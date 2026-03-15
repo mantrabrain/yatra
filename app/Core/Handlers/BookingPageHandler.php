@@ -41,6 +41,24 @@ class BookingPageHandler extends BasePageHandler
         $booking = null;
         if (function_exists('yatra_get_booking_session')) {
             $session = yatra_get_booking_session();
+            
+            // If no session exists, initialize with defaults for display purposes
+            // This allows logged-out users to see pricing without "Contact for pricing" error
+            if (empty($session) || empty($session['trip_id'])) {
+                // Try to get trip_id from URL parameters (for direct booking page access)
+                $trip_id = isset($_GET['trip_id']) ? (int) $_GET['trip_id'] : null;
+                
+                if ($trip_id) {
+                    // Initialize minimal session for pricing display
+                    $session = [
+                        'trip_id' => $trip_id,
+                        'travelers' => 1, // Default to 1 traveler
+                        'travel_date' => '',
+                        'timestamp' => time(),
+                    ];
+                }
+            }
+            
             if (!empty($session) && !empty($session['trip_id'])) {
                 // Load trip for display context
                 try {
@@ -137,6 +155,72 @@ class BookingPageHandler extends BasePageHandler
                 // Debug log to verify gateways are being resolved
                 if (!empty($enabled_gateways)) {
                     }
+                // Calculate pricing using CalculationService (single source of truth)
+                $calculationService = new \Yatra\Services\CalculationService();
+                $pricing_calculation = [];
+                
+                // Get coupon code from session if available
+                $coupon_code = isset($session['coupon']['code']) ? $session['coupon']['code'] : '';
+                
+                try {
+                    $pricing_calculation = $calculationService->calculateFromSession($session, $coupon_code);
+                } catch (\Throwable $e) {
+                    // If calculation fails, set empty pricing
+                    $pricing_calculation = [
+                        'base_amount' => 0,
+                        'gross_total' => 0,
+                        'final_total' => 0,
+                        'amount_due' => 0,
+                        'tax_calculation' => [
+                            'tax_breakdown' => [],
+                            'total_tax_amount' => 0,
+                            'tax_inclusive' => false,
+                        ],
+                    ];
+                }
+                
+                // Get itinerary costs (premium feature)
+                $trip_id = (int) $session['trip_id'];
+                $total_travelers = (int) ($session['travelers'] ?? 1);
+                $traveler_counts = $session['traveler_counts'] ?? [];
+                $travel_date = $session['travel_date'] ?? '';
+                
+                $itinerary_costs = apply_filters('yatra_booking_itinerary_costs', [], $trip_id, $total_travelers, $traveler_counts, $travel_date);
+                $itinerary_costs_total = 0.0;
+                
+                foreach ($itinerary_costs as $cost) {
+                    $basePrice = (float) ($cost['price'] ?? 0);
+                    $pricePer = $cost['price_per'] ?? 'person';
+                    
+                    switch ($pricePer) {
+                        case 'person':
+                            $calculatedPrice = $basePrice * $total_travelers;
+                            break;
+                        case 'group':
+                            $calculatedPrice = $basePrice;
+                            break;
+                        case 'day':
+                            $duration_days = (int) ($trip->duration_days ?? 1);
+                            $calculatedPrice = $basePrice * $duration_days;
+                            break;
+                        default:
+                            $calculatedPrice = $basePrice;
+                            break;
+                    }
+                    
+                    $itinerary_costs_total += $calculatedPrice;
+                }
+                
+                // Add itinerary costs to pricing calculation
+                $pricing_calculation['itinerary_costs'] = $itinerary_costs;
+                $pricing_calculation['itinerary_costs_total'] = $itinerary_costs_total;
+                
+                // Note: CalculationService already includes itinerary costs in final_total and amount_due
+                // No need to add them again here
+                
+                // Create Checkout model instance
+                $checkout = new \Yatra\Models\Checkout($trip, $session, $pricing_calculation);
+                
                 // Build booking view model expected by templates
                 $booking = (object) [
                     'trip' => $trip,
@@ -151,11 +235,16 @@ class BookingPageHandler extends BasePageHandler
                     'deposit_percentage' => $session['deposit_percentage'] ?? null,
                     'enabled_gateways' => $enabled_gateways,
                     'group_discount' => $session['group_discount'] ?? null,
+                    // Pre-calculated pricing data
+                    'pricing_calculation' => $pricing_calculation,
+                    'tax_calculation' => $pricing_calculation['tax_calculation'] ?? [],
                     // amounts for templates
                     'total_amount' => $session['total_amount'] ?? null,
                     'amount_paid' => $session['amount_paid'] ?? null,
                     'remaining_amount' => $session['remaining_amount'] ?? null,
                     'booking_reference' => $session['booking_reference'] ?? null,
+                    // Checkout model for clean template access
+                    'checkout' => $checkout,
                 ];
             }
         }

@@ -272,6 +272,93 @@ class BookingValidator
             $sanitized['payment_status'] = in_array($data['payment_status'], $validStatuses) ? $data['payment_status'] : 'pending';
         }
 
+        // Tax fields
+        if (isset($data['subtotal'])) {
+            $sanitized['subtotal'] = (float)$data['subtotal'];
+        }
+        if (isset($data['tax_amount'])) {
+            $sanitized['tax_amount'] = (float)$data['tax_amount'];
+        }
+        if (isset($data['tax_rate'])) {
+            $sanitized['tax_rate'] = (float)$data['tax_rate'];
+        }
+        if (isset($data['tax_inclusive'])) {
+            $sanitized['tax_inclusive'] = (bool)$data['tax_inclusive'];
+        }
+        if (isset($data['tax_details'])) {
+            $sanitized['tax_details'] = $data['tax_details']; // Already JSON encoded
+        }
+
+        // Other booking fields
+        if (isset($data['currency'])) {
+            $sanitized['currency'] = sanitize_text_field($data['currency']);
+        }
+        if (isset($data['amount_due'])) {
+            $sanitized['amount_due'] = (float)$data['amount_due'];
+        }
+        if (isset($data['amount_paid'])) {
+            $sanitized['amount_paid'] = (float)$data['amount_paid'];
+        }
+        if (isset($data['discount_amount'])) {
+            $sanitized['discount_amount'] = (float)$data['discount_amount'];
+        }
+        if (isset($data['discount_code'])) {
+            $sanitized['discount_code'] = sanitize_text_field($data['discount_code']);
+        }
+        if (isset($data['reference'])) {
+            $sanitized['reference'] = sanitize_text_field($data['reference']);
+        }
+        if (isset($data['contact_first_name'])) {
+            $sanitized['contact_first_name'] = sanitize_text_field($data['contact_first_name']);
+        }
+        if (isset($data['contact_last_name'])) {
+            $sanitized['contact_last_name'] = sanitize_text_field($data['contact_last_name']);
+        }
+        if (isset($data['contact_email'])) {
+            $sanitized['contact_email'] = sanitize_email($data['contact_email']);
+        }
+        if (isset($data['contact_phone'])) {
+            $sanitized['contact_phone'] = sanitize_text_field($data['contact_phone']);
+        }
+        if (isset($data['contact_country'])) {
+            $sanitized['contact_country'] = sanitize_text_field($data['contact_country']);
+        }
+        if (isset($data['contact_data'])) {
+            $sanitized['contact_data'] = $data['contact_data']; // Already JSON encoded
+        }
+        if (isset($data['emergency_contact'])) {
+            $sanitized['emergency_contact'] = $data['emergency_contact']; // Already JSON encoded
+        }
+        if (isset($data['availability_id'])) {
+            $sanitized['availability_id'] = !empty($data['availability_id']) ? (int)$data['availability_id'] : null;
+        }
+        if (isset($data['user_id'])) {
+            $sanitized['user_id'] = !empty($data['user_id']) ? (int)$data['user_id'] : null;
+        }
+        if (isset($data['special_requests'])) {
+            $sanitized['special_requests'] = sanitize_textarea_field($data['special_requests']);
+        }
+        if (isset($data['newsletter_optin'])) {
+            $sanitized['newsletter_optin'] = (int)(bool)$data['newsletter_optin'];
+        }
+        if (isset($data['ip_address'])) {
+            $sanitized['ip_address'] = sanitize_text_field($data['ip_address']);
+        }
+        if (isset($data['created_at'])) {
+            $sanitized['created_at'] = sanitize_text_field($data['created_at']);
+        }
+        if (isset($data['updated_at'])) {
+            $sanitized['updated_at'] = sanitize_text_field($data['updated_at']);
+        }
+        
+        // Itinerary costs fields
+        if (isset($data['itinerary_costs'])) {
+            $sanitized['itinerary_costs'] = $data['itinerary_costs']; // Already JSON encoded
+        }
+        if (isset($data['itinerary_costs_total'])) {
+            $sanitized['itinerary_costs_total'] = (float)$data['itinerary_costs_total'];
+        }
+
         return $sanitized;
     }
 

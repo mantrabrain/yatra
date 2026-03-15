@@ -267,7 +267,7 @@ class PaymentGatewayController extends BaseController
             return new WP_Error('trip_not_found', __('Trip associated with this booking is unavailable.', 'yatra'), ['status' => 400]);
         }
 
-        $currency = $booking->currency ?? ($trip->currency ?? SettingsService::getCurrency());
+        $currency = $booking->currency ?? SettingsService::getCurrency();
         $travelersCount = (int) ($booking->travelers_count ?? $booking->travelers ?? 1);
         $travelersCount = max(1, $travelersCount);
         $pricePerPerson = $travelersCount > 0 ? ((float) $booking->total_amount / $travelersCount) : (float) $trip->sale_price;
@@ -770,6 +770,41 @@ class PaymentGatewayController extends BaseController
             );
         }
 
+        // Get tax breakdown for invoice
+        $tax_breakdown = [];
+        $tax_amount = 0;
+        $subtotal = (float) ($payment->booking_total_amount ?? $payment->amount ?? 0);
+        
+        if (!empty($payment->tax_details)) {
+            $taxes = json_decode($payment->tax_details, true) ?: [];
+            foreach ($taxes as $tax) {
+                $tax_amount += (float) ($tax['amount'] ?? 0);
+                $tax_breakdown[] = [
+                    'name' => $tax['name'] ?? 'Tax',
+                    'rate' => $tax['rate'] ?? 0,
+                    'amount' => $tax['amount'] ?? 0
+                ];
+            }
+            // Adjust subtotal for tax-exclusive pricing
+            if (!empty($payment->tax_inclusive) && $payment->tax_inclusive) {
+                $subtotal = (float) ($payment->subtotal ?? $subtotal);
+            }
+        } elseif (!empty($payment->tax_amount) && $payment->tax_amount > 0) {
+            // Single tax fallback
+            $tax_amount = (float) $payment->tax_amount;
+            $tax_breakdown[] = [
+                'name' => __('Tax', 'yatra'),
+                'rate' => (float) ($payment->tax_rate ?? 0),
+                'amount' => $tax_amount
+            ];
+            // Adjust subtotal for tax-exclusive pricing
+            if (!empty($payment->tax_inclusive) && $payment->tax_inclusive) {
+                $subtotal = (float) ($payment->subtotal ?? $subtotal);
+            } else {
+                $subtotal = (float) ($payment->subtotal ?? ($subtotal - $tax_amount));
+            }
+        }
+
         $templateData = [
             'company_name' => $companyName,
             'company_address' => $companyAddress,
@@ -790,6 +825,9 @@ class PaymentGatewayController extends BaseController
             'booking_total' => number_format((float) ($payment->booking_total_amount ?? $payment->amount ?? 0), 2),
             'amount_paid' => number_format((float) ($payment->booking_amount_paid ?? $payment->amount ?? 0), 2),
             'amount_due' => number_format((float) ($payment->booking_amount_due ?? 0), 2),
+            'tax_breakdown' => $tax_breakdown,
+            'tax_amount' => number_format($tax_amount, 2),
+            'subtotal' => number_format($subtotal, 2),
         ];
 
         $pdfBinary = $pdfService->renderTemplateToPdfSafely('pdf/invoice.php', $templateData, [

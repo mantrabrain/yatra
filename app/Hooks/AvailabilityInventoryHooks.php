@@ -24,12 +24,12 @@ class AvailabilityInventoryHooks
         add_action('yatra_departure_saved', [self::class, 'onDepartureSave'], 10, 1);
     }
 
-    public static function onBookingCreated(int $bookingId, ?array $booking = null): void
+    public static function onBookingCreated(int $bookingId, $booking = null): void
     {
         self::syncForBooking($bookingId, $booking);
     }
 
-    public static function onBookingDeleted(int $bookingId, ?array $booking = null): void
+    public static function onBookingDeleted(int $bookingId, $booking = null): void
     {
         self::syncForBooking($bookingId, $booking);
     }
@@ -39,7 +39,7 @@ class AvailabilityInventoryHooks
         self::syncForBooking($bookingId, null);
     }
 
-    private static function syncForBooking(int $bookingId, ?array $booking = null): void
+    private static function syncForBooking(int $bookingId, $booking = null): void
     {
         try {
             if (!is_object($booking)) {

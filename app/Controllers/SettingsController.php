@@ -120,11 +120,15 @@ class SettingsController extends BaseController
         
         // Tax Settings
         'enable_tax' => false,
+        'tax_name' => __('Tax', 'yatra'),
         'tax_rate' => 0,
         'tax_inclusive' => false,
         'vat_number' => '',
         'tax_by_country' => false,
         'tax_rates' => [],
+        'multiple_taxes_enabled' => false,
+        'multiple_taxes' => [],
+        'multiple_taxes_by_country' => [],
         
         // Currency Settings
         'default_currency' => 'USD',
@@ -375,6 +379,16 @@ class SettingsController extends BaseController
             if (!empty($flexible_payment_settings) && $is_flexible_payments_enabled) {
                 do_action('yatra_save_flexible_payment_settings', $flexible_payment_settings);
                 $updated = array_merge($updated, array_keys($flexible_payment_settings));
+            }
+
+            // Sync currency keys: keep 'currency' and 'default_currency' in sync
+            // Admin UI has both Payment Settings (currency) and Currency Settings (default_currency)
+            if (in_array('default_currency', $updated, true) && !in_array('currency', $updated, true)) {
+                $sync_currency = get_option('yatra_default_currency', 'USD');
+                update_option('yatra_currency', $sync_currency);
+            } elseif (in_array('currency', $updated, true) && !in_array('default_currency', $updated, true)) {
+                $sync_currency = get_option('yatra_currency', 'USD');
+                update_option('yatra_default_currency', $sync_currency);
             }
 
             if (!empty($errors)) {

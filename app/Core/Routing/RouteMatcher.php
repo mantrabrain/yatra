@@ -142,13 +142,35 @@ class RouteMatcher
      */
     public static function matchBookingConfirmationPage(string $path): ?array
     {
+        // Try /book/confirmation/{token} pattern first
         $token = UrlParser::extractTokenFromPath($path, '/^book\/confirmation\/([a-zA-Z0-9_-]+)$/');
-
+        
         if ($token) {
             return [
                 'type' => 'booking_confirmation',
                 'confirmation_id' => $token
             ];
+        }
+        
+        // Try /booking-confirmation/{token} pattern
+        $token = UrlParser::extractTokenFromPath($path, '/^booking-confirmation\/([a-zA-Z0-9_-]+)$/');
+        
+        if ($token) {
+            return [
+                'type' => 'booking_confirmation',
+                'confirmation_id' => $token
+            ];
+        }
+        
+        // Try /booking-confirmation?booking_id={token} pattern (query parameter)
+        if (strpos($path, 'booking-confirmation') !== false) {
+            $booking_id = $_GET['booking_id'] ?? null;
+            if ($booking_id) {
+                return [
+                    'type' => 'booking_confirmation',
+                    'confirmation_id' => $booking_id
+                ];
+            }
         }
 
         return null;

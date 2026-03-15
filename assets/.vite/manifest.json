@@ -11,35 +11,35 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-BRlbVGhV.js": {
-    "file": "dist/js/index-BRlbVGhV.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-DaojQtdO.js",
-      "_default-i18n-DxhLUi3L.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
-  "_index-DsyE5-hy.js": {
-    "file": "dist/js/index-DsyE5-hy.js",
+  "_index-Ca8T0YWF.js": {
+    "file": "dist/js/index-Ca8T0YWF.js",
     "name": "index",
     "imports": [
       "_clsx-DgYk2OaC.js",
-      "_react-vendor-DaojQtdO.js",
+      "_react-vendor-D3y7IuOx.js",
       "_default-i18n-DxhLUi3L.js"
     ],
     "dynamicImports": [
       "node_modules/@wordpress/vips/build-module/vips-worker.mjs"
     ]
   },
+  "_index-CuK4RzLZ.js": {
+    "file": "dist/js/index-CuK4RzLZ.js",
+    "name": "index",
+    "imports": [
+      "_react-vendor-D3y7IuOx.js",
+      "_default-i18n-DxhLUi3L.js"
+    ],
+    "css": [
+      "admin/dist/css/index.css"
+    ]
+  },
   "_react-vendor-!~{001}~.js": {
     "file": "admin/dist/css/react-vendor.css",
     "src": "_react-vendor-!~{001}~.js"
   },
-  "_react-vendor-DaojQtdO.js": {
-    "file": "admin/dist/js/react-vendor-DaojQtdO.js",
+  "_react-vendor-D3y7IuOx.js": {
+    "file": "admin/dist/js/react-vendor-D3y7IuOx.js",
     "name": "react-vendor",
     "css": [
       "admin/dist/css/react-vendor.css"
@@ -57,8 +57,8 @@
     "src": "resources/js/account-page.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-DaojQtdO.js",
-      "_index-BRlbVGhV.js",
+      "_react-vendor-D3y7IuOx.js",
+      "_index-CuK4RzLZ.js",
       "_default-i18n-DxhLUi3L.js"
     ]
   },
@@ -68,8 +68,8 @@
     "src": "resources/js/blocks/activity/index.tsx",
     "isEntry": true,
     "imports": [
-      "_index-DsyE5-hy.js",
-      "_react-vendor-DaojQtdO.js",
+      "_index-Ca8T0YWF.js",
+      "_react-vendor-D3y7IuOx.js",
       "_default-i18n-DxhLUi3L.js",
       "_clsx-DgYk2OaC.js"
     ]
@@ -80,8 +80,8 @@
     "src": "resources/js/blocks/destination/index.tsx",
     "isEntry": true,
     "imports": [
-      "_index-DsyE5-hy.js",
-      "_react-vendor-DaojQtdO.js",
+      "_index-Ca8T0YWF.js",
+      "_react-vendor-D3y7IuOx.js",
       "_default-i18n-DxhLUi3L.js",
       "_clsx-DgYk2OaC.js"
     ]
@@ -92,8 +92,8 @@
     "src": "resources/js/blocks/tour/index.tsx",
     "isEntry": true,
     "imports": [
-      "_index-DsyE5-hy.js",
-      "_react-vendor-DaojQtdO.js",
+      "_index-Ca8T0YWF.js",
+      "_react-vendor-D3y7IuOx.js",
       "_default-i18n-DxhLUi3L.js",
       "_clsx-DgYk2OaC.js"
     ]
@@ -104,8 +104,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-DaojQtdO.js",
-      "_index-BRlbVGhV.js",
+      "_react-vendor-D3y7IuOx.js",
+      "_index-CuK4RzLZ.js",
       "_clsx-DgYk2OaC.js",
       "_default-i18n-DxhLUi3L.js"
     ]

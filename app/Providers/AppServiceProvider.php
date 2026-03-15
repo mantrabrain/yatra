@@ -41,6 +41,9 @@ class AppServiceProvider
         // Initialize template loader for all frontend routing
         \Yatra\Core\TemplateLoader::init();
 
+        // Initialize ItineraryCostService for free itinerary costs feature
+        \Yatra\Services\ItineraryCostService::init();
+
         // Ensure frontend bundles are marked as ES modules
         add_filter('script_loader_tag', [$this, 'addFrontendModuleType'], 10, 2);
 

@@ -774,11 +774,11 @@ class BookingRepository extends BaseRepository
 
         $intFields = ['trip_id', 'customer_id', 'user_id', 'travelers_count', 'cancelled_by', 'availability_id'];
 
-        $floatFields = ['total_amount', 'amount_paid', 'amount_due', 'discount_amount'];
+        $floatFields = ['total_amount', 'amount_paid', 'amount_due', 'discount_amount', 'subtotal', 'tax_amount', 'tax_rate', 'itinerary_costs_total'];
 
-        $boolFields = ['newsletter_optin', 'terms_accepted', 'reminder_sent'];
+        $boolFields = ['newsletter_optin', 'terms_accepted', 'reminder_sent', 'tax_inclusive'];
 
-        $jsonFields = ['contact_data', 'emergency_contact', 'travelers_data'];
+        $jsonFields = ['contact_data', 'emergency_contact', 'tax_details', 'itinerary_costs'];
 
         $dateFields = ['travel_date', 'start_date', 'end_date', 'payment_date', 'cancelled_at', 'confirmed_at', 'completed_at', 'reminder_sent_at'];
 

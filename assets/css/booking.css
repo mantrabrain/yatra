@@ -932,7 +932,7 @@
 .yatra-form-group input[type="date"],
 .yatra-form-group select,
 .yatra-form-group textarea {
-    width: calc(100% - 32px);
+    width: 100%;
     padding: 12px 16px;
     border: 1px solid #d1d5db;
     border-radius: 8px;

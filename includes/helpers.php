@@ -1106,7 +1106,7 @@ function yatra_enqueue_single_trip_scripts(): void
             [
                 'tripId' => (int) $trip->id,
                 'basePrice' => (float) ($trip->base_price ?? 0),
-                'currencySymbol' => yatra_get_currency_symbol($trip->currency ?? 'USD'),
+                'currencySymbol' => yatra_get_currency_symbol(\Yatra\Services\SettingsService::getCurrency()),
                 'apiUrls' => [
                     'groupDiscounts' => rest_url('yatra/v1/discounts/group-discounts')
                 ]
@@ -1116,7 +1116,7 @@ function yatra_enqueue_single_trip_scripts(): void
 }
 
 /**
- * Calculate base price for single trip display
+ * Calculate base price for single trip display using CalculationService
  * 
  * @param object $trip Trip object
  * @return array Pricing data including base_price, has_availability, has_traveler_pricing, pricing_type
@@ -1129,7 +1129,12 @@ function yatra_single_trip_calculate_base_price($trip) {
     $pricing_type = $trip->pricing_type ?? 'regular';
     $has_traveler_pricing = ($pricing_type === 'traveler_based' && !empty($trip->price_types));
     
-    // Calculate base price (for display)
+    // Use CalculationService for consistent pricing
+    $calculationService = new \Yatra\Services\CalculationService();
+    
+    // Determine base price using CalculationService logic
+    $trip_price = 0;
+    
     if ($has_availability) {
         // Get the lowest price from availability dates
         $min_price = PHP_FLOAT_MAX;
@@ -1161,7 +1166,7 @@ function yatra_single_trip_calculate_base_price($trip) {
             }
         }
 
-        $base_price = ($min_price < PHP_FLOAT_MAX) ? $min_price : ($trip->sale_price ?: $trip->original_price);
+        $trip_price = ($min_price < PHP_FLOAT_MAX) ? $min_price : ($trip->sale_price ?: $trip->original_price);
     } elseif ($has_traveler_pricing) {
         // Get default or first traveler category price
         $default_price_type = null;
@@ -1177,42 +1182,44 @@ function yatra_single_trip_calculate_base_price($trip) {
 
         // Get the price from the price type - check multiple possible fields
         if ($default_price_type) {
-            $base_price = 0;
+            $trip_price = 0;
             // Try effective_price first, then discounted_price, then original_price
             if (!empty($default_price_type->effective_price) && $default_price_type->effective_price > 0) {
-                $base_price = (float)$default_price_type->effective_price;
+                $trip_price = (float)$default_price_type->effective_price;
             } elseif (!empty($default_price_type->discounted_price) && $default_price_type->discounted_price > 0) {
-                $base_price = (float)$default_price_type->discounted_price;
+                $trip_price = (float)$default_price_type->discounted_price;
             } elseif (!empty($default_price_type->original_price) && $default_price_type->original_price > 0) {
-                $base_price = (float)$default_price_type->original_price;
+                $trip_price = (float)$default_price_type->original_price;
             } elseif (!empty($default_price_type->sale_price) && $default_price_type->sale_price > 0) {
-                $base_price = (float)$default_price_type->sale_price;
+                $trip_price = (float)$default_price_type->sale_price;
             }
 
             // If still no price, try to get the minimum from all price types
-            if ($base_price <= 0) {
+            if ($trip_price <= 0) {
                 foreach ($trip->price_types as $pt) {
                     $pt_price = (float)($pt->effective_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
-                    if ($pt_price > 0 && ($base_price <= 0 || $pt_price < $base_price)) {
-                        $base_price = $pt_price;
+                    if ($pt_price > 0 && ($trip_price <= 0 || $pt_price < $trip_price)) {
+                        $trip_price = $pt_price;
                     }
                 }
             }
         } else {
-            $base_price = $trip->sale_price ?: $trip->original_price;
+            $trip_price = $trip->sale_price ?: $trip->original_price;
         }
     } else {
         // Regular pricing
-        $base_price = $trip->sale_price > 0 ? $trip->sale_price : $trip->original_price;
+        $trip_price = $trip->sale_price > 0 ? $trip->sale_price : $trip->original_price;
     }
 
-    // Apply dynamic pricing if module is enabled
-    if (!empty($base_price) && apply_filters('yatra_dynamic_pricing_enabled', false)) {
-        $base_price = apply_filters('yatra_trip_display_price', $base_price, $trip->id ?? 0, [
-            'departure_date' => null, // Generic display for single trip page
-            'spots_remaining' => null,
-        ]);
-    }
+    // Apply CalculationService filter for dynamic pricing (pro plugins)
+    $base_price = apply_filters('yatra_calculate_base_amount', $trip_price, [
+        'trip_price' => $trip_price,
+        'travelers_count' => 1,
+        'traveler_counts' => ['default' => 1],
+        'pricing_type' => $pricing_type,
+        'price_types' => $trip->price_types ?? [],
+        'trip_id' => $trip->id ?? 0
+    ]);
 
     return [
         'base_price' => $base_price,

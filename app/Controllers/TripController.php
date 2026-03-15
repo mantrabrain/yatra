@@ -18,6 +18,7 @@ use Yatra\Repositories\TravelerCategoryRepository;
 use Yatra\Models\Trip;
 use Yatra\Validators\TripValidator;
 use Yatra\Exceptions\TripNotFoundException;
+use Yatra\Services\SettingsService;
 use Yatra\Exceptions\ValidationException;
 use Yatra\Database\Tables\TripAvailabilityDatesTable;
 
@@ -1396,7 +1397,7 @@ class TripController extends BaseController
                 'original_price' => isset($trip->original_price) ? (float) $trip->original_price : 0,
                 'discounted_price' => isset($trip->discounted_price) ? (float) $trip->discounted_price : 0,
                 'sale_price' => isset($trip->sale_price) ? (float) $trip->sale_price : 0,
-                'currency' => $trip->currency ?? 'USD',
+                'currency' => SettingsService::getCurrency(),
                 'duration_days' => isset($trip->duration_days) ? (int) $trip->duration_days : 1,
                 'max_travelers' => isset($trip->max_travelers) ? (int) $trip->max_travelers : 20,
                 'min_travelers' => isset($trip->min_travelers) ? (int) $trip->min_travelers : 1,

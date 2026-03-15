@@ -67,9 +67,10 @@ class Bootstrap
             }
 
             // Initialize Dynamic Pricing Service
-            if (class_exists('\Yatra\Services\DynamicPricingService')) {
-                \Yatra\Services\DynamicPricingService::init();
-            }
+            // DISABLED: Automatic dynamic pricing was adding 15% markup for trips with ≤5 spots
+            // if (class_exists('\Yatra\Services\DynamicPricingService')) {
+            //     \Yatra\Services\DynamicPricingService::init();
+            // }
 
             // Initialize SEO Manager
             if (class_exists('\Yatra\Managers\SEOManager')) {

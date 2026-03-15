@@ -122,7 +122,7 @@ if (!empty($trip->itinerary_days)) {
 window.yatraTripData = {
     tripId: <?php echo (int)$trip->id; ?>,
     basePrice: <?php echo (float)$base_price; ?>,
-    currencySymbol: '<?php echo yatra_get_currency_symbol($trip->currency ?? 'USD'); ?>',
+    currencySymbol: '<?php echo yatra_get_currency_symbol(\Yatra\Services\SettingsService::getCurrency()); ?>',
     availabilityDates: <?php echo json_encode(array_map(function ($avail) {
         return $avail->departure_date ?? $avail->date;
     }, $trip->availability_dates ?? [])); ?>,

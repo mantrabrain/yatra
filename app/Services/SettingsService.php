@@ -115,6 +115,9 @@ class SettingsService
         'tax_rate' => 0,
         'tax_inclusive' => false,
         'tax_label' => 'Tax',
+        'multiple_taxes_enabled' => false,
+        'multiple_taxes' => [],
+        'multiple_taxes_by_country' => [],
         
         // Currency
         'enabled_currencies' => ['USD'],
@@ -460,10 +463,25 @@ class SettingsService
 
     /**
      * Get currency settings
+     * Checks both 'currency' and 'default_currency' keys for compatibility
+     * (Admin UI Currency Settings saves as 'default_currency')
      */
     public static function getCurrency(): string
     {
-        return self::getString('currency', 'USD');
+        // Priority: 'currency' key first (Payment Settings), then 'default_currency' (Currency Settings)
+        $currency = self::getString('currency', '');
+        if (!empty($currency) && $currency !== 'USD') {
+            return $currency;
+        }
+        
+        // Check default_currency (from Currency Settings section)
+        $defaultCurrency = self::getString('default_currency', '');
+        if (!empty($defaultCurrency)) {
+            return $defaultCurrency;
+        }
+        
+        // Return whatever currency is set, even if USD
+        return !empty($currency) ? $currency : 'USD';
     }
 
     /**
@@ -472,37 +490,6 @@ class SettingsService
     public static function getCurrencyPosition(): string
     {
         return self::getString('currency_position', 'before');
-    }
-
-    /**
-     * Get currency symbol
-     */
-    public static function getCurrencySymbol(): string
-    {
-        $currency = self::getCurrency();
-        $symbols = [
-            'USD' => '$',
-            'EUR' => '€',
-            'GBP' => '£',
-            'JPY' => '¥',
-            'AUD' => 'A$',
-            'CAD' => 'C$',
-            'CHF' => 'CHF',
-            'CNY' => '¥',
-            'INR' => '₹',
-            'BDT' => '৳',
-            'NPR' => 'रु',
-        ];
-        
-        return $symbols[$currency] ?? $currency;
-    }
-
-    /**
-     * Check if payment test mode is enabled
-     */
-    public static function isPaymentTestMode(): bool
-    {
-        return self::isEnabled('payment_test_mode');
     }
 
     /**
@@ -519,17 +506,15 @@ class SettingsService
      */
     public static function getBookingBase(): string
     {
-        $base = self::getString('booking_base', 'book');
-        return preg_replace('/[^a-z0-9_-]/i', '', $base) ?: 'book';
+        $base = self::getString('booking_base', 'booking');
+        return preg_replace('/[^a-z0-9_-]/i', '', $base) ?: 'booking';
     }
 
-    
     /**
      * Check if using custom booking page
      */
     public static function useCustomBookingPage(): bool
     {
-       // var_dump(self::isEnabled('use_booking_page'));exit;
         return self::isEnabled('use_booking_page') && self::getInt('booking_page_id') > 0;
     }
 

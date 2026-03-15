@@ -88,5 +88,35 @@ class DiscountRepository extends BaseRepository
         
         return $wpdb->get_results($query) ?: [];
     }
+    
+    /**
+     * Count how many bookings have used a specific discount code
+     * 
+     * @param string $code Discount code
+     * @return int Number of bookings that used this code
+     */
+    public function countUsage(string $code): int
+    {
+        global $wpdb;
+        
+        // Try new bookings table first, then fallback to old table
+        $bookingsTable = $wpdb->prefix . 'yatra_new_bookings';
+        $tableExists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $bookingsTable));
+        
+        if (!$tableExists) {
+            $bookingsTable = $wpdb->prefix . 'yatra_bookings';
+        }
+        
+        $count = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM `{$bookingsTable}` 
+                WHERE discount_code = %s 
+                AND status NOT IN ('cancelled', 'failed')",
+                $code
+            )
+        );
+        
+        return (int) ($count ?? 0);
+    }
 }
 

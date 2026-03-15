@@ -143,6 +143,18 @@ $amountDue = (string) ($amount_due ?? '0.00');
     </table>
 
     <table class="totals">
+        <?php if (!empty($tax_breakdown)): ?>
+        <tr>
+            <td class="label"><?php esc_html_e('Subtotal', 'yatra'); ?></td>
+            <td class="value"><?php echo $currencySymbol . htmlspecialchars($subtotal, ENT_QUOTES, 'UTF-8'); ?></td>
+        </tr>
+        <?php foreach ($tax_breakdown as $tax): ?>
+        <tr>
+            <td class="label"><?php echo htmlspecialchars($tax['name'], ENT_QUOTES, 'UTF-8'); ?> (<?php echo htmlspecialchars($tax['rate'], ENT_QUOTES, 'UTF-8'); ?>%)</td>
+            <td class="value"><?php echo $currencySymbol . htmlspecialchars($tax['amount'], ENT_QUOTES, 'UTF-8'); ?></td>
+        </tr>
+        <?php endforeach; ?>
+        <?php endif; ?>
         <tr>
             <td class="label"><?php esc_html_e('Booking Total', 'yatra'); ?></td>
             <td class="value"><?php echo $currencySymbol . htmlspecialchars($bookingTotal, ENT_QUOTES, 'UTF-8'); ?></td>

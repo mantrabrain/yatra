@@ -75,11 +75,11 @@ class NotificationService
         $message = sprintf(
             __("A new booking has been received.\n\nBooking ID: %d\nTrip: %s\nCustomer: %s %s\nEmail: %s\nTotal Amount: %s\n\nView booking details in admin panel.", 'yatra'),
             $bookingId,
-            $bookingData['trip_name'] ?? '',
-            $bookingData['first_name'] ?? '',
-            $bookingData['last_name'] ?? '',
-            $bookingData['email'] ?? '',
-            yatra_format_price($bookingData['total_amount'] ?? 0)
+            $bookingData->trip_name ?? '',
+            $bookingData->first_name ?? '',
+            $bookingData->last_name ?? '',
+            $bookingData->email ?? '',
+            yatra_format_price((float) ($bookingData->total_amount ?? 0))
         );
         
         EmailService::send($admin_email, $subject, $message);
@@ -90,7 +90,7 @@ class NotificationService
      */
     private static function notifyCustomerBookingCreated(int $bookingId, $bookingData): void
     {
-        $customer_email = $bookingData['email'] ?? '';
+        $customer_email = $bookingData->email ?? '';
         if (empty($customer_email)) {
             return;
         }
@@ -99,10 +99,10 @@ class NotificationService
         
         $message = sprintf(
             __("Dear %s,\n\nThank you for your booking!\n\nBooking ID: %d\nTrip: %s\nTotal Amount: %s\n\nWe will send you further details shortly.\n\nBest regards,\n%s", 'yatra'),
-            $bookingData['first_name'] ?? 'Customer',
+            $bookingData->first_name ?? 'Customer',
             $bookingId,
-            $bookingData['trip_name'] ?? '',
-            yatra_format_price($bookingData['total_amount'] ?? 0),
+            $bookingData->trip_name ?? '',
+            yatra_format_price((float) ($bookingData->total_amount ?? 0)),
             get_bloginfo('name')
         );
         
@@ -166,9 +166,9 @@ class NotificationService
         $message = sprintf(
             __("A booking has been cancelled.\n\nBooking ID: %d\nTrip: %s\nCustomer: %s %s", 'yatra'),
             $bookingId,
-            $bookingData['trip_name'] ?? '',
-            $bookingData['first_name'] ?? '',
-            $bookingData['last_name'] ?? ''
+            $bookingData->trip_name ?? '',
+            $bookingData->first_name ?? '',
+            $bookingData->last_name ?? ''
         );
         
         EmailService::send($admin_email, $subject, $message);
@@ -179,7 +179,7 @@ class NotificationService
      */
     private static function notifyCustomerCancellation(int $bookingId, $bookingData): void
     {
-        $customer_email = $bookingData['email'] ?? '';
+        $customer_email = $bookingData->email ?? '';
         if (empty($customer_email)) {
             return;
         }
@@ -188,9 +188,9 @@ class NotificationService
         
         $message = sprintf(
             __("Dear %s,\n\nYour booking has been cancelled.\n\nBooking ID: %d\nTrip: %s\n\nIf you have any questions, please contact us.\n\nBest regards,\n%s", 'yatra'),
-            $bookingData['first_name'] ?? 'Customer',
+            $bookingData->first_name ?? 'Customer',
             $bookingId,
-            $bookingData['trip_name'] ?? '',
+            $bookingData->trip_name ?? '',
             get_bloginfo('name')
         );
         

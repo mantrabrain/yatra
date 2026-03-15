@@ -123,7 +123,7 @@ if (!defined('ABSPATH')) {
                 <div class="yatra-hero-discount-tag" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
                     <?php echo esc_html__('SAVE', 'yatra'); ?> <?php echo esc_html($trip->discount_percentage); ?>%
                     <meta itemprop="discount" content="<?php echo esc_attr($trip->discount_percentage); ?>">
-                    <meta itemprop="discountCurrency" content="<?php echo esc_attr($trip->currency ?? 'USD'); ?>">
+                    <meta itemprop="discountCurrency" content="<?php echo esc_attr(\Yatra\Services\SettingsService::getCurrency()); ?>">
                 </div>
             <?php endif; ?>
             

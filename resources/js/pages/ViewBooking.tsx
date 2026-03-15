@@ -166,6 +166,18 @@ const ViewBooking: React.FC = () => {
           discount_amount: data.discount_amount || 0,
           discount_code: data.discount_code || null,
           currency: data.currency || "USD",
+          // Tax fields
+          subtotal: data.subtotal,
+          tax_amount: data.tax_amount,
+          tax_rate: data.tax_rate,
+          tax_inclusive: data.tax_inclusive,
+          tax_details: data.tax_details,
+          tax_breakdown: data.tax_breakdown,
+          taxable_amount: data.taxable_amount,
+          // Itinerary costs
+          itinerary_costs: data.itinerary_costs,
+          itinerary_costs_total: data.itinerary_costs_total,
+          // End tax fields
           payment_status: data.payment_status,
           booking_status: data.status,
           payment_method: data.payment_gateway,
@@ -754,13 +766,197 @@ const ViewBooking: React.FC = () => {
                         : __("Travelers", "yatra")}
                     </div>
                   </div>
-                  <div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
-                      <DollarSign className="w-3 h-3" />
-                      {__("Total Amount", "yatra")}
+                </div>
+
+                {/* Payment Summary with Gross/Net and Tax Breakdown */}
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                    {__("Payment Summary", "yatra")}
+                  </h4>
+                  <div className="space-y-2">
+                                        
+                    {/* Gross Total */}
+                    <div className="flex justify-between text-sm">
+                      <span className="font-bold text-gray-900 dark:text-white">
+                        {__("Gross Total", "yatra")}
+                      </span>
+                      <span className="text-gray-900 dark:text-white">
+                        {formatPrice(
+                          (booking as any).subtotal || booking.total_amount,
+                          booking.currency,
+                        )}
+                      </span>
                     </div>
-                    <div className="text-lg font-semibold text-gray-900 dark:text-white">
-                      {formatPrice(booking.total_amount || 0, booking.currency)}
+
+                    {/* Itinerary Costs */}
+                    {(() => {
+                      const itineraryCosts = (booking as any).itinerary_costs;
+                      const itineraryCostsTotal = parseFloat((booking as any).itinerary_costs_total || 0);
+                      
+                      if (itineraryCostsTotal > 0) {
+                        let costs = [];
+                        
+                        // Try to parse itinerary_costs if it's a string
+                        if (typeof itineraryCosts === 'string') {
+                          try {
+                            costs = JSON.parse(itineraryCosts);
+                          } catch (e) {
+                            console.error('Failed to parse itinerary_costs:', e);
+                          }
+                        } else if (Array.isArray(itineraryCosts)) {
+                          costs = itineraryCosts;
+                        }
+                        
+                        if (costs.length > 0) {
+                          return (
+                            <>
+                              <div className="flex justify-between text-sm font-medium">
+                                <span className="text-gray-600 dark:text-gray-400">
+                                  {__("Itinerary Costs", "yatra")}
+                                </span>
+                              </div>
+                              {costs.map((cost: any, index: number) => (
+                                <div key={index} className="flex justify-between text-sm ml-4">
+                                  <span className="text-gray-600 dark:text-gray-400">
+                                    {cost.name} ({cost.price_per === 'person' ? 'per person' : 'per group'})
+                                  </span>
+                                  <span className="text-gray-900 dark:text-white">
+                                    {formatPrice(cost.total_cost, booking.currency)}
+                                  </span>
+                                </div>
+                              ))}
+                              <div className="flex justify-between text-sm font-medium">
+                                <span className="text-gray-600 dark:text-gray-400">
+                                  {__("Itinerary Costs Total", "yatra")}
+                                </span>
+                                <span className="text-gray-900 dark:text-white">
+                                  {formatPrice(itineraryCostsTotal, booking.currency)}
+                                </span>
+                              </div>
+                            </>
+                          );
+                        } else if (itineraryCostsTotal > 0) {
+                          // Show total even if individual items aren't available
+                          return (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600 dark:text-gray-400">
+                                {__("Itinerary Costs", "yatra")}
+                              </span>
+                              <span className="text-gray-900 dark:text-white">
+                                {formatPrice(itineraryCostsTotal, booking.currency)}
+                              </span>
+                            </div>
+                          );
+                        }
+                      }
+                      
+                      return null;
+                    })()}
+
+                    {/* Taxable Amount (SubTotal) - Displayed after all costs are added */}
+                    {((booking as any).tax_amount > 0 || ((booking as any).tax_breakdown?.length > 0)) && (
+                      <div className="flex justify-between text-sm font-medium border-t border-gray-200 dark:border-gray-700 pt-2">
+                        <span className="font-bold text-gray-900 dark:text-white">
+                          {__("Subtotal (Taxable Amount)", "yatra")}
+                        </span>
+                        <span className="text-gray-900 dark:text-white">
+                          {formatPrice(
+                            (booking as any).taxable_amount > 0 
+                              ? (booking as any).taxable_amount 
+                              : ((booking as any).subtotal || booking.total_amount),
+                            booking.currency
+                          )}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Discount if any */}
+                    {booking.discount_amount > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {__("Discount", "yatra")}
+                        </span>
+                        <span className="text-green-600 dark:text-green-400">
+                          -{formatPrice(booking.discount_amount, booking.currency)}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Tax Breakdown */}
+                    {(parseFloat((booking as any).tax_amount) > 0 || (booking as any).tax_breakdown?.length > 0) && (
+                      <>
+                        {(() => {
+                          // Use tax_breakdown if available (already parsed by backend)
+                          const taxBreakdown = (booking as any).tax_breakdown;
+                          
+                          if (Array.isArray(taxBreakdown) && taxBreakdown.length > 0) {
+                            return taxBreakdown.map((tax: any, index: number) => (
+                              <div key={index} className="flex justify-between text-sm">
+                                <span className="text-gray-600 dark:text-gray-400">
+                                  {tax.name} ({tax.rate}%)
+                                </span>
+                                <span className="text-gray-900 dark:text-white">
+                                  {formatPrice(tax.amount, booking.currency)}
+                                </span>
+                              </div>
+                            ));
+                          }
+                          
+                          // Fallback: try parsing tax_details JSON string
+                          const taxDetails = (booking as any).tax_details;
+                          if (taxDetails) {
+                            try {
+                              const taxes = typeof taxDetails === 'string' 
+                                ? JSON.parse(taxDetails) 
+                                : taxDetails;
+                              
+                              if (Array.isArray(taxes) && taxes.length > 0) {
+                                return taxes.map((tax: any, index: number) => (
+                                  <div key={index} className="flex justify-between text-sm">
+                                    <span className="text-gray-600 dark:text-gray-400">
+                                      {tax.name} ({tax.rate}%)
+                                    </span>
+                                    <span className="text-gray-900 dark:text-white">
+                                      {formatPrice(tax.amount, booking.currency)}
+                                    </span>
+                                  </div>
+                                ));
+                              }
+                            } catch (e) {
+                              console.error('Failed to parse tax_details:', e);
+                            }
+                          }
+                          
+                          // Final fallback: show single tax line
+                          if ((booking as any).tax_amount > 0) {
+                            return (
+                              <div className="flex justify-between text-sm">
+                                <span className="text-gray-600 dark:text-gray-400">
+                                  {__("Tax", "yatra")} ({(booking as any).tax_rate}%)
+                                </span>
+                                <span className="text-gray-900 dark:text-white">
+                                  {formatPrice(
+                                    (booking as any).tax_amount,
+                                    booking.currency,
+                                  )}
+                                </span>
+                              </div>
+                            );
+                          }
+                          
+                          return null;
+                        })()}
+                      </>
+                    )}
+
+                    {/* Net Amount (Total with tax) */}
+                    <div className="flex justify-between text-base font-semibold pt-2 border-t border-gray-200 dark:border-gray-700">
+                      <span className="text-gray-900 dark:text-white">
+                        {__("Net Amount", "yatra")}
+                      </span>
+                      <span className="text-gray-900 dark:text-white">
+                        {formatPrice(booking.total_amount || 0, booking.currency)}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -1138,7 +1334,12 @@ const ViewBooking: React.FC = () => {
                     {__("Trip Price per Person", "yatra")}
                   </div>
                   <div className="text-sm text-gray-900 dark:text-white">
-                    {formatPrice(booking.trip_price)}
+                    {(() => {
+                      const subtotal = (booking as any).subtotal || booking.total_amount;
+                      const travelers = booking.travelers || 1;
+                      const pricePerPerson = subtotal / travelers;
+                      return formatPrice(pricePerPerson, booking.currency);
+                    })()}
                   </div>
                 </div>
                 <div>

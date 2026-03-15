@@ -535,14 +535,26 @@ $has_flexible_options = $flexible_payments_enabled && !empty($payment_method_opt
 <?php endif; ?>
 
 <!-- Payment Gateway Section -->
-<?php if (!empty($enabled_gateways)) : ?>
+<?php
+// Get gateways directly from registry (real-time)
+$real_time_gateways = [];
+if (class_exists('Yatra\PaymentGateways\PaymentGatewayRegistry')) {
+    $registry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
+    $checkout_gateways = $registry->getForCheckout();
+    
+    foreach ($checkout_gateways as $gateway) {
+        $real_time_gateways[$gateway['id']] = $gateway;
+    }
+}
+?>
+<?php if (!empty($real_time_gateways)) : ?>
 <div class="yatra-booking-section">
     <h2 class="yatra-section-title"><?php esc_html_e('Select Payment Gateway', 'yatra'); ?></h2>
     
     <div class="yatra-gateway-options">
         <?php 
         $first = true;
-        foreach ($enabled_gateways as $gateway_id => $gateway) : 
+        foreach ($real_time_gateways as $gateway_id => $gateway) : 
             $icon = !empty($gateway['icon']) ? $gateway['icon'] : plugins_url('assets/images/payment-placeholder.png', dirname(__DIR__));
         ?>
         <div class="yatra-gateway-option-wrapper">

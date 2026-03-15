@@ -396,6 +396,12 @@ class DiscountController extends BaseController
             $user = get_userdata((int) $prepared['updated_by']);
             $prepared['updated_by_name'] = $user ? esc_html($user->display_name) : null;
         }
+        
+        // Calculate actual usage count from bookings
+        if (!empty($prepared['code'])) {
+            $discountRepository = new \Yatra\Repositories\DiscountRepository();
+            $prepared['usage_count'] = $discountRepository->countUsage($prepared['code']);
+        }
 
         return $prepared;
     }

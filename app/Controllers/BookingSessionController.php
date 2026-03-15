@@ -11,13 +11,13 @@ use Yatra\Repositories\TravellerRepository;
 use Yatra\Repositories\CustomerRepository;
 use Yatra\Repositories\TripRepository;
 use Yatra\Repositories\BookingRepository;
-use Yatra\Repositories\DiscountRepository;
+use Yatra\Services\SettingsService;
 use Yatra\Services\DepartureService;
 use Yatra\Services\AvailabilityService;
+use Yatra\Services\CalculationService;
 use Yatra\Repositories\DepartureRepository;
 use Yatra\Repositories\BookingDepartureRepository;
 use Yatra\PaymentGateways\PaymentGatewayRegistry;
-use Yatra\Services\SettingsService;
 
 /**
  * Booking Session REST API Controller
@@ -46,11 +46,6 @@ class BookingSessionController extends BaseController
     private BookingRepository $bookingRepository;
 
     /**
-     * @var DiscountRepository
-     */
-    private DiscountRepository $discountRepository;
-
-    /**
      * @var DepartureService
      */
     private DepartureService $departureService;
@@ -61,6 +56,11 @@ class BookingSessionController extends BaseController
     private AvailabilityService $availabilityService;
 
     /**
+     * @var \Yatra\Repositories\DiscountRepository
+     */
+    private $discountRepository;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -69,7 +69,6 @@ class BookingSessionController extends BaseController
         $this->customerRepository = new CustomerRepository();
         $this->tripRepository = new TripRepository();
         $this->bookingRepository = new BookingRepository();
-        $this->discountRepository = new DiscountRepository();
         $this->departureService = new DepartureService(
             new DepartureRepository(),
             new \Yatra\Repositories\BookingDepartureRepository(),
@@ -79,6 +78,21 @@ class BookingSessionController extends BaseController
         $this->availabilityService = new AvailabilityService(
             new \Yatra\Repositories\AvailabilityRepository()
         );
+        $this->discountRepository = new \Yatra\Repositories\DiscountRepository();
+    }
+
+    /**
+     * Public permission callback for REST API routes
+     * Allows public access to booking endpoints
+     * 
+     * Removes cookie validation to prevent "Cookie check failed" errors for logged-out users
+     */
+    public function public_permission_callback(?WP_REST_Request $request = null): bool
+    {
+        // Remove cookie validation requirement for this endpoint
+        // This allows guest users to access the endpoint without nonce validation
+        remove_filter('rest_authentication_errors', 'rest_cookie_check_errors', 100);
+        return true;
     }
 
     /**
@@ -287,6 +301,65 @@ class BookingSessionController extends BaseController
             if (isset($data['additional_services']) && is_array($data['additional_services'])) {
                 $existing_session['additional_services'] = array_map('intval', $data['additional_services']);
             }
+            
+            // Recalculate taxes for partial updates
+            $trip_price = $existing_session['trip_price'];
+            $travelers_count = $existing_session['travelers'];
+            $additional_services = $existing_session['additional_services'] ?? [];
+            
+            // Calculate base amount - handle traveler-based pricing
+            $base_amount = 0;
+            $pricing_type = $existing_session['pricing_type'] ?? 'regular';
+            $price_types = $existing_session['price_types'] ?? [];
+            $traveler_counts = $existing_session['traveler_counts'] ?? [];
+            
+            if ($pricing_type === 'traveler_based' && !empty($price_types)) {
+                // Calculate for traveler-based pricing
+                foreach ($price_types as $pt) {
+                    $pt = (array) $pt;
+                    $category_id = $pt['category_id'] ?? 0;
+                    $category_price = isset($pt['effective_price']) ? (float) $pt['effective_price'] : ($pt['sale_price'] ?? $pt['discounted_price'] ?? $pt['original_price'] ?? 0);
+                    $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : 0;
+                    $base_amount += $category_price * $count;
+                }
+            } else {
+                // Regular pricing
+                $base_amount = $trip_price * $travelers_count;
+            }
+            
+            // Calculate additional services cost
+            $services_cost = 0;
+            if (!empty($additional_services)) {
+                foreach ($additional_services as $service_id) {
+                    $service = $wpdb->get_row($wpdb->prepare(
+                        "SELECT price FROM {$wpdb->prefix}yatra_additional_services WHERE id = %d",
+                        $service_id
+                    ));
+                    if ($service && $service->price) {
+                        $services_cost += (float) $service->price;
+                    }
+                }
+            }
+            
+            // Use CalculationService for pricing (fetches trip data from database)
+            $calculationService = new CalculationService();
+            $pricing = $calculationService->calculatePricing([
+                'trip_id'           => (int) $trip->id,
+                'travelers_count'   => $travelers_count,
+                'traveler_counts'   => $traveler_counts,
+                'travel_date'       => $travel_date,
+                'departure_time'    => $departure_time,
+                'selected_services' => $additional_services,
+                'coupon_code'       => '',
+                'payment_method'    => 'full',
+            ]);
+            $subtotal = $pricing['subtotal'];
+            $total_with_tax = $pricing['final_total'];
+            $tax_calculation = $pricing['tax_calculation'];
+            $services_cost = $pricing['services_cost'];
+            
+            // Note: Pricing is calculated on-demand via CalculationService, not stored in session
+            
             $existing_session['timestamp'] = time();
             
             // Save updated session
@@ -478,13 +551,26 @@ class BookingSessionController extends BaseController
             }
         }
 
-        // Prepare session data
+        // Use CalculationService as single source of truth for all pricing
+        $calculationService = new CalculationService();
+        $pricing = $calculationService->calculatePricing([
+            'trip_id'           => (int) $trip->id,
+            'travelers_count'   => $travelers_count,
+            'traveler_counts'   => $traveler_counts,
+            'travel_date'       => $travel_date,
+            'departure_time'    => $departure_time,
+            'selected_services' => $additional_services,
+            'availability_id'   => $availability_id ? (int) $availability_id : null,
+            'coupon_code'       => '',
+            'payment_method'    => 'full',
+        ]);
+
+        // Prepare session data - essential trip data (pricing fetched from database on-demand)
         $session_data = [
             'trip_id' => (int) $trip->id,
             'trip_title' => $trip->title,
             'trip_slug' => $trip->slug,
-            'trip_price' => $trip_price,
-            'currency' => $trip->currency ?: 'USD',
+            'currency' => $pricing['currency'] ?? \Yatra\Services\SettingsService::getCurrency(),
             'min_travelers' => (int) ($trip->min_travelers ?: 1),
             'max_travelers' => (int) ($trip->max_travelers ?: 20),
             'duration_days' => (int) ($trip->duration_days ?: 1),
@@ -494,7 +580,7 @@ class BookingSessionController extends BaseController
             'timestamp' => time(),
             // Availability-specific data
             'availability_id' => $availability_id,
-            'pricing_type' => $pricing_type,
+            'pricing_type' => $pricing['pricing_type'] ?? $pricing_type,
             'price_types' => $price_types,
             'traveler_counts' => $traveler_counts,
             'is_day_trip' => $is_day_trip,
@@ -502,6 +588,7 @@ class BookingSessionController extends BaseController
             'additional_services' => $additional_services,
             // Payment gateways available for checkout UI
             'enabled_gateways' => $enabled_gateways,
+            // Note: NO pricing data stored - fetched from database on-demand via CalculationService
         ];
 
         if (!empty($data['is_remaining_payment'])) {
@@ -597,7 +684,7 @@ class BookingSessionController extends BaseController
             'original_price' => (float) $trip->original_price,
             'sale_price' => (float) $trip->sale_price,
             'price' => !empty($trip->discounted_price) ? (float) $trip->discounted_price : (float) $trip->original_price,
-            'currency' => $trip->currency ?: 'USD',
+            'currency' => \Yatra\Services\SettingsService::getCurrency(),
             'starting_location' => $trip->starting_location,
             'ending_location' => $trip->ending_location,
         ];
@@ -680,7 +767,8 @@ class BookingSessionController extends BaseController
         $contact_first_name = $data['contact_first_name'] ?? '';
         $contact_last_name = $data['contact_last_name'] ?? '';
         $contact_country = $data['contact_country'] ?? '';
-        $contact_nationality = $data['contact_nationality'] ?? '';
+        
+                $contact_nationality = $data['contact_nationality'] ?? '';
         $contact_address = $data['contact_address'] ?? '';
         
         // Emergency contact
@@ -739,213 +827,87 @@ class BookingSessionController extends BaseController
             ], 404);
         }
 
-        // Calculate price - Priority: 1. Availability date, 2. Trip price
-        $total_amount = 0;
-        $price_per_person = 0;
-        $travelers_count = count($travelers);
-        $availability = null;
-        
-        // Try to get availability using AvailabilityService
-        if (!empty($travel_date)) {
-            $availability = $this->availabilityService->getByTripAndDate($trip_id, $travel_date);
+        // ========================================
+        // PRICING via CalculationService (single source of truth)
+        // ========================================
+        // Count only actual travelers (exclude contact and emergency contact)
+        $travelers_count = 0;
+        foreach ($travelers as $traveler) {
+            if (isset($traveler['type']) && $traveler['type'] === 'traveler') {
+                $travelers_count++;
+            }
+        }
+        // Fallback if no type is set (legacy data)
+        if ($travelers_count === 0) {
+            $travelers_count = count($travelers);
         }
         
-        // Determine pricing type and calculate total
-        $pricing_type = 'regular';
-        if ($availability) {
-            $pricing_type = $availability->pricing_type ?? $trip->pricing_type ?? 'regular';
-        } else {
-            $pricing_type = $trip->pricing_type ?? 'regular';
-        }
-        
-        if ($pricing_type === 'traveler_based') {
-            // Traveler-based pricing: Calculate based on each traveler's category
-            $price_types = [];
-            
-            // Priority 1: Check availability pricing override
-            if ($availability && isset($availability->price_types) && !empty($availability->price_types)) {
-                $price_types = is_string($availability->price_types) 
-                    ? (json_decode($availability->price_types, true) ?: []) 
-                    : $availability->price_types;
-            }
-            
-            // Priority 2: If no availability pricing (NULL or empty), use trip default
-            if (empty($price_types) && !empty($trip->price_types)) {
-                $price_types = is_array($trip->price_types) ? $trip->price_types : [];
-            }
-            
-            // Index price types by category_id
-            $priceByCategory = [];
-            foreach ($price_types as $pt) {
-                $pt = (object) $pt;
-                $catId = $pt->category_id ?? null;
-                if ($catId) {
-                    $priceByCategory[$catId] = $pt->effective_price ?? $pt->discounted_price ?? $pt->sale_price ?? $pt->original_price ?? 0;
-                }
-            }
-            
-            // Calculate total for each traveler based on their category
-            foreach ($travelers as $traveler) {
-                $categoryId = $traveler['category_id'] ?? null;
-                if ($categoryId && isset($priceByCategory[$categoryId])) {
-                    $total_amount += (float) $priceByCategory[$categoryId];
-                } else {
-                    // Fallback to first category price or trip price
-                    $firstPrice = !empty($priceByCategory) ? reset($priceByCategory) : 0;
-                    $total_amount += $firstPrice > 0 ? (float) $firstPrice : ((float) ($trip->discounted_price ?? $trip->original_price));
-                }
-            }
-            
-            $price_per_person = $travelers_count > 0 ? $total_amount / $travelers_count : 0;
-        } else {
-            // Regular pricing with proper fallback: availability → trip default
-            // Priority 1: Check availability discounted price override
-            if ($availability && isset($availability->discounted_price) && $availability->discounted_price !== null && $availability->discounted_price > 0) {
-                $price_per_person = (float) $availability->discounted_price;
-            } 
-            // Priority 2: Check availability original price override
-            elseif ($availability && isset($availability->original_price) && $availability->original_price !== null && $availability->original_price > 0) {
-                $price_per_person = (float) $availability->original_price;
-            } 
-            // Priority 3: Fall back to trip default pricing
-            else {
-                $price_per_person = !empty($trip->discounted_price) ? (float) $trip->discounted_price : (float) $trip->original_price;
-            }
-            $total_amount = $price_per_person * $travelers_count;
-        }
-
-        // Handle payment method and totals from frontend booking summary
         $payment_method = sanitize_text_field($data['payment_method'] ?? 'full');
         $payment_gateway = sanitize_text_field($data['payment_gateway'] ?? 'pay_later');
-        $frontend_total = isset($data['total_amount']) ? (float) $data['total_amount'] : null;
-        $frontend_due = isset($data['amount_due']) ? (float) $data['amount_due'] : null;
-        $frontend_paid = isset($data['amount_paid']) ? (float) $data['amount_paid'] : null;
-
-        // Use filters for flexible payment settings (Pro feature)
-        // These filters allow the Pro FlexiblePayments module to provide the actual values
-        $flexible_payments_enabled = apply_filters('yatra_flexible_payments_enabled', false);
-        $deposit_percentage = (int) apply_filters('yatra_deposit_percentage', 20);
-        $partial_percentage = (int) apply_filters('yatra_partial_payment_percentage', 30);
-
-        if ($frontend_total !== null && $frontend_total > 0) {
-            $total_amount = $frontend_total;
+        
+        // Get coupon code from request OR session
+        $coupon_code = sanitize_text_field($data['coupon_code'] ?? '');
+        if (empty($coupon_code) && !empty($session['coupon']['code'])) {
+            $coupon_code = sanitize_text_field($session['coupon']['code']);
         }
         
-        // ========================================
-        // APPLY GROUP DISCOUNT (Auto-applied based on traveler count)
-        // ========================================
-        $discount_amount = 0;
-        $discount_code = null;
-        $applied_discount = null;
+        $departure_time = $data['departure_time'] ?? ($session['departure_time'] ?? '');
+        $additional_services = $data['additional_services'] ?? ($session['additional_services'] ?? []);
+        $availability_id = $data['availability_id'] ?? ($session['availability_id'] ?? null);
         
-        // Get traveler counts by category from session or data
-        // Priority: 1. Frontend data, 2. Session data, 3. Build from travelers array
-        $travelerCountsByCategory = [];
-        
-        // Try to get from frontend data first
+        // Build traveler_counts from travelers array or session
+        $traveler_counts = [];
         if (!empty($data['traveler_counts']) && is_array($data['traveler_counts'])) {
-            $travelerCountsByCategory = $data['traveler_counts'];
-        }
-        // Try to get from session
-        elseif (!empty($session['traveler_counts']) && is_array($session['traveler_counts'])) {
-            $travelerCountsByCategory = $session['traveler_counts'];
-        }
-        // Build from travelers array if category_id is present
-        else {
+            $traveler_counts = $data['traveler_counts'];
+        } elseif (!empty($session['traveler_counts']) && is_array($session['traveler_counts'])) {
+            $traveler_counts = $session['traveler_counts'];
+        } else {
+            // Build from travelers array if category_id is present
             foreach ($travelers as $traveler) {
                 $categoryId = $traveler['category_id'] ?? null;
                 if ($categoryId) {
-                    if (!isset($travelerCountsByCategory[$categoryId])) {
-                        $travelerCountsByCategory[$categoryId] = 0;
+                    if (!isset($traveler_counts[$categoryId])) {
+                        $traveler_counts[$categoryId] = 0;
                     }
-                    $travelerCountsByCategory[$categoryId]++;
+                    $traveler_counts[$categoryId]++;
                 }
             }
-        }
-        
-        // If no category-based travelers, use total count with a default category
-        if (empty($travelerCountsByCategory) && $travelers_count > 0) {
-            // Use 'default' as a placeholder category for total-based discounts
-            $travelerCountsByCategory['default'] = $travelers_count;
-        }
-        
-        // Build price types array for discount calculation
-        // Priority: 1. Already set price_types, 2. Session price_types, 3. Default
-        $priceTypesForDiscount = [];
-        
-        // Use price_types if already set from traveler_based pricing
-        if (!empty($price_types)) {
-            foreach ($price_types as $pt) {
-                $pt = (object) $pt;
-                $priceTypesForDiscount[] = [
-                    'category_id' => $pt->category_id ?? null,
-                    'effective_price' => $pt->effective_price ?? $pt->discounted_price ?? $pt->sale_price ?? $pt->original_price ?? 0,
-                ];
+            if (empty($traveler_counts) && $travelers_count > 0) {
+                $traveler_counts['default'] = $travelers_count;
             }
         }
-        // Try to get from session
-        elseif (!empty($session['price_types']) && is_array($session['price_types'])) {
-            foreach ($session['price_types'] as $pt) {
-                $pt = (object) $pt;
-                $priceTypesForDiscount[] = [
-                    'category_id' => $pt->category_id ?? null,
-                    'effective_price' => $pt->effective_price ?? $pt->discounted_price ?? $pt->sale_price ?? $pt->original_price ?? 0,
-                ];
-            }
-        }
-        // For regular pricing, create a default price type entry
-        else {
-            $priceTypesForDiscount[] = [
-                'category_id' => 'default',
-                'effective_price' => $price_per_person,
-            ];
-        }
         
-        // Use DiscountService to calculate group discount (handles category-based discounts properly)
-        $discountService = new \Yatra\Services\DiscountService();
-        $groupDiscountResult = $discountService->calculateGroupDiscount($trip_id, $travelerCountsByCategory, $priceTypesForDiscount);
+        // Use CalculationService as single source of truth
+        $calculationService = new CalculationService();
+        $pricing = $calculationService->calculatePricing([
+            'trip_id'           => $trip_id,
+            'travelers_count'   => $travelers_count,
+            'traveler_counts'   => $traveler_counts,
+            'travel_date'       => $travel_date,
+            'departure_time'    => $departure_time,
+            'selected_services' => $additional_services,
+            'availability_id'   => $availability_id ? (int) $availability_id : null,
+            'coupon_code'       => $coupon_code,
+            'payment_method'    => $payment_method,
+        ]);
         
-        if ($groupDiscountResult) {
-            $discount_amount = (float) ($groupDiscountResult['amount'] ?? 0);
-            // Use label as discount_code if no code is set (for display purposes)
-            $discount_code = $groupDiscountResult['code'] ?? $groupDiscountResult['label'] ?? null;
-            $applied_discount = $groupDiscountResult;
-        }
+        // Extract pricing results
+        $total_amount           = $pricing['final_total'];
+        $amount_due             = $pricing['amount_due'];
+        $amount_paid            = $pricing['amount_paid'];
+        $tax_calculation        = $pricing['tax_calculation'];
+        $tax_breakdown          = $tax_calculation['tax_breakdown'];
+        $total_tax_amount       = $tax_calculation['total_tax_amount'];
         
-        // Ensure discount doesn't exceed total
-        if ($discount_amount > $total_amount) {
-            $discount_amount = $total_amount;
-        }
-        $discount_amount = round($discount_amount, 2);
+                $tax_inclusive           = $tax_calculation['tax_inclusive'];
+        $tax_rate               = $tax_calculation['tax_rate'];
+        $subtotal_before_discount = $pricing['subtotal'];
+        $discount_amount        = $pricing['total_discount_amount'];
+        $discount_code          = $pricing['group_discount']['code'] ?? ($pricing['coupon_discount']['code'] ?? null);
         
-        // Apply discount to total
-        $subtotal_before_discount = $total_amount;
-        $total_amount = $total_amount - $discount_amount;
-
-        if ($frontend_due !== null && $frontend_due >= 0) {
-            $amount_due = $frontend_due;
-            // Recalculate amount_due if discount was applied
-            if ($discount_amount > 0) {
-                // Proportionally reduce amount_due based on discount
-                $discount_ratio = $total_amount / $subtotal_before_discount;
-                $amount_due = $frontend_due * $discount_ratio;
-            }
-        } else {
-            $amount_due = $total_amount;
-            if ($payment_method === 'deposit') {
-                $amount_due = $total_amount * ($deposit_percentage / 100);
-            } elseif ($payment_method === 'partial') {
-                $amount_due = $total_amount * ($partial_percentage / 100);
-            }
-        }
-
-        $amount_paid = $frontend_paid !== null ? $frontend_paid : ($total_amount - $amount_due);
-        if ($amount_paid < 0) {
-            $amount_paid = 0;
-        }
-
-        // Generate booking reference
-        $booking_reference = 'YTR-' . strtoupper(substr(md5(uniqid((string)mt_rand(), true)), 0, 8));
+        // Generate booking reference using the same method as BookingService
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        $booking_reference = $bookingRepository->generateReference();
 
         // Prepare contact data
         $contact_data = [
@@ -1103,11 +1065,10 @@ class BookingSessionController extends BaseController
             'travel_date' => sanitize_text_field($travel_date),
             'availability_id' => !empty($availability_id) ? (int) $availability_id : null,
             'travelers_count' => $travelers_count,
-            'travelers_data' => '', // Legacy field - travellers now stored in separate table
             'total_amount' => $total_amount,
             'amount_paid' => 0,
             'amount_due' => $amount_due,
-            'currency' => \Yatra\Services\SettingsService::getCurrency(),
+            'currency' => $pricing['currency'] ?? \Yatra\Services\SettingsService::getCurrency(),
             'discount_amount' => $discount_amount,
             'discount_code' => $discount_code,
             'payment_method' => $payment_method,
@@ -1118,8 +1079,17 @@ class BookingSessionController extends BaseController
             'ip_address' => $this->getClientIp(),
             'created_at' => current_time('mysql'),
             'updated_at' => current_time('mysql'),
+            // Tax fields
+            'subtotal' => $subtotal_before_discount,
+            'tax_amount' => $total_tax_amount,
+            'tax_rate' => $tax_rate,
+            'tax_inclusive' => $tax_inclusive,
+            'tax_details' => wp_json_encode($tax_breakdown),
+            // Itinerary costs
+            'itinerary_costs' => wp_json_encode($pricing['itinerary_costs'] ?? []),
+            'itinerary_costs_total' => ($pricing['itinerary_costs_total'] ?? 0),
         ];
-
+        
         try {
             $booking = $booking_service->createBooking($booking_data);
             // BookingService returns ['success'=>bool, 'booking_id'=>int, ...]
@@ -1146,6 +1116,13 @@ class BookingSessionController extends BaseController
                 'message' => __('Failed to create booking. Please try again.', 'yatra'),
                 'error' => __('Booking ID was not generated.', 'yatra'),
             ], 500);
+        }
+
+        // Get the actual booking reference from database
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        $saved_booking = $bookingRepository->find($booking_id);
+        if ($saved_booking && !empty($saved_booking->reference)) {
+            $booking_reference = $saved_booking->reference;
         }
 
         // ========================================
@@ -1245,12 +1222,11 @@ class BookingSessionController extends BaseController
         // For online gateways, create payment intent and return redirect URL
         if (!$is_offline && $amount_due > 0) {
             // Build payment params - merge with request data so gateways can access their own tokens
-            $globalCurrency = \Yatra\Services\SettingsService::getCurrency();
             $payment_params = array_merge($data, [
                 'booking_id' => $booking_id,
                 'reference' => $booking_reference,
                 'amount' => $amount_due,
-                'currency' => $globalCurrency,
+                'currency' => $pricing['currency'] ?? \Yatra\Services\SettingsService::getCurrency(),
                 'customer_email' => $contact_data['email'],
                 'customer_name' => $contact_data['first_name'] . ' ' . $contact_data['last_name'],
                 'trip_title' => $trip->title,
@@ -1424,7 +1400,7 @@ class BookingSessionController extends BaseController
                 'customer_name' => trim($contact_data['first_name'] . ' ' . $contact_data['last_name']),
                 'trip_id' => $trip_id,
                 'trip_date' => $travel_date,
-                'currency' => $trip->currency ?: 'USD',
+                'currency' => $pricing['currency'] ?? \Yatra\Services\SettingsService::getCurrency(),
                 'amount' => $amount_due,
                 'subtotal' => $subtotal_before_discount,
                 'discount_amount' => $discount_amount,
@@ -1433,6 +1409,7 @@ class BookingSessionController extends BaseController
             ],
         ]);
     }
+    
     
     /**
      * Get confirmation page URL
@@ -2153,48 +2130,54 @@ class BookingSessionController extends BaseController
             ], 400);
         }
         
-        // Find the coupon
-        $discount = $this->discountRepository->findByCode($code);
+        // Use DiscountService to calculate coupon discount
+        $discountService = new \Yatra\Services\DiscountService();
+        $total_amount = $this->calculateSessionTotal($session);
+        $trip_id = (int) $session['trip_id'];
+        $travelers_count = (int) ($session['travelers'] ?? 1);
+        $traveler_counts = $session['traveler_counts'] ?? [];
         
-        if (!$discount) {
+        $coupon_result = $discountService->calculateCouponDiscount(
+            $code,
+            $total_amount,
+            $trip_id,
+            $travelers_count,
+            $traveler_counts
+        );
+        
+        // Check if discount was calculated (validation passed)
+        if ($coupon_result['calculated_amount'] <= 0) {
             return new WP_REST_Response([
                 'success' => false,
-                'message' => __('Invalid coupon.', 'yatra'),
-            ], 404);
-        }
-        
-        // Validate coupon
-        $validation = $this->validateCoupon($discount, $session);
-        if (!$validation['valid']) {
-            return new WP_REST_Response([
-                'success' => false,
-                'message' => $validation['message'],
+                'message' => __('This coupon is not valid for your booking.', 'yatra'),
             ], 400);
         }
         
-        // Calculate discount amount
-        $total_amount = $this->calculateSessionTotal($session);
-        $discount_amount = $this->calculateDiscountAmount($discount, $total_amount, $session);
+        $discount_amount = $coupon_result['calculated_amount'];
         
-        // Store coupon in session
+        error_log('apply_coupon - Coupon result: ' . print_r($coupon_result, true));
+        error_log('apply_coupon - Original code: ' . $code);
+        
+        // Store coupon in session (use the original $code variable, not from result)
         $session['coupon'] = [
-            'id' => (int) $discount->id,
-            'code' => $discount->code,
-            'type' => $discount->type,
-            'amount' => (float) $discount->amount,
+            'code' => $code,  // Use the actual code that was validated
+            'type' => $coupon_result['type'],
+            'amount' => $coupon_result['amount'],
             'discount_amount' => $discount_amount,
-            'description' => $discount->description ?? '',
+            'label' => $coupon_result['label'],
         ];
         $session['timestamp'] = time();
         
         yatra_set_booking_session($session);
         
+        error_log('apply_coupon - Session coupon stored: ' . print_r($session['coupon'], true));
+        
         return new WP_REST_Response([
             'success' => true,
             'message' => __('Coupon applied successfully!', 'yatra'),
             'data' => [
-                'code' => $discount->code,
-                'type' => $discount->type,
+                'code' => $code,
+                'type' => $coupon_result['type'],
                 'discount_amount' => $discount_amount,
                 'discount_formatted' => yatra_format_price($discount_amount),
                 'new_total' => $total_amount - $discount_amount,
@@ -2209,24 +2192,39 @@ class BookingSessionController extends BaseController
      */
     public function calculate_summary(WP_REST_Request $request): WP_REST_Response
     {
+        yatra_start_session();
+        $session = yatra_get_booking_session();
         $data = $request->get_json_params();
         
-        $trip_id = (int) ($data['trip_id'] ?? 0);
-        $traveler_counts = $data['traveler_counts'] ?? [];
-        $travel_date = sanitize_text_field($data['travel_date'] ?? '');
-        $departure_time = sanitize_text_field($data['departure_time'] ?? '');
-        $availability_id = !empty($data['availability_id']) ? sanitize_text_field($data['availability_id']) : null;
-        $pricing_type_from_request = sanitize_text_field($data['pricing_type'] ?? '');
-        $coupon_code = sanitize_text_field($data['coupon_code'] ?? '');
-        $payment_method = sanitize_text_field($data['payment_method'] ?? 'full');
-        $selected_service_ids_from_request = isset($data['additional_services']) && is_array($data['additional_services']) 
-            ? array_map('intval', $data['additional_services']) 
-            : null;
+        error_log('=== calculate_summary CALLED ===');
+        error_log('Request data: ' . print_r($data, true));
+        error_log('Session traveler_counts: ' . print_r($session['traveler_counts'] ?? 'NOT SET', true));
+        error_log('Session travelers: ' . ($session['travelers'] ?? 'NOT SET'));
+        
+        // Get trip_id from session (required)
+        $trip_id = (int) ($session['trip_id'] ?? 0);
+        
+        // Get traveler_counts from REQUEST (for dynamic updates) or fallback to session
+        $traveler_counts = $data['traveler_counts'] ?? ($session['traveler_counts'] ?? []);
+        
+        // Get other data from request or session
+        $travel_date = sanitize_text_field($data['travel_date'] ?? ($session['travel_date'] ?? ''));
+        $departure_time = sanitize_text_field($data['departure_time'] ?? ($session['departure_time'] ?? ''));
+        $availability_id = $data['availability_id'] ?? ($session['availability_id'] ?? null);
+        $pricing_type_from_request = sanitize_text_field($data['pricing_type'] ?? ($session['pricing_type'] ?? ''));
+        $payment_method = sanitize_text_field($data['payment_method'] ?? ($session['payment_method'] ?? 'full'));
+        $selected_service_ids_from_request = $data['additional_services'] ?? ($session['additional_services'] ?? null);
+        
+        // IMPORTANT: Always read coupon from SESSION (not request) to maintain applied discount
+        $coupon_code = isset($session['coupon']['code']) ? sanitize_text_field($session['coupon']['code']) : '';
+        
+        error_log('calculate_summary - Final traveler_counts: ' . print_r($traveler_counts, true));
+        error_log('calculate_summary - Coupon from session: ' . $coupon_code);
         
         if (empty($trip_id)) {
             return new WP_REST_Response([
                 'success' => false,
-                'message' => __('Trip ID is required.', 'yatra'),
+                'message' => __('No active booking session found.', 'yatra'),
             ], 400);
         }
         
@@ -2250,9 +2248,11 @@ class BookingSessionController extends BaseController
         global $wpdb;
 
         $availability = null;
-        if (!empty($availability_id)) {
-            $availability = $this->availabilityService->getById($availability_id);
+        if (!empty($availability_id) && is_numeric($availability_id)) {
+            // Only use getById if availability_id is numeric
+            $availability = $this->availabilityService->getById((int) $availability_id);
         } elseif (!empty($travel_date)) {
+            // For string IDs or when no availability_id, use date-based lookup
             $availability = $this->availabilityService->getByTripAndDate($trip_id, $travel_date);
             
             if ($availability && !empty($departure_time) && $availability->departure_time !== $departure_time) {
@@ -2400,9 +2400,14 @@ class BookingSessionController extends BaseController
         } else {
             // Regular pricing
             $total_travelers = array_sum(array_map('intval', $normalized_traveler_counts));
-            if ($total_travelers < 1) $total_travelers = 1;
+            // If traveler_counts is empty, fallback to session 'travelers' count
+            if ($total_travelers < 1) {
+                $total_travelers = !empty($session['travelers']) ? (int) $session['travelers'] : 1;
+            }
             $price_per_person = $base_trip_price;
             $subtotal = $price_per_person * $total_travelers;
+            
+            error_log('calculate_summary - Regular pricing: total_travelers=' . $total_travelers . ', subtotal=' . $subtotal);
         }
         
         // Calculate group discount
@@ -2440,42 +2445,66 @@ class BookingSessionController extends BaseController
         $group_discount_label = $group_discount['label'] ?? __('Group Discount', 'yatra');
         $group_discount_code = $group_discount['code'] ?? null;
         
-        // Calculate coupon discount
+        // Calculate coupon discount using DiscountService
         $coupon_discount_amount = 0;
         $coupon_discount_label = '';
         $coupon_error = '';
         
         if (!empty($coupon_code)) {
-            $discount = $this->discountRepository->findByCode($coupon_code);
-            if ($discount) {
-                $session = [
-                    'trip_id' => $trip_id,
-                    'travelers' => $total_travelers,
-                    'travel_date' => $travel_date,
-                    'departure_time' => $departure_time,
-                    'availability_id' => $availability_id,
-                    'pricing_type' => $is_traveler_based ? 'traveler_based' : 'regular',
-                    'trip_price' => $base_trip_price,
-                    'traveler_counts' => $is_traveler_based ? $normalized_traveler_counts : ['default' => $total_travelers],
-                    'price_types' => $is_traveler_based ? $price_types : [],
-                ];
-                $validation = $this->validateCoupon($discount, $session);
-                if ($validation['valid']) {
-                    $coupon_discount_amount = $this->calculateDiscountAmount($discount, $subtotal - $group_discount_amount, $session);
-                    $coupon_discount_label = $discount->type === 'percentage' 
-                        ? sprintf(__('Coupon (%s%%)', 'yatra'), $discount->amount)
-                        : __('Coupon Discount', 'yatra');
-                } else {
-                    $coupon_error = $validation['message'];
-                }
+            $discountService = new \Yatra\Services\DiscountService();
+            $subtotal_after_group = $subtotal - $group_discount_amount;
+            
+            $coupon_result = $discountService->calculateCouponDiscount(
+                $coupon_code,
+                $subtotal_after_group,
+                $trip_id,
+                $total_travelers,
+                $is_traveler_based ? $normalized_traveler_counts : []
+            );
+            
+            if ($coupon_result['calculated_amount'] > 0) {
+                $coupon_discount_amount = $coupon_result['calculated_amount'];
+                $coupon_discount_label = $coupon_result['label'];
             } else {
-                $coupon_error = __('Invalid coupon code.', 'yatra');
+                $coupon_error = __('This coupon is not valid for your booking.', 'yatra');
             }
         }
         
-        // Calculate total
-        $total_discount = $group_discount_amount + $coupon_discount_amount;
-        $total_amount = max(0, $subtotal - $total_discount);
+        // Use CalculationService for on-demand pricing calculation
+        $calculationService = new CalculationService();
+        
+        // Initialize additional services (will be populated later via filter)
+        $additional_services = [];
+        
+        // Create session-like data structure for calculation (trip data fetched from database)
+        $session_like_data = [
+            'trip_id' => $trip_id,
+            'travelers' => $total_travelers,
+            'traveler_counts' => $traveler_counts,
+            'travel_date' => $travel_date,
+            'departure_time' => $departure_time,
+            'additional_services' => $additional_services
+        ];
+        
+        // Apply filter for pro plugins to modify summary calculation parameters
+        $calculation_params = apply_filters('yatra_summary_calculation_params', [
+            'session_data' => $session_like_data,
+            'coupon_code' => $coupon_code,
+            'payment_method' => $payment_method,
+        ]);
+        
+        $pricing = $calculationService->calculateFromSession(
+            $calculation_params['session_data'], 
+            $calculation_params['coupon_code'], 
+            $calculation_params['payment_method']
+        );
+        
+        $total_amount = $pricing['final_total'];
+        $amount_due = $pricing['amount_due'];
+        $tax_calculation = $pricing['tax_calculation'];
+        $total_tax_amount = $pricing['tax_calculation']['total_tax_amount'];
+        $tax_inclusive = $pricing['tax_calculation']['tax_inclusive'];
+        $tax_breakdown = $pricing['tax_calculation']['tax_breakdown'];
         
         /**
          * Filter: Get additional services for this trip
@@ -2570,8 +2599,8 @@ class BookingSessionController extends BaseController
             $itinerary_costs_total += $calculatedPrice;
         }
         
-        // Add services and itinerary costs total to the booking total
-        $total_amount = $total_amount + $services_total + $itinerary_costs_total;
+        // Note: CalculationService already includes itinerary costs in final_total
+        // No need to add itinerary_costs_total again - it's already included in $total_amount
         
         // Calculate due amount based on payment method
         // Use filters for flexible payment settings (Pro feature)
@@ -2586,18 +2615,20 @@ class BookingSessionController extends BaseController
             $amount_due = $total_amount * ($partial_percentage / 100);
         }
         
-        // Build pricing HTML for the summary section
+        // Build pricing HTML for the summary section (using CalculationService data)
         $pricing_html = $this->buildPricingHtml([
             'is_traveler_based' => $is_traveler_based,
             'category_breakdown' => $category_breakdown,
-            'subtotal' => $subtotal,
+            'price_per_person' => $price_per_person ?? $base_trip_price,
             'total_travelers' => $total_travelers,
-            'price_per_person' => $base_trip_price,
-            'group_discount_amount' => $group_discount_amount,
-            'group_discount_label' => $group_discount_label,
-            'coupon_discount_amount' => $coupon_discount_amount,
-            'coupon_discount_label' => $coupon_discount_label,
-            'coupon_code' => $coupon_code,
+            'gross_total' => $pricing['gross_total'] ?? $pricing['base_amount'],
+            'subtotal' => $pricing['gross_total'] ?? $pricing['base_amount'],
+            'taxable_amount' => $pricing['taxable_amount'] ?? 0,
+            'group_discount_amount' => $pricing['group_discount']['amount'] ?? 0,
+            'group_discount_label' => $pricing['group_discount']['label'] ?? '',
+            'coupon_discount_amount' => $pricing['coupon_discount']['calculated_amount'] ?? 0,
+            'coupon_discount_label' => $pricing['coupon_discount']['label'] ?? '',
+            'coupon_code' => $pricing['coupon_discount']['code'] ?? '',
             'additional_services' => $additional_services,
             'services_total' => $services_total,
             'itinerary_costs' => $itinerary_costs,
@@ -2607,6 +2638,13 @@ class BookingSessionController extends BaseController
             'payment_method' => $payment_method,
             'deposit_percentage' => $deposit_percentage,
             'partial_percentage' => $partial_percentage,
+            // Tax variables from centralized calculation
+            'enable_tax' => $pricing['tax_calculation']['enable_tax'],
+            'tax_breakdown' => $pricing['tax_calculation']['tax_breakdown'],
+            'total_tax_amount' => $pricing['tax_calculation']['total_tax_amount'],
+            'tax_inclusive' => $pricing['tax_calculation']['tax_inclusive'],
+            // Currency for consistent formatting
+            'currency' => $pricing['currency'] ?? \Yatra\Services\SettingsService::getCurrency(),
         ]);
         
         // Build response
@@ -2632,8 +2670,8 @@ class BookingSessionController extends BaseController
                     'code' => $coupon_code,
                 ] : null,
                 'coupon_error' => $coupon_error,
-                'total_discount' => round($total_discount, 2),
-                'total_discount_formatted' => yatra_format_price($total_discount),
+                'total_discount' => round($group_discount_amount + $coupon_discount_amount, 2),
+                'total_discount_formatted' => yatra_format_price($group_discount_amount + $coupon_discount_amount),
                 // Additional services (premium feature)
                 'additional_services' => $additional_services,
                 'services_total' => round($services_total, 2),
@@ -2657,34 +2695,83 @@ class BookingSessionController extends BaseController
     /**
      * Build HTML for the pricing summary section
      * This is returned via AJAX to update the pricing breakdown dynamically
-     * Uses the pricing-summary.php template for rendering
+     * Uses the pricing-summary.php template for rendering with Checkout model
      */
     private function buildPricingHtml(array $data): string
     {
-        // Extract variables for the template
-        $is_traveler_based = $data['is_traveler_based'] ?? false;
-        $category_breakdown = $data['category_breakdown'] ?? [];
-        $subtotal = $data['subtotal'] ?? 0;
-        $total_travelers = $data['total_travelers'] ?? 0;
-        $price_per_person = $data['price_per_person'] ?? 0;
-        $coupon_discount_amount = $data['coupon_discount_amount'] ?? 0;
-        $coupon_discount_label = $data['coupon_discount_label'] ?? '';
-        $coupon_code = $data['coupon_code'] ?? '';
-        $group_discount_amount = $data['group_discount_amount'] ?? 0;
-        $group_discount_label = $data['group_discount_label'] ?? '';
-        $additional_services = $data['additional_services'] ?? [];
-        $services_total = $data['services_total'] ?? 0;
-        $total_amount = $data['total_amount'] ?? 0;
-        $amount_due = $data['amount_due'] ?? 0;
-        $payment_method = $data['payment_method'] ?? 'full';
-        $deposit_percentage = $data['deposit_percentage'] ?? 20;
-        $partial_percentage = $data['partial_percentage'] ?? 30;
+        // Get session data to create Checkout model
+        yatra_start_session();
+        $session = yatra_get_booking_session();
         
-        // Load the template
+        // Get trip data
+        $trip_id = (int) ($session['trip_id'] ?? 0);
+        if (empty($trip_id)) {
+            return '<p>' . __('Pricing information not available.', 'yatra') . '</p>';
+        }
+        
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $trip = $tripRepository->findPublished($trip_id);
+        if (!$trip) {
+            return '<p>' . __('Trip not found.', 'yatra') . '</p>';
+        }
+        
+        // Build pricing calculation array from data
+        $pricingCalculation = [
+            'original_price' => $trip->original_price ?? 0,
+            'discounted_price' => $trip->discounted_price ?? $trip->original_price ?? 0,
+            'unit_price' => $data['price_per_person'] ?? ($trip->discounted_price ?? $trip->original_price ?? 0),
+            'pricing_type' => $session['pricing_type'] ?? 'regular',
+            'base_amount' => $data['gross_total'] ?? 0,
+            'subtotal' => $data['subtotal'] ?? $data['gross_total'] ?? 0,
+            'taxable_amount' => $data['taxable_amount'] ?? 0,
+            'gross_total' => $data['gross_total'] ?? 0,
+            'final_total' => $data['total_amount'] ?? 0,
+            'amount_due' => $data['amount_due'] ?? 0,
+            'travelers_count' => $data['total_travelers'] ?? 1,
+            'is_traveler_based' => $data['is_traveler_based'] ?? false,
+            'category_breakdown' => $data['category_breakdown'] ?? [],
+            'group_discount' => [
+                'amount' => $data['group_discount_amount'] ?? 0,
+                'label' => $data['group_discount_label'] ?? '',
+            ],
+            'coupon_discount' => [
+                'code' => $data['coupon_code'] ?? '',
+                'calculated_amount' => $data['coupon_discount_amount'] ?? 0,
+                'label' => $data['coupon_discount_label'] ?? '',
+            ],
+            'total_discount_amount' => ($data['group_discount_amount'] ?? 0) + ($data['coupon_discount_amount'] ?? 0),
+            'additional_services' => $data['additional_services'] ?? [],
+            'services_total' => $data['services_total'] ?? 0,
+            'itinerary_costs' => $data['itinerary_costs'] ?? [],
+            'itinerary_costs_total' => $data['itinerary_costs_total'] ?? 0,
+            'tax_calculation' => [
+                'enable_tax' => $data['enable_tax'] ?? false,
+                'tax_breakdown' => $data['tax_breakdown'] ?? [],
+                'total_tax_amount' => $data['total_tax_amount'] ?? 0,
+                'tax_inclusive' => $data['tax_inclusive'] ?? false,
+            ],
+            'currency' => $data['currency'] ?? null,
+        ];
+        
+        // Update session with payment method if provided
+        if (!empty($data['payment_method'])) {
+            $session['payment_method'] = $data['payment_method'];
+        }
+        if (!empty($data['deposit_percentage'])) {
+            $session['deposit_percentage'] = $data['deposit_percentage'];
+        }
+        if (!empty($data['partial_payment_percentage'])) {
+            $session['partial_payment_percentage'] = $data['partial_percentage'];
+        }
+        
+        // Create Checkout model instance
+        $checkout = new \Yatra\Models\Checkout($trip, $session, $pricingCalculation);
+        
+        // Load the template (uses $checkout model)
         $template_path = YATRA_PLUGIN_PATH . 'templates/partials/pricing-summary.php';
         
         if (!file_exists($template_path)) {
-            return '';
+            return '<p>' . __('Template not found.', 'yatra') . '</p>';
         }
         
         // Use output buffering to capture the template output
@@ -2727,125 +2814,30 @@ class BookingSessionController extends BaseController
     }
 
     /**
-     * Validate coupon against current session
-     */
-    private function validateCoupon(\stdClass $discount, array $session): array
-    {
-        // Check if coupon is active (draft or not published = invalid)
-        if ($discount->status !== 'publish') {
-            return ['valid' => false, 'message' => __('Invalid coupon.', 'yatra')];
-        }
-        
-        // Check validity dates
-        $now = current_time('Y-m-d');
-        
-        if (!empty($discount->valid_from) && $now < $discount->valid_from) {
-            return ['valid' => false, 'message' => __('Invalid coupon.', 'yatra')];
-        }
-        
-        if (!empty($discount->expiry_date) && $now > $discount->expiry_date) {
-            return ['valid' => false, 'message' => __('Invalid coupon.', 'yatra')];
-        }
-        
-        // Check usage limit
-        if ($discount->usage_limit > 0 && $discount->usage_count >= $discount->usage_limit) {
-            return ['valid' => false, 'message' => __('This coupon has reached its usage limit.', 'yatra')];
-        }
-        
-        // Check usage limit per customer (if logged in)
-        if ($discount->usage_limit_per_customer > 0 && is_user_logged_in()) {
-            $user_id = get_current_user_id();
-            $user_usage = $this->getCouponUsageByUser($discount->code, $user_id);
-            if ($user_usage >= $discount->usage_limit_per_customer) {
-                return ['valid' => false, 'message' => __('You have already used this coupon the maximum number of times.', 'yatra')];
-            }
-        }
-        
-        // Check if applicable to this trip
-        if ($discount->applicable_to === 'specific_trips') {
-            $trip_ids = is_string($discount->trip_ids) ? maybe_unserialize($discount->trip_ids) : ($discount->trip_ids ?? []);
-            if (!empty($trip_ids) && !in_array((int) $session['trip_id'], array_map('intval', $trip_ids), true)) {
-                return ['valid' => false, 'message' => __('This coupon is not applicable to this trip.', 'yatra')];
-            }
-        }
-        
-        // Check minimum amount
-        $total = $this->calculateSessionTotal($session);
-        if (!empty($discount->min_amount) && $total < (float) $discount->min_amount) {
-            return [
-                'valid' => false, 
-                'message' => sprintf(
-                    __('Minimum order amount of %s required for this coupon.', 'yatra'),
-                    yatra_format_price((float) $discount->min_amount)
-                ),
-            ];
-        }
-        
-        // Check first-time customer
-        if ($discount->first_time_customer_only && is_user_logged_in()) {
-            $user_id = get_current_user_id();
-            $has_previous_booking = $this->bookingRepository->hasUserMadeBooking($user_id);
-            if ($has_previous_booking) {
-                return ['valid' => false, 'message' => __('This coupon is only for first-time customers.', 'yatra')];
-            }
-        }
-        
-        // Check group size requirements
-        if ($discount->is_group_discount && !empty($discount->min_group_size)) {
-            $travelers = (int) ($session['travelers'] ?? 1);
-            if ($travelers < (int) $discount->min_group_size) {
-                return [
-                    'valid' => false,
-                    'message' => sprintf(
-                        __('This coupon requires a minimum group size of %d travelers.', 'yatra'),
-                        (int) $discount->min_group_size
-                    ),
-                ];
-            }
-        }
-        
-        return ['valid' => true, 'message' => ''];
-    }
-
-    /**
      * Calculate total amount from session
+     * Uses CalculationService to get accurate pricing (without coupon)
      */
     private function calculateSessionTotal(array $session): float
     {
-        $pricing_type = $session['pricing_type'] ?? 'regular';
+        // Use CalculationService to get accurate base pricing
+        $calculationService = new \Yatra\Services\CalculationService();
         
-        if ($pricing_type === 'traveler_based' && !empty($session['price_types'])) {
-            $total = 0;
-            $traveler_counts = $session['traveler_counts'] ?? [];
+        try {
+            // Calculate pricing WITHOUT coupon (we're calculating this to apply coupon to it)
+            $pricing = $calculationService->calculateFromSession($session, '');
             
-            foreach ($session['price_types'] as $index => $pt) {
-                $pt = (array) $pt;
-                $category_id = $pt['category_id'] ?? $index;
-                $price = (float) ($pt['effective_price'] ?? $pt['discounted_price'] ?? $pt['sale_price'] ?? $pt['original_price'] ?? 0);
-                $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : ($index === 0 ? 1 : 0);
-                $total += $price * $count;
-            }
-        } else {
-            // Regular pricing
-            $price = (float) ($session['trip_price'] ?? 0);
-            $travelers = (int) ($session['travelers'] ?? 1);
-            $total = $price * $travelers;
+            // Return gross_total (base amount before discounts but after any group discounts)
+            $total = $pricing['gross_total'] ?? 0;
+            
+            return (float) $total;
+        } catch (\Throwable $e) {
+            error_log('calculateSessionTotal - ERROR: ' . $e->getMessage());
+            return 0.0;
         }
-        
-        // Add tax if enabled
-        $country = $session['country'] ?? null;
-        $tax_details = \Yatra\Services\TaxService::calculateTax($total, $country);
-        
-        if (!$tax_details['tax_inclusive']) {
-            // Tax is added on top
-            $total += $tax_details['tax_amount'];
-        }
-        // If tax is inclusive, it's already in the price
-        
-        return $total;
     }
 
     /**
+     * @deprecated Use DiscountService::calculateCouponDiscount() instead
      * Calculate discount amount
      */
     private function calculateDiscountAmount(\stdClass $discount, float $total, array $session): float

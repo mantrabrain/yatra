@@ -11,6 +11,7 @@ use Yatra\Database\Tables\TripAvailabilityDatesTable;
 use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Database\Tables\TripContentTable;
 use Yatra\Database\Tables\TripItineraryTable;
+use Yatra\Services\SettingsService;
 
 /**
  * Single Trip Frontend Controller
@@ -262,7 +263,7 @@ class SingleTripController
         $trip->deposit_amount = (float) ($trip->deposit_amount ?? 0);
 
         // Get currency
-        $trip->currency = $trip->currency ?? get_option('yatra_currency', 'USD');
+        $trip->currency = SettingsService::getCurrency();
 
         // Compute effective pricing (same logic as TripRepository::computeEffectivePricing)
         $trip->effective_price_min = 0;

@@ -113,12 +113,3 @@ foreach ($controllers as $controllerClass) {
         continue;
     }
 }
-
-/**
- * Debug: Log all registered routes (only in WP_DEBUG mode)
- */
-if (defined('WP_DEBUG') && WP_DEBUG && defined('YATRA_DEBUG_API') && YATRA_DEBUG_API) {
-    add_action('rest_api_init', function() {
-        $routes = rest_get_server()->get_routes('yatra/v1');
-        }, 999);
-}

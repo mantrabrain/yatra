@@ -81,7 +81,6 @@ interface BookingFormData {
   subtotal: string;
   tax_amount: string;
   total_amount: string;
-  currency: string;
   payment_status: string;
   booking_status: string;
   payment_method: string;
@@ -149,7 +148,6 @@ const BookingForm: React.FC = () => {
     subtotal: "",
     tax_amount: "",
     total_amount: "",
-    currency: globalCurrency,
     payment_status: "pending",
     booking_status: "pending",
     payment_method: "",
@@ -364,7 +362,6 @@ const BookingForm: React.FC = () => {
             contact.phone ||
             booking.contact_phone ||
             "",
-          customer_country: (booking as any).contact_country || "",
           trip_id: String(booking.trip_id || ""),
           trip_title: booking.trip_title || "",
           booking_date: normalizeDateInput(
@@ -373,16 +370,13 @@ const BookingForm: React.FC = () => {
               new Date().toISOString(),
           ),
           travel_date: normalizeDateInput(booking.travel_date ?? ""),
-          travelers: String(booking.travelers || "1"),
-          travelers_data: travelers, // Add the correctly parsed travelers data
-          subtotal: String((booking as any).subtotal || booking.total_amount || ""),
-          tax_amount: String((booking as any).tax_amount || "0"),
-          total_amount: String(booking.total_amount || ""),
-          currency: booking.currency || "USD",
+          travelers: booking.travelers_count || travelers.length || 1,
+          total_amount: parseFloat(booking.total_amount || 0),
           payment_status: booking.payment_status || "pending",
-          booking_status: booking.booking_status || "pending",
-          payment_method: booking.payment_method || "",
-          notes: booking.notes || "",
+          booking_status: booking.status || "pending",
+          payment_method: booking.payment_gateway || "",
+          notes: booking.special_requests || "",
+          travelers_data: travelers,
           emergency_contact: emergencyContact,
         };
 
@@ -396,6 +390,11 @@ const BookingForm: React.FC = () => {
   // Track if we've loaded booking data to prevent auto-calculation from overwriting
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
+  // Load tax settings on mount
+  useEffect(() => {
+    taxService.loadTaxSettings();
+  }, []);
+
   // Load booking data into form when editing
   useEffect(() => {
     if (bookingData && isEditMode) {
@@ -403,30 +402,25 @@ const BookingForm: React.FC = () => {
         customer_name: bookingData.customer_name || "",
         customer_email: bookingData.customer_email || "",
         customer_phone: bookingData.customer_phone || "",
-        customer_country: (bookingData as any).contact_country || (bookingData as any).customer_country || "",
+        customer_country: (bookingData as any).contact_country || "",
         trip_id: String(bookingData.trip_id || ""),
         booking_date:
           bookingData.booking_date || new Date().toISOString().split("T")[0],
         travel_date: bookingData.travel_date || "",
-        travelers: String((bookingData as any).travelers_count || bookingData.travelers_data?.length || "1"),
+        travelers: String(bookingData.travelers || "1"),
         subtotal: String((bookingData as any).subtotal || bookingData.total_amount || ""),
         tax_amount: String((bookingData as any).tax_amount || "0"),
         total_amount: String(bookingData.total_amount || ""),
-        currency: bookingData.currency || "USD",
         payment_status: bookingData.payment_status || "pending",
         booking_status: bookingData.booking_status || "pending",
         payment_method: bookingData.payment_method || "",
-        notes: (bookingData as any).special_requests || bookingData.notes || "",
+        notes: bookingData.notes || "",
       });
 
-      // Set travelers data - use the correctly parsed travelers_data
-      if (bookingData.travelers_data && Array.isArray(bookingData.travelers_data) && bookingData.travelers_data.length > 0) {
+      // Set travelers data
+      if (bookingData.travelers_data && bookingData.travelers_data.length > 0) {
         setTravelersData(bookingData.travelers_data);
         // Expand first traveler by default
-        setExpandedTravelers([0]);
-      } else {
-        // Ensure at least one empty traveler
-        setTravelersData([{}]);
         setExpandedTravelers([0]);
       }
 
@@ -439,46 +433,27 @@ const BookingForm: React.FC = () => {
     }
   }, [bookingData, isEditMode]);
 
-  // Auto-calculate pricing when trip or travelers change
-  useEffect(() => {
-    // Don't auto-calculate if we're in edit mode - user can manually update if needed
-    if (isEditMode) return;
+// Fetch trips for dropdown - get all trips regardless of status
+const { data: tripsData, isLoading: isLoadingTrips } = useQuery({
+  queryKey: ["trips-list-all"],
+  queryFn: async () => {
+    // Fetch all trips - try without status filter first, then with status=all
+    return await apiService.getTrips({ per_page: 500 });
+  },
+  // Always fetch trips when user can manage bookings
+  enabled: can("yatra_view_bookings") || can("yatra_view_trips"),
+  retry: 1,
+});
 
-    if (formData.trip_id && formData.travelers) {
-      const selectedTrip = tripsData?.data?.find(
-        (trip: any) => String(trip.id) === formData.trip_id,
-      );
-      if (selectedTrip) {
-        const subtotal = selectedTrip.price * parseInt(formData.travelers);
-        
-        // Calculate tax
-        const taxCalculation = taxService.calculateBookingTax(
-          subtotal,
-          formData.customer_country
-        );
-        
-        setFormData((prev) => ({
-          ...prev,
-          subtotal: taxCalculation.subtotal.toString(),
-          tax_amount: taxCalculation.tax_amount.toString(),
-          total_amount: taxCalculation.total_amount.toString(),
-        }));
-      }
-    }
-  }, [
-    formData.trip_id,
-    formData.travelers,
-    formData.customer_country,
-    tripsData?.data,
-    isEditMode,
-  ]);
+// Fetch booking data if editing
+const { data: bookingData, isLoading: isLoadingBooking } = useQuery({
+  queryKey: ["booking", bookingId],
+  queryFn: async () => {
+    if (!bookingId) return null;
+    const result = await apiService.getBooking(bookingId);
 
-  // Load tax settings on mount
-  useEffect(() => {
-    taxService.loadTaxSettings();
-  }, []);
-
-  const handleFieldChange = (field: keyof BookingFormData, value: string) => {
+    if (!result) {
+      throw new Error("Failed to fetch booking");
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
@@ -861,31 +836,6 @@ const BookingForm: React.FC = () => {
                       placeholder={__("+1234567890", "yatra")}
                     />
                   </div>
-
-                  {/* Customer Country */}
-                  <div>
-                    <label
-                      htmlFor="customer_country"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-                    >
-                      {__("Country", "yatra")}
-                    </label>
-                    <select
-                      id="customer_country"
-                      value={formData.customer_country}
-                      onChange={(e) =>
-                        handleFieldChange("customer_country", e.target.value)
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="">{__("Select country", "yatra")}</option>
-                      {countryList.map((country) => (
-                        <option key={country.code} value={country.code}>
-                          {country.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
                 </CardContent>
               </Card>
 
@@ -1131,72 +1081,18 @@ const BookingForm: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Tax Breakdown */}
-                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-2 text-sm">
-                        {__("Pricing Breakdown", "yatra")}
-                      </h4>
-                      <div className="space-y-2 text-sm">
-                        {formData.subtotal ? (
-                          <>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600 dark:text-gray-400">
-                                {__("Subtotal", "yatra")}
-                              </span>
-                              <span className="font-medium text-gray-900 dark:text-white">
-                                {currencySymbol}{parseFloat(formData.subtotal).toFixed(2)}
-                              </span>
-                            </div>
-                            {/* Itinerary Costs */}
-                            {(bookingData as any)?.itinerary_costs_total > 0 && (
-                              <div className="flex justify-between">
-                                <span className="text-gray-600 dark:text-gray-400">
-                                  {__("Itinerary Costs", "yatra")}
-                                </span>
-                                <span className="font-medium text-gray-900 dark:text-white">
-                                  {getCurrencySymbol(formData.currency || globalCurrency)}{(bookingData as any).itinerary_costs_total.toFixed(2)}
-                                </span>
-                              </div>
-                            )}
-                            {parseFloat(formData.tax_amount) > 0 && (
-                              <div className="flex justify-between">
-                                <span className="text-gray-600 dark:text-gray-400">
-                                  {__("Tax", "yatra")}
-                                </span>
-                                <span className="font-medium text-gray-900 dark:text-white">
-                                  {currencySymbol}{parseFloat(formData.tax_amount).toFixed(2)}
-                                </span>
-                              </div>
-                            )}
-                            <div className="border-t pt-2 flex justify-between font-semibold">
-                              <span className="text-gray-900 dark:text-white">
-                                {__("Total", "yatra")}
-                              </span>
-                              <span className="text-gray-900 dark:text-white">
-                                {getCurrencySymbol(formData.currency || globalCurrency)}{formData.total_amount}
-                              </span>
-                            </div>
-                          </>
-                        ) : (
-                          <div className="text-center text-gray-500 dark:text-gray-400 py-2">
-                            {__("Select a trip and number of travelers to see pricing", "yatra")}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
                     {/* Total Amount */}
                     <div>
                       <label
                         htmlFor="total_amount"
                         className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
                       >
-                        {__("Total Amount", "yatra")} ({formData.currency || globalCurrency}){" "}
+                        {__("Total Amount", "yatra")} ({globalCurrency}){" "}
                         <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                          {getCurrencySymbol(formData.currency || globalCurrency)}
+                          {currencySymbol}
                         </span>
                         <Input
                           id="total_amount"

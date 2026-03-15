@@ -14,6 +14,7 @@ use Yatra\Repositories\BookingDepartureRepository;
 use Yatra\Validators\BookingValidator;
 use Yatra\Utils\Logger;
 use Yatra\Services\CacheService;
+use Yatra\Services\BookingTaxService;
 
 /**
  * Booking Service
@@ -80,7 +81,9 @@ class BookingService
             return null;
         }
 
-        return $this->formatBookingWithDetails($booking);
+        $formatted = $this->formatBookingWithDetails($booking);
+
+        return $formatted;
     }
 
     /**
@@ -162,6 +165,16 @@ class BookingService
             ];
         }
 
+        // Validate tax configuration
+        $taxValidation = BookingTaxService::validateBookingTax($data);
+        if (!$taxValidation['valid']) {
+            return [
+                'success' => false,
+                'message' => __('Tax configuration error.', 'yatra'),
+                'errors' => $taxValidation['errors']
+            ];
+        }
+
         return ['success' => true];
     }
 
@@ -178,7 +191,9 @@ class BookingService
         try {
             Logger::info("Booking creation started", [
                 'data_keys' => array_keys($data),
-                'trip_id' => $data['trip_id'] ?? null
+                'trip_id' => $data['trip_id'] ?? null,
+                'has_itinerary_costs' => isset($data['itinerary_costs']),
+                'has_itinerary_costs_total' => isset($data['itinerary_costs_total'])
             ]);
             
             // Comprehensive validation using BookingValidator
@@ -188,24 +203,20 @@ class BookingService
                 Logger::warning('Booking validation failed', [
                     'trip_id' => $data['trip_id'] ?? null,
                     'errors' => $e->getErrors(),
-                    'error' => $e->getMessage(),
-                ]);
-                return [
-                    'success' => false,
-                    'message' => $e->getMessage() ?: __('Booking validation failed.', 'yatra'),
-                    'errors'  => $e->getErrors(),
-                ];
-            } catch (\Exception $e) {
-                Logger::warning('Booking validation failed', [
-                    'trip_id' => $data['trip_id'] ?? null,
-                    'error' => $e->getMessage(),
                 ]);
                 return [
                     'success' => false,
                     'message' => $e->getMessage() ?: __('Booking validation failed.', 'yatra'),
                 ];
             }
+            
             $data = BookingValidator::sanitize($data);
+            
+            Logger::info("After BookingValidator::sanitize", [
+                'data_keys' => array_keys($data),
+                'has_itinerary_costs' => isset($data['itinerary_costs']),
+                'has_itinerary_costs_total' => isset($data['itinerary_costs_total'])
+            ]);
             
             // Business rule validations
             $validationResult = $this->validateBookingBusinessRules($data);
@@ -257,7 +268,10 @@ class BookingService
                 $data['customer_id'] = $customerId;
             }
 
-            // Calculate amounts
+            // Apply tax calculation to booking data
+            $data = BookingTaxService::applyTaxToBooking($data);
+
+            // Calculate amounts (recalculated after tax)
             $data['amount_due'] = (float) ($data['total_amount'] ?? 0) - (float) ($data['amount_paid'] ?? 0);
 
             // Create booking
@@ -672,6 +686,15 @@ class BookingService
             'discount_amount' => (float) ($booking->discount_amount ?? 0),
             'discount_code' => $booking->discount_code ?? null,
             'currency' => $booking->currency,
+            'tax_amount' => (float) ($booking->tax_amount ?? 0),
+            'tax_rate' => (float) ($booking->tax_rate ?? 0),
+            'tax_inclusive' => (bool) ($booking->tax_inclusive ?? false),
+            'tax_details' => $booking->tax_details ?? null,
+            'tax_breakdown' => $booking->tax_details ? json_decode($booking->tax_details, true) : [],
+            'subtotal' => (float) ($booking->subtotal ?? $booking->total_amount ?? 0),
+            'taxable_amount' => (float) (($booking->subtotal ?? $booking->total_amount ?? 0) + ($booking->itinerary_costs_total ?? 0)),
+            'itinerary_costs' => $booking->itinerary_costs ? json_decode($booking->itinerary_costs, true) : [],
+            'itinerary_costs_total' => (float) ($booking->itinerary_costs_total ?? 0),
             'status' => $booking->status,
             'payment_status' => $booking->payment_status,
             // Some UIs expect payment_method; map from payment_gateway
@@ -732,6 +755,14 @@ class BookingService
         // Add payments
         $formatted['payments'] = $this->getBookingPayments((int) $booking->id);
 
+        // Add tax breakdown
+        $formatted['tax_breakdown'] = BookingTaxService::getBookingTaxBreakdown((array) $formatted);
+        $formatted['tax_display'] = BookingTaxService::formatBookingTaxDisplay((array) $formatted);
+        
+        // Add itinerary costs
+        $formatted['itinerary_costs'] = $booking->itinerary_costs ? json_decode($booking->itinerary_costs, true) : [];
+        $formatted['itinerary_costs_total'] = (float) ($booking->itinerary_costs_total ?? 0);
+
         // Add additional fields
         $formatted['special_requests'] = $booking->special_requests;
         $formatted['internal_notes'] = $booking->internal_notes;
@@ -783,9 +814,8 @@ class BookingService
             return;
         }
 
-        $settings = SettingsService::getSettings();
-
-        if (empty($settings['email_notifications']['booking_confirmation'])) {
+        // Check if booking confirmation emails are enabled
+        if (!SettingsService::isEnabled('email_booking_confirmation')) {
             return;
         }
 

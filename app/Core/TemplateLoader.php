@@ -314,12 +314,20 @@ class TemplateLoader
             'top'
         );
 
-        // Add rewrite rule for remaining checkout: checkout/{token}
+        // Add rewrite rule for remaining checkout: /remaining-checkout/{token}/
         add_rewrite_rule(
-            '^checkout/([a-zA-Z0-9_-]+)/?$',
+            '^remaining-checkout/([a-zA-Z0-9_-]+)/?$',
             'index.php?yatra_remaining_checkout=$matches[1]',
             'top'
         );
+        
+        // Check if rewrite rules need flushing (only flush once after plugin update/activation)
+        $rewrite_version = get_option('yatra_rewrite_rules_version', '0');
+        $current_version = '1.0.1'; // Increment this when rewrite rules change
+        if ($rewrite_version !== $current_version) {
+            flush_rewrite_rules(false);
+            update_option('yatra_rewrite_rules_version', $current_version);
+        }
     }
 
     /**

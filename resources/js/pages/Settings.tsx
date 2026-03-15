@@ -68,6 +68,78 @@ import { getCurrencyOptions } from "../data/currencies";
 import { SearchableSelect } from "../components/ui/searchable-select";
 import { MultiSelect, MultiSelectOption } from "../components/ui/multi-select";
 
+// Multiple Taxes Editor Component
+const MultipleTaxesEditor = React.memo(
+  ({
+    taxes,
+    onChange,
+  }: {
+    taxes: Array<{ name: string; rate: number }>;
+    onChange: (taxes: Array<{ name: string; rate: number }>) => void;
+  }) => {
+    const removeTax = (index: number) => {
+      onChange(taxes.filter((_, i) => i !== index));
+    };
+
+    const updateTax = (index: number, field: "name" | "rate", value: string | number) => {
+      const updated = [...taxes];
+      if (field === "rate") {
+        updated[index].rate = parseFloat(value as string) || 0;
+      } else {
+        updated[index].name = value as string;
+      }
+      onChange(updated);
+    };
+
+    return (
+      <div className="space-y-4">
+        {/* Tax Cards */}
+        <div className="space-y-3">
+          {taxes.filter((tax) => tax.name && tax.name.trim() !== '').map((tax, index) => (
+            <div key={index} className="relative p-4 border rounded-lg bg-gray-50 dark:bg-gray-800 w-full">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => removeTax(index)}
+                className="absolute top-3 right-3 text-red-600 hover:text-red-700 p-2"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+              
+              <div className="flex items-center gap-3 pr-12">
+                <div className="flex-1">
+                  <Input
+                    value={tax.name}
+                    onChange={(e) => updateTax(index, "name", e.target.value)}
+                    placeholder={__("Tax name (e.g., VAT, GST)", "yatra")}
+                    className="w-full"
+                  />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-1">
+                    <Input
+                      type="number"
+                      value={tax.rate}
+                      onChange={(e) => updateTax(index, "rate", e.target.value)}
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      placeholder={__("Rate", "yatra")}
+                      className="w-full"
+                    />
+                    <span className="text-sm text-gray-500 dark:text-gray-400">%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+);
+
 // Helper component for form field with description - MUST be outside component to prevent remounts
 const FormField = React.memo(
   ({
@@ -707,11 +779,15 @@ interface SettingsData {
 
   // Tax Settings
   enable_tax: boolean;
+  tax_name: string;
   tax_rate: number;
   tax_inclusive: boolean;
   vat_number: string;
   tax_by_country: boolean;
   tax_rates: Record<string, number>;
+  multiple_taxes_enabled: boolean;
+  multiple_taxes: Array<{ name: string; rate: number }>;
+  multiple_taxes_by_country: Record<string, Array<{ name: string; rate: number }>>;
 
   // Currency Settings
   default_currency: string;
@@ -1961,13 +2037,14 @@ const Settings: React.FC = () => {
   }, [activeSection]);
 
   // Fetch settings
-  const { data: settings, isLoading } = useQuery({
+  const { data: settings, isLoading, error } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
       try {
         const response = await apiClient.get("/settings");
         return response;
       } catch (error: any) {
+        console.error('Error fetching settings:', error);
         showToast(
           error?.message || __("Failed to load settings", "yatra"),
           "error",
@@ -2150,11 +2227,15 @@ const Settings: React.FC = () => {
       allow_anonymous_reviews: false,
       review_reminder_days: 7,
       enable_tax: true,
+      tax_name: __("Tax", "yatra"),
       tax_rate: 10,
       tax_inclusive: false,
       vat_number: "",
       tax_by_country: false,
       tax_rates: {},
+      multiple_taxes_enabled: false,
+      multiple_taxes: [],
+      multiple_taxes_by_country: {},
       default_currency: "USD",
       multi_currency: false,
       currency_position: "left",
@@ -2449,12 +2530,10 @@ const Settings: React.FC = () => {
   const isInitializedRef = React.useRef(false);
 
   // Mailchimp state
-  const [mailchimpValidating, setMailchimpValidating] = useState(false);
   const [mailchimpConnectionStatus, setMailchimpConnectionStatus] = useState<{
     connected: boolean;
     error?: string;
   } | null>(null);
-  const [mailchimpLoadingLists, setMailchimpLoadingLists] = useState(false);
   const [mailchimpLists, setMailchimpLists] = useState<Array<{
     id: string;
     name: string;
@@ -2465,19 +2544,20 @@ const Settings: React.FC = () => {
     type: string;
     required: boolean;
   }>>([]);
-  const [mailchimpLoadingFields, setMailchimpLoadingFields] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
   const [validatingApiKey, setValidatingApiKey] = useState(false);
   const [showFacebookToken, setShowFacebookToken] = useState(false);
-  const [showGaSecret, setShowGaSecret] = useState(false);
   const [seoImageUrl, setSeoImageUrl] = useState<string>('');
   const [seoImageLoading, setSeoImageLoading] = useState<boolean>(false);
   const [seoImageError, setSeoImageError] = useState<string>('');
-  
+
+  const [newTaxName, setNewTaxName] = useState("");
+  const [newTaxRate, setNewTaxRate] = useState("");
+
   // Facebook Pixel validation state
   const [validatingPixel, setValidatingPixel] = useState(false);
   const [validatingToken, setValidatingToken] = useState(false);
-  
+
   // Google Analytics validation state
   const [validatingMeasurementId, setValidatingMeasurementId] = useState(false);
   const [validatingApiSecret, setValidatingApiSecret] = useState(false);
@@ -2543,7 +2623,6 @@ const Settings: React.FC = () => {
   };
 
   const loadMailchimpLists = async () => {
-    setMailchimpLoadingLists(true);
     try {
       const response = await apiClient.get("/mailchimp/lists");
       
@@ -2563,8 +2642,6 @@ const Settings: React.FC = () => {
     } catch (error: any) {
       console.error("Error loading Mailchimp lists:", error);
       setMailchimpLists([]);
-    } finally {
-      setMailchimpLoadingLists(false);
     }
   };
 
@@ -2574,7 +2651,6 @@ const Settings: React.FC = () => {
       return;
     }
     
-    setMailchimpLoadingFields(true);
     try {
       const response = await apiClient.get(`/mailchimp/lists/${listId}/merge-fields`);
       
@@ -2594,8 +2670,6 @@ const Settings: React.FC = () => {
     } catch (error: any) {
       console.error("Error loading Mailchimp merge fields:", error);
       setMailchimpMergeFields([]);
-    } finally {
-      setMailchimpLoadingFields(false);
     }
   };
 
@@ -5340,28 +5414,79 @@ const Settings: React.FC = () => {
               {formData.enable_tax && (
                 <>
                   <FormField
-                    id="tax_rate"
-                    label={__("Tax Rate (%)", "yatra")}
-                    description={__("Default tax rate percentage", "yatra")}
+                    id="multiple_taxes"
+                    label={__("Taxes", "yatra")}
+                    description={__("Configure taxes to apply to bookings", "yatra")}
                   >
-                    <div className="flex items-center gap-2">
-                      <Input
-                        id="tax_rate"
-                        type="number"
-                        value={formData.tax_rate}
-                        name="tax_rate"
-                        onChange={handleFieldChange}
-                        min="0"
-                        max="100"
-                        step="0.01"
-                        className="flex-1"
-                      />
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        %
-                      </span>
+                    <MultipleTaxesEditor
+                      taxes={formData.multiple_taxes || []}
+                      onChange={(taxes) => {
+                        setFormData((prev) =>
+                          prev ? { ...prev, multiple_taxes: taxes } : prev
+                        );
+                      }}
+                    />
+
+                    {/* New Tax Input Fields - Template for adding new taxes */}
+                    <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 mt-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1">
+                          <Input
+                            value={newTaxName}
+                            onChange={(e) => setNewTaxName(e.target.value)}
+                            placeholder={__("Tax name (e.g., VAT, GST)", "yatra")}
+                            className="w-full"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-1">
+                            <Input
+                              type="number"
+                              value={newTaxRate}
+                              onChange={(e) => setNewTaxRate(e.target.value)}
+                              min="0"
+                              max="100"
+                              step="0.01"
+                              placeholder={__("Rate", "yatra")}
+                              className="w-full"
+                            />
+                            <span className="text-sm text-gray-500 dark:text-gray-400">%</span>
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          onClick={() => {
+                            if (newTaxName && newTaxRate && parseFloat(newTaxRate) >= 0 && parseFloat(newTaxRate) <= 100) {
+                              setFormData((prev) => {
+                                const currentTaxes = prev?.multiple_taxes || [];
+                                const newTax = { name: newTaxName, rate: parseFloat(newTaxRate) };
+                                const updatedTaxes = [...currentTaxes, newTax];
+                                return prev ? { ...prev, multiple_taxes: updatedTaxes } : prev;
+                              });
+                              setNewTaxName('');
+                              setNewTaxRate('');
+                            }
+                          }}
+                          disabled={!newTaxName || !newTaxRate || parseFloat(newTaxRate) < 0 || parseFloat(newTaxRate) > 100}
+                          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          {__("Add new Tax", "yatra")}
+                        </Button>
+                      </div>
                     </div>
+
+                    {/* Total Tax Rate */}
+                    {(formData.multiple_taxes || []).length > 0 && (
+                      <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 mt-4">
+                        <div className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                          {__("Total Tax Rate:", "yatra")} {(formData.multiple_taxes || []).reduce((sum, tax) => sum + tax.rate, 0).toFixed(2)}%
+                        </div>
+                      </div>
+                    )}
                   </FormField>
 
+                  
                   <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
                     <input
                       type="checkbox"
