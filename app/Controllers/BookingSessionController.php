@@ -318,9 +318,19 @@ class BookingSessionController extends BaseController
                 foreach ($price_types as $pt) {
                     $pt = (array) $pt;
                     $category_id = $pt['category_id'] ?? 0;
+                    $pricing_mode = $pt['pricing_mode'] ?? 'per_person';
                     $category_price = isset($pt['effective_price']) ? (float) $pt['effective_price'] : ($pt['sale_price'] ?? $pt['discounted_price'] ?? $pt['original_price'] ?? 0);
                     $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : 0;
-                    $base_amount += $category_price * $count;
+                    
+                    if ($pricing_mode === 'per_group') {
+                        // Per group: charge flat price once if any travelers in this category
+                        if ($count > 0) {
+                            $base_amount += $category_price;
+                        }
+                    } else {
+                        // Per person: charge per traveler
+                        $base_amount += $category_price * $count;
+                    }
                 }
             } else {
                 // Regular pricing
@@ -2795,11 +2805,20 @@ class BookingSessionController extends BaseController
             ], 400);
         }
         
-        // Remove coupon from session
+        // Remove coupon directly from session to avoid array_merge issues
+        if (isset($_SESSION['yatra_booking']['coupon'])) {
+            unset($_SESSION['yatra_booking']['coupon']);
+        }
+        $_SESSION['yatra_booking']['timestamp'] = time();
+        
+        // Also update local session array for calculation
         unset($session['coupon']);
         $session['timestamp'] = time();
         
-        yatra_set_booking_session($session);
+        // Ensure session data is written immediately
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
         
         $total_amount = $this->calculateSessionTotal($session);
         

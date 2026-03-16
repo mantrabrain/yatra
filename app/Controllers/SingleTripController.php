@@ -532,8 +532,88 @@ class SingleTripController
      */
     private function getPriceTypes(int $trip_id): array
     {
-        // Table removed: return empty price types for traveler-based pricing
-        return [];
+        // Read price_types JSON from trips table
+        $table = esc_sql(TripsTable::getTableName());
+        $json = $this->wpdb->get_var(
+            $this->wpdb->prepare("SELECT price_types FROM `{$table}` WHERE id = %d", $trip_id)
+        );
+
+        if (empty($json)) {
+            return [];
+        }
+
+        $decoded = is_string($json) ? json_decode($json, true) : $json;
+        if (!is_array($decoded) || empty($decoded)) {
+            return [];
+        }
+
+        // Collect category IDs for enrichment
+        $category_ids = [];
+        foreach ($decoded as $pt) {
+            if (!is_array($pt)) continue;
+            $cat_id = $pt['category_id'] ?? null;
+            if ($cat_id !== null && $cat_id !== '') {
+                $category_ids[] = (int) $cat_id;
+            }
+        }
+
+        // Fetch category metadata (label, slug, pricing_mode, age_min, age_max, min_pax, max_pax)
+        $categories = [];
+        if (!empty($category_ids)) {
+            $classifications_table = esc_sql(ClassificationsTable::getTableName());
+            $placeholders = implode(',', array_fill(0, count($category_ids), '%d'));
+            $rows = $this->wpdb->get_results(
+                $this->wpdb->prepare(
+                    "SELECT id, name, slug, metadata FROM `{$classifications_table}` WHERE id IN ({$placeholders})",
+                    ...$category_ids
+                )
+            );
+            foreach ($rows as $row) {
+                $meta = !empty($row->metadata) ? json_decode($row->metadata, true) : [];
+                $categories[(int) $row->id] = (object) [
+                    'label'        => $row->name,
+                    'slug'         => $row->slug,
+                    'pricing_mode' => $meta['pricing_mode'] ?? 'per_person',
+                    'age_min'      => isset($meta['age_min']) ? (int) $meta['age_min'] : null,
+                    'age_max'      => isset($meta['age_max']) ? (int) $meta['age_max'] : null,
+                    'min_pax'      => isset($meta['min_pax']) ? (int) $meta['min_pax'] : null,
+                    'max_pax'      => isset($meta['max_pax']) ? (int) $meta['max_pax'] : null,
+                    'max_quantity'  => isset($meta['max_quantity']) ? (int) $meta['max_quantity'] : null,
+                    'description'  => $meta['description'] ?? '',
+                ];
+            }
+        }
+
+        // Build enriched price_types as objects
+        $result = [];
+        foreach ($decoded as $pt) {
+            if (!is_array($pt)) continue;
+
+            $cat_id = isset($pt['category_id']) ? (int) $pt['category_id'] : null;
+            $cat = ($cat_id !== null && isset($categories[$cat_id])) ? $categories[$cat_id] : null;
+
+            $original   = isset($pt['original_price']) ? (float) $pt['original_price'] : 0;
+            $discounted = isset($pt['discounted_price']) ? (float) $pt['discounted_price'] : 0;
+            $effective  = ($discounted > 0 && $discounted < $original) ? $discounted : $original;
+
+            $result[] = (object) [
+                'category_id'      => $cat_id,
+                'category_label'   => $cat ? $cat->label : ($pt['label'] ?? __('Traveler', 'yatra')),
+                'category_slug'    => $cat ? $cat->slug : '',
+                'original_price'   => $original,
+                'discounted_price' => $discounted,
+                'effective_price'  => $effective,
+                'pricing_mode'     => $cat ? $cat->pricing_mode : ($pt['pricing_mode'] ?? 'per_person'),
+                'age_min'          => $cat ? $cat->age_min : null,
+                'age_max'          => $cat ? $cat->age_max : null,
+                'min_pax'          => $cat ? $cat->min_pax : null,
+                'max_pax'          => $cat ? $cat->max_pax : null,
+                'max_quantity'     => $cat ? $cat->max_quantity : null,
+                'description'      => $cat ? $cat->description : ($pt['description'] ?? ''),
+            ];
+        }
+
+        return $result;
     }
 
     /**

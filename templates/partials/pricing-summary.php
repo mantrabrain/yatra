@@ -30,8 +30,20 @@ if (!isset($checkout) || !($checkout instanceof \Yatra\Models\Checkout)) {
 <!-- Traveler-based pricing breakdown -->
 <div class="yatra-price-breakdown-categories" id="price-breakdown-categories">
     <?php foreach ($checkout->getCategoryBreakdown() as $cat) : ?>
+    <?php 
+    // Calculate per-unit price for display
+    $per_unit_price = $cat['count'] > 0 ? $cat['subtotal'] / $cat['count'] : 0;
+    $per_unit_formatted = $checkout->formatPrice($per_unit_price);
+    ?>
     <div class="yatra-price-row yatra-category-subtotal" data-category-id="<?php echo esc_attr($cat['category_id']); ?>">
-        <span><?php echo esc_html($cat['label']); ?> x <span class="category-count"><?php echo (int) $cat['count']; ?></span></span>
+        <span>
+            <?php echo esc_html($cat['label']); ?> x <span class="category-count"><?php echo (int) $cat['count']; ?></span>
+            <?php if ($cat['count'] > 0) : ?>
+                <span class="yatra-price-calculation" style="color: #6b7280; font-size: 0.9em; font-weight: normal;">
+                    (<?php echo esc_html($per_unit_formatted); ?> x <?php echo (int) $cat['count']; ?>)
+                </span>
+            <?php endif; ?>
+        </span>
         <span class="category-subtotal"><?php echo esc_html($checkout->formatPrice($cat['subtotal'])); ?></span>
     </div>
     <?php endforeach; ?>
@@ -281,8 +293,10 @@ if (!isset($checkout) || !($checkout instanceof \Yatra\Models\Checkout)) {
 
 <!-- Taxable Amount (SubTotal - amount that tax is calculated on) -->
 <?php 
-$taxable_amount = $checkout->getTaxableAmount();
-if ($taxable_amount && $taxable_amount > 0 && $checkout->hasTaxes()) : 
+$has_discount = $checkout->hasCoupon() || $checkout->getGroupDiscountAmount() > 0;
+// Only show taxable amount if there are taxes AND if there's a discount
+if ($checkout->hasTaxes() && $has_discount) : 
+    $taxable_amount = $checkout->getTaxableAmount();
 ?>
 <div class="yatra-price-row yatra-price-subtotal" style="border-top: 1px dashed #e5e7eb; margin-top: 8px; padding-top: 8px;">
     <span><strong><?php esc_html_e('Subtotal (Taxable Amount)', 'yatra'); ?></strong></span>

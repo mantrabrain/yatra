@@ -795,18 +795,23 @@ class TripRepository extends BaseRepository
             return [];
         }
 
-        // Normalize each price type entry
+        // Normalize each price type entry (preserve all fields needed for pricing)
         return array_values(array_filter(array_map(function ($pt) {
             if (!is_array($pt)) {
                 return null;
             }
-            return [
+            $normalized = [
                 'category_id'      => isset($pt['category_id']) ? (int) $pt['category_id'] : null,
                 'original_price'   => isset($pt['original_price']) ? (float) $pt['original_price'] : null,
                 'discounted_price' => isset($pt['discounted_price']) ? (float) $pt['discounted_price'] : null,
                 'sale_price'       => isset($pt['sale_price']) ? (float) $pt['sale_price'] : null,
                 'label'            => $pt['label'] ?? ($pt['title'] ?? null),
+                'pricing_mode'     => $pt['pricing_mode'] ?? 'per_person',
             ];
+            // Preserve optional metadata if present
+            if (isset($pt['category_label'])) $normalized['category_label'] = $pt['category_label'];
+            if (isset($pt['description'])) $normalized['description'] = $pt['description'];
+            return $normalized;
         }, $decoded)));
     }
 

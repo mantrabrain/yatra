@@ -1438,6 +1438,7 @@ class TripController extends BaseController
         $is_single_day = ($trip_data->duration_days ?? 1) <= 1;
 
         $traveler_category_labels = [];
+        $traveler_category_meta = [];
         $traveler_category_ids = [];
         $add_category_ids = static function ($price_types_raw) use (&$traveler_category_ids): void {
             if (empty($price_types_raw)) {
@@ -1483,6 +1484,7 @@ class TripController extends BaseController
         }
 
         $traveler_category_ids = array_values(array_unique(array_filter($traveler_category_ids)));
+        
         if (!empty($traveler_category_ids)) {
             $traveler_category_repo = new TravelerCategoryRepository();
             $categories = $traveler_category_repo->all([
@@ -1490,14 +1492,25 @@ class TripController extends BaseController
                     'id' => $traveler_category_ids,
                 ],
             ]);
+            
             foreach ($categories as $cat) {
-                if (!empty($cat->id) && isset($cat->label)) {
-                    $traveler_category_labels[(string) $cat->id] = (string) $cat->label;
+                // Use 'name' field from database, not 'label'
+                if (!empty($cat->id) && isset($cat->name)) {
+                    $traveler_category_labels[(string) $cat->id] = (string) $cat->name;
                 }
+                // Parse metadata for pricing_mode, age_min, age_max, min_pax, max_pax
+                $meta = !empty($cat->metadata) ? (is_string($cat->metadata) ? json_decode($cat->metadata, true) : (array) $cat->metadata) : [];
+                $traveler_category_meta[(string) $cat->id] = [
+                    'pricing_mode' => $meta['pricing_mode'] ?? 'per_person',
+                    'age_min'      => isset($meta['age_min']) ? (int) $meta['age_min'] : null,
+                    'age_max'      => isset($meta['age_max']) ? (int) $meta['age_max'] : null,
+                    'min_pax'      => isset($meta['min_pax']) ? (int) $meta['min_pax'] : null,
+                    'max_pax'      => isset($meta['max_pax']) ? (int) $meta['max_pax'] : null,
+                ];
             }
         }
 
-        $enrich_price_types = static function ($price_types_raw) use ($traveler_category_labels): array {
+        $enrich_price_types = static function ($price_types_raw) use ($traveler_category_labels, $traveler_category_meta): array {
             if (empty($price_types_raw)) {
                 return [];
             }
@@ -1511,7 +1524,7 @@ class TripController extends BaseController
                 return [];
             }
 
-            return array_map(static function ($pt) use ($traveler_category_labels) {
+            return array_map(static function ($pt) use ($traveler_category_labels, $traveler_category_meta) {
                 if (is_object($pt)) {
                     $pt = (array) $pt;
                 }
@@ -1533,6 +1546,24 @@ class TripController extends BaseController
 
                 if (empty($pt['label']) && !empty($pt['category_label'])) {
                     $pt['label'] = $pt['category_label'];
+                }
+
+                // Enrich with category metadata (pricing_mode, age, pax limits)
+                if ($cat_id !== null && isset($traveler_category_meta[(string) $cat_id])) {
+                    $meta = $traveler_category_meta[(string) $cat_id];
+                    // Always use category metadata pricing_mode to ensure correct mode from database
+                    $pt['pricing_mode'] = $meta['pricing_mode'];
+                    if (!isset($pt['age_min'])) $pt['age_min'] = $meta['age_min'];
+                    if (!isset($pt['age_max'])) $pt['age_max'] = $meta['age_max'];
+                    if (!isset($pt['min_pax'])) $pt['min_pax'] = $meta['min_pax'];
+                    if (!isset($pt['max_pax'])) $pt['max_pax'] = $meta['max_pax'];
+                }
+
+                // Compute effective_price if not set
+                if (!isset($pt['effective_price'])) {
+                    $original = (float) ($pt['original_price'] ?? 0);
+                    $discounted = (float) ($pt['discounted_price'] ?? 0);
+                    $pt['effective_price'] = ($discounted > 0 && $discounted < $original) ? $discounted : $original;
                 }
 
                 return $pt;

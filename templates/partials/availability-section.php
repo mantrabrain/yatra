@@ -267,12 +267,12 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
                         <label class="yatra-card-traveler-label"><?php esc_html_e('Travelers', 'yatra'); ?></label>
                         
                         <?php 
-                        // Use card-specific pricing (priority: availability date > rule > trip)
+                        // Use enriched trip-level price_types for traveler-based pricing to ensure category labels and pricing mode
                         $card_pricing_type = $card['pricing_type'] ?? $pricing_type ?? 'regular';
-                        $card_price_types = $card['traveler_pricing'] ?? [];
+                        $card_price_types = [];
                         
-                        // If empty, fallback to trip-level price_types
-                        if (empty($card_price_types) && $card_pricing_type === 'traveler_based' && !empty($price_types)) {
+                        // Always use enriched trip-level price_types for traveler-based pricing
+                        if ($card_pricing_type === 'traveler_based' && !empty($price_types)) {
                             $card_price_types = $price_types;
                         }
                         
@@ -329,14 +329,42 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
                             $pt_category_id = $pt->category_id ?? $pt_index;
                             $pt_min_qty = 0;
                             $pt_max_qty = (int) min($seats_available, $max_travelers);
+                            $pt_pricing_mode = $pt->pricing_mode ?? 'per_person';
+                            $pt_is_per_group = ($pt_pricing_mode === 'per_group');
+                            
+                            // Build pricing label (same as sidebar)
+                            $pricing_label = '';
+                            if ($pt_is_per_group) {
+                                if (!empty($pt->min_pax) && !empty($pt->max_pax)) {
+                                    $pricing_label = sprintf(__('per group (%d-%d pax)', 'yatra'), $pt->min_pax, $pt->max_pax);
+                                } elseif (!empty($pt->max_pax)) {
+                                    $pricing_label = sprintf(__('per group (up to %d pax)', 'yatra'), $pt->max_pax);
+                                } elseif (!empty($pt->min_pax)) {
+                                    $pricing_label = sprintf(__('per group (%d+ pax)', 'yatra'), $pt->min_pax);
+                                } else {
+                                    $pricing_label = __('per group', 'yatra');
+                                }
+                            }
+                            
+                            // Build price HTML (same as sidebar)
+                            $pt_price_html = '';
+                            if ($pt_price > 0) {
+                                $pt_price_html = '<div class="yatra-quantity-price-wrapper">';
+                                $pt_price_html .= '<span class="yatra-quantity-price">' . yatra_format_price($pt_price) . '</span>';
+                                if ($pt_is_per_group) {
+                                    $pt_price_html .= '<span class="yatra-pricing-mode-label yatra-pricing-mode-group">' . esc_html($pricing_label) . '</span>';
+                                }
+                                $pt_price_html .= '</div>';
+                            }
 
                             $traveler_rows[] = [
                                 'label' => $pt_label,
                                 'subtitle' => $pt_age_text,
-                                'price_html' => $pt_price > 0 ? esc_html(yatra_format_price($pt_price)) : '',
+                                'price_html' => $pt_price_html,
                                 'row_attrs' => [
                                     'data-category-id' => $pt_category_id,
                                     'data-price' => $pt_price,
+                                    'data-pricing-mode' => $pt_pricing_mode,
                                 ],
                                 'minus_disabled' => $pt_default <= $pt_min_qty,
                                 'plus_disabled' => $pt_default >= $pt_max_qty,
@@ -353,6 +381,8 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
                                 'input_attrs' => [
                                     'data-item' => $item_id,
                                     'data-category' => $pt_category_id,
+                                    'data-price' => $pt_price,
+                                    'data-pricing-mode' => $pt_pricing_mode,
                                     'value' => $pt_default,
                                     'min' => $pt_min_qty,
                                     'max' => $pt_max_qty,

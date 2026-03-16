@@ -134,5 +134,40 @@ class TravelerCategoryRepository extends BaseRepository
             ClassificationTypes::TRAVELER_TYPE, ...$categoryIds
         ));
     }
+
+    /**
+     * Get metadata by category IDs
+     * 
+     * @param array $categoryIds Array of category IDs
+     * @return array Array of metadata indexed by category ID
+     */
+    public function getMetadataByIds(array $categoryIds): array
+    {
+        $table = $this->getTableName();
+        
+        $categoryIds = array_unique(array_filter($categoryIds));
+        if (empty($categoryIds)) {
+            return [];
+        }
+        
+        $placeholders = implode(',', array_fill(0, count($categoryIds), '%d'));
+        $rows = $this->wpdb->get_results($this->wpdb->prepare(
+            "SELECT id, metadata FROM `{$table}` WHERE type = %s AND id IN ({$placeholders})",
+            ClassificationTypes::TRAVELER_TYPE,
+            ...$categoryIds
+        ));
+        
+        $result = [];
+        foreach ($rows as $row) {
+            $meta = !empty($row->metadata) ? json_decode($row->metadata, true) : [];
+            $result[(int) $row->id] = [
+                'pricing_mode' => $meta['pricing_mode'] ?? 'per_person',
+                'min_pax'      => $meta['min_pax'] ?? null,
+                'max_pax'      => $meta['max_pax'] ?? null,
+            ];
+        }
+        
+        return $result;
+    }
 }
 

@@ -128,7 +128,17 @@
             $('.yatra-qty-input[data-category-id]').each(function() {
                 const count = parseInt($(this).val()) || 0;
                 const price = parseFloat($(this).data('price')) || 0;
-                total += count * price;
+                const pricingMode = $(this).data('pricing-mode') || $(this).closest('.yatra-quantity-row').data('pricing-mode') || 'per_person';
+                
+                if (pricingMode === 'per_group') {
+                    // Per group: charge flat price once if any travelers in this category
+                    if (count > 0) {
+                        total += price;
+                    }
+                } else {
+                    // Per person: charge per traveler
+                    total += count * price;
+                }
             });
             return total;
         }

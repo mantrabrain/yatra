@@ -3949,20 +3949,20 @@ button.yatra-booking-button svg path {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 12px;
-    border-radius: 8px;
-    transition: background-color 0.2s ease;
+    padding: 16px 12px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
     gap: 16px;
+    margin-bottom: 8px;
 }
 
 .yatra-quantity-row:hover {
-    background-color: #f9fafb;
+    background-color: #f8fafc;
+    transform: translateX(2px);
 }
 
 .yatra-quantity-row:not(:last-child) {
-    border-bottom: 1px solid #f3f4f6;
-    margin-bottom: 4px;
-    padding-bottom: 14px;
+    border-bottom: none;
 }
 
 .yatra-quantity-label {
@@ -3976,22 +3976,22 @@ button.yatra-booking-button svg path {
 .yatra-quantity-title {
     font-size: 15px;
     font-weight: 600;
-    color: #111827;
+    color: #0f172a;
     line-height: 1.3;
 }
 
 .yatra-quantity-subtitle {
     font-size: 12px;
-    color: #6b7280;
+    color: #64748b;
     line-height: 1.4;
 }
 
 .yatra-quantity-price {
     display: block;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: #059669;
-    margin-top: 4px;
+    margin-top: 2px;
     white-space: nowrap;
 }
 
@@ -4225,71 +4225,77 @@ button.yatra-booking-button svg path {
 }
 
 .yatra-quantity-controls {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     background: #ffffff;
-    padding: 6px;
+    padding: 4px;
     border-radius: 10px;
-    border: 1.5px solid #e5e7eb;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+}
+
+.yatra-quantity-controls:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 .yatra-quantity-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
     border: none;
-    background: #f3f4f6;
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.15s ease;
-    color: #374151;
+    color: #64748b;
     padding: 0;
     flex-shrink: 0;
 }
 
 .yatra-quantity-btn:hover:not(:disabled) {
-    background: #3b82f6;
-    color: #ffffff;
-    transform: scale(1.1);
-    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    background: #f1f5f9;
+    color: #2563eb;
 }
 
 .yatra-quantity-btn:active:not(:disabled) {
+    background: #e2e8f0;
+    color: #1e40af;
     transform: scale(0.95);
-    background: #2563eb;
 }
 
 .yatra-quantity-btn:disabled {
     opacity: 0.3;
     cursor: not-allowed;
-    background: #f9fafb;
+    color: #cbd5e1;
 }
 
 .yatra-quantity-btn svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     stroke-width: 2.5;
 }
 
 .yatra-quantity-input {
-    width: 44px;
-    height: 32px;
+    width: 32px;
+    height: 28px;
     text-align: center;
     border: none;
-    background: #f9fafb;
-    font-size: 16px;
+    background: transparent;
+    font-size: 14px;
     font-weight: 700;
-    color: #111827;
+    color: #0f172a;
     padding: 0;
     cursor: default;
-    min-width: 44px;
-    border-radius: 6px;
+    min-width: 32px;
+    border-radius: 4px;
     appearance: textfield;
     -moz-appearance: textfield;
+    transition: background-color 0.15s ease;
 }
 
 .yatra-quantity-input::-webkit-outer-spin-button,
@@ -4300,6 +4306,7 @@ button.yatra-booking-button svg path {
 
 .yatra-quantity-input:focus {
     outline: none;
+    background: #f8fafc;
 }
 
 .yatra-quantity-note {
@@ -7661,32 +7668,14 @@ input.yatra-datepicker,
 }
 
 .yatra-availability-card .yatra-quantity-row {
-    padding: 10px 10px;
-    border-radius: 12px;
-}
-
-.yatra-availability-card .yatra-quantity-row:hover {
-    background-color: #f8fafc;
+    padding: 10px 8px;
+    border-radius: 10px;
 }
 
 .yatra-availability-card .yatra-quantity-row:not(:last-child) {
-    border-bottom: 1px solid #eef2f7;
-    margin-bottom: 8px;
-    padding-bottom: 12px;
-}
-
-.yatra-availability-card .yatra-quantity-title {
-    font-weight: 700;
-    color: #0f172a;
-}
-
-.yatra-availability-card .yatra-quantity-subtitle {
-    color: #64748b;
-}
-
-.yatra-availability-card .yatra-quantity-price {
-    color: #2563eb;
-    font-weight: 700;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 2px;
+    padding-bottom: 10px;
 }
 
 /* Simple Travelers Display in Availability Cards */

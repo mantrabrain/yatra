@@ -210,13 +210,25 @@ if (!defined('ABSPATH')) {
             <?php if ($has_traveler_pricing): ?>
                 <!-- Traveler-Based Pricing: Show dynamic categories with prices -->
                 <?php
-                $first_label = !empty($trip->price_types[0]->category_label)
-                    ? $trip->price_types[0]->category_label
-                    : __('Traveler', 'yatra');
-                $traveler_display_text = $first_label . ' x 1';
+                // Normalize price_types to match availability section
+                $normalized_price_types = [];
+                foreach ($trip->price_types as $pt) {
+                    if (is_array($pt)) {
+                        $normalized_price_types[] = (object) $pt;
+                    } else {
+                        $normalized_price_types[] = $pt;
+                    }
+                }
+                
+                $first_category = isset($normalized_price_types[0]) ? $normalized_price_types[0] : null;
+                $first_label = '';
+                if ($first_category) {
+                    $first_label = $first_category->category_label ?? $first_category->label ?? __('Traveler', 'yatra');
+                }
+                $traveler_display_text = ($first_label ?: __('Traveler', 'yatra')) . ' x 1';
 
                 $traveler_rows = [];
-                foreach ($trip->price_types as $index => $price_type) {
+                foreach ($normalized_price_types as $index => $price_type) {
                     $pricing_mode = $price_type->pricing_mode ?? 'per_person';
                     $is_per_group = ($pricing_mode === 'per_group');
                     $pricing_label = '';
@@ -296,15 +308,15 @@ if (!defined('ABSPATH')) {
                 }
 
                 $root_id = '';
-                $root_class = 'yatra-booking-field-select yatra-participants-select';
+                $root_class = 'yatra-booking-field-select yatra-participants-select yatra-availability-participants';
                 $container_attrs = [];
 
                 $display_id = 'participants-display';
-                $display_class = 'yatra-participants-display';
+                $display_class = 'yatra-participants-display yatra-availability-participants-display';
                 $display_attrs = [];
 
                 $dropdown_id = 'quantity-selector';
-                $dropdown_class = 'yatra-booking-quantity-selector';
+                $dropdown_class = 'yatra-booking-quantity-selector yatra-availability-quantity-selector';
                 $dropdown_attrs = [];
 
                 $display_text = $traveler_display_text;

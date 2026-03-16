@@ -4,2868 +4,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Travel Booking & Management 3.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/yatra\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Last-Translator: Yatra Dev <mantrabrain@gmail.com>\n"
+"Language-Team: Yatra Development Team <mantrabrain@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-15T14:47:58+00:00\n"
+"POT-Creation-Date: 2026-03-15T15:04:44+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Domain: yatra\n"
-
-#: assets/admin/dist/js/app.js:29291
-msgid "Failed to load reviews. Please try again."
-msgstr ""
-
-#: assets/admin/dist/js/app.js:29321
-msgid "Select reviews to display as testimonials"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:29323
-msgid "Save the trip first to select testimonials from reviews"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:29328
-msgid "Testimonials"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:29329
-msgid "Select approved reviews to display as testimonials on the trip page"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:29335
-msgid "Loading reviews..."
-msgstr ""
-
-#: assets/admin/dist/js/app.js:29346
-msgid "Retry"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:29351
-msgid "No approved reviews yet"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:29352
-msgid "Reviews will appear here once customers submit and they are approved"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:29357
-msgid "Select reviews to feature as testimonials"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:29366
-#: templates/listing-trip.php:246
-msgid "Clear all"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:29404
-msgid "Selected as testimonial"
-msgstr ""
-
-#: assets/dist/blocks/activity.js:102
-#: assets/dist/blocks/destination.js:109
-#: assets/dist/blocks/tour.js:111
-msgid "Showing "
-msgstr ""
-
-#: assets/dist/blocks/activity.js:103
-msgid "all"
-msgstr ""
-
-#: assets/dist/blocks/activity.js:104
-msgid " activities in "
-msgstr ""
-
-#: assets/dist/blocks/activity.js:106
-#: assets/dist/blocks/destination.js:113
-#: assets/dist/blocks/tour.js:115
-msgid " columns"
-msgstr ""
-
-#: assets/dist/blocks/activity.js:11
-#: assets/dist/blocks/destination.js:16
-#: assets/dist/blocks/tour.js:11
-#: resources/js/blocks/activity/block.js:29
-#: resources/js/blocks/destination/block.js:29
-#: resources/js/blocks/tour/block.js:29
-msgid "Title"
-msgstr ""
-
-#: assets/dist/blocks/activity.js:19
-#: assets/dist/blocks/destination.js:24
-#: assets/dist/blocks/tour.js:19
-#: resources/js/blocks/activity/block.js:38
-#: resources/js/blocks/destination/block.js:38
-#: resources/js/blocks/tour/block.js:38
-msgid "Order"
-msgstr ""
-
-#: assets/dist/blocks/activity.js:22
-#: assets/dist/blocks/destination.js:27
-#: assets/dist/blocks/tour.js:23
-#: resources/js/blocks/activity/block.js:41
-#: resources/js/blocks/destination/block.js:41
-#: resources/js/blocks/tour/block.js:42
-msgid "Ascending"
-msgstr ""
-
-#: assets/dist/blocks/activity.js:23
-#: assets/dist/blocks/destination.js:28
-#: assets/dist/blocks/tour.js:22
-#: resources/js/blocks/activity/block.js:42
-#: resources/js/blocks/destination/block.js:42
-#: resources/js/blocks/tour/block.js:41
-msgid "Descending"
-msgstr ""
-
-#: assets/dist/blocks/activity.js:31
-#: resources/js/blocks/activity/block.js:51
-msgid "Number of Activities"
-msgstr ""
-
-#: assets/dist/blocks/activity.js:41
-#: assets/dist/blocks/destination.js:46
-#: assets/dist/blocks/tour.js:41
-#: resources/js/blocks/activity/block.js:62
-#: resources/js/blocks/destination/block.js:62
-#: resources/js/blocks/tour/block.js:62
-msgid "Columns"
-msgstr ""
-
-#: assets/dist/blocks/activity.js:51
-#: assets/dist/blocks/destination.js:56
-#: assets/dist/blocks/tour.js:59
-#: resources/js/blocks/activity/block.js:73
-#: resources/js/blocks/destination/block.js:73
-#: resources/js/blocks/tour/block.js:81
-msgid "Show pagination"
-msgstr ""
-
-#: assets/dist/blocks/activity.js:7
-#: resources/js/blocks/activity/block.js:25
-msgid "Activity Settings"
-msgstr ""
-
-#: assets/dist/blocks/activity.js:77
-msgid "Activity Block"
-msgstr ""
-
-#: assets/dist/blocks/activity.js:87
-msgid "This block will display activity listings on the frontend"
-msgstr ""
-
-#: assets/dist/blocks/destination.js:10
-#: resources/js/blocks/destination/block.js:25
-msgid "Destination Settings"
-msgstr ""
-
-#: assets/dist/blocks/destination.js:111
-msgid " destinations in "
-msgstr ""
-
-#: assets/dist/blocks/destination.js:36
-#: resources/js/blocks/destination/block.js:51
-msgid "Number of Destinations"
-msgstr ""
-
-#: assets/dist/blocks/destination.js:84
-msgid "Destination Block"
-msgstr ""
-
-#: assets/dist/blocks/destination.js:94
-msgid "This block will display destination listings on the frontend"
-msgstr ""
-
-#: assets/dist/blocks/tour.js:113
-msgid " tours in "
-msgstr ""
-
-#: assets/dist/blocks/tour.js:31
-#: resources/js/blocks/tour/block.js:51
-msgid "Number of Tours"
-msgstr ""
-
-#: assets/dist/blocks/tour.js:51
-#: resources/js/blocks/tour/block.js:73
-msgid "Show only featured tours"
-msgstr ""
-
-#: assets/dist/blocks/tour.js:7
-#: resources/js/blocks/tour/block.js:25
-msgid "Trip Settings"
-msgstr ""
-
-#: assets/dist/blocks/tour.js:85
-msgid "Tour Block"
-msgstr ""
-
-#: assets/dist/blocks/tour.js:96
-msgid "This block will display "
-msgstr ""
-
-#: assets/dist/blocks/tour.js:97
-msgid "featured "
-msgstr ""
-
-#: assets/dist/blocks/tour.js:98
-msgid "tour listings on the frontend"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1004
-#: templates/partials/booking-content.php:233
-#: templates/partials/booking-content.php:390
-msgid "traveler"
-msgid_plural "travelers"
-msgstr[0] ""
-msgstr[1] ""
-
-#: assets/dist/js/account-page.js:1004
-#: templates/partials/availability-section.php:75
-#: templates/partials/availability-section.php:414
-msgid "travelers"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1038
-#: app/Controllers/BookingSessionController.php:2391
-#: app/Models/Checkout.php:103
-#: templates/booking-confirmation.php:285
-#: templates/partials/availability-section.php:296
-#: templates/partials/availability-section.php:298
-#: templates/partials/availability-section.php:304
-#: templates/partials/booking-content.php:324
-#: templates/partials/booking-form-fields.php:320
-#: templates/partials/booking-form-fields.php:356
-#: templates/partials/single-trip/content-overview.php:62
-#: templates/partials/single-trip/content-overview.php:74
-#: templates/partials/single-trip/content-overview.php:78
-#: templates/partials/single-trip/content-sidebar.php:215
-#: templates/partials/single-trip/content-sidebar.php:267
-#: templates/partials/single-trip/content-sidebar.php:403
-#: templates/partials/single-trip/content-sidebar.php:455
-#: templates/partials/single-trip/sticky-sidebar.php:187
-#: assets/dist/js/account-page.js:157
-#: assets/dist/js/account-page.js:312
-#: assets/dist/js/account-page.js:875
-msgid "Traveler"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1038
-#: templates/partials/booking-form-fields.php:439
-msgid "Lead Traveler"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1045
-msgid "Primary Contact"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1084
-#: templates/pdf/itinerary.php:308
-msgid "Emergency Contact"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1099
-#: templates/partials/booking-form-fields.php:584
-msgid "Special Requests"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1142
-#: templates/partials/booking-content.php:700
-msgid "Payment Information"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1145
-#: app/Providers/FrontendAssetsProvider.php:421
-msgid "Payment Status"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1166
-#: templates/booking-confirmation.php:437
-#: templates/partials/remaining-checkout-content.php:70
-#: templates/pdf/voucher.php:186
-msgid "Amount Paid"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1173
-msgid "Amount Due"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1182
-msgid "Timeline"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1185
-msgid "Created"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1189
-msgid "Last Updated"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1298
-msgid "Manage and view all your travel bookings"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1304
-msgid "Search bookings..."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1319
-msgid "All Bookings"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1338
-#: assets/dist/js/account-page.js:1320
-msgid "Upcoming"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1352
-#: assets/dist/js/account-page.js:1322
-msgid "Completed"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1367
-msgid "No bookings found"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1368
-msgid "Try adjusting your filters or check back later."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1402
-#: assets/dist/js/account-page.js:301
-msgid "Multiple destinations"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1413
-#: templates/booking-confirmation.php:250
-#: templates/partials/booking-content.php:300
-#: templates/partials/remaining-checkout-content.php:84
-#: templates/partials/remaining-checkout-content.php:143
-#: templates/pdf/invoice.php:128
-#: templates/pdf/itinerary.php:176
-#: assets/dist/js/account-page.js:863
-msgid "Travel Date"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1417
-#: templates/booking-confirmation.php:274
-#: templates/partials/availability-section.php:267
-#: templates/partials/booking-content.php:318
-#: templates/partials/booking-content.php:388
-#: templates/partials/remaining-checkout-content.php:88
-#: templates/partials/remaining-checkout-content.php:147
-#: assets/dist/js/account-page.js:312
-#: assets/dist/js/account-page.js:875
-msgid "Travelers"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1421
-#: app/Providers/FrontendAssetsProvider.php:420
-#: templates/partials/remaining-checkout-content.php:154
-#: templates/pdf/voucher.php:182
-#: templates/shortcodes/my-account.php:99
-#: assets/dist/js/account-page.js:1159
-msgid "Total Amount"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1425
-msgid "Paid / Due"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1429
-msgid "Due:"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1436
-#: templates/booking-confirmation.php:258
-msgid "Booked On"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1458
-msgid "Download Voucher"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1468
-msgid "Payment"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1501
-#: templates/partials/booking-content.php:94
-#: templates/partials/remaining-checkout-content.php:49
-#: templates/partials/remaining-checkout-content.php:120
-msgid "Pay Remaining Balance"
-msgstr ""
-
-#: assets/dist/js/account-page.js:155
-msgid "Welcome back,"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1581
-msgid "Payments & Invoices"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1583
-msgid "Track deposits, balances, and installment schedules with secure payment links."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1591
-msgid "Total Payments"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1598
-#: app/Controllers/ReportsController.php:255
-#: templates/partials/remaining-checkout-content.php:158
-msgid "Paid"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1606
-#: app/Controllers/BookingSessionController.php:2070
-#: app/Controllers/BookingSessionController.php:2096
-#: app/Controllers/ReportsController.php:256
-#: assets/dist/js/account-page.js:1321
-#: assets/dist/js/account-page.js:1345
-msgid "Pending"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1613
-msgid "Outstanding"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1621
-msgid "No payments found"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1622
-msgid "Payment history will appear here once you make a booking."
-msgstr ""
-
-#: assets/dist/js/account-page.js:163
-msgid "You have"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1660
-#: templates/partials/availability-section.php:83
-msgid "Booking"
-msgstr ""
-
-#: assets/dist/js/account-page.js:167
-msgid "upcoming adventure"
-msgstr ""
-
-#: assets/dist/js/account-page.js:167
-msgid "upcoming adventures"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1679
-#: templates/pdf/invoice.php:129
-msgid "Amount"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1686
-#: templates/partials/booking-form-fields.php:513
-#: assets/dist/js/account-page.js:1154
-msgid "Payment Method"
-msgstr ""
-
-#: assets/dist/js/account-page.js:169
-msgid "coming up"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1693
-msgid "Payment Date"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1707
-#: templates/booking-confirmation.php:582
-msgid "Download Invoice"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1721
-msgid "View Receipt"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1732
-msgid "Pending approval"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1744
-msgid "View Booking Details"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1784
-msgid "Travel Documents"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1785
-msgid "Download itineraries, vouchers, invoices, and other documents for each trip."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1795
-msgid "Search documents..."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1810
-msgid "All Documents"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1811
-msgid "Itineraries"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1812
-msgid "Vouchers"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1813
-msgid "Invoices"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1822
-#: templates/partials/single-trip/content-itinerary.php:10
-msgid "Itinerary"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1826
-msgid "Voucher"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1830
-msgid "Invoice"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1834
-#: templates/partials/single-trip/content-downloads.php:12
-#: assets/dist/js/account-page.js:1106
-#: assets/dist/js/account-page.js:1814
-msgid "Downloads"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1840
-msgid "No documents found"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1841
-msgid "No documents are available yet. Please check back later."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1855
-msgid "Updated"
-msgstr ""
-
-#: assets/dist/js/account-page.js:186
-msgid "View Calendar"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1860
-msgid "Access"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1881
-#: templates/partials/remaining-checkout-content.php:62
-msgid "Not available"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1882
-#: assets/dist/js/account-page.js:1120
-msgid "Not Available"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1892
-#: templates/partials/single-trip/content-downloads.php:89
-#: assets/dist/js/account-page.js:1130
-msgid "Download"
-msgstr ""
-
-#: assets/dist/js/account-page.js:19
-#: assets/dist/js/account-page.js:11
-msgid "Invalid date"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1904
-#: assets/dist/js/account-page.js:1902
-msgid "Preview"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1966
-msgid "Update your contact details, address, and communication preferences."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1981
-msgid "Edit Profile"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1990
-#: templates/partials/single-trip/enquiry-modal.php:31
-msgid "Full Name"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2001
-#: templates/partials/single-trip/enquiry-modal.php:32
-msgid "Enter your full name"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2007
-#: templates/partials/booking-auth.php:144
-#: templates/partials/single-trip/enquiry-modal.php:36
-#: templates/shortcodes/my-account.php:207
-msgid "Email Address"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2018
-msgid "Enter your email address"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2023
-#: templates/partials/booking-auth.php:157
-#: templates/partials/single-trip/enquiry-modal.php:41
-#: templates/shortcodes/my-account.php:212
-msgid "Phone Number"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2031
-msgid "Enter your phone number"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2036
-msgid "City"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2044
-msgid "Enter your city"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2049
-msgid "Address"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2057
-msgid "Enter your address"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2062
-msgid "Country"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2070
-msgid "Enter your country"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2072
-#: assets/dist/js/account-page.js:2003
-#: assets/dist/js/account-page.js:2020
-#: assets/dist/js/account-page.js:2033
-#: assets/dist/js/account-page.js:2046
-#: assets/dist/js/account-page.js:2059
-msgid "Not set"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2084
-#: templates/shortcodes/my-account.php:218
-msgid "Save Changes"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2110
-msgid "Update your password to keep your account secure."
-msgstr ""
-
-#: assets/dist/js/account-page.js:2121
-#: assets/dist/js/account-page.js:2108
-msgid "Change Password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2129
-msgid "Current Password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2143
-msgid "Enter your current password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2149
-msgid "New Password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2163
-msgid "Enter new password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2169
-msgid "Confirm New Password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2183
-msgid "Confirm your new password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2186
-msgid "Passwords do not match"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2208
-msgid "Update Password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2228
-#: assets/dist/js/index-0Q_xhKfx.js:108726
-#: assets/dist/js/index-5L9fy43s.js:108726
-#: assets/dist/js/index-B9njHOE9.js:108726
-#: assets/dist/js/index-B_-9Q1Pm.js:108726
-#: assets/dist/js/index-BaeKfBxd.js:108726
-#: assets/dist/js/index-Be-zS_7L.js:108726
-#: assets/dist/js/index-BgndTSnI.js:108726
-#: assets/dist/js/index-Ca8T0YWF.js:106333
-#: assets/dist/js/index-D72LVK04.js:108726
-#: assets/dist/js/index-DaZ-5sTw.js:108726
-#: assets/dist/js/index-DsyE5-hy.js:106333
-#: assets/dist/js/index-l5TSUBE6.js:108726
-#: assets/dist/js/index-xDWn_aGf.js:108726
-#: templates/partials/booking-content.php:177
-#: templates/partials/single-trip/enquiry-modal.php:127
-#: assets/dist/js/account-page.js:2097
-#: assets/js/stripe.js:145
-msgid "Cancel"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2239
-msgid "Communication Preferences"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2251
-msgid "Booking reminders"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2262
-msgid "Payment notifications"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2272
-msgid "Promotional offers"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2283
-msgid "Trip updates"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2302
-#: assets/dist/js/index-0Q_xhKfx.js:105886
-#: assets/dist/js/index-5L9fy43s.js:105886
-#: assets/dist/js/index-B9njHOE9.js:105886
-#: assets/dist/js/index-B_-9Q1Pm.js:105886
-#: assets/dist/js/index-BaeKfBxd.js:105886
-#: assets/dist/js/index-Be-zS_7L.js:105886
-#: assets/dist/js/index-BgndTSnI.js:105886
-#: assets/dist/js/index-Ca8T0YWF.js:103493
-#: assets/dist/js/index-D72LVK04.js:105886
-#: assets/dist/js/index-DaZ-5sTw.js:105886
-#: assets/dist/js/index-DsyE5-hy.js:103493
-#: assets/dist/js/index-l5TSUBE6.js:105886
-#: assets/dist/js/index-xDWn_aGf.js:105886
-#: templates/listing-activity.php:247
-#: templates/partials/single-trip/content-sidebar.php:167
-#: templates/shortcodes/activity.php:123
-#: templates/shortcodes/destination.php:92
-#: templates/single-activity.php:130
-#: templates/single-destination.php:130
-msgid "From"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2338
-msgid "Support & Help Center"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2340
-msgid "Our team is available 24/7 for urgent requests. Submit a ticket or contact us directly."
-msgstr ""
-
-#: assets/dist/js/account-page.js:2348
-msgid "Total Tickets"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2355
-msgid "Open"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2364
-msgid "Resolved"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2374
-msgid "Create a new support ticket"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2375
-msgid "Please describe your issue and we will get back to you as soon as possible."
-msgstr ""
-
-#: assets/dist/js/account-page.js:2389
-msgid "Subject"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2399
-msgid "Enter ticket subject"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2407
-#: templates/partials/single-trip/enquiry-modal.php:118
-msgid "Message"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2416
-msgid "How can we help?"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2431
-msgid "Submit Ticket"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2442
-msgid "Your Support Tickets"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2446
-msgid "No support tickets yet"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2447
-msgid "Create a ticket above to get started."
-msgstr ""
-
-#: assets/dist/js/account-page.js:2468
-msgid "Last updated"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2487
-msgid "View"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2509
-msgid "Need Immediate Assistance?"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2510
-msgid "Call our 24/7 concierge desk for urgent travel support."
-msgstr ""
-
-#: assets/dist/js/account-page.js:2552
-msgid "Failed to remove trip from wishlist."
-msgstr ""
-
-#: assets/dist/js/account-page.js:2558
-msgid "Your wishlist of favorite trips"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2587
-#: assets/dist/js/account-page.js:2308
-msgid "No saved trips yet"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2588
-msgid "Start exploring and save your favorite trips to your wishlist!"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2599
-msgid "Browse Trips"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2634
-#: templates/partials/single-trip/content-sidebar.php:161
-msgid "OFF"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2640
-msgid "Remove from favorites"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2671
-#: app/Repositories/SavedTripRepository.php:290
-msgid "Flexible"
-msgstr ""
-
-#: assets/dist/js/account-page.js:271
-msgid "Your next adventures"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2712
-#: templates/single-activity.php:201
-#: templates/single-destination.php:201
-msgid "reviews"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2729
-msgid "Starting from"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2736
-msgid "Per person"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2738
-#: app/Providers/FrontendAssetsProvider.php:422
-#: templates/partials/single-trip/similar-trips.php:192
-#: templates/shortcodes/my-account.php:113
-#: templates/single-activity.php:222
-#: templates/single-destination.php:240
-#: templates/trip-listing-card.php:302
-#: assets/dist/js/account-page.js:1448
-msgid "View Details"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2751
-msgid "Dashboard"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2752
-#: app/Core/Modules/ModuleManager.php:106
-#: templates/trip-listing-card.php:224
-#: assets/dist/js/account-page.js:1297
-msgid "Bookings"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2753
-#: app/Core/Modules/ModuleManager.php:180
-msgid "Payments"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2754
-msgid "Documents"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2755
-#: assets/dist/js/account-page.js:2290
-#: assets/dist/js/account-page.js:2557
-msgid "Saved Trips"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2756
-#: templates/shortcodes/my-account.php:60
-#: assets/dist/js/account-page.js:1964
-msgid "Profile"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2757
-#: assets/dist/js/account-page.js:1512
-msgid "Support"
-msgstr ""
-
-#: assets/dist/js/account-page.js:282
-msgid "View all"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2973
-#: assets/dist/js/account-page.js:1331
-msgid "Total Bookings"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2979
-#: assets/dist/js/account-page.js:270
-msgid "Upcoming Trips"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2984
-msgid "Outstanding Balance"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2989
-#: assets/dist/js/account-page.js:1359
-msgid "Total Spent"
-msgstr ""
-
-#: assets/dist/js/account-page.js:3042
-msgid "Hello,"
-msgstr ""
-
-#: assets/dist/js/account-page.js:3044
-msgid "Guest"
-msgstr ""
-
-#: assets/dist/js/account-page.js:3046
-msgid "Manage bookings, payments, and documents – everything for your adventures in one place."
-msgstr ""
-
-#: assets/dist/js/account-page.js:3062
-#: app/Providers/FrontendAssetsProvider.php:413
-#: app/Shortcodes/LoginShortcode.php:147
-#: templates/shortcodes/my-account.php:39
-msgid "Logout"
-msgstr ""
-
-#: assets/dist/js/account-page.js:3093
-msgid "Need help right away?"
-msgstr ""
-
-#: assets/dist/js/account-page.js:3094
-msgid "Concierge Desk"
-msgstr ""
-
-#: assets/dist/js/account-page.js:322
-msgid "No upcoming trips"
-msgstr ""
-
-#: assets/dist/js/account-page.js:323
-msgid "Start planning your next adventure!"
-msgstr ""
-
-#: assets/dist/js/account-page.js:330
-msgid "Quick Actions"
-msgstr ""
-
-#: assets/dist/js/account-page.js:343
-msgid "View Bookings"
-msgstr ""
-
-#: assets/dist/js/account-page.js:359
-msgid "Make Payment"
-msgstr ""
-
-#: assets/dist/js/account-page.js:375
-#: assets/dist/js/account-page.js:204
-msgid "My Documents"
-msgstr ""
-
-#: assets/dist/js/account-page.js:391
-msgid "Get Support"
-msgstr ""
-
-#: assets/dist/js/account-page.js:403
-msgid "Notifications"
-msgstr ""
-
-#: assets/dist/js/account-page.js:404
-msgid "Updates & reminders"
-msgstr ""
-
-#: assets/dist/js/account-page.js:422
-msgid "No new notifications"
-msgstr ""
-
-#: assets/dist/js/account-page.js:431
-msgid "Recent Activity"
-msgstr ""
-
-#: assets/dist/js/account-page.js:432
-msgid "Your latest updates"
-msgstr ""
-
-#: assets/dist/js/account-page.js:444
-msgid "Booking confirmed:"
-msgstr ""
-
-#: assets/dist/js/account-page.js:463
-msgid "Payment pending:"
-msgstr ""
-
-#: assets/dist/js/account-page.js:51
-#: app/Providers/FrontendAssetsProvider.php:392
-#: app/Providers/FrontendAssetsProvider.php:431
-#: includes/helpers.php:261
-#: templates/partials/single-trip/content-sidebar.php:175
-#: templates/partials/single-trip/similar-trips.php:187
-#: templates/trip-listing-card.php:297
-msgid "Contact for pricing"
-msgstr ""
-
-#: assets/dist/js/account-page.js:6
-msgid "N/A"
-msgstr ""
-
-#: assets/dist/js/account-page.js:776
-msgid "Booking not found or error loading booking"
-msgstr ""
-
-#: assets/dist/js/account-page.js:800
-#: app/Providers/FrontendAssetsProvider.php:418
-#: app/Services/BookingService.php:888
-#: templates/pdf/voucher.php:110
-#: assets/dist/js/account-page.js:750
-#: assets/dist/js/account-page.js:761
-msgid "Booking Details"
-msgstr ""
-
-#: assets/dist/js/account-page.js:801
-msgid "Complete booking information"
-msgstr ""
-
-#: assets/dist/js/account-page.js:812
-#: assets/dist/js/account-page.js:771
-msgid "Back to Bookings"
-msgstr ""
-
-#: assets/dist/js/account-page.js:821
-msgid "Booking Overview"
-msgstr ""
-
-#: assets/dist/js/account-page.js:835
-msgid "Booking Number"
-msgstr ""
-
-#: assets/dist/js/account-page.js:839
-#: templates/partials/remaining-checkout-content.php:80
-#: templates/partials/remaining-checkout-content.php:139
-#: templates/shortcodes/activity.php:113
-#: templates/shortcodes/destination.php:82
-#: templates/single-activity.php:108
-#: templates/single-destination.php:108
-msgid "Trip"
-msgid_plural "Trips"
-msgstr[0] ""
-msgstr[1] ""
-
-#: assets/dist/js/account-page.js:848
-#: templates/shortcodes/my-account.php:109
-msgid "View Trip"
-msgstr ""
-
-#: assets/dist/js/account-page.js:856
-#: templates/pdf/itinerary.php:221
-msgid "Booking Date"
-msgstr ""
-
-#: assets/dist/js/account-page.js:870
-#: app/Controllers/TripController.php:1961
-#: templates/booking-confirmation.php:254
-#: templates/partials/single-trip/content-overview.php:97
-#: templates/partials/single-trip/content-sidebar.php:319
-#: templates/partials/single-trip/content-sidebar.php:507
-#: templates/partials/single-trip/enquiry-modal.php:61
-#: templates/pdf/itinerary.php:159
-msgid "Number of Travelers"
-msgstr ""
-
-#: assets/dist/js/account-page.js:880
-#: templates/booking-confirmation.php:314
-#: templates/partials/booking-content.php:195
-msgid "Payment Summary"
-msgstr ""
-
-#: assets/dist/js/account-page.js:883
-#: templates/booking-confirmation.php:332
-#: templates/partials/pricing-summary.php:53
-msgid "Gross Total"
-msgstr ""
-
-#: assets/dist/js/account-page.js:890
-#: templates/booking-confirmation.php:392
-#: templates/partials/pricing-summary.php:288
-msgid "Subtotal (Taxable Amount)"
-msgstr ""
-
-#: assets/dist/js/account-page.js:894
-#: templates/booking-confirmation.php:339
-msgid "Discount"
-msgstr ""
-
-#: assets/dist/js/account-page.js:904
-#: templates/booking-confirmation.php:354
-#: templates/partials/pricing-summary.php:137
-msgid "Itinerary Costs"
-msgstr ""
-
-#: assets/dist/js/account-page.js:910
-#: templates/partials/availability-section.php:183
-#: templates/partials/booking-content.php:572
-#: templates/partials/single-trip/content-itinerary.php:114
-#: templates/partials/single-trip/content-sidebar.php:173
-#: templates/partials/single-trip/content-sidebar.php:176
-#: templates/single-activity.php:220
-#: templates/single-destination.php:238
-msgid "per person"
-msgstr ""
-
-#: assets/dist/js/account-page.js:915
-#: templates/partials/booking-content.php:576
-#: templates/partials/single-trip/content-itinerary.php:116
-msgid "per booking"
-msgstr ""
-
-#: assets/dist/js/account-page.js:957
-#: app/Controllers/PaymentGatewayController.php:796
-#: app/Controllers/SettingsController.php:123
-#: app/Services/BookingTaxService.php:125
-#: app/Services/BookingTaxService.php:211
-#: app/Services/TaxService.php:45
-#: app/Services/TaxService.php:159
-#: templates/booking-confirmation.php:412
-#: templates/partials/pricing-summary.php:301
-msgid "Tax"
-msgstr ""
-
-#: assets/dist/js/account-page.js:971
-#: templates/booking-confirmation.php:430
-#: templates/partials/pricing-summary.php:314
-msgid "Net Amount"
-msgstr ""
-
-#: assets/dist/js/account-page.js:981
-msgid "Customer Information"
-msgstr ""
-
-#: assets/dist/js/account-page.js:999
-msgid "Travelers Information"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:104444
-#: assets/dist/js/index-5L9fy43s.js:104444
-#: assets/dist/js/index-B9njHOE9.js:104444
-#: assets/dist/js/index-B_-9Q1Pm.js:104444
-#: assets/dist/js/index-BaeKfBxd.js:104444
-#: assets/dist/js/index-Be-zS_7L.js:104444
-#: assets/dist/js/index-BgndTSnI.js:104444
-#: assets/dist/js/index-Ca8T0YWF.js:102051
-#: assets/dist/js/index-D72LVK04.js:104444
-#: assets/dist/js/index-DaZ-5sTw.js:104444
-#: assets/dist/js/index-DsyE5-hy.js:102051
-#: assets/dist/js/index-l5TSUBE6.js:104444
-#: assets/dist/js/index-xDWn_aGf.js:104444
-msgid "Sort ascending"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:104445
-#: assets/dist/js/index-5L9fy43s.js:104445
-#: assets/dist/js/index-B9njHOE9.js:104445
-#: assets/dist/js/index-B_-9Q1Pm.js:104445
-#: assets/dist/js/index-BaeKfBxd.js:104445
-#: assets/dist/js/index-Be-zS_7L.js:104445
-#: assets/dist/js/index-BgndTSnI.js:104445
-#: assets/dist/js/index-Ca8T0YWF.js:102052
-#: assets/dist/js/index-D72LVK04.js:104445
-#: assets/dist/js/index-DaZ-5sTw.js:104445
-#: assets/dist/js/index-DsyE5-hy.js:102052
-#: assets/dist/js/index-l5TSUBE6.js:104445
-#: assets/dist/js/index-xDWn_aGf.js:104445
-msgid "Sort descending"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104509
-#: assets/dist/js/index-5L9fy43s.js:104509
-#: assets/dist/js/index-B9njHOE9.js:104509
-#: assets/dist/js/index-B_-9Q1Pm.js:104509
-#: assets/dist/js/index-BaeKfBxd.js:104509
-#: assets/dist/js/index-Be-zS_7L.js:104509
-#: assets/dist/js/index-BgndTSnI.js:104509
-#: assets/dist/js/index-Ca8T0YWF.js:102116
-#: assets/dist/js/index-D72LVK04.js:104509
-#: assets/dist/js/index-DaZ-5sTw.js:104509
-#: assets/dist/js/index-DsyE5-hy.js:102116
-#: assets/dist/js/index-l5TSUBE6.js:104509
-#: assets/dist/js/index-xDWn_aGf.js:104509
-msgid "Is none of"
-msgstr ""
-
-#. 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is none of: Admin, Editor".
-#: assets/dist/js/index-0Q_xhKfx.js:104513
-#: assets/dist/js/index-5L9fy43s.js:104513
-#: assets/dist/js/index-B9njHOE9.js:104513
-#: assets/dist/js/index-B_-9Q1Pm.js:104513
-#: assets/dist/js/index-BaeKfBxd.js:104513
-#: assets/dist/js/index-Be-zS_7L.js:104513
-#: assets/dist/js/index-BgndTSnI.js:104513
-#: assets/dist/js/index-Ca8T0YWF.js:102120
-#: assets/dist/js/index-D72LVK04.js:104513
-#: assets/dist/js/index-DaZ-5sTw.js:104513
-#: assets/dist/js/index-DsyE5-hy.js:102120
-#: assets/dist/js/index-l5TSUBE6.js:104513
-#: assets/dist/js/index-xDWn_aGf.js:104513
-msgid "<Name>%1$s is none of: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104539
-#: assets/dist/js/index-5L9fy43s.js:104539
-#: assets/dist/js/index-B9njHOE9.js:104539
-#: assets/dist/js/index-B_-9Q1Pm.js:104539
-#: assets/dist/js/index-BaeKfBxd.js:104539
-#: assets/dist/js/index-Be-zS_7L.js:104539
-#: assets/dist/js/index-BgndTSnI.js:104539
-#: assets/dist/js/index-Ca8T0YWF.js:102146
-#: assets/dist/js/index-D72LVK04.js:104539
-#: assets/dist/js/index-DaZ-5sTw.js:104539
-#: assets/dist/js/index-DsyE5-hy.js:102146
-#: assets/dist/js/index-l5TSUBE6.js:104539
-#: assets/dist/js/index-xDWn_aGf.js:104539
-msgid "Includes"
-msgstr ""
-
-#. 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is any: Admin, Editor".
-#: assets/dist/js/index-0Q_xhKfx.js:104543
-#: assets/dist/js/index-5L9fy43s.js:104543
-#: assets/dist/js/index-B9njHOE9.js:104543
-#: assets/dist/js/index-B_-9Q1Pm.js:104543
-#: assets/dist/js/index-BaeKfBxd.js:104543
-#: assets/dist/js/index-Be-zS_7L.js:104543
-#: assets/dist/js/index-BgndTSnI.js:104543
-#: assets/dist/js/index-Ca8T0YWF.js:102150
-#: assets/dist/js/index-D72LVK04.js:104543
-#: assets/dist/js/index-DaZ-5sTw.js:104543
-#: assets/dist/js/index-DsyE5-hy.js:102150
-#: assets/dist/js/index-l5TSUBE6.js:104543
-#: assets/dist/js/index-xDWn_aGf.js:104543
-msgid "<Name>%1$s includes: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104572
-#: assets/dist/js/index-5L9fy43s.js:104572
-#: assets/dist/js/index-B9njHOE9.js:104572
-#: assets/dist/js/index-B_-9Q1Pm.js:104572
-#: assets/dist/js/index-BaeKfBxd.js:104572
-#: assets/dist/js/index-Be-zS_7L.js:104572
-#: assets/dist/js/index-BgndTSnI.js:104572
-#: assets/dist/js/index-Ca8T0YWF.js:102179
-#: assets/dist/js/index-D72LVK04.js:104572
-#: assets/dist/js/index-DaZ-5sTw.js:104572
-#: assets/dist/js/index-DsyE5-hy.js:102179
-#: assets/dist/js/index-l5TSUBE6.js:104572
-#: assets/dist/js/index-xDWn_aGf.js:104572
-msgid "Includes all"
-msgstr ""
-
-#. 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author includes all: Admin, Editor".
-#: assets/dist/js/index-0Q_xhKfx.js:104576
-#: assets/dist/js/index-5L9fy43s.js:104576
-#: assets/dist/js/index-B9njHOE9.js:104576
-#: assets/dist/js/index-B_-9Q1Pm.js:104576
-#: assets/dist/js/index-BaeKfBxd.js:104576
-#: assets/dist/js/index-Be-zS_7L.js:104576
-#: assets/dist/js/index-BgndTSnI.js:104576
-#: assets/dist/js/index-Ca8T0YWF.js:102183
-#: assets/dist/js/index-D72LVK04.js:104576
-#: assets/dist/js/index-DaZ-5sTw.js:104576
-#: assets/dist/js/index-DsyE5-hy.js:102183
-#: assets/dist/js/index-l5TSUBE6.js:104576
-#: assets/dist/js/index-xDWn_aGf.js:104576
-msgid "<Name>%1$s includes all: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104600
-#: assets/dist/js/index-5L9fy43s.js:104600
-#: assets/dist/js/index-B9njHOE9.js:104600
-#: assets/dist/js/index-B_-9Q1Pm.js:104600
-#: assets/dist/js/index-BaeKfBxd.js:104600
-#: assets/dist/js/index-Be-zS_7L.js:104600
-#: assets/dist/js/index-BgndTSnI.js:104600
-#: assets/dist/js/index-Ca8T0YWF.js:102207
-#: assets/dist/js/index-D72LVK04.js:104600
-#: assets/dist/js/index-DaZ-5sTw.js:104600
-#: assets/dist/js/index-DsyE5-hy.js:102207
-#: assets/dist/js/index-l5TSUBE6.js:104600
-#: assets/dist/js/index-xDWn_aGf.js:104600
-msgid "Between (inc)"
-msgstr ""
-
-#. 1: Filter name (e.g. "Item count"). 2: Filter value min. 3: Filter value max. e.g.: "Item count between (inc): 10 and 180".
-#: assets/dist/js/index-0Q_xhKfx.js:104604
-#: assets/dist/js/index-5L9fy43s.js:104604
-#: assets/dist/js/index-B9njHOE9.js:104604
-#: assets/dist/js/index-B_-9Q1Pm.js:104604
-#: assets/dist/js/index-BaeKfBxd.js:104604
-#: assets/dist/js/index-Be-zS_7L.js:104604
-#: assets/dist/js/index-BgndTSnI.js:104604
-#: assets/dist/js/index-Ca8T0YWF.js:102211
-#: assets/dist/js/index-D72LVK04.js:104604
-#: assets/dist/js/index-DaZ-5sTw.js:104604
-#: assets/dist/js/index-DsyE5-hy.js:102211
-#: assets/dist/js/index-l5TSUBE6.js:104604
-#: assets/dist/js/index-xDWn_aGf.js:104604
-msgid "<Name>%1$s between (inc): </Name><Value>%2$s and %3$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104628
-#: assets/dist/js/index-5L9fy43s.js:104628
-#: assets/dist/js/index-B9njHOE9.js:104628
-#: assets/dist/js/index-B_-9Q1Pm.js:104628
-#: assets/dist/js/index-BaeKfBxd.js:104628
-#: assets/dist/js/index-Be-zS_7L.js:104628
-#: assets/dist/js/index-BgndTSnI.js:104628
-#: assets/dist/js/index-Ca8T0YWF.js:102235
-#: assets/dist/js/index-D72LVK04.js:104628
-#: assets/dist/js/index-DaZ-5sTw.js:104628
-#: assets/dist/js/index-DsyE5-hy.js:102235
-#: assets/dist/js/index-l5TSUBE6.js:104628
-#: assets/dist/js/index-xDWn_aGf.js:104628
-msgid "In the past"
-msgstr ""
-
-#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "7 days"): "Date is in the past: 7 days".
-#: assets/dist/js/index-0Q_xhKfx.js:104632
-#: assets/dist/js/index-5L9fy43s.js:104632
-#: assets/dist/js/index-B9njHOE9.js:104632
-#: assets/dist/js/index-B_-9Q1Pm.js:104632
-#: assets/dist/js/index-BaeKfBxd.js:104632
-#: assets/dist/js/index-Be-zS_7L.js:104632
-#: assets/dist/js/index-BgndTSnI.js:104632
-#: assets/dist/js/index-Ca8T0YWF.js:102239
-#: assets/dist/js/index-D72LVK04.js:104632
-#: assets/dist/js/index-DaZ-5sTw.js:104632
-#: assets/dist/js/index-DsyE5-hy.js:102239
-#: assets/dist/js/index-l5TSUBE6.js:104632
-#: assets/dist/js/index-xDWn_aGf.js:104632
-msgid "<Name>%1$s is in the past: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104656
-#: assets/dist/js/index-5L9fy43s.js:104656
-#: assets/dist/js/index-B9njHOE9.js:104656
-#: assets/dist/js/index-B_-9Q1Pm.js:104656
-#: assets/dist/js/index-BaeKfBxd.js:104656
-#: assets/dist/js/index-Be-zS_7L.js:104656
-#: assets/dist/js/index-BgndTSnI.js:104656
-#: assets/dist/js/index-Ca8T0YWF.js:102263
-#: assets/dist/js/index-D72LVK04.js:104656
-#: assets/dist/js/index-DaZ-5sTw.js:104656
-#: assets/dist/js/index-DsyE5-hy.js:102263
-#: assets/dist/js/index-l5TSUBE6.js:104656
-#: assets/dist/js/index-xDWn_aGf.js:104656
-msgid "Over"
-msgstr ""
-
-#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "7 days"): "Date is over: 7 days".
-#: assets/dist/js/index-0Q_xhKfx.js:104660
-#: assets/dist/js/index-5L9fy43s.js:104660
-#: assets/dist/js/index-B9njHOE9.js:104660
-#: assets/dist/js/index-B_-9Q1Pm.js:104660
-#: assets/dist/js/index-BaeKfBxd.js:104660
-#: assets/dist/js/index-Be-zS_7L.js:104660
-#: assets/dist/js/index-BgndTSnI.js:104660
-#: assets/dist/js/index-Ca8T0YWF.js:102267
-#: assets/dist/js/index-D72LVK04.js:104660
-#: assets/dist/js/index-DaZ-5sTw.js:104660
-#: assets/dist/js/index-DsyE5-hy.js:102267
-#: assets/dist/js/index-l5TSUBE6.js:104660
-#: assets/dist/js/index-xDWn_aGf.js:104660
-msgid "<Name>%1$s is over: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104682
-#: assets/dist/js/index-5L9fy43s.js:104682
-#: assets/dist/js/index-B9njHOE9.js:104682
-#: assets/dist/js/index-B_-9Q1Pm.js:104682
-#: assets/dist/js/index-BaeKfBxd.js:104682
-#: assets/dist/js/index-Be-zS_7L.js:104682
-#: assets/dist/js/index-BgndTSnI.js:104682
-#: assets/dist/js/index-Ca8T0YWF.js:102289
-#: assets/dist/js/index-D72LVK04.js:104682
-#: assets/dist/js/index-DaZ-5sTw.js:104682
-#: assets/dist/js/index-DsyE5-hy.js:102289
-#: assets/dist/js/index-l5TSUBE6.js:104682
-#: assets/dist/js/index-xDWn_aGf.js:104682
-msgid "Is"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104700
-#: assets/dist/js/index-5L9fy43s.js:104700
-#: assets/dist/js/index-B9njHOE9.js:104700
-#: assets/dist/js/index-B_-9Q1Pm.js:104700
-#: assets/dist/js/index-BaeKfBxd.js:104700
-#: assets/dist/js/index-Be-zS_7L.js:104700
-#: assets/dist/js/index-BgndTSnI.js:104700
-#: assets/dist/js/index-Ca8T0YWF.js:102307
-#: assets/dist/js/index-D72LVK04.js:104700
-#: assets/dist/js/index-DaZ-5sTw.js:104700
-#: assets/dist/js/index-DsyE5-hy.js:102307
-#: assets/dist/js/index-l5TSUBE6.js:104700
-#: assets/dist/js/index-xDWn_aGf.js:104700
-msgid "Is not"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104718
-#: assets/dist/js/index-5L9fy43s.js:104718
-#: assets/dist/js/index-B9njHOE9.js:104718
-#: assets/dist/js/index-B_-9Q1Pm.js:104718
-#: assets/dist/js/index-BaeKfBxd.js:104718
-#: assets/dist/js/index-Be-zS_7L.js:104718
-#: assets/dist/js/index-BgndTSnI.js:104718
-#: assets/dist/js/index-Ca8T0YWF.js:102325
-#: assets/dist/js/index-D72LVK04.js:104718
-#: assets/dist/js/index-DaZ-5sTw.js:104718
-#: assets/dist/js/index-DsyE5-hy.js:102325
-#: assets/dist/js/index-l5TSUBE6.js:104718
-#: assets/dist/js/index-xDWn_aGf.js:104718
-msgid "Less than"
-msgstr ""
-
-#. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is less than: 10".
-#: assets/dist/js/index-0Q_xhKfx.js:104722
-#: assets/dist/js/index-5L9fy43s.js:104722
-#: assets/dist/js/index-B9njHOE9.js:104722
-#: assets/dist/js/index-B_-9Q1Pm.js:104722
-#: assets/dist/js/index-BaeKfBxd.js:104722
-#: assets/dist/js/index-Be-zS_7L.js:104722
-#: assets/dist/js/index-BgndTSnI.js:104722
-#: assets/dist/js/index-Ca8T0YWF.js:102329
-#: assets/dist/js/index-D72LVK04.js:104722
-#: assets/dist/js/index-DaZ-5sTw.js:104722
-#: assets/dist/js/index-DsyE5-hy.js:102329
-#: assets/dist/js/index-l5TSUBE6.js:104722
-#: assets/dist/js/index-xDWn_aGf.js:104722
-msgid "<Name>%1$s is less than: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104740
-#: assets/dist/js/index-5L9fy43s.js:104740
-#: assets/dist/js/index-B9njHOE9.js:104740
-#: assets/dist/js/index-B_-9Q1Pm.js:104740
-#: assets/dist/js/index-BaeKfBxd.js:104740
-#: assets/dist/js/index-Be-zS_7L.js:104740
-#: assets/dist/js/index-BgndTSnI.js:104740
-#: assets/dist/js/index-Ca8T0YWF.js:102347
-#: assets/dist/js/index-D72LVK04.js:104740
-#: assets/dist/js/index-DaZ-5sTw.js:104740
-#: assets/dist/js/index-DsyE5-hy.js:102347
-#: assets/dist/js/index-l5TSUBE6.js:104740
-#: assets/dist/js/index-xDWn_aGf.js:104740
-msgid "Greater than"
-msgstr ""
-
-#. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is greater than: 10".
-#: assets/dist/js/index-0Q_xhKfx.js:104744
-#: assets/dist/js/index-5L9fy43s.js:104744
-#: assets/dist/js/index-B9njHOE9.js:104744
-#: assets/dist/js/index-B_-9Q1Pm.js:104744
-#: assets/dist/js/index-BaeKfBxd.js:104744
-#: assets/dist/js/index-Be-zS_7L.js:104744
-#: assets/dist/js/index-BgndTSnI.js:104744
-#: assets/dist/js/index-Ca8T0YWF.js:102351
-#: assets/dist/js/index-D72LVK04.js:104744
-#: assets/dist/js/index-DaZ-5sTw.js:104744
-#: assets/dist/js/index-DsyE5-hy.js:102351
-#: assets/dist/js/index-l5TSUBE6.js:104744
-#: assets/dist/js/index-xDWn_aGf.js:104744
-msgid "<Name>%1$s is greater than: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104764
-#: assets/dist/js/index-5L9fy43s.js:104764
-#: assets/dist/js/index-B9njHOE9.js:104764
-#: assets/dist/js/index-B_-9Q1Pm.js:104764
-#: assets/dist/js/index-BaeKfBxd.js:104764
-#: assets/dist/js/index-Be-zS_7L.js:104764
-#: assets/dist/js/index-BgndTSnI.js:104764
-#: assets/dist/js/index-Ca8T0YWF.js:102371
-#: assets/dist/js/index-D72LVK04.js:104764
-#: assets/dist/js/index-DaZ-5sTw.js:104764
-#: assets/dist/js/index-DsyE5-hy.js:102371
-#: assets/dist/js/index-l5TSUBE6.js:104764
-#: assets/dist/js/index-xDWn_aGf.js:104764
-msgid "Less than or equal"
-msgstr ""
-
-#. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is less than or equal to: 10".
-#: assets/dist/js/index-0Q_xhKfx.js:104768
-#: assets/dist/js/index-5L9fy43s.js:104768
-#: assets/dist/js/index-B9njHOE9.js:104768
-#: assets/dist/js/index-B_-9Q1Pm.js:104768
-#: assets/dist/js/index-BaeKfBxd.js:104768
-#: assets/dist/js/index-Be-zS_7L.js:104768
-#: assets/dist/js/index-BgndTSnI.js:104768
-#: assets/dist/js/index-Ca8T0YWF.js:102375
-#: assets/dist/js/index-D72LVK04.js:104768
-#: assets/dist/js/index-DaZ-5sTw.js:104768
-#: assets/dist/js/index-DsyE5-hy.js:102375
-#: assets/dist/js/index-l5TSUBE6.js:104768
-#: assets/dist/js/index-xDWn_aGf.js:104768
-msgid "<Name>%1$s is less than or equal to: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104788
-#: assets/dist/js/index-5L9fy43s.js:104788
-#: assets/dist/js/index-B9njHOE9.js:104788
-#: assets/dist/js/index-B_-9Q1Pm.js:104788
-#: assets/dist/js/index-BaeKfBxd.js:104788
-#: assets/dist/js/index-Be-zS_7L.js:104788
-#: assets/dist/js/index-BgndTSnI.js:104788
-#: assets/dist/js/index-Ca8T0YWF.js:102395
-#: assets/dist/js/index-D72LVK04.js:104788
-#: assets/dist/js/index-DaZ-5sTw.js:104788
-#: assets/dist/js/index-DsyE5-hy.js:102395
-#: assets/dist/js/index-l5TSUBE6.js:104788
-#: assets/dist/js/index-xDWn_aGf.js:104788
-msgid "Greater than or equal"
-msgstr ""
-
-#. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is greater than or equal to: 10".
-#: assets/dist/js/index-0Q_xhKfx.js:104792
-#: assets/dist/js/index-5L9fy43s.js:104792
-#: assets/dist/js/index-B9njHOE9.js:104792
-#: assets/dist/js/index-B_-9Q1Pm.js:104792
-#: assets/dist/js/index-BaeKfBxd.js:104792
-#: assets/dist/js/index-Be-zS_7L.js:104792
-#: assets/dist/js/index-BgndTSnI.js:104792
-#: assets/dist/js/index-Ca8T0YWF.js:102399
-#: assets/dist/js/index-D72LVK04.js:104792
-#: assets/dist/js/index-DaZ-5sTw.js:104792
-#: assets/dist/js/index-DsyE5-hy.js:102399
-#: assets/dist/js/index-l5TSUBE6.js:104792
-#: assets/dist/js/index-xDWn_aGf.js:104792
-msgid "<Name>%1$s is greater than or equal to: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104812
-#: assets/dist/js/index-5L9fy43s.js:104812
-#: assets/dist/js/index-B9njHOE9.js:104812
-#: assets/dist/js/index-B_-9Q1Pm.js:104812
-#: assets/dist/js/index-BaeKfBxd.js:104812
-#: assets/dist/js/index-Be-zS_7L.js:104812
-#: assets/dist/js/index-BgndTSnI.js:104812
-#: assets/dist/js/index-Ca8T0YWF.js:102419
-#: assets/dist/js/index-D72LVK04.js:104812
-#: assets/dist/js/index-DaZ-5sTw.js:104812
-#: assets/dist/js/index-DsyE5-hy.js:102419
-#: assets/dist/js/index-l5TSUBE6.js:104812
-#: assets/dist/js/index-xDWn_aGf.js:104812
-msgid "Before"
-msgstr ""
-
-#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is before: 2024-01-01".
-#: assets/dist/js/index-0Q_xhKfx.js:104816
-#: assets/dist/js/index-5L9fy43s.js:104816
-#: assets/dist/js/index-B9njHOE9.js:104816
-#: assets/dist/js/index-B_-9Q1Pm.js:104816
-#: assets/dist/js/index-BaeKfBxd.js:104816
-#: assets/dist/js/index-Be-zS_7L.js:104816
-#: assets/dist/js/index-BgndTSnI.js:104816
-#: assets/dist/js/index-Ca8T0YWF.js:102423
-#: assets/dist/js/index-D72LVK04.js:104816
-#: assets/dist/js/index-DaZ-5sTw.js:104816
-#: assets/dist/js/index-DsyE5-hy.js:102423
-#: assets/dist/js/index-l5TSUBE6.js:104816
-#: assets/dist/js/index-xDWn_aGf.js:104816
-msgid "<Name>%1$s is before: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104835
-#: assets/dist/js/index-5L9fy43s.js:104835
-#: assets/dist/js/index-B9njHOE9.js:104835
-#: assets/dist/js/index-B_-9Q1Pm.js:104835
-#: assets/dist/js/index-BaeKfBxd.js:104835
-#: assets/dist/js/index-Be-zS_7L.js:104835
-#: assets/dist/js/index-BgndTSnI.js:104835
-#: assets/dist/js/index-Ca8T0YWF.js:102442
-#: assets/dist/js/index-D72LVK04.js:104835
-#: assets/dist/js/index-DaZ-5sTw.js:104835
-#: assets/dist/js/index-DsyE5-hy.js:102442
-#: assets/dist/js/index-l5TSUBE6.js:104835
-#: assets/dist/js/index-xDWn_aGf.js:104835
-msgid "After"
-msgstr ""
-
-#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is after: 2024-01-01".
-#: assets/dist/js/index-0Q_xhKfx.js:104839
-#: assets/dist/js/index-5L9fy43s.js:104839
-#: assets/dist/js/index-B9njHOE9.js:104839
-#: assets/dist/js/index-B_-9Q1Pm.js:104839
-#: assets/dist/js/index-BaeKfBxd.js:104839
-#: assets/dist/js/index-Be-zS_7L.js:104839
-#: assets/dist/js/index-BgndTSnI.js:104839
-#: assets/dist/js/index-Ca8T0YWF.js:102446
-#: assets/dist/js/index-D72LVK04.js:104839
-#: assets/dist/js/index-DaZ-5sTw.js:104839
-#: assets/dist/js/index-DsyE5-hy.js:102446
-#: assets/dist/js/index-l5TSUBE6.js:104839
-#: assets/dist/js/index-xDWn_aGf.js:104839
-msgid "<Name>%1$s is after: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104858
-#: assets/dist/js/index-5L9fy43s.js:104858
-#: assets/dist/js/index-B9njHOE9.js:104858
-#: assets/dist/js/index-B_-9Q1Pm.js:104858
-#: assets/dist/js/index-BaeKfBxd.js:104858
-#: assets/dist/js/index-Be-zS_7L.js:104858
-#: assets/dist/js/index-BgndTSnI.js:104858
-#: assets/dist/js/index-Ca8T0YWF.js:102465
-#: assets/dist/js/index-D72LVK04.js:104858
-#: assets/dist/js/index-DaZ-5sTw.js:104858
-#: assets/dist/js/index-DsyE5-hy.js:102465
-#: assets/dist/js/index-l5TSUBE6.js:104858
-#: assets/dist/js/index-xDWn_aGf.js:104858
-msgid "Before (inc)"
-msgstr ""
-
-#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is on or before: 2024-01-01".
-#: assets/dist/js/index-0Q_xhKfx.js:104862
-#: assets/dist/js/index-5L9fy43s.js:104862
-#: assets/dist/js/index-B9njHOE9.js:104862
-#: assets/dist/js/index-B_-9Q1Pm.js:104862
-#: assets/dist/js/index-BaeKfBxd.js:104862
-#: assets/dist/js/index-Be-zS_7L.js:104862
-#: assets/dist/js/index-BgndTSnI.js:104862
-#: assets/dist/js/index-Ca8T0YWF.js:102469
-#: assets/dist/js/index-D72LVK04.js:104862
-#: assets/dist/js/index-DaZ-5sTw.js:104862
-#: assets/dist/js/index-DsyE5-hy.js:102469
-#: assets/dist/js/index-l5TSUBE6.js:104862
-#: assets/dist/js/index-xDWn_aGf.js:104862
-msgid "<Name>%1$s is on or before: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104883
-#: assets/dist/js/index-5L9fy43s.js:104883
-#: assets/dist/js/index-B9njHOE9.js:104883
-#: assets/dist/js/index-B_-9Q1Pm.js:104883
-#: assets/dist/js/index-BaeKfBxd.js:104883
-#: assets/dist/js/index-Be-zS_7L.js:104883
-#: assets/dist/js/index-BgndTSnI.js:104883
-#: assets/dist/js/index-Ca8T0YWF.js:102490
-#: assets/dist/js/index-D72LVK04.js:104883
-#: assets/dist/js/index-DaZ-5sTw.js:104883
-#: assets/dist/js/index-DsyE5-hy.js:102490
-#: assets/dist/js/index-l5TSUBE6.js:104883
-#: assets/dist/js/index-xDWn_aGf.js:104883
-msgid "After (inc)"
-msgstr ""
-
-#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is on or after: 2024-01-01".
-#: assets/dist/js/index-0Q_xhKfx.js:104887
-#: assets/dist/js/index-5L9fy43s.js:104887
-#: assets/dist/js/index-B9njHOE9.js:104887
-#: assets/dist/js/index-B_-9Q1Pm.js:104887
-#: assets/dist/js/index-BaeKfBxd.js:104887
-#: assets/dist/js/index-Be-zS_7L.js:104887
-#: assets/dist/js/index-BgndTSnI.js:104887
-#: assets/dist/js/index-Ca8T0YWF.js:102494
-#: assets/dist/js/index-D72LVK04.js:104887
-#: assets/dist/js/index-DaZ-5sTw.js:104887
-#: assets/dist/js/index-DsyE5-hy.js:102494
-#: assets/dist/js/index-l5TSUBE6.js:104887
-#: assets/dist/js/index-xDWn_aGf.js:104887
-msgid "<Name>%1$s is on or after: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104908
-#: assets/dist/js/index-5L9fy43s.js:104908
-#: assets/dist/js/index-B9njHOE9.js:104908
-#: assets/dist/js/index-B_-9Q1Pm.js:104908
-#: assets/dist/js/index-BaeKfBxd.js:104908
-#: assets/dist/js/index-Be-zS_7L.js:104908
-#: assets/dist/js/index-BgndTSnI.js:104908
-#: assets/dist/js/index-Ca8T0YWF.js:102515
-#: assets/dist/js/index-D72LVK04.js:104908
-#: assets/dist/js/index-DaZ-5sTw.js:104908
-#: assets/dist/js/index-DsyE5-hy.js:102515
-#: assets/dist/js/index-l5TSUBE6.js:104908
-#: assets/dist/js/index-xDWn_aGf.js:104908
-msgid "Contains"
-msgstr ""
-
-#. 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title contains: Hello".
-#: assets/dist/js/index-0Q_xhKfx.js:104912
-#: assets/dist/js/index-5L9fy43s.js:104912
-#: assets/dist/js/index-B9njHOE9.js:104912
-#: assets/dist/js/index-B_-9Q1Pm.js:104912
-#: assets/dist/js/index-BaeKfBxd.js:104912
-#: assets/dist/js/index-Be-zS_7L.js:104912
-#: assets/dist/js/index-BgndTSnI.js:104912
-#: assets/dist/js/index-Ca8T0YWF.js:102519
-#: assets/dist/js/index-D72LVK04.js:104912
-#: assets/dist/js/index-DaZ-5sTw.js:104912
-#: assets/dist/js/index-DsyE5-hy.js:102519
-#: assets/dist/js/index-l5TSUBE6.js:104912
-#: assets/dist/js/index-xDWn_aGf.js:104912
-msgid "<Name>%1$s contains: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104930
-#: assets/dist/js/index-5L9fy43s.js:104930
-#: assets/dist/js/index-B9njHOE9.js:104930
-#: assets/dist/js/index-B_-9Q1Pm.js:104930
-#: assets/dist/js/index-BaeKfBxd.js:104930
-#: assets/dist/js/index-Be-zS_7L.js:104930
-#: assets/dist/js/index-BgndTSnI.js:104930
-#: assets/dist/js/index-Ca8T0YWF.js:102537
-#: assets/dist/js/index-D72LVK04.js:104930
-#: assets/dist/js/index-DaZ-5sTw.js:104930
-#: assets/dist/js/index-DsyE5-hy.js:102537
-#: assets/dist/js/index-l5TSUBE6.js:104930
-#: assets/dist/js/index-xDWn_aGf.js:104930
-msgid "Doesn't contain"
-msgstr ""
-
-#. 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title doesn't contain: Hello".
-#: assets/dist/js/index-0Q_xhKfx.js:104934
-#: assets/dist/js/index-5L9fy43s.js:104934
-#: assets/dist/js/index-B9njHOE9.js:104934
-#: assets/dist/js/index-B_-9Q1Pm.js:104934
-#: assets/dist/js/index-BaeKfBxd.js:104934
-#: assets/dist/js/index-Be-zS_7L.js:104934
-#: assets/dist/js/index-BgndTSnI.js:104934
-#: assets/dist/js/index-Ca8T0YWF.js:102541
-#: assets/dist/js/index-D72LVK04.js:104934
-#: assets/dist/js/index-DaZ-5sTw.js:104934
-#: assets/dist/js/index-DsyE5-hy.js:102541
-#: assets/dist/js/index-l5TSUBE6.js:104934
-#: assets/dist/js/index-xDWn_aGf.js:104934
-msgid "<Name>%1$s doesn't contain: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104954
-#: assets/dist/js/index-5L9fy43s.js:104954
-#: assets/dist/js/index-B9njHOE9.js:104954
-#: assets/dist/js/index-B_-9Q1Pm.js:104954
-#: assets/dist/js/index-BaeKfBxd.js:104954
-#: assets/dist/js/index-Be-zS_7L.js:104954
-#: assets/dist/js/index-BgndTSnI.js:104954
-#: assets/dist/js/index-Ca8T0YWF.js:102561
-#: assets/dist/js/index-D72LVK04.js:104954
-#: assets/dist/js/index-DaZ-5sTw.js:104954
-#: assets/dist/js/index-DsyE5-hy.js:102561
-#: assets/dist/js/index-l5TSUBE6.js:104954
-#: assets/dist/js/index-xDWn_aGf.js:104954
-msgid "Starts with"
-msgstr ""
-
-#. 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title starts with: Hello".
-#: assets/dist/js/index-0Q_xhKfx.js:104958
-#: assets/dist/js/index-5L9fy43s.js:104958
-#: assets/dist/js/index-B9njHOE9.js:104958
-#: assets/dist/js/index-B_-9Q1Pm.js:104958
-#: assets/dist/js/index-BaeKfBxd.js:104958
-#: assets/dist/js/index-Be-zS_7L.js:104958
-#: assets/dist/js/index-BgndTSnI.js:104958
-#: assets/dist/js/index-Ca8T0YWF.js:102565
-#: assets/dist/js/index-D72LVK04.js:104958
-#: assets/dist/js/index-DaZ-5sTw.js:104958
-#: assets/dist/js/index-DsyE5-hy.js:102565
-#: assets/dist/js/index-l5TSUBE6.js:104958
-#: assets/dist/js/index-xDWn_aGf.js:104958
-msgid "<Name>%1$s starts with: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104976
-#: assets/dist/js/index-5L9fy43s.js:104976
-#: assets/dist/js/index-B9njHOE9.js:104976
-#: assets/dist/js/index-B_-9Q1Pm.js:104976
-#: assets/dist/js/index-BaeKfBxd.js:104976
-#: assets/dist/js/index-Be-zS_7L.js:104976
-#: assets/dist/js/index-BgndTSnI.js:104976
-#: assets/dist/js/index-Ca8T0YWF.js:102583
-#: assets/dist/js/index-D72LVK04.js:104976
-#: assets/dist/js/index-DaZ-5sTw.js:104976
-#: assets/dist/js/index-DsyE5-hy.js:102583
-#: assets/dist/js/index-l5TSUBE6.js:104976
-#: assets/dist/js/index-xDWn_aGf.js:104976
-msgid "On"
-msgstr ""
-
-#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is: 2024-01-01".
-#: assets/dist/js/index-0Q_xhKfx.js:104980
-#: assets/dist/js/index-5L9fy43s.js:104980
-#: assets/dist/js/index-B9njHOE9.js:104980
-#: assets/dist/js/index-B_-9Q1Pm.js:104980
-#: assets/dist/js/index-BaeKfBxd.js:104980
-#: assets/dist/js/index-Be-zS_7L.js:104980
-#: assets/dist/js/index-BgndTSnI.js:104980
-#: assets/dist/js/index-Ca8T0YWF.js:102587
-#: assets/dist/js/index-D72LVK04.js:104980
-#: assets/dist/js/index-DaZ-5sTw.js:104980
-#: assets/dist/js/index-DsyE5-hy.js:102587
-#: assets/dist/js/index-l5TSUBE6.js:104980
-#: assets/dist/js/index-xDWn_aGf.js:104980
-msgid "<Name>%1$s is: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#. DataViews operator name
-#: assets/dist/js/index-0Q_xhKfx.js:104999
-#: assets/dist/js/index-5L9fy43s.js:104999
-#: assets/dist/js/index-B9njHOE9.js:104999
-#: assets/dist/js/index-B_-9Q1Pm.js:104999
-#: assets/dist/js/index-BaeKfBxd.js:104999
-#: assets/dist/js/index-Be-zS_7L.js:104999
-#: assets/dist/js/index-BgndTSnI.js:104999
-#: assets/dist/js/index-Ca8T0YWF.js:102606
-#: assets/dist/js/index-D72LVK04.js:104999
-#: assets/dist/js/index-DaZ-5sTw.js:104999
-#: assets/dist/js/index-DsyE5-hy.js:102606
-#: assets/dist/js/index-l5TSUBE6.js:104999
-#: assets/dist/js/index-xDWn_aGf.js:104999
-msgid "Not on"
-msgstr ""
-
-#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is not: 2024-01-01".
-#: assets/dist/js/index-0Q_xhKfx.js:105003
-#: assets/dist/js/index-5L9fy43s.js:105003
-#: assets/dist/js/index-B9njHOE9.js:105003
-#: assets/dist/js/index-B_-9Q1Pm.js:105003
-#: assets/dist/js/index-BaeKfBxd.js:105003
-#: assets/dist/js/index-Be-zS_7L.js:105003
-#: assets/dist/js/index-BgndTSnI.js:105003
-#: assets/dist/js/index-Ca8T0YWF.js:102610
-#: assets/dist/js/index-D72LVK04.js:105003
-#: assets/dist/js/index-DaZ-5sTw.js:105003
-#: assets/dist/js/index-DsyE5-hy.js:102610
-#: assets/dist/js/index-l5TSUBE6.js:105003
-#: assets/dist/js/index-xDWn_aGf.js:105003
-msgid "<Name>%1$s is not: </Name><Value>%2$s</Value>"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105115
-#: assets/dist/js/index-5L9fy43s.js:105115
-#: assets/dist/js/index-B9njHOE9.js:105115
-#: assets/dist/js/index-B_-9Q1Pm.js:105115
-#: assets/dist/js/index-BaeKfBxd.js:105115
-#: assets/dist/js/index-Be-zS_7L.js:105115
-#: assets/dist/js/index-BgndTSnI.js:105115
-#: assets/dist/js/index-Ca8T0YWF.js:102722
-#: assets/dist/js/index-D72LVK04.js:105115
-#: assets/dist/js/index-DaZ-5sTw.js:105115
-#: assets/dist/js/index-DsyE5-hy.js:102722
-#: assets/dist/js/index-l5TSUBE6.js:105115
-#: assets/dist/js/index-xDWn_aGf.js:105115
-#: templates/single-activity.php:172
-#: templates/single-destination.php:172
-msgid "Days"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105116
-#: assets/dist/js/index-5L9fy43s.js:105116
-#: assets/dist/js/index-B9njHOE9.js:105116
-#: assets/dist/js/index-B_-9Q1Pm.js:105116
-#: assets/dist/js/index-BaeKfBxd.js:105116
-#: assets/dist/js/index-Be-zS_7L.js:105116
-#: assets/dist/js/index-BgndTSnI.js:105116
-#: assets/dist/js/index-Ca8T0YWF.js:102723
-#: assets/dist/js/index-D72LVK04.js:105116
-#: assets/dist/js/index-DaZ-5sTw.js:105116
-#: assets/dist/js/index-DsyE5-hy.js:102723
-#: assets/dist/js/index-l5TSUBE6.js:105116
-#: assets/dist/js/index-xDWn_aGf.js:105116
-msgid "Weeks"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105117
-#: assets/dist/js/index-5L9fy43s.js:105117
-#: assets/dist/js/index-B9njHOE9.js:105117
-#: assets/dist/js/index-B_-9Q1Pm.js:105117
-#: assets/dist/js/index-BaeKfBxd.js:105117
-#: assets/dist/js/index-Be-zS_7L.js:105117
-#: assets/dist/js/index-BgndTSnI.js:105117
-#: assets/dist/js/index-Ca8T0YWF.js:102724
-#: assets/dist/js/index-D72LVK04.js:105117
-#: assets/dist/js/index-DaZ-5sTw.js:105117
-#: assets/dist/js/index-DsyE5-hy.js:102724
-#: assets/dist/js/index-l5TSUBE6.js:105117
-#: assets/dist/js/index-xDWn_aGf.js:105117
-msgid "Months"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105118
-#: assets/dist/js/index-5L9fy43s.js:105118
-#: assets/dist/js/index-B9njHOE9.js:105118
-#: assets/dist/js/index-B_-9Q1Pm.js:105118
-#: assets/dist/js/index-BaeKfBxd.js:105118
-#: assets/dist/js/index-Be-zS_7L.js:105118
-#: assets/dist/js/index-BgndTSnI.js:105118
-#: assets/dist/js/index-Ca8T0YWF.js:102725
-#: assets/dist/js/index-D72LVK04.js:105118
-#: assets/dist/js/index-DaZ-5sTw.js:105118
-#: assets/dist/js/index-DsyE5-hy.js:102725
-#: assets/dist/js/index-l5TSUBE6.js:105118
-#: assets/dist/js/index-xDWn_aGf.js:105118
-msgid "Years"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105121
-#: assets/dist/js/index-5L9fy43s.js:105121
-#: assets/dist/js/index-B9njHOE9.js:105121
-#: assets/dist/js/index-B_-9Q1Pm.js:105121
-#: assets/dist/js/index-BaeKfBxd.js:105121
-#: assets/dist/js/index-Be-zS_7L.js:105121
-#: assets/dist/js/index-BgndTSnI.js:105121
-#: assets/dist/js/index-Ca8T0YWF.js:102728
-#: assets/dist/js/index-D72LVK04.js:105121
-#: assets/dist/js/index-DaZ-5sTw.js:105121
-#: assets/dist/js/index-DsyE5-hy.js:102728
-#: assets/dist/js/index-l5TSUBE6.js:105121
-#: assets/dist/js/index-xDWn_aGf.js:105121
-msgid "Days ago"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105122
-#: assets/dist/js/index-5L9fy43s.js:105122
-#: assets/dist/js/index-B9njHOE9.js:105122
-#: assets/dist/js/index-B_-9Q1Pm.js:105122
-#: assets/dist/js/index-BaeKfBxd.js:105122
-#: assets/dist/js/index-Be-zS_7L.js:105122
-#: assets/dist/js/index-BgndTSnI.js:105122
-#: assets/dist/js/index-Ca8T0YWF.js:102729
-#: assets/dist/js/index-D72LVK04.js:105122
-#: assets/dist/js/index-DaZ-5sTw.js:105122
-#: assets/dist/js/index-DsyE5-hy.js:102729
-#: assets/dist/js/index-l5TSUBE6.js:105122
-#: assets/dist/js/index-xDWn_aGf.js:105122
-msgid "Weeks ago"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105123
-#: assets/dist/js/index-5L9fy43s.js:105123
-#: assets/dist/js/index-B9njHOE9.js:105123
-#: assets/dist/js/index-B_-9Q1Pm.js:105123
-#: assets/dist/js/index-BaeKfBxd.js:105123
-#: assets/dist/js/index-Be-zS_7L.js:105123
-#: assets/dist/js/index-BgndTSnI.js:105123
-#: assets/dist/js/index-Ca8T0YWF.js:102730
-#: assets/dist/js/index-D72LVK04.js:105123
-#: assets/dist/js/index-DaZ-5sTw.js:105123
-#: assets/dist/js/index-DsyE5-hy.js:102730
-#: assets/dist/js/index-l5TSUBE6.js:105123
-#: assets/dist/js/index-xDWn_aGf.js:105123
-msgid "Months ago"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105124
-#: assets/dist/js/index-5L9fy43s.js:105124
-#: assets/dist/js/index-B9njHOE9.js:105124
-#: assets/dist/js/index-B_-9Q1Pm.js:105124
-#: assets/dist/js/index-BaeKfBxd.js:105124
-#: assets/dist/js/index-Be-zS_7L.js:105124
-#: assets/dist/js/index-BgndTSnI.js:105124
-#: assets/dist/js/index-Ca8T0YWF.js:102731
-#: assets/dist/js/index-D72LVK04.js:105124
-#: assets/dist/js/index-DaZ-5sTw.js:105124
-#: assets/dist/js/index-DsyE5-hy.js:102731
-#: assets/dist/js/index-l5TSUBE6.js:105124
-#: assets/dist/js/index-xDWn_aGf.js:105124
-msgid "Years ago"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105182
-#: assets/dist/js/index-5L9fy43s.js:105182
-#: assets/dist/js/index-B9njHOE9.js:105182
-#: assets/dist/js/index-B_-9Q1Pm.js:105182
-#: assets/dist/js/index-BaeKfBxd.js:105182
-#: assets/dist/js/index-Be-zS_7L.js:105182
-#: assets/dist/js/index-BgndTSnI.js:105182
-#: assets/dist/js/index-Ca8T0YWF.js:102789
-#: assets/dist/js/index-D72LVK04.js:105182
-#: assets/dist/js/index-DaZ-5sTw.js:105182
-#: assets/dist/js/index-DsyE5-hy.js:102789
-#: assets/dist/js/index-l5TSUBE6.js:105182
-#: assets/dist/js/index-xDWn_aGf.js:105182
-msgid "Unit"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105327
-#: assets/dist/js/index-5L9fy43s.js:105327
-#: assets/dist/js/index-B9njHOE9.js:105327
-#: assets/dist/js/index-B_-9Q1Pm.js:105327
-#: assets/dist/js/index-BaeKfBxd.js:105327
-#: assets/dist/js/index-Be-zS_7L.js:105327
-#: assets/dist/js/index-BgndTSnI.js:105327
-#: assets/dist/js/index-Ca8T0YWF.js:102934
-#: assets/dist/js/index-D72LVK04.js:105327
-#: assets/dist/js/index-DaZ-5sTw.js:105327
-#: assets/dist/js/index-DsyE5-hy.js:102934
-#: assets/dist/js/index-l5TSUBE6.js:105327
-#: assets/dist/js/index-xDWn_aGf.js:105327
-msgid "Date time"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105377
-#: assets/dist/js/index-5L9fy43s.js:105377
-#: assets/dist/js/index-B9njHOE9.js:105377
-#: assets/dist/js/index-B_-9Q1Pm.js:105377
-#: assets/dist/js/index-BaeKfBxd.js:105377
-#: assets/dist/js/index-Be-zS_7L.js:105377
-#: assets/dist/js/index-BgndTSnI.js:105377
-#: assets/dist/js/index-Ca8T0YWF.js:102984
-#: assets/dist/js/index-D72LVK04.js:105377
-#: assets/dist/js/index-DaZ-5sTw.js:105377
-#: assets/dist/js/index-DsyE5-hy.js:102984
-#: assets/dist/js/index-l5TSUBE6.js:105377
-#: assets/dist/js/index-xDWn_aGf.js:105377
-#: app/Controllers/TripController.php:1625
-msgid "Today"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105382
-#: assets/dist/js/index-5L9fy43s.js:105382
-#: assets/dist/js/index-B9njHOE9.js:105382
-#: assets/dist/js/index-B_-9Q1Pm.js:105382
-#: assets/dist/js/index-BaeKfBxd.js:105382
-#: assets/dist/js/index-Be-zS_7L.js:105382
-#: assets/dist/js/index-BgndTSnI.js:105382
-#: assets/dist/js/index-Ca8T0YWF.js:102989
-#: assets/dist/js/index-D72LVK04.js:105382
-#: assets/dist/js/index-DaZ-5sTw.js:105382
-#: assets/dist/js/index-DsyE5-hy.js:102989
-#: assets/dist/js/index-l5TSUBE6.js:105382
-#: assets/dist/js/index-xDWn_aGf.js:105382
-msgid "Yesterday"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105390
-#: assets/dist/js/index-5L9fy43s.js:105390
-#: assets/dist/js/index-B9njHOE9.js:105390
-#: assets/dist/js/index-B_-9Q1Pm.js:105390
-#: assets/dist/js/index-BaeKfBxd.js:105390
-#: assets/dist/js/index-Be-zS_7L.js:105390
-#: assets/dist/js/index-BgndTSnI.js:105390
-#: assets/dist/js/index-Ca8T0YWF.js:102997
-#: assets/dist/js/index-D72LVK04.js:105390
-#: assets/dist/js/index-DaZ-5sTw.js:105390
-#: assets/dist/js/index-DsyE5-hy.js:102997
-#: assets/dist/js/index-l5TSUBE6.js:105390
-#: assets/dist/js/index-xDWn_aGf.js:105390
-msgid "Past week"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105398
-#: assets/dist/js/index-5L9fy43s.js:105398
-#: assets/dist/js/index-B9njHOE9.js:105398
-#: assets/dist/js/index-B_-9Q1Pm.js:105398
-#: assets/dist/js/index-BaeKfBxd.js:105398
-#: assets/dist/js/index-Be-zS_7L.js:105398
-#: assets/dist/js/index-BgndTSnI.js:105398
-#: assets/dist/js/index-Ca8T0YWF.js:103005
-#: assets/dist/js/index-D72LVK04.js:105398
-#: assets/dist/js/index-DaZ-5sTw.js:105398
-#: assets/dist/js/index-DsyE5-hy.js:103005
-#: assets/dist/js/index-l5TSUBE6.js:105398
-#: assets/dist/js/index-xDWn_aGf.js:105398
-msgid "Past month"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105408
-#: assets/dist/js/index-5L9fy43s.js:105408
-#: assets/dist/js/index-B9njHOE9.js:105408
-#: assets/dist/js/index-B_-9Q1Pm.js:105408
-#: assets/dist/js/index-BaeKfBxd.js:105408
-#: assets/dist/js/index-Be-zS_7L.js:105408
-#: assets/dist/js/index-BgndTSnI.js:105408
-#: assets/dist/js/index-Ca8T0YWF.js:103015
-#: assets/dist/js/index-D72LVK04.js:105408
-#: assets/dist/js/index-DaZ-5sTw.js:105408
-#: assets/dist/js/index-DsyE5-hy.js:103015
-#: assets/dist/js/index-l5TSUBE6.js:105408
-#: assets/dist/js/index-xDWn_aGf.js:105408
-msgid "Last 7 days"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105416
-#: assets/dist/js/index-5L9fy43s.js:105416
-#: assets/dist/js/index-B9njHOE9.js:105416
-#: assets/dist/js/index-B_-9Q1Pm.js:105416
-#: assets/dist/js/index-BaeKfBxd.js:105416
-#: assets/dist/js/index-Be-zS_7L.js:105416
-#: assets/dist/js/index-BgndTSnI.js:105416
-#: assets/dist/js/index-Ca8T0YWF.js:103023
-#: assets/dist/js/index-D72LVK04.js:105416
-#: assets/dist/js/index-DaZ-5sTw.js:105416
-#: assets/dist/js/index-DsyE5-hy.js:103023
-#: assets/dist/js/index-l5TSUBE6.js:105416
-#: assets/dist/js/index-xDWn_aGf.js:105416
-msgid "Last 30 days"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105424
-#: assets/dist/js/index-5L9fy43s.js:105424
-#: assets/dist/js/index-B9njHOE9.js:105424
-#: assets/dist/js/index-B_-9Q1Pm.js:105424
-#: assets/dist/js/index-BaeKfBxd.js:105424
-#: assets/dist/js/index-Be-zS_7L.js:105424
-#: assets/dist/js/index-BgndTSnI.js:105424
-#: assets/dist/js/index-Ca8T0YWF.js:103031
-#: assets/dist/js/index-D72LVK04.js:105424
-#: assets/dist/js/index-DaZ-5sTw.js:105424
-#: assets/dist/js/index-DsyE5-hy.js:103031
-#: assets/dist/js/index-l5TSUBE6.js:105424
-#: assets/dist/js/index-xDWn_aGf.js:105424
-msgid "Month to date"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105432
-#: assets/dist/js/index-5L9fy43s.js:105432
-#: assets/dist/js/index-B9njHOE9.js:105432
-#: assets/dist/js/index-B_-9Q1Pm.js:105432
-#: assets/dist/js/index-BaeKfBxd.js:105432
-#: assets/dist/js/index-Be-zS_7L.js:105432
-#: assets/dist/js/index-BgndTSnI.js:105432
-#: assets/dist/js/index-Ca8T0YWF.js:103039
-#: assets/dist/js/index-D72LVK04.js:105432
-#: assets/dist/js/index-DaZ-5sTw.js:105432
-#: assets/dist/js/index-DsyE5-hy.js:103039
-#: assets/dist/js/index-l5TSUBE6.js:105432
-#: assets/dist/js/index-xDWn_aGf.js:105432
-msgid "Last year"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105440
-#: assets/dist/js/index-5L9fy43s.js:105440
-#: assets/dist/js/index-B9njHOE9.js:105440
-#: assets/dist/js/index-B_-9Q1Pm.js:105440
-#: assets/dist/js/index-BaeKfBxd.js:105440
-#: assets/dist/js/index-Be-zS_7L.js:105440
-#: assets/dist/js/index-BgndTSnI.js:105440
-#: assets/dist/js/index-Ca8T0YWF.js:103047
-#: assets/dist/js/index-D72LVK04.js:105440
-#: assets/dist/js/index-DaZ-5sTw.js:105440
-#: assets/dist/js/index-DsyE5-hy.js:103047
-#: assets/dist/js/index-l5TSUBE6.js:105440
-#: assets/dist/js/index-xDWn_aGf.js:105440
-msgid "Year to date"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105690
-#: assets/dist/js/index-5L9fy43s.js:105690
-#: assets/dist/js/index-B9njHOE9.js:105690
-#: assets/dist/js/index-B_-9Q1Pm.js:105690
-#: assets/dist/js/index-BaeKfBxd.js:105690
-#: assets/dist/js/index-Be-zS_7L.js:105690
-#: assets/dist/js/index-BgndTSnI.js:105690
-#: assets/dist/js/index-Ca8T0YWF.js:103297
-#: assets/dist/js/index-D72LVK04.js:105690
-#: assets/dist/js/index-DaZ-5sTw.js:105690
-#: assets/dist/js/index-DsyE5-hy.js:103297
-#: assets/dist/js/index-l5TSUBE6.js:105690
-#: assets/dist/js/index-xDWn_aGf.js:105690
-#: templates/partials/single-trip/sticky-sidebar.php:164
-msgid "Date"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105814
-#: assets/dist/js/index-5L9fy43s.js:105814
-#: assets/dist/js/index-B9njHOE9.js:105814
-#: assets/dist/js/index-B_-9Q1Pm.js:105814
-#: assets/dist/js/index-BaeKfBxd.js:105814
-#: assets/dist/js/index-Be-zS_7L.js:105814
-#: assets/dist/js/index-BgndTSnI.js:105814
-#: assets/dist/js/index-Ca8T0YWF.js:103421
-#: assets/dist/js/index-D72LVK04.js:105814
-#: assets/dist/js/index-DaZ-5sTw.js:105814
-#: assets/dist/js/index-DsyE5-hy.js:103421
-#: assets/dist/js/index-l5TSUBE6.js:105814
-#: assets/dist/js/index-xDWn_aGf.js:105814
-#: templates/partials/pricing-summary.php:208
-msgid "Required"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105816
-#: assets/dist/js/index-5L9fy43s.js:105816
-#: assets/dist/js/index-B9njHOE9.js:105816
-#: assets/dist/js/index-B_-9Q1Pm.js:105816
-#: assets/dist/js/index-BaeKfBxd.js:105816
-#: assets/dist/js/index-Be-zS_7L.js:105816
-#: assets/dist/js/index-BgndTSnI.js:105816
-#: assets/dist/js/index-Ca8T0YWF.js:103423
-#: assets/dist/js/index-D72LVK04.js:105816
-#: assets/dist/js/index-DaZ-5sTw.js:105816
-#: assets/dist/js/index-DsyE5-hy.js:103423
-#: assets/dist/js/index-l5TSUBE6.js:105816
-#: assets/dist/js/index-xDWn_aGf.js:105816
-msgid "Optional"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105866
-#: assets/dist/js/index-5L9fy43s.js:105866
-#: assets/dist/js/index-B9njHOE9.js:105866
-#: assets/dist/js/index-B_-9Q1Pm.js:105866
-#: assets/dist/js/index-BaeKfBxd.js:105866
-#: assets/dist/js/index-Be-zS_7L.js:105866
-#: assets/dist/js/index-BgndTSnI.js:105866
-#: assets/dist/js/index-Ca8T0YWF.js:103473
-#: assets/dist/js/index-D72LVK04.js:105866
-#: assets/dist/js/index-DaZ-5sTw.js:105866
-#: assets/dist/js/index-DsyE5-hy.js:103473
-#: assets/dist/js/index-l5TSUBE6.js:105866
-#: assets/dist/js/index-xDWn_aGf.js:105866
-msgid "Custom"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:105899
-#: assets/dist/js/index-5L9fy43s.js:105899
-#: assets/dist/js/index-B9njHOE9.js:105899
-#: assets/dist/js/index-B_-9Q1Pm.js:105899
-#: assets/dist/js/index-BaeKfBxd.js:105899
-#: assets/dist/js/index-Be-zS_7L.js:105899
-#: assets/dist/js/index-BgndTSnI.js:105899
-#: assets/dist/js/index-Ca8T0YWF.js:103506
-#: assets/dist/js/index-D72LVK04.js:105899
-#: assets/dist/js/index-DaZ-5sTw.js:105899
-#: assets/dist/js/index-DsyE5-hy.js:103506
-#: assets/dist/js/index-l5TSUBE6.js:105899
-#: assets/dist/js/index-xDWn_aGf.js:105899
-msgid "To"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:106170
-#: assets/dist/js/index-5L9fy43s.js:106170
-#: assets/dist/js/index-B9njHOE9.js:106170
-#: assets/dist/js/index-B_-9Q1Pm.js:106170
-#: assets/dist/js/index-BaeKfBxd.js:106170
-#: assets/dist/js/index-Be-zS_7L.js:106170
-#: assets/dist/js/index-BgndTSnI.js:106170
-#: assets/dist/js/index-Ca8T0YWF.js:103777
-#: assets/dist/js/index-D72LVK04.js:106170
-#: assets/dist/js/index-DaZ-5sTw.js:106170
-#: assets/dist/js/index-DsyE5-hy.js:103777
-#: assets/dist/js/index-l5TSUBE6.js:106170
-#: assets/dist/js/index-xDWn_aGf.js:106170
-msgid "The max. value must be greater than the min. value."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:106175
-#: assets/dist/js/index-5L9fy43s.js:106175
-#: assets/dist/js/index-B9njHOE9.js:106175
-#: assets/dist/js/index-B_-9Q1Pm.js:106175
-#: assets/dist/js/index-BaeKfBxd.js:106175
-#: assets/dist/js/index-Be-zS_7L.js:106175
-#: assets/dist/js/index-BgndTSnI.js:106175
-#: assets/dist/js/index-Ca8T0YWF.js:103782
-#: assets/dist/js/index-D72LVK04.js:106175
-#: assets/dist/js/index-DaZ-5sTw.js:106175
-#: assets/dist/js/index-DsyE5-hy.js:103782
-#: assets/dist/js/index-l5TSUBE6.js:106175
-#: assets/dist/js/index-xDWn_aGf.js:106175
-msgid "Min."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:106187
-#: assets/dist/js/index-5L9fy43s.js:106187
-#: assets/dist/js/index-B9njHOE9.js:106187
-#: assets/dist/js/index-B_-9Q1Pm.js:106187
-#: assets/dist/js/index-BaeKfBxd.js:106187
-#: assets/dist/js/index-Be-zS_7L.js:106187
-#: assets/dist/js/index-BgndTSnI.js:106187
-#: assets/dist/js/index-Ca8T0YWF.js:103794
-#: assets/dist/js/index-D72LVK04.js:106187
-#: assets/dist/js/index-DaZ-5sTw.js:106187
-#: assets/dist/js/index-DsyE5-hy.js:103794
-#: assets/dist/js/index-l5TSUBE6.js:106187
-#: assets/dist/js/index-xDWn_aGf.js:106187
-msgid "Max."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:106561
-#: assets/dist/js/index-5L9fy43s.js:106561
-#: assets/dist/js/index-B9njHOE9.js:106561
-#: assets/dist/js/index-B_-9Q1Pm.js:106561
-#: assets/dist/js/index-BaeKfBxd.js:106561
-#: assets/dist/js/index-Be-zS_7L.js:106561
-#: assets/dist/js/index-BgndTSnI.js:106561
-#: assets/dist/js/index-Ca8T0YWF.js:104168
-#: assets/dist/js/index-D72LVK04.js:106561
-#: assets/dist/js/index-DaZ-5sTw.js:106561
-#: assets/dist/js/index-DsyE5-hy.js:104168
-#: assets/dist/js/index-l5TSUBE6.js:106561
-#: assets/dist/js/index-xDWn_aGf.js:106561
-msgid "Open color picker"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:106652
-#: assets/dist/js/index-5L9fy43s.js:106652
-#: assets/dist/js/index-B9njHOE9.js:106652
-#: assets/dist/js/index-B_-9Q1Pm.js:106652
-#: assets/dist/js/index-BaeKfBxd.js:106652
-#: assets/dist/js/index-Be-zS_7L.js:106652
-#: assets/dist/js/index-BgndTSnI.js:106652
-#: assets/dist/js/index-Ca8T0YWF.js:104259
-#: assets/dist/js/index-D72LVK04.js:106652
-#: assets/dist/js/index-DaZ-5sTw.js:106652
-#: assets/dist/js/index-DsyE5-hy.js:104259
-#: assets/dist/js/index-l5TSUBE6.js:106652
-#: assets/dist/js/index-xDWn_aGf.js:106652
-msgid "Hide password"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:106652
-#: assets/dist/js/index-5L9fy43s.js:106652
-#: assets/dist/js/index-B9njHOE9.js:106652
-#: assets/dist/js/index-B_-9Q1Pm.js:106652
-#: assets/dist/js/index-BaeKfBxd.js:106652
-#: assets/dist/js/index-Be-zS_7L.js:106652
-#: assets/dist/js/index-BgndTSnI.js:106652
-#: assets/dist/js/index-Ca8T0YWF.js:104259
-#: assets/dist/js/index-D72LVK04.js:106652
-#: assets/dist/js/index-DaZ-5sTw.js:106652
-#: assets/dist/js/index-DsyE5-hy.js:104259
-#: assets/dist/js/index-l5TSUBE6.js:106652
-#: assets/dist/js/index-xDWn_aGf.js:106652
-msgid "Show password"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:106854
-#: assets/dist/js/index-5L9fy43s.js:106854
-#: assets/dist/js/index-B9njHOE9.js:106854
-#: assets/dist/js/index-B_-9Q1Pm.js:106854
-#: assets/dist/js/index-BaeKfBxd.js:106854
-#: assets/dist/js/index-Be-zS_7L.js:106854
-#: assets/dist/js/index-BgndTSnI.js:106854
-#: assets/dist/js/index-Ca8T0YWF.js:104461
-#: assets/dist/js/index-D72LVK04.js:106854
-#: assets/dist/js/index-DaZ-5sTw.js:106854
-#: assets/dist/js/index-DsyE5-hy.js:104461
-#: assets/dist/js/index-l5TSUBE6.js:106854
-#: assets/dist/js/index-xDWn_aGf.js:106854
-msgid "Value must be a valid email address."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:106948
-#: assets/dist/js/index-5L9fy43s.js:106948
-#: assets/dist/js/index-B9njHOE9.js:106948
-#: assets/dist/js/index-B_-9Q1Pm.js:106948
-#: assets/dist/js/index-BaeKfBxd.js:106948
-#: assets/dist/js/index-Be-zS_7L.js:106948
-#: assets/dist/js/index-BgndTSnI.js:106948
-#: assets/dist/js/index-Ca8T0YWF.js:104555
-#: assets/dist/js/index-D72LVK04.js:106948
-#: assets/dist/js/index-DaZ-5sTw.js:106948
-#: assets/dist/js/index-DsyE5-hy.js:104555
-#: assets/dist/js/index-l5TSUBE6.js:106948
-#: assets/dist/js/index-xDWn_aGf.js:106948
-msgid "Value must be an integer."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:107028
-#: assets/dist/js/index-5L9fy43s.js:107028
-#: assets/dist/js/index-B9njHOE9.js:107028
-#: assets/dist/js/index-B_-9Q1Pm.js:107028
-#: assets/dist/js/index-BaeKfBxd.js:107028
-#: assets/dist/js/index-Be-zS_7L.js:107028
-#: assets/dist/js/index-BgndTSnI.js:107028
-#: assets/dist/js/index-Ca8T0YWF.js:104635
-#: assets/dist/js/index-D72LVK04.js:107028
-#: assets/dist/js/index-DaZ-5sTw.js:107028
-#: assets/dist/js/index-DsyE5-hy.js:104635
-#: assets/dist/js/index-l5TSUBE6.js:107028
-#: assets/dist/js/index-xDWn_aGf.js:107028
-msgid "Value must be a number."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:107234
-#: assets/dist/js/index-5L9fy43s.js:107234
-#: assets/dist/js/index-B9njHOE9.js:107234
-#: assets/dist/js/index-B_-9Q1Pm.js:107234
-#: assets/dist/js/index-BaeKfBxd.js:107234
-#: assets/dist/js/index-Be-zS_7L.js:107234
-#: assets/dist/js/index-BgndTSnI.js:107234
-#: assets/dist/js/index-Ca8T0YWF.js:104841
-#: assets/dist/js/index-D72LVK04.js:107234
-#: assets/dist/js/index-DaZ-5sTw.js:107234
-#: assets/dist/js/index-DsyE5-hy.js:104841
-#: assets/dist/js/index-l5TSUBE6.js:107234
-#: assets/dist/js/index-xDWn_aGf.js:107234
-msgid "True"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:107237
-#: assets/dist/js/index-5L9fy43s.js:107237
-#: assets/dist/js/index-B9njHOE9.js:107237
-#: assets/dist/js/index-B_-9Q1Pm.js:107237
-#: assets/dist/js/index-BaeKfBxd.js:107237
-#: assets/dist/js/index-Be-zS_7L.js:107237
-#: assets/dist/js/index-BgndTSnI.js:107237
-#: assets/dist/js/index-Ca8T0YWF.js:104844
-#: assets/dist/js/index-D72LVK04.js:107237
-#: assets/dist/js/index-DaZ-5sTw.js:107237
-#: assets/dist/js/index-DsyE5-hy.js:104844
-#: assets/dist/js/index-l5TSUBE6.js:107237
-#: assets/dist/js/index-xDWn_aGf.js:107237
-msgid "False"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:107244
-#: assets/dist/js/index-5L9fy43s.js:107244
-#: assets/dist/js/index-B9njHOE9.js:107244
-#: assets/dist/js/index-B_-9Q1Pm.js:107244
-#: assets/dist/js/index-BaeKfBxd.js:107244
-#: assets/dist/js/index-Be-zS_7L.js:107244
-#: assets/dist/js/index-BgndTSnI.js:107244
-#: assets/dist/js/index-Ca8T0YWF.js:104851
-#: assets/dist/js/index-D72LVK04.js:107244
-#: assets/dist/js/index-DaZ-5sTw.js:107244
-#: assets/dist/js/index-DsyE5-hy.js:104851
-#: assets/dist/js/index-l5TSUBE6.js:107244
-#: assets/dist/js/index-xDWn_aGf.js:107244
-msgid "Value must be true, false, or undefined"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:107312
-#: assets/dist/js/index-5L9fy43s.js:107312
-#: assets/dist/js/index-B9njHOE9.js:107312
-#: assets/dist/js/index-B_-9Q1Pm.js:107312
-#: assets/dist/js/index-BaeKfBxd.js:107312
-#: assets/dist/js/index-Be-zS_7L.js:107312
-#: assets/dist/js/index-BgndTSnI.js:107312
-#: assets/dist/js/index-Ca8T0YWF.js:104919
-#: assets/dist/js/index-D72LVK04.js:107312
-#: assets/dist/js/index-DaZ-5sTw.js:107312
-#: assets/dist/js/index-DsyE5-hy.js:104919
-#: assets/dist/js/index-l5TSUBE6.js:107312
-#: assets/dist/js/index-xDWn_aGf.js:107312
-msgid "Value must be an array."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:107315
-#: assets/dist/js/index-5L9fy43s.js:107315
-#: assets/dist/js/index-B9njHOE9.js:107315
-#: assets/dist/js/index-B_-9Q1Pm.js:107315
-#: assets/dist/js/index-BaeKfBxd.js:107315
-#: assets/dist/js/index-Be-zS_7L.js:107315
-#: assets/dist/js/index-BgndTSnI.js:107315
-#: assets/dist/js/index-Ca8T0YWF.js:104922
-#: assets/dist/js/index-D72LVK04.js:107315
-#: assets/dist/js/index-DaZ-5sTw.js:107315
-#: assets/dist/js/index-DsyE5-hy.js:104922
-#: assets/dist/js/index-l5TSUBE6.js:107315
-#: assets/dist/js/index-xDWn_aGf.js:107315
-msgid "Every value must be a string."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:107435
-#: assets/dist/js/index-5L9fy43s.js:107435
-#: assets/dist/js/index-B9njHOE9.js:107435
-#: assets/dist/js/index-B_-9Q1Pm.js:107435
-#: assets/dist/js/index-BaeKfBxd.js:107435
-#: assets/dist/js/index-Be-zS_7L.js:107435
-#: assets/dist/js/index-BgndTSnI.js:107435
-#: assets/dist/js/index-Ca8T0YWF.js:105042
-#: assets/dist/js/index-D72LVK04.js:107435
-#: assets/dist/js/index-DaZ-5sTw.js:107435
-#: assets/dist/js/index-DsyE5-hy.js:105042
-#: assets/dist/js/index-l5TSUBE6.js:107435
-#: assets/dist/js/index-xDWn_aGf.js:107435
-msgid "Value must be a valid color."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:108194
-#: assets/dist/js/index-5L9fy43s.js:108194
-#: assets/dist/js/index-B9njHOE9.js:108194
-#: assets/dist/js/index-B_-9Q1Pm.js:108194
-#: assets/dist/js/index-BaeKfBxd.js:108194
-#: assets/dist/js/index-Be-zS_7L.js:108194
-#: assets/dist/js/index-BgndTSnI.js:108194
-#: assets/dist/js/index-Ca8T0YWF.js:105801
-#: assets/dist/js/index-D72LVK04.js:108194
-#: assets/dist/js/index-DaZ-5sTw.js:108194
-#: assets/dist/js/index-DsyE5-hy.js:105801
-#: assets/dist/js/index-l5TSUBE6.js:108194
-#: assets/dist/js/index-xDWn_aGf.js:108194
-msgid "Could not validate elements."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:108239
-#: assets/dist/js/index-5L9fy43s.js:108239
-#: assets/dist/js/index-B9njHOE9.js:108239
-#: assets/dist/js/index-B_-9Q1Pm.js:108239
-#: assets/dist/js/index-BaeKfBxd.js:108239
-#: assets/dist/js/index-Be-zS_7L.js:108239
-#: assets/dist/js/index-BgndTSnI.js:108239
-#: assets/dist/js/index-Ca8T0YWF.js:105846
-#: assets/dist/js/index-D72LVK04.js:108239
-#: assets/dist/js/index-DaZ-5sTw.js:108239
-#: assets/dist/js/index-DsyE5-hy.js:105846
-#: assets/dist/js/index-l5TSUBE6.js:108239
-#: assets/dist/js/index-xDWn_aGf.js:108239
-msgid "Unknown error when running elements validation asynchronously."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:108298
-#: assets/dist/js/index-5L9fy43s.js:108298
-#: assets/dist/js/index-B9njHOE9.js:108298
-#: assets/dist/js/index-B_-9Q1Pm.js:108298
-#: assets/dist/js/index-BaeKfBxd.js:108298
-#: assets/dist/js/index-Be-zS_7L.js:108298
-#: assets/dist/js/index-BgndTSnI.js:108298
-#: assets/dist/js/index-Ca8T0YWF.js:105905
-#: assets/dist/js/index-D72LVK04.js:108298
-#: assets/dist/js/index-DaZ-5sTw.js:108298
-#: assets/dist/js/index-DsyE5-hy.js:105905
-#: assets/dist/js/index-l5TSUBE6.js:108298
-#: assets/dist/js/index-xDWn_aGf.js:108298
-msgid "Validation could not be processed."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:108313
-#: assets/dist/js/index-5L9fy43s.js:108313
-#: assets/dist/js/index-B9njHOE9.js:108313
-#: assets/dist/js/index-B_-9Q1Pm.js:108313
-#: assets/dist/js/index-BaeKfBxd.js:108313
-#: assets/dist/js/index-Be-zS_7L.js:108313
-#: assets/dist/js/index-BgndTSnI.js:108313
-#: assets/dist/js/index-Ca8T0YWF.js:105920
-#: assets/dist/js/index-D72LVK04.js:108313
-#: assets/dist/js/index-DaZ-5sTw.js:108313
-#: assets/dist/js/index-DsyE5-hy.js:105920
-#: assets/dist/js/index-l5TSUBE6.js:108313
-#: assets/dist/js/index-xDWn_aGf.js:108313
-msgid "Unknown error when running custom validation asynchronously."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:108343
-#: assets/dist/js/index-5L9fy43s.js:108343
-#: assets/dist/js/index-B9njHOE9.js:108343
-#: assets/dist/js/index-B_-9Q1Pm.js:108343
-#: assets/dist/js/index-BaeKfBxd.js:108343
-#: assets/dist/js/index-Be-zS_7L.js:108343
-#: assets/dist/js/index-BgndTSnI.js:108343
-#: assets/dist/js/index-Ca8T0YWF.js:105950
-#: assets/dist/js/index-D72LVK04.js:108343
-#: assets/dist/js/index-DaZ-5sTw.js:108343
-#: assets/dist/js/index-DsyE5-hy.js:105950
-#: assets/dist/js/index-l5TSUBE6.js:108343
-#: assets/dist/js/index-xDWn_aGf.js:108343
-msgid "Value does not match the required pattern."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:108351
-#: assets/dist/js/index-5L9fy43s.js:108351
-#: assets/dist/js/index-B9njHOE9.js:108351
-#: assets/dist/js/index-B_-9Q1Pm.js:108351
-#: assets/dist/js/index-BaeKfBxd.js:108351
-#: assets/dist/js/index-Be-zS_7L.js:108351
-#: assets/dist/js/index-BgndTSnI.js:108351
-#: assets/dist/js/index-Ca8T0YWF.js:105958
-#: assets/dist/js/index-D72LVK04.js:108351
-#: assets/dist/js/index-DaZ-5sTw.js:108351
-#: assets/dist/js/index-DsyE5-hy.js:105958
-#: assets/dist/js/index-l5TSUBE6.js:108351
-#: assets/dist/js/index-xDWn_aGf.js:108351
-msgid "Value is below the minimum."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:108359
-#: assets/dist/js/index-5L9fy43s.js:108359
-#: assets/dist/js/index-B9njHOE9.js:108359
-#: assets/dist/js/index-B_-9Q1Pm.js:108359
-#: assets/dist/js/index-BaeKfBxd.js:108359
-#: assets/dist/js/index-Be-zS_7L.js:108359
-#: assets/dist/js/index-BgndTSnI.js:108359
-#: assets/dist/js/index-Ca8T0YWF.js:105966
-#: assets/dist/js/index-D72LVK04.js:108359
-#: assets/dist/js/index-DaZ-5sTw.js:108359
-#: assets/dist/js/index-DsyE5-hy.js:105966
-#: assets/dist/js/index-l5TSUBE6.js:108359
-#: assets/dist/js/index-xDWn_aGf.js:108359
-msgid "Value is above the maximum."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:108367
-#: assets/dist/js/index-5L9fy43s.js:108367
-#: assets/dist/js/index-B9njHOE9.js:108367
-#: assets/dist/js/index-B_-9Q1Pm.js:108367
-#: assets/dist/js/index-BaeKfBxd.js:108367
-#: assets/dist/js/index-Be-zS_7L.js:108367
-#: assets/dist/js/index-BgndTSnI.js:108367
-#: assets/dist/js/index-Ca8T0YWF.js:105974
-#: assets/dist/js/index-D72LVK04.js:108367
-#: assets/dist/js/index-DaZ-5sTw.js:108367
-#: assets/dist/js/index-DsyE5-hy.js:105974
-#: assets/dist/js/index-l5TSUBE6.js:108367
-#: assets/dist/js/index-xDWn_aGf.js:108367
-msgid "Value is too short."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:108375
-#: assets/dist/js/index-5L9fy43s.js:108375
-#: assets/dist/js/index-B9njHOE9.js:108375
-#: assets/dist/js/index-B_-9Q1Pm.js:108375
-#: assets/dist/js/index-BaeKfBxd.js:108375
-#: assets/dist/js/index-Be-zS_7L.js:108375
-#: assets/dist/js/index-BgndTSnI.js:108375
-#: assets/dist/js/index-Ca8T0YWF.js:105982
-#: assets/dist/js/index-D72LVK04.js:108375
-#: assets/dist/js/index-DaZ-5sTw.js:108375
-#: assets/dist/js/index-DsyE5-hy.js:105982
-#: assets/dist/js/index-l5TSUBE6.js:108375
-#: assets/dist/js/index-xDWn_aGf.js:108375
-msgid "Value is too long."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:108383
-#: assets/dist/js/index-5L9fy43s.js:108383
-#: assets/dist/js/index-B9njHOE9.js:108383
-#: assets/dist/js/index-B_-9Q1Pm.js:108383
-#: assets/dist/js/index-BaeKfBxd.js:108383
-#: assets/dist/js/index-Be-zS_7L.js:108383
-#: assets/dist/js/index-BgndTSnI.js:108383
-#: assets/dist/js/index-Ca8T0YWF.js:105990
-#: assets/dist/js/index-D72LVK04.js:108383
-#: assets/dist/js/index-DaZ-5sTw.js:108383
-#: assets/dist/js/index-DsyE5-hy.js:105990
-#: assets/dist/js/index-l5TSUBE6.js:108383
-#: assets/dist/js/index-xDWn_aGf.js:108383
-msgid "Value must be one of the elements."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:108406
-#: assets/dist/js/index-5L9fy43s.js:108406
-#: assets/dist/js/index-B9njHOE9.js:108406
-#: assets/dist/js/index-B_-9Q1Pm.js:108406
-#: assets/dist/js/index-BaeKfBxd.js:108406
-#: assets/dist/js/index-Be-zS_7L.js:108406
-#: assets/dist/js/index-BgndTSnI.js:108406
-#: assets/dist/js/index-Ca8T0YWF.js:106013
-#: assets/dist/js/index-D72LVK04.js:108406
-#: assets/dist/js/index-DaZ-5sTw.js:108406
-#: assets/dist/js/index-DsyE5-hy.js:106013
-#: assets/dist/js/index-l5TSUBE6.js:108406
-#: assets/dist/js/index-xDWn_aGf.js:108406
-msgid "Unknown error when running custom validation."
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:108440
-#: assets/dist/js/index-5L9fy43s.js:108440
-#: assets/dist/js/index-B9njHOE9.js:108440
-#: assets/dist/js/index-B_-9Q1Pm.js:108440
-#: assets/dist/js/index-BaeKfBxd.js:108440
-#: assets/dist/js/index-Be-zS_7L.js:108440
-#: assets/dist/js/index-BgndTSnI.js:108440
-#: assets/dist/js/index-Ca8T0YWF.js:106047
-#: assets/dist/js/index-D72LVK04.js:108440
-#: assets/dist/js/index-DaZ-5sTw.js:108440
-#: assets/dist/js/index-DsyE5-hy.js:106047
-#: assets/dist/js/index-l5TSUBE6.js:108440
-#: assets/dist/js/index-xDWn_aGf.js:108440
-msgid "Validating…"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:108735
-#: assets/dist/js/index-5L9fy43s.js:108735
-#: assets/dist/js/index-B9njHOE9.js:108735
-#: assets/dist/js/index-B_-9Q1Pm.js:108735
-#: assets/dist/js/index-BaeKfBxd.js:108735
-#: assets/dist/js/index-Be-zS_7L.js:108735
-#: assets/dist/js/index-BgndTSnI.js:108735
-#: assets/dist/js/index-Ca8T0YWF.js:106342
-#: assets/dist/js/index-D72LVK04.js:108735
-#: assets/dist/js/index-DaZ-5sTw.js:108735
-#: assets/dist/js/index-DsyE5-hy.js:106342
-#: assets/dist/js/index-l5TSUBE6.js:108735
-#: assets/dist/js/index-xDWn_aGf.js:108735
-#: templates/partials/booking-content.php:512
-msgid "Apply"
-msgstr ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:108806
-#: assets/dist/js/index-5L9fy43s.js:108806
-#: assets/dist/js/index-B5fPvAqc.js:108
-#: assets/dist/js/index-B9njHOE9.js:108806
-#: assets/dist/js/index-BRlbVGhV.js:716
-#: assets/dist/js/index-BZn3M6ju.js:108
-#: assets/dist/js/index-B_-9Q1Pm.js:108806
-#: assets/dist/js/index-BaeKfBxd.js:108806
-#: assets/dist/js/index-Be-zS_7L.js:108806
-#: assets/dist/js/index-BgndTSnI.js:108806
-#: assets/dist/js/index-Bs5Z9Hl8.js:108
-#: assets/dist/js/index-BsVfIPZp.js:108
-#: assets/dist/js/index-C1bUwUdP.js:108
-#: assets/dist/js/index-C8yqW6MV.js:108
-#: assets/dist/js/index-CN7DNpA4.js:108
-#: assets/dist/js/index-CNnpLRlh.js:716
-#: assets/dist/js/index-Ca8T0YWF.js:106413
-#: assets/dist/js/index-CqePsfDj.js:716
-#: assets/dist/js/index-CtFqfl7o.js:716
-#: assets/dist/js/index-CuK4RzLZ.js:716
-#: assets/dist/js/index-Cx4y5Ucr.js:108
-#: assets/dist/js/index-D0YYyCTG.js:108
-#: assets/dist/js/index-D72LVK04.js:108806
-#: assets/dist/js/index-DKN4YitT.js:108
-#: assets/dist/js/index-DaZ-5sTw.js:108806
-#: assets/dist/js/index-DsyE5-hy.js:106413
-#: assets/dist/js/index-F_EoMG4E.js:716
-#: assets/dist/js/index-QdhgJSyb.js:108
-#: assets/dist/js/index-guY8zmvT.js:108
-#: assets/dist/js/index-ivKjAX5w.js:716
-#: assets/dist/js/index-l5TSUBE6.js:108806
-#: assets/dist/js/index-q4nk_CBw.js:108
-#: assets/dist/js/index-xDWn_aGf.js:108806
-msgid "Close"
-msgstr ""
-
-#. %d: Number of fields that need attention
-#: assets/dist/js/index-0Q_xhKfx.js:108995
-#: assets/dist/js/index-5L9fy43s.js:108995
-#: assets/dist/js/index-B9njHOE9.js:108995
-#: assets/dist/js/index-B_-9Q1Pm.js:108995
-#: assets/dist/js/index-BaeKfBxd.js:108995
-#: assets/dist/js/index-Be-zS_7L.js:108995
-#: assets/dist/js/index-BgndTSnI.js:108995
-#: assets/dist/js/index-Ca8T0YWF.js:106602
-#: assets/dist/js/index-D72LVK04.js:108995
-#: assets/dist/js/index-DaZ-5sTw.js:108995
-#: assets/dist/js/index-DsyE5-hy.js:106602
-#: assets/dist/js/index-l5TSUBE6.js:108995
-#: assets/dist/js/index-xDWn_aGf.js:108995
-msgid "%d field needs attention"
-msgid_plural "%d fields need attention"
-msgstr[0] ""
-msgstr[1] ""
-
-#: assets/dist/js/index-0Q_xhKfx.js:109326
-#: assets/dist/js/index-5L9fy43s.js:109326
-#: assets/dist/js/index-B9njHOE9.js:109326
-#: assets/dist/js/index-B_-9Q1Pm.js:109326
-#: assets/dist/js/index-BaeKfBxd.js:109326
-#: assets/dist/js/index-Be-zS_7L.js:109326
-#: assets/dist/js/index-BgndTSnI.js:109326
-#: assets/dist/js/index-Ca8T0YWF.js:106933
-#: assets/dist/js/index-D72LVK04.js:109326
-#: assets/dist/js/index-DaZ-5sTw.js:109326
-#: assets/dist/js/index-DsyE5-hy.js:106933
-#: assets/dist/js/index-l5TSUBE6.js:109326
-#: assets/dist/js/index-xDWn_aGf.js:109326
-msgid "More details"
-msgstr ""
-
-#: assets/dist/js/default-i18n-DxhLUi3L.js:585
-#: assets/dist/js/default-i18n-EdzemK12.js:585
-msgctxt "text direction"
-msgid "ltr"
-msgstr ""
-
-#. %s: Field name.
-#: assets/dist/js/index-0Q_xhKfx.js:107975
-#: assets/dist/js/index-5L9fy43s.js:107975
-#: assets/dist/js/index-B9njHOE9.js:107975
-#: assets/dist/js/index-B_-9Q1Pm.js:107975
-#: assets/dist/js/index-BaeKfBxd.js:107975
-#: assets/dist/js/index-Be-zS_7L.js:107975
-#: assets/dist/js/index-BgndTSnI.js:107975
-#: assets/dist/js/index-Ca8T0YWF.js:105582
-#: assets/dist/js/index-D72LVK04.js:107975
-#: assets/dist/js/index-DaZ-5sTw.js:107975
-#: assets/dist/js/index-DsyE5-hy.js:105582
-#: assets/dist/js/index-l5TSUBE6.js:107975
-#: assets/dist/js/index-xDWn_aGf.js:107975
-msgctxt "field"
-msgid "Edit %s (has errors)"
-msgstr ""
-
-#. %s: Field name.
-#: assets/dist/js/index-0Q_xhKfx.js:107979
-#: assets/dist/js/index-5L9fy43s.js:107979
-#: assets/dist/js/index-B9njHOE9.js:107979
-#: assets/dist/js/index-B_-9Q1Pm.js:107979
-#: assets/dist/js/index-BaeKfBxd.js:107979
-#: assets/dist/js/index-Be-zS_7L.js:107979
-#: assets/dist/js/index-BgndTSnI.js:107979
-#: assets/dist/js/index-Ca8T0YWF.js:105586
-#: assets/dist/js/index-D72LVK04.js:107979
-#: assets/dist/js/index-DaZ-5sTw.js:107979
-#: assets/dist/js/index-DsyE5-hy.js:105586
-#: assets/dist/js/index-l5TSUBE6.js:107979
-#: assets/dist/js/index-xDWn_aGf.js:107979
-msgctxt "field"
-msgid "Edit %s"
-msgstr ""
 
 #. Plugin Name of the plugin
 #: yatra.php
@@ -3645,6 +793,12 @@ msgstr ""
 msgid "Confirmed"
 msgstr ""
 
+#: app/Controllers/BookingSessionController.php:2070
+#: app/Controllers/BookingSessionController.php:2096
+#: app/Controllers/ReportsController.php:256
+msgid "Pending"
+msgstr ""
+
 #: app/Controllers/BookingSessionController.php:2072
 #, php-format
 msgid "[%s] %s New Booking - %s"
@@ -3789,6 +943,26 @@ msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2177
 msgid "Coupon applied successfully!"
+msgstr ""
+
+#: app/Controllers/BookingSessionController.php:2391
+#: app/Models/Checkout.php:103
+#: templates/booking-confirmation.php:285
+#: templates/partials/availability-section.php:296
+#: templates/partials/availability-section.php:298
+#: templates/partials/availability-section.php:304
+#: templates/partials/booking-content.php:324
+#: templates/partials/booking-form-fields.php:320
+#: templates/partials/booking-form-fields.php:356
+#: templates/partials/single-trip/content-overview.php:62
+#: templates/partials/single-trip/content-overview.php:74
+#: templates/partials/single-trip/content-overview.php:78
+#: templates/partials/single-trip/content-sidebar.php:215
+#: templates/partials/single-trip/content-sidebar.php:267
+#: templates/partials/single-trip/content-sidebar.php:403
+#: templates/partials/single-trip/content-sidebar.php:455
+#: templates/partials/single-trip/sticky-sidebar.php:187
+msgid "Traveler"
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2445
@@ -4136,6 +1310,17 @@ msgstr ""
 msgid "Invoice PDF generator is not installed. Please run composer install to install dompdf/dompdf."
 msgstr ""
 
+#: app/Controllers/PaymentGatewayController.php:796
+#: app/Controllers/SettingsController.php:123
+#: app/Services/BookingTaxService.php:125
+#: app/Services/BookingTaxService.php:211
+#: app/Services/TaxService.php:45
+#: app/Services/TaxService.php:159
+#: templates/booking-confirmation.php:412
+#: templates/partials/pricing-summary.php:301
+msgid "Tax"
+msgstr ""
+
 #: app/Controllers/PaymentGatewayController.php:813
 #: app/Controllers/PaymentGatewayController.php:929
 #: app/Controllers/PaymentGatewayController.php:1045
@@ -4175,6 +1360,11 @@ msgstr ""
 #: app/Controllers/ReportsController.php:395
 #: app/Controllers/ReportsController.php:445
 msgid "(Untitled Trip)"
+msgstr ""
+
+#: app/Controllers/ReportsController.php:255
+#: templates/partials/remaining-checkout-content.php:158
+msgid "Paid"
 msgstr ""
 
 #: app/Controllers/ReportsController.php:257
@@ -4492,6 +1682,10 @@ msgstr ""
 msgid "+%d%%"
 msgstr ""
 
+#: app/Controllers/TripController.php:1625
+msgid "Today"
+msgstr ""
+
 #: app/Controllers/TripController.php:1627
 msgid "Tomorrow"
 msgstr ""
@@ -4532,6 +1726,16 @@ msgstr ""
 #: app/Controllers/TripController.php:1782
 #: templates/partials/single-trip/content-location.php:520
 msgid "Ending Point"
+msgstr ""
+
+#: app/Controllers/TripController.php:1961
+#: templates/booking-confirmation.php:254
+#: templates/partials/single-trip/content-overview.php:97
+#: templates/partials/single-trip/content-sidebar.php:319
+#: templates/partials/single-trip/content-sidebar.php:507
+#: templates/partials/single-trip/enquiry-modal.php:61
+#: templates/pdf/itinerary.php:159
+msgid "Number of Travelers"
 msgstr ""
 
 #: app/Controllers/TripDownloadController.php:131
@@ -4686,6 +1890,11 @@ msgstr ""
 msgid "Customize booking form fields with drag-and-drop builder. Add custom fields for traveler information and emergency contacts. Create the perfect booking experience for your customers."
 msgstr ""
 
+#: app/Core/Modules/ModuleManager.php:106
+#: templates/trip-listing-card.php:224
+msgid "Bookings"
+msgstr ""
+
 #: app/Core/Modules/ModuleManager.php:119
 msgid "Advanced Discount"
 msgstr ""
@@ -4724,6 +1933,10 @@ msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:179
 msgid "Enable deposit and partial payment options for bookings. Allow customers to pay a percentage upfront and the rest later. Perfect for high-value trips and improving conversion rates."
+msgstr ""
+
+#: app/Core/Modules/ModuleManager.php:180
+msgid "Payments"
 msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:193
@@ -5354,7 +2567,6 @@ msgid "Select which payment channels to enable"
 msgstr ""
 
 #: app/PaymentGateways/Gateways/Paystack/PaystackGateway.php:66
-#: assets/js/stripe.js:579
 msgid "Card"
 msgstr ""
 
@@ -5542,6 +2754,15 @@ msgstr ""
 msgid "Yatra"
 msgstr ""
 
+#: app/Providers/FrontendAssetsProvider.php:392
+#: app/Providers/FrontendAssetsProvider.php:431
+#: includes/helpers.php:261
+#: templates/partials/single-trip/content-sidebar.php:175
+#: templates/partials/single-trip/similar-trips.php:187
+#: templates/trip-listing-card.php:297
+msgid "Contact for pricing"
+msgstr ""
+
 #: app/Providers/FrontendAssetsProvider.php:410
 #: app/Shortcodes/LoginShortcode.php:144
 #: templates/account-page.php:28
@@ -5557,15 +2778,47 @@ msgstr ""
 msgid "Account Settings"
 msgstr ""
 
+#: app/Providers/FrontendAssetsProvider.php:413
+#: app/Shortcodes/LoginShortcode.php:147
+#: templates/shortcodes/my-account.php:39
+msgid "Logout"
+msgstr ""
+
 #: app/Providers/FrontendAssetsProvider.php:415
 #: app/Shortcodes/MyAccountShortcode.php:75
 #: templates/partials/booking-auth.php:31
 msgid "Register"
 msgstr ""
 
+#: app/Providers/FrontendAssetsProvider.php:418
+#: app/Services/BookingService.php:888
+#: templates/pdf/voucher.php:110
+msgid "Booking Details"
+msgstr ""
+
 #: app/Providers/FrontendAssetsProvider.php:419
 #: templates/pdf/itinerary.php:186
 msgid "Booking Status"
+msgstr ""
+
+#: app/Providers/FrontendAssetsProvider.php:420
+#: templates/partials/remaining-checkout-content.php:154
+#: templates/pdf/voucher.php:182
+#: templates/shortcodes/my-account.php:99
+msgid "Total Amount"
+msgstr ""
+
+#: app/Providers/FrontendAssetsProvider.php:421
+msgid "Payment Status"
+msgstr ""
+
+#: app/Providers/FrontendAssetsProvider.php:422
+#: templates/partials/single-trip/similar-trips.php:192
+#: templates/shortcodes/my-account.php:113
+#: templates/single-activity.php:222
+#: templates/single-destination.php:240
+#: templates/trip-listing-card.php:302
+msgid "View Details"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:425
@@ -5669,6 +2922,10 @@ msgstr ""
 #: app/Repositories/SavedTripRepository.php:286
 #, php-format
 msgid "%d Nights"
+msgstr ""
+
+#: app/Repositories/SavedTripRepository.php:290
+msgid "Flexible"
 msgstr ""
 
 #: app/Repositories/SavedTripRepository.php:299
@@ -7386,6 +4643,47 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
+#: templates/booking-confirmation.php:250
+#: templates/partials/booking-content.php:300
+#: templates/partials/remaining-checkout-content.php:84
+#: templates/partials/remaining-checkout-content.php:143
+#: templates/pdf/invoice.php:128
+#: templates/pdf/itinerary.php:176
+msgid "Travel Date"
+msgstr ""
+
+#: templates/booking-confirmation.php:258
+msgid "Booked On"
+msgstr ""
+
+#: templates/booking-confirmation.php:274
+#: templates/partials/availability-section.php:267
+#: templates/partials/booking-content.php:318
+#: templates/partials/booking-content.php:388
+#: templates/partials/remaining-checkout-content.php:88
+#: templates/partials/remaining-checkout-content.php:147
+msgid "Travelers"
+msgstr ""
+
+#: templates/booking-confirmation.php:314
+#: templates/partials/booking-content.php:195
+msgid "Payment Summary"
+msgstr ""
+
+#: templates/booking-confirmation.php:332
+#: templates/partials/pricing-summary.php:53
+msgid "Gross Total"
+msgstr ""
+
+#: templates/booking-confirmation.php:339
+msgid "Discount"
+msgstr ""
+
+#: templates/booking-confirmation.php:354
+#: templates/partials/pricing-summary.php:137
+msgid "Itinerary Costs"
+msgstr ""
+
 #: templates/booking-confirmation.php:365
 msgid "(per person)"
 msgstr ""
@@ -7396,6 +4694,22 @@ msgstr ""
 
 #: templates/booking-confirmation.php:369
 msgid "(flat rate)"
+msgstr ""
+
+#: templates/booking-confirmation.php:392
+#: templates/partials/pricing-summary.php:288
+msgid "Subtotal (Taxable Amount)"
+msgstr ""
+
+#: templates/booking-confirmation.php:430
+#: templates/partials/pricing-summary.php:314
+msgid "Net Amount"
+msgstr ""
+
+#: templates/booking-confirmation.php:437
+#: templates/partials/remaining-checkout-content.php:70
+#: templates/pdf/voucher.php:186
+msgid "Amount Paid"
 msgstr ""
 
 #: templates/booking-confirmation.php:445
@@ -7458,6 +4772,10 @@ msgstr ""
 
 #: templates/booking-confirmation.php:565
 msgid "Return to Home"
+msgstr ""
+
+#: templates/booking-confirmation.php:582
+msgid "Download Invoice"
 msgstr ""
 
 #: templates/booking-confirmation.php:592
@@ -7601,6 +4919,15 @@ msgstr ""
 msgid "No description available"
 msgstr ""
 
+#: templates/listing-activity.php:247
+#: templates/partials/single-trip/content-sidebar.php:167
+#: templates/shortcodes/activity.php:123
+#: templates/shortcodes/destination.php:92
+#: templates/single-activity.php:130
+#: templates/single-destination.php:130
+msgid "From"
+msgstr ""
+
 #: templates/listing-activity.php:254
 msgid "View Trips"
 msgstr ""
@@ -7739,6 +5066,10 @@ msgstr ""
 
 #: templates/listing-trip.php:245
 msgid "Filters"
+msgstr ""
+
+#: templates/listing-trip.php:246
+msgid "Clear all"
 msgstr ""
 
 #: templates/listing-trip.php:264
@@ -7929,6 +5260,15 @@ msgstr ""
 msgid "Capacity"
 msgstr ""
 
+#: templates/partials/availability-section.php:75
+#: templates/partials/availability-section.php:414
+msgid "travelers"
+msgstr ""
+
+#: templates/partials/availability-section.php:83
+msgid "Booking"
+msgstr ""
+
 #: templates/partials/availability-section.php:84
 msgid "Flexible dates"
 msgstr ""
@@ -7955,6 +5295,16 @@ msgstr ""
 
 #: templates/partials/availability-section.php:163
 msgid "per departure"
+msgstr ""
+
+#: templates/partials/availability-section.php:183
+#: templates/partials/booking-content.php:572
+#: templates/partials/single-trip/content-itinerary.php:114
+#: templates/partials/single-trip/content-sidebar.php:173
+#: templates/partials/single-trip/content-sidebar.php:176
+#: templates/single-activity.php:220
+#: templates/single-destination.php:238
+msgid "per person"
 msgstr ""
 
 #: templates/partials/availability-section.php:203
@@ -8152,8 +5502,20 @@ msgstr ""
 msgid "Doe"
 msgstr ""
 
+#: templates/partials/booking-auth.php:144
+#: templates/partials/single-trip/enquiry-modal.php:36
+#: templates/shortcodes/my-account.php:207
+msgid "Email Address"
+msgstr ""
+
 #: templates/partials/booking-auth.php:151
 msgid "your@email.com"
+msgstr ""
+
+#: templates/partials/booking-auth.php:157
+#: templates/partials/single-trip/enquiry-modal.php:41
+#: templates/shortcodes/my-account.php:212
+msgid "Phone Number"
 msgstr ""
 
 #: templates/partials/booking-auth.php:163
@@ -8217,6 +5579,12 @@ msgstr ""
 msgid "Please login or create an account to continue with your booking"
 msgstr ""
 
+#: templates/partials/booking-content.php:94
+#: templates/partials/remaining-checkout-content.php:49
+#: templates/partials/remaining-checkout-content.php:120
+msgid "Pay Remaining Balance"
+msgstr ""
+
 #: templates/partials/booking-content.php:96
 msgid "Complete Your Booking"
 msgstr ""
@@ -8252,12 +5620,24 @@ msgstr ""
 msgid "Complete Booking"
 msgstr ""
 
+#: templates/partials/booking-content.php:177
+#: templates/partials/single-trip/enquiry-modal.php:127
+msgid "Cancel"
+msgstr ""
+
 #: templates/partials/booking-content.php:206
 #: templates/partials/remaining-checkout-content.php:61
 #: templates/pdf/itinerary.php:115
 #: templates/pdf/itinerary.php:217
 msgid "Booking Reference"
 msgstr ""
+
+#: templates/partials/booking-content.php:233
+#: templates/partials/booking-content.php:390
+msgid "traveler"
+msgid_plural "travelers"
+msgstr[0] ""
+msgstr[1] ""
 
 #: templates/partials/booking-content.php:242
 msgid "Original Booking Total"
@@ -8340,6 +5720,10 @@ msgstr ""
 msgid "Enter coupon code"
 msgstr ""
 
+#: templates/partials/booking-content.php:512
+msgid "Apply"
+msgstr ""
+
 #: templates/partials/booking-content.php:527
 msgid "Remove coupon"
 msgstr ""
@@ -8350,6 +5734,11 @@ msgstr ""
 
 #: templates/partials/booking-content.php:574
 msgid "per day"
+msgstr ""
+
+#: templates/partials/booking-content.php:576
+#: templates/partials/single-trip/content-itinerary.php:116
+msgid "per booking"
 msgstr ""
 
 #: templates/partials/booking-content.php:579
@@ -8383,6 +5772,10 @@ msgstr ""
 msgid "Secure payment processing"
 msgstr ""
 
+#: templates/partials/booking-content.php:700
+msgid "Payment Information"
+msgstr ""
+
 #: templates/partials/booking-form-fields.php:228
 #: templates/partials/booking-form-fields.php:460
 msgid "Passport Details"
@@ -8404,6 +5797,10 @@ msgstr ""
 msgid "%s %d"
 msgstr ""
 
+#: templates/partials/booking-form-fields.php:439
+msgid "Lead Traveler"
+msgstr ""
+
 #: templates/partials/booking-form-fields.php:442
 msgid "Traveler 1 (Lead Traveler)"
 msgstr ""
@@ -8417,6 +5814,10 @@ msgstr ""
 msgid "Additional traveler"
 msgstr ""
 
+#: templates/partials/booking-form-fields.php:513
+msgid "Payment Method"
+msgstr ""
+
 #: templates/partials/booking-form-fields.php:519
 msgid "Pay in Full"
 msgstr ""
@@ -8427,6 +5828,10 @@ msgstr ""
 
 #: templates/partials/booking-form-fields.php:552
 msgid "Select Payment Gateway"
+msgstr ""
+
+#: templates/partials/booking-form-fields.php:584
+msgid "Special Requests"
 msgstr ""
 
 #: templates/partials/booking-form-fields.php:585
@@ -8528,6 +5933,10 @@ msgctxt "pricing type"
 msgid "(flat rate)"
 msgstr ""
 
+#: templates/partials/pricing-summary.php:208
+msgid "Required"
+msgstr ""
+
 #: templates/partials/pricing-summary.php:234
 msgid "Original Price"
 msgstr ""
@@ -8566,9 +5975,24 @@ msgstr ""
 msgid "(unknown)"
 msgstr ""
 
+#: templates/partials/remaining-checkout-content.php:62
+msgid "Not available"
+msgstr ""
+
 #: templates/partials/remaining-checkout-content.php:74
 msgid "Total Cost"
 msgstr ""
+
+#: templates/partials/remaining-checkout-content.php:80
+#: templates/partials/remaining-checkout-content.php:139
+#: templates/shortcodes/activity.php:113
+#: templates/shortcodes/destination.php:82
+#: templates/single-activity.php:108
+#: templates/single-destination.php:108
+msgid "Trip"
+msgid_plural "Trips"
+msgstr[0] ""
+msgstr[1] ""
 
 #: templates/partials/remaining-checkout-content.php:93
 msgid "Partial Payment"
@@ -8592,6 +6016,14 @@ msgstr ""
 
 #: templates/partials/remaining-checkout-content.php:172
 msgid "Access travel documents inside your account"
+msgstr ""
+
+#: templates/partials/single-trip/content-downloads.php:12
+msgid "Downloads"
+msgstr ""
+
+#: templates/partials/single-trip/content-downloads.php:89
+msgid "Download"
 msgstr ""
 
 #: templates/partials/single-trip/content-downloads.php:99
@@ -8665,6 +6097,10 @@ msgstr ""
 
 #: templates/partials/single-trip/content-included-excluded.php:43
 msgid "Excluded"
+msgstr ""
+
+#: templates/partials/single-trip/content-itinerary.php:10
+msgid "Itinerary"
 msgstr ""
 
 #: templates/partials/single-trip/content-itinerary.php:59
@@ -8759,6 +6195,10 @@ msgstr ""
 
 #: templates/partials/single-trip/content-sidebar.php:153
 msgid "Group discount available"
+msgstr ""
+
+#: templates/partials/single-trip/content-sidebar.php:161
+msgid "OFF"
 msgstr ""
 
 #: templates/partials/single-trip/content-sidebar.php:187
@@ -8892,6 +6332,14 @@ msgstr ""
 msgid "Fill out the form below and we'll get back to you as soon as possible"
 msgstr ""
 
+#: templates/partials/single-trip/enquiry-modal.php:31
+msgid "Full Name"
+msgstr ""
+
+#: templates/partials/single-trip/enquiry-modal.php:32
+msgid "Enter your full name"
+msgstr ""
+
 #: templates/partials/single-trip/enquiry-modal.php:48
 msgid "Preferred Travel Date"
 msgstr ""
@@ -8922,6 +6370,10 @@ msgstr ""
 
 #: templates/partials/single-trip/enquiry-modal.php:111
 msgid "Ages 3 and younger are not permitted."
+msgstr ""
+
+#: templates/partials/single-trip/enquiry-modal.php:118
+msgid "Message"
 msgstr ""
 
 #: templates/partials/single-trip/enquiry-modal.php:119
@@ -9191,6 +6643,10 @@ msgstr ""
 msgid "Similar Adventures"
 msgstr ""
 
+#: templates/partials/single-trip/sticky-sidebar.php:164
+msgid "Date"
+msgstr ""
+
 #: templates/partials/single-trip/sticky-sidebar.php:229
 msgid "Check"
 msgstr ""
@@ -9318,6 +6774,10 @@ msgstr ""
 msgid "Booking Ref"
 msgstr ""
 
+#: templates/pdf/invoice.php:129
+msgid "Amount"
+msgstr ""
+
 #: templates/pdf/invoice.php:136
 msgid "Payment via"
 msgstr ""
@@ -9387,6 +6847,10 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
+#: templates/pdf/itinerary.php:221
+msgid "Booking Date"
+msgstr ""
+
 #: templates/pdf/itinerary.php:258
 msgid "Travel Timeline"
 msgstr ""
@@ -9441,6 +6905,10 @@ msgstr ""
 
 #: templates/pdf/itinerary.php:304
 msgid "Weather Conditions"
+msgstr ""
+
+#: templates/pdf/itinerary.php:308
+msgid "Emergency Contact"
 msgstr ""
 
 #: templates/pdf/itinerary.php:317
@@ -10187,8 +7655,16 @@ msgstr ""
 msgid "Wishlist"
 msgstr ""
 
+#: templates/shortcodes/my-account.php:60
+msgid "Profile"
+msgstr ""
+
 #: templates/shortcodes/my-account.php:83
 msgid "Booking #"
+msgstr ""
+
+#: templates/shortcodes/my-account.php:109
+msgid "View Trip"
 msgstr ""
 
 #: templates/shortcodes/my-account.php:126
@@ -10213,6 +7689,10 @@ msgstr ""
 
 #: templates/shortcodes/my-account.php:192
 msgid "Profile Information"
+msgstr ""
+
+#: templates/shortcodes/my-account.php:218
+msgid "Save Changes"
 msgstr ""
 
 #: templates/shortcodes/my-account.php:613
@@ -10348,6 +7828,16 @@ msgstr ""
 msgid "Available Trips"
 msgstr ""
 
+#: templates/single-activity.php:172
+#: templates/single-destination.php:172
+msgid "Days"
+msgstr ""
+
+#: templates/single-activity.php:201
+#: templates/single-destination.php:201
+msgid "reviews"
+msgstr ""
+
 #: templates/single-activity.php:216
 #: templates/single-destination.php:234
 msgid "Price on request"
@@ -10432,158 +7922,4 @@ msgstr ""
 
 #: app/PaymentGateways/Gateways/Square/square.js:96
 msgid "Card Details"
-msgstr ""
-
-#: assets/js/stripe.js:139
-msgid "Complete Your Payment"
-msgstr ""
-
-#: assets/js/stripe.js:142
-#: assets/js/stripe.js:172
-msgid "Pay"
-msgstr ""
-
-#: assets/js/stripe.js:159
-msgid "Processing..."
-msgstr ""
-
-#: assets/js/stripe.js:226
-msgid "One-tap checkout"
-msgstr ""
-
-#: assets/js/stripe.js:237
-msgid "Checking your device for wallet support…"
-msgstr ""
-
-#: assets/js/stripe.js:375
-msgid "Please pay using the Apple Pay or Google Pay button above."
-msgstr ""
-
-#: assets/js/stripe.js:460
-msgid "Apple Pay and Google Pay are not available on this browser/device."
-msgstr ""
-
-#: assets/js/stripe.js:464
-msgid "Use card payment instead or switch to a supported device."
-msgstr ""
-
-#: assets/js/stripe.js:471
-msgid "Great! Apple Pay or Google Pay is available on this device."
-msgstr ""
-
-#: assets/js/stripe.js:502
-msgid "Unable to load Apple Pay / Google Pay. Please try again later or use card payment."
-msgstr ""
-
-#: assets/js/stripe.js:505
-msgid "Wallet payment failed to load."
-msgstr ""
-
-#: assets/js/stripe.js:562
-msgid "Choose a payment option"
-msgstr ""
-
-#: assets/js/stripe.js:566
-msgid "Payment methods"
-msgstr ""
-
-#: assets/js/stripe.js:570
-msgid "Pick the option that works best for you."
-msgstr ""
-
-#: assets/js/stripe.js:580
-msgid "Use any major debit or credit card via Stripe Elements."
-msgstr ""
-
-#: assets/js/stripe.js:588
-msgid "Google Pay"
-msgstr ""
-
-#: assets/js/stripe.js:589
-msgid "Pay instantly with the cards saved to your Google account."
-msgstr ""
-
-#: assets/js/stripe.js:597
-msgid "Apple Pay"
-msgstr ""
-
-#: assets/js/stripe.js:598
-msgid "Use Apple Wallet on iPhone, iPad, or Mac to pay securely."
-msgstr ""
-
-#: resources/js/blocks/activity/block.json
-msgctxt "block title"
-msgid "Activity"
-msgstr ""
-
-#: resources/js/blocks/activity/block.json
-msgctxt "block description"
-msgid "Display activity listings with customizable options"
-msgstr ""
-
-#: resources/js/blocks/activity/block.json
-msgctxt "block keyword"
-msgid "activity"
-msgstr ""
-
-#: resources/js/blocks/activity/block.json
-msgctxt "block keyword"
-msgid "things to do"
-msgstr ""
-
-#: resources/js/blocks/activity/block.json
-#: resources/js/blocks/destination/block.json
-#: resources/js/blocks/tour/block.json
-msgctxt "block keyword"
-msgid "yatra"
-msgstr ""
-
-#: resources/js/blocks/destination/block.json
-msgctxt "block title"
-msgid "Destination"
-msgstr ""
-
-#: resources/js/blocks/destination/block.json
-msgctxt "block description"
-msgid "Display destination listings with customizable options"
-msgstr ""
-
-#: resources/js/blocks/destination/block.json
-msgctxt "block keyword"
-msgid "destination"
-msgstr ""
-
-#: resources/js/blocks/destination/block.json
-msgctxt "block keyword"
-msgid "place"
-msgstr ""
-
-#: resources/js/blocks/destination/block.json
-msgctxt "block keyword"
-msgid "location"
-msgstr ""
-
-#: resources/js/blocks/tour/block.json
-msgctxt "block title"
-msgid "Trip"
-msgstr ""
-
-#: resources/js/blocks/tour/block.json
-msgctxt "block description"
-msgid "Display trip listings with customizable options"
-msgstr ""
-
-#: resources/js/blocks/tour/block.json
-msgctxt "block keyword"
-msgid "tour"
-msgstr ""
-
-#: resources/js/blocks/tour/block.json
-msgctxt "block keyword"
-msgid "trip"
-msgstr ""
-
-#: resources/js/blocks/tour/block.json
-msgctxt "block keyword"
-msgid "travel"
 msgstr ""

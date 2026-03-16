@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const response = await fetch(window.yatraTripData?.groupDiscountsUrl || '', {
                 method: 'GET',
                 headers: {
-                    'Content-Type' => 'application/json',
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     trip_ids: [window.yatraTripData?.tripId]
@@ -165,34 +165,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return discountAmount;
     }
     
-    // Get traveler counts by category
-    function getTravelerCountsByCategory() {
-        const counts = {adults: 0, children: 0, seniors: 0};
-        
-        document.querySelectorAll('input[name*="travelers["]').forEach(input => {
-            const name = input.name;
-            if (name.includes('[adults]')) {
-                counts.adults = parseInt(input.value) || 0;
-            } else if (name.includes('[children]')) {
-                counts.children = parseInt(input.value) || 0;
-            } else if (name.includes('[seniors]')) {
-                counts.seniors = parseInt(input.value) || 0;
-            }
-        });
-        
-        return counts;
-    }
-    
-    // Get price multiplier for traveler category
-    function getCategoryMultiplier(category) {
-        const multipliers = {
-            adults: 1.0,
-            children: 0.8,  // 80% of adult price
-            seniors: 0.9    // 90% of adult price
-        };
-        return multipliers[category] || 1.0;
-    }
-    
     // Update pricing display
     function updatePricing() {
         const totalTravelers = calculateTotalTravelers();
@@ -201,15 +173,24 @@ document.addEventListener('DOMContentLoaded', function () {
         // Calculate subtotal
         let subtotal = 0;
         
-        if (document.querySelector('input[name*="travelers["]')) {
-            // Traveler-based pricing
-            const travelerCounts = getTravelerCountsByCategory();
-            for (const [category, count] of Object.entries(travelerCounts)) {
-                if (count > 0) {
-                    const multiplier = getCategoryMultiplier(category);
-                    subtotal += basePrice * multiplier * count;
+        const categoryInputs = document.querySelectorAll('input[name*="travelers["]');
+        if (categoryInputs.length > 0) {
+            // Traveler-based pricing: read actual prices from data attributes
+            categoryInputs.forEach(input => {
+                const count = parseInt(input.value) || 0;
+                const price = parseFloat(input.dataset.price) || 0;
+                const pricingMode = input.dataset.pricingMode || 'per_person';
+                
+                if (pricingMode === 'per_group') {
+                    // Per group: charge flat price once if any travelers
+                    if (count > 0) {
+                        subtotal += price;
+                    }
+                } else {
+                    // Per person: charge per traveler
+                    subtotal += price * count;
                 }
-            }
+            });
         } else {
             // Simple pricing
             subtotal = basePrice * totalTravelers;
@@ -221,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Update display
         if (totalAmountElement) {
-            totalAmountElement.textContent = window.yatraTripData?.currencySymbol || '$' + finalTotal.toFixed(2);
+            totalAmountElement.textContent = (window.yatraTripData?.currencySymbol || '$') + finalTotal.toFixed(2);
         }
         
         // Show/hide group discount indicator

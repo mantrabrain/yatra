@@ -303,25 +303,68 @@ class CalculationService
      */
     private function resolvePriceTypes(object $trip, ?object $availability): array
     {
+        $types = [];
+        
         // Priority 1: Availability price_types
         if ($availability && !empty($availability->price_types)) {
             $types = is_string($availability->price_types) 
                 ? json_decode($availability->price_types, true) 
                 : $availability->price_types;
-            if (!empty($types)) {
-                return $types;
-            }
         }
         
         // Priority 2: Trip price_types
-        if (!empty($trip->price_types)) {
+        if (empty($types) && !empty($trip->price_types)) {
             if (is_string($trip->price_types)) {
-                return json_decode($trip->price_types, true) ?: [];
+                $types = json_decode($trip->price_types, true) ?: [];
+            } else {
+                $types = is_array($trip->price_types) ? $trip->price_types : [];
             }
-            return is_array($trip->price_types) ? $trip->price_types : [];
         }
         
-        return [];
+        if (empty($types)) {
+            return [];
+        }
+        
+        // Enrich with pricing_mode from category metadata if missing
+        $needs_enrichment = false;
+        foreach ($types as $pt) {
+            $pt = (array) $pt;
+            if (empty($pt['pricing_mode'])) {
+                $needs_enrichment = true;
+                break;
+            }
+        }
+        
+        if ($needs_enrichment) {
+            $category_ids = array_filter(array_map(function($pt) {
+                $pt = (array) $pt;
+                return isset($pt['category_id']) ? (int) $pt['category_id'] : null;
+            }, $types));
+            
+            if (!empty($category_ids)) {
+                $category_meta = $this->getCategoryMetadata($category_ids);
+                foreach ($types as &$pt) {
+                    if (is_object($pt)) $pt = (array) $pt;
+                    $cat_id = isset($pt['category_id']) ? (int) $pt['category_id'] : null;
+                    if ($cat_id && isset($category_meta[$cat_id]) && empty($pt['pricing_mode'])) {
+                        $pt['pricing_mode'] = $category_meta[$cat_id]['pricing_mode'] ?? 'per_person';
+                    }
+                }
+                unset($pt);
+            }
+        }
+        
+        return $types;
+    }
+    
+    /**
+     * Get category metadata (pricing_mode, etc.) by IDs
+     */
+    private function getCategoryMetadata(array $category_ids): array
+    {
+        // Use repository instead of direct database query
+        $repository = new \Yatra\Repositories\TravelerCategoryRepository();
+        return $repository->getMetadataByIds($category_ids);
     }
     
     /**
@@ -379,6 +422,7 @@ class CalculationService
             foreach ($price_types as $pt) {
                 $pt = (array) $pt;
                 $category_id = $pt['category_id'] ?? 0;
+                $pricing_mode = $pt['pricing_mode'] ?? 'per_person';
                 
                 // Priority: discounted_price → sale_price → original_price
                 $category_price = 0.0;
@@ -399,7 +443,16 @@ class CalculationService
                 ]);
                 
                 $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : 0;
-                $base_amount += $category_price * $count;
+                
+                if ($pricing_mode === 'per_group') {
+                    // Per group: charge flat price once if any travelers in this category
+                    if ($count > 0) {
+                        $base_amount += $category_price;
+                    }
+                } else {
+                    // Per person: charge per traveler
+                    $base_amount += $category_price * $count;
+                }
             }
             
             return round($base_amount, 2);

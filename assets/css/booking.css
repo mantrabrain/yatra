@@ -1002,6 +1002,9 @@
     outline: none;
     box-shadow: none;
 }
+.yatra-traveler-selector .yatra-select-arrow {
+    display:none;
+}
 
 .yatra-quantity-btn {
     width: 36px;

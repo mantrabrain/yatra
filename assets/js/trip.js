@@ -2024,7 +2024,17 @@
           const input = row.querySelector('input[type="number"]');
           const price = parseFloat(row.getAttribute('data-price')) || 0;
           const count = parseInt(input?.value) || 0;
-          total += price * count;
+          const pricingMode = row.getAttribute('data-pricing-mode') || (input ? input.getAttribute('data-pricing-mode') : '') || 'per_person';
+          
+          if (pricingMode === 'per_group') {
+            // Per group: charge flat price once if any travelers
+            if (count > 0) {
+              total += price;
+            }
+          } else {
+            // Per person: charge per traveler
+            total += price * count;
+          }
           totalTravelers += count;
         });
       } else {
@@ -3320,12 +3330,20 @@
       let totalTravelers = 0;
 
       if (categoryInputs.length > 0) {
-        // Traveler-based pricing: sum up each category's price * quantity
+        // Traveler-based pricing: sum up each category's price * quantity (respecting pricing mode)
         categoryInputs.forEach((input) => {
           const quantity = parseInt(input.value) || 0;
           const row = input.closest('.yatra-quantity-row');
           const price = row ? parseFloat(row.getAttribute('data-price')) || 0 : 0;
-          totalPrice += quantity * price;
+          const pricingMode = (row ? row.getAttribute('data-pricing-mode') : null) || input.getAttribute('data-pricing-mode') || 'per_person';
+          
+          if (pricingMode === 'per_group') {
+            if (quantity > 0) {
+              totalPrice += price;
+            }
+          } else {
+            totalPrice += quantity * price;
+          }
           totalTravelers += quantity;
         });
       } else {
