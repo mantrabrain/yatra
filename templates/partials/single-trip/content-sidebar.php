@@ -387,13 +387,47 @@ if (!defined('ABSPATH')) {
                     <?php echo esc_html__('Make Enquiry', 'yatra'); ?>
                 </button>
 
-                <!-- Single Trust Signal -->
+                <!-- Cancellation Policy Trust Signal -->
+                <?php 
+                $cancellation_policy = '';
+                if (method_exists($trip, 'getCancellationPolicy')) {
+                    $cancellation_policy = $trip->getCancellationPolicy();
+                } elseif (isset($trip->cancellation_policy)) {
+                    $cancellation_policy = $trip->cancellation_policy;
+                }
+                
+                $cancellation_text = '';
+                if (!empty($cancellation_policy)) {
+                    // Extract cancellation info from policy
+                    $policy_lower = strtolower($cancellation_policy);
+                    if (strpos($policy_lower, 'free') !== false || strpos($policy_lower, 'no charge') !== false) {
+                        if (preg_match('/(\d+)\s*(hour|day|week)s?\s*before/i', $cancellation_policy, $matches)) {
+                            $time_value = $matches[1];
+                            $time_unit = $matches[2];
+                            $cancellation_text = sprintf(
+                                __('Free cancellation up to %d %s%s before', 'yatra'),
+                                $time_value,
+                                $time_unit,
+                                $time_value > 1 ? 's' : ''
+                            );
+                        } else {
+                            $cancellation_text = __('Free cancellation', 'yatra');
+                        }
+                    } else {
+                        // Non-free cancellation, show brief info
+                        $cancellation_text = __('Cancellation policy applies', 'yatra');
+                    }
+                } else {
+                    // Default fallback
+                    $cancellation_text = __('Free cancellation up to 24 hours before', 'yatra');
+                }
+                ?>
                 <div class="yatra-booking-trust">
                     <div class="yatra-booking-trust-icon">
                         <?php echo yatra_svg_icon('check', 'yatra-icon-xs'); ?>
                     </div>
                     <div class="yatra-booking-trust-text">
-                        <strong><?php esc_html_e('Free cancellation', 'yatra'); ?></strong> <?php esc_html_e('up to 24 hours before', 'yatra'); ?>
+                        <strong><?php echo esc_html($cancellation_text); ?></strong>
                     </div>
                 </div>
             </form>

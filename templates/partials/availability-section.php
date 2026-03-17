@@ -284,13 +284,51 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
                             </div>
                         </div>
                         
+                        <?php 
+                        $cancellation_policy = '';
+                        if (method_exists($trip_data, 'getCancellationPolicy')) {
+                            $cancellation_policy = $trip_data->getCancellationPolicy();
+                        } elseif (isset($trip_data->cancellation_policy)) {
+                            $cancellation_policy = $trip_data->cancellation_policy;
+                        }
+                        
+                        $cancellation_label = '';
+                        $cancellation_value = '';
+                        if (!empty($cancellation_policy)) {
+                            // Extract cancellation info from policy
+                            $policy_lower = strtolower($cancellation_policy);
+                            if (strpos($policy_lower, 'free') !== false || strpos($policy_lower, 'no charge') !== false) {
+                                $cancellation_label = __('Free Cancellation', 'yatra');
+                                if (preg_match('/(\d+)\s*(hour|day|week)s?\s*before/i', $cancellation_policy, $matches)) {
+                                    $time_value = $matches[1];
+                                    $time_unit = $matches[2];
+                                    $cancellation_value = sprintf(
+                                        __('Up to %d %s%s before', 'yatra'),
+                                        $time_value,
+                                        $time_unit,
+                                        $time_value > 1 ? 's' : ''
+                                    );
+                                } else {
+                                    $cancellation_value = __('No charge', 'yatra');
+                                }
+                            } else {
+                                // Non-free cancellation
+                                $cancellation_label = __('Cancellation Policy', 'yatra');
+                                $cancellation_value = __('See details', 'yatra');
+                            }
+                        } else {
+                            // Default fallback
+                            $cancellation_label = __('Free Cancellation', 'yatra');
+                            $cancellation_value = __('Up to 24 hours before', 'yatra');
+                        }
+                        ?>
                         <div class="yatra-card-info-item">
                             <div class="yatra-card-info-icon">
                                 <?php echo yatra_svg_icon('check', 'yatra-icon-sm'); ?>
                             </div>
                             <div class="yatra-card-info-content">
-                                <div class="yatra-card-info-label"><?php esc_html_e('Free Cancellation', 'yatra'); ?></div>
-                                <div class="yatra-card-info-value"><?php esc_html_e('Up to 24 hours before', 'yatra'); ?></div>
+                                <div class="yatra-card-info-label"><?php echo esc_html($cancellation_label); ?></div>
+                                <div class="yatra-card-info-value"><?php echo esc_html($cancellation_value); ?></div>
                             </div>
                         </div>
                     </div>
