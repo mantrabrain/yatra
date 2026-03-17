@@ -102,9 +102,9 @@ class SetupWizardController
     public function admin_menus()
     {
         add_submenu_page(
-            'tools.php',
+            'yatra',
             __('Yatra Setup Wizard', 'yatra'),
-            __('Yatra Setup', 'yatra'),
+            __('Setup Wizard', 'yatra'),
             'manage_options',
             'yatra-setup',
             array($this, 'setup_wizard')
@@ -452,7 +452,7 @@ class SetupWizardController
             delete_transient(self::WIZARD_REDIRECT_OPTION);
 
             if (!self::is_wizard_completed()) {
-                wp_safe_redirect(admin_url('tools.php?page=yatra-setup'));
+                wp_safe_redirect(admin_url('admin.php?page=yatra-setup'));
                 exit;
             }
         }

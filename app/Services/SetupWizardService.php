@@ -80,7 +80,7 @@ class SetupWizardService
             }
             
             // Force redirect to setup wizard
-            wp_safe_redirect(admin_url('tools.php?page=yatra-setup'));
+            wp_safe_redirect(admin_url('admin.php?page=yatra-setup'));
             exit;
         }
     }
