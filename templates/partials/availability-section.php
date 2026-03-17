@@ -317,9 +317,9 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
                                 $cancellation_value = __('See details', 'yatra');
                             }
                         } else {
-                            // Default fallback
-                            $cancellation_label = __('Free Cancellation', 'yatra');
-                            $cancellation_value = __('Up to 24 hours before', 'yatra');
+                            // Default fallback when no policy is set
+                            $cancellation_label = __('Cancellation Policy', 'yatra');
+                            $cancellation_value = __('May apply', 'yatra');
                         }
                         ?>
                         <div class="yatra-card-info-item">

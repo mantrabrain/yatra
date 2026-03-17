@@ -418,8 +418,8 @@ if (!defined('ABSPATH')) {
                         $cancellation_text = __('Cancellation policy applies', 'yatra');
                     }
                 } else {
-                    // Default fallback
-                    $cancellation_text = __('Free cancellation up to 24 hours before', 'yatra');
+                    // Default fallback when no policy is set
+                    $cancellation_text = __('Cancellation policy may apply', 'yatra');
                 }
                 ?>
                 <div class="yatra-booking-trust">
