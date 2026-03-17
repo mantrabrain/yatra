@@ -1379,29 +1379,15 @@ class TripController extends BaseController
             // Get selected date if provided
             $selected_date = sanitize_text_field((string) ($request->get_param('date') ?? ''));
 
-            // Fetch availability dates from database (specific dates)
-            // Use TripService to get availability dates
-            $availability = $this->service->getTripWithAvailability($id);
-            $specific_dates = $availability ? [$availability] : [];
-
-            // Generate recurring dates
-            $recurring_dates = [];
-            try {
-                $recurringService = new RecurringAvailabilityService(new RecurringAvailabilityRepository());
-                $fromDate = date('Y-m-d');
-                $toDate = date('Y-m-d', strtotime('+90 days')); // Show next 90 days
-                $generatedDates = $recurringService->generateDatesForTrip($id, $fromDate, $toDate);
-                
-                // Convert to objects to match specific dates format
-                foreach ($generatedDates as $date) {
-                    $recurring_dates[] = (object) array_merge($date, ['is_recurring' => 1]);
-                }
-            } catch (\Exception $e) {
-                error_log('Error generating recurring dates: ' . $e->getMessage());
-            }
+            // Fetch availability dates using centralized resolution service
+            $resolutionService = new \Yatra\Services\AvailabilityResolutionService();
+            $fromDate = date('Y-m-d');
+            $toDate = date('Y-m-d', strtotime('+12 months'));
             
-            // Merge and deduplicate (specific dates take priority)
-            $availability_dates = array_merge($specific_dates, $recurring_dates);
+            $availability_dates = $resolutionService->getAllAvailabilityDates($id, $fromDate, $toDate);
+            
+            // Log for debugging
+            error_log('Yatra Availability Debug: Trip ID ' . $id . ' has ' . count($availability_dates) . ' availability dates from centralized service');
 
             // Prepare trip data for template
             $trip_data = (object) [
@@ -1618,14 +1604,56 @@ class TripController extends BaseController
                               (!empty($avail->return_date) ? strtotime($avail->return_date) : 
                               strtotime($avail->departure_date . ' + ' . (($trip_data->duration_days ?? 1) - 1) . ' days'));
                 
-                // Pricing fallback: Use availability pricing if set, otherwise use trip default
-                $original_price = isset($avail->original_price) && $avail->original_price !== null && $avail->original_price > 0
-                    ? (float) $avail->original_price 
-                    : (float) ($trip_data->original_price ?? $trip_data->price ?? 0);
+                // Pricing: Use availability-specific pricing (PRIORITY), then fall back to trip default
+                // For traveler-based pricing, use first category's price (default traveler)
+                // For regular pricing, use effective_price or availability price
                 
-                $sale_price = isset($avail->discounted_price) && $avail->discounted_price !== null && $avail->discounted_price > 0
-                    ? (float) $avail->discounted_price 
-                    : (float) ($trip_data->discounted_price ?? $original_price);
+$card_pricing_type = $avail->pricing_type ?? $trip_data->pricing_type ?? 'regular';
+                
+                // Debug logging
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log(sprintf(
+                        'Yatra Avail Card [%s]: Date=%s, PricingType=%s, HasPriceTypes=%s, EffectivePrice=%s',
+                        $avail->source ?? 'unknown',
+                        $avail->departure_date,
+                        $card_pricing_type,
+                        !empty($avail->price_types) ? 'YES(' . count($avail->price_types) . ')' : 'NO',
+                        $avail->effective_price ?? 'null'
+                    ));
+                    if (!empty($avail->price_types)) {
+                        error_log('Yatra Avail Card price_types: ' . print_r($avail->price_types, true));
+                    }
+                }
+                
+                if ($card_pricing_type === 'traveler_based' && !empty($avail->price_types)) {
+                    // Traveler-based: Use first category's price as default display price
+                    $first_category = is_array($avail->price_types) ? $avail->price_types[0] : (array) $avail->price_types[0];
+                    $sale_price = (float) ($first_category['discounted_price'] ?? $first_category['original_price'] ?? 0);
+                    $original_price = (float) ($first_category['original_price'] ?? $sale_price);
+                    
+                    if (defined('WP_DEBUG') && WP_DEBUG) {
+                        error_log(sprintf(
+                            'Yatra Avail Card: Using first category - SalePrice=%s, OriginalPrice=%s',
+                            $sale_price,
+                            $original_price
+                        ));
+                    }
+                } elseif (isset($avail->effective_price) && $avail->effective_price > 0) {
+                    // Regular pricing: Use pre-calculated effective price from SingleTripController
+                    $sale_price = (float) $avail->effective_price;
+                    $original_price = isset($avail->original_price) && $avail->original_price > 0
+                        ? (float) $avail->original_price
+                        : $sale_price;
+                } else {
+                    // Fallback: Manual calculation if effective_price not set
+                    $original_price = isset($avail->original_price) && $avail->original_price !== null && $avail->original_price > 0
+                        ? (float) $avail->original_price 
+                        : (float) ($trip_data->original_price ?? $trip_data->price ?? 0);
+                    
+                    $sale_price = isset($avail->discounted_price) && $avail->discounted_price !== null && $avail->discounted_price > 0
+                        ? (float) $avail->discounted_price 
+                        : (float) ($trip_data->discounted_price ?? $original_price);
+                }
                 
                 // Store base prices before dynamic pricing
                 $base_original_price = $original_price;
@@ -1708,27 +1736,27 @@ class TripController extends BaseController
                     ? date('Y-m-d', $departure_date)
                     : strtolower(date('M-Y', $departure_date));
                 
-                // Determine pricing for this availability card
-                // Priority: 1. Availability date pricing, 2. Rule pricing (inherited), 3. Trip pricing
+                // pricing_type ALWAYS comes from trip (centralized service already set this)
                 $card_pricing_type = $avail->pricing_type ?? $trip_data->pricing_type ?? 'regular';
+                
+                // price_types come from centralized service (already resolved with priority: Rules → Dates → Trip)
                 $card_traveler_pricing = [];
-                
-                // Get traveler pricing from availability or rule
                 if (!empty($avail->price_types)) {
-                    // From specific availability date (priority)
-                    $card_traveler_pricing = is_string($avail->price_types) ? (json_decode($avail->price_types, true) ?: []) : (is_array($avail->price_types) ? $avail->price_types : []);
-                } elseif (!empty($avail->traveler_pricing)) {
-                    // From recurring rule (fallback)
-                    $card_traveler_pricing = is_string($avail->traveler_pricing) ? (json_decode($avail->traveler_pricing, true) ?: []) : (is_array($avail->traveler_pricing) ? $avail->traveler_pricing : []);
-                }
-
-                if (!empty($card_traveler_pricing) && is_array($card_traveler_pricing)) {
-                    $card_traveler_pricing = $enrich_price_types($card_traveler_pricing);
-                }
-                
-                // If no availability-specific pricing, fall back to trip pricing
-                if (empty($card_traveler_pricing) && $card_pricing_type === 'traveler_based' && !empty($trip_data->price_types)) {
-                    $card_traveler_pricing = $trip_data->price_types;
+                    $card_traveler_pricing = is_array($avail->price_types) ? $avail->price_types : [];
+                    
+                    // Enrich with category labels if needed
+                    if (!empty($card_traveler_pricing)) {
+                        $card_traveler_pricing = $enrich_price_types($card_traveler_pricing);
+                    }
+                    
+                    // Debug logging
+                    if (defined('WP_DEBUG') && WP_DEBUG) {
+                        error_log('Yatra Card traveler_pricing count: ' . count($card_traveler_pricing));
+                        if (!empty($card_traveler_pricing[0])) {
+                            $first = is_array($card_traveler_pricing[0]) ? $card_traveler_pricing[0] : (array) $card_traveler_pricing[0];
+                            error_log('Yatra Card first category: ' . print_r($first, true));
+                        }
+                    }
                 }
                 
                 $availability_cards[] = [

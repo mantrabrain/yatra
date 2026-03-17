@@ -897,6 +897,7 @@ const Availability: React.FC = () => {
           tab: "availability",
           action: "edit",
           id: date.id,
+          trip_id: date.trip_id,
         }),
     },
     {
@@ -1301,6 +1302,7 @@ const Availability: React.FC = () => {
                                   tab: "availability",
                                   action: "edit",
                                   id: alert.id,
+                                  trip_id: alert.trip_id,
                                 })
                               }
                               className="text-xs border-yellow-300 text-yellow-800 hover:bg-yellow-100 dark:border-yellow-700 dark:text-yellow-300"
@@ -1447,6 +1449,7 @@ const Availability: React.FC = () => {
                                 tab: "availability",
                                 action: "edit",
                                 id: entry.id,
+                                trip_id: entry.trip_id,
                               })
                             }
                           >
@@ -1705,6 +1708,7 @@ const Availability: React.FC = () => {
                               tab: "availability",
                               action: "edit",
                               id: date.id,
+                              trip_id: date.trip_id,
                             });
                           }}
                         />

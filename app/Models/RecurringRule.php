@@ -15,16 +15,50 @@ class RecurringRule
 {
     public int $id = 0;
     public int $trip_id = 0;
-    public string $recurrence_type = 'daily'; // daily | weekly | monthly | custom_days
-    public array $weekdays = []; // For weekly/custom_days: [0,1,2,3,4,5,6] (Sun-Sat)
-    public ?string $end_date = null; // Optional end date for the rule
+    public string $name = '';
+    public string $status = 'active'; // active | inactive | paused
+    public string $recurrence_type = 'weekly'; // daily | weekly | monthly | yearly | custom
+    public ?string $recurrence_pattern = null;
     public ?string $start_date = null; // Start date for the rule
-    public int $max_capacity = 0; // Capacity override for generated dates
-    public array $pricing_by_traveler_type = []; // Pricing per traveler type
-    public ?float $base_price = null; // Base price per person
-    public bool $is_active = true;
+    public ?string $end_date = null; // Optional end date for the rule
+    public ?array $days_of_week = null; // JSON array: [0,1,2,3,4,5,6] (Sun-Sat)
+    public ?int $day_of_month = null;
+    public ?int $month_of_year = null;
+    public int $interval = 1;
+    public string $availability_status = 'available';
+    public ?int $max_bookings = null;
+    public ?float $price_override = null;
+    public string $price_type = 'fixed';
+    public ?string $departure_time = null;
+    public ?string $arrival_time = null;
+    public ?float $duration_hours = null;
+    public ?string $from_location = null;
+    public ?string $to_location = null;
+    public ?array $exceptions = null;
+    public string $exception_type = 'exclude';
+    public string $capacity_type = 'fixed';
+    public ?int $capacity_value = null;
+    public float $pricing_adjustment = 0.00;
+    public string $pricing_adjustment_type = 'amount';
+    public ?int $cutoff_hours = null;
+    public ?int $cutoff_days = null;
+    public ?int $advance_booking_days = null;
+    public ?int $minimum_participants = null;
+    public ?int $maximum_participants = null;
+    public ?array $age_restrictions = null;
+    public ?string $skill_level = null;
+    public string $season_type = 'all';
+    public bool $holiday_only = false;
+    public bool $weekend_only = false;
+    public bool $weekday_only = false;
+    public ?string $notes = null;
+    public int $priority = 10;
+    public bool $auto_generate = true;
+    public ?string $last_generated = null;
     public string $created_at = '';
     public string $updated_at = '';
+    public ?int $created_by = null;
+    public ?int $updated_by = null;
 
     /**
      * Create from array (database row)
@@ -35,40 +69,41 @@ class RecurringRule
         
         $rule->id = (int) ($data['id'] ?? 0);
         $rule->trip_id = (int) ($data['trip_id'] ?? 0);
-        $rule->recurrence_type = sanitize_text_field($data['recurrence_type'] ?? 'daily');
+        $rule->name = sanitize_text_field($data['name'] ?? '');
+        $rule->status = sanitize_text_field($data['status'] ?? 'active');
+        $rule->recurrence_type = sanitize_text_field($data['recurrence_type'] ?? 'weekly');
         $rule->start_date = !empty($data['start_date']) ? sanitize_text_field($data['start_date']) : null;
         $rule->end_date = !empty($data['end_date']) ? sanitize_text_field($data['end_date']) : null;
-        $rule->max_capacity = (int) ($data['max_capacity'] ?? 0);
-        $rule->base_price = !empty($data['base_price']) ? (float) $data['base_price'] : null;
-        $rule->is_active = isset($data['is_active']) ? (bool) $data['is_active'] : true;
+        $rule->capacity_value = (int) ($data['capacity_value'] ?? 0);
+        $rule->price_override = !empty($data['price_override']) ? (float) $data['price_override'] : null;
         $rule->created_at = $data['created_at'] ?? '';
         $rule->updated_at = $data['updated_at'] ?? '';
         
-        // Handle weekdays as JSON or comma-separated string
-        if (isset($data['weekdays'])) {
-            if (is_string($data['weekdays'])) {
+        // Handle days_of_week as JSON or comma-separated string
+        if (isset($data['days_of_week'])) {
+            if (is_string($data['days_of_week'])) {
                 // Try JSON first, then comma-separated
-                $decoded = json_decode($data['weekdays'], true);
+                $decoded = json_decode($data['days_of_week'], true);
                 if (is_array($decoded)) {
-                    $rule->weekdays = array_map('intval', $decoded);
+                    $rule->days_of_week = array_map('intval', $decoded);
                 } else {
-                    $rule->weekdays = array_map('intval', explode(',', $data['weekdays']));
+                    $rule->days_of_week = array_map('intval', explode(',', $data['days_of_week']));
                 }
-            } elseif (is_array($data['weekdays'])) {
-                $rule->weekdays = array_map('intval', $data['weekdays']);
+            } elseif (is_array($data['days_of_week'])) {
+                $rule->days_of_week = array_map('intval', $data['days_of_week']);
             } else {
-                $rule->weekdays = [];
+                $rule->days_of_week = [];
             }
         }
         
-        // Handle pricing_by_traveler_type as JSON
-        if (isset($data['pricing_by_traveler_type'])) {
-            if (is_string($data['pricing_by_traveler_type'])) {
-                $rule->pricing_by_traveler_type = json_decode($data['pricing_by_traveler_type'], true) ?: [];
-            } elseif (is_array($data['pricing_by_traveler_type'])) {
-                $rule->pricing_by_traveler_type = $data['pricing_by_traveler_type'];
+        // Handle exceptions as JSON
+        if (isset($data['exceptions'])) {
+            if (is_string($data['exceptions'])) {
+                $rule->exceptions = json_decode($data['exceptions'], true) ?: [];
+            } elseif (is_array($data['exceptions'])) {
+                $rule->exceptions = $data['exceptions'];
             } else {
-                $rule->pricing_by_traveler_type = [];
+                $rule->exceptions = [];
             }
         }
         
@@ -101,7 +136,7 @@ class RecurringRule
      */
     public function isActiveForDate(string $date): bool
     {
-        if (!$this->is_active) {
+        if ($this->status !== 'active') {
             return false;
         }
         

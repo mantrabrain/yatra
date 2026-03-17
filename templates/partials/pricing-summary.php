@@ -31,6 +31,10 @@ if (!isset($checkout) || !($checkout instanceof \Yatra\Models\Checkout)) {
 <div class="yatra-price-breakdown-categories" id="price-breakdown-categories">
     <?php foreach ($checkout->getCategoryBreakdown() as $cat) : ?>
     <?php 
+    // Get pricing mode from category data
+    $pricing_mode = $cat['pricing_mode'] ?? 'per_person';
+    $is_per_group = ($pricing_mode === 'per_group');
+    
     // Calculate per-unit price for display
     $per_unit_price = $cat['count'] > 0 ? $cat['subtotal'] / $cat['count'] : 0;
     $per_unit_formatted = $checkout->formatPrice($per_unit_price);
@@ -40,7 +44,11 @@ if (!isset($checkout) || !($checkout instanceof \Yatra\Models\Checkout)) {
             <?php echo esc_html($cat['label']); ?> x <span class="category-count"><?php echo (int) $cat['count']; ?></span>
             <?php if ($cat['count'] > 0) : ?>
                 <span class="yatra-price-calculation" style="color: #6b7280; font-size: 0.9em; font-weight: normal;">
-                    (<?php echo esc_html($per_unit_formatted); ?> x <?php echo (int) $cat['count']; ?>)
+                    <?php if ($is_per_group) : ?>
+                        (<?php echo esc_html($checkout->formatPrice($cat['subtotal'])); ?> <?php esc_html_e('per group', 'yatra'); ?>)
+                    <?php else : ?>
+                        (<?php echo esc_html($per_unit_formatted); ?> x <?php echo (int) $cat['count']; ?>)
+                    <?php endif; ?>
                 </span>
             <?php endif; ?>
         </span>

@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Yatra\Repositories;
 
 use Yatra\Models\RecurringRule;
+use Yatra\Database\Tables\TripAvailabilityRulesTable;
 
 /**
  * Recurring Rule Repository
  * Handles database operations for recurring departure rules
  * 
- * Table: wp_yatra_trip_recurring_rules
+ * Table: yatra_new_trip_availability_rules
  * 
  * Fields:
  * - id (primary key)
@@ -33,7 +34,7 @@ class RecurringRuleRepository extends BaseRepository
      */
     protected function getTableName(): string
     {
-        return $this->wpdb->prefix . 'yatra_trip_recurring_rules';
+        return TripAvailabilityRulesTable::getTableName();
     }
 
     /**
@@ -90,7 +91,7 @@ class RecurringRuleRepository extends BaseRepository
         $query = $this->wpdb->prepare(
             "SELECT * FROM `{$table}` 
              WHERE trip_id = %d 
-               AND is_active = 1
+               AND status = 'active'
                AND (start_date IS NULL OR start_date <= %s)
                AND (end_date IS NULL OR end_date >= %s)
              ORDER BY created_at DESC",
@@ -115,12 +116,13 @@ class RecurringRuleRepository extends BaseRepository
         
         $insertData = [
             'trip_id' => (int) ($data['trip_id'] ?? 0),
-            'recurrence_type' => sanitize_text_field($data['recurrence_type'] ?? 'daily'),
-            'start_date' => !empty($data['start_date']) ? sanitize_text_field($data['start_date']) : null,
+            'name' => sanitize_text_field($data['name'] ?? 'Recurring Rule'),
+            'status' => sanitize_text_field($data['status'] ?? 'active'),
+            'recurrence_type' => sanitize_text_field($data['recurrence_type'] ?? 'weekly'),
+            'start_date' => !empty($data['start_date']) ? sanitize_text_field($data['start_date']) : current_time('Y-m-d'),
             'end_date' => !empty($data['end_date']) ? sanitize_text_field($data['end_date']) : null,
-            'max_capacity' => (int) ($data['max_capacity'] ?? 0),
-            'base_price' => !empty($data['base_price']) ? (float) $data['base_price'] : null,
-            'is_active' => isset($data['is_active']) ? (bool) $data['is_active'] : true,
+            'capacity_value' => (int) ($data['max_capacity'] ?? 0),
+            'price_override' => !empty($data['base_price']) ? (float) $data['base_price'] : null,
             'created_at' => current_time('mysql'),
             'updated_at' => current_time('mysql'),
         ];

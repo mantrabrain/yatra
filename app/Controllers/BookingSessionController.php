@@ -407,68 +407,65 @@ class BookingSessionController extends BaseController
         $travel_date = !empty($data['travel_date']) ? sanitize_text_field($data['travel_date']) : '';
         $departure_time = !empty($data['departure_time']) ? sanitize_text_field($data['departure_time']) : '';
         
-        // Try to find specific availability using AvailabilityService
+        // Use centralized AvailabilityResolutionService to get resolved availability
+        // This follows priority: Recurring Rules → Availability Dates → Trip Default
+        $availability = null;
         if ($travel_date) {
-            $availability = $this->availabilityService->getByTripAndDate((int) $data['trip_id'], $travel_date);
-            
-            if ($availability && $departure_time && $availability->departure_time !== $departure_time) {
-                $availability = null; // Time mismatch
-            }
-            
-            if ($availability) {
-                $data['availability_id'] = $availability->id;
-                $data['seats_available'] = $availability->seats_available;
-                $data['seats_total'] = $availability->seats_total;
-                $data['pricing'] = $availability->pricing;
-                $data['price_per'] = $availability->price_per;
+            try {
+                $resolutionService = new \Yatra\Services\AvailabilityResolutionService();
+                $availability = $resolutionService->resolveAvailabilityForDate((int) $data['trip_id'], $travel_date);
+                
+                // Check departure time match if specified
+                if ($availability && $departure_time && isset($availability->departure_time) && $availability->departure_time !== $departure_time) {
+                    $availability = null; // Time mismatch
+                }
+                
+                if ($availability) {
+                    $data['availability_id'] = $availability->id;
+                    $data['seats_available'] = $availability->seats_available;
+                    $data['seats_total'] = $availability->seats_total;
+                }
+            } catch (\Exception $e) {
+                error_log('Yatra Booking: Error resolving availability - ' . $e->getMessage());
+                $availability = null;
             }
         }
         
-        // Priority: Use data sent from frontend (availability card) first
-        // 1. Frontend-sent pricing_type and price_types (from availability card)
-        // 2. Database availability pricing
-        // 3. Trip pricing
+        // Get pricing configuration from resolved availability (already follows priority chain)
+        // pricing_type always comes from trip
+        $pricing_type = !empty($data['pricing_type']) 
+            ? sanitize_text_field($data['pricing_type']) 
+            : ($availability ? $availability->pricing_type : ($trip->pricing_type ?? 'regular'));
         
-        $pricing_type = !empty($data['pricing_type']) ? sanitize_text_field($data['pricing_type']) : ($trip->pricing_type ?? 'regular');
-        $trip_price = !empty($trip->discounted_price) ? (float) $trip->discounted_price : (float) $trip->original_price;
-        
-        // Apply dynamic pricing if module is enabled
-        if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
-            $trip_price = apply_filters('yatra_booking_trip_price', $trip_price, (int) $trip->id, [
-                'departure_date' => $travel_date,
-                'spots_remaining' => $availability ? (int) ($availability->spots_remaining ?? null) : null,
-                'availability_id' => $availability_id,
-            ]);
-        }
-        
+        // Get price_types from resolved availability (already follows priority: Rules → Dates → Trip)
         $price_types = [];
         
         // First priority: price_types sent from frontend (from availability card)
         if (!empty($data['price_types']) && is_array($data['price_types'])) {
             $price_types = $data['price_types'];
         }
-        // Second priority: availability from database
-        elseif ($availability) {
-            $pricing_type = $availability->pricing_type ?? $pricing_type;
-            
-            // Get availability price
-            if (!empty($availability->discounted_price)) {
-                $trip_price = (float) $availability->discounted_price;
-            } elseif (!empty($availability->original_price)) {
-                $trip_price = (float) $availability->original_price;
-            }
-            
-            // Get price_types if traveler-based
-            if (!empty($availability->price_types)) {
-                $price_types = is_string($availability->price_types) 
-                    ? (json_decode($availability->price_types, true) ?: []) 
-                    : $availability->price_types;
-            }
+        // Second priority: Use resolved availability price_types (already prioritized)
+        elseif ($availability && !empty($availability->price_types)) {
+            $price_types = is_array($availability->price_types) ? $availability->price_types : [];
         }
         
-        // Third priority: If no price_types yet, use trip's price_types
-        if (empty($price_types) && $pricing_type === 'traveler_based' && !empty($trip->price_types)) {
-            $price_types = is_array($trip->price_types) ? $trip->price_types : [];
+        // Get base price for regular pricing
+        $trip_price = 0;
+        if ($pricing_type === 'regular') {
+            if ($availability) {
+                $trip_price = (float) ($availability->discounted_price ?? $availability->original_price ?? 0);
+            } else {
+                $trip_price = (float) ($trip->discounted_price ?? $trip->original_price ?? 0);
+            }
+            
+            // Apply dynamic pricing if module is enabled
+            if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
+                $trip_price = apply_filters('yatra_booking_trip_price', $trip_price, (int) $trip->id, [
+                    'departure_date' => $travel_date,
+                    'spots_remaining' => $availability ? (int) ($availability->seats_available ?? 0) : null,
+                    'availability_id' => $availability_id,
+                ]);
+            }
         }
         
         // Enrich price_types with category labels if needed (some might already have them from frontend)

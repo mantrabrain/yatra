@@ -64,7 +64,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const bookingForm = document.querySelector('.yatra-booking-form');
     const totalAmountElement = document.getElementById('total-amount');
     const travelerInputs = document.querySelectorAll('input[name*="travelers["], input[name="num_travelers"]');
+    const dateInput = document.getElementById('travel_date');
     let currentGroupDiscounts = null;
+    let selectedAvailability = null;
     
     // Load group discounts for this trip
     async function loadGroupDiscounts() {
@@ -165,17 +167,74 @@ document.addEventListener('DOMContentLoaded', function () {
         return discountAmount;
     }
     
+    // Update pricing when date changes
+    if (dateInput) {
+        dateInput.addEventListener('change', function() {
+            const selectedDate = this.value;
+            const bookingCard = document.querySelector('.yatra-booking-card');
+            
+            if (bookingCard) {
+                const availabilityData = bookingCard.getAttribute('data-availability');
+                if (availabilityData) {
+                    try {
+                        const availabilities = JSON.parse(availabilityData);
+                        selectedAvailability = availabilities.find(a => a.departure_date === selectedDate);
+                        
+                        // Update traveler input prices if traveler-based pricing
+                        if (selectedAvailability && selectedAvailability.pricing_type === 'traveler_based' && selectedAvailability.price_types) {
+                            selectedAvailability.price_types.forEach((pt, index) => {
+                                const input = document.querySelector(`input[name="travelers[${pt.category_id}]"]`);
+                                if (input) {
+                                    const price = pt.discounted_price || pt.original_price || 0;
+                                    input.setAttribute('data-price', price);
+                                }
+                            });
+                        }
+                        
+                        // Recalculate total
+                        updatePricing();
+                    } catch (e) {
+                        console.error('Error parsing availability data:', e);
+                    }
+                }
+            }
+        });
+        
+        // Set today's date by default if available, otherwise use trip fallback pricing
+        const today = new Date().toISOString().split('T')[0];
+        const bookingCard = document.querySelector('.yatra-booking-card');
+        if (bookingCard && !dateInput.value) {
+            const availabilityData = bookingCard.getAttribute('data-availability');
+            if (availabilityData) {
+                try {
+                    const availabilities = JSON.parse(availabilityData);
+                    const todayAvailability = availabilities.find(a => a.departure_date === today);
+                    if (todayAvailability) {
+                        dateInput.value = today;
+                        dateInput.dispatchEvent(new Event('change'));
+                    } else {
+                        // No availability for today - use trip's default pricing (already set in HTML)
+                        // Just trigger initial calculation with trip prices
+                        updatePricing();
+                    }
+                } catch (e) {
+                    console.error('Error setting default date:', e);
+                }
+            }
+        }
+    }
+    
     // Update pricing display
     function updatePricing() {
         const totalTravelers = calculateTotalTravelers();
-        const basePrice = window.yatraTripData?.basePrice || 0;
+        let basePrice = window.yatraTripData?.basePrice || 0;
         
         // Calculate subtotal
         let subtotal = 0;
         
         const categoryInputs = document.querySelectorAll('input[name*="travelers["]');
         if (categoryInputs.length > 0) {
-            // Traveler-based pricing: read actual prices from data attributes
+            // Traveler-based pricing: read actual prices from data attributes (updated by date change)
             categoryInputs.forEach(input => {
                 const count = parseInt(input.value) || 0;
                 const price = parseFloat(input.dataset.price) || 0;
@@ -192,7 +251,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         } else {
-            // Simple pricing
+            // Simple pricing - use selected availability price if available
+            if (selectedAvailability && selectedAvailability.price) {
+                basePrice = parseFloat(selectedAvailability.price);
+            }
             subtotal = basePrice * totalTravelers;
         }
         

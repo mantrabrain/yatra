@@ -267,7 +267,7 @@ class AvailabilityController extends BaseController
     {
         try {
             $id = (int) $request->get_param('id');
-            $item = $this->service->find($id);
+            $item = $this->service->getById($id);
 
             if (!$item) {
                 return new WP_Error(
@@ -403,7 +403,7 @@ class AvailabilityController extends BaseController
      */
     protected function prepare_item_for_response($item, WP_REST_Request $request): array
     {
-        $data = $item->toArray();
+        $data = (array) $item;
         
         // Format prices as strings for frontend
         if (isset($data['original_price'])) {

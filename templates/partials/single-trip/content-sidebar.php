@@ -53,6 +53,8 @@ if (!defined('ABSPATH')) {
                 'status' => $avail->status,
                 'is_limited' => $avail->is_limited ?? false,
                 'is_sold_out' => $avail->is_sold_out ?? false,
+                'pricing_type' => $avail->pricing_type ?? $pricing_type,
+                'price_types' => !empty($avail->price_types) ? $avail->price_types : [],
             ];
         }
     }
@@ -343,9 +345,31 @@ if (!defined('ABSPATH')) {
                 <?php endif; ?>
 
                 <!-- Total Price Display (Dynamic) -->
+                <?php
+                // Calculate initial total based on default traveler quantities
+                $initial_total = $base_price;
+                if ($traveler_data['has_traveler_pricing'] && !empty($traveler_data['traveler_rows'])) {
+                    $initial_total = 0;
+                    foreach ($traveler_data['traveler_rows'] as $row) {
+                        $quantity = (int) ($row['input_attrs']['value'] ?? 0);
+                        $price = (float) ($row['input_attrs']['data-price'] ?? 0);
+                        $pricing_mode = $row['input_attrs']['data-pricing-mode'] ?? 'per_person';
+                        
+                        if ($pricing_mode === 'per_group') {
+                            // Per group: charge once if any travelers
+                            if ($quantity > 0) {
+                                $initial_total += $price;
+                            }
+                        } else {
+                            // Per person: charge per traveler
+                            $initial_total += $price * $quantity;
+                        }
+                    }
+                }
+                ?>
                 <div class="yatra-booking-total" id="booking-total">
                     <div class="yatra-booking-total-label"><?php echo esc_html__('Total', 'yatra'); ?></div>
-                    <div class="yatra-booking-total-amount" id="total-amount"><?php echo yatra_format_price($base_price); ?></div>
+                    <div class="yatra-booking-total-amount" id="total-amount"><?php echo yatra_format_price($initial_total); ?></div>
                 </div>
 
                 <!-- Action Buttons -->

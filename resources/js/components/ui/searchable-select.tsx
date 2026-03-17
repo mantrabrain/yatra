@@ -96,11 +96,9 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           error ? "border-red-500" : "border-gray-300 dark:border-gray-600"
         } bg-white dark:bg-gray-800 px-4 py-2.5 text-base ring-offset-white focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-900 dark:focus-within:ring-blue-400 transition-colors`}
       >
-        <button
-          type="button"
+        <div
           onClick={() => !disabled && setIsOpen(!isOpen)}
-          disabled={disabled}
-          className="flex-1 flex items-center justify-between text-left"
+          className={`flex-1 flex items-center justify-between text-left ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
         >
           <span
             className={
@@ -139,7 +137,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
               className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
             />
           </div>
-        </button>
+        </div>
       </div>
 
       {isOpen && (

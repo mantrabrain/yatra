@@ -462,63 +462,40 @@ class SingleTripController
     }
 
     /**
-     * Get availability dates for trip from database
+     * Get availability dates for a trip using centralized resolution service
      *
      * @param int $trip_id Trip ID
-     * @return array Availability dates with pricing and seat info
+     * @return array Array of availability date objects
      */
     private function getAvailabilityDates(int $trip_id): array
     {
-        $table = TripAvailabilityDatesTable::getTableName();
+        // Use centralized AvailabilityResolutionService
+        $resolutionService = new \Yatra\Services\AvailabilityResolutionService();
         
-        // Get all availability dates for this trip
-        $availability = $this->wpdb->get_results(
-            $this->wpdb->prepare(
-                "SELECT * FROM {$table}
-                 WHERE trip_id = %d
-                 ORDER BY departure_date ASC",
-                $trip_id
-            )
-        ) ?: [];
+        // Get dates for next 12 months
+        $fromDate = date('Y-m-d');
+        $toDate = date('Y-m-d', strtotime('+12 months'));
         
-        // Format availability dates for frontend
+        $availability = $resolutionService->getAllAvailabilityDates($trip_id, $fromDate, $toDate);
+        
+        // Add calculated fields
         foreach ($availability as $avail) {
-            $avail->departure_date = $avail->departure_date;
-            $avail->return_date = $avail->return_date;
-            $avail->original_price = $avail->original_price ? (float) $avail->original_price : null;
-            $avail->discounted_price = $avail->discounted_price ? (float) $avail->discounted_price : null;
-            $avail->seats_total = (int) $avail->seats_total;
-            $avail->seats_available = (int) $avail->seats_available;
-            $avail->seats_reserved = (int) ($avail->seats_reserved ?? 0);
-            
-            // Parse price_types JSON for traveler-based pricing
-            $price_types_raw = $avail->price_types ?? null;
-            $avail->price_types = [];
-            if (!empty($price_types_raw) && is_string($price_types_raw)) {
-                $decoded = json_decode($price_types_raw, true);
-                if (is_array($decoded)) {
-                    $avail->price_types = $decoded;
-                }
-            }
-            
-            // Calculate effective price for this date
-            // For traveler-based pricing, get the minimum price from price_types
-            if (!empty($avail->price_types) && is_array($avail->price_types)) {
-                $min_price = PHP_FLOAT_MAX;
-                foreach ($avail->price_types as $pt) {
-                    $pt_price = (float) ($pt['effective_price'] ?? $pt['discounted_price'] ?? $pt['original_price'] ?? 0);
-                    if ($pt_price > 0 && $pt_price < $min_price) {
-                        $min_price = $pt_price;
-                    }
-                }
-                $avail->effective_price = ($min_price < PHP_FLOAT_MAX) ? $min_price : ($avail->discounted_price ?? $avail->original_price);
-            } else {
-                $avail->effective_price = $avail->discounted_price ?? $avail->original_price;
-            }
-            
             // Calculate if limited availability
             $avail->is_limited = ($avail->seats_available <= 5 && $avail->seats_available > 0);
             $avail->is_sold_out = ($avail->seats_available <= 0 || $avail->status === 'sold_out');
+            
+            // Debug logging
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log(sprintf(
+                    'Yatra Availability [%s]: Date=%s, PricingType=%s, HasPriceTypes=%s, EffectivePrice=%s, Seats=%d',
+                    $avail->source,
+                    $avail->departure_date,
+                    $avail->pricing_type,
+                    !empty($avail->price_types) ? 'YES(' . count($avail->price_types) . ')' : 'NO',
+                    $avail->effective_price ?? 'null',
+                    $avail->seats_available
+                ));
+            }
         }
         
         return $availability;
@@ -1892,6 +1869,9 @@ class SingleTripController
         if ($has_traveler_pricing) {
             // Traveler-Based Pricing: Show dynamic categories
             foreach ($trip->price_types as $index => $price_type) {
+                // Normalize to object if array
+                $price_type = is_array($price_type) ? (object) $price_type : $price_type;
+                
                 $pricing_mode = $price_type->pricing_mode ?? 'per_person';
                 $is_per_group = ($pricing_mode === 'per_group');
                 $pricing_label = '';
@@ -1907,9 +1887,10 @@ class SingleTripController
                     }
                 }
 
-                $display_price_type = $price_type->effective_price;
+                $display_price_type = $price_type->effective_price ?? $price_type->discounted_price ?? $price_type->original_price ?? 0;
                 if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
-                    $display_price_type = apply_filters('yatra_trip_display_price', $display_price_type, $trip->getId() ?? 0, [
+                    $trip_id = is_object($trip) && method_exists($trip, 'getId') ? $trip->getId() : ($trip->id ?? 0);
+                    $display_price_type = apply_filters('yatra_trip_display_price', $display_price_type, $trip_id, [
                         'departure_date' => null,
                         'spots_remaining' => null,
                         'price_type_id' => $price_type->id ?? null,
@@ -1917,25 +1898,28 @@ class SingleTripController
                 }
 
                 $age_info = '';
-                if ($price_type->age_min !== null || $price_type->age_max !== null) {
-                    if ($price_type->age_min !== null && $price_type->age_max !== null) {
-                        $age_info = sprintf(__('(Age %d-%d)', 'yatra'), $price_type->age_min, $price_type->age_max);
-                    } elseif ($price_type->age_min !== null) {
-                        $age_info = sprintf(__('(Age %d+)', 'yatra'), $price_type->age_min);
+                $age_min = $price_type->age_min ?? null;
+                $age_max = $price_type->age_max ?? null;
+                if ($age_min !== null || $age_max !== null) {
+                    if ($age_min !== null && $age_max !== null) {
+                        $age_info = sprintf(__('(Age %d-%d)', 'yatra'), $age_min, $age_max);
+                    } elseif ($age_min !== null) {
+                        $age_info = sprintf(__('(Age %d+)', 'yatra'), $age_min);
                     } else {
-                        $age_info = sprintf(__('(Up to age %d)', 'yatra'), $price_type->age_max);
+                        $age_info = sprintf(__('(Up to age %d)', 'yatra'), $age_max);
                     }
                 }
 
                 $price_html = '<div class="yatra-quantity-price-wrapper">';
-                $price_html .= '<span class="yatra-quantity-price">' . yatra_format_price($display_price_type) . '</span>';
+                $price_html .= '<span class="yatra-quantity-price">' . yatra_format_price((float) $display_price_type) . '</span>';
                 if ($is_per_group) {
                     $price_html .= '<span class="yatra-pricing-mode-label yatra-pricing-mode-group">' . esc_html($pricing_label) . '</span>';
                 }
                 $price_html .= '</div>';
 
                 $input_id = 'traveler_' . $price_type->category_id;
-                $pt_max_qty = (int) ($price_type->max_quantity ?: $trip->getMaxTravelers());
+                $max_travelers = is_object($trip) && method_exists($trip, 'getMaxTravelers') ? $trip->getMaxTravelers() : ($trip->max_travelers ?? 20);
+                $pt_max_qty = (int) ($price_type->max_quantity ?: $max_travelers);
                 $pt_value = ($index === 0) ? 1 : 0;
 
                 $traveler_rows[] = [
@@ -1963,6 +1947,7 @@ class SingleTripController
                         'value' => $pt_value,
                         'min' => 0,
                         'max' => $pt_max_qty,
+                        'data-category' => $price_type->category_id,
                         'data-category-label' => $price_type->category_label,
                         'data-price' => $price_type->effective_price,
                         'data-pricing-mode' => $pricing_mode,

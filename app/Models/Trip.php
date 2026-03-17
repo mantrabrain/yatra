@@ -93,6 +93,7 @@ class Trip
     public bool $has_discount = false;
     public ?array $best_discount = null;
     public ?float $current_price = null;
+    public ?float $discount_percentage = null;
     public bool $deposit_required = false;
     public ?float $deposit_amount = null;
     public ?float $deposit_percentage = null;
@@ -204,11 +205,13 @@ class Trip
     public float $revenue_total = 0.00;
     public float $conversion_rate = 0.00;
     public float $avg_rating = 0.00;
+    public ?float $average_rating = null;
     public int $reviews_count = 0;
     public ?string $last_viewed_at = null;
     public ?string $last_booked_at = null;
 
     // JSON Fields (stored as arrays/objects)
+    public array $attributes = [];
     public array $highlights = [];
     public array $testimonials = [];
     public array $countries = [];

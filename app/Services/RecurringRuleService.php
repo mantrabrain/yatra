@@ -116,7 +116,7 @@ class RecurringRuleService
                 
             case 'weekly':
                 // Generate for specified weekdays
-                if (empty($rule->weekdays)) {
+                if (empty($rule->days_of_week)) {
                     break;
                 }
                 
@@ -124,7 +124,7 @@ class RecurringRuleService
                     $dayOfWeek = (int) date('w', $current); // 0 = Sunday, 6 = Saturday
                     $dateStr = date('Y-m-d', $current);
                     
-                    if (in_array($dayOfWeek, $rule->weekdays, true) && $rule->isActiveForDate($dateStr)) {
+                    if (in_array($dayOfWeek, $rule->days_of_week, true) && $rule->isActiveForDate($dateStr)) {
                         $dates[] = $this->buildDateInfo($dateStr, $rule);
                     }
                     
@@ -146,7 +146,7 @@ class RecurringRuleService
                 
             case 'custom_days':
                 // Generate for custom weekdays
-                if (empty($rule->weekdays)) {
+                if (empty($rule->days_of_week)) {
                     break;
                 }
                 
@@ -154,7 +154,7 @@ class RecurringRuleService
                     $dayOfWeek = (int) date('w', $current);
                     $dateStr = date('Y-m-d', $current);
                     
-                    if (in_array($dayOfWeek, $rule->weekdays, true) && $rule->isActiveForDate($dateStr)) {
+                    if (in_array($dayOfWeek, $rule->days_of_week, true) && $rule->isActiveForDate($dateStr)) {
                         $dates[] = $this->buildDateInfo($dateStr, $rule);
                     }
                     
@@ -173,9 +173,9 @@ class RecurringRuleService
     {
         return [
             'date' => $date,
-            'max_capacity' => $rule->max_capacity,
-            'base_price' => $rule->base_price,
-            'pricing_by_traveler_type' => $rule->pricing_by_traveler_type,
+            'max_capacity' => $rule->capacity_value,
+            'base_price' => $rule->price_override,
+            'pricing_by_traveler_type' => null, // This field doesn't exist in the new schema
             'source' => 'recurring_rule',
             'rule_id' => $rule->id,
         ];

@@ -23,7 +23,7 @@ if (!defined('ABSPATH')) {
 
         // Calculate rating stats from actual reviews
         $total_reviews = count($display_reviews);
-        $avg_rating = $trip->average_rating > 0 ? $trip->average_rating : 0;
+        $avg_rating = (isset($trip->average_rating) && $trip->average_rating > 0) ? $trip->average_rating : 0;
 
         // Calculate rating distribution (5★, 4★, 3★, 2★, 1★)
         $rating_distribution = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
