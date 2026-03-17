@@ -1,7 +1,11 @@
 <?php
 if (!defined('ABSPATH')) {
     exit;
-} ?>
+}
+
+// Location Section
+// Expected variables: $trip, $tab, $itinerary_entries
+?>
 <section class="yatra-trip-section" id="location" itemscope itemtype="https://schema.org/Place">
     <h2 class="yatra-trip-section-title">
         <?php yatra_render_tab_icon($tab->icon ?? null, 'map-pin', 'yatra-trip-section-title-icon', $tab->label ?? 'Location'); ?>
@@ -10,8 +14,8 @@ if (!defined('ABSPATH')) {
 
     <?php 
                 // Use starting location coordinates if available
-                $map_lat = $trip->starting_latitude ?? null;
-                $map_lng = $trip->starting_longitude ?? null;
+                $map_lat = $trip->getStartingLatitude() ?? null;
+                $map_lng = $trip->getStartingLongitude() ?? null;
                 
                 // Itinerary entries with coordinates are passed from controller (proper MVC pattern)
                 // This follows the separation of concerns principle
@@ -21,7 +25,7 @@ if (!defined('ABSPATH')) {
                     <div class="yatra-trip-map" id="yatra-trip-map" 
                          data-lat="<?php echo esc_attr($map_lat); ?>"
                          data-lng="<?php echo esc_attr($map_lng); ?>"
-                         data-starting-location="<?php echo esc_attr($trip->starting_location ?? ''); ?>"
+                         data-starting-location="<?php echo esc_attr($trip->getStartingLocation() ?? ''); ?>"
                          itemprop="hasMap" itemscope itemtype="https://schema.org/Map"
                          style="position: relative;">
                         <meta itemprop="mapType" content="OpenStreetMap">
@@ -65,11 +69,11 @@ if (!defined('ABSPATH')) {
                                 }
                                 
                                 // Parse and validate coordinates
-                                var startLat = parseFloat('<?php echo esc_js($trip->starting_latitude ?? '0'); ?>');
-                                var startLng = parseFloat('<?php echo esc_js($trip->starting_longitude ?? '0'); ?>');
+                                var startLat = parseFloat('<?php echo esc_js($trip->getStartingLatitude() ?? '0'); ?>');
+                                var startLng = parseFloat('<?php echo esc_js($trip->getStartingLongitude() ?? '0'); ?>');
                                 var endLat = parseFloat('<?php echo esc_js($trip->ending_latitude ?? '0'); ?>');
                                 var endLng = parseFloat('<?php echo esc_js($trip->ending_longitude ?? '0'); ?>');
-                                var startingLocation = '<?php echo esc_js($trip->starting_location ?? ''); ?>';
+                                var startingLocation = '<?php echo esc_js($trip->getStartingLocation() ?? ''); ?>';
                                 var endingLocation = '<?php echo esc_js($trip->ending_location ?? ''); ?>';
                                 
                                 // Validate coordinates

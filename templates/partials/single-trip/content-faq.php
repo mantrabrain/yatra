@@ -11,7 +11,8 @@ if (!defined('ABSPATH')) {
         "mainEntity": [
             <?php
             $faq_items = [];
-            foreach ($trip->faqs as $index => $faq) {
+            $faqs = $trip->getFaqs();
+            foreach ($faqs as $index => $faq) {
                 $question = is_object($faq) ? ($faq->title ?? '') : ($faq['question'] ?? '');
                 $answer = is_object($faq) ? ($faq->description ?? '') : ($faq['answer'] ?? '');
                 
@@ -53,8 +54,8 @@ if (!defined('ABSPATH')) {
     </div>
     
     <div class="faq-container" itemscope itemtype="https://schema.org/FAQ">
-        <meta itemprop="about" content="<?php echo esc_attr($trip->title); ?>">
-        <?php foreach ($trip->faqs as $index => $faq): ?>
+        <meta itemprop="about" content="<?php echo esc_attr($trip->getTitle()); ?>">
+        <?php foreach ($faqs as $index => $faq): ?>
             <?php
             $question = is_object($faq) ? ($faq->title ?? '') : '';
             $answer = is_object($faq) ? ($faq->description ?? '') : '';
@@ -79,7 +80,7 @@ if (!defined('ABSPATH')) {
                 </div>
             <?php endif; ?>
         <?php endforeach; ?>
-        <?php if (empty($trip->faqs) || !is_array($trip->faqs)): ?>
+        <?php if (empty($faqs)): ?>
             <div class="yatra-no-faqs">
                 <p class="text-gray-500 text-center py-8">
                     <?php echo esc_html__('No frequently asked questions available for this trip.', 'yatra'); ?>

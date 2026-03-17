@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
                 <?php echo yatra_svg_icon('star', 'yatra-reviews-section-icon'); ?>
                 <?php echo esc_html__('Reviews', 'yatra'); ?>
             </h2>
-            <meta itemprop="about" content="<?php echo esc_attr($trip->title); ?>">
+            <meta itemprop="about" content="<?php echo esc_attr($trip->getTitle()); ?>">
         </div>
 
         <?php

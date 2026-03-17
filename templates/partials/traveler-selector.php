@@ -78,7 +78,19 @@ $dropdown_attrs = (isset($dropdown_attrs) && is_array($dropdown_attrs)) ? $dropd
                     </svg>
                 </button>
 
-                <input type="number" class="yatra-quantity-input yatra-availability-category yatra-qty-input" readonly<?php echo $render_attrs($input_attrs); ?>>
+                <input type="number" 
+                       class="yatra-quantity-input yatra-availability-category yatra-qty-input" 
+                       readonly
+                       id="<?php echo isset($input_attrs['id']) ? esc_attr($input_attrs['id']) : ''; ?>"
+                       name="<?php echo isset($input_attrs['name']) ? esc_attr($input_attrs['name']) : ''; ?>"
+                       value="<?php echo isset($input_attrs['value']) ? esc_attr($input_attrs['value']) : '0'; ?>"
+                       min="<?php echo isset($input_attrs['min']) ? esc_attr($input_attrs['min']) : '0'; ?>"
+                       max="<?php echo isset($input_attrs['max']) ? esc_attr($input_attrs['max']) : '999'; ?>"
+                       data-item="<?php echo isset($input_attrs['data-item']) ? esc_attr($input_attrs['data-item']) : ''; ?>"
+                       data-category="<?php echo isset($input_attrs['data-category']) ? esc_attr($input_attrs['data-category']) : ''; ?>"
+                       data-price="<?php echo isset($input_attrs['data-price']) ? esc_attr($input_attrs['data-price']) : ''; ?>"
+                       data-pricing-mode="<?php echo isset($input_attrs['data-pricing-mode']) ? esc_attr($input_attrs['data-pricing-mode']) : ''; ?>"
+                       data-category-label="<?php echo isset($input_attrs['data-category-label']) ? esc_attr($input_attrs['data-category-label']) : ''; ?>">
 
                 <button type="button" class="yatra-quantity-btn yatra-quantity-plus yatra-qty-btn yatra-qty-plus"<?php echo $plus_disabled ? ' disabled' : ''; ?><?php echo $render_attrs($plus_attrs); ?>>
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">

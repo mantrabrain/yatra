@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) {
     </div>
 
     <div class="yatra-attributes-grid">
-        <?php foreach ($trip->attributes as $attribute): ?>
+        <?php foreach ($trip->getAttributes() as $attribute): ?>
             <div class="yatra-attribute-item">
                 <div class="yatra-attribute-icon">
                     <?php if ($attribute['icon']): ?>

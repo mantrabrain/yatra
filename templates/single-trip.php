@@ -30,7 +30,7 @@ if (!$trip) {
 // Set up page title
 add_filter('wp_title', function ($title) {
     global $trip;
-    return esc_html($trip->title) . ' - ' . get_bloginfo('name');
+    return esc_html($trip->getTitle()) . ' - ' . get_bloginfo('name');
 }, 10, 1);
 
 // Include SEO helper functions
@@ -56,8 +56,9 @@ $trip_categories = isset($trip->trip_categories) ? $trip->trip_categories : [];
 // Set up global itinerary gallery data for modal (simple URL array like hero)
 global $yatra_itinerary_gallery_images;
 $yatra_itinerary_gallery_images = [];
-if (!empty($trip->itinerary_days)) {
-    foreach ($trip->itinerary_days as $day) {
+$itinerary_days = $trip->getItineraryDays();
+if (!empty($itinerary_days)) {
+    foreach ($itinerary_days as $day) {
         if (!empty($day['entries'])) {
             foreach ($day['entries'] as $entry) {
                 // Add gallery images
@@ -125,7 +126,7 @@ window.yatraTripData = {
     currencySymbol: '<?php echo yatra_get_currency_symbol(\Yatra\Services\SettingsService::getCurrency()); ?>',
     availabilityDates: <?php echo json_encode(array_map(function ($avail) {
         return $avail->departure_date ?? $avail->date;
-    }, $trip->availability_dates ?? [])); ?>,
+    }, $trip->getAvailabilityDates())); ?>,
     groupDiscountsUrl: '<?php echo esc_url(rest_url('yatra/v1/discounts/group-discounts')); ?>'
 };
 
@@ -137,7 +138,7 @@ window.yatraVars = {
 
 <!-- Downloads JavaScript -->
 <?php 
-$downloads = isset($trip->downloadable_items) ? $trip->downloadable_items : [];
+$downloads = $trip->getDownloadableItems();
 if (!empty($downloads)): 
 ?>
 <script src="<?php echo esc_url(plugin_dir_url(dirname(__FILE__)) . 'assets/js/api-helper.js'); ?>"></script>
@@ -158,7 +159,10 @@ if (!empty($downloads)):
     <?php yatra_get_template('partials/single-trip/quick-facts', ['trip' => $trip]); ?>
 
     <!-- Trip Attributes -->
-    <?php if (!empty($trip->attributes)): ?>
+    <?php 
+    $attributes = $trip->getAttributes();
+    if (!empty($attributes)): 
+    ?>
         <?php yatra_get_template('partials/single-trip/trip-attributes', ['trip' => $trip]); ?>
     <?php endif; ?>
 
@@ -189,7 +193,12 @@ if (!empty($downloads)):
     <?php endif; ?>
 
     <!-- Similar Trips Section -->
-    <?php yatra_get_template('partials/single-trip/similar-trips', ['trip' => $trip]); ?>
+    <?php 
+    $similar_trips = $trip->getSimilarTrips();
+    if (!empty($similar_trips)): 
+    ?>
+        <?php yatra_get_template('partials/single-trip/similar-trips', ['trip' => $trip]); ?>
+    <?php endif; ?>
 
     <!-- Reviews Section - Full Width -->
     <?php if (yatra_reviews_enabled()): ?>

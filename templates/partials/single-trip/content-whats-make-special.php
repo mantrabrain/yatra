@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
         <div class="yatra-trip-special-content">
             <div class="yatra-special-features">
                 <?php 
-                $special_content = $trip->what_makes_special ?? '';
+                $special_content = $trip->getWhatMakesSpecial() ?? '';
                 if (!empty($special_content)) {
                     // Split content by lines and create feature items
                     $features = preg_split('/\r\n|\r|\n/', $special_content);

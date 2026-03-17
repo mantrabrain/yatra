@@ -242,6 +242,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 input.addEventListener('input', updatePricing);
             });
             
+            // Also listen for plus/minus button clicks
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.yatra-quantity-plus') || e.target.closest('.yatra-quantity-minus')) {
+                    // Delay to ensure input value is updated first
+                    setTimeout(updatePricing, 50);
+                }
+            });
+            
             // Initial pricing update
             updatePricing();
         });
@@ -277,6 +285,188 @@ document.addEventListener('DOMContentLoaded', function () {
                         block: 'center'
                     });
                 }
+            }
+        });
+    }
+
+    /**
+     * Traveler Synchronization Across All Locations
+     * Syncs traveler inputs between sidebar, enquiry modal, and availability section
+     */
+    
+    // Handle +/- button clicks for traveler inputs
+    document.addEventListener('click', function(e) {
+        // Check if click is on a quantity button or its children (SVG, path, etc.)
+        const btn = e.target.closest('.yatra-quantity-btn, .yatra-quantity-plus, .yatra-quantity-minus');
+        if (!btn) return;
+        
+        // Prevent default button behavior
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const target = btn.getAttribute('data-target');
+        if (!target) return;
+        
+        // Try to find input by ID first (for simple inputs)
+        let input = document.getElementById(target);
+        
+        // If not found by ID, find by data-target in the same row (for category inputs)
+        if (!input) {
+            const row = btn.closest('.yatra-quantity-row');
+            if (row) {
+                input = row.querySelector('input[type="number"]');
+            }
+        }
+        
+        if (!input) return;
+        
+        const min = parseInt(input.getAttribute('min')) || 0;
+        const max = parseInt(input.getAttribute('max')) || 99;
+        let value = parseInt(input.value) || 0;
+        
+        // Update value based on button type
+        if (btn.classList.contains('yatra-quantity-plus')) {
+            value = Math.min(value + 1, max);
+        } else if (btn.classList.contains('yatra-quantity-minus')) {
+            value = Math.max(value - 1, min);
+        }
+        
+        // Update the input
+        input.value = value;
+        
+        // Update button states
+        const minusBtn = btn.classList.contains('yatra-quantity-minus') ? btn : btn.parentElement.querySelector('.yatra-quantity-minus');
+        const plusBtn = btn.classList.contains('yatra-quantity-plus') ? btn : btn.parentElement.querySelector('.yatra-quantity-plus');
+        
+        if (minusBtn) minusBtn.disabled = value <= min;
+        if (plusBtn) plusBtn.disabled = value >= max;
+        
+        // Trigger change event
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        // Sync to other locations
+        syncTravelerInputs(input);
+    });
+    
+    // Handle direct input changes
+    document.addEventListener('change', function(e) {
+        const input = e.target;
+        
+        // Check if it's a traveler input
+        if (input.classList.contains('yatra-quantity-input') || 
+            input.classList.contains('yatra-quantity-input-simple') ||
+            input.id === 'num_travelers' ||
+            input.id === 'enquiry_adults' ||
+            input.name?.startsWith('travelers[') ||
+            input.id?.startsWith('traveler_')) {
+            
+            syncTravelerInputs(input);
+        }
+    });
+    
+    /**
+     * Sync traveler input value to all matching inputs across locations
+     */
+    function syncTravelerInputs(sourceInput) {
+        const sourceId = sourceInput.id;
+        const sourceName = sourceInput.name;
+        const sourceCategory = sourceInput.getAttribute('data-category');
+        const sourceValue = parseInt(sourceInput.value) || 0;
+        
+        // Determine if this is regular pricing or traveler-based pricing
+        if (sourceId === 'num_travelers' || sourceId === 'enquiry_adults' || sourceId?.startsWith('num-travelers-')) {
+            // Regular pricing - sync all num_travelers and enquiry_adults inputs
+            const regularInputs = document.querySelectorAll('#num_travelers, #enquiry_adults');
+            regularInputs.forEach(input => {
+                if (input !== sourceInput) {
+                    const max = parseInt(input.getAttribute('max')) || 99;
+                    input.value = Math.min(sourceValue, max);
+                }
+            });
+            
+            // Also sync to availability section inputs
+            const availabilityInputs = document.querySelectorAll('input[id^="num-travelers-"]');
+            availabilityInputs.forEach(input => {
+                if (input !== sourceInput) {
+                    const max = parseInt(input.getAttribute('max')) || 99;
+                    input.value = Math.min(sourceValue, max);
+                }
+            });
+            
+        } else if (sourceId?.startsWith('traveler_') || sourceName?.startsWith('travelers[') || sourceCategory) {
+            // Traveler-based pricing - extract category ID
+            let categoryId = '';
+            
+            if (sourceCategory) {
+                // From availability section (data-category attribute)
+                categoryId = sourceCategory;
+            } else if (sourceId?.startsWith('traveler_')) {
+                categoryId = sourceId.replace('traveler_', '');
+            } else if (sourceName?.includes('[')) {
+                const match = sourceName.match(/travelers\[(\d+)\]/);
+                if (match) categoryId = match[1];
+            }
+            
+            if (categoryId) {
+                // Sync all inputs for this category across all locations
+                const categoryInputs = document.querySelectorAll(
+                    `input[id="traveler_${categoryId}"], input[name="travelers[${categoryId}]"], input[data-category="${categoryId}"]`
+                );
+                
+                categoryInputs.forEach(input => {
+                    if (input !== sourceInput) {
+                        const max = parseInt(input.getAttribute('max')) || 99;
+                        input.value = Math.min(sourceValue, max);
+                        
+                        // Update button states for this input
+                        const row = input.closest('.yatra-quantity-row');
+                        if (row) {
+                            const min = parseInt(input.getAttribute('min')) || 0;
+                            const minusBtn = row.querySelector('.yatra-quantity-minus');
+                            const plusBtn = row.querySelector('.yatra-quantity-plus');
+                            if (minusBtn) minusBtn.disabled = input.value <= min;
+                            if (plusBtn) plusBtn.disabled = input.value >= max;
+                        }
+                    }
+                });
+                
+                // Update dropdown display text if exists
+                updateTravelerDisplayText();
+            }
+        }
+    }
+    
+    /**
+     * Update traveler dropdown display text
+     */
+    function updateTravelerDisplayText() {
+        const displays = document.querySelectorAll('.yatra-traveler-selector-display, .yatra-participants-display');
+        
+        displays.forEach(display => {
+            // Find all traveler inputs in the same container
+            const container = display.closest('.yatra-traveler-selector, .yatra-booking-field-select');
+            if (!container) return;
+            
+            const dropdown = container.querySelector('.yatra-traveler-selector-dropdown, .yatra-booking-quantity-selector');
+            if (!dropdown) return;
+            
+            const inputs = dropdown.querySelectorAll('input[type="number"]');
+            const parts = [];
+            let total = 0;
+            
+            inputs.forEach(input => {
+                const value = parseInt(input.value) || 0;
+                if (value > 0) {
+                    const label = input.getAttribute('data-category-label') || 'Traveler';
+                    parts.push(`${label} x ${value}`);
+                    total += value;
+                }
+            });
+            
+            if (parts.length > 0) {
+                display.textContent = parts.join(', ');
+            } else {
+                display.textContent = 'Select travelers';
             }
         });
     }

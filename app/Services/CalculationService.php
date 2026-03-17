@@ -213,8 +213,8 @@ class CalculationService
         // ── Currency ────────────────────────────────────────────────────
         $currency = SettingsService::getCurrency();
         
-        // ── Gross total (effective price × travelers, before services/discounts/taxes) ───
-        $gross_total = $base_amount;
+        // ── Gross total (subtotal before discounts/taxes, includes services) ───
+        $gross_total = $subtotal;
         
         // ── Build result ────────────────────────────────────────────
         $pricing_data = [

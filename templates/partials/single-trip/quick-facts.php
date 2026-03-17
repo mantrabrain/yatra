@@ -16,10 +16,10 @@ if (!defined('ABSPATH')) {
             <div class="yatra-quick-fact-label"><?php echo esc_html__('Duration', 'yatra'); ?></div>
             <div class="yatra-quick-fact-value">
                 <?php
-                if ($trip->trip_type === 'single_day') {
+                if ($trip->getTripType() === 'single_day') {
                     echo esc_html__('Day Trip', 'yatra');
                 } else {
-                    echo esc_html(yatra_format_duration($trip->duration_days, $trip->duration_nights));
+                    echo esc_html(yatra_format_duration($trip->getDurationDays(), $trip->getDurationNights()));
                 }
                 ?>
             </div>
@@ -27,29 +27,35 @@ if (!defined('ABSPATH')) {
     </div>
 
     <!-- Difficulty -->
-    <?php if (!empty($trip->difficulty_level)): ?>
+    <?php 
+    $difficulty_level = $trip->getDifficultyLevel();
+    if (!empty($difficulty_level)): 
+    ?>
         <div class="yatra-quick-fact">
             <div class="yatra-quick-fact-icon">
                 <?php 
                 $difficulty_icons = [
                     'easy' => 'smile',
-                    'moderate' => 'zap',
+                    'moderate' => 'activity',
                     'challenging' => 'alert-triangle',
                     'difficult' => 'trending-up'
                 ];
-                $icon = $difficulty_icons[$trip->difficulty_level] ?? 'mountain';
+                $icon = $difficulty_icons[$difficulty_level] ?? 'mountain';
                 echo yatra_svg_icon($icon, 'yatra-icon-lg');
                 ?>
             </div>
             <div class="yatra-quick-fact-content">
                 <div class="yatra-quick-fact-label"><?php echo esc_html__('Difficulty', 'yatra'); ?></div>
-                <div class="yatra-quick-fact-value"><?php echo esc_html(ucfirst($trip->difficulty_level)); ?></div>
+                <div class="yatra-quick-fact-value"><?php echo esc_html(ucfirst($difficulty_level)); ?></div>
             </div>
         </div>
     <?php endif; ?>
 
     <!-- Landmarks -->
-    <?php if (!empty($trip->landmarks) && is_array($trip->landmarks)): ?>
+    <?php 
+    $landmarks = $trip->getLandmarks();
+    if (!empty($landmarks)): 
+    ?>
         <div class="yatra-quick-fact">
             <div class="yatra-quick-fact-icon">
                 <?php echo yatra_svg_icon('map-pin', 'yatra-icon-lg'); ?>
@@ -58,7 +64,7 @@ if (!defined('ABSPATH')) {
                 <div class="yatra-quick-fact-label"><?php echo esc_html__('Landmarks', 'yatra'); ?></div>
                 <div class="yatra-quick-fact-value">
                     <?php 
-                    $landmark_count = count($trip->landmarks);
+                    $landmark_count = count($landmarks);
                     echo esc_html(sprintf(_n('%d landmark', '%d landmarks', $landmark_count, 'yatra'), $landmark_count)); 
                     ?>
                 </div>
@@ -76,8 +82,8 @@ if (!defined('ABSPATH')) {
             <div class="yatra-quick-fact-label"><?php echo esc_html__('Group Size', 'yatra'); ?></div>
             <div class="yatra-quick-fact-value">
                 <?php 
-                $min_travelers = $trip->min_travelers ?? 1;
-                $max_travelers = $trip->max_travelers ?? 20;
+                $min_travelers = $trip->getMinTravelers();
+                $max_travelers = $trip->getMaxTravelers();
                 echo esc_html(sprintf(__('%d-%d travelers', 'yatra'), $min_travelers, $max_travelers)); 
                 ?>
             </div>
@@ -85,7 +91,10 @@ if (!defined('ABSPATH')) {
     </div>
 
     <!-- Price -->
-    <?php if (!empty($trip->original_price) && $trip->original_price > 0): ?>
+    <?php 
+    $original_price = $trip->getOriginalPrice();
+    if ($original_price > 0): 
+    ?>
         <div class="yatra-quick-fact">
             <div class="yatra-quick-fact-icon">
                 <?php echo yatra_svg_icon('dollar-sign', 'yatra-icon-lg'); ?>
@@ -94,12 +103,12 @@ if (!defined('ABSPATH')) {
                 <div class="yatra-quick-fact-label"><?php echo esc_html__('Price', 'yatra'); ?></div>
                 <div class="yatra-quick-fact-value">
                     <?php 
-                    $price = $trip->original_price;
-                    if (!empty($trip->sale_price) && $trip->sale_price < $price) {
-                        echo '<span class="yatra-price-current">' . yatra_format_price($trip->sale_price) . '</span>';
-                        echo ' <span class="yatra-price-original">' . yatra_format_price($price) . '</span>';
+                    $sale_price = $trip->getSalePrice();
+                    if ($sale_price > 0 && $sale_price < $original_price) {
+                        echo '<span class="yatra-price-current">' . yatra_format_price($sale_price) . '</span>';
+                        echo ' <span class="yatra-price-original">' . yatra_format_price($original_price) . '</span>';
                     } else {
-                        echo '<span class="yatra-price-current">' . yatra_format_price($price) . '</span>';
+                        echo '<span class="yatra-price-current">' . yatra_format_price($original_price) . '</span>';
                     }
                     ?>
                 </div>

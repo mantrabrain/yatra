@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
     <div class="yatra-downloads-container">
         <div class="yatra-downloads-list">
             <?php 
-            $downloads = isset($trip->downloadable_items) ? $trip->downloadable_items : [];
+            $downloads = $trip->getDownloadableItems();
             foreach ($downloads as $download): ?>
                 <div class="yatra-download-item" data-download-id="<?php echo esc_attr($download->id); ?>">
                     <div class="yatra-download-icon">

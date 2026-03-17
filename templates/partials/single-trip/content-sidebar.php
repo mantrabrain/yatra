@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 <aside class="yatra-trip-sidebar" id="booking">
     <?php
     // Determine if this is a multi-day trip
-    $is_multi_day = ($trip->duration_days ?? 1) > 1;
+    $is_multi_day = ($trip->getDurationDays() ?? 1) > 1;
 
     // Check for group discounts availability early for the badge (premium feature)
     $sidebar_has_group_discounts = false;
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
         if (class_exists('\Yatra\Services\DiscountService') &&
             method_exists('\Yatra\Services\DiscountService', 'getGroupDiscountsForTrip')) {
             $discountService = new \Yatra\Services\DiscountService();
-            $groupDiscountsResult = $discountService->getGroupDiscountsForTrip((int) $trip->id);
+            $groupDiscountsResult = $discountService->getGroupDiscountsForTrip((int) $trip->getId());
             if (!empty($groupDiscountsResult)) {
                 $sidebar_has_group_discounts = true;
                 $sidebar_group_discounts_data = $groupDiscountsResult;
@@ -39,7 +39,7 @@ if (!defined('ABSPATH')) {
     // Prepare availability data for JavaScript
     $availability_json = [];
     if ($has_availability) {
-        foreach ($trip->availability_dates as $avail) {
+        foreach ($trip->getAvailabilityDates() as $avail) {
             $availability_json[] = [
                 'id' => (int) $avail->id,
                 'date' => $avail->departure_date,
@@ -102,7 +102,7 @@ if (!defined('ABSPATH')) {
     } else {
         // Fallback for regular pricing when effective_price_min is 0
         // This runs for both regular pricing AND traveler pricing scenarios
-        $original = (float) ($trip->original_price ?? 0);
+        $original = (float) ($trip->getOriginalPrice() ?? 0);
         $discounted = (float) ($trip->discounted_price ?? 0);
 
         // Determine current price: Priority: discounted_price > original_price > sale_price
@@ -110,8 +110,8 @@ if (!defined('ABSPATH')) {
             $current = $discounted;
         } elseif ($original > 0) {
             $current = $original;
-        } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
-            $current = (float) $trip->sale_price;
+        } elseif (!empty($trip->getSalePrice()) && (float)$trip->getSalePrice() > 0) {
+            $current = (float) $trip->getSalePrice();
         } else {
             $current = 0;
         }
@@ -184,7 +184,7 @@ if (!defined('ABSPATH')) {
         <!-- ========================================== -->
         <div class="yatra-availability-info">
                     <span class="yatra-availability-count">
-                        <?php echo esc_html(sprintf(_n('%d departure available', '%d departures available', count($trip->availability_dates), 'yatra'), count($trip->availability_dates))); ?>
+                        <?php echo esc_html(sprintf(_n('%d departure available', '%d departures available', count($trip->getAvailabilityDates()), 'yatra'), count($trip->getAvailabilityDates()))); ?>
                     </span>
         </div>
 
@@ -207,106 +207,12 @@ if (!defined('ABSPATH')) {
             </div>
 
             <!-- Travelers Selection - Respects Trip's Pricing Type -->
-            <?php if ($has_traveler_pricing): ?>
-                <!-- Traveler-Based Pricing: Show dynamic categories with prices -->
-                <?php
-                // Normalize price_types to match availability section
-                $normalized_price_types = [];
-                foreach ($trip->price_types as $pt) {
-                    if (is_array($pt)) {
-                        $normalized_price_types[] = (object) $pt;
-                    } else {
-                        $normalized_price_types[] = $pt;
-                    }
-                }
-                
-                $first_category = isset($normalized_price_types[0]) ? $normalized_price_types[0] : null;
-                $first_label = '';
-                if ($first_category) {
-                    $first_label = $first_category->category_label ?? $first_category->label ?? __('Traveler', 'yatra');
-                }
-                $traveler_display_text = ($first_label ?: __('Traveler', 'yatra')) . ' x 1';
-
-                $traveler_rows = [];
-                foreach ($normalized_price_types as $index => $price_type) {
-                    $pricing_mode = $price_type->pricing_mode ?? 'per_person';
-                    $is_per_group = ($pricing_mode === 'per_group');
-                    $pricing_label = '';
-                    if ($is_per_group) {
-                        if (!empty($price_type->min_pax) && !empty($price_type->max_pax)) {
-                            $pricing_label = sprintf(__('per group (%d-%d pax)', 'yatra'), $price_type->min_pax, $price_type->max_pax);
-                        } elseif (!empty($price_type->max_pax)) {
-                            $pricing_label = sprintf(__('per group (up to %d pax)', 'yatra'), $price_type->max_pax);
-                        } elseif (!empty($price_type->min_pax)) {
-                            $pricing_label = sprintf(__('per group (%d+ pax)', 'yatra'), $price_type->min_pax);
-                        } else {
-                            $pricing_label = __('per group', 'yatra');
-                        }
-                    }
-
-                    $display_price_type = $price_type->effective_price;
-                    if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
-                        $display_price_type = apply_filters('yatra_trip_display_price', $display_price_type, $trip->id ?? 0, [
-                            'departure_date' => null,
-                            'spots_remaining' => null,
-                            'price_type_id' => $price_type->id ?? null,
-                        ]);
-                    }
-
-                    $age_info = '';
-                    if ($price_type->age_min !== null || $price_type->age_max !== null) {
-                        if ($price_type->age_min !== null && $price_type->age_max !== null) {
-                            $age_info = sprintf(__('(Age %d-%d)', 'yatra'), $price_type->age_min, $price_type->age_max);
-                        } elseif ($price_type->age_min !== null) {
-                            $age_info = sprintf(__('(Age %d+)', 'yatra'), $price_type->age_min);
-                        } else {
-                            $age_info = sprintf(__('(Up to age %d)', 'yatra'), $price_type->age_max);
-                        }
-                    }
-
-                    $price_html = '<div class="yatra-quantity-price-wrapper">';
-                    $price_html .= '<span class="yatra-quantity-price">' . yatra_format_price($display_price_type) . '</span>';
-                    if ($is_per_group) {
-                        $price_html .= '<span class="yatra-pricing-mode-label yatra-pricing-mode-group">' . esc_html($pricing_label) . '</span>';
-                    }
-                    $price_html .= '</div>';
-
-                    $input_id = 'traveler_' . $price_type->category_id;
-                    $pt_max_qty = (int) ($price_type->max_quantity ?: $trip->max_travelers);
-                    $pt_value = ($index === 0) ? 1 : 0;
-
-                    $traveler_rows[] = [
-                        'label' => $price_type->category_label ?: __('Traveler', 'yatra'),
-                        'subtitle' => $age_info,
-                        'price_html' => $price_html,
-                        'row_attrs' => [
-                            'data-category-id' => $price_type->category_id,
-                            'data-price' => $price_type->effective_price,
-                            'data-pricing-mode' => $pricing_mode,
-                        ],
-                        'minus_disabled' => ($index !== 0),
-                        'plus_disabled' => false,
-                        'minus_attrs' => [
-                            'data-target' => $input_id,
-                            'aria-label' => sprintf(__('Decrease %s', 'yatra'), $price_type->category_label),
-                        ],
-                        'plus_attrs' => [
-                            'data-target' => $input_id,
-                            'aria-label' => sprintf(__('Increase %s', 'yatra'), $price_type->category_label),
-                        ],
-                        'input_attrs' => [
-                            'id' => $input_id,
-                            'name' => 'travelers[' . $price_type->category_id . ']',
-                            'value' => $pt_value,
-                            'min' => 0,
-                            'max' => $pt_max_qty,
-                            'data-category-label' => $price_type->category_label,
-                            'data-price' => $price_type->effective_price,
-                            'data-pricing-mode' => $pricing_mode,
-                        ],
-                    ];
-                }
-
+            <?php
+            // Use helper function to prepare traveler data
+            $traveler_data = \Yatra\Controllers\SingleTripController::prepareTravelerSelectorData($trip, 'availability');
+            
+            if ($traveler_data['has_traveler_pricing']):
+                // Setup variables for traveler-selector.php
                 $root_id = '';
                 $root_class = 'yatra-booking-field-select yatra-participants-select yatra-availability-participants';
                 $container_attrs = [];
@@ -319,43 +225,28 @@ if (!defined('ABSPATH')) {
                 $dropdown_class = 'yatra-booking-quantity-selector yatra-availability-quantity-selector';
                 $dropdown_attrs = [];
 
-                $display_text = $traveler_display_text;
+                $display_text = $traveler_data['traveler_display_text'];
                 $icon_html = yatra_svg_icon('users', 'yatra-icon-sm');
-                $rows = $traveler_rows;
+                $rows = $traveler_data['traveler_rows'];
 
                 include YATRA_PLUGIN_PATH . 'templates/partials/traveler-selector.php';
+            else:
+                // Regular Pricing: Simple number of travelers input
                 ?>
-            <?php else: ?>
-                <!-- Regular Pricing: Simple number of travelers input -->
                 <div class="yatra-booking-field-group">
                     <label for="num_travelers" class="yatra-booking-field-label"><?php echo esc_html__('Number of Travelers', 'yatra'); ?></label>
-                    <div class="yatra-booking-travelers-simple">
-                        <div class="yatra-booking-field-icon">
-                            <?php echo yatra_svg_icon('users', 'yatra-icon-sm'); ?>
-                        </div>
-                        <div class="yatra-quantity-controls-inline">
-                            <button type="button" class="yatra-quantity-btn yatra-quantity-minus" data-target="num_travelers" aria-label="<?php esc_attr_e('Decrease travelers', 'yatra'); ?>">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                                </svg>
-                            </button>
-                            <input type="number"
-                                   id="num_travelers"
-                                   name="num_travelers"
-                                   class="yatra-quantity-input-simple"
-                                   value="1"
-                                   min="<?php echo esc_attr($trip->min_travelers ?: 1); ?>"
-                                   max="<?php echo esc_attr($trip->max_travelers ?: 20); ?>"
-                                   readonly
-                                   data-price="<?php echo esc_attr($base_price); ?>">
-                            <button type="button" class="yatra-quantity-btn yatra-quantity-plus" data-target="num_travelers" aria-label="<?php esc_attr_e('Increase travelers', 'yatra'); ?>">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                </svg>
-                            </button>
-                        </div>
-                        <span class="yatra-travelers-range"><?php echo esc_html(sprintf(__('Min: %d, Max: %d', 'yatra'), $trip->min_travelers ?: 1, $trip->max_travelers ?: 20)); ?></span>
-                    </div>
+                    <?php
+                    // Setup variables for traveler-input-simple.php
+                    $input_id = 'num_travelers';
+                    $input_name = 'num_travelers';
+                    $value = 1;
+                    $min = $trip->getMinTravelers() ?: 1;
+                    $max = $trip->getMaxTravelers() ?: 20;
+                    $data_price = $base_price;
+                    $range_text = sprintf(__('Min: %d, Max: %d', 'yatra'), $min, $max);
+                    
+                    include YATRA_PLUGIN_PATH . 'templates/partials/traveler-input-simple.php';
+                    ?>
                 </div>
             <?php endif; ?>
             <?php else: ?>
@@ -363,22 +254,22 @@ if (!defined('ABSPATH')) {
             <!-- REGULAR BOOKING (No Availability Setup) -->
             <!-- ========================================== -->
 
-            <?php if (!empty($trip->available_from) || !empty($trip->available_to)): ?>
+            <?php if (!empty($trip->getAvailableFrom()) || !empty($trip->getAvailableTo())): ?>
                 <div class="yatra-booking-availability-compact">
                     <span class="yatra-booking-availability-text">
                         <?php
-                        if (!empty($trip->available_from) && !empty($trip->available_to)) {
+                        if (!empty($trip->getAvailableFrom()) && !empty($trip->getAvailableTo())) {
                             echo esc_html(sprintf(__('Available: %s - %s', 'yatra'),
-                                date_i18n(get_option('date_format'), strtotime($trip->available_from)),
-                                date_i18n(get_option('date_format'), strtotime($trip->available_to))
+                                date_i18n(get_option('date_format'), strtotime($trip->getAvailableFrom())),
+                                date_i18n(get_option('date_format'), strtotime($trip->getAvailableTo()))
                             ));
-                        } elseif (!empty($trip->available_from)) {
+                        } elseif (!empty($trip->getAvailableFrom())) {
                             echo esc_html(sprintf(__('Available from: %s', 'yatra'),
-                                date_i18n(get_option('date_format'), strtotime($trip->available_from))
+                                date_i18n(get_option('date_format'), strtotime($trip->getAvailableFrom()))
                             ));
                         } else {
                             echo esc_html(sprintf(__('Available until: %s', 'yatra'),
-                                date_i18n(get_option('date_format'), strtotime($trip->available_to))
+                                date_i18n(get_option('date_format'), strtotime($trip->getAvailableTo()))
                             ));
                         }
                         ?>
@@ -397,8 +288,8 @@ if (!defined('ABSPATH')) {
                            name="travel_date"
                            class="yatra-booking-select yatra-datepicker"
                            placeholder="<?php esc_attr_e('Select date', 'yatra'); ?>"
-                           data-min-date="<?php echo esc_attr($trip->available_from ?: date('Y-m-d')); ?>"
-                           data-max-date="<?php echo esc_attr($trip->available_to ?: ''); ?>"
+                           data-min-date="<?php echo esc_attr($trip->getAvailableFrom() ?: date('Y-m-d')); ?>"
+                           data-max-date="<?php echo esc_attr($trip->getAvailableTo() ?: ''); ?>"
                            readonly
                            required>
                     <svg class="yatra-select-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -407,94 +298,12 @@ if (!defined('ABSPATH')) {
                 </div>
 
                 <!-- Travelers Selection -->
-                <?php if ($has_traveler_pricing): ?>
-                    <!-- Traveler-Based Pricing: Show dynamic categories with prices -->
-                    <?php
-                    $first_label = !empty($trip->price_types[0]->category_label)
-                        ? $trip->price_types[0]->category_label
-                        : __('Traveler', 'yatra');
-                    $traveler_display_text = $first_label . ' x 1';
-
-                    $traveler_rows = [];
-                    foreach ($trip->price_types as $index => $price_type) {
-                        $pricing_mode = $price_type->pricing_mode ?? 'per_person';
-                        $is_per_group = ($pricing_mode === 'per_group');
-                        $pricing_label = '';
-                        if ($is_per_group) {
-                            if (!empty($price_type->min_pax) && !empty($price_type->max_pax)) {
-                                $pricing_label = sprintf(__('per group (%d-%d pax)', 'yatra'), $price_type->min_pax, $price_type->max_pax);
-                            } elseif (!empty($price_type->max_pax)) {
-                                $pricing_label = sprintf(__('per group (up to %d pax)', 'yatra'), $price_type->max_pax);
-                            } elseif (!empty($price_type->min_pax)) {
-                                $pricing_label = sprintf(__('per group (%d+ pax)', 'yatra'), $price_type->min_pax);
-                            } else {
-                                $pricing_label = __('per group', 'yatra');
-                            }
-                        }
-
-                        $display_price_type = $price_type->effective_price;
-                        if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
-                            $display_price_type = apply_filters('yatra_trip_display_price', $display_price_type, $trip->id ?? 0, [
-                                'departure_date' => null,
-                                'spots_remaining' => null,
-                                'price_type_id' => $price_type->id ?? null,
-                            ]);
-                        }
-
-                        $age_info = '';
-                        if ($price_type->age_min !== null || $price_type->age_max !== null) {
-                            if ($price_type->age_min !== null && $price_type->age_max !== null) {
-                                $age_info = sprintf(__('(Age %d-%d)', 'yatra'), $price_type->age_min, $price_type->age_max);
-                            } elseif ($price_type->age_min !== null) {
-                                $age_info = sprintf(__('(Age %d+)', 'yatra'), $price_type->age_min);
-                            } else {
-                                $age_info = sprintf(__('(Up to age %d)', 'yatra'), $price_type->age_max);
-                            }
-                        }
-
-                        $price_html = '<div class="yatra-quantity-price-wrapper">';
-                        $price_html .= '<span class="yatra-quantity-price">' . yatra_format_price($display_price_type) . '</span>';
-                        if ($is_per_group) {
-                            $price_html .= '<span class="yatra-pricing-mode-label yatra-pricing-mode-group">' . esc_html($pricing_label) . '</span>';
-                        }
-                        $price_html .= '</div>';
-
-                        $input_id = 'traveler_' . $price_type->category_id;
-                        $pt_max_qty = (int) ($price_type->max_quantity ?: $trip->max_travelers);
-                        $pt_value = ($index === 0) ? 1 : 0;
-
-                        $traveler_rows[] = [
-                            'label' => $price_type->category_label ?: __('Traveler', 'yatra'),
-                            'subtitle' => $age_info,
-                            'price_html' => $price_html,
-                            'row_attrs' => [
-                                'data-category-id' => $price_type->category_id,
-                                'data-price' => $price_type->effective_price,
-                                'data-pricing-mode' => $pricing_mode,
-                            ],
-                            'minus_disabled' => ($index !== 0),
-                            'plus_disabled' => false,
-                            'minus_attrs' => [
-                                'data-target' => $input_id,
-                                'aria-label' => sprintf(__('Decrease %s', 'yatra'), $price_type->category_label),
-                            ],
-                            'plus_attrs' => [
-                                'data-target' => $input_id,
-                                'aria-label' => sprintf(__('Increase %s', 'yatra'), $price_type->category_label),
-                            ],
-                            'input_attrs' => [
-                                'id' => $input_id,
-                                'name' => 'travelers[' . $price_type->category_id . ']',
-                                'value' => $pt_value,
-                                'min' => 0,
-                                'max' => $pt_max_qty,
-                                'data-category-label' => $price_type->category_label,
-                                'data-price' => $price_type->effective_price,
-                                'data-pricing-mode' => $pricing_mode,
-                            ],
-                        ];
-                    }
-
+                <?php
+                // Use helper function to prepare traveler data
+                $traveler_data = \Yatra\Controllers\SingleTripController::prepareTravelerSelectorData($trip, 'sidebar');
+                
+                if ($traveler_data['has_traveler_pricing']):
+                    // Setup variables for traveler-selector.php
                     $root_id = '';
                     $root_class = 'yatra-booking-field-select yatra-participants-select';
                     $container_attrs = [];
@@ -507,43 +316,28 @@ if (!defined('ABSPATH')) {
                     $dropdown_class = 'yatra-booking-quantity-selector';
                     $dropdown_attrs = [];
 
-                    $display_text = $traveler_display_text;
+                    $display_text = $traveler_data['traveler_display_text'];
                     $icon_html = yatra_svg_icon('users', 'yatra-icon-sm');
-                    $rows = $traveler_rows;
+                    $rows = $traveler_data['traveler_rows'];
 
                     include YATRA_PLUGIN_PATH . 'templates/partials/traveler-selector.php';
+                else:
+                    // Regular Pricing: Simple number of travelers input
                     ?>
-                <?php else: ?>
-                    <!-- Regular Pricing: Simple number of travelers input -->
                     <div class="yatra-booking-field-group">
                         <label for="num_travelers" class="yatra-booking-field-label"><?php echo esc_html__('Number of Travelers', 'yatra'); ?></label>
-                        <div class="yatra-booking-travelers-simple">
-                            <div class="yatra-booking-field-icon">
-                                <?php echo yatra_svg_icon('users', 'yatra-icon-sm'); ?>
-                            </div>
-                            <div class="yatra-quantity-controls-inline">
-                                <button type="button" class="yatra-quantity-btn yatra-quantity-minus" data-target="num_travelers" aria-label="<?php esc_attr_e('Decrease travelers', 'yatra'); ?>">
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                                    </svg>
-                                </button>
-                                <input type="number"
-                                       id="num_travelers"
-                                       name="num_travelers"
-                                       class="yatra-quantity-input-simple"
-                                       value="1"
-                                       min="<?php echo esc_attr($trip->min_travelers ?: 1); ?>"
-                                       max="<?php echo esc_attr($trip->max_travelers ?: 20); ?>"
-                                       readonly
-                                       data-price="<?php echo esc_attr($base_price); ?>">
-                                <button type="button" class="yatra-quantity-btn yatra-quantity-plus" data-target="num_travelers" aria-label="<?php esc_attr_e('Increase travelers', 'yatra'); ?>">
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                    </svg>
-                                </button>
-                            </div>
-                            <span class="yatra-travelers-range"><?php echo esc_html(sprintf(__('Min: %d, Max: %d', 'yatra'), $trip->min_travelers ?: 1, $trip->max_travelers ?: 20)); ?></span>
-                        </div>
+                        <?php
+                        // Setup variables for traveler-input-simple.php
+                        $input_id = 'num_travelers';
+                        $input_name = 'num_travelers';
+                        $value = 1;
+                        $min = $trip->getMinTravelers() ?: 1;
+                        $max = $trip->getMaxTravelers() ?: 20;
+                        $data_price = $base_price;
+                        $range_text = sprintf(__('Min: %d, Max: %d', 'yatra'), $min, $max);
+                        
+                        include YATRA_PLUGIN_PATH . 'templates/partials/traveler-input-simple.php';
+                        ?>
                     </div>
                 <?php endif; ?>
                 <?php endif; ?>
@@ -555,7 +349,7 @@ if (!defined('ABSPATH')) {
                 </div>
 
                 <!-- Action Buttons -->
-                <button type="button" class="yatra-booking-button" id="check-availability-btn" data-trip-id="<?php echo esc_attr($trip->id); ?>">
+                <button type="button" class="yatra-booking-button" id="check-availability-btn" data-trip-id="<?php echo esc_attr($trip->getId()); ?>">
                     <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>

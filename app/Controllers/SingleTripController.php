@@ -141,7 +141,7 @@ class SingleTripController
      * Prepare trip data with all relationships and transformations
      *
      * @param object $trip Raw trip data from database
-     * @return object Prepared trip data
+     * @return \Yatra\Models\Trip Prepared trip data as Trip model
      */
     private function prepareTrip(object $trip): object
     {
@@ -345,8 +345,8 @@ class SingleTripController
         // Format featured image
         $trip->featured_image_url = $this->getFeaturedImageUrl($trip->featured_image ?? '');
 
-       
-        return $trip;
+        // Convert stdClass to Trip model instance
+        return \Yatra\Models\Trip::fromStdClass($trip);
     }
 
     /**
@@ -1875,6 +1875,319 @@ class SingleTripController
         }
 
         return $navigation_items;
+    }
+
+    /**
+     * Prepare traveler selector data for common component
+     *
+     * @param object $trip Trip object
+     * @param string $context Context for IDs (sidebar, availability, enquiry)
+     * @return array Traveler selector data
+     */
+    public static function prepareTravelerSelectorData($trip, string $context = 'sidebar'): array
+    {
+        $has_traveler_pricing = !empty($trip->price_types);
+        $traveler_rows = [];
+        
+        if ($has_traveler_pricing) {
+            // Traveler-Based Pricing: Show dynamic categories
+            foreach ($trip->price_types as $index => $price_type) {
+                $pricing_mode = $price_type->pricing_mode ?? 'per_person';
+                $is_per_group = ($pricing_mode === 'per_group');
+                $pricing_label = '';
+                if ($is_per_group) {
+                    if (!empty($price_type->min_pax) && !empty($price_type->max_pax)) {
+                        $pricing_label = sprintf(__('per group (%d-%d pax)', 'yatra'), $price_type->min_pax, $price_type->max_pax);
+                    } elseif (!empty($price_type->max_pax)) {
+                        $pricing_label = sprintf(__('per group (up to %d pax)', 'yatra'), $price_type->max_pax);
+                    } elseif (!empty($price_type->min_pax)) {
+                        $pricing_label = sprintf(__('per group (%d+ pax)', 'yatra'), $price_type->min_pax);
+                    } else {
+                        $pricing_label = __('per group', 'yatra');
+                    }
+                }
+
+                $display_price_type = $price_type->effective_price;
+                if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
+                    $display_price_type = apply_filters('yatra_trip_display_price', $display_price_type, $trip->getId() ?? 0, [
+                        'departure_date' => null,
+                        'spots_remaining' => null,
+                        'price_type_id' => $price_type->id ?? null,
+                    ]);
+                }
+
+                $age_info = '';
+                if ($price_type->age_min !== null || $price_type->age_max !== null) {
+                    if ($price_type->age_min !== null && $price_type->age_max !== null) {
+                        $age_info = sprintf(__('(Age %d-%d)', 'yatra'), $price_type->age_min, $price_type->age_max);
+                    } elseif ($price_type->age_min !== null) {
+                        $age_info = sprintf(__('(Age %d+)', 'yatra'), $price_type->age_min);
+                    } else {
+                        $age_info = sprintf(__('(Up to age %d)', 'yatra'), $price_type->age_max);
+                    }
+                }
+
+                $price_html = '<div class="yatra-quantity-price-wrapper">';
+                $price_html .= '<span class="yatra-quantity-price">' . yatra_format_price($display_price_type) . '</span>';
+                if ($is_per_group) {
+                    $price_html .= '<span class="yatra-pricing-mode-label yatra-pricing-mode-group">' . esc_html($pricing_label) . '</span>';
+                }
+                $price_html .= '</div>';
+
+                $input_id = 'traveler_' . $price_type->category_id;
+                $pt_max_qty = (int) ($price_type->max_quantity ?: $trip->getMaxTravelers());
+                $pt_value = ($index === 0) ? 1 : 0;
+
+                $traveler_rows[] = [
+                    'label' => $price_type->category_label ?: __('Traveler', 'yatra'),
+                    'subtitle' => $age_info,
+                    'price_html' => $price_html,
+                    'row_attrs' => [
+                        'data-category-id' => $price_type->category_id,
+                        'data-price' => $price_type->effective_price,
+                        'data-pricing-mode' => $pricing_mode,
+                    ],
+                    'minus_disabled' => ($index !== 0),
+                    'plus_disabled' => false,
+                    'minus_attrs' => [
+                        'data-target' => $input_id,
+                        'aria-label' => sprintf(__('Decrease %s', 'yatra'), $price_type->category_label),
+                    ],
+                    'plus_attrs' => [
+                        'data-target' => $input_id,
+                        'aria-label' => sprintf(__('Increase %s', 'yatra'), $price_type->category_label),
+                    ],
+                    'input_attrs' => [
+                        'id' => $input_id,
+                        'name' => 'travelers[' . $price_type->category_id . ']',
+                        'value' => $pt_value,
+                        'min' => 0,
+                        'max' => $pt_max_qty,
+                        'data-category-label' => $price_type->category_label,
+                        'data-price' => $price_type->effective_price,
+                        'data-pricing-mode' => $pricing_mode,
+                    ],
+                ];
+            }
+
+            // Generate display text with all categories and their default values
+            $display_parts = [];
+            foreach ($trip->price_types as $index => $price_type) {
+                $category_label = $price_type->category_label ?? __('Traveler', 'yatra');
+                $default_value = ($index === 0) ? 1 : 0;
+                
+                if ($default_value > 0) {
+                    $display_parts[] = $category_label . ' x ' . $default_value;
+                }
+            }
+            
+            $traveler_display_text = !empty($display_parts) ? implode(', ', $display_parts) : __('Select travelers', 'yatra');
+        } else {
+            // Regular Pricing: Simple adult/children setup
+            $traveler_rows = [
+                [
+                    'label' => __('Adult', 'yatra'),
+                    'subtitle' => __('(Age 13-99)', 'yatra'),
+                    'price_html' => '',
+                    'row_attrs' => [],
+                    'minus_disabled' => false,
+                    'plus_disabled' => false,
+                    'minus_attrs' => [
+                        'data-target' => $context . '_adults',
+                        'aria-label' => __('Decrease adults', 'yatra'),
+                    ],
+                    'plus_attrs' => [
+                        'data-target' => $context . '_adults',
+                        'aria-label' => __('Increase adults', 'yatra'),
+                    ],
+                    'input_attrs' => [
+                        'id' => $context . '_adults',
+                        'name' => $context . '_adults',
+                        'value' => 1,
+                        'min' => 1,
+                        'max' => 20,
+                    ],
+                ],
+                [
+                    'label' => __('Child', 'yatra'),
+                    'subtitle' => __('(Age 4-12)', 'yatra'),
+                    'price_html' => '',
+                    'row_attrs' => [],
+                    'minus_disabled' => true,
+                    'plus_disabled' => false,
+                    'minus_attrs' => [
+                        'data-target' => $context . '_children',
+                        'aria-label' => __('Decrease children', 'yatra'),
+                    ],
+                    'plus_attrs' => [
+                        'data-target' => $context . '_children',
+                        'aria-label' => __('Increase children', 'yatra'),
+                    ],
+                    'input_attrs' => [
+                        'id' => $context . '_children',
+                        'name' => $context . '_children',
+                        'value' => 0,
+                        'min' => 0,
+                        'max' => 10,
+                    ],
+                ],
+            ];
+
+            $traveler_display_text = __('Adult x 1', 'yatra');
+        }
+
+        return [
+            'has_traveler_pricing' => $has_traveler_pricing,
+            'traveler_rows' => $traveler_rows,
+            'traveler_display_text' => $traveler_display_text,
+            'context' => $context,
+        ];
+    }
+
+    /**
+     * Prepare traveler selector data for availability section
+     * 
+     * @param object $trip Trip data
+     * @param array $card Availability card data
+     * @param string $item_id Item ID
+     * @param int $trip_id Trip ID
+     * @param int $seats_available Seats available
+     * @param int $max_travelers Max travelers
+     * @param bool $dp_enabled Dynamic pricing enabled
+     * @param array $initial_travelers Initial traveler counts from request (category_id => count)
+     * @return array Traveler selector data
+     */
+    public static function prepareAvailabilityTravelerSelectorData($trip, array $card, string $item_id, int $trip_id, int $seats_available, int $max_travelers, bool $dp_enabled, array $initial_travelers = []): array
+    {
+        $card_pricing_type = $card['pricing_type'] ?? 'regular';
+        $card_price_types = [];
+        
+        // Always use enriched trip-level price_types for traveler-based pricing
+        if ($card_pricing_type === 'traveler_based' && !empty($trip->price_types)) {
+            $card_price_types = $trip->price_types;
+        }
+        
+        $has_traveler_pricing = ($card_pricing_type === 'traveler_based' && !empty($card_price_types));
+        $traveler_rows = [];
+        
+        if ($has_traveler_pricing) {
+            // Normalize price_types
+            $normalized_price_types = [];
+            foreach ($card_price_types as $pt) {
+                if (is_array($pt)) {
+                    $normalized_price_types[] = (object) $pt;
+                } else {
+                    $normalized_price_types[] = $pt;
+                }
+            }
+            
+            // Build display text from initial travelers if provided
+            $display_parts = [];
+            
+            foreach ($normalized_price_types as $pt_index => $pt) {
+                $pt_min = isset($pt->age_min) ? (int) $pt->age_min : 0;
+                $pt_max = isset($pt->age_max) ? (int) $pt->age_max : 99;
+                $pt_label = $pt->category_label ?? $pt->label ?? __('Traveler', 'yatra');
+                $pt_age_text = ($pt_min > 0 || $pt_max < 99) ? sprintf(__('(Age %d-%d)', 'yatra'), $pt_min, $pt_max) : '';
+                
+                // Use initial traveler count if provided, otherwise use default
+                $pt_category_id = $pt->category_id ?? $pt_index;
+                $pt_default = isset($initial_travelers[$pt_category_id]) ? (int) $initial_travelers[$pt_category_id] : ($pt_index === 0 ? 1 : 0);
+                
+                $pt_price = 0;
+                if (isset($pt->effective_price) && $pt->effective_price > 0) {
+                    $pt_price = (float) $pt->effective_price;
+                } elseif (isset($pt->sale_price) && $pt->sale_price > 0) {
+                    $pt_price = (float) $pt->sale_price;
+                } elseif (isset($pt->discounted_price) && $pt->discounted_price > 0) {
+                    $pt_price = (float) $pt->discounted_price;
+                } elseif (isset($pt->original_price) && $pt->original_price > 0) {
+                    $pt_price = (float) $pt->original_price;
+                }
+                    
+                // Apply dynamic pricing to traveler category prices
+                if ($dp_enabled && $pt_price > 0) {
+                    $pt_price = apply_filters('yatra_availability_price', $pt_price, $trip_id, [
+                        'departure_date' => $card['date'] ?? null,
+                        'spots_remaining' => $card['spots_remaining'] ?? null,
+                        'availability_id' => $item_id,
+                        'price_type_id' => $pt->id ?? ($pt->price_type_id ?? null),
+                    ]);
+                }
+
+                $pt_category_id = $pt->category_id ?? $pt_index;
+                $pt_min_qty = 0;
+                $pt_max_qty = (int) min($seats_available, $max_travelers);
+                $pt_pricing_mode = $pt->pricing_mode ?? 'per_person';
+                $pt_is_per_group = ($pt_pricing_mode === 'per_group');
+                
+                // Build pricing label
+                $pricing_label = '';
+                if ($pt_is_per_group) {
+                    if (!empty($pt->min_pax) && !empty($pt->max_pax)) {
+                        $pricing_label = sprintf(__('per group (%d-%d pax)', 'yatra'), $pt->min_pax, $pt->max_pax);
+                    } elseif (!empty($pt->max_pax)) {
+                        $pricing_label = sprintf(__('per group (up to %d pax)', 'yatra'), $pt->max_pax);
+                    } elseif (!empty($pt->min_pax)) {
+                        $pricing_label = sprintf(__('per group (%d+ pax)', 'yatra'), $pt->min_pax);
+                    } else {
+                        $pricing_label = __('per group', 'yatra');
+                    }
+                }
+
+                $price_html = '<div class="yatra-quantity-price-wrapper">';
+                $price_html .= '<span class="yatra-quantity-price">' . yatra_format_price($pt_price) . '</span>';
+                if ($pt_is_per_group) {
+                    $price_html .= '<span class="yatra-pricing-mode-label yatra-pricing-mode-group">' . esc_html($pricing_label) . '</span>';
+                }
+                $price_html .= '</div>';
+
+                $traveler_rows[] = [
+                    'label' => $pt_label,
+                    'subtitle' => $pt_age_text,
+                    'price_html' => $price_html,
+                    'row_attrs' => [
+                        'data-category-id' => $pt_category_id,
+                        'data-price' => $pt_price,
+                        'data-pricing-mode' => $pt_pricing_mode,
+                    ],
+                    'minus_disabled' => ($pt_index !== 0),
+                    'plus_disabled' => false,
+                    'minus_attrs' => [
+                        'data-target' => 'traveler_' . $pt_category_id . '_' . $item_id,
+                        'aria-label' => sprintf(__('Decrease %s', 'yatra'), $pt_label),
+                    ],
+                    'plus_attrs' => [
+                        'data-target' => 'traveler_' . $pt_category_id . '_' . $item_id,
+                        'aria-label' => sprintf(__('Increase %s', 'yatra'), $pt_label),
+                    ],
+                    'input_attrs' => [
+                        'data-item' => $item_id,
+                        'data-category' => $pt_category_id,
+                        'data-price' => $pt_price,
+                        'data-pricing-mode' => $pt_pricing_mode,
+                        'value' => $pt_default,
+                        'min' => $pt_min_qty,
+                        'max' => $pt_max_qty,
+                    ],
+                ];
+                
+                // Build display text parts
+                if ($pt_default > 0) {
+                    $display_parts[] = $pt_label . ' x ' . $pt_default;
+                }
+            }
+            
+            // Generate display text from parts
+            $traveler_display_text = !empty($display_parts) ? implode(', ', $display_parts) : __('Select travelers', 'yatra');
+        }
+
+        return [
+            'has_traveler_pricing' => $has_traveler_pricing,
+            'traveler_rows' => $traveler_rows,
+            'traveler_display_text' => $traveler_display_text ?? __('Adult x 1', 'yatra'),
+            'item_id' => $item_id,
+        ];
     }
 
     /**

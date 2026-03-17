@@ -24,7 +24,7 @@ if (!defined('ABSPATH')) {
 
     <?php
     // Use dynamic itinerary data from trip only
-    $itinerary_days = !empty($trip->itinerary_days) ? $trip->itinerary_days : [];
+    $itinerary_days = $trip->getItineraryDays();
 
     // Icon mapping function
     $get_icon = function($icon_name) {

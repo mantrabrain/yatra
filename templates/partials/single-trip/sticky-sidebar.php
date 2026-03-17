@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 // Expected variables: $trip, $has_availability, $has_traveler_pricing, $base_price, $pricing_type
 
 // Determine if this is a multi-day trip
-$is_multi_day = ($trip->duration_days ?? 1) > 1;
+$is_multi_day = ($trip->getDurationDays() ?? 1) > 1;
 
 // Check for group discounts availability (premium feature)
 $sidebar_has_group_discounts = false;
@@ -24,7 +24,7 @@ try {
     if (class_exists('\Yatra\Services\DiscountService') &&
         method_exists('\Yatra\Services\DiscountService', 'getGroupDiscountsForTrip')) {
         $discountService = new \Yatra\Services\DiscountService();
-        $groupDiscountsResult = $discountService->getGroupDiscountsForTrip((int) $trip->id);
+        $groupDiscountsResult = $discountService->getGroupDiscountsForTrip((int) $trip->getId());
         if (!empty($groupDiscountsResult)) {
             $sidebar_has_group_discounts = true;
             $sidebar_group_discounts_data = $groupDiscountsResult;
@@ -37,7 +37,7 @@ try {
 // Prepare availability data for JavaScript
 $availability_json = [];
 if ($has_availability) {
-    foreach ($trip->availability_dates as $avail) {
+    foreach ($trip->getAvailabilityDates() as $avail) {
         $availability_json[] = [
             'id' => (int) $avail->id,
             'date' => $avail->departure_date,
@@ -97,15 +97,15 @@ if ($effective_min > 0) {
         $discount['discount_text'] = sprintf(__('Up to %d%%', 'yatra'), $max_discount_pct);
     }
 } else {
-    $original = (float) ($trip->original_price ?? 0);
+    $original = (float) ($trip->getOriginalPrice() ?? 0);
     $discounted = (float) ($trip->discounted_price ?? 0);
 
     if ($discounted > 0) {
         $current = $discounted;
     } elseif ($original > 0) {
         $current = $original;
-    } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
-        $current = (float) $trip->sale_price;
+    } elseif (!empty($trip->getSalePrice()) && (float)$trip->getSalePrice() > 0) {
+        $current = (float) $trip->getSalePrice();
     } else {
         $current = 0;
     }
@@ -162,8 +162,8 @@ if ($effective_min > 0) {
                            name="travel_date"
                            class="yatra-mobile-datepicker-input"
                            placeholder="<?php esc_attr_e('Date', 'yatra'); ?>"
-                           data-min-date="<?php echo esc_attr($trip->available_from ?: date('Y-m-d')); ?>"
-                           data-max-date="<?php echo esc_attr($trip->available_to ?: ''); ?>"
+                           data-min-date="<?php echo esc_attr($trip->getAvailableFrom() ?: date('Y-m-d')); ?>"
+                           data-max-date="<?php echo esc_attr($trip->getAvailableTo() ?: ''); ?>"
                            readonly
                            required>
                     <svg class="yatra-mobile-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,8 +206,8 @@ if ($effective_min > 0) {
                                    name="num_travelers"
                                    class="yatra-mobile-quantity-input"
                                    value="1"
-                                   min="<?php echo esc_attr($trip->min_travelers ?: 1); ?>"
-                                   max="<?php echo esc_attr($trip->max_travelers ?: 20); ?>"
+                                   min="<?php echo esc_attr($trip->getMinTravelers() ?: 1); ?>"
+                                   max="<?php echo esc_attr($trip->getMaxTravelers() ?: 20); ?>"
                                    readonly
                                    data-price="<?php echo esc_attr($base_price); ?>">
                             <button type="button" class="yatra-mobile-quantity-btn yatra-mobile-quantity-plus" data-target="mobile_num_travelers">
@@ -222,7 +222,7 @@ if ($effective_min > 0) {
             
             <!-- Action Buttons -->
             <div class="yatra-mobile-action-section">
-                <button type="button" class="yatra-mobile-check-btn" id="mobile-check-availability-btn" data-trip-id="<?php echo esc_attr($trip->id); ?>">
+                <button type="button" class="yatra-mobile-check-btn" id="mobile-check-availability-btn" data-trip-id="<?php echo esc_attr($trip->getId()); ?>">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>

@@ -30,51 +30,77 @@ if (!defined('ABSPATH')) {
             <div class="yatra-carousel-track" id="similar-carousel">
                 <?php
                 // Use dynamic similar trips from controller, with fallback to sample data
-                $similar_trips_data = !empty($trip->similar_trips) ? $trip->similar_trips : [];
+                $similar_trips_data = $trip->getSimilarTrips();
                 
                 // Only show real trips from database - no dummy data
 
                 foreach ($similar_trips_data as $similar_trip) {
-                    // Convert to Trip model if needed
-                    if (!($similar_trip instanceof \Yatra\Models\Trip)) {
-                        $similar_trip = \Yatra\Models\Trip::fromStdClass((object) $similar_trip);
-                    }
+                    // Prepare trip data directly from object properties
+                    $title = $similar_trip->title ?? '';
+                    $slug = $similar_trip->slug ?? '';
                     
-                    // Set required properties for the template
-                    if (!isset($similar_trip->featured_image_url)) {
-                        $similar_trip->featured_image_url = $similar_trip->featured_image ?? '';
-                    }
+                    // Duration
+                    $duration_days = (int) ($similar_trip->duration_days ?? 0);
+                    $duration_nights = (int) ($similar_trip->duration_nights ?? 0);
+                    $duration = [
+                        'has_duration' => $duration_days > 0,
+                        'formatted' => $duration_nights > 0 
+                            ? sprintf(_n('%d day %d night', '%d days %d nights', $duration_days, 'yatra'), $duration_days, $duration_nights)
+                            : sprintf(_n('%d day', '%d days', $duration_days, 'yatra'), $duration_days)
+                    ];
                     
-                    // Get trip data using Trip model methods
-                    $title = $similar_trip->getTitle();
-                    $duration = $similar_trip->getDuration();
-                    $difficulty = $similar_trip->getDifficulty();
-                    $pricing = $similar_trip->getPricing();
-                    $discount = $similar_trip->getDiscount();
-                    $image = $similar_trip->getImage();
-                    $permalink = $similar_trip->getPermalink();
-                    $destinations = $similar_trip->getDestinations();
-                    $categories = $similar_trip->getCategories();
-                    $activities = $similar_trip->getActivities();
+                    // Difficulty
+                    $difficulty = [
+                        'has_difficulty' => !empty($similar_trip->difficulty_level),
+                        'level' => $similar_trip->difficulty_level ?? '',
+                        'icon' => 'activity'
+                    ];
                     
-                    // Calculate rating directly from reviews array
-                    $reviews = $similar_trip->reviews ?? [];
-                    $review_count = count($reviews);
-                    $average_rating = 0;
-
-                    if ($review_count > 0) {
-                        $total_rating = 0;
-                        foreach ($reviews as $review) {
-                            $total_rating += (float) ($review->rating ?? 0);
-                        }
-                        $average_rating = round($total_rating / $review_count, 1);
+                    // Pricing
+                    $original_price = (float) ($similar_trip->original_price ?? 0);
+                    $sale_price = (float) ($similar_trip->sale_price ?? $original_price);
+                    $current_price = $sale_price > 0 ? $sale_price : $original_price;
+                    $has_discount = $original_price > 0 && $sale_price < $original_price;
+                    $discount_pct = $has_discount ? round((($original_price - $sale_price) / $original_price) * 100) : 0;
+                    
+                    $pricing = [
+                        'has_price' => $current_price > 0,
+                        'current_price' => yatra_format_price($current_price),
+                        'original_price' => $has_discount ? yatra_format_price($original_price) : '',
+                        'has_discount' => $has_discount,
+                        'price_prefix' => __('From ', 'yatra')
+                    ];
+                    
+                    $discount = [
+                        'has_discount' => $has_discount,
+                        'discount_text' => $discount_pct > 0 ? $discount_pct . '%' : ''
+                    ];
+                    
+                    // Image
+                    $image_url = $similar_trip->featured_image_url ?? '';
+                    if (empty($image_url)) {
+                        $image_url = plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE);
                     }
-
+                    $image = [
+                        'url' => $image_url,
+                        'alt' => $title
+                    ];
+                    
+                    // Permalink
+                    $trip_base = \Yatra\Services\SettingsService::getTripBase();
+                    $permalink = home_url('/' . $trip_base . '/' . $slug . '/');
+                    
+                    // Empty arrays for now (can be populated later if needed)
+                    $destinations = [];
+                    $categories = [];
+                    $activities = [];
+                    
+                    // Rating
                     $rating = [
-                        'average_rating' => $average_rating,
-                        'review_count' => $review_count,
-                        'formatted_rating' => number_format($average_rating, 1),
-                        'has_rating' => $average_rating > 0 && $review_count > 0
+                        'average_rating' => 0,
+                        'review_count' => 0,
+                        'formatted_rating' => '0.0',
+                        'has_rating' => false
                     ];
                     ?>
                     <div class="yatra-carousel-item">

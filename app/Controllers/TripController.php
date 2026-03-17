@@ -1363,6 +1363,21 @@ class TripController extends BaseController
             if (!$trip) {
                 return $this->error_response('Trip not found', 404);
             }
+            
+            // Get traveler data from request
+            $num_travelers = (int) ($request->get_param('num_travelers') ?? 1);
+            $travelers_json = $request->get_param('travelers');
+            $travelers = [];
+            
+            if ($travelers_json) {
+                $decoded = json_decode($travelers_json, true);
+                if (is_array($decoded)) {
+                    $travelers = $decoded;
+                }
+            }
+            
+            // Get selected date if provided
+            $selected_date = sanitize_text_field((string) ($request->get_param('date') ?? ''));
 
             // Fetch availability dates from database (specific dates)
             // Use TripService to get availability dates
@@ -1382,8 +1397,8 @@ class TripController extends BaseController
                     $recurring_dates[] = (object) array_merge($date, ['is_recurring' => 1]);
                 }
             } catch (\Exception $e) {
-                // Log error but continue with specific dates only
-                }
+                error_log('Error generating recurring dates: ' . $e->getMessage());
+            }
             
             // Merge and deduplicate (specific dates take priority)
             $availability_dates = array_merge($specific_dates, $recurring_dates);
@@ -1410,7 +1425,7 @@ class TripController extends BaseController
             ob_start();
             
             // Generate availability HTML
-            $this->render_availability_template($trip_data, $sort_key);
+            $this->render_availability_template($trip_data, $sort_key, $travelers, $num_travelers, $selected_date);
             
             $html = ob_get_clean();
 
@@ -1425,7 +1440,7 @@ class TripController extends BaseController
     /**
      * Render availability template
      */
-    private function render_availability_template($trip_data, string $sort_key = 'date-asc'): void
+    private function render_availability_template($trip_data, string $sort_key = 'date-asc', array $travelers = [], int $num_travelers = 1, string $selected_date = ''): void
     {
         // Check if we have real availability data
         $has_availability = !empty($trip_data->availability_dates) && is_array($trip_data->availability_dates);
@@ -1826,21 +1841,16 @@ class TripController extends BaseController
         }
 
         $availability_cards = $this->sortAvailabilityCards($availability_cards, $sort_key);
-
-        // DEBUG: Output all trip data
-        echo '<!-- TRIP DATA DEBUG -->';
-        echo '<!-- Trip ID: ' . ($trip_data->id ?? 'NO ID') . ' -->';
-        echo '<!-- Trip original_price: ' . var_export($trip_data->original_price ?? null, true) . ' -->';
-        echo '<!-- Trip sale_price: ' . var_export($trip_data->sale_price ?? null, true) . ' -->';
-        echo '<!-- Trip discounted_price: ' . var_export($trip_data->discounted_price ?? null, true) . ' -->';
-        echo '<!-- Trip price: ' . var_export($trip_data->price ?? null, true) . ' -->';
-        echo '<!-- Trip pricing_type: ' . ($trip_data->pricing_type ?? 'regular') . ' -->';
-        echo '<!-- All Trip Data: ' . var_export($trip_data, true) . ' -->';
         
         // Prepare additional data for the template
         $pricing_type = $trip_data->pricing_type ?? 'regular';
         $price_types = $trip_data->price_types ?? [];
         $is_day_trip = ($trip_data->duration_days ?? 1) <= 1;
+        
+        // Pass traveler data to template for pre-filling
+        $initial_travelers = $travelers;
+        $initial_num_travelers = $num_travelers;
+        $initial_selected_date = $selected_date;
         
         // Include the template file
         $template_path = YATRA_PLUGIN_PATH . 'templates/partials/availability-section.php';

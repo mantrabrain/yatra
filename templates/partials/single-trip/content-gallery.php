@@ -16,12 +16,12 @@ if (!defined('ABSPATH')) {
             <?php if ($image): ?>
                 <div class="yatra-gallery-item" data-image-index="<?php echo esc_attr($index); ?>" itemscope itemtype="https://schema.org/ImageObject">
                     <img src="<?php echo esc_url($image); ?>" 
-                         alt="<?php echo esc_attr(sprintf(__('Photo %d of %s trip gallery', 'yatra'), $index + 1, $trip->title)); ?>"
-                         title="<?php echo esc_attr(sprintf(__('Photo %d - %s', 'yatra'), $index + 1, $trip->title)); ?>"
+                         alt="<?php echo esc_attr(sprintf(__('Photo %d of %s trip gallery', 'yatra'), $index + 1, $trip->getTitle())); ?>"
+                         title="<?php echo esc_attr(sprintf(__('Photo %d - %s', 'yatra'), $index + 1, $trip->getTitle())); ?>"
                          itemprop="url" content="<?php echo esc_url($image); ?>">
                     <meta itemprop="contentUrl" content="<?php echo esc_url($image); ?>">
-                    <meta itemprop="name" content="<?php echo esc_attr(sprintf(__('Photo %d - %s', 'yatra'), $index + 1, $trip->title)); ?>">
-                    <meta itemprop="description" content="<?php echo esc_attr(sprintf(__('Photo %d from the %s trip gallery', 'yatra'), $index + 1, $trip->title)); ?>">
+                    <meta itemprop="name" content="<?php echo esc_attr(sprintf(__('Photo %d - %s', 'yatra'), $index + 1, $trip->getTitle())); ?>">
+                    <meta itemprop="description" content="<?php echo esc_attr(sprintf(__('Photo %d from the %s trip gallery', 'yatra'), $index + 1, $trip->getTitle())); ?>">
                     <meta itemprop="position" content="<?php echo $index + 1; ?>">
                     <meta itemprop="encodingFormat" content="image/jpeg">
                 </div>

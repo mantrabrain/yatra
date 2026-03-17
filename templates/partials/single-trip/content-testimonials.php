@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
     <div class="yatra-testimonials-content">
         <?php
         // Get testimonials from trip data (loaded via SingleTripController)
-        $display_testimonials = !empty($trip->testimonials) && is_array($trip->testimonials) ? $trip->testimonials : [];
+        $display_testimonials = $trip->getTestimonials();
         ?>
 
         <?php if (!empty($display_testimonials)): ?>

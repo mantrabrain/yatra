@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
         <div class="yatra-trip-story-content">
             <div class="yatra-trip-story-text">
                 <?php 
-                $story_content = $trip->trip_story ?? '';
+                $story_content = $trip->getTripStory() ?? '';
                 if (!empty($story_content)) {
                     // Use wp_kses_post to allow basic HTML formatting but strip dangerous content
                     echo wp_kses_post($story_content);

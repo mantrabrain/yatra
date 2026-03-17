@@ -36,6 +36,10 @@ class Trip
     public ?string $ending_location = null;
     public ?string $latitude = null;
     public ?string $longitude = null;
+    public ?string $starting_latitude = null;
+    public ?string $starting_longitude = null;
+    public ?string $ending_latitude = null;
+    public ?string $ending_longitude = null;
     public int $map_zoom_level = 10;
     public ?string $timezone = null;
     public ?string $country_code = null;
@@ -236,6 +240,7 @@ class Trip
     public array $departures = [];
     public array $bookings = [];
     public array $downloadable_items = [];
+    public array $similar_trips = [];
 
 
     // Timestamps
@@ -1359,6 +1364,310 @@ class Trip
             'is_published' => $this->status === 'publish',
             'is_draft' => $this->status === 'draft'
         ];
+    }
+
+    /**
+     * Get description
+     */
+    public function getDescription(): string
+    {
+        return $this->description ?? '';
+    }
+
+    /**
+     * Get highlights
+     */
+    public function getHighlights(): array
+    {
+        return is_array($this->highlights) ? $this->highlights : [];
+    }
+
+    /**
+     * Get FAQs
+     */
+    public function getFaqs(): array
+    {
+        return is_array($this->faqs) ? $this->faqs : [];
+    }
+
+    /**
+     * Get included items
+     */
+    public function getIncludedItems(): array
+    {
+        return is_array($this->included_items) ? $this->included_items : [];
+    }
+
+    /**
+     * Get excluded items
+     */
+    public function getExcludedItems(): array
+    {
+        return is_array($this->excluded_items) ? $this->excluded_items : [];
+    }
+
+    /**
+     * Get downloadable items
+     */
+    public function getDownloadableItems(): array
+    {
+        return is_array($this->downloadable_items) ? $this->downloadable_items : [];
+    }
+
+    /**
+     * Get landmarks
+     */
+    public function getLandmarks(): array
+    {
+        return is_array($this->landmarks) ? $this->landmarks : [];
+    }
+
+    /**
+     * Get attributes
+     */
+    public function getAttributes(): array
+    {
+        return is_array($this->attributes) ? $this->attributes : [];
+    }
+
+    /**
+     * Get trip type
+     */
+    public function getTripType(): string
+    {
+        return $this->trip_type ?? 'multiple_days';
+    }
+
+    /**
+     * Get duration days
+     */
+    public function getDurationDays(): int
+    {
+        return $this->duration_days ?? 0;
+    }
+
+    /**
+     * Get duration nights
+     */
+    public function getDurationNights(): int
+    {
+        return $this->duration_nights ?? 0;
+    }
+
+    /**
+     * Get difficulty level
+     */
+    public function getDifficultyLevel(): string
+    {
+        return $this->difficulty_level ?? '';
+    }
+
+    /**
+     * Get min travelers
+     */
+    public function getMinTravelers(): int
+    {
+        return $this->min_travelers ?? 1;
+    }
+
+    /**
+     * Get max travelers
+     */
+    public function getMaxTravelers(): int
+    {
+        return $this->max_travelers ?? 20;
+    }
+
+    /**
+     * Get original price
+     */
+    public function getOriginalPrice(): float
+    {
+        return (float) ($this->original_price ?? 0);
+    }
+
+    /**
+     * Get sale price
+     */
+    public function getSalePrice(): float
+    {
+        return (float) ($this->sale_price ?? 0);
+    }
+
+    /**
+     * Get price (alias for getEffectivePrice for backward compatibility)
+     */
+    public function getPrice(): float
+    {
+        return $this->getEffectivePrice();
+    }
+
+    /**
+     * Get price types
+     */
+    public function getPriceTypes(): array
+    {
+        return is_array($this->price_types) ? $this->price_types : [];
+    }
+
+    /**
+     * Get pricing type
+     */
+    public function getPricingType(): string
+    {
+        return $this->pricing_type ?? 'regular';
+    }
+
+    /**
+     * Get availability dates
+     */
+    public function getAvailabilityDates(): array
+    {
+        return is_array($this->availability_dates) ? $this->availability_dates : [];
+    }
+
+    /**
+     * Get itinerary days
+     */
+    public function getItineraryDays(): array
+    {
+        return is_array($this->itinerary_days) ? $this->itinerary_days : [];
+    }
+
+    /**
+     * Get starting location
+     */
+    public function getStartingLocation(): ?string
+    {
+        return $this->starting_location;
+    }
+
+    /**
+     * Get starting latitude
+     */
+    public function getStartingLatitude(): ?string
+    {
+        return $this->starting_latitude ?? null;
+    }
+
+    /**
+     * Get starting longitude
+     */
+    public function getStartingLongitude(): ?string
+    {
+        return $this->starting_longitude ?? null;
+    }
+
+    /**
+     * Get seasonal availability
+     */
+    public function getSeasonalAvailability(): ?string
+    {
+        return $this->seasonal_availability;
+    }
+
+    /**
+     * Get available from date
+     */
+    public function getAvailableFrom(): ?string
+    {
+        return $this->available_from;
+    }
+
+    /**
+     * Get available to date
+     */
+    public function getAvailableTo(): ?string
+    {
+        return $this->available_to;
+    }
+
+    /**
+     * Get average rating
+     */
+    public function getAverageRating(): float
+    {
+        return (float) ($this->average_rating ?? 0);
+    }
+
+    /**
+     * Get review count
+     */
+    public function getReviewCount(): int
+    {
+        return (int) ($this->review_count ?? 0);
+    }
+
+    /**
+     * Get ID
+     */
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Get physical requirements
+     */
+    public function getPhysicalRequirements(): ?string
+    {
+        return $this->physical_requirements ?? null;
+    }
+
+    /**
+     * Get visa requirements
+     */
+    public function getVisaRequirements(): ?string
+    {
+        return $this->visa_requirements ?? null;
+    }
+
+    /**
+     * Get vaccination requirements
+     */
+    public function getVaccinationRequirements(): ?string
+    {
+        return $this->vaccination_requirements ?? null;
+    }
+
+    /**
+     * Get cancellation policy
+     */
+    public function getCancellationPolicy(): ?string
+    {
+        return $this->cancellation_policy ?? null;
+    }
+
+    /**
+     * Get trip story
+     */
+    public function getTripStory(): ?string
+    {
+        return $this->trip_story ?? null;
+    }
+
+    /**
+     * Get what makes special
+     */
+    public function getWhatMakesSpecial(): ?string
+    {
+        return $this->what_makes_special ?? null;
+    }
+
+    /**
+     * Get similar trips
+     */
+    public function getSimilarTrips(): array
+    {
+        return is_array($this->similar_trips ?? null) ? $this->similar_trips : [];
+    }
+
+    /**
+     * Get testimonials
+     */
+    public function getTestimonials(): array
+    {
+        return is_array($this->testimonials ?? null) ? $this->testimonials : [];
     }
 
     /**

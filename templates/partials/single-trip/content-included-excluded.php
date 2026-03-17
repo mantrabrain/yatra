@@ -9,14 +9,17 @@ if (!defined('ABSPATH')) {
         <?php echo esc_html(isset($tab->label) ? $tab->label : __("What's Included & Excluded", 'yatra')); ?>
     </h2>
     <div class="yatra-included-excluded">
-        <?php if (!empty($trip->included_items)): ?>
+        <?php 
+        $included_items = $trip->getIncludedItems();
+        if (!empty($included_items)): 
+        ?>
             <div class="yatra-included-section">
                 <h3>
                     <?php echo yatra_svg_icon('check', 'yatra-included-icon'); ?>
                     <?php echo esc_html__('Included', 'yatra'); ?>
                 </h3>
                 <ul class="yatra-included-list">
-                    <?php foreach ($trip->included_items as $item): ?>
+                    <?php foreach ($included_items as $item): ?>
                         <?php
                         $item_title = is_array($item) ? ($item['title'] ?? '') : (is_object($item) ? ($item->title ?? '') : $item);
                         $item_desc = is_array($item) ? ($item['description'] ?? '') : (is_object($item) ? ($item->description ?? '') : '');
@@ -36,14 +39,17 @@ if (!defined('ABSPATH')) {
                 </ul>
             </div>
         <?php endif; ?>
-        <?php if (!empty($trip->excluded_items)): ?>
+        <?php 
+        $excluded_items = $trip->getExcludedItems();
+        if (!empty($excluded_items)): 
+        ?>
             <div class="yatra-excluded-section">
                 <h3>
                     <?php echo yatra_svg_icon('x', 'yatra-excluded-icon'); ?>
                     <?php echo esc_html__('Excluded', 'yatra'); ?>
                 </h3>
                 <ul class="yatra-excluded-list">
-                    <?php foreach ($trip->excluded_items as $item): ?>
+                    <?php foreach ($excluded_items as $item): ?>
                         <?php
                         $item_title = is_array($item) ? ($item['title'] ?? '') : (is_object($item) ? ($item->title ?? '') : $item);
                         $item_desc = is_array($item) ? ($item['description'] ?? '') : (is_object($item) ? ($item->description ?? '') : '');
