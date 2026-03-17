@@ -418,10 +418,7 @@ class SetupWizardController
     {
         check_admin_referer('yatra-setup');
 
-        // Handle sample data import if requested
-        if (isset($_POST['import_sample_data']) && $_POST['import_sample_data'] === 'yes') {
-            set_transient('yatra_import_sample_data', 1, 300);
-        }
+        // Sample data import is now handled via JavaScript API calls in the setup wizard templates
 
         // Redirect to dashboard
         wp_safe_redirect(admin_url('admin.php?page=yatra'));

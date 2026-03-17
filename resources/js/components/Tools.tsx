@@ -174,6 +174,12 @@ const Tools: React.FC = () => {
   const [showMigrationConfirm, setShowMigrationConfirm] = useState(false);
   const [showMigrationCompleteNotice, setShowMigrationCompleteNotice] =
     useState(true);
+  
+  // Sample Data states
+  const [isImportingSampleData, setIsImportingSampleData] = useState(false);
+  const [sampleDataStatus, setSampleDataStatus] = useState<any>(null);
+  const [sampleDataJob, setSampleDataJob] = useState<any>(null);
+  
   const { showToast } = useToast();
 
   // Helper function to format bytes
@@ -206,6 +212,20 @@ const Tools: React.FC = () => {
       setShowMigrationCompleteNotice(true);
     }
   }, [migrationProgress?.started_at, migrationProgress?.all_complete]);
+
+  // Load sample data status on mount
+  useEffect(() => {
+    const loadSampleDataStatus = async () => {
+      try {
+        const status = await apiService.getSampleDataStatus();
+        setSampleDataStatus(status);
+      } catch (error) {
+        console.error("Failed to load sample data status:", error);
+      }
+    };
+
+    loadSampleDataStatus();
+  }, []);
 
   // Background job states
   const [exportJob, setExportJob] = useState<JobStatus | null>(null);
@@ -726,6 +746,42 @@ const Tools: React.FC = () => {
     }
   };
 
+  // Handle sample data import - imports all data automatically
+  const handleImportSampleData = async () => {
+    setIsImportingSampleData(true);
+    setSampleDataJob({ progress: 0 });
+
+    try {
+      // Import all sample data from JSON files automatically
+      const response = await apiService.importSampleData({
+        data_types: [], // Not used anymore - imports all data types
+        overwrite: false,
+      });
+
+      if (response.success) {
+        setSampleDataJob({ ...response.data, progress: 100 });
+        
+        // Show detailed success message with counts
+        const data = response.data || {};
+        const message = `Successfully imported: ${data.trips || 0} trips, ${data.classifications || 0} classifications, ${data.items || 0} items, ${data.trip_classifications || 0} trip assignments, ${data.discounts || 0} discounts, ${data.availability_dates || 0} availability dates, ${data.availability_rules || 0} rules, ${data.itinerary_days || 0} itinerary days, ${data.itinerary_entries || 0} itinerary entries`;
+        
+        showToast(message, "success");
+        
+        // Refresh sample data status
+        const statusResponse = await apiService.getSampleDataStatus();
+        setSampleDataStatus(statusResponse);
+      } else {
+        throw new Error(response.message || __("Import failed"));
+      }
+    } catch (error: any) {
+      console.error("Sample data import error:", error);
+      showToast(error.message || __("Failed to import sample data. Please try again."), "error");
+    } finally {
+      setIsImportingSampleData(false);
+      setTimeout(() => setSampleDataJob(null), 3000);
+    }
+  };
+
   // Get status badge
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -1067,7 +1123,7 @@ const Tools: React.FC = () => {
         <div className="flex items-center gap-3">
           <Button
             onClick={() =>
-              window.open("/wp-admin/tools.php?page=yatra-setup", "_blank")
+              window.open("/wp-admin/admin.php?page=yatra-setup", "_blank")
             }
             variant="outline"
             className="flex items-center gap-2"
@@ -1492,6 +1548,112 @@ const Tools: React.FC = () => {
                     importing data to prevent any potential data loss.
                   </p>
                 </div>
+              </div>
+            </Card>
+
+            {/* Sample Data Section */}
+            <Card className="p-8">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                  <Database className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    Import Sample Data
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Quick setup with demo content
+                  </p>
+                </div>
+              </div>
+              <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+                Quickly populate your Yatra site with sample trips, categories, destinations, and more. Perfect for testing and demonstration purposes.
+              </p>
+
+              {/* What Will Be Imported */}
+              <div className="space-y-4 mb-6">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
+                  <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    The following data will be imported automatically:
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-blue-800 dark:text-blue-200">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>11 Sample Trips (multi-day & single-day)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Tag className="w-4 h-4" />
+                      <span>8 Categories</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Activity className="w-4 h-4" />
+                      <span>10 Activities</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4" />
+                      <span>10 Destinations</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mountain className="w-4 h-4" />
+                      <span>6 Difficulty Levels</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Settings className="w-4 h-4" />
+                      <span>8 Attributes</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <List className="w-4 h-4" />
+                      <span>6 Itinerary Item Types</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      <span>8 Traveler Categories</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Tag className="w-4 h-4" />
+                      <span>8 Discount Codes</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      <span>21 Availability Dates</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <RefreshCw className="w-4 h-4" />
+                      <span>9 Availability Rules</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      <span>31 Itinerary Days</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <List className="w-4 h-4" />
+                      <span>25 Itinerary Entries</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleImportSampleData}
+                  disabled={isImportingSampleData}
+                  className="flex-1"
+                  size="lg"
+                >
+                  {isImportingSampleData ? (
+                    <>
+                      <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+                      Importing...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-5 h-5 mr-2" />
+                      Import Sample Data
+                    </>
+                  )}
+                </Button>
               </div>
             </Card>
           </div>

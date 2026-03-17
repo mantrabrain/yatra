@@ -1,0 +1,168 @@
+[
+  {
+    "trip_slug": "swiss-alps-mountain-trek",
+    "classifications": [
+      {"slug": "adventure-tours", "type": "category"},
+      {"slug": "trekking-hiking", "type": "category"},
+      {"slug": "hiking", "type": "activity"},
+      {"slug": "camping", "type": "activity"},
+      {"slug": "rock-climbing", "type": "activity"},
+      {"slug": "photography", "type": "activity"},
+      {"slug": "swiss-alps", "type": "destination"},
+      {"slug": "challenging", "type": "difficulty"},
+      {"slug": "adult", "type": "traveler_type"},
+      {"slug": "student", "type": "traveler_type"},
+      {"slug": "child", "type": "traveler_type"}
+    ]
+  },
+  {
+    "trip_slug": "maldives-beach-escape",
+    "classifications": [
+      {"slug": "beach-island", "type": "category"},
+      {"slug": "snorkeling", "type": "activity"},
+      {"slug": "kayaking", "type": "activity"},
+      {"slug": "photography", "type": "activity"},
+      {"slug": "maldives", "type": "destination"},
+      {"slug": "easy", "type": "difficulty"},
+      {"slug": "adult", "type": "traveler_type"},
+      {"slug": "child", "type": "traveler_type"},
+      {"slug": "infant", "type": "traveler_type"},
+      {"slug": "family", "type": "traveler_type"}
+    ]
+  },
+  {
+    "trip_slug": "kyoto-cultural-journey",
+    "classifications": [
+      {"slug": "cultural-tours", "type": "category"},
+      {"slug": "city-tours", "type": "category"},
+      {"slug": "city-walking-tour", "type": "activity"},
+      {"slug": "cooking-class", "type": "activity"},
+      {"slug": "photography", "type": "activity"},
+      {"slug": "kyoto-japan", "type": "destination"},
+      {"slug": "easy", "type": "difficulty"},
+      {"slug": "adult", "type": "traveler_type"},
+      {"slug": "student", "type": "traveler_type"},
+      {"slug": "senior", "type": "traveler_type"}
+    ]
+  },
+  {
+    "trip_slug": "serengeti-wildlife-safari",
+    "classifications": [
+      {"slug": "wildlife-safari", "type": "category"},
+      {"slug": "adventure-tours", "type": "category"},
+      {"slug": "wildlife-viewing", "type": "activity"},
+      {"slug": "photography", "type": "activity"},
+      {"slug": "camping", "type": "activity"},
+      {"slug": "serengeti-tanzania", "type": "destination"},
+      {"slug": "moderate", "type": "difficulty"},
+      {"slug": "adult", "type": "traveler_type"},
+      {"slug": "child", "type": "traveler_type"},
+      {"slug": "solo-traveler", "type": "traveler_type"},
+      {"slug": "group-leader", "type": "traveler_type"}
+    ]
+  },
+  {
+    "trip_slug": "paris-city-explorer",
+    "classifications": [
+      {"slug": "city-tours", "type": "category"},
+      {"slug": "cultural-tours", "type": "category"},
+      {"slug": "food-wine", "type": "category"},
+      {"slug": "city-walking-tour", "type": "activity"},
+      {"slug": "cooking-class", "type": "activity"},
+      {"slug": "photography", "type": "activity"},
+      {"slug": "paris-france", "type": "destination"},
+      {"slug": "easy", "type": "difficulty"},
+      {"slug": "adult", "type": "traveler_type"},
+      {"slug": "student", "type": "traveler_type"},
+      {"slug": "senior", "type": "traveler_type"}
+    ]
+  },
+  {
+    "trip_slug": "bali-island-adventure",
+    "classifications": [
+      {"slug": "beach-island", "type": "category"},
+      {"slug": "cultural-tours", "type": "category"},
+      {"slug": "adventure-tours", "type": "category"},
+      {"slug": "snorkeling", "type": "activity"},
+      {"slug": "hiking", "type": "activity"},
+      {"slug": "cycling", "type": "activity"},
+      {"slug": "cooking-class", "type": "activity"},
+      {"slug": "bali-indonesia", "type": "destination"},
+      {"slug": "moderate", "type": "difficulty"},
+      {"slug": "adult", "type": "traveler_type"},
+      {"slug": "child", "type": "traveler_type"},
+      {"slug": "student", "type": "traveler_type"},
+      {"slug": "family", "type": "traveler_type"}
+    ]
+  },
+  {
+    "trip_slug": "iceland-northern-lights",
+    "classifications": [
+      {"slug": "adventure-tours", "type": "category"},
+      {"slug": "hiking", "type": "activity"},
+      {"slug": "photography", "type": "activity"},
+      {"slug": "kayaking", "type": "activity"},
+      {"slug": "iceland", "type": "destination"},
+      {"slug": "moderate", "type": "difficulty"},
+      {"slug": "adult", "type": "traveler_type"},
+      {"slug": "student", "type": "traveler_type"}
+    ]
+  },
+  {
+    "trip_slug": "new-zealand-adventure",
+    "classifications": [
+      {"slug": "adventure-tours", "type": "category"},
+      {"slug": "trekking-hiking", "type": "category"},
+      {"slug": "hiking", "type": "activity"},
+      {"slug": "kayaking", "type": "activity"},
+      {"slug": "rock-climbing", "type": "activity"},
+      {"slug": "cycling", "type": "activity"},
+      {"slug": "new-zealand", "type": "destination"},
+      {"slug": "challenging", "type": "difficulty"},
+      {"slug": "adult", "type": "traveler_type"},
+      {"slug": "student", "type": "traveler_type"}
+    ]
+  },
+  {
+    "trip_slug": "peru-machu-picchu-trek",
+    "classifications": [
+      {"slug": "trekking-hiking", "type": "category"},
+      {"slug": "cultural-tours", "type": "category"},
+      {"slug": "hiking", "type": "activity"},
+      {"slug": "camping", "type": "activity"},
+      {"slug": "photography", "type": "activity"},
+      {"slug": "peru", "type": "destination"},
+      {"slug": "difficult", "type": "difficulty"},
+      {"slug": "adult", "type": "traveler_type"},
+      {"slug": "student", "type": "traveler_type"}
+    ]
+  },
+  {
+    "trip_slug": "norway-fjords-cruise",
+    "classifications": [
+      {"slug": "cruise-tours", "type": "category"},
+      {"slug": "adventure-tours", "type": "category"},
+      {"slug": "hiking", "type": "activity"},
+      {"slug": "kayaking", "type": "activity"},
+      {"slug": "photography", "type": "activity"},
+      {"slug": "norway", "type": "destination"},
+      {"slug": "easy", "type": "difficulty"},
+      {"slug": "adult", "type": "traveler_type"},
+      {"slug": "senior", "type": "traveler_type"},
+      {"slug": "family", "type": "traveler_type"}
+    ]
+  },
+  {
+    "trip_slug": "grand-canyon-day-tour",
+    "classifications": [
+      {"slug": "adventure-tours", "type": "category"},
+      {"slug": "hiking", "type": "activity"},
+      {"slug": "photography", "type": "activity"},
+      {"slug": "easy", "type": "difficulty"},
+      {"slug": "adult", "type": "traveler_type"},
+      {"slug": "child", "type": "traveler_type"},
+      {"slug": "senior", "type": "traveler_type"},
+      {"slug": "student", "type": "traveler_type"}
+    ]
+  }
+]

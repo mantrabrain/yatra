@@ -677,6 +677,12 @@ export const apiService = {
     apiClient.post(API_ENDPOINTS.MIGRATION_MIGRATE_ALL, data),
   cancelMigration: () => apiClient.post(API_ENDPOINTS.MIGRATION_CANCEL),
 
+  // Sample Data
+  importSampleData: (data: any) =>
+    apiClient.post("/sample-data/import", data),
+  getSampleDataStatus: () => apiClient.get("/sample-data/status"),
+  cleanupSampleData: () => apiClient.delete("/sample-data/cleanup"),
+
   // Common bulk operations
   bulkDelete: (endpoint: string, ids: (string | number)[]) =>
     Promise.all(ids.map((id) => apiClient.delete(`${endpoint}/${id}`))),

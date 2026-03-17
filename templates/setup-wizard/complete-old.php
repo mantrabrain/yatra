@@ -173,9 +173,91 @@ defined('ABSPATH') || exit;
         </div>
 
         <div class="yatra-setup-actions">
-            <button type="submit" class="button button-primary button-large" name="save_step" value="complete">
+            <button type="submit" class="button button-primary button-large" name="save_step" value="complete" onclick="handleCompleteSetup(event)">
                 <?php esc_html_e('Complete Setup', 'yatra'); ?>
             </button>
         </div>
     </form>
 </div>
+
+<script>
+function handleCompleteSetup(event) {
+    const checkbox = document.querySelector('input[name="import_sample_data"]');
+    const button = event.target;
+    
+    if (checkbox && checkbox.checked) {
+        event.preventDefault();
+        
+        // Show loading state
+        button.disabled = true;
+        button.innerHTML = '<?php esc_html_e('Importing Sample Data...', 'yatra'); ?>';
+        
+        // Call the same API as Tools.tsx
+        fetch('<?php echo rest_url('yatra/v1/sample-data/import'); ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': '<?php echo wp_create_nonce('wp_rest'); ?>'
+            },
+            body: JSON.stringify({
+                data_types: [], // Import all data types
+                overwrite: false
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                const successDiv = document.createElement('div');
+                successDiv.className = 'notice notice-success is-dismissible';
+                successDiv.style.marginTop = '20px';
+                successDiv.innerHTML = '<p><?php echo esc_html(__('Sample data imported successfully! Completing setup...', 'yatra')); ?></p>';
+                button.parentNode.insertBefore(successDiv, button);
+                
+                // Show detailed counts if available
+                if (data.data) {
+                    const counts = data.data;
+                    const details = Object.keys(counts)
+                        .filter(key => counts[key] > 0)
+                        .map(key => `${key}: ${counts[key]}`)
+                        .join(', ');
+                    
+                    if (details) {
+                        const detailsDiv = document.createElement('div');
+                        detailsDiv.style.marginTop = '10px';
+                        detailsDiv.style.fontSize = '12px';
+                        detailsDiv.style.color = '#6b7280';
+                        detailsDiv.innerHTML = '<strong><?php esc_html_e('Imported:', 'yatra'); ?></strong> ' + details;
+                        button.parentNode.insertBefore(detailsDiv, button);
+                    }
+                }
+                
+                // Submit form after successful import
+                setTimeout(() => {
+                    button.form.submit();
+                }, 2000);
+            } else {
+                throw new Error(data.message || '<?php esc_html_e('Import failed', 'yatra'); ?>');
+            }
+        })
+        .catch(error => {
+            console.error('Sample data import error:', error);
+            
+            // Show error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'notice notice-error is-dismissible';
+            errorDiv.style.marginTop = '20px';
+            errorDiv.innerHTML = '<p><?php echo esc_html(__('Failed to import sample data. Setup will continue without sample data.', 'yatra')); ?></p>';
+            button.parentNode.insertBefore(errorDiv, button);
+            
+            // Continue with setup after error
+            setTimeout(() => {
+                button.form.submit();
+            }, 2000);
+        });
+    } else {
+        // No sample data import requested, just submit form
+        return true;
+    }
+}
+</script>

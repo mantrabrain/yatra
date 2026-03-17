@@ -1,0 +1,200 @@
+[
+  {
+    "type": "item",
+    "name": "Mountain Hut",
+    "slug": "mountain-hut",
+    "description": "Basic mountain accommodation with shared facilities",
+    "icon": "home",
+    "status": "publish",
+    "parent_slug": "accommodation"
+  },
+  {
+    "type": "item",
+    "name": "5-Star Hotel",
+    "slug": "5-star-hotel",
+    "description": "Luxury hotel with premium amenities",
+    "icon": "hotel",
+    "status": "publish",
+    "parent_slug": "accommodation"
+  },
+  {
+    "type": "item",
+    "name": "Beach Resort",
+    "slug": "beach-resort",
+    "description": "Beachfront resort with ocean views",
+    "icon": "umbrella-beach",
+    "status": "publish",
+    "parent_slug": "accommodation"
+  },
+  {
+    "type": "item",
+    "name": "Safari Lodge",
+    "slug": "safari-lodge",
+    "description": "Safari lodge in the wilderness",
+    "icon": "tree",
+    "status": "publish",
+    "parent_slug": "accommodation"
+  },
+  {
+    "type": "item",
+    "name": "Tented Camp",
+    "slug": "tented-camp",
+    "description": "Luxury tented camp experience",
+    "icon": "campground",
+    "status": "publish",
+    "parent_slug": "accommodation"
+  },
+  {
+    "type": "item",
+    "name": "Guided Hiking",
+    "slug": "guided-hiking",
+    "description": "Professional guided hiking activity",
+    "icon": "hiking",
+    "status": "publish",
+    "parent_slug": "activity"
+  },
+  {
+    "type": "item",
+    "name": "Snorkeling Trip",
+    "slug": "snorkeling-trip",
+    "description": "Guided snorkeling in coral reefs",
+    "icon": "water",
+    "status": "publish",
+    "parent_slug": "activity"
+  },
+  {
+    "type": "item",
+    "name": "Temple Visit",
+    "slug": "temple-visit",
+    "description": "Guided tour of historic temples",
+    "icon": "monument",
+    "status": "publish",
+    "parent_slug": "activity"
+  },
+  {
+    "type": "item",
+    "name": "Game Drive",
+    "slug": "game-drive",
+    "description": "Safari game drive in 4x4 vehicle",
+    "icon": "binoculars",
+    "status": "publish",
+    "parent_slug": "activity"
+  },
+  {
+    "type": "item",
+    "name": "City Walking Tour",
+    "slug": "city-walking-tour-item",
+    "description": "Guided walking tour of city highlights",
+    "icon": "walking",
+    "status": "publish",
+    "parent_slug": "activity"
+  },
+  {
+    "type": "item",
+    "name": "Cooking Class",
+    "slug": "cooking-class-item",
+    "description": "Local cooking class experience",
+    "icon": "utensils",
+    "status": "publish",
+    "parent_slug": "activity"
+  },
+  {
+    "type": "item",
+    "name": "Breakfast",
+    "slug": "breakfast",
+    "description": "Morning breakfast meal",
+    "icon": "coffee",
+    "status": "publish",
+    "parent_slug": "meal"
+  },
+  {
+    "type": "item",
+    "name": "Lunch",
+    "slug": "lunch",
+    "description": "Midday lunch meal",
+    "icon": "utensils",
+    "status": "publish",
+    "parent_slug": "meal"
+  },
+  {
+    "type": "item",
+    "name": "Dinner",
+    "slug": "dinner",
+    "description": "Evening dinner meal",
+    "icon": "utensils",
+    "status": "publish",
+    "parent_slug": "meal"
+  },
+  {
+    "type": "item",
+    "name": "Welcome Dinner",
+    "slug": "welcome-dinner",
+    "description": "Special welcome dinner for guests",
+    "icon": "glass-cheers",
+    "status": "publish",
+    "parent_slug": "meal"
+  },
+  {
+    "type": "item",
+    "name": "Airport Transfer",
+    "slug": "airport-transfer",
+    "description": "Transfer to/from airport",
+    "icon": "car",
+    "status": "publish",
+    "parent_slug": "transportation"
+  },
+  {
+    "type": "item",
+    "name": "Coach Transfer",
+    "slug": "coach-transfer",
+    "description": "Coach/bus transfer between locations",
+    "icon": "bus",
+    "status": "publish",
+    "parent_slug": "transportation"
+  },
+  {
+    "type": "item",
+    "name": "Boat Transfer",
+    "slug": "boat-transfer",
+    "description": "Speedboat or ferry transfer",
+    "icon": "ship",
+    "status": "publish",
+    "parent_slug": "transportation"
+  },
+  {
+    "type": "item",
+    "name": "Landmark Visit",
+    "slug": "landmark-visit",
+    "description": "Visit to a famous landmark or attraction",
+    "icon": "camera",
+    "status": "publish",
+    "parent_slug": "sightseeing"
+  },
+  {
+    "type": "item",
+    "name": "Scenic Viewpoint",
+    "slug": "scenic-viewpoint",
+    "description": "Scenic viewpoint or lookout stop",
+    "icon": "eye",
+    "status": "publish",
+    "parent_slug": "sightseeing"
+  },
+  {
+    "type": "item",
+    "name": "Rest & Explore",
+    "slug": "rest-and-explore",
+    "description": "Free time to rest or explore independently",
+    "icon": "clock",
+    "status": "publish",
+    "parent_slug": "free-time"
+  },
+  {
+    "type": "item",
+    "name": "Shopping Time",
+    "slug": "shopping-time",
+    "description": "Free time for shopping and souvenirs",
+    "icon": "shopping-bag",
+    "status": "publish",
+    "parent_slug": "free-time"
+  }
+]

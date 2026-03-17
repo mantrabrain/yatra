@@ -197,7 +197,7 @@ class ModuleManager
                 'is_premium' => true,
                 'purchase_url' => 'https://wpyatra.com/pricing?module=dynamic-pricing',
                 'is_core' => false,
-                'enabled' => true,
+                'enabled' => false,
                 'tags' => ['pricing', 'revenue', 'automation', 'discounts', 'sales'],
                 'video_url' => self::DEFAULT_VIDEO_URL,
                 'requires_pro' => true,

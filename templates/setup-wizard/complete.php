@@ -117,7 +117,7 @@ defined('ABSPATH') || exit;
                 </div>
                 <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #111827;"><?php esc_html_e('Import Sample Data', 'yatra'); ?></h3>
                 <p style="margin: 0 0 16px; font-size: 13px; color: #6b7280; text-align: center; line-height: 1.5;"><?php esc_html_e('Get started quickly with demo content', 'yatra'); ?></p>
-                <button type="button" onclick="if(confirm('<?php esc_attr_e('This will import sample trips, destinations, and bookings. Continue?', 'yatra'); ?>')) { this.form.submit(); }" name="import_sample_data" value="yes" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #f59e0b; color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; margin-top: auto;" onmouseover="this.style.background='#d97706';" onmouseout="this.style.background='#f59e0b';">
+                <button type="button" id="import-sample-data-btn" onclick="importSampleData()" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #f59e0b; color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; margin-top: auto;" onmouseover="this.style.background='#d97706';" onmouseout="this.style.background='#f59e0b';">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
@@ -335,3 +335,83 @@ defined('ABSPATH') || exit;
     }
 }
 </style>
+
+<script>
+function importSampleData() {
+    const button = document.getElementById('import-sample-data-btn');
+    const originalText = button.innerHTML;
+    
+    // Confirm import
+    if (!confirm('<?php esc_attr_e('This will import sample trips, destinations, and bookings. Continue?', 'yatra'); ?>')) {
+        return;
+    }
+    
+    // Show loading state
+    button.disabled = true;
+    button.style.opacity = '0.6';
+    button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> <?php esc_attr_e('Importing...', 'yatra'); ?>';
+    
+    // Call the same API as Tools.tsx
+    fetch('<?php echo rest_url('yatra/v1/sample-data/import'); ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-WP-Nonce': '<?php echo wp_create_nonce('wp_rest'); ?>'
+        },
+        body: JSON.stringify({
+            data_types: [], // Import all data types
+            overwrite: false
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            const successDiv = document.createElement('div');
+            successDiv.className = 'notice notice-success is-dismissible';
+            successDiv.style.marginTop = '20px';
+            successDiv.innerHTML = '<p><?php echo esc_html(__('Sample data imported successfully!', 'yatra')); ?></p>';
+            button.parentNode.appendChild(successDiv);
+            
+            // Update button to show success
+            button.style.background = '#22c55e';
+            button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> <?php esc_attr_e('Imported Successfully', 'yatra'); ?>';
+            
+            // Show detailed counts if available
+            if (data.data) {
+                const counts = data.data;
+                const details = Object.keys(counts)
+                    .filter(key => counts[key] > 0)
+                    .map(key => `${key}: ${counts[key]}`)
+                    .join(', ');
+                
+                if (details) {
+                    const detailsDiv = document.createElement('div');
+                    detailsDiv.style.marginTop = '10px';
+                    detailsDiv.style.fontSize = '12px';
+                    detailsDiv.style.color = '#6b7280';
+                    detailsDiv.innerHTML = '<strong><?php esc_html_e('Imported:', 'yatra'); ?></strong> ' + details;
+                    button.parentNode.appendChild(detailsDiv);
+                }
+            }
+        } else {
+            throw new Error(data.message || '<?php esc_html_e('Import failed', 'yatra'); ?>');
+        }
+    })
+    .catch(error => {
+        console.error('Sample data import error:', error);
+        
+        // Show error message
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'notice notice-error is-dismissible';
+        errorDiv.style.marginTop = '20px';
+        errorDiv.innerHTML = '<p><?php echo esc_html(__('Failed to import sample data. Please try again.', 'yatra')); ?></p>';
+        button.parentNode.appendChild(errorDiv);
+        
+        // Reset button
+        button.disabled = false;
+        button.style.opacity = '1';
+        button.innerHTML = originalText;
+    });
+}
+</script>

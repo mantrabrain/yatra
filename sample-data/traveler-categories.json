@@ -1,0 +1,66 @@
+[
+  {
+    "type": "traveler_type",
+    "name": "Adult",
+    "slug": "adult",
+    "description": "Standard adult traveler (18+ years)",
+    "icon": "user",
+    "status": "publish"
+  },
+  {
+    "type": "traveler_type",
+    "name": "Child",
+    "slug": "child",
+    "description": "Child traveler (2-17 years)",
+    "icon": "users",
+    "status": "publish"
+  },
+  {
+    "type": "traveler_type",
+    "name": "Infant",
+    "slug": "infant",
+    "description": "Infant traveler (0-2 years)",
+    "icon": "baby",
+    "status": "publish"
+  },
+  {
+    "type": "traveler_type",
+    "name": "Student",
+    "slug": "student",
+    "description": "Student traveler with valid ID",
+    "icon": "graduation-cap",
+    "status": "publish"
+  },
+  {
+    "type": "traveler_type",
+    "name": "Senior",
+    "slug": "senior",
+    "description": "Senior traveler (65+ years)",
+    "icon": "user-check",
+    "status": "publish"
+  },
+  {
+    "type": "traveler_type",
+    "name": "Group Leader",
+    "slug": "group-leader",
+    "description": "Group leader or tour coordinator",
+    "icon": "star",
+    "status": "publish"
+  },
+  {
+    "type": "traveler_type",
+    "name": "Family",
+    "slug": "family",
+    "description": "Family group pricing",
+    "icon": "home",
+    "status": "publish"
+  },
+  {
+    "type": "traveler_type",
+    "name": "Solo Traveler",
+    "slug": "solo-traveler",
+    "description": "Individual traveler",
+    "icon": "user",
+    "status": "publish"
+  }
+]

@@ -1,0 +1,90 @@
+[
+  {
+    "type": "attribute",
+    "name": "Group Size",
+    "slug": "group-size",
+    "description": "Maximum group size for the trip",
+    "metadata": {
+      "field_type": "number",
+      "unit": "people"
+    },
+    "status": "publish"
+  },
+  {
+    "type": "attribute",
+    "name": "Age Restriction",
+    "slug": "age-restriction",
+    "description": "Minimum age requirement",
+    "metadata": {
+      "field_type": "number",
+      "unit": "years"
+    },
+    "status": "publish"
+  },
+  {
+    "type": "attribute",
+    "name": "Fitness Level",
+    "slug": "fitness-level",
+    "description": "Required fitness level",
+    "metadata": {
+      "field_type": "select",
+      "options": ["Low", "Moderate", "High", "Very High"]
+    },
+    "status": "publish"
+  },
+  {
+    "type": "attribute",
+    "name": "Accommodation Type",
+    "slug": "accommodation-type",
+    "description": "Type of accommodation provided",
+    "metadata": {
+      "field_type": "select",
+      "options": ["Hotel", "Resort", "Guesthouse", "Camping", "Lodge", "Hostel"]
+    },
+    "status": "publish"
+  },
+  {
+    "type": "attribute",
+    "name": "Meal Plan",
+    "slug": "meal-plan",
+    "description": "Meals included in the trip",
+    "metadata": {
+      "field_type": "select",
+      "options": ["Breakfast Only", "Half Board", "Full Board", "All Inclusive"]
+    },
+    "status": "publish"
+  },
+  {
+    "type": "attribute",
+    "name": "Transportation",
+    "slug": "transportation",
+    "description": "Mode of transportation",
+    "metadata": {
+      "field_type": "select",
+      "options": ["Bus", "Private Vehicle", "Train", "Flight", "Boat", "Walking"]
+    },
+    "status": "publish"
+  },
+  {
+    "type": "attribute",
+    "name": "Guide Language",
+    "slug": "guide-language",
+    "description": "Languages spoken by guides",
+    "metadata": {
+      "field_type": "multiselect",
+      "options": ["English", "Spanish", "French", "German", "Italian", "Japanese", "Chinese"]
+    },
+    "status": "publish"
+  },
+  {
+    "type": "attribute",
+    "name": "Season",
+    "slug": "season",
+    "description": "Best season for this trip",
+    "metadata": {
+      "field_type": "select",
+      "options": ["Spring", "Summer", "Fall", "Winter", "Year-round"]
+    },
+    "status": "publish"
+  }
+]

@@ -23,10 +23,13 @@ if (!defined('ABSPATH')) {
                 $sidebar_group_discounts_data = $groupDiscountsResult;
                 // Get min_group_size from ranges if available, otherwise use legacy field
                 $min_group = 2;
-                if (!empty($groupDiscountsResult[0]['group_discount_ranges'])) {
-                    $first_range = $groupDiscountsResult[0]['group_discount_ranges'][0] ?? null;
-                    if ($first_range && !empty($first_range['min_group_size'])) {
-                        $min_group = (int) $first_range['min_group_size'];
+                if (!empty($groupDiscountsResult[0]->group_discount_ranges)) {
+                    $ranges = json_decode($groupDiscountsResult[0]->group_discount_ranges, true);
+                    if (!empty($ranges) && is_array($ranges)) {
+                        $first_range = $ranges[0] ?? null;
+                        if ($first_range && !empty($first_range['min_group_size'])) {
+                            $min_group = (int) $first_range['min_group_size'];
+                        }
                     }
                 }
             }

@@ -1,0 +1,212 @@
+[
+  {
+    "trip_slug": "swiss-alps-mountain-trek",
+    "departure_date": "2024-06-15",
+    "arrival_date": "2024-06-21",
+    "seats_total": 12,
+    "seats_available": 8,
+    "seats_reserved": 4,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "swiss-alps-mountain-trek",
+    "departure_date": "2024-07-01",
+    "arrival_date": "2024-07-07",
+    "seats_total": 12,
+    "seats_available": 12,
+    "seats_reserved": 0,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "swiss-alps-mountain-trek",
+    "departure_date": "2024-08-10",
+    "arrival_date": "2024-08-16",
+    "seats_total": 12,
+    "seats_available": 3,
+    "seats_reserved": 9,
+    "pricing_type": "regular",
+    "status": "limited"
+  },
+  {
+    "trip_slug": "maldives-beach-escape",
+    "departure_date": "2024-05-20",
+    "arrival_date": "2024-05-24",
+    "seats_total": 20,
+    "seats_available": 15,
+    "seats_reserved": 5,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "maldives-beach-escape",
+    "departure_date": "2024-06-05",
+    "arrival_date": "2024-06-09",
+    "seats_total": 20,
+    "seats_available": 20,
+    "seats_reserved": 0,
+    "pricing_type": "discounted",
+    "original_price": 899.00,
+    "discounted_price": 749.00,
+    "discount_percentage": 16.69,
+    "status": "available"
+  },
+  {
+    "trip_slug": "kyoto-cultural-journey",
+    "departure_date": "2024-04-10",
+    "arrival_date": "2024-04-15",
+    "seats_total": 15,
+    "seats_available": 10,
+    "seats_reserved": 5,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "kyoto-cultural-journey",
+    "departure_date": "2024-10-15",
+    "arrival_date": "2024-10-20",
+    "seats_total": 15,
+    "seats_available": 12,
+    "seats_reserved": 3,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "serengeti-wildlife-safari",
+    "departure_date": "2024-07-20",
+    "arrival_date": "2024-07-27",
+    "seats_total": 10,
+    "seats_available": 6,
+    "seats_reserved": 4,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "serengeti-wildlife-safari",
+    "departure_date": "2024-09-05",
+    "arrival_date": "2024-09-12",
+    "seats_total": 10,
+    "seats_available": 10,
+    "seats_reserved": 0,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "paris-city-explorer",
+    "departure_date": "2024-05-01",
+    "arrival_date": "2024-05-04",
+    "seats_total": 25,
+    "seats_available": 20,
+    "seats_reserved": 5,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "paris-city-explorer",
+    "departure_date": "2024-06-15",
+    "arrival_date": "2024-06-18",
+    "seats_total": 25,
+    "seats_available": 25,
+    "seats_reserved": 0,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "bali-island-adventure",
+    "departure_date": "2024-05-10",
+    "arrival_date": "2024-05-19",
+    "seats_total": 16,
+    "seats_available": 12,
+    "seats_reserved": 4,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "iceland-northern-lights",
+    "departure_date": "2024-11-01",
+    "arrival_date": "2024-11-06",
+    "seats_total": 12,
+    "seats_available": 8,
+    "seats_reserved": 4,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "iceland-northern-lights",
+    "departure_date": "2024-12-15",
+    "arrival_date": "2024-12-20",
+    "seats_total": 12,
+    "seats_available": 12,
+    "seats_reserved": 0,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "new-zealand-adventure",
+    "departure_date": "2024-12-01",
+    "arrival_date": "2024-12-12",
+    "seats_total": 14,
+    "seats_available": 10,
+    "seats_reserved": 4,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "peru-machu-picchu-trek",
+    "departure_date": "2024-06-01",
+    "arrival_date": "2024-06-09",
+    "seats_total": 12,
+    "seats_available": 5,
+    "seats_reserved": 7,
+    "pricing_type": "regular",
+    "status": "limited"
+  },
+  {
+    "trip_slug": "peru-machu-picchu-trek",
+    "departure_date": "2024-08-15",
+    "arrival_date": "2024-08-23",
+    "seats_total": 12,
+    "seats_available": 12,
+    "seats_reserved": 0,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "norway-fjords-cruise",
+    "departure_date": "2024-06-20",
+    "arrival_date": "2024-06-26",
+    "seats_total": 18,
+    "seats_available": 14,
+    "seats_reserved": 4,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "grand-canyon-day-tour",
+    "departure_date": "2024-05-15",
+    "seats_total": 50,
+    "seats_available": 35,
+    "seats_reserved": 15,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "grand-canyon-day-tour",
+    "departure_date": "2024-05-22",
+    "seats_total": 50,
+    "seats_available": 42,
+    "seats_reserved": 8,
+    "pricing_type": "regular",
+    "status": "available"
+  },
+  {
+    "trip_slug": "grand-canyon-day-tour",
+    "departure_date": "2024-06-01",
+    "seats_total": 50,
+    "seats_available": 50,
+    "seats_reserved": 0,
+    "pricing_type": "regular",
+    "status": "available"
+  }
+]

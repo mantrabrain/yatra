@@ -1,0 +1,219 @@
+[
+  {
+    "trip_slug": "swiss-alps-mountain-trek",
+    "day_number": 1,
+    "title": "Arrival in Zurich & Transfer to Interlaken",
+    "description": "Arrive in Zurich, meet your guide, and transfer to Interlaken. Brief orientation and welcome dinner.",
+    "order": 1
+  },
+  {
+    "trip_slug": "swiss-alps-mountain-trek",
+    "day_number": 2,
+    "title": "Zurich to Alpine Village",
+    "description": "Journey to the mountains and begin your trek.",
+    "order": 2
+  },
+  {
+    "trip_slug": "swiss-alps-mountain-trek",
+    "day_number": 3,
+    "title": "Mountain Lake Trek",
+    "description": "Trek to pristine alpine lakes with stunning views.",
+    "order": 3
+  },
+  {
+    "trip_slug": "swiss-alps-mountain-trek",
+    "day_number": 4,
+    "title": "High Mountain Pass",
+    "description": "Challenge yourself crossing the mountain pass.",
+    "order": 4
+  },
+  {
+    "trip_slug": "swiss-alps-mountain-trek",
+    "day_number": 5,
+    "title": "Glacier Views",
+    "description": "Trek with spectacular glacier views.",
+    "order": 5
+  },
+  {
+    "trip_slug": "swiss-alps-mountain-trek",
+    "day_number": 6,
+    "title": "Descent to Zermatt",
+    "description": "Descend to the charming town of Zermatt.",
+    "order": 6
+  },
+  {
+    "trip_slug": "swiss-alps-mountain-trek",
+    "day_number": 7,
+    "title": "Departure",
+    "description": "Final breakfast and departure.",
+    "order": 7
+  },
+  {
+    "trip_slug": "maldives-beach-escape",
+    "day_number": 1,
+    "title": "Arrival in Paradise",
+    "description": "Speedboat transfer to your island resort.",
+    "order": 1
+  },
+  {
+    "trip_slug": "maldives-beach-escape",
+    "day_number": 2,
+    "title": "Beach & Snorkeling",
+    "description": "Relax on the beach and explore coral reefs.",
+    "order": 2
+  },
+  {
+    "trip_slug": "maldives-beach-escape",
+    "day_number": 3,
+    "title": "Water Sports Day",
+    "description": "Kayaking, paddleboarding, and more.",
+    "order": 3
+  },
+  {
+    "trip_slug": "maldives-beach-escape",
+    "day_number": 4,
+    "title": "Island Hopping",
+    "description": "Visit nearby islands and local villages.",
+    "order": 4
+  },
+  {
+    "trip_slug": "maldives-beach-escape",
+    "day_number": 5,
+    "title": "Departure",
+    "description": "Morning at leisure, then transfer to airport.",
+    "order": 5
+  },
+  {
+    "trip_slug": "kyoto-cultural-journey",
+    "day_number": 1,
+    "title": "Arrival in Kyoto",
+    "description": "Check into traditional ryokan.",
+    "order": 1
+  },
+  {
+    "trip_slug": "kyoto-cultural-journey",
+    "day_number": 2,
+    "title": "Temple Tour",
+    "description": "Visit Kinkaku-ji and Ryoan-ji temples.",
+    "order": 2
+  },
+  {
+    "trip_slug": "kyoto-cultural-journey",
+    "day_number": 3,
+    "title": "Tea Ceremony & Geisha District",
+    "description": "Traditional tea ceremony and Gion exploration.",
+    "order": 3
+  },
+  {
+    "trip_slug": "kyoto-cultural-journey",
+    "day_number": 4,
+    "title": "Bamboo Forest & Arashiyama",
+    "description": "Walk through bamboo groves and visit temples.",
+    "order": 4
+  },
+  {
+    "trip_slug": "kyoto-cultural-journey",
+    "day_number": 5,
+    "title": "Fushimi Inari & Kaiseki Dinner",
+    "description": "Explore thousand torii gates and enjoy traditional dinner.",
+    "order": 5
+  },
+  {
+    "trip_slug": "kyoto-cultural-journey",
+    "day_number": 6,
+    "title": "Departure",
+    "description": "Final morning in Kyoto before departure.",
+    "order": 6
+  },
+  {
+    "trip_slug": "serengeti-wildlife-safari",
+    "day_number": 1,
+    "title": "Arrival in Arusha",
+    "description": "Meet your safari guide and briefing.",
+    "order": 1
+  },
+  {
+    "trip_slug": "serengeti-wildlife-safari",
+    "day_number": 2,
+    "title": "Tarangire National Park",
+    "description": "First game drive in elephant country.",
+    "order": 2
+  },
+  {
+    "trip_slug": "serengeti-wildlife-safari",
+    "day_number": 3,
+    "title": "Ngorongoro Crater",
+    "description": "Descend into the crater for wildlife viewing.",
+    "order": 3
+  },
+  {
+    "trip_slug": "serengeti-wildlife-safari",
+    "day_number": 4,
+    "title": "Serengeti Central",
+    "description": "Enter the vast Serengeti plains.",
+    "order": 4
+  },
+  {
+    "trip_slug": "serengeti-wildlife-safari",
+    "day_number": 5,
+    "title": "Full Day Serengeti",
+    "description": "Morning and afternoon game drives.",
+    "order": 5
+  },
+  {
+    "trip_slug": "serengeti-wildlife-safari",
+    "day_number": 6,
+    "title": "Serengeti to Lake Manyara",
+    "description": "Game drive en route to Lake Manyara.",
+    "order": 6
+  },
+  {
+    "trip_slug": "serengeti-wildlife-safari",
+    "day_number": 7,
+    "title": "Lake Manyara National Park",
+    "description": "Tree-climbing lions and flamingos.",
+    "order": 7
+  },
+  {
+    "trip_slug": "serengeti-wildlife-safari",
+    "day_number": 8,
+    "title": "Return to Arusha",
+    "description": "Final game drive and return to Arusha.",
+    "order": 8
+  },
+  {
+    "trip_slug": "paris-city-explorer",
+    "day_number": 1,
+    "title": "Arrival & Eiffel Tower",
+    "description": "Check-in and evening Eiffel Tower visit.",
+    "order": 1
+  },
+  {
+    "trip_slug": "paris-city-explorer",
+    "day_number": 2,
+    "title": "Louvre & Notre-Dame",
+    "description": "Museum tour and cathedral visit.",
+    "order": 2
+  },
+  {
+    "trip_slug": "paris-city-explorer",
+    "day_number": 3,
+    "title": "Versailles Day Trip",
+    "description": "Explore the Palace of Versailles.",
+    "order": 3
+  },
+  {
+    "trip_slug": "paris-city-explorer",
+    "day_number": 4,
+    "title": "Montmartre & Departure",
+    "description": "Morning in Montmartre, afternoon departure.",
+    "order": 4
+  },
+  {
+    "trip_slug": "grand-canyon-day-tour",
+    "day_number": 1,
+    "title": "Grand Canyon Full Day Tour",
+    "description": "Full-day exploration of the Grand Canyon with multiple viewpoints and photo stops.",
+    "order": 1
+  }
+]

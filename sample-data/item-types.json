@@ -1,0 +1,50 @@
+[
+  {
+    "type": "item_type",
+    "name": "Accommodation",
+    "slug": "accommodation",
+    "description": "Hotel, resort, camping, or other lodging",
+    "icon": "hotel",
+    "status": "publish"
+  },
+  {
+    "type": "item_type",
+    "name": "Activity",
+    "slug": "activity",
+    "description": "Tours, excursions, and activities",
+    "icon": "activity",
+    "status": "publish"
+  },
+  {
+    "type": "item_type",
+    "name": "Meal",
+    "slug": "meal",
+    "description": "Breakfast, lunch, dinner, or snacks",
+    "icon": "utensils",
+    "status": "publish"
+  },
+  {
+    "type": "item_type",
+    "name": "Transportation",
+    "slug": "transportation",
+    "description": "Bus, flight, train, boat, or other transport",
+    "icon": "bus",
+    "status": "publish"
+  },
+  {
+    "type": "item_type",
+    "name": "Sightseeing",
+    "slug": "sightseeing",
+    "description": "Tourist attractions and landmarks",
+    "icon": "camera",
+    "status": "publish"
+  },
+  {
+    "type": "item_type",
+    "name": "Free Time",
+    "slug": "free-time",
+    "description": "Leisure and free time activities",
+    "icon": "clock",
+    "status": "publish"
+  }
+]

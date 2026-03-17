@@ -85,6 +85,7 @@ $controllers = [
     \Yatra\Controllers\ModuleController::class,
     \Yatra\Controllers\ReportsController::class,
     \Yatra\Controllers\ToolsController::class,
+    \Yatra\Controllers\SampleDataController::class,
 
 ];
 
