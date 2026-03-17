@@ -69,7 +69,7 @@ defined('ABSPATH') || exit;
     </div>
 
     <div class="wizard-footer">
-        <a href="<?php echo esc_url(add_query_arg('step', 'currency', remove_query_arg('activate_error'))); ?>" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
+        <a href="<?php echo esc_url($this->get_step_url('currency')); ?>" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="19" y1="12" x2="5" y2="12"></line>
                 <polyline points="12 19 5 12 12 5"></polyline>

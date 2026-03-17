@@ -192,16 +192,24 @@ class SetupWizardController
         $next_key = $current_key + 1;
 
         if (isset($keys[$next_key])) {
-            return add_query_arg(
-                array(
-                    'page' => 'yatra-setup',
-                    'step' => $keys[$next_key]
-                ),
-                admin_url('tools.php')
-            );
+            return $this->get_step_url($keys[$next_key]);
         }
 
         return '';
+    }
+
+    /**
+     * Get URL for a specific step
+     */
+    public function get_step_url($step)
+    {
+        return add_query_arg(
+            array(
+                'page' => 'yatra-setup',
+                'step' => $step
+            ),
+            admin_url('admin.php')
+        );
     }
 
     /**
@@ -245,7 +253,7 @@ class SetupWizardController
                         } elseif ($is_completed) {
                             ?>
                             <li class="done">
-                                <a href="<?php echo esc_url(add_query_arg('step', $step_key, remove_query_arg('activate_error'))); ?>"><span class="step-icon"><?php echo $icon; ?></span><?php echo esc_html($step['name']); ?></a>
+                                <a href="<?php echo esc_url($this->get_step_url($step_key)); ?>"><span class="step-icon"><?php echo $icon; ?></span><?php echo esc_html($step['name']); ?></a>
                             </li>
                             <?php
                         } else {

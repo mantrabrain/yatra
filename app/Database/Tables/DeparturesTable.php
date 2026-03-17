@@ -13,7 +13,7 @@ class DeparturesTable extends BaseTable
     /**
      * Table name without prefix
      */
-    protected static string $table = 'yatra_trip_departures';
+    protected static string $table = 'yatra_new_trip_departures';
 
     /**
      * Get table name
