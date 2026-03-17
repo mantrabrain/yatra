@@ -104,7 +104,7 @@ class SetupWizardController
         add_submenu_page(
             'yatra',
             __('Yatra Setup Wizard', 'yatra'),
-            __('Setup Wizard', 'yatra'),
+            '',
             'manage_options',
             'yatra-setup',
             array($this, 'setup_wizard')
@@ -119,6 +119,11 @@ class SetupWizardController
     {
         if (empty($_GET['page']) || 'yatra-setup' !== $_GET['page']) {
             return;
+        }
+
+        // Handle skip setup request
+        if (isset($_GET['skip_setup']) && $_GET['skip_setup'] === '1') {
+            $this->skip_setup_wizard();
         }
 
         $steps = $this->get_steps();
@@ -448,6 +453,19 @@ class SetupWizardController
         return get_option(self::WIZARD_COMPLETED_OPTION, '0') !== '1' && 
                apply_filters('yatra_enable_setup_wizard', true) && 
                current_user_can('manage_options');
+    }
+
+    /**
+     * Handle skipping the setup wizard
+     */
+    public function skip_setup_wizard()
+    {
+        // Mark wizard as completed
+        update_option(self::WIZARD_COMPLETED_OPTION, '1');
+        
+        // Redirect to admin dashboard
+        wp_safe_redirect(admin_url());
+        exit;
     }
 
     /**
