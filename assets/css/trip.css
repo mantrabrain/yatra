@@ -3802,10 +3802,99 @@ button.yatra-booking-button svg path {
     font-size: 12px;
     font-weight: 500;
     color: #059669;
+    position: relative;
 }
 
 .yatra-group-discount-badge-minimal svg {
     flex-shrink: 0;
+}
+
+/* Tooltip Styles */
+.yatra-has-tooltip {
+    cursor: help;
+}
+
+.yatra-has-tooltip .yatra-info-icon {
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.yatra-has-tooltip:hover .yatra-info-icon {
+    opacity: 1;
+}
+
+.yatra-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    min-width: 220px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    pointer-events: none;
+}
+
+.yatra-has-tooltip:hover .yatra-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.yatra-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #ffffff;
+}
+
+.yatra-tooltip-header {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+    border-radius: 8px 8px 0 0;
+    font-size: 13px;
+    color: #111827;
+}
+
+.yatra-tooltip-content {
+    padding: 8px;
+}
+
+.yatra-discount-tier {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 6px;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
+}
+
+.yatra-discount-tier:hover {
+    background: #f3f4f6;
+}
+
+.yatra-tier-size {
+    font-size: 12px;
+    color: #4b5563;
+    font-weight: 500;
+}
+
+.yatra-tier-discount {
+    font-size: 12px;
+    font-weight: 600;
+    color: #059669;
+    background: #ecfdf5;
+    padding: 2px 8px;
+    border-radius: 4px;
 }
 
 /* Applied Group Discount Display */

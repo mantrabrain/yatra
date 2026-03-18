@@ -36,7 +36,7 @@ class DiscountService extends BaseService
         $table = \Yatra\Database\Tables\DiscountsTable::getTableName();
         $today = date('Y-m-d H:i:s');
 
-        // Query for active group discounts applicable to this trip
+        // Query for active group discounts
         // Check both is_group_discount=1 OR discount_mode IN ('group', 'both') for backward compatibility
         $query = $wpdb->prepare(
             "SELECT * FROM `{$table}` 
@@ -44,15 +44,30 @@ class DiscountService extends BaseService
             AND status = 'publish'
             AND (valid_from IS NULL OR valid_from <= %s)
             AND (expiry_date IS NULL OR expiry_date >= %s)
-            AND (trip_ids IS NULL OR trip_ids = '' OR FIND_IN_SET(%d, trip_ids) > 0)
             ORDER BY created_at DESC",
             $today,
-            $today,
-            $tripId
+            $today
         );
         
         $results = $wpdb->get_results($query);
-        return $results ?: [];
+        
+        // Filter by trip_ids in PHP since it's stored as serialized array
+        $filtered = [];
+        foreach ($results as $discount) {
+            // If applicable_to is 'all', include it
+            if (empty($discount->trip_ids) || $discount->applicable_to === 'all') {
+                $filtered[] = $discount;
+                continue;
+            }
+            
+            // If applicable_to is 'specific_trips', check if trip is in the list
+            $trip_ids = maybe_unserialize($discount->trip_ids);
+            if (is_array($trip_ids) && in_array($tripId, array_map('intval', $trip_ids), true)) {
+                $filtered[] = $discount;
+            }
+        }
+        
+        return $filtered;
     }
 
     protected function validate(array $data, ?int $id = null): void

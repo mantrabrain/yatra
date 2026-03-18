@@ -319,7 +319,7 @@ class BookingSessionController extends BaseController
                     $pt = (array) $pt;
                     $category_id = $pt['category_id'] ?? 0;
                     $pricing_mode = $pt['pricing_mode'] ?? 'per_person';
-                    $category_price = isset($pt['effective_price']) ? (float) $pt['effective_price'] : ($pt['sale_price'] ?? $pt['discounted_price'] ?? $pt['original_price'] ?? 0);
+                    $category_price = isset($pt['effective_price']) ? (float) $pt['effective_price'] : \Yatra\Services\TripPricingService::resolveCategoryEffectivePrice($pt);
                     $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : 0;
                     
                     if ($pricing_mode === 'per_group') {
@@ -409,16 +409,16 @@ class BookingSessionController extends BaseController
         
         // Use centralized AvailabilityResolutionService to get resolved availability
         // This follows priority: Recurring Rules → Availability Dates → Trip Default
+        // Pass departure_time for day tours with multiple time slots on the same date
         $availability = null;
         if ($travel_date) {
             try {
                 $resolutionService = new \Yatra\Services\AvailabilityResolutionService();
-                $availability = $resolutionService->resolveAvailabilityForDate((int) $data['trip_id'], $travel_date);
-                
-                // Check departure time match if specified
-                if ($availability && $departure_time && isset($availability->departure_time) && $availability->departure_time !== $departure_time) {
-                    $availability = null; // Time mismatch
-                }
+                $availability = $resolutionService->resolveAvailabilityForDate(
+                    (int) $data['trip_id'],
+                    $travel_date,
+                    $departure_time ?: null
+                );
                 
                 if ($availability) {
                     $data['availability_id'] = $availability->id;
@@ -431,42 +431,31 @@ class BookingSessionController extends BaseController
             }
         }
         
-        // Get pricing configuration from resolved availability (already follows priority chain)
-        // pricing_type always comes from trip
-        $pricing_type = !empty($data['pricing_type']) 
-            ? sanitize_text_field($data['pricing_type']) 
-            : ($availability ? $availability->pricing_type : ($trip->pricing_type ?? 'regular'));
+        // Resolve pricing_type and price_types via centralized TripPricingService
+        // Priority: frontend data → availability → trip defaults
+        $pricing_type = !empty($data['pricing_type'])
+            ? sanitize_text_field($data['pricing_type'])
+            : \Yatra\Services\TripPricingService::resolvePricingType($trip);
         
-        // Get price_types from resolved availability (already follows priority: Rules → Dates → Trip)
         $price_types = [];
         
         // First priority: price_types sent from frontend (from availability card)
         if (!empty($data['price_types']) && is_array($data['price_types'])) {
             $price_types = $data['price_types'];
         }
-        // Second priority: Use resolved availability price_types (already prioritized)
+        // Second priority: availability price_types (already includes trip fallback from AvailabilityResolutionService)
         elseif ($availability && !empty($availability->price_types)) {
             $price_types = is_array($availability->price_types) ? $availability->price_types : [];
         }
-        
-        // Get base price for regular pricing
-        $trip_price = 0;
-        if ($pricing_type === 'regular') {
-            if ($availability) {
-                $trip_price = (float) ($availability->discounted_price ?? $availability->original_price ?? 0);
-            } else {
-                $trip_price = (float) ($trip->discounted_price ?? $trip->original_price ?? 0);
-            }
-            
-            // Apply dynamic pricing if module is enabled
-            if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
-                $trip_price = apply_filters('yatra_booking_trip_price', $trip_price, (int) $trip->id, [
-                    'departure_date' => $travel_date,
-                    'spots_remaining' => $availability ? (int) ($availability->seats_available ?? 0) : null,
-                    'availability_id' => $availability_id,
-                ]);
-            }
+        // Third priority: trip's price_types via centralized normalizer
+        if (empty($price_types)) {
+            $price_types = \Yatra\Services\TripPricingService::resolvePriceTypes($trip);
         }
+        // Auto-detect traveler_based if price_types are present
+        if (!empty($price_types) && $pricing_type === 'regular') {
+            $pricing_type = 'traveler_based';
+        }
+        // NOTE: Actual pricing calculation is handled entirely by CalculationService below
         
         // Enrich price_types with category labels if needed (some might already have them from frontend)
         if (!empty($price_types)) {
@@ -504,9 +493,9 @@ class BookingSessionController extends BaseController
                             $pt['age_min'] = $cat->age_min ? (int) $cat->age_min : null;
                             $pt['age_max'] = $cat->age_max ? (int) $cat->age_max : null;
                         }
-                        // Ensure effective price is set
+                        // Ensure effective price is set via centralized resolver
                         if (!isset($pt['effective_price'])) {
-                            $pt['effective_price'] = $pt['discounted_price'] ?? $pt['sale_price'] ?? $pt['original_price'] ?? 0;
+                            $pt['effective_price'] = \Yatra\Services\TripPricingService::resolveCategoryEffectivePrice($pt);
                         }
                     }
                 }
@@ -613,11 +602,24 @@ class BookingSessionController extends BaseController
         // Set session
         yatra_set_booking_session($session_data);
         
+        // Get the booking token directly from session (it's added by yatra_set_booking_session)
+        yatra_start_session();
+        $booking_token = $_SESSION['yatra_booking_token'] ?? null;
+        
+                
         // Fire hook when trip is added to booking session (for Pro modules)
         do_action('yatra_trip_added_to_session', $session_data['trip_id'], $session_data);
 
-        // Get redirect URL - session has all data, no need for URL params
+        // Get redirect URL
         $redirect_url = yatra_get_checkout_url();
+        
+        // Add booking token to URL for REST API → page load session restoration
+        if ($booking_token) {
+            $redirect_url = add_query_arg('booking_token', $booking_token, $redirect_url);
+        }
+        
+        // Add booking_token to response data for debugging
+        $session_data['booking_token'] = $booking_token;
 
         return new WP_REST_Response([
             'success' => true,
@@ -2259,36 +2261,36 @@ class BookingSessionController extends BaseController
             // Only use getById if availability_id is numeric
             $availability = $this->availabilityService->getById((int) $availability_id);
         } elseif (!empty($travel_date)) {
-            // For string IDs or when no availability_id, use date-based lookup
-            $availability = $this->availabilityService->getByTripAndDate($trip_id, $travel_date);
-            
-            if ($availability && !empty($departure_time) && $availability->departure_time !== $departure_time) {
-                $availability = null; // Time mismatch
-            }
+            // For string IDs or when no availability_id, use date+time lookup for day tours
+            $availability = $this->availabilityService->getByTripAndDateTime($trip_id, $travel_date, $departure_time ?: null);
         }
         
-        // Get price types for traveler-based pricing
-        // Table removed: rely on availability price_types or trip->price_types only
-        $price_types_table = null;
-        $categories_table = null;
+        // Resolve pricing type and price_types via centralized TripPricingService
+        $resolved_pricing_type = !empty($pricing_type_from_request)
+            ? $pricing_type_from_request
+            : \Yatra\Services\TripPricingService::resolvePricingType($trip);
+        
         $price_types = [];
         
-        $resolved_pricing_type = !empty($pricing_type_from_request) ? $pricing_type_from_request : ($trip->pricing_type ?? 'regular');
-
-        if ($availability && !empty($availability->pricing_type)) {
-            $resolved_pricing_type = $availability->pricing_type;
-        }
-
+        // First priority: availability price_types (already includes trip fallback from AvailabilityResolutionService)
         if ($availability && !empty($availability->price_types)) {
-            $availability_price_types = is_string($availability->price_types)
+            $avail_pts = is_string($availability->price_types)
                 ? (json_decode($availability->price_types, true) ?: [])
                 : $availability->price_types;
-
-            if (!empty($availability_price_types) && is_array($availability_price_types)) {
-                $price_types = array_map(function ($pt) {
-                    return (object) $pt;
-                }, $availability_price_types);
+            if (!empty($avail_pts) && is_array($avail_pts)) {
+                $price_types = array_map(function ($pt) { return (object) $pt; }, $avail_pts);
             }
+        }
+        // Second priority: trip's price_types via centralized normalizer
+        if (empty($price_types)) {
+            $normalized = \Yatra\Services\TripPricingService::resolvePriceTypes($trip);
+            if (!empty($normalized)) {
+                $price_types = array_map(function ($pt) { return (object) $pt; }, $normalized);
+            }
+        }
+        // Auto-detect traveler_based if price_types are present
+        if (!empty($price_types)) {
+            $resolved_pricing_type = 'traveler_based';
         }
 
         // Enrich availability price_types with category labels if missing
@@ -2335,7 +2337,7 @@ class BookingSessionController extends BaseController
         }
 
         foreach ($price_types as $pt) {
-            $pt->effective_price = $pt->effective_price ?? ($pt->discounted_price ?? $pt->sale_price ?? $pt->original_price ?? 0);
+            $pt->effective_price = $pt->effective_price ?? \Yatra\Services\TripPricingService::resolveCategoryEffectivePrice((array) $pt);
         }
 
         if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
@@ -2357,16 +2359,21 @@ class BookingSessionController extends BaseController
 
         $is_traveler_based = $resolved_pricing_type === 'traveler_based' && !empty($price_types);
 
-        // Base trip price with proper fallback: availability → trip default
-        $base_trip_price = !empty($trip->discounted_price) ? (float) $trip->discounted_price : (float) $trip->original_price;
+        // Base trip price via centralized TripPricingService (single source of truth)
+        $base_trip_price = \Yatra\Services\TripPricingService::resolveRegularCurrentPrice($trip);
         
-        // Override with availability pricing if set (not NULL)
-        if ($availability && isset($availability->discounted_price) && $availability->discounted_price !== null && $availability->discounted_price > 0) {
-            $base_trip_price = (float) $availability->discounted_price;
-        } elseif ($availability && isset($availability->original_price) && $availability->original_price !== null && $availability->original_price > 0) {
-            $base_trip_price = (float) $availability->original_price;
+        // Override with availability pricing if available
+        if ($availability) {
+            $avail_price = !empty($availability->discounted_price) && (float) $availability->discounted_price > 0
+                ? (float) $availability->discounted_price
+                : (!empty($availability->original_price) && (float) $availability->original_price > 0
+                    ? (float) $availability->original_price : 0);
+            if ($avail_price > 0) {
+                $base_trip_price = $avail_price;
+            }
         }
 
+        // Apply dynamic pricing filter (Pro DynamicPricingModule hooks here)
         if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
             $base_trip_price = apply_filters('yatra_booking_trip_price', $base_trip_price, $trip_id, [
                 'departure_date' => $travel_date,
@@ -2437,7 +2444,7 @@ class BookingSessionController extends BaseController
                 $pt = (object) $pt;
                 $priceTypesForDiscount[] = [
                     'category_id' => $pt->category_id ?? null,
-                    'effective_price' => $pt->effective_price ?? $pt->discounted_price ?? $pt->sale_price ?? $pt->original_price ?? 0,
+                    'effective_price' => $pt->effective_price ?? \Yatra\Services\TripPricingService::resolveCategoryEffectivePrice((array) $pt),
                 ];
             }
         } else {
@@ -2722,11 +2729,12 @@ class BookingSessionController extends BaseController
             return '<p>' . __('Trip not found.', 'yatra') . '</p>';
         }
         
-        // Build pricing calculation array from data
+        // Build pricing calculation array from data (centralized pricing)
+        $resolvedCurrentPrice = \Yatra\Services\TripPricingService::resolveRegularCurrentPrice($trip);
         $pricingCalculation = [
             'original_price' => $trip->original_price ?? 0,
-            'discounted_price' => $trip->discounted_price ?? $trip->original_price ?? 0,
-            'unit_price' => $data['price_per_person'] ?? ($trip->discounted_price ?? $trip->original_price ?? 0),
+            'discounted_price' => $resolvedCurrentPrice,
+            'unit_price' => $data['price_per_person'] ?? $resolvedCurrentPrice,
             'pricing_type' => $session['pricing_type'] ?? 'regular',
             'base_amount' => $data['gross_total'] ?? 0,
             'subtotal' => $data['subtotal'] ?? $data['gross_total'] ?? 0,

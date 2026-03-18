@@ -19,13 +19,14 @@ if (!defined('ABSPATH')) {
             $discountService = new \Yatra\Services\DiscountService();
             $groupDiscountsResult = $discountService->getGroupDiscountsForTrip((int) $trip->getId());
             if (!empty($groupDiscountsResult)) {
-                $sidebar_has_group_discounts = true;
-                $sidebar_group_discounts_data = $groupDiscountsResult;
-                // Get min_group_size from ranges if available, otherwise use legacy field
-                $min_group = 2;
+                // Decode and format the group discount ranges for tooltip display
                 if (!empty($groupDiscountsResult[0]->group_discount_ranges)) {
                     $ranges = json_decode($groupDiscountsResult[0]->group_discount_ranges, true);
                     if (!empty($ranges) && is_array($ranges)) {
+                        $sidebar_has_group_discounts = true;
+                        $sidebar_group_discounts_data = $ranges; // Use decoded ranges array
+                        
+                        // Get min_group_size from first range
                         $first_range = $ranges[0] ?? null;
                         if ($first_range && !empty($first_range['min_group_size'])) {
                             $min_group = (int) $first_range['min_group_size'];
@@ -56,88 +57,33 @@ if (!defined('ABSPATH')) {
                 'status' => $avail->status,
                 'is_limited' => $avail->is_limited ?? false,
                 'is_sold_out' => $avail->is_sold_out ?? false,
-                'pricing_type' => $avail->pricing_type ?? $pricing_type,
+                'pricing_type' => (!empty($avail->price_types) && is_array($avail->price_types)) ? 'traveler_based' : $pricing_type,
                 'price_types' => !empty($avail->price_types) ? $avail->price_types : [],
             ];
         }
     }
 
-    // Calculate pricing - use pre-computed values from SingleTripController
+    // Pricing — resolved via centralized TripPricingService (single source of truth)
+    // SingleTripController pre-computes effective_price_min, min_category_original_price, max_discount_percentage
+    $displayPricing = \Yatra\Services\TripPricingService::resolveDisplayPricing($trip);
+
     $pricing = [
-        'has_price' => false,
-        'current_price' => '',
-        'original_price' => '',
-        'price_prefix' => '',
-        'has_discount' => false,
-        'raw_current_price' => 0,
-        'raw_original_price' => 0,
-        'is_traveler_based' => $has_traveler_pricing
+        'has_price'          => $displayPricing['effective_price_min'] > 0,
+        'current_price'      => $displayPricing['effective_price_min'] > 0 ? yatra_format_price($displayPricing['effective_price_min']) : '',
+        'original_price'     => $displayPricing['has_discount'] ? yatra_format_price($displayPricing['min_category_original_price']) : '',
+        'price_prefix'       => $displayPricing['price_prefix'],
+        'has_discount'       => $displayPricing['has_discount'],
+        'raw_current_price'  => $displayPricing['effective_price_min'],
+        'raw_original_price' => $displayPricing['min_category_original_price'],
+        'is_traveler_based'  => $displayPricing['has_traveler_pricing'],
     ];
 
     $discount = [
-        'has_discount' => false,
-        'discount_text' => '',
-        'discount_percentage' => 0
+        'has_discount'       => $displayPricing['has_discount'],
+        'discount_text'      => $displayPricing['max_discount_percentage'] > 0
+            ? sprintf(__('Up to %d%%', 'yatra'), $displayPricing['max_discount_percentage']) : '',
+        'discount_percentage' => $displayPricing['max_discount_percentage'],
     ];
-
-    // Use effective_price_min computed in SingleTripController (same as listing page)
-    $effective_min = (float) ($trip->effective_price_min ?? 0);
-    $original_min = (float) ($trip->min_category_original_price ?? 0);
-    $max_discount_pct = (int) ($trip->max_discount_percentage ?? 0);
-
-    if ($effective_min > 0) {
-        $pricing['has_price'] = true;
-        $pricing['raw_current_price'] = $effective_min;
-        $pricing['current_price'] = yatra_format_price($effective_min);
-
-        if ($has_traveler_pricing || $has_availability) {
-            $pricing['price_prefix'] = __('From ', 'yatra');
-        }
-
-        // Check for discount
-        if ($max_discount_pct > 0 && $original_min > $effective_min) {
-            $pricing['has_discount'] = true;
-            $pricing['raw_original_price'] = $original_min;
-            $pricing['original_price'] = yatra_format_price($original_min);
-
-            $discount['has_discount'] = true;
-            $discount['discount_percentage'] = $max_discount_pct;
-            $discount['discount_text'] = sprintf(__('Up to %d%%', 'yatra'), $max_discount_pct);
-        }
-    } else {
-        // Fallback for regular pricing when effective_price_min is 0
-        // This runs for both regular pricing AND traveler pricing scenarios
-        $original = (float) ($trip->getOriginalPrice() ?? 0);
-        $discounted = (float) ($trip->discounted_price ?? 0);
-
-        // Determine current price: Priority: discounted_price > original_price > sale_price
-        if ($discounted > 0) {
-            $current = $discounted;
-        } elseif ($original > 0) {
-            $current = $original;
-        } elseif (!empty($trip->getSalePrice()) && (float)$trip->getSalePrice() > 0) {
-            $current = (float) $trip->getSalePrice();
-        } else {
-            $current = 0;
-        }
-
-        if ($current > 0) {
-            $pricing['has_price'] = true;
-            $pricing['raw_current_price'] = $current;
-            $pricing['current_price'] = yatra_format_price($current);
-
-            if ($current < $original && $original > 0) {
-                $pricing['has_discount'] = true;
-                $pricing['raw_original_price'] = $original;
-                $pricing['original_price'] = yatra_format_price($original);
-
-                $pct = round((($original - $current) / $original) * 100);
-                $discount['has_discount'] = true;
-                $discount['discount_percentage'] = $pct;
-                $discount['discount_text'] = sprintf(__('%d%%', 'yatra'), $pct);
-            }
-        }
-    }
     ?>
     <div class="yatra-booking-card"
          data-has-availability="<?php echo $has_availability ? 'true' : 'false'; ?>"
@@ -147,8 +93,8 @@ if (!defined('ABSPATH')) {
          data-group-discounts='<?php echo esc_attr(json_encode($sidebar_group_discounts_data)); ?>'>
 
         <?php if ($sidebar_has_group_discounts): ?>
-            <!-- Group Discount Badge - Minimal -->
-            <div class="yatra-group-discount-badge-minimal">
+            <!-- Group Discount Badge - Minimal with Tooltip -->
+            <div class="yatra-group-discount-badge-minimal yatra-has-tooltip">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="9" cy="7" r="4"></circle>
@@ -156,6 +102,38 @@ if (!defined('ABSPATH')) {
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
                 <span><?php echo esc_html__('Group discount available', 'yatra'); ?></span>
+                <svg class="yatra-info-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <div class="yatra-tooltip">
+                    <div class="yatra-tooltip-header">
+                        <strong><?php echo esc_html__('Group Discount Tiers', 'yatra'); ?></strong>
+                    </div>
+                    <div class="yatra-tooltip-content">
+                        <?php if (!empty($sidebar_group_discounts_data) && is_array($sidebar_group_discounts_data)): ?>
+                            <?php foreach ($sidebar_group_discounts_data as $range): ?>
+                                <div class="yatra-discount-tier">
+                                    <span class="yatra-tier-size">
+                                        <?php 
+                                        $min = (int) ($range['min_group_size'] ?? 0);
+                                        $max = isset($range['max_group_size']) && $range['max_group_size'] > 0 ? (int) $range['max_group_size'] : null;
+                                        if ($max) {
+                                            echo sprintf(esc_html__('%d-%d travelers', 'yatra'), $min, $max);
+                                        } else {
+                                            echo sprintf(esc_html__('%d+ travelers', 'yatra'), $min);
+                                        }
+                                        ?>
+                                    </span>
+                                    <span class="yatra-tier-discount">
+                                        <?php echo esc_html(sprintf(__('%s%% OFF', 'yatra'), number_format((float) ($range['discount_percentage'] ?? 0), 1))); ?>
+                                    </span>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
         <?php endif; ?>
 

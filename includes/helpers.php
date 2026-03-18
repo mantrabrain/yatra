@@ -589,18 +589,34 @@ function yatra_set_booking_session(array $data): void
     // Clear any existing remaining payment session to avoid conflicts
     unset($_SESSION['yatra_remaining']);
     
-    $_SESSION['yatra_booking'] = array_merge(
+    $session_data = array_merge(
         $_SESSION['yatra_booking'] ?? [],
         $data,
         ['timestamp' => time()]
     );
     
-    // Ensure session data is written to storage immediately
-    // This is crucial for REST API requests where the session might not auto-save
-    if (session_status() === PHP_SESSION_ACTIVE) {
-        session_write_close();
+    $_SESSION['yatra_booking'] = $session_data;
+    
+    // ALWAYS store in transient as backup (not just for REST API)
+    // This ensures data persists across all request types
+    // Generate or reuse booking token
+    $booking_token = $_SESSION['yatra_booking_token'] ?? 'yatra_booking_' . wp_generate_password(32, false);
+    $_SESSION['yatra_booking_token'] = $booking_token;
+    $session_data['booking_token'] = $booking_token;
+    
+    // Store in transient (expires in 30 minutes)
+    try {
+        $transient_set = set_transient($booking_token, $session_data, 1800);
+        if (!$transient_set) {
+            // Fallback: ensure session data is still available
+            error_log('Yatra: Failed to set transient, session fallback will be used');
+        }
+    } catch (Exception $e) {
+        // Log error but don't fail the booking process
+        error_log('Yatra: Transient error: ' . $e->getMessage());
     }
-}
+    
+    }
 
 /**
  * Get booking session data
@@ -614,6 +630,31 @@ function yatra_get_booking_session(?string $key = null, $default = null)
     yatra_start_session();
     
     $booking_data = $_SESSION['yatra_booking'] ?? [];
+    
+    // If session is empty, try to restore from transient (REST API → page load transition)
+    if (empty($booking_data) || empty($booking_data['trip_id'])) {
+        // Check for booking token in URL or session
+        $booking_token = $_GET['booking_token'] ?? $_SESSION['yatra_booking_token'] ?? null;
+        
+        if ($booking_token) {
+            try {
+                $transient_data = get_transient($booking_token);
+                
+                if ($transient_data && is_array($transient_data) && !empty($transient_data['trip_id'])) {
+                    // Validate transient data integrity
+                    if (isset($transient_data['timestamp']) && (time() - $transient_data['timestamp']) < 1800) {
+                        $booking_data = $transient_data;
+                        // Restore to session
+                        $_SESSION['yatra_booking'] = $booking_data;
+                        $_SESSION['yatra_booking_token'] = $booking_token;
+                    }
+                }
+            } catch (Exception $e) {
+                // Log error but continue with empty session
+                error_log('Yatra: Error retrieving transient: ' . $e->getMessage());
+            }
+        }
+    }
     
     // Check if session is expired (30 minutes)
     if (!empty($booking_data['timestamp'])) {
@@ -918,6 +959,12 @@ function yatra_get_trip_permalink($trip): string
     }
     
     $base = SettingsService::getTripBase();
+    $permalink_structure = get_option('permalink_structure');
+    $is_plain = empty($permalink_structure);
+    
+    if ($is_plain) {
+        return add_query_arg(['yatra_trip_slug' => $slug], home_url('/'));
+    }
     
     return home_url('/' . $base . '/' . $slug . '/');
 }
