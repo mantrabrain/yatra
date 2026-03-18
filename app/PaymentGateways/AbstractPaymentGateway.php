@@ -108,13 +108,14 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
      */
     protected function getDefaultConfig(): array
     {
-        $defaults = ['enabled' => false];
+        // PayLater gateway is enabled by default, others are disabled
+        $defaults = ['enabled' => $this->id === 'pay_later'];
         foreach ($this->getConfigFields() as $field) {
             $defaults[$field['id']] = $field['default'] ?? '';
         }
         // Ensure 'enabled' is always present
         if (!isset($defaults['enabled'])) {
-            $defaults['enabled'] = false;
+            $defaults['enabled'] = $this->id === 'pay_later';
         }
         return $defaults;
     }
