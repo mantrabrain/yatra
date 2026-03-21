@@ -265,62 +265,12 @@ class SingleTripController
         // Get currency
         $trip->currency = SettingsService::getCurrency();
 
-        // Compute effective pricing (same logic as TripRepository::computeEffectivePricing)
-        $trip->effective_price_min = 0;
-        $trip->min_category_original_price = 0;
-        $trip->max_discount_percentage = 0;
-        
-        if (!empty($trip->pricing_type) && $trip->pricing_type === 'traveler_based' && !empty($trip->price_types)) {
-            // For traveler-based pricing, find minimum effective price from price_types
-            $min_price = PHP_FLOAT_MAX;
-            $min_original = 0;
-            $max_discount = 0;
-            
-            foreach ($trip->price_types as $pt) {
-                $original = (float) ($pt->original_price ?? 0);
-                $discounted = (float) ($pt->discounted_price ?? 0);
-                $effective = ($discounted > 0 && $discounted < $original) ? $discounted : $original;
-                
-                if ($effective > 0 && $effective < $min_price) {
-                    $min_price = $effective;
-                    $min_original = $original;
-                }
-                
-                // Calculate discount percentage for this category
-                if ($original > 0 && $discounted > 0 && $discounted < $original) {
-                    $discount_pct = round((($original - $discounted) / $original) * 100);
-                    if ($discount_pct > $max_discount) {
-                        $max_discount = $discount_pct;
-                    }
-                }
-            }
-            
-            if ($min_price < PHP_FLOAT_MAX) {
-                $trip->effective_price_min = $min_price;
-                $trip->min_category_original_price = $min_original;
-                $trip->max_discount_percentage = $max_discount;
-            }
-        } else {
-            // Regular pricing logic
-            if (!empty($trip->discounted_price) && (float)$trip->discounted_price > 0) {
-                $trip->effective_price_min = (float)$trip->discounted_price;
-            } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
-                $trip->effective_price_min = (float)$trip->sale_price;
-            } elseif (!empty($trip->original_price) && (float)$trip->original_price > 0) {
-                $trip->effective_price_min = (float)$trip->original_price;
-            }
-            
-            // Set min_category_original_price for regular pricing
-            $trip->min_category_original_price = (float)($trip->original_price ?? 0);
-        }
-
-        // Calculate discount percentage
-        $trip->discount_percentage = 0;
-        if ($trip->max_discount_percentage > 0) {
-            $trip->discount_percentage = $trip->max_discount_percentage;
-        } elseif ($trip->original_price > 0 && $trip->sale_price < $trip->original_price) {
-            $trip->discount_percentage = round((($trip->original_price - $trip->sale_price) / $trip->original_price) * 100);
-        }
+        // Compute effective pricing via centralized TripPricingService (single source of truth)
+        $displayPricing = \Yatra\Services\TripPricingService::resolveDisplayPricing($trip);
+        $trip->effective_price_min = $displayPricing['effective_price_min'];
+        $trip->min_category_original_price = $displayPricing['min_category_original_price'];
+        $trip->max_discount_percentage = $displayPricing['max_discount_percentage'];
+        $trip->discount_percentage = $displayPricing['discount_percentage'];
 
         // Ensure ID is integer
         $trip_id = (int) $trip->id;
@@ -352,97 +302,18 @@ class SingleTripController
     /**
      * Calculate base price for template display
      * 
+     * Delegates to centralized TripPricingService (single source of truth).
+     * 
      * @param object $trip Trip object
      * @return float Base price
      */
     private function calculateBasePrice(object $trip): float
     {
-        // Check if availability dates exist (PRIORITY)
-        if (!empty($trip->availability_dates) && is_array($trip->availability_dates)) {
-            $min_price = PHP_FLOAT_MAX;
-            
-            foreach ($trip->availability_dates as $avail) {
-                $avail_price = $avail->effective_price ?? $avail->original_price ?? 0;
-                if ($avail_price > 0 && $avail_price < $min_price) {
-                    $min_price = $avail_price;
-                }
+        $availDates = !empty($trip->availability_dates) && is_array($trip->availability_dates)
+            ? $trip->availability_dates : null;
 
-                // Also check price_types within availability if traveler-based
-                if (!empty($avail->price_types) && is_array($avail->price_types)) {
-                    foreach ($avail->price_types as $pt) {
-                        $pt = (object) $pt;
-                        $pt_price = (float) ($pt->effective_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
-                        if ($pt_price > 0 && $pt_price < $min_price) {
-                            $min_price = $pt_price;
-                        }
-                    }
-                }
-            }
-
-            // If no price found from availability, check traveler-based pricing
-            if ($min_price >= PHP_FLOAT_MAX && !empty($trip->price_types)) {
-                foreach ($trip->price_types as $pt) {
-                    $pt_price = (float) ($pt->effective_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
-                    if ($pt_price > 0 && $pt_price < $min_price) {
-                        $min_price = $pt_price;
-                    }
-                }
-            }
-
-            $base_price = ($min_price < PHP_FLOAT_MAX) ? $min_price : ($trip->sale_price ?: $trip->original_price);
-        } elseif (!empty($trip->price_types)) {
-            // Get default or first traveler category price
-            $default_price_type = null;
-            foreach ($trip->price_types as $pt) {
-                if (!empty($pt->is_default)) {
-                    $default_price_type = $pt;
-                    break;
-                }
-            }
-            if (!$default_price_type && !empty($trip->price_types)) {
-                $default_price_type = $trip->price_types[0];
-            }
-
-            // Get the price from the price type - check multiple possible fields
-            $base_price = 0;
-            if ($default_price_type) {
-                // Try effective_price first, then discounted_price, then original_price
-                if (!empty($default_price_type->effective_price) && $default_price_type->effective_price > 0) {
-                    $base_price = (float) $default_price_type->effective_price;
-                } elseif (!empty($default_price_type->discounted_price) && $default_price_type->discounted_price > 0) {
-                    $base_price = (float) $default_price_type->discounted_price;
-                } elseif (!empty($default_price_type->original_price) && $default_price_type->original_price > 0) {
-                    $base_price = (float) $default_price_type->original_price;
-                } elseif (!empty($default_price_type->sale_price) && $default_price_type->sale_price > 0) {
-                    $base_price = (float) $default_price_type->sale_price;
-                }
-
-                // If still no price, try to get the minimum from all price types
-                if ($base_price <= 0) {
-                    foreach ($trip->price_types as $pt) {
-                        $pt_price = (float) ($pt->effective_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
-                        if ($pt_price > 0 && ($base_price <= 0 || $pt_price < $base_price)) {
-                            $base_price = $pt_price;
-                        }
-                    }
-                }
-            } else {
-                $base_price = $trip->sale_price ?: $trip->original_price;
-            }
-        } else {
-            // Regular pricing
-            $base_price = $trip->sale_price > 0 ? $trip->sale_price : $trip->original_price;
-        }
-
-        // Apply dynamic pricing if module is enabled
-        if (!empty($base_price) && apply_filters('yatra_dynamic_pricing_enabled', false)) {
-            $base_price = apply_filters('yatra_trip_display_price', $base_price, $trip->id ?? 0, [
-                'departure_date' => null, // Generic display for single trip page
-                'spots_remaining' => null,
-            ]);
-        }
-
-        return (float) $base_price;
+        $pricing = \Yatra\Services\TripPricingService::resolveDisplayPricing($trip, $availDates);
+        return (float) $pricing['effective_price_min'];
     }
 
     /**
@@ -1863,7 +1734,8 @@ class SingleTripController
      */
     public static function prepareTravelerSelectorData($trip, string $context = 'sidebar'): array
     {
-        $has_traveler_pricing = !empty($trip->price_types);
+        $trip_pricing_type = $trip->pricing_type ?? '';
+        $has_traveler_pricing = ($trip_pricing_type === 'traveler_based' && !empty($trip->price_types));
         $traveler_rows = [];
         
         if ($has_traveler_pricing) {
@@ -1887,7 +1759,7 @@ class SingleTripController
                     }
                 }
 
-                $display_price_type = $price_type->effective_price ?? $price_type->discounted_price ?? $price_type->original_price ?? 0;
+                $display_price_type = $price_type->effective_price ?? \Yatra\Services\TripPricingService::resolveCategoryEffectivePrice((array) $price_type);
                 if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
                     $trip_id = is_object($trip) && method_exists($trip, 'getId') ? $trip->getId() : ($trip->id ?? 0);
                     $display_price_type = apply_filters('yatra_trip_display_price', $display_price_type, $trip_id, [

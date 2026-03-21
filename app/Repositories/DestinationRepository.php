@@ -181,16 +181,13 @@ class DestinationRepository extends BaseRepository
             return 0.0;
         }
 
-        $candidates = [];
-        foreach (['sale_price', 'discounted_price', 'original_price'] as $field) {
-            if (isset($trip->{$field}) && (float) $trip->{$field} > 0) {
-                $candidates[] = (float) $trip->{$field};
-            }
+        // Use centralized TripPricingService for trip-level pricing
+        $tripEffective = \Yatra\Services\TripPricingService::getEffectivePrice($trip);
+        if ($tripEffective > 0) {
+            return $tripEffective;
         }
 
-        if (!empty($candidates)) {
-            return (float) min($candidates);
-        }
+        $candidates = [];
 
         // Fallback 1: look at traveler-based pricing from recurring availability rules
         $rulesRepo = new RecurringAvailabilityRepository();

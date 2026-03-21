@@ -217,54 +217,15 @@ class SavedTripRepository extends BaseRepository
             $pricingType = $tripObj->pricing_type ?? 'regular';
             $hasTravelerPricing = ($pricingType === 'traveler_based' && !empty($tripObj->price_types));
             
-            // Get prices from trip object - check multiple possible fields
-            $originalPrice = (float) ($tripObj->original_price ?? $tripObj->price ?? 0);
-            $salePrice = (float) ($tripObj->sale_price ?? $tripObj->discounted_price ?? 0);
-            $discountedPrice = (float) ($tripObj->discounted_price ?? 0);
-            $displayPrice = 0;
-            $hasDiscount = false;
-            $discountPercent = 0;
-            
-            // Calculate base price (matching single-trip.php logic)
-            if ($hasAvailability) {
-                // Get the lowest price from availability dates
-                $minPrice = PHP_FLOAT_MAX;
-                foreach ($tripObj->availability_dates as $avail) {
-                    $avail = (object) $avail;
-                    $availPrice = (float) ($avail->effective_price ?? $avail->sale_price ?? $avail->discounted_price ?? $avail->original_price ?? 0);
-                    if ($availPrice > 0 && $availPrice < $minPrice) {
-                        $minPrice = $availPrice;
-                    }
-                }
-                $displayPrice = ($minPrice < PHP_FLOAT_MAX) ? $minPrice : ($salePrice > 0 ? $salePrice : $originalPrice);
-                } elseif ($hasTravelerPricing) {
-                // Get default or first traveler category price
-                $defaultPriceType = null;
-                foreach ($tripObj->price_types as $pt) {
-                    $pt = (object) $pt;
-                    if (!empty($pt->is_default)) {
-                        $defaultPriceType = $pt;
-                        break;
-                    }
-                }
-                if (!$defaultPriceType && !empty($tripObj->price_types)) {
-                    $defaultPriceType = (object) $tripObj->price_types[0];
-                }
-                if ($defaultPriceType) {
-                    $displayPrice = (float) ($defaultPriceType->effective_price ?? $defaultPriceType->sale_price ?? $defaultPriceType->discounted_price ?? $defaultPriceType->original_price ?? 0);
-                } else {
-                    $displayPrice = $salePrice > 0 ? $salePrice : $originalPrice;
-                }
-                } else {
-                // Regular pricing - use sale_price if available and less than original, otherwise original_price
-                if ($salePrice > 0 && $salePrice < $originalPrice && $originalPrice > 0) {
-                    $displayPrice = $salePrice;
-                    $hasDiscount = true;
-                    $discountPercent = ($originalPrice > 0) ? round((($originalPrice - $salePrice) / $originalPrice) * 100) : 0;
-                } else {
-                    $displayPrice = $originalPrice > 0 ? $originalPrice : 0;
-                }
-                }
+            // Centralized pricing via TripPricingService (single source of truth)
+            $availDates = $hasAvailability && !empty($tripObj->availability_dates) 
+                ? array_map(function($a) { return (object) $a; }, $tripObj->availability_dates) 
+                : null;
+            $resolvedPricing = \Yatra\Services\TripPricingService::resolveDisplayPricing($tripObj, $availDates);
+            $originalPrice = $resolvedPricing['original_price'];
+            $displayPrice = $resolvedPricing['current_price'];
+            $hasDiscount = $resolvedPricing['has_discount'];
+            $discountPercent = $resolvedPricing['discount_percentage'];
             
             // Get destinations for location
             $destinations = $tripRepository->getDestinations($tripId);

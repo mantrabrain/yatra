@@ -24,7 +24,7 @@
     "excluded_items": "[{\"title\":\"Flights\",\"description\":\"Airfare to/from Switzerland\"},{\"title\":\"Personal Gear\",\"description\":\"Hiking boots and clothing\"},{\"title\":\"Travel Insurance\",\"description\":\"Required for all trekkers\"},{\"title\":\"Tips\",\"description\":\"Guide and staff tips\"}]",
     "booking_window_days": 30,
     "booking_deadline_hours": 24,
-    "pricing_type": "regular",
+    "pricing_type": "traveler_based",
     "deposit_amount": 299.00,
     "age_min": 18,
     "age_max": 65,

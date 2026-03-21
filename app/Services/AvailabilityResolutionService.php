@@ -37,18 +37,19 @@ class AvailabilityResolutionService
     }
 
     /**
-     * Resolve availability for a specific trip and date
+     * Resolve availability for a specific trip and date (and optionally time)
      * 
      * Priority:
      * 1. Check Recurring Rules
-     * 2. Check Availability Dates
+     * 2. Check Availability Dates (with time matching for day tours)
      * 3. Fall back to Trip defaults
      * 
      * @param int $tripId Trip ID
      * @param string $date Date in Y-m-d format
+     * @param string|null $departureTime Optional departure time for day tour time slots
      * @return object Resolved availability data
      */
-    public function resolveAvailabilityForDate(int $tripId, string $date): object
+    public function resolveAvailabilityForDate(int $tripId, string $date, ?string $departureTime = null): object
     {
         // Get trip data
         $trip = $this->tripRepository->find($tripId);
@@ -62,8 +63,8 @@ class AvailabilityResolutionService
             return $this->buildAvailabilityObject($trip, $recurringData, 'recurring_rule');
         }
 
-        // Priority 2: Check Availability Dates
-        $availabilityDate = $this->availabilityRepository->findByTripIdAndDate($tripId, $date);
+        // Priority 2: Check Availability Dates (time-aware for day tours)
+        $availabilityDate = $this->availabilityRepository->findByTripIdAndDateTime($tripId, $date, $departureTime);
         if ($availabilityDate) {
             return $this->buildAvailabilityObject($trip, $availabilityDate, 'availability_date');
         }
@@ -93,7 +94,11 @@ class AvailabilityResolutionService
         // Step 1: Get specific availability dates
         $specificDates = $this->availabilityRepository->findByTripIdAndDateRange($tripId, $fromDate, $toDate);
         foreach ($specificDates as $avail) {
+            // Use composite key (date + time) to support multiple time slots on the same date (day tours)
             $dateKey = $avail->departure_date;
+            if (!empty($avail->departure_time)) {
+                $dateKey .= '_' . $avail->departure_time;
+            }
             $dateMap[$dateKey] = $this->buildAvailabilityObject($trip, $avail, 'availability_date');
         }
 
@@ -146,9 +151,13 @@ class AvailabilityResolutionService
     {
         $avail = new \stdClass();
         
-        // Get trip's pricing configuration
+        // Get trip's pricing configuration (used as fallback for all sources)
         $trip_pricing_type = $trip->pricing_type ?? 'regular';
         $trip_price_types = $this->getTripPriceTypes((int) $trip->id);
+        $trip_original_price = isset($trip->original_price) ? (float) $trip->original_price : null;
+        $trip_discounted_price = isset($trip->discounted_price) && (float) $trip->discounted_price > 0
+            ? (float) $trip->discounted_price
+            : (isset($trip->sale_price) && (float) $trip->sale_price > 0 ? (float) $trip->sale_price : null);
 
         switch ($sourceType) {
             case 'recurring_rule':
@@ -159,12 +168,18 @@ class AvailabilityResolutionService
                 $avail->seats_total = $source['max_capacity'] ?? 0;
                 $avail->seats_available = $source['max_capacity'] ?? 0;
                 $avail->seats_reserved = 0;
-                $avail->original_price = $source['base_price'] ?? null;
-                $avail->discounted_price = null;
                 $avail->status = 'available';
                 $avail->is_recurring = true;
                 $avail->rule_id = $source['rule_id'] ?? null;
                 $avail->source = 'recurring_rule';
+                
+                // Pricing: rule base_price → trip original_price fallback
+                $rule_price = isset($source['base_price']) && $source['base_price'] !== null
+                    ? (float) $source['base_price'] : null;
+                $avail->original_price = ($rule_price !== null && $rule_price > 0)
+                    ? $rule_price : $trip_original_price;
+                // Rules don't have discounted_price — inherit trip's discount
+                $avail->discounted_price = $trip_discounted_price;
                 
                 // Inherit trip's pricing_type
                 $avail->pricing_type = $trip_pricing_type;
@@ -185,11 +200,20 @@ class AvailabilityResolutionService
                 $avail->seats_total = (int) ($source->seats_total ?? 0);
                 $avail->seats_available = (int) ($source->seats_available ?? 0);
                 $avail->seats_reserved = (int) ($source->seats_reserved ?? 0);
-                $avail->original_price = isset($source->original_price) ? (float) $source->original_price : null;
-                $avail->discounted_price = isset($source->discounted_price) ? (float) $source->discounted_price : null;
                 $avail->status = $source->status ?? 'available';
                 $avail->is_recurring = false;
                 $avail->source = 'availability_date';
+                
+                // Pricing: availability price → trip price fallback
+                $avail_orig = isset($source->original_price) && $source->original_price !== null
+                    ? (float) $source->original_price : null;
+                $avail_disc = isset($source->discounted_price) && $source->discounted_price !== null
+                    ? (float) $source->discounted_price : null;
+                
+                $avail->original_price = ($avail_orig !== null && $avail_orig > 0)
+                    ? $avail_orig : $trip_original_price;
+                $avail->discounted_price = ($avail_disc !== null && $avail_disc > 0)
+                    ? $avail_disc : $trip_discounted_price;
                 
                 // Inherit trip's pricing_type
                 $avail->pricing_type = $trip_pricing_type;
@@ -212,8 +236,8 @@ class AvailabilityResolutionService
                 $avail->seats_total = (int) ($trip->max_travelers ?? 20);
                 $avail->seats_available = (int) ($trip->max_travelers ?? 20);
                 $avail->seats_reserved = 0;
-                $avail->original_price = isset($trip->original_price) ? (float) $trip->original_price : null;
-                $avail->discounted_price = isset($trip->discounted_price) ? (float) $trip->discounted_price : null;
+                $avail->original_price = $trip_original_price;
+                $avail->discounted_price = $trip_discounted_price;
                 $avail->status = 'available';
                 $avail->is_recurring = false;
                 $avail->source = 'trip_default';
@@ -224,14 +248,19 @@ class AvailabilityResolutionService
                 break;
         }
 
-        // Calculate effective price using CalculationService
+        // Calculate effective price via centralized TripPricingService
         $avail->effective_price = $this->calculateEffectivePrice($avail);
+
+        // Pro filter: allows Dynamic Pricing, Itinerary Pricing, etc. to modify per-date availability
+        $avail = (object) apply_filters('yatra_resolve_availability_object', $avail, $trip, $sourceType);
 
         return $avail;
     }
 
     /**
      * Calculate effective price based on pricing type
+     * 
+     * Delegates to centralized TripPricingService for consistent pricing resolution.
      * 
      * @param object $avail Availability object
      * @return float Effective price
@@ -242,16 +271,18 @@ class AvailabilityResolutionService
             // For traveler-based, return minimum price from categories
             $min_price = PHP_FLOAT_MAX;
             foreach ($avail->price_types as $pt) {
-                $pt = is_array($pt) ? (object) $pt : $pt;
-                $price = (float) ($pt->discounted_price ?? $pt->original_price ?? 0);
+                $price = TripPricingService::resolveCategoryEffectivePrice((array) $pt);
                 if ($price > 0 && $price < $min_price) {
                     $min_price = $price;
                 }
             }
             return $min_price < PHP_FLOAT_MAX ? $min_price : 0.0;
         } else {
-            // For regular pricing
-            return (float) ($avail->discounted_price ?? $avail->original_price ?? 0);
+            // For regular pricing: discounted → original
+            if (!empty($avail->discounted_price) && (float) $avail->discounted_price > 0) {
+                return (float) $avail->discounted_price;
+            }
+            return (float) ($avail->original_price ?? 0);
         }
     }
 

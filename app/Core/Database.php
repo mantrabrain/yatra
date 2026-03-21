@@ -116,7 +116,7 @@ class Database
         // DATABASE VERSION TRACKING
         // ============================================
         
-        update_option('yatra_db_version', '2.0.0');
+        update_option('yatra_db_version', YATRA_VERSION);
       
     }
 

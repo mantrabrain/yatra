@@ -580,7 +580,7 @@ const Trips: React.FC = () => {
     // Fallback: Pretty permalink path (matches TripPageHandler route)
     const baseSite = siteUrl.replace(/\/$/, "");
     const prettyUrl = `${baseSite}/${tripBase}/${tripSlug}`;
-    const plainUrl = `${baseSite}/?trip=${encodeURIComponent(tripSlug)}`;
+    const plainUrl = `${baseSite}/?yatra_trip_slug=${encodeURIComponent(tripSlug)}`;
 
     // Honor site permalink structure (default to plain when unknown)
     const targetUrl = isPlainPermalink ? plainUrl : prettyUrl;

@@ -210,47 +210,21 @@ class DiscountAndDealsShortcode extends BaseShortcode
      */
     private function processTripData($trip): array
     {
-        $original_price = (float) ($trip->original_price ?? 0);
-        $discounted_price = (float) ($trip->discounted_price ?? 0);
-        $sale_price = (float) ($trip->sale_price ?? 0);
+        // Use centralized TripPricingService for pricing and discount computation
+        $pricing = \Yatra\Services\TripPricingService::resolveDisplayPricing($trip);
+        $original_price = $pricing['original_price'];
+        $current_price = $pricing['current_price'];
+        $discountInfo = \Yatra\Services\TripPricingService::computeDiscount($original_price, $current_price);
         
-        $has_discount = false;
         $best_discount = null;
-        $current_price = $original_price;
-        
-        // Check for discounted price
-        if ($discounted_price > 0 && $discounted_price < $original_price) {
-            $has_discount = true;
-            $discount_amount = $original_price - $discounted_price;
-            $discount_percentage = ($discount_amount / $original_price) * 100;
-            
+        if ($discountInfo['has_discount']) {
             $best_discount = [
                 'type' => 'percentage',
-                'value' => round($discount_percentage, 1),
-                'amount' => $discount_amount,
+                'value' => round((float) $discountInfo['discount_percentage'], 1),
+                'amount' => $discountInfo['discount_amount'],
                 'original_price' => $original_price,
-                'discounted_price' => $discounted_price
+                'discounted_price' => $current_price
             ];
-            $current_price = $discounted_price;
-        }
-        
-        // Check for sale price
-        if ($sale_price > 0 && $sale_price < $original_price) {
-            $has_discount = true;
-            $discount_amount = $original_price - $sale_price;
-            $discount_percentage = ($discount_amount / $original_price) * 100;
-            
-            // Use sale price if it's better than discounted price
-            if (!$best_discount || $sale_price < $best_discount['discounted_price']) {
-                $best_discount = [
-                    'type' => 'percentage',
-                    'value' => round($discount_percentage, 1),
-                    'amount' => $discount_amount,
-                    'original_price' => $original_price,
-                    'discounted_price' => $sale_price
-                ];
-                $current_price = $sale_price;
-            }
         }
         
         // Generate permalink directly
@@ -265,9 +239,9 @@ class DiscountAndDealsShortcode extends BaseShortcode
             'description' => $trip->description ?? '',
             'short_description' => $trip->short_description ?? '',
             'original_price' => $original_price,
-            'discounted_price' => $current_price < $original_price ? $current_price : null,
-            'sale_price' => $current_price < $original_price ? $current_price : null,
-            'has_discount' => $has_discount,
+            'discounted_price' => $discountInfo['has_discount'] ? $current_price : null,
+            'sale_price' => $discountInfo['has_discount'] ? $current_price : null,
+            'has_discount' => $discountInfo['has_discount'],
             'best_discount' => $best_discount,
             'current_price' => $current_price,
             'featured_image' => $trip->featured_image,

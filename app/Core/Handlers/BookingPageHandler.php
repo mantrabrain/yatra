@@ -68,17 +68,9 @@ class BookingPageHandler extends BasePageHandler
                     $trip = null;
                 }
 
-                // Ensure trip has a price property for templates
+                // Ensure trip has a price property for templates (centralized pricing)
                 if ($trip && !isset($trip->price)) {
-                    $price = null;
-                    if (!empty($trip->discounted_price)) {
-                        $price = (float) $trip->discounted_price;
-                    } elseif (!empty($trip->sale_price)) {
-                        $price = (float) $trip->sale_price;
-                    } elseif (!empty($trip->original_price)) {
-                        $price = (float) $trip->original_price;
-                    }
-                    $trip->price = $price;
+                    $trip->price = \Yatra\Services\TripPricingService::resolveRegularCurrentPrice($trip);
                 }
 
                 // Ensure trip has a usable featured_image URL (not attachment ID)

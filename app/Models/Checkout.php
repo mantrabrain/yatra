@@ -103,7 +103,7 @@ class Checkout
             $categoryLabel = $pt->category_label ?? __('Traveler', 'yatra');
             $categoryPrice = isset($pt->effective_price) 
                 ? (float) $pt->effective_price 
-                : ($pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
+                : \Yatra\Services\TripPricingService::resolveCategoryEffectivePrice((array) $pt);
             $count = isset($travelerCounts[$categoryId]) 
                 ? (int) $travelerCounts[$categoryId] 
                 : ($index === 0 ? 1 : 0);
@@ -131,8 +131,8 @@ class Checkout
             return (float) $this->pricingCalculation['unit_price'];
         }
         
-        // Fallback to trip pricing
-        return (float) ($this->trip->discounted_price ?? $this->trip->original_price ?? 0);
+        // Fallback to trip pricing via centralized TripPricingService
+        return \Yatra\Services\TripPricingService::resolveRegularCurrentPrice($this->trip);
     }
     
     public function getBaseAmount(): float

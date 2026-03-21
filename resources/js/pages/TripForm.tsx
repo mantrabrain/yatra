@@ -3479,7 +3479,7 @@ const TripForm: React.FC = () => {
     // Fallback: honor permalink structure with pretty vs plain URLs
     const baseSite = siteUrl.replace(/\/$/, "");
     const prettyUrl = `${baseSite}/${tripBase}/${slug}`;
-    const plainUrl = `${baseSite}/?trip=${encodeURIComponent(slug)}`;
+    const plainUrl = `${baseSite}/?yatra_trip_slug=${encodeURIComponent(slug)}`;
     const targetUrl = isPlainPermalink ? plainUrl : prettyUrl;
 
     window.open(targetUrl, "_blank", "noopener,noreferrer");

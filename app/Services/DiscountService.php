@@ -858,16 +858,30 @@ class DiscountService extends BaseService
         // Cast tripId to int to ensure type safety
         $tripId = (int) $tripId;
         
+        // Debug: Log initial calculation data
+        if (WP_DEBUG && WP_DEBUG_LOG) {
+            error_log('Yatra Debug - DiscountService calculateGroupDiscount called: ' . print_r([
+                'trip_id' => $tripId,
+                'traveler_counts' => $travelerCounts,
+                'price_types' => $priceTypes,
+                'advanced_discount_enabled' => apply_filters('yatra_advanced_discount_enabled', false)
+            ], true));
+        }
+        
         // Check if Advanced Discount module is enabled - group discounts are a Pro feature
         if (!apply_filters('yatra_advanced_discount_enabled', false)) {
+            error_log('Yatra Debug - Advanced Discount module NOT enabled');
             return null;
         }
         
         $groupDiscounts = $this->getGroupDiscountsForTrip($tripId);
         
         if (empty($groupDiscounts)) {
+            error_log('Yatra Debug - No group discounts found for trip ' . $tripId);
             return null;
         }
+        
+        error_log('Yatra Debug - Found ' . count($groupDiscounts) . ' group discounts for trip ' . $tripId);
 
         $totalTravelers = array_sum(array_map('intval', $travelerCounts));
         
@@ -880,17 +894,40 @@ class DiscountService extends BaseService
                 $priceByCategory[$categoryId] = (float) ($pt->effective_price ?? $pt->sale_price ?? $pt->original_price ?? 0);
             }
         }
+        
+        // Debug: Log traveler counts and total
+        if (WP_DEBUG && WP_DEBUG_LOG) {
+            error_log('Yatra Debug - Group Discount Calculation: ' . print_r([
+                'total_travelers' => $totalTravelers,
+                'traveler_counts' => $travelerCounts,
+                'price_by_category' => $priceByCategory
+            ], true));
+        }
 
         foreach ($groupDiscounts as $discount) {
-            $discountMode = $discount['discount_mode'] ?? 'total';
+            $discountMode = $discount->discount_mode ?? 'total';
+            
+            // Debug: Log discount details
+            if (WP_DEBUG && WP_DEBUG_LOG) {
+                error_log('Yatra Debug - Processing discount: ' . print_r([
+                    'discount_code' => $discount->code ?? 'unknown',
+                    'discount_mode' => $discountMode,
+                    'discount_amount' => $discount->amount ?? $discount->discount_amount ?? 'not_set',
+                    'discount_type' => $discount->type ?? $discount->discount_type ?? 'not_set',
+                    'category_discounts' => !empty($discount->category_discounts),
+                    'group_discount_ranges' => !empty($discount->group_discount_ranges)
+                ], true));
+            }
             
             // Category-based discounts: check each category's count and apply to that category's subtotal
-            if ($discountMode === 'category_based' && !empty($discount['category_discounts'])) {
+            if ($discountMode === 'category_based' && !empty($discount->category_discounts)) {
                 $totalDiscountAmount = 0;
                 $appliedCategories = [];
                 
-                foreach ($discount['category_discounts'] as $catDiscount) {
-                    $categoryId = $catDiscount['traveler_category_id'] ?? null;
+                $categoryDiscounts = is_array($discount->category_discounts) ? $discount->category_discounts : unserialize($discount->category_discounts);
+                foreach ($categoryDiscounts as $catDiscount) {
+                    $catDiscount = (object) $catDiscount;
+                    $categoryId = $catDiscount->traveler_category_id ?? null;
                     if ($categoryId === null) continue;
                     
                     // Get the count for this specific category
@@ -898,14 +935,16 @@ class DiscountService extends BaseService
                     if ($categoryCount <= 0) continue;
                     
                     // Check if this category's count falls within any range
-                    if (!empty($catDiscount['ranges'])) {
-                        foreach ($catDiscount['ranges'] as $range) {
-                            $minSize = (int) ($range['min_group_size'] ?? 0);
-                            $maxSize = !empty($range['max_group_size']) ? (int) $range['max_group_size'] : PHP_INT_MAX;
+                    if (!empty($catDiscount->ranges)) {
+                        $ranges = is_array($catDiscount->ranges) ? $catDiscount->ranges : unserialize($catDiscount->ranges);
+                        foreach ($ranges as $range) {
+                            $range = (object) $range;
+                            $minSize = (int) ($range->min_group_size ?? 0);
+                            $maxSize = !empty($range->max_group_size) ? (int) $range->max_group_size : PHP_INT_MAX;
                             
                             if ($categoryCount >= $minSize && $categoryCount <= $maxSize) {
-                                $discountType = $range['discount_type'] ?? 'percentage';
-                                $discountValue = (float) ($range['discount_amount'] ?? 0);
+                                $discountType = $range->discount_type ?? 'percentage';
+                                $discountValue = (float) ($range->discount_amount ?? 0);
                                 
                                 // Calculate discount for this category's subtotal only
                                 $categoryPrice = $priceByCategory[$categoryId] ?? 0;
@@ -920,7 +959,7 @@ class DiscountService extends BaseService
                                 $totalDiscountAmount += $categoryDiscount;
                                 $appliedCategories[] = [
                                     'category_id' => $categoryId,
-                                    'category_label' => $catDiscount['traveler_category_label'] ?? 'Traveler',
+                                    'category_label' => $catDiscount->traveler_category_label ?? 'Traveler',
                                     'count' => $categoryCount,
                                     'discount_type' => $discountType,
                                     'discount_value' => $discountValue,
@@ -949,21 +988,23 @@ class DiscountService extends BaseService
                     return [
                         'type' => 'category_based',
                         'amount' => round($totalDiscountAmount, 2),
-                        'code' => $discount['code'] ?? null,
+                        'code' => $discount->code ?? null,
                         'label' => $discountInfo,
                         'applied_categories' => $appliedCategories,
                     ];
                 }
             }
             // Total-based discounts: check total travelers and apply to total
-            elseif (!empty($discount['group_discount_ranges'])) {
-                foreach ($discount['group_discount_ranges'] as $range) {
-                    $minSize = (int) ($range['min_group_size'] ?? 0);
-                    $maxSize = !empty($range['max_group_size']) ? (int) $range['max_group_size'] : PHP_INT_MAX;
+            elseif (!empty($discount->group_discount_ranges)) {
+                $groupDiscountRanges = is_array($discount->group_discount_ranges) ? $discount->group_discount_ranges : unserialize($discount->group_discount_ranges);
+                foreach ($groupDiscountRanges as $range) {
+                    $range = (object) $range;
+                    $minSize = (int) ($range->min_group_size ?? 0);
+                    $maxSize = !empty($range->max_group_size) ? (int) $range->max_group_size : PHP_INT_MAX;
                     
                     if ($totalTravelers >= $minSize && $totalTravelers <= $maxSize) {
-                        $discountType = $range['discount_type'] ?? 'percentage';
-                        $discountValue = (float) ($range['discount_amount'] ?? 0);
+                        $discountType = $range->discount_type ?? 'percentage';
+                        $discountValue = (float) ($range->discount_amount ?? 0);
                         
                         // Calculate total subtotal from all categories
                         $totalSubtotal = 0;
@@ -981,7 +1022,7 @@ class DiscountService extends BaseService
                             'type' => $discountType,
                             'value' => $discountValue,
                             'amount' => round($calculatedAmount, 2),
-                            'code' => $discount['code'] ?? null,
+                            'code' => $discount->code ?? null,
                             'label' => $discountType === 'percentage' 
                                 ? sprintf(__('Group Discount (%s%%)', 'yatra'), $discountValue)
                                 : sprintf(__('Group Discount (%s)', 'yatra'), yatra_format_price($discountValue)),
@@ -990,12 +1031,32 @@ class DiscountService extends BaseService
                 }
             } else {
                 // Legacy format
-                $minSize = (int) ($discount['min_group_size'] ?? 0);
-                $maxSize = !empty($discount['max_group_size']) ? (int) $discount['max_group_size'] : PHP_INT_MAX;
+                $minSize = (int) ($discount->min_group_size ?? 0);
+                $maxSize = !empty($discount->max_group_size) ? (int) $discount->max_group_size : PHP_INT_MAX;
+                
+                // If min_size is 0 but we have a discount value, this might be a simple discount
+                // that applies to any group size >= 2
+                if ($minSize === 0 && $discountValue > 0) {
+                    $minSize = 2; // Default to minimum 2 travelers for group discount
+                }
+                
+                // Handle different field names for discount type and value
+                $discountType = $discount->type ?? $discount->discount_type ?? 'percentage';
+                $discountValue = (float) ($discount->amount ?? $discount->discount_amount ?? 0);
+                
+                // Debug: Log legacy format processing
+                if (WP_DEBUG && WP_DEBUG_LOG) {
+                    error_log('Yatra Debug - Legacy format processing: ' . print_r([
+                        'min_size' => $minSize,
+                        'max_size' => $maxSize,
+                        'total_travelers' => $totalTravelers,
+                        'discount_type' => $discountType,
+                        'discount_value' => $discountValue,
+                        'meets_criteria' => $totalTravelers >= $minSize && $totalTravelers <= $maxSize
+                    ], true));
+                }
                 
                 if ($totalTravelers >= $minSize && $totalTravelers <= $maxSize) {
-                    $discountType = $discount['discount_type'] ?? 'percentage';
-                    $discountValue = (float) ($discount['discount_amount'] ?? 0);
                     
                     // Calculate total subtotal from all categories
                     $totalSubtotal = 0;
@@ -1013,7 +1074,7 @@ class DiscountService extends BaseService
                         'type' => $discountType,
                         'value' => $discountValue,
                         'amount' => round($calculatedAmount, 2),
-                        'code' => $discount['code'] ?? null,
+                        'code' => $discount->code ?? null,
                         'label' => $discountType === 'percentage' 
                             ? sprintf(__('Group Discount (%s%%)', 'yatra'), $discountValue)
                             : sprintf(__('Group Discount (%s)', 'yatra'), yatra_format_price($discountValue)),

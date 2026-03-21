@@ -421,8 +421,11 @@ class AvailabilityController extends BaseController
             $data['pricing_type'] = 'regular';
         }
         
-        // Ensure price_types is an array
-        if (!isset($data['price_types']) || !is_array($data['price_types'])) {
+        // Decode price_types JSON string from DB and ensure it's an array
+        if (isset($data['price_types']) && is_string($data['price_types'])) {
+            $decoded = json_decode($data['price_types'], true);
+            $data['price_types'] = is_array($decoded) ? $decoded : [];
+        } elseif (!isset($data['price_types']) || !is_array($data['price_types'])) {
             $data['price_types'] = [];
         }
         

@@ -379,7 +379,7 @@ class RecurringAvailabilityRepository extends BaseRepository
                 $p['age_min'] = $cat->age_min ? (int) $cat->age_min : null;
                 $p['age_max'] = $cat->age_max ? (int) $cat->age_max : null;
                 // Calculate effective price
-                $p['effective_price'] = $p['sale_price'] ?? $p['discounted_price'] ?? $p['original_price'] ?? 0;
+                $p['effective_price'] = \Yatra\Services\TripPricingService::resolveCategoryEffectivePrice($p);
             }
         }
         

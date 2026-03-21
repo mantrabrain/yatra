@@ -18,26 +18,98 @@ if (!defined('ABSPATH')) {
             method_exists('\Yatra\Services\DiscountService', 'getGroupDiscountsForTrip')) {
             $discountService = new \Yatra\Services\DiscountService();
             $groupDiscountsResult = $discountService->getGroupDiscountsForTrip((int) $trip->getId());
+            
+            // Debug: Log what we found
+            if (WP_DEBUG && WP_DEBUG_LOG) {
+                error_log('Yatra Debug - Group discounts for trip ' . $trip->getId() . ': ' . print_r($groupDiscountsResult, true));
+            }
+            
             if (!empty($groupDiscountsResult)) {
-                // Decode and format the group discount ranges for tooltip display
-                if (!empty($groupDiscountsResult[0]->group_discount_ranges)) {
-                    $ranges = json_decode($groupDiscountsResult[0]->group_discount_ranges, true);
-                    if (!empty($ranges) && is_array($ranges)) {
-                        $sidebar_has_group_discounts = true;
-                        $sidebar_group_discounts_data = $ranges; // Use decoded ranges array
-                        
-                        // Get min_group_size from first range
-                        $first_range = $ranges[0] ?? null;
-                        if ($first_range && !empty($first_range['min_group_size'])) {
-                            $min_group = (int) $first_range['min_group_size'];
+                $sidebar_has_group_discounts = true;
+                $all_ranges = [];
+                
+                // Process ALL group discount rules
+                foreach ($groupDiscountsResult as $discount) {
+                    $ranges = [];
+                    
+                    // Try different field names where ranges might be stored
+                    $possible_fields = ['group_discount_ranges', 'ranges', 'discount_ranges'];
+                    foreach ($possible_fields as $field) {
+                        if (!empty($discount->$field)) {
+                            if (is_string($discount->$field)) {
+                                $ranges = json_decode($discount->$field, true);
+                            } elseif (is_array($discount->$field)) {
+                                $ranges = $discount->$field;
+                            }
+                            break;
                         }
                     }
+                    
+                    // If no ranges found, create a basic structure from other fields
+                    if (empty($ranges)) {
+                        $ranges = [];
+                        // Check if it's a simple discount with min/max fields
+                        $min_size = !empty($discount->min_group_size) ? (int) $discount->min_group_size : 0;
+                        $max_size = !empty($discount->max_group_size) ? (int) $discount->max_group_size : null;
+                        
+                        // Handle different field names for discount value and type
+                        $discount_value = 0;
+                        $discount_type = 'percentage';
+                        
+                        if (!empty($discount->amount)) {
+                            $discount_value = (float) $discount->amount;
+                        } elseif (!empty($discount->discount_amount)) {
+                            $discount_value = (float) $discount->discount_amount;
+                        }
+                        
+                        if (!empty($discount->type)) {
+                            $discount_type = $discount->type;
+                        } elseif (!empty($discount->discount_type)) {
+                            $discount_type = $discount->discount_type;
+                        }
+                        
+                        // If no min_size is set, assume it's a general group discount starting from 2 people
+                        if ($min_size === 0) {
+                            $min_size = 2;
+                        }
+                        
+                        if ($min_size > 0 && $discount_value > 0) {
+                            $ranges[] = [
+                                'min_group_size' => $min_size,
+                                'max_group_size' => $max_size,
+                                'discount_amount' => $discount_value,
+                                'discount_type' => $discount_type,
+                                'discount_percentage' => $discount_type === 'percentage' ? $discount_value : null,
+                                'discount_code' => $discount->code ?? ''
+                            ];
+                        }
+                    } else {
+                        // Add discount code to existing ranges if available
+                        foreach ($ranges as &$range) {
+                            if (!isset($range['discount_code'])) {
+                                $range['discount_code'] = $discount->code ?? '';
+                            }
+                        }
+                    }
+                    
+                    // Merge ranges from this discount rule
+                    $all_ranges = array_merge($all_ranges, $ranges);
+                }
+                
+                $sidebar_group_discounts_data = $all_ranges;
+                
+                // Debug: Log final ranges
+                if (WP_DEBUG && WP_DEBUG_LOG) {
+                    error_log('Yatra Debug - Final group discount ranges from ALL rules: ' . print_r($all_ranges, true));
                 }
             }
         }
     } catch (\Exception $e) {
         // Silently fail if premium features are not available
         $sidebar_has_group_discounts = false;
+        if (WP_DEBUG && WP_DEBUG_LOG) {
+            error_log('Yatra Debug - Group discount error: ' . $e->getMessage());
+        }
     }
 
     // Prepare availability data for JavaScript
@@ -127,7 +199,16 @@ if (!defined('ABSPATH')) {
                                         ?>
                                     </span>
                                     <span class="yatra-tier-discount">
-                                        <?php echo esc_html(sprintf(__('%s%% OFF', 'yatra'), number_format((float) ($range['discount_percentage'] ?? 0), 1))); ?>
+                                        <?php 
+                                        $discount_type = $range['discount_type'] ?? 'percentage';
+                                        $discount_value = (float) ($range['discount_amount'] ?? $range['discount_percentage'] ?? 0);
+                                        
+                                        if ($discount_type === 'percentage') {
+                                            echo esc_html(sprintf(__('%s%% OFF', 'yatra'), number_format($discount_value, 1)));
+                                        } else {
+                                            echo esc_html(sprintf(__('%s OFF', 'yatra'), yatra_format_price($discount_value)));
+                                        }
+                                        ?>
                                     </span>
                                 </div>
                             <?php endforeach; ?>

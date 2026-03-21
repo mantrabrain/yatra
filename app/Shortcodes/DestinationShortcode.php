@@ -246,27 +246,14 @@ class DestinationShortcode extends BaseShortcode
                         ], true));
                     }
                     
-                    // Get pricing - use correct field names from database
-                    if (isset($trip->original_price) && $trip->original_price > 0) {
-                        if ($min_price === null || $trip->original_price < $min_price) {
-                            $min_price = $trip->original_price;
+                    // Get pricing via centralized TripPricingService
+                    $effective = \Yatra\Services\TripPricingService::getEffectivePrice($trip);
+                    if ($effective > 0) {
+                        if ($min_price === null || $effective < $min_price) {
+                            $min_price = $effective;
                         }
-                        if ($max_price === null || $trip->original_price > $max_price) {
-                            $max_price = $trip->original_price;
-                        }
-                    } elseif (isset($trip->discounted_price) && $trip->discounted_price > 0) {
-                        if ($min_price === null || $trip->discounted_price < $min_price) {
-                            $min_price = $trip->discounted_price;
-                        }
-                        if ($max_price === null || $trip->discounted_price > $max_price) {
-                            $max_price = $trip->discounted_price;
-                        }
-                    } elseif (isset($trip->sale_price) && $trip->sale_price > 0) {
-                        if ($min_price === null || $trip->sale_price < $min_price) {
-                            $min_price = $trip->sale_price;
-                        }
-                        if ($max_price === null || $trip->sale_price > $max_price) {
-                            $max_price = $trip->sale_price;
+                        if ($max_price === null || $effective > $max_price) {
+                            $max_price = $effective;
                         }
                     }
                     

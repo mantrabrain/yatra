@@ -541,16 +541,9 @@ class TripRepository extends BaseRepository
             }
         }
 
-        // Apply enriched data to each trip (regular pricing fallback only)
+        // Apply enriched data to each trip — use centralized TripPricingService
         foreach ($trips as $trip) {
-            $trip->effective_price_min = 0;
-            if (!empty($trip->discounted_price) && (float)$trip->discounted_price > 0) {
-                $trip->effective_price_min = (float)$trip->discounted_price;
-            } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
-                $trip->effective_price_min = (float)$trip->sale_price;
-            } elseif (!empty($trip->original_price) && (float)$trip->original_price > 0) {
-                $trip->effective_price_min = (float)$trip->original_price;
-            }
+            $trip->effective_price_min = \Yatra\Services\TripPricingService::getEffectivePrice($trip);
             
             // Set relationships
             $trip->destinations = $destinations_data[$trip->id] ?? [];
@@ -566,16 +559,8 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Compute effective pricing based on pricing type
-        $trip->effective_price_min = 0;
-        // Regular pricing logic only (traveler-based table removed)
-        if (!empty($trip->discounted_price) && (float)$trip->discounted_price > 0) {
-            $trip->effective_price_min = (float)$trip->discounted_price;
-        } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
-            $trip->effective_price_min = (float)$trip->sale_price;
-        } elseif (!empty($trip->original_price) && (float)$trip->original_price > 0) {
-            $trip->effective_price_min = (float)$trip->original_price;
-        }
+        // Compute effective pricing via centralized TripPricingService
+        $trip->effective_price_min = \Yatra\Services\TripPricingService::getEffectivePrice($trip);
     }
 
     /**

@@ -348,15 +348,69 @@ class SampleDataRepository
         
         foreach ($data as $item) {
             $trip_slug = $item['slug'];
-            // Keep slug in data - it's a real DB column
             
             $item['created_at'] = $item['created_at'] ?? $now;
             $item['updated_at'] = $item['updated_at'] ?? $now;
             $item['created_by'] = $item['created_by'] ?? $uid;
             $item['updated_by'] = $item['updated_by'] ?? $uid;
             
-            // Ensure JSON fields are properly encoded
-            foreach (['included_items', 'excluded_items', 'price_types', 'frontend_tabs', 'custom_fields'] as $jsonField) {
+            // Resolve price_types: convert traveler_category slugs to category_id
+            // and map field names (price→original_price, sale_price→discounted_price)
+            if (!empty($item['price_types'])) {
+                $price_types_raw = $item['price_types'];
+                
+                // Decode if it's a JSON string
+                if (is_string($price_types_raw)) {
+                    $price_types_raw = json_decode($price_types_raw, true);
+                }
+                
+                if (is_array($price_types_raw) && !empty($price_types_raw)) {
+                    $resolved_price_types = [];
+                    foreach ($price_types_raw as $pt) {
+                        $resolved = [];
+                        
+                        // Resolve traveler_category slug to numeric category_id
+                        // Composite key uses 'traveler_type:' (matches type field in classifications table)
+                        if (isset($pt['traveler_category'])) {
+                            $slug = $pt['traveler_category'];
+                            $composite_key = 'traveler_type:' . $slug;
+                            if (isset($this->classification_ids[$composite_key])) {
+                                $resolved['category_id'] = $this->classification_ids[$composite_key];
+                            } elseif (isset($this->slug_to_id[$slug])) {
+                                $resolved['category_id'] = $this->slug_to_id[$slug];
+                            } else {
+                                // Keep slug as label fallback
+                                $resolved['category_id'] = null;
+                                $resolved['label'] = ucfirst(str_replace('-', ' ', $slug));
+                            }
+                        } elseif (isset($pt['category_id'])) {
+                            $resolved['category_id'] = $pt['category_id'];
+                        }
+                        
+                        // Map field names: price → original_price, sale_price → discounted_price
+                        $resolved['original_price'] = (float) ($pt['original_price'] ?? $pt['price'] ?? 0);
+                        $resolved['discounted_price'] = (float) ($pt['discounted_price'] ?? $pt['sale_price'] ?? 0);
+                        
+                        if (isset($resolved['label'])) {
+                            // Keep label for fallback display
+                        }
+                        
+                        $resolved_price_types[] = $resolved;
+                    }
+                    
+                    $item['price_types'] = wp_json_encode($resolved_price_types);
+                    
+                    // Auto-set pricing_type to traveler_based when price_types exist
+                    if (empty($item['pricing_type']) || $item['pricing_type'] === 'regular') {
+                        $item['pricing_type'] = 'traveler_based';
+                    }
+                } else {
+                    $item['price_types'] = null;
+                }
+            }
+            
+            // Ensure other JSON fields are properly encoded
+            foreach (['included_items', 'excluded_items', 'frontend_tabs', 'custom_fields'] as $jsonField) {
                 if (isset($item[$jsonField]) && is_array($item[$jsonField])) {
                     $item[$jsonField] = wp_json_encode($item[$jsonField]);
                 }

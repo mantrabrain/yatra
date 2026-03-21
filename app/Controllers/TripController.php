@@ -1320,6 +1320,11 @@ class TripController extends BaseController
             $data['attributes'] = $attributes;
         }
 
+        // Add permalink (respects WordPress permalink structure: plain vs pretty)
+        if (!empty($data['slug'])) {
+            $data['permalink'] = yatra_get_trip_permalink($item);
+        }
+
         // Add user information
         if (isset($data['created_by']) && $data['created_by'] > 0) {
             $user = get_userdata($data['created_by']);
@@ -1604,85 +1609,35 @@ class TripController extends BaseController
                               (!empty($avail->return_date) ? strtotime($avail->return_date) : 
                               strtotime($avail->departure_date . ' + ' . (($trip_data->duration_days ?? 1) - 1) . ' days'));
                 
-                // Pricing: Use availability-specific pricing (PRIORITY), then fall back to trip default
-                // For traveler-based pricing, use first category's price (default traveler)
-                // For regular pricing, use effective_price or availability price
-                
-$card_pricing_type = $avail->pricing_type ?? $trip_data->pricing_type ?? 'regular';
-                
-                // Debug logging
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log(sprintf(
-                        'Yatra Avail Card [%s]: Date=%s, PricingType=%s, HasPriceTypes=%s, EffectivePrice=%s',
-                        $avail->source ?? 'unknown',
-                        $avail->departure_date,
-                        $card_pricing_type,
-                        !empty($avail->price_types) ? 'YES(' . count($avail->price_types) . ')' : 'NO',
-                        $avail->effective_price ?? 'null'
-                    ));
-                    if (!empty($avail->price_types)) {
-                        error_log('Yatra Avail Card price_types: ' . print_r($avail->price_types, true));
-                    }
-                }
-                
-                if ($card_pricing_type === 'traveler_based' && !empty($avail->price_types)) {
-                    // Traveler-based: Use first category's price as default display price
-                    $first_category = is_array($avail->price_types) ? $avail->price_types[0] : (array) $avail->price_types[0];
-                    $sale_price = (float) ($first_category['discounted_price'] ?? $first_category['original_price'] ?? 0);
-                    $original_price = (float) ($first_category['original_price'] ?? $sale_price);
-                    
-                    if (defined('WP_DEBUG') && WP_DEBUG) {
-                        error_log(sprintf(
-                            'Yatra Avail Card: Using first category - SalePrice=%s, OriginalPrice=%s',
-                            $sale_price,
-                            $original_price
-                        ));
-                    }
-                } elseif (isset($avail->effective_price) && $avail->effective_price > 0) {
-                    // Regular pricing: Use pre-calculated effective price from SingleTripController
-                    $sale_price = (float) $avail->effective_price;
-                    $original_price = isset($avail->original_price) && $avail->original_price > 0
-                        ? (float) $avail->original_price
-                        : $sale_price;
-                } else {
-                    // Fallback: Manual calculation if effective_price not set
-                    $original_price = isset($avail->original_price) && $avail->original_price !== null && $avail->original_price > 0
-                        ? (float) $avail->original_price 
-                        : (float) ($trip_data->original_price ?? $trip_data->price ?? 0);
-                    
-                    $sale_price = isset($avail->discounted_price) && $avail->discounted_price !== null && $avail->discounted_price > 0
-                        ? (float) $avail->discounted_price 
-                        : (float) ($trip_data->discounted_price ?? $original_price);
-                }
+                // Pricing: Use centralized TripPricingService (single source of truth)
+                $cardPricing = \Yatra\Services\TripPricingService::resolveCardPricing($avail, $trip_data);
+                $card_pricing_type = $cardPricing['pricing_type'];
+                $sale_price = $cardPricing['sale_price'];
+                $original_price = $cardPricing['original_price'];
                 
                 // Store base prices before dynamic pricing
                 $base_original_price = $original_price;
                 $base_sale_price = $sale_price;
                 
-                // Apply dynamic pricing if enabled
+                // Apply dynamic pricing if enabled (Pro DynamicPricingModule hooks here)
                 if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
-                    $original_price = apply_filters('yatra_availability_price', $original_price, $trip_data->id, [
+                    $dp_context = [
                         'departure_date' => $avail->departure_date ?? null,
                         'spots_remaining' => $seats,
                         'availability_id' => $avail->id ?? null,
-                    ]);
-                    $sale_price = apply_filters('yatra_availability_price', $sale_price, $trip_data->id, [
-                        'departure_date' => $avail->departure_date ?? null,
-                        'spots_remaining' => $seats,
-                        'availability_id' => $avail->id ?? null,
-                    ]);
+                    ];
+                    $original_price = apply_filters('yatra_availability_price', $original_price, $trip_data->id, $dp_context);
+                    $sale_price = apply_filters('yatra_availability_price', $sale_price, $trip_data->id, $dp_context);
                 }
                 
                 // Calculate discount/surge pricing badge
-                $discount_percent = 0;
+                $discount_percent = $cardPricing['discount_percentage'];
                 $discount_text = '';
                 
-                // First check if there's a base discount (discounted_price < original_price)
-                if ($base_original_price > 0 && $base_sale_price < $base_original_price) {
-                    $discount_percent = round((($base_original_price - $base_sale_price) / $base_original_price) * 100);
-                    $discount_text = $discount_percent > 0 ? sprintf(__('%d%% OFF', 'yatra'), $discount_percent) : '';
+                if ($discount_percent > 0) {
+                    $discount_text = sprintf(__('%d%% OFF', 'yatra'), $discount_percent);
                 }
-                // Then check if dynamic pricing increased the price
+                // Check if dynamic pricing increased the price (surge)
                 elseif ($base_sale_price > 0 && $sale_price > $base_sale_price) {
                     $surge_percent = round((($sale_price - $base_sale_price) / $base_sale_price) * 100);
                     $discount_text = $surge_percent > 0 ? sprintf(__('+%d%%', 'yatra'), $surge_percent) : '';
@@ -1736,8 +1691,12 @@ $card_pricing_type = $avail->pricing_type ?? $trip_data->pricing_type ?? 'regula
                     ? date('Y-m-d', $departure_date)
                     : strtolower(date('M-Y', $departure_date));
                 
-                // pricing_type ALWAYS comes from trip (centralized service already set this)
-                $card_pricing_type = $avail->pricing_type ?? $trip_data->pricing_type ?? 'regular';
+                // pricing_type MODEL comes from trip level (regular vs traveler_based)
+                // Note: $avail->pricing_type enum is about price state, not pricing model
+                $card_pricing_type = $trip_data->pricing_type ?? 'regular';
+                if (!empty($avail->price_types) && is_array($avail->price_types) && count($avail->price_types) > 0) {
+                    $card_pricing_type = 'traveler_based';
+                }
                 
                 // price_types come from centralized service (already resolved with priority: Rules → Dates → Trip)
                 $card_traveler_pricing = [];
@@ -1800,8 +1759,8 @@ $card_pricing_type = $avail->pricing_type ?? $trip_data->pricing_type ?? 'regula
         
         // Use sample data only if no real availability
         if (empty($availability_cards)) {
-            $sample_original = $trip_data->original_price ?? $trip_data->price ?? 0;
-            $sample_sale = $trip_data->discounted_price ?? $trip_data->original_price ?? $trip_data->price ?? 0;
+            $sample_original = (float) ($trip_data->original_price ?? $trip_data->price ?? 0);
+            $sample_sale = \Yatra\Services\TripPricingService::resolveRegularCurrentPrice($trip_data) ?: $sample_original;
             $sample_date = date('Y-m-d', strtotime('+7 days'));
             $sample_seats = 15;
             

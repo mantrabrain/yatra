@@ -755,10 +755,24 @@ const License: React.FC = () => {
                       </div>
                       <button
                         onClick={() => {
-                          navigator.clipboard.writeText(
-                            JSON.stringify(debugData.response, null, 2),
-                          );
-                          showToast("Response copied to clipboard!", "success");
+                          const text = JSON.stringify(debugData.response, null, 2);
+                          if (navigator?.clipboard?.writeText) {
+                            navigator.clipboard.writeText(text);
+                            showToast("Response copied to clipboard!", "success");
+                          } else {
+                            // Fallback for older browsers
+                            const textArea = document.createElement("textarea");
+                            textArea.value = text;
+                            document.body.appendChild(textArea);
+                            textArea.select();
+                            try {
+                              document.execCommand('copy');
+                              showToast("Response copied to clipboard!", "success");
+                            } catch (err) {
+                              showToast("Failed to copy to clipboard", "error");
+                            }
+                            document.body.removeChild(textArea);
+                          }
                         }}
                         className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
                       >
@@ -797,17 +811,28 @@ const License: React.FC = () => {
                         </div>
                         <button
                           onClick={() => {
-                            navigator.clipboard.writeText(
-                              JSON.stringify(
-                                debugData.response.edd_api_request,
-                                null,
-                                2,
-                              ),
+                            const text = JSON.stringify(
+                              debugData.response.edd_api_request,
+                              null,
+                              2,
                             );
-                            showToast(
-                              "Request copied to clipboard!",
-                              "success",
-                            );
+                            if (navigator?.clipboard?.writeText) {
+                              navigator.clipboard.writeText(text);
+                              showToast("Request copied to clipboard!", "success");
+                            } else {
+                              // Fallback for older browsers
+                              const textArea = document.createElement("textarea");
+                              textArea.value = text;
+                              document.body.appendChild(textArea);
+                              textArea.select();
+                              try {
+                                document.execCommand('copy');
+                                showToast("Request copied to clipboard!", "success");
+                              } catch (err) {
+                                showToast("Failed to copy to clipboard", "error");
+                              }
+                              document.body.removeChild(textArea);
+                            }
                           }}
                           className="text-xs text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1"
                         >
@@ -851,17 +876,31 @@ const License: React.FC = () => {
                         </div>
                         <button
                           onClick={() => {
-                            navigator.clipboard.writeText(
-                              JSON.stringify(
-                                debugData.response.edd_api_response,
-                                null,
-                                2,
-                              ),
+                            const text = JSON.stringify(
+                              debugData.response.edd_api_response,
+                              null,
+                              2,
                             );
-                            showToast(
-                              "Response copied to clipboard!",
-                              "success",
-                            );
+                            if (navigator?.clipboard?.writeText) {
+                              navigator.clipboard.writeText(text);
+                              showToast(
+                                "Response copied to clipboard!",
+                                "success",
+                              );
+                            } else {
+                              // Fallback for older browsers
+                              const textArea = document.createElement("textarea");
+                              textArea.value = text;
+                              document.body.appendChild(textArea);
+                              textArea.select();
+                              try {
+                                document.execCommand('copy');
+                                showToast("Response copied to clipboard!", "success");
+                              } catch (err) {
+                                showToast("Failed to copy to clipboard", "error");
+                              }
+                              document.body.removeChild(textArea);
+                            }
                           }}
                           className="text-xs text-green-600 dark:text-green-400 hover:underline flex items-center gap-1"
                         >
@@ -905,10 +944,24 @@ const License: React.FC = () => {
                         </div>
                         <button
                           onClick={() => {
-                            navigator.clipboard.writeText(
-                              JSON.stringify(debugData.error, null, 2),
-                            );
-                            showToast("Error copied to clipboard!", "success");
+                            const text = JSON.stringify(debugData.error, null, 2);
+                            if (navigator?.clipboard?.writeText) {
+                              navigator.clipboard.writeText(text);
+                              showToast("Error copied to clipboard!", "success");
+                            } else {
+                              // Fallback for older browsers
+                              const textArea = document.createElement("textarea");
+                              textArea.value = text;
+                              document.body.appendChild(textArea);
+                              textArea.select();
+                              try {
+                                document.execCommand('copy');
+                                showToast("Error copied to clipboard!", "success");
+                              } catch (err) {
+                                showToast("Failed to copy to clipboard", "error");
+                              }
+                              document.body.removeChild(textArea);
+                            }
                           }}
                           className="text-xs text-red-600 dark:text-red-400 hover:underline flex items-center gap-1"
                         >

@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `updated_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who last updated this record',
     
     PRIMARY KEY (`id`),
-    UNIQUE KEY `trip_departure_date` (`trip_id`, `departure_date`),
+    UNIQUE KEY `trip_departure_date_time` (`trip_id`, `departure_date`, `departure_time`),
     KEY `trip_id` (`trip_id`),
     KEY `departure_date` (`departure_date`),
     KEY `arrival_date` (`arrival_date`),

@@ -311,6 +311,21 @@ class AvailabilityService
     }
 
     /**
+     * Get availability by trip ID, departure date, and optionally time.
+     * Supports day tours with multiple time slots on the same date.
+     * 
+     * @param int $tripId Trip ID
+     * @param string $departureDate Departure date (YYYY-MM-DD)
+     * @param string|null $departureTime Departure time (HH:MM:SS or HH:MM)
+     * @return \stdClass|null Availability object or null
+     */
+    public function getByTripAndDateTime(int $tripId, string $departureDate, ?string $departureTime = null): ?\stdClass
+    {
+        $repository = new \Yatra\Repositories\AvailabilityRepository();
+        return $repository->findByTripIdAndDateTime($tripId, $departureDate, $departureTime);
+    }
+
+    /**
      * Get availability by ID
      */
     public function getById(int $availabilityId): ?\stdClass
@@ -416,6 +431,41 @@ class AvailabilityService
     {
         // Table deprecated/removed: return empty so callers fall back gracefully
         return [];
+    }
+
+    /**
+     * Normalize time string to HH:MM:SS format for MySQL TIME column.
+     * Accepts HH:MM, HH:MM:SS, H:MM, or 12-hour formats (e.g., "9:00 AM").
+     * 
+     * @param string $time Time string
+     * @return string|false Normalized time (HH:MM:SS) or false if invalid
+     */
+    private function normalizeTimeFormat(string $time)
+    {
+        $time = trim($time);
+        
+        if (empty($time)) {
+            return false;
+        }
+
+        // Try parsing with strtotime (handles "9:00 AM", "14:30", etc.)
+        $timestamp = strtotime($time);
+        if ($timestamp !== false) {
+            return date('H:i:s', $timestamp);
+        }
+
+        // Manual regex for HH:MM or HH:MM:SS
+        if (preg_match('/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/', $time, $matches)) {
+            $hours = (int) $matches[1];
+            $minutes = (int) $matches[2];
+            $seconds = isset($matches[3]) ? (int) $matches[3] : 0;
+
+            if ($hours >= 0 && $hours <= 23 && $minutes >= 0 && $minutes <= 59 && $seconds >= 0 && $seconds <= 59) {
+                return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+            }
+        }
+
+        return false;
     }
 }
 

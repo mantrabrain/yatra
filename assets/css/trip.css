@@ -1410,7 +1410,6 @@ button.yatra-booking-button svg path {
     padding: var(--yatra-small-gap) var(--yatra-element-gap);
     margin: 0 auto var(--yatra-section-gap);
     position: relative;
-    z-index: 10;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 0;
@@ -3795,14 +3794,15 @@ button.yatra-booking-button svg path {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 10px;
-    margin-bottom: 12px;
-    background: #ecfdf5;
-    border-radius: 4px;
-    font-size: 12px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    color: #0369a1;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
     font-weight: 500;
-    color: #059669;
+    border: 1px solid #bae6fd;
     position: relative;
+    z-index: 1;
 }
 
 .yatra-group-discount-badge-minimal svg {
@@ -3834,7 +3834,7 @@ button.yatra-booking-button svg path {
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     padding: 0;
     min-width: 220px;
-    z-index: 1000;
+    z-index: 999999;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.2s ease, visibility 0.2s ease;
@@ -3844,6 +3844,8 @@ button.yatra-booking-button svg path {
 .yatra-has-tooltip:hover .yatra-tooltip {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
+    z-index: 999999;
 }
 
 .yatra-tooltip::after {

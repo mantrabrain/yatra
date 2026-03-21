@@ -84,7 +84,7 @@ class CalculationService
         // Availability can override trip-level pricing
         $availability = null;
         if (!empty($availability_id) || !empty($travel_date)) {
-            $availability = $this->resolveAvailability($trip_id, $travel_date, $availability_id);
+            $availability = $this->resolveAvailability($trip_id, $travel_date, $availability_id, $departure_time);
         }
         
         $pricing_type = $this->resolvePricingType($trip, $availability);
@@ -292,10 +292,22 @@ class CalculationService
      */
     private function resolvePricingType(object $trip, ?object $availability): string
     {
-        if ($availability && !empty($availability->pricing_type)) {
-            return $availability->pricing_type;
+        // The trip's pricing_type defines the pricing MODEL (regular vs traveler_based)
+        // Note: availability date's pricing_type enum ('regular','discounted','special') is
+        // about price STATE, not pricing model — do NOT use it here.
+        $pricing_type = $trip->pricing_type ?? 'regular';
+        
+        // Override to traveler_based if availability has its own price_types
+        if ($availability && !empty($availability->price_types)) {
+            $types = is_string($availability->price_types)
+                ? json_decode($availability->price_types, true)
+                : $availability->price_types;
+            if (!empty($types) && is_array($types)) {
+                $pricing_type = 'traveler_based';
+            }
         }
-        return $trip->pricing_type ?? 'regular';
+        
+        return $pricing_type;
     }
     
     /**
@@ -370,7 +382,7 @@ class CalculationService
     /**
      * Resolve availability data
      */
-    private function resolveAvailability(int $trip_id, string $travel_date, ?int $availability_id): ?object
+    private function resolveAvailability(int $trip_id, string $travel_date, ?int $availability_id, string $departure_time = ''): ?object
     {
         if (!class_exists('\Yatra\Services\AvailabilityService')) {
             return null;
@@ -388,11 +400,11 @@ class CalculationService
                 }
             }
             
-            // Fallback: lookup by trip + date
+            // Fallback: lookup by trip + date + time (time-aware for day tours)
             if (!empty($travel_date)) {
                 $repo = new \Yatra\Repositories\AvailabilityRepository();
                 $availabilityService = new \Yatra\Services\AvailabilityService($repo);
-                return $availabilityService->getByTripAndDate($trip_id, $travel_date);
+                return $availabilityService->getByTripAndDateTime($trip_id, $travel_date, $departure_time ?: null);
             }
         } catch (\Exception $e) {
             // Availability lookup failed, continue with trip-level pricing
@@ -485,6 +497,24 @@ class CalculationService
                 $discountService = new DiscountService();
                 $discountResult  = $discountService->calculateGroupDiscount($trip_id, $traveler_counts, $price_types);
                 
+                // Debug: Log the calculation result
+                if (WP_DEBUG && WP_DEBUG_LOG) {
+                    $priceTypesDebug = [];
+                    foreach ($price_types as $pt) {
+                        $pt = (object) $pt;
+                        $priceTypesDebug[] = [
+                            'category_id' => $pt->category_id ?? null,
+                            'price' => $pt->effective_price ?? $pt->sale_price ?? $pt->original_price ?? 0
+                        ];
+                    }
+                    error_log('Yatra Debug - Group Discount Calculation Result: ' . print_r([
+                        'trip_id' => $trip_id,
+                        'traveler_counts' => $traveler_counts,
+                        'price_types' => $priceTypesDebug,
+                        'discount_result' => $discountResult
+                    ], true));
+                }
+                
                 if ($discountResult && !empty($discountResult['amount'])) {
                     return [
                         'amount' => (float) ($discountResult['amount'] ?? 0),
@@ -493,7 +523,10 @@ class CalculationService
                     ];
                 }
             } catch (\Exception $e) {
-                // DiscountService failed, fall through to filter
+                // Debug: Log the exception
+                if (WP_DEBUG && WP_DEBUG_LOG) {
+                    error_log('Yatra Debug - Group Discount Calculation Exception: ' . $e->getMessage());
+                }
             }
         }
         

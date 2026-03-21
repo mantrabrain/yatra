@@ -64,6 +64,46 @@ class AvailabilityRepository extends BaseRepository
     }
 
     /**
+     * Find availability by trip ID, departure date, and optionally departure time.
+     * Supports day tours with multiple time slots on the same date.
+     * 
+     * @param int $tripId Trip ID
+     * @param string $departureDate Departure date (YYYY-MM-DD)
+     * @param string|null $departureTime Departure time (HH:MM:SS or HH:MM)
+     * @return object|null Availability object or null
+     */
+    public function findByTripIdAndDateTime(int $tripId, string $departureDate, ?string $departureTime = null): ?object
+    {
+        $table = esc_sql($this->table);
+
+        if (!empty($departureTime)) {
+            $result = $this->wpdb->get_row($this->wpdb->prepare(
+                "SELECT * FROM `{$table}` 
+                 WHERE trip_id = %d 
+                 AND departure_date = %s
+                 AND departure_time = %s
+                 AND status IN ('available', 'limited')
+                 LIMIT 1",
+                $tripId,
+                $departureDate,
+                $departureTime
+            ));
+        } else {
+            $result = $this->wpdb->get_row($this->wpdb->prepare(
+                "SELECT * FROM `{$table}` 
+                 WHERE trip_id = %d 
+                 AND departure_date = %s
+                 AND status IN ('available', 'limited')
+                 LIMIT 1",
+                $tripId,
+                $departureDate
+            ));
+        }
+
+        return $result ?: null;
+    }
+
+    /**
      * Find availability records by trip ID and departure date
      * 
      * @param int $tripId Trip ID

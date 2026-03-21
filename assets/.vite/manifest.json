@@ -11,6 +11,17 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
+  "_index-CXOixm4R.js": {
+    "file": "dist/js/index-CXOixm4R.js",
+    "name": "index",
+    "imports": [
+      "_react-vendor-D3y7IuOx.js",
+      "_default-i18n-DxhLUi3L.js"
+    ],
+    "css": [
+      "admin/dist/css/index.css"
+    ]
+  },
   "_index-Ca8T0YWF.js": {
     "file": "dist/js/index-Ca8T0YWF.js",
     "name": "index",
@@ -21,17 +32,6 @@
     ],
     "dynamicImports": [
       "node_modules/@wordpress/vips/build-module/vips-worker.mjs"
-    ]
-  },
-  "_index-CuK4RzLZ.js": {
-    "file": "dist/js/index-CuK4RzLZ.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-D3y7IuOx.js",
-      "_default-i18n-DxhLUi3L.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
     ]
   },
   "_react-vendor-!~{001}~.js": {
@@ -58,7 +58,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-D3y7IuOx.js",
-      "_index-CuK4RzLZ.js",
+      "_index-CXOixm4R.js",
       "_default-i18n-DxhLUi3L.js"
     ]
   },
@@ -105,7 +105,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-D3y7IuOx.js",
-      "_index-CuK4RzLZ.js",
+      "_index-CXOixm4R.js",
       "_clsx-DgYk2OaC.js",
       "_default-i18n-DxhLUi3L.js"
     ]
