@@ -292,6 +292,13 @@ const Discounts: React.FC = () => {
   // Check if Advanced Discount module is enabled (Pro plugin sets this flag via yatraAdmin)
   const isAdvancedDiscountEnabled = !!(window as any).yatraAdmin
     ?.advancedDiscountEnabled;
+  
+  // Debug: Log the flag value
+  console.log('Yatra Debug - Advanced Discount Enabled:', {
+    yatraAdmin: (window as any).yatraAdmin,
+    advancedDiscountEnabled: (window as any).yatraAdmin?.advancedDiscountEnabled,
+    isAdvancedDiscountEnabled
+  });
 
   const handleSelectDiscountType = (type: "promo" | "group" | "both") => {
     // Block group and both options if Advanced Discount module is not enabled - show premium dialog

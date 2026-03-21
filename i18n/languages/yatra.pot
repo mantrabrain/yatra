@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-21T08:34:20+00:00\n"
+"POT-Creation-Date: 2026-03-21T09:01:38+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -963,8 +963,8 @@ msgstr ""
 #: app/Controllers/BookingSessionController.php:2459
 #: app/Models/Checkout.php:188
 #: app/Services/CalculationService.php:490
-#: app/Services/CalculationService.php:503
-#: app/Services/DiscountService.php:950
+#: app/Services/CalculationService.php:521
+#: app/Services/DiscountService.php:985
 #: templates/partials/booking-content.php:50
 msgid "Group Discount"
 msgstr ""
@@ -1861,8 +1861,8 @@ msgstr ""
 
 #: app/Controllers/TripController.php:1989
 #: templates/booking-confirmation.php:254
-#: templates/partials/single-trip/content-sidebar.php:288
-#: templates/partials/single-trip/content-sidebar.php:379
+#: templates/partials/single-trip/content-sidebar.php:301
+#: templates/partials/single-trip/content-sidebar.php:392
 #: templates/partials/single-trip/enquiry-modal.php:61
 #: templates/pdf/itinerary.php:159
 msgid "Number of Travelers"
@@ -2243,8 +2243,8 @@ msgid "You do not have permission to perform this action."
 msgstr ""
 
 #: app/Models/Checkout.php:209
-#: app/Services/DiscountService.php:1057
-#: app/Services/DiscountService.php:1098
+#: app/Services/DiscountService.php:1112
+#: app/Services/DiscountService.php:1153
 msgid "Coupon Discount"
 msgstr ""
 
@@ -2890,7 +2890,7 @@ msgstr ""
 #: app/Providers/FrontendAssetsProvider.php:392
 #: app/Providers/FrontendAssetsProvider.php:431
 #: includes/helpers.php:261
-#: templates/partials/single-trip/content-sidebar.php:226
+#: templates/partials/single-trip/content-sidebar.php:239
 #: templates/partials/single-trip/similar-trips.php:213
 #: templates/trip-listing-card.php:297
 msgid "Contact for pricing"
@@ -3565,42 +3565,42 @@ msgstr ""
 msgid "Customers merged successfully."
 msgstr ""
 
-#: app/Services/DiscountService.php:945
-#: app/Services/DiscountService.php:992
-#: app/Services/DiscountService.php:1024
+#: app/Services/DiscountService.php:980
+#: app/Services/DiscountService.php:1027
+#: app/Services/DiscountService.php:1079
 #, php-format
 msgid "Group Discount (%s%%)"
 msgstr ""
 
-#: app/Services/DiscountService.php:947
-#: app/Services/DiscountService.php:993
-#: app/Services/DiscountService.php:1025
+#: app/Services/DiscountService.php:982
+#: app/Services/DiscountService.php:1028
+#: app/Services/DiscountService.php:1080
 #, php-format
 msgid "Group Discount (%s)"
 msgstr ""
 
-#: app/Services/DiscountService.php:1097
+#: app/Services/DiscountService.php:1152
 #, php-format
 msgid "Coupon (%s%%)"
 msgstr ""
 
-#: app/Services/DiscountService.php:1128
+#: app/Services/DiscountService.php:1183
 msgid "This coupon is not yet valid."
 msgstr ""
 
-#: app/Services/DiscountService.php:1133
+#: app/Services/DiscountService.php:1188
 msgid "This coupon has expired."
 msgstr ""
 
-#: app/Services/DiscountService.php:1140
+#: app/Services/DiscountService.php:1195
 msgid "This coupon has reached its usage limit."
 msgstr ""
 
-#: app/Services/DiscountService.php:1150
+#: app/Services/DiscountService.php:1205
 msgid "This coupon is not applicable to this trip."
 msgstr ""
 
-#: app/Services/DiscountService.php:1161
+#: app/Services/DiscountService.php:1216
 #, php-format
 msgid "Minimum order amount of %s required for this coupon."
 msgstr ""
@@ -5058,7 +5058,7 @@ msgid "No description available"
 msgstr ""
 
 #: templates/listing-activity.php:247
-#: templates/partials/single-trip/content-sidebar.php:218
+#: templates/partials/single-trip/content-sidebar.php:231
 #: templates/shortcodes/activity.php:123
 #: templates/shortcodes/destination.php:92
 #: templates/single-activity.php:130
@@ -5418,7 +5418,7 @@ msgid "Book Now"
 msgstr ""
 
 #: templates/partials/availability-section.php:94
-#: templates/partials/single-trip/content-sidebar.php:436
+#: templates/partials/single-trip/content-sidebar.php:449
 #: templates/partials/single-trip/enquiry-modal.php:10
 msgid "Make Enquiry"
 msgstr ""
@@ -5438,8 +5438,8 @@ msgstr ""
 #: templates/partials/availability-section.php:215
 #: templates/partials/booking-content.php:572
 #: templates/partials/single-trip/content-itinerary.php:114
-#: templates/partials/single-trip/content-sidebar.php:224
-#: templates/partials/single-trip/content-sidebar.php:227
+#: templates/partials/single-trip/content-sidebar.php:237
+#: templates/partials/single-trip/content-sidebar.php:240
 #: templates/single-activity.php:220
 #: templates/single-destination.php:238
 msgid "per person"
@@ -5531,7 +5531,7 @@ msgid "Select travelers to update the total, then click Book Now."
 msgstr ""
 
 #: templates/partials/availability-section.php:544
-#: templates/partials/single-trip/content-sidebar.php:420
+#: templates/partials/single-trip/content-sidebar.php:433
 #: templates/partials/single-trip/sticky-sidebar.php:251
 msgid "Total"
 msgstr ""
@@ -6267,97 +6267,97 @@ msgstr ""
 msgid "Trip Highlights"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:143
+#: templates/partials/single-trip/content-sidebar.php:156
 #: templates/partials/single-trip/sticky-sidebar.php:97
 #, php-format
 msgid "Up to %d%%"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:163
+#: templates/partials/single-trip/content-sidebar.php:176
 msgid "Group discount available"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:171
+#: templates/partials/single-trip/content-sidebar.php:184
 msgid "Group Discount Tiers"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:182
+#: templates/partials/single-trip/content-sidebar.php:195
 #: templates/partials/single-trip/quick-facts.php:87
 #, php-format
 msgid "%d-%d travelers"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:184
+#: templates/partials/single-trip/content-sidebar.php:197
 #, php-format
 msgid "%d+ travelers"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:194
+#: templates/partials/single-trip/content-sidebar.php:207
 #, php-format
 msgid "%s%% OFF"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:196
+#: templates/partials/single-trip/content-sidebar.php:209
 #, php-format
 msgid "%s OFF"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:212
+#: templates/partials/single-trip/content-sidebar.php:225
 msgid "OFF"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:238
+#: templates/partials/single-trip/content-sidebar.php:251
 #, php-format
 msgid "%d departure available"
 msgid_plural "%d departures available"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/partials/single-trip/content-sidebar.php:252
-#: templates/partials/single-trip/content-sidebar.php:341
+#: templates/partials/single-trip/content-sidebar.php:265
+#: templates/partials/single-trip/content-sidebar.php:354
 #: templates/partials/single-trip/enquiry-modal.php:53
 msgid "Select date"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:297
-#: templates/partials/single-trip/content-sidebar.php:388
+#: templates/partials/single-trip/content-sidebar.php:310
+#: templates/partials/single-trip/content-sidebar.php:401
 #, php-format
 msgid "Min: %d, Max: %d"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:313
+#: templates/partials/single-trip/content-sidebar.php:326
 #, php-format
 msgid "Available: %s - %s"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:318
+#: templates/partials/single-trip/content-sidebar.php:331
 #, php-format
 msgid "Available from: %s"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:322
+#: templates/partials/single-trip/content-sidebar.php:335
 #, php-format
 msgid "Available until: %s"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:429
+#: templates/partials/single-trip/content-sidebar.php:442
 msgid "Check Availability"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:457
+#: templates/partials/single-trip/content-sidebar.php:470
 #, php-format
 msgid "Free cancellation up to %d %s%s before"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:463
+#: templates/partials/single-trip/content-sidebar.php:476
 msgid "Free cancellation"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:467
+#: templates/partials/single-trip/content-sidebar.php:480
 msgid "Cancellation policy applies"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:471
+#: templates/partials/single-trip/content-sidebar.php:484
 msgid "Cancellation policy may apply"
 msgstr ""
 

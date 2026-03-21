@@ -81,7 +81,7 @@ interface DiscountFormData {
 
 const DiscountForm: React.FC = () => {
   const queryClient = useQueryClient();
-  const { can } = usePermissions();
+  const { can, permissions, isPro } = usePermissions();
   const { showToast } = useToast();
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   // Get initial discount_mode from URL at initialization time
@@ -324,11 +324,7 @@ const DiscountForm: React.FC = () => {
   };
 
   const handleGroupDiscountToggle = (checked: boolean) => {
-    // Check if user has permission for group discounts
-    if (checked && !can("yatra_group_discounts")) {
-      setShowPremiumModal(true);
-      return;
-    }
+  
     handleFieldChange("is_group_discount", checked);
   };
 
