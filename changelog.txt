@@ -1,3 +1,12 @@
+= 2.3.4 | 2026-03-23
+* Added - 11 new booking and requirements fields for comprehensive trip management
+* Added - Physical, visa, and vaccination requirements fields
+* Added - Accommodation and transportation management fields
+* Added - Cancellation policy configuration
+* Enhanced - Important Info section with professional UI/UX design
+* Added - Promotional notice system for Yatra Pro pricing alerts
+* Fixed - Dismiss functionality with 15-day temporary and permanent options
+
 = 2.2.9 | 2024-08-08
 * Added - Bulk delete enquiry option added!
 

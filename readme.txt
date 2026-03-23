@@ -4,7 +4,7 @@ Tags: travel-booking, tour-booking, travel-agency, tour-operator, travel-website
 Requires at least: 5.6
 Tested up to: 6.9
 Requires PHP: 7.0
-Stable tag: 2.3.3
+Stable tag: 2.3.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://wpyatra.com/donate/
@@ -278,6 +278,10 @@ Donate link: https://wpyatra.com/donate/
 17. **Frontend Tour Display** - Beautiful tour presentation
 
 == Changelog ==
+
+= 2.3.4 | 2026-03-23 =
+* ✅ Added - Promotional notice system for Yatra Pro pricing alerts
+* ✅ Fixed - Dismiss functionality with 15-day temporary and permanent options
 
 = 2.3.3 | 2025-12-21 =
 * ✅ Compatibility - 6.9 compatibility tested

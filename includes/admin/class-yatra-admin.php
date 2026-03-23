@@ -100,6 +100,9 @@ final class Yatra_Admin
     {
         $this->includes();
         $this->init_hooks();
+        
+        // Initialize promotional notice
+        Yatra_Promotional_Notice::instance();
     }
 
     /**
@@ -115,7 +118,6 @@ final class Yatra_Admin
         add_action('admin_init', array($this, 'admin_redirects'));
         add_action('admin_menu', array($this, 'yatra_submenu'));
         add_action('admin_menu', array($this, 'yatra_tour_submenu'));
-        add_action('admin_notices', array($this, 'promotional_offer'));
         add_action('admin_notices', array($this, 'yatra_three_notice'));
         add_filter('plugin_action_links_' . plugin_basename(YATRA_PLUGIN_DIR . 'yatra.php'), [$this, 'settings_link'], 10, 4);
 
@@ -142,33 +144,7 @@ final class Yatra_Admin
     }
 
 
-    public function promotional_offer()
-    {
-return;
-        if (!current_user_can('manage_yatra')) {
-            return;
-        }
-
-        $offer_key = 'yatra_black_friday_cyber_monday_promo';
-
-        $offer_start_date = strtotime('2022-10-28 00:00:01');
-
-        $offer_end_date = strtotime('2022-12-05 23:59:00');
-
-        $hide_notice = get_option($offer_key, 'show');
-
-        if ('hide' == $hide_notice) {
-            return;
-        }
-
-        if ($offer_start_date < current_time('timestamp') && current_time('timestamp') < $offer_end_date) {
-
-            yatra_load_admin_template('notices.promo');
-
-        }
-
-    }
-
+    
     public function admin_redirects()
     {
 
@@ -415,6 +391,7 @@ return;
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-permalinks.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-review.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-addons.php';
+        include_once YATRA_ABSPATH . 'includes/admin/class-yatra-promotional-notice.php';
 
 
     }
