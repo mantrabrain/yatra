@@ -56,6 +56,7 @@ interface Trip {
   pricing_type?: "regular" | "traveler_based" | string;
   status: string;
   created_at: string;
+  updated_at?: string;
   bookings_count?: number;
   featured?: boolean;
   trip_type?: "single_day" | "multi_day" | "flexible";
@@ -66,6 +67,14 @@ interface Trip {
   max_travelers?: number;
   countries?: string[];
   regions?: string[];
+  featured_image_url?: string;
+  availability_dates?: Array<{
+    id: number;
+    departure_date: string;
+    seats_remaining?: number;
+    status?: string;
+  }>;
+  attributes?: Record<number, any>;
   trip_category?: Array<{
     id: number;
     name: string;
@@ -675,14 +684,18 @@ const Trips: React.FC = () => {
         status: true,
         trip_type: true,
         duration: false,
+        availability: true, // Availability status (has dates, seats)
+        capacity: false, // Min/Max travelers
         countries: false,
         difficulty: false,
+        attributes: false, // Custom attributes count
         // Control chips inside Trip column
         destinations: true,
         activities: true,
         categories: true,
         bookings: true,
         created: true,
+        modified: false, // Last modified date
       };
 
       if (typeof window === "undefined") {
@@ -749,6 +762,21 @@ const Trips: React.FC = () => {
       label: __("Difficulty", "yatra"),
       visible: visibleColumns.difficulty,
     },
+    {
+      key: "availability",
+      label: __("Availability", "yatra"),
+      visible: visibleColumns.availability,
+    },
+    {
+      key: "capacity",
+      label: __("Capacity", "yatra"),
+      visible: visibleColumns.capacity,
+    },
+    {
+      key: "attributes",
+      label: __("Attributes", "yatra"),
+      visible: visibleColumns.attributes,
+    },
     // These control which chips are shown inside the Trip column
     {
       key: "destinations",
@@ -778,6 +806,11 @@ const Trips: React.FC = () => {
       key: "created",
       label: __("Created", "yatra"),
       visible: visibleColumns.created,
+    },
+    {
+      key: "modified",
+      label: __("Modified", "yatra"),
+      visible: visibleColumns.modified,
     },
   ];
 
@@ -949,7 +982,19 @@ const Trips: React.FC = () => {
       render: (trip: Trip) => {
         const editUrl = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${trip.id}`;
         return (
-          <div className="flex items-start gap-2">
+          <div className="flex items-start gap-3">
+            {/* Featured Image Thumbnail */}
+            {trip.featured_image_url ? (
+              <img
+                src={trip.featured_image_url}
+                alt={trip.title}
+                className="w-12 h-12 object-cover rounded flex-shrink-0"
+              />
+            ) : (
+              <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded flex-shrink-0 flex items-center justify-center">
+                <span className="text-gray-400 text-[10px]">{__("No img", "yatra")}</span>
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1">
                 <a
@@ -1158,6 +1203,78 @@ const Trips: React.FC = () => {
       },
     });
 
+    // Availability column
+    cols.push({
+      key: "availability",
+      label: __("Availability", "yatra"),
+      sortable: false,
+      visible: visibleColumns.availability,
+      render: (trip: Trip) => {
+        const dates = trip.availability_dates || [];
+        if (!dates.length) {
+          return (
+            <span className="text-xs text-gray-400 dark:text-gray-500">
+              {__("No dates", "yatra")}
+            </span>
+          );
+        }
+        const availableCount = dates.filter(d => d.status === 'available').length;
+        return (
+          <div className="text-sm">
+            <div className="text-gray-700 dark:text-gray-300">
+              {dates.length} {__("dates", "yatra")}
+            </div>
+            {availableCount > 0 && (
+              <div className="text-xs text-green-600 dark:text-green-400">
+                {availableCount} {__("available", "yatra")}
+              </div>
+            )}
+          </div>
+        );
+      },
+    });
+
+    // Capacity column
+    cols.push({
+      key: "capacity",
+      label: __("Capacity", "yatra"),
+      sortable: false,
+      visible: visibleColumns.capacity,
+      render: (trip: Trip) => {
+        if (!trip.min_travelers && !trip.max_travelers) return null;
+        const min = trip.min_travelers || 0;
+        const max = trip.max_travelers || 0;
+        return (
+          <span className="text-sm text-gray-700 dark:text-gray-300">
+            {min}-{max} {__("travelers", "yatra")}
+          </span>
+        );
+      },
+    });
+
+    // Attributes column
+    cols.push({
+      key: "attributes",
+      label: __("Attributes", "yatra"),
+      sortable: false,
+      visible: visibleColumns.attributes,
+      render: (trip: Trip) => {
+        const attrCount = trip.attributes ? Object.keys(trip.attributes).length : 0;
+        if (!attrCount) {
+          return (
+            <span className="text-xs text-gray-400 dark:text-gray-500">
+              {__("None", "yatra")}
+            </span>
+          );
+        }
+        return (
+          <Badge className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400">
+            {attrCount} {__("attributes", "yatra")}
+          </Badge>
+        );
+      },
+    });
+
     if (isPro) {
       cols.push({
         key: "bookings",
@@ -1182,6 +1299,22 @@ const Trips: React.FC = () => {
           {formatDate(trip.created_at)}
         </span>
       ),
+    });
+
+    // Modified column
+    cols.push({
+      key: "modified",
+      label: __("Modified", "yatra"),
+      sortable: true,
+      visible: visibleColumns.modified,
+      render: (trip: Trip) => {
+        if (!trip.updated_at) return null;
+        return (
+          <span className="text-gray-500 dark:text-gray-400 text-sm">
+            {formatDate(trip.updated_at)}
+          </span>
+        );
+      },
     });
 
     return cols;

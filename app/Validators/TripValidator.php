@@ -264,6 +264,10 @@ class TripValidator
             $sanitized['transportation_details'] = wp_kses_post($data['transportation_details']);
         }
 
+        if (isset($data['transportation_included'])) {
+            $sanitized['transportation_included'] = (bool)$data['transportation_included'];
+        }
+
         if (isset($data['payment_terms'])) {
             $sanitized['payment_terms'] = wp_kses_post($data['payment_terms']);
         }
@@ -372,6 +376,20 @@ class TripValidator
 
         if (isset($data['booking_deadline_hours'])) {
             $sanitized['booking_deadline_hours'] = (int)$data['booking_deadline_hours'];
+        }
+
+        // Time slot fields
+        if (isset($data['has_default_time_slots'])) {
+            $sanitized['has_default_time_slots'] = (bool)$data['has_default_time_slots'];
+        }
+
+        if (isset($data['default_time_slots'])) {
+            // Keep as string (already JSON encoded from controller)
+            $sanitized['default_time_slots'] = $data['default_time_slots'];
+        }
+
+        if (isset($data['departure_time'])) {
+            $sanitized['departure_time'] = sanitize_text_field($data['departure_time']);
         }
 
         // Enum fields

@@ -146,6 +146,11 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
   const handleAttributeValueChange = (attributeId: number, value: any) => {
     const newAttributeValues = { ...attributeValues, [attributeId]: value };
     setAttributeValues(newAttributeValues);
+    console.log("TripAttributesSection: Updating attribute", {
+      attributeId,
+      value,
+      newAttributeValues
+    });
     handleFieldChange("attributes", newAttributeValues);
   };
 

@@ -36,9 +36,8 @@ import {
   Save,
   Loader2,
   Sparkles,
-  Box,
   Calendar,
-  BarChart3,
+  Clock,
   Image,
   HelpCircle,
   Search,
@@ -57,17 +56,20 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  History,
-  Lightbulb,
   Copy,
   Check,
   BookOpen,
-  Mail,
-  Database,
   Download,
   Eye,
   X,
   Trash2,
+  Users,
+  Box,
+  BarChart3,
+  Database,
+  History,
+  Home,
+  Car,
 } from "lucide-react";
 import { RichTextEditor } from "../components/ui/rich-text-editor";
 import { IconPicker, IconPickerValue } from "../components/ui/icon-picker";
@@ -253,6 +255,12 @@ const normalizeAmenityItems = (items: unknown): TripAmenityItem[] => {
   return [];
 };
 
+interface TimeSlot {
+  id: string;
+  time: string; // HH:MM format
+  label: string;
+}
+
 interface TripFormData {
   // Overview
   title: string;
@@ -326,6 +334,11 @@ interface TripFormData {
   physical_requirements: string;
   visa_requirements: string;
   vaccination_requirements: string;
+  
+  // Fallback Settings (for trips without availability dates/rules)
+  has_default_time_slots: boolean; // For day tours: enable multiple time slots
+  default_time_slots: TimeSlot[]; // Array of time slot objects for day tours
+  departure_time: string; // Default departure time
 
   // Included/Excluded
   included_items: TripAmenityItem[];
@@ -507,6 +520,9 @@ const TripForm: React.FC = () => {
   const [showCategorySelector, setShowCategorySelector] = useState(false);
   const [showLandmarkDialog, setShowLandmarkDialog] = useState(false);
   const [landmarkInput, setLandmarkInput] = useState("");
+  
+  // Sub-tab state for Trip Details section (itinerary)
+  const [tripDetailsTab, setTripDetailsTab] = useState<"itinerary" | "included">("itinerary");
 
   // Track visited sections for lazy loading and update URL
   useEffect(() => {
@@ -1376,15 +1392,18 @@ const TripForm: React.FC = () => {
     deposit_amount: "",
     deposit_percentage: "",
     payment_terms: "",
-    max_travelers: "",
-    min_travelers: "",
+    max_travelers: "10",
+    min_travelers: "2",
     booking_deadline_hours: "24",
-    cancellation_policy: "",
-    age_min: "",
-    age_max: "",
-    physical_requirements: "",
-    visa_requirements: "",
-    vaccination_requirements: "",
+    cancellation_policy: "Flexible",
+    age_min: "18",
+    age_max: "65",
+    physical_requirements: "Moderate",
+    visa_requirements: "Schengen visa",
+    vaccination_requirements: "COVID-19 vaccination",
+    has_default_time_slots: false,
+    default_time_slots: [],
+    departure_time: "09:00",
     included_items: [],
     excluded_items: [],
     attributes: {}, // attribute_id -> value mapping
@@ -2125,6 +2144,11 @@ const TripForm: React.FC = () => {
       physical_requirements: tripData.physical_requirements || "",
       visa_requirements: tripData.visa_requirements || "",
       vaccination_requirements: tripData.vaccination_requirements || "",
+      has_default_time_slots: tripData.has_default_time_slots || false,
+      default_time_slots: Array.isArray(tripData.default_time_slots) 
+        ? tripData.default_time_slots 
+        : (tripData.default_time_slots ? JSON.parse(tripData.default_time_slots) : []),
+      departure_time: tripData.departure_time || "09:00",
       included_items: normalizeAmenityItems(tripData.included_items),
       excluded_items: normalizeAmenityItems(tripData.excluded_items),
       // Preserve current itinerary data if it exists, otherwise use database data
@@ -2356,44 +2380,35 @@ const TripForm: React.FC = () => {
     return fieldErrors;
   };
 
-  // Define sections - Organized in logical workflow order (First Things First)
+  // Define sections - Reorganized for beginner-friendly UX
+  // PHASE 1: ESSENTIALS (Must complete for publishable trip)
   const essentialsSections: Section[] = [
-    // Step 1: Basic Information (includes Trip Type & Duration)
+    // 1. Trip Basics - What you're offering
     {
       id: "basic",
-      label: __("Basic Information", "yatra"),
+      label: __("Trip Basics", "yatra"),
       icon: FileText,
       required: true,
       completed: !!(formData.title?.trim() && formData.slug?.trim()),
       hasErrors: getSectionErrors("basic").length > 0,
     },
 
-    // Step 2: Location & Geography
+    // 2. Location & Route - Where it happens
     {
       id: "location",
-      label: __("Location & Geography", "yatra"),
+      label: __("Location & Route", "yatra"),
       icon: MapPin,
       required: false,
       completed: !!(formData.destinations.length > 0),
       hasErrors: getSectionErrors("location").length > 0,
     },
 
-    // Step 3: Schedule & Availability (renamed from Duration & Schedule)
-    {
-      id: "duration",
-      label: __("Schedule & Availability", "yatra"),
-      icon: Calendar,
-      required: false,
-      completed: !!(formData.available_from || formData.available_to),
-      hasErrors: getSectionErrors("duration").length > 0,
-    },
-
-    // Step 4: Pricing & Payment
+    // 3. Pricing - How much it costs
     {
       id: "pricing",
-      label: __("Pricing & Payment", "yatra"),
+      label: __("Pricing", "yatra"),
       icon: DollarSign,
-      required: false,
+      required: true,
       completed:
         formData.pricing_type === "regular"
           ? !!(
@@ -2405,54 +2420,43 @@ const TripForm: React.FC = () => {
       hasErrors: getSectionErrors("pricing").length > 0,
     },
 
-    // Step 5: Booking Requirements
+    // 4. Availability & Booking - When available + booking rules (merged duration + booking)
     {
-      id: "booking",
-      label: __("Booking Requirements", "yatra"),
-      icon: Mail,
-      required: false,
-      completed: !!(formData.min_travelers && formData.max_travelers),
-      hasErrors: getSectionErrors("booking").length > 0,
-    },
-
-    // Step 6: Attributes
-    {
-      id: "attributes",
-      label: __("Attributes", "yatra"),
-      icon: Tag,
-      required: false,
-      completed:
-        formData.attributes && Object.keys(formData.attributes).length > 0,
-      hasErrors: getSectionErrors("attributes").length > 0,
-    },
-
-    // Step 7: Itinerary Builder (now optional)
-    {
-      id: "itinerary",
-      label: __("Itinerary Builder", "yatra"),
+      id: "duration",
+      label: __("Availability & Booking", "yatra"),
       icon: Calendar,
       required: false,
-      completed: formData.itinerary_days.length > 0,
-      hasErrors: getSectionErrors("itinerary").length > 0,
-    },
-
-    // Step 8: What's Included & Excluded
-    {
-      id: "included",
-      label: __("Included & Excluded", "yatra"),
-      icon: CheckSquare,
-      required: false,
-      completed:
-        formData.included_items.length > 0 ||
-        formData.excluded_items.length > 0,
-      hasErrors: getSectionErrors("included").length > 0,
+      completed: !!(
+        formData.available_from || 
+        formData.available_to || 
+        (formData.min_travelers && formData.max_travelers)
+      ),
+      hasErrors: getSectionErrors("duration").length > 0 || getSectionErrors("booking").length > 0,
     },
   ];
 
-  const marketingSections: Section[] = [
+  // PHASE 2: DETAILS (Enhance trip quality)
+  const detailsSections: Section[] = [
+    // 5. Trip Details - Description + Itinerary + Included/Excluded (merged 3 sections)
+    {
+      id: "itinerary",
+      label: __("Trip Details", "yatra"),
+      icon: BookOpen,
+      required: false,
+      completed: 
+        formData.itinerary_days.length > 0 ||
+        formData.included_items.length > 0 ||
+        formData.excluded_items.length > 0,
+      hasErrors: getSectionErrors("itinerary").length > 0 || getSectionErrors("included").length > 0,
+    },
+  ];
+
+  // PHASE 3: OPTIMIZATION (Improve discoverability)
+  const optimizationSections: Section[] = [
+    // 6. Media & Gallery - Photos, videos, testimonials
     {
       id: "media",
-      label: __("Media & Content", "yatra"),
+      label: __("Media & Gallery", "yatra"),
       icon: Image,
       required: false,
       completed: formData.gallery_images.length > 0 || !!formData.video_url,
@@ -2470,48 +2474,55 @@ const TripForm: React.FC = () => {
           },
         ] as Section[])
       : []),
-    {
-      id: "seo",
-      label: __("SEO Settings", "yatra"),
-      icon: Search,
-      required: false,
-      completed: !!(formData.meta_title || formData.meta_description),
-      hasErrors: getSectionErrors("seo").length > 0,
-    },
+    
+    // 7. Categories & Attributes - Classification + Custom Attributes (merged 2 sections)
     {
       id: "categorization",
-      label: __("Categorization", "yatra"),
+      label: __("Categories & Attributes", "yatra"),
       icon: Tag,
       required: false,
       completed: !!(
         formData.trip_category ||
         formData.activity_types.length > 0 ||
-        formData.tags.length > 0
+        formData.tags.length > 0 ||
+        (formData.attributes && Object.keys(formData.attributes).length > 0)
       ),
-      hasErrors: getSectionErrors("categorization").length > 0,
+      hasErrors: getSectionErrors("categorization").length > 0 || getSectionErrors("attributes").length > 0,
     },
-    {
-      id: "faqs",
-      label: __("FAQs", "yatra"),
-      icon: HelpCircle,
-      required: false,
-      completed: formData.faqs.length > 0,
-      hasErrors: getSectionErrors("faqs").length > 0,
-    },
+    
+    // 8. SEO & Marketing - SEO + FAQs (merged, fixed duplicate)
     {
       id: "seo",
-      label: __("SEO Settings", "yatra"),
+      label: __("SEO & Marketing", "yatra"),
       icon: Search,
       required: false,
-      completed: !!(formData.meta_title && formData.meta_description),
-      hasErrors: getSectionErrors("seo").length > 0,
+      completed: !!(
+        formData.meta_title || 
+        formData.meta_description ||
+        formData.faqs.length > 0
+      ),
+      hasErrors: getSectionErrors("seo").length > 0 || getSectionErrors("faqs").length > 0,
+    },
+  ];
+
+  // PHASE 4: ADVANCED (Power users only)
+  const advancedSections: Section[] = [
+    // 9. Advanced Settings - Publishing, scheduling, technical
+    {
+      id: "advanced",
+      label: __("Advanced Settings", "yatra"),
+      icon: Settings,
+      required: false,
+      completed: false,
+      hasErrors: false,
     },
   ];
 
   // Calculate completion percentage
   const completedSections = [
     ...essentialsSections,
-    ...marketingSections,
+    ...detailsSections,
+    ...optimizationSections,
   ].filter((s) => s.completed).length;
   const totalRequiredSections = essentialsSections.filter(
     (s) => s.required,
@@ -2524,14 +2535,9 @@ const TripForm: React.FC = () => {
   // Get current step number and total steps for navigation
   const allSections = [
     ...essentialsSections,
-    ...marketingSections,
-    {
-      id: "advanced" as SectionId,
-      label: __("Lifecycle", "yatra"),
-      icon: Settings,
-      required: false,
-      completed: false,
-    },
+    ...detailsSections,
+    ...optimizationSections,
+    ...advancedSections,
   ];
   const currentStepIndex = allSections.findIndex(
     (s) => s.id === currentSection,
@@ -2605,6 +2611,16 @@ const TripForm: React.FC = () => {
   };
 
   const handleFieldChange = (field: keyof TripFormData, value: any) => {
+    // Debug: Log when attributes field changes
+    if (field === "attributes") {
+      console.log("TripForm: handleFieldChange for attributes", {
+        field,
+        value,
+        valueType: typeof value,
+        isObject: typeof value === 'object',
+        keys: typeof value === 'object' ? Object.keys(value) : null
+      });
+    }
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
@@ -2935,6 +2951,9 @@ const TripForm: React.FC = () => {
       landmarks: dummyData.landmarks || [],
       availability_dates: dummyData.availability_dates || [],
       frontend_tabs: dummyData.frontend_tabs || [],
+      has_default_time_slots: dummyData.has_default_time_slots || false,
+      default_time_slots: dummyData.default_time_slots || [],
+      departure_time: dummyData.departure_time || "09:00",
       downloadable_items: dummyData.downloadable_items || [],
     });
 
@@ -3229,6 +3248,9 @@ const TripForm: React.FC = () => {
         physical_requirements: data.physical_requirements.trim(),
         visa_requirements: data.visa_requirements.trim(),
         vaccination_requirements: data.vaccination_requirements.trim(),
+        has_default_time_slots: data.has_default_time_slots || false,
+        default_time_slots: JSON.stringify(data.default_time_slots || []),
+        departure_time: data.departure_time || "09:00",
         included_items: (data.included_items || [])
           .map((item) => ({
             title: item.title?.trim() || "",
@@ -3308,6 +3330,16 @@ const TripForm: React.FC = () => {
           }))
           .filter((item) => item.title);
       }
+
+      // Debug: Log attributes and time slots data being sent
+      console.log("Saving trip with attributes and time slots:", {
+        tripId,
+        attributes: payload.attributes,
+        has_default_time_slots: payload.has_default_time_slots,
+        default_time_slots: payload.default_time_slots,
+        departure_time: payload.departure_time,
+        fullPayloadKeys: Object.keys(payload)
+      });
 
       if (isEditMode && tripId) {
         const response = await apiClient.put(`/trips/${tripId}`, payload);
@@ -5008,33 +5040,40 @@ const TripForm: React.FC = () => {
 
       case "duration":
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <Calendar className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {__("Schedule & Availability", "yatra")}
+                {__("Availability & Booking", "yatra")}
               </h2>
               <Badge
                 variant="outline"
-                className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800"
+                className="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300 border-blue-200 dark:border-blue-800"
               >
                 {__("Recommended", "yatra")}
               </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               {__(
-                "Set when your trip is available for booking and any seasonal information",
+                "When is it available & who can book it?",
                 "yatra",
               )}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {__(
-                  "Optional, but completing this helps automate calendar availability and booking rules.",
+                  "Set your trip's availability period, capacity limits, and booking requirements. This helps automate bookings and prevent overbooking.",
                   "yatra",
                 )}
               </span>
             </p>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
+              {/* SECTION 1: Availability Period */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-blue-500" />
+                  {__("Availability Period", "yatra")}
+                </h3>
+                <div className="space-y-4">
               {/* Availability Dates */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -5134,17 +5173,629 @@ const TripForm: React.FC = () => {
                   className="mt-2"
                 />
               </div>
+                </div>
+              </div>
+
+              {/* SECTION 2: Capacity & Travelers */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-blue-500" />
+                  {__("Capacity & Travelers", "yatra")}
+                </h3>
+                <div className="space-y-4">
+                  {/* Group Size */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label
+                        htmlFor="min_travelers"
+                        className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                      >
+                        {__("Minimum Travelers", "yatra")}
+                      </label>
+                      <Input
+                        id="min_travelers"
+                        type="number"
+                        min="1"
+                        value={formData.min_travelers}
+                        onChange={(e) =>
+                          handleFieldChange("min_travelers", e.target.value)
+                        }
+                        className={errors.min_travelers ? "border-red-500" : ""}
+                      />
+                      {errors.min_travelers && (
+                        <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4" />
+                          {errors.min_travelers}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="max_travelers"
+                        className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                      >
+                        {__("Maximum Travelers", "yatra")}
+                      </label>
+                      <Input
+                        id="max_travelers"
+                        type="number"
+                        min="1"
+                        value={formData.max_travelers}
+                        onChange={(e) =>
+                          handleFieldChange("max_travelers", e.target.value)
+                        }
+                        className={errors.max_travelers ? "border-red-500" : ""}
+                      />
+                      {errors.max_travelers && (
+                        <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4" />
+                          {errors.max_travelers}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Fallback Settings */}
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+                    <div className="flex items-start gap-2 mb-3">
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                        {__("Fallback Settings", "yatra")}
+                      </h4>
+                      <span title={__("These settings are used when the trip has no availability dates or recurring rules set. They provide default values for flexible booking.", "yatra")}>
+                        <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                      </span>
+                    </div>
+                    
+                    {/* Info Banner */}
+                    <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                        <div className="text-xs text-amber-800 dark:text-amber-200">
+                          <p className="font-medium mb-1">{__("When are these settings used?", "yatra")}</p>
+                          <p className="text-amber-700 dark:text-amber-300">
+                            {__("These settings apply ONLY when your trip has ZERO availability dates AND ZERO recurring rules. They provide defaults for flexible booking scenarios.", "yatra")}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Settings Content - Grouped by Trip Type */}
+                    <div className="space-y-4">
+                      {/* Day Tour Settings */}
+                      {formData.trip_type === "single_day" && (
+                        <div className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                          <h5 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                            <Clock className="w-4 h-4" />
+                            {__("Day Tour Time Settings", "yatra")}
+                          </h5>
+                          
+                          {/* Enable Multiple Time Slots Toggle */}
+                          <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                            <div className="flex items-start gap-3">
+                              <input
+                                type="checkbox"
+                                id="has_default_time_slots"
+                                checked={formData.has_default_time_slots}
+                                onChange={(e) => handleFieldChange("has_default_time_slots", e.target.checked)}
+                                className="mt-0.5 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                              />
+                              <div className="flex-1">
+                                <label htmlFor="has_default_time_slots" className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">
+                                  {__("Enable Multiple Time Slots", "yatra")}
+                                </label>
+                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                  {__("Allow customers to select from multiple departure times (e.g., Morning, Afternoon, Evening tours)", "yatra")}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Time Slots Configuration (if enabled) */}
+                          {formData.has_default_time_slots && (
+                            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                              <div className="flex items-center justify-between mb-3">
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                                    {__("Time Slots Configuration", "yatra")}
+                                  </label>
+                                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                    {__("Add multiple departure times for customers to choose from.", "yatra")}
+                                  </p>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const newSlot: TimeSlot = {
+                                      id: `slot-${Date.now()}`,
+                                      time: "09:00",
+                                      label: ""
+                                    };
+                                    handleFieldChange("default_time_slots", [...formData.default_time_slots, newSlot]);
+                                  }}
+                                  className="flex items-center gap-1"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                  {__("Add Time Slot", "yatra")}
+                                </Button>
+                              </div>
+
+                              {formData.default_time_slots.length === 0 ? (
+                                <div className="text-center py-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
+                                  <Clock className="w-8 h-8 mx-auto text-gray-400 mb-2" />
+                                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                                    {__("No time slots added yet", "yatra")}
+                                  </p>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      const newSlot: TimeSlot = {
+                                        id: `slot-${Date.now()}`,
+                                        time: "09:00",
+                                        label: "Morning Tour"
+                                      };
+                                      handleFieldChange("default_time_slots", [newSlot]);
+                                    }}
+                                  >
+                                    <Plus className="w-4 h-4 mr-1" />
+                                    {__("Add First Time Slot", "yatra")}
+                                  </Button>
+                                </div>
+                              ) : (
+                                <div className="space-y-3">
+                                  {formData.default_time_slots.map((slot, index) => (
+                                    <div key={slot.id} className="flex items-start gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                      <div className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex-shrink-0 mt-1">
+                                        <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                                          {index + 1}
+                                        </span>
+                                      </div>
+                                      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div>
+                                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            {__("Time", "yatra")}
+                                          </label>
+                                          <Input
+                                            type="time"
+                                            value={slot.time}
+                                            onChange={(e) => {
+                                              const updated = [...formData.default_time_slots];
+                                              updated[index] = { ...slot, time: e.target.value };
+                                              handleFieldChange("default_time_slots", updated);
+                                            }}
+                                            className="w-full"
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            {__("Label", "yatra")}
+                                          </label>
+                                          <Input
+                                            type="text"
+                                            value={slot.label}
+                                            onChange={(e) => {
+                                              const updated = [...formData.default_time_slots];
+                                              updated[index] = { ...slot, label: e.target.value };
+                                              handleFieldChange("default_time_slots", updated);
+                                            }}
+                                            placeholder={__("e.g., Morning Tour, Afternoon Tour", "yatra")}
+                                            className="w-full"
+                                          />
+                                        </div>
+                                      </div>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          const updated = formData.default_time_slots.filter((_, i) => i !== index);
+                                          handleFieldChange("default_time_slots", updated);
+                                        }}
+                                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 flex-shrink-0 mt-1"
+                                        title={__("Remove time slot", "yatra")}
+                                      >
+                                        <X className="w-4 h-4" />
+                                      </Button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Single Departure Time (if multiple slots disabled) */}
+                          {!formData.has_default_time_slots && (
+                            <div>
+                              <label htmlFor="departure_time_single" className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                                {__("Default Departure Time", "yatra")}
+                              </label>
+                              <Input
+                                id="departure_time_single"
+                                type="time"
+                                value={formData.departure_time}
+                                onChange={(e) => handleFieldChange("departure_time", e.target.value)}
+                                className="max-w-xs"
+                              />
+                              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                {__("Single departure time for all bookings when multiple time slots are not enabled.", "yatra")}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Multi-Day Trip Settings */}
+                      {formData.trip_type === "multi_day" && (
+                        <div className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                          <h5 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            {__("Multi-Day Trip Departure Settings", "yatra")}
+                          </h5>
+                          
+                          <div>
+                            <label htmlFor="departure_time_multiday" className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                              {__("Default Departure Time", "yatra")}
+                            </label>
+                            <Input
+                              id="departure_time_multiday"
+                              type="time"
+                              value={formData.departure_time}
+                              onChange={(e) => handleFieldChange("departure_time", e.target.value)}
+                              className="max-w-xs"
+                            />
+                            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                              {__("Default departure time for trips without specific availability dates.", "yatra")}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* No Trip Type Selected */}
+                      {!formData.trip_type && (
+                        <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 text-center">
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {__("Please select a trip type (Day Tour or Multi-Day) to configure fallback settings.", "yatra")}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 3: Booking Policies */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-blue-500" />
+                  {__("Booking Policies", "yatra")}
+                </h3>
+                <div className="space-y-4">
+                  {/* Age Restrictions */}
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                      {__("Age Restrictions", "yatra")}
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="age_min"
+                          className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                        >
+                          {__("Minimum Age", "yatra")}
+                        </label>
+                        <Input
+                          id="age_min"
+                          type="number"
+                          min="0"
+                          value={formData.age_min}
+                          onChange={(e) =>
+                            handleFieldChange("age_min", e.target.value)
+                          }
+                          placeholder={__("e.g., 18", "yatra")}
+                          className={errors.age_min ? "border-red-500" : ""}
+                        />
+                        {errors.age_min && (
+                          <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                            <AlertCircle className="w-4 h-4" />
+                            {errors.age_min}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="age_max"
+                          className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                        >
+                          {__("Maximum Age", "yatra")}
+                        </label>
+                        <Input
+                          id="age_max"
+                          type="number"
+                          min="0"
+                          value={formData.age_max}
+                          onChange={(e) =>
+                            handleFieldChange("age_max", e.target.value)
+                          }
+                          placeholder={__("e.g., 65", "yatra")}
+                          className={errors.age_max ? "border-red-500" : ""}
+                        />
+                        {errors.age_max && (
+                          <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                            <AlertCircle className="w-4 h-4" />
+                            {errors.age_max}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Requirements */}
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                      {__("Trip Requirements", "yatra")}
+                    </h4>
+                    <div className="space-y-4">
+                      <div>
+                        <label
+                          htmlFor="physical_requirements"
+                          className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                        >
+                          {__("Physical Requirements", "yatra")}
+                        </label>
+                        <textarea
+                          id="physical_requirements"
+                          value={formData.physical_requirements}
+                          onChange={(e) =>
+                            handleFieldChange("physical_requirements", e.target.value)
+                          }
+                          placeholder={__(
+                            "e.g., Moderate fitness level required. Some walking involved but no strenuous activities.",
+                            "yatra",
+                          )}
+                          rows={3}
+                          className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="visa_requirements"
+                          className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                        >
+                          {__("Visa Requirements", "yatra")}
+                        </label>
+                        <textarea
+                          id="visa_requirements"
+                          value={formData.visa_requirements}
+                          onChange={(e) =>
+                            handleFieldChange("visa_requirements", e.target.value)
+                          }
+                          placeholder={__(
+                            "e.g., Tourist visa required. Can be obtained on arrival or in advance.",
+                            "yatra",
+                          )}
+                          rows={3}
+                          className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="vaccination_requirements"
+                          className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                        >
+                          {__("Vaccination Requirements", "yatra")}
+                        </label>
+                        <textarea
+                          id="vaccination_requirements"
+                          value={formData.vaccination_requirements}
+                          onChange={(e) =>
+                            handleFieldChange("vaccination_requirements", e.target.value)
+                          }
+                          placeholder={__(
+                            "e.g., No mandatory vaccinations. Recommended: Hepatitis A, Typhoid, and routine vaccinations.",
+                            "yatra",
+                          )}
+                          rows={3}
+                          className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Cancellation Policy */}
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                      {__("Cancellation Policy", "yatra")}
+                    </h4>
+                    <textarea
+                      id="cancellation_policy"
+                      value={formData.cancellation_policy}
+                      onChange={(e) =>
+                        handleFieldChange("cancellation_policy", e.target.value)
+                      }
+                      placeholder={__(
+                        "e.g., Free cancellation up to 30 days before departure. 50% refund for cancellations 15-30 days before. No refund for cancellations less than 15 days before.",
+                        "yatra",
+                      )}
+                      rows={4}
+                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 4: Accommodation */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Home className="w-4 h-4 text-blue-500" />
+                  {__("Accommodation", "yatra")}
+                </h3>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label
+                        htmlFor="accommodation_type"
+                        className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                      >
+                        {__("Accommodation Type", "yatra")}
+                      </label>
+                      <Input
+                        id="accommodation_type"
+                        type="text"
+                        value={formData.accommodation_type}
+                        onChange={(e) =>
+                          handleFieldChange("accommodation_type", e.target.value)
+                        }
+                        placeholder={__("e.g., Hotel, Resort, Teahouse, Camping", "yatra")}
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="meal_plan"
+                        className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                      >
+                        {__("Meal Plan", "yatra")}
+                      </label>
+                      <Select
+                        id="meal_plan"
+                        value={formData.meal_plan}
+                        onChange={(e) =>
+                          handleFieldChange("meal_plan", e.target.value)
+                        }
+                      >
+                        <option value="">{__("Select meal plan", "yatra")}</option>
+                        <option value="breakfast">{__("Breakfast Only", "yatra")}</option>
+                        <option value="half_board">{__("Half Board (Breakfast + Dinner)", "yatra")}</option>
+                        <option value="full_board">{__("Full Board (All Meals)", "yatra")}</option>
+                        <option value="all_inclusive">{__("All Inclusive", "yatra")}</option>
+                        <option value="none">{__("No Meals Included", "yatra")}</option>
+                      </Select>
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="accommodation_details"
+                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                    >
+                      {__("Accommodation Details", "yatra")}
+                    </label>
+                    <textarea
+                      id="accommodation_details"
+                      value={formData.accommodation_details}
+                      onChange={(e) =>
+                        handleFieldChange("accommodation_details", e.target.value)
+                      }
+                      placeholder={__(
+                        "e.g., 4-star beachfront resort with private balconies, infinity pool, and spa facilities",
+                        "yatra",
+                      )}
+                      rows={3}
+                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 5: Transportation */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Car className="w-4 h-4 text-blue-500" />
+                  {__("Transportation", "yatra")}
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="transportation_included"
+                      checked={formData.transportation_included}
+                      onChange={(e) =>
+                        handleFieldChange("transportation_included", e.target.checked)
+                      }
+                      className="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    />
+                    <label
+                      htmlFor="transportation_included"
+                      className="text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      {__("Transportation Included", "yatra")}
+                    </label>
+                  </div>
+                  {formData.transportation_included && (
+                    <>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label
+                            htmlFor="pickup_location"
+                            className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                          >
+                            {__("Pickup Location", "yatra")}
+                          </label>
+                          <Input
+                            id="pickup_location"
+                            type="text"
+                            value={formData.pickup_location}
+                            onChange={(e) =>
+                              handleFieldChange("pickup_location", e.target.value)
+                            }
+                            placeholder={__("e.g., Airport, Hotel, City Center", "yatra")}
+                          />
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="dropoff_location"
+                            className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                          >
+                            {__("Dropoff Location", "yatra")}
+                          </label>
+                          <Input
+                            id="dropoff_location"
+                            type="text"
+                            value={formData.dropoff_location}
+                            onChange={(e) =>
+                              handleFieldChange("dropoff_location", e.target.value)
+                            }
+                            placeholder={__("e.g., Airport, Hotel, City Center", "yatra")}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="transportation_details"
+                          className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                        >
+                          {__("Transportation Details", "yatra")}
+                        </label>
+                        <textarea
+                          id="transportation_details"
+                          value={formData.transportation_details}
+                          onChange={(e) =>
+                            handleFieldChange("transportation_details", e.target.value)
+                          }
+                          placeholder={__(
+                            "e.g., Private air-conditioned vehicle with professional driver",
+                            "yatra",
+                          )}
+                          rows={3}
+                          className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         );
 
       case "categorization":
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <Tag className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {__("Categorization", "yatra")}
+                {__("Categories & Attributes", "yatra")}
               </h2>
               <Badge
                 variant="outline"
@@ -5154,19 +5805,23 @@ const TripForm: React.FC = () => {
               </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__(
-                "Organize and classify your trip for better discoverability and filtering",
-                "yatra",
-              )}
+              {__("How should travelers find this trip?", "yatra")}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {__(
-                  "Optional, but completing this helps your trip appear in the right categories and search results.",
+                  "Organize your trip with categories, activities, and custom attributes to help travelers discover it through search and filters.",
                   "yatra",
                 )}
               </span>
             </p>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
+              {/* SECTION 1: Categories & Classification */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Tag className="w-4 h-4 text-blue-500" />
+                  {__("Categories & Classification", "yatra")}
+                </h3>
+                <div className="space-y-4">
               {/* Trip Category */}
               <div>
                 <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
@@ -5376,6 +6031,26 @@ const TripForm: React.FC = () => {
                     "yatra",
                   )}
                   className="mt-2"
+                />
+              </div>
+                </div>
+              </div>
+
+              {/* SECTION 2: Custom Attributes */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-blue-500" />
+                  {__("Custom Attributes", "yatra")}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                  {__("Add custom attributes for advanced filtering and search capabilities.", "yatra")}
+                </p>
+                <TripAttributesSection
+                  formData={formData}
+                  handleFieldChange={handleFieldChange}
+                  tripId={tripId || undefined}
+                  isEditMode={isEditMode}
+                  tripAttributesData={tripAttributesData}
                 />
               </div>
             </div>
@@ -5947,13 +6622,10 @@ const TripForm: React.FC = () => {
               </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__(
-                "Set pricing for different traveler types and payment options",
-                "yatra",
-              )}
+              {__("How much does it cost?", "yatra")}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {__(
-                  "Optional for drafts, but adding pricing now makes publishing and selling much easier later.",
+                  "Set pricing for different traveler types and payment options. Optional for drafts, but adding pricing now makes publishing easier.",
                   "yatra",
                 )}
               </span>
@@ -6584,444 +7256,106 @@ const TripForm: React.FC = () => {
           </div>
         );
 
-      case "booking":
-        return (
-          <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <Mail className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {__("Booking Requirements", "yatra")}
-              </h2>
-              <Badge
-                variant="outline"
-                className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800"
-              >
-                {__("Recommended", "yatra")}
-              </Badge>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__(
-                "Configure booking limits, deadlines, and traveler requirements",
-                "yatra",
-              )}
-              <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {__(
-                  "Optional today, but setting these helps automate capacity and avoid overbookings later.",
-                  "yatra",
-                )}
-              </span>
-            </p>
-
-            <div className="space-y-6">
-              {/* Group Size */}
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                  {__("Group Size", "yatra")}
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="min_travelers"
-                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                    >
-                      {__("Minimum Travelers", "yatra")}
-                    </label>
-                    <Input
-                      id="min_travelers"
-                      type="number"
-                      min="1"
-                      value={formData.min_travelers}
-                      onChange={(e) =>
-                        handleFieldChange("min_travelers", e.target.value)
-                      }
-                      className={errors.min_travelers ? "border-red-500" : ""}
-                    />
-                    {errors.min_travelers && (
-                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {errors.min_travelers}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="max_travelers"
-                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                    >
-                      {__("Maximum Travelers", "yatra")}
-                    </label>
-                    <Input
-                      id="max_travelers"
-                      type="number"
-                      min="1"
-                      value={formData.max_travelers}
-                      onChange={(e) =>
-                        handleFieldChange("max_travelers", e.target.value)
-                      }
-                      className={errors.max_travelers ? "border-red-500" : ""}
-                    />
-                    {errors.max_travelers && (
-                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {errors.max_travelers}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Age Restrictions */}
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                  {__("Age Restrictions", "yatra")}
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="age_min"
-                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                    >
-                      {__("Minimum Age", "yatra")}
-                    </label>
-                    <Input
-                      id="age_min"
-                      type="number"
-                      min="0"
-                      value={formData.age_min}
-                      onChange={(e) =>
-                        handleFieldChange("age_min", e.target.value)
-                      }
-                      placeholder={__("e.g., 18", "yatra")}
-                      className={errors.age_min ? "border-red-500" : ""}
-                    />
-                    {errors.age_min && (
-                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {errors.age_min}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="age_max"
-                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                    >
-                      {__("Maximum Age", "yatra")}
-                    </label>
-                    <Input
-                      id="age_max"
-                      type="number"
-                      min="0"
-                      value={formData.age_max}
-                      onChange={(e) =>
-                        handleFieldChange("age_max", e.target.value)
-                      }
-                      placeholder={__("e.g., 65", "yatra")}
-                      className={errors.age_max ? "border-red-500" : ""}
-                    />
-                    {errors.age_max && (
-                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {errors.age_max}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Booking Deadlines */}
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                  {__("Booking Deadlines", "yatra")}
-                </h3>
-                <div>
-                  <label
-                    htmlFor="booking_deadline_hours"
-                    className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                  >
-                    {__("Booking Deadline (Hours)", "yatra")}
-                  </label>
-                  <input
-                    type="number"
-                    id="booking_deadline_hours"
-                    value={formData.booking_deadline_hours}
-                    onChange={(e) =>
-                      handleFieldChange(
-                        "booking_deadline_hours",
-                        e.target.value,
-                      )
-                    }
-                    placeholder="24"
-                    min="0"
-                    max="720"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                  />
-                  <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                    {__(
-                      "Hours before trip start when booking closes (e.g., 24 for 1 day before)",
-                      "yatra",
-                    )}
-                  </p>
-                </div>
-              </div>
-
-              {/* Travel Requirements */}
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                  {__("Travel Requirements", "yatra")}
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label
-                      htmlFor="physical_requirements"
-                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                    >
-                      {__("Physical Requirements", "yatra")}
-                    </label>
-                    <textarea
-                      id="physical_requirements"
-                      value={formData.physical_requirements}
-                      onChange={(e) =>
-                        handleFieldChange(
-                          "physical_requirements",
-                          e.target.value,
-                        )
-                      }
-                      placeholder={__(
-                        "e.g., Moderate fitness level required, ability to walk 5km per day",
-                        "yatra",
-                      )}
-                      rows={2}
-                      className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="visa_requirements"
-                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                    >
-                      {__("Visa Requirements", "yatra")}
-                    </label>
-                    <textarea
-                      id="visa_requirements"
-                      value={formData.visa_requirements}
-                      onChange={(e) =>
-                        handleFieldChange("visa_requirements", e.target.value)
-                      }
-                      placeholder={__(
-                        "e.g., Valid passport required, visa on arrival available for most nationalities",
-                        "yatra",
-                      )}
-                      rows={2}
-                      className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="vaccination_requirements"
-                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                    >
-                      {__("Vaccination Requirements", "yatra")}
-                    </label>
-                    <textarea
-                      id="vaccination_requirements"
-                      value={formData.vaccination_requirements}
-                      onChange={(e) =>
-                        handleFieldChange(
-                          "vaccination_requirements",
-                          e.target.value,
-                        )
-                      }
-                      placeholder={__(
-                        "e.g., Yellow fever vaccination required for entry",
-                        "yatra",
-                      )}
-                      rows={2}
-                      className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Cancellation Policy */}
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                  {__("Cancellation Policy", "yatra")}
-                </h3>
-                <div>
-                  <label
-                    htmlFor="cancellation_policy"
-                    className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                  >
-                    {__("Cancellation Policy Details", "yatra")}
-                  </label>
-                  <textarea
-                    id="cancellation_policy"
-                    value={formData.cancellation_policy}
-                    onChange={(e) =>
-                      handleFieldChange("cancellation_policy", e.target.value)
-                    }
-                    placeholder={__(
-                      "e.g., Full refund 30 days before departure, 50% refund 15-29 days before, no refund within 14 days",
-                      "yatra",
-                    )}
-                    rows={3}
-                    className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
       case "attributes":
-        return (
-          <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <Tag className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {__("Attributes", "yatra")}
-              </h2>
-              <Badge
-                variant="outline"
-                className="text-xs bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-300 border-green-200 dark:border-green-800"
-              >
-                {__("Optional", "yatra")}
-              </Badge>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__("Add custom attributes to describe your trip", "yatra")}
-              <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {__(
-                  "These attributes can be used for filtering and search on the frontend",
-                  "yatra",
-                )}
-              </span>
-            </p>
-
-            <TripAttributesSection
-              formData={formData}
-              handleFieldChange={handleFieldChange}
-              tripId={tripId || undefined}
-              isEditMode={isEditMode}
-              tripAttributesData={tripAttributesData}
-            />
-          </div>
-        );
+        // Redirect to categorization section (attributes now merged there)
+        setCurrentSection("categorization");
+        return null;
 
       case "itinerary":
         return (
-          <ItinerarySection
-            formData={formData as any}
-            isEditMode={isEditMode}
-            tripId={tripId}
-          />
-        );
-
-      case "included":
-        return (
-          <IncludedSection
-            formData={formData}
-            errors={errors}
-            handleFieldChange={handleFieldChange as any}
-          />
-        );
-
-      case "faqs":
-        return (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            {/* Header */}
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <HelpCircle className="w-5 h-5 text-gray-500" />
+              <BookOpen className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {__("Frequently Asked Questions", "yatra")}
+                {__("Trip Details", "yatra")}
               </h2>
               <Badge
                 variant="outline"
-                className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800"
+                className="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300 border-blue-200 dark:border-blue-800"
               >
                 {__("Recommended", "yatra")}
               </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__("Add common questions and answers about your trip", "yatra")}
+              {__("What will travelers experience?", "yatra")}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {__(
-                  "Optional, but addressing FAQs up front reduces support questions later.",
-                  "yatra",
-                )}
+                {__("Build your day-by-day itinerary and list what's included/excluded to set clear expectations.", "yatra")}
               </span>
             </p>
-            <div className="space-y-4">
-              {formData.faqs.map((faq, index) => (
-                <div
-                  key={index}
-                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+
+            {/* Sub-tabs */}
+            <div className="border-b border-gray-200 dark:border-gray-700">
+              <nav className="flex gap-6" aria-label="Trip Details Tabs">
+                <button
+                  onClick={() => setTripDetailsTab("itinerary")}
+                  className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    tripDetailsTab === "itinerary"
+                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+                  }`}
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                      {__("FAQ", "yatra")} {index + 1}
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={() => handleFAQRemove(index)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    {__("Itinerary", "yatra")}
                   </div>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                        {__("Question", "yatra")}
-                      </label>
-                      <Input
-                        type="text"
-                        value={faq.question}
-                        onChange={(e) =>
-                          handleFAQChange(index, "question", e.target.value)
-                        }
-                        placeholder={__("Enter question...", "yatra")}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                        {__("Answer", "yatra")}
-                      </label>
-                      <textarea
-                        value={faq.answer}
-                        onChange={(e) =>
-                          handleFAQChange(index, "answer", e.target.value)
-                        }
-                        placeholder={__("Enter answer...", "yatra")}
-                        rows={3}
-                        className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
-                      />
-                    </div>
+                </button>
+                <button
+                  onClick={() => setTripDetailsTab("included")}
+                  className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    tripDetailsTab === "included"
+                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <CheckSquare className="w-4 h-4" />
+                    {__("Included/Excluded", "yatra")}
                   </div>
-                </div>
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleFAQAdd}
-                className="w-full"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                {__("Add FAQ", "yatra")}
-              </Button>
+                </button>
+              </nav>
+            </div>
+
+            {/* Tab Content */}
+            <div className="mt-6">
+              {tripDetailsTab === "itinerary" && (
+                <ItinerarySection
+                  formData={formData as any}
+                  isEditMode={isEditMode}
+                  tripId={tripId}
+                />
+              )}
+              {tripDetailsTab === "included" && (
+                <IncludedSection
+                  formData={formData}
+                  errors={errors}
+                  handleFieldChange={handleFieldChange as any}
+                />
+              )}
             </div>
           </div>
         );
+
+      case "included":
+        // Redirect to itinerary with included tab selected
+        setCurrentSection("itinerary");
+        setTripDetailsTab("included");
+        return null;
+
+      case "faqs":
+        // Redirect to seo section (FAQs now merged there)
+        setCurrentSection("seo");
+        return null;
 
       // Removed: case 'frontend-tabs' - now part of 'advanced' case
 
       case "seo":
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <Search className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {__("SEO Settings", "yatra")}
+                {__("SEO & Marketing", "yatra")}
               </h2>
               <Badge
                 variant="outline"
@@ -7030,7 +7364,21 @@ const TripForm: React.FC = () => {
                 {__("Recommended", "yatra")}
               </Badge>
             </div>
-            <div className="space-y-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__("How will people find & trust this trip?", "yatra")}
+              <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {__("Optimize for search engines and answer common questions to build trust and improve discoverability.", "yatra")}
+              </span>
+            </p>
+
+            <div className="space-y-6">
+              {/* SECTION 1: SEO Settings */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Search className="w-4 h-4 text-blue-500" />
+                  {__("Search Engine Optimization", "yatra")}
+                </h3>
+                <div className="space-y-4">
               <div>
                 <label
                   htmlFor="meta_title"
@@ -7114,44 +7462,116 @@ const TripForm: React.FC = () => {
               </div>
             </div>
 
-            {/* SEO Preview */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{__("SEO Preview", "yatra")}</CardTitle>
-                <CardDescription>
-                  {__(
-                    "Preview how your trip appears in search results",
-                    "yatra",
-                  )}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                    {__("Google Search Result Preview", "yatra")}
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-blue-800 dark:text-blue-400 text-sm font-medium">
-                      {sanitizeTextForSEO(
-                        formData.meta_title || formData.title || "Trip Title",
-                        60,
+                {/* SEO Preview */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{__("SEO Preview", "yatra")}</CardTitle>
+                    <CardDescription>
+                      {__(
+                        "Preview how your trip appears in search results",
+                        "yatra",
                       )}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                        {__("Google Search Result Preview", "yatra")}
+                      </div>
+                      <div className="space-y-2">
+                        <div className="text-blue-800 dark:text-blue-400 text-sm font-medium">
+                          {sanitizeTextForSEO(
+                            formData.meta_title || formData.title || "Trip Title",
+                            60,
+                          )}
+                        </div>
+                        <div className="text-green-700 dark:text-green-400 text-sm">
+                          {formData.meta_description
+                            ? sanitizeTextForSEO(formData.meta_description, 150)
+                            : formData.description
+                              ? sanitizeTextForSEO(formData.description, 150)
+                              : "Trip description..."}
+                        </div>
+                        <div className="text-gray-600 dark:text-gray-400 text-xs">
+                          {window.location.hostname}/trip/
+                          {formData.slug || "trip-slug"}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-green-700 dark:text-green-400 text-sm">
-                      {formData.meta_description
-                        ? sanitizeTextForSEO(formData.meta_description, 150)
-                        : formData.description
-                          ? sanitizeTextForSEO(formData.description, 150)
-                          : "Trip description..."}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* SECTION 2: FAQs */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <HelpCircle className="w-4 h-4 text-blue-500" />
+                  {__("Frequently Asked Questions", "yatra")}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                  {__("Answer common questions to build trust and reduce support inquiries. FAQs also help with SEO.", "yatra")}
+                </p>
+                <div className="space-y-4">
+                  {formData.faqs.map((faq, index) => (
+                    <div
+                      key={index}
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-900"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                          {__("FAQ", "yatra")} {index + 1}
+                        </h4>
+                        <button
+                          type="button"
+                          onClick={() => handleFAQRemove(index)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
+                            {__("Question", "yatra")}
+                          </label>
+                          <Input
+                            type="text"
+                            value={faq.question}
+                            onChange={(e) =>
+                              handleFAQChange(index, "question", e.target.value)
+                            }
+                            placeholder={__("Enter question...", "yatra")}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
+                            {__("Answer", "yatra")}
+                          </label>
+                          <textarea
+                            value={faq.answer}
+                            onChange={(e) =>
+                              handleFAQChange(index, "answer", e.target.value)
+                            }
+                            placeholder={__("Enter answer...", "yatra")}
+                            rows={3}
+                            className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-gray-600 dark:text-gray-400 text-xs">
-                      {window.location.hostname}/trip/
-                      {formData.slug || "trip-slug"}
-                    </div>
-                  </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleFAQAdd}
+                    className="w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {__("Add FAQ", "yatra")}
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         );
 
@@ -7165,16 +7585,16 @@ const TripForm: React.FC = () => {
               </h2>
               <Badge
                 variant="outline"
-                className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800"
+                className="text-xs bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-300 border-purple-200 dark:border-purple-800"
               >
-                {__("Recommended", "yatra")}
+                {__("Power Users", "yatra")}
               </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__("Manage publishing schedule and lifecycle settings", "yatra")}
+              {__("When should this trip be published or archived?", "yatra")}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {__(
-                  "Optional, but scheduling ahead saves time when launching seasonal trips.",
+                  "Schedule automatic publishing and unpublishing for seasonal trips. Optional but useful for managing trip lifecycles.",
                   "yatra",
                 )}
               </span>
@@ -7861,13 +8281,18 @@ const TripForm: React.FC = () => {
         {/* Sidebar */}
         <div className="w-80 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 overflow-y-auto overflow-x-hidden flex-shrink-0 min-h-0">
           <div className="p-5 pb-8 space-y-6">
-            {/* Essentials */}
+            {/* PHASE 1: ESSENTIALS */}
             <div>
               <div className="flex items-center gap-2 mb-3 px-1">
-                <Box className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                <h3 className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                  {__("ESSENTIALS", "yatra")}
-                </h3>
+                <div className="flex items-center gap-2 flex-1">
+                  <Box className="w-3.5 h-3.5 text-red-500 dark:text-red-400 flex-shrink-0" />
+                  <h3 className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                    {__("PHASE 1: ESSENTIALS", "yatra")}
+                  </h3>
+                </div>
+                <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800">
+                  {__("Must Complete", "yatra")}
+                </Badge>
               </div>
               <div className="space-y-0.5">
                 {essentialsSections.map((section, index) => {
@@ -7921,6 +8346,9 @@ const TripForm: React.FC = () => {
                       </div>
                       <span className="flex-1 min-w-0 break-words leading-snug">
                         {section.label}
+                        {section.required && (
+                          <span className="ml-1 text-[9px] text-red-500">*</span>
+                        )}
                       </span>
                       {section.hasErrors && (
                         <span
@@ -7934,18 +8362,24 @@ const TripForm: React.FC = () => {
               </div>
             </div>
 
-            {/* Marketing */}
+            {/* PHASE 2: DETAILS */}
             <div>
               <div className="flex items-center gap-2 mb-3 px-1">
-                <BarChart3 className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                <h3 className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                  {__("MARKETING", "yatra")}
-                </h3>
+                <div className="flex items-center gap-2 flex-1">
+                  <BookOpen className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 flex-shrink-0" />
+                  <h3 className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                    {__("PHASE 2: DETAILS", "yatra")}
+                  </h3>
+                </div>
+                <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800">
+                  {__("Recommended", "yatra")}
+                </Badge>
               </div>
               <div className="space-y-0.5">
-                {marketingSections.map((section) => {
+                {detailsSections.map((section, index) => {
                   const Icon = section.icon;
                   const isActive = currentSection === section.id;
+                  const sectionNumber = essentialsSections.length + index + 1;
                   return (
                     <button
                       key={section.id}
@@ -7959,15 +8393,30 @@ const TripForm: React.FC = () => {
                             : "border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-100"
                       }`}
                     >
-                      <Icon
-                        className={`w-4 h-4 flex-shrink-0 transition-colors ${
-                          isActive
-                            ? "text-blue-600 dark:text-blue-400"
-                            : section.hasErrors
-                              ? "text-red-600 dark:text-red-400"
-                              : "text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400"
-                        }`}
-                      />
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span
+                          className={`text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full ${
+                            isActive
+                              ? "bg-blue-600 text-white dark:bg-blue-500"
+                              : section.completed
+                                ? "bg-green-500 text-white"
+                                : section.hasErrors
+                                  ? "bg-red-500 text-white"
+                                  : "bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                          }`}
+                        >
+                          {sectionNumber}
+                        </span>
+                        <Icon
+                          className={`w-4 h-4 transition-colors ${
+                            isActive
+                              ? "text-blue-600 dark:text-blue-400"
+                              : section.hasErrors
+                                ? "text-red-600 dark:text-red-400"
+                                : "text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400"
+                          }`}
+                        />
+                      </div>
                       <span className="flex-1 min-w-0 break-words leading-snug">
                         {section.label}
                       </span>
@@ -7983,37 +8432,132 @@ const TripForm: React.FC = () => {
               </div>
             </div>
 
-            {/* Advanced */}
-            <div className="pb-12">
+            {/* PHASE 3: OPTIMIZATION */}
+            <div>
               <div className="flex items-center gap-2 mb-3 px-1">
-                <Settings className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                <h3 className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                  {__("ADVANCED", "yatra")}
-                </h3>
+                <div className="flex items-center gap-2 flex-1">
+                  <BarChart3 className="w-3.5 h-3.5 text-purple-500 dark:text-purple-400 flex-shrink-0" />
+                  <h3 className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                    {__("PHASE 3: OPTIMIZATION", "yatra")}
+                  </h3>
+                </div>
+                <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800">
+                  {__("Optional", "yatra")}
+                </Badge>
               </div>
               <div className="space-y-0.5">
-                <button
-                  type="button"
-                  onClick={() => setCurrentSection("advanced")}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal transition-all duration-200 text-left group border ${
-                    currentSection === "advanced"
-                      ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-sm border-blue-200 dark:border-blue-800"
-                      : "border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-100"
-                  }`}
-                >
-                  <Settings
-                    className={`w-4 h-4 flex-shrink-0 transition-colors ${
-                      currentSection === "advanced"
-                        ? "text-blue-600 dark:text-blue-400"
-                        : "text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400"
-                    }`}
-                  />
-                  <span className="flex-1 min-w-0 break-words leading-snug">
-                    {__("Lifecycle", "yatra")}
-                  </span>
-                </button>
+                {optimizationSections.map((section, index) => {
+                  const Icon = section.icon;
+                  const isActive = currentSection === section.id;
+                  const sectionNumber = essentialsSections.length + detailsSections.length + index + 1;
+                  return (
+                    <button
+                      key={section.id}
+                      type="button"
+                      onClick={() => setCurrentSection(section.id)}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal transition-all duration-200 text-left group border ${
+                        isActive
+                          ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-sm border-blue-200 dark:border-blue-800"
+                          : section.hasErrors
+                            ? "border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10"
+                            : "border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-100"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span
+                          className={`text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full ${
+                            isActive
+                              ? "bg-blue-600 text-white dark:bg-blue-500"
+                              : section.completed
+                                ? "bg-green-500 text-white"
+                                : section.hasErrors
+                                  ? "bg-red-500 text-white"
+                                  : "bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                          }`}
+                        >
+                          {sectionNumber}
+                        </span>
+                        <Icon
+                          className={`w-4 h-4 transition-colors ${
+                            isActive
+                              ? "text-blue-600 dark:text-blue-400"
+                              : section.hasErrors
+                                ? "text-red-600 dark:text-red-400"
+                                : "text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400"
+                          }`}
+                        />
+                      </div>
+                      <span className="flex-1 min-w-0 break-words leading-snug">
+                        {section.label}
+                      </span>
+                      {section.hasErrors && (
+                        <span
+                          className="flex-shrink-0 w-2 h-2 bg-red-500 rounded-full"
+                          title={__("This section has errors", "yatra")}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
+
+            {/* PHASE 4: ADVANCED */}
+            <div className="pb-12">
+              <div className="flex items-center gap-2 mb-3 px-1">
+                <div className="flex items-center gap-2 flex-1">
+                  <Settings className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                  <h3 className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                    {__("PHASE 4: ADVANCED", "yatra")}
+                  </h3>
+                </div>
+                <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-gray-50 dark:bg-gray-900/20 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-800">
+                  {__("Power Users", "yatra")}
+                </Badge>
+              </div>
+              <div className="space-y-0.5">
+                {advancedSections.map((section, index) => {
+                  const Icon = section.icon;
+                  const isActive = currentSection === section.id;
+                  const sectionNumber = essentialsSections.length + detailsSections.length + optimizationSections.length + index + 1;
+                  return (
+                    <button
+                      key={section.id}
+                      type="button"
+                      onClick={() => setCurrentSection(section.id)}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal transition-all duration-200 text-left group border ${
+                        isActive
+                          ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-sm border-blue-200 dark:border-blue-800"
+                          : "border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-100"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span
+                          className={`text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full ${
+                            isActive
+                              ? "bg-blue-600 text-white dark:bg-blue-500"
+                              : "bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                          }`}
+                        >
+                          {sectionNumber}
+                        </span>
+                        <Icon
+                          className={`w-4 h-4 transition-colors ${
+                            isActive
+                              ? "text-blue-600 dark:text-blue-400"
+                              : "text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400"
+                          }`}
+                        />
+                      </div>
+                      <span className="flex-1 min-w-0 break-words leading-snug">
+                        {section.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
           </div>
         </div>
 

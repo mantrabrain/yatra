@@ -71,6 +71,9 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `available_to` date DEFAULT NULL COMMENT 'Last available date',
     `booking_window_days` smallint(5) UNSIGNED DEFAULT 30 COMMENT 'Days in advance to book',
     `booking_deadline_hours` smallint(5) UNSIGNED DEFAULT 24 COMMENT 'Hours before trip start',
+    `has_default_time_slots` tinyint(1) DEFAULT 0 COMMENT 'Enable multiple time slots for day tours',
+    `default_time_slots` text COMMENT 'JSON array of time slot objects for day tours',
+    `departure_time` time DEFAULT NULL COMMENT 'Default departure time for trips',
     
     -- SEASONAL & AVAILABILITY (Form Fields)
     `seasonal_availability` varchar(100) DEFAULT NULL,
@@ -180,7 +183,8 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     KEY `idx_starting_latitude` (`starting_latitude`),
     KEY `idx_starting_longitude` (`starting_longitude`),
     KEY `idx_ending_latitude` (`ending_latitude`),
-    KEY `idx_ending_longitude` (`ending_longitude`)
+    KEY `idx_ending_longitude` (`ending_longitude`),
+    KEY `idx_has_default_time_slots` (`has_default_time_slots`)
 ) {$charsetCollate} COMMENT='Optimized trips table with only used fields';
 SQL;
     }

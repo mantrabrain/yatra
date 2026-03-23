@@ -522,6 +522,9 @@ class TripController extends BaseController
             if (isset($rawData['frontend_tabs'])) {
                 $data['frontend_tabs'] = wp_json_encode($rawData['frontend_tabs']);
             }
+            if (isset($rawData['default_time_slots'])) {
+                $data['default_time_slots'] = wp_json_encode($rawData['default_time_slots']);
+            }
             
             // Handle featured_priority field
             if (isset($rawData['featured_priority'])) {
@@ -602,6 +605,13 @@ class TripController extends BaseController
             }
             if (isset($data['testimonial_review_ids'])) {
                 $data['testimonial_review_ids'] = is_string($data['testimonial_review_ids']) ? $data['testimonial_review_ids'] : wp_json_encode($data['testimonial_review_ids']);
+            }
+            if (isset($data['default_time_slots'])) {
+                error_log('YATRA DEBUG: default_time_slots received: ' . print_r($data['default_time_slots'], true));
+                $data['default_time_slots'] = is_string($data['default_time_slots']) ? $data['default_time_slots'] : wp_json_encode($data['default_time_slots']);
+                error_log('YATRA DEBUG: default_time_slots after encoding: ' . $data['default_time_slots']);
+            } else {
+                error_log('YATRA DEBUG: default_time_slots NOT in request data');
             }
             
             // Handle featured_priority field (already in $data for update)
@@ -933,6 +943,7 @@ class TripController extends BaseController
             'pricing_rules',
             'booking_rules',
             'testimonial_review_ids',
+            'default_time_slots',
         ];
 
         foreach ($jsonFields as $field) {
@@ -1318,6 +1329,14 @@ class TripController extends BaseController
             }
 
             $data['attributes'] = $attributes;
+        }
+
+        // Add featured image URL
+        if (isset($data['featured_image']) && $data['featured_image'] > 0) {
+            $imageUrl = wp_get_attachment_image_url($data['featured_image'], 'medium');
+            $data['featured_image_url'] = $imageUrl ?: '';
+        } else {
+            $data['featured_image_url'] = '';
         }
 
         // Add permalink (respects WordPress permalink structure: plain vs pretty)

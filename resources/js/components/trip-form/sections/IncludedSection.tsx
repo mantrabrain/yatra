@@ -41,7 +41,7 @@ interface IncludedSectionProps extends TripFormSectionProps {
 
 export const IncludedSection: React.FC<IncludedSectionProps> = ({
   formData,
-  onFieldChange,
+  handleFieldChange,
 }) => {
   const [newIncludedItem, setNewIncludedItem] = React.useState<TripAmenityItem>(
     {
@@ -63,7 +63,7 @@ export const IncludedSection: React.FC<IncludedSectionProps> = ({
   const addIncludedItem = () => {
     if (newIncludedItem.title.trim()) {
       const updatedItems = [...included_items, { ...newIncludedItem }];
-      onFieldChange("included_items", updatedItems);
+      handleFieldChange("included_items", updatedItems);
       setNewIncludedItem({ title: "", description: "" });
     }
   };
@@ -71,7 +71,7 @@ export const IncludedSection: React.FC<IncludedSectionProps> = ({
   const addExcludedItem = () => {
     if (newExcludedItem.title.trim()) {
       const updatedItems = [...excluded_items, { ...newExcludedItem }];
-      onFieldChange("excluded_items", updatedItems);
+      handleFieldChange("excluded_items", updatedItems);
       setNewExcludedItem({ title: "", description: "" });
     }
   };
@@ -80,14 +80,14 @@ export const IncludedSection: React.FC<IncludedSectionProps> = ({
     const updatedItems = included_items.filter(
       (_: any, i: number) => i !== index,
     );
-    onFieldChange("included_items", updatedItems);
+    handleFieldChange("included_items", updatedItems);
   };
 
   const removeExcludedItem = (index: number) => {
     const updatedItems = excluded_items.filter(
       (_: any, i: number) => i !== index,
     );
-    onFieldChange("excluded_items", updatedItems);
+    handleFieldChange("excluded_items", updatedItems);
   };
 
   return (

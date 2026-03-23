@@ -13,11 +13,15 @@ use Yatra\Repositories\TripRepository;
  * Availability Resolution Service
  * 
  * Centralized service to resolve availability data following priority:
- * 1. Recurring Rules (highest priority)
- * 2. Availability Dates (medium priority)
- * 3. Trip Default (fallback)
+ * 1. Recurring Rules (highest priority - pattern-based dates)
+ * 2. Availability Dates (medium priority - specific dates)
+ * 3. Trip Default (fallback - ONLY if no dates/rules exist)
  * 
- * This ensures consistent availability resolution across all controllers.
+ * This ensures:
+ * - Recurring rules are checked first for consistent scheduling
+ * - Availability dates provide specific date overrides when needed
+ * - Trip defaults only used for flexible booking (trip-only pricing)
+ * - Consistent availability resolution across all controllers
  */
 class AvailabilityResolutionService
 {
@@ -40,9 +44,12 @@ class AvailabilityResolutionService
      * Resolve availability for a specific trip and date (and optionally time)
      * 
      * Priority:
-     * 1. Check Recurring Rules
-     * 2. Check Availability Dates (with time matching for day tours)
-     * 3. Fall back to Trip defaults
+     * 1. Check Recurring Rules (highest priority - pattern-based dates)
+     * 2. Check Availability Dates (medium priority - specific dates)
+     * 3. Fall back to Trip defaults (ONLY if no dates/rules exist)
+     * 
+     * This ensures recurring rules are checked first for consistent scheduling,
+     * with availability dates providing overrides when needed.
      * 
      * @param int $tripId Trip ID
      * @param string $date Date in Y-m-d format
@@ -57,19 +64,22 @@ class AvailabilityResolutionService
             throw new \Exception('Trip not found');
         }
 
-        // Priority 1: Check Recurring Rules
+        // Priority 1: Check Recurring Rules (highest priority)
+        // Pattern-based dates (e.g., "every Monday") are checked first
         $recurringData = $this->checkRecurringRules($tripId, $date);
         if ($recurringData) {
             return $this->buildAvailabilityObject($trip, $recurringData, 'recurring_rule');
         }
 
-        // Priority 2: Check Availability Dates (time-aware for day tours)
+        // Priority 2: Check Availability Dates (medium priority)
+        // Specific dates with custom pricing/capacity (time-aware for day tours)
         $availabilityDate = $this->availabilityRepository->findByTripIdAndDateTime($tripId, $date, $departureTime);
         if ($availabilityDate) {
             return $this->buildAvailabilityObject($trip, $availabilityDate, 'availability_date');
         }
 
-        // Priority 3: Trip Default
+        // Priority 3: Trip Default (ONLY if no recurring rules AND no availability dates exist)
+        // This is the fallback for trips with flexible booking (trip-only pricing)
         return $this->buildAvailabilityObject($trip, null, 'trip_default');
     }
 
