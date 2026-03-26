@@ -1202,6 +1202,12 @@
 
       // Set today's date as default value
       this.dateInput.value = todayStr;
+      
+      // Enable button since we have a default date
+      if (this.checkAvailabilityBtn) {
+        this.checkAvailabilityBtn.disabled = false;
+        this.checkAvailabilityBtn.classList.remove('disabled');
+      }
 
       // Destroy existing instance if any
       if (this.dateInput._flatpickr) {
@@ -1223,8 +1229,12 @@
         },
         onChange: (selectedDates, dateStr) => {
           this.dateInput.value = dateStr;
-          // Update sidebar content for the selected date
-          this.updateSidebarForDate(dateStr);
+          
+          // Enable Check Availability button when date is selected
+          if (this.checkAvailabilityBtn && dateStr) {
+            this.checkAvailabilityBtn.disabled = false;
+            this.checkAvailabilityBtn.classList.remove('disabled');
+          }
         }
       });
 
@@ -1564,12 +1574,8 @@
       let availabilitySection = document.getElementById('availability');
 
       if (availabilitySection) {
-        // Section already loaded, just show it
-        availabilitySection.style.display = 'block';
-        this.scrollToAvailability(availabilitySection);
-        // Sync sidebar travelers to cards
-        this.syncSidebarTravelersToCards();
-        this.resetButton();
+        // Section already loaded, reload it with new date filter
+        this.reloadAvailabilityWithDate(date, tripId);
         return;
       }
 
@@ -1578,13 +1584,15 @@
 
       // Build REST endpoint; support plain permalinks via rest_route query
       let restUrl;
-      if (isPlain && !baseUrl.includes('/yatra/v1')) {
-        restUrl = `${baseUrl}/?rest_route=/yatra/v1/trips/${tripId}/availability-template`;
+      if (isPlain && baseUrl.includes('rest_route=')) {
+        // Plain permalinks: baseUrl already has rest_route, append to it with &
+        restUrl = `${baseUrl}/trips/${tripId}/availability-template&date=${encodeURIComponent(date)}`;
       } else if (baseUrl.includes('/yatra/v1')) {
-        restUrl = baseUrl + '/trips/' + tripId + '/availability-template';
+        restUrl = baseUrl + '/trips/' + tripId + '/availability-template?date=' + encodeURIComponent(date);
       } else {
-        restUrl = baseUrl + '/yatra/v1/trips/' + tripId + '/availability-template';
+        restUrl = baseUrl + '/yatra/v1/trips/' + tripId + '/availability-template?date=' + encodeURIComponent(date);
       }
+      
       const nonce = (window.yatraTripData && window.yatraTripData.nonce) || '';
 
       
@@ -1788,6 +1796,80 @@
         this.checkAvailabilityBtn.disabled = false;
       }
     }
+    
+    reloadAvailabilityWithDate(date, tripId) {
+      // Show loading state
+      if (this.checkAvailabilityBtn && !this.checkAvailabilityBtn.dataset.originalHtml) {
+        this.checkAvailabilityBtn.dataset.originalHtml = this.checkAvailabilityBtn.innerHTML;
+      }
+      if (this.checkAvailabilityBtn) {
+        this.checkAvailabilityBtn.innerHTML = '<svg class="animate-spin" width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Loading...';
+        this.checkAvailabilityBtn.disabled = true;
+      }
+      
+      // Build REST URL with date parameter
+      const { base: baseUrl, isPlain } = getRestBase();
+      let restUrl;
+      if (isPlain && baseUrl.includes('rest_route=')) {
+        // Plain permalinks: baseUrl already has rest_route, append to it with &
+        restUrl = `${baseUrl}/trips/${tripId}/availability-template&date=${encodeURIComponent(date)}`;
+      } else if (baseUrl.includes('/yatra/v1')) {
+        restUrl = baseUrl + '/trips/' + tripId + '/availability-template?date=' + encodeURIComponent(date);
+      } else {
+        restUrl = baseUrl + '/yatra/v1/trips/' + tripId + '/availability-template?date=' + encodeURIComponent(date);
+      }
+      
+      // Fetch new availability HTML
+      fetch(restUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'omit',
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch availability');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (!data || !data.html) {
+          throw new Error('No HTML returned from server');
+        }
+        
+        // Replace existing availability section
+        const existingSection = document.getElementById('availability');
+        if (existingSection) {
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = data.html;
+          const newSection = tempDiv.firstElementChild;
+          
+          if (newSection) {
+            existingSection.parentNode.replaceChild(newSection, existingSection);
+            
+            // Re-initialize availability section handlers
+            if (window.availabilitySection) {
+              window.availabilitySection.setup();
+            }
+            
+            // Scroll to section
+            this.scrollToAvailability(newSection);
+            
+            // Sync sidebar travelers to cards
+            this.syncSidebarTravelersToCards();
+          }
+        }
+        
+        // Reset button state
+        this.resetButton();
+      })
+      .catch(error => {
+        console.error('Error reloading availability:', error);
+        alert('Failed to reload availability. Please try again.');
+        this.resetButton();
+      });
+    }
 
     autoSelectDateCard(selectedDate) {
       if (!selectedDate) return;
@@ -1856,10 +1938,12 @@
       if (!tripId) return;
 
       // Build REST URL
-      let baseUrl = getRestBase();
+      const { base: baseUrl, isPlain } = getRestBase();
 
       let restUrl;
-      if (baseUrl.includes('/yatra/v1')) {
+      if (isPlain && !baseUrl.includes('/yatra/v1')) {
+        restUrl = `${baseUrl}/?rest_route=/yatra/v1/trips/${tripId}/date-pricing&date=${dateStr}`;
+      } else if (baseUrl.includes('/yatra/v1')) {
         restUrl = baseUrl + '/trips/' + tripId + '/date-pricing?date=' + dateStr;
       } else {
         restUrl = baseUrl + '/yatra/v1/trips/' + tripId + '/date-pricing?date=' + dateStr;
@@ -2750,6 +2834,31 @@
       }
 
       this.attachEventListeners();
+      
+      // Apply active month filter on initial load
+      const activeFilterBtn = this.section.querySelector('.yatra-availability-filter-btn.active');
+      if (activeFilterBtn) {
+        const filter = activeFilterBtn.getAttribute('data-filter');
+        this.currentMonthFilter = filter || 'all';
+        this.filterByMonth(filter);
+      }
+      
+      // Scroll to selected card if exists
+      this.scrollToSelectedCard();
+    }
+    
+    scrollToSelectedCard() {
+      // Find the selected card
+      const selectedCard = this.section.querySelector('.yatra-availability-card.selected');
+      if (selectedCard) {
+        // Small delay to ensure rendering is complete
+        setTimeout(() => {
+          selectedCard.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+        }, 300);
+      }
     }
 
     attachEventListeners() {

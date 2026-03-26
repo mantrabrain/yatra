@@ -65,6 +65,17 @@ class Trip
     public ?string $seasonal_enable_date = null;
     public ?string $seasonal_disable_date = null;
     public array $blackout_dates = [];
+    
+    // Booking Mode & Availability Flags
+    public string $booking_mode = 'flexible'; // 'date_specific' or 'flexible'
+    public bool $has_specific_availability = false; // Has configured availability dates/rules
+    public bool $has_availability = false; // Backward compatibility: has specific dates in current range
+    public bool $has_booking_capability = true; // Can be booked (always true for good UX)
+    
+    // Fallback Settings (for trips without availability dates/rules)
+    public bool $has_default_time_slots = false;
+    public ?string $default_time_slots = null; // JSON string
+    public ?string $departure_time = null;
 
     // Categorization
     public ?string $trip_category = null;
@@ -1527,6 +1538,63 @@ class Trip
     public function getAvailabilityDates(): array
     {
         return is_array($this->availability_dates) ? $this->availability_dates : [];
+    }
+
+    /**
+     * Get booking mode
+     */
+    public function getBookingMode(): string
+    {
+        return $this->booking_mode ?? 'flexible';
+    }
+
+    /**
+     * Check if trip has specific availability configured
+     */
+    public function getHasSpecificAvailability(): bool
+    {
+        return $this->has_specific_availability ?? false;
+    }
+
+    /**
+     * Check if trip has booking capability
+     */
+    public function getHasBookingCapability(): bool
+    {
+        return $this->has_booking_capability ?? true;
+    }
+
+    /**
+     * Check if trip has default time slots enabled
+     */
+    public function getHasDefaultTimeSlots(): bool
+    {
+        return $this->has_default_time_slots ?? false;
+    }
+
+    /**
+     * Get default time slots as array
+     */
+    public function getDefaultTimeSlots(): array
+    {
+        if (empty($this->default_time_slots)) {
+            return [];
+        }
+        
+        if (is_array($this->default_time_slots)) {
+            return $this->default_time_slots;
+        }
+        
+        $decoded = json_decode($this->default_time_slots, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Get default departure time
+     */
+    public function getDepartureTime(): ?string
+    {
+        return $this->departure_time;
     }
 
     /**

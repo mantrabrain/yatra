@@ -1402,9 +1402,14 @@ class TripController extends BaseController
             
             // Get selected date if provided
             $selected_date = sanitize_text_field((string) ($request->get_param('date') ?? ''));
+            
+            // Get selected month if provided (format: 'jan-2025' or 'Y-m-d' for day trips)
+            $selected_month = sanitize_text_field((string) ($request->get_param('month') ?? ''));
 
             // Fetch availability dates using centralized resolution service
             $resolutionService = new \Yatra\Services\AvailabilityResolutionService();
+            
+            // Always show all dates from today onwards (selected_date is only for highlighting)
             $fromDate = date('Y-m-d');
             $toDate = date('Y-m-d', strtotime('+12 months'));
             
@@ -1412,6 +1417,73 @@ class TripController extends BaseController
             
             // Log for debugging
             error_log('Yatra Availability Debug: Trip ID ' . $id . ' has ' . count($availability_dates) . ' availability dates from centralized service');
+            
+            // Determine if this is a day trip
+            $is_single_day = ($trip->duration_days ?? 1) <= 1;
+            
+            // Auto-select month and date
+            $auto_selected_month = '';
+            $auto_selected_date = '';
+            
+            if (!empty($availability_dates)) {
+                // If month provided, use it
+                if (!empty($selected_month)) {
+                    $auto_selected_month = $selected_month;
+                } elseif (!empty($selected_date)) {
+                    // Use selected date's month
+                    $selected_timestamp = strtotime($selected_date);
+                    $auto_selected_month = $is_single_day 
+                        ? date('Y-m-d', $selected_timestamp) 
+                        : strtolower(date('M-Y', $selected_timestamp));
+                } else {
+                    // Use first available date's month
+                    $first_avail = reset($availability_dates);
+                    if (!empty($first_avail->departure_date)) {
+                        $first_date = strtotime($first_avail->departure_date);
+                        $auto_selected_month = $is_single_day 
+                            ? date('Y-m-d', $first_date) 
+                            : strtolower(date('M-Y', $first_date));
+                    }
+                }
+                
+                // Find closest available date
+                if (!empty($selected_date)) {
+                    // Check if selected date is available
+                    $date_found = false;
+                    foreach ($availability_dates as $avail) {
+                        if (!empty($avail->departure_date) && $avail->departure_date === $selected_date) {
+                            $auto_selected_date = $selected_date;
+                            $date_found = true;
+                            break;
+                        }
+                    }
+                    
+                    // If selected date not available, find closest
+                    if (!$date_found) {
+                        $selected_timestamp = strtotime($selected_date);
+                        $closest_date = null;
+                        $min_diff = PHP_INT_MAX;
+                        
+                        foreach ($availability_dates as $avail) {
+                            if (!empty($avail->departure_date)) {
+                                $avail_timestamp = strtotime($avail->departure_date);
+                                $diff = abs($avail_timestamp - $selected_timestamp);
+                                
+                                if ($diff < $min_diff) {
+                                    $min_diff = $diff;
+                                    $closest_date = $avail->departure_date;
+                                }
+                            }
+                        }
+                        
+                        $auto_selected_date = $closest_date ?? '';
+                    }
+                } else {
+                    // No date provided, select first available date
+                    $first_avail = reset($availability_dates);
+                    $auto_selected_date = $first_avail->departure_date ?? '';
+                }
+            }
 
             // Prepare trip data for template
             $trip_data = (object) [
@@ -1435,12 +1507,14 @@ class TripController extends BaseController
             ob_start();
             
             // Generate availability HTML
-            $this->render_availability_template($trip_data, $sort_key, $travelers, $num_travelers, $selected_date);
+            $this->render_availability_template($trip_data, $sort_key, $travelers, $num_travelers, $selected_date, $auto_selected_month, $auto_selected_date);
             
             $html = ob_get_clean();
 
             return $this->success_response([
                 'html' => $html,
+                'selected_month' => $auto_selected_month,
+                'selected_date' => $auto_selected_date,
             ]);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
@@ -1450,7 +1524,7 @@ class TripController extends BaseController
     /**
      * Render availability template
      */
-    private function render_availability_template($trip_data, string $sort_key = 'date-asc', array $travelers = [], int $num_travelers = 1, string $selected_date = ''): void
+    private function render_availability_template($trip_data, string $sort_key = 'date-asc', array $travelers = [], int $num_travelers = 1, string $selected_date = '', string $auto_selected_month = '', string $auto_selected_date = ''): void
     {
         // Check if we have real availability data
         $has_availability = !empty($trip_data->availability_dates) && is_array($trip_data->availability_dates);
@@ -1857,6 +1931,11 @@ class TripController extends BaseController
         $initial_travelers = $travelers;
         $initial_num_travelers = $num_travelers;
         $initial_selected_date = $selected_date;
+        
+        // Pass auto-selected month and date to template
+        $selected_month_filter = $auto_selected_month;
+        // Use actual selected date for highlighting (not auto-selected closest date)
+        $selected_date_filter = !empty($selected_date) ? $selected_date : $auto_selected_date;
         
         // Include the template file
         $template_path = YATRA_PLUGIN_PATH . 'templates/partials/availability-section.php';

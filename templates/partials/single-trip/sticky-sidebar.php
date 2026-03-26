@@ -36,6 +36,7 @@ try {
 
 // Prepare availability data for JavaScript
 $availability_json = [];
+$booking_mode = $trip->getBookingMode();
 if ($has_availability) {
     foreach ($trip->getAvailabilityDates() as $avail) {
         $availability_json[] = [
@@ -130,6 +131,7 @@ if ($effective_min > 0) {
 ?>
 <div class="yatra-mobile-sticky-sidebar" id="yatra-mobile-sticky-sidebar"
      data-has-availability="<?php echo $has_availability ? 'true' : 'false'; ?>"
+     data-booking-mode="<?php echo esc_attr($booking_mode); ?>"
      data-is-multi-day="<?php echo $is_multi_day ? 'true' : 'false'; ?>"
      data-pricing-type="<?php echo esc_attr($pricing_type); ?>"
      data-availability='<?php echo esc_attr(json_encode($availability_json)); ?>'
@@ -244,15 +246,7 @@ if ($effective_min > 0) {
             </div>
         </div>
 
-        <!-- Row 2: Total Price Only -->
-        <div class="yatra-mobile-row-2">
-            <!-- Total Price Display -->
-            <div class="yatra-mobile-total-section" id="mobile-booking-total">
-                <div class="yatra-mobile-total-label"><?php echo esc_html__('Total', 'yatra'); ?></div>
-                <div class="yatra-mobile-total-amount" id="mobile-total-amount"><?php echo yatra_format_price($base_price); ?></div>
             </div>
-        </div>
-    </div>
     
     </div>
 
@@ -501,14 +495,17 @@ function updateMobileTotal() {
         }
     }
     
-    // Format and update display
-    if (window.yatraTripData && window.yatraTripData.currencySymbol) {
-        mobileTotal.textContent = window.yatraTripData.currencySymbol + total.toFixed(2);
-    } else {
-        mobileTotal.textContent = formatCurrency(total);
+    // Format and update display (mobile total element has been removed)
+    // The mobile total price display is no longer shown
+    if (mobileTotal) {
+        if (window.yatraTripData && window.yatraTripData.currencySymbol) {
+            mobileTotal.textContent = window.yatraTripData.currencySymbol + total.toFixed(2);
+        } else {
+            mobileTotal.textContent = formatCurrency(total);
+        }
     }
     
-    // Also sync with main form total if it exists
+    // Also sync with main form total if it exists (main total also removed)
     const mainTotal = document.getElementById('total-amount');
     if (mainTotal && window.yatraTripData && window.yatraTripData.currencySymbol) {
         mainTotal.textContent = window.yatraTripData.currencySymbol + total.toFixed(2);

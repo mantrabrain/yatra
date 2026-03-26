@@ -2128,9 +2128,6 @@ button.yatra-booking-button svg path {
     order: 4;
 }
 
-.yatra-mobile-total-section {
-    order: 5;
-}
 
 .yatra-mobile-action-section {
     order: 6;
@@ -2501,34 +2498,6 @@ button.yatra-booking-button svg path {
     z-index: 1;
 }
 
-/* Total Price Section */
-.yatra-mobile-total-section {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    flex-shrink: 0;
-    background: #f0f9ff;
-    border: 1px solid #bae6fd;
-    border-radius: 8px;
-    padding: 10px 14px;
-}
-
-.yatra-mobile-total-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: #0369a1;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    line-height: 1;
-}
-
-.yatra-mobile-total-amount {
-    font-size: 16px;
-    font-weight: 700;
-    color: #0c4a6e;
-    line-height: 1;
-}
 
 /* Trust Badge */
 .yatra-mobile-trust-badge {
@@ -2734,19 +2703,7 @@ button.yatra-booking-button svg path {
         border-color: #4b5563;
     }
     
-    .yatra-mobile-total-section {
-        background: #1e3a4f;
-        border-color: #334155;
-    }
-    
-    .yatra-mobile-total-label {
-        color: #38bdf8;
-    }
-    
-    .yatra-mobile-total-amount {
-        color: #7dd3fc;
-    }
-    
+        
     .yatra-mobile-price-amount {
         color: #f9fafb;
     }
@@ -2869,18 +2826,12 @@ button.yatra-booking-button svg path {
         padding: 4px 6px;
     }
     
-    .yatra-mobile-total-section {
-        padding: 4px 6px;
-    }
-    
+        
     .yatra-mobile-price-amount {
         font-size: 14px;
     }
     
-    .yatra-mobile-total-amount {
-        font-size: 12px;
-    }
-    
+        
     .yatra-mobile-datepicker {
         font-size: 11px;
         min-width: 40px;
@@ -2950,18 +2901,12 @@ button.yatra-booking-button svg path {
         padding: 3px 4px;
     }
     
-    .yatra-mobile-total-section {
-        padding: 3px 4px;
-    }
-    
+        
     .yatra-mobile-price-amount {
         font-size: 12px;
     }
     
-    .yatra-mobile-total-amount {
-        font-size: 10px;
-    }
-    
+        
     .yatra-mobile-datepicker {
         font-size: 10px;
         min-width: 35px;
@@ -4246,6 +4191,25 @@ button.yatra-booking-button svg path {
     color: #059669;
 }
 
+/* Flexible Booking Info */
+.yatra-flexible-booking-info {
+    background: #eff6ff;
+    border-left: 3px solid #3b82f6;
+}
+
+.yatra-flexible-booking-info .yatra-availability-count {
+    color: #1e40af;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.yatra-availability-note {
+    display: block;
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 400;
+}
+
 /* Departure Dates List */
 .yatra-departure-dates-list {
     display: flex;
@@ -4677,27 +4641,6 @@ input.yatra-datepicker,
     color: #78350f;
 }
 
-/* Total Price Display */
-.yatra-booking-total {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 2px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.yatra-booking-total-label {
-    font-size: 16px;
-    font-weight: 600;
-    color: #374151;
-}
-
-.yatra-booking-total-amount {
-    font-size: 24px;
-    font-weight: 700;
-    color: #ef4444;
-}
 
 /* Single Trust Signal */
 .yatra-booking-trust {
@@ -7349,6 +7292,17 @@ input.yatra-datepicker,
 .yatra-availability-card.open {
     border-color: #bfdbfe;
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+/* Selected card state - highlighted with blue border */
+.yatra-availability-card.selected {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 10px 30px rgba(15, 23, 42, 0.08);
+    background: #f0f9ff;
+}
+
+.yatra-availability-card.selected .yatra-availability-card-header {
+    background: #eff6ff;
 }
 
 /* Card Header - Clean Modern Design */

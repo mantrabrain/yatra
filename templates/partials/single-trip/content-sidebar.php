@@ -242,9 +242,9 @@ if (!defined('ABSPATH')) {
             </div>
         </div>
 
-        <?php if ($has_availability): ?>
+        <?php if ($trip->getBookingMode() === 'date_specific' && $has_availability): ?>
         <!-- ========================================== -->
-        <!-- AVAILABILITY-BASED BOOKING -->
+        <!-- DATE-SPECIFIC BOOKING (Has Availability Dates/Rules) -->
         <!-- ========================================== -->
         <div class="yatra-availability-info">
                     <span class="yatra-availability-count">
@@ -252,7 +252,7 @@ if (!defined('ABSPATH')) {
                     </span>
         </div>
 
-        <form class="yatra-booking-form" data-booking-mode="availability">
+        <form class="yatra-booking-form" data-booking-mode="date_specific">
             <!-- Date Selection -->
             <div class="yatra-booking-field-select">
                 <div class="yatra-booking-field-icon">
@@ -315,12 +315,14 @@ if (!defined('ABSPATH')) {
             <?php endif; ?>
             <?php else: ?>
             <!-- ========================================== -->
-            <!-- REGULAR BOOKING (No Availability Setup) -->
+            <!-- FLEXIBLE BOOKING MODE (No Specific Availability Configured) -->
             <!-- ========================================== -->
-
-            <?php if (!empty($trip->getAvailableFrom()) || !empty($trip->getAvailableTo())): ?>
-                <div class="yatra-booking-availability-compact">
-                    <span class="yatra-booking-availability-text">
+            <div class="yatra-availability-info yatra-flexible-booking-info">
+                <span class="yatra-availability-count">
+                    <?php echo esc_html__('Flexible booking available', 'yatra'); ?>
+                </span>
+                <?php if (!empty($trip->getAvailableFrom()) || !empty($trip->getAvailableTo())): ?>
+                    <span class="yatra-availability-note">
                         <?php
                         if (!empty($trip->getAvailableFrom()) && !empty($trip->getAvailableTo())) {
                             echo esc_html(sprintf(__('Available: %s - %s', 'yatra'),
@@ -338,10 +340,10 @@ if (!defined('ABSPATH')) {
                         }
                         ?>
                     </span>
-                </div>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
 
-            <form class="yatra-booking-form" data-booking-mode="regular">
+            <form class="yatra-booking-form" data-booking-mode="flexible">
                 <!-- Date Selection (Flexible) -->
                 <div class="yatra-booking-field-select">
                     <div class="yatra-booking-field-icon">
@@ -406,34 +408,7 @@ if (!defined('ABSPATH')) {
                 <?php endif; ?>
                 <?php endif; ?>
 
-                <!-- Total Price Display (Dynamic) -->
-                <?php
-                // Calculate initial total based on default traveler quantities
-                $initial_total = $base_price;
-                if ($traveler_data['has_traveler_pricing'] && !empty($traveler_data['traveler_rows'])) {
-                    $initial_total = 0;
-                    foreach ($traveler_data['traveler_rows'] as $row) {
-                        $quantity = (int) ($row['input_attrs']['value'] ?? 0);
-                        $price = (float) ($row['input_attrs']['data-price'] ?? 0);
-                        $pricing_mode = $row['input_attrs']['data-pricing-mode'] ?? 'per_person';
-                        
-                        if ($pricing_mode === 'per_group') {
-                            // Per group: charge once if any travelers
-                            if ($quantity > 0) {
-                                $initial_total += $price;
-                            }
-                        } else {
-                            // Per person: charge per traveler
-                            $initial_total += $price * $quantity;
-                        }
-                    }
-                }
-                ?>
-                <div class="yatra-booking-total" id="booking-total">
-                    <div class="yatra-booking-total-label"><?php echo esc_html__('Total', 'yatra'); ?></div>
-                    <div class="yatra-booking-total-amount" id="total-amount"><?php echo yatra_format_price($initial_total); ?></div>
-                </div>
-
+                
                 <!-- Action Buttons -->
                 <button type="button" class="yatra-booking-button" id="check-availability-btn" data-trip-id="<?php echo esc_attr($trip->getId()); ?>">
                     <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">

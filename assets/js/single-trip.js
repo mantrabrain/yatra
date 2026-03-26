@@ -262,7 +262,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const groupDiscount = calculateGroupDiscount(totalTravelers, basePrice);
         const finalTotal = subtotal - groupDiscount;
         
-        // Update display
+        // Update display (total element has been removed from sidebar)
+        // The total price display is no longer shown in the sidebar
+        // This code is kept for reference but will not execute as totalAmountElement is null
         if (totalAmountElement) {
             totalAmountElement.textContent = (window.yatraTripData?.currencySymbol || '$') + finalTotal.toFixed(2);
         }
@@ -271,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function () {
         updateGroupDiscountIndicator(totalTravelers, groupDiscount);
     }
     
-    // Update group discount indicator
+    // Update group discount indicator (total element has been removed)
     function updateGroupDiscountIndicator(totalTravelers, discountAmount) {
         let indicator = document.querySelector('.yatra-group-discount-indicator');
         
@@ -279,7 +281,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!indicator) {
                 indicator = document.createElement('div');
                 indicator.className = 'yatra-group-discount-indicator';
-                totalAmountElement.parentNode.appendChild(indicator);
+                // Find a suitable parent to append the indicator
+                const bookingForm = document.querySelector('.yatra-booking-form');
+                if (bookingForm) {
+                    bookingForm.appendChild(indicator);
+                }
             }
             
             indicator.innerHTML = `

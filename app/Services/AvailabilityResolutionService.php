@@ -123,10 +123,151 @@ class AvailabilityResolutionService
             }
         }
 
+        // Step 3: Fallback to trip_default if no specific availability configured
+        // This generates availability for flexible booking trips
+        if (empty($dateMap)) {
+            $dateMap = $this->generateDefaultAvailability($trip, $fromDate, $toDate);
+        }
+
         // Sort by date
         ksort($dateMap);
         
         return array_values($dateMap);
+    }
+
+    /**
+     * Get booking mode information for a trip
+     * 
+     * Determines whether the trip uses date-specific booking (with configured availability)
+     * or flexible booking (no specific dates configured).
+     * 
+     * @param int $tripId Trip ID
+     * @return array Booking mode information with keys:
+     *               - 'mode': 'date_specific' or 'flexible'
+     *               - 'has_availability': boolean
+     *               - 'has_dates': boolean (has specific availability dates)
+     *               - 'has_rules': boolean (has recurring rules)
+     */
+    public function getBookingMode(int $tripId): array
+    {
+        // Check for specific availability dates (any date, not range-limited)
+        global $wpdb;
+        $availTable = \Yatra\Database\Tables\TripAvailabilityDatesTable::getTableName();
+        $hasSpecificDates = (bool) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM {$availTable} WHERE trip_id = %d LIMIT 1",
+                $tripId
+            )
+        );
+
+        // Check for recurring rules
+        $recurringTable = \Yatra\Database\Tables\TripAvailabilityRulesTable::getTableName();
+        $hasRecurringRules = (bool) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM {$recurringTable} WHERE trip_id = %d AND status = 'active' LIMIT 1",
+                $tripId
+            )
+        );
+
+        $hasAvailability = $hasSpecificDates || $hasRecurringRules;
+
+        return [
+            'mode' => $hasAvailability ? 'date_specific' : 'flexible',
+            'has_availability' => $hasAvailability,
+            'has_dates' => $hasSpecificDates,
+            'has_rules' => $hasRecurringRules,
+        ];
+    }
+
+    /**
+     * Generate default availability dates for flexible booking trips
+     * 
+     * When no specific availability dates or recurring rules are configured,
+     * this generates availability based on trip defaults for the requested date range.
+     * 
+     * @param object $trip Trip object
+     * @param string $fromDate Start date
+     * @param string $toDate End date
+     * @return array Array of availability objects keyed by date
+     */
+    private function generateDefaultAvailability(object $trip, string $fromDate, string $toDate): array
+    {
+        $dateMap = [];
+        
+        // Respect trip's available_from and available_to if set
+        $tripAvailableFrom = !empty($trip->available_from) ? $trip->available_from : null;
+        $tripAvailableTo = !empty($trip->available_to) ? $trip->available_to : null;
+        
+        // Determine actual date range
+        $startDate = $fromDate;
+        $endDate = $toDate;
+        
+        if ($tripAvailableFrom && $tripAvailableFrom > $startDate) {
+            $startDate = $tripAvailableFrom;
+        }
+        
+        if ($tripAvailableTo && $tripAvailableTo < $endDate) {
+            $endDate = $tripAvailableTo;
+        }
+        
+        // Don't generate dates if the range is invalid
+        if ($startDate > $endDate) {
+            return [];
+        }
+        
+        // Check if trip has multiple time slots (for day tours)
+        $hasTimeSlots = !empty($trip->has_default_time_slots) && $trip->trip_type === 'single_day';
+        $timeSlots = [];
+        
+        if ($hasTimeSlots) {
+            // Parse time slots from JSON
+            $timeSlotsData = $trip->default_time_slots;
+            if (is_string($timeSlotsData)) {
+                $timeSlotsData = json_decode($timeSlotsData, true);
+            }
+            if (is_array($timeSlotsData) && !empty($timeSlotsData)) {
+                $timeSlots = $timeSlotsData;
+            }
+        }
+        
+        // Generate daily availability for the range
+        // For flexible booking, we generate dates to show in the calendar
+        $currentDate = new \DateTime($startDate);
+        $finalDate = new \DateTime($endDate);
+        
+        while ($currentDate <= $finalDate) {
+            $dateStr = $currentDate->format('Y-m-d');
+            
+            if ($hasTimeSlots && !empty($timeSlots)) {
+                // Generate separate availability for each time slot
+                foreach ($timeSlots as $slot) {
+                    $timeValue = $slot['time'] ?? null;
+                    if (!$timeValue) continue;
+                    
+                    $defaultData = [
+                        'date' => $dateStr,
+                        'departure_date' => $dateStr,
+                        'departure_time' => $timeValue,
+                    ];
+                    
+                    $dateKey = $dateStr . '_' . $timeValue;
+                    $dateMap[$dateKey] = $this->buildAvailabilityObject($trip, (object) $defaultData, 'trip_default');
+                }
+            } else {
+                // Single availability per date
+                $defaultData = [
+                    'date' => $dateStr,
+                    'departure_date' => $dateStr,
+                ];
+                
+                $dateMap[$dateStr] = $this->buildAvailabilityObject($trip, (object) $defaultData, 'trip_default');
+            }
+            
+            // Move to next day
+            $currentDate->modify('+1 day');
+        }
+        
+        return $dateMap;
     }
 
     /**
@@ -239,10 +380,38 @@ class AvailabilityResolutionService
                 break;
 
             case 'trip_default':
-                // From trip defaults (no specific date)
-                $avail->id = 'default';
+                // From trip defaults (flexible booking)
+                // Can be used for single date resolution (departure_date = null) 
+                // or for generating availability list (departure_date = specific date)
+                $departure_date = null;
+                if (is_object($source) && !empty($source->departure_date)) {
+                    $departure_date = $source->departure_date;
+                } elseif (is_array($source) && !empty($source['departure_date'])) {
+                    $departure_date = $source['departure_date'];
+                }
+                
+                // Get departure time from source or trip default
+                $departure_time_value = null;
+                if (is_object($source) && !empty($source->departure_time)) {
+                    $departure_time_value = $source->departure_time;
+                } elseif (is_array($source) && !empty($source['departure_time'])) {
+                    $departure_time_value = $source['departure_time'];
+                } else {
+                    // Use trip's default departure time
+                    $departure_time_value = $trip->departure_time ?? null;
+                }
+                
+                $avail->id = $departure_date ? 'default_' . $departure_date : 'default';
+                if ($departure_time_value) {
+                    $avail->id .= '_' . str_replace(':', '', $departure_time_value);
+                }
+                
                 $avail->trip_id = (int) $trip->id;
-                $avail->departure_date = null;
+                $avail->departure_date = $departure_date;
+                $avail->arrival_date = null;
+                $avail->return_date = null;
+                $avail->departure_time = $departure_time_value;
+                $avail->arrival_time = null;
                 $avail->seats_total = (int) ($trip->max_travelers ?? 20);
                 $avail->seats_available = (int) ($trip->max_travelers ?? 20);
                 $avail->seats_reserved = 0;

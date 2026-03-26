@@ -42,11 +42,14 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
         <p class="yatra-availability-subtitle"><?php esc_html_e('Choose your preferred departure date and book your spot', 'yatra'); ?></p>
     </div>
 
-    <?php if (!empty($month_filters)): ?>
+    <?php if (!empty($month_filters)): 
+        // Determine which filter should be active
+        $active_filter = !empty($selected_month_filter) ? $selected_month_filter : 'all';
+    ?>
     <div class="yatra-availability-filters">
-        <button type="button" class="yatra-availability-filter-btn active" data-filter="all"><?php esc_html_e('All Dates', 'yatra'); ?></button>
+        <button type="button" class="yatra-availability-filter-btn <?php echo ($active_filter === 'all') ? 'active' : ''; ?>" data-filter="all"><?php esc_html_e('All Dates', 'yatra'); ?></button>
         <?php foreach ($month_filters as $key => $label): ?>
-        <button type="button" class="yatra-availability-filter-btn" data-filter="<?php echo esc_attr($key); ?>"><?php echo esc_html($label); ?></button>
+        <button type="button" class="yatra-availability-filter-btn <?php echo ($active_filter === $key) ? 'active' : ''; ?>" data-filter="<?php echo esc_attr($key); ?>"><?php echo esc_html($label); ?></button>
         <?php endforeach; ?>
     </div>
     <?php endif; ?>
@@ -148,7 +151,14 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
                 $card_status = 'sold_out';
             }
         ?>
-        <div class="yatra-availability-card <?php echo $index === 0 ? 'open' : ''; ?> <?php echo $is_limited ? 'limited' : ''; ?> <?php echo $is_hidden ? 'yatra-hidden-departure' : ''; ?> yatra-card-status-<?php echo esc_attr($card_status); ?>"
+        <?php 
+            // Check if this card should be selected
+            $is_selected_card = !empty($selected_date_filter) && 
+                               !empty($card['data_date']) && 
+                               $card['data_date'] === $selected_date_filter;
+            $should_be_open = $is_selected_card || $index === 0;
+        ?>
+        <div class="yatra-availability-card <?php echo $should_be_open ? 'open' : ''; ?> <?php echo $is_selected_card ? 'selected' : ''; ?> <?php echo $is_limited ? 'limited' : ''; ?> <?php echo $is_hidden ? 'yatra-hidden-departure' : ''; ?> yatra-card-status-<?php echo esc_attr($card_status); ?>"
              data-availability-id="<?php echo esc_attr($item_id); ?>"
              data-month="<?php echo esc_attr($card['data_month'] ?? ''); ?>"
              data-date="<?php echo esc_attr($card['data_date'] ?? ''); ?>"

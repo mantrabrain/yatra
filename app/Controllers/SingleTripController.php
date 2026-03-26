@@ -240,7 +240,12 @@ class SingleTripController
         // Fetch availability dates from database table
         $trip->availability_dates = $this->getAvailabilityDates((int) $trip->id);
         
-    
+        // Get booking mode information (date-specific vs flexible)
+        $resolutionService = new \Yatra\Services\AvailabilityResolutionService();
+        $bookingModeInfo = $resolutionService->getBookingMode((int) $trip->id);
+        $trip->booking_mode = $bookingModeInfo['mode'];
+        $trip->has_specific_availability = $bookingModeInfo['has_availability'];
+        
         $trip->blackout_dates = $this->decodeJson($trip->blackout_dates ?? '');
         
         // Get trip attributes with their values
@@ -289,7 +294,15 @@ class SingleTripController
 
         // Calculate base price for template display
         $trip->base_price = $this->calculateBasePrice($trip);
+        
+        // Availability flags for backward compatibility and template logic
+        // has_availability: true if specific dates/rules exist
         $trip->has_availability = !empty($trip->availability_dates) && is_array($trip->availability_dates) && count($trip->availability_dates) > 0;
+        
+        // has_booking_capability: true if trip can be booked (either specific dates OR flexible mode)
+        // This ensures booking interface always shows (industry best practice)
+        $trip->has_booking_capability = $trip->has_availability || ($trip->booking_mode === 'flexible');
+        
         $trip->has_traveler_pricing = ($trip->pricing_type === 'traveler_based' && !empty($trip->price_types));
         
         // Format featured image
