@@ -3915,7 +3915,7 @@ const Settings: React.FC = () => {
                                     <img
                                       src={gateway.icon}
                                       alt={gateway.title}
-                                      className="w-6 h-6 object-contain"
+                                      className="w-10 h-10 object-contain"
                                     />
                                   )}
                                   <div>
@@ -3987,7 +3987,7 @@ const Settings: React.FC = () => {
                               )}
 
                               {/* Frontend Display Settings */}
-                              <div className="space-y-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                              <div className="space-y-4">
                                 <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
                                   {__("Frontend Display Settings", "yatra")}
                                 </h4>

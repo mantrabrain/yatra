@@ -43,30 +43,21 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
     {
         // If icon is a relative path (starts with /), convert to full URL
         if (!empty($this->icon) && strpos($this->icon, 'http') !== 0) {
-            // Get the gateway class name to determine folder
-            $className = get_class($this);
-            $parts = explode('\\', $className);
-            $gatewayFolder = end($parts); // e.g., 'StripeGateway'
-            $folderName = str_replace('Gateway', '', $gatewayFolder); // e.g., 'Stripe'
-            
-            // Get the correct plugin file path
-            $pluginFile = dirname(__DIR__, 3) . '/yatra.php';
-            
-            // Check if the icon exists in the gateway folder
-            $iconPath = dirname(__DIR__, 3) . "/app/PaymentGateways/Gateways/{$folderName}/icon.svg";
-            
-            if (file_exists($iconPath)) {
-                return plugins_url("app/PaymentGateways/Gateways/{$folderName}/icon.svg", $pluginFile);
+            // Priority 1: Check if icon is directly specified (e.g., 'paypal.svg', 'stripe.svg')
+            if (strpos($this->icon, '.') !== false) {
+                // Icon has extension, check in payment-gateways folder
+                $iconPath = YATRA_PLUGIN_PATH . "assets/images/payment-gateways/{$this->icon}";
+                if (file_exists($iconPath)) {
+                    return YATRA_PLUGIN_URL . "assets/images/payment-gateways/{$this->icon}";
+                }
             }
             
-            // Fallback to old path for backward compatibility
-            $legacyPath = dirname(__DIR__, 3) . '/public/images/gateways/' . $this->icon;
-            if (file_exists($legacyPath)) {
-                return plugins_url('public/images/gateways/' . $this->icon, $pluginFile);
-            }
+            // Priority 2: Try to derive icon name from gateway ID
+            $iconName = $this->id;
             
-            // If no icon found, return empty string
-            return '';
+          
+            return YATRA_PLUGIN_URL . "assets/images/payment-gateways/{$iconName}.svg";
+           
         }
         return $this->icon;
     }

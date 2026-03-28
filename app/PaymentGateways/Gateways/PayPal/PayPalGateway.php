@@ -13,7 +13,7 @@ class PayPalGateway extends AbstractPaymentGateway
     protected string $id = 'paypal';
     protected string $title = 'PayPal';
     protected string $description = 'Accept PayPal and credit card payments';
-    protected string $icon = 'icon.svg';
+    protected string $icon = 'paypal.svg';
     protected string $sandboxUrl = 'https://developer.paypal.com/tools/sandbox/';
     protected array $supports = ['paypal', 'credit_card', 'refunds', 'recurring', 'tokenization', 'scheduled_payments'];
 
