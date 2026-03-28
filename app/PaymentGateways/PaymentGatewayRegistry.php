@@ -31,30 +31,26 @@ class PaymentGatewayRegistry
     }
 
     /**
-     * Register built-in payment gateways
-     * Order matters - Pay Later first, then popular gateways
+     * Register built-in payment gateways (Free version)
+     * Only PayLater and PayPal are included in free version
+     * Premium gateways are registered by Yatra Pro via 'yatra_register_payment_gateways' hook
      */
     private function registerBuiltInGateways(): void
     {
-        $builtInGateways = [
-            Gateways\PayLater\PayLaterGateway::class,      // Book Now Pay Later - First
-            Gateways\Stripe\StripeGateway::class,          // Popular worldwide
-            Gateways\PayPal\PayPalGateway::class,          // Popular worldwide
-            Gateways\Razorpay\RazorpayGateway::class,      // Popular in India
-            Gateways\Mollie\MollieGateway::class,          // Popular in Europe
-            Gateways\Paystack\PaystackGateway::class,      // Popular in Africa
-            Gateways\Square\SquareGateway::class,          // Popular in US/Canada
-            Gateways\AuthorizeNet\AuthorizeNetGateway::class,  // Popular in US
-            Gateways\BankTransfer\BankTransferGateway::class,  // Manual/Offline
-            Gateways\Esewa\EsewaGateway::class,             // Popular in Nepal
-            Gateways\Khalti\KhaltiGateway::class,           // Popular in Nepal
+        // Free gateways - always available
+        $freeGateways = [
+            Gateways\PayLater\PayLaterGateway::class,      // Book Now Pay Later - Free
+            Gateways\PayPal\PayPalGateway::class,          // PayPal - Free
         ];
 
-        foreach ($builtInGateways as $gatewayClass) {
+        foreach ($freeGateways as $gatewayClass) {
             if (class_exists($gatewayClass)) {
                 $this->register(new $gatewayClass());
             }
         }
+        
+        // Premium gateways are registered by Yatra Pro plugin
+        // via the 'yatra_register_payment_gateways' action hook
     }
 
     /**
@@ -90,14 +86,51 @@ class PaymentGatewayRegistry
     }
 
     /**
+     * Get list of premium gateway IDs (requires Yatra Pro)
+     */
+    public function getPremiumGatewayIds(): array
+    {
+        return [
+            'stripe',
+            'razorpay',
+            'mollie',
+            'paystack',
+            'square',
+            'authorize_net',
+            'bank_transfer',
+        ];
+    }
+    
+    /**
+     * Check if a gateway is premium (requires Pro)
+     */
+    public function isPremiumGateway(string $gatewayId): bool
+    {
+        return in_array($gatewayId, $this->getPremiumGatewayIds(), true);
+    }
+    
+    /**
+     * Check if Yatra Pro is active
+     */
+    private function isProActive(): bool
+    {
+        return defined('YATRA_PRO_VERSION') && class_exists('YatraPro\Plugin');
+    }
+
+    /**
      * Get gateway definitions for admin settings UI
+     * Shows all gateways (registered + premium placeholders) with Pro badges
      */
     public function getDefinitions(): array
     {
         $definitions = [];
+        $isProActive = $this->isProActive();
 
+        // Add registered gateways
         foreach ($this->gateways as $id => $gateway) {
             $config = $gateway->getConfig();
+            $isPremium = $this->isPremiumGateway($id);
+            
             $definitions[$id] = [
                 'id' => $id,
                 'title' => $gateway->getTitle(),
@@ -109,10 +142,130 @@ class PaymentGatewayRegistry
                 'fields' => $gateway->getConfigFields(),
                 'config' => $config,
                 'enabled' => !empty($config['enabled']),
+                'is_premium' => $isPremium,
+                'requires_pro' => $isPremium && !$isProActive,
             ];
+        }
+        
+        // Add premium gateway placeholders if Pro is not active
+        if (!$isProActive) {
+            $premiumPlaceholders = $this->getPremiumGatewayPlaceholders();
+            foreach ($premiumPlaceholders as $id => $placeholder) {
+                // Only add if not already registered
+                if (!isset($definitions[$id])) {
+                    $definitions[$id] = $placeholder;
+                }
+            }
         }
 
         return $definitions;
+    }
+    
+    /**
+     * Get premium gateway placeholders for UI when Pro is not active
+     */
+    private function getPremiumGatewayPlaceholders(): array
+    {
+        return [
+            'stripe' => [
+                'id' => 'stripe',
+                'title' => __('Stripe', 'yatra'),
+                'description' => __('Accept credit card payments via Stripe', 'yatra'),
+                'icon' => 'credit-card',
+                'sandbox_url' => '',
+                'is_offline' => false,
+                'supports' => ['refunds', 'subscriptions'],
+                'fields' => [],
+                'config' => ['enabled' => false],
+                'enabled' => false,
+                'is_premium' => true,
+                'requires_pro' => true,
+            ],
+            'razorpay' => [
+                'id' => 'razorpay',
+                'title' => __('Razorpay', 'yatra'),
+                'description' => __('Accept payments via Razorpay (India)', 'yatra'),
+                'icon' => 'credit-card',
+                'sandbox_url' => '',
+                'is_offline' => false,
+                'supports' => ['refunds'],
+                'fields' => [],
+                'config' => ['enabled' => false],
+                'enabled' => false,
+                'is_premium' => true,
+                'requires_pro' => true,
+            ],
+            'mollie' => [
+                'id' => 'mollie',
+                'title' => __('Mollie', 'yatra'),
+                'description' => __('Accept payments via Mollie (Europe)', 'yatra'),
+                'icon' => 'credit-card',
+                'sandbox_url' => '',
+                'is_offline' => false,
+                'supports' => ['refunds'],
+                'fields' => [],
+                'config' => ['enabled' => false],
+                'enabled' => false,
+                'is_premium' => true,
+                'requires_pro' => true,
+            ],
+            'paystack' => [
+                'id' => 'paystack',
+                'title' => __('Paystack', 'yatra'),
+                'description' => __('Accept payments via Paystack (Africa)', 'yatra'),
+                'icon' => 'credit-card',
+                'sandbox_url' => '',
+                'is_offline' => false,
+                'supports' => ['refunds'],
+                'fields' => [],
+                'config' => ['enabled' => false],
+                'enabled' => false,
+                'is_premium' => true,
+                'requires_pro' => true,
+            ],
+            'square' => [
+                'id' => 'square',
+                'title' => __('Square', 'yatra'),
+                'description' => __('Accept payments via Square (US/Canada)', 'yatra'),
+                'icon' => 'credit-card',
+                'sandbox_url' => '',
+                'is_offline' => false,
+                'supports' => ['refunds'],
+                'fields' => [],
+                'config' => ['enabled' => false],
+                'enabled' => false,
+                'is_premium' => true,
+                'requires_pro' => true,
+            ],
+            'authorize_net' => [
+                'id' => 'authorize_net',
+                'title' => __('Authorize.Net', 'yatra'),
+                'description' => __('Accept payments via Authorize.Net (US)', 'yatra'),
+                'icon' => 'credit-card',
+                'sandbox_url' => '',
+                'is_offline' => false,
+                'supports' => ['refunds'],
+                'fields' => [],
+                'config' => ['enabled' => false],
+                'enabled' => false,
+                'is_premium' => true,
+                'requires_pro' => true,
+            ],
+            'bank_transfer' => [
+                'id' => 'bank_transfer',
+                'title' => __('Bank Transfer', 'yatra'),
+                'description' => __('Accept manual bank transfer payments', 'yatra'),
+                'icon' => 'dollar-sign',
+                'sandbox_url' => '',
+                'is_offline' => true,
+                'supports' => [],
+                'fields' => [],
+                'config' => ['enabled' => false],
+                'enabled' => false,
+                'is_premium' => true,
+                'requires_pro' => true,
+            ],
+        ];
     }
 
     /**

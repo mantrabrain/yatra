@@ -1430,19 +1430,15 @@ class TripController extends BaseController
                 if (!empty($selected_month)) {
                     $auto_selected_month = $selected_month;
                 } elseif (!empty($selected_date)) {
-                    // Use selected date's month
+                    // Use selected date's month (always month-based now)
                     $selected_timestamp = strtotime($selected_date);
-                    $auto_selected_month = $is_single_day 
-                        ? date('Y-m-d', $selected_timestamp) 
-                        : strtolower(date('M-Y', $selected_timestamp));
+                    $auto_selected_month = strtolower(date('M-Y', $selected_timestamp));
                 } else {
-                    // Use first available date's month
+                    // Use first available date's month (always month-based now)
                     $first_avail = reset($availability_dates);
                     if (!empty($first_avail->departure_date)) {
                         $first_date = strtotime($first_avail->departure_date);
-                        $auto_selected_month = $is_single_day 
-                            ? date('Y-m-d', $first_date) 
-                            : strtolower(date('M-Y', $first_date));
+                        $auto_selected_month = strtolower(date('M-Y', $first_date));
                     }
                 }
                 
@@ -1736,24 +1732,10 @@ class TripController extends BaseController
                     $discount_text = $surge_percent > 0 ? sprintf(__('+%d%%', 'yatra'), $surge_percent) : '';
                 }
                 
-                // For day trips, use day-based filters; for multi-day trips, use month-based filters
-                if ($is_single_day) {
-                    $day_key = date('Y-m-d', $departure_date);
-                    $today = date('Y-m-d');
-                    $tomorrow = date('Y-m-d', strtotime('+1 day'));
-                    
-                    // Show "Today", "Tomorrow", or day name with date
-                    if ($day_key === $today) {
-                        $month_filters[$day_key] = __('Today', 'yatra');
-                    } elseif ($day_key === $tomorrow) {
-                        $month_filters[$day_key] = __('Tomorrow', 'yatra');
-                    } else {
-                        $month_filters[$day_key] = date_i18n('D, j M', $departure_date); // e.g., "Sat, 30 Nov"
-                    }
-                } else {
-                    $month_key = strtolower(date('M-Y', $departure_date));
-                    $month_filters[$month_key] = date('M Y', $departure_date);
-                }
+                // Use month-based filters for both day trips and multi-day trips for better navigation
+                // This prevents overwhelming users with too many individual date filters
+                $month_key = strtolower(date('M-Y', $departure_date));
+                $month_filters[$month_key] = date('M Y', $departure_date);
                 
                 $from_location = !empty($avail->from_location) ? $avail->from_location : ($trip_data->starting_location ?? '');
                 $to_location = !empty($avail->to_location) ? $avail->to_location : ($trip_data->ending_location ?? $from_location);
@@ -1779,10 +1761,8 @@ class TripController extends BaseController
                     $to_label = __('Return', 'yatra');
                 }
                 
-                // Use the same key format for filtering
-                $filter_key = $is_single_day 
-                    ? date('Y-m-d', $departure_date)
-                    : strtolower(date('M-Y', $departure_date));
+                // Use month-based keys for filtering for both day trips and multi-day trips
+                $filter_key = strtolower(date('M-Y', $departure_date));
                 
                 // pricing_type MODEL comes from trip level (regular vs traveler_based)
                 // Note: $avail->pricing_type enum is about price state, not pricing model

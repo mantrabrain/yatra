@@ -51,6 +51,7 @@ import { useToast } from "../components/ui/toast";
 import { apiClient, apiService } from "../lib/api-client";
 import { Button } from "../components/ui/button";
 import { ProFeature, ProBadge } from "../components/ProFeature";
+import { PremiumUpgradeDialog } from "../components/modules/PremiumUpgradeDialog";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
 import { Label } from "../components/ui/label";
@@ -682,6 +683,8 @@ interface GatewayDefinition {
   fields: GatewayField[];
   config: PaymentGatewayConfig;
   enabled: boolean;
+  is_premium?: boolean;
+  requires_pro?: boolean;
 }
 
 interface SettingsData {
@@ -2553,6 +2556,10 @@ const Settings: React.FC = () => {
 
   const [newTaxName, setNewTaxName] = useState("");
   const [newTaxRate, setNewTaxRate] = useState("");
+  
+  // Premium upgrade dialog state
+  const [showPremiumDialog, setShowPremiumDialog] = useState(false);
+  const [selectedPremiumGateway, setSelectedPremiumGateway] = useState<string>('');
 
   // Facebook Pixel validation state
   const [validatingPixel, setValidatingPixel] = useState(false);
@@ -3835,21 +3842,23 @@ const Settings: React.FC = () => {
                       const isExpanded = expandedGateways[gatewayId];
                       const isDragging = draggedGateway === gatewayId;
 
+                      const isPremium = gateway.requires_pro || false;
+                      
                       return (
                         <Card
                           key={gatewayId}
-                          className={`border transition-all ${
+                          className={`relative border transition-all !py-0 ${
                             isDragging
                               ? "border-blue-400 bg-blue-50 dark:bg-blue-900/20 opacity-75"
                               : config.enabled
                                 ? "border-green-200 dark:border-green-800"
                                 : "border-gray-200 dark:border-gray-700"
                           }`}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, gatewayId)}
-                          onDragOver={handleDragOver}
-                          onDrop={(e) => handleDrop(e, gatewayId)}
-                          onDragEnd={handleDragEnd}
+                          draggable={!isPremium}
+                          onDragStart={(e) => !isPremium && handleDragStart(e, gatewayId)}
+                          onDragOver={!isPremium ? handleDragOver : undefined}
+                          onDrop={(e) => !isPremium && handleDrop(e, gatewayId)}
+                          onDragEnd={!isPremium ? handleDragEnd : undefined}
                         >
                           <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
@@ -3885,13 +3894,20 @@ const Settings: React.FC = () => {
                                   type="checkbox"
                                   id={`gateway_enable_${gatewayId}`}
                                   checked={config.enabled || false}
-                                  onChange={(e) =>
+                                  onChange={(e) => {
+                                    // Show Pro popup if trying to enable a premium gateway
+                                    if (gateway.requires_pro && e.target.checked) {
+                                      e.preventDefault();
+                                      const pricingUrl = (window as any).yatraAdmin?.pricingUrl || 'https://wpyatra.com/pricing';
+                                      window.open(pricingUrl, '_blank');
+                                      return;
+                                    }
                                     handleGatewayConfigChange(
                                       gatewayId,
                                       "enabled",
                                       e.target.checked,
-                                    )
-                                  }
+                                    );
+                                  }}
                                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                 />
                                 <div className="flex items-center gap-2">
@@ -3929,19 +3945,26 @@ const Settings: React.FC = () => {
                                   </div>
                                 </div>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => toggleGatewayExpanded(gatewayId)}
-                                className="h-8"
-                                disabled={!gateway.fields?.length}
-                              >
-                                {isExpanded ? (
-                                  <ChevronDown className="w-4 h-4" />
-                                ) : (
-                                  <ChevronRight className="w-4 h-4" />
+                              <div className="flex items-center gap-2">
+                                {gateway.requires_pro && (
+                                  <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-sm">
+                                    PRO
+                                  </span>
                                 )}
-                              </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => toggleGatewayExpanded(gatewayId)}
+                                  className="h-8"
+                                  disabled={!gateway.fields?.length}
+                                >
+                                  {isExpanded ? (
+                                    <ChevronDown className="w-4 h-4" />
+                                  ) : (
+                                    <ChevronRight className="w-4 h-4" />
+                                  )}
+                                </Button>
+                              </div>
                             </div>
                           </CardHeader>
                           {isExpanded && (
@@ -4439,6 +4462,16 @@ const Settings: React.FC = () => {
                                 </div>
                               )}
                             </CardContent>
+                          )}
+                          {/* Clean overlay for premium gateways */}
+                          {isPremium && (
+                            <div 
+                              className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5 dark:from-purple-500/10 dark:to-blue-500/10 rounded-lg cursor-pointer hover:from-purple-500/10 hover:to-blue-500/10 dark:hover:from-purple-500/15 dark:hover:to-blue-500/15 transition-all duration-200"
+                              onClick={() => {
+                                setSelectedPremiumGateway(gateway.title);
+                                setShowPremiumDialog(true);
+                              }}
+                            />
                           )}
                         </Card>
                       );
@@ -7782,6 +7815,15 @@ const Settings: React.FC = () => {
           </div>
         </div>
       </ConditionalRender>
+      
+      {/* Premium Upgrade Dialog for Payment Gateways */}
+      <PremiumUpgradeDialog
+        open={showPremiumDialog}
+        onClose={() => setShowPremiumDialog(false)}
+        moduleName={selectedPremiumGateway}
+        moduleDescription={`Unlock ${selectedPremiumGateway} payment gateway to accept payments from your customers. This premium gateway provides secure payment processing with advanced features.`}
+        purchaseUrl={(window as any).yatraAdmin?.pricingUrl || 'https://wpyatra.com/pricing'}
+      />
     </div>
   );
 };
