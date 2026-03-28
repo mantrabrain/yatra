@@ -280,9 +280,9 @@ class PaymentGatewayRegistry
             $config = $gateway->getConfig();
             $checkoutGateways[] = [
                 'id' => $id,
-                'title' => $gateway->getTitle(),
-                'description' => $gateway->getDescription(),
-                'icon' => $gateway->getIcon(),
+                'title' => !empty($config['title']) ? $config['title'] : $gateway->getTitle(),
+                'description' => !empty($config['description']) ? $config['description'] : $gateway->getDescription(),
+                'icon' => !empty($config['icon']) ? $config['icon'] : $gateway->getIcon(),
                 'is_offline' => $gateway->isOffline(),
                 'supports' => $gateway->getSupports(),
             ];
