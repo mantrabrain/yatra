@@ -2,13 +2,17 @@
 
 namespace Yatra\Migration;
 
+use Yatra\Constants\ClassificationTypes;
+use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Database\Tables\TripsTable;
 use Yatra\Utils\Logger;
 
 /**
  * Migration for traveler categories (multiple pricing options)
  * 
  * Migrates multiple pricing options from old Yatra to traveler categories system
- * and assigns them to trips
+ * (ClassificationsTable with type='traveler_type') and assigns pricing to trips
+ * via the price_types JSON column on TripsTable.
  */
 class TravelerCategoriesMigration extends BaseMigration
 {
@@ -187,7 +191,8 @@ class TravelerCategoriesMigration extends BaseMigration
                 }
 
                 // Get multiple pricing for this tour
-                $multiplePricing = get_post_meta($oldTourId, 'yatra_multiple_pricing', true);
+                $multiplePricing = $this->getRawPostMeta($oldTourId, 'yatra_multiple_pricing');
+                $multiplePricing = maybe_unserialize($multiplePricing);
                 Logger::info("Multiple pricing data", [
                     'old_tour_id' => $oldTourId,
                     'pricing_data' => $multiplePricing,
@@ -397,113 +402,160 @@ class TravelerCategoriesMigration extends BaseMigration
     }
 
     /**
-     * Check if category exists by label
+     * Check if traveler category exists by label in ClassificationsTable
      */
     private function categoryExists(string $label): bool
     {
-        $sql = $this->wpdb->prepare(
-            "SELECT COUNT(*) FROM {$this->wpdb->prefix}yatra_traveler_categories WHERE label = %s",
-            $label
-        );
+        $table = ClassificationsTable::getTableName();
+        $type = ClassificationTypes::TRAVELER_TYPE;
 
-        return (int) $this->wpdb->get_var($sql) > 0;
+        return (int) $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COUNT(*) FROM {$table} WHERE type = %s AND name = %s",
+            $type,
+            $label
+        )) > 0;
     }
 
     /**
-     * Get category ID by label
+     * Get traveler category ID by label from ClassificationsTable
      */
     private function getCategoryIdByLabel(string $label): ?int
     {
-        $sql = $this->wpdb->prepare(
-            "SELECT id FROM {$this->wpdb->prefix}yatra_traveler_categories WHERE label = %s",
-            $label
-        );
+        $table = ClassificationsTable::getTableName();
+        $type = ClassificationTypes::TRAVELER_TYPE;
 
-        return (int) $this->wpdb->get_var($sql) ?: null;
+        $id = $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT id FROM {$table} WHERE type = %s AND name = %s LIMIT 1",
+            $type,
+            $label
+        ));
+
+        return $id ? (int) $id : null;
     }
 
     /**
-     * Create traveler category
+     * Create traveler category in ClassificationsTable with type='traveler_type'
      */
     private function createCategory(array $data): ?int
     {
-        $table = $this->wpdb->prefix . 'yatra_traveler_categories';
-        
-        // Generate unique slug by adding suffix if needed
-        $slug = $this->generateUniqueSlug($data['slug'], $table);
-        
-        // Get current user ID
-        $currentUserId = get_current_user_id();
-        if (!$currentUserId) {
-            // Fallback to admin user (ID 1) if no current user
-            $currentUserId = 1;
+        $table = ClassificationsTable::getTableName();
+        $type = ClassificationTypes::TRAVELER_TYPE;
+
+        // Generate unique slug scoped to traveler_type
+        $baseSlug = sanitize_title($data['label']);
+        $slug = $baseSlug;
+        $counter = 1;
+        while ($this->slugExists($slug)) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
         }
-        
-        Logger::info("Creating traveler category with user tracking", [
-            'label' => $data['label'],
-            'slug' => $slug,
-            'current_user_id' => $currentUserId
-        ]);
-        
+
+        $currentUserId = get_current_user_id() ?: 1;
+
         $result = $this->wpdb->insert(
             $table,
             [
-                'label' => $data['label'],
+                'type' => $type,
+                'name' => $data['label'],
                 'slug' => $slug,
-                'description' => $data['description'],
-                'status' => $data['is_active'] ? 'publish' : 'draft',
+                'description' => $data['description'] ?? '',
+                'status' => !empty($data['is_active']) ? 'publish' : 'draft',
                 'created_at' => current_time('mysql'),
                 'updated_at' => current_time('mysql'),
                 'created_by' => $currentUserId,
-                'updated_by' => $currentUserId
+                'updated_by' => $currentUserId,
             ],
-            ['%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d']
+            ['%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d']
         );
 
         return $result ? (int) $this->wpdb->insert_id : null;
     }
 
     /**
-     * Generate unique slug by adding suffix if already exists
-     */
-    protected function generateUniqueSlug(string $baseSlug, string $table): string
-    {
-        $slug = $baseSlug;
-        $counter = 1;
-
-        // Keep incrementing until we find a unique slug
-        while ($this->slugExists($slug)) {
-            $slug = $baseSlug . '-' . $counter;
-            $counter++;
-        }
-
-        Logger::info("Generated unique slug", [
-            'base_slug' => $baseSlug,
-            'final_slug' => $slug,
-            'attempts' => $counter - 1,
-            'table' => $table
-        ]);
-
-        return $slug;
-    }
-
-    /**
-     * Check if slug exists
+     * Check if slug exists for traveler_type in ClassificationsTable
      */
     private function slugExists(string $slug): bool
     {
-        $table = $this->wpdb->prefix . 'yatra_traveler_categories';
-        
-        $count = (int) $this->wpdb->get_var($this->wpdb->prepare(
-            "SELECT COUNT(*) FROM {$table} WHERE slug = %s",
-            $slug
-        ));
-        
-        Logger::info("Slug exists result", [
-            'slug' => $slug,
-            'count' => $count
-        ]);
+        $table = ClassificationsTable::getTableName();
+        $type = ClassificationTypes::TRAVELER_TYPE;
 
-        return $count > 0;
+        return (int) $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COUNT(*) FROM {$table} WHERE type = %s AND slug = %s",
+            $type,
+            $slug
+        )) > 0;
+    }
+
+    /**
+     * Create/update price type assignment for a trip.
+     *
+     * Appends a pricing entry to the trip's price_types JSON column in TripsTable.
+     * Each entry links a traveler category (from ClassificationsTable) with pricing.
+     */
+    private function createPriceType(array $data): ?int
+    {
+        $tripsTable = TripsTable::getTableName();
+        $tripId = (int) $data['trip_id'];
+
+        // Read existing price_types JSON
+        $existingJson = $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT price_types FROM {$tripsTable} WHERE id = %d",
+            $tripId
+        ));
+
+        $priceTypes = [];
+        if (!empty($existingJson)) {
+            $decoded = json_decode($existingJson, true);
+            if (is_array($decoded)) {
+                $priceTypes = $decoded;
+            }
+        }
+
+        // Check for duplicate (same category_id)
+        foreach ($priceTypes as $existing) {
+            if (($existing['category_id'] ?? null) == $data['category_id']) {
+                return (int) $data['category_id']; // Already exists
+            }
+        }
+
+        // Append new price type
+        $priceTypes[] = [
+            'category_id' => (int) $data['category_id'],
+            'label' => $data['label'] ?? '',
+            'description' => $data['description'] ?? '',
+            'regular_price' => (float) ($data['regular_price'] ?? 0),
+            'sales_price' => (float) ($data['sales_price'] ?? 0),
+            'minimum_pax' => (int) ($data['minimum_pax'] ?? 1),
+            'maximum_pax' => (int) ($data['maximum_pax'] ?? 0),
+            'group_size' => (int) ($data['group_size'] ?? 1),
+            'pricing_per' => $data['pricing_per'] ?? 'person',
+            'is_active' => (int) ($data['is_active'] ?? 1),
+        ];
+
+        $updated = $this->wpdb->update(
+            $tripsTable,
+            ['price_types' => json_encode($priceTypes)],
+            ['id' => $tripId],
+            ['%s'],
+            ['%d']
+        );
+
+        if ($updated !== false) {
+            // Also update pricing_type to 'traveler_based' on the trip
+            $this->wpdb->update(
+                $tripsTable,
+                ['pricing_type' => 'traveler_based'],
+                ['id' => $tripId],
+                ['%s'],
+                ['%d']
+            );
+            return (int) $data['category_id'];
+        }
+
+        Logger::error("Failed to update price_types for trip", [
+            'trip_id' => $tripId,
+            'error' => $this->wpdb->last_error
+        ]);
+        return null;
     }
 }

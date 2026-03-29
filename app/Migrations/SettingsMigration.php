@@ -92,31 +92,18 @@ class SettingsMigration extends BaseMigration
     
     /**
      * Get settings mapping from old to new
+     *
+     * These are the ACTUAL old Yatra option keys verified from old plugin source code.
+     * Old keys found in: class-yatra-install.php, class-yatra-setup-wizard.php,
+     * yatra-template-functions.php, class-yatra-email.php, yatra-pricing-functions.php,
+     * hooks/yatra-design-hooks.php, class-yatra-assets.php, functions.php
      */
     private function getSettingsMap(): array
     {
         return [
-            // General Settings
+            // Currency Settings (verified from setup wizard + template functions)
             [
-                'old' => 'yatra_general_company_name',
-                'new' => 'yatra_company_name',
-            ],
-            [
-                'old' => 'yatra_general_company_email',
-                'new' => 'yatra_company_email',
-            ],
-            [
-                'old' => 'yatra_general_company_phone',
-                'new' => 'yatra_company_phone',
-            ],
-            [
-                'old' => 'yatra_general_company_address',
-                'new' => 'yatra_company_address',
-            ],
-            
-            // Currency Settings
-            [
-                'old' => 'yatra_currency_code',
+                'old' => 'yatra_currency',
                 'new' => 'yatra_currency',
             ],
             [
@@ -124,138 +111,128 @@ class SettingsMigration extends BaseMigration
                 'new' => 'yatra_currency_position',
             ],
             [
-                'old' => 'yatra_currency_thousand_separator',
+                'old' => 'yatra_thousand_separator',
                 'new' => 'yatra_thousand_separator',
             ],
             [
-                'old' => 'yatra_currency_decimal_separator',
+                'old' => 'yatra_decimal_separator',
                 'new' => 'yatra_decimal_separator',
             ],
             [
-                'old' => 'yatra_currency_number_of_decimals',
-                'new' => 'yatra_decimal_places',
+                'old' => 'yatra_price_number_decimals',
+                'new' => 'yatra_price_number_decimals',
                 'transform' => function($value) {
                     return intval($value);
                 }
             ],
-            
-            // Trip/Tour Settings
             [
-                'old' => 'yatra_general_tour_listing_page_displays',
-                'new' => 'yatra_trip_listing_display',
+                'old' => 'yatra_currency_symbol_type',
+                'new' => 'yatra_currency_symbol_type',
             ],
+
+            // Page Settings (verified from class-yatra-install.php)
             [
-                'old' => 'yatra_general_number_of_tour_list_per_page',
-                'new' => 'yatra_trips_per_page',
+                'old' => 'yatra_checkout_page',
+                'new' => 'yatra_checkout_page',
                 'transform' => function($value) {
-                    return intval($value) ?: 12;
+                    return intval($value);
                 }
             ],
             [
-                'old' => 'yatra_general_enable_tour_archive',
-                'new' => 'yatra_enable_trip_archive',
+                'old' => 'yatra_cart_page',
+                'new' => 'yatra_cart_page',
                 'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
-                }
-            ],
-            
-            // Booking Settings
-            [
-                'old' => 'yatra_booking_enable_guest_booking',
-                'new' => 'yatra_enable_guest_booking',
-                'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
+                    return intval($value);
                 }
             ],
             [
-                'old' => 'yatra_booking_require_login',
-                'new' => 'yatra_require_login',
+                'old' => 'yatra_thankyou_page',
+                'new' => 'yatra_thankyou_page',
                 'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
+                    return intval($value);
                 }
             ],
             [
-                'old' => 'yatra_booking_allow_guest_checkout',
-                'new' => 'yatra_allow_guest_checkout',
+                'old' => 'yatra_my_account_page',
+                'new' => 'yatra_my_account_page',
                 'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
+                    return intval($value);
                 }
             ],
             [
-                'old' => 'yatra_booking_confirmation',
-                'new' => 'yatra_booking_confirmation',
+                'old' => 'yatra_failed_transaction_page',
+                'new' => 'yatra_failed_transaction_page',
                 'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
+                    return intval($value);
                 }
             ],
+
+            // Booking/Checkout Settings (verified from class-yatra-install.php + hooks)
             [
-                'old' => 'yatra_booking_auto_confirm',
-                'new' => 'yatra_auto_confirm_bookings',
+                'old' => 'yatra_enable_guest_checkout',
+                'new' => 'yatra_enable_guest_checkout',
                 'transform' => function($value) {
                     return $value === 'yes' || $value === true || $value === 1;
                 }
             ],
             [
-                'old' => 'yatra_booking_expiry_hours',
-                'new' => 'yatra_booking_expiry_hours',
-                'transform' => function($value) {
-                    return intval($value) ?: 24;
-                }
+                'old' => 'yatra_booknow_button_text',
+                'new' => 'yatra_booknow_button_text',
             ],
             [
-                'old' => 'yatra_booking_cancellation_days',
-                'new' => 'yatra_cancellation_days',
-                'transform' => function($value) {
-                    return intval($value) ?: 7;
-                }
+                'old' => 'yatra_booknow_loading_text',
+                'new' => 'yatra_booknow_loading_text',
             ],
             [
-                'old' => 'yatra_booking_refund_policy',
-                'new' => 'yatra_refund_policy',
+                'old' => 'yatra_booking_form_title_text',
+                'new' => 'yatra_booking_form_title_text',
             ],
             [
-                'old' => 'yatra_booking_allow_waitlist',
-                'new' => 'yatra_allow_waitlist',
+                'old' => 'yatra_enquiry_form_title_text',
+                'new' => 'yatra_enquiry_form_title_text',
+            ],
+            [
+                'old' => 'yatra_enquiry_button_text',
+                'new' => 'yatra_enquiry_button_text',
+            ],
+            [
+                'old' => 'yatra_select_date_title',
+                'new' => 'yatra_select_date_title',
+            ],
+            [
+                'old' => 'yatra_custom_attributes_title_text',
+                'new' => 'yatra_custom_attributes_title_text',
+            ],
+            [
+                'old' => 'yatra_update_cart_text',
+                'new' => 'yatra_update_cart_text',
+            ],
+            [
+                'old' => 'yatra_proceed_to_checkout_text',
+                'new' => 'yatra_proceed_to_checkout_text',
+            ],
+            [
+                'old' => 'yatra_order_booking_text',
+                'new' => 'yatra_order_booking_text',
+            ],
+
+            // Payment Gateway Settings (verified from function-yatra-payments.php)
+            [
+                'old' => 'yatra_payment_gateway_test_mode',
+                'new' => 'yatra_payment_gateway_test_mode',
                 'transform' => function($value) {
                     return $value === 'yes' || $value === true || $value === 1;
                 }
             ],
-            
-            // Payment Settings
             [
-                'old' => 'yatra_payment_test_mode',
-                'new' => 'yatra_payment_test_mode',
+                'old' => 'yatra_payment_gateway_enable_logging',
+                'new' => 'yatra_payment_gateway_enable_logging',
                 'transform' => function($value) {
                     return $value === 'yes' || $value === true || $value === 1;
                 }
             ],
-            [
-                'old' => 'yatra_payment_enable_deposit',
-                'new' => 'yatra_enable_deposit',
-                'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
-                }
-            ],
-            [
-                'old' => 'yatra_payment_deposit_type',
-                'new' => 'yatra_deposit_type',
-            ],
-            [
-                'old' => 'yatra_payment_deposit_amount',
-                'new' => 'yatra_deposit_amount',
-                'transform' => function($value) {
-                    return floatval($value) ?: 20;
-                }
-            ],
-            [
-                'old' => 'yatra_payment_deposit_percentage',
-                'new' => 'yatra_deposit_percentage',
-                'transform' => function($value) {
-                    return floatval($value) ?: 20;
-                }
-            ],
-            
-            // Email Settings
+
+            // Email Settings (verified from class-yatra-email.php)
             [
                 'old' => 'yatra_email_from_name',
                 'new' => 'yatra_email_from_name',
@@ -265,204 +242,108 @@ class SettingsMigration extends BaseMigration
                 'new' => 'yatra_email_from_address',
             ],
             [
-                'old' => 'yatra_email_admin_email',
-                'new' => 'yatra_admin_email',
+                'old' => 'yatra_admin_email_recipient_lists',
+                'new' => 'yatra_admin_email_recipient_lists',
             ],
             [
-                'old' => 'yatra_email_enable_admin_notifications',
-                'new' => 'yatra_enable_admin_notifications',
+                'old' => 'yatra_disable_all_email',
+                'new' => 'yatra_disable_all_email',
                 'transform' => function($value) {
                     return $value === 'yes' || $value === true || $value === 1;
                 }
             ],
+
+            // Tax Settings (verified from yatra-pricing-functions.php)
             [
-                'old' => 'yatra_email_enable_customer_notifications',
-                'new' => 'yatra_enable_customer_notifications',
-                'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
-                }
-            ],
-            
-            // Review Settings
-            [
-                'old' => 'yatra_review_enable_reviews',
-                'new' => 'yatra_enable_reviews',
-                'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
-                }
-            ],
-            [
-                'old' => 'yatra_review_require_booking',
-                'new' => 'yatra_require_booking_to_review',
-                'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
-                }
-            ],
-            [
-                'old' => 'yatra_review_auto_approve',
-                'new' => 'yatra_auto_approve_reviews',
-                'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
-                }
-            ],
-            [
-                'old' => 'yatra_review_moderation',
-                'new' => 'yatra_enable_review_moderation',
-                'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
-                }
-            ],
-            
-            // Tax Settings
-            [
-                'old' => 'yatra_tax_enable',
-                'new' => 'yatra_enable_tax',
-                'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
-                }
-            ],
-            [
-                'old' => 'yatra_tax_rate',
+                'old' => 'yatra_payment_tax_rate',
                 'new' => 'yatra_tax_rate',
                 'transform' => function($value) {
                     return floatval($value);
                 }
             ],
+
+            // Layout/Design Settings (verified from hooks and setup wizard)
             [
-                'old' => 'yatra_tax_inclusive',
-                'new' => 'yatra_tax_inclusive',
+                'old' => 'yatra_page_container_class',
+                'new' => 'yatra_page_container_class',
+            ],
+            [
+                'old' => 'yatra_setting_layouts_single_tour_tab_layout',
+                'new' => 'yatra_setting_layouts_single_tour_tab_layout',
+            ],
+            [
+                'old' => 'yatra_setting_layouts_tour_archive',
+                'new' => 'yatra_setting_layouts_tour_archive',
+            ],
+            [
+                'old' => 'yatra_design_primary_color',
+                'new' => 'yatra_design_primary_color',
+            ],
+            [
+                'old' => 'yatra_available_for_booking_color',
+                'new' => 'yatra_available_for_booking_color',
+            ],
+            [
+                'old' => 'yatra_available_for_enquiry_only_color',
+                'new' => 'yatra_available_for_enquiry_only_color',
+            ],
+            [
+                'old' => 'yatra_not_available_for_booking_enquiry_color',
+                'new' => 'yatra_not_available_for_booking_enquiry_color',
+            ],
+
+            // Misc Settings (verified from various files)
+            [
+                'old' => 'yatra_date_selection_type',
+                'new' => 'yatra_date_selection_type',
+            ],
+            [
+                'old' => 'yatra_enquiry_form_show',
+                'new' => 'yatra_enquiry_form_show',
                 'transform' => function($value) {
                     return $value === 'yes' || $value === true || $value === 1;
                 }
             ],
             [
-                'old' => 'yatra_tax_label',
-                'new' => 'yatra_tax_label',
-            ],
-            
-            // Permalink Settings
-            [
-                'old' => 'yatra_permalink_tour_base',
-                'new' => 'yatra_trip_base',
-                'default' => 'trip',
-            ],
-            [
-                'old' => 'yatra_permalink_destination_base',
-                'new' => 'yatra_destination_base',
-                'default' => 'destination',
-            ],
-            [
-                'old' => 'yatra_permalink_activity_base',
-                'new' => 'yatra_activity_base',
-                'default' => 'activity',
-            ],
-            [
-                'old' => 'yatra_permalink_booking_base',
-                'new' => 'yatra_booking_base',
-                'default' => 'book',
-            ],
-            
-            // Advanced Settings
-            [
-                'old' => 'yatra_advanced_debug_mode',
-                'new' => 'yatra_enable_debug_mode',
-                'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
-                }
-            ],
-            [
-                'old' => 'yatra_advanced_delete_data',
-                'new' => 'yatra_delete_data_on_uninstall',
-                'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
-                }
-            ],
-            
-            // Customer Settings
-            [
-                'old' => 'yatra_customer_enable_accounts',
-                'new' => 'yatra_enable_customer_accounts',
-                'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
-                }
-            ],
-            [
-                'old' => 'yatra_customer_enable_registration',
-                'new' => 'yatra_enable_customer_registration',
-                'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
-                }
+                'old' => 'yatra_log_options',
+                'new' => 'yatra_log_options',
             ],
         ];
     }
     
     /**
      * Migrate complex settings (arrays, objects, etc.)
+     *
+     * Verified from old plugin source:
+     *   - yatra_payment_gateways: array of active gateway IDs (from class-yatra-install.php)
+     *   - yatra_permalinks: array with tour_base, activity_base, destination_base, attributes_base
+     *     (from admin/class-yatra-admin-permalinks.php)
      */
     private function migrateComplexSettings(): void
     {
-        // Migrate payment gateway settings
-        $oldGatewaySettings = get_option('yatra_payment_gateways', []);
-        if (!empty($oldGatewaySettings) && is_array($oldGatewaySettings)) {
-            $newGatewayConfigs = [];
-            
-            foreach ($oldGatewaySettings as $gateway => $config) {
-                if (is_array($config)) {
-                    $newGatewayConfigs[$gateway] = $config;
-                }
+        // Migrate active payment gateways list
+        // Old: yatra_payment_gateways = ['paypal', 'booking_only'] (array of gateway IDs)
+        $oldGateways = get_option('yatra_payment_gateways', []);
+        if (!empty($oldGateways) && is_array($oldGateways)) {
+            update_option('yatra_active_payment_gateways', $oldGateways);
+        }
+
+        // Migrate permalink settings
+        // Old: yatra_permalinks = ['yatra_tour_base' => '...', 'yatra_destination_base' => '...', ...]
+        $oldPermalinks = get_option('yatra_permalinks', []);
+        if (!empty($oldPermalinks) && is_array($oldPermalinks)) {
+            if (!empty($oldPermalinks['yatra_tour_base'])) {
+                update_option('yatra_trip_base', $oldPermalinks['yatra_tour_base']);
             }
-            
-            if (!empty($newGatewayConfigs)) {
-                update_option('yatra_gateway_configs', $newGatewayConfigs);
-                }
-        }
-        
-        // Migrate email template settings
-        $emailTemplates = [
-            'booking_confirmation',
-            'booking_cancelled',
-            'booking_completed',
-            'payment_received',
-            'payment_reminder',
-            'admin_new_booking',
-        ];
-        
-        foreach ($emailTemplates as $template) {
-            $oldKey = "yatra_email_template_{$template}";
-            $oldTemplate = get_option($oldKey, null);
-            
-            if ($oldTemplate !== null) {
-                $newKey = "yatra_email_{$template}";
-                update_option($newKey, $oldTemplate);
-                }
-        }
-        
-        // Migrate date/time format settings
-        $dateFormat = get_option('yatra_general_date_format', 'Y-m-d');
-        $timeFormat = get_option('yatra_general_time_format', 'H:i');
-        
-        if ($dateFormat) {
-            update_option('yatra_date_format', $dateFormat);
+            if (!empty($oldPermalinks['yatra_destination_base'])) {
+                update_option('yatra_destination_base', $oldPermalinks['yatra_destination_base']);
             }
-        
-        if ($timeFormat) {
-            update_option('yatra_time_format', $timeFormat);
+            if (!empty($oldPermalinks['yatra_activity_base'])) {
+                update_option('yatra_activity_base', $oldPermalinks['yatra_activity_base']);
             }
-        
-        // Migrate page settings
-        $pages = [
-            'booking_page' => 'yatra_general_booking_page',
-            'customer_account_page' => 'yatra_customer_account_page',
-            'terms_page' => 'yatra_general_terms_page',
-            'privacy_page' => 'yatra_general_privacy_page',
-        ];
-        
-        foreach ($pages as $newKey => $oldKey) {
-            $pageId = get_option($oldKey, 0);
-            if ($pageId) {
-                update_option("yatra_{$newKey}", intval($pageId));
-                }
+            if (!empty($oldPermalinks['yatra_attributes_base'])) {
+                update_option('yatra_attributes_base', $oldPermalinks['yatra_attributes_base']);
+            }
         }
-        
-        }
+    }
 }

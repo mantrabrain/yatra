@@ -13,6 +13,6 @@ class DestinationMigration extends BaseMigration
 
     public function run(): array
     {
-        return $this->migrateTaxonomy('destination', 'yatra_destinations', 'destinations');
+        return $this->migrateTaxonomy('destination', 'destination', 'destinations');
     }
 }

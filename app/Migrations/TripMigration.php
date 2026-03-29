@@ -4,6 +4,8 @@ namespace Yatra\Migration;
 
 use Yatra\Utils\Logger;
 use Yatra\Migration\MigrationProgress;
+use Yatra\Database\Tables\TripsTable;
+use Yatra\Database\Tables\TripContentTable;
 use Yatra\Database\Tables\TripAvailabilityDatesTable;
 
 class TripMigration extends BaseMigration
@@ -63,7 +65,9 @@ class TripMigration extends BaseMigration
                     }
                 }
 
-                $featuredImageId = get_post_thumbnail_id($oldTrip->ID);
+                // Raw SQL: get_post_thumbnail_id internally calls get_post_meta for _thumbnail_id
+                $featuredImageId = $this->getRawPostMeta($oldTrip->ID, '_thumbnail_id');
+                $featuredImageId = $featuredImageId ? (int) $featuredImageId : null;
                 $createdBy = intval($oldTrip->post_author);
 
                 $regularPrice = $this->getLegacyMetaValue($meta, [
@@ -180,7 +184,7 @@ class TripMigration extends BaseMigration
                     }
                 }
 
-                update_post_meta($oldTrip->ID, '_migrated_to_trip_id', $newTripId);
+                $this->setRawPostMeta($oldTrip->ID, '_migrated_to_trip_id', (string) $newTripId);
 
                 $this->migrateTripDestinations($oldTrip->ID, $newTripId);
                 $this->migrateTripActivities($oldTrip->ID, $newTripId);
@@ -296,14 +300,20 @@ class TripMigration extends BaseMigration
         // Log what keys were checked
         // If no gallery meta found, try to get attached images to the tour post
         if (empty($galleryImages)) {
-            $attachedImages = get_attached_media('image', $oldTourId);
+            // Raw SQL: get_attached_media won't reliably work for unregistered CPT parents
+            $attachedImages = $this->wpdb->get_results($this->wpdb->prepare(
+                "SELECT ID, post_excerpt FROM {$this->wpdb->posts}
+                 WHERE post_parent = %d AND post_type = 'attachment' AND post_mime_type LIKE 'image%%'
+                 ORDER BY menu_order ASC",
+                $oldTourId
+            ));
             if (!empty($attachedImages)) {
                 foreach ($attachedImages as $attachment) {
                     $galleryImages[] = [
                         'id' => $attachment->ID,
                         'url' => wp_get_attachment_url($attachment->ID),
                         'thumbnail_url' => wp_get_attachment_thumb_url($attachment->ID),
-                        'alt_text' => get_post_meta($attachment->ID, '_wp_attachment_image_alt', true),
+                        'alt_text' => $this->getRawPostMeta($attachment->ID, '_wp_attachment_image_alt') ?? '',
                         'caption' => $attachment->post_excerpt
                     ];
                 }
@@ -343,7 +353,7 @@ class TripMigration extends BaseMigration
                     }
                     
                     $thumbnailUrl = wp_get_attachment_thumb_url($imageId) ?: $imageUrl;
-                    $altText = get_post_meta($imageId, '_wp_attachment_image_alt', true) ?: '';
+                    $altText = $this->getRawPostMeta($imageId, '_wp_attachment_image_alt') ?? '';
                     $attachment = get_post($imageId);
                     if ($attachment) {
                         $caption = $attachment->post_excerpt ?: '';

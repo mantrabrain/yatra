@@ -145,7 +145,7 @@ class AvailabilityConditionsMigration extends BaseMigration
 
                     // Migrate to recurring rules for each associated trip
                     foreach ($tours as $tour) {
-                        $newTripId = get_post_meta($tour->object_id, '_migrated_to_trip_id', true);
+                        $newTripId = $this->getRawPostMeta((int) $tour->object_id, '_migrated_to_trip_id');
                         
                         if (!$newTripId) {
                             continue;

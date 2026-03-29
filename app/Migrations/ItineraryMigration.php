@@ -2,6 +2,8 @@
 
 namespace Yatra\Migration;
 
+use Yatra\Database\Tables\TripItineraryDaysTable;
+use Yatra\Database\Tables\TripItineraryDayEntryTable;
 use Yatra\Utils\Logger;
 
 /**
@@ -408,8 +410,8 @@ class ItineraryMigration extends BaseMigration
     private function createItinerary(int $tripId, array $itineraryData, int $oldTourId): bool
     {
         try {
-            $tableDays = $this->wpdb->prefix . 'yatra_trip_itinerary_days';
-            $tableEntries = $this->wpdb->prefix . 'yatra_trip_itinerary_entries';
+            $tableDays = TripItineraryDaysTable::getTableName();
+            $tableEntries = TripItineraryDayEntryTable::getTableName();
             
             // Get current user ID for tracking
             $currentUserId = get_current_user_id();
@@ -504,7 +506,7 @@ class ItineraryMigration extends BaseMigration
      */
     private function hasItinerary(int $tripId): bool
     {
-        $tableDays = $this->wpdb->prefix . 'yatra_trip_itinerary_days';
+        $tableDays = TripItineraryDaysTable::getTableName();
         
         $count = (int) $this->wpdb->get_var($this->wpdb->prepare(
             "SELECT COUNT(*) FROM {$tableDays} WHERE trip_id = %d",
@@ -519,21 +521,12 @@ class ItineraryMigration extends BaseMigration
      */
     private function deleteTripItinerary(int $tripId): void
     {
-        $tableDays = $this->wpdb->prefix . 'yatra_trip_itinerary_days';
-        $tableEntries = $this->wpdb->prefix . 'yatra_trip_itinerary_entries';
-        $tableImages = $this->wpdb->prefix . 'yatra_trip_itinerary_entry_images';
+        $tableDays = TripItineraryDaysTable::getTableName();
+        $tableEntries = TripItineraryDayEntryTable::getTableName();
 
         // Delete entries first (foreign key constraint)
         $this->wpdb->delete($tableEntries, ['trip_id' => $tripId], ['%d']);
-        
-        // Delete images
-        $this->wpdb->query($this->wpdb->prepare(
-            "DELETE ti FROM {$tableImages} ti 
-             INNER JOIN {$tableEntries} te ON ti.entry_id = te.id 
-             WHERE te.trip_id = %d",
-            $tripId
-        ));
-        
+
         // Delete days
         $this->wpdb->delete($tableDays, ['trip_id' => $tripId], ['%d']);
     }

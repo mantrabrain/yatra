@@ -196,7 +196,7 @@ class TourDateMigration extends BaseMigration
                     ];
                     
                     $wpdb->insert(
-                        $wpdb->prefix . 'yatra_trip_availability_dates',
+                        TripAvailabilityDatesTable::getTableName(),
                         $availabilityData
                     );
                     

@@ -158,8 +158,8 @@ class ServicesMigration extends BaseMigration
     private function migrateServiceToTrips(int $oldServiceId, string $serviceName, string $serviceSlug, string $description, string $priceType, string $pricePer, float $servicePrice, bool $isRequired): int
     {
         global $wpdb;
-        $services_table = $wpdb->prefix . 'yatra_additional_services';
-        $trip_services_table = $wpdb->prefix . 'yatra_trip_services';
+        $services_table = AdditionalServicesTable::getTableName();
+        $trip_services_table = TripAdditionalServicesTable::getTableName();
         $migrated_count = 0;
 
         // First, check if service already exists in master table
@@ -211,7 +211,7 @@ class ServicesMigration extends BaseMigration
 
         foreach ($tours as $tour) {
             // Get the migrated trip ID
-            $newTripId = get_post_meta($tour->object_id, '_migrated_to_trip_id', true);
+            $newTripId = $this->getRawPostMeta((int) $tour->object_id, '_migrated_to_trip_id');
             
             if (!$newTripId) {
                 continue;

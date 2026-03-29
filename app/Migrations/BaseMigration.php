@@ -47,6 +47,26 @@ abstract class BaseMigration
         return $this->service->getPostMeta($postId);
     }
 
+    protected function getRawPostMeta(int $postId, string $metaKey): ?string
+    {
+        return $this->service->getRawPostMeta($postId, $metaKey);
+    }
+
+    protected function setRawPostMeta(int $postId, string $metaKey, string $metaValue): void
+    {
+        $this->service->setRawPostMeta($postId, $metaKey, $metaValue);
+    }
+
+    protected function getRawTermMeta(int $termId, string $metaKey): ?string
+    {
+        return $this->service->getRawTermMeta($termId, $metaKey);
+    }
+
+    protected function setRawTermMeta(int $termId, string $metaKey, string $metaValue): void
+    {
+        $this->service->setRawTermMeta($termId, $metaKey, $metaValue);
+    }
+
     protected function getLegacyMetaValue(array $meta, array $keys, $default = null)
     {
         return $this->service->getLegacyMetaValue($meta, $keys, $default);
@@ -111,16 +131,25 @@ abstract class BaseMigration
 
     /**
      * Shared taxonomy migration handler.
+     *
+     * Migrates old WordPress taxonomy terms into the unified ClassificationsTable
+     * (wp_yatra_new_classifications) using the `type` column to differentiate.
+     *
+     * @param string $taxonomy Old WordPress taxonomy slug (e.g. 'destination', 'activity', 'attributes')
+     * @param string $classificationType The classification type value for the new table (e.g. 'destination', 'activity', 'attribute')
+     * @param string $dataType Progress tracking key (e.g. 'destinations', 'activities', 'attributes')
      */
-    protected function migrateTaxonomy(string $taxonomy, string $newTable, string $dataType): array
+    protected function migrateTaxonomy(string $taxonomy, string $classificationType, string $dataType): array
     {
         $migrated = 0;
         $skipped = 0;
         $failed = 0;
 
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+
         $terms = $this->wpdb->get_results(
             $this->wpdb->prepare(
-                "SELECT t.*, tt.description 
+                "SELECT t.*, tt.description, tt.parent
                  FROM {$this->wpdb->terms} t
                  INNER JOIN {$this->wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
                  WHERE tt.taxonomy = %s",
@@ -143,27 +172,56 @@ abstract class BaseMigration
 
                 $slug = $baseSlug;
                 $existingId = null;
-                
+
                 if ($this->isForceMigration()) {
-                    // Force migration: Always insert new (create duplicates)
-                    $slug = $this->generateUniqueSlug($baseSlug, $newTable);
+                    // Force migration: generate unique slug
+                    $counter = 1;
+                    $uniqueSlug = $slug;
+                    while ($this->wpdb->get_var($this->wpdb->prepare(
+                        "SELECT id FROM {$classificationsTable} WHERE type = %s AND slug = %s",
+                        $classificationType,
+                        $uniqueSlug
+                    ))) {
+                        $uniqueSlug = $slug . '-' . $counter++;
+                    }
+                    $slug = $uniqueSlug;
                 } else {
-                    // Regular migration: Check if already exists
+                    // Regular migration: Check if already exists by type+slug
                     $existingId = $this->wpdb->get_var($this->wpdb->prepare(
-                        "SELECT id FROM {$this->wpdb->prefix}{$newTable} WHERE slug = %s",
+                        "SELECT id FROM {$classificationsTable} WHERE type = %s AND slug = %s",
+                        $classificationType,
                         $baseSlug
                     ));
-                    
+
                     if (!$existingId) {
                         // Generate unique slug for new insert
-                        $slug = $this->generateUniqueSlug($baseSlug, $newTable);
+                        $counter = 1;
+                        $uniqueSlug = $slug;
+                        while ($this->wpdb->get_var($this->wpdb->prepare(
+                            "SELECT id FROM {$classificationsTable} WHERE type = %s AND slug = %s",
+                            $classificationType,
+                            $uniqueSlug
+                        ))) {
+                            $uniqueSlug = $slug . '-' . $counter++;
+                        }
+                        $slug = $uniqueSlug;
                     }
                 }
 
+                // Get term meta for featured image / icon using raw SQL
+                $termImage = $this->getRawTermMeta((int) $term->term_id, 'yatra_term_image');
+                $metadata = [];
+                if (!empty($termImage)) {
+                    $metadata['featured_image'] = $termImage;
+                }
+
                 $data = [
+                    'type' => $classificationType,
                     'name' => $term->name,
                     'slug' => $slug,
                     'description' => $term->description ?? '',
+                    'parent_id' => !empty($term->parent) ? $this->getParentClassificationId($term->parent, $taxonomy, $classificationType) : null,
+                    'metadata' => !empty($metadata) ? json_encode($metadata) : null,
                     'status' => 'publish',
                     'updated_at' => current_time('mysql'),
                 ];
@@ -171,16 +229,14 @@ abstract class BaseMigration
                 if ($existingId && !$this->isForceMigration()) {
                     // Regular migration: Update existing record
                     $updated = $this->wpdb->update(
-                        $this->wpdb->prefix . $newTable,
+                        $classificationsTable,
                         $data,
                         ['id' => $existingId]
                     );
-                    
+
                     if ($updated !== false) {
                         $newId = $existingId;
-                        if (function_exists('update_term_meta')) {
-                            update_term_meta($term->term_id, $metaKey, $newId);
-                        }
+                        $this->setRawTermMeta((int) $term->term_id, $metaKey, (string) $newId);
                         $migrated++;
                         $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
                         usleep(50000);
@@ -197,15 +253,13 @@ abstract class BaseMigration
                     // Force migration OR new record: Insert new
                     $data['created_at'] = current_time('mysql');
                     $inserted = $this->wpdb->insert(
-                        $this->wpdb->prefix . $newTable,
+                        $classificationsTable,
                         $data
                     );
 
                     if ($inserted) {
                         $newId = (int) $this->wpdb->insert_id;
-                        if (function_exists('update_term_meta')) {
-                            update_term_meta($term->term_id, $metaKey, $newId);
-                        }
+                        $this->setRawTermMeta((int) $term->term_id, $metaKey, (string) $newId);
                         $migrated++;
                         $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
                         usleep(50000);
@@ -224,12 +278,22 @@ abstract class BaseMigration
                 Logger::error("Exception migrating {$taxonomy}: " . $e->getMessage(), [
                     'source' => 'migration',
                     'taxonomy' => $taxonomy,
-                    'term_slug' => $term->slug
+                    'term_slug' => $term->slug ?? 'unknown'
                 ]);
                 $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
             }
         }
 
         return compact('migrated', 'skipped', 'failed');
+    }
+
+    /**
+     * Look up the new classifications table ID for a parent term
+     */
+    private function getParentClassificationId(int $parentTermId, string $taxonomy, string $classificationType): ?int
+    {
+        $metaKey = sprintf('_yatra_migrated_%s_id', $taxonomy);
+        $parentNewId = $this->getRawTermMeta($parentTermId, $metaKey);
+        return $parentNewId ? (int) $parentNewId : null;
     }
 }

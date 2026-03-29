@@ -13,6 +13,6 @@ class ActivityMigration extends BaseMigration
 
     public function run(): array
     {
-        return $this->migrateTaxonomy('activity', 'yatra_activities', 'activities');
+        return $this->migrateTaxonomy('activity', 'activity', 'activities');
     }
 }

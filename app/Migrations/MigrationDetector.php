@@ -129,6 +129,12 @@ class MigrationDetector
                 'description' => 'Availability rules and conditions (Premium)',
                 'table' => 'term_taxonomy (availability_conditions)',
             ],
+            'traveler_categories' => [
+                'label' => 'Traveler Categories',
+                'count' => $this->countOldTravelerCategories(),
+                'description' => 'Multiple pricing / traveler-based pricing options',
+                'table' => 'postmeta (yatra_multiple_pricing on tour posts)',
+            ],
         ];
     }
     
@@ -222,13 +228,16 @@ class MigrationDetector
     }
     
     /**
-     * Count old reviews (stored as comments)
+     * Count old reviews (stored as comments on tour posts)
      */
     private function countOldReviews(): int
     {
         $count = $this->wpdb->get_var(
-            "SELECT COUNT(*) FROM {$this->wpdb->comments} 
-             WHERE comment_type = 'yatra_review'"
+            "SELECT COUNT(*) FROM {$this->wpdb->comments} c
+             INNER JOIN {$this->wpdb->posts} p ON c.comment_post_ID = p.ID
+             WHERE p.post_type = 'tour'
+             AND c.comment_type IN ('', 'comment', 'review', 'yatra_review')
+             AND c.comment_approved != 'trash'"
         );
         
         return (int) $count;
@@ -366,6 +375,25 @@ class MigrationDetector
         return (int) $count;
     }
     
+    /**
+     * Count old traveler categories (tours with multiple pricing in postmeta)
+     */
+    private function countOldTravelerCategories(): int
+    {
+        $count = $this->wpdb->get_var(
+            "SELECT COUNT(DISTINCT pm.post_id)
+             FROM {$this->wpdb->postmeta} pm
+             INNER JOIN {$this->wpdb->posts} p ON pm.post_id = p.ID
+             WHERE pm.meta_key = 'yatra_multiple_pricing'
+             AND p.post_type = 'tour'
+             AND pm.meta_value != ''
+             AND pm.meta_value != 'a:0:{}'
+             AND p.post_status != 'trash'"
+        );
+
+        return (int) $count;
+    }
+
     /**
      * Check if a table exists
      */

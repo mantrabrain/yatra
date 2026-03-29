@@ -238,22 +238,40 @@ class Bootstrap
      */
     private function ensureDatabaseTables(): void
     {
-
         // Register migration routes
         add_action('rest_api_init', function() {
-            if (class_exists('\Yatra\Migrations\MigrationController')) {
-                $migrationController = new \Yatra\Migrations\MigrationController();
+            // Temporarily manually require migration files until autoloader is fixed
+            $migrationFiles = [
+                __DIR__ . '/Migrations/MigrationController.php',
+                __DIR__ . '/Migrations/MigrationProgress.php',
+                __DIR__ . '/Migrations/MigrationDetector.php',
+            ];
+            
+            foreach ($migrationFiles as $file) {
+                if (file_exists($file)) {
+                    require_once $file;
+                }
+            }
+            
+            if (class_exists('\Yatra\Migration\MigrationController')) {
+                $migrationController = new \Yatra\Migration\MigrationController();
                 $migrationController->registerRoutes();
             }
         });
         
         // Register Action Scheduler hook for background migration processing
         add_action('yatra_migrate_data_type', function($dataType, $force = false) {
-            if (class_exists('\Yatra\Migrations\MigrationProgress')) {
-                $migrationService = new \Yatra\Migrations\MigrationProgress();
+            if (class_exists('\Yatra\Migration\MigrationProgress')) {
+                $migrationService = new \Yatra\Migration\MigrationProgress();
                 $result = $migrationService->processMigration($dataType, (bool) $force);
+                
+                // Log result for debugging
+                if (isset($result['success']) && $result['success']) {
+                    error_log("Yatra Migration completed for {$dataType}: migrated={$result['migrated']}, skipped={$result['skipped']}, failed={$result['failed']}");
                 } else {
+                    error_log("Yatra Migration failed for {$dataType}: " . ($result['error'] ?? 'Unknown error'));
                 }
+            }
         }, 10, 2);
     }
 

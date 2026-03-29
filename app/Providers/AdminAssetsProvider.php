@@ -206,6 +206,40 @@ class AdminAssetsProvider
             if (file_exists($appJs)) {
                 $jsVersion = YATRA_VERSION . '.' . filemtime($appJs) . '.view-icon-fix.' . time() . '.' . microtime(true);
 
+                // Get current user for permissions
+                $current_user = wp_get_current_user();
+                
+                // Get user capabilities
+                $capabilities = [];
+                if ($current_user->ID > 0) {
+                    $user_caps = $current_user->allcaps;
+                    foreach ($user_caps as $cap => $has_cap) {
+                        if ($has_cap && strpos($cap, 'yatra_') === 0) {
+                            $capabilities[$cap] = true;
+                        }
+                    }
+                }
+                
+                // Localize data for production
+                $localized_data = apply_filters('yatra_admin_localized_data', [
+                    'apiUrl' => rest_url('yatra/v1'),
+                    'licenseStatus' => 'inactive',
+                    'restUrl' => rest_url(),
+                    'nonce' => wp_create_nonce('wp_rest'),
+                    'currentUser' => $current_user->ID,
+                    'currentUserEmail' => $current_user->user_email,
+                    'currentUserDisplayName' => $current_user->display_name,
+                    'currentUserLogin' => $current_user->user_login,
+                    'currentUserAvatar' => get_avatar($current_user->ID, 96),
+                    'siteUrl' => home_url(),
+                    'adminUrl' => admin_url('admin.php'),
+                    'capabilities' => $capabilities,
+                    'roles' => $current_user->roles,
+                    'isPro' => defined('YATRA_PRO_VERSION'),
+                    'version' => defined('YATRA_VERSION') ? YATRA_VERSION : '1.0.0',
+                    'proVersion' => defined('YATRA_PRO_VERSION') ? YATRA_PRO_VERSION : null,
+                ]);
+
                 // Enqueue our script with media library as dependency
                 wp_enqueue_script(
                     'yatra-admin',
@@ -224,6 +258,9 @@ class AdminAssetsProvider
                     $jsVersion,
                     true
                 );
+
+                // Localize script data
+                wp_localize_script('yatra-admin', 'yatraAdmin', $localized_data);
             }
         }
     }

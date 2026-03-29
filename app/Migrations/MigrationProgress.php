@@ -11,7 +11,9 @@ namespace Yatra\Migration;
 use Yatra\Constants\ClassificationTypes;
 use Yatra\Core\Database;
 use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Database\Tables\DeparturesTable;
 use Yatra\Database\Tables\DiscountsTable;
+use Yatra\Database\Tables\TripsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Utils\Logger;
 use Yatra\Migration\TripMigration;
@@ -27,6 +29,7 @@ use Yatra\Migration\TravelerCategoriesMigration;
 use Yatra\Migration\AttributeMigration;
 use Yatra\Migration\SettingsMigration;
 use Yatra\Migration\ServicesMigration;
+use Yatra\Migration\ItineraryMigration;
 use Yatra\Migration\AvailabilityConditionsMigration;
 
 class MigrationProgress
@@ -52,6 +55,7 @@ class MigrationProgress
      * @var string[]
      */
     private array $dataTypesOrder = [
+        'settings',
         'destinations',
         'activities',
         'attributes',
@@ -163,7 +167,7 @@ class MigrationProgress
         $startTime = microtime(true);
         
         // Get total count before starting migration
-        $detector = new \Yatra\Migrations\MigrationDetector();
+        $detector = new \Yatra\Migration\MigrationDetector();
         $oldData = $detector->detectOldData();
         $total = $oldData[$dataType]['count'] ?? 0;
         
@@ -376,9 +380,12 @@ class MigrationProgress
             update_option('yatra_migration_progress', $progress);
             update_option('yatra_migration_started_at', current_time('mysql'));
             
-            // Schedule migrations for each data type
+            // Schedule migrations for each data type with sequential delays
             $scheduledActions = [];
-            foreach ($this->dataTypesOrder as $dataType) {
+            $baseTime = time();
+            $delaySeconds = 30; // 30 seconds between each data type
+            
+            foreach ($this->dataTypesOrder as $index => $dataType) {
                 $args = [
                     'data_type' => $dataType,
                 ];
@@ -387,14 +394,21 @@ class MigrationProgress
                     $args['force'] = true;
                 }
 
+                // Schedule with increasing delay to ensure sequential execution
+                $scheduledTime = $baseTime + ($index * $delaySeconds);
+                
                 $actionId = as_schedule_single_action(
-                    time(),
+                    $scheduledTime,
                     'yatra_migrate_data_type',
                     $args,
                     'yatra_migration'
                 );
                 
-                $scheduledActions[$dataType] = $actionId;
+                $scheduledActions[$dataType] = [
+                    'action_id' => $actionId,
+                    'scheduled_time' => $scheduledTime,
+                    'delay_seconds' => $index * $delaySeconds
+                ];
             }
             
             $response = [
@@ -533,25 +547,108 @@ class MigrationProgress
     
     public function isTripMigrated(int $oldTripId): bool
     {
-        return (bool) get_post_meta($oldTripId, '_migrated_to_trip_id', true);
+        return (bool) $this->getRawPostMeta($oldTripId, '_migrated_to_trip_id');
     }
     
     public function getMigratedTripId(int $oldTripId): ?int
     {
-        $newId = get_post_meta($oldTripId, '_migrated_to_trip_id', true);
+        $newId = $this->getRawPostMeta($oldTripId, '_migrated_to_trip_id');
         return $newId ? (int) $newId : null;
     }
     
+    /**
+     * Get all post meta for a post using raw SQL.
+     * Old post types (tour, yatra-booking, etc.) are NOT registered in the new plugin,
+     * so we must use raw queries instead of get_post_meta().
+     */
     public function getPostMeta(int $postId): array
     {
-        $meta = get_post_meta($postId);
+        $rows = $this->wpdb->get_results($this->wpdb->prepare(
+            "SELECT meta_key, meta_value FROM {$this->wpdb->postmeta} WHERE post_id = %d",
+            $postId
+        ));
+
         $result = [];
-        
-        foreach ($meta as $key => $value) {
-            $result[$key] = is_array($value) && count($value) === 1 ? $value[0] : $value;
+        foreach ($rows as $row) {
+            $result[$row->meta_key] = $row->meta_value;
         }
-        
+
         return $result;
+    }
+
+    /**
+     * Get a single post meta value using raw SQL.
+     */
+    public function getRawPostMeta(int $postId, string $metaKey): ?string
+    {
+        return $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT meta_value FROM {$this->wpdb->postmeta} WHERE post_id = %d AND meta_key = %s LIMIT 1",
+            $postId,
+            $metaKey
+        ));
+    }
+
+    /**
+     * Set/update a post meta value using raw SQL.
+     */
+    public function setRawPostMeta(int $postId, string $metaKey, string $metaValue): void
+    {
+        $exists = $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT meta_id FROM {$this->wpdb->postmeta} WHERE post_id = %d AND meta_key = %s LIMIT 1",
+            $postId,
+            $metaKey
+        ));
+
+        if ($exists) {
+            $this->wpdb->update(
+                $this->wpdb->postmeta,
+                ['meta_value' => $metaValue],
+                ['post_id' => $postId, 'meta_key' => $metaKey]
+            );
+        } else {
+            $this->wpdb->insert(
+                $this->wpdb->postmeta,
+                ['post_id' => $postId, 'meta_key' => $metaKey, 'meta_value' => $metaValue]
+            );
+        }
+    }
+
+    /**
+     * Get a single term meta value using raw SQL.
+     * Old taxonomies (destination, activity, attributes) are NOT registered in the new plugin.
+     */
+    public function getRawTermMeta(int $termId, string $metaKey): ?string
+    {
+        return $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT meta_value FROM {$this->wpdb->termmeta} WHERE term_id = %d AND meta_key = %s LIMIT 1",
+            $termId,
+            $metaKey
+        ));
+    }
+
+    /**
+     * Set/update a term meta value using raw SQL.
+     */
+    public function setRawTermMeta(int $termId, string $metaKey, string $metaValue): void
+    {
+        $exists = $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT meta_id FROM {$this->wpdb->termmeta} WHERE term_id = %d AND meta_key = %s LIMIT 1",
+            $termId,
+            $metaKey
+        ));
+
+        if ($exists) {
+            $this->wpdb->update(
+                $this->wpdb->termmeta,
+                ['meta_value' => $metaValue],
+                ['term_id' => $termId, 'meta_key' => $metaKey]
+            );
+        } else {
+            $this->wpdb->insert(
+                $this->wpdb->termmeta,
+                ['term_id' => $termId, 'meta_key' => $metaKey, 'meta_value' => $metaValue]
+            );
+        }
     }
 
     /**
@@ -682,240 +779,271 @@ class MigrationProgress
     
     /**
      * Migrate coupons from old custom post type
+     * NOTE: This is a legacy duplicate method. The primary coupon migration
+     * is handled by CouponMigration class with correct meta key mappings.
+     * This method is kept for backward compatibility but delegates to CouponMigration.
      */
     public function migrateCoupons(): array
     {
-        global $wpdb;
-        
-        $migrated = 0;
-        $skipped = 0;
-        $failed = 0;
-        
-        // Get all old coupons
-        $oldCoupons = $wpdb->get_results(
-            "SELECT * FROM {$wpdb->posts} 
-             WHERE post_type = 'yatra-coupons' 
-             AND post_status IN ('publish', 'draft')"
-        );
-        $total = count($oldCoupons);
-        
-        foreach ($oldCoupons as $oldCoupon) {
-            try {
-                // Check if already migrated
-                if (get_post_meta($oldCoupon->ID, '_migrated_to_coupon_id', true)) {
-                    $skipped++;
-                    $this->updateProgress('coupons', 'running', $migrated, $skipped, $failed, $total, null, null);
-                    continue;
-                }
-                
-                // Get all coupon meta data
-                $meta = $this->getPostMeta($oldCoupon->ID);
-                
-                // Create new coupon in yatra_coupons table
-                $couponData = [
-                    'code' => $oldCoupon->post_title,
-                    'description' => $oldCoupon->post_content,
-                    'discount_type' => $meta['yatra_coupon_discount_type'] ?? 'percentage',
-                    'discount_amount' => floatval($meta['yatra_coupon_discount_amount'] ?? 0),
-                    'minimum_amount' => floatval($meta['yatra_coupon_minimum_amount'] ?? 0),
-                    'maximum_amount' => floatval($meta['yatra_coupon_maximum_amount'] ?? 0),
-                    'usage_limit' => intval($meta['yatra_coupon_usage_limit'] ?? 0),
-                    'usage_count' => intval($meta['yatra_coupon_usage_count'] ?? 0),
-                    'start_date' => $meta['yatra_coupon_start_date'] ?? null,
-                    'end_date' => $meta['yatra_coupon_end_date'] ?? null,
-                    'status' => $oldCoupon->post_status === 'publish' ? 'active' : 'inactive',
-                    'created_at' => $oldCoupon->post_date,
-                    'updated_at' => $oldCoupon->post_modified,
-                ];
-                
-                $wpdb->insert(
-                    DiscountsTable::getTableName(),
-                    $couponData
-                );
-                
-                $newCouponId = $wpdb->insert_id;
-                
-                if ($newCouponId) {
-                    // Mark as migrated
-                    update_post_meta($oldCoupon->ID, '_migrated_to_coupon_id', $newCouponId);
-                    $migrated++;
-                    $this->updateProgress('coupons', 'running', $migrated, $skipped, $failed, $total, null, null);
-                } else {
-                    $failed++;
-                    $this->updateProgress('coupons', 'running', $migrated, $skipped, $failed, $total, null, null);
-                }
-                
-            } catch (\Exception $e) {
-                $failed++;
-                $this->updateProgress('coupons', 'running', $migrated, $skipped, $failed, $total, null, null);
-                }
-        }
-        
-        return [
-            'migrated' => $migrated,
-            'skipped' => $skipped,
-            'failed' => $failed,
-        ];
+        return (new CouponMigration($this))->run();
     }
     
     /**
-     * Migrate tour dates from old table structure
+     * Migrate tour dates from old table structure.
+     *
+     * Old table: wp_yatra_tour_dates (start_date, end_date, max_travellers, pricing, active, note_to_customer, note_to_admin)
+     * New table: DeparturesTable (trip_id, date, time, max_capacity, booked_count, status, source, price_override, notes)
      */
     public function migrateTourDates(): array
     {
         global $wpdb;
-        
+
         $migrated = 0;
         $skipped = 0;
         $failed = 0;
-        
+
         $oldTable = $wpdb->prefix . 'yatra_tour_dates';
-        
+        $departuresTable = DeparturesTable::getTableName();
+
         // Check if old table exists
         if ($wpdb->get_var("SHOW TABLES LIKE '{$oldTable}'") !== $oldTable) {
-            return [
-                'migrated' => 0,
-                'skipped' => 0,
-                'failed' => 0,
-            ];
+            return compact('migrated', 'skipped', 'failed');
         }
-        
+
         // Get all old tour dates
         $oldTourDates = $wpdb->get_results("SELECT * FROM {$oldTable}");
         $total = count($oldTourDates);
-        
+
         foreach ($oldTourDates as $oldDate) {
             try {
-                // Check if already migrated
-                $exists = $wpdb->get_var($wpdb->prepare(
-                    "SELECT id FROM {$wpdb->prefix}yatra_departures 
-                     WHERE old_tour_date_id = %d",
-                    $oldDate->id
-                ));
-                
-                if ($exists) {
-                    $skipped++;
-                    $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
-                    continue;
-                }
-                
                 // Get the migrated trip ID
                 $newTripId = $this->getMigratedTripId($oldDate->tour_id);
-                
+
                 if (!$newTripId) {
                     $failed++;
                     $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
                     continue;
                 }
-                
-                // Create new departure
+
+                // Check if a departure for this trip+date already exists
+                $startDate = $oldDate->start_date ?? null;
+                if (empty($startDate)) {
+                    $skipped++;
+                    $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
+                    continue;
+                }
+
+                $exists = $wpdb->get_var($wpdb->prepare(
+                    "SELECT id FROM {$departuresTable} WHERE trip_id = %d AND date = %s",
+                    $newTripId,
+                    $startDate
+                ));
+
+                if ($exists && !$this->isForceMigration()) {
+                    $skipped++;
+                    $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
+                    continue;
+                }
+
+                // Parse pricing override
+                $priceOverride = null;
+                $priceByTravelerType = null;
+                if (!empty($oldDate->pricing)) {
+                    $pricing = maybe_unserialize($oldDate->pricing);
+                    if (is_numeric($pricing)) {
+                        $priceOverride = (float) $pricing;
+                    } elseif (is_array($pricing)) {
+                        $priceByTravelerType = json_encode($pricing);
+                    }
+                }
+
+                // Combine notes
+                $notes = trim(
+                    ($oldDate->note_to_customer ?? '') .
+                    (!empty($oldDate->note_to_admin) ? "\n[Admin] " . $oldDate->note_to_admin : '')
+                );
+
                 $departureData = [
                     'trip_id' => $newTripId,
-                    'start_date' => $oldDate->start_date,
-                    'end_date' => $oldDate->end_date,
-                    'max_travelers' => $oldDate->max_travellers ?? 0,
-                    'available_seats' => $oldDate->max_travellers ?? 0,
-                    'price_override' => !empty($oldDate->pricing) ? maybe_unserialize($oldDate->pricing) : null,
-                    'status' => $oldDate->active ? 'confirmed' : 'cancelled',
-                    'notes' => $oldDate->note_to_customer ?? '',
-                    'admin_notes' => $oldDate->note_to_admin ?? '',
-                    'old_tour_date_id' => $oldDate->id,
-                    'created_at' => $oldDate->created_at,
-                    'updated_at' => $oldDate->updated_at,
+                    'date' => $startDate,
+                    'time' => null,
+                    'max_capacity' => (int) ($oldDate->max_travellers ?? 0),
+                    'booked_count' => 0,
+                    'status' => !empty($oldDate->active) ? 'upcoming' : 'cancelled',
+                    'source' => 'migrated',
+                    'price_override' => $priceOverride,
+                    'price_by_traveler_type' => $priceByTravelerType,
+                    'notes' => !empty($notes) ? $notes : null,
+                    'created_at' => $oldDate->created_at ?? current_time('mysql'),
+                    'updated_at' => $oldDate->updated_at ?? current_time('mysql'),
                 ];
-                
-                $wpdb->insert(
-                    $wpdb->prefix . 'yatra_departures',
-                    $departureData
-                );
-                
-                if ($wpdb->insert_id) {
+
+                if ($exists && $this->isForceMigration()) {
+                    $wpdb->update($departuresTable, $departureData, ['id' => $exists]);
                     $migrated++;
-                    $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
                 } else {
-                    $failed++;
-                    $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
+                    $inserted = $wpdb->insert($departuresTable, $departureData);
+                    if ($inserted) {
+                        $migrated++;
+                    } else {
+                        $failed++;
+                        Logger::error("Failed to insert departure: {$wpdb->last_error}", [
+                            'source' => 'migration', 'data_type' => 'tour_dates'
+                        ]);
+                    }
                 }
-                
+
+                $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
+
             } catch (\Exception $e) {
                 $failed++;
                 $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
-                }
+            }
         }
-        
-        return [
-            'migrated' => $migrated,
-            'skipped' => $skipped,
-            'failed' => $failed,
-        ];
+
+        return compact('migrated', 'skipped', 'failed');
     }
     
     /**
-     * Migrate trip destinations relationship
+     * Migrate trip destinations relationship.
+     *
+     * Uses raw SQL to query wp_term_relationships + wp_term_taxonomy + wp_terms
+     * because the old 'destination' taxonomy is NOT registered in the new plugin.
+     * Inserts into ClassificationsTable (type=destination) looked up by slug,
+     * and links via TripClassificationsTable.
      */
     public function migrateTripDestinations(int $oldTripId, int $newTripId): void
     {
-        // Get old trip destinations from taxonomy relationships
-        $destinations = wp_get_post_terms($oldTripId, 'destination', ['fields' => 'all']);
-        
-        if (empty($destinations) || is_wp_error($destinations)) {
+        // Raw SQL: get terms assigned to this post via the 'destination' taxonomy
+        $destinations = $this->wpdb->get_results($this->wpdb->prepare(
+            "SELECT t.term_id, t.name, t.slug
+             FROM {$this->wpdb->terms} t
+             INNER JOIN {$this->wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+             INNER JOIN {$this->wpdb->term_relationships} tr ON tt.term_taxonomy_id = tr.term_taxonomy_id
+             WHERE tr.object_id = %d AND tt.taxonomy = 'destination'",
+            $oldTripId
+        ));
+
+        if (empty($destinations)) {
             return;
         }
-        
+
+        $classificationsTable = ClassificationsTable::getTableName();
+        $tripClassificationsTable = TripClassificationsTable::getTableName();
+
         foreach ($destinations as $index => $destination) {
-            // Find the migrated destination ID
+            // Find the migrated destination in the unified ClassificationsTable
             $newDestinationId = $this->wpdb->get_var($this->wpdb->prepare(
-                "SELECT id FROM {$this->wpdb->prefix}yatra_destinations WHERE slug = %s",
-                $destination->slug
+                "SELECT id FROM {$classificationsTable} WHERE slug = %s AND type = %s",
+                $destination->slug,
+                ClassificationTypes::DESTINATION
             ));
-            
+
+            if (!$newDestinationId) {
+                // Also try looking up by term meta mapping
+                $mappedId = $this->getRawTermMeta((int) $destination->term_id, '_yatra_migrated_destination_id');
+                if ($mappedId) {
+                    $newDestinationId = (int) $mappedId;
+                }
+            }
+
             if ($newDestinationId) {
-                $this->wpdb->insert(
-                    $this->wpdb->prefix . 'yatra_trip_destinations',
-                    [
-                        'trip_id' => $newTripId,
-                        'destination_id' => $newDestinationId,
-                        'is_primary' => ($index === 0) ? 1 : 0,
-                        'order' => $index,
-                        'created_at' => current_time('mysql'),
-                    ]
-                );
+                // Check if relationship already exists
+                $exists = $this->wpdb->get_var($this->wpdb->prepare(
+                    "SELECT id FROM {$tripClassificationsTable}
+                     WHERE trip_id = %d AND classification_id = %d AND classification_type = %s",
+                    $newTripId,
+                    $newDestinationId,
+                    ClassificationTypes::DESTINATION
+                ));
+
+                if (!$exists) {
+                    $this->wpdb->insert(
+                        $tripClassificationsTable,
+                        [
+                            'trip_id' => $newTripId,
+                            'classification_id' => $newDestinationId,
+                            'classification_type' => ClassificationTypes::DESTINATION,
+                            'relationship_type' => ($index === 0) ? 'primary' : 'secondary',
+                            'sort_order' => $index,
+                            'is_active' => 1,
+                            'created_at' => current_time('mysql'),
+                            'updated_at' => current_time('mysql'),
+                        ]
+                    );
+                }
             }
         }
     }
-    
+
     /**
-     * Migrate trip activities relationship
+     * Migrate trip activities relationship.
+     *
+     * Uses raw SQL to query wp_term_relationships + wp_term_taxonomy + wp_terms
+     * because the old 'activity' taxonomy is NOT registered in the new plugin.
+     * Inserts into ClassificationsTable (type=activity) looked up by slug,
+     * and links via TripClassificationsTable.
      */
     public function migrateTripActivities(int $oldTripId, int $newTripId): void
     {
-        // Get old trip activities from taxonomy relationships
-        $activities = wp_get_post_terms($oldTripId, 'activity', ['fields' => 'all']);
-        
-        if (empty($activities) || is_wp_error($activities)) {
+        // Raw SQL: get terms assigned to this post via the 'activity' taxonomy
+        $activities = $this->wpdb->get_results($this->wpdb->prepare(
+            "SELECT t.term_id, t.name, t.slug
+             FROM {$this->wpdb->terms} t
+             INNER JOIN {$this->wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+             INNER JOIN {$this->wpdb->term_relationships} tr ON tt.term_taxonomy_id = tr.term_taxonomy_id
+             WHERE tr.object_id = %d AND tt.taxonomy = 'activity'",
+            $oldTripId
+        ));
+
+        if (empty($activities)) {
             return;
         }
-        
-        foreach ($activities as $index => $activity) {
 
-            $classfication_table = ClassificationsTable::getTableName();
-            // Find the migrated activity ID
+        $classificationsTable = ClassificationsTable::getTableName();
+        $tripClassificationsTable = TripClassificationsTable::getTableName();
+
+        foreach ($activities as $index => $activity) {
+            // Find the migrated activity in the unified ClassificationsTable
             $newActivityId = $this->wpdb->get_var($this->wpdb->prepare(
-                "SELECT id FROM {$classfication_table} WHERE slug = %s and type=%s",
+                "SELECT id FROM {$classificationsTable} WHERE slug = %s AND type = %s",
                 $activity->slug,
                 ClassificationTypes::ACTIVITY
             ));
-            
+
+            if (!$newActivityId) {
+                // Also try looking up by term meta mapping
+                $mappedId = $this->getRawTermMeta((int) $activity->term_id, '_yatra_migrated_activity_id');
+                if ($mappedId) {
+                    $newActivityId = (int) $mappedId;
+                }
+            }
+
             if ($newActivityId) {
-                $this->wpdb->insert(
-                    TripClassificationsTable::getTableName(),
-                    [
-                        'trip_id' => $newTripId,
-                        'classification_id' => $newActivityId,
-                        'sort_order' => $index,
-                        'created_at' => current_time('mysql'),
-                    ]
-                );
+                // Check if relationship already exists
+                $exists = $this->wpdb->get_var($this->wpdb->prepare(
+                    "SELECT id FROM {$tripClassificationsTable}
+                     WHERE trip_id = %d AND classification_id = %d AND classification_type = %s",
+                    $newTripId,
+                    $newActivityId,
+                    ClassificationTypes::ACTIVITY
+                ));
+
+                if (!$exists) {
+                    $this->wpdb->insert(
+                        $tripClassificationsTable,
+                        [
+                            'trip_id' => $newTripId,
+                            'classification_id' => $newActivityId,
+                            'classification_type' => ClassificationTypes::ACTIVITY,
+                            'relationship_type' => 'primary',
+                            'sort_order' => $index,
+                            'is_active' => 1,
+                            'created_at' => current_time('mysql'),
+                            'updated_at' => current_time('mysql'),
+                        ]
+                    );
+                }
             }
         }
     }
@@ -931,7 +1059,14 @@ class MigrationProgress
         delete_option('yatra_migration_started_at');
 
         // For forced runs we only clear the mapping meta so records can reprocess.
-        foreach (['_migrated_to_trip_id', '_migrated_to_coupon_id'] as $metaKey) {
+        $migrationMetaKeys = [
+            '_migrated_to_trip_id',
+            '_migrated_to_coupon_id',
+            '_migrated_to_customer_id',
+            '_migrated_to_booking_id',
+            '_migrated_to_payment_id',
+        ];
+        foreach ($migrationMetaKeys as $metaKey) {
             $wpdb->query(
                 $wpdb->prepare(
                     "DELETE FROM {$wpdb->postmeta} WHERE meta_key = %s",
@@ -945,22 +1080,19 @@ class MigrationProgress
     }
 
     /**
-     * Clear trip relationship tables before re-inserting fresh links.
+     * Clear trip classification relationships before re-inserting fresh links.
+     * Uses the unified TripClassificationsTable (not old separate tables).
      */
     public function deleteTripRelationships(int $tripId): void
     {
-        $tables = [
-            'yatra_trip_destinations',
-            'yatra_trip_activities',
-        ];
+        $tripClassificationsTable = TripClassificationsTable::getTableName();
 
-        foreach ($tables as $table) {
-            $this->wpdb->delete(
-                $this->wpdb->prefix . $table,
-                ['trip_id' => $tripId],
-                ['%d']
-            );
-        }
+        // Delete all classification relationships for this trip (destinations, activities, attributes, etc.)
+        $this->wpdb->delete(
+            $tripClassificationsTable,
+            ['trip_id' => $tripId],
+            ['%d']
+        );
     }
 
     /**
