@@ -328,24 +328,22 @@ class MigrationProgress
     }
     
     /**
-     * Migrate all data types using Action Scheduler
+     * Migrate all data types.
+     *
+     * Attempts Action Scheduler first; falls back to direct synchronous
+     * processing when AS cron is broken (common in Local by Flywheel
+     * and similar environments).
      */
     public function migrateAll(bool $force = false): array
     {
         try {
             $this->ensureSchemaUpToDate();
-
-            // Check if Action Scheduler is available
-            if (!function_exists('as_schedule_single_action')) {
-                throw new \Exception('WooCommerce Action Scheduler is not available');
-            }
-
             $this->forceMigration = $force;
 
             if ($this->forceMigration) {
                 $this->resetMigratedData();
             }
-            
+
             // Check if migration is already running
             $progress = $this->getMigrationProgress();
             if ($progress['any_running'] && !$progress['all_complete']) {
@@ -354,81 +352,120 @@ class MigrationProgress
                     'error' => 'Migration is already in progress. Please wait for it to complete.',
                 ];
             }
-            
-            // Get old data counts first
-            $detector = new MigrationDetector();
-            $oldData = $detector->detectOldData();
-            
-            // Initialize migration progress tracking with actual counts
-            $progress = [];
-            foreach ($this->dataTypesOrder as $dataType) {
-                // Get the count from old data detection
-                $count = isset($oldData[$dataType]) ? (int)$oldData[$dataType]['count'] : 0;
-                
-                $progress[$dataType] = [
-                    'status' => 'pending',
-                    'migrated' => 0,
-                    'skipped' => 0,
-                    'failed' => 0,
-                    'total' => $count,
-                    'started_at' => null,
-                    'completed_at' => null,
-                ];
-            }
-            
-            // Save initial progress state
-            update_option('yatra_migration_progress', $progress);
-            update_option('yatra_migration_started_at', current_time('mysql'));
-            
-            // Schedule migrations for each data type with sequential delays
-            $scheduledActions = [];
-            $baseTime = time();
-            $delaySeconds = 30; // 30 seconds between each data type
-            
-            foreach ($this->dataTypesOrder as $index => $dataType) {
-                $args = [
-                    'data_type' => $dataType,
-                ];
 
-                if ($this->forceMigration) {
-                    $args['force'] = true;
-                }
+            // Initialize progress tracking in DB
+            $this->initializeProgress($force);
 
-                // Schedule with increasing delay to ensure sequential execution
-                $scheduledTime = $baseTime + ($index * $delaySeconds);
-                
-                $actionId = as_schedule_single_action(
-                    $scheduledTime,
-                    'yatra_migrate_data_type',
-                    $args,
-                    'yatra_migration'
-                );
-                
-                $scheduledActions[$dataType] = [
-                    'action_id' => $actionId,
-                    'scheduled_time' => $scheduledTime,
-                    'delay_seconds' => $index * $delaySeconds
-                ];
-            }
+            // Schedule background process
+            wp_schedule_single_event(time(), 'yatra_migration_background_run', [$force]);
             
-            $response = [
+            // Try to force cron to run immediately
+            spawn_cron();
+
+            return [
                 'success' => true,
-                'message' => 'Migration started for all data types. Processing in background...',
-                'scheduled_actions' => $scheduledActions,
-                'data_types' => $this->dataTypesOrder,
+                'message' => 'Migration started successfully.',
+                'started_at' => current_time('mysql'),
             ];
 
-            // Immediately try to kick the queue once to avoid waiting for cron
-            $this->maybeKickActionScheduler(get_option('yatra_migration_progress', []), true);
-
-            return $response;
-            
         } catch (\Exception $e) {
             return [
                 'success' => false,
                 'error' => $e->getMessage(),
             ];
         }
+    }
+
+    /**
+     * Initialize progress tracking in DB before background run
+     */
+    private function initializeProgress(bool $force = false): void
+    {
+        $this->ensureSchemaUpToDate();
+        $this->forceMigration = $force;
+
+        // Get old data counts
+        $detector = new MigrationDetector();
+        $oldData = $detector->detectOldData();
+
+        // Initialize progress tracking
+        $progress = [];
+        foreach ($this->dataTypesOrder as $dataType) {
+            $count = isset($oldData[$dataType]) ? (int)$oldData[$dataType]['count'] : 0;
+            $progress[$dataType] = [
+                'status' => 'pending',
+                'migrated' => 0,
+                'skipped' => 0,
+                'failed' => 0,
+                'total' => $count,
+                'started_at' => null,
+                'completed_at' => null,
+            ];
+        }
+
+        update_option('yatra_migration_progress', $progress);
+        update_option('yatra_migration_started_at', current_time('mysql'));
+    }
+
+    /**
+     * Migrate all data types directly (synchronous, no Action Scheduler).
+     *
+     * Processes each migration sequentially in the current request.
+     * Increases PHP time/memory limits to handle large datasets.
+     */
+    public function migrateAllDirect(bool $force = false): array
+    {
+        // Increase PHP limits for long migration
+        @set_time_limit(3600);
+        @ini_set('memory_limit', '1G');
+
+        // Progress has already been initialized by migrateAll() before scheduling
+        // But we refresh the force variable just in case
+        $this->forceMigration = $force;
+
+        // Process each data type sequentially
+        $results = [];
+        $overallSuccess = true;
+
+        foreach ($this->dataTypesOrder as $dataType) {
+            try {
+                Logger::info("Direct migration: processing {$dataType}", ['source' => 'migration']);
+                $result = $this->processMigration($dataType, $force);
+                $results[$dataType] = $result;
+
+                if (isset($result['success']) && !$result['success']) {
+                    $overallSuccess = false;
+                    Logger::error("Direct migration: {$dataType} failed", [
+                        'source' => 'migration',
+                        'error' => $result['error'] ?? 'Unknown'
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                $overallSuccess = false;
+                $results[$dataType] = [
+                    'success' => false,
+                    'data_type' => $dataType,
+                    'error' => $e->getMessage(),
+                ];
+                // Update progress to failed for this type
+                $this->updateProgress($dataType, 'failed', 0, 0, 0, 0, null, current_time('mysql'));
+
+                Logger::error("Direct migration: {$dataType} threw exception: {$e->getMessage()}", [
+                    'source' => 'migration',
+                    'data_type' => $dataType,
+                ]);
+            }
+        }
+
+        return [
+            'success' => $overallSuccess,
+            'message' => $overallSuccess
+                ? 'All migrations completed successfully.'
+                : 'Migration completed with some errors. Check individual results.',
+            'mode' => 'direct',
+            'results' => $results,
+            'data_types' => $this->dataTypesOrder,
+        ];
     }
 
     /**
@@ -711,12 +748,6 @@ class MigrationProgress
                 "ALTER TABLE {$table} ADD COLUMN `discounted_price` decimal(10,2) DEFAULT NULL AFTER `original_price`"
             );
         }
-
-        if (!in_array('price_per_person', $columns, true)) {
-            $this->wpdb->query(
-                "ALTER TABLE {$table} ADD COLUMN `price_per_person` tinyint(1) DEFAULT 1 AFTER `currency`"
-            );
-        }
     }
     
     private function logMigration(string $dataType, array $result, float $duration): void
@@ -756,7 +787,8 @@ class MigrationProgress
     }
 
     /**
-     * If all data types are marked completed, clear migration progress options.
+     * If all data types are marked completed, preserve the progress data for summary display.
+     * Note: We no longer delete the progress data so users can see the migration summary.
      */
     private function finalizeProgressIfAllComplete(): void
     {
@@ -772,8 +804,8 @@ class MigrationProgress
             }
         }
 
-        delete_option('yatra_migration_progress');
-        delete_option('yatra_migration_started_at');
+        // Keep the progress data so the UI can display the summary
+        // Only clear logs to save space
         delete_option('yatra_migration_log');
     }
     

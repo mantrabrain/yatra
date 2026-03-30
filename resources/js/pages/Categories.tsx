@@ -87,7 +87,7 @@ export const Categories: React.FC = () => {
       seo_keywords: false,
       created_at: true,
     };
-    const saved = localStorage.getItem("yatra_categories_columns");
+    const saved = localStorage.getItem("yatra_categories_columns_v2");
     return saved ? { ...defaultColumns, ...JSON.parse(saved) } : defaultColumns;
   });
 
@@ -173,7 +173,7 @@ export const Categories: React.FC = () => {
     
     setVisibleColumns(newVisibleColumns);
     localStorage.setItem(
-      "yatra_categories_columns",
+      "yatra_categories_columns_v2",
       JSON.stringify(newVisibleColumns),
     );
   };
@@ -640,6 +640,18 @@ export const Categories: React.FC = () => {
       key: "description",
       label: __("Description", "yatra"),
       visible: visibleColumns.description,
+      render: (category: Category) => (
+        <span
+          className={`block max-w-[300px] truncate ${
+            category.status === "trash" || statusFilter === "trash"
+              ? "text-gray-400 dark:text-gray-600"
+              : "text-gray-600 dark:text-gray-400"
+          }`}
+          title={category.description || ""}
+        >
+          {category.description || __("No description", "yatra")}
+        </span>
+      ),
     },
     {
       key: "seo_title",

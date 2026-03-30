@@ -51,7 +51,7 @@ class TripMigration extends BaseMigration
                 
                 if ($this->isForceMigration()) {
                     // Force migration: Always insert new (create duplicates)
-                    $slug = $this->generateUniqueSlug($baseSlug, 'yatra_trips');
+                    $slug = $this->generateUniqueSlug($baseSlug, 'yatra_new_trips');
                     } else {
                     // Regular migration: Check if already exists
                     $existingTripId = $this->wpdb->get_var($this->wpdb->prepare(
@@ -61,7 +61,7 @@ class TripMigration extends BaseMigration
                     
                     if (!$existingTripId) {
                         // Generate unique slug for new insert
-                        $slug = $this->generateUniqueSlug($baseSlug, 'yatra_trips');
+                        $slug = $this->generateUniqueSlug($baseSlug, 'yatra_new_trips');
                     }
                 }
 
@@ -89,10 +89,6 @@ class TripMigration extends BaseMigration
                     'yatra_tour_maximum_number_of_traveller',
                     'yatra_tour_meta_group_max',
                 ]);
-
-                $pricePerMeta = strtolower((string) $this->getLegacyMetaValue($meta, [
-                    'yatra_tour_meta_price_per',
-                ], 'person'));
 
                 $regularPriceFloat = $regularPrice !== null ? (float) $regularPrice : 0.0;
                 $salePriceFloat = $salePrice !== null && $salePrice !== ''
@@ -123,7 +119,6 @@ class TripMigration extends BaseMigration
                     'original_price' => $regularPriceFloat,
                     'sale_price' => $salePriceFloat,
                     'discounted_price' => $salePriceFloat,
-                    'price_per_person' => $pricePerMeta !== 'group' ? 1 : 0,
                     'featured_image' => $featuredImageId ?: null,
                     'status' => $status,
                     'created_at' => $oldTrip->post_date,
@@ -186,11 +181,19 @@ class TripMigration extends BaseMigration
 
                 $this->setRawPostMeta($oldTrip->ID, '_migrated_to_trip_id', (string) $newTripId);
 
+                // Migrate trip classifications (destinations, activities, categories, attributes)
                 $this->migrateTripDestinations($oldTrip->ID, $newTripId);
                 $this->migrateTripActivities($oldTrip->ID, $newTripId);
+                $this->migrateTripCategories($oldTrip->ID, $newTripId);
+                $this->migrateTripAttributes($oldTrip->ID, $newTripId);
+                
+                // Migrate trip content (gallery, highlights, FAQs)
                 $this->migrateTripGallery($oldTrip->ID, $newTripId, $meta);
                 $this->migrateTripHighlights($oldTrip->ID, $newTripId, $meta);
                 $this->migrateTripFAQs($oldTrip->ID, $newTripId, $meta);
+                
+                // Migrate pricing and availability
+                $this->migrateTripPricing($oldTrip->ID, $newTripId, $meta);
                 $this->migrateTripAvailabilityDates($oldTrip->ID, $newTripId, $meta, $tripData);
 
                 $this->updateProgress('trips', 'running', $migrated, $skipped, $failed, $total, null, null);
@@ -221,9 +224,9 @@ class TripMigration extends BaseMigration
         global $wpdb;
         $table = TripContentTable::getTableName();
         
-        // Clear existing gallery for this trip (unless force migration)
+        // Clear existing gallery images for this trip (unless force migration)
         if (!$this->isForceMigration()) {
-            $deleted = $wpdb->delete($table, ['trip_id' => $newTripId], ['%d']);
+            $deleted = $wpdb->delete($table, ['trip_id' => $newTripId, 'content_type' => 'image'], ['%d', '%s']);
             if ($deleted) {
                 }
         }
@@ -373,21 +376,29 @@ class TripMigration extends BaseMigration
                 }
                 
                 if (!empty($imageUrl)) {
+                    $imageMetadata = [];
+                    if ($imageId) {
+                        $imageMetadata['image_id'] = $imageId;
+                    }
+                    if (!empty($altText)) {
+                        $imageMetadata['alt_text'] = $altText;
+                    }
+
                     $result = $wpdb->insert(
                         $table,
                         [
                             'trip_id' => $newTripId,
-                            'image_id' => $imageId ?: null,
-                            'image_url' => $imageUrl,
+                            'content_type' => 'image',
+                            'title' => !empty($altText) ? $altText : (!empty($caption) ? $caption : null),
+                            'description' => !empty($caption) ? $caption : null,
+                            'content_url' => $imageUrl,
                             'thumbnail_url' => $thumbnailUrl,
-                            'alt_text' => $altText,
-                            'caption' => $caption,
-                            'order' => $order,
-                            'is_featured' => $order === 0 ? 1 : 0, // First image is featured
-                            'image_type' => 'gallery',
+                            'metadata' => !empty($imageMetadata) ? json_encode($imageMetadata) : null,
+                            'sort_order' => $order,
+                            'is_featured' => $order === 0 ? 1 : 0,
                             'created_at' => current_time('mysql')
                         ],
-                        ['%d', '%d', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s']
+                        ['%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s']
                     );
                     
                     if ($result) {
@@ -459,16 +470,26 @@ class TripMigration extends BaseMigration
                 }
                 
                 if (!empty($title)) {
+                    $highlightMetadata = [];
+                    if (!empty($icon)) {
+                        $highlightMetadata['icon'] = $icon;
+                    }
+                    if (!empty($description)) {
+                        $highlightMetadata['description'] = $description;
+                    }
+
                     $wpdb->insert(
                         $table,
                         [
                             'trip_id' => $newTripId,
-                            'highlight_text' => $title,
-                            'highlight_icon' => $icon,
-                            'order' => $order,
+                            'content_type' => 'highlight',
+                            'title' => $title,
+                            'description' => !empty($description) ? $description : null,
+                            'metadata' => !empty($highlightMetadata) ? json_encode($highlightMetadata) : null,
+                            'sort_order' => $order,
                             'created_at' => current_time('mysql')
                         ],
-                        ['%d', '%s', '%s', '%d', '%s']
+                        ['%d', '%s', '%s', '%s', '%s', '%d', '%s']
                     );
                     $order++;
                 }
@@ -566,12 +587,13 @@ class TripMigration extends BaseMigration
                     $table,
                     [
                         'trip_id' => $newTripId,
-                        'question' => wp_kses_post($question),
-                        'answer' => wp_kses_post($answer),
-                        'order' => $order,
+                        'content_type' => 'faq',
+                        'title' => wp_kses_post($question),
+                        'description' => wp_kses_post($answer),
+                        'sort_order' => $order,
                         'created_at' => current_time('mysql')
                     ],
-                    ['%d', '%s', '%s', '%d', '%s']
+                    ['%d', '%s', '%s', '%s', '%d', '%s']
                 );
                 
                 if ($result) {
@@ -585,6 +607,253 @@ class TripMigration extends BaseMigration
         }
         
         }
+
+    /**
+     * Migrate trip categories relationship
+     */
+    private function migrateTripCategories(int $oldTripId, int $newTripId): void
+    {
+        global $wpdb;
+        
+        // Get categories assigned to this trip via 'trip_category' taxonomy
+        $categories = $wpdb->get_results($wpdb->prepare(
+            "SELECT t.term_id, t.name, t.slug
+             FROM {$wpdb->terms} t
+             INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+             INNER JOIN {$wpdb->term_relationships} tr ON tt.term_taxonomy_id = tr.term_taxonomy_id
+             WHERE tr.object_id = %d AND tt.taxonomy = 'trip_category'",
+            $oldTripId
+        ));
+
+        if (empty($categories)) {
+            return;
+        }
+
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
+
+        foreach ($categories as $index => $category) {
+            // Find the migrated category in ClassificationsTable
+            $newCategoryId = $wpdb->get_var($wpdb->prepare(
+                "SELECT id FROM {$classificationsTable} WHERE slug = %s AND type = %s",
+                $category->slug,
+                \Yatra\Constants\ClassificationTypes::CATEGORY
+            ));
+
+            if (!$newCategoryId) {
+                // Try looking up by term meta mapping
+                $mappedId = $this->getRawTermMeta((int) $category->term_id, '_yatra_migrated_category_id');
+                if ($mappedId) {
+                    $newCategoryId = (int) $mappedId;
+                }
+            }
+
+            if ($newCategoryId) {
+                // Check if relationship already exists
+                $exists = $wpdb->get_var($wpdb->prepare(
+                    "SELECT id FROM {$tripClassificationsTable}
+                     WHERE trip_id = %d AND classification_id = %d AND classification_type = %s",
+                    $newTripId,
+                    $newCategoryId,
+                    \Yatra\Constants\ClassificationTypes::CATEGORY
+                ));
+
+                if (!$exists) {
+                    $wpdb->insert(
+                        $tripClassificationsTable,
+                        [
+                            'trip_id' => $newTripId,
+                            'classification_id' => $newCategoryId,
+                            'classification_type' => \Yatra\Constants\ClassificationTypes::CATEGORY,
+                            'relationship_type' => 'primary',
+                            'sort_order' => $index,
+                            'is_active' => 1,
+                            'created_at' => current_time('mysql'),
+                            'updated_at' => current_time('mysql'),
+                        ]
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * Migrate trip attributes with values
+     */
+    private function migrateTripAttributes(int $oldTripId, int $newTripId): void
+    {
+        global $wpdb;
+        
+        // Get custom attributes from post meta
+        $attributesData = $this->getRawPostMeta($oldTripId, 'tour_meta_custom_attributes');
+        
+        if (empty($attributesData)) {
+            return;
+        }
+
+        // Unserialize if needed
+        if (is_string($attributesData)) {
+            $attributesData = maybe_unserialize($attributesData);
+        }
+
+        if (!is_array($attributesData) || empty($attributesData)) {
+            return;
+        }
+
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
+
+        $order = 0;
+        foreach ($attributesData as $termId => $attributeValue) {
+            // Get the old attribute term
+            $attribute = $wpdb->get_row($wpdb->prepare(
+                "SELECT t.term_id, t.name, t.slug
+                 FROM {$wpdb->terms} t
+                 INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+                 WHERE t.term_id = %d AND tt.taxonomy = 'attributes'",
+                $termId
+            ));
+
+            if (!$attribute) {
+                continue;
+            }
+
+            // Find the migrated attribute in ClassificationsTable
+            $newAttributeId = $wpdb->get_var($wpdb->prepare(
+                "SELECT id FROM {$classificationsTable} WHERE slug = %s AND type = %s",
+                $attribute->slug,
+                \Yatra\Constants\ClassificationTypes::ATTRIBUTE
+            ));
+
+            if (!$newAttributeId) {
+                // Try looking up by term meta mapping
+                $mappedId = $this->getRawTermMeta((int) $attribute->term_id, '_yatra_migrated_attributes_id');
+                if ($mappedId) {
+                    $newAttributeId = (int) $mappedId;
+                }
+            }
+
+            if ($newAttributeId) {
+                // Check if relationship already exists
+                $exists = $wpdb->get_var($wpdb->prepare(
+                    "SELECT id FROM {$tripClassificationsTable}
+                     WHERE trip_id = %d AND classification_id = %d AND classification_type = %s",
+                    $newTripId,
+                    $newAttributeId,
+                    \Yatra\Constants\ClassificationTypes::ATTRIBUTE
+                ));
+
+                if (!$exists) {
+                    // Store attribute value in metadata JSON
+                    $metadata = json_encode(['value' => $attributeValue]);
+                    
+                    $wpdb->insert(
+                        $tripClassificationsTable,
+                        [
+                            'trip_id' => $newTripId,
+                            'classification_id' => $newAttributeId,
+                            'classification_type' => \Yatra\Constants\ClassificationTypes::ATTRIBUTE,
+                            'relationship_type' => 'primary',
+                            'sort_order' => $order,
+                            'metadata' => $metadata,
+                            'is_active' => 1,
+                            'created_at' => current_time('mysql'),
+                            'updated_at' => current_time('mysql'),
+                        ]
+                    );
+                    $order++;
+                }
+            }
+        }
+    }
+
+    /**
+     * Migrate trip pricing (traveler categories with pricing values)
+     */
+    private function migrateTripPricing(int $oldTripId, int $newTripId, array $meta): void
+    {
+        global $wpdb;
+        
+        // Check for multiple pricing options (traveler categories)
+        $pricingKeys = [
+            'yatra_tour_meta_tour_price_per_person',
+            'yatra_tour_meta_price_per_person',
+            'yatra_tour_price_per_person',
+            'tour_price_per_person',
+        ];
+
+        $multiplePricing = null;
+        foreach ($pricingKeys as $key) {
+            if (isset($meta[$key]) && !empty($meta[$key])) {
+                $data = $meta[$key];
+                if (is_string($data)) {
+                    $data = maybe_unserialize($data);
+                }
+                if (is_array($data) && !empty($data)) {
+                    $multiplePricing = $data;
+                    break;
+                }
+            }
+        }
+
+        if (empty($multiplePricing)) {
+            return;
+        }
+
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+        $tripsTable = \Yatra\Database\Tables\TripsTable::getTableName();
+
+        // Build price_types array
+        $priceTypes = [];
+        
+        foreach ($multiplePricing as $pricingId => $pricing) {
+            if (!is_array($pricing)) {
+                continue;
+            }
+
+            $label = $pricing['label'] ?? $pricing['name'] ?? '';
+            if (empty($label)) {
+                continue;
+            }
+
+            // Find the traveler category by label
+            $categoryId = $wpdb->get_var($wpdb->prepare(
+                "SELECT id FROM {$classificationsTable} WHERE name = %s AND type = %s",
+                $label,
+                \Yatra\Constants\ClassificationTypes::TRAVELER_TYPE
+            ));
+
+            if (!$categoryId) {
+                continue;
+            }
+
+            // Extract pricing values
+            $regularPrice = floatval($pricing['regular_price'] ?? $pricing['price'] ?? 0);
+            $salePrice = floatval($pricing['sale_price'] ?? $pricing['discounted_price'] ?? 0);
+
+            if ($regularPrice > 0) {
+                $priceTypes[] = [
+                    'category_id' => (int) $categoryId,
+                    'label' => $label,
+                    'original_price' => $regularPrice,
+                    'discounted_price' => $salePrice > 0 && $salePrice < $regularPrice ? $salePrice : null,
+                    'min_travelers' => intval($pricing['min_pax'] ?? $pricing['min_travelers'] ?? 1),
+                    'max_travelers' => intval($pricing['max_pax'] ?? $pricing['max_travelers'] ?? 1),
+                ];
+            }
+        }
+
+        if (!empty($priceTypes)) {
+            // Update trip with price_types JSON
+            $wpdb->update(
+                $tripsTable,
+                ['price_types' => json_encode($priceTypes)],
+                ['id' => $newTripId],
+                ['%s'],
+                ['%d']
+            );
+        }
+    }
 
     /**
      * Migrate availability date ranges from old tour system

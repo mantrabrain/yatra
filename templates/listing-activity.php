@@ -267,39 +267,54 @@ $paged_activities = $total_items > 0 ? array_slice($activities, $offset, $per_pa
             </div>
 
             <!-- Pagination -->
-            <?php if ($total_pages > 1) { ?>
-            <div class="yatra-listing-pagination">
+            <?php if ($total_pages > 1) {
+                // Manual URL builder to avoid ampersand issues
+                $build_page_url = function($page) use ($sort) {
+                    $base_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+                    $params = ['yatra_page' => $page];
+                    if (!empty($sort)) {
+                        $params['yatra_sort'] = $sort;
+                    }
+                    $query_string = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
+                    return esc_url($base_path . '?' . $query_string);
+                };
+                ?>
+                <div class="yatra-listing-pagination">
                 <?php
-                $base_url = remove_query_arg('yatra_page');
                 
                 // Previous button
                 if ($current_page > 1) {
-                    $prev_url = esc_url(add_query_arg('yatra_page', $current_page - 1, $base_url));
+                    $prev_url = $build_page_url($current_page - 1);
                     echo "<a href=\"{$prev_url}\" class=\"yatra-pagination-btn\">" . esc_html__('Previous', 'yatra') . "</a>";
                 } else {
                     echo "<span class=\"yatra-pagination-btn disabled\">" . esc_html__('Previous', 'yatra') . "</span>";
                 }
                 
-                // Page numbers
+                // Smart pagination with ellipsis
+                $range = 2;
                 for ($i = 1; $i <= $total_pages; $i++) {
-                    if ($i === $current_page) {
-                        echo "<span class=\"yatra-pagination-btn active\">{$i}</span>";
-                    } else {
-                        $page_url = esc_url(add_query_arg('yatra_page', $i, $base_url));
-                        echo "<a href=\"{$page_url}\" class=\"yatra-pagination-btn\">{$i}</a>";
+                    if ($i == 1 || $i == $total_pages || ($i >= $current_page - $range && $i <= $current_page + $range)) {
+                        if ($i === $current_page) {
+                            echo "<span class=\"yatra-pagination-btn active\">{$i}</span>";
+                        } else {
+                            $page_url = $build_page_url($i);
+                            echo "<a href=\"{$page_url}\" class=\"yatra-pagination-btn\">{$i}</a>";
+                        }
+                    } elseif ($i == $current_page - $range - 1 || $i == $current_page + $range + 1) {
+                        echo '<span class="yatra-pagination-ellipsis">...</span>';
                     }
                 }
                 
                 // Next button
                 if ($current_page < $total_pages) {
-                    $next_url = esc_url(add_query_arg('yatra_page', $current_page + 1, $base_url));
+                    $next_url = $build_page_url($current_page + 1);
                     echo "<a href=\"{$next_url}\" class=\"yatra-pagination-btn\">" . esc_html__('Next', 'yatra') . "</a>";
                 } else {
                     echo "<span class=\"yatra-pagination-btn disabled\">" . esc_html__('Next', 'yatra') . "</span>";
                 }
-                ?>
-            </div>
-            <?php } ?>
+                
+                echo '</div>';
+            } ?>
         </div>
     </div>
 </div>

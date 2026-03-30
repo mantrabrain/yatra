@@ -273,7 +273,7 @@ abstract class BaseMigration
                         $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
                     }
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $failed++;
                 Logger::error("Exception migrating {$taxonomy}: " . $e->getMessage(), [
                     'source' => 'migration',

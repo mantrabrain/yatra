@@ -140,89 +140,54 @@ class ItineraryMigration extends BaseMigration
     }
 
     /**
-     * Get old tours that might have itinerary data
+     * Get old tours that might have itinerary data.
+     *
+     * Uses an efficient SQL query with EXISTS to find only tours that
+     * actually have itinerary-related meta keys, instead of loading
+     * all meta for every tour and filtering in PHP.
      */
     private function getOldToursWithItinerary(): array
     {
-        // Get ALL tours (not just published) for debugging
-        $tours = $this->wpdb->get_results(
-            "SELECT * FROM {$this->wpdb->posts} 
-             WHERE post_type = 'tour'"
+        // Known itinerary meta keys from old Yatra versions
+        $itineraryKeys = [
+            'itinerary_repeator',
+            'itinerary_label',
+            'yatra_tour_itinerary',
+            'yatra_tour_meta_itinerary',
+            'yatra_itinerary',
+            'tour_itinerary',
+            'yatra_tour_days',
+            'yatra_tour_meta_days',
+            'yatra_days',
+            'tour_days',
+            'yatra_tour_schedule',
+            'yatra_tour_meta_schedule',
+            'yatra_schedule',
+            'tour_schedule',
+        ];
+
+        $placeholders = implode(',', array_fill(0, count($itineraryKeys), '%s'));
+
+        // Single efficient SQL query: only return tours with itinerary meta
+        $sql = $this->wpdb->prepare(
+            "SELECT DISTINCT p.*
+             FROM {$this->wpdb->posts} p
+             INNER JOIN {$this->wpdb->postmeta} pm ON p.ID = pm.post_id
+             WHERE p.post_type = 'tour'
+             AND p.post_status IN ('publish', 'draft', 'pending', 'private')
+             AND pm.meta_key IN ({$placeholders})
+             AND pm.meta_value != ''
+             AND pm.meta_value IS NOT NULL",
+            ...$itineraryKeys
         );
 
-        Logger::info("Itinerary Migration: Found tours", [
-            'total_tours' => count($tours)
+        $tours = $this->wpdb->get_results($sql);
+
+        Logger::info("Itinerary Migration: Found tours with itinerary meta", [
+            'total_tours_with_itinerary' => count($tours),
         ]);
 
-        // Debug: Check first tour before filtering
-        if (!empty($tours)) {
-            $firstTour = reset($tours);
-            $firstMeta = $this->getPostMeta($firstTour->ID);
-            }
-
-        // Filter tours that have itinerary-related meta data
-        $toursWithItinerary = array_filter($tours, function($tour) {
-            $meta = $this->getPostMeta($tour->ID);
-            
-            // Aggressive debug: Log all meta keys for this tour
-            Logger::info("Itinerary Migration: Tour meta keys", [
-                'tour_id' => $tour->ID,
-                'tour_title' => $tour->post_title,
-                'meta_keys' => array_keys($meta),
-                'content_preview' => substr($tour->post_content, 0, 200)
-            ]);
-            
-            // Check for various possible itinerary meta keys
-            $itineraryKeys = [
-                'itinerary_repeator',  // This is the actual key found in the database
-                'itinerary_label',
-                'yatra_tour_itinerary',
-                'yatra_tour_meta_itinerary',
-                'yatra_itinerary',
-                'tour_itinerary',
-                'yatra_tour_days',
-                'yatra_tour_meta_days',
-                'yatra_days',
-                'tour_days',
-                'yatra_tour_schedule',
-                'yatra_tour_meta_schedule',
-                'yatra_schedule',
-                'tour_schedule'
-            ];
-
-            foreach ($itineraryKeys as $key) {
-                if (!empty($meta[$key])) {
-                    Logger::info("Itinerary Migration: Found itinerary meta", [
-                        'tour_id' => $tour->ID,
-                        'meta_key' => $key,
-                        'meta_value' => $meta[$key]
-                    ]);
-                    return true;
-                }
-            }
-
-            // Also check if tour content might contain itinerary information
-            // (some tours might have itinerary in the content)
-            if (strpos($tour->post_content, 'Day') !== false || 
-                strpos($tour->post_content, 'itinerary') !== false ||
-                strpos($tour->post_content, 'schedule') !== false) {
-                Logger::info("Itinerary Migration: Found itinerary in content", [
-                    'tour_id' => $tour->ID,
-                    'has_day' => strpos($tour->post_content, 'Day') !== false,
-                    'has_itinerary' => strpos($tour->post_content, 'itinerary') !== false,
-                    'has_schedule' => strpos($tour->post_content, 'schedule') !== false
-                ]);
-                return true;
-            }
-
-            return false;
-        });
-
-        Logger::info("Itinerary Migration: Tours with itinerary", [
-            'tours_with_itinerary' => count($toursWithItinerary)
-        ]);
-
-        return $toursWithItinerary;
+        return $tours;
     }
 
     /**
@@ -392,15 +357,20 @@ class ItineraryMigration extends BaseMigration
      */
     private function cleanDayData(string $title, string $description): array
     {
-        // Remove "Day {number} -" pattern from title and description
-        $pattern = '/^Day\s+\d+\s*-\s*/i';
+        // Decode entities so non-breaking spaces or dashed become native characters
+        $title = html_entity_decode(trim($title), ENT_QUOTES, 'UTF-8');
+        $description = html_entity_decode(trim($description), ENT_QUOTES, 'UTF-8');
+
+        // Remove "Day X -", "Day X :", "Day {index} -" pattern from title and description
+        // Matches literal "{index}" as well, just in case the old JS templates saved it to the DB.
+        $pattern = '/^Day[\s\xA0]*(\d+|\{index\})[\s\xA0]*[-:–—]*[\s\xA0]*/iu';
         
-        $cleanTitle = preg_replace($pattern, '', trim($title));
-        $cleanDescription = preg_replace($pattern, '', trim($description));
+        $cleanTitle = preg_replace($pattern, '', $title);
+        $cleanDescription = preg_replace($pattern, '', $description);
         
         return [
-            'title' => $cleanTitle,
-            'description' => $cleanDescription
+            'title' => trim($cleanTitle),
+            'description' => trim($cleanDescription)
         ];
     }
 
@@ -451,13 +421,14 @@ class ItineraryMigration extends BaseMigration
 
                 // Create entries for this day
                 foreach ($dayData['entries'] as $entryData) {
+                    $cleanedEntry = $this->cleanDayData($entryData['title'], $entryData['description']);
                     $entryResult = $this->wpdb->insert(
                         $tableEntries,
                         [
                             'trip_id' => $tripId,
                             'day_id' => $dayId,
-                            'title' => $entryData['title'],
-                            'description' => $entryData['description'],
+                            'title' => $cleanedEntry['title'],
+                            'description' => $cleanedEntry['description'],
                             'time' => $entryData['time'],
                             'start_time' => $entryData['start_time'],
                             'end_time' => $entryData['end_time'],
@@ -541,13 +512,7 @@ class ItineraryMigration extends BaseMigration
              WHERE meta_key = '_migrated_to_trip_id' AND post_id = %d",
             $oldTourId
         ));
-        
-        Logger::info("Itinerary Migration: Trip mapping check", [
-            'old_tour_id' => $oldTourId,
-            'new_trip_id' => $tripId,
-            'found_mapping' => !empty($tripId)
-        ]);
-        
-        return $tripId;
+
+        return $tripId ? (int) $tripId : null;
     }
 }

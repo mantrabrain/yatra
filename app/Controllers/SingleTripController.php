@@ -1474,6 +1474,7 @@ class SingleTripController
             $itinerary[] = [
                 'day' => (int) $day->day_number,
                 'day_title' => $day->title ?: sprintf(__('Day %d', 'yatra'), $day->day_number),
+                'day_description' => $day->description ?: '',
                 'entries' => $formatted_entries,
             ];
         }

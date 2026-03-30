@@ -91,7 +91,7 @@ class TourDateMigration extends BaseMigration
                     
                     // Format 1: pricing_per = 'person' with price_per_person array
                     if (isset($pricing['pricing_per']) && $pricing['pricing_per'] === 'person' && isset($pricing['price_per_person'])) {
-                        $pricingType = 'traveler_based';
+                        $pricingType = 'regular';
                         $priceTypesArray = [];
                         $pricePerPerson = is_array($pricing['price_per_person']) ? $pricing['price_per_person'] : [];
                         
@@ -121,7 +121,7 @@ class TourDateMigration extends BaseMigration
                     
                     // Format 2: Direct traveler_categories array
                     if (!$hasTravelerPricing && isset($pricing['traveler_categories']) && is_array($pricing['traveler_categories'])) {
-                        $pricingType = 'traveler_based';
+                        $pricingType = 'regular';
                         $priceTypesArray = [];
                         
                         foreach ($pricing['traveler_categories'] as $category) {

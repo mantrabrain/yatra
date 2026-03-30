@@ -107,13 +107,13 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
   },
   server: {
-    port: 3000,
+    port: 5173,
     strictPort: true,
     host: true, // Allow external connections
     hmr: {
       host: 'localhost',
-      port: 3000,
-      clientPort: 3000,
+      port: 5173,
+      clientPort: 5173,
     },
     // Allow WordPress admin on http://yatra.local to load assets from this dev server
     cors: true,

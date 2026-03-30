@@ -4,8 +4,10 @@ namespace Yatra\Migration;
 
 use Yatra\Migration\MigrationProgress;
 use Yatra\Utils\Logger;
-use YatraPro\Database\Tables\AdditionalServicesTable;
-use YatraPro\Database\Tables\TripAdditionalServicesTable;
+
+// NOTE: YatraPro classes are NOT imported with `use` statements to avoid
+// fatal "class not found" errors when Yatra Pro is not active.
+// Instead, we check at runtime with class_exists().
 
 class ServicesMigration extends BaseMigration
 {
@@ -23,9 +25,19 @@ class ServicesMigration extends BaseMigration
         $failed = 0;
 
         try {
+            // Check if Yatra Pro table classes are available at runtime
+            if (!class_exists('\\YatraPro\\Database\\Tables\\AdditionalServicesTable') ||
+                !class_exists('\\YatraPro\\Database\\Tables\\TripAdditionalServicesTable')) {
+                Logger::info('ServicesMigration: Yatra Pro table classes not available, skipping', [
+                    'source' => 'migration',
+                    'data_type' => 'services',
+                ]);
+                return compact('migrated', 'skipped', 'failed');
+            }
+
             // Check if Yatra Pro tables exist (created by Pro plugin)
-            $services_table = AdditionalServicesTable::getTableName();
-            $trip_services_table = TripAdditionalServicesTable::getTableName();
+            $services_table = \YatraPro\Database\Tables\AdditionalServicesTable::getTableName();
+            $trip_services_table = \YatraPro\Database\Tables\TripAdditionalServicesTable::getTableName();
             
             $services_exists = $wpdb->get_var("SHOW TABLES LIKE '{$services_table}'");
             $trip_services_exists = $wpdb->get_var("SHOW TABLES LIKE '{$trip_services_table}'");
@@ -138,7 +150,7 @@ class ServicesMigration extends BaseMigration
                 $this->updateProgress('services', 'running', $migrated, $skipped, $failed, $total, null, null);
             }
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Logger::error("Services migration failed", [
                 'source' => 'migration',
                 'error' => $e->getMessage()
@@ -158,8 +170,8 @@ class ServicesMigration extends BaseMigration
     private function migrateServiceToTrips(int $oldServiceId, string $serviceName, string $serviceSlug, string $description, string $priceType, string $pricePer, float $servicePrice, bool $isRequired): int
     {
         global $wpdb;
-        $services_table = AdditionalServicesTable::getTableName();
-        $trip_services_table = TripAdditionalServicesTable::getTableName();
+        $services_table = \YatraPro\Database\Tables\AdditionalServicesTable::getTableName();
+        $trip_services_table = \YatraPro\Database\Tables\TripAdditionalServicesTable::getTableName();
         $migrated_count = 0;
 
         // First, check if service already exists in master table

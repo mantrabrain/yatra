@@ -273,6 +273,14 @@ class Bootstrap
                 }
             }
         }, 10, 2);
+
+        // Register background hook for all data types migration via cron
+        add_action('yatra_migration_background_run', function($force = false) {
+            if (class_exists('\Yatra\Migration\MigrationProgress')) {
+                $migrationService = new \Yatra\Migration\MigrationProgress();
+                $migrationService->migrateAllDirect((bool) $force);
+            }
+        }, 10, 1);
     }
 
     /**

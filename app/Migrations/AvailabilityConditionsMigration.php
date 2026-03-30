@@ -22,14 +22,7 @@ class AvailabilityConditionsMigration extends BaseMigration
         $failed = 0;
 
         try {
-            // Ensure months column exists in the table
             $table = TripAvailabilityRulesTable::getTableName();
-            $column_exists = $wpdb->get_results("SHOW COLUMNS FROM {$table} LIKE 'months'");
-            
-            if (empty($column_exists)) {
-                $wpdb->query("ALTER TABLE {$table} ADD COLUMN `months` varchar(50) DEFAULT NULL COMMENT 'Comma-separated month numbers 1-12' AFTER `day_of_week`");
-                } else {
-                }
 
             // Check if availability conditions data exists in database (regardless of plugin/module status)
             $conditions_count = $wpdb->get_var(
@@ -192,7 +185,7 @@ class AvailabilityConditionsMigration extends BaseMigration
                 $this->updateProgress('availability_conditions', 'running', $migrated, $skipped, $failed, $total, null, null);
             }
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Logger::error("Availability conditions migration failed", [
                 'source' => 'migration',
                 'error' => $e->getMessage()
@@ -242,22 +235,21 @@ class AvailabilityConditionsMigration extends BaseMigration
         // Prepare months as JSON array string (e.g., "[1,12]" not "0,11")
         $months_string = !empty($normalized_months) ? json_encode($normalized_months) : null;
 
+        // Build recurrence_pattern JSON with months data if available
+        $recurrencePattern = [];
+        if (!empty($normalized_months)) {
+            $recurrencePattern['months'] = $normalized_months;
+        }
+
         $ruleData = [
             'name' => $condition->name,
-            'rule_type' => $rule_type,
-            'status' => 'active', // Always active for migrated rules
+            'recurrence_type' => $rule_type,
+            'status' => 'active',
             'start_date' => !empty($start_date) ? $start_date : current_time('Y-m-d'),
             'end_date' => !empty($end_date) ? $end_date : null,
-            'days_of_week' => $days_of_week_string, // Weekly rules use days_of_week
-            'week_of_month' => null, // Not used for weekly rules
-            'day_of_week' => null, // Not used for weekly rules
-            'months' => $months_string, // JSON array string (e.g., "[1,12]")
-            'interval_days' => null,
-            'interval_start_date' => null,
-            'seats_total' => null,
-            'original_price' => null,
-            'sale_price' => null,
-            'traveler_pricing' => null,
+            'days_of_week' => !empty($days_of_week) ? json_encode($days_of_week) : null,
+            'recurrence_pattern' => !empty($recurrencePattern) ? json_encode($recurrencePattern) : null,
+            'interval' => 1,
             'created_at' => current_time('mysql'),
         ];
 
@@ -275,20 +267,13 @@ class AvailabilityConditionsMigration extends BaseMigration
         $insertData = [
             'trip_id' => $tripId,
             'name' => $ruleData['name'],
-            'rule_type' => $ruleData['rule_type'],
+            'recurrence_type' => $ruleData['recurrence_type'],
             'status' => $ruleData['status'],
             'start_date' => $ruleData['start_date'],
             'end_date' => $ruleData['end_date'],
-            'days_of_week' => $ruleData['days_of_week'], // Comma-separated string
-            'week_of_month' => $ruleData['week_of_month'],
-            'day_of_week' => $ruleData['day_of_week'],
-            'months' => $ruleData['months'], // Comma-separated month numbers
-            'interval_days' => $ruleData['interval_days'],
-            'interval_start_date' => $ruleData['interval_start_date'],
-            'seats_total' => $ruleData['seats_total'],
-            'original_price' => $ruleData['original_price'],
-            'sale_price' => $ruleData['sale_price'],
-            'traveler_pricing' => $ruleData['traveler_pricing'],
+            'days_of_week' => $ruleData['days_of_week'],
+            'recurrence_pattern' => $ruleData['recurrence_pattern'],
+            'interval' => $ruleData['interval'],
             'created_at' => $ruleData['created_at'],
             'updated_at' => current_time('mysql'),
         ];

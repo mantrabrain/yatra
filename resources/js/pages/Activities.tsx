@@ -102,7 +102,7 @@ const Activities: React.FC = () => {
       created_by_name: false,
       updated_by_name: false,
     };
-    const saved = localStorage.getItem("yatra-activities-columns");
+    const saved = localStorage.getItem("yatra-activities-columns-v2");
     return saved ? { ...defaultColumns, ...JSON.parse(saved) } : defaultColumns;
   });
 
@@ -219,7 +219,7 @@ const Activities: React.FC = () => {
     
     setVisibleColumns(newVisibleColumns);
     localStorage.setItem(
-      "yatra-activities-columns",
+      "yatra-activities-columns-v2",
       JSON.stringify(newVisibleColumns),
     );
   };
@@ -817,12 +817,13 @@ const Activities: React.FC = () => {
                     visible: visibleColumns.description,
                     render: (activity: Activity) => (
                       <span
-                        className={
+                        className={`block max-w-[300px] truncate ${
                           activity.status === "trash" ||
                           statusFilter === "trash"
                             ? "text-gray-400 dark:text-gray-600"
                             : "text-gray-600 dark:text-gray-400"
-                        }
+                        }`}
+                        title={activity.description || ""}
                       >
                         {activity.description || __("No description", "yatra")}
                       </span>

@@ -248,9 +248,15 @@ yatra_get_header();
             <?php if ($total_pages > 1): ?>
                 <div class="yatra-listing-pagination">
                     <?php
-                    $base_url_no_page = remove_query_arg('yatra_page');
-                    $prev_page        = max(1, $current_page - 1);
-                    $next_page        = min($total_pages, $current_page + 1);
+                    $prev_page = max(1, $current_page - 1);
+                    $next_page = min($total_pages, $current_page + 1);
+                    
+                    // Manual URL builder to avoid ampersand issues
+                    $build_page_url = function($page) {
+                        $base_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+                        $query_string = http_build_query(['yatra_page' => $page], '', '&', PHP_QUERY_RFC3986);
+                        return esc_url($base_path . '?' . $query_string);
+                    };
                     ?>
 
                     <?php if ($current_page <= 1): ?>
@@ -258,23 +264,33 @@ yatra_get_header();
                             <?php echo esc_html__('Previous', 'yatra'); ?>
                         </span>
                     <?php else: ?>
-                        <a class="yatra-pagination-btn" href="<?php echo esc_url(add_query_arg(['yatra_page' => $prev_page], $base_url_no_page)); ?>">
+                        <a class="yatra-pagination-btn" href="<?php echo $build_page_url($prev_page); ?>">
                             <?php echo esc_html__('Previous', 'yatra'); ?>
                         </a>
                     <?php endif; ?>
 
-                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                        <a class="yatra-pagination-btn<?php echo $i === $current_page ? ' active' : ''; ?>" href="<?php echo esc_url(add_query_arg(['yatra_page' => $i], $base_url_no_page)); ?>">
-                            <?php echo (int) $i; ?>
-                        </a>
-                    <?php endfor; ?>
+                    <?php
+                    // Smart pagination with ellipsis
+                    $range = 2;
+                    for ($i = 1; $i <= $total_pages; $i++):
+                        if ($i == 1 || $i == $total_pages || ($i >= $current_page - $range && $i <= $current_page + $range)):
+                            $active = $i === $current_page ? ' active' : '';
+                            ?>
+                            <a class="yatra-pagination-btn<?php echo $active; ?>" href="<?php echo $build_page_url($i); ?>">
+                                <?php echo (int) $i; ?>
+                            </a>
+                        <?php elseif ($i == $current_page - $range - 1 || $i == $current_page + $range + 1): ?>
+                            <span class="yatra-pagination-ellipsis">...</span>
+                        <?php endif;
+                    endfor;
+                    ?>
 
                     <?php if ($current_page >= $total_pages): ?>
                         <span class="yatra-pagination-btn disabled" aria-disabled="true">
                             <?php echo esc_html__('Next', 'yatra'); ?>
                         </span>
                     <?php else: ?>
-                        <a class="yatra-pagination-btn" href="<?php echo esc_url(add_query_arg(['yatra_page' => $next_page], $base_url_no_page)); ?>">
+                        <a class="yatra-pagination-btn" href="<?php echo $build_page_url($next_page); ?>">
                             <?php echo esc_html__('Next', 'yatra'); ?>
                         </a>
                     <?php endif; ?>

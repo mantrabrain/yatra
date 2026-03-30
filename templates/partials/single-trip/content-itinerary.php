@@ -75,6 +75,11 @@ if (!defined('ABSPATH')) {
                 </div>
 
                 <div class="yatra-itinerary-day-content">
+                    <?php if (!empty($day['day_description'])): ?>
+                        <div class="yatra-day-description" style="margin-bottom: 20px; color: #4b5563; font-size: 15px; line-height: 1.6;">
+                            <?php echo wp_kses_post(wpautop($day['day_description'])); ?>
+                        </div>
+                    <?php endif; ?>
                     <div class="yatra-entries-timeline">
                         <?php foreach ($day['entries'] as $index => $entry):
                             $type_color = $type_colors[$entry['item_type']] ?? '#6b7280';

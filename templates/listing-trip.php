@@ -91,14 +91,19 @@ function yatra_get_filter_array($key, $sanitize_callback = 'sanitize_text_field'
     return [];
 }
 
+// Clean $_GET to remove malformed parameters from multiple ampersands
+$clean_get = array_filter($_GET, function($key) {
+    return !empty($key) && $key !== '';
+}, ARRAY_FILTER_USE_KEY);
+
 // Get active filters from URL parameters
 $active_filters = [
-    'destination'        => sanitize_text_field($_GET['destination'] ?? ''),
-    'activity'           => sanitize_text_field($_GET['activity'] ?? ''),
-    'price_min'          => !empty($_GET['price_min']) ? intval($_GET['price_min']) : '',
-    'price_max'          => !empty($_GET['price_max']) ? intval($_GET['price_max']) : '',
-    'trip_type'          => sanitize_text_field($_GET['trip_type'] ?? ''),
-    'sort'               => sanitize_text_field($_GET['sort'] ?? ''),
+    'destination'        => sanitize_text_field($clean_get['destination'] ?? ''),
+    'activity'           => sanitize_text_field($clean_get['activity'] ?? ''),
+    'price_min'          => !empty($clean_get['price_min']) ? intval($clean_get['price_min']) : '',
+    'price_max'          => !empty($clean_get['price_max']) ? intval($clean_get['price_max']) : '',
+    'trip_type'          => sanitize_text_field($clean_get['trip_type'] ?? ''),
+    'sort'               => sanitize_text_field($clean_get['sort'] ?? ''),
     'difficulty'         => yatra_get_filter_array('difficulty', 'intval'),
     'rating'             => yatra_get_filter_array('rating', 'intval'),
     'categories'         => yatra_get_filter_array('categories', 'intval'),
@@ -892,15 +897,32 @@ yatra_get_header();
     }
 
     // Helper to preserve filters in pagination URLs
-    $base_url = remove_query_arg('page');
-    $base_url = esc_url($base_url);
-
-    $build_page_url = function(int $page) use ($base_url, $active_filters) {
-        $args = ['page' => $page];
+    // Build URLs manually to avoid WordPress add_query_arg issues
+    $build_page_url = function(int $page) use ($active_filters) {
+        // Get clean base path
+        $base_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        
+        // Build query parameters manually
+        $params = ['page' => $page];
         foreach ($active_filters as $k => $v) {
-            if ($v !== '') $args[$k] = $v;
+            if ($v !== '' && $v !== null && $v !== []) {
+                if (is_array($v)) {
+                    // Handle array parameters
+                    foreach ($v as $item) {
+                        if ($item !== '') {
+                            $params[$k . '[]'] = $item;
+                        }
+                    }
+                } else {
+                    $params[$k] = $v;
+                }
+            }
         }
-        return esc_url(add_query_arg($args, $base_url));
+        
+        // Build query string manually
+        $query_string = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
+        
+        return esc_url($base_path . '?' . $query_string);
     };
     ?>
     <div class="yatra-listing-pagination">
@@ -909,9 +931,19 @@ yatra_get_header();
             <?php esc_html_e('Previous', 'yatra'); ?>
         </a>
         <?php
+        // Smart pagination with ellipsis
+        $range = 2; // Show 2 pages on each side of current page
+        $show_items = ($range * 2) + 1;
+        
         for ($p = 1; $p <= $total_pages_to_render; $p++) {
-            $active = $p === $current_page_to_render ? 'active' : '';
-            echo '<a class="yatra-pagination-btn ' . $active . '" href="' . $build_page_url($p) . '">' . esc_html($p) . '</a>';
+            // Always show first page, last page, and pages around current page
+            if ($p == 1 || $p == $total_pages_to_render || ($p >= $current_page_to_render - $range && $p <= $current_page_to_render + $range)) {
+                $active = $p === $current_page_to_render ? 'active' : '';
+                echo '<a class="yatra-pagination-btn ' . $active . '" href="' . $build_page_url($p) . '">' . esc_html($p) . '</a>';
+            } elseif ($p == $current_page_to_render - $range - 1 || $p == $current_page_to_render + $range + 1) {
+                // Show ellipsis
+                echo '<span class="yatra-pagination-ellipsis">...</span>';
+            }
         }
         ?>
         <?php $next_disabled = $current_page_to_render >= $total_pages_to_render; ?>

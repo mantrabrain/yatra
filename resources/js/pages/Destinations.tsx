@@ -81,7 +81,7 @@ const Destinations: React.FC = () => {
       created_by_name: false,
       updated_by_name: false,
     };
-    const saved = localStorage.getItem("yatra_destinations_visible_columns");
+    const saved = localStorage.getItem("yatra_destinations_visible_columns_v2");
     return saved ? { ...defaultColumns, ...JSON.parse(saved) } : defaultColumns;
   });
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -304,7 +304,7 @@ const Destinations: React.FC = () => {
     
     setVisibleColumns(newVisibleColumns);
     localStorage.setItem(
-      "yatra_destinations_visible_columns",
+      "yatra_destinations_visible_columns_v2",
       JSON.stringify(newVisibleColumns),
     );
   };
@@ -642,12 +642,13 @@ const Destinations: React.FC = () => {
                     visible: visibleColumns.description,
                     render: (destination: Destination) => (
                       <span
-                        className={
+                        className={`block max-w-[300px] truncate ${
                           destination.status === "trash" ||
                           statusFilter === "trash"
                             ? "text-gray-400 dark:text-gray-600"
                             : "text-gray-600 dark:text-gray-400"
-                        }
+                        }`}
+                        title={destination.description || ""}
                       >
                         {destination.description ||
                           __("No description", "yatra")}

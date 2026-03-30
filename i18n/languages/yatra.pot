@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-28T06:30:23+00:00\n"
+"POT-Creation-Date: 2026-03-30T08:53:02+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -229,9 +229,9 @@ msgstr ""
 #: assets/dist/js/account-page.js:1038
 #: app/Controllers/BookingSessionController.php:2405
 #: app/Controllers/SingleTripController.php:462
-#: app/Controllers/SingleTripController.php:1811
-#: app/Controllers/SingleTripController.php:1846
-#: app/Controllers/SingleTripController.php:1960
+#: app/Controllers/SingleTripController.php:1812
+#: app/Controllers/SingleTripController.php:1847
+#: app/Controllers/SingleTripController.php:1961
 #: app/Models/Checkout.php:103
 #: templates/booking-confirmation.php:285
 #: templates/partials/availability-section.php:378
@@ -1134,7 +1134,7 @@ msgstr ""
 #: assets/dist/js/account-page.js:910
 #: templates/partials/availability-section.php:225
 #: templates/partials/booking-content.php:572
-#: templates/partials/single-trip/content-itinerary.php:114
+#: templates/partials/single-trip/content-itinerary.php:119
 #: templates/partials/single-trip/content-sidebar.php:237
 #: templates/partials/single-trip/content-sidebar.php:240
 #: templates/single-activity.php:220
@@ -1144,7 +1144,7 @@ msgstr ""
 
 #: assets/dist/js/account-page.js:915
 #: templates/partials/booking-content.php:576
-#: templates/partials/single-trip/content-itinerary.php:116
+#: templates/partials/single-trip/content-itinerary.php:121
 msgid "per booking"
 msgstr ""
 
@@ -2959,12 +2959,12 @@ msgid "Loyal (4+)"
 msgstr ""
 
 #: app/Controllers/ReportsController.php:524
-#: app/Controllers/SingleTripController.php:1859
+#: app/Controllers/SingleTripController.php:1860
 msgid "Adult"
 msgstr ""
 
 #: app/Controllers/ReportsController.php:525
-#: app/Controllers/SingleTripController.php:1882
+#: app/Controllers/SingleTripController.php:1883
 msgid "Child"
 msgstr ""
 
@@ -3071,40 +3071,40 @@ msgstr ""
 msgid "Day %d"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1679
+#: app/Controllers/SingleTripController.php:1680
 msgid "No custom content available for this section."
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1765
-#: app/Controllers/SingleTripController.php:1998
+#: app/Controllers/SingleTripController.php:1766
+#: app/Controllers/SingleTripController.php:1999
 #: templates/partials/availability-section.php:424
 #, php-format
 msgid "per group (%d-%d pax)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1767
-#: app/Controllers/SingleTripController.php:2000
+#: app/Controllers/SingleTripController.php:1768
+#: app/Controllers/SingleTripController.php:2001
 #: templates/partials/availability-section.php:426
 #, php-format
 msgid "per group (up to %d pax)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1769
-#: app/Controllers/SingleTripController.php:2002
+#: app/Controllers/SingleTripController.php:1770
+#: app/Controllers/SingleTripController.php:2003
 #: templates/partials/availability-section.php:428
 #, php-format
 msgid "per group (%d+ pax)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1771
-#: app/Controllers/SingleTripController.php:2004
+#: app/Controllers/SingleTripController.php:1772
+#: app/Controllers/SingleTripController.php:2005
 #: templates/partials/availability-section.php:430
 #: templates/partials/pricing-summary.php:48
 msgid "per group"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1790
-#: app/Controllers/SingleTripController.php:1961
+#: app/Controllers/SingleTripController.php:1791
+#: app/Controllers/SingleTripController.php:1962
 #: templates/partials/availability-section.php:412
 #: templates/partials/booking-content.php:331
 #: templates/partials/booking-form-fields.php:364
@@ -3112,7 +3112,7 @@ msgstr ""
 msgid "(Age %d-%d)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1792
+#: app/Controllers/SingleTripController.php:1793
 #: templates/partials/availability-section.php:414
 #: templates/partials/booking-content.php:333
 #: templates/partials/booking-form-fields.php:366
@@ -3120,7 +3120,7 @@ msgstr ""
 msgid "(Age %d+)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1794
+#: app/Controllers/SingleTripController.php:1795
 #: templates/partials/availability-section.php:416
 #: templates/partials/booking-content.php:335
 #: templates/partials/booking-form-fields.php:368
@@ -3128,58 +3128,58 @@ msgstr ""
 msgid "(Up to age %d)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1823
-#: app/Controllers/SingleTripController.php:2028
+#: app/Controllers/SingleTripController.php:1824
+#: app/Controllers/SingleTripController.php:2029
 #: templates/partials/availability-section.php:462
 #: templates/partials/booking-content.php:352
 #, php-format
 msgid "Decrease %s"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1827
-#: app/Controllers/SingleTripController.php:2032
+#: app/Controllers/SingleTripController.php:1828
+#: app/Controllers/SingleTripController.php:2033
 #: templates/partials/availability-section.php:468
 #: templates/partials/booking-content.php:356
 #, php-format
 msgid "Increase %s"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1854
-#: app/Controllers/SingleTripController.php:2052
+#: app/Controllers/SingleTripController.php:1855
+#: app/Controllers/SingleTripController.php:2053
 #: templates/partials/availability-section.php:489
 msgid "Select travelers"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1860
+#: app/Controllers/SingleTripController.php:1861
 msgid "(Age 13-99)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1867
+#: app/Controllers/SingleTripController.php:1868
 msgid "Decrease adults"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1871
+#: app/Controllers/SingleTripController.php:1872
 msgid "Increase adults"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1883
+#: app/Controllers/SingleTripController.php:1884
 msgid "(Age 4-12)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1890
+#: app/Controllers/SingleTripController.php:1891
 msgid "Decrease children"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1894
+#: app/Controllers/SingleTripController.php:1895
 msgid "Increase children"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1906
-#: app/Controllers/SingleTripController.php:2058
+#: app/Controllers/SingleTripController.php:1907
+#: app/Controllers/SingleTripController.php:2059
 msgid "Adult x 1"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:2260
+#: app/Controllers/SingleTripController.php:2261
 msgid "Custom Tab"
 msgstr ""
 
@@ -4068,7 +4068,7 @@ msgid "Booking Status"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:425
-#: templates/partials/single-trip/content-itinerary.php:324
+#: templates/partials/single-trip/content-itinerary.php:329
 #: templates/partials/single-trip/gallery-modal.php:29
 msgid "Loading..."
 msgstr ""
@@ -7187,39 +7187,39 @@ msgstr ""
 msgid "Detailed itinerary information will be available soon. Please check back later or contact us for more details."
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:162
+#: templates/partials/single-trip/content-itinerary.php:167
 msgid "Photos"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:187
+#: templates/partials/single-trip/content-itinerary.php:192
 #, php-format
 msgid "Itinerary Gallery Image %d"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:257
+#: templates/partials/single-trip/content-itinerary.php:262
 msgid "Video thumbnail"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:293
-#: templates/partials/single-trip/content-itinerary.php:323
+#: templates/partials/single-trip/content-itinerary.php:298
+#: templates/partials/single-trip/content-itinerary.php:328
 msgid "Itinerary Gallery Image"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:304
+#: templates/partials/single-trip/content-itinerary.php:309
 msgid "Itinerary Gallery"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:307
+#: templates/partials/single-trip/content-itinerary.php:312
 #: templates/partials/single-trip/gallery-modal.php:12
 msgid "Close Gallery"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:312
+#: templates/partials/single-trip/content-itinerary.php:317
 #: templates/partials/single-trip/gallery-modal.php:17
 msgid "Previous Image"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:317
+#: templates/partials/single-trip/content-itinerary.php:322
 #: templates/partials/single-trip/gallery-modal.php:22
 msgid "Next Image"
 msgstr ""
