@@ -213,11 +213,9 @@ class TripRepository extends BaseRepository
         if ($this->hasSoftDelete()) {
             $query .= " AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')";
         }
-
-        $result = $this->wpdb->get_row(
-            $this->wpdb->prepare($query, $id)
-        );
-
+        
+        $result = $this->wpdb->get_row($this->wpdb->prepare($query, $id));
+        
         return $result ?: null;
     }
 

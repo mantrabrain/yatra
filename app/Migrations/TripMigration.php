@@ -34,10 +34,6 @@ class TripMigration extends BaseMigration
             "SELECT COUNT(*) FROM " . TripsTable::getTableName()
         );
         
-        // List all tour IDs and titles for debugging
-        foreach ($oldTrips as $idx => $trip) {
-            }
-
         foreach ($oldTrips as $oldTrip) {
             try {
                 // Always re-migrate trips on every run - no skip logic
@@ -52,7 +48,7 @@ class TripMigration extends BaseMigration
                 if ($this->isForceMigration()) {
                     // Force migration: Always insert new (create duplicates)
                     $slug = $this->generateUniqueSlug($baseSlug, 'yatra_new_trips');
-                    } else {
+                } else {
                     // Regular migration: Check if already exists
                     $existingTripId = $this->wpdb->get_var($this->wpdb->prepare(
                         "SELECT id FROM " . TripsTable::getTableName() . " WHERE slug = %s",

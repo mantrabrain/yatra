@@ -46,7 +46,7 @@ class AddTaxFieldsToBookingsMigration
                 ADD COLUMN `tax_amount` decimal(12,2) DEFAULT 0 COMMENT 'Total tax amount' AFTER `subtotal`,
                 ADD COLUMN `tax_rate` decimal(5,2) DEFAULT 0 COMMENT 'Total tax rate percentage' AFTER `tax_amount`,
                 ADD COLUMN `tax_inclusive` tinyint(1) DEFAULT 0 COMMENT 'Whether tax is included in price' AFTER `tax_rate`,
-                ADD COLUMN `tax_details` text COMMENT 'JSON with detailed tax breakdown' AFTER `tax_inclusive'";
+                ADD COLUMN `tax_details` text COMMENT 'JSON with detailed tax breakdown' AFTER `tax_inclusive`";
         
         // Add indexes for tax fields
         $sql .= ", ADD INDEX `idx_tax_amount` (`tax_amount`)";
@@ -154,7 +154,7 @@ class AddTaxFieldsToBookingsMigration
                 }
             } catch (\Exception $e) {
                 // Log error but continue with other bookings
-                error_log("Yatra Tax Migration Error for booking {$booking->id}: " . $e->getMessage());
+                error_log('[Yatra] Tax migration error for booking ' . $booking->id . ': ' . $e->getMessage());
             }
         }
         

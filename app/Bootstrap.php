@@ -99,19 +99,17 @@ class Bootstrap
             // Load text domain
             $this->loadTextDomain();
 
-        } catch (\Exception $e) {
-            // Log the error
-            if (function_exists('error_log')) {
-                }
-            
+        } catch (\Throwable $e) {
+            error_log('Yatra plugin initialization error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+
             // Show admin notice if in admin area
             if (is_admin()) {
                 add_action('admin_notices', function() use ($e) {
-                    echo '<div class="notice notice-error"><p>Yatra plugin failed to initialize: ' . 
+                    echo '<div class="notice notice-error"><p><strong>Yatra:</strong> ' .
                          esc_html($e->getMessage()) . '</p></div>';
                 });
             }
-            
+
             return;
         }
 
@@ -126,75 +124,79 @@ class Bootstrap
         $helpersPath = YATRA_PLUGIN_PATH . 'includes/helpers.php';
         if (file_exists($helpersPath)) {
             require_once $helpersPath;
-        } else {
-            }
-        
+        }
+
         $seoHelperPath = YATRA_PLUGIN_PATH . 'includes/seo-helper.php';
         if (file_exists($seoHelperPath)) {
             require_once $seoHelperPath;
-        } else {
-            }
+        }
     }
 
     /**
-     * Register service providers
-     */
-    /**
-     * Register and boot service providers
+     * Register and boot service providers.
+     *
+     * Each provider is instantiated once. The same instance is used for both
+     * register() and boot() so that any hooks added during register() remain
+     * attached to the object that boot() later acts on.
      */
     private function registerServiceProviders(): void
     {
-        $providers = [];
-        
-        // Core providers
+        $providerClasses = [];
+
+        // Core providers — always loaded
         if (class_exists('Yatra\Providers\AppServiceProvider')) {
-            $providers[] = 'Yatra\Providers\AppServiceProvider';
-        } else {
-            }
-        
+            $providerClasses[] = 'Yatra\Providers\AppServiceProvider';
+        }
+
         if (class_exists('Yatra\Providers\RouteServiceProvider')) {
-            $providers[] = 'Yatra\Providers\RouteServiceProvider';
+            $providerClasses[] = 'Yatra\Providers\RouteServiceProvider';
         }
-        
+
+        // Admin-only providers
         if (is_admin() && class_exists('Yatra\Providers\AdminServiceProvider')) {
-            $providers[] = 'Yatra\Providers\AdminServiceProvider';
+            $providerClasses[] = 'Yatra\Providers\AdminServiceProvider';
         }
 
-        // Frontend assets provider (always load for frontend asset management)
+        // Frontend-only providers
         if (!is_admin() && class_exists('Yatra\Providers\FrontendAssetsProvider')) {
-            $providers[] = 'Yatra\Providers\FrontendAssetsProvider';
+            $providerClasses[] = 'Yatra\Providers\FrontendAssetsProvider';
         }
 
-        // Shortcode provider (always load for shortcode functionality)
+        // Shortcode provider (frontend + admin)
         if (class_exists('Yatra\Providers\ShortcodeServiceProvider')) {
-            $providers[] = 'Yatra\Providers\ShortcodeServiceProvider';
+            $providerClasses[] = 'Yatra\Providers\ShortcodeServiceProvider';
         }
 
-        // Block provider (always load for Gutenberg block functionality)
+        // Block provider (Gutenberg)
         if (class_exists('Yatra\Providers\BlockServiceProvider')) {
-            $providers[] = 'Yatra\Providers\BlockServiceProvider';
+            $providerClasses[] = 'Yatra\Providers\BlockServiceProvider';
         }
 
-        // Register each provider
-        foreach ($providers as $provider) {
+        // Instantiate and register all providers, keeping a map of the instances
+        // so boot() runs on the exact same object that register() did.
+        $instances = [];
+
+        foreach ($providerClasses as $class) {
             try {
-                $providerInstance = new $provider($this->container);
-                if (method_exists($providerInstance, 'register')) {
-                    $providerInstance->register();
+                $instance = new $class($this->container);
+                if (method_exists($instance, 'register')) {
+                    $instance->register();
                 }
-            } catch (\Exception $e) {
+                $instances[$class] = $instance;
+            } catch (\Throwable $e) {
+                error_log("Yatra: Failed to register provider {$class}: " . $e->getMessage());
                 continue;
             }
         }
-        
-        // Boot each provider
-        foreach ($providers as $provider) {
+
+        // Boot each successfully registered provider
+        foreach ($instances as $class => $instance) {
             try {
-                $providerInstance = $this->container->get($provider);
-                if (method_exists($providerInstance, 'boot')) {
-                    $providerInstance->boot();
+                if (method_exists($instance, 'boot')) {
+                    $instance->boot();
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
+                error_log("Yatra: Failed to boot provider {$class}: " . $e->getMessage());
                 continue;
             }
         }

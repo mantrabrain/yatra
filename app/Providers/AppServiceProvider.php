@@ -4,11 +4,12 @@ namespace Yatra\Providers;
 
 use WP_REST_Request;
 use Yatra\Core\Database;
+use Yatra\Core\ServiceProvider;
 
 /**
  * Service provider for Yatra plugin
  */
-class AppServiceProvider
+class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register services

@@ -59,10 +59,16 @@ class CustomerMigration extends BaseMigration
                 // In old system, post_title is the customer email
                 $email = $oldCustomer->post_title;
 
-                // Customer info is stored as individual post meta keys
-                // These come from yatra_tour_customer_info array saved during booking
+                // Customer info is stored as individual post meta keys.
+                // These come from $yatra_tour_customer_info saved during booking via
+                // Yatra_Customers::update() which iterates the form array and calls
+                // update_post_meta() for each key.
+                //
+                // Checkout form field keys (class-yatra-checkout-form.php):
+                //   fullname, email, country, phone_number  <-- note: phone_NUMBER not phone
                 $fullname = $meta['fullname'] ?? $meta['full_name'] ?? $meta['name'] ?? '';
-                $phone = $meta['phone'] ?? $meta['phone_number'] ?? $meta['contact'] ?? '';
+                // Always try phone_number first — that is the real checkout form field name.
+                $phone = $meta['phone_number'] ?? $meta['phone'] ?? $meta['contact'] ?? '';
                 $country = $meta['country'] ?? '';
                 $address = $meta['address'] ?? '';
                 $city = $meta['city'] ?? '';
@@ -103,6 +109,23 @@ class CustomerMigration extends BaseMigration
                     );
                     $newCustomerId = $existingCustomerId;
                     $migrated++;
+                } elseif ($existingCustomerId && $this->isForceMigration()) {
+                    // Update existing customer during force migration
+                    $updateData = $customerData;
+                    unset($updateData['created_at']);
+
+                    $this->wpdb->update(
+                        CustomersTable::getTableName(),
+                        $updateData,
+                        ['id' => $existingCustomerId]
+                    );
+                    $newCustomerId = $existingCustomerId;
+                    Logger::debug("Customer updated (force migration): {$email}", [
+                        'source' => 'migration',
+                        'customer_id' => $oldCustomer->ID,
+                        'existing_customer_id' => $existingCustomerId
+                    ]);
+                    $migrated++;
                 } else {
                     // Insert new customer
                     $inserted = $this->wpdb->insert(
@@ -114,6 +137,27 @@ class CustomerMigration extends BaseMigration
                         $newCustomerId = $this->wpdb->insert_id;
                         $migrated++;
                     } else {
+                        // Check if it's a duplicate key error and handle gracefully
+                        if (strpos($this->wpdb->last_error, 'Duplicate entry') !== false) {
+                            // Try to find existing customer by email
+                            $existingCustomer = $this->wpdb->get_row($this->wpdb->prepare(
+                                "SELECT id FROM " . CustomersTable::getTableName() . " WHERE email = %s LIMIT 1",
+                                $email
+                            ));
+                            
+                            if ($existingCustomer) {
+                                $newCustomerId = $existingCustomer->id;
+                                $skipped++;
+                                Logger::debug("Customer skipped (email already exists): {$email}", [
+                                    'source' => 'migration',
+                                    'customer_id' => $oldCustomer->ID,
+                                    'existing_customer_id' => $existingCustomer->id
+                                ]);
+                                $this->updateProgress('customers', 'running', $migrated, $skipped, $failed, $total, null, null);
+                                continue;
+                            }
+                        }
+                        
                         $failed++;
                         Logger::error("Failed to insert customer ID {$oldCustomer->ID}: {$this->wpdb->last_error}", [
                             'source' => 'migration',

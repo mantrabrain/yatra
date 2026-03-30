@@ -30,7 +30,7 @@ class AttributeMigration extends BaseMigration
         $skipped = 0;
         $failed = 0;
 
-        Logger::info("Starting attribute migration", ['source' => 'migration']);
+        Logger::info("Starting attribute migration.", ['source' => 'migration']);
 
         // Step 1: Migrate attribute definitions (taxonomy terms → ClassificationsTable)
         $defResult = $this->migrateAttributeDefinitions();
@@ -105,16 +105,22 @@ class AttributeMigration extends BaseMigration
                 ));
 
                 $slug = $baseSlug;
-                if (!$existingId || $this->isForceMigration()) {
-                    // Generate unique slug if needed
+
+                if ($existingId && !$this->isForceMigration()) {
+                    // Skip if already exists and not force migration
+                    $skipped++;
+                    $this->updateProgress('attributes', 'running', $migrated, $skipped, $failed, $total, null, null);
+                    continue;
+                }
+
+                if (!$existingId) {
+                    // Generate unique slug for new insert
                     $counter = 1;
                     $uniqueSlug = $slug;
                     while ($this->wpdb->get_var($this->wpdb->prepare(
-                        "SELECT id FROM {$classificationsTable} WHERE type = %s AND slug = %s" . ($existingId ? " AND id != %d" : ""),
-                        ...array_merge(
-                            [ClassificationTypes::ATTRIBUTE, $uniqueSlug],
-                            $existingId ? [$existingId] : []
-                        )
+                        "SELECT id FROM {$classificationsTable} WHERE type = %s AND slug = %s",
+                        ClassificationTypes::ATTRIBUTE,
+                        $uniqueSlug
                     ))) {
                         $uniqueSlug = $slug . '-' . $counter++;
                     }
@@ -146,8 +152,8 @@ class AttributeMigration extends BaseMigration
                     'updated_at' => current_time('mysql'),
                 ];
 
-                if ($existingId && !$this->isForceMigration()) {
-                    // Update existing
+                if ($existingId && $this->isForceMigration()) {
+                    // Update existing during force migration
                     $this->wpdb->update($classificationsTable, $data, ['id' => $existingId]);
                     $newId = (int) $existingId;
                 } else {
@@ -155,8 +161,15 @@ class AttributeMigration extends BaseMigration
                     $data['created_at'] = current_time('mysql');
                     $inserted = $this->wpdb->insert($classificationsTable, $data);
                     if (!$inserted) {
+                        $errorMsg = $this->wpdb->last_error;
+                        // Check if it's a duplicate key error and handle gracefully
+                        if (strpos($errorMsg, 'Duplicate entry') !== false) {
+                            $skipped++;
+                            $this->updateProgress('attributes', 'running', $migrated, $skipped, $failed, $total, null, null);
+                            continue;
+                        }
                         $failed++;
-                        Logger::error("Failed to insert attribute: {$term->name} — {$this->wpdb->last_error}", ['source' => 'migration']);
+                        Logger::error("Failed to insert attribute '{$term->name}': {$errorMsg}", ['source' => 'migration']);
                         $this->updateProgress('attributes', 'running', $migrated, $skipped, $failed, $total, null, null);
                         continue;
                     }

@@ -48,22 +48,24 @@ class BookingMigration extends BaseMigration
         $skipped = 0;
         $failed = 0;
 
-        // Old bookings are stored as CPT 'yatra-booking' in wp_posts
-        $oldBookings = $this->wpdb->get_results(
-            "SELECT * FROM {$this->wpdb->posts} 
-             WHERE post_type = 'yatra-booking' 
-             AND post_status NOT IN ('trash', 'auto-draft')"
+        // Check if old booking post type exists at all
+        $postTypeCheck = $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$this->wpdb->posts} WHERE post_type = 'yatra-booking'"
         );
+        
+        // Get old bookings
+        $oldBookings = $this->wpdb->get_results(
+            "SELECT ID, post_title, post_status, post_date, post_content, post_modified 
+             FROM {$this->wpdb->posts} 
+             WHERE post_type = 'yatra-booking' 
+             AND post_status NOT IN ('trash', 'auto-draft')
+             ORDER BY ID ASC"
+        );
+        
         $total = count($oldBookings);
-
-        if ($total === 0) {
-            return compact('migrated', 'skipped', 'failed');
-        }
-
-        Logger::info("Found {$total} old bookings to migrate", ['source' => 'migration', 'data_type' => 'bookings']);
-
+        
         foreach ($oldBookings as $oldBooking) {
-            try {
+                try {
                 // Check if already migrated
                 $migratedId = $this->getRawPostMeta($oldBooking->ID, '_migrated_to_booking_id');
                 if ($migratedId && !$this->isForceMigration()) {
@@ -87,100 +89,143 @@ class BookingMigration extends BaseMigration
 
                 // Get the first tour entry from booking meta (most bookings have one tour)
                 $firstTour = !empty($bookingMeta) ? reset($bookingMeta) : [];
-                $oldTourId = (int) ($firstTour['tour_id'] ?? 0);
+                $oldTourId = (int) ($firstTour['yatra_tour_id'] ?? 0);
+                
+                // Validate old tour ID
+                if ($oldTourId <= 0) {
+                    $failed++;
+                    Logger::warning("Booking {$oldBooking->ID}: Invalid tour ID", [
+                        'source' => 'migration',
+                        'data_type' => 'bookings',
+                        'booking_id' => $oldBooking->ID,
+                        'tour_id' => $oldTourId
+                    ]);
+                    $this->updateProgress('bookings', 'running', $migrated, $skipped, $failed, $total, null, null);
+                    continue;
+                }
 
+                // Extract booking code early for error logging.
+                // Old plugin stores booking_code with a '#' prefix (e.g. '#abc1234567').
+                // Strip it so the new 'reference' column stays clean.
+                $rawBookingCode = $bookingParams['booking_code'] ?? ('YTR-' . $oldBooking->ID);
+                $bookingCode = ltrim($rawBookingCode, '#');
+                
                 // Map old trip ID to new trip ID
                 $newTripId = $oldTourId > 0 ? $this->getMigratedTripId($oldTourId) : null;
-
+                
+                // If initial mapping failed, try fallback methods
                 if (!$newTripId) {
                     // Try to find trip by title if tour_id mapping doesn't exist
-                    $tourName = $firstTour['tour_name'] ?? '';
+                    $tourName = $firstTour['yatra_tour_name'] ?? '';
+                    
                     if (!empty($tourName)) {
                         $newTripId = $this->wpdb->get_var($this->wpdb->prepare(
                             "SELECT id FROM " . \Yatra\Database\Tables\TripsTable::getTableName() . " WHERE title = %s LIMIT 1",
                             $tourName
                         ));
                     }
+                    
+                    // If still not found, try by slug
+                    if (!$newTripId && !empty($tourName)) {
+                        $slug = sanitize_title($tourName);
+                        $newTripId = $this->wpdb->get_var($this->wpdb->prepare(
+                            "SELECT id FROM " . \Yatra\Database\Tables\TripsTable::getTableName() . " WHERE slug = %s LIMIT 1",
+                            $slug
+                        ));
+                    }
+                    
+                    // Last resort: check if old tour post still exists and get its title
+                    if (!$newTripId && $oldTourId > 0) {
+                        $oldTourPost = $this->wpdb->get_row($this->wpdb->prepare(
+                            "SELECT post_title FROM {$this->wpdb->posts} WHERE ID = %d AND post_type = 'tour'",
+                            $oldTourId
+                        ));
+                        
+                        if ($oldTourPost && !empty($oldTourPost->post_title)) {
+                            $newTripId = $this->wpdb->get_var($this->wpdb->prepare(
+                                "SELECT id FROM " . \Yatra\Database\Tables\TripsTable::getTableName() . " WHERE title = %s LIMIT 1",
+                                $oldTourPost->post_title
+                            ));
+                        }
+                    }
                 }
 
+                // If still no trip found, fail this booking
                 if (!$newTripId) {
                     $failed++;
-                    Logger::warning("Booking {$oldBooking->ID}: No matching new trip found for old tour ID {$oldTourId}", [
+                    Logger::warning("Booking {$oldBooking->ID}: No matching new trip found", [
                         'source' => 'migration',
                         'data_type' => 'bookings',
+                        'old_tour_id' => $oldTourId,
+                        'tour_name' => $firstTour['yatra_tour_name'] ?? 'N/A',
+                        'booking_code' => $bookingCode,
                     ]);
                     $this->updateProgress('bookings', 'running', $migrated, $skipped, $failed, $total, null, null);
                     continue;
                 }
 
-                // Map old customer to new customer
-                $oldCustomerId = (int) ($meta['yatra_customer_id'] ?? 0);
-                $newCustomerId = null;
-                $wpUserId = $meta['yatra_user_id'] ?? null;
+                // Start database transaction for data integrity
+                $this->wpdb->query('START TRANSACTION');
 
-                if ($oldCustomerId > 0) {
-                    $newCustomerId = (int) ($this->getRawPostMeta($oldCustomerId, '_migrated_to_customer_id') ?: 0) ?: null;
-                }
+                try {
+                    // Map old customer to new customer
+                    $oldCustomerId = (int) ($meta['yatra_customer_id'] ?? 0);
+                    $newCustomerId = null;
+                    $wpUserId = $meta['yatra_user_id'] ?? null;
 
-                // If no migrated customer found, try to look up by email
-                $customerInfo = $bookingParams['yatra_tour_customer_info'] ?? [];
-                if (is_string($customerInfo)) {
-                    $customerInfo = maybe_unserialize($customerInfo);
-                }
-                if (!is_array($customerInfo)) {
-                    $customerInfo = [];
-                }
+                    if ($oldCustomerId > 0) {
+                        $newCustomerId = (int) ($this->getRawPostMeta($oldCustomerId, '_migrated_to_customer_id') ?: 0) ?: null;
+                    }
 
-                $contactEmail = $customerInfo['email'] ?? '';
-                $contactFullname = $customerInfo['fullname'] ?? $customerInfo['full_name'] ?? '';
-                $contactPhone = $customerInfo['phone'] ?? $customerInfo['phone_number'] ?? '';
-                $contactCountry = $customerInfo['country'] ?? $firstTour['country'] ?? '';
+                    // If no migrated customer found, try to look up by email
+                    $customerInfo = $bookingParams['yatra_tour_customer_info'] ?? [];
+                    if (is_string($customerInfo)) {
+                        $customerInfo = maybe_unserialize($customerInfo);
+                    }
+                    if (!is_array($customerInfo)) {
+                        $customerInfo = [];
+                    }
 
-                if (!$newCustomerId && !empty($contactEmail)) {
-                    $newCustomerId = $this->wpdb->get_var($this->wpdb->prepare(
-                        "SELECT id FROM " . CustomersTable::getTableName() . " WHERE email = %s",
-                        $contactEmail
-                    ));
-                }
+                    $contactEmail = $customerInfo['email'] ?? '';
+                    $contactPhone = $customerInfo['phone'] ?? $customerInfo['phone_number'] ?? '';
+                    $contactCountry = $customerInfo['country'] ?? $firstTour['country'] ?? '';
+                    $nameParts = $this->parseFullName($customerInfo['fullname'] ?? $customerInfo['full_name'] ?? '');
 
-                // Parse contact name
-                $nameParts = $this->parseFullName($contactFullname);
+                    // Map old booking status to new status
+                    $newStatus = $this->mapBookingStatus($oldBooking->post_status);
 
-                // Map old booking status to new status
-                $newStatus = $this->mapBookingStatus($oldBooking->post_status);
-
-                // Extract pricing info
-                $totalAmount = (float) ($bookingParams['total_booking_price'] ?? $bookingParams['total_booking_net_price'] ?? 0);
-                $grossAmount = (float) ($bookingParams['total_booking_gross_price'] ?? $totalAmount);
-                $currency = $bookingParams['yatra_currency'] ?? 'USD';
-                $bookingCode = $bookingParams['booking_code'] ?? 'YTR-' . $oldBooking->ID;
-                $bookingDate = $bookingParams['booking_date'] ?? $oldBooking->post_date;
+                    // Extract pricing info
+                    $totalAmount = (float) ($bookingParams['total_booking_price'] ?? $bookingParams['total_booking_net_price'] ?? 0);
+                    $grossAmount = (float) ($bookingParams['total_booking_gross_price'] ?? $totalAmount);
+                    $currency = $bookingParams['yatra_currency'] ?? 'USD';
+                    $bookingDate = $bookingParams['booking_date'] ?? $oldBooking->post_date;
 
                 // Calculate total travelers across all tours in this booking
-                $totalTravelers = 0;
-                foreach ($bookingMeta as $tourEntry) {
-                    $totalTravelers += (int) ($tourEntry['number_of_person'] ?? 1);
-                }
-                if ($totalTravelers < 1) {
-                    $totalTravelers = 1;
-                }
+                    $totalTravelers = 0;
+                    foreach ($bookingMeta as $tourEntry) {
+                        $pax = $tourEntry['number_of_person'] ?? 1;
+                        $totalTravelers += is_array($pax) ? array_sum($pax) : (int) $pax;
+                    }
+                    if ($totalTravelers < 1) {
+                        $totalTravelers = 1;
+                    }
 
-                // Get travel date from first tour
-                $travelDate = $firstTour['selected_date'] ?? null;
-                if ($travelDate) {
-                    // Normalize date format
-                    $parsedDate = strtotime($travelDate);
-                    if ($parsedDate) {
-                        $travelDate = date('Y-m-d', $parsedDate);
+                    // Get travel date from first tour
+                    $travelDate = $firstTour['yatra_selected_date'] ?? null;
+                    if ($travelDate) {
+                        // Normalize date format
+                        $parsedDate = strtotime($travelDate);
+                        if ($parsedDate) {
+                            $travelDate = date('Y-m-d', $parsedDate);
+                        } else {
+                            $travelDate = date('Y-m-d');
+                        }
                     } else {
                         $travelDate = date('Y-m-d');
                     }
-                } else {
-                    $travelDate = date('Y-m-d');
-                }
 
-                // Extract coupon/discount info
-                $couponData = $bookingParams['coupon'] ?? [];
+                    // Extract coupon/discount info
+                    $couponData = $bookingParams['coupon'] ?? [];
                 if (is_string($couponData)) {
                     $couponData = maybe_unserialize($couponData);
                 }
@@ -217,7 +262,9 @@ class BookingMigration extends BaseMigration
                     'contact_first_name' => $nameParts['first_name'],
                     'contact_last_name' => $nameParts['last_name'],
                     'contact_email' => $contactEmail,
-                    'contact_phone' => $contactPhone,
+                    // phone_number is the actual checkout form field key in old plugin;
+                    // always prefer it — phone is a legacy fallback only.
+                    'contact_phone' => $customerInfo['phone_number'] ?? $customerInfo['phone'] ?? $contactPhone,
                     'contact_country' => $contactCountry,
                     'travel_date' => $travelDate,
                     'travelers_count' => $totalTravelers,
@@ -234,7 +281,8 @@ class BookingMigration extends BaseMigration
                     'payment_status' => $paymentStatus,
                     'status' => $newStatus,
                     'created_at' => $oldBooking->post_date,
-                    'updated_at' => $oldBooking->post_modified,
+                    // post_modified is now included in the SELECT query — was NULL before.
+                    'updated_at' => $oldBooking->post_modified ?: $oldBooking->post_date,
                 ];
 
                 // Check if booking with same reference exists
@@ -242,6 +290,9 @@ class BookingMigration extends BaseMigration
                     "SELECT id FROM " . BookingsTable::getTableName() . " WHERE reference = %s",
                     $bookingCode
                 ));
+
+                // Initialize to null — will be set on successful insert or update.
+                $newBookingId = null;
 
                 if ($existingBookingId && !$this->isForceMigration()) {
                     // Update existing booking
@@ -254,8 +305,7 @@ class BookingMigration extends BaseMigration
                         $updateData,
                         ['id' => $existingBookingId]
                     );
-                    $newBookingId = $existingBookingId;
-                    $migrated++;
+                    $newBookingId = (int) $existingBookingId;
                 } else {
                     // For force migration, ensure unique reference
                     if ($this->isForceMigration() && $existingBookingId) {
@@ -268,29 +318,70 @@ class BookingMigration extends BaseMigration
                     );
 
                     if ($inserted) {
-                        $newBookingId = $this->wpdb->insert_id;
-                        $migrated++;
+                        $newBookingId = (int) $this->wpdb->insert_id;
                     } else {
                         $failed++;
-                        Logger::error("Failed to insert booking ID {$oldBooking->ID}: {$this->wpdb->last_error}", [
+                        $errorDetails = [
                             'source' => 'migration',
                             'data_type' => 'bookings',
                             'booking_id' => $oldBooking->ID,
-                        ]);
+                            'booking_code' => $bookingCode,
+                            'error' => $this->wpdb->last_error,
+                            'trip_id' => $newTripId,
+                            'customer_id' => $newCustomerId
+                        ];
+                        
+                        // Check for specific error types
+                        if (strpos($this->wpdb->last_error, 'Duplicate entry') !== false) {
+                            $errorDetails['error_type'] = 'duplicate_reference';
+                            Logger::warning("Booking failed (duplicate reference): {$oldBooking->ID} - {$bookingCode}", $errorDetails);
+                        } elseif (strpos($this->wpdb->last_error, 'Cannot add or update a child row') !== false) {
+                            $errorDetails['error_type'] = 'foreign_key_constraint';
+                            Logger::warning("Booking failed (foreign key): {$oldBooking->ID} - trip_id: {$newTripId}, customer_id: {$newCustomerId}", $errorDetails);
+                        } else {
+                            $errorDetails['error_type'] = 'database_error';
+                            Logger::error("Failed to insert booking ID {$oldBooking->ID}: {$this->wpdb->last_error}", $errorDetails);
+                        }
+                        
                         $this->updateProgress('bookings', 'running', $migrated, $skipped, $failed, $total, null, null);
                         continue;
                     }
                 }
 
+                // Guard: only persist migration marker and payments if we have a valid new ID.
+                if ($newBookingId === null) {
+                    $failed++;
+                    Logger::error("Booking {$oldBooking->ID}: no new booking ID — skipping marker and payments.", [
+                        'source' => 'migration',
+                        'data_type' => 'bookings',
+                        'booking_id' => $oldBooking->ID,
+                    ]);
+                    $this->updateProgress('bookings', 'running', $migrated, $skipped, $failed, $total, null, null);
+                    continue;
+                }
+
                 // Mark as migrated
-                $this->setRawPostMeta($oldBooking->ID, '_migrated_to_booking_id', (string) $newBookingId);
+                    $this->setRawPostMeta($oldBooking->ID, '_migrated_to_booking_id', (string) $newBookingId);
 
-                // Migrate associated payments
-                $this->migrateBookingPayments($oldBooking->ID, $newBookingId, $newCustomerId);
+                    // Migrate associated payments
+                    $this->migrateBookingPayments($oldBooking->ID, $newBookingId, $newCustomerId);
 
-                $this->updateProgress('bookings', 'running', $migrated, $skipped, $failed, $total, null, null);
+                    // Commit transaction
+                    $this->wpdb->query('COMMIT');
+                    $migrated++;
+                    Logger::info("Migrated booking ID {$oldBooking->ID} → new booking ID {$newBookingId}.", [
+                        'source'     => 'migration',
+                        'data_type'  => 'bookings',
+                        'booking_id' => $oldBooking->ID,
+                        'new_id'     => $newBookingId,
+                    ]);
 
-                usleep(50000);
+                } catch (\Exception $e) {
+                    // Rollback transaction on error
+                    $this->wpdb->query('ROLLBACK');
+                    throw $e;
+                }
+                
             } catch (\Exception $e) {
                 $failed++;
                 Logger::error("Exception migrating booking ID {$oldBooking->ID}: {$e->getMessage()}", [
@@ -301,6 +392,7 @@ class BookingMigration extends BaseMigration
                 ]);
                 $this->updateProgress('bookings', 'running', $migrated, $skipped, $failed, $total, null, null);
             }
+
         }
 
         return compact('migrated', 'skipped', 'failed');

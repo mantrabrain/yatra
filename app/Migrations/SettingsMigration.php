@@ -26,6 +26,35 @@ class SettingsMigration extends BaseMigration
             
             $total = count($settingsMap);
             
+            Logger::info("Starting settings migration", [
+                'source' => 'migration',
+                'total_simple_settings' => $total,
+                'force_migration' => $this->isForceMigration()
+            ]);
+            
+            // Debug: Check what old Yatra settings actually exist
+            global $wpdb;
+            $existingOldSettings = $wpdb->get_col(
+                "SELECT option_name FROM {$wpdb->options} 
+                 WHERE option_name LIKE 'yatra_%' 
+                 AND option_name NOT LIKE '%gateway_configs%'
+                 AND option_name NOT LIKE '%migration_%'
+                 ORDER BY option_name"
+            );
+            
+            Logger::info("Found " . count($existingOldSettings) . " existing old Yatra settings", [
+                'source' => 'migration',
+                'existing_settings' => $existingOldSettings
+            ]);
+            
+            // Debug: Log specific gateway-related settings
+            $gatewaySettings = ['yatra_payment_gateways', 'yatra_paypal_settings', 'yatra_stripe_settings', 'yatra_authorize_net_settings'];
+            foreach ($gatewaySettings as $key) {
+                $value = get_option($key, 'NOT_FOUND');
+                $valueType = is_array($value) ? '[ARRAY:' . count($value) . ']' : (is_serialized($value) ? '[SERIALIZED]' : $value);
+                Logger::debug("Gateway setting - {$key}: {$valueType}", ['source' => 'migration']);
+            }
+            
             foreach ($settingsMap as $mapping) {
                 try {
                     $oldKey = $mapping['old'];
@@ -42,22 +71,49 @@ class SettingsMigration extends BaseMigration
                     
                     if ($oldValue === null) {
                         $skipped++;
+                        Logger::debug("Setting skipped (not found): {$oldKey}", ['source' => 'migration']);
                         continue;
                     }
                     
                     // Transform value if needed
                     $newValue = $transform ? $transform($oldValue) : $oldValue;
                     
-                    // Check if new setting already exists
+                    // Check if new setting already exists.
+                    // NOTE: Since many option keys are shared between old and new plugin (same
+                    // option_name for the same feature), the new plugin's install routine may
+                    // have already written a default value. We always overwrite to ensure the
+                    // user's real data from the old plugin wins — unless it's identical.
                     $existingValue = get_option($newKey, null);
-                    
+
                     if ($existingValue !== null && !$this->isForceMigration()) {
-                        $skipped++;
-                        continue;
+                        // If the values are already identical, just count as migrated to avoid
+                        // misleading 'skipped 30 settings' message in the UI.
+                        if (serialize($existingValue) === serialize($newValue)) {
+                            $migrated++;
+                            Logger::debug("Setting already matches, counted as migrated: {$oldKey} -> {$newKey}", ['source' => 'migration']);
+                            $this->updateProgress('settings', 'running', $migrated, $skipped, $failed, $total, null, null);
+                            continue;
+                        }
+                        // Values differ — for same-key settings the old data should win.
+                        // Only skip if old and new keys are truly different option names
+                        // (meaning the new plugin intentionally renamed them).
+                        if ($oldKey !== $newKey) {
+                            $skipped++;
+                            Logger::debug("Setting skipped (already exists, different key): {$oldKey} -> {$newKey}", ['source' => 'migration']);
+                            $this->updateProgress('settings', 'running', $migrated, $skipped, $failed, $total, null, null);
+                            continue;
+                        }
+                        // Same key in both systems — overwrite with old user data.
                     }
                     
                     // Update or add new setting
                     update_option($newKey, $newValue);
+                    
+                    if ($existingValue !== null && $this->isForceMigration()) {
+                        Logger::info("Setting force-migrated (overwritten): {$oldKey} -> {$newKey}", ['source' => 'migration']);
+                    } else {
+                        Logger::info("Setting migrated: {$oldKey} -> {$newKey}", ['source' => 'migration']);
+                    }
                     
                     $migrated++;
                     
@@ -65,7 +121,7 @@ class SettingsMigration extends BaseMigration
                     $failed++;
                     Logger::error("Setting migration exception", [
                         'source' => 'migration',
-                        'old_key' => $oldKey,
+                        'old_key' => $oldKey ?? 'unknown',
                         'error' => $e->getMessage()
                     ]);
                 }
@@ -73,8 +129,19 @@ class SettingsMigration extends BaseMigration
                 $this->updateProgress('settings', 'running', $migrated, $skipped, $failed, $total, null, null);
             }
             
-            // Migrate complex settings (arrays/objects)
-            $this->migrateComplexSettings();
+            // Migrate complex settings (arrays/objects) and count them
+            Logger::info("Starting complex settings migration", ['source' => 'migration']);
+            $complexResults = $this->migrateComplexSettings();
+            $migrated += $complexResults['migrated'];
+            $skipped += $complexResults['skipped'];
+            $failed += $complexResults['failed'];
+            
+            Logger::info("Settings migration completed", [
+                'source' => 'migration',
+                'migrated' => $migrated,
+                'skipped' => $skipped,
+                'failed' => $failed
+            ]);
             
         } catch (\Exception $e) {
             Logger::error("Settings migration failed", [
@@ -308,6 +375,40 @@ class SettingsMigration extends BaseMigration
                 'old' => 'yatra_log_options',
                 'new' => 'yatra_log_options',
             ],
+
+            // ── Additional settings verified from yatra-misc-functions.php and form handler ──
+
+            // Tour listing "View Details" button text
+            [
+                'old' => 'yatra_tour_view_details_button_text',
+                'new' => 'yatra_tour_view_details_button_text',
+            ],
+
+            // Checkout legal agreement toggles (class-yatra-form-handler.php)
+            [
+                'old' => 'yatra_checkout_show_agree_to_privacy_policy',
+                'new' => 'yatra_checkout_show_agree_to_privacy_policy',
+                'transform' => function($value) {
+                    return $value === 'yes' || $value === true || $value === 1;
+                }
+            ],
+            [
+                'old' => 'yatra_checkout_show_agree_to_terms_policy',
+                'new' => 'yatra_checkout_show_agree_to_terms_policy',
+                'transform' => function($value) {
+                    return $value === 'yes' || $value === true || $value === 1;
+                }
+            ],
+
+            // Date/time display formats (used in template-tags.php)
+            [
+                'old' => 'yatra_date_format',
+                'new' => 'yatra_date_format',
+            ],
+            [
+                'old' => 'yatra_time_format',
+                'new' => 'yatra_time_format',
+            ],
         ];
     }
     
@@ -318,32 +419,339 @@ class SettingsMigration extends BaseMigration
      *   - yatra_payment_gateways: array of active gateway IDs (from class-yatra-install.php)
      *   - yatra_permalinks: array with tour_base, activity_base, destination_base, attributes_base
      *     (from admin/class-yatra-admin-permalinks.php)
+     *   - Individual gateway settings (yatra_paypal_settings, yatra_stripe_settings, etc.)
+     * 
+     * @return array ['migrated' => int, 'skipped' => int, 'failed' => int]
      */
-    private function migrateComplexSettings(): void
+    private function migrateComplexSettings(): array
     {
-        // Migrate active payment gateways list
-        // Old: yatra_payment_gateways = ['paypal', 'booking_only'] (array of gateway IDs)
+        $migrated = 0;
+        $skipped = 0;
+        $failed = 0;
+        
+        // Migrate active payment gateways list.
+        //
+        // OLD format (class-yatra-install.php line 197):
+        //   yatra_payment_gateways = ['booking_only' => 'yes', 'paypal' => 'yes']
+        //   Active gateways are retrieved via array_keys() — the value is always 'yes'.
+        //
+        // NEW format expected by yatra 3.x:
+        //   yatra_active_payment_gateways = ['booking_only', 'paypal']  (indexed array)
+        //
+        // We must convert the associative slug=>yes map to a plain indexed list.
         $oldGateways = get_option('yatra_payment_gateways', []);
         if (!empty($oldGateways) && is_array($oldGateways)) {
-            update_option('yatra_active_payment_gateways', $oldGateways);
+            // Filter out any disabled gateways (value != 'yes') and extract just the slugs.
+            $activeGatewayIds = array_keys(array_filter($oldGateways, function($v) {
+                return $v === 'yes' || $v === true || $v === 1;
+            }));
+            update_option('yatra_active_payment_gateways', $activeGatewayIds);
+            $migrated++;
+            Logger::info("Migrated active payment gateways (indexed)", [
+                'source' => 'migration',
+                'gateways' => $activeGatewayIds
+            ]);
+        } else {
+            $skipped++;
+            Logger::debug("Skipped payment gateways (not found or empty)", ['source' => 'migration']);
         }
+
+        // Migrate payment gateway configurations
+        $gatewayResults = $this->migratePaymentGatewayConfigs();
+        $migrated += $gatewayResults['migrated'];
+        $skipped += $gatewayResults['skipped'];
 
         // Migrate permalink settings
         // Old: yatra_permalinks = ['yatra_tour_base' => '...', 'yatra_destination_base' => '...', ...]
         $oldPermalinks = get_option('yatra_permalinks', []);
         if (!empty($oldPermalinks) && is_array($oldPermalinks)) {
+            $permalinksMigrated = 0;
             if (!empty($oldPermalinks['yatra_tour_base'])) {
                 update_option('yatra_trip_base', $oldPermalinks['yatra_tour_base']);
+                $permalinksMigrated++;
             }
             if (!empty($oldPermalinks['yatra_destination_base'])) {
                 update_option('yatra_destination_base', $oldPermalinks['yatra_destination_base']);
+                $permalinksMigrated++;
             }
             if (!empty($oldPermalinks['yatra_activity_base'])) {
                 update_option('yatra_activity_base', $oldPermalinks['yatra_activity_base']);
+                $permalinksMigrated++;
             }
             if (!empty($oldPermalinks['yatra_attributes_base'])) {
                 update_option('yatra_attributes_base', $oldPermalinks['yatra_attributes_base']);
+                $permalinksMigrated++;
             }
+            
+            if ($permalinksMigrated > 0) {
+                $migrated += $permalinksMigrated;
+                Logger::info("Migrated {$permalinksMigrated} permalink settings", ['source' => 'migration']);
+            }
+        } else {
+            $skipped++;
+            Logger::debug("Skipped permalinks (not found or empty)", ['source' => 'migration']);
         }
+        
+        // Migrate enquiry/booking form settings
+        $enquiryResults = $this->migrateEnquirySettings();
+        $migrated += $enquiryResults['migrated'];
+        $skipped += $enquiryResults['skipped'];
+        
+        return [
+            'migrated' => $migrated,
+            'skipped' => $skipped,
+            'failed' => $failed,
+        ];
+    }
+    
+    /**
+     * Migrate payment gateway configurations from old Yatra 2.x.
+     *
+     * Old Yatra stored each gateway's credentials as individual flat wp_options:
+     *
+     *   PayPal (core plugin):
+     *     yatra_payment_gateway_paypal_email
+     *     yatra_payment_gateway_paypal_label_on_checkout
+     *
+     *   Stripe (yatra-stripe add-on):
+     *     yatra_payment_gateway_stripe_live_publishable_key
+     *     yatra_payment_gateway_stripe_live_secret_key
+     *     yatra_payment_gateway_stripe_test_publishable_key
+     *     yatra_payment_gateway_stripe_test_secret_key
+     *     yatra_payment_gateway_stripe_webhook_endpoint_secret
+     *     yatra_payment_gateway_stripe_label_on_checkout
+     *
+     *   Razorpay (yatra-razorpay add-on):
+     *     yatra_payment_gateway_razorpay_key_id
+     *     yatra_payment_gateway_razorpay_key_secret
+     *     yatra_payment_gateway_razorpay_payment_action
+     *     yatra_payment_gateway_razorpay_enable_webhook
+     *     yatra_payment_gateway_razorpay_webhook_secret
+     *     yatra_payment_gateway_razorpay_label_on_checkout
+     *
+     *   2Checkout (yatra-2checkout add-on):
+     *     yatra_payment_gateway_2checkout_live_publishable_key
+     *     yatra_payment_gateway_2checkout_live_private_key
+     *     yatra_payment_gateway_2checkout_merchant_code
+     *     yatra_payment_gateway_2checkout_ins_secret_word
+     *     yatra_payment_gateway_2checkout_webhook_endpoint_secret
+     *     yatra_payment_gateway_2checkout_label_on_checkout
+     *
+     *   Booking Only (core plugin):
+     *     yatra_payment_gateway_booking_only_label_on_checkout
+     *
+     * New Yatra 3.0 stores all configs in a single serialised option:
+     *   yatra_gateway_configs = [
+     *     'paypal'  => ['email' => '...', ...],
+     *     'stripe'  => ['api_key' => '...', 'api_secret' => '...', ...],
+     *     'razorpay'=> ['key_id' => '...', 'key_secret' => '...', ...],
+     *     ...
+     *   ]
+     *
+     * Active gateway slugs in old system use 'booking_only'; new system uses 'pay_later'.
+     *
+     * @return array ['migrated' => int, 'skipped' => int]
+     */
+    private function migratePaymentGatewayConfigs(): array
+    {
+        $gatewayConfigs = [];
+        $migrated       = 0;
+        $skipped        = 0;
+
+        // Global test mode flag from old plugin (applies to all gateways).
+        $globalTestMode = get_option('yatra_payment_gateway_test_mode', 'no') === 'yes';
+
+        // ── PayPal ────────────────────────────────────────────────────────────
+        $paypalEmail = get_option('yatra_payment_gateway_paypal_email', '');
+        if (!empty($paypalEmail)) {
+            $gatewayConfigs['paypal'] = [
+                'email'      => sanitize_email($paypalEmail),
+                'test_mode'  => $globalTestMode,
+                'title'      => get_option('yatra_payment_gateway_paypal_label_on_checkout', 'PayPal Standard'),
+            ];
+            $migrated++;
+            Logger::info('Migrated PayPal gateway config.', [
+                'source'      => 'migration',
+                'has_email'   => !empty($paypalEmail),
+            ]);
+        } else {
+            $skipped++;
+            Logger::debug('Skipped PayPal gateway config — yatra_payment_gateway_paypal_email not found.', [
+                'source' => 'migration',
+            ]);
+        }
+
+        // ── Stripe ────────────────────────────────────────────────────────────
+        // Keys differ between live and test mode; pick the appropriate set.
+        $stripePubKey    = $globalTestMode
+            ? get_option('yatra_payment_gateway_stripe_test_publishable_key', '')
+            : get_option('yatra_payment_gateway_stripe_live_publishable_key', '');
+        $stripeSecretKey = $globalTestMode
+            ? get_option('yatra_payment_gateway_stripe_test_secret_key', '')
+            : get_option('yatra_payment_gateway_stripe_live_secret_key', '');
+        $stripeWebhook   = get_option('yatra_payment_gateway_stripe_webhook_endpoint_secret', '');
+
+        // Also store the opposite-mode keys so the admin can switch without re-entering them.
+        $stripeLivePub    = get_option('yatra_payment_gateway_stripe_live_publishable_key', '');
+        $stripeLiveSecret = get_option('yatra_payment_gateway_stripe_live_secret_key', '');
+        $stripeTestPub    = get_option('yatra_payment_gateway_stripe_test_publishable_key', '');
+        $stripeTestSecret = get_option('yatra_payment_gateway_stripe_test_secret_key', '');
+
+        if (!empty($stripePubKey) || !empty($stripeSecretKey)) {
+            $gatewayConfigs['stripe'] = array_filter([
+                // New Pro gateway uses 'api_key' (publishable) and 'api_secret' (secret).
+                'api_key'              => $stripePubKey,
+                'api_secret'           => $stripeSecretKey,
+                'webhook_secret'       => $stripeWebhook,
+                'test_mode'            => $globalTestMode,
+                'title'                => get_option('yatra_payment_gateway_stripe_label_on_checkout', 'Pay with Credit / Debit Card'),
+                // Preserve all four keys so switching modes works without re-entry.
+                'live_publishable_key' => $stripeLivePub,
+                'live_secret_key'      => $stripeLiveSecret,
+                'test_publishable_key' => $stripeTestPub,
+                'test_secret_key'      => $stripeTestSecret,
+            ], fn($v) => $v !== '' && $v !== null);
+            $migrated++;
+            Logger::info('Migrated Stripe gateway config.', [
+                'source'         => 'migration',
+                'has_pub_key'    => !empty($stripePubKey),
+                'has_secret_key' => !empty($stripeSecretKey),
+            ]);
+        } else {
+            $skipped++;
+            Logger::debug('Skipped Stripe gateway config — no keys found.', ['source' => 'migration']);
+        }
+
+        // ── Razorpay ──────────────────────────────────────────────────────────
+        $razorKeyId     = get_option('yatra_payment_gateway_razorpay_key_id', '');
+        $razorKeySecret = get_option('yatra_payment_gateway_razorpay_key_secret', '');
+
+        if (!empty($razorKeyId) || !empty($razorKeySecret)) {
+            $gatewayConfigs['razorpay'] = array_filter([
+                'key_id'         => $razorKeyId,
+                'key_secret'     => $razorKeySecret,
+                'payment_action' => get_option('yatra_payment_gateway_razorpay_payment_action', 'capture'),
+                'webhook_secret' => get_option('yatra_payment_gateway_razorpay_webhook_secret', ''),
+                'test_mode'      => $globalTestMode,
+                'title'          => get_option('yatra_payment_gateway_razorpay_label_on_checkout', 'Pay with Cards'),
+            ], fn($v) => $v !== '' && $v !== null);
+            $migrated++;
+            Logger::info('Migrated Razorpay gateway config.', [
+                'source'        => 'migration',
+                'has_key_id'    => !empty($razorKeyId),
+                'has_key_secret'=> !empty($razorKeySecret),
+            ]);
+        } else {
+            $skipped++;
+            Logger::debug('Skipped Razorpay gateway config — no keys found.', ['source' => 'migration']);
+        }
+
+        // ── 2Checkout ─────────────────────────────────────────────────────────
+        $twoCheckoutPubKey     = get_option('yatra_payment_gateway_2checkout_live_publishable_key', '');
+        $twoCheckoutPrivateKey = get_option('yatra_payment_gateway_2checkout_live_private_key', '');
+        $twoCheckoutMerchant   = get_option('yatra_payment_gateway_2checkout_merchant_code', '');
+
+        if (!empty($twoCheckoutPubKey) || !empty($twoCheckoutPrivateKey) || !empty($twoCheckoutMerchant)) {
+            $gatewayConfigs['2checkout'] = array_filter([
+                'publishable_key' => $twoCheckoutPubKey,
+                'private_key'     => $twoCheckoutPrivateKey,
+                'merchant_code'   => $twoCheckoutMerchant,
+                'ins_secret_word' => get_option('yatra_payment_gateway_2checkout_ins_secret_word', ''),
+                'webhook_secret'  => get_option('yatra_payment_gateway_2checkout_webhook_endpoint_secret', ''),
+                'test_mode'       => $globalTestMode,
+                'title'           => get_option('yatra_payment_gateway_2checkout_label_on_checkout', 'Pay with Cards'),
+            ], fn($v) => $v !== '' && $v !== null);
+            $migrated++;
+            Logger::info('Migrated 2Checkout gateway config.', ['source' => 'migration']);
+        } else {
+            $skipped++;
+            Logger::debug('Skipped 2Checkout gateway config — no keys found.', ['source' => 'migration']);
+        }
+
+        // ── Booking-Only / Pay-Later ──────────────────────────────────────────
+        // Old slug was 'booking_only'; new system calls it 'pay_later'.
+        $bookingOnlyLabel = get_option('yatra_payment_gateway_booking_only_label_on_checkout', 'Book Now Pay Later');
+        $gatewayConfigs['pay_later'] = [
+            'title' => $bookingOnlyLabel,
+        ];
+        $migrated++;
+        Logger::info('Migrated Pay Later (booking_only) gateway config.', ['source' => 'migration']);
+
+        // ── Persist all configs ───────────────────────────────────────────────
+        if (!empty($gatewayConfigs)) {
+            // Merge with any existing pro-gateway configs already saved so we do
+            // not clobber configs written by Pro module registration.
+            $existing = get_option('yatra_gateway_configs', []);
+            if (!is_array($existing)) {
+                $existing = [];
+            }
+            if ($this->isForceMigration()) {
+                $merged = array_merge($existing, $gatewayConfigs);
+            } else {
+                // Non-force: only fill in gateways not already configured.
+                $merged = array_merge($gatewayConfigs, $existing);
+            }
+            update_option('yatra_gateway_configs', $merged);
+            Logger::info('Saved yatra_gateway_configs.', [
+                'source'   => 'migration',
+                'count'    => count($merged),
+                'gateways' => array_keys($merged),
+            ]);
+        }
+
+        // ── Fix active-gateway slug: booking_only → pay_later ─────────────────
+        $activeGateways = get_option('yatra_active_payment_gateways', []);
+        if (is_array($activeGateways) && in_array('booking_only', $activeGateways, true)) {
+            $activeGateways = array_map(
+                fn($slug) => $slug === 'booking_only' ? 'pay_later' : $slug,
+                $activeGateways
+            );
+            update_option('yatra_active_payment_gateways', array_values(array_unique($activeGateways)));
+            Logger::info('Renamed booking_only → pay_later in active gateways list.', ['source' => 'migration']);
+        }
+
+        return [
+            'migrated' => $migrated,
+            'skipped'  => $skipped,
+        ];
+    }
+    
+    /**
+     * Migrate enquiry and booking form settings
+     * 
+     * @return array ['migrated' => int, 'skipped' => int]
+     */
+    private function migrateEnquirySettings(): array
+    {
+        $migrated = 0;
+        $skipped = 0;
+        
+        // Check if enquiry forms were enabled in old version
+        $enquiryEnabled = get_option('yatra_enquiry_form_show', 'no');
+        if ($enquiryEnabled === 'yes' || $enquiryEnabled === true) {
+            update_option('yatra_enable_enquiry', true);
+            $migrated++;
+            Logger::info("Migrated enquiry form setting", ['source' => 'migration']);
+        } else {
+            $skipped++;
+            Logger::debug("Skipped enquiry form setting (disabled or not found)", ['source' => 'migration']);
+        }
+        
+        // Migrate booking form field settings if they exist
+        $oldBookingFields = get_option('yatra_booking_form_fields', []);
+        if (!empty($oldBookingFields) && is_array($oldBookingFields)) {
+            // Transform old booking form fields to new format
+            update_option('yatra_legacy_booking_fields', $oldBookingFields);
+            $migrated++;
+            Logger::info("Migrated booking form fields", ['source' => 'migration', 'count' => count($oldBookingFields)]);
+        } else {
+            $skipped++;
+            Logger::debug("Skipped booking form fields (not found or empty)", ['source' => 'migration']);
+        }
+        
+        return [
+            'migrated' => $migrated,
+            'skipped' => $skipped,
+        ];
     }
 }

@@ -45,27 +45,26 @@ class TourDateMigration extends BaseMigration
                 // Check if already migrated (only for regular migration)
                 $existsInAvailability = null;
                 
-                if (!$this->isForceMigration()) {
-                    $existsInAvailability = $wpdb->get_var($wpdb->prepare(
-                        "SELECT id FROM " . TripAvailabilityDatesTable::getTableName() . " 
-                         WHERE trip_id IN (
-                             SELECT meta_value FROM {$wpdb->prefix}postmeta 
-                             WHERE post_id = %d AND meta_key = '_migrated_to_trip_id'
-                         )
-                         AND departure_date = %s",
-                        $oldDate->tour_id,
-                        $oldDate->start_date
-                    ));
-
-                    if ($existsInAvailability) {
-                        $skipped++;
-                        $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
-                        continue;
-                    }
-                } else {
-                    }
-
                 $newTripId = $this->getMigratedTripId($oldDate->tour_id);
+
+                if (!$this->isForceMigration()) {
+                    // Duplicate check: use the resolved newTripId directly so we
+                    // do not need a subquery that carried the wrong outer tour_id.
+                    if ($newTripId) {
+                        $existsInAvailability = $wpdb->get_var($wpdb->prepare(
+                            "SELECT id FROM " . TripAvailabilityDatesTable::getTableName() . "
+                             WHERE trip_id = %d AND departure_date = %s",
+                            $newTripId,
+                            $oldDate->start_date
+                        ));
+
+                        if ($existsInAvailability) {
+                            $skipped++;
+                            $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
+                            continue;
+                        }
+                    }
+                }
 
                 if (!$newTripId) {
                     $failed++;
@@ -116,19 +115,19 @@ class TourDateMigration extends BaseMigration
                             $originalPrice = $priceTypesArray[0]['original_price'] ?? null;
                             $discountedPrice = $priceTypesArray[0]['discounted_price'] ?? null;
                             $hasTravelerPricing = true;
-                            }
+                        }
                     }
-                    
+
                     // Format 2: Direct traveler_categories array
                     if (!$hasTravelerPricing && isset($pricing['traveler_categories']) && is_array($pricing['traveler_categories'])) {
                         $pricingType = 'regular';
                         $priceTypesArray = [];
-                        
+
                         foreach ($pricing['traveler_categories'] as $category) {
                             if (is_array($category)) {
                                 $origPrice = floatval($category['regular_price'] ?? $category['price'] ?? 0);
                                 $discPrice = floatval($category['sale_price'] ?? $category['discounted_price'] ?? 0);
-                                
+
                                 if ($origPrice > 0) {
                                     $priceTypesArray[] = [
                                         'category_id' => $category['category_id'] ?? $category['id'] ?? 0,
@@ -138,81 +137,69 @@ class TourDateMigration extends BaseMigration
                                 }
                             }
                         }
-                        
+
                         if (!empty($priceTypesArray)) {
                             $priceTypes = json_encode($priceTypesArray);
                             $originalPrice = $priceTypesArray[0]['original_price'] ?? null;
                             $discountedPrice = $priceTypesArray[0]['discounted_price'] ?? null;
                             $hasTravelerPricing = true;
-                            }
+                        }
                     }
-                    
+
                     // Format 3: Regular pricing (single price for all)
                     if (!$hasTravelerPricing) {
                         $pricingType = 'regular';
                         $originalPrice = floatval($pricing['regular_price'] ?? $pricing['price'] ?? 0);
                         $discountedPrice = floatval($pricing['sale_price'] ?? $pricing['discounted_price'] ?? 0);
-                        
+
                         // If discounted price is 0 or >= original, set to null
                         if ($discountedPrice <= 0 || ($originalPrice > 0 && $discountedPrice >= $originalPrice)) {
                             $discountedPrice = null;
                         }
-                        
-                        }
+                    }
                 }
                 
-                if ($priceTypes) {
-                    }
+                // Migrate to yatra_trip_availability_dates.
+                // Reaching here means: no duplicate found (or force migration).
+                $maxTravelers = intval($oldDate->max_travellers ?? 0);
+                if ($maxTravelers <= 0) {
+                    $maxTravelers = 10; // Default
+                }
 
-                // Migrate to yatra_trip_availability_dates
-                if (!$existsInAvailability || $this->isForceMigration()) {
-                    $maxTravelers = intval($oldDate->max_travellers ?? 0);
-                    if ($maxTravelers <= 0) {
-                        $maxTravelers = 10; // Default
-                    }
-                    
-                    // Determine status based on active flag
-                    $availabilityStatus = 'available';
-                    if (!$oldDate->active) {
-                        $availabilityStatus = 'cancelled';
-                    }
+                // Determine status based on active flag
+                $availabilityStatus = $oldDate->active ? 'available' : 'cancelled';
 
-                    $availabilityData = [
-                        'trip_id' => $newTripId,
-                        'departure_date' => $oldDate->start_date,
-                        'return_date' => $oldDate->end_date,
-                        'seats_total' => $maxTravelers,
-                        'seats_available' => $maxTravelers,
-                        'seats_reserved' => 0,
-                        'seats_waitlist' => 0,
-                        'pricing_type' => $pricingType,
-                        'original_price' => $originalPrice,
-                        'discounted_price' => $discountedPrice,
-                        'price_types' => $priceTypes,
-                        'status' => $availabilityStatus,
-                        'special_notes' => $oldDate->note_to_customer ?? null,
-                        'created_at' => $oldDate->created_at ?? current_time('mysql'),
-                        'updated_at' => $oldDate->updated_at ?? current_time('mysql'),
-                    ];
-                    
-                    $wpdb->insert(
-                        TripAvailabilityDatesTable::getTableName(),
-                        $availabilityData
-                    );
-                    
-                    $insertedId = $wpdb->insert_id;
-                    
-                    if (!$insertedId) {
-                        $failed++;
-                        Logger::error("Failed to insert availability date", [
-                            'source' => 'migration',
-                            'tour_date_id' => $oldDate->id,
-                            'error' => $wpdb->last_error
-                        ]);
-                        $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
-                        continue;
-                    }
-                    }
+                $availabilityData = [
+                    'trip_id'          => $newTripId,
+                    'departure_date'   => $oldDate->start_date,
+                    'return_date'      => $oldDate->end_date,
+                    'seats_total'      => $maxTravelers,
+                    'seats_available'  => $maxTravelers,
+                    'seats_reserved'   => 0,
+                    'seats_waitlist'   => 0,
+                    'pricing_type'     => $pricingType,
+                    'original_price'   => $originalPrice,
+                    'discounted_price' => $discountedPrice,
+                    'price_types'      => $priceTypes,
+                    'status'           => $availabilityStatus,
+                    'special_notes'    => $oldDate->note_to_customer ?? null,
+                    'created_at'       => $oldDate->created_at ?? current_time('mysql'),
+                    'updated_at'       => $oldDate->updated_at ?? current_time('mysql'),
+                ];
+
+                $wpdb->insert(TripAvailabilityDatesTable::getTableName(), $availabilityData);
+                $insertedId = $wpdb->insert_id;
+
+                if (!$insertedId) {
+                    $failed++;
+                    Logger::error("Failed to insert availability date", [
+                        'source'        => 'migration',
+                        'tour_date_id'  => $oldDate->id,
+                        'error'         => $wpdb->last_error,
+                    ]);
+                    $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
+                    continue;
+                }
 
                 $migrated++;
                 Logger::info("Migrated tour date to availability", [
