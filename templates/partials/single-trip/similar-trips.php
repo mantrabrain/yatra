@@ -60,8 +60,14 @@ if (!defined('ABSPATH')) {
                     $original_price = (float) ($similar_trip->original_price ?? 0);
                     $sale_price = (float) ($similar_trip->sale_price ?? $original_price);
                     $current_price = $sale_price > 0 ? $sale_price : $original_price;
-                    $has_discount = $original_price > 0 && $sale_price < $original_price;
-                    $discount_pct = $has_discount ? round((($original_price - $sale_price) / $original_price) * 100) : 0;
+                    $discount_pct = 0;
+                    $has_discount = false;
+                    
+                    if ($original_price > 0 && $sale_price < $original_price) {
+                        $discount_pct = round((($original_price - $sale_price) / $original_price) * 100);
+                        // Only show discount if percentage is greater than 0
+                        $has_discount = $discount_pct > 0;
+                    }
                     
                     $pricing = [
                         'has_price' => $current_price > 0,
@@ -73,7 +79,7 @@ if (!defined('ABSPATH')) {
                     
                     $discount = [
                         'has_discount' => $has_discount,
-                        'discount_text' => $discount_pct > 0 ? $discount_pct . '%' : ''
+                        'discount_text' => $has_discount ? $discount_pct . '%' : ''
                     ];
                     
                     // Image

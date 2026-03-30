@@ -151,7 +151,7 @@ if (!defined('ABSPATH')) {
     ];
 
     $discount = [
-        'has_discount'       => $displayPricing['has_discount'],
+        'has_discount'       => $displayPricing['has_discount'] && $displayPricing['max_discount_percentage'] > 0,
         'discount_text'      => $displayPricing['max_discount_percentage'] > 0
             ? sprintf(__('Up to %d%%', 'yatra'), $displayPricing['max_discount_percentage']) : '',
         'discount_percentage' => $displayPricing['max_discount_percentage'],

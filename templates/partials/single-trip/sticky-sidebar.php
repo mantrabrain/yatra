@@ -117,14 +117,18 @@ if ($effective_min > 0) {
         $pricing['current_price'] = yatra_format_price($current);
 
         if ($current < $original && $original > 0) {
-            $pricing['has_discount'] = true;
-            $pricing['raw_original_price'] = $original;
-            $pricing['original_price'] = yatra_format_price($original);
-
             $pct = round((($original - $current) / $original) * 100);
-            $discount['has_discount'] = true;
-            $discount['discount_percentage'] = $pct;
-            $discount['discount_text'] = sprintf(__('%d%%', 'yatra'), $pct);
+            
+            // Only show discount if percentage is greater than 0
+            if ($pct > 0) {
+                $pricing['has_discount'] = true;
+                $pricing['raw_original_price'] = $original;
+                $pricing['original_price'] = yatra_format_price($original);
+                
+                $discount['has_discount'] = true;
+                $discount['discount_percentage'] = $pct;
+                $discount['discount_text'] = sprintf(__('%d%%', 'yatra'), $pct);
+            }
         }
     }
 }

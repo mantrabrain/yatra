@@ -789,11 +789,13 @@ class Trip
                 $sale_price = (float) $this->discounted_price;
             }
             
-            $has_discount = $sale_price > 0 && $sale_price < $original_price;
-            
-            if ($has_discount && $original_price > 0) {
+            if ($sale_price > 0 && $sale_price < $original_price && $original_price > 0) {
                 $discount_percent = round((($original_price - $sale_price) / $original_price) * 100);
-                $discount_text = $discount_percent . '%';
+                // Only show discount if percentage is greater than 0
+                if ($discount_percent > 0) {
+                    $discount_text = $discount_percent . '%';
+                    $has_discount = true;
+                }
             }
         }
         
