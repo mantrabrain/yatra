@@ -2187,7 +2187,7 @@ const Tools: React.FC = () => {
                       size="sm"
                     >
                       <Database className="w-4 h-4 mr-2" />
-                      {migrationProgress?.all_complete ? 'Migrate Again' : 'Start Migration'}
+                      {migrationProgress?.all_complete && migrationProgress?.started_at ? 'Migrate Again' : 'Start Migration'}
                     </Button>
                   )}
                 </div>
@@ -2210,7 +2210,7 @@ const Tools: React.FC = () => {
             ) : migrationStatus?.has_old_data ? (
               <div className="space-y-6">
                 {/* Migration Completion Notice */}
-                {migrationProgress?.all_complete && (
+                {migrationProgress?.all_complete && migrationProgress?.started_at && Object.keys(migrationProgress.progress || {}).length > 0 && (
                   <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800 rounded-lg p-4">
                     <div className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
@@ -2236,7 +2236,7 @@ const Tools: React.FC = () => {
                 )}
 
                 {/* Advanced Progress Bar (only show during migration) */}
-                {migrationProgress && !migrationProgress.all_complete && (
+                {migrationProgress && !migrationProgress.all_complete && migrationProgress.started_at && Object.keys(migrationProgress.progress || {}).length > 0 && (
                   <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
@@ -2377,7 +2377,7 @@ const Tools: React.FC = () => {
                 )}
 
                 {/* Migration Summary (show after completion) */}
-                {migrationProgress?.all_complete && (() => {
+                {migrationProgress?.all_complete && migrationProgress?.started_at && Object.keys(migrationProgress.progress || {}).length > 0 && (() => {
                   const totalMigrated = Object.values(migrationProgress.progress || {}).reduce(
                     (sum: number, p: any) => sum + (p.migrated || 0),
                     0

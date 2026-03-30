@@ -256,6 +256,8 @@ class TemplateLoader
         add_rewrite_tag('%yatra_destination_slug%', '([^&]+)');
         add_rewrite_tag('%yatra_activity_slug%', '([^&]+)');
         add_rewrite_tag('%yatra_category_slug%', '([^&]+)');
+        add_rewrite_tag('%yatra_page%', '([0-9]+)');
+        add_rewrite_tag('%paged%', '([0-9]+)');
 
         // Add rewrite rule for email verification: /yatra-verify-email/{token}/
         add_rewrite_rule(
@@ -271,6 +273,13 @@ class TemplateLoader
             'top'
         );
 
+        // Add rewrite rule for trip listing with pagination: {trip_base}/page/{page}/
+        add_rewrite_rule(
+            '^' . $trip_base . '/page/([0-9]+)/?$',
+            'index.php?yatra_listing_page=trip&paged=$matches[1]',
+            'top'
+        );
+        
         // Add rewrite rule for trip single page: {trip_base}/{trip_slug}
         add_rewrite_rule(
             '^' . $trip_base . '/([^/]+)/?$',
@@ -279,6 +288,13 @@ class TemplateLoader
         );
 
         // Add rewrite rules for SINGLE taxonomy pages (must come before listing pages)
+        // Single destination with pagination: /destination/{slug}/page/{page}/
+        add_rewrite_rule(
+            '^' . $destination_base . '/([^/]+)/page/([0-9]+)/?$',
+            'index.php?yatra_destination_slug=$matches[1]&yatra_page=$matches[2]',
+            'top'
+        );
+        
         // Single destination: /destination/{slug}/
         add_rewrite_rule(
             '^' . $destination_base . '/([^/]+)/?$',
@@ -286,6 +302,13 @@ class TemplateLoader
             'top'
         );
 
+        // Single activity with pagination: /activity/{slug}/page/{page}/
+        add_rewrite_rule(
+            '^' . $activity_base . '/([^/]+)/page/([0-9]+)/?$',
+            'index.php?yatra_activity_slug=$matches[1]&yatra_page=$matches[2]',
+            'top'
+        );
+        
         // Single activity: /activity/{slug}/
         add_rewrite_rule(
             '^' . $activity_base . '/([^/]+)/?$',
@@ -293,6 +316,13 @@ class TemplateLoader
             'top'
         );
 
+        // Single category with pagination: /trip-category/{slug}/page/{page}/
+        add_rewrite_rule(
+            '^' . $trip_category_base . '/([^/]+)/page/([0-9]+)/?$',
+            'index.php?yatra_category_slug=$matches[1]&yatra_page=$matches[2]',
+            'top'
+        );
+        
         // Single category: /trip-category/{slug}/
         add_rewrite_rule(
             '^' . $trip_category_base . '/([^/]+)/?$',
@@ -323,7 +353,7 @@ class TemplateLoader
         
         // Check if rewrite rules need flushing (only flush once after plugin update/activation)
         $rewrite_version = get_option('yatra_rewrite_rules_version', '0');
-        $current_version = '1.0.1'; // Increment this when rewrite rules change
+        $current_version = '1.0.3'; // Increment this when rewrite rules change
         if ($rewrite_version !== $current_version) {
             flush_rewrite_rules(false);
             update_option('yatra_rewrite_rules_version', $current_version);
@@ -346,6 +376,8 @@ class TemplateLoader
             'yatra_destination_slug',
             'yatra_activity_slug',
             'yatra_category_slug',
+            'yatra_page',
+            'paged',
         ];
 
         // Add dynamic base names for plain permalink support

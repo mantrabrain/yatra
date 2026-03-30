@@ -769,41 +769,37 @@ class TripMigration extends BaseMigration
 
     /**
      * Migrate trip pricing (traveler categories with pricing values)
+     * 
+     * Old Plugin Structure:
+     * - Single Pricing: yatra_tour_meta_regular_price, yatra_tour_meta_sales_price
+     * - Multiple Pricing: yatra_multiple_pricing (serialized array)
+     *   - Fields: pricing_label, regular_price, sales_price, pricing_per, group_size, minimum_pax, maximum_pax
+     * 
+     * New Plugin Structure:
+     * - pricing_type: 'regular' or 'traveler_based'
+     * - price_types: JSON array with category_id, original_price, discounted_price, pricing_mode
      */
     private function migrateTripPricing(int $oldTripId, int $newTripId, array $meta): void
     {
         global $wpdb;
         
-        // Check for multiple pricing options (traveler categories)
-        $pricingKeys = [
-            'yatra_tour_meta_tour_price_per_person',
-            'yatra_tour_meta_price_per_person',
-            'yatra_tour_price_per_person',
-            'tour_price_per_person',
-        ];
-
-        $multiplePricing = null;
-        foreach ($pricingKeys as $key) {
-            if (isset($meta[$key]) && !empty($meta[$key])) {
-                $data = $meta[$key];
-                if (is_string($data)) {
-                    $data = maybe_unserialize($data);
-                }
-                if (is_array($data) && !empty($data)) {
-                    $multiplePricing = $data;
-                    break;
-                }
-            }
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+        $tripsTable = \Yatra\Database\Tables\TripsTable::getTableName();
+        
+        // Get multiple pricing data from old plugin (stored in yatra_multiple_pricing meta key)
+        $multiplePricing = $meta['yatra_multiple_pricing'] ?? null;
+        
+        if (is_string($multiplePricing)) {
+            $multiplePricing = maybe_unserialize($multiplePricing);
         }
 
-        if (empty($multiplePricing)) {
+        // Check if we have valid multiple pricing data
+        if (empty($multiplePricing) || !is_array($multiplePricing)) {
+            // No multiple pricing, trip will use regular pricing (already migrated in main trip data)
             return;
         }
 
-        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
-        $tripsTable = \Yatra\Database\Tables\TripsTable::getTableName();
-
-        // Build price_types array
+        // Build price_types array for traveler-based pricing
         $priceTypes = [];
         
         foreach ($multiplePricing as $pricingId => $pricing) {
@@ -811,45 +807,85 @@ class TripMigration extends BaseMigration
                 continue;
             }
 
-            $label = $pricing['label'] ?? $pricing['name'] ?? '';
+            // Old plugin uses 'pricing_label' field for category name
+            $label = trim($pricing['pricing_label'] ?? '');
             if (empty($label)) {
                 continue;
             }
 
-            // Find the traveler category by label
+            // Find the traveler category by label (case-insensitive)
             $categoryId = $wpdb->get_var($wpdb->prepare(
-                "SELECT id FROM {$classificationsTable} WHERE name = %s AND type = %s",
+                "SELECT id FROM {$classificationsTable} WHERE LOWER(name) = LOWER(%s) AND type = %s",
                 $label,
                 \Yatra\Constants\ClassificationTypes::TRAVELER_TYPE
             ));
 
             if (!$categoryId) {
+                // Category doesn't exist in new system, skip this pricing entry
                 continue;
             }
 
-            // Extract pricing values
-            $regularPrice = floatval($pricing['regular_price'] ?? $pricing['price'] ?? 0);
-            $salePrice = floatval($pricing['sale_price'] ?? $pricing['discounted_price'] ?? 0);
+            // Extract pricing values - old plugin uses 'regular_price' and 'sales_price'
+            $regularPrice = floatval($pricing['regular_price'] ?? 0);
+            $salePrice = floatval($pricing['sales_price'] ?? 0);
+            
+            // Get pricing mode from old plugin (person/group)
+            $pricingPer = $pricing['pricing_per'] ?? 'person';
+            // Map old pricing_per to new pricing_mode
+            $pricingMode = ($pricingPer === 'group') ? 'per_group' : 'per_person';
+            
+            // Get group size if pricing is per group
+            $groupSize = intval($pricing['group_size'] ?? 1);
+            
+            // Get min/max travelers (pax)
+            $minPax = intval($pricing['minimum_pax'] ?? 1);
+            $maxPax = intval($pricing['maximum_pax'] ?? 1);
+            
+            // Ensure min is at least 1
+            if ($minPax < 1) {
+                $minPax = 1;
+            }
+            
+            // Ensure max is at least equal to min
+            if ($maxPax < $minPax) {
+                $maxPax = $minPax;
+            }
 
+            // Only add if regular price is valid
             if ($regularPrice > 0) {
-                $priceTypes[] = [
+                $priceType = [
                     'category_id' => (int) $categoryId,
                     'label' => $label,
                     'original_price' => $regularPrice,
-                    'discounted_price' => $salePrice > 0 && $salePrice < $regularPrice ? $salePrice : null,
-                    'min_travelers' => intval($pricing['min_pax'] ?? $pricing['min_travelers'] ?? 1),
-                    'max_travelers' => intval($pricing['max_pax'] ?? $pricing['max_travelers'] ?? 1),
+                    'discounted_price' => ($salePrice > 0 && $salePrice < $regularPrice) ? $salePrice : null,
+                    'pricing_mode' => $pricingMode,
+                    'min_travelers' => $minPax,
+                    'max_travelers' => $maxPax,
                 ];
+                
+                // Add group_size if pricing is per group
+                if ($pricingMode === 'per_group' && $groupSize > 0) {
+                    $priceType['group_size'] = $groupSize;
+                }
+                
+                $priceTypes[] = $priceType;
             }
         }
 
+        // If we have valid price types, update the trip
         if (!empty($priceTypes)) {
-            // Update trip with price_types JSON
+            // Encode price_types as JSON
+            $priceTypesJson = json_encode($priceTypes);
+            
+            // Update trip with price_types JSON AND set pricing_type to 'traveler_based'
             $wpdb->update(
                 $tripsTable,
-                ['price_types' => json_encode($priceTypes)],
+                [
+                    'price_types' => $priceTypesJson,
+                    'pricing_type' => 'traveler_based'
+                ],
                 ['id' => $newTripId],
-                ['%s'],
+                ['%s', '%s'],
                 ['%d']
             );
         }

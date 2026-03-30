@@ -61,7 +61,7 @@ if (!empty($categories) && is_array($categories)) {
 }
 
 $per_page     = 6;
-$current_page = isset($_GET['yatra_page']) ? max(1, (int) $_GET['yatra_page']) : 1;
+$current_page = max(1, (int) (get_query_var('paged') ?: ($_GET['paged'] ?? 1)));
 $total_items  = is_array($categories) ? count($categories) : 0;
 $total_pages  = $total_items > 0 ? (int) ceil($total_items / $per_page) : 1;
 $current_page = min($current_page, $total_pages);
@@ -291,15 +291,28 @@ yatra_get_header();
                     $prev_page = max(1, $current_page - 1);
                     $next_page = min($total_pages, $current_page + 1);
                     
-                    // Manual URL builder to avoid ampersand issues
+                    // Build pagination URLs preserving all query parameters
                     $build_page_url = function($page) use ($sort) {
-                        $base_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-                        $params = ['yatra_page' => $page];
+                        // Get current URL without query string
+                        $base_path = strtok($_SERVER['REQUEST_URI'], '?');
+                        $base_path = rtrim($base_path, '/');
+                        
+                        // Preserve all existing query parameters
+                        $query_string = $_SERVER['QUERY_STRING'] ?? '';
+                        parse_str($query_string, $params);
+                        
+                        if ($page > 1) {
+                            $params['paged'] = $page;
+                        } else {
+                            unset($params['paged']);
+                        }
+                        
                         if (!empty($sort)) {
                             $params['yatra_sort'] = $sort;
                         }
-                        $query_string = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
-                        return esc_url($base_path . '?' . $query_string);
+                        
+                        $query = http_build_query($params);
+                        return esc_url($base_path . ($query ? '?' . $query : ''));
                     };
                     ?>
                     <?php if ($current_page <= 1) : ?>

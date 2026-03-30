@@ -88,7 +88,7 @@ $labels = $type_labels[$type] ?? $type_labels['category'];
 
 // Basic pagination for trips on taxonomy pages (10 trips per page)
 $per_page     = 10;
-$current_page = isset($_GET['yatra_page']) ? max(1, (int) $_GET['yatra_page']) : 1;
+$current_page = max(1, (int) (get_query_var('paged') ?: ($_GET['paged'] ?? 1)));
 $total_trips  = is_array($trips) ? count($trips) : 0;
 $total_pages  = $total_trips > 0 ? (int) ceil($total_trips / $per_page) : 1;
 $current_page = min($current_page, $total_pages);
@@ -183,11 +183,23 @@ yatra_get_header();
                         <div class="yatra-results-info">
                             <h2><?php echo sprintf(esc_html($labels['trips_title']), esc_html($taxonomy_data->name)); ?></h2>
                             <p class="yatra-results-count">
-                                <?php echo sprintf(
-                                    __('Showing <strong>%d</strong> of %d trips', 'yatra'),
-                                    count($paged_trips),
-                                    $total_trips
-                                ); ?>
+                                <?php 
+                                $start_item = ($current_page - 1) * $per_page + 1;
+                                $end_item = min($current_page * $per_page, $total_trips);
+                                
+                                if ($total_trips > 0) {
+                                    echo sprintf(
+                                        __('Showing <strong>%d-%d</strong> of %d trips (Page %d of %d)', 'yatra'),
+                                        $start_item,
+                                        $end_item,
+                                        $total_trips,
+                                        $current_page,
+                                        $total_pages
+                                    );
+                                } else {
+                                    echo esc_html__('No trips found', 'yatra');
+                                }
+                                ?>
                             </p>
                         </div>
                         <div class="yatra-results-controls">
@@ -251,11 +263,29 @@ yatra_get_header();
                     $prev_page = max(1, $current_page - 1);
                     $next_page = min($total_pages, $current_page + 1);
                     
-                    // Manual URL builder to avoid ampersand issues
+                    // Build pagination URLs using query parameter format
                     $build_page_url = function($page) {
-                        $base_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-                        $query_string = http_build_query(['yatra_page' => $page], '', '&', PHP_QUERY_RFC3986);
-                        return esc_url($base_path . '?' . $query_string);
+                        // Get current URL without query string
+                        $base_path = strtok($_SERVER['REQUEST_URI'], '?');
+                        $base_path = rtrim($base_path, '/');
+                        
+                        // Remove any existing /page/X/ segment
+                        $base_path = preg_replace('#/page/[0-9]+#', '', $base_path);
+                        
+                        // Get existing query parameters
+                        $query_string = $_SERVER['QUERY_STRING'] ?? '';
+                        parse_str($query_string, $params);
+                        
+                        // Set or remove paged parameter
+                        if ($page > 1) {
+                            $params['paged'] = $page;
+                        } else {
+                            unset($params['paged']);
+                        }
+                        
+                        // Build final URL
+                        $query = http_build_query($params);
+                        return esc_url($base_path . ($query ? '?' . $query : ''));
                     };
                     ?>
 

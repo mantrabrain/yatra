@@ -174,7 +174,22 @@ yatra_get_header();
                     <p class="yatra-results-count">
                         <?php
                         $display_total = $trip_total ?: (is_array($trips_source) ? count($trips_source) : 0);
-                        echo sprintf(__('Showing <strong>%d</strong> trips', 'yatra'), $display_total);
+                        $per_page_display = 12; // matches per_page in ListingPageHandler
+                        $start_item = ($trip_current_page - 1) * $per_page_display + 1;
+                        $end_item = min($trip_current_page * $per_page_display, $display_total);
+                        
+                        if ($display_total > 0) {
+                            echo sprintf(
+                                __('Showing <strong>%d-%d</strong> of %d trips (Page %d of %d)', 'yatra'),
+                                $start_item,
+                                $end_item,
+                                $display_total,
+                                $trip_current_page,
+                                $trip_total_pages
+                            );
+                        } else {
+                            echo esc_html__('No trips found', 'yatra');
+                        }
                         ?>
                     </p>
                 </div>
@@ -896,14 +911,17 @@ yatra_get_header();
         $current_page_to_render = $total_pages_to_render;
     }
 
-    // Helper to preserve filters in pagination URLs
-    // Build URLs manually to avoid WordPress add_query_arg issues
+    // Build pagination URLs using query parameter format
     $build_page_url = function(int $page) use ($active_filters) {
-        // Get clean base path
-        $base_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        // Get current URL without query string
+        $base_path = strtok($_SERVER['REQUEST_URI'], '?');
+        $base_path = rtrim($base_path, '/');
         
-        // Build query parameters manually
-        $params = ['page' => $page];
+        // Remove any existing /page/X/ segment
+        $base_path = preg_replace('#/page/[0-9]+#', '', $base_path);
+        
+        // Build query parameters
+        $params = [];
         foreach ($active_filters as $k => $v) {
             if ($v !== '' && $v !== null && $v !== []) {
                 if (is_array($v)) {
@@ -919,10 +937,14 @@ yatra_get_header();
             }
         }
         
-        // Build query string manually
-        $query_string = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
+        // Add pagination parameter
+        if ($page > 1) {
+            $params['paged'] = $page;
+        }
         
-        return esc_url($base_path . '?' . $query_string);
+        // Build final URL
+        $query_string = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
+        return esc_url($base_path . ($query_string ? '?' . $query_string : ''));
     };
     ?>
     <div class="yatra-listing-pagination">

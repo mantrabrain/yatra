@@ -56,8 +56,9 @@ class ListingPageHandler extends BasePageHandler
         if ($listing_type === 'trip') {
             $tripListingService = new \Yatra\Services\TripListingService();
             
-            // Get current page and filters from request
-            $page = max(1, (int) ($_GET['page'] ?? 1));
+            // Get current page from WordPress pagination parameter
+            $page = max(1, (int) (get_query_var('paged') ?: ($_GET['paged'] ?? 1)));
+            
             $requestParams = [
                 'page' => $page,
                 'per_page' => 12,

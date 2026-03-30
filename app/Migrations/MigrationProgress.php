@@ -516,7 +516,8 @@ class MigrationProgress
         $startedAt = get_option('yatra_migration_started_at', null);
         $progressChanged = false;
 
-        $allComplete = true;
+        // If progress is empty (no migration has been run), set all_complete to false
+        $allComplete = !empty($progress);
         $anyRunning = false;
 
         foreach ($progress as $dataType => $status) {
