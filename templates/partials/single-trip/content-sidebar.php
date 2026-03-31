@@ -19,11 +19,7 @@ if (!defined('ABSPATH')) {
             $discountService = new \Yatra\Services\DiscountService();
             $groupDiscountsResult = $discountService->getGroupDiscountsForTrip((int) $trip->getId());
             
-            // Debug: Log what we found
-            if (WP_DEBUG && WP_DEBUG_LOG) {
-                error_log('Yatra Debug - Group discounts for trip ' . $trip->getId() . ': ' . print_r($groupDiscountsResult, true));
-            }
-            
+                        
             if (!empty($groupDiscountsResult)) {
                 $sidebar_has_group_discounts = true;
                 $all_ranges = [];
@@ -97,19 +93,11 @@ if (!defined('ABSPATH')) {
                 }
                 
                 $sidebar_group_discounts_data = $all_ranges;
-                
-                // Debug: Log final ranges
-                if (WP_DEBUG && WP_DEBUG_LOG) {
-                    error_log('Yatra Debug - Final group discount ranges from ALL rules: ' . print_r($all_ranges, true));
-                }
             }
         }
     } catch (\Exception $e) {
         // Silently fail if premium features are not available
         $sidebar_has_group_discounts = false;
-        if (WP_DEBUG && WP_DEBUG_LOG) {
-            error_log('Yatra Debug - Group discount error: ' . $e->getMessage());
-        }
     }
 
     // Prepare availability data for JavaScript

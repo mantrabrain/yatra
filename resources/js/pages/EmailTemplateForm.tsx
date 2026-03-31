@@ -611,7 +611,7 @@ const EmailTemplateForm: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, from_name: e.target.value })
                     }
-                    placeholder={__("e.g., Your Company Name")}
+                    placeholder={__("e.g., Travel Agency Name")}
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {__("Leave empty to use site default")}

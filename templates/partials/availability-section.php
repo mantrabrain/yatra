@@ -119,27 +119,6 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
                 if ($first_traveler) {
                     $first_traveler = is_array($first_traveler) ? (object) $first_traveler : $first_traveler;
                     $initial_total_price = (float) ($first_traveler->effective_price ?? $first_traveler->discounted_price ?? $first_traveler->original_price ?? $sale_price);
-                    
-                    // Debug logging
-                    if (defined('WP_DEBUG') && WP_DEBUG) {
-                        error_log(sprintf(
-                            'Yatra Template: Date=%s, InitialTotalPrice=%s, SalePrice=%s, FirstTraveler=%s',
-                            $card['date'] ?? 'unknown',
-                            $initial_total_price,
-                            $sale_price,
-                            print_r($first_traveler, true)
-                        ));
-                    }
-                }
-            } else {
-                // Debug for regular pricing
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log(sprintf(
-                        'Yatra Template: Date=%s, Regular pricing - InitialTotalPrice=%s, SalePrice=%s',
-                        $card['date'] ?? 'unknown',
-                        $initial_total_price,
-                        $sale_price
-                    ));
                 }
             }
             
@@ -557,16 +536,6 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
                             <?php 
                             $formatted_total = yatra_format_price($initial_total_price);
                             echo esc_html($formatted_total);
-                            
-                            // Debug logging
-                            if (defined('WP_DEBUG') && WP_DEBUG) {
-                                error_log(sprintf(
-                                    'Yatra Template Render: Date=%s, InitialTotalPrice=%s, Formatted=%s',
-                                    $card['date'] ?? 'unknown',
-                                    $initial_total_price,
-                                    $formatted_total
-                                ));
-                            }
                             ?>
                         </div>
                     </div>

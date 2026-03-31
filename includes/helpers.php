@@ -607,13 +607,8 @@ function yatra_set_booking_session(array $data): void
     // Store in transient (expires in 30 minutes)
     try {
         $transient_set = set_transient($booking_token, $session_data, 1800);
-        if (!$transient_set) {
-            // Fallback: ensure session data is still available
-            error_log('Yatra: Failed to set transient, session fallback will be used');
-        }
     } catch (Exception $e) {
-        // Log error but don't fail the booking process
-        error_log('Yatra: Transient error: ' . $e->getMessage());
+        // Continue without transient - session fallback will be used
     }
     
     }
@@ -650,8 +645,7 @@ function yatra_get_booking_session(?string $key = null, $default = null)
                     }
                 }
             } catch (Exception $e) {
-                // Log error but continue with empty session
-                error_log('Yatra: Error retrieving transient: ' . $e->getMessage());
+                // Continue without transient data
             }
         }
     }

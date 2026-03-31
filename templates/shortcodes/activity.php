@@ -19,29 +19,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// DEBUG: Let's examine the actual data structure
-if (defined('WP_DEBUG') && WP_DEBUG && !empty($activities)) {
-    error_log('=== YATRA ACTIVITY DEBUG ===');
-    error_log('Total activities: ' . count($activities));
-    
-    foreach ($activities as $index => $activity) {
-        error_log("--- Activity {$index} ---");
-        error_log('All data keys: ' . implode(', ', array_keys($activity)));
-        error_log('Name: ' . ($activity['term']->name ?? 'NOT SET'));
-        error_log('Trip count: ' . ($activity['trip_count'] ?? 'NOT SET'));
-        error_log('Avg rating: ' . ($activity['avg_rating'] ?? 'NOT SET'));
-        error_log('Min price: ' . ($activity['min_price'] ?? 'NOT SET'));
-        error_log('Max price: ' . ($activity['max_price'] ?? 'NOT SET'));
-        error_log('Avg duration: ' . ($activity['avg_duration'] ?? 'NOT SET'));
-        error_log('Avg group size: ' . ($activity['avg_group_size'] ?? 'NOT SET'));
-        error_log('Rating count: ' . ($activity['rating_count'] ?? 'NOT SET'));
-        error_log('Difficulty: ' . ($activity['difficulty'] ?? 'NOT SET'));
-        error_log('Link: ' . ($activity['link'] ?? 'NOT SET'));
-        error_log('Image: ' . ($activity['image'] ?? 'NOT SET'));
-    }
-    
-    error_log('=== END YATRA ACTIVITY DEBUG ===');
-}
 
 $columns = (int) $atts['columns'];
 $column_class = 'yatra-activity-grid-' . min(max($columns, 1), 4);

@@ -22,8 +22,8 @@ class AdminServiceProvider extends ServiceProvider
         // Register admin menu
         add_action('admin_menu', [$this, 'registerAdminMenu']);
 
-        // Enqueue admin assets - use priority 5 to run before other plugins
-        add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets'], 5);
+        // Enqueue admin assets - use priority 20 to run after WordPress core
+        add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets'], 20);
         
         // Add module type to script tag
         add_filter('script_loader_tag', [$this, 'addModuleTypeToScript'], 10, 2);

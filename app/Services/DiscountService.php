@@ -858,30 +858,17 @@ class DiscountService extends BaseService
         // Cast tripId to int to ensure type safety
         $tripId = (int) $tripId;
         
-        // Debug: Log initial calculation data
-        if (WP_DEBUG && WP_DEBUG_LOG) {
-            error_log('Yatra Debug - DiscountService calculateGroupDiscount called: ' . print_r([
-                'trip_id' => $tripId,
-                'traveler_counts' => $travelerCounts,
-                'price_types' => $priceTypes,
-                'advanced_discount_enabled' => apply_filters('yatra_advanced_discount_enabled', false)
-            ], true));
-        }
-        
         // Check if Advanced Discount module is enabled - group discounts are a Pro feature
         if (!apply_filters('yatra_advanced_discount_enabled', false)) {
-            error_log('Yatra Debug - Advanced Discount module NOT enabled');
             return null;
         }
         
         $groupDiscounts = $this->getGroupDiscountsForTrip($tripId);
         
         if (empty($groupDiscounts)) {
-            error_log('Yatra Debug - No group discounts found for trip ' . $tripId);
             return null;
         }
         
-        error_log('Yatra Debug - Found ' . count($groupDiscounts) . ' group discounts for trip ' . $tripId);
 
         $totalTravelers = array_sum(array_map('intval', $travelerCounts));
         
@@ -1165,62 +1152,41 @@ class DiscountService extends BaseService
      */
     private function validateCoupon(\stdClass $discount, int $trip_id, float $total, int $travelers_count): array
     {
-        error_log('DiscountService::validateCoupon - START');
-        error_log('DiscountService - Discount code: ' . ($discount->code ?? 'unknown'));
-        error_log('DiscountService - Discount status: ' . ($discount->status ?? 'unknown'));
-        error_log('DiscountService - Trip ID: ' . $trip_id);
-        error_log('DiscountService - Total: ' . $total);
-        
         // Check validity dates
         $now = current_time('Y-m-d');
         
-        error_log('DiscountService - Current date: ' . $now);
-        error_log('DiscountService - Valid from: ' . ($discount->valid_from ?? 'not set'));
-        error_log('DiscountService - Expiry date: ' . ($discount->expiry_date ?? 'not set'));
-        
         if (!empty($discount->valid_from) && $now < $discount->valid_from) {
-            error_log('DiscountService - FAILED: Not yet valid');
             return ['valid' => false, 'message' => __('This coupon is not yet valid.', 'yatra')];
         }
         
         if (!empty($discount->expiry_date) && $now > $discount->expiry_date) {
-            error_log('DiscountService - FAILED: Expired');
             return ['valid' => false, 'message' => __('This coupon has expired.', 'yatra')];
         }
         
         // Check usage limit
-        error_log('DiscountService - Usage limit: ' . ($discount->usage_limit ?? 0) . ', Usage count: ' . ($discount->usage_count ?? 0));
         if ($discount->usage_limit > 0 && $discount->usage_count >= $discount->usage_limit) {
-            error_log('DiscountService - FAILED: Usage limit reached');
             return ['valid' => false, 'message' => __('This coupon has reached its usage limit.', 'yatra')];
         }
         
         // Check if applicable to this trip
-        error_log('DiscountService - Applicable to: ' . ($discount->applicable_to ?? 'not set'));
         if ($discount->applicable_to === 'specific_trips') {
             $trip_ids = is_string($discount->trip_ids) ? maybe_unserialize($discount->trip_ids) : ($discount->trip_ids ?? []);
-            error_log('DiscountService - Specific trip IDs: ' . print_r($trip_ids, true));
             if (!empty($trip_ids) && !in_array($trip_id, array_map('intval', $trip_ids), true)) {
-                error_log('DiscountService - FAILED: Not applicable to this trip');
                 return ['valid' => false, 'message' => __('This coupon is not applicable to this trip.', 'yatra')];
             }
         }
         
         // Check minimum amount
-        error_log('DiscountService - Min amount: ' . ($discount->min_amount ?? 'not set'));
         if (!empty($discount->min_amount) && $total < (float) $discount->min_amount) {
-            error_log('DiscountService - FAILED: Below minimum amount');
             return [
                 'valid' => false, 
                 'message' => sprintf(
-                    __('Minimum order amount of %s required for this coupon.', 'yatra'),
+                    __('Minimum amount of %s required for this coupon.', 'yatra'),
                     yatra_format_price((float) $discount->min_amount)
                 )
             ];
         }
         
-        error_log('DiscountService - Validation PASSED');
         return ['valid' => true, 'message' => ''];
     }
 }
-

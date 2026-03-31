@@ -4766,7 +4766,7 @@ const Settings: React.FC = () => {
                     value={formData.from_name}
                     name="from_name"
                     onChange={handleFieldChange}
-                    placeholder={__("Your Company Name", "yatra")}
+                    placeholder={__("Travel Agency Name", "yatra")}
                   />
                 </FormField>
               </div>

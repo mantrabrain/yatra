@@ -31,15 +31,107 @@ class AdminAssetsProvider
         // Prevent problematic scripts that cause initialization errors
         $this->preventProblematicScripts();
 
-        // Enqueue WordPress media library
+        // Enqueue WordPress media library dependencies
         $this->enqueueWordPressMedia();
-
-        // Remove WordPress core form CSS
-        wp_dequeue_style('forms');
-        wp_deregister_style('forms');
 
         // Enqueue admin React app assets
         $this->enqueueAdminReactApp();
+
+        // Senior Engineer Solution: Complete forms CSS removal
+        // First, remove any existing forms style
+        wp_dequeue_style('forms');
+        wp_deregister_style('forms');
+        
+        // Get all registered styles that depend on forms
+        global $wp_styles;
+        $dependent_styles = [];
+        
+        if (isset($wp_styles->registered) && is_array($wp_styles->registered)) {
+            foreach ($wp_styles->registered as $handle => $style) {
+                if (isset($style->deps) && is_array($style->deps) && in_array('forms', $style->deps)) {
+                    $dependent_styles[] = $handle;
+                }
+            }
+        }
+        
+        // Register forms as empty style to satisfy dependencies
+        wp_register_style('forms', false);
+        
+        // Re-enqueue dependent styles without forms dependency
+        foreach ($dependent_styles as $handle) {
+            if ($handle !== 'forms') {
+                wp_dequeue_style($handle);
+                $style = $wp_styles->registered[$handle] ?? null;
+                if ($style && isset($style->deps)) {
+                    // Remove forms from dependencies
+                    $style->deps = array_diff($style->deps, ['forms']);
+                    wp_enqueue_style($handle);
+                }
+            }
+        }
+        
+        // Aggressive WordPress Admin CSS removal
+        $admin_css_handles = [
+            'dashicons',
+            'admin-bar', 
+            'common',
+            'admin-menu',
+            'dashboard',
+            'list-tables',
+            'edit',
+            'revisions',
+            'media',
+            'themes',
+            'about',
+            'nav-menus',
+            'wp-pointer',
+            'widgets',
+            'site-icon',
+            'l10n',
+            'buttons',
+            'wp-auth-check',
+            'wp-components',
+            'wp-commands',
+            'media-views',
+            'login',
+            'install',
+            'wp-reset-editor-styles',
+            'wp-admin',
+            'colors',
+            'thickbox'
+        ];
+        
+        // Dequeue all WordPress admin CSS and register empty placeholders
+        foreach ($admin_css_handles as $handle) {
+            wp_dequeue_style($handle);
+            wp_deregister_style($handle);
+            // Register as empty style to satisfy dependencies
+            wp_register_style($handle, false);
+        }
+        
+        // Final safety dequeue at print time
+        add_action('wp_print_styles', function() use ($dependent_styles, $admin_css_handles) {
+            wp_dequeue_style('forms');
+            foreach ($dependent_styles as $handle) {
+                if ($handle !== 'forms') {
+                    wp_dequeue_style($handle);
+                }
+            }
+            
+            // Ensure admin CSS is removed at render time
+            foreach ($admin_css_handles as $handle) {
+                wp_dequeue_style($handle);
+            }
+        }, 999);
+
+        // Add aggressive style loader filter to prevent WordPress admin CSS
+        add_filter('style_loader_src', function($src, $handle) use ($admin_css_handles) {
+            if (in_array($handle, $admin_css_handles)) {
+                return false; // Prevent loading actual CSS files
+            }
+            // Allow load-styles.php but individual handles will be blocked above
+            return $src;
+        }, 999, 2);
 
         // Add inline script for media library compatibility
         $this->addMediaLibraryCompatScript();

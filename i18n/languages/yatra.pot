@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-30T09:20:42+00:00\n"
+"POT-Creation-Date: 2026-03-31T10:46:25+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -55,7 +55,7 @@ msgid "Select reviews to feature as testimonials"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:29477
-#: templates/listing-trip.php:251
+#: templates/listing-trip.php:266
 msgid "Clear all"
 msgstr ""
 
@@ -238,7 +238,7 @@ msgstr ""
 #: templates/partials/booking-content.php:324
 #: templates/partials/booking-form-fields.php:320
 #: templates/partials/booking-form-fields.php:356
-#: templates/partials/single-trip/sticky-sidebar.php:189
+#: templates/partials/single-trip/sticky-sidebar.php:193
 #: assets/dist/js/account-page.js:157
 #: assets/dist/js/account-page.js:312
 #: assets/dist/js/account-page.js:875
@@ -873,7 +873,7 @@ msgstr ""
 
 #: assets/dist/js/account-page.js:2738
 #: app/Providers/FrontendAssetsProvider.php:422
-#: templates/partials/single-trip/similar-trips.php:218
+#: templates/partials/single-trip/similar-trips.php:224
 #: templates/shortcodes/my-account.php:113
 #: templates/single-activity.php:222
 #: templates/single-destination.php:240
@@ -1031,7 +1031,7 @@ msgstr ""
 #: app/Providers/FrontendAssetsProvider.php:431
 #: includes/helpers.php:261
 #: templates/partials/single-trip/content-sidebar.php:239
-#: templates/partials/single-trip/similar-trips.php:213
+#: templates/partials/single-trip/similar-trips.php:219
 #: templates/trip-listing-card.php:297
 msgid "Contact for pricing"
 msgstr ""
@@ -1466,7 +1466,7 @@ msgid "Year to date"
 msgstr ""
 
 #: assets/dist/js/index-BoxTf9b_.js:103297
-#: templates/partials/single-trip/sticky-sidebar.php:166
+#: templates/partials/single-trip/sticky-sidebar.php:170
 msgid "Date"
 msgstr ""
 
@@ -3797,13 +3797,13 @@ msgstr ""
 msgid "Untitled Trip"
 msgstr ""
 
-#: app/Models/Trip.php:930
+#: app/Models/Trip.php:932
 #: app/Services/TripPricingService.php:105
 #: app/Services/TripPricingService.php:126
 #: app/Services/TripPricingService.php:133
 #: templates/listing-destination.php:258
 #: templates/listing-trip-category.php:263
-#: templates/partials/single-trip/similar-trips.php:71
+#: templates/partials/single-trip/similar-trips.php:77
 #: templates/partials/single-trip/sticky-sidebar.php:88
 msgid "From "
 msgstr ""
@@ -4135,13 +4135,13 @@ msgid "Trips"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:444
-#: templates/listing-trip.php:495
+#: templates/listing-trip.php:510
 #: templates/single-taxonomy.php:72
 msgid "Destinations"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:445
-#: templates/listing-trip.php:540
+#: templates/listing-trip.php:555
 #: templates/shortcodes/trip-search.php:71
 #: templates/single-taxonomy.php:77
 msgid "Activities"
@@ -4221,23 +4221,23 @@ msgstr ""
 msgid "Extreme"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2404
+#: app/Repositories/TripRepository.php:2402
 msgid "Adventure"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2405
+#: app/Repositories/TripRepository.php:2403
 msgid "Cultural"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2406
+#: app/Repositories/TripRepository.php:2404
 msgid "Wildlife"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2407
+#: app/Repositories/TripRepository.php:2405
 msgid "Pilgrimage"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2408
+#: app/Repositories/TripRepository.php:2406
 msgid "Educational"
 msgstr ""
 
@@ -6052,16 +6052,16 @@ msgstr ""
 #: templates/listing-activity.php:97
 #: templates/listing-destination.php:98
 #: templates/listing-trip-category.php:98
-#: templates/listing-trip.php:183
+#: templates/listing-trip.php:198
 #: templates/partials/single-trip/reviews.php:101
-#: templates/single-taxonomy.php:195
+#: templates/single-taxonomy.php:207
 msgid "Sort by:"
 msgstr ""
 
 #: templates/listing-activity.php:102
 #: templates/listing-destination.php:103
 #: templates/listing-trip-category.php:103
-#: templates/listing-trip.php:187
+#: templates/listing-trip.php:202
 msgid "Most Popular"
 msgstr ""
 
@@ -6086,16 +6086,16 @@ msgstr ""
 #: templates/listing-activity.php:116
 #: templates/listing-destination.php:117
 #: templates/listing-trip-category.php:117
-#: templates/listing-trip.php:232
-#: templates/single-taxonomy.php:206
+#: templates/listing-trip.php:247
+#: templates/single-taxonomy.php:218
 msgid "Grid View"
 msgstr ""
 
 #: templates/listing-activity.php:121
 #: templates/listing-destination.php:122
 #: templates/listing-trip-category.php:122
-#: templates/listing-trip.php:237
-#: templates/single-taxonomy.php:211
+#: templates/listing-trip.php:252
+#: templates/single-taxonomy.php:223
 msgid "List View"
 msgstr ""
 
@@ -6117,35 +6117,35 @@ msgstr ""
 msgid "No activities found."
 msgstr ""
 
-#: templates/listing-activity.php:288
-#: templates/listing-activity.php:290
-#: templates/listing-destination.php:298
-#: templates/listing-destination.php:302
-#: templates/listing-trip-category.php:307
-#: templates/listing-trip-category.php:311
-#: templates/listing-trip.php:931
+#: templates/listing-activity.php:301
+#: templates/listing-activity.php:303
+#: templates/listing-destination.php:311
+#: templates/listing-destination.php:315
+#: templates/listing-trip-category.php:320
+#: templates/listing-trip-category.php:324
+#: templates/listing-trip.php:953
 #: templates/partials/single-trip/similar-trips.php:17
 #: templates/shortcodes/activity.php:172
 #: templates/shortcodes/destination.php:141
 #: templates/shortcodes/trip.php:83
-#: templates/single-taxonomy.php:264
-#: templates/single-taxonomy.php:268
+#: templates/single-taxonomy.php:294
+#: templates/single-taxonomy.php:298
 msgid "Previous"
 msgstr ""
 
-#: templates/listing-activity.php:311
-#: templates/listing-activity.php:313
-#: templates/listing-destination.php:322
-#: templates/listing-destination.php:326
-#: templates/listing-trip-category.php:331
-#: templates/listing-trip-category.php:335
-#: templates/listing-trip.php:951
+#: templates/listing-activity.php:324
+#: templates/listing-activity.php:326
+#: templates/listing-destination.php:335
+#: templates/listing-destination.php:339
+#: templates/listing-trip-category.php:344
+#: templates/listing-trip-category.php:348
+#: templates/listing-trip.php:973
 #: templates/partials/single-trip/similar-trips.php:22
 #: templates/shortcodes/activity.php:192
 #: templates/shortcodes/destination.php:161
 #: templates/shortcodes/trip.php:101
-#: templates/single-taxonomy.php:290
-#: templates/single-taxonomy.php:294
+#: templates/single-taxonomy.php:320
+#: templates/single-taxonomy.php:324
 msgid "Next"
 msgstr ""
 
@@ -6208,165 +6208,168 @@ msgstr ""
 msgid "Trips with %s"
 msgstr ""
 
-#: templates/listing-trip.php:177
+#: templates/listing-trip.php:183
+#: templates/single-taxonomy.php:192
 #, php-format
-msgid "Showing <strong>%d</strong> trips"
-msgstr ""
-
-#: templates/listing-trip.php:186
-#: templates/setup-wizard/theme-old.php:31
-#: templates/setup-wizard/theme.php:48
-#: templates/single-taxonomy.php:197
-msgid "Recommended"
-msgstr ""
-
-#: templates/listing-trip.php:188
-#: templates/single-taxonomy.php:198
-msgid "Price: Low to High"
-msgstr ""
-
-#: templates/listing-trip.php:189
-#: templates/single-taxonomy.php:199
-msgid "Price: High to Low"
-msgstr ""
-
-#: templates/listing-trip.php:190
-#: templates/single-taxonomy.php:200
-msgid "Rating: Highest"
+msgid "Showing <strong>%d-%d</strong> of %d trips (Page %d of %d)"
 msgstr ""
 
 #: templates/listing-trip.php:191
-#: templates/single-taxonomy.php:201
+#: templates/listing-trip.php:897
+#: templates/single-taxonomy.php:200
+#: templates/single-taxonomy.php:252
+msgid "No trips found"
+msgstr ""
+
+#: templates/listing-trip.php:201
+#: templates/setup-wizard/theme-old.php:31
+#: templates/setup-wizard/theme.php:48
+#: templates/single-taxonomy.php:209
+msgid "Recommended"
+msgstr ""
+
+#: templates/listing-trip.php:203
+#: templates/single-taxonomy.php:210
+msgid "Price: Low to High"
+msgstr ""
+
+#: templates/listing-trip.php:204
+#: templates/single-taxonomy.php:211
+msgid "Price: High to Low"
+msgstr ""
+
+#: templates/listing-trip.php:205
+#: templates/single-taxonomy.php:212
+msgid "Rating: Highest"
+msgstr ""
+
+#: templates/listing-trip.php:206
+#: templates/single-taxonomy.php:213
 msgid "Duration: Shortest"
 msgstr ""
 
-#: templates/listing-trip.php:192
-#: templates/single-taxonomy.php:202
+#: templates/listing-trip.php:207
+#: templates/single-taxonomy.php:214
 msgid "Duration: Longest"
 msgstr ""
 
-#: templates/listing-trip.php:250
+#: templates/listing-trip.php:265
 msgid "Filters"
 msgstr ""
 
-#: templates/listing-trip.php:269
+#: templates/listing-trip.php:284
 #: templates/shortcodes/search.php:107
 msgid "Price Range"
 msgstr ""
 
-#: templates/listing-trip.php:272
+#: templates/listing-trip.php:287
 msgid "Clear price filters"
 msgstr ""
 
-#: templates/listing-trip.php:286
+#: templates/listing-trip.php:301
 msgid "Min Price"
 msgstr ""
 
-#: templates/listing-trip.php:291
+#: templates/listing-trip.php:306
 msgid "Max Price"
 msgstr ""
 
-#: templates/listing-trip.php:311
+#: templates/listing-trip.php:326
 msgid "Trip Type"
 msgstr ""
 
-#: templates/listing-trip.php:314
+#: templates/listing-trip.php:329
 msgid "Clear trip type filter"
 msgstr ""
 
-#: templates/listing-trip.php:342
+#: templates/listing-trip.php:357
 msgid "All Types"
 msgstr ""
 
-#: templates/listing-trip.php:360
+#: templates/listing-trip.php:375
 #: templates/pdf/itinerary.php:155
 msgid "Difficulty Level"
 msgstr ""
 
-#: templates/listing-trip.php:363
+#: templates/listing-trip.php:378
 msgid "Clear difficulty filters"
 msgstr ""
 
-#: templates/listing-trip.php:400
+#: templates/listing-trip.php:415
 #: templates/single-activity.php:119
 #: templates/single-destination.php:119
 msgid "Rating"
 msgstr ""
 
-#: templates/listing-trip.php:403
+#: templates/listing-trip.php:418
 msgid "Clear rating filters"
 msgstr ""
 
-#: templates/listing-trip.php:451
+#: templates/listing-trip.php:466
 #: templates/single-taxonomy.php:82
 msgid "Categories"
 msgstr ""
 
-#: templates/listing-trip.php:454
+#: templates/listing-trip.php:469
 msgid "Clear category filters"
 msgstr ""
 
-#: templates/listing-trip.php:498
+#: templates/listing-trip.php:513
 msgid "Clear destination filters"
 msgstr ""
 
-#: templates/listing-trip.php:543
+#: templates/listing-trip.php:558
 msgid "Clear activity filters"
 msgstr ""
 
-#: templates/listing-trip.php:585
+#: templates/listing-trip.php:600
 #: templates/partials/single-trip/content-important-info.php:112
 msgid "Accommodation"
 msgstr ""
 
-#: templates/listing-trip.php:618
+#: templates/listing-trip.php:633
 msgid "Included Services"
 msgstr ""
 
-#: templates/listing-trip.php:651
+#: templates/listing-trip.php:666
 msgid "Special Offers"
 msgstr ""
 
-#: templates/listing-trip.php:684
+#: templates/listing-trip.php:699
 msgid "Booking Options"
 msgstr ""
 
-#: templates/listing-trip.php:717
+#: templates/listing-trip.php:732
 msgid "Age Suitability"
 msgstr ""
 
-#: templates/listing-trip.php:745
+#: templates/listing-trip.php:760
 #: templates/partials/single-trip/trip-attributes.php:11
 msgid "Trip Attributes"
 msgstr ""
 
-#: templates/listing-trip.php:812
+#: templates/listing-trip.php:827
 #: templates/partials/booking-content.php:451
 #: templates/partials/single-trip/trip-attributes.php:37
 #: templates/pdf/consent.php:193
 msgid "Yes"
 msgstr ""
 
-#: templates/listing-trip.php:821
+#: templates/listing-trip.php:836
 #: templates/shortcodes/search.php:113
 msgid "Min"
 msgstr ""
 
-#: templates/listing-trip.php:828
+#: templates/listing-trip.php:843
 #: templates/shortcodes/search.php:122
 msgid "Max"
 msgstr ""
 
-#: templates/listing-trip.php:854
+#: templates/listing-trip.php:869
 msgid "Type to filter…"
 msgstr ""
 
-#: templates/listing-trip.php:882
-#: templates/single-taxonomy.php:240
-msgid "No trips found"
-msgstr ""
-
-#: templates/listing-trip.php:883
+#: templates/listing-trip.php:898
 msgid "Try adjusting your search or filter to find what you're looking for."
 msgstr ""
 
@@ -7541,7 +7544,7 @@ msgid "Placeholder image for %s"
 msgstr ""
 
 #: templates/partials/single-trip/hero.php:260
-#: templates/partials/single-trip/similar-trips.php:123
+#: templates/partials/single-trip/similar-trips.php:129
 #: templates/single-activity.php:160
 #: templates/single-destination.php:160
 #: templates/trip-listing-card.php:127
@@ -7683,16 +7686,16 @@ msgstr ""
 msgid "Similar Adventures"
 msgstr ""
 
-#: templates/partials/single-trip/sticky-sidebar.php:127
+#: templates/partials/single-trip/sticky-sidebar.php:130
 #, php-format
 msgid "%d%%"
 msgstr ""
 
-#: templates/partials/single-trip/sticky-sidebar.php:231
+#: templates/partials/single-trip/sticky-sidebar.php:235
 msgid "Check"
 msgstr ""
 
-#: templates/partials/single-trip/sticky-sidebar.php:237
+#: templates/partials/single-trip/sticky-sidebar.php:241
 msgid "Enquire"
 msgstr ""
 
@@ -8685,29 +8688,6 @@ msgstr ""
 msgid "Your login information is secure and encrypted."
 msgstr ""
 
-#: templates/shortcodes/mini-cart.php:26
-msgid "Shopping Cart"
-msgstr ""
-
-#: templates/shortcodes/mini-cart.php:46
-msgid "Qty:"
-msgstr ""
-
-#: templates/shortcodes/mini-cart.php:63
-msgid "Browse Tours"
-msgstr ""
-
-#: templates/shortcodes/mini-cart.php:71
-msgid "Total:"
-msgstr ""
-
-#: templates/shortcodes/mini-cart.php:84
-msgid "Proceed to Checkout"
-msgstr ""
-
-#: templates/shortcodes/mini-cart.php:87
-msgid "View Cart"
-msgstr ""
 
 #: templates/shortcodes/my-account.php:30
 #, php-format
@@ -8870,7 +8850,7 @@ msgid "We couldn't find any trips matching your criteria. Try adjusting your fil
 msgstr ""
 
 #: templates/shortcodes/trip.php:67
-#: templates/single-taxonomy.php:243
+#: templates/single-taxonomy.php:255
 msgid "Browse All Trips"
 msgstr ""
 
@@ -8935,12 +8915,7 @@ msgid_plural "%d Trips"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/single-taxonomy.php:187
-#, php-format
-msgid "Showing <strong>%d</strong> of %d trips"
-msgstr ""
-
-#: templates/single-taxonomy.php:241
+#: templates/single-taxonomy.php:253
 #, php-format
 msgid "There are no trips available for %s at the moment. Please check back later or explore other options."
 msgstr ""

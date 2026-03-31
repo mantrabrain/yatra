@@ -1071,8 +1071,8 @@ class TripController extends BaseController
                     'id' => (int) ($dest->id ?? 0),
                     'name' => $dest->name ?? '',
                     'slug' => $dest->slug ?? '',
-                    'is_primary' => (bool) $dest->is_primary,
-                    'order' => (int) $dest->order,
+                    'is_primary' => (bool) ($dest->is_primary ?? false),
+                    'order' => (int) ($dest->order ?? 0),
                 ];
             }, $item->destinations);
         }
@@ -1083,8 +1083,8 @@ class TripController extends BaseController
                     'id' => (int) ($act->classification_id ?? 0),
                     'name' => $act->activity_name ?? '',
                     'slug' => $act->activity_slug ?? '',
-                    'is_primary' => (bool) $act->is_primary,
-                    'order' => (int) $act->order,
+                    'is_primary' => (bool) ($act->is_primary ?? false),
+                    'order' => (int) ($act->order ?? 0),
                 ];
             }, $item->activities);
         }

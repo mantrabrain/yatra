@@ -183,7 +183,7 @@ class RecurringAvailabilityService
      */
     public function getStatusCounts(int $tripId): array
     {
-        return $this->repository->getStatusCounts($tripId);
+        return $this->repository->getStatusCounts(['trip_id' => $tripId]);
     }
 
     /**

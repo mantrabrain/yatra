@@ -9,7 +9,6 @@ use Yatra\Shortcodes\TripShortcode;
 use Yatra\Shortcodes\ActivityShortcode;
 use Yatra\Shortcodes\DestinationShortcode;
 use Yatra\Shortcodes\DiscountAndDealsShortcode;
-use Yatra\Shortcodes\MiniCartShortcode;
 use Yatra\Shortcodes\SearchShortcode;
 use Yatra\Shortcodes\LoginShortcode;
 use Yatra\Ajax\TripShortcodeAjax;
@@ -80,11 +79,10 @@ class ShortcodeServiceProvider extends \Yatra\Core\ServiceProvider
     {
         $shortcodes = [
             'yatra_my_account' => MyAccountShortcode::class,
-            'yatra_tour' => TripShortcode::class,
+            'yatra_trip' => TripShortcode::class,
             'yatra_activity' => ActivityShortcode::class,
             'yatra_destination' => DestinationShortcode::class,
             'yatra_discount_and_deals' => DiscountAndDealsShortcode::class,
-            'yatra_mini_cart' => MiniCartShortcode::class,
             'yatra_search' => SearchShortcode::class,
             'yatra_login' => LoginShortcode::class,
         ];
