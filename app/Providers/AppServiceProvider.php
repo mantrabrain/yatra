@@ -76,40 +76,20 @@ class AppServiceProvider extends ServiceProvider
     {
         // Check if tables exist, create them if they don't
         $missing_table = false;
-        $required_tables = [
-            'yatra_trips',
-            'yatra_bookings',
-            'yatra_booking_travellers',
-            'yatra_classifications',
-            'yatra_trip_classifications',
-            'yatra_reviews',
-            'yatra_enquiries',
-            'yatra_payments',
-            'yatra_trip_availability_dates',
-            'yatra_departures',
-            'yatra_departure_bookings',
-            'yatra_customers',
-            'yatra_booking_traveller_meta',
-            'yatra_additional_services',
-            'yatra_trip_services',
-            'yatra_booking_services',
-            'yatra_booking_sessions',
-            'yatra_coupons',
-            'yatra_booking_coupons',
-        ];
+        $required_tables = \Yatra\Services\InstallerService::getRequiredTables();
 
         global $wpdb;
         foreach ($required_tables as $table) {
-            $table_name = $wpdb->prefix . $table;
-            if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") !== $table_name) {
+            // $table already includes prefix from Table class
+            if ($wpdb->get_var("SHOW TABLES LIKE '$table'") !== $table) {
                 $missing_table = true;
                 break;
             }
         }
 
         if ($missing_table) {
-            // Use centralized Database class to create ALL tables
-            Database::createTables();
+            // Use centralized InstallerService for table creation
+            \Yatra\Services\InstallerService::createDatabaseTables();
         }
 
         // Always run updateTables to ensure schema is up to date
@@ -125,8 +105,8 @@ class AppServiceProvider extends ServiceProvider
         // Flush rewrite rules
         flush_rewrite_rules();
         
-        // Set default options
-        $this->setDefaultOptions();
+        // Run installer for fresh installation setup (centralized location)
+        \Yatra\Services\InstallerService::install();
     }
 
     /**

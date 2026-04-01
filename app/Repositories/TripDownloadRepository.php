@@ -35,8 +35,8 @@ class TripDownloadRepository
         }
 
         // Create the table if it doesn't exist
-        if (class_exists('\\Yatra\\Core\\Database')) {
-            \Yatra\Core\Database::createTables();
+        if (class_exists('\\Yatra\\Services\\InstallerService')) {
+            \Yatra\Services\InstallerService::createDatabaseTables();
         }
 
         return (bool) $wpdb->get_var("SHOW TABLES LIKE '{$table}'");

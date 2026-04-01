@@ -719,7 +719,7 @@ class MigrationProgress
         }
 
         try {
-            Database::createTables();
+            \Yatra\Services\InstallerService::createDatabaseTables();
         } catch (\Throwable $e) {
             Logger::error('Failed to ensure Yatra tables exist before migration', [
                 'source' => 'migration',

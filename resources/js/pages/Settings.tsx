@@ -2109,7 +2109,7 @@ const Settings: React.FC = () => {
 
       currency: "USD",
       payment_test_mode: true,
-      payment_gateways: ["stripe", "paypal"],
+      payment_gateways: ["pay_later"],
       payment_methods: ["credit_card", "paypal", "bank_transfer"],
       partial_payment: true,
       partial_payment_percentage: 30,

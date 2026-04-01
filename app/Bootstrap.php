@@ -290,10 +290,10 @@ class Bootstrap
      */
     public function activate(): void
     {
-        // Create database tables
-        Database::createTables();
+        // Run centralized installer for all one-time actions (tables + settings)
+        \Yatra\Services\InstallerService::install();
         
-        // Set default options
+        // Set default options (only version tracking - other defaults handled by InstallerService)
         if (get_option('yatra_version') === false) {
             add_option('yatra_version', YATRA_VERSION);
         }

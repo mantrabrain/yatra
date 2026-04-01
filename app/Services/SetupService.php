@@ -24,6 +24,9 @@ class SetupService
      */
     public static function activate(): void
     {
+        // Run centralized installer for default settings
+        InstallerService::install();
+        
         if (class_exists('Yatra\Services\SetupWizardService')) {
             SetupWizardService::triggerWizardOnActivation();
         }
