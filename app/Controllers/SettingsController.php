@@ -94,10 +94,7 @@ class SettingsController extends BaseController
         
         // Trip Settings
         'default_trip_status' => 'draft',
-        'max_group_size' => 20,
-        'min_group_size' => 2,
         'booking_advance_days' => 0,
-        'allow_custom_dates' => false,
         'require_minimum_participants' => false,
         'minimum_participants' => 1,
         

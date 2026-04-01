@@ -756,10 +756,7 @@ interface SettingsData {
 
   // Trip Settings
   default_trip_status: string;
-  max_group_size: number;
-  min_group_size: number;
   booking_advance_days: number;
-  allow_custom_dates: boolean;
   require_minimum_participants: boolean;
   minimum_participants: number;
 
@@ -2210,10 +2207,7 @@ const Settings: React.FC = () => {
       smtp_encryption: "tls",
       default_trip_status: "active",
     
-      max_group_size: 20,
-      min_group_size: 2,
       booking_advance_days: 30,
-      allow_custom_dates: false,
       require_minimum_participants: true,
       minimum_participants: 2,
       customer_registration: true,
@@ -4967,43 +4961,6 @@ const Settings: React.FC = () => {
                   <option value="inactive">{__("Inactive", "yatra")}</option>
                 </Select>
               </FormField>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  id="max_group_size"
-                  label={__("Maximum Group Size", "yatra")}
-                  description={__(
-                    "Maximum number of participants per booking",
-                    "yatra",
-                  )}
-                >
-                  <Input
-                    id="max_group_size"
-                    type="number"
-                    value={formData.max_group_size}
-                    name="max_group_size"
-                    onChange={handleFieldChange}
-                    min="1"
-                  />
-                </FormField>
-
-                <FormField
-                  id="min_group_size"
-                  label={__("Minimum Group Size", "yatra")}
-                  description={__(
-                    "Minimum number of participants required",
-                    "yatra",
-                  )}
-                >
-                  <Input
-                    id="min_group_size"
-                    type="number"
-                    value={formData.min_group_size}
-                    name="min_group_size"
-                    onChange={handleFieldChange}
-                    min="1"
-                  />
-                </FormField>
-              </div>
 
               <FormField
                 id="booking_advance_days"
@@ -5022,31 +4979,6 @@ const Settings: React.FC = () => {
                   min="1"
                 />
               </FormField>
-
-              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                <input
-                  type="checkbox"
-                  id="allow_custom_dates"
-                  checked={formData.allow_custom_dates}
-                  name="allow_custom_dates"
-                  onChange={handleFieldChange}
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <div className="flex-1">
-                  <Label
-                    htmlFor="allow_custom_dates"
-                    className="font-medium cursor-pointer"
-                  >
-                    {__("Allow Custom Dates", "yatra")}
-                  </Label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__(
-                      "Allow customers to request custom departure dates",
-                      "yatra",
-                    )}
-                  </p>
-                </div>
-              </div>
 
               <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
                 <input
