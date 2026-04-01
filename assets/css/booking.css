@@ -940,6 +940,7 @@
     color: #111827;
     background: #fff;
     transition: all 0.2s;
+    box-sizing:border-box;
 }
 
 .yatra-form-group input:focus,
