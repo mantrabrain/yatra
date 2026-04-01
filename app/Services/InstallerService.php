@@ -46,31 +46,85 @@ class InstallerService
     /**
      * Set all default options for fresh installation
      * Only Book Now Pay Later should be enabled by default
+     * Uses SettingsService keys to ensure consistency
      * 
      * @return void
      */
     private static function setDefaultOptions(): void
     {
         // Payment Gateway Settings - Only enable Pay Later by default
+        // These match SettingsService defaults exactly
         update_option('yatra_payment_gateways', ['pay_later']);
         update_option('yatra_payment_methods', []);
         update_option('yatra_payment_test_mode', true);
         update_option('yatra_auto_confirm_pay_later', true);
         update_option('yatra_partial_payment', false);
         update_option('yatra_gateway_configs', []);
+        update_option('yatra_gateway_order', []);
+        
+        // Currency Settings - Match SettingsService defaults
+        update_option('yatra_currency', 'USD');
+        update_option('yatra_currency_position', 'before');
+        update_option('yatra_thousand_separator', ',');
+        update_option('yatra_decimal_separator', '.');
+        update_option('yatra_decimal_places', 2);
+        
+        // Flexible Payment Settings - Match SettingsService defaults
+        update_option('yatra_enable_deposit', false);
+        update_option('yatra_deposit_type', 'percentage');
+        update_option('yatra_deposit_amount', 20);
+        update_option('yatra_deposit_required', false);
+        update_option('yatra_deposit_percentage', 20);
+        update_option('yatra_partial_payment_percentage', 30);
+        
+        // Scheduled Payment Settings - Match SettingsService defaults
+        update_option('yatra_enable_scheduled_payments', false);
+        update_option('yatra_scheduled_payment_type', 'single');
+        update_option('yatra_scheduled_payment_days', 15);
+        update_option('yatra_scheduled_payment_installments', 1);
+        update_option('yatra_scheduled_payment_interval', 30);
+        update_option('yatra_scheduled_payment_reminder_days', 3);
+        update_option('yatra_allow_save_payment_methods', false);
+        
+        // Trip Settings - Match SettingsService defaults
+        update_option('yatra_trip_base', 'trip');
+        update_option('yatra_trips_per_page', 12);
+        update_option('yatra_enable_wishlist', true);
+        update_option('yatra_enable_comparison', false);
+        update_option('yatra_show_sold_out', true);
+        
+        // Customer Settings - Match SettingsService defaults
+        update_option('yatra_enable_customer_accounts', true);
+        update_option('yatra_enable_customer_registration', true);
+        
+        // Booking Settings - Match SettingsService defaults
+        update_option('yatra_booking_base', 'book');
+        update_option('yatra_use_booking_page', false);
+        update_option('yatra_booking_page_id', 0);
+        update_option('yatra_enable_guest_booking', true);
+        update_option('yatra_booking_confirmation', true);
+        update_option('yatra_auto_confirm_bookings', false);
+        update_option('yatra_require_login', false);
+        update_option('yatra_allow_guest_checkout', true);
+        update_option('yatra_cancellation_policy', 'full_refund');
+        update_option('yatra_cancellation_days', 7);
+        update_option('yatra_refund_policy', '');
+        update_option('yatra_booking_expiry_hours', 24);
+        update_option('yatra_booking_reminder_days', 3);
+        update_option('yatra_allow_waitlist', true);
+        
+        // Email Settings - Match SettingsService defaults
+        update_option('yatra_email_from_name', '');
+        update_option('yatra_email_from_address', '');
+        update_option('yatra_admin_email', '');
+        update_option('yatra_enable_admin_notifications', true);
+        update_option('yatra_enable_customer_notifications', true);
         
         // Clear any existing Stripe/PayPal settings that might exist
         delete_option('yatra_stripe_settings');
         delete_option('yatra_paypal_settings');
         
-        // Basic Settings
-        update_option('yatra_currency', 'USD');
-        update_option('yatra_currency_position', 'before');
-        update_option('yatra_decimal_places', 2);
-        update_option('yatra_thousand_separator', ',');
-        update_option('yatra_decimal_separator', '.');
-        
-        // Set installation tracking
+        // Set installation tracking (not in SettingsService but needed for tracking)
         update_option('yatra_installation_date', current_time('mysql'));
         update_option('yatra_version', defined('YATRA_VERSION') ? YATRA_VERSION : '3.0.0');
         

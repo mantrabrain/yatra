@@ -70,6 +70,8 @@ class SettingsService
         'partial_payment' => false,
         'partial_payment_percentage' => 30,
         'auto_confirm_pay_later' => true,
+        'payment_gateways' => ['pay_later'],
+        'payment_methods' => [],
         'gateway_configs' => [],
         'gateway_order' => [],
         
