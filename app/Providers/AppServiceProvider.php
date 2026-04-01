@@ -64,9 +64,6 @@ class AppServiceProvider extends ServiceProvider
 
         // Initialize cache hooks
         \Yatra\Hooks\CacheHooks::init();
-
-        // Initialize trip validation hooks
-        \Yatra\Hooks\TripValidationHooks::init();
     }
 
     /**

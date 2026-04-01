@@ -92,12 +92,7 @@ class SettingsController extends BaseController
         'smtp_password' => '',
         'smtp_encryption' => 'tls',
         
-        // Trip Settings
-        'default_trip_status' => 'draft',
-        'booking_advance_days' => 0,
-        'require_minimum_participants' => false,
-        'minimum_participants' => 1,
-        
+                
         // Customer Settings
         'customer_registration' => true,
         'customer_fields' => [],

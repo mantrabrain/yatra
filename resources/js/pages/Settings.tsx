@@ -754,12 +754,7 @@ interface SettingsData {
   smtp_password: string;
   smtp_encryption: string;
 
-  // Trip Settings
-  default_trip_status: string;
-  booking_advance_days: number;
-  require_minimum_participants: boolean;
-  minimum_participants: number;
-
+  
   // Customer Settings
   customer_registration: boolean;
   customer_fields: string[];
@@ -2205,12 +2200,7 @@ const Settings: React.FC = () => {
       smtp_username: "",
       smtp_password: "",
       smtp_encryption: "tls",
-      default_trip_status: "active",
-    
-      booking_advance_days: 30,
-      require_minimum_participants: true,
-      minimum_participants: 2,
-      customer_registration: true,
+            customer_registration: true,
       customer_fields: ["name", "email", "phone", "address"],
       require_email_verification: false,
       customer_account_page: "/my-account",
@@ -3285,7 +3275,6 @@ const Settings: React.FC = () => {
       icon: DollarSign,
     },
     { id: "email" as SettingsSection, label: __("Email", "yatra"), icon: Mail },
-    { id: "trip" as SettingsSection, label: __("Trip", "yatra"), icon: MapPin },
     {
       id: "customer" as SettingsSection,
       label: __("Customer", "yatra"),
@@ -4933,96 +4922,6 @@ const Settings: React.FC = () => {
                     />
                   </FormField>
                 </>
-              )}
-            </div>
-          </div>
-        );
-
-      case "trip":
-        return (
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <FormField
-                id="default_trip_status"
-                label={__("Default Trip Status", "yatra")}
-                description={__(
-                  "Status assigned to new trips by default",
-                  "yatra",
-                )}
-              >
-                <Select
-                  id="default_trip_status"
-                  value={formData.default_trip_status}
-                  name="default_trip_status"
-                  onChange={handleFieldChange}
-                >
-                  <option value="draft">{__("Draft", "yatra")}</option>
-                  <option value="active">{__("Active", "yatra")}</option>
-                  <option value="inactive">{__("Inactive", "yatra")}</option>
-                </Select>
-              </FormField>
-
-              <FormField
-                id="booking_advance_days"
-                label={__("Maximum Booking Advance Days", "yatra")}
-                description={__(
-                  "How many days in advance customers can book",
-                  "yatra",
-                )}
-              >
-                <Input
-                  id="booking_advance_days"
-                  type="number"
-                  value={formData.booking_advance_days}
-                  name="booking_advance_days"
-                  onChange={handleFieldChange}
-                  min="1"
-                />
-              </FormField>
-
-              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                <input
-                  type="checkbox"
-                  id="require_minimum_participants"
-                  checked={formData.require_minimum_participants}
-                  name="require_minimum_participants"
-                  onChange={handleFieldChange}
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <div className="flex-1">
-                  <Label
-                    htmlFor="require_minimum_participants"
-                    className="font-medium cursor-pointer"
-                  >
-                    {__("Require Minimum Participants", "yatra")}
-                  </Label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__(
-                      "Trip requires minimum participants to proceed",
-                      "yatra",
-                    )}
-                  </p>
-                </div>
-              </div>
-
-              {formData.require_minimum_participants && (
-                <FormField
-                  id="minimum_participants"
-                  label={__("Minimum Participants", "yatra")}
-                  description={__(
-                    "Minimum number of participants required for trip to proceed",
-                    "yatra",
-                  )}
-                >
-                  <Input
-                    id="minimum_participants"
-                    type="number"
-                    value={formData.minimum_participants}
-                    name="minimum_participants"
-                    onChange={handleFieldChange}
-                    min="1"
-                  />
-                </FormField>
               )}
             </div>
           </div>
