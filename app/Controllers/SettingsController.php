@@ -267,7 +267,12 @@ class SettingsController extends BaseController
             // Get all settings from WordPress options table with yatra_ prefix
             foreach ($this->default_settings as $key => $default_value) {
                 $option_name = 'yatra_' . $key;
-                $value = get_option($option_name, $default_value);
+                $value = get_option($option_name, false);
+                
+                // Only use default if option doesn't exist (wasn't set by InstallerService)
+                if ($value === false) {
+                    $value = $default_value;
+                }
                 
                 // Handle serialized arrays (for fields like payment_gateways, customer_fields, etc.)
                 if (is_string($value) && is_serialized($value)) {

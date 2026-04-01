@@ -59,7 +59,59 @@ class InstallerService
         update_option('yatra_payment_test_mode', true);
         update_option('yatra_auto_confirm_pay_later', true);
         update_option('yatra_partial_payment', false);
-        update_option('yatra_gateway_configs', []);
+        // Set gateway configs with proper structure - only enable pay_later by default
+        $gateway_configs = [
+            'pay_later' => [
+                'enabled' => true,
+                'title' => 'Book Now, Pay Later',
+                'description' => 'Allow customers to reserve now and pay before the trip',
+            ],
+            // Explicitly disable all other gateways
+            'stripe' => [
+                'enabled' => false,
+                'title' => 'Stripe',
+                'description' => 'Accept credit and debit cards',
+                'api_key' => '',
+                'api_secret' => '',
+                'webhook_secret' => '',
+            ],
+            'paypal' => [
+                'enabled' => false,
+                'title' => 'PayPal',
+                'description' => 'Accept PayPal payments',
+                'api_key' => '',
+                'api_secret' => '',
+            ],
+            'razorpay' => [
+                'enabled' => false,
+                'title' => 'Razorpay',
+                'description' => 'Accept payments via Razorpay',
+                'api_key' => '',
+                'api_secret' => '',
+            ],
+            'square' => [
+                'enabled' => false,
+                'title' => 'Square',
+                'description' => 'Accept payments via Square',
+                'api_key' => '',
+                'api_secret' => '',
+            ],
+            'authorize_net' => [
+                'enabled' => false,
+                'title' => 'Authorize.net',
+                'description' => 'Accept payments via Authorize.net',
+                'api_key' => '',
+                'api_secret' => '',
+            ],
+            'bank_transfer' => [
+                'enabled' => false,
+                'title' => 'Bank Transfer',
+                'description' => 'Accept manual bank transfer payments',
+                'api_key' => '',
+                'api_secret' => '',
+            ]
+        ];
+        update_option('yatra_gateway_configs', $gateway_configs);
         update_option('yatra_gateway_order', []);
         
         // Currency Settings - Match SettingsService defaults
