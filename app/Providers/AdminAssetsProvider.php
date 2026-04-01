@@ -231,7 +231,7 @@ class AdminAssetsProvider
     {
         // Check if we're in development mode and Vite dev server is running
         $isDevMode = defined('WP_DEBUG') && WP_DEBUG && defined('YATRA_DEV_MODE') && YATRA_DEV_MODE;
-        $viteDevServer = 'http://localhost:3000';
+        $viteDevServer = 'http://localhost:5173';
         
         if ($isDevMode && $this->isViteDevServerRunning($viteDevServer)) {
             // In dev mode, inject localized data and Vite's HMR client
@@ -325,6 +325,7 @@ class AdminAssetsProvider
                     'currentUserAvatar' => get_avatar($current_user->ID, 96),
                     'siteUrl' => home_url(),
                     'adminUrl' => admin_url('admin.php'),
+                    'pluginUrl' => YATRA_PLUGIN_URL,
                     'capabilities' => $capabilities,
                     'roles' => $current_user->roles,
                     'isPro' => defined('YATRA_PRO_VERSION'),
@@ -413,6 +414,7 @@ class AdminAssetsProvider
             'currentUserAvatar' => get_avatar($current_user->ID, 96),
             'siteUrl' => home_url(),
             'adminUrl' => admin_url('admin.php'),
+            'pluginUrl' => YATRA_PLUGIN_URL,
             'permalinkStructure' => (get_option('permalink_structure') ?: '') ?: 'plain',
             'tripBase' => \Yatra\Services\SettingsService::getTripBase(),
             'bookingBase' => \Yatra\Services\SettingsService::getBookingBase(),

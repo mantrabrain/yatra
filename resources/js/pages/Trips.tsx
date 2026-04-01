@@ -991,9 +991,11 @@ const Trips: React.FC = () => {
                 className="w-12 h-12 object-cover rounded flex-shrink-0"
               />
             ) : (
-              <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded flex-shrink-0 flex items-center justify-center">
-                <span className="text-gray-400 text-[10px]">{__("No img", "yatra")}</span>
-              </div>
+              <img
+                src={`${(window as any).yatraAdmin?.siteUrl || ""}/wp-content/plugins/yatra/assets/images/trip-placeholder.svg`}
+                alt={trip.title}
+                className="w-12 h-12 object-cover rounded flex-shrink-0"
+              />
             )}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1">
