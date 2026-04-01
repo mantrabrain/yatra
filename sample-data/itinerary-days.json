@@ -215,5 +215,26 @@
     "title": "Grand Canyon Full Day Tour",
     "description": "Full-day exploration of the Grand Canyon with multiple viewpoints and photo stops.",
     "order": 1
+  },
+  {
+    "trip_slug": "paris-city-highlights-tour",
+    "day_number": 1,
+    "title": "Paris Landmarks & River Cruise",
+    "description": "Complete Paris experience with Eiffel Tower, Louvre, Notre-Dame, and Seine cruise.",
+    "order": 1
+  },
+  {
+    "trip_slug": "nyc-helicopter-liberty-tour",
+    "day_number": 1,
+    "title": "NYC Skyline & Liberty Experience",
+    "description": "Aerial Manhattan views plus Statue of Liberty and Ellis Island visit.",
+    "order": 1
+  },
+  {
+    "trip_slug": "tokyo-cultural-food-tour",
+    "day_number": 1,
+    "title": "Tokyo Culture & Cuisine Day",
+    "description": "Immersive experience of Japanese temples, tea ceremony, and authentic food.",
+    "order": 1
   }
 ]

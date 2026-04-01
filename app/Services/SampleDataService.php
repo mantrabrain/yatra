@@ -28,6 +28,114 @@ class SampleDataService
     }
 
     /**
+     * Generate dynamic future dates for sample data
+     * 
+     * @param array $base_data Original sample data
+     * @return array Modified data with future dates
+     */
+    private function generate_dynamic_dates(array $base_data): array
+    {
+        $current_date = new \DateTime();
+        $current_year = (int)$current_date->format('Y');
+        $current_month = (int)$current_date->format('m');
+        
+        // Generate dates starting from next month
+        $start_date = new \DateTime();
+        $start_date->modify('+1 month');
+        $start_year = (int)$start_date->format('Y');
+        $start_month = (int)$start_date->format('m');
+        
+        // Process availability dates
+        if (!empty($base_data['availability_dates'])) {
+            $base_data['availability_dates'] = array_map(function($date_entry) use ($current_year, $current_month, $start_year, $start_month) {
+                $original_date = new \DateTime($date_entry['departure_date']);
+                $original_year = (int)$original_date->format('Y');
+                $original_month = (int)$original_date->format('m');
+                $original_day = (int)$original_date->format('d');
+                
+                // Calculate year offset
+                $year_offset = $start_year - $original_year;
+                if ($original_month < $start_month) {
+                    $year_offset = max(0, $year_offset);
+                }
+                
+                // Create new future date
+                $new_departure = new \DateTime();
+                $new_departure->setDate($start_year + $year_offset, $original_month, $original_day);
+                
+                // Ensure date is at least 30 days in the future
+                $min_date = new \DateTime();
+                $min_date->modify('+30 days');
+                if ($new_departure < $min_date) {
+                    $new_departure = $min_date;
+                }
+                
+                $date_entry['departure_date'] = $new_departure->format('Y-m-d');
+                
+                // For single day trips, arrival = departure
+                if (isset($date_entry['arrival_date']) && $date_entry['arrival_date'] === $date_entry['departure_date']) {
+                    $date_entry['arrival_date'] = $new_departure->format('Y-m-d');
+                } else {
+                    // For multi-day trips, calculate arrival date
+                    $original_arrival = new \DateTime($date_entry['arrival_date']);
+                    $interval = $original_arrival->diff($original_date);
+                    $new_arrival = clone $new_departure;
+                    $new_arrival->add($interval);
+                    $date_entry['arrival_date'] = $new_arrival->format('Y-m-d');
+                }
+                
+                return $date_entry;
+            }, $base_data['availability_dates']);
+        }
+        
+        // Process availability rules
+        if (!empty($base_data['availability_rules'])) {
+            $base_data['availability_rules'] = array_map(function($rule) use ($start_year, $start_month) {
+                $original_start = new \DateTime($rule['start_date']);
+                $original_year = (int)$original_start->format('Y');
+                $original_month = (int)$original_start->format('m');
+                
+                // Calculate new start date
+                $year_offset = $start_year - $original_year;
+                if ($original_month < $start_month) {
+                    $year_offset = max(0, $year_offset);
+                }
+                
+                $new_start = new \DateTime();
+                $new_start->setDate($start_year + $year_offset, $original_month, (int)$original_start->format('d'));
+                
+                // Ensure start date is at least 30 days in the future
+                $min_date = new \DateTime();
+                $min_date->modify('+30 days');
+                if ($new_start < $min_date) {
+                    $new_start = $min_date;
+                }
+                
+                $rule['start_date'] = $new_start->format('Y-m-d');
+                
+                // Update end date to maintain same duration
+                $original_end = new \DateTime($rule['end_date']);
+                $duration = $original_end->diff($original_start);
+                $new_end = clone $new_start;
+                $new_end->add($duration);
+                
+                // For multi-year rules, ensure end date is reasonable
+                $max_end = clone $new_start;
+                $max_end->modify('+2 years');
+                if ($new_end > $max_end) {
+                    $new_end = $max_end;
+                }
+                
+                $rule['end_date'] = $new_end->format('Y-m-d');
+                
+                return $rule;
+            }, $base_data['availability_rules']);
+        }
+        
+        return $base_data;
+    }
+
+    /**
      * Import all sample data from JSON files
      * 
      * Order matters:
@@ -36,7 +144,7 @@ class SampleDataService
      * 3. Discounts
      * 4. Trips - tracked by slug=>id
      * 5. Trip-Classification pivot - needs both classification IDs and trip IDs
-     * 6. Availability dates/rules - needs trip IDs
+     * 6. Availability dates/rules - needs trip IDs (with dynamic dates)
      * 7. Itinerary days - needs trip IDs, tracked by composite key=>id
      * 8. Itinerary entries - needs day IDs, item_type IDs, and item IDs
      */
@@ -46,6 +154,9 @@ class SampleDataService
 
         try {
             $sample_data = $this->repository->get_all_sample_data();
+            
+            // Generate dynamic future dates
+            $sample_data = $this->generate_dynamic_dates($sample_data);
             
             // 1. Import Classifications (all types except items)
             $classifications = array_merge(
@@ -157,7 +268,8 @@ class SampleDataService
             'swiss-alps-mountain-trek', 'maldives-beach-escape', 'kyoto-cultural-journey',
             'serengeti-wildlife-safari', 'paris-city-explorer', 'bali-island-adventure',
             'iceland-northern-lights', 'new-zealand-adventure', 'peru-machu-picchu-trek',
-            'norway-fjords-cruise', 'grand-canyon-day-tour'
+            'norway-fjords-cruise', 'grand-canyon-day-tour', 'paris-city-highlights-tour',
+            'nyc-helicopter-liberty-tour', 'tokyo-cultural-food-tour'
         ];
         $trip_slugs_sql = "'" . implode("','", $trip_slugs) . "'";
         

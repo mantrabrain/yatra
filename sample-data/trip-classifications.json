@@ -164,5 +164,43 @@
       {"slug": "senior", "type": "traveler_type"},
       {"slug": "student", "type": "traveler_type"}
     ]
+  },
+  {
+    "trip_slug": "paris-city-highlights-tour",
+    "classifications": [
+      {"slug": "city-tours", "type": "category"},
+      {"slug": "city-walking-tour", "type": "activity"},
+      {"slug": "photography", "type": "activity"},
+      {"slug": "easy", "type": "difficulty"},
+      {"slug": "adult", "type": "traveler_type"},
+      {"slug": "child", "type": "traveler_type"},
+      {"slug": "senior", "type": "traveler_type"},
+      {"slug": "student", "type": "traveler_type"}
+    ]
+  },
+  {
+    "trip_slug": "nyc-helicopter-liberty-tour",
+    "classifications": [
+      {"slug": "city-tours", "type": "category"},
+      {"slug": "sightseeing", "type": "activity"},
+      {"slug": "photography", "type": "activity"},
+      {"slug": "easy", "type": "difficulty"},
+      {"slug": "adult", "type": "traveler_type"},
+      {"slug": "child", "type": "traveler_type"},
+      {"slug": "senior", "type": "traveler_type"}
+    ]
+  },
+  {
+    "trip_slug": "tokyo-cultural-food-tour",
+    "classifications": [
+      {"slug": "cultural-tours", "type": "category"},
+      {"slug": "cooking-class", "type": "activity"},
+      {"slug": "city-walking-tour", "type": "activity"},
+      {"slug": "easy", "type": "difficulty"},
+      {"slug": "adult", "type": "traveler_type"},
+      {"slug": "child", "type": "traveler_type"},
+      {"slug": "senior", "type": "traveler_type"},
+      {"slug": "student", "type": "traveler_type"}
+    ]
   }
 ]

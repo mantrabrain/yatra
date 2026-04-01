@@ -109,5 +109,41 @@
     "departure_time": "07:00:00",
     "status": "active",
     "auto_generate": 1
+  },
+  {
+    "trip_slug": "paris-city-highlights-tour",
+    "name": "Daily Paris Highlights Tours",
+    "recurrence_type": "daily",
+    "start_date": "2024-05-01",
+    "end_date": "2024-10-31",
+    "interval": 1,
+    "availability_status": "available",
+    "departure_time": "09:00:00",
+    "status": "active",
+    "auto_generate": 1
+  },
+  {
+    "trip_slug": "nyc-helicopter-liberty-tour",
+    "name": "Daily NYC Helicopter Tours",
+    "recurrence_type": "daily",
+    "start_date": "2024-05-01",
+    "end_date": "2024-09-30",
+    "interval": 1,
+    "availability_status": "available",
+    "departure_time": "10:00:00",
+    "status": "active",
+    "auto_generate": 1
+  },
+  {
+    "trip_slug": "tokyo-cultural-food-tour",
+    "name": "Daily Tokyo Cultural Tours",
+    "recurrence_type": "daily",
+    "start_date": "2024-05-01",
+    "end_date": "2024-10-31",
+    "interval": 1,
+    "availability_status": "available",
+    "departure_time": "08:30:00",
+    "status": "active",
+    "auto_generate": 1
   }
 ]

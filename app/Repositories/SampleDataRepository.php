@@ -687,7 +687,8 @@ class SampleDataRepository
             'swiss-alps-mountain-trek', 'maldives-beach-escape', 'kyoto-cultural-journey',
             'serengeti-wildlife-safari', 'paris-city-explorer', 'bali-island-adventure',
             'iceland-northern-lights', 'new-zealand-adventure', 'peru-machu-picchu-trek',
-            'norway-fjords-cruise', 'grand-canyon-day-tour'
+            'norway-fjords-cruise', 'grand-canyon-day-tour', 'paris-city-highlights-tour',
+            'nyc-helicopter-liberty-tour', 'tokyo-cultural-food-tour'
         ];
         $slugs_string = "'" . implode("','", $trip_slugs) . "'";
         

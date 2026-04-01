@@ -287,5 +287,131 @@
     "duration": "4 hours",
     "order": 6,
     "status": "publish"
+  },
+  {
+    "trip_slug": "paris-city-highlights-tour",
+    "day_number": 1,
+    "title": "Eiffel Tower Visit",
+    "description": "Skip-the-line access to the Eiffel Tower with panoramic views",
+    "item_type": "sightseeing",
+    "order": 1,
+    "status": "publish"
+  },
+  {
+    "trip_slug": "paris-city-highlights-tour",
+    "day_number": 1,
+    "title": "Louvre Museum Tour",
+    "description": "Guided tour of the world's largest art museum",
+    "item_type": "sightseeing",
+    "order": 2,
+    "status": "publish"
+  },
+  {
+    "trip_slug": "paris-city-highlights-tour",
+    "day_number": 1,
+    "title": "Notre-Dame Cathedral",
+    "description": "Visit the iconic Gothic cathedral",
+    "item_type": "sightseeing",
+    "order": 3,
+    "status": "publish"
+  },
+  {
+    "trip_slug": "paris-city-highlights-tour",
+    "day_number": 1,
+    "title": "Seine River Cruise",
+    "description": "1-hour scenic cruise along the Seine",
+    "item_type": "activity",
+    "order": 4,
+    "status": "publish"
+  },
+  {
+    "trip_slug": "paris-city-highlights-tour",
+    "day_number": 1,
+    "title": "Lunch Break",
+    "description": "French cuisine lunch at traditional bistro",
+    "item_type": "meal",
+    "order": 5,
+    "status": "publish"
+  },
+  {
+    "trip_slug": "nyc-helicopter-liberty-tour",
+    "day_number": 1,
+    "title": "Manhattan Helicopter Tour",
+    "description": "15-minute aerial tour of NYC skyline",
+    "item_type": "activity",
+    "order": 1,
+    "status": "publish"
+  },
+  {
+    "trip_slug": "nyc-helicopter-liberty-tour",
+    "day_number": 1,
+    "title": "Statue of Liberty Visit",
+    "description": "Ferry to Liberty Island and monument access",
+    "item_type": "sightseeing",
+    "order": 2,
+    "status": "publish"
+  },
+  {
+    "trip_slug": "nyc-helicopter-liberty-tour",
+    "day_number": 1,
+    "title": "Ellis Island Museum",
+    "description": "Historic immigration museum experience",
+    "item_type": "sightseeing",
+    "order": 3,
+    "status": "publish"
+  },
+  {
+    "trip_slug": "nyc-helicopter-liberty-tour",
+    "day_number": 1,
+    "title": "Lunch at Local Restaurant",
+    "description": "NYC-style lunch with harbor views",
+    "item_type": "meal",
+    "order": 4,
+    "status": "publish"
+  },
+  {
+    "trip_slug": "tokyo-cultural-food-tour",
+    "day_number": 1,
+    "title": "Traditional Tea Ceremony",
+    "description": "Authentic Japanese tea ceremony experience",
+    "item_type": "activity",
+    "order": 1,
+    "status": "publish"
+  },
+  {
+    "trip_slug": "tokyo-cultural-food-tour",
+    "day_number": 1,
+    "title": "Temple Visit",
+    "description": "Guided tour of historic Buddhist temples",
+    "item_type": "sightseeing",
+    "order": 2,
+    "status": "publish"
+  },
+  {
+    "trip_slug": "tokyo-cultural-food-tour",
+    "day_number": 1,
+    "title": "Tsukiji Market Tour",
+    "description": "Explore the famous fish market and food stalls",
+    "item_type": "activity",
+    "order": 3,
+    "status": "publish"
+  },
+  {
+    "trip_slug": "tokyo-cultural-food-tour",
+    "day_number": 1,
+    "title": "Authentic Japanese Lunch",
+    "description": "Multi-course traditional Japanese meal",
+    "item_type": "meal",
+    "order": 4,
+    "status": "publish"
+  },
+  {
+    "trip_slug": "tokyo-cultural-food-tour",
+    "day_number": 1,
+    "title": "Cooking Class",
+    "description": "Hands-on Japanese cooking class",
+    "item_type": "activity",
+    "order": 5,
+    "status": "publish"
   }
 ]
