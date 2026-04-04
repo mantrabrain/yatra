@@ -1402,9 +1402,25 @@ class TripController extends BaseController
             
             // Get selected date if provided
             $selected_date = sanitize_text_field((string) ($request->get_param('date') ?? ''));
-            
-            // Get selected month if provided (format: 'jan-2025' or 'Y-m-d' for day trips)
-            $selected_month = sanitize_text_field((string) ($request->get_param('month') ?? ''));
+
+            // Month filter for list: "all" or lowercase key e.g. "jan-2026" (matches data-month on cards)
+            $month_filter = sanitize_text_field((string) ($request->get_param('month_filter') ?? ''));
+            if ($month_filter === '') {
+                $month_filter = sanitize_text_field((string) ($request->get_param('month') ?? 'all'));
+            }
+            $month_filter = strtolower($month_filter ?: 'all');
+            // Accept YYYY-MM from JS (locale-safe); map to same M-Y keys used on cards
+            if ($month_filter !== 'all' && preg_match('/^(\d{4})-(\d{2})$/', $month_filter, $mm)) {
+                $ts = strtotime(sprintf('%04d-%02d-01', (int) $mm[1], (int) $mm[2]));
+                if ($ts) {
+                    $month_filter = strtolower(date('M-Y', $ts));
+                }
+            }
+
+            $page = max(1, (int) ($request->get_param('page') ?? 1));
+            $per_page = (int) ($request->get_param('per_page') ?? 10);
+            $per_page = max(1, min(50, $per_page));
+            $partial = (int) ($request->get_param('partial') ?? 0) === 1;
 
             // Fetch availability dates using centralized resolution service
             $resolutionService = new \Yatra\Services\AvailabilityResolutionService();
@@ -1426,10 +1442,8 @@ class TripController extends BaseController
             $auto_selected_date = '';
             
             if (!empty($availability_dates)) {
-                // If month provided, use it
-                if (!empty($selected_month)) {
-                    $auto_selected_month = $selected_month;
-                } elseif (!empty($selected_date)) {
+                // Legacy UI hint: month of selected date (response JSON); list filter uses month_filter
+                if (!empty($selected_date)) {
                     // Use selected date's month (always month-based now)
                     $selected_timestamp = strtotime($selected_date);
                     $auto_selected_month = strtolower(date('M-Y', $selected_timestamp));
@@ -1501,27 +1515,132 @@ class TripController extends BaseController
 
             // Start output buffering
             ob_start();
-            
-            // Generate availability HTML
-            $this->render_availability_template($trip_data, $sort_key, $travelers, $num_travelers, $selected_date, $auto_selected_month, $auto_selected_date);
-            
+
+            $slice_meta = $this->render_availability_template(
+                $trip_data,
+                $sort_key,
+                $travelers,
+                $num_travelers,
+                $selected_date,
+                $auto_selected_month,
+                $auto_selected_date,
+                $month_filter,
+                $page,
+                $per_page,
+                $partial
+            );
+
             $html = ob_get_clean();
 
-            return $this->success_response([
+            $payload = [
                 'html' => $html,
-                'selected_month' => $auto_selected_month,
+                'selected_month' => $month_filter,
                 'selected_date' => $auto_selected_date,
-            ]);
+                'month_filter' => $month_filter,
+                'sort' => $sort_key,
+                'total' => $slice_meta['total'],
+                'page' => $slice_meta['page'],
+                'per_page' => $slice_meta['per_page'],
+                'has_more' => $slice_meta['has_more'],
+                'loaded_count' => $slice_meta['loaded_count'],
+                'partial' => $partial,
+            ];
+
+            return $this->success_response($payload);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
     }
 
     /**
-     * Render availability template
+     * Normalize departure date to Y-m-d for comparisons (handles datetime strings).
      */
-    private function render_availability_template($trip_data, string $sort_key = 'date-asc', array $travelers = [], int $num_travelers = 1, string $selected_date = '', string $auto_selected_month = '', string $auto_selected_date = ''): void
+    private static function normalizeAvailabilityDateString(?string $value): string
     {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return '';
+        }
+        if (preg_match('/^(\d{4}-\d{2}-\d{2})/', $value, $m)) {
+            return $m[1];
+        }
+
+        return $value;
+    }
+
+    /**
+     * Paginate filtered availability cards (after sort).
+     * When $pin_date is Y-m-d and that departure exists in the filtered list, the page is
+     * adjusted so that row is included (fixes sidebar picking e.g. Aug 13 while page 1 only had Aug 1–10).
+     *
+     * @return array{items: array, total: int, page: int, per_page: int, has_more: bool, loaded_count: int}
+     */
+    private function computeAvailabilityPage(
+        array $sorted_cards,
+        string $month_filter,
+        int $page,
+        int $per_page,
+        string $pin_date = ''
+    ): array {
+        $month_filter = strtolower($month_filter ?: 'all');
+        $filtered = $sorted_cards;
+        if ($month_filter !== 'all') {
+            $filtered = array_values(array_filter(
+                $sorted_cards,
+                static function (array $c) use ($month_filter): bool {
+                    return (string) ($c['data_month'] ?? '') === $month_filter;
+                }
+            ));
+        }
+
+        $total = count($filtered);
+        $per_page = max(1, min(50, $per_page));
+        $page = max(1, $page);
+
+        $pin_date = trim($pin_date);
+        if ($pin_date !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $pin_date)) {
+            $pin_norm = self::normalizeAvailabilityDateString($pin_date);
+            foreach ($filtered as $idx => $c) {
+                $card_norm = self::normalizeAvailabilityDateString((string) ($c['data_date'] ?? ''));
+                if ($card_norm !== '' && $card_norm === $pin_norm) {
+                    $page = (int) (floor((int) $idx / $per_page) + 1);
+                    break;
+                }
+            }
+        }
+
+        $offset = ($page - 1) * $per_page;
+        $items = array_slice($filtered, $offset, $per_page);
+        $loaded_count = $offset + count($items);
+
+        return [
+            'items' => $items,
+            'total' => $total,
+            'page' => $page,
+            'per_page' => $per_page,
+            'has_more' => $loaded_count < $total,
+            'loaded_count' => $loaded_count,
+        ];
+    }
+
+    /**
+     * Render availability template (full section or card fragment only).
+     *
+     * @return array{total: int, page: int, per_page: int, has_more: bool, loaded_count: int}
+     */
+    private function render_availability_template(
+        $trip_data,
+        string $sort_key = 'date-asc',
+        array $travelers = [],
+        int $num_travelers = 1,
+        string $selected_date = '',
+        string $auto_selected_month = '',
+        string $auto_selected_date = '',
+        string $month_filter = 'all',
+        int $page = 1,
+        int $per_page = 10,
+        bool $fragment_cards_only = false
+    ): array {
         // Check if we have real availability data
         $has_availability = !empty($trip_data->availability_dates) && is_array($trip_data->availability_dates);
 
@@ -1900,30 +2019,56 @@ class TripController extends BaseController
             $month_filters[strtolower(date('M-Y', strtotime('+7 days')))] = date('M Y', strtotime('+7 days'));
         }
 
-        $availability_cards = $this->sortAvailabilityCards($availability_cards, $sort_key);
-        
-        // Prepare additional data for the template
+        $sorted_cards = $this->sortAvailabilityCards($availability_cards, $sort_key);
+
+        $pin_date = '';
+        if (!$fragment_cards_only) {
+            $pin_candidate = trim((string) $selected_date);
+            if ($pin_candidate !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $pin_candidate)) {
+                $pin_date = $pin_candidate;
+            }
+        }
+
+        $slice = $this->computeAvailabilityPage($sorted_cards, $month_filter, $page, $per_page, $pin_date);
+
         $pricing_type = $trip_data->pricing_type ?? 'regular';
         $price_types = $trip_data->price_types ?? [];
         $is_day_trip = ($trip_data->duration_days ?? 1) <= 1;
-        
-        // Pass traveler data to template for pre-filling
+
         $initial_travelers = $travelers;
         $initial_num_travelers = $num_travelers;
         $initial_selected_date = $selected_date;
-        
-        // Pass auto-selected month and date to template
-        $selected_month_filter = $auto_selected_month;
-        // Use actual selected date for highlighting (not auto-selected closest date)
+
+        $selected_month_filter = strtolower($month_filter ?: 'all');
         $selected_date_filter = !empty($selected_date) ? $selected_date : $auto_selected_date;
-        
-        // Include the template file
+
+        if ($fragment_cards_only) {
+            foreach ($slice['items'] as $index => $card) {
+                include YATRA_PLUGIN_PATH . 'templates/partials/availability-card.php';
+            }
+
+            return $slice;
+        }
+
+        $availability_cards = $slice['items'];
+        $availability_total_matching = $slice['total'];
+        $availability_page = $slice['page'];
+        $availability_per_page = $slice['per_page'];
+        $availability_has_more = $slice['has_more'];
+        $availability_loaded_count = $slice['loaded_count'];
+
+        // Month filter active but no matching departures while other months exist
+        $availability_filtered_no_results = $selected_month_filter !== 'all'
+            && $slice['total'] === 0
+            && !empty($month_filters);
+
         $template_path = YATRA_PLUGIN_PATH . 'templates/partials/availability-section.php';
-        
+
         if (file_exists($template_path)) {
-            $sort_key = $sort_key;
             include $template_path;
         }
+
+        return $slice;
     }
 
     private function sortAvailabilityCards(array $cards, string $sort_key): array

@@ -27,6 +27,51 @@
     return { base, isPlain };
   };
 
+  /**
+   * YYYY-MM from a calendar day; server maps to its locale M-Y to match card data-month.
+   * @param {string} dateStr YYYY-MM-DD
+   */
+  const monthFilterKeyFromIsoDate = (dateStr) => {
+    if (!dateStr || typeof dateStr !== 'string') {
+      return 'all';
+    }
+    const m = dateStr.match(/^(\d{4})-(\d{2})-\d{2}/);
+    if (!m) {
+      return 'all';
+    }
+    return `${m[1]}-${m[2]}`;
+  };
+
+  /**
+   * Build public REST URL for trip availability HTML (full section or card fragment).
+   * @param {string|number} tripId
+   * @param {{date?: string, month_filter?: string, sort?: string, page?: number, per_page?: number, partial?: boolean}} params
+   */
+
+  const buildAvailabilityTemplateUrl = (tripId, params = {}) => {
+    const { base: baseUrl, isPlain } = getRestBase();
+    const q = new URLSearchParams();
+    if (params.date) {
+      q.set('date', params.date);
+    }
+    const mf = params.month_filter != null && params.month_filter !== '' ? params.month_filter : 'all';
+    q.set('month_filter', mf);
+    q.set('sort', params.sort || 'date-asc');
+    q.set('page', String(Math.max(1, parseInt(params.page, 10) || 1)));
+    q.set('per_page', String(Math.min(50, Math.max(1, parseInt(params.per_page, 10) || 10))));
+    if (params.partial) {
+      q.set('partial', '1');
+    }
+    const qs = q.toString();
+    if (isPlain && baseUrl.includes('rest_route=')) {
+      return `${baseUrl}/trips/${tripId}/availability-template&${qs}`;
+    }
+    if (baseUrl.includes('/yatra/v1')) {
+      return `${baseUrl}/trips/${tripId}/availability-template?${qs}`;
+    }
+    return `${baseUrl}/yatra/v1/trips/${tripId}/availability-template?${qs}`;
+  };
+
   // Currency formatting helper for trip page (uses localized yatraTripData)
   if (typeof window.yatra_format_price_js !== 'function') {
     window.yatra_format_price_js = function(amount) {
@@ -1229,7 +1274,7 @@
         },
         onChange: (selectedDates, dateStr) => {
           this.dateInput.value = dateStr;
-          
+
           // Enable Check Availability button when date is selected
           if (this.checkAvailabilityBtn && dateStr) {
             this.checkAvailabilityBtn.disabled = false;
@@ -1579,23 +1624,14 @@
         return;
       }
 
-      // Make AJAX call to get availability template
-      const { base: baseUrl, isPlain } = getRestBase();
-
-      // Build REST endpoint; support plain permalinks via rest_route query
-      let restUrl;
-      if (isPlain && baseUrl.includes('rest_route=')) {
-        // Plain permalinks: baseUrl already has rest_route, append to it with &
-        restUrl = `${baseUrl}/trips/${tripId}/availability-template&date=${encodeURIComponent(date)}`;
-      } else if (baseUrl.includes('/yatra/v1')) {
-        restUrl = baseUrl + '/trips/' + tripId + '/availability-template?date=' + encodeURIComponent(date);
-      } else {
-        restUrl = baseUrl + '/yatra/v1/trips/' + tripId + '/availability-template?date=' + encodeURIComponent(date);
-      }
-      
-      const nonce = (window.yatraTripData && window.yatraTripData.nonce) || '';
-
-      
+      const monthKey = monthFilterKeyFromIsoDate(date);
+      const restUrl = buildAvailabilityTemplateUrl(tripId, {
+        date,
+        month_filter: monthKey,
+        sort: 'date-asc',
+        page: 1,
+        per_page: 10,
+      });
 
       fetch(restUrl, {
         method: 'GET',
@@ -1807,19 +1843,19 @@
         this.checkAvailabilityBtn.disabled = true;
       }
       
-      // Build REST URL with date parameter
-      const { base: baseUrl, isPlain } = getRestBase();
-      let restUrl;
-      if (isPlain && baseUrl.includes('rest_route=')) {
-        // Plain permalinks: baseUrl already has rest_route, append to it with &
-        restUrl = `${baseUrl}/trips/${tripId}/availability-template&date=${encodeURIComponent(date)}`;
-      } else if (baseUrl.includes('/yatra/v1')) {
-        restUrl = baseUrl + '/trips/' + tripId + '/availability-template?date=' + encodeURIComponent(date);
-      } else {
-        restUrl = baseUrl + '/yatra/v1/trips/' + tripId + '/availability-template?date=' + encodeURIComponent(date);
-      }
-      
-      // Fetch new availability HTML
+      const availSection = document.getElementById('availability');
+      const listEl = availSection ? availSection.querySelector('.yatra-availability-list') : null;
+      const sortKey = listEl?.dataset?.sort || 'date-asc';
+      const monthKey = monthFilterKeyFromIsoDate(date);
+
+      const restUrl = buildAvailabilityTemplateUrl(tripId, {
+        date,
+        month_filter: monthKey,
+        sort: sortKey,
+        page: 1,
+        per_page: 10,
+      });
+
       fetch(restUrl, {
         method: 'GET',
         headers: {
@@ -1876,7 +1912,7 @@
 
       // Wait a bit for the availability section to render
       setTimeout(() => {
-        const availabilityCards = document.querySelectorAll('.yatra-availability-card-item');
+        const availabilityCards = document.querySelectorAll('.yatra-availability-card');
         if (!availabilityCards.length) return;
 
         let matchingCard = null;
@@ -2699,7 +2735,7 @@
 
       // Wait a bit for the availability section to render
       setTimeout(() => {
-        const availabilityCards = document.querySelectorAll('.yatra-availability-card-item');
+        const availabilityCards = document.querySelectorAll('.yatra-availability-card');
         if (!availabilityCards.length) return;
 
         let matchingCard = null;
@@ -2825,7 +2861,10 @@
       this.section = document.getElementById('availability');
       if (!this.section) return;
 
-      this.filterButtons = this.section.querySelectorAll('.yatra-availability-filter-btn');
+      const filterBar = this.section.querySelector('.yatra-availability-filters');
+      this.filterButtons = filterBar
+        ? filterBar.querySelectorAll('.yatra-availability-filter-btn')
+        : this.section.querySelectorAll('.yatra-availability-filter-btn');
       this.availabilityItems = this.section.querySelectorAll('.yatra-availability-card');
 
       const sortSelect = this.section.querySelector('#availability-sort');
@@ -2834,15 +2873,22 @@
       }
 
       this.attachEventListeners();
-      
-      // Apply active month filter on initial load
-      const activeFilterBtn = this.section.querySelector('.yatra-availability-filter-btn.active');
-      if (activeFilterBtn) {
-        const filter = activeFilterBtn.getAttribute('data-filter');
-        this.currentMonthFilter = filter || 'all';
-        this.filterByMonth(filter);
+
+      const listEl = this.section.querySelector('.yatra-availability-list');
+      if (listEl && listEl.dataset.monthFilter) {
+        this.currentMonthFilter = listEl.dataset.monthFilter;
+      } else {
+        const activeFilterBtn = filterBar
+          ? filterBar.querySelector('.yatra-availability-filter-btn.active')
+          : this.section.querySelector('.yatra-availability-filter-btn.active');
+        if (activeFilterBtn) {
+          this.currentMonthFilter = activeFilterBtn.getAttribute('data-filter') || 'all';
+        }
       }
-      
+      if (listEl && listEl.dataset.sort) {
+        this.currentSortKey = listEl.dataset.sort;
+      }
+
       // Scroll to selected card if exists
       this.scrollToSelectedCard();
     }
@@ -2862,26 +2908,46 @@
     }
 
     attachEventListeners() {
-      // Month filter buttons
+      const filterBar = this.section.querySelector('.yatra-availability-filters');
+
+      // Month filter buttons (server-side filter; buttons live only in .yatra-availability-filters)
       this.filterButtons.forEach((btn) => {
         btn.addEventListener('click', () => {
-          const filter = btn.getAttribute('data-filter');
-          this.currentMonthFilter = filter || 'all';
-          this.filterByMonth(filter);
-
-          // Update active state
+          const filter = btn.getAttribute('data-filter') || 'all';
+          this.currentMonthFilter = filter;
           this.filterButtons.forEach((b) => b.classList.remove('active'));
           btn.classList.add('active');
+          this.reloadAvailabilityFromServer({
+            month_filter: filter,
+            page: 1,
+            sort: this.currentSortKey,
+          });
         });
       });
 
-      // Sort dropdown
+      const showAllCta = this.section.querySelector('.yatra-availability-show-all-dates');
+      if (showAllCta && filterBar) {
+        showAllCta.addEventListener('click', (e) => {
+          e.preventDefault();
+          const allPill = filterBar.querySelector('.yatra-availability-filter-btn[data-filter="all"]');
+          if (allPill) {
+            allPill.click();
+          }
+        });
+      }
+
+      // Sort dropdown (server-side sort)
       const sortSelect = document.getElementById('availability-sort');
       if (sortSelect) {
         sortSelect.addEventListener('change', (e) => {
           const value = e && e.target ? e.target.value : '';
           this.currentSortKey = value || 'date-asc';
-          this.reloadAvailabilityWithSort(this.currentSortKey, sortSelect);
+          this.reloadAvailabilityFromServer({
+            month_filter: this.currentMonthFilter,
+            page: 1,
+            sort: this.currentSortKey,
+            selectEl: sortSelect,
+          });
         });
       }
 
@@ -3039,27 +3105,50 @@
       }
     }
 
-    reloadAvailabilityWithSort(sortKey, selectEl) {
+    /**
+     * Replace availability section from API (sort / month filter / reset page).
+     * @param {{ month_filter?: string, page?: number, sort?: string, per_page?: number, selectEl?: HTMLSelectElement }} opts
+     */
+    reloadAvailabilityFromServer(opts = {}) {
       const tripId = window.yatraTripData?.tripId || this.section?.getAttribute('data-trip-id') || 0;
       if (!tripId) {
-        this.sortItems(sortKey);
-        return;
+        if (opts.sort) {
+          this.sortItems(opts.sort);
+        }
+        return Promise.resolve();
       }
 
-      const base = (window.yatraTripData?.restUrl || window.yatraTripData?.apiUrl || '/wp-json/yatra/v1').replace(/\/$/, '');
-      const url = `${base}/trips/${tripId}/availability-template?sort=${encodeURIComponent(sortKey || 'date-asc')}`;
+      const listEl = this.section?.querySelector('.yatra-availability-list');
+      const monthFilter = opts.month_filter != null
+        ? opts.month_filter
+        : (listEl?.dataset?.monthFilter || this.currentMonthFilter || 'all');
+      const sortKey = opts.sort || listEl?.dataset?.sort || this.currentSortKey || 'date-asc';
+      const page = opts.page != null ? opts.page : 1;
+      const perPage = opts.per_page != null
+        ? opts.per_page
+        : (parseInt(listEl?.dataset?.perPage, 10) || 10);
+      const selectEl = opts.selectEl;
+      const travelDateInput = document.getElementById('travel_date');
+      const travelDate = travelDateInput && travelDateInput.value ? travelDateInput.value : undefined;
 
       const prevDisabled = !!(selectEl && selectEl.disabled);
       if (selectEl) {
         selectEl.disabled = true;
       }
 
-      fetch(url, {
+      const url = buildAvailabilityTemplateUrl(tripId, {
+        date: travelDate,
+        month_filter: monthFilter,
+        sort: sortKey,
+        page,
+        per_page: perPage,
+      });
+
+      return fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        // Public endpoint: do not send cookies/nonces
         credentials: 'omit',
       })
           .then((resp) => resp.json())
@@ -3081,21 +3170,15 @@
               oldSection.replaceWith(newSection);
             }
 
-            // Rebind handlers on the new section
+            this.currentMonthFilter = monthFilter;
+            this.currentSortKey = sortKey;
             this.setup();
-
-            // Re-apply the active month filter (client-side)
-            const activeBtn = this.section.querySelector(`.yatra-availability-filter-btn[data-filter="${this.currentMonthFilter}"]`);
-            if (activeBtn) {
-              this.filterButtons.forEach((b) => b.classList.remove('active'));
-              activeBtn.classList.add('active');
-            }
-            this.filterByMonth(this.currentMonthFilter);
           })
           .catch((err) => {
-            console.error('[Yatra] Availability sort reload failed:', err);
-            // Fallback to client-side sort
-            this.sortItems(sortKey);
+            console.error('[Yatra] Availability reload failed:', err);
+            if (opts.sort) {
+              this.sortItems(opts.sort);
+            }
           })
           .finally(() => {
             if (selectEl) {
@@ -3700,75 +3783,100 @@
     }
 
     handleLoadMore() {
+      const tripId = window.yatraTripData?.tripId || this.section?.getAttribute('data-trip-id') || 0;
       const loadMoreContainer = this.section.querySelector('.yatra-availability-load-more');
       const btn = this.section.querySelector('.yatra-availability-load-more-btn');
       const countInfo = this.section.querySelector('.yatra-availability-count-info');
       const list = this.section.querySelector('.yatra-availability-list');
 
-      if (!btn || !list || !loadMoreContainer) return;
+      if (!tripId || !btn || !list || !loadMoreContainer) return;
 
-      const perPage = parseInt(loadMoreContainer.dataset.perPage) || 10;
-      const totalItems = parseInt(list.dataset.total) || 0;
-      let displayedCount = parseInt(list.dataset.displayed) || 0;
+      const perPage = parseInt(list.dataset.perPage, 10) || parseInt(loadMoreContainer.dataset.perPage, 10) || 10;
+      const currentPage = parseInt(list.dataset.page, 10) || 1;
+      const nextPage = currentPage + 1;
+      const monthFilter = list.dataset.monthFilter || loadMoreContainer.dataset.monthFilter || this.currentMonthFilter || 'all';
+      const sortKey = list.dataset.sort || loadMoreContainer.dataset.sort || this.currentSortKey || 'date-asc';
+      const travelDateInput = document.getElementById('travel_date');
+      const travelDate = travelDateInput && travelDateInput.value ? travelDateInput.value : undefined;
 
-      // Get all hidden cards
-      const hiddenCards = this.section.querySelectorAll('.yatra-availability-card.yatra-hidden-departure');
-
-      if (hiddenCards.length === 0) {
-        // No more items to show, hide the button
-        loadMoreContainer.style.display = 'none';
-        return;
-      }
-
-      // Show loading state
       const originalHTML = btn.innerHTML;
-      btn.innerHTML = '<svg class="yatra-spinner" width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Loading...';
+      const loadingSvg = '<svg class="yatra-spinner" width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> ';
+      btn.innerHTML = loadingSvg + 'Loading...';
       btn.disabled = true;
 
-      // Simulate a small delay for UX
-      setTimeout(() => {
-        // Show next batch of cards
-        let shown = 0;
-        hiddenCards.forEach((card) => {
-          if (shown < perPage) {
-            card.style.display = '';
-            card.classList.remove('yatra-hidden-departure');
-            shown++;
-          }
-        });
+      const url = buildAvailabilityTemplateUrl(tripId, {
+        date: travelDate,
+        month_filter: monthFilter,
+        sort: sortKey,
+        page: nextPage,
+        per_page: perPage,
+        partial: true,
+      });
 
-        // Update displayed count
-        displayedCount += shown;
-        list.dataset.displayed = displayedCount;
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'omit',
+      })
+          .then((resp) => {
+            if (!resp.ok) {
+              throw new Error('Load more failed');
+            }
+            return resp.json();
+          })
+          .then((data) => {
+            const html = data?.html || data?.data?.html;
+            if (!html || typeof html !== 'string') {
+              throw new Error('No HTML returned');
+            }
 
-        // Update the availability items array for sorting/filtering
-        this.availabilityItems = this.section.querySelectorAll('.yatra-availability-card');
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html.trim();
 
-        // Re-setup toggle handlers for newly visible cards
-        this.setupToggleHandlers();
+            while (tempDiv.firstChild) {
+              list.appendChild(tempDiv.firstChild);
+            }
 
-        // Re-initialize traveler selectors for newly visible cards
-        this.initTravelerSelectors();
+            const total = Number(data.total) || parseInt(list.dataset.total, 10) || 0;
+            const loadedCount = Number(data.loaded_count);
+            const hasMore = !!data.has_more;
+            const displayed = Number.isFinite(loadedCount)
+              ? loadedCount
+              : (parseInt(list.dataset.displayed, 10) || 0) + perPage;
 
-        // Re-attach book now handlers
-        this.attachBookNowHandlers();
+            list.dataset.total = String(total);
+            list.dataset.displayed = String(displayed);
+            list.dataset.page = String(nextPage);
 
-        // Calculate remaining
-        const remaining = totalItems - displayedCount;
+            this.availabilityItems = this.section.querySelectorAll('.yatra-availability-card');
+            this.setupToggleHandlers();
+            this.initTravelerSelectors();
+            this.attachBookNowHandlers();
 
-        if (remaining <= 0) {
-          // No more items, hide the load more section
-          loadMoreContainer.style.display = 'none';
-        } else {
-          // Update button text and count info
-          btn.innerHTML = `<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Load more departures (${remaining} remaining)`;
-          btn.disabled = false;
+            if (!hasMore) {
+              loadMoreContainer.style.display = 'none';
+              return;
+            }
 
-          if (countInfo) {
-            countInfo.textContent = `Showing ${displayedCount} of ${totalItems} departures`;
-          }
-        }
-      }, 300);
+            const remaining = Math.max(0, total - displayed);
+            btn.innerHTML = `<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Load more departures (${remaining} remaining)`;
+            btn.disabled = false;
+
+            loadMoreContainer.dataset.currentPage = String(nextPage);
+            loadMoreContainer.dataset.loaded = String(displayed);
+            loadMoreContainer.dataset.total = String(total);
+
+            if (countInfo) {
+              countInfo.textContent = `Showing ${displayed} of ${total} departures`;
+            }
+          })
+          .catch((err) => {
+            console.error('[Yatra] Load more failed:', err);
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+          });
     }
 
     attachBookNowHandlers() {
