@@ -7,6 +7,7 @@ namespace Yatra\Controllers;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
+use Yatra\Services\EmailTemplatePreviewService;
 
 /**
  * Settings REST API Controller
@@ -85,14 +86,14 @@ class SettingsController extends BaseController
         'email_template_confirmation' => true,
         'email_template_cancellation' => true,
         'email_template_reminder' => true,
+        'email_template_admin_new_booking' => true,
         'smtp_enabled' => false,
         'smtp_host' => 'smtp.gmail.com',
         'smtp_port' => 587,
         'smtp_username' => '',
         'smtp_password' => '',
         'smtp_encryption' => 'tls',
-        
-                
+
         // Customer Settings
         'customer_registration' => true,
         'customer_fields' => [],
@@ -179,6 +180,11 @@ class SettingsController extends BaseController
         'booking_form_config' => [],
         ];
         
+        $base_settings = array_merge(
+            $base_settings,
+            \Yatra\Services\EmailTemplateDefaults::settingsOptionDefaults()
+        );
+
         // Allow Pro plugins to add their settings via filter
         $this->default_settings = apply_filters('yatra_settings_default_fields', $base_settings);
     }
@@ -236,6 +242,47 @@ class SettingsController extends BaseController
                 'permission_callback' => [$this, 'check_permission'],
             ],
         ]);
+
+        register_rest_route($namespace, '/' . $base . '/email-template-preview', [
+            [
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'preview_core_email_template'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+    }
+
+    /**
+     * Preview a core (settings-backed) transactional template with sample merge data.
+     */
+    public function preview_core_email_template(WP_REST_Request $request)
+    {
+        try {
+            $params = $request->get_json_params();
+            if (!is_array($params)) {
+                return $this->error_response(__('Invalid request body.', 'yatra'), 400);
+            }
+
+            $templateKey = sanitize_key($params['template_key'] ?? '');
+            $subjectTpl = sanitize_text_field($params['subject'] ?? '');
+            $bodyTpl = wp_kses_post($params['body'] ?? '');
+            $tripId = isset($params['trip_id']) ? (int) $params['trip_id'] : 0;
+            $tripId = $tripId > 0 ? $tripId : null;
+
+            $rendered = EmailTemplatePreviewService::render($templateKey, $subjectTpl, $bodyTpl, $tripId);
+
+            return $this->success_response([
+                'success' => true,
+                'data' => [
+                    'subject' => $rendered['subject'],
+                    'body' => $rendered['body'],
+                ],
+            ]);
+        } catch (\InvalidArgumentException $e) {
+            return $this->error_response($e->getMessage(), 400);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
     }
 
     public function check_permission(?WP_REST_Request $request = null): bool
@@ -244,8 +291,9 @@ class SettingsController extends BaseController
             return false;
         }
 
-        // Only administrators can manage settings
-        return current_user_can('manage_options');
+        // Match other Yatra admin surfaces (e.g. Email Automation, Pro modules)
+        return current_user_can('manage_options')
+            || current_user_can('manage_yatra');
     }
 
     /**
@@ -532,6 +580,12 @@ class SettingsController extends BaseController
             if ($key === 'seo_trip_meta_keywords') {
                 // Allow keywords, strip HTML and sanitize
                 return sanitize_text_field($value);
+            }
+            if (is_string($key) && strpos($key, 'email_tpl_') === 0 && substr($key, -5) === '_body') {
+                return wp_kses_post((string) $value);
+            }
+            if (is_string($key) && strpos($key, 'email_tpl_') === 0 && substr($key, -8) === '_subject') {
+                return sanitize_text_field((string) $value);
             }
             if ($key === 'smtp_password' || $key === 'api_key' || $key === 'sms_api_key' || $key === 'recaptcha_secret_key') {
                 // Don't sanitize passwords/keys too aggressively

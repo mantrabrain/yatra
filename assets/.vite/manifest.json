@@ -11,35 +11,35 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-B7Uoe-LV.js": {
-    "file": "dist/js/index-B7Uoe-LV.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-BIt6a1DI.js",
-      "_default-i18n-DxhLUi3L.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
-  "_index-BoxTf9b_.js": {
-    "file": "dist/js/index-BoxTf9b_.js",
+  "_index-B2Z22w6V.js": {
+    "file": "dist/js/index-B2Z22w6V.js",
     "name": "index",
     "imports": [
       "_clsx-DgYk2OaC.js",
-      "_react-vendor-BIt6a1DI.js",
+      "_react-vendor-BHteVFHs.js",
       "_default-i18n-DxhLUi3L.js"
     ],
     "dynamicImports": [
       "node_modules/@wordpress/vips/build-module/vips-worker.mjs"
     ]
   },
+  "_index-DHkBlElb.js": {
+    "file": "dist/js/index-DHkBlElb.js",
+    "name": "index",
+    "imports": [
+      "_react-vendor-BHteVFHs.js",
+      "_default-i18n-DxhLUi3L.js"
+    ],
+    "css": [
+      "admin/dist/css/index.css"
+    ]
+  },
   "_react-vendor-!~{001}~.js": {
     "file": "admin/dist/css/react-vendor.css",
     "src": "_react-vendor-!~{001}~.js"
   },
-  "_react-vendor-BIt6a1DI.js": {
-    "file": "admin/dist/js/react-vendor-BIt6a1DI.js",
+  "_react-vendor-BHteVFHs.js": {
+    "file": "admin/dist/js/react-vendor-BHteVFHs.js",
     "name": "react-vendor",
     "css": [
       "admin/dist/css/react-vendor.css"
@@ -57,8 +57,8 @@
     "src": "resources/js/account-page.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-BIt6a1DI.js",
-      "_index-B7Uoe-LV.js",
+      "_react-vendor-BHteVFHs.js",
+      "_index-DHkBlElb.js",
       "_default-i18n-DxhLUi3L.js"
     ]
   },
@@ -68,8 +68,8 @@
     "src": "resources/js/blocks/activity/index.tsx",
     "isEntry": true,
     "imports": [
-      "_index-BoxTf9b_.js",
-      "_react-vendor-BIt6a1DI.js",
+      "_index-B2Z22w6V.js",
+      "_react-vendor-BHteVFHs.js",
       "_default-i18n-DxhLUi3L.js",
       "_clsx-DgYk2OaC.js"
     ]
@@ -80,8 +80,8 @@
     "src": "resources/js/blocks/destination/index.tsx",
     "isEntry": true,
     "imports": [
-      "_index-BoxTf9b_.js",
-      "_react-vendor-BIt6a1DI.js",
+      "_index-B2Z22w6V.js",
+      "_react-vendor-BHteVFHs.js",
       "_default-i18n-DxhLUi3L.js",
       "_clsx-DgYk2OaC.js"
     ]
@@ -92,8 +92,8 @@
     "src": "resources/js/blocks/tour/index.tsx",
     "isEntry": true,
     "imports": [
-      "_index-BoxTf9b_.js",
-      "_react-vendor-BIt6a1DI.js",
+      "_index-B2Z22w6V.js",
+      "_react-vendor-BHteVFHs.js",
       "_default-i18n-DxhLUi3L.js",
       "_clsx-DgYk2OaC.js"
     ]
@@ -104,8 +104,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-BIt6a1DI.js",
-      "_index-B7Uoe-LV.js",
+      "_react-vendor-BHteVFHs.js",
+      "_index-DHkBlElb.js",
       "_clsx-DgYk2OaC.js",
       "_default-i18n-DxhLUi3L.js"
     ]

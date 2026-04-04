@@ -12,6 +12,8 @@ use Yatra\Repositories\CustomerRepository;
 use Yatra\Repositories\TripRepository;
 use Yatra\Repositories\BookingRepository;
 use Yatra\Services\SettingsService;
+use Yatra\Services\TransactionalEmailTemplateService;
+use Yatra\Services\EmailService;
 use Yatra\Services\DepartureService;
 use Yatra\Services\AvailabilityService;
 use Yatra\Services\CalculationService;
@@ -1979,67 +1981,50 @@ class BookingSessionController extends BaseController
         // Format prices using global currency settings
         $formatted_total = yatra_format_price($total_amount);
         $formatted_due = yatra_format_price($amount_due);
-        
-        // Determine email subject and intro based on booking status
-        $to = sanitize_email($customer_email);
-        
-        if ($booking_status === 'confirmed') {
-            $subject = sprintf(__('[%s] Booking Confirmed - %s', 'yatra'), get_bloginfo('name'), $reference);
-            $body = sprintf(__("Dear %s,\n\n", 'yatra'), $customer_name ?: 'Customer');
-            $body .= __("Thank you for your booking! Your reservation has been confirmed.\n\n", 'yatra');
-        } else {
-            $subject = sprintf(__('[%s] Booking Received - %s', 'yatra'), get_bloginfo('name'), $reference);
-            $body = sprintf(__("Dear %s,\n\n", 'yatra'), $customer_name ?: 'Customer');
-            $body .= __("Thank you for your booking! Your reservation has been received and is pending confirmation.\n\n", 'yatra');
-            
-            // Add expiry notice for pending bookings
-            if ($expiry_datetime) {
-                $body .= sprintf(
-                    __("⚠️ Important: Please complete your payment before %s to avoid automatic cancellation.\n\n", 'yatra'),
-                    date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($expiry_datetime))
-                );
-            }
+
+        $intro_paragraph = $booking_status === 'confirmed'
+            ? __('Thank you for your booking! Your reservation has been confirmed.', 'yatra')
+            : __('Thank you for your booking! Your reservation has been received and is pending confirmation.', 'yatra');
+        if ($booking_status === 'pending' && $expiry_datetime) {
+            $intro_paragraph .= ' ' . sprintf(
+                __('Please complete your payment before %s to avoid automatic cancellation.', 'yatra'),
+                date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($expiry_datetime))
+            );
         }
-        $body .= "═══════════════════════════════════════\n";
-        $body .= sprintf(__("Booking Reference: %s\n", 'yatra'), $reference);
-        $body .= "═══════════════════════════════════════\n\n";
-        $body .= sprintf(__("Trip: %s\n", 'yatra'), $trip->title);
-        $body .= sprintf(__("Travel Date: %s\n", 'yatra'), date_i18n(get_option('date_format'), strtotime($travel_date)));
-        $body .= sprintf(__("Duration: %d Days / %d Nights\n", 'yatra'), $trip->duration_days, $trip->duration_nights);
-        $body .= sprintf(__("Number of Travelers: %d\n\n", 'yatra'), count($travelers));
-        
-        $body .= __("PAYMENT DETAILS\n", 'yatra');
-        $body .= "───────────────────────────────────────\n";
-        $body .= sprintf(__("Total Amount: %s\n", 'yatra'), $formatted_total);
-        
-        if ($payment_method === 'deposit') {
-            $body .= sprintf(__("Payment Type: Deposit\n", 'yatra'));
-            $body .= sprintf(__("Amount Due Now: %s\n", 'yatra'), $formatted_due);
-            $body .= sprintf(__("Remaining Balance: %s (due before trip)\n", 'yatra'), yatra_format_price($total_amount - $amount_due));
-        } elseif ($payment_method === 'partial') {
-            $body .= sprintf(__("Payment Type: Partial Payment\n", 'yatra'));
-            $body .= sprintf(__("Amount Due Now: %s\n", 'yatra'), $formatted_due);
-            $body .= sprintf(__("Remaining Balance: %s\n", 'yatra'), yatra_format_price($total_amount - $amount_due));
-        } else {
-            $body .= sprintf(__("Payment Type: Full Payment\n", 'yatra'));
-        }
-        
-        if ($payment_gateway === 'pay_later') {
-            $body .= "\n" . __("Payment Status: Pay Later - Please contact us to arrange payment.\n", 'yatra');
-        } elseif ($payment_gateway === 'bank_transfer') {
-            $body .= "\n" . __("Payment Status: Bank Transfer - You will receive bank details in a separate email.\n", 'yatra');
-        }
-        
-        $body .= "\n" . __("TRAVELERS\n", 'yatra');
-        $body .= "───────────────────────────────────────\n";
-        foreach ($travelers as $i => $traveler) {
-            $traveler_name = trim(($traveler['first_name'] ?? '') . ' ' . ($traveler['last_name'] ?? ''));
-            $body .= sprintf(__("Traveler %d: %s\n", 'yatra'), $i + 1, $traveler_name ?: 'N/A');
-        }
-        
-        $body .= "\n" . __("CANCELLATION POLICY\n", 'yatra');
-        $body .= "───────────────────────────────────────\n";
-        
+
+        ob_start();
+        ?>
+        <div style="background:#f3f4f6;padding:20px;border-radius:8px;margin:16px 0;">
+            <p style="margin:0 0 8px;"><strong><?php esc_html_e('Booking reference', 'yatra'); ?>:</strong> <?php echo esc_html($reference); ?></p>
+            <p style="margin:0 0 8px;"><strong><?php esc_html_e('Trip', 'yatra'); ?>:</strong> <?php echo esc_html($trip->title); ?></p>
+            <p style="margin:0 0 8px;"><strong><?php esc_html_e('Travel date', 'yatra'); ?>:</strong> <?php echo esc_html(date_i18n(get_option('date_format'), strtotime($travel_date))); ?></p>
+            <p style="margin:0 0 8px;"><strong><?php esc_html_e('Duration', 'yatra'); ?>:</strong> <?php echo esc_html(sprintf(__('%d days / %d nights', 'yatra'), (int) $trip->duration_days, (int) $trip->duration_nights)); ?></p>
+            <p style="margin:0;"><strong><?php esc_html_e('Travelers', 'yatra'); ?>:</strong> <?php echo esc_html((string) count($travelers)); ?></p>
+        </div>
+        <h3 style="font-size:16px;"><?php esc_html_e('Payment details', 'yatra'); ?></h3>
+        <p><?php echo esc_html(sprintf(__('Total: %s', 'yatra'), $formatted_total)); ?></p>
+        <?php if ($payment_method === 'deposit') : ?>
+            <p><?php echo esc_html(sprintf(__('Payment type: Deposit — due now %s, remaining %s', 'yatra'), $formatted_due, yatra_format_price($total_amount - $amount_due))); ?></p>
+        <?php elseif ($payment_method === 'partial') : ?>
+            <p><?php echo esc_html(sprintf(__('Payment type: Partial — due now %s, remaining %s', 'yatra'), $formatted_due, yatra_format_price($total_amount - $amount_due))); ?></p>
+        <?php else : ?>
+            <p><?php esc_html_e('Payment type: Full payment', 'yatra'); ?></p>
+        <?php endif; ?>
+        <?php if ($payment_gateway === 'pay_later') : ?>
+            <p><?php esc_html_e('Pay later — please contact us to arrange payment.', 'yatra'); ?></p>
+        <?php elseif ($payment_gateway === 'bank_transfer') : ?>
+            <p><?php esc_html_e('Bank transfer — you will receive bank details separately.', 'yatra'); ?></p>
+        <?php endif; ?>
+        <h3 style="font-size:16px;"><?php esc_html_e('Travelers', 'yatra'); ?></h3>
+        <ul style="padding-left:20px;">
+            <?php foreach ($travelers as $i => $traveler) : ?>
+                <?php
+                $traveler_name = trim(($traveler['first_name'] ?? '') . ' ' . ($traveler['last_name'] ?? ''));
+                ?>
+                <li><?php echo esc_html(sprintf(__('Traveler %d: %s', 'yatra'), $i + 1, $traveler_name ?: '—')); ?></li>
+            <?php endforeach; ?>
+        </ul>
+        <?php
         $cancellation_policy_labels = [
             'full_refund' => __('Full refund available', 'yatra'),
             'partial_refund' => __('Partial refund available', 'yatra'),
@@ -2047,70 +2032,56 @@ class BookingSessionController extends BaseController
             'flexible' => __('Flexible cancellation', 'yatra'),
         ];
         $policy_label = $cancellation_policy_labels[$cancellation_policy] ?? __('Standard policy applies', 'yatra');
-        
-        $body .= sprintf(__("Policy: %s\n", 'yatra'), $policy_label);
-        $body .= sprintf(__("Free cancellation up to: %d days before departure\n", 'yatra'), $cancellation_days);
-        
-        // Add custom refund policy text if set
-        $custom_refund_policy = \Yatra\Services\SettingsService::get('refund_policy', '');
-        if (!empty($custom_refund_policy)) {
-            $body .= sprintf(__("Details: %s\n", 'yatra'), $custom_refund_policy);
+        ?>
+        <h3 style="font-size:16px;"><?php esc_html_e('Cancellation policy', 'yatra'); ?></h3>
+        <p><?php echo esc_html($policy_label); ?> — <?php echo esc_html(sprintf(__('free cancellation up to %d days before departure', 'yatra'), (int) $cancellation_days)); ?></p>
+        <?php
+        $custom_refund_policy = SettingsService::getString('refund_policy', '');
+        if ($custom_refund_policy !== '') {
+            echo '<p>' . esc_html($custom_refund_policy) . '</p>';
         }
-        
-        $body .= "\n" . __("WHAT'S NEXT?\n", 'yatra');
-        $body .= "───────────────────────────────────────\n";
-        $body .= __("1. You will receive a detailed trip itinerary within 24-48 hours.\n", 'yatra');
-        $body .= __("2. Our team will contact you to confirm any special requirements.\n", 'yatra');
-        $body .= __("3. Please ensure all traveler passports are valid for at least 6 months.\n\n", 'yatra');
-        
-        $body .= __("If you have any questions, please don't hesitate to contact us.\n\n", 'yatra');
-        $body .= sprintf(__("Best regards,\n%s Team\n", 'yatra'), get_bloginfo('name'));
-        $body .= "\n" . home_url() . "\n";
+        ?>
+        <h3 style="font-size:16px;"><?php esc_html_e('What’s next?', 'yatra'); ?></h3>
+        <ol style="padding-left:20px;">
+            <li><?php esc_html_e('You will receive a detailed trip itinerary within 24–48 hours.', 'yatra'); ?></li>
+            <li><?php esc_html_e('Our team will contact you to confirm any special requirements.', 'yatra'); ?></li>
+            <li><?php esc_html_e('Please ensure passports are valid for at least 6 months.', 'yatra'); ?></li>
+        </ol>
+        <p><?php esc_html_e('If you have any questions, contact us anytime.', 'yatra'); ?></p>
+        <p><a href="<?php echo esc_url(home_url('/')); ?>"><?php echo esc_html(home_url('/')); ?></a></p>
+        <?php
+        $details_html = ob_get_clean();
 
-        // Set HTML content type for better formatting
-        $headers = ['Content-Type: text/plain; charset=UTF-8'];
-        
-        wp_mail($to, $subject, $body, $headers);
+        $vars = [
+            'customer_name' => $customer_name,
+            'customer_first_name' => (string) ($contact['first_name'] ?? ''),
+            'customer_last_name' => (string) ($contact['last_name'] ?? ''),
+            'customer_email' => $customer_email,
+            'customer_phone' => (string) ($contact['phone'] ?? ''),
+            'booking_reference' => $reference,
+            'booking_id' => (string) $booking_id,
+            'trip_name' => (string) $trip->title,
+            'trip_url' => home_url('/' . SettingsService::getTripBase() . '/' . rawurlencode((string) ($trip->slug ?? '')) . '/'),
+            'travel_date' => date_i18n(get_option('date_format'), strtotime($travel_date)),
+            'travelers_count' => (string) count($travelers),
+            'total_amount_formatted' => $formatted_total,
+            'amount_due_formatted' => $formatted_due,
+            'currency' => SettingsService::getCurrency(),
+            'intro_paragraph' => $intro_paragraph,
+            'details_html' => $details_html,
+            'details_html_only' => '1',
+            'footer_note' => sprintf(__('— %s', 'yatra'), get_bloginfo('name')),
+            'transactional_context' => 'booking_created',
+        ];
 
-        // Admin notification
-        $admin_email = get_option('admin_email');
-        
-        $status_emoji = ($booking_status === 'confirmed') ? '✅' : '⏳';
-        $status_label = ($booking_status === 'confirmed') ? __('Confirmed', 'yatra') : __('Pending', 'yatra');
-        
-        $admin_subject = sprintf(__('[%s] %s New Booking - %s', 'yatra'), get_bloginfo('name'), $status_emoji, $reference);
-        
-        $admin_body = sprintf(__("A new booking has been received! Status: %s\n\n", 'yatra'), $status_label);
-        $admin_body .= "═══════════════════════════════════════\n";
-        $admin_body .= sprintf(__("Reference: %s\n", 'yatra'), $reference);
-        $admin_body .= sprintf(__("Status: %s\n", 'yatra'), strtoupper($status_label));
-        $admin_body .= "═══════════════════════════════════════\n\n";
-        $admin_body .= sprintf(__("Trip: %s\n", 'yatra'), $trip->title);
-        $admin_body .= sprintf(__("Travel Date: %s\n", 'yatra'), date_i18n(get_option('date_format'), strtotime($travel_date)));
-        $admin_body .= sprintf(__("Travelers: %d\n\n", 'yatra'), count($travelers));
-        
-        $admin_body .= __("CUSTOMER DETAILS\n", 'yatra');
-        $admin_body .= "───────────────────────────────────────\n";
-        $admin_body .= sprintf(__("Name: %s\n", 'yatra'), $customer_name);
-        $admin_body .= sprintf(__("Email: %s\n", 'yatra'), $customer_email);
-        $admin_body .= sprintf(__("Phone: %s\n", 'yatra'), $contact['phone'] ?? 'N/A');
-        $admin_body .= sprintf(__("Country: %s\n\n", 'yatra'), $contact['country'] ?? 'N/A');
-        
-        $admin_body .= __("PAYMENT\n", 'yatra');
-        $admin_body .= "───────────────────────────────────────\n";
-        $admin_body .= sprintf(__("Total: %s\n", 'yatra'), $formatted_total);
-        $admin_body .= sprintf(__("Due Now: %s\n", 'yatra'), $formatted_due);
-        $admin_body .= sprintf(__("Method: %s\n", 'yatra'), ucfirst($payment_method));
-        $admin_body .= sprintf(__("Gateway: %s\n", 'yatra'), ucwords(str_replace('_', ' ', $payment_gateway)));
-        $admin_body .= sprintf(__("Payment Status: %s\n\n", 'yatra'), __('Pending', 'yatra'));
-        
-        if ($booking_status === 'pending' && $payment_gateway !== 'pay_later') {
-            $admin_body .= sprintf(__("⚠️ ACTION REQUIRED: This booking is pending. Please verify payment and confirm.\n\n", 'yatra'));
-        }
-        
-        $admin_body .= sprintf(__("View Booking: %s\n", 'yatra'), admin_url('admin.php?page=yatra&subpage=bookings&action=view&id=' . $booking_id));
+        TransactionalEmailTemplateService::sendIfEnabled(
+            TransactionalEmailTemplateService::TYPE_BOOKING_CONFIRMATION,
+            $customer_email,
+            $vars
+        );
 
-        wp_mail($admin_email, $admin_subject, $admin_body, $headers);
+        // Admin new-booking email is sent from NotificationService (yatra_booking_created) using
+        // Email → Templates → Admin: New booking, to avoid duplicate messages.
     }
 
     /**

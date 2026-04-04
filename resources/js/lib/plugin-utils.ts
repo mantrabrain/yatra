@@ -71,3 +71,7 @@ export const isModuleActive = (moduleName: string): boolean => {
   }
   return isActive;
 };
+
+/** Yatra Pro + Email Automation module (DB templates, sequences, logs). */
+export const isEmailAutomationModuleEnabled = (): boolean =>
+  isModuleActive("email_automation");

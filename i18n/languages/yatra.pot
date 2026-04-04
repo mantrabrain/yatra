@@ -9,57 +9,57 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-31T10:46:25+00:00\n"
+"POT-Creation-Date: 2026-04-04T12:56:17+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
 
-#: assets/admin/dist/js/app.js:29402
+#: assets/admin/dist/js/app.js:29407
 msgid "Failed to load reviews. Please try again."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29432
+#: assets/admin/dist/js/app.js:29437
 msgid "Select reviews to display as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29434
+#: assets/admin/dist/js/app.js:29439
 msgid "Save the trip first to select testimonials from reviews"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29439
+#: assets/admin/dist/js/app.js:29444
 msgid "Testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29440
+#: assets/admin/dist/js/app.js:29445
 msgid "Select approved reviews to display as testimonials on the trip page"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29446
+#: assets/admin/dist/js/app.js:29451
 msgid "Loading reviews..."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29457
+#: assets/admin/dist/js/app.js:29462
 msgid "Retry"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29462
+#: assets/admin/dist/js/app.js:29467
 msgid "No approved reviews yet"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29463
+#: assets/admin/dist/js/app.js:29468
 msgid "Reviews will appear here once customers submit and they are approved"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29468
+#: assets/admin/dist/js/app.js:29473
 msgid "Select reviews to feature as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29477
+#: assets/admin/dist/js/app.js:29482
 #: templates/listing-trip.php:266
 msgid "Clear all"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29515
+#: assets/admin/dist/js/app.js:29520
 msgid "Selected as testimonial"
 msgstr ""
 
@@ -221,20 +221,21 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: assets/dist/js/account-page.js:1004
-#: templates/partials/availability-section.php:78
-#: templates/partials/availability-section.php:543
+#: templates/partials/availability-card.php:430
+#: templates/partials/availability-section.php:104
 msgid "travelers"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1038
-#: app/Controllers/BookingSessionController.php:2405
+#: app/Controllers/BookingSessionController.php:2412
 #: app/Controllers/SingleTripController.php:462
 #: app/Controllers/SingleTripController.php:1812
 #: app/Controllers/SingleTripController.php:1847
 #: app/Controllers/SingleTripController.php:1961
 #: app/Models/Checkout.php:103
+#: app/Services/TransactionalEmailTemplateService.php:305
 #: templates/booking-confirmation.php:285
-#: templates/partials/availability-section.php:378
+#: templates/partials/availability-card.php:265
 #: templates/partials/booking-content.php:324
 #: templates/partials/booking-form-fields.php:320
 #: templates/partials/booking-form-fields.php:356
@@ -344,8 +345,12 @@ msgid "Travel Date"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1417
+#: app/Controllers/BookingSessionController.php:2002
+#: app/Controllers/BookingSessionController.php:2018
+#: app/Services/TransactionalEmailTemplateService.php:249
+#: app/Services/TransactionalEmailTemplateService.php:320
 #: templates/booking-confirmation.php:274
-#: templates/partials/availability-section.php:347
+#: templates/partials/availability-card.php:234
 #: templates/partials/booking-content.php:318
 #: templates/partials/booking-content.php:388
 #: templates/partials/remaining-checkout-content.php:88
@@ -415,8 +420,8 @@ msgid "Paid"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1606
-#: app/Controllers/BookingSessionController.php:2079
-#: app/Controllers/BookingSessionController.php:2105
+#: app/Controllers/BookingSessionController.php:2086
+#: app/Controllers/BookingSessionController.php:2112
 #: app/Controllers/ReportsController.php:256
 #: assets/dist/js/account-page.js:1321
 #: assets/dist/js/account-page.js:1345
@@ -440,7 +445,7 @@ msgid "You have"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1660
-#: templates/partials/availability-section.php:86
+#: templates/partials/availability-section.php:112
 msgid "Booking"
 msgstr ""
 
@@ -702,7 +707,9 @@ msgid "Update Password"
 msgstr ""
 
 #: assets/dist/js/account-page.js:2228
+#: assets/dist/js/index-B2Z22w6V.js:106333
 #: assets/dist/js/index-BoxTf9b_.js:106333
+#: assets/dist/js/index-C5mz5_GL.js:106333
 #: templates/partials/booking-content.php:177
 #: templates/partials/single-trip/enquiry-modal.php:85
 #: assets/dist/js/account-page.js:2097
@@ -731,10 +738,12 @@ msgid "Trip updates"
 msgstr ""
 
 #: assets/dist/js/account-page.js:2302
+#: assets/dist/js/index-B2Z22w6V.js:103493
 #: assets/dist/js/index-BoxTf9b_.js:103493
+#: assets/dist/js/index-C5mz5_GL.js:103493
 #: templates/listing-activity.php:247
-#: templates/partials/single-trip/content-sidebar.php:231
-#: templates/shortcodes/activity.php:123
+#: templates/partials/single-trip/content-sidebar.php:219
+#: templates/shortcodes/activity.php:100
 #: templates/shortcodes/destination.php:92
 #: templates/single-activity.php:130
 #: templates/single-destination.php:130
@@ -840,7 +849,7 @@ msgid "Browse Trips"
 msgstr ""
 
 #: assets/dist/js/account-page.js:2634
-#: templates/partials/single-trip/content-sidebar.php:225
+#: templates/partials/single-trip/content-sidebar.php:213
 msgid "OFF"
 msgstr ""
 
@@ -1030,7 +1039,7 @@ msgstr ""
 #: app/Providers/FrontendAssetsProvider.php:392
 #: app/Providers/FrontendAssetsProvider.php:431
 #: includes/helpers.php:261
-#: templates/partials/single-trip/content-sidebar.php:239
+#: templates/partials/single-trip/content-sidebar.php:227
 #: templates/partials/single-trip/similar-trips.php:219
 #: templates/trip-listing-card.php:297
 msgid "Contact for pricing"
@@ -1046,7 +1055,6 @@ msgstr ""
 
 #: assets/dist/js/account-page.js:800
 #: app/Providers/FrontendAssetsProvider.php:418
-#: app/Services/BookingService.php:888
 #: templates/pdf/voucher.php:110
 #: assets/dist/js/account-page.js:750
 #: assets/dist/js/account-page.js:761
@@ -1071,9 +1079,13 @@ msgid "Booking Number"
 msgstr ""
 
 #: assets/dist/js/account-page.js:839
+#: app/Controllers/BookingSessionController.php:1999
+#: app/Services/TransactionalEmailTemplateService.php:247
+#: app/Services/TransactionalEmailTemplateService.php:293
+#: app/Services/TransactionalEmailTemplateService.php:318
 #: templates/partials/remaining-checkout-content.php:80
 #: templates/partials/remaining-checkout-content.php:139
-#: templates/shortcodes/activity.php:113
+#: templates/shortcodes/activity.php:90
 #: templates/shortcodes/destination.php:82
 #: templates/single-activity.php:108
 #: templates/single-destination.php:108
@@ -1093,10 +1105,10 @@ msgid "Booking Date"
 msgstr ""
 
 #: assets/dist/js/account-page.js:870
-#: app/Controllers/TripController.php:2067
+#: app/Controllers/TripController.php:2212
 #: templates/booking-confirmation.php:254
-#: templates/partials/single-trip/content-sidebar.php:301
-#: templates/partials/single-trip/content-sidebar.php:394
+#: templates/partials/single-trip/content-sidebar.php:289
+#: templates/partials/single-trip/content-sidebar.php:382
 #: templates/partials/single-trip/enquiry-modal.php:61
 #: templates/pdf/itinerary.php:159
 msgid "Number of Travelers"
@@ -1132,11 +1144,11 @@ msgid "Itinerary Costs"
 msgstr ""
 
 #: assets/dist/js/account-page.js:910
-#: templates/partials/availability-section.php:225
+#: templates/partials/availability-card.php:112
 #: templates/partials/booking-content.php:572
 #: templates/partials/single-trip/content-itinerary.php:119
-#: templates/partials/single-trip/content-sidebar.php:237
-#: templates/partials/single-trip/content-sidebar.php:240
+#: templates/partials/single-trip/content-sidebar.php:225
+#: templates/partials/single-trip/content-sidebar.php:228
 #: templates/single-activity.php:220
 #: templates/single-destination.php:238
 msgid "per person"
@@ -1150,7 +1162,7 @@ msgstr ""
 
 #: assets/dist/js/account-page.js:957
 #: app/Controllers/PaymentGatewayController.php:796
-#: app/Controllers/SettingsController.php:123
+#: app/Controllers/SettingsController.php:124
 #: app/Services/BookingTaxService.php:125
 #: app/Services/BookingTaxService.php:211
 #: app/Services/TaxService.php:45
@@ -1174,440 +1186,636 @@ msgstr ""
 msgid "Travelers Information"
 msgstr ""
 
-#: assets/dist/js/index-B7Uoe-LV.js:720
-#: assets/dist/js/index-BoxTf9b_.js:106413
-msgid "Close"
-msgstr ""
-
+#: assets/dist/js/index-B2Z22w6V.js:102051
 #: assets/dist/js/index-BoxTf9b_.js:102051
+#: assets/dist/js/index-C5mz5_GL.js:102051
 msgid "Sort ascending"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:102052
 #: assets/dist/js/index-BoxTf9b_.js:102052
+#: assets/dist/js/index-C5mz5_GL.js:102052
 msgid "Sort descending"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102116
 #: assets/dist/js/index-BoxTf9b_.js:102116
+#: assets/dist/js/index-C5mz5_GL.js:102116
 msgid "Is none of"
 msgstr ""
 
 #. 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is none of: Admin, Editor".
+#: assets/dist/js/index-B2Z22w6V.js:102120
 #: assets/dist/js/index-BoxTf9b_.js:102120
+#: assets/dist/js/index-C5mz5_GL.js:102120
 msgid "<Name>%1$s is none of: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102146
 #: assets/dist/js/index-BoxTf9b_.js:102146
+#: assets/dist/js/index-C5mz5_GL.js:102146
 msgid "Includes"
 msgstr ""
 
 #. 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is any: Admin, Editor".
+#: assets/dist/js/index-B2Z22w6V.js:102150
 #: assets/dist/js/index-BoxTf9b_.js:102150
+#: assets/dist/js/index-C5mz5_GL.js:102150
 msgid "<Name>%1$s includes: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102179
 #: assets/dist/js/index-BoxTf9b_.js:102179
+#: assets/dist/js/index-C5mz5_GL.js:102179
 msgid "Includes all"
 msgstr ""
 
 #. 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author includes all: Admin, Editor".
+#: assets/dist/js/index-B2Z22w6V.js:102183
 #: assets/dist/js/index-BoxTf9b_.js:102183
+#: assets/dist/js/index-C5mz5_GL.js:102183
 msgid "<Name>%1$s includes all: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102207
 #: assets/dist/js/index-BoxTf9b_.js:102207
+#: assets/dist/js/index-C5mz5_GL.js:102207
 msgid "Between (inc)"
 msgstr ""
 
 #. 1: Filter name (e.g. "Item count"). 2: Filter value min. 3: Filter value max. e.g.: "Item count between (inc): 10 and 180".
+#: assets/dist/js/index-B2Z22w6V.js:102211
 #: assets/dist/js/index-BoxTf9b_.js:102211
+#: assets/dist/js/index-C5mz5_GL.js:102211
 msgid "<Name>%1$s between (inc): </Name><Value>%2$s and %3$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102235
 #: assets/dist/js/index-BoxTf9b_.js:102235
+#: assets/dist/js/index-C5mz5_GL.js:102235
 msgid "In the past"
 msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "7 days"): "Date is in the past: 7 days".
+#: assets/dist/js/index-B2Z22w6V.js:102239
 #: assets/dist/js/index-BoxTf9b_.js:102239
+#: assets/dist/js/index-C5mz5_GL.js:102239
 msgid "<Name>%1$s is in the past: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102263
 #: assets/dist/js/index-BoxTf9b_.js:102263
+#: assets/dist/js/index-C5mz5_GL.js:102263
 msgid "Over"
 msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "7 days"): "Date is over: 7 days".
+#: assets/dist/js/index-B2Z22w6V.js:102267
 #: assets/dist/js/index-BoxTf9b_.js:102267
+#: assets/dist/js/index-C5mz5_GL.js:102267
 msgid "<Name>%1$s is over: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102289
 #: assets/dist/js/index-BoxTf9b_.js:102289
+#: assets/dist/js/index-C5mz5_GL.js:102289
 msgid "Is"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102307
 #: assets/dist/js/index-BoxTf9b_.js:102307
+#: assets/dist/js/index-C5mz5_GL.js:102307
 msgid "Is not"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102325
 #: assets/dist/js/index-BoxTf9b_.js:102325
+#: assets/dist/js/index-C5mz5_GL.js:102325
 msgid "Less than"
 msgstr ""
 
 #. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is less than: 10".
+#: assets/dist/js/index-B2Z22w6V.js:102329
 #: assets/dist/js/index-BoxTf9b_.js:102329
+#: assets/dist/js/index-C5mz5_GL.js:102329
 msgid "<Name>%1$s is less than: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102347
 #: assets/dist/js/index-BoxTf9b_.js:102347
+#: assets/dist/js/index-C5mz5_GL.js:102347
 msgid "Greater than"
 msgstr ""
 
 #. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is greater than: 10".
+#: assets/dist/js/index-B2Z22w6V.js:102351
 #: assets/dist/js/index-BoxTf9b_.js:102351
+#: assets/dist/js/index-C5mz5_GL.js:102351
 msgid "<Name>%1$s is greater than: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102371
 #: assets/dist/js/index-BoxTf9b_.js:102371
+#: assets/dist/js/index-C5mz5_GL.js:102371
 msgid "Less than or equal"
 msgstr ""
 
 #. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is less than or equal to: 10".
+#: assets/dist/js/index-B2Z22w6V.js:102375
 #: assets/dist/js/index-BoxTf9b_.js:102375
+#: assets/dist/js/index-C5mz5_GL.js:102375
 msgid "<Name>%1$s is less than or equal to: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102395
 #: assets/dist/js/index-BoxTf9b_.js:102395
+#: assets/dist/js/index-C5mz5_GL.js:102395
 msgid "Greater than or equal"
 msgstr ""
 
 #. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is greater than or equal to: 10".
+#: assets/dist/js/index-B2Z22w6V.js:102399
 #: assets/dist/js/index-BoxTf9b_.js:102399
+#: assets/dist/js/index-C5mz5_GL.js:102399
 msgid "<Name>%1$s is greater than or equal to: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102419
 #: assets/dist/js/index-BoxTf9b_.js:102419
+#: assets/dist/js/index-C5mz5_GL.js:102419
 msgid "Before"
 msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is before: 2024-01-01".
+#: assets/dist/js/index-B2Z22w6V.js:102423
 #: assets/dist/js/index-BoxTf9b_.js:102423
+#: assets/dist/js/index-C5mz5_GL.js:102423
 msgid "<Name>%1$s is before: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102442
 #: assets/dist/js/index-BoxTf9b_.js:102442
+#: assets/dist/js/index-C5mz5_GL.js:102442
 msgid "After"
 msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is after: 2024-01-01".
+#: assets/dist/js/index-B2Z22w6V.js:102446
 #: assets/dist/js/index-BoxTf9b_.js:102446
+#: assets/dist/js/index-C5mz5_GL.js:102446
 msgid "<Name>%1$s is after: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102465
 #: assets/dist/js/index-BoxTf9b_.js:102465
+#: assets/dist/js/index-C5mz5_GL.js:102465
 msgid "Before (inc)"
 msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is on or before: 2024-01-01".
+#: assets/dist/js/index-B2Z22w6V.js:102469
 #: assets/dist/js/index-BoxTf9b_.js:102469
+#: assets/dist/js/index-C5mz5_GL.js:102469
 msgid "<Name>%1$s is on or before: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102490
 #: assets/dist/js/index-BoxTf9b_.js:102490
+#: assets/dist/js/index-C5mz5_GL.js:102490
 msgid "After (inc)"
 msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is on or after: 2024-01-01".
+#: assets/dist/js/index-B2Z22w6V.js:102494
 #: assets/dist/js/index-BoxTf9b_.js:102494
+#: assets/dist/js/index-C5mz5_GL.js:102494
 msgid "<Name>%1$s is on or after: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102515
 #: assets/dist/js/index-BoxTf9b_.js:102515
+#: assets/dist/js/index-C5mz5_GL.js:102515
 msgid "Contains"
 msgstr ""
 
 #. 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title contains: Hello".
+#: assets/dist/js/index-B2Z22w6V.js:102519
 #: assets/dist/js/index-BoxTf9b_.js:102519
+#: assets/dist/js/index-C5mz5_GL.js:102519
 msgid "<Name>%1$s contains: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102537
 #: assets/dist/js/index-BoxTf9b_.js:102537
+#: assets/dist/js/index-C5mz5_GL.js:102537
 msgid "Doesn't contain"
 msgstr ""
 
 #. 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title doesn't contain: Hello".
+#: assets/dist/js/index-B2Z22w6V.js:102541
 #: assets/dist/js/index-BoxTf9b_.js:102541
+#: assets/dist/js/index-C5mz5_GL.js:102541
 msgid "<Name>%1$s doesn't contain: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102561
 #: assets/dist/js/index-BoxTf9b_.js:102561
+#: assets/dist/js/index-C5mz5_GL.js:102561
 msgid "Starts with"
 msgstr ""
 
 #. 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title starts with: Hello".
+#: assets/dist/js/index-B2Z22w6V.js:102565
 #: assets/dist/js/index-BoxTf9b_.js:102565
+#: assets/dist/js/index-C5mz5_GL.js:102565
 msgid "<Name>%1$s starts with: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102583
 #: assets/dist/js/index-BoxTf9b_.js:102583
+#: assets/dist/js/index-C5mz5_GL.js:102583
 msgid "On"
 msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is: 2024-01-01".
+#: assets/dist/js/index-B2Z22w6V.js:102587
 #: assets/dist/js/index-BoxTf9b_.js:102587
+#: assets/dist/js/index-C5mz5_GL.js:102587
 msgid "<Name>%1$s is: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #. DataViews operator name
+#: assets/dist/js/index-B2Z22w6V.js:102606
 #: assets/dist/js/index-BoxTf9b_.js:102606
+#: assets/dist/js/index-C5mz5_GL.js:102606
 msgid "Not on"
 msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is not: 2024-01-01".
+#: assets/dist/js/index-B2Z22w6V.js:102610
 #: assets/dist/js/index-BoxTf9b_.js:102610
+#: assets/dist/js/index-C5mz5_GL.js:102610
 msgid "<Name>%1$s is not: </Name><Value>%2$s</Value>"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:102722
 #: assets/dist/js/index-BoxTf9b_.js:102722
+#: assets/dist/js/index-C5mz5_GL.js:102722
 #: templates/single-activity.php:172
 #: templates/single-destination.php:172
 msgid "Days"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:102723
 #: assets/dist/js/index-BoxTf9b_.js:102723
+#: assets/dist/js/index-C5mz5_GL.js:102723
 msgid "Weeks"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:102724
 #: assets/dist/js/index-BoxTf9b_.js:102724
+#: assets/dist/js/index-C5mz5_GL.js:102724
 msgid "Months"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:102725
 #: assets/dist/js/index-BoxTf9b_.js:102725
+#: assets/dist/js/index-C5mz5_GL.js:102725
 msgid "Years"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:102728
 #: assets/dist/js/index-BoxTf9b_.js:102728
+#: assets/dist/js/index-C5mz5_GL.js:102728
 msgid "Days ago"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:102729
 #: assets/dist/js/index-BoxTf9b_.js:102729
+#: assets/dist/js/index-C5mz5_GL.js:102729
 msgid "Weeks ago"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:102730
 #: assets/dist/js/index-BoxTf9b_.js:102730
+#: assets/dist/js/index-C5mz5_GL.js:102730
 msgid "Months ago"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:102731
 #: assets/dist/js/index-BoxTf9b_.js:102731
+#: assets/dist/js/index-C5mz5_GL.js:102731
 msgid "Years ago"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:102789
 #: assets/dist/js/index-BoxTf9b_.js:102789
+#: assets/dist/js/index-C5mz5_GL.js:102789
 msgid "Unit"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:102934
 #: assets/dist/js/index-BoxTf9b_.js:102934
+#: assets/dist/js/index-C5mz5_GL.js:102934
 msgid "Date time"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:102984
 #: assets/dist/js/index-BoxTf9b_.js:102984
+#: assets/dist/js/index-C5mz5_GL.js:102984
 msgid "Today"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:102989
 #: assets/dist/js/index-BoxTf9b_.js:102989
+#: assets/dist/js/index-C5mz5_GL.js:102989
 msgid "Yesterday"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:102997
 #: assets/dist/js/index-BoxTf9b_.js:102997
+#: assets/dist/js/index-C5mz5_GL.js:102997
 msgid "Past week"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:103005
 #: assets/dist/js/index-BoxTf9b_.js:103005
+#: assets/dist/js/index-C5mz5_GL.js:103005
 msgid "Past month"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:103015
 #: assets/dist/js/index-BoxTf9b_.js:103015
+#: assets/dist/js/index-C5mz5_GL.js:103015
 msgid "Last 7 days"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:103023
 #: assets/dist/js/index-BoxTf9b_.js:103023
+#: assets/dist/js/index-C5mz5_GL.js:103023
 msgid "Last 30 days"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:103031
 #: assets/dist/js/index-BoxTf9b_.js:103031
+#: assets/dist/js/index-C5mz5_GL.js:103031
 msgid "Month to date"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:103039
 #: assets/dist/js/index-BoxTf9b_.js:103039
+#: assets/dist/js/index-C5mz5_GL.js:103039
 msgid "Last year"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:103047
 #: assets/dist/js/index-BoxTf9b_.js:103047
+#: assets/dist/js/index-C5mz5_GL.js:103047
 msgid "Year to date"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:103297
 #: assets/dist/js/index-BoxTf9b_.js:103297
+#: assets/dist/js/index-C5mz5_GL.js:103297
 #: templates/partials/single-trip/sticky-sidebar.php:170
 msgid "Date"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:103421
 #: assets/dist/js/index-BoxTf9b_.js:103421
+#: assets/dist/js/index-C5mz5_GL.js:103421
 #: templates/partials/pricing-summary.php:228
 msgid "Required"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:103423
 #: assets/dist/js/index-BoxTf9b_.js:103423
+#: assets/dist/js/index-C5mz5_GL.js:103423
 msgid "Optional"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:103473
 #: assets/dist/js/index-BoxTf9b_.js:103473
+#: assets/dist/js/index-C5mz5_GL.js:103473
 msgid "Custom"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:103506
 #: assets/dist/js/index-BoxTf9b_.js:103506
+#: assets/dist/js/index-C5mz5_GL.js:103506
 msgid "To"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:103777
 #: assets/dist/js/index-BoxTf9b_.js:103777
+#: assets/dist/js/index-C5mz5_GL.js:103777
 msgid "The max. value must be greater than the min. value."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:103782
 #: assets/dist/js/index-BoxTf9b_.js:103782
+#: assets/dist/js/index-C5mz5_GL.js:103782
 msgid "Min."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:103794
 #: assets/dist/js/index-BoxTf9b_.js:103794
+#: assets/dist/js/index-C5mz5_GL.js:103794
 msgid "Max."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:104168
 #: assets/dist/js/index-BoxTf9b_.js:104168
+#: assets/dist/js/index-C5mz5_GL.js:104168
 msgid "Open color picker"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:104259
 #: assets/dist/js/index-BoxTf9b_.js:104259
+#: assets/dist/js/index-C5mz5_GL.js:104259
 msgid "Hide password"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:104259
 #: assets/dist/js/index-BoxTf9b_.js:104259
+#: assets/dist/js/index-C5mz5_GL.js:104259
 msgid "Show password"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:104461
 #: assets/dist/js/index-BoxTf9b_.js:104461
+#: assets/dist/js/index-C5mz5_GL.js:104461
 msgid "Value must be a valid email address."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:104555
 #: assets/dist/js/index-BoxTf9b_.js:104555
+#: assets/dist/js/index-C5mz5_GL.js:104555
 msgid "Value must be an integer."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:104635
 #: assets/dist/js/index-BoxTf9b_.js:104635
+#: assets/dist/js/index-C5mz5_GL.js:104635
 msgid "Value must be a number."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:104841
 #: assets/dist/js/index-BoxTf9b_.js:104841
+#: assets/dist/js/index-C5mz5_GL.js:104841
 msgid "True"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:104844
 #: assets/dist/js/index-BoxTf9b_.js:104844
+#: assets/dist/js/index-C5mz5_GL.js:104844
 msgid "False"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:104851
 #: assets/dist/js/index-BoxTf9b_.js:104851
+#: assets/dist/js/index-C5mz5_GL.js:104851
 msgid "Value must be true, false, or undefined"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:104919
 #: assets/dist/js/index-BoxTf9b_.js:104919
+#: assets/dist/js/index-C5mz5_GL.js:104919
 msgid "Value must be an array."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:104922
 #: assets/dist/js/index-BoxTf9b_.js:104922
+#: assets/dist/js/index-C5mz5_GL.js:104922
 msgid "Every value must be a string."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:105042
 #: assets/dist/js/index-BoxTf9b_.js:105042
+#: assets/dist/js/index-C5mz5_GL.js:105042
 msgid "Value must be a valid color."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:105801
 #: assets/dist/js/index-BoxTf9b_.js:105801
+#: assets/dist/js/index-C5mz5_GL.js:105801
 msgid "Could not validate elements."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:105846
 #: assets/dist/js/index-BoxTf9b_.js:105846
+#: assets/dist/js/index-C5mz5_GL.js:105846
 msgid "Unknown error when running elements validation asynchronously."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:105905
 #: assets/dist/js/index-BoxTf9b_.js:105905
+#: assets/dist/js/index-C5mz5_GL.js:105905
 msgid "Validation could not be processed."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:105920
 #: assets/dist/js/index-BoxTf9b_.js:105920
+#: assets/dist/js/index-C5mz5_GL.js:105920
 msgid "Unknown error when running custom validation asynchronously."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:105950
 #: assets/dist/js/index-BoxTf9b_.js:105950
+#: assets/dist/js/index-C5mz5_GL.js:105950
 msgid "Value does not match the required pattern."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:105958
 #: assets/dist/js/index-BoxTf9b_.js:105958
+#: assets/dist/js/index-C5mz5_GL.js:105958
 msgid "Value is below the minimum."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:105966
 #: assets/dist/js/index-BoxTf9b_.js:105966
+#: assets/dist/js/index-C5mz5_GL.js:105966
 msgid "Value is above the maximum."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:105974
 #: assets/dist/js/index-BoxTf9b_.js:105974
+#: assets/dist/js/index-C5mz5_GL.js:105974
 msgid "Value is too short."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:105982
 #: assets/dist/js/index-BoxTf9b_.js:105982
+#: assets/dist/js/index-C5mz5_GL.js:105982
 msgid "Value is too long."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:105990
 #: assets/dist/js/index-BoxTf9b_.js:105990
+#: assets/dist/js/index-C5mz5_GL.js:105990
 msgid "Value must be one of the elements."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:106013
 #: assets/dist/js/index-BoxTf9b_.js:106013
+#: assets/dist/js/index-C5mz5_GL.js:106013
 msgid "Unknown error when running custom validation."
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:106047
 #: assets/dist/js/index-BoxTf9b_.js:106047
+#: assets/dist/js/index-C5mz5_GL.js:106047
 msgid "Validating…"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:106342
 #: assets/dist/js/index-BoxTf9b_.js:106342
+#: assets/dist/js/index-C5mz5_GL.js:106342
 #: templates/partials/booking-content.php:512
 msgid "Apply"
 msgstr ""
 
+#: assets/dist/js/index-B2Z22w6V.js:106413
+#: assets/dist/js/index-B7Uoe-LV.js:720
+#: assets/dist/js/index-BoxTf9b_.js:106413
+#: assets/dist/js/index-C5mz5_GL.js:106413
+#: assets/dist/js/index-C7SOTaCX.js:720
+#: assets/dist/js/index-DHkBlElb.js:720
+msgid "Close"
+msgstr ""
+
 #. %d: Number of fields that need attention
+#: assets/dist/js/index-B2Z22w6V.js:106602
 #: assets/dist/js/index-BoxTf9b_.js:106602
+#: assets/dist/js/index-C5mz5_GL.js:106602
 msgid "%d field needs attention"
 msgid_plural "%d fields need attention"
 msgstr[0] ""
 msgstr[1] ""
 
+#: assets/dist/js/index-B2Z22w6V.js:106933
 #: assets/dist/js/index-BoxTf9b_.js:106933
+#: assets/dist/js/index-C5mz5_GL.js:106933
 msgid "More details"
 msgstr ""
 
@@ -1617,13 +1825,17 @@ msgid "ltr"
 msgstr ""
 
 #. %s: Field name.
+#: assets/dist/js/index-B2Z22w6V.js:105582
 #: assets/dist/js/index-BoxTf9b_.js:105582
+#: assets/dist/js/index-C5mz5_GL.js:105582
 msgctxt "field"
 msgid "Edit %s (has errors)"
 msgstr ""
 
 #. %s: Field name.
+#: assets/dist/js/index-B2Z22w6V.js:105586
 #: assets/dist/js/index-BoxTf9b_.js:105586
+#: assets/dist/js/index-C5mz5_GL.js:105586
 msgctxt "field"
 msgid "Edit %s"
 msgstr ""
@@ -1827,12 +2039,12 @@ msgid "Please enter a valid email address."
 msgstr ""
 
 #: app/Controllers/AuthController.php:322
-#: app/Controllers/BookingSessionController.php:965
+#: app/Controllers/BookingSessionController.php:967
 msgid "Password must be at least 8 characters long."
 msgstr ""
 
 #: app/Controllers/AuthController.php:329
-#: app/Controllers/BookingSessionController.php:972
+#: app/Controllers/BookingSessionController.php:974
 msgid "Passwords do not match."
 msgstr ""
 
@@ -1945,7 +2157,7 @@ msgstr ""
 
 #: app/Controllers/BookingsController.php:734
 #: app/Controllers/BookingsController.php:795
-#: app/Controllers/BookingSessionController.php:1484
+#: app/Controllers/BookingSessionController.php:1486
 #: app/Controllers/CustomerController.php:289
 #: app/Controllers/PaymentGatewayController.php:189
 #: app/Controllers/PaymentGatewayController.php:249
@@ -1954,7 +2166,7 @@ msgstr ""
 #: app/Services/BookingService.php:383
 #: app/Services/BookingService.php:467
 #: app/Services/BookingService.php:554
-#: app/Services/BookingService.php:997
+#: app/Services/BookingService.php:976
 #: app/Services/PaymentService.php:85
 msgid "Booking not found."
 msgstr ""
@@ -1992,40 +2204,40 @@ msgstr ""
 msgid "You do not have permission to access this itinerary."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:196
+#: app/Controllers/BookingSessionController.php:198
 msgid "Missing required payment data."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:207
+#: app/Controllers/BookingSessionController.php:209
 msgid "Invalid payment gateway."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:215
+#: app/Controllers/BookingSessionController.php:217
 msgid "Gateway does not support this payment method."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:230
+#: app/Controllers/BookingSessionController.php:232
 msgid "Payment failed."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:266
+#: app/Controllers/BookingSessionController.php:268
 msgid "Payment completed successfully."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:380
+#: app/Controllers/BookingSessionController.php:382
 msgid "Booking session updated."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:388
+#: app/Controllers/BookingSessionController.php:390
 #: app/Controllers/SavedTripController.php:122
 msgid "Trip ID is required."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:398
-#: app/Controllers/BookingSessionController.php:678
-#: app/Controllers/BookingSessionController.php:835
-#: app/Controllers/BookingSessionController.php:2245
-#: app/Controllers/BookingSessionController.php:2729
+#: app/Controllers/BookingSessionController.php:400
+#: app/Controllers/BookingSessionController.php:680
+#: app/Controllers/BookingSessionController.php:837
+#: app/Controllers/BookingSessionController.php:2252
+#: app/Controllers/BookingSessionController.php:2736
 #: app/Services/BookingService.php:235
 #: app/Services/EnquiryService.php:82
 #: app/Services/ReviewService.php:105
@@ -2033,385 +2245,263 @@ msgstr ""
 msgid "Trip not found."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:520
+#: app/Controllers/BookingSessionController.php:522
 msgid "Please select at least 1 traveler to continue."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:626
+#: app/Controllers/BookingSessionController.php:628
 msgid "Booking session created."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:642
+#: app/Controllers/BookingSessionController.php:644
 msgid "No active booking session."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:662
+#: app/Controllers/BookingSessionController.php:664
 msgid "Booking session cleared."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:744
+#: app/Controllers/BookingSessionController.php:746
 msgid "You must be logged in to make a booking."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:754
+#: app/Controllers/BookingSessionController.php:756
 msgid "Guest checkout is not allowed. Please log in or create an account."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:769
+#: app/Controllers/BookingSessionController.php:771
 msgid "No trip selected for booking."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:796
-#: app/Controllers/BookingSessionController.php:1506
+#: app/Controllers/BookingSessionController.php:798
+#: app/Controllers/BookingSessionController.php:1508
 msgid "Email address is required."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:803
+#: app/Controllers/BookingSessionController.php:805
 msgid "Phone number is required."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:810
+#: app/Controllers/BookingSessionController.php:812
 msgid "Travel date is required."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:817
+#: app/Controllers/BookingSessionController.php:819
 msgid "At least one traveler is required."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:825
+#: app/Controllers/BookingSessionController.php:827
 msgid "Invalid email address."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:980
+#: app/Controllers/BookingSessionController.php:982
 msgid "An account with this email already exists. Please log in."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1109
-#: app/Controllers/BookingSessionController.php:1117
-#: app/Controllers/BookingSessionController.php:1125
+#: app/Controllers/BookingSessionController.php:1111
+#: app/Controllers/BookingSessionController.php:1119
+#: app/Controllers/BookingSessionController.php:1127
 msgid "Failed to create booking. Please try again."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1126
+#: app/Controllers/BookingSessionController.php:1128
 msgid "Booking ID was not generated."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1252
+#: app/Controllers/BookingSessionController.php:1254
 msgid "Booking created. Redirecting to payment..."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1265
+#: app/Controllers/BookingSessionController.php:1267
 msgid "Booking created. Complete payment..."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1276
+#: app/Controllers/BookingSessionController.php:1278
 msgid "Payment processing failed. Please try again."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1298
+#: app/Controllers/BookingSessionController.php:1300
 msgid "Booking received!"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1304
+#: app/Controllers/BookingSessionController.php:1306
 msgid "Booking confirmed!"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1309
+#: app/Controllers/BookingSessionController.php:1311
 msgid "Booking confirmed! Payment will be collected later."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1312
+#: app/Controllers/BookingSessionController.php:1314
 msgid "Booking received! We will contact you to arrange payment."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1317
+#: app/Controllers/BookingSessionController.php:1319
 msgid "Booking received! Please complete the bank transfer. We will confirm once payment is verified."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1466
+#: app/Controllers/BookingSessionController.php:1468
 msgid "Invalid booking for remaining payment."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1474
+#: app/Controllers/BookingSessionController.php:1476
 #: app/Controllers/PaymentGatewayController.php:200
 #: app/Controllers/PaymentGatewayController.php:261
 #: templates/partials/remaining-checkout-content.php:19
 msgid "This booking is already fully paid."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1494
+#: app/Controllers/BookingSessionController.php:1496
 #: app/Controllers/PaymentGatewayController.php:194
 #: app/Controllers/PaymentGatewayController.php:255
 msgid "You do not have permission to pay for this booking."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1514
+#: app/Controllers/BookingSessionController.php:1516
 msgid "Ready to process remaining payment."
 msgstr ""
 
+#: app/Controllers/BookingSessionController.php:1986
+msgid "Thank you for your booking! Your reservation has been confirmed."
+msgstr ""
+
 #: app/Controllers/BookingSessionController.php:1987
+msgid "Thank you for your booking! Your reservation has been received and is pending confirmation."
+msgstr ""
+
+#: app/Controllers/BookingSessionController.php:1990
 #, php-format
-msgid "[%s] Booking Confirmed - %s"
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:1988
-#: app/Controllers/BookingSessionController.php:1992
-#: app/Services/BookingCronService.php:143
-#: app/Services/BookingCronService.php:245
-#, php-format
-msgid ""
-"Dear %s,\n"
-"\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:1989
-msgid ""
-"Thank you for your booking! Your reservation has been confirmed.\n"
-"\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:1991
-#, php-format
-msgid "[%s] Booking Received - %s"
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:1993
-msgid ""
-"Thank you for your booking! Your reservation has been received and is pending confirmation.\n"
-"\n"
-""
+msgid "Please complete your payment before %s to avoid automatic cancellation."
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:1998
+#: app/Services/TransactionalEmailTemplateService.php:271
+msgid "Booking reference"
+msgstr ""
+
+#: app/Controllers/BookingSessionController.php:2000
+#: app/Services/TransactionalEmailTemplateService.php:248
+#: app/Services/TransactionalEmailTemplateService.php:294
+#: app/Services/TransactionalEmailTemplateService.php:319
+msgid "Travel date"
+msgstr ""
+
+#: app/Controllers/BookingSessionController.php:2001
+#: app/Providers/FrontendAssetsProvider.php:437
+#: templates/partials/availability-card.php:164
+#: templates/partials/single-trip/quick-facts.php:16
+#: templates/pdf/itinerary.php:151
+#: templates/shortcodes/search.php:132
+#: templates/shortcodes/trip-search.php:100
+#: templates/trip-listing-card.php:190
+msgid "Duration"
+msgstr ""
+
+#: app/Controllers/BookingSessionController.php:2001
 #, php-format
-msgid ""
-"⚠️ Important: Please complete your payment before %s to avoid automatic cancellation.\n"
-"\n"
-""
+msgid "%d days / %d nights"
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2004
-#: app/Services/BookingCronService.php:147
-#: app/Services/BookingCronService.php:249
-#, php-format
-msgid ""
-"Booking Reference: %s\n"
-""
+msgid "Payment details"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2006
-#: app/Controllers/BookingSessionController.php:2088
-#: app/Services/BookingCronService.php:150
-#: app/Services/BookingCronService.php:250
-#: app/Services/BookingCronService.php:274
+#: app/Controllers/BookingSessionController.php:2005
 #, php-format
-msgid ""
-"Trip: %s\n"
-""
+msgid "Total: %s"
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2007
-#: app/Controllers/BookingSessionController.php:2089
-#: app/Services/BookingCronService.php:151
 #, php-format
-msgid ""
-"Travel Date: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2008
-#, php-format
-msgid ""
-"Duration: %d Days / %d Nights\n"
-""
+msgid "Payment type: Deposit — due now %s, remaining %s"
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2009
 #, php-format
-msgid ""
-"Number of Travelers: %d\n"
-"\n"
-""
+msgid "Payment type: Partial — due now %s, remaining %s"
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2011
-msgid ""
-"PAYMENT DETAILS\n"
-""
+msgid "Payment type: Full payment"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2013
-#, php-format
-msgid ""
-"Total Amount: %s\n"
-""
+#: app/Controllers/BookingSessionController.php:2014
+msgid "Pay later — please contact us to arrange payment."
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2016
-msgid ""
-"Payment Type: Deposit\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2017
-#: app/Controllers/BookingSessionController.php:2021
-#, php-format
-msgid ""
-"Amount Due Now: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2018
-#, php-format
-msgid ""
-"Remaining Balance: %s (due before trip)\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2020
-msgid ""
-"Payment Type: Partial Payment\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2022
-#, php-format
-msgid ""
-"Remaining Balance: %s\n"
-""
+msgid "Bank transfer — you will receive bank details separately."
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2024
-msgid ""
-"Payment Type: Full Payment\n"
-""
+#, php-format
+msgid "Traveler %d: %s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2028
-msgid ""
-"Payment Status: Pay Later - Please contact us to arrange payment.\n"
-""
+#: app/Controllers/BookingSessionController.php:2029
+msgid "Full refund available"
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2030
-msgid ""
-"Payment Status: Bank Transfer - You will receive bank details in a separate email.\n"
-""
+msgid "Partial refund available"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2033
-msgid ""
-"TRAVELERS\n"
-""
+#: app/Controllers/BookingSessionController.php:2031
+msgid "No refund available"
+msgstr ""
+
+#: app/Controllers/BookingSessionController.php:2032
+msgid "Flexible cancellation"
+msgstr ""
+
+#: app/Controllers/BookingSessionController.php:2034
+msgid "Standard policy applies"
+msgstr ""
+
+#: app/Controllers/BookingSessionController.php:2036
+msgid "Cancellation policy"
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2037
 #, php-format
-msgid ""
-"Traveler %d: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2040
-msgid ""
-"CANCELLATION POLICY\n"
-""
+msgid "free cancellation up to %d days before departure"
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2044
-msgid "Full refund available"
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2045
-msgid "Partial refund available"
+msgid "What’s next?"
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2046
-msgid "No refund available"
+msgid "You will receive a detailed trip itinerary within 24–48 hours."
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2047
-msgid "Flexible cancellation"
+msgid "Our team will contact you to confirm any special requirements."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2049
-msgid "Standard policy applies"
+#: app/Controllers/BookingSessionController.php:2048
+msgid "Please ensure passports are valid for at least 6 months."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2051
+#: app/Controllers/BookingSessionController.php:2050
+msgid "If you have any questions, contact us anytime."
+msgstr ""
+
+#: app/Controllers/BookingSessionController.php:2073
 #, php-format
-msgid ""
-"Policy: %s\n"
-""
+msgid "— %s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2052
-#, php-format
-msgid ""
-"Free cancellation up to: %d days before departure\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2057
-#, php-format
-msgid ""
-"Details: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2060
-msgid ""
-"WHAT'S NEXT?\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2062
-msgid ""
-"1. You will receive a detailed trip itinerary within 24-48 hours.\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2063
-msgid ""
-"2. Our team will contact you to confirm any special requirements.\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2064
-msgid ""
-"3. Please ensure all traveler passports are valid for at least 6 months.\n"
-"\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2066
-msgid ""
-"If you have any questions, please don't hesitate to contact us.\n"
-"\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2067
-#: app/Services/BookingCronService.php:261
-#, php-format
-msgid ""
-"Best regards,\n"
-"%s Team\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2079
+#: app/Controllers/BookingSessionController.php:2086
 msgid "Confirmed"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2081
+#: app/Controllers/BookingSessionController.php:2088
 #, php-format
 msgid "[%s] %s New Booking - %s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2083
+#: app/Controllers/BookingSessionController.php:2090
 #, php-format
 msgid ""
 "A new booking has been received! Status: %s\n"
@@ -2419,22 +2509,37 @@ msgid ""
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2085
+#: app/Controllers/BookingSessionController.php:2092
 #, php-format
 msgid ""
 "Reference: %s\n"
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2086
+#: app/Controllers/BookingSessionController.php:2093
 #, php-format
 msgid ""
 "Status: %s\n"
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2090
-#: app/Services/BookingCronService.php:152
+#: app/Controllers/BookingSessionController.php:2095
+#: app/Services/BookingCronService.php:228
+#: app/Services/BookingCronService.php:252
+#, php-format
+msgid ""
+"Trip: %s\n"
+""
+msgstr ""
+
+#: app/Controllers/BookingSessionController.php:2096
+#, php-format
+msgid ""
+"Travel Date: %s\n"
+""
+msgstr ""
+
+#: app/Controllers/BookingSessionController.php:2097
 #, php-format
 msgid ""
 "Travelers: %d\n"
@@ -2442,34 +2547,34 @@ msgid ""
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2092
+#: app/Controllers/BookingSessionController.php:2099
 msgid ""
 "CUSTOMER DETAILS\n"
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2094
+#: app/Controllers/BookingSessionController.php:2101
 #, php-format
 msgid ""
 "Name: %s\n"
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2095
+#: app/Controllers/BookingSessionController.php:2102
 #, php-format
 msgid ""
 "Email: %s\n"
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2096
+#: app/Controllers/BookingSessionController.php:2103
 #, php-format
 msgid ""
 "Phone: %s\n"
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2097
+#: app/Controllers/BookingSessionController.php:2104
 #, php-format
 msgid ""
 "Country: %s\n"
@@ -2477,41 +2582,41 @@ msgid ""
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2099
+#: app/Controllers/BookingSessionController.php:2106
 msgid ""
 "PAYMENT\n"
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2101
+#: app/Controllers/BookingSessionController.php:2108
 #, php-format
 msgid ""
 "Total: %s\n"
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2102
+#: app/Controllers/BookingSessionController.php:2109
 #, php-format
 msgid ""
 "Due Now: %s\n"
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2103
+#: app/Controllers/BookingSessionController.php:2110
 #, php-format
 msgid ""
 "Method: %s\n"
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2104
+#: app/Controllers/BookingSessionController.php:2111
 #, php-format
 msgid ""
 "Gateway: %s\n"
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2105
+#: app/Controllers/BookingSessionController.php:2112
 #, php-format
 msgid ""
 "Payment Status: %s\n"
@@ -2519,58 +2624,58 @@ msgid ""
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2108
+#: app/Controllers/BookingSessionController.php:2115
 msgid ""
 "⚠️ ACTION REQUIRED: This booking is pending. Please verify payment and confirm.\n"
 "\n"
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2111
+#: app/Controllers/BookingSessionController.php:2118
 #, php-format
 msgid ""
 "View Booking: %s\n"
 ""
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2129
+#: app/Controllers/BookingSessionController.php:2136
 msgid "Please enter a coupon code."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2138
-#: app/Controllers/BookingSessionController.php:2236
-#: app/Controllers/BookingSessionController.php:2809
+#: app/Controllers/BookingSessionController.php:2145
+#: app/Controllers/BookingSessionController.php:2243
+#: app/Controllers/BookingSessionController.php:2816
 msgid "No active booking session found."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2161
-#: app/Controllers/BookingSessionController.php:2483
+#: app/Controllers/BookingSessionController.php:2168
+#: app/Controllers/BookingSessionController.php:2490
 msgid "This coupon is not valid for your booking."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2186
+#: app/Controllers/BookingSessionController.php:2193
 msgid "Coupon applied successfully!"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2459
+#: app/Controllers/BookingSessionController.php:2466
 #: app/Models/Checkout.php:188
 #: app/Services/CalculationService.php:490
 #: app/Services/CalculationService.php:521
-#: app/Services/DiscountService.php:985
+#: app/Services/DiscountService.php:972
 #: templates/partials/booking-content.php:50
 msgid "Group Discount"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2723
+#: app/Controllers/BookingSessionController.php:2730
 #: templates/partials/pricing-summary.php:24
 msgid "Pricing information not available."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2789
+#: app/Controllers/BookingSessionController.php:2796
 msgid "Template not found."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2832
+#: app/Controllers/BookingSessionController.php:2839
 msgid "Coupon removed."
 msgstr ""
 
@@ -2896,6 +3001,8 @@ msgstr ""
 #: app/Controllers/PaymentGatewayController.php:813
 #: app/Controllers/PaymentGatewayController.php:929
 #: app/Controllers/PaymentGatewayController.php:1045
+#: app/Services/TransactionalEmailTemplateService.php:264
+#: app/Services/TransactionalEmailTemplateService.php:285
 msgid "Customer"
 msgstr ""
 
@@ -2993,7 +3100,7 @@ msgstr ""
 
 #: app/Controllers/SampleDataController.php:223
 #: app/Controllers/SampleDataController.php:263
-#: app/Services/SampleDataService.php:139
+#: app/Services/SampleDataService.php:250
 msgid "Sample data cleaned up successfully!"
 msgstr ""
 
@@ -3006,7 +3113,7 @@ msgid "An error occurred during cleanup. Please check the error logs."
 msgstr ""
 
 #: app/Controllers/SampleDataController.php:251
-#: app/Services/SampleDataService.php:116
+#: app/Services/SampleDataService.php:227
 #: templates/setup-wizard/complete.php:373
 msgid "Sample data imported successfully!"
 msgstr ""
@@ -3077,35 +3184,35 @@ msgstr ""
 
 #: app/Controllers/SingleTripController.php:1766
 #: app/Controllers/SingleTripController.php:1999
-#: templates/partials/availability-section.php:424
+#: templates/partials/availability-card.php:311
 #, php-format
 msgid "per group (%d-%d pax)"
 msgstr ""
 
 #: app/Controllers/SingleTripController.php:1768
 #: app/Controllers/SingleTripController.php:2001
-#: templates/partials/availability-section.php:426
+#: templates/partials/availability-card.php:313
 #, php-format
 msgid "per group (up to %d pax)"
 msgstr ""
 
 #: app/Controllers/SingleTripController.php:1770
 #: app/Controllers/SingleTripController.php:2003
-#: templates/partials/availability-section.php:428
+#: templates/partials/availability-card.php:315
 #, php-format
 msgid "per group (%d+ pax)"
 msgstr ""
 
 #: app/Controllers/SingleTripController.php:1772
 #: app/Controllers/SingleTripController.php:2005
-#: templates/partials/availability-section.php:430
+#: templates/partials/availability-card.php:317
 #: templates/partials/pricing-summary.php:48
 msgid "per group"
 msgstr ""
 
 #: app/Controllers/SingleTripController.php:1791
 #: app/Controllers/SingleTripController.php:1962
-#: templates/partials/availability-section.php:412
+#: templates/partials/availability-card.php:299
 #: templates/partials/booking-content.php:331
 #: templates/partials/booking-form-fields.php:364
 #, php-format
@@ -3113,7 +3220,7 @@ msgid "(Age %d-%d)"
 msgstr ""
 
 #: app/Controllers/SingleTripController.php:1793
-#: templates/partials/availability-section.php:414
+#: templates/partials/availability-card.php:301
 #: templates/partials/booking-content.php:333
 #: templates/partials/booking-form-fields.php:366
 #, php-format
@@ -3121,7 +3228,7 @@ msgid "(Age %d+)"
 msgstr ""
 
 #: app/Controllers/SingleTripController.php:1795
-#: templates/partials/availability-section.php:416
+#: templates/partials/availability-card.php:303
 #: templates/partials/booking-content.php:335
 #: templates/partials/booking-form-fields.php:368
 #, php-format
@@ -3130,7 +3237,7 @@ msgstr ""
 
 #: app/Controllers/SingleTripController.php:1824
 #: app/Controllers/SingleTripController.php:2029
-#: templates/partials/availability-section.php:462
+#: templates/partials/availability-card.php:349
 #: templates/partials/booking-content.php:352
 #, php-format
 msgid "Decrease %s"
@@ -3138,7 +3245,7 @@ msgstr ""
 
 #: app/Controllers/SingleTripController.php:1828
 #: app/Controllers/SingleTripController.php:2033
-#: templates/partials/availability-section.php:468
+#: templates/partials/availability-card.php:355
 #: templates/partials/booking-content.php:356
 #, php-format
 msgid "Increase %s"
@@ -3146,7 +3253,7 @@ msgstr ""
 
 #: app/Controllers/SingleTripController.php:1855
 #: app/Controllers/SingleTripController.php:2053
-#: templates/partials/availability-section.php:489
+#: templates/partials/availability-card.php:376
 msgid "Select travelers"
 msgstr ""
 
@@ -3372,52 +3479,52 @@ msgstr ""
 msgid "Revision restored successfully"
 msgstr ""
 
-#: app/Controllers/TripController.php:1727
-#: app/Controllers/TripController.php:1862
+#: app/Controllers/TripController.php:1846
+#: app/Controllers/TripController.php:1981
 #, php-format
 msgid "%d%% OFF"
 msgstr ""
 
-#: app/Controllers/TripController.php:1732
-#: app/Controllers/TripController.php:1866
+#: app/Controllers/TripController.php:1851
+#: app/Controllers/TripController.php:1985
 #, php-format
 msgid "+%d%%"
 msgstr ""
 
-#: app/Controllers/TripController.php:1753
+#: app/Controllers/TripController.php:1872
 msgid "Start"
 msgstr ""
 
-#: app/Controllers/TripController.php:1754
+#: app/Controllers/TripController.php:1873
 msgid "End"
 msgstr ""
 
-#: app/Controllers/TripController.php:1760
-#: app/Controllers/TripController.php:1872
-#: templates/partials/availability-section.php:189
+#: app/Controllers/TripController.php:1879
+#: app/Controllers/TripController.php:1991
+#: templates/partials/availability-card.php:76
 #: templates/pdf/itinerary.php:262
 msgid "Departure"
 msgstr ""
 
-#: app/Controllers/TripController.php:1761
-#: app/Controllers/TripController.php:1875
-#: templates/partials/availability-section.php:196
+#: app/Controllers/TripController.php:1880
+#: app/Controllers/TripController.php:1994
+#: templates/partials/availability-card.php:83
 msgid "Return"
 msgstr ""
 
-#: app/Controllers/TripController.php:1811
-#: app/Controllers/TripController.php:1884
+#: app/Controllers/TripController.php:1930
+#: app/Controllers/TripController.php:2003
 msgid "Group Departure"
 msgstr ""
 
-#: app/Controllers/TripController.php:1874
-#: app/Controllers/TripController.php:1887
+#: app/Controllers/TripController.php:1993
+#: app/Controllers/TripController.php:2006
 #: templates/partials/single-trip/content-location.php:500
 msgid "Starting Point"
 msgstr ""
 
-#: app/Controllers/TripController.php:1877
-#: app/Controllers/TripController.php:1888
+#: app/Controllers/TripController.php:1996
+#: app/Controllers/TripController.php:2007
 #: templates/partials/single-trip/content-location.php:524
 msgid "Ending Point"
 msgstr ""
@@ -3550,11 +3657,11 @@ msgid "Operations"
 msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:89
-msgid "Email Automation/Customization"
+msgid "Email Automation"
 msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:90
-msgid "Automated email campaigns for booking confirmations, payment reminders, and customer engagement. Increase conversions with timely, personalized communication throughout the booking journey."
+msgid "Adds the full automation template library (database), sequences, and send logs on the Email screen. Everyone already gets Delivery settings plus the four core customer templates (booking, payment, cancellation, reminder) without this module."
 msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:91
@@ -3788,8 +3895,8 @@ msgid "You do not have permission to perform this action."
 msgstr ""
 
 #: app/Models/Checkout.php:209
-#: app/Services/DiscountService.php:1112
-#: app/Services/DiscountService.php:1153
+#: app/Services/DiscountService.php:1099
+#: app/Services/DiscountService.php:1140
 msgid "Coupon Discount"
 msgstr ""
 
@@ -4099,16 +4206,6 @@ msgstr ""
 msgid "Trip Details"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:437
-#: templates/partials/availability-section.php:277
-#: templates/partials/single-trip/quick-facts.php:16
-#: templates/pdf/itinerary.php:151
-#: templates/shortcodes/search.php:132
-#: templates/shortcodes/trip-search.php:100
-#: templates/trip-listing-card.php:190
-msgid "Duration"
-msgstr ""
-
 #: app/Providers/FrontendAssetsProvider.php:438
 #: templates/partials/single-trip/quick-facts.php:48
 #: templates/shortcodes/search.php:93
@@ -4266,110 +4363,68 @@ msgid_plural "%d activities deleted."
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/Services/BookingCronService.php:138
+#: app/Services/BookingCronService.php:141
+msgid "Payment reminder"
+msgstr ""
+
+#: app/Services/BookingCronService.php:142
 #, php-format
-msgid "[%s] Trip Reminder - Your adventure is %d days away!"
+msgid "Outstanding balance: %s — please pay before travel."
 msgstr ""
 
 #: app/Services/BookingCronService.php:144
-#, php-format
-msgid ""
-"This is a friendly reminder that your trip is just %d days away!\n"
-"\n"
-""
+#: app/Services/BookingService.php:1014
+msgid "Preparation checklist"
 msgstr ""
 
-#: app/Services/BookingCronService.php:157
-msgid ""
-"PAYMENT REMINDER\n"
-""
+#: app/Services/BookingCronService.php:145
+#: app/Services/BookingService.php:1015
+msgid "Valid ID / passport"
 msgstr ""
 
-#: app/Services/BookingCronService.php:159
-#, php-format
-msgid ""
-"Outstanding Balance: %s\n"
-""
+#: app/Services/BookingCronService.php:146
+#: app/Services/BookingService.php:1016
+msgid "Travel insurance"
 msgstr ""
 
-#: app/Services/BookingCronService.php:160
-msgid ""
-"Please ensure payment is completed before your travel date.\n"
-"\n"
-""
+#: app/Services/BookingCronService.php:147
+#: app/Services/BookingService.php:1017
+msgid "Emergency contacts"
 msgstr ""
 
-#: app/Services/BookingCronService.php:163
-msgid ""
-"PREPARATION CHECKLIST\n"
-""
-msgstr ""
-
-#: app/Services/BookingCronService.php:165
-msgid ""
-"□ Valid passport (at least 6 months validity)\n"
-""
-msgstr ""
-
-#: app/Services/BookingCronService.php:166
-msgid ""
-"□ Travel insurance documents\n"
-""
-msgstr ""
-
-#: app/Services/BookingCronService.php:167
-msgid ""
-"□ Emergency contact information\n"
-""
-msgstr ""
-
-#: app/Services/BookingCronService.php:168
-msgid ""
-"□ Any required medications\n"
-""
-msgstr ""
-
-#: app/Services/BookingCronService.php:169
-msgid ""
-"□ Appropriate clothing for your destination\n"
-"\n"
-""
-msgstr ""
-
-#: app/Services/BookingCronService.php:171
-msgid ""
-"If you have any questions or need to make changes, please contact us.\n"
-"\n"
-""
-msgstr ""
-
-#: app/Services/BookingCronService.php:172
-#, php-format
-msgid ""
-"Have a wonderful trip!\n"
-"\n"
-"%s Team\n"
-""
-msgstr ""
-
-#: app/Services/BookingCronService.php:208
+#: app/Services/BookingCronService.php:186
 msgid "Booking expired due to non-payment"
 msgstr ""
 
-#: app/Services/BookingCronService.php:240
-#: app/Services/BookingCronService.php:270
+#: app/Services/BookingCronService.php:218
+#: app/Services/BookingCronService.php:248
 #, php-format
 msgid "[%s] Booking Expired - %s"
 msgstr ""
 
-#: app/Services/BookingCronService.php:246
+#: app/Services/BookingCronService.php:223
+#, php-format
+msgid ""
+"Dear %s,\n"
+"\n"
+""
+msgstr ""
+
+#: app/Services/BookingCronService.php:224
 msgid ""
 "We regret to inform you that your booking has been automatically cancelled due to non-payment.\n"
 "\n"
 ""
 msgstr ""
 
-#: app/Services/BookingCronService.php:254
+#: app/Services/BookingCronService.php:227
+#, php-format
+msgid ""
+"Booking Reference: %s\n"
+""
+msgstr ""
+
+#: app/Services/BookingCronService.php:232
 #, php-format
 msgid ""
 "Bookings that are not paid within %d hours are automatically cancelled to maintain availability for other travelers.\n"
@@ -4377,21 +4432,29 @@ msgid ""
 ""
 msgstr ""
 
-#: app/Services/BookingCronService.php:258
+#: app/Services/BookingCronService.php:236
 msgid ""
 "If you still wish to book this trip, please visit our website to create a new booking.\n"
 "\n"
 ""
 msgstr ""
 
-#: app/Services/BookingCronService.php:259
+#: app/Services/BookingCronService.php:237
 msgid ""
 "If you believe this is an error or have already made a payment, please contact us immediately.\n"
 "\n"
 ""
 msgstr ""
 
-#: app/Services/BookingCronService.php:272
+#: app/Services/BookingCronService.php:239
+#, php-format
+msgid ""
+"Best regards,\n"
+"%s Team\n"
+""
+msgstr ""
+
+#: app/Services/BookingCronService.php:250
 #, php-format
 msgid ""
 "Booking %s has been automatically cancelled due to non-payment.\n"
@@ -4399,14 +4462,14 @@ msgid ""
 ""
 msgstr ""
 
-#: app/Services/BookingCronService.php:273
+#: app/Services/BookingCronService.php:251
 #, php-format
 msgid ""
 "Customer: %s (%s)\n"
 ""
 msgstr ""
 
-#: app/Services/BookingCronService.php:275
+#: app/Services/BookingCronService.php:253
 #, php-format
 msgid ""
 "View: %s\n"
@@ -4491,110 +4554,68 @@ msgstr ""
 msgid "Booking deleted successfully."
 msgstr ""
 
-#: app/Services/BookingService.php:823
-#, php-format
-msgid "[%s] Booking Confirmation - %s"
+#: app/Services/BookingService.php:818
+msgid "Thank you for your booking! Here are your details:"
 msgstr ""
 
-#: app/Services/BookingService.php:856
+#: app/Services/BookingService.php:861
+msgid "Your booking has been confirmed! Here are your details:"
+msgstr ""
+
+#: app/Services/BookingService.php:872
 #, php-format
 msgid "[%s] Booking Status Update - %s"
 msgstr ""
 
-#: app/Services/BookingService.php:883
-msgid "Booking Confirmation"
-msgstr ""
-
-#: app/Services/BookingService.php:885
-#, php-format
-msgid "Thank you for your booking, %s!"
-msgstr ""
-
-#: app/Services/BookingService.php:889
-#: app/Services/BookingService.php:937
-msgid "Reference:"
-msgstr ""
-
-#: app/Services/BookingService.php:890
-#: app/Services/BookingService.php:938
-msgid "Trip:"
-msgstr ""
-
-#: app/Services/BookingService.php:891
-#: app/Services/BookingService.php:939
-#: templates/pdf/voucher.php:168
-msgid "Travel Date:"
-msgstr ""
-
-#: app/Services/BookingService.php:892
-#: templates/pdf/voucher.php:107
-msgid "Travelers:"
-msgstr ""
-
-#: app/Services/BookingService.php:893
-msgid "Total Amount:"
-msgstr ""
-
 #: app/Services/BookingService.php:896
-msgid "We will be in touch with further details soon."
-msgstr ""
-
-#: app/Services/BookingService.php:917
 msgid "Your booking has been confirmed!"
 msgstr ""
 
-#: app/Services/BookingService.php:918
+#: app/Services/BookingService.php:897
+#: app/Services/TransactionalEmailTemplateService.php:290
 msgid "Your booking has been cancelled."
 msgstr ""
 
-#: app/Services/BookingService.php:919
+#: app/Services/BookingService.php:898
 msgid "Your trip has been completed. Thank you for traveling with us!"
 msgstr ""
 
-#: app/Services/BookingService.php:922
+#: app/Services/BookingService.php:901
 #, php-format
 msgid "Your booking status has been updated to: %s"
 msgstr ""
 
-#: app/Services/BookingService.php:932
+#: app/Services/BookingService.php:911
 msgid "Booking Update"
 msgstr ""
 
-#: app/Services/BookingService.php:978
+#: app/Services/BookingService.php:916
+msgid "Reference:"
+msgstr ""
+
+#: app/Services/BookingService.php:917
+msgid "Trip:"
+msgstr ""
+
+#: app/Services/BookingService.php:918
+#: templates/pdf/voucher.php:168
+msgid "Travel Date:"
+msgstr ""
+
+#: app/Services/BookingService.php:957
 msgid "Invalid traveler bulk action."
 msgstr ""
 
-#: app/Services/BookingService.php:1001
+#: app/Services/BookingService.php:980
 msgid "No email address found."
 msgstr ""
 
-#: app/Services/BookingService.php:1014
+#: app/Services/BookingService.php:993
 msgid "Unknown email type."
 msgstr ""
 
-#: app/Services/BookingService.php:1019
+#: app/Services/BookingService.php:998
 msgid "Email sent successfully."
-msgstr ""
-
-#: app/Services/BookingService.php:1031
-#, php-format
-msgid "[%s] Reminder: Your Trip is Coming Up - %s"
-msgstr ""
-
-#: app/Services/BookingService.php:1039
-#, php-format
-msgid ""
-"Hi %s,\n"
-"\n"
-"This is a friendly reminder that your trip is coming up in %d days!\n"
-"\n"
-"Trip: %s\n"
-"Travel Date: %s\n"
-"Reference: %s\n"
-"\n"
-"We look forward to seeing you!\n"
-"\n"
-"%s"
 msgstr ""
 
 #: app/Services/BookingTaxService.php:206
@@ -4674,44 +4695,44 @@ msgstr ""
 msgid "Customers merged successfully."
 msgstr ""
 
-#: app/Services/DiscountService.php:980
-#: app/Services/DiscountService.php:1027
-#: app/Services/DiscountService.php:1079
+#: app/Services/DiscountService.php:967
+#: app/Services/DiscountService.php:1014
+#: app/Services/DiscountService.php:1066
 #, php-format
 msgid "Group Discount (%s%%)"
 msgstr ""
 
-#: app/Services/DiscountService.php:982
-#: app/Services/DiscountService.php:1028
-#: app/Services/DiscountService.php:1080
+#: app/Services/DiscountService.php:969
+#: app/Services/DiscountService.php:1015
+#: app/Services/DiscountService.php:1067
 #, php-format
 msgid "Group Discount (%s)"
 msgstr ""
 
-#: app/Services/DiscountService.php:1152
+#: app/Services/DiscountService.php:1139
 #, php-format
 msgid "Coupon (%s%%)"
 msgstr ""
 
-#: app/Services/DiscountService.php:1183
+#: app/Services/DiscountService.php:1159
 msgid "This coupon is not yet valid."
 msgstr ""
 
-#: app/Services/DiscountService.php:1188
+#: app/Services/DiscountService.php:1163
 msgid "This coupon has expired."
 msgstr ""
 
-#: app/Services/DiscountService.php:1195
+#: app/Services/DiscountService.php:1168
 msgid "This coupon has reached its usage limit."
 msgstr ""
 
-#: app/Services/DiscountService.php:1205
+#: app/Services/DiscountService.php:1175
 msgid "This coupon is not applicable to this trip."
 msgstr ""
 
-#: app/Services/DiscountService.php:1216
+#: app/Services/DiscountService.php:1184
 #, php-format
-msgid "Minimum order amount of %s required for this coupon."
+msgid "Minimum amount of %s required for this coupon."
 msgstr ""
 
 #: app/Services/EmailService.php:174
@@ -4855,12 +4876,12 @@ msgstr ""
 msgid "Day number must be at least 1"
 msgstr ""
 
-#: app/Services/NotificationService.php:73
+#: app/Services/NotificationService.php:68
 #, php-format
 msgid "[%s] New Booking Received - #%d"
 msgstr ""
 
-#: app/Services/NotificationService.php:76
+#: app/Services/NotificationService.php:71
 #, php-format
 msgid ""
 "A new booking has been received.\n"
@@ -4874,34 +4895,12 @@ msgid ""
 "View booking details in admin panel."
 msgstr ""
 
-#: app/Services/NotificationService.php:98
-#, php-format
-msgid "[%s] Booking Confirmation - #%d"
-msgstr ""
-
-#: app/Services/NotificationService.php:101
-#, php-format
-msgid ""
-"Dear %s,\n"
-"\n"
-"Thank you for your booking!\n"
-"\n"
-"Booking ID: %d\n"
-"Trip: %s\n"
-"Total Amount: %s\n"
-"\n"
-"We will send you further details shortly.\n"
-"\n"
-"Best regards,\n"
-"%s"
-msgstr ""
-
-#: app/Services/NotificationService.php:118
+#: app/Services/NotificationService.php:89
 #, php-format
 msgid "[%s] Payment Received - Booking #%d"
 msgstr ""
 
-#: app/Services/NotificationService.php:121
+#: app/Services/NotificationService.php:92
 #, php-format
 msgid ""
 "Payment has been received.\n"
@@ -4912,35 +4911,16 @@ msgid ""
 "Transaction ID: %s"
 msgstr ""
 
-#: app/Services/NotificationService.php:144
-#, php-format
-msgid "[%s] Payment Confirmation - Booking #%d"
+#: app/Services/NotificationService.php:116
+msgid "Online payment"
 msgstr ""
 
-#: app/Services/NotificationService.php:147
-#, php-format
-msgid ""
-"Dear %s,\n"
-"\n"
-"Your payment has been received successfully!\n"
-"\n"
-"Booking ID: %d\n"
-"Amount Paid: %s\n"
-"Payment Method: %s\n"
-"\n"
-"Thank you for your payment.\n"
-"\n"
-"Best regards,\n"
-"%s"
-msgstr ""
-
-#: app/Services/NotificationService.php:164
-#: app/Services/NotificationService.php:187
+#: app/Services/NotificationService.php:132
 #, php-format
 msgid "[%s] Booking Cancelled - #%d"
 msgstr ""
 
-#: app/Services/NotificationService.php:167
+#: app/Services/NotificationService.php:135
 #, php-format
 msgid ""
 "A booking has been cancelled.\n"
@@ -4948,22 +4928,6 @@ msgid ""
 "Booking ID: %d\n"
 "Trip: %s\n"
 "Customer: %s %s"
-msgstr ""
-
-#: app/Services/NotificationService.php:190
-#, php-format
-msgid ""
-"Dear %s,\n"
-"\n"
-"Your booking has been cancelled.\n"
-"\n"
-"Booking ID: %d\n"
-"Trip: %s\n"
-"\n"
-"If you have any questions, please contact us.\n"
-"\n"
-"Best regards,\n"
-"%s"
 msgstr ""
 
 #: app/Services/PaymentService.php:92
@@ -5149,7 +5113,7 @@ msgstr ""
 msgid "You must be logged in to leave a review."
 msgstr ""
 
-#: app/Services/SampleDataService.php:124
+#: app/Services/SampleDataService.php:235
 #, php-format
 msgid "Error importing sample data: %s"
 msgstr ""
@@ -5384,6 +5348,120 @@ msgstr ""
 
 #: app/Services/TaxValidationService.php:97
 msgid "Total tax rate cannot exceed 100%"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:176
+#, php-format
+msgid "[%s] Booking update — %s"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:179
+#, php-format
+msgid "[%s] Payment received — %s"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:182
+#, php-format
+msgid "[%s] Booking cancelled — %s"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:185
+#, php-format
+msgid "[%s] Your trip is coming up — %s"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:188
+#, php-format
+msgid "[%s] Notification"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:211
+msgid "This is an automated message from your travel site."
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:220
+msgid "there"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:224
+#: app/Services/TransactionalEmailTemplateService.php:237
+msgid "Booking update"
+msgstr ""
+
+#. translators: %s: customer first name
+#: app/Services/TransactionalEmailTemplateService.php:226
+#: app/Services/TransactionalEmailTemplateService.php:240
+#: app/Services/TransactionalEmailTemplateService.php:289
+#, php-format
+msgid "Hello %s,"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:229
+#: app/Services/TransactionalEmailTemplateService.php:243
+msgid "Thank you for your booking. Here are your details:"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:245
+msgid "Booking details"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:246
+#: app/Services/TransactionalEmailTemplateService.php:292
+#: app/Services/TransactionalEmailTemplateService.php:317
+msgid "Reference"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:250
+#: templates/partials/availability-card.php:441
+msgid "Total"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:251
+msgid "Amount due now"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:267
+msgid "Payment received"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:268
+#: app/Services/TransactionalEmailTemplateService.php:310
+#, php-format
+msgid "Dear %s,"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:269
+msgid "We have received your payment. Thank you."
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:272
+msgid "Amount paid"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:273
+msgid "Method"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:274
+msgid "Transaction ID"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:288
+msgid "Booking cancelled"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:309
+msgid "Trip reminder"
+msgstr ""
+
+#. translators: %s: number of days
+#: app/Services/TransactionalEmailTemplateService.php:313
+#, php-format
+msgid "Your trip is coming up in %s days. We look forward to seeing you!"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:322
+msgid "Balance due"
 msgstr ""
 
 #: app/Services/TripListingService.php:517
@@ -6125,7 +6203,7 @@ msgstr ""
 #: templates/listing-trip-category.php:324
 #: templates/listing-trip.php:953
 #: templates/partials/single-trip/similar-trips.php:17
-#: templates/shortcodes/activity.php:172
+#: templates/shortcodes/activity.php:149
 #: templates/shortcodes/destination.php:141
 #: templates/shortcodes/trip.php:83
 #: templates/single-taxonomy.php:294
@@ -6141,7 +6219,7 @@ msgstr ""
 #: templates/listing-trip-category.php:348
 #: templates/listing-trip.php:973
 #: templates/partials/single-trip/similar-trips.php:22
-#: templates/shortcodes/activity.php:192
+#: templates/shortcodes/activity.php:169
 #: templates/shortcodes/destination.php:161
 #: templates/shortcodes/trip.php:101
 #: templates/single-taxonomy.php:320
@@ -6397,6 +6475,117 @@ msgstr ""
 msgid "All rights reserved."
 msgstr ""
 
+#: templates/partials/availability-card.php:59
+msgid "Toggle availability details"
+msgstr ""
+
+#: templates/partials/availability-card.php:90
+msgid "Seats remaining"
+msgstr ""
+
+#: templates/partials/availability-card.php:92
+msgid "per departure"
+msgstr ""
+
+#: templates/partials/availability-card.php:132
+msgid "Sold Out"
+msgstr ""
+
+#: templates/partials/availability-card.php:134
+msgid "Limited"
+msgstr ""
+
+#: templates/partials/availability-card.php:136
+msgid "Blocked"
+msgstr ""
+
+#: templates/partials/availability-card.php:138
+msgid "Closed"
+msgstr ""
+
+#: templates/partials/availability-card.php:140
+msgid "Cancelled"
+msgstr ""
+
+#: templates/partials/availability-card.php:142
+msgid "Available"
+msgstr ""
+
+#: templates/partials/availability-card.php:168
+#: templates/partials/single-trip/content-itinerary.php:68
+#: templates/pdf/itinerary.php:278
+msgid "Day"
+msgid_plural "Days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/partials/availability-card.php:179
+msgid "Seats left"
+msgstr ""
+
+#: templates/partials/availability-card.php:180
+#, php-format
+msgid "%d seat"
+msgid_plural "%d seats"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/partials/availability-card.php:198
+msgid "Free Cancellation"
+msgstr ""
+
+#: templates/partials/availability-card.php:203
+#, php-format
+msgid "Up to %d %s%s before"
+msgstr ""
+
+#: templates/partials/availability-card.php:209
+msgid "No charge"
+msgstr ""
+
+#: templates/partials/availability-card.php:213
+#: templates/partials/availability-card.php:218
+#: templates/partials/booking-content.php:630
+#: templates/partials/single-trip/content-important-info.php:71
+msgid "Cancellation Policy"
+msgstr ""
+
+#: templates/partials/availability-card.php:214
+msgid "See details"
+msgstr ""
+
+#: templates/partials/availability-card.php:219
+msgid "May apply"
+msgstr ""
+
+#: templates/partials/availability-card.php:410
+#: templates/partials/traveler-input-simple.php:14
+msgid "Decrease travelers"
+msgstr ""
+
+#: templates/partials/availability-card.php:424
+#: templates/partials/traveler-input-simple.php:28
+msgid "Increase travelers"
+msgstr ""
+
+#: templates/partials/availability-card.php:434
+msgid "Select travelers to update the total, then click Book Now."
+msgstr ""
+
+#: templates/partials/availability-card.php:442
+msgid "for 1 traveler"
+msgstr ""
+
+#: templates/partials/availability-card.php:494
+#: templates/partials/availability-section.php:120
+#: templates/partials/single-trip/hero.php:247
+msgid "Book Now"
+msgstr ""
+
+#: templates/partials/availability-card.php:495
+msgid "Continue to booking"
+msgstr ""
+
 #: templates/partials/availability-section.php:30
 msgid "Availability"
 msgstr ""
@@ -6425,155 +6614,58 @@ msgstr ""
 msgid "Choose your preferred departure date and book your spot"
 msgstr ""
 
-#: templates/partials/availability-section.php:50
+#: templates/partials/availability-section.php:51
 msgid "All Dates"
 msgstr ""
 
-#: templates/partials/availability-section.php:67
-msgid "Available on Request"
+#: templates/partials/availability-section.php:73
+msgid "No departures in this period"
 msgstr ""
 
-#: templates/partials/availability-section.php:68
-msgid "This trip is available on request. No specific departure dates are set, so you can book this trip for your preferred dates."
-msgstr ""
-
+#. translators: %s: Month and year label, e.g. "Apr 2026"
 #: templates/partials/availability-section.php:77
-msgid "Capacity"
+#, php-format
+msgid "There are no scheduled departures in %s. Try another month or view all available dates."
 msgstr ""
 
-#: templates/partials/availability-section.php:87
-msgid "Flexible dates"
+#: templates/partials/availability-section.php:81
+msgid "There are no departures for this filter. Try another month or view all available dates."
+msgstr ""
+
+#: templates/partials/availability-section.php:85
+msgid "Show all departure dates"
 msgstr ""
 
 #: templates/partials/availability-section.php:94
-#: templates/partials/availability-section.php:617
-#: templates/partials/single-trip/hero.php:247
-msgid "Book Now"
+msgid "Available on Request"
 msgstr ""
 
-#: templates/partials/availability-section.php:97
-#: templates/partials/single-trip/content-sidebar.php:424
+#: templates/partials/availability-section.php:95
+msgid "This trip is available on request. No specific departure dates are set, so you can book this trip for your preferred dates."
+msgstr ""
+
+#: templates/partials/availability-section.php:103
+msgid "Capacity"
+msgstr ""
+
+#: templates/partials/availability-section.php:113
+msgid "Flexible dates"
+msgstr ""
+
+#: templates/partials/availability-section.php:123
+#: templates/partials/single-trip/content-sidebar.php:412
 #: templates/partials/single-trip/enquiry-modal.php:10
 msgid "Make Enquiry"
 msgstr ""
 
-#: templates/partials/availability-section.php:172
-msgid "Toggle availability details"
-msgstr ""
-
-#: templates/partials/availability-section.php:203
-msgid "Seats remaining"
-msgstr ""
-
-#: templates/partials/availability-section.php:205
-msgid "per departure"
-msgstr ""
-
-#: templates/partials/availability-section.php:245
-msgid "Sold Out"
-msgstr ""
-
-#: templates/partials/availability-section.php:247
-msgid "Limited"
-msgstr ""
-
-#: templates/partials/availability-section.php:249
-msgid "Blocked"
-msgstr ""
-
-#: templates/partials/availability-section.php:251
-msgid "Closed"
-msgstr ""
-
-#: templates/partials/availability-section.php:253
-msgid "Cancelled"
-msgstr ""
-
-#: templates/partials/availability-section.php:255
-msgid "Available"
-msgstr ""
-
-#: templates/partials/availability-section.php:281
-#: templates/partials/single-trip/content-itinerary.php:68
-#: templates/pdf/itinerary.php:278
-msgid "Day"
-msgid_plural "Days"
-msgstr[0] ""
-msgstr[1] ""
-
-#: templates/partials/availability-section.php:292
-msgid "Seats left"
-msgstr ""
-
-#: templates/partials/availability-section.php:293
-#, php-format
-msgid "%d seat"
-msgid_plural "%d seats"
-msgstr[0] ""
-msgstr[1] ""
-
-#: templates/partials/availability-section.php:311
-msgid "Free Cancellation"
-msgstr ""
-
-#: templates/partials/availability-section.php:316
-#, php-format
-msgid "Up to %d %s%s before"
-msgstr ""
-
-#: templates/partials/availability-section.php:322
-msgid "No charge"
-msgstr ""
-
-#: templates/partials/availability-section.php:326
-#: templates/partials/availability-section.php:331
-#: templates/partials/booking-content.php:630
-#: templates/partials/single-trip/content-important-info.php:71
-msgid "Cancellation Policy"
-msgstr ""
-
-#: templates/partials/availability-section.php:327
-msgid "See details"
-msgstr ""
-
-#: templates/partials/availability-section.php:332
-msgid "May apply"
-msgstr ""
-
-#: templates/partials/availability-section.php:523
-#: templates/partials/traveler-input-simple.php:14
-msgid "Decrease travelers"
-msgstr ""
-
-#: templates/partials/availability-section.php:537
-#: templates/partials/traveler-input-simple.php:28
-msgid "Increase travelers"
-msgstr ""
-
-#: templates/partials/availability-section.php:547
-msgid "Select travelers to update the total, then click Book Now."
-msgstr ""
-
-#: templates/partials/availability-section.php:554
-msgid "Total"
-msgstr ""
-
-#: templates/partials/availability-section.php:555
-msgid "for 1 traveler"
-msgstr ""
-
-#: templates/partials/availability-section.php:618
-msgid "Continue to booking"
-msgstr ""
-
-#: templates/partials/availability-section.php:631
+#: templates/partials/availability-section.php:162
 #, php-format
 msgid "Load more departures (%d remaining)"
 msgstr ""
 
-#: templates/partials/availability-section.php:634
+#: templates/partials/availability-section.php:166
 #, php-format
-msgid "Showing %d of %d departures"
+msgid "Showing %1$d of %2$d departures"
 msgstr ""
 
 #: templates/partials/booking-auth.php:38
@@ -7248,97 +7340,97 @@ msgstr ""
 msgid "Trip Highlights"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:156
+#: templates/partials/single-trip/content-sidebar.php:144
 #: templates/partials/single-trip/sticky-sidebar.php:98
 #, php-format
 msgid "Up to %d%%"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:176
+#: templates/partials/single-trip/content-sidebar.php:164
 msgid "Group discount available"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:184
+#: templates/partials/single-trip/content-sidebar.php:172
 msgid "Group Discount Tiers"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:195
+#: templates/partials/single-trip/content-sidebar.php:183
 #: templates/partials/single-trip/quick-facts.php:87
 #, php-format
 msgid "%d-%d travelers"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:197
+#: templates/partials/single-trip/content-sidebar.php:185
 #, php-format
 msgid "%d+ travelers"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:207
+#: templates/partials/single-trip/content-sidebar.php:195
 #, php-format
 msgid "%s%% OFF"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:209
+#: templates/partials/single-trip/content-sidebar.php:197
 #, php-format
 msgid "%s OFF"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:251
+#: templates/partials/single-trip/content-sidebar.php:239
 #, php-format
 msgid "%d departure available"
 msgid_plural "%d departures available"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/partials/single-trip/content-sidebar.php:265
-#: templates/partials/single-trip/content-sidebar.php:356
+#: templates/partials/single-trip/content-sidebar.php:253
+#: templates/partials/single-trip/content-sidebar.php:344
 #: templates/partials/single-trip/enquiry-modal.php:53
 msgid "Select date"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:310
-#: templates/partials/single-trip/content-sidebar.php:403
+#: templates/partials/single-trip/content-sidebar.php:298
+#: templates/partials/single-trip/content-sidebar.php:391
 #, php-format
 msgid "Min: %d, Max: %d"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:322
+#: templates/partials/single-trip/content-sidebar.php:310
 msgid "Flexible booking available"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:328
+#: templates/partials/single-trip/content-sidebar.php:316
 #, php-format
 msgid "Available: %s - %s"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:333
+#: templates/partials/single-trip/content-sidebar.php:321
 #, php-format
 msgid "Available from: %s"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:337
+#: templates/partials/single-trip/content-sidebar.php:325
 #, php-format
 msgid "Available until: %s"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:417
+#: templates/partials/single-trip/content-sidebar.php:405
 msgid "Check Availability"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:445
+#: templates/partials/single-trip/content-sidebar.php:433
 #, php-format
 msgid "Free cancellation up to %d %s%s before"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:451
+#: templates/partials/single-trip/content-sidebar.php:439
 msgid "Free cancellation"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:455
+#: templates/partials/single-trip/content-sidebar.php:443
 msgid "Cancellation policy applies"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:459
+#: templates/partials/single-trip/content-sidebar.php:447
 msgid "Cancellation policy may apply"
 msgstr ""
 
@@ -7957,6 +8049,10 @@ msgstr ""
 
 #: templates/pdf/voucher.php:97
 msgid "Voucher #"
+msgstr ""
+
+#: templates/pdf/voucher.php:107
+msgid "Travelers:"
 msgstr ""
 
 #: templates/pdf/voucher.php:113
@@ -8586,34 +8682,34 @@ msgstr ""
 msgid "Get Started"
 msgstr ""
 
-#: templates/shortcodes/activity.php:55
+#: templates/shortcodes/activity.php:32
 msgid "Activity Listings"
 msgstr ""
 
-#: templates/shortcodes/activity.php:61
+#: templates/shortcodes/activity.php:38
 #, php-format
 msgid "Showing %d of %d activities"
 msgstr ""
 
-#: templates/shortcodes/activity.php:134
+#: templates/shortcodes/activity.php:111
 #: templates/shortcodes/destination.php:103
 #: templates/tmpl-tour-item.php:5
 msgid "Featured"
 msgstr ""
 
-#: templates/shortcodes/activity.php:144
+#: templates/shortcodes/activity.php:121
 msgid "No activities found on this page. Try navigating to other pages."
 msgstr ""
 
-#: templates/shortcodes/activity.php:152
+#: templates/shortcodes/activity.php:129
 msgid "No Activities Found"
 msgstr ""
 
-#: templates/shortcodes/activity.php:153
+#: templates/shortcodes/activity.php:130
 msgid "We couldn't find any activities. Please check back later or browse our tours directly."
 msgstr ""
 
-#: templates/shortcodes/activity.php:155
+#: templates/shortcodes/activity.php:132
 #: templates/shortcodes/destination.php:124
 #: templates/shortcodes/discount-and-deals.php:70
 msgid "Browse All Tours"
@@ -8687,7 +8783,6 @@ msgstr ""
 #: templates/shortcodes/login.php:135
 msgid "Your login information is secure and encrypted."
 msgstr ""
-
 
 #: templates/shortcodes/my-account.php:30
 #, php-format

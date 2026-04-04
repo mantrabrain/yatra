@@ -408,21 +408,87 @@ class SEOService
         }
 
         $trip = $this->pageObject;
-        
-        $this->seoData['title'] = $trip->meta_title ?? $trip->name ?? '';
-        $this->seoData['description'] = $trip->meta_description ?? $trip->description ?? '';
-        $this->seoData['keywords'] = $trip->meta_keywords ?? '';
-        $this->seoData['image'] = $trip->featured_image_url ?? ($trip->gallery_images[0] ?? '');
-        
-        $this->seoData['url'] = function_exists('yatra_get_trip_permalink') 
-            ? yatra_get_trip_permalink($trip) 
+
+        $customTitle = trim((string) ($trip->meta_title ?? ''));
+        $displayTitle = '';
+        if (\is_object($trip) && \method_exists($trip, 'getTitle')) {
+            $displayTitle = $this->sanitizeText($trip->getTitle());
+        } else {
+            $displayTitle = $this->sanitizeText((string) ($trip->title ?? $trip->name ?? ''));
+        }
+
+        $this->seoData['title'] = $customTitle !== ''
+            ? $this->sanitizeText($customTitle)
+            : $displayTitle;
+
+        $customDesc = trim((string) ($trip->meta_description ?? ''));
+        $fallbackDesc = '';
+        if (\is_object($trip) && \method_exists($trip, 'getShortDescription')) {
+            $short = $trip->getShortDescription();
+            if (!empty($short)) {
+                $fallbackDesc = $this->sanitizeText(\wp_strip_all_tags((string) $short));
+            }
+        }
+        if ($fallbackDesc === '' && !empty($trip->description)) {
+            $fallbackDesc = $this->sanitizeText(
+                \wp_trim_words(\wp_strip_all_tags((string) $trip->description), 40, '…')
+            );
+        }
+        if ($fallbackDesc === '') {
+            $fallbackDesc = $this->sanitizeText(SettingsService::getString('seo_trip_meta_description', ''));
+        }
+        $this->seoData['description'] = $customDesc !== ''
+            ? $this->sanitizeText($customDesc)
+            : $fallbackDesc;
+
+        $customKeywords = trim((string) ($trip->meta_keywords ?? ''));
+        $this->seoData['keywords'] = $customKeywords !== ''
+            ? $this->sanitizeText($customKeywords)
+            : $this->sanitizeText(SettingsService::getString('seo_trip_meta_keywords', ''));
+
+        $this->seoData['image'] = $this->resolveTripSeoImageUrl($trip);
+
+        $this->seoData['url'] = function_exists('yatra_get_trip_permalink')
+            ? yatra_get_trip_permalink($trip)
             : home_url('/' . SettingsService::getTripBase() . '/' . ($trip->slug ?? ''));
-        
+
         $this->seoData['type'] = 'article';
         $this->seoData['published_time'] = date('c', strtotime($trip->created_at ?? 'now'));
         $this->seoData['modified_time'] = date('c', strtotime($trip->updated_at ?? 'now'));
         $this->seoData['author'] = get_bloginfo('name');
         $this->seoData['publisher'] = get_bloginfo('name');
+    }
+
+    /**
+     * Resolve share/SEO image URL for a trip (featured, gallery, then global trip SEO image setting).
+     *
+     * @param object $trip
+     */
+    private function resolveTripSeoImageUrl(object $trip): string
+    {
+        $raw = '';
+        if (!empty($trip->featured_image_url)) {
+            $raw = (string) $trip->featured_image_url;
+        } elseif (!empty($trip->gallery_images) && \is_array($trip->gallery_images)) {
+            $first = $trip->gallery_images[0] ?? null;
+            if (\is_string($first)) {
+                $raw = $first;
+            } elseif (\is_array($first)) {
+                $raw = (string) ($first['url'] ?? $first['src'] ?? '');
+            }
+        }
+
+        if ($raw === '') {
+            $imageId = SettingsService::getInt('seo_trip_meta_image', 0);
+            if ($imageId > 0) {
+                $url = \wp_get_attachment_url($imageId);
+                if ($url && \filter_var($url, FILTER_VALIDATE_URL)) {
+                    $raw = $url;
+                }
+            }
+        }
+
+        return $raw !== '' ? $this->validateUrl($raw) : '';
     }
 
     /**

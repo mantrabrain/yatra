@@ -32,6 +32,8 @@ interface ModalProps {
   hideHeader?: boolean;
   hideFooter?: boolean;
   customZIndex?: number;
+  /** Replaces default `max-h-[70vh] overflow-y-auto custom-scrollbar` on the body wrapper (e.g. full-height previews). */
+  bodyScrollClassName?: string;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -54,6 +56,7 @@ export const Modal: React.FC<ModalProps> = ({
   hideHeader = false,
   hideFooter = false,
   customZIndex,
+  bodyScrollClassName,
 }) => {
   useEffect(() => {
     if (!isOpen) {
@@ -74,6 +77,8 @@ export const Modal: React.FC<ModalProps> = ({
 
   const panelWidthClass = maxWidthClassName || sizeClasses[size];
   const bodyClasses = bodyClassName ?? "px-6 py-5";
+  const bodyScrollClasses =
+    bodyScrollClassName ?? "max-h-[70vh] overflow-y-auto custom-scrollbar";
   const zIndex = customZIndex || 999999;
 
   // Default loading skeleton
@@ -157,9 +162,7 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
         )}
 
-        <div
-          className={`${bodyClasses} max-h-[70vh] overflow-y-auto custom-scrollbar`}
-        >
+        <div className={`${bodyClasses} ${bodyScrollClasses}`}>
           <div className="w-full">
             {loading
               ? loadingSkeleton || defaultLoadingSkeleton

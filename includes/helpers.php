@@ -1420,11 +1420,20 @@ function yatra_get_header( $header_name = null ) {
         function_exists( 'wp_is_block_theme' ) &&
         wp_is_block_theme()
     ) {
+        /*
+         * Full-site editing themes often omit add_theme_support( 'title-tag' ); the document title is
+         * injected via template canvas using _block_template_render_title_tag (unconditional). Yatra
+         * renders this minimal head instead of canvas, so _wp_render_title_tag would no-op and the
+         * page would have no <title>. Mirror canvas: print title here and drop duplicate core hooks.
+         */
+        remove_action( 'wp_head', '_wp_render_title_tag', 1 );
+        remove_action( 'wp_head', '_block_template_render_title_tag', 1 );
         ?>
         <!doctype html>
             <html <?php language_attributes(); ?>>
             <head>
                 <meta charset="<?php bloginfo( 'charset' ); ?>">
+                <title><?php echo esc_html( wp_get_document_title() ); ?></title>
                 <?php wp_head(); ?>
             </head>
 

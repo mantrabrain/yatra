@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { __ } from "../lib/i18n";
-import { apiClient } from "../lib/api-client";
 import { useToast } from "../components/ui/toast";
 import {
   Card,
@@ -23,11 +22,29 @@ import {
   Copy,
   Check,
   Info,
-  X,
   Zap,
   ChevronDown,
 } from "lucide-react";
 import { Switch } from "../components/ui/switch";
+import {
+  getCoreTemplateDefinition,
+  isCoreTemplateSlug,
+} from "../lib/email-templates-catalog";
+import { isEmailAutomationModuleEnabled } from "../lib/plugin-utils";
+import {
+  fetchSettings,
+  previewCoreEmailTemplate,
+  saveSettings,
+} from "../api/settings-api";
+import { EmailPreviewModal } from "../components/email/EmailPreviewModal";
+import {
+  createEmailTemplate,
+  fetchEmailTemplate,
+  fetchEmailTemplateVariables,
+  previewEmailTemplate,
+  sendEmailTemplateTest,
+  updateEmailTemplate,
+} from "../api/email-automation-api";
 
 interface PreviewData {
   subject: string;
@@ -35,18 +52,25 @@ interface PreviewData {
 }
 
 const EmailTemplateForm: React.FC = () => {
-  const { id, isCreateMode } = useMemo(() => {
+  const { id, isCreateMode, coreTemplateSlug } = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     const templateId = params.get("id");
     const action = params.get("action");
+    const core = params.get("core_template") || "";
     return {
       id: templateId,
       isCreateMode: action === "create",
+      coreTemplateSlug: core,
     };
   }, []);
 
+  const isCoreSettingsEdit = isCoreTemplateSlug(coreTemplateSlug);
+  const coreDef = isCoreSettingsEdit
+    ? getCoreTemplateDefinition(coreTemplateSlug)
+    : undefined;
+
   const goBack = () => {
-    window.location.href = `admin.php?page=yatra&subpage=email-automation`;
+    window.location.href = `admin.php?page=yatra&subpage=email-automation&tab=templates`;
   };
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -69,54 +93,93 @@ const EmailTemplateForm: React.FC = () => {
   const [copiedVar, setCopiedVar] = useState<string | null>(null);
   const [showEventDropdown, setShowEventDropdown] = useState(false);
 
+  useEffect(() => {
+    if (isCreateMode && !isEmailAutomationModuleEnabled()) {
+      window.location.href =
+        "admin.php?page=yatra&subpage=email-automation&tab=templates";
+    }
+  }, [isCreateMode]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("action") !== "edit") return;
+    const ct = params.get("core_template");
+    if (ct && !isCoreTemplateSlug(ct)) {
+      window.location.href =
+        "admin.php?page=yatra&subpage=email-automation&tab=templates";
+    }
+  }, []);
+
+  const { data: settings, isLoading: settingsLoading } = useQuery({
+    queryKey: ["settings"],
+    queryFn: () => fetchSettings(),
+    enabled: isCoreSettingsEdit,
+  });
+
   const { data: templateData, isLoading } = useQuery({
     queryKey: ["email-template", id],
-    queryFn: async () => {
-      const response = await apiClient.get(`/email-templates/${id}`);
-      return response.data;
-    },
-    enabled: !!id,
+    queryFn: () => fetchEmailTemplate(id as string),
+    enabled: Boolean(id) && !isCoreSettingsEdit,
   });
 
   const { data: variablesData } = useQuery({
     queryKey: ["email-variables"],
-    queryFn: async () => {
-      const response = await apiClient.get("/email-templates/variables");
-      return response.data;
-    },
+    queryFn: () => fetchEmailTemplateVariables(),
+    enabled: !isCoreSettingsEdit && isEmailAutomationModuleEnabled(),
   });
 
   // Get events from window.yatraAdmin (passed from PHP)
   const events = (window as any).yatraAdmin?.emailEvents || [];
 
   useEffect(() => {
-    if (templateData) {
-      setFormData({
-        name: templateData.name || "",
-        description: templateData.description || "",
-        from_name: templateData.from_name || "",
-        from_email: templateData.from_email || "",
-        to_email: templateData.to_email || "",
-        reply_to: templateData.reply_to || "",
-        subject: templateData.subject || "",
-        body: templateData.body || "",
-        event_key: templateData.event_key || "",
-        is_active: templateData.is_active ?? true,
-      });
-    }
+    if (!templateData || typeof templateData !== "object") return;
+    const t = templateData as Record<string, unknown>;
+    setFormData({
+      name: String(t.name ?? ""),
+      description: String(t.description ?? ""),
+      from_name: String(t.from_name ?? ""),
+      from_email: String(t.from_email ?? ""),
+      to_email: String(t.to_email ?? ""),
+      reply_to: String(t.reply_to ?? ""),
+      subject: String(t.subject ?? ""),
+      body: String(t.body ?? ""),
+      event_key: String(t.event_key ?? ""),
+      is_active: Boolean(t.is_active ?? true),
+    });
   }, [templateData]);
+
+  useEffect(() => {
+    if (!isCoreSettingsEdit || !settings || !coreDef) return;
+    const flag = coreDef.settingsFlag;
+    const subj = coreDef.settingsSubject;
+    const bodyKey = coreDef.settingsBody;
+    if (!flag || !subj || !bodyKey) return;
+    const s = settings as Record<string, unknown>;
+    setFormData({
+      name: coreDef.name,
+      description: coreDef.description,
+      from_name: "",
+      from_email: "",
+      to_email: coreDef.to_email || "",
+      reply_to: "",
+      subject: String(s[subj] ?? ""),
+      body: String(s[bodyKey] ?? ""),
+      event_key: coreDef.event_key,
+      is_active: Boolean(s[flag]),
+    });
+  }, [isCoreSettingsEdit, settings, coreDef]);
 
   const saveMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
       if (isCreateMode) {
-        const response = await apiClient.post("/email-templates", data);
+        const response = await createEmailTemplate(data);
         // Check if the response indicates failure
         if (response && response.success === false) {
           throw new Error(response.message || __("Failed to create template"));
         }
         return response;
       }
-      return await apiClient.put(`/email-templates/${id}`, data);
+      return await updateEmailTemplate(id as string, data);
     },
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["email-templates"] });
@@ -129,7 +192,7 @@ const EmailTemplateForm: React.FC = () => {
         } else {
           // Fallback to list page
           window.location.href =
-            "admin.php?page=yatra&subpage=email-automation";
+            "admin.php?page=yatra&subpage=email-automation&tab=templates";
         }
       } else {
         queryClient.invalidateQueries({ queryKey: ["email-template", id] });
@@ -146,23 +209,72 @@ const EmailTemplateForm: React.FC = () => {
     },
   });
 
+  const saveCoreMutation = useMutation({
+    mutationFn: async () => {
+      if (!coreDef?.settingsFlag || !coreDef.settingsSubject || !coreDef.settingsBody) {
+        throw new Error(__("Invalid template", "yatra"));
+      }
+      if (!settings) {
+        throw new Error(__("Settings not loaded", "yatra"));
+      }
+      const base = { ...(settings as Record<string, unknown>) };
+      base[coreDef.settingsSubject] = formData.subject;
+      base[coreDef.settingsBody] = formData.body;
+      base[coreDef.settingsFlag] = formData.is_active;
+      await saveSettings(base);
+      return base;
+    },
+    onSuccess: (saved) => {
+      queryClient.setQueryData(["settings"], saved);
+      showToast(__("Template saved", "yatra"), "success");
+    },
+    onError: (error: unknown) => {
+      const message =
+        error instanceof Error
+          ? error.message
+          : __("Failed to save", "yatra");
+      showToast(message, "error");
+    },
+  });
+
   const previewMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiClient.post(
-        `/email-templates/${id}/preview`,
-        {},
-      );
-      return response.data;
+      return previewEmailTemplate(id as string);
     },
     onSuccess: (data) => {
       setPreviewData(data);
       setShowPreview(true);
     },
+    onError: () => {
+      showToast(__("Failed to load preview"), "error");
+    },
+  });
+
+  const corePreviewMutation = useMutation({
+    mutationFn: async () => {
+      if (!coreTemplateSlug) {
+        throw new Error(__("Invalid template", "yatra"));
+      }
+      return previewCoreEmailTemplate({
+        template_key: coreTemplateSlug,
+        subject: formData.subject,
+        body: formData.body,
+      });
+    },
+    onSuccess: (data) => {
+      setPreviewData(data);
+      setShowPreview(true);
+    },
+    onError: (error: unknown) => {
+      const message =
+        error instanceof Error ? error.message : __("Preview failed", "yatra");
+      showToast(message, "error");
+    },
   });
 
   const testMutation = useMutation({
     mutationFn: async (email: string) => {
-      return await apiClient.post(`/email-templates/${id}/test`, { email });
+      return sendEmailTemplateTest(id as string, email);
     },
     onSuccess: () => {
       showToast(__("Test email sent successfully"), "success");
@@ -176,12 +288,15 @@ const EmailTemplateForm: React.FC = () => {
   const handleSubmit = (e?: React.FormEvent | React.MouseEvent) => {
     if (e) e.preventDefault();
 
-    // Validate required fields
+    if (isCoreSettingsEdit) {
+      saveCoreMutation.mutate();
+      return;
+    }
+
     if (!formData.name.trim()) {
       showToast(__("Template name is required"), "error");
       return;
     }
-    // Event is optional for custom templates
     if (!formData.subject.trim()) {
       showToast(__("Subject line is required"), "error");
       return;
@@ -210,7 +325,11 @@ const EmailTemplateForm: React.FC = () => {
     }
   };
 
-  if (isLoading && !isCreateMode) {
+  const showEditSkeleton =
+    !isCreateMode &&
+    (isCoreSettingsEdit ? settingsLoading : isLoading);
+
+  if (showEditSkeleton) {
     return (
       <div className="space-y-6">
         {/* Header Skeleton */}
@@ -335,7 +454,12 @@ const EmailTemplateForm: React.FC = () => {
             <p className="text-gray-500 dark:text-gray-400 mt-1">
               {isCreateMode
                 ? __("Create a new custom email template")
-                : templateData?.name}
+                : isCoreSettingsEdit
+                  ? __(
+                      "Core customer email (saved with site settings). From address is set under Email → Delivery.",
+                      "yatra",
+                    )
+                  : String(templateData?.name ?? "")}
             </p>
           </div>
         </div>
@@ -343,10 +467,16 @@ const EmailTemplateForm: React.FC = () => {
           {!isCreateMode && (
             <Button
               variant="outline"
-              onClick={() => previewMutation.mutate()}
-              disabled={previewMutation.isPending}
+              onClick={() =>
+                isCoreSettingsEdit
+                  ? corePreviewMutation.mutate()
+                  : previewMutation.mutate()
+              }
+              disabled={
+                previewMutation.isPending || corePreviewMutation.isPending
+              }
             >
-              {previewMutation.isPending ? (
+              {previewMutation.isPending || corePreviewMutation.isPending ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : (
                 <Eye className="w-4 h-4 mr-2" />
@@ -356,10 +486,10 @@ const EmailTemplateForm: React.FC = () => {
           )}
           <Button
             onClick={handleSubmit}
-            disabled={saveMutation.isPending}
+            disabled={saveMutation.isPending || saveCoreMutation.isPending}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
-            {saveMutation.isPending ? (
+            {saveMutation.isPending || saveCoreMutation.isPending ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : (
               <Save className="w-4 h-4 mr-2" />
@@ -402,6 +532,8 @@ const EmailTemplateForm: React.FC = () => {
                     setFormData({ ...formData, name: e.target.value })
                   }
                   placeholder={__("Enter template name")}
+                  readOnly={isCoreSettingsEdit}
+                  className={isCoreSettingsEdit ? "bg-gray-50 dark:bg-gray-900/40" : ""}
                 />
               </div>
 
@@ -417,6 +549,8 @@ const EmailTemplateForm: React.FC = () => {
                   placeholder={__(
                     "Brief description of when this email is sent",
                   )}
+                  readOnly={isCoreSettingsEdit}
+                  className={isCoreSettingsEdit ? "bg-gray-50 dark:bg-gray-900/40" : ""}
                 />
               </div>
 
@@ -425,7 +559,7 @@ const EmailTemplateForm: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {__("Trigger Event")}
                 </label>
-                {templateData?.is_system ? (
+                {Boolean(templateData?.is_system) || isCoreSettingsEdit ? (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
@@ -600,79 +734,92 @@ const EmailTemplateForm: React.FC = () => {
                 </p>
               </div>
 
-              {/* From/Reply-To Settings */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {__("From Name")}
-                  </label>
-                  <Input
-                    value={formData.from_name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, from_name: e.target.value })
-                    }
-                    placeholder={__("e.g., Travel Agency Name")}
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {__("Leave empty to use site default")}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {__("From Email")}
-                  </label>
-                  <Input
-                    type="email"
-                    value={formData.from_email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, from_email: e.target.value })
-                    }
-                    placeholder={__("e.g., noreply@yoursite.com")}
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {__("Leave empty to use site default")}
-                  </p>
-                </div>
-              </div>
+              {!isCoreSettingsEdit && (
+                <>
+                  {/* From/Reply-To Settings */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        {__("From Name")}
+                      </label>
+                      <Input
+                        value={formData.from_name}
+                        onChange={(e) =>
+                          setFormData({ ...formData, from_name: e.target.value })
+                        }
+                        placeholder={__("e.g., Travel Agency Name")}
+                      />
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {__("Leave empty to use site default")}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        {__("From Email")}
+                      </label>
+                      <Input
+                        type="email"
+                        value={formData.from_email}
+                        onChange={(e) =>
+                          setFormData({ ...formData, from_email: e.target.value })
+                        }
+                        placeholder={__("e.g., noreply@yoursite.com")}
+                      />
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {__("Leave empty to use site default")}
+                      </p>
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {__("To Email")}
-                  </label>
-                  <Input
-                    type="email"
-                    value={formData.to_email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, to_email: e.target.value })
-                    }
-                    placeholder={__("e.g., {{customer_email}}")}
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {__(
-                      "Recipient email. Use variables or leave empty for default",
-                    )}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {__("Reply-To Email")}
-                  </label>
-                  <Input
-                    type="email"
-                    value={formData.reply_to}
-                    onChange={(e) =>
-                      setFormData({ ...formData, reply_to: e.target.value })
-                    }
-                    placeholder={__("e.g., support@yoursite.com")}
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {__(
-                      "Where replies will be sent. Leave empty to use From Email",
-                    )}
-                  </p>
-                </div>
-              </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        {__("To Email")}
+                      </label>
+                      <Input
+                        type="email"
+                        value={formData.to_email}
+                        onChange={(e) =>
+                          setFormData({ ...formData, to_email: e.target.value })
+                        }
+                        placeholder={__("e.g., {{customer_email}}")}
+                      />
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {__(
+                          "Recipient email. Use variables or leave empty for default",
+                        )}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        {__("Reply-To Email")}
+                      </label>
+                      <Input
+                        type="email"
+                        value={formData.reply_to}
+                        onChange={(e) =>
+                          setFormData({ ...formData, reply_to: e.target.value })
+                        }
+                        placeholder={__("e.g., support@yoursite.com")}
+                      />
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {__(
+                          "Where replies will be sent. Leave empty to use From Email",
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {isCoreSettingsEdit && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 rounded-lg border border-gray-200 dark:border-gray-600 p-3 bg-gray-50 dark:bg-gray-800/50">
+                  {__(
+                    "From / reply addresses are configured under Email → Delivery. Recipient uses the customer on the booking.",
+                    "yatra",
+                  )}
+                </p>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -710,7 +857,7 @@ const EmailTemplateForm: React.FC = () => {
           </Card>
 
           {/* Test Email - Only show in edit mode */}
-          {!isCreateMode && (
+          {!isCreateMode && !isCoreSettingsEdit && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -758,11 +905,43 @@ const EmailTemplateForm: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {__("Click to copy, double-click to insert at cursor")}
-              </p>
+              {!isCoreSettingsEdit && (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {__("Click to copy, double-click to insert at cursor")}
+                </p>
+              )}
 
-              {variablesData &&
+              {isCoreSettingsEdit && coreDef?.mergeTags ? (
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
+                    {__("Merge tags", "yatra")}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {__(
+                      "Click a tag to copy; paste into subject or HTML body.",
+                      "yatra",
+                    )}
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {coreDef.mergeTags.split(",").map((raw) => {
+                      const tag = raw.trim();
+                      const inner = tag.replace(/\{\{|\}\}/g, "").trim();
+                      if (!inner) return null;
+                      return (
+                        <button
+                          key={tag}
+                          type="button"
+                          onClick={() => copyVariable(inner)}
+                          className="rounded border border-gray-200 dark:border-gray-600 px-2 py-1 text-xs font-mono text-blue-600 dark:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+                        >
+                          {tag}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                variablesData &&
                 Object.entries(variablesData).map(
                   ([category, variables]: [string, any]) => (
                     <div key={category}>
@@ -796,7 +975,8 @@ const EmailTemplateForm: React.FC = () => {
                       </div>
                     </div>
                   ),
-                )}
+                )
+              )}
             </CardContent>
           </Card>
 
@@ -851,7 +1031,9 @@ const EmailTemplateForm: React.FC = () => {
                       {__("Key")}
                     </span>
                     <code className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">
-                      {templateData?.template_key}
+                      {isCoreSettingsEdit
+                        ? coreDef?.template_key
+                        : String(templateData?.template_key ?? "")}
                     </code>
                   </div>
                   <div className="flex justify-between">
@@ -859,7 +1041,9 @@ const EmailTemplateForm: React.FC = () => {
                       {__("Category")}
                     </span>
                     <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                      {templateData?.category}
+                      {isCoreSettingsEdit
+                        ? coreDef?.category
+                        : String(templateData?.category ?? "")}
                     </Badge>
                   </div>
                   <div className="flex justify-between">
@@ -868,12 +1052,17 @@ const EmailTemplateForm: React.FC = () => {
                     </span>
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                        templateData?.recipient_type === "admin"
+                        (isCoreSettingsEdit
+                          ? coreDef?.recipient_type
+                          : String(templateData?.recipient_type ?? "")) ===
+                          "admin"
                           ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
                           : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
                       }`}
                     >
-                      {templateData?.recipient_type === "admin"
+                      {(isCoreSettingsEdit
+                        ? coreDef?.recipient_type
+                        : String(templateData?.recipient_type ?? "")) === "admin"
                         ? __("Admin")
                         : __("Customer")}
                     </span>
@@ -883,7 +1072,9 @@ const EmailTemplateForm: React.FC = () => {
                       {__("Type")}
                     </span>
                     <span className="text-gray-900 dark:text-white">
-                      {templateData?.is_system ? __("System") : __("Custom")}
+                      {isCoreSettingsEdit || Boolean(templateData?.is_system)
+                        ? __("System")
+                        : __("Custom")}
                     </span>
                   </div>
                 </>
@@ -893,77 +1084,15 @@ const EmailTemplateForm: React.FC = () => {
         </div>
       </div>
 
-      {/* Preview Modal */}
-      {showPreview && previewData && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2"
-          onClick={() => setShowPreview(false)}
-        >
-          <div
-            className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-[95vw] max-w-6xl h-[95vh] max-h-[95vh] overflow-hidden flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex-shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                  <Eye className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {__("Email Preview")}
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {__("Preview with sample data")}
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowPreview(false)}
-                className="rounded-full w-8 h-8 p-0"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-
-            {/* Subject Line */}
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
-              <div className="flex items-center gap-2 mb-1">
-                <Mail className="w-4 h-4 text-gray-400" />
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                  {__("Subject")}
-                </span>
-              </div>
-              <p className="text-base font-medium text-gray-900 dark:text-white">
-                {previewData.subject}
-              </p>
-            </div>
-
-            {/* Email Body */}
-            <div className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-950">
-              <div className="p-6 h-full">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-full">
-                  <iframe
-                    srcDoc={previewData.body}
-                    className="w-full h-full min-h-[500px] border-0"
-                    title="Email Preview"
-                    sandbox="allow-same-origin"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-              <Button variant="outline" onClick={() => setShowPreview(false)}>
-                {__("Close")}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EmailPreviewModal
+        open={showPreview && Boolean(previewData)}
+        onClose={() => {
+          setShowPreview(false);
+          setPreviewData(null);
+        }}
+        subject={previewData?.subject ?? ""}
+        body={previewData?.body ?? ""}
+      />
     </div>
   );
 };

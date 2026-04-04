@@ -87,7 +87,7 @@ class EmailService
             $mail->SMTPAuth = true;
             $mail->Username = $smtp_username;
             $mail->Password = $smtp_password;
-            $mail->SMTPSecure = $smtp_encryption === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
+            self::configureSmtpEncryption($mail, $smtp_encryption);
             $mail->Port = $smtp_port;
             
             // Recipients
@@ -137,6 +137,24 @@ class EmailService
         }
     }
     
+    private static function configureSmtpEncryption(PHPMailer $mail, string $smtp_encryption): void
+    {
+        if ($smtp_encryption === 'ssl') {
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->SMTPAutoTLS = true;
+
+            return;
+        }
+        if ($smtp_encryption === 'tls') {
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->SMTPAutoTLS = true;
+
+            return;
+        }
+        $mail->SMTPSecure = '';
+        $mail->SMTPAutoTLS = false;
+    }
+
     /**
      * Custom from email filter
      */
@@ -182,7 +200,7 @@ class EmailService
             $mail->SMTPAuth = true;
             $mail->Username = $smtp_username;
             $mail->Password = $smtp_password;
-            $mail->SMTPSecure = $smtp_encryption === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
+            self::configureSmtpEncryption($mail, $smtp_encryption);
             $mail->Port = $smtp_port;
             $mail->Timeout = 10;
             

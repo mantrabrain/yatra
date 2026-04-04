@@ -370,17 +370,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       { subpage: "enquiries", label: "Enquiries", icon: MessageSquare },
       { subpage: "reviews", label: "Reviews", icon: Star },
       { subpage: "reports", label: "Reports", icon: BarChart3 },
-      // Email Automation - show only if Pro plugin is active and module is enabled
-      ...(isProPluginActive() && isModuleActive("email_automation")
-        ? [
-            {
-              subpage: "email-automation",
-              label: "Email Automation",
-              icon: Mail,
-              isPremium: true,
-            },
-          ]
-        : []),
+      // Email — SMTP & transactional for all; Pro adds automation tabs on the same screen
+      {
+        subpage: "email-automation",
+        label: __("Email", "yatra"),
+        icon: Mail,
+        isPremium: false,
+      },
       // Abandoned Booking Recovery - show only if Pro plugin is active and module is enabled
       ...(isProPluginActive() && isModuleActive("abandoned_booking_recovery")
         ? [

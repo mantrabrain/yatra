@@ -9,6 +9,7 @@ import { ArrowLeft, Save, Loader2, Edit2, X, Eye } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { usePermissions } from "../hooks/usePermissions";
 import { useToast } from "../components/ui/toast";
+import { fetchSettings } from "../api/settings-api";
 import { apiClient } from "../lib/api-client";
 import { generateSlug } from "../lib/slug";
 import { Button } from "../components/ui/button";
@@ -94,7 +95,7 @@ const DestinationForm: React.FC = () => {
     queryKey: ["settings"],
     queryFn: async () => {
       try {
-        const response = await apiClient.get("/settings");
+        const response = await fetchSettings();
         return response?.data || response;
       } catch (error) {
         return {};

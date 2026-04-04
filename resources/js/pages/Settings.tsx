@@ -49,6 +49,15 @@ import { __ } from "../lib/i18n";
 import { usePermissions } from "../hooks/usePermissions";
 import { useToast } from "../components/ui/toast";
 import { apiClient, apiService } from "../lib/api-client";
+import {
+  fetchBookingPageShortcodeStatus,
+  fetchPaymentGatewayDefinitions,
+  fetchSettings,
+  fetchWordPressPages,
+  postFlushRewriteRules,
+  postInsertBookingShortcode,
+  saveSettings,
+} from "../api/settings-api";
 import { Button } from "../components/ui/button";
 import { ProFeature, ProBadge } from "../components/ProFeature";
 import { PremiumUpgradeDialog } from "../components/modules/PremiumUpgradeDialog";
@@ -596,7 +605,6 @@ type SettingsSection =
   | "booking"
   | "booking_form"
   | "payment"
-  | "email"
   | "trip"
   | "customer"
   | "review"
@@ -747,6 +755,7 @@ interface SettingsData {
   email_template_confirmation: boolean;
   email_template_cancellation: boolean;
   email_template_reminder: boolean;
+  email_template_admin_new_booking: boolean;
   smtp_enabled: boolean;
   smtp_host: string;
   smtp_port: number;
@@ -754,7 +763,17 @@ interface SettingsData {
   smtp_password: string;
   smtp_encryption: string;
 
-  
+  email_tpl_booking_subject: string;
+  email_tpl_booking_body: string;
+  email_tpl_payment_subject: string;
+  email_tpl_payment_body: string;
+  email_tpl_cancellation_subject: string;
+  email_tpl_cancellation_body: string;
+  email_tpl_reminder_subject: string;
+  email_tpl_reminder_body: string;
+  email_tpl_admin_booking_subject: string;
+  email_tpl_admin_booking_body: string;
+
   // Customer Settings
   customer_registration: boolean;
   customer_fields: string[];
@@ -1987,6 +2006,9 @@ const Settings: React.FC = () => {
   const getInitialActiveSection = (): SettingsSection => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("yatra_settings_active_section");
+      if (saved === "email") {
+        return "notification";
+      }
       if (
         saved &&
         [
@@ -1994,7 +2016,6 @@ const Settings: React.FC = () => {
           "booking",
           "booking_form",
           "payment",
-          "email",
           "trip",
           "customer",
           "review",
@@ -2036,8 +2057,7 @@ const Settings: React.FC = () => {
     queryKey: ["settings"],
     queryFn: async () => {
       try {
-        const response = await apiClient.get("/settings");
-        return response;
+        return await fetchSettings();
       } catch (error: any) {
         console.error('Error fetching settings:', error);
         showToast(
@@ -2060,7 +2080,9 @@ const Settings: React.FC = () => {
     queryKey: ["payment-gateways-definitions"],
     queryFn: async () => {
       try {
-        const response = await apiClient.get("/payment/gateways/definitions");
+        const response = (await fetchPaymentGatewayDefinitions()) as {
+          gateways?: Record<string, GatewayDefinition>;
+        };
         return response.gateways || {};
       } catch (error: any) {
         console.error("Failed to load gateway definitions:", error);
@@ -2194,12 +2216,23 @@ const Settings: React.FC = () => {
       email_template_confirmation: true,
       email_template_cancellation: true,
       email_template_reminder: true,
+      email_template_admin_new_booking: true,
       smtp_enabled: false,
       smtp_host: "smtp.gmail.com",
       smtp_port: 587,
       smtp_username: "",
       smtp_password: "",
       smtp_encryption: "tls",
+      email_tpl_booking_subject: "",
+      email_tpl_booking_body: "",
+      email_tpl_payment_subject: "",
+      email_tpl_payment_body: "",
+      email_tpl_cancellation_subject: "",
+      email_tpl_cancellation_body: "",
+      email_tpl_reminder_subject: "",
+      email_tpl_reminder_body: "",
+      email_tpl_admin_booking_subject: "",
+      email_tpl_admin_booking_body: "",
             customer_registration: true,
       customer_fields: ["name", "email", "phone", "address"],
       require_email_verification: false,
@@ -3067,7 +3100,7 @@ const Settings: React.FC = () => {
   const saveMutation = useMutation({
     mutationFn: async (data: SettingsData) => {
       try {
-        await apiClient.put("/settings", data);
+        await saveSettings(data as Record<string, unknown>);
         return data;
       } catch (error: any) {
         showToast(
@@ -3095,8 +3128,7 @@ const Settings: React.FC = () => {
   // Flush rewrite rules mutation - must be at top level
   const flushRewriteRulesMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiClient.post("/settings/flush-rewrite-rules");
-      return response;
+      return await postFlushRewriteRules();
     },
     onSuccess: () => {
       showToast(__("Rewrite rules flushed successfully", "yatra"), "success");
@@ -3113,7 +3145,7 @@ const Settings: React.FC = () => {
   const { data: pagesData } = useQuery({
     queryKey: ["wordpress-pages"],
     queryFn: async () => {
-      const response = await apiClient.get("/settings/pages");
+      const response = await fetchWordPressPages();
       return response as Array<{
         id: number;
         title: string;
@@ -3127,9 +3159,7 @@ const Settings: React.FC = () => {
   // Check shortcode on-demand when user selects a page
   const checkShortcodeMutation = useMutation({
     mutationFn: async (pageId: number) => {
-      const response = await apiClient.get(
-        `/settings/check-shortcode/${pageId}`,
-      );
+      const response = await fetchBookingPageShortcodeStatus(pageId);
       return response as {
         has_shortcode: boolean;
         page_title: string;
@@ -3142,10 +3172,7 @@ const Settings: React.FC = () => {
   // Insert shortcode mutation
   const insertShortcodeMutation = useMutation({
     mutationFn: async (pageId: number) => {
-      const response = await apiClient.post(
-        `/settings/insert-shortcode/${pageId}`,
-      );
-      return response;
+      return await postInsertBookingShortcode(pageId);
     },
     onSuccess: () => {
       showToast(__("Shortcode added successfully", "yatra"), "success");
@@ -3274,7 +3301,6 @@ const Settings: React.FC = () => {
       label: __("Payment", "yatra"),
       icon: DollarSign,
     },
-    { id: "email" as SettingsSection, label: __("Email", "yatra"), icon: Mail },
     {
       id: "customer" as SettingsSection,
       label: __("Customer", "yatra"),
@@ -4690,243 +4716,6 @@ const Settings: React.FC = () => {
           </div>
         );
 
-      case "email":
-        return (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-                {__("Email Configuration", "yatra")}
-              </h3>
-              <div className="space-y-4">
-                <FormField
-                  id="admin_email"
-                  label={__("Admin Email", "yatra")}
-                  description={__(
-                    "Email address to receive admin notifications",
-                    "yatra",
-                  )}
-                  required
-                >
-                  <Input
-                    id="admin_email"
-                    type="email"
-                    value={formData.admin_email}
-                    name="admin_email"
-                    onChange={handleFieldChange}
-                    placeholder={__("admin@example.com", "yatra")}
-                  />
-                </FormField>
-
-                <FormField
-                  id="from_email"
-                  label={__("From Email", "yatra")}
-                  description={__(
-                    "Email address used as sender for customer emails",
-                    "yatra",
-                  )}
-                  required
-                >
-                  <Input
-                    id="from_email"
-                    type="email"
-                    value={formData.from_email}
-                    name="from_email"
-                    onChange={handleFieldChange}
-                    placeholder={__("noreply@example.com", "yatra")}
-                  />
-                </FormField>
-
-                <FormField
-                  id="from_name"
-                  label={__("From Name", "yatra")}
-                  description={__(
-                    "Name displayed as sender in customer emails",
-                    "yatra",
-                  )}
-                >
-                  <Input
-                    id="from_name"
-                    value={formData.from_name}
-                    name="from_name"
-                    onChange={handleFieldChange}
-                    placeholder={__("Travel Agency Name", "yatra")}
-                  />
-                </FormField>
-              </div>
-            </div>
-
-            <SectionDivider title={__("Email Templates", "yatra")} />
-
-            <div className="space-y-3">
-              {[
-                {
-                  id: "email_template_booking",
-                  label: __("Booking Confirmation Email", "yatra"),
-                  desc: __("Send email when booking is confirmed", "yatra"),
-                },
-                {
-                  id: "email_template_confirmation",
-                  label: __("Payment Confirmation Email", "yatra"),
-                  desc: __("Send email when payment is received", "yatra"),
-                },
-                {
-                  id: "email_template_cancellation",
-                  label: __("Cancellation Email", "yatra"),
-                  desc: __("Send email when booking is cancelled", "yatra"),
-                },
-                {
-                  id: "email_template_reminder",
-                  label: __("Booking Reminder Email", "yatra"),
-                  desc: __("Send reminder email before departure", "yatra"),
-                },
-              ].map((template) => (
-                <div
-                  key={template.id}
-                  className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md"
-                >
-                  <input
-                    type="checkbox"
-                    id={template.id}
-                    checked={
-                      formData[template.id as keyof SettingsData] as boolean
-                    }
-                    name={template.id}
-                    onChange={handleFieldChange}
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <div className="flex-1">
-                    <Label
-                      htmlFor={template.id}
-                      className="font-medium cursor-pointer"
-                    >
-                      {template.label}
-                    </Label>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                      {template.desc}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <SectionDivider title={__("SMTP Settings (Optional)", "yatra")} />
-
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                <input
-                  type="checkbox"
-                  id="smtp_enabled"
-                  checked={formData.smtp_enabled}
-                  name="smtp_enabled"
-                  onChange={handleFieldChange}
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <div className="flex-1">
-                  <Label
-                    htmlFor="smtp_enabled"
-                    className="font-medium cursor-pointer"
-                  >
-                    {__("Enable SMTP", "yatra")}
-                  </Label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__(
-                      "Use custom SMTP server instead of default WordPress mail",
-                      "yatra",
-                    )}
-                  </p>
-                </div>
-              </div>
-
-              {formData.smtp_enabled && (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      id="smtp_host"
-                      label={__("SMTP Host", "yatra")}
-                      description={__("SMTP server address", "yatra")}
-                    >
-                      <Input
-                        id="smtp_host"
-                        value={formData.smtp_host}
-                        name="smtp_host"
-                        onChange={handleFieldChange}
-                        placeholder="smtp.gmail.com"
-                      />
-                    </FormField>
-
-                    <FormField
-                      id="smtp_port"
-                      label={__("SMTP Port", "yatra")}
-                      description={__(
-                        "SMTP server port (usually 587 or 465)",
-                        "yatra",
-                      )}
-                    >
-                      <Input
-                        id="smtp_port"
-                        type="number"
-                        value={formData.smtp_port}
-                        name="smtp_port"
-                        onChange={handleFieldChange}
-                        placeholder="587"
-                      />
-                    </FormField>
-                  </div>
-
-                  <FormField
-                    id="smtp_encryption"
-                    label={__("Encryption", "yatra")}
-                    description={__("Connection encryption type", "yatra")}
-                  >
-                    <Select
-                      id="smtp_encryption"
-                      value={formData.smtp_encryption}
-                      name="smtp_encryption"
-                      onChange={handleFieldChange}
-                    >
-                      <option value="tls">{__("TLS", "yatra")}</option>
-                      <option value="ssl">{__("SSL", "yatra")}</option>
-                      <option value="none">{__("None", "yatra")}</option>
-                    </Select>
-                  </FormField>
-
-                  <FormField
-                    id="smtp_username"
-                    label={__("SMTP Username", "yatra")}
-                    description={__("Your SMTP account username", "yatra")}
-                  >
-                    <Input
-                      id="smtp_username"
-                      value={formData.smtp_username}
-                      name="smtp_username"
-                      onChange={handleFieldChange}
-                      placeholder={__("your-email@gmail.com", "yatra")}
-                    />
-                  </FormField>
-
-                  <FormField
-                    id="smtp_password"
-                    label={__("SMTP Password", "yatra")}
-                    description={__(
-                      "Your SMTP account password or app password",
-                      "yatra",
-                    )}
-                  >
-                    <Input
-                      id="smtp_password"
-                      type="password"
-                      value={formData.smtp_password}
-                      name="smtp_password"
-                      onChange={handleFieldChange}
-                      placeholder={__("Enter SMTP password", "yatra")}
-                    />
-                  </FormField>
-                </>
-              )}
-            </div>
-          </div>
-        );
-
       case "customer":
         return (
           <div className="space-y-6">
@@ -5515,6 +5304,23 @@ const Settings: React.FC = () => {
       case "notification":
         return (
           <div className="space-y-6">
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-100">
+              <p className="font-medium">
+                {__("Customer email delivery & templates", "yatra")}
+              </p>
+              <p className="mt-1 text-blue-800/90 dark:text-blue-200/90">
+                {__(
+                  "SMTP, From/Admin addresses are under Email → Delivery; core templates (booking, payment, cancellation, reminder, and admin new-booking) are under Email → Templates.",
+                  "yatra",
+                )}
+              </p>
+              <a
+                href="admin.php?page=yatra&subpage=email-automation"
+                className="mt-2 inline-flex font-medium text-blue-700 underline underline-offset-2 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-200"
+              >
+                {__("Open Email", "yatra")}
+              </a>
+            </div>
             <div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
                 {__("Email Notifications", "yatra")}

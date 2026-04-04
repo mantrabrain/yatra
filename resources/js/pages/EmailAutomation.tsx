@@ -1,86 +1,50 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { __ } from "../lib/i18n";
-import { apiClient } from "../lib/api-client";
+import {
+  deleteEmailSequence,
+  fetchEmailLogs,
+  fetchEmailSequences,
+  updateEmailSequenceStatus,
+} from "../api/email-automation-api";
 import { useToast } from "../components/ui/toast";
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
-import { Select } from "../components/ui/select";
 import { PageHeader } from "../components/common/PageHeader";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
-import { Switch } from "../components/ui/switch";
-import {
-  Table as SharedTable,
-  BulkActionToolbar,
-  Pagination,
-} from "../components/shared";
 import PremiumUpgradeCard from "./premium-pages/EmailAutomation";
 import {
   Mail,
   Edit,
-  Search,
-  CheckCircle,
   Clock,
   FileText,
-  CreditCard,
-  MessageSquare,
   Bell,
-  Megaphone,
   Plus,
   Trash2,
   Play,
   Pause,
-  Calendar,
   Zap,
   GitBranch,
-  Copy,
+  Loader2,
+  Save,
+  Settings2,
+  Send,
 } from "lucide-react";
-import { isProPluginActive } from "../lib/plugin-utils";
-
-interface EmailTemplate {
-  id: number;
-  template_key: string;
-  event_key: string;
-  name: string;
-  description: string;
-  subject: string;
-  body: string;
-  category: string;
-  recipient_type: "customer" | "admin";
-  is_active: boolean;
-  is_system: boolean;
-  variables: string[];
-  to_email?: string;
-  from_email?: string;
-  from_name?: string;
-  reply_to?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-// Helper to detect actual recipient type based on to_email field
-const getEffectiveRecipientType = (
-  template: EmailTemplate,
-): "customer" | "admin" => {
-  const toEmail = template.to_email || "";
-  // If to_email contains admin_email placeholder, it's for admin
-  if (toEmail.includes("{{admin_email}}") || toEmail.includes("admin")) {
-    return "admin";
-  }
-  // If to_email contains customer_email placeholder or is empty (default to customer), it's for customer
-  if (toEmail.includes("{{customer_email}}") || toEmail === "") {
-    return "customer";
-  }
-  // Fall back to the stored recipient_type
-  return template.recipient_type;
-};
+import {
+  isProPluginActive,
+  isEmailAutomationModuleEnabled,
+} from "../lib/plugin-utils";
+import { useEmailSettingsManager } from "../hooks/useEmailSettingsManager";
+import { EmailDeliverySection } from "../components/settings/EmailDeliverySection";
+import { EmailTemplatesList } from "../components/email/EmailTemplatesList";
+import { Pagination } from "../components/shared";
 
 interface EmailLog {
   id: number;
@@ -91,628 +55,6 @@ interface EmailLog {
   status: "sent" | "failed" | "opened" | "clicked";
   sent_at: string;
 }
-
-const isModuleAvailable = (): boolean => {
-  if (!isProPluginActive()) {
-    return false;
-  }
-  const raw = (window as any).yatraAdmin?.emailAutomationEnabled;
-  return raw === true || raw === "true" || raw === 1 || raw === "1";
-};
-
-const categoryIcons: Record<string, React.ElementType> = {
-  booking: FileText,
-  payment: CreditCard,
-  enquiry: MessageSquare,
-  reminder: Bell,
-  marketing: Megaphone,
-};
-
-const EmailTemplatesList: React.FC = () => {
-  const queryClient = useQueryClient();
-  const { showToast } = useToast();
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-  const [recipientFilter, setRecipientFilter] = useState("all");
-  const [eventFilter, setEventFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [bulkAction, setBulkAction] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
-
-  // Column visibility state with localStorage
-  const [visibleColumns, setVisibleColumns] = useState(() => {
-    const saved = localStorage.getItem("yatra-email-templates-columns");
-    return saved
-      ? JSON.parse(saved)
-      : {
-          name: true,
-          event: true,
-          description: true,
-          category: true,
-          recipient_type: true,
-          is_active: true,
-        };
-  });
-
-  const toggleColumn = (columnKey: string) => {
-    const newVisibleColumns = {
-      ...visibleColumns,
-      [columnKey]: !visibleColumns[columnKey],
-    };
-    setVisibleColumns(newVisibleColumns);
-    localStorage.setItem(
-      "yatra-email-templates-columns",
-      JSON.stringify(newVisibleColumns),
-    );
-  };
-
-  const { data: templatesData, isLoading } = useQuery({
-    queryKey: ["email-templates"],
-    queryFn: async () => {
-      const response = await apiClient.get("/email-templates");
-      return response;
-    },
-    enabled: isModuleAvailable(),
-  });
-
-  const toggleMutation = useMutation({
-    mutationFn: async ({
-      id,
-      is_active,
-    }: {
-      id: number;
-      is_active: boolean;
-    }) => {
-      return await apiClient.put(`/email-templates/${id}`, { is_active });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["email-templates"] });
-      showToast(__("Template updated"), "success");
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return await apiClient.delete(`/email-templates/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["email-templates"] });
-      showToast(__("Template deleted"), "success");
-    },
-    onError: (error: any) => {
-      showToast(error?.message || __("Failed to delete template"), "error");
-    },
-  });
-
-  const duplicateMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return await apiClient.post(`/email-templates/${id}/duplicate`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["email-templates"] });
-      showToast(__("Template duplicated successfully"), "success");
-    },
-    onError: (error: any) => {
-      showToast(error?.message || __("Failed to duplicate template"), "error");
-    },
-  });
-
-  // Bulk delete mutation (only deletes custom templates)
-  const bulkDeleteMutation = useMutation({
-    mutationFn: async (ids: number[]) => {
-      // Filter to only delete custom templates
-      const customTemplateIds = ids.filter((id) => {
-        const template = templates.find((t: EmailTemplate) => t.id === id);
-        return template && !template.is_system;
-      });
-
-      if (customTemplateIds.length === 0) {
-        throw new Error(
-          __(
-            "No custom templates selected. System templates cannot be deleted.",
-          ),
-        );
-      }
-
-      // Delete each custom template
-      await Promise.all(
-        customTemplateIds.map((id) =>
-          apiClient.delete(`/email-templates/${id}`),
-        ),
-      );
-      return {
-        deleted: customTemplateIds.length,
-        skipped: ids.length - customTemplateIds.length,
-      };
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["email-templates"] });
-      setSelectedIds([]);
-      setBulkAction("");
-      if (data.skipped > 0) {
-        showToast(
-          __(
-            `Deleted ${data.deleted} template(s). ${data.skipped} system template(s) were skipped.`,
-          ),
-          "success",
-        );
-      } else {
-        showToast(__(`Deleted ${data.deleted} template(s)`), "success");
-      }
-    },
-    onError: (error: any) => {
-      showToast(error?.message || __("Failed to delete templates"), "error");
-    },
-  });
-
-  const templates = templatesData?.data || [];
-  const categories: string[] = [
-    ...new Set(templates.map((t: EmailTemplate) => t.category)),
-  ] as string[];
-
-  const filteredTemplates = useMemo(() => {
-    return templates.filter((t: EmailTemplate) => {
-      const matchesSearch =
-        !searchTerm ||
-        t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory =
-        categoryFilter === "all" || t.category === categoryFilter;
-      const matchesRecipient =
-        recipientFilter === "all" || t.recipient_type === recipientFilter;
-      const matchesEvent = eventFilter === "all" || t.event_key === eventFilter;
-      const matchesStatus =
-        statusFilter === "all" ||
-        (statusFilter === "active" && t.is_active) ||
-        (statusFilter === "inactive" && !t.is_active);
-      return (
-        matchesSearch &&
-        matchesCategory &&
-        matchesRecipient &&
-        matchesEvent &&
-        matchesStatus
-      );
-    });
-  }, [
-    templates,
-    searchTerm,
-    categoryFilter,
-    recipientFilter,
-    eventFilter,
-    statusFilter,
-  ]);
-
-  // Pagination calculations
-  const totalFilteredItems = filteredTemplates.length;
-  const totalPages = Math.ceil(totalFilteredItems / itemsPerPage);
-  const paginatedTemplates = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredTemplates.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredTemplates, currentPage, itemsPerPage]);
-
-  // Reset to page 1 when filters change
-  useMemo(() => {
-    setCurrentPage(1);
-  }, [searchTerm, categoryFilter, recipientFilter, eventFilter, statusFilter]);
-
-  const handleEdit = (template: EmailTemplate) => {
-    window.location.href = `admin.php?page=yatra&subpage=email-automation&action=edit&id=${template.id}`;
-  };
-
-  // Delete confirmation dialog state
-  const [deleteDialog, setDeleteDialog] = useState<{
-    isOpen: boolean;
-    template: EmailTemplate | null;
-  }>({
-    isOpen: false,
-    template: null,
-  });
-
-  const handleDelete = useCallback((template: EmailTemplate) => {
-    setDeleteDialog({ isOpen: true, template });
-  }, []);
-
-  const confirmDelete = useCallback(() => {
-    if (deleteDialog.template) {
-      deleteMutation.mutate(deleteDialog.template.id);
-    }
-    setDeleteDialog({ isOpen: false, template: null });
-  }, [deleteDialog.template, deleteMutation]);
-
-  const cancelDelete = useCallback(() => {
-    setDeleteDialog({ isOpen: false, template: null });
-  }, []);
-
-  const handleDuplicate = (template: EmailTemplate) => {
-    duplicateMutation.mutate(template.id);
-  };
-
-  const handleCreate = () => {
-    window.location.href =
-      "admin.php?page=yatra&subpage=email-automation&tab=template&action=create";
-  };
-
-  const handleBulkAction = () => {
-    if (!bulkAction || selectedIds.length === 0) {
-      showToast(__("Please select templates and an action"), "error");
-      return;
-    }
-
-    if (bulkAction === "delete") {
-      // BulkActionToolbar handles confirmation dialog
-      bulkDeleteMutation.mutate(selectedIds);
-    }
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIds(filteredTemplates.map((t: EmailTemplate) => t.id));
-    } else {
-      setSelectedIds([]);
-    }
-  };
-
-  const handleSelectOne = (id: string | number, checked: boolean) => {
-    const numId = typeof id === "string" ? parseInt(id, 10) : id;
-    if (checked) {
-      setSelectedIds([...selectedIds, numId]);
-    } else {
-      setSelectedIds(selectedIds.filter((i) => i !== numId));
-    }
-  };
-
-  // Get events from window.yatraAdmin (passed from PHP)
-  const events = (window as any).yatraAdmin?.emailEvents || [];
-
-  // Helper to get event key (just return as-is since it's already in dot notation)
-  const formatEventKey = (eventKey: string) => {
-    return eventKey || "-";
-  };
-
-  const columns = [
-    {
-      key: "name",
-      label: __("Template"),
-      visible: visibleColumns.name,
-      render: (template: EmailTemplate) => {
-        const CategoryIcon = categoryIcons[template.category] || Mail;
-        return (
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-              <CategoryIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <a
-                href={`admin.php?page=yatra&subpage=email-automation&action=edit&id=${template.id}`}
-                className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline"
-              >
-                {template.name}
-              </a>
-              {template.is_system ? (
-                <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
-                  {__("System")}
-                </span>
-              ) : (
-                <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                  {__("Custom")}
-                </span>
-              )}
-            </div>
-          </div>
-        );
-      },
-    },
-    {
-      key: "event",
-      label: __("Event"),
-      visible: visibleColumns.event,
-      render: (template: EmailTemplate) => {
-        const eventInfo = events.find((e: any) => e.key === template.event_key);
-        return (
-          <span
-            className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 cursor-help"
-            title={eventInfo?.description || ""}
-          >
-            <Zap className="w-3 h-3" />
-            {formatEventKey(template.event_key)}
-          </span>
-        );
-      },
-    },
-    {
-      key: "description",
-      label: __("Description"),
-      visible: visibleColumns.description,
-      render: (template: EmailTemplate) => (
-        <span className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
-          {template.description || "-"}
-        </span>
-      ),
-    },
-    {
-      key: "category",
-      label: __("Category"),
-      visible: visibleColumns.category,
-      render: (template: EmailTemplate) => {
-        const CategoryIcon = categoryIcons[template.category] || Mail;
-        return (
-          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-            <CategoryIcon className="w-3 h-3" />
-            {template.category.charAt(0).toUpperCase() +
-              template.category.slice(1)}
-          </span>
-        );
-      },
-    },
-    {
-      key: "recipient_type",
-      label: __("Recipient"),
-      visible: visibleColumns.recipient_type,
-      render: (template: EmailTemplate) => {
-        const effectiveRecipient = getEffectiveRecipientType(template);
-        const toEmail = template.to_email || "";
-        return (
-          <div className="flex flex-col gap-1">
-            <span
-              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-fit ${
-                effectiveRecipient === "admin"
-                  ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
-                  : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-              }`}
-            >
-              {effectiveRecipient === "admin" ? __("Admin") : __("Customer")}
-            </span>
-            {toEmail && (
-              <span
-                className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]"
-                title={toEmail}
-              >
-                {toEmail}
-              </span>
-            )}
-          </div>
-        );
-      },
-    },
-    {
-      key: "is_active",
-      label: __("Status"),
-      visible: visibleColumns.is_active,
-      render: (template: EmailTemplate) => (
-        <Switch
-          checked={template.is_active}
-          onCheckedChange={(checked) =>
-            toggleMutation.mutate({ id: template.id, is_active: checked })
-          }
-          disabled={toggleMutation.isPending}
-        />
-      ),
-    },
-  ];
-
-  const actions = [
-    {
-      key: "edit",
-      label: __("Edit"),
-      icon: <Edit className="w-4 h-4" />,
-      onClick: handleEdit,
-    },
-    {
-      key: "duplicate",
-      label: __("Duplicate"),
-      icon: <Copy className="w-4 h-4" />,
-      onClick: handleDuplicate,
-    },
-    {
-      key: "delete",
-      label: __("Delete"),
-      icon: <Trash2 className="w-4 h-4" />,
-      onClick: handleDelete,
-      condition: (template: EmailTemplate) => !template.is_system,
-      variant: "destructive" as const,
-    },
-  ];
-
-  const columnOptions = [
-    { key: "name", label: __("Template"), visible: visibleColumns.name },
-    { key: "event", label: __("Event"), visible: visibleColumns.event },
-    {
-      key: "description",
-      label: __("Description"),
-      visible: visibleColumns.description,
-    },
-    {
-      key: "category",
-      label: __("Category"),
-      visible: visibleColumns.category,
-    },
-    {
-      key: "recipient_type",
-      label: __("Recipient"),
-      visible: visibleColumns.recipient_type,
-    },
-    {
-      key: "is_active",
-      label: __("Status"),
-      visible: visibleColumns.is_active,
-    },
-  ];
-
-  return (
-    <div className="space-y-4">
-      {/* Create Template Button - Outside Filter Container */}
-      <div className="flex justify-end">
-        <Button
-          onClick={handleCreate}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          {__("Create Template")}
-        </Button>
-      </div>
-
-      {/* Filters - Grid Layout */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
-            {/* Search Field - Takes most space */}
-            <div className="lg:col-span-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder={__("Search templates...")}
-                  className="pl-10 w-full"
-                />
-              </div>
-            </div>
-
-            {/* Category Filter */}
-            <div className="lg:col-span-2">
-              <Select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full"
-              >
-                <option value="all">{__("All Categories")}</option>
-                {categories.map((cat: string) => (
-                  <option key={cat} value={cat}>
-                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                  </option>
-                ))}
-              </Select>
-            </div>
-
-            {/* Recipient Filter */}
-            <div className="lg:col-span-2">
-              <Select
-                value={recipientFilter}
-                onChange={(e) => setRecipientFilter(e.target.value)}
-                className="w-full"
-              >
-                <option value="all">{__("All Recipients")}</option>
-                <option value="customer">{__("Customer")}</option>
-                <option value="admin">{__("Admin")}</option>
-              </Select>
-            </div>
-
-            {/* Event Filter */}
-            <div className="lg:col-span-2">
-              <Select
-                value={eventFilter}
-                onChange={(e) => setEventFilter(e.target.value)}
-                className="w-full"
-              >
-                <option value="all">{__("All Events")}</option>
-                {events.map((event: any) => (
-                  <option key={event.key} value={event.key}>
-                    {event.name}
-                  </option>
-                ))}
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Bulk Actions - Outside of filter card */}
-      <BulkActionToolbar
-        selectedIds={selectedIds}
-        bulkAction={bulkAction}
-        setBulkAction={setBulkAction}
-        onApply={handleBulkAction}
-        onClearSelection={() => setSelectedIds([])}
-        statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
-        statusOptions={[
-          { key: "all", label: __("All"), count: templates.length },
-          {
-            key: "active",
-            label: __("Active"),
-            count: templates.filter((t: EmailTemplate) => t.is_active).length,
-          },
-          {
-            key: "inactive",
-            label: __("Inactive"),
-            count: templates.filter((t: EmailTemplate) => !t.is_active).length,
-          },
-        ]}
-        showColumnsDropdown={showColumnsDropdown}
-        setShowColumnsDropdown={setShowColumnsDropdown}
-        columnOptions={columnOptions}
-        onToggleColumn={toggleColumn}
-        bulkMutationPending={bulkDeleteMutation.isPending}
-        totalItems={filteredTemplates.length}
-        bulkActionOptions={[{ value: "delete", label: __("Delete") }]}
-      />
-
-      {/* Templates Table */}
-      <Card>
-        <CardContent className="p-0">
-          <SharedTable
-            data={paginatedTemplates}
-            columns={columns}
-            actions={actions}
-            isLoading={isLoading}
-            emptyText={__("No templates found")}
-            emptyDescription={__(
-              "Create your first email template to get started.",
-            )}
-            onCreateClick={handleCreate}
-            getItemId={(template: EmailTemplate) => template.id}
-            capability="manage_yatra"
-            skeletonRows={5}
-            selectedItemIds={selectedIds}
-            onSelectItem={handleSelectOne}
-            onSelectAll={handleSelectAll}
-            isAllSelected={
-              selectedIds.length > 0 &&
-              selectedIds.length === paginatedTemplates.length
-            }
-          />
-        </CardContent>
-      </Card>
-
-      {/* Pagination */}
-      {totalFilteredItems > itemsPerPage && (
-        <div className="mt-4">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalItems={totalFilteredItems}
-            itemsPerPage={itemsPerPage}
-            onPageChange={setCurrentPage}
-            itemName={__("templates")}
-          />
-        </div>
-      )}
-
-      {/* Delete Confirmation Dialog */}
-      <ConfirmationDialog
-        isOpen={deleteDialog.isOpen}
-        onClose={cancelDelete}
-        onConfirm={confirmDelete}
-        title={__("Delete Template")}
-        message={
-          deleteDialog.template
-            ? __(
-                'Are you sure you want to delete "{name}"? This action cannot be undone.',
-              ).replace("{name}", deleteDialog.template.name)
-            : ""
-        }
-        confirmText={__("Delete")}
-        cancelText={__("Cancel")}
-        variant="danger"
-        isLoading={deleteMutation.isPending}
-      />
-    </div>
-  );
-};
 
 interface EmailSequence {
   id: number;
@@ -726,61 +68,19 @@ interface EmailSequence {
   steps_count?: number;
 }
 
-const triggerTypes = [
-  {
-    value: "booking_created",
-    label: "Booking Created",
-    icon: Calendar,
-    description: "When a new booking is made",
-  },
-  {
-    value: "booking_confirmed",
-    label: "Booking Confirmed",
-    icon: CheckCircle,
-    description: "When booking status changes to confirmed",
-  },
-  {
-    value: "payment_received",
-    label: "Payment Received",
-    icon: CreditCard,
-    description: "When a payment is processed",
-  },
-  {
-    value: "days_before_trip",
-    label: "Days Before Trip",
-    icon: Clock,
-    description: "X days before the travel date",
-  },
-  {
-    value: "days_after_trip",
-    label: "Days After Trip",
-    icon: Clock,
-    description: "X days after the trip ends",
-  },
-  {
-    value: "enquiry_created",
-    label: "Enquiry Received",
-    icon: MessageSquare,
-    description: "When a new enquiry is submitted",
-  },
-];
-
 const EmailSequencesList: React.FC = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
 
   const { data: sequencesData, isLoading } = useQuery({
     queryKey: ["email-sequences"],
-    queryFn: async () => {
-      const response = await apiClient.get("/email-sequences");
-      return response;
-    },
-    enabled: isModuleAvailable(),
+    queryFn: () => fetchEmailSequences(),
+    enabled: isEmailAutomationModuleEnabled(),
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiClient.delete(`/email-sequences/${id}`);
+      return await deleteEmailSequence(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["email-sequences"] });
@@ -790,7 +90,7 @@ const EmailSequencesList: React.FC = () => {
 
   const toggleStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      return await apiClient.put(`/email-sequences/${id}`, { status });
+      return await updateEmailSequenceStatus(id, status);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["email-sequences"] });
@@ -798,7 +98,7 @@ const EmailSequencesList: React.FC = () => {
     },
   });
 
-  const sequences = sequencesData?.data || [];
+  const sequences = sequencesData || [];
 
   const navigateToCreate = () => {
     window.location.href =
@@ -875,9 +175,11 @@ const EmailSequencesList: React.FC = () => {
     }
   };
 
+  const emailEvents = (window as any).yatraAdmin?.emailEvents || [];
+
   const getTriggerLabel = (triggerType: string) => {
-    const trigger = triggerTypes.find((t) => t.value === triggerType);
-    return trigger?.label || triggerType;
+    const ev = emailEvents.find((e: { key?: string }) => e.key === triggerType);
+    return ev?.name || triggerType;
   };
 
   return (
@@ -1016,20 +318,18 @@ const EmailSequencesList: React.FC = () => {
 };
 
 const EmailLogsList: React.FC = () => {
-  const [page] = useState(1);
+  const [page, setPage] = useState(1);
+  const perPage = 20;
 
   const { data: logsData, isLoading } = useQuery({
-    queryKey: ["email-logs", page],
-    queryFn: async () => {
-      const response = await apiClient.get("/email-logs", {
-        params: { page, per_page: 20 },
-      });
-      return response;
-    },
-    enabled: isModuleAvailable(),
+    queryKey: ["email-logs", page, perPage],
+    queryFn: () => fetchEmailLogs({ page, per_page: perPage }),
+    enabled: isEmailAutomationModuleEnabled(),
   });
 
-  const logs = logsData?.data || [];
+  const logs = logsData?.items ?? [];
+  const totalItems = logsData?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
 
   if (isLoading) {
     return (
@@ -1136,7 +436,9 @@ const EmailLogsList: React.FC = () => {
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(log.sent_at).toLocaleDateString()}
+                      {log.sent_at
+                        ? new Date(log.sent_at).toLocaleString()
+                        : "—"}
                     </td>
                   </tr>
                 ))}
@@ -1144,43 +446,127 @@ const EmailLogsList: React.FC = () => {
             </table>
           </div>
         )}
+        {logs.length > 0 && totalPages > 1 && (
+          <div className="border-t border-gray-200 px-4 py-3 dark:border-gray-700">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={perPage}
+              onPageChange={setPage}
+              itemName={__("entries", "yatra")}
+            />
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 };
 
-const EmailAutomation: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<
-    "templates" | "sequences" | "logs"
-  >("templates");
+type EmailHubTab = "delivery" | "templates" | "sequences" | "logs";
 
-  if (!isModuleAvailable()) {
-    return <PremiumUpgradeCard />;
-  }
+function getInitialEmailHubTab(): EmailHubTab {
+  if (typeof window === "undefined") return "delivery";
+  const tab = new URLSearchParams(window.location.search).get("tab");
+  if (tab === "sequences" || tab === "sequence") return "sequences";
+  if (tab === "template" || tab === "templates") return "templates";
+  if (tab === "logs") return "logs";
+  if (tab === "delivery" || tab === "core") return "delivery";
+  return "delivery";
+}
+
+const EmailAutomationModulePrompt: React.FC = () => (
+  <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 dark:border-amber-800 dark:bg-amber-950/30">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex gap-3">
+        <Settings2 className="mt-0.5 h-6 w-6 shrink-0 text-amber-600 dark:text-amber-400" />
+        <div>
+          <h3 className="text-base font-semibold text-amber-900 dark:text-amber-100">
+            {__("Enable the Email Automation module", "yatra")}
+          </h3>
+          <p className="mt-1 text-sm text-amber-800/90 dark:text-amber-200/90">
+            {__(
+              "Yatra Pro is active. Turn on Email Automation under Modules to use custom templates, sequences, and send logs.",
+              "yatra",
+            )}
+          </p>
+        </div>
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        className="shrink-0 border-amber-300 bg-white hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950 dark:hover:bg-amber-900"
+        onClick={() => {
+          window.location.href =
+            "admin.php?page=yatra&subpage=modules";
+        }}
+      >
+        {__("Open Modules", "yatra")}
+      </Button>
+    </div>
+  </div>
+);
+
+const EmailAutomation: React.FC = () => {
+  const emailMgr = useEmailSettingsManager();
+  const [activeTab, setActiveTab] = useState<EmailHubTab>(() => {
+    const t = getInitialEmailHubTab();
+    if (
+      !isProPluginActive() &&
+      (t === "sequences" || t === "logs")
+    ) {
+      return "delivery";
+    }
+    return t;
+  });
+
+  const showProAutomationExtras = isProPluginActive();
+  const automationReady = isEmailAutomationModuleEnabled();
 
   const tabs = [
-    { key: "templates", label: __("Email Templates"), icon: FileText },
-    { key: "sequences", label: __("Sequences"), icon: GitBranch },
-    { key: "logs", label: __("Email Logs"), icon: Mail },
+    {
+      key: "delivery" as const,
+      label: __("Delivery", "yatra"),
+      icon: Send,
+    },
+    {
+      key: "templates" as const,
+      label: __("Templates", "yatra"),
+      icon: FileText,
+    },
+    ...(showProAutomationExtras
+      ? [
+          {
+            key: "sequences" as const,
+            label: __("Sequences", "yatra"),
+            icon: GitBranch,
+          },
+          {
+            key: "logs" as const,
+            label: __("Email logs", "yatra"),
+            icon: Mail,
+          },
+        ]
+      : []),
   ];
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <PageHeader
         description={__(
-          "Customize email templates and manage automated sequences",
+          "Delivery (addresses & SMTP), core templates for everyone, and optional Pro sequences and logs.",
+          "yatra",
         )}
       />
 
-      {/* Tabs */}
       <Card>
         <div className="border-b border-gray-200 dark:border-gray-700">
-          <nav className="flex gap-1 px-4">
+          <nav className="flex flex-wrap gap-1 px-4">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => setActiveTab(tab.key as any)}
+                type="button"
+                onClick={() => setActiveTab(tab.key)}
                 className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === tab.key
                     ? "border-blue-500 text-blue-600 dark:text-blue-400"
@@ -1195,11 +581,93 @@ const EmailAutomation: React.FC = () => {
         </div>
 
         <CardContent className="p-6">
-          {/* Content */}
-          {activeTab === "templates" && <EmailTemplatesList />}
-          {activeTab === "sequences" && <EmailSequencesList />}
-          {activeTab === "logs" && <EmailLogsList />}
+          {activeTab === "delivery" && (
+            <>
+              {!emailMgr.ready ? (
+                <div className="flex justify-center py-16">
+                  <Loader2 className="h-10 w-10 animate-spin text-gray-400" />
+                </div>
+              ) : (
+                <EmailDeliverySection
+                  values={emailMgr.values}
+                  onFieldChange={emailMgr.handleFieldChange}
+                />
+              )}
+            </>
+          )}
+
+          {activeTab === "templates" && (
+            <>
+              {automationReady && (
+                <p className="mb-6 text-sm text-gray-600 dark:text-gray-400">
+                  {__(
+                    "Customer booking, payment, cancellation, and trip-reminder emails use the matching template when its body is filled; otherwise the free plugin defaults or settings HTML apply. Admin: New Booking sends when that template has a body (plain-text admin notices from checkout and notifications are skipped to avoid duplicates). Other booking.created templates send in addition to the customer email. Booking Confirmed uses the “Booking Confirmed” row when a booking moves to confirmed; Trip Completed uses its template instead of the generic completed email when the body is filled.",
+                    "yatra",
+                  )}
+                </p>
+              )}
+              {!emailMgr.ready && !automationReady ? (
+                <div className="flex justify-center py-16">
+                  <Loader2 className="h-10 w-10 animate-spin text-gray-400" />
+                </div>
+              ) : (
+                <EmailTemplatesList
+                  automationModuleActive={automationReady}
+                  settingsBridge={
+                    automationReady
+                      ? undefined
+                      : {
+                          values: emailMgr.values,
+                          onFieldChange: emailMgr.handleFieldChange,
+                        }
+                  }
+                />
+              )}
+            </>
+          )}
+
+          {activeTab === "sequences" &&
+            (automationReady ? (
+              <EmailSequencesList />
+            ) : isProPluginActive() ? (
+              <EmailAutomationModulePrompt />
+            ) : (
+              <PremiumUpgradeCard />
+            ))}
+
+          {activeTab === "logs" &&
+            (automationReady ? (
+              <EmailLogsList />
+            ) : isProPluginActive() ? (
+              <EmailAutomationModulePrompt />
+            ) : (
+              <PremiumUpgradeCard />
+            ))}
         </CardContent>
+
+        {(activeTab === "delivery" || activeTab === "templates") &&
+          emailMgr.ready && (
+            <CardFooter className="flex justify-end border-t border-gray-100 pt-4 dark:border-gray-700/50">
+              <Button
+                type="button"
+                onClick={emailMgr.save}
+                disabled={!emailMgr.canSave}
+                className="flex items-center gap-2"
+              >
+                {emailMgr.isSaving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {__("Saving…", "yatra")}
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4" />
+                    {__("Save email settings", "yatra")}
+                  </>
+                )}
+              </Button>
+            </CardFooter>
+          )}
       </Card>
     </div>
   );

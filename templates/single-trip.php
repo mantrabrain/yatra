@@ -27,14 +27,7 @@ if (!$trip) {
     exit;
 }
 
-// Set up page title
-add_filter('wp_title', function ($title) {
-    global $trip;
-    return esc_html($trip->getTitle()) . ' - ' . get_bloginfo('name');
-}, 10, 1);
-
-// Include SEO helper functions
-require_once plugin_dir_path(dirname(__FILE__)) . 'includes/seo-helper.php';
+// Document title and meta tags are handled by Yatra\Managers\SEOManager (document_title + wp_head).
 
 yatra_get_header();
 

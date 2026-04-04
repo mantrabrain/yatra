@@ -34,6 +34,7 @@ import { Badge } from "../components/ui/badge";
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { Edit, Trash2 } from "lucide-react";
 import { HelpText } from "../components/ui/help-text";
+import { fetchSettings } from "../api/settings-api";
 import { apiClient } from "../lib/api-client";
 import { getErrorContext } from "../lib/errors";
 import { useToast } from "../components/ui/toast";
@@ -539,7 +540,7 @@ const Trips: React.FC = () => {
     queryKey: ["settings"],
     queryFn: async () => {
       try {
-        const response = await apiClient.get("/settings");
+        const response = await fetchSettings();
         return response;
       } catch (error) {
         return null;

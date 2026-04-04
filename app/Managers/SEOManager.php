@@ -67,13 +67,20 @@ class SEOManager
             $pageType = self::getCurrentPageType();
             $pageObject = self::getCurrentPageObject();
 
-            if ($pageType && $pageObject) {
-                $seoService = SEOService::forPage($pageType, $pageObject);
-                $seoTitle = $seoService->getTitle();
-                
-                if (!empty($seoTitle) && is_string($seoTitle)) {
-                    return wp_strip_all_tags($seoTitle);
-                }
+            if ($pageType === '') {
+                return $title;
+            }
+
+            $allowsNullObject = ($pageType === SEOService::PAGE_TYPE_TRIP_ARCHIVE);
+            if (!$allowsNullObject && !$pageObject) {
+                return $title;
+            }
+
+            $seoService = SEOService::forPage($pageType, $pageObject);
+            $seoTitle = $seoService->getTitle();
+
+            if (!empty($seoTitle) && is_string($seoTitle)) {
+                return wp_strip_all_tags($seoTitle);
             }
 
             return $title;

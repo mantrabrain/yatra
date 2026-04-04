@@ -165,12 +165,26 @@ class InstallerService
         update_option('yatra_booking_reminder_days', 3);
         update_option('yatra_allow_waitlist', true);
         
-        // Email Settings - Match SettingsService defaults
-        update_option('yatra_email_from_name', '');
-        update_option('yatra_email_from_address', '');
-        update_option('yatra_admin_email', '');
+        // Email identity: canonical keys (REST / EmailService) + legacy keys for older code paths
+        $wpAdminEmail = (string) get_option('admin_email', '');
+        $blogName = (string) get_bloginfo('name');
+        update_option('yatra_from_email', $wpAdminEmail);
+        update_option('yatra_from_name', $blogName);
+        update_option('yatra_admin_email', $wpAdminEmail);
+        update_option('yatra_email_from_name', $blogName);
+        update_option('yatra_email_from_address', $wpAdminEmail);
         update_option('yatra_enable_admin_notifications', true);
         update_option('yatra_enable_customer_notifications', true);
+
+        // Default transactional template HTML + subjects (Email → Templates / settings API)
+        foreach (EmailTemplateDefaults::settingsOptionDefaults() as $optionKey => $value) {
+            update_option('yatra_' . $optionKey, $value);
+        }
+        update_option('yatra_email_template_booking', true);
+        update_option('yatra_email_template_confirmation', true);
+        update_option('yatra_email_template_cancellation', true);
+        update_option('yatra_email_template_reminder', true);
+        update_option('yatra_email_template_admin_new_booking', true);
         
         // Clear any existing Stripe/PayPal settings that might exist
         delete_option('yatra_stripe_settings');
@@ -257,5 +271,41 @@ class InstallerService
         }
         
         return false;
+    }
+
+    /**
+     * One-time: persist default HTML subjects/bodies when options exist but are empty (pre-template-defaults installs).
+     */
+    public static function maybeBackfillEmailTemplateDefaults(): void
+    {
+        // Default-on for new option on existing sites (add_option no-ops if already present).
+        add_option('yatra_email_template_admin_new_booking', 1);
+
+        if (!get_option('yatra_email_identity_synced_v1')) {
+            $from = get_option('yatra_from_email', '');
+            if (($from === false || $from === '') && ($legacy = get_option('yatra_email_from_address', '')) && is_string($legacy) && $legacy !== '') {
+                update_option('yatra_from_email', $legacy);
+            }
+            $fname = get_option('yatra_from_name', '');
+            if (($fname === false || $fname === '') && ($legacy = get_option('yatra_email_from_name', '')) && is_string($legacy) && $legacy !== '') {
+                update_option('yatra_from_name', $legacy);
+            }
+            update_option('yatra_email_identity_synced_v1', '1');
+        }
+
+        if (get_option('yatra_email_tpl_defaults_backfill_1')) {
+            return;
+        }
+
+        foreach (EmailTemplateDefaults::settingsOptionDefaults() as $key => $defaultValue) {
+            $name = 'yatra_' . $key;
+            $current = get_option($name, false);
+            $isEmpty = $current === false || $current === '' || (is_string($current) && trim($current) === '');
+            if ($isEmpty) {
+                update_option($name, $defaultValue);
+            }
+        }
+
+        update_option('yatra_email_tpl_defaults_backfill_1', '1');
     }
 }

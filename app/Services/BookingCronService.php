@@ -109,10 +109,9 @@ class BookingCronService
         }
 
         foreach ($bookings as $booking) {
-            self::sendReminderEmail($booking);
-
-            // Mark reminder as sent
-            $bookingRepository->markReminderSent($booking->id);
+            if (self::sendReminderEmail($booking)) {
+                $bookingRepository->markReminderSent($booking->id);
+            }
         }
 
         // Log the operation
@@ -123,58 +122,37 @@ class BookingCronService
     /**
      * Send a reminder email to the customer
      */
-    private static function sendReminderEmail(object $booking): void
+    private static function sendReminderEmail(object $booking): bool
     {
         $customer_email = $booking->contact_email;
-        $customer_name = trim($booking->contact_first_name . ' ' . $booking->contact_last_name);
-        
+
         if (empty($customer_email)) {
-            return;
+            return false;
         }
 
         $reminder_days = (int) SettingsService::get('booking_reminder_days', 3);
-        
-        $subject = sprintf(
-            __('[%s] Trip Reminder - Your adventure is %d days away!', 'yatra'),
-            get_bloginfo('name'),
-            $reminder_days
-        );
+        $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
+        $vars['reminder_days'] = (string) $reminder_days;
+        $vars['days_until_trip'] = (string) $reminder_days;
 
-        $body = sprintf(__("Dear %s,\n\n", 'yatra'), $customer_name ?: 'Traveler');
-        $body .= sprintf(__("This is a friendly reminder that your trip is just %d days away!\n\n", 'yatra'), $reminder_days);
-        
-        $body .= "═══════════════════════════════════════\n";
-        $body .= sprintf(__("Booking Reference: %s\n", 'yatra'), $booking->reference);
-        $body .= "═══════════════════════════════════════\n\n";
-        
-        $body .= sprintf(__("Trip: %s\n", 'yatra'), $booking->trip_title);
-        $body .= sprintf(__("Travel Date: %s\n", 'yatra'), date_i18n(get_option('date_format'), strtotime($booking->travel_date)));
-        $body .= sprintf(__("Travelers: %d\n\n", 'yatra'), $booking->travelers_count);
-
-        // Check payment status
         $amount_due = (float) $booking->amount_due;
+        $extra = '';
         if ($amount_due > 0) {
-            $body .= "⚠️ " . __("PAYMENT REMINDER\n", 'yatra');
-            $body .= "───────────────────────────────────────\n";
-            $body .= sprintf(__("Outstanding Balance: %s\n", 'yatra'), yatra_format_price($amount_due));
-            $body .= __("Please ensure payment is completed before your travel date.\n\n", 'yatra');
+            $extra = '<p><strong>' . esc_html__('Payment reminder', 'yatra') . '</strong></p>'
+                . '<p>' . esc_html(sprintf(__('Outstanding balance: %s — please pay before travel.', 'yatra'), yatra_format_price($amount_due))) . '</p>';
         }
+        $extra .= '<p><strong>' . esc_html__('Preparation checklist', 'yatra') . '</strong></p><ul>'
+            . '<li>' . esc_html__('Valid ID / passport', 'yatra') . '</li>'
+            . '<li>' . esc_html__('Travel insurance', 'yatra') . '</li>'
+            . '<li>' . esc_html__('Emergency contacts', 'yatra') . '</li>'
+            . '</ul>';
+        $vars['reminder_extra_html'] = $extra;
 
-        $body .= __("PREPARATION CHECKLIST\n", 'yatra');
-        $body .= "───────────────────────────────────────\n";
-        $body .= __("□ Valid passport (at least 6 months validity)\n", 'yatra');
-        $body .= __("□ Travel insurance documents\n", 'yatra');
-        $body .= __("□ Emergency contact information\n", 'yatra');
-        $body .= __("□ Any required medications\n", 'yatra');
-        $body .= __("□ Appropriate clothing for your destination\n\n", 'yatra');
-
-        $body .= __("If you have any questions or need to make changes, please contact us.\n\n", 'yatra');
-        $body .= sprintf(__("Have a wonderful trip!\n\n%s Team\n", 'yatra'), get_bloginfo('name'));
-        $body .= home_url() . "\n";
-
-        $headers = ['Content-Type: text/plain; charset=UTF-8'];
-        
-        wp_mail($customer_email, $subject, $body, $headers);
+        return TransactionalEmailTemplateService::sendIfEnabled(
+            TransactionalEmailTemplateService::TYPE_BOOKING_REMINDER,
+            $customer_email,
+            $vars
+        );
     }
 
     /**

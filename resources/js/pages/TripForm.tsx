@@ -75,6 +75,7 @@ import { RichTextEditor } from "../components/ui/rich-text-editor";
 import { IconPicker, IconPickerValue } from "../components/ui/icon-picker";
 import { __ } from "../lib/i18n";
 import { usePermissions } from "../hooks/usePermissions";
+import { fetchSettings } from "../api/settings-api";
 import { apiClient } from "../lib/api-client";
 import { wpService } from "../lib/api-client";
 import { Button } from "../components/ui/button";
@@ -1605,7 +1606,7 @@ const TripForm: React.FC = () => {
     queryKey: ["settings"],
     queryFn: async () => {
       try {
-        const response = await apiClient.get("/settings");
+        const response = await fetchSettings();
         return response;
       } catch (error: any) {
         // Return default currency if settings fetch fails

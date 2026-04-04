@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace Yatra\Services;
 
+use Yatra\Repositories\BookingRepository;
+
 class NotificationService
 {
     /**
@@ -23,11 +25,9 @@ class NotificationService
         if (SettingsService::isEnabled('notify_new_booking') && SettingsService::isEnabled('notify_admin')) {
             self::notifyAdminNewBooking($bookingId, $bookingData);
         }
-        
-        // Notify customer if enabled
-        if (SettingsService::isEnabled('notify_customer_booking')) {
-            self::notifyCustomerBookingCreated($bookingId, $bookingData);
-        }
+
+        // Customer booking confirmation is sent by checkout / BookingService (TransactionalEmailTemplateService)
+        // to avoid duplicate emails and to respect Settings → Email templates.
     }
     
     /**
@@ -54,14 +54,11 @@ class NotificationService
         if (!SettingsService::isEnabled('notify_cancellation')) {
             return;
         }
-        
-        // Notify admin
+
+        // Notify admin only — customer cancellation email is sent from BookingService (TransactionalEmailTemplateService).
         if (SettingsService::isEnabled('notify_admin')) {
             self::notifyAdminCancellation($bookingId, $bookingData);
         }
-        
-        // Notify customer
-        self::notifyCustomerCancellation($bookingId, $bookingData);
     }
     
     /**
@@ -69,44 +66,37 @@ class NotificationService
      */
     private static function notifyAdminNewBooking(int $bookingId, $bookingData): void
     {
-        $admin_email = get_option('admin_email');
-        $subject = sprintf(__('[%s] New Booking Received - #%d', 'yatra'), get_bloginfo('name'), $bookingId);
-        
-        $message = sprintf(
-            __("A new booking has been received.\n\nBooking ID: %d\nTrip: %s\nCustomer: %s %s\nEmail: %s\nTotal Amount: %s\n\nView booking details in admin panel.", 'yatra'),
-            $bookingId,
-            $bookingData->trip_name ?? '',
-            $bookingData->first_name ?? '',
-            $bookingData->last_name ?? '',
-            $bookingData->email ?? '',
-            yatra_format_price((float) ($bookingData->total_amount ?? 0))
-        );
-        
-        EmailService::send($admin_email, $subject, $message);
-    }
-    
-    /**
-     * Notify customer of booking creation
-     */
-    private static function notifyCustomerBookingCreated(int $bookingId, $bookingData): void
-    {
-        $customer_email = $bookingData->email ?? '';
-        if (empty($customer_email)) {
+        if (!apply_filters('yatra_notify_admin_new_booking', true, $bookingId, $bookingData)) {
             return;
         }
-        
-        $subject = sprintf(__('[%s] Booking Confirmation - #%d', 'yatra'), get_bloginfo('name'), $bookingId);
-        
-        $message = sprintf(
-            __("Dear %s,\n\nThank you for your booking!\n\nBooking ID: %d\nTrip: %s\nTotal Amount: %s\n\nWe will send you further details shortly.\n\nBest regards,\n%s", 'yatra'),
-            $bookingData->first_name ?? 'Customer',
-            $bookingId,
-            $bookingData->trip_name ?? '',
-            yatra_format_price((float) ($bookingData->total_amount ?? 0)),
-            get_bloginfo('name')
+
+        $admin_email = SettingsService::getString('admin_email', get_option('admin_email'));
+        if ($admin_email === '' || !is_email($admin_email)) {
+            return;
+        }
+
+        $repository = new BookingRepository();
+        $booking = $repository->findWithTrip($bookingId);
+        if (!$booking) {
+            return;
+        }
+
+        $adminNotifyContext = [
+            'booking_id' => $bookingId,
+            'reference' => $booking->reference ?? '',
+            'source' => 'yatra_booking_created',
+        ];
+        if (!apply_filters('yatra_send_checkout_admin_notification', true, $adminNotifyContext)) {
+            return;
+        }
+
+        $variables = TransactionalEmailTemplateService::variablesFromBooking($booking);
+
+        TransactionalEmailTemplateService::sendIfEnabled(
+            TransactionalEmailTemplateService::TYPE_ADMIN_NEW_BOOKING,
+            $admin_email,
+            $variables
         );
-        
-        EmailService::send($customer_email, $subject, $message);
     }
     
     /**
@@ -133,26 +123,23 @@ class NotificationService
      */
     private static function notifyCustomerPaymentReceived(array $paymentData): void
     {
-        // Get booking to get customer email
         $bookingRepository = new \Yatra\Repositories\BookingRepository();
-        $booking = $bookingRepository->find($paymentData['booking_id'] ?? 0);
-        
-        if (!$booking || empty($booking->email)) {
+        $booking = $bookingRepository->findWithTrip((int) ($paymentData['booking_id'] ?? 0));
+
+        if (!$booking || empty($booking->contact_email)) {
             return;
         }
-        
-        $subject = sprintf(__('[%s] Payment Confirmation - Booking #%d', 'yatra'), get_bloginfo('name'), $booking->id);
-        
-        $message = sprintf(
-            __("Dear %s,\n\nYour payment has been received successfully!\n\nBooking ID: %d\nAmount Paid: %s\nPayment Method: %s\n\nThank you for your payment.\n\nBest regards,\n%s", 'yatra'),
-            $booking->first_name ?? 'Customer',
-            $booking->id,
-            yatra_format_price($paymentData['amount'] ?? 0),
-            $paymentData['payment_method'] ?? 'N/A',
-            get_bloginfo('name')
+
+        $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
+        $vars['payment_amount_formatted'] = yatra_format_price((float) ($paymentData['amount'] ?? 0));
+        $vars['payment_method'] = (string) ($paymentData['payment_method'] ?? __('Online payment', 'yatra'));
+        $vars['transaction_id'] = (string) ($paymentData['transaction_id'] ?? '');
+
+        TransactionalEmailTemplateService::sendIfEnabled(
+            TransactionalEmailTemplateService::TYPE_PAYMENT_CONFIRMATION,
+            $booking->contact_email,
+            $vars
         );
-        
-        EmailService::send($booking->email, $subject, $message);
     }
     
     /**
@@ -174,26 +161,4 @@ class NotificationService
         EmailService::send($admin_email, $subject, $message);
     }
     
-    /**
-     * Notify customer of cancellation
-     */
-    private static function notifyCustomerCancellation(int $bookingId, $bookingData): void
-    {
-        $customer_email = $bookingData->email ?? '';
-        if (empty($customer_email)) {
-            return;
-        }
-        
-        $subject = sprintf(__('[%s] Booking Cancelled - #%d', 'yatra'), get_bloginfo('name'), $bookingId);
-        
-        $message = sprintf(
-            __("Dear %s,\n\nYour booking has been cancelled.\n\nBooking ID: %d\nTrip: %s\n\nIf you have any questions, please contact us.\n\nBest regards,\n%s", 'yatra'),
-            $bookingData->first_name ?? 'Customer',
-            $bookingId,
-            $bookingData->trip_name ?? '',
-            get_bloginfo('name')
-        );
-        
-        EmailService::send($customer_email, $subject, $message);
-    }
 }

@@ -86,8 +86,8 @@ class ModuleManager
             ],
             [
                 'slug' => 'email_automation',
-                'name' => __('Email Automation/Customization', 'yatra'),
-                'description' => __('Automated email campaigns for booking confirmations, payment reminders, and customer engagement. Increase conversions with timely, personalized communication throughout the booking journey.', 'yatra'),
+                'name' => __('Email Automation', 'yatra'),
+                'description' => __('Adds the full automation template library (database), sequences, and send logs on the Email screen. Everyone already gets Delivery settings plus the four core customer templates (booking, payment, cancellation, reminder) without this module.', 'yatra'),
                 'category' => __('Marketing', 'yatra'),
                 'docs_url' => 'https://docs.yatra.com/modules/email-automation',
                 'is_premium' => true,

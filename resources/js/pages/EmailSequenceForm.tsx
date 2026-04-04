@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { __ } from "../lib/i18n";
-import { apiClient } from "../lib/api-client";
+import {
+  createEmailSequence,
+  fetchEmailSequence,
+  fetchEmailTemplates,
+  updateEmailSequence,
+} from "../api/email-automation-api";
 import { useToast } from "../components/ui/toast";
 import {
   Card,
@@ -36,6 +41,7 @@ interface EmailTemplate {
   category: string;
   description?: string;
   event_key?: string;
+  recipient_type?: string;
 }
 
 interface SequenceStep {
@@ -119,23 +125,19 @@ const EmailSequenceForm: React.FC = () => {
   // Fetch sequence data if editing
   const { data: sequenceData, isLoading: isLoadingSequence } = useQuery({
     queryKey: ["email-sequence", id],
-    queryFn: async () => {
-      const response = await apiClient.get(`/email-sequences/${id}`);
-      return response.data;
-    },
+    queryFn: () => fetchEmailSequence(id as string),
     enabled: isEditing,
   });
 
   // Fetch templates for step selection
   const { data: templatesData } = useQuery({
     queryKey: ["email-templates"],
-    queryFn: async () => {
-      const response = await apiClient.get("/email-templates");
-      return response.data;
-    },
+    queryFn: () => fetchEmailTemplates(),
   });
 
-  const templates: EmailTemplate[] = templatesData || [];
+  const templates: EmailTemplate[] = Array.isArray(templatesData)
+    ? templatesData
+    : [];
 
   // Get all trigger events from Schema (passed via window.yatraAdmin.emailEvents)
   const allTriggerEvents = useMemo(() => {
@@ -150,10 +152,9 @@ const EmailSequenceForm: React.FC = () => {
   // State for trigger dropdown
   const [openTriggerDropdown, setOpenTriggerDropdown] = useState(false);
 
-  // Filter templates to only show those WITHOUT event_key (for use in sequences)
-  // Templates with event_key are triggered directly by events, not by sequences
+  // Sequences send to the customer; exclude admin-only templates. Event-bound templates may still be reused as step content.
   const sequenceTemplates = useMemo(() => {
-    return templates.filter((t) => !t.event_key || t.event_key === "");
+    return templates.filter((t) => t.recipient_type !== "admin");
   }, [templates]);
 
   // Populate form when editing
@@ -162,7 +163,7 @@ const EmailSequenceForm: React.FC = () => {
       setFormData({
         name: sequenceData.name || "",
         description: sequenceData.description || "",
-        trigger_type: sequenceData.trigger_type || "booking_created",
+        trigger_type: sequenceData.trigger_type || "booking.created",
         trigger_config: sequenceData.trigger_config || {},
         status: sequenceData.status || "draft",
         applicable_to: sequenceData.applicable_to || "all",
@@ -178,7 +179,7 @@ const EmailSequenceForm: React.FC = () => {
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiClient.post("/email-sequences", data);
+      return await createEmailSequence(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["email-sequences"] });
@@ -193,7 +194,7 @@ const EmailSequenceForm: React.FC = () => {
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiClient.put(`/email-sequences/${id}`, data);
+      return await updateEmailSequence(id as string, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["email-sequences"] });
@@ -751,7 +752,7 @@ const EmailSequenceForm: React.FC = () => {
                                 </p>
                                 <p className="text-xs mt-1">
                                   {__(
-                                    "Create a template without an event to use in sequences",
+                                    "Add customer email templates under Email → Templates first.",
                                   )}
                                 </p>
                               </div>

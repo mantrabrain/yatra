@@ -305,7 +305,21 @@ class SettingsService
         // Try to fetch from database directly for settings not in defaults
         $option_name = self::OPTION_PREFIX . $key;
         $value = get_option($option_name, null);
-        
+
+        // Installer / migrations used yatra_email_from_*; REST + EmailService use yatra_from_*.
+        if (($value === null || $value === false || $value === '') && $key === 'from_email') {
+            $legacy = get_option(self::OPTION_PREFIX . 'email_from_address', '');
+            if (is_string($legacy) && $legacy !== '') {
+                $value = $legacy;
+            }
+        }
+        if (($value === null || $value === false || $value === '') && $key === 'from_name') {
+            $legacy = get_option(self::OPTION_PREFIX . 'email_from_name', '');
+            if (is_string($legacy) && $legacy !== '') {
+                $value = $legacy;
+            }
+        }
+
         if ($value !== null) {
             // Handle serialized arrays
             if (is_string($value) && is_serialized($value)) {

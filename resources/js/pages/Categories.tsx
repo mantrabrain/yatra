@@ -16,6 +16,7 @@ import { getDefaultBulkStatusOptions } from "../components/shared/bulkStatusOpti
 import { __ } from "../lib/i18n";
 import { usePermissions } from "../hooks/usePermissions";
 import { useToast } from "../components/ui/toast";
+import { fetchSettings } from "../api/settings-api";
 import { apiClient } from "../lib/api-client";
 import { getErrorContext } from "../lib/errors";
 import { Button } from "../components/ui/button";
@@ -379,7 +380,7 @@ export const Categories: React.FC = () => {
     queryKey: ["settings"],
     queryFn: async () => {
       try {
-        const response = await apiClient.get("/settings");
+        const response = await fetchSettings();
         return response;
       } catch (error) {
         return null;

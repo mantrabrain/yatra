@@ -321,6 +321,8 @@ class Bootstrap
             // Update version
             update_option('yatra_version', YATRA_VERSION);
         }
+
+        \Yatra\Services\InstallerService::maybeBackfillEmailTemplateDefaults();
     }
 
     /**

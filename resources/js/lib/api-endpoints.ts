@@ -1,6 +1,8 @@
 /**
  * API Endpoints Configuration
- * Central place for all API endpoint definitions
+ *
+ * Central path definitions for `yatra/v1`. Use `resources/js/api/*-api.ts`
+ * modules for typed `apiClient` calls instead of hardcoding strings in pages.
  */
 
 export const API_ENDPOINTS = {
@@ -77,6 +79,16 @@ export const API_ENDPOINTS = {
   // Settings
   SETTINGS: "/settings",
   SETTINGS_GROUP: (group: string) => `/settings?group=${group}`,
+  SETTINGS_PAGES: "/settings/pages",
+  SETTINGS_FLUSH_REWRITE_RULES: "/settings/flush-rewrite-rules",
+  SETTINGS_CHECK_SHORTCODE: (pageId: string | number) =>
+    `/settings/check-shortcode/${pageId}`,
+  SETTINGS_INSERT_SHORTCODE: (pageId: string | number) =>
+    `/settings/insert-shortcode/${pageId}`,
+  SETTINGS_EMAIL_TEMPLATE_PREVIEW: "/settings/email-template-preview",
+
+  // Payment (definitions for admin Settings UI)
+  PAYMENT_GATEWAY_DEFINITIONS: "/payment/gateways/definitions",
 
   // Enquiries
   ENQUIRIES: "/enquiries",
@@ -184,6 +196,20 @@ export const API_ENDPOINTS = {
 
   // Saved Trips
   SAVED_TRIPS: "/saved-trips",
+
+  // Email automation (Yatra Pro module — routes registered when module is active)
+  EMAIL_TEMPLATES: "/email-templates",
+  EMAIL_TEMPLATE_GET: (id: string | number) => `/email-templates/${id}`,
+  EMAIL_TEMPLATE_PREVIEW: (id: string | number) =>
+    `/email-templates/${id}/preview`,
+  EMAIL_TEMPLATE_TEST: (id: string | number) =>
+    `/email-templates/${id}/test`,
+  EMAIL_TEMPLATE_DUPLICATE: (id: string | number) =>
+    `/email-templates/${id}/duplicate`,
+  EMAIL_TEMPLATE_VARIABLES: "/email-templates/variables",
+  EMAIL_SEQUENCES: "/email-sequences",
+  EMAIL_SEQUENCE_GET: (id: string | number) => `/email-sequences/${id}`,
+  EMAIL_LOGS: "/email-logs",
 } as const;
 
 // Type for endpoint keys

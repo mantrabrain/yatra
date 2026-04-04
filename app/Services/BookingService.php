@@ -814,20 +814,15 @@ class BookingService
             return;
         }
 
-        // Check if booking confirmation emails are enabled
-        if (!SettingsService::isEnabled('email_booking_confirmation')) {
-            return;
-        }
+        $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
+        $vars['intro_paragraph'] = __('Thank you for your booking! Here are your details:', 'yatra');
+        $vars['transactional_context'] = 'booking_created';
 
-        $subject = sprintf(
-            __('[%s] Booking Confirmation - %s', 'yatra'),
-            get_bloginfo('name'),
-            $booking->reference
+        TransactionalEmailTemplateService::sendIfEnabled(
+            TransactionalEmailTemplateService::TYPE_BOOKING_CONFIRMATION,
+            $booking->contact_email,
+            $vars
         );
-
-        $message = $this->getBookingConfirmationEmailContent($booking);
-
-        wp_mail($booking->contact_email, $subject, $message, ['Content-Type: text/html; charset=UTF-8']);
     }
 
     /**
@@ -852,56 +847,49 @@ class BookingService
             return;
         }
 
+        if ($newStatus === 'cancelled') {
+            TransactionalEmailTemplateService::sendIfEnabled(
+                TransactionalEmailTemplateService::TYPE_BOOKING_CANCELLATION,
+                $booking->contact_email,
+                TransactionalEmailTemplateService::variablesFromBooking($booking)
+            );
+
+            return;
+        }
+
+        if ($newStatus === 'confirmed') {
+            $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
+            $vars['intro_paragraph'] = __('Your booking has been confirmed! Here are your details:', 'yatra');
+            $vars['transactional_context'] = 'status_confirmed';
+            TransactionalEmailTemplateService::sendIfEnabled(
+                TransactionalEmailTemplateService::TYPE_BOOKING_CONFIRMATION,
+                $booking->contact_email,
+                $vars
+            );
+
+            return;
+        }
+
+        if ($newStatus === 'completed') {
+            $handled = apply_filters('yatra_send_booking_status_email_html', null, $bookingId, $oldStatus, $newStatus, $booking);
+            if ($handled !== null) {
+                return;
+            }
+        }
+
         $subject = sprintf(
             __('[%s] Booking Status Update - %s', 'yatra'),
             get_bloginfo('name'),
             $booking->reference
         );
-
         $message = $this->getStatusChangeEmailContent($booking, $newStatus);
 
-        wp_mail($booking->contact_email, $subject, $message, ['Content-Type: text/html; charset=UTF-8']);
-    }
-
-    /**
-     * Get booking confirmation email content
-     * 
-     * @param object $booking Booking data
-     * @return string HTML email content
-     */
-    private function getBookingConfirmationEmailContent(object $booking): string
-    {
-        ob_start();
-        ?>
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        </head>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #2563eb;"><?php esc_html_e('Booking Confirmation', 'yatra'); ?></h1>
-            
-            <p><?php printf(esc_html__('Thank you for your booking, %s!', 'yatra'), esc_html($booking->contact_first_name)); ?></p>
-            
-            <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <h2 style="margin-top: 0;"><?php esc_html_e('Booking Details', 'yatra'); ?></h2>
-                <p><strong><?php esc_html_e('Reference:', 'yatra'); ?></strong> <?php echo esc_html($booking->reference); ?></p>
-                <p><strong><?php esc_html_e('Trip:', 'yatra'); ?></strong> <?php echo esc_html($booking->trip_title); ?></p>
-                <p><strong><?php esc_html_e('Travel Date:', 'yatra'); ?></strong> <?php echo esc_html(date_i18n(get_option('date_format'), strtotime($booking->travel_date))); ?></p>
-                <p><strong><?php esc_html_e('Travelers:', 'yatra'); ?></strong> <?php echo esc_html($booking->travelers_count); ?></p>
-                <p><strong><?php esc_html_e('Total Amount:', 'yatra'); ?></strong> <?php echo esc_html($booking->currency . ' ' . number_format((float) $booking->total_amount, 2)); ?></p>
-            </div>
-            
-            <p><?php esc_html_e('We will be in touch with further details soon.', 'yatra'); ?></p>
-            
-            <p style="margin-top: 30px; color: #666; font-size: 14px;">
-                <?php echo esc_html(get_bloginfo('name')); ?>
-            </p>
-        </body>
-        </html>
-        <?php
-        return ob_get_clean();
+        EmailService::send(
+            $booking->contact_email,
+            $subject,
+            $message,
+            ['Content-Type: text/html; charset=UTF-8']
+        );
     }
 
     /**
@@ -1027,31 +1015,30 @@ class BookingService
      */
     private function sendBookingReminderEmail(object $booking): void
     {
-        $subject = sprintf(
-            __('[%s] Reminder: Your Trip is Coming Up - %s', 'yatra'),
-            get_bloginfo('name'),
-            $booking->reference
+        $daysUntilTrip = (int) ((strtotime((string) $booking->travel_date) - time()) / 86400);
+        $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
+        $vars['days_until_trip'] = (string) max(0, $daysUntilTrip);
+        $vars['reminder_days'] = (string) SettingsService::getInt('booking_reminder_days', 3);
+
+        $checklist = '<p><strong>' . esc_html__('Preparation checklist', 'yatra') . '</strong></p><ul>'
+            . '<li>' . esc_html__('Valid ID / passport', 'yatra') . '</li>'
+            . '<li>' . esc_html__('Travel insurance', 'yatra') . '</li>'
+            . '<li>' . esc_html__('Emergency contacts', 'yatra') . '</li>'
+            . '</ul>';
+        $vars['reminder_extra_html'] = $checklist;
+
+        $sent = TransactionalEmailTemplateService::sendIfEnabled(
+            TransactionalEmailTemplateService::TYPE_BOOKING_REMINDER,
+            $booking->contact_email,
+            $vars
         );
 
-        $daysUntilTrip = (int) ((strtotime($booking->travel_date) - time()) / 86400);
-
-        $message = sprintf(
-            __("Hi %s,\n\nThis is a friendly reminder that your trip is coming up in %d days!\n\nTrip: %s\nTravel Date: %s\nReference: %s\n\nWe look forward to seeing you!\n\n%s", 'yatra'),
-            $booking->contact_first_name,
-            $daysUntilTrip,
-            $booking->trip_title,
-            date_i18n(get_option('date_format'), strtotime($booking->travel_date)),
-            $booking->reference,
-            get_bloginfo('name')
-        );
-
-        wp_mail($booking->contact_email, $subject, $message);
-
-        // Mark reminder as sent
-        $this->bookingRepository->update((int) $booking->id, [
-            'reminder_sent' => 1,
-            'reminder_sent_at' => current_time('mysql'),
-        ]);
+        if ($sent) {
+            $this->bookingRepository->update((int) $booking->id, [
+                'reminder_sent' => 1,
+                'reminder_sent_at' => current_time('mysql'),
+            ]);
+        }
     }
 }
 
