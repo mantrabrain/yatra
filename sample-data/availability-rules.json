@@ -48,6 +48,31 @@
     "auto_generate": 1
   },
   {
+    "trip_slug": "bali-island-adventure",
+    "name": "Weekly Bali Departures",
+    "recurrence_type": "weekly",
+    "start_date": "2024-06-01",
+    "end_date": "2024-10-31",
+    "days_of_week": [6],
+    "interval": 1,
+    "availability_status": "available",
+    "departure_time": "09:00:00",
+    "status": "active",
+    "auto_generate": 1
+  },
+  {
+    "trip_slug": "new-zealand-adventure",
+    "name": "Bi-weekly South Island Departures",
+    "recurrence_type": "weekly",
+    "start_date": "2024-05-01",
+    "end_date": "2024-09-30",
+    "days_of_week": [2, 5],
+    "interval": 2,
+    "availability_status": "available",
+    "status": "active",
+    "auto_generate": 1
+  },
+  {
     "trip_slug": "paris-city-explorer",
     "name": "Weekend City Tours",
     "recurrence_type": "weekly",

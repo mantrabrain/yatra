@@ -94,6 +94,23 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `weekend_only` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Apply only on weekends',
     `weekday_only` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Apply only on weekdays',
     
+    -- Recurring Availability UI (admin React) — aligns with RecurringAvailabilityRepository
+    `rule_type` varchar(50) NOT NULL DEFAULT 'weekly' COMMENT 'weekly|daily|monthly|custom|date_range|single_date',
+    `seats_total` smallint(5) unsigned DEFAULT NULL COMMENT 'Seat cap for capacity service / generated dates',
+    `week_of_month` smallint(5) unsigned DEFAULT NULL,
+    `day_of_week` tinyint(3) unsigned DEFAULT NULL COMMENT '0–6 when rule uses a single weekday',
+    `interval_days` int(11) DEFAULT NULL,
+    `interval_start_date` date DEFAULT NULL,
+    `excluded_dates` longtext DEFAULT NULL COMMENT 'JSON: excluded dates list',
+    `time_slots` longtext DEFAULT NULL COMMENT 'JSON: time slot definitions',
+    `original_price` decimal(10,2) DEFAULT NULL,
+    `sale_price` decimal(10,2) DEFAULT NULL,
+    `traveler_pricing` longtext DEFAULT NULL COMMENT 'JSON: per-category pricing',
+    `pricing_by_traveler_type` longtext DEFAULT NULL COMMENT 'JSON: alternate key for traveler pricing',
+    `alert_threshold` smallint(5) unsigned DEFAULT NULL,
+    `day_overrides` longtext DEFAULT NULL COMMENT 'JSON: per-day capacity/price overrides',
+    `months` longtext DEFAULT NULL COMMENT 'JSON: month filters',
+
     -- Metadata and Status
     `notes` text DEFAULT NULL COMMENT 'Internal notes for this rule',
     `priority` smallint(5) unsigned DEFAULT 10 COMMENT 'Rule priority (lower = higher priority)',

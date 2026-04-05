@@ -164,11 +164,15 @@ class EnquiryService
          */
         do_action('yatra_enquiry_created', $enquiry);
 
-        // Send admin notification
-        $this->sendAdminNotification($enquiryId);
+        // Core plaintext (wp_mail). Pro Email Automation sends HTML when templates exist — see
+        // yatra_send_enquiry_created_* filters in yatra-pro EmailAutomationHooks.
+        if (apply_filters('yatra_send_enquiry_created_admin_email', true, $enquiry)) {
+            $this->sendAdminNotification($enquiryId);
+        }
 
-        // Send customer confirmation
-        $this->sendCustomerConfirmation($enquiryId);
+        if (apply_filters('yatra_send_enquiry_created_customer_email', true, $enquiry)) {
+            $this->sendCustomerConfirmation($enquiryId);
+        }
 
         return [
             'success' => true,
@@ -239,8 +243,9 @@ class EnquiryService
          */
         do_action('yatra_enquiry_responded', $enquiry, $response);
 
-        // Send response email to customer
-        $this->sendResponseEmail($enquiry, $response);
+        if (apply_filters('yatra_send_enquiry_response_core_email', true, $enquiry, $response)) {
+            $this->sendResponseEmail($enquiry, $response);
+        }
 
         return [
             'success' => true,
@@ -395,24 +400,20 @@ class EnquiryService
         }
 
         $adminEmail = get_option('admin_email');
+        if ($adminEmail === '' || !is_email($adminEmail)) {
+            return;
+        }
 
         $subject = sprintf(
-            __('[%s] New Enquiry from %s', 'yatra'),
+            /* translators: 1: site name, 2: customer name */
+            __('💬 [%1$s] New enquiry · %2$s', 'yatra'),
             get_bloginfo('name'),
             $enquiry->name
         );
 
-        $message = sprintf(
-            __("New enquiry received:\n\nName: %s\nEmail: %s\nPhone: %s\nTrip: %s\n\nMessage:\n%s\n\nView in admin: %s", 'yatra'),
-            $enquiry->name,
-            $enquiry->email,
-            $enquiry->phone ?: 'N/A',
-            $enquiry->trip_title ?: 'General',
-            $enquiry->message,
-            admin_url('admin.php?page=yatra&subpage=enquiries&action=view&id=' . $enquiryId)
-        );
+        $body = EmailTemplateDefaults::renderCoreEnquiryAdminNotificationHtml($enquiry);
 
-        wp_mail($adminEmail, $subject, $message);
+        EmailService::send($adminEmail, $subject, $body, ['Content-Type: text/html; charset=UTF-8']);
     }
 
     /**
@@ -429,17 +430,13 @@ class EnquiryService
         }
 
         $subject = sprintf(
-            __('[%s] We received your enquiry', 'yatra'),
+            __('✉️ [%s] We received your message', 'yatra'),
             get_bloginfo('name')
         );
 
-        $message = sprintf(
-            __("Hi %s,\n\nThank you for your enquiry. We have received your message and will get back to you shortly.\n\nBest regards,\n%s", 'yatra'),
-            $enquiry->name,
-            get_bloginfo('name')
-        );
+        $body = EmailTemplateDefaults::renderCoreEnquiryCustomerConfirmationHtml($enquiry);
 
-        wp_mail($enquiry->email, $subject, $message);
+        EmailService::send($enquiry->email, $subject, $body, ['Content-Type: text/html; charset=UTF-8']);
     }
 
     /**
@@ -455,19 +452,13 @@ class EnquiryService
         }
 
         $subject = sprintf(
-            __('[%s] Response to your enquiry', 'yatra'),
+            __('💬 [%s] Re: your enquiry', 'yatra'),
             get_bloginfo('name')
         );
 
-        $message = sprintf(
-            __("Hi %s,\n\nThank you for contacting us. Here is our response to your enquiry:\n\n%s\n\nYour original message:\n%s\n\nBest regards,\n%s", 'yatra'),
-            $enquiry->name,
-            $response,
-            $enquiry->message,
-            get_bloginfo('name')
-        );
+        $body = EmailTemplateDefaults::renderCoreEnquiryResponseHtml($enquiry, $response);
 
-        wp_mail($enquiry->email, $subject, $message);
+        EmailService::send($enquiry->email, $subject, $body, ['Content-Type: text/html; charset=UTF-8']);
     }
 }
 

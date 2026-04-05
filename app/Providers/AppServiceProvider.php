@@ -64,6 +64,10 @@ class AppServiceProvider extends ServiceProvider
 
         // Initialize cache hooks
         \Yatra\Hooks\CacheHooks::init();
+
+        add_filter('yatra_require_email_verification', static function (): bool {
+            return \Yatra\Services\SettingsService::isEnabled('require_email_verification');
+        });
     }
 
     /**

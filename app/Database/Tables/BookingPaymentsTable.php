@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `booking_id` bigint(20) UNSIGNED NOT NULL,
     `customer_id` bigint(20) UNSIGNED DEFAULT NULL,
     `transaction_id` varchar(255) DEFAULT NULL,
-    `gateway` varchar(50) NOT NULL,
+    `gateway` varchar(80) NOT NULL,
     `amount` decimal(12,2) NOT NULL,
     `currency` char(3) DEFAULT 'USD',
     `status` enum('pending','completed','failed','refunded','cancelled') DEFAULT 'pending',

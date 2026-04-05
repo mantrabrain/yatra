@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `dropoff_location` varchar(255) DEFAULT NULL COMMENT 'Specific dropoff point',
     
     -- Status and Availability
-    `status` enum('available','unavailable','limited','sold_out','cancelled','blocked') NOT NULL DEFAULT 'available',
+    `status` enum('available','unavailable','limited','sold_out','cancelled','blocked','closed') NOT NULL DEFAULT 'available',
     `is_blocked` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Whether this date is blocked',
     `block_reason` varchar(255) DEFAULT NULL COMMENT 'Reason for blocking',
     

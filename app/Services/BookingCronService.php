@@ -240,8 +240,8 @@ class BookingCronService
         $body .= home_url() . "\n";
 
         $headers = ['Content-Type: text/plain; charset=UTF-8'];
-        
-        wp_mail($customer_email, $subject, $body, $headers);
+
+        EmailService::send($customer_email, $subject, $body, $headers);
 
         // Also notify admin
         $admin_email = get_option('admin_email');
@@ -252,7 +252,7 @@ class BookingCronService
         $admin_body .= sprintf(__("Trip: %s\n", 'yatra'), $trip ? $trip->title : 'N/A');
         $admin_body .= sprintf(__("View: %s\n", 'yatra'), admin_url('admin.php?page=yatra&subpage=bookings&action=view&id=' . $booking->id));
 
-        wp_mail($admin_email, $admin_subject, $admin_body, $headers);
+        EmailService::send($admin_email, $admin_subject, $admin_body, $headers);
     }
 }
 

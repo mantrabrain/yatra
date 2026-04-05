@@ -187,6 +187,10 @@ class BookingService
     public function createBooking(array $data): array
     {
         $startTime = microtime(true);
+
+        // Checkout defers the rich confirmation to BookingSessionController (avoids duplicate customer emails).
+        // Not persisted; stripped by BookingValidator::sanitize().
+        $skipInitialCustomerConfirmation = !empty($data['skip_initial_customer_confirmation']);
         
         try {
             Logger::info("Booking creation started", [
@@ -282,8 +286,11 @@ class BookingService
                 return ['success' => false, 'message' => __('Failed to create booking.', 'yatra')];
             }
 
+            // Waitlist bookings do not consume departure capacity until promoted.
+            $isWaitlist = isset($data['status']) && $data['status'] === 'waitlist';
+
             // Link booking to departure if start_date is provided
-            if (!empty($data['start_date']) && !empty($data['end_date'])) {
+            if (!$isWaitlist && !empty($data['start_date']) && !empty($data['end_date'])) {
                 try {
                     $trip = $this->tripRepository->find((int) $data['trip_id']);
                     // Get max capacity from trip's max_travelers, or use default
@@ -326,8 +333,10 @@ class BookingService
                 $this->saveTravelers($bookingId, $data['travelers']);
             }
 
-            // Send confirmation email if needed
-            $this->sendBookingConfirmationEmail($bookingId);
+            // Customer confirmation: skip when checkout will send the session email (offline / zero due).
+            if (!$skipInitialCustomerConfirmation) {
+                $this->sendBookingConfirmationEmail($bookingId);
+            }
             
             // Clear related caches
             CacheService::invalidateEntity('booking', $bookingId);
@@ -400,11 +409,18 @@ class BookingService
             $data['end_date'] = $this->calculateEndDate($data['travel_date'], (int) $booking->trip_id);
         }
 
+        $oldStatus = (string) ($booking->status ?? '');
+
         // Update booking
         $updated = $this->bookingRepository->update($id, $data);
 
         if (!$updated) {
             return ['success' => false, 'message' => __('Failed to update booking.', 'yatra')];
+        }
+
+        $newStatus = isset($data['status']) ? (string) $data['status'] : null;
+        if ($newStatus !== null && $oldStatus === 'waitlist' && $newStatus !== 'waitlist') {
+            WaitlistService::releaseWaitlistHolding($booking);
         }
 
         // Handle departure date change if date was changed
@@ -472,6 +488,10 @@ class BookingService
 
         if (!$updated) {
             return ['success' => false, 'message' => __('Failed to update status.', 'yatra')];
+        }
+
+        if ($oldStatus === 'waitlist' && $status !== 'waitlist') {
+            WaitlistService::releaseWaitlistHolding($booking);
         }
 
         // ========================================
@@ -552,6 +572,19 @@ class BookingService
 
         if (!$booking) {
             return ['success' => false, 'message' => __('Booking not found.', 'yatra')];
+        }
+
+        if (($booking->status ?? '') === 'waitlist') {
+            WaitlistService::releaseWaitlistHolding($booking);
+        }
+
+        try {
+            $departure = $this->departureService->getDepartureForBooking($id);
+            if ($departure) {
+                $this->departureService->unlinkBookingFromDeparture($id, $departure->id);
+            }
+        } catch (\Throwable $e) {
+            // Continue with delete
         }
 
         // Delete related travelers
@@ -799,6 +832,15 @@ class BookingService
             $isLead = $index === 0;
             $this->travellerRepository->createTraveller($bookingId, $index, $isLead, $travelerData);
         }
+    }
+
+    /**
+     * Transactional "new booking" email (settings / Pro templates). Used by checkout when the session
+     * defers email until after payment redirect or sends the rich HTML confirmation at the end.
+     */
+    public function sendNewBookingTransactionalConfirmation(int $bookingId): void
+    {
+        $this->sendBookingConfirmationEmail($bookingId);
     }
 
     /**

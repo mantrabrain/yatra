@@ -107,6 +107,65 @@ class MigrationProgress
             'migration_log' => $this->getMigrationLog(),
         ];
     }
+
+    /**
+     * Whether this site still has legacy Yatra (< 3.0) footprints worth migrating.
+     * Uses detector counts and/or the old plugin's yatra_plugin_version option.
+     */
+    public function hasLegacyEnvironment(): bool
+    {
+        if ($this->detector->hasOldData()) {
+            return true;
+        }
+
+        $legacyVer = get_option('yatra_plugin_version', '');
+        if ($legacyVer === '' || $legacyVer === false) {
+            return false;
+        }
+
+        if (version_compare((string) $legacyVer, '3.0.0', '>=')) {
+            return false;
+        }
+
+        global $wpdb;
+        $legacyTours = (int) $wpdb->get_var(
+            "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'tour' AND post_status != 'trash'"
+        );
+
+        return $legacyTours > 0;
+    }
+
+    /**
+     * True when legacy data exists but migration is incomplete or had failures.
+     * Used for the WordPress admin bar notice (per-user dismiss).
+     */
+    public function legacyMigrationNeedsAttention(): bool
+    {
+        if (!$this->hasLegacyEnvironment()) {
+            return false;
+        }
+
+        $oldData = $this->detector->detectOldData();
+        $progress = get_option('yatra_migration_progress', []);
+
+        foreach ($this->dataTypesOrder as $type) {
+            $count = (int) ($oldData[$type]['count'] ?? 0);
+            if ($count === 0) {
+                continue;
+            }
+
+            $st = $progress[$type] ?? [];
+            $status = $st['status'] ?? '';
+            if ($status !== 'completed') {
+                return true;
+            }
+            if ((int) ($st['failed'] ?? 0) > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
     
     /**
      * Migrate specific data type using Action Scheduler for background processing
@@ -117,25 +176,29 @@ class MigrationProgress
             $this->ensureSchemaUpToDate();
 
             // Check if Action Scheduler is available
-            if (!function_exists('as_schedule_single_action')) {
-                throw new \Exception('WooCommerce Action Scheduler is not available');
+            // Prefer Action Scheduler (bundled with Yatra); fall back to WP-Cron for the same hook.
+            $actionId = null;
+            if (function_exists('as_schedule_single_action')) {
+                $actionArgs = [
+                    'data_type' => $dataType,
+                ];
+                if ($force) {
+                    $actionArgs['force'] = true;
+                }
+                $actionId = as_schedule_single_action(
+                    time(),
+                    'yatra_migrate_data_type',
+                    $actionArgs,
+                    'yatra_migration'
+                );
+            } elseif (function_exists('wp_schedule_single_event')) {
+                wp_schedule_single_event(time(), 'yatra_migrate_data_type', [$dataType, $force]);
+                spawn_cron();
+            } else {
+                throw new \Exception(__('No background scheduler is available (Action Scheduler or WP-Cron).', 'yatra'));
             }
-            
-            // Schedule the migration to run in the background
-            $actionArgs = [
-                'data_type' => $dataType,
-            ];
 
-            if ($force) {
-                $actionArgs['force'] = true;
-            }
-
-            $actionId = as_schedule_single_action(
-                time(),
-                'yatra_migrate_data_type',
-                $actionArgs,
-                'yatra_migration'
-            );
+            $this->kickQueueRunner();
             
             return [
                 'success' => true,
@@ -330,9 +393,9 @@ class MigrationProgress
     /**
      * Migrate all data types.
      *
-     * Attempts Action Scheduler first; falls back to direct synchronous
-     * processing when AS cron is broken (common in Local by Flywheel
-     * and similar environments).
+     * Queues a full run on Action Scheduler (bundled with Yatra) so work happens outside
+     * the admin HTTP request. Falls back to WP-Cron if AS is unavailable. Immediately runs
+     * the AS queue runner once so progress starts without waiting for another page load.
      */
     public function migrateAll(bool $force = false): array
     {
@@ -356,16 +419,13 @@ class MigrationProgress
             // Initialize progress tracking in DB
             $this->initializeProgress($force);
 
-            // Schedule background process
-            wp_schedule_single_event(time(), 'yatra_migration_background_run', [$force]);
-            
-            // Try to force cron to run immediately
-            spawn_cron();
+            $this->scheduleFullMigrationBackgroundRun($force);
 
             return [
                 'success' => true,
                 'message' => 'Migration started successfully.',
                 'started_at' => current_time('mysql'),
+                'background' => true,
             ];
 
         } catch (\Exception $e) {
@@ -373,6 +433,66 @@ class MigrationProgress
                 'success' => false,
                 'error' => $e->getMessage(),
             ];
+        }
+    }
+
+    /**
+     * Queue migrateAllDirect on Action Scheduler (preferred) or WP-Cron, and try to start work immediately.
+     */
+    private function scheduleFullMigrationBackgroundRun(bool $force): void
+    {
+        // Avoid duplicate full runs from a previous attempt
+        if (function_exists('wp_unschedule_hook')) {
+            wp_unschedule_hook('yatra_migration_background_run');
+        } else {
+            wp_clear_scheduled_hook('yatra_migration_background_run', [false]);
+            wp_clear_scheduled_hook('yatra_migration_background_run', [true]);
+        }
+        if (function_exists('as_unschedule_all_actions')) {
+            // Empty group + empty args => cancel_actions_by_hook (clears all arg variants)
+            as_unschedule_all_actions('yatra_migration_background_run');
+        }
+
+        if (function_exists('as_schedule_single_action')) {
+            as_schedule_single_action(
+                time(),
+                'yatra_migration_background_run',
+                [$force],
+                'yatra_migration'
+            );
+        } else {
+            wp_schedule_single_event(time(), 'yatra_migration_background_run', [$force]);
+        }
+
+        spawn_cron();
+        $this->kickQueueRunner();
+    }
+
+    /**
+     * Run Action Scheduler's queue runner (processes pending yatra_migration jobs in this or a follow-up request).
+     */
+    public function kickQueueRunner(): void
+    {
+        try {
+            if (class_exists(\ActionScheduler::class)) {
+                $runner = \ActionScheduler::runner();
+                if ($runner && method_exists($runner, 'run')) {
+                    $runner->run();
+
+                    return;
+                }
+            }
+
+            if (class_exists(\ActionScheduler_QueueRunner::class)) {
+                $runner = \ActionScheduler_QueueRunner::instance();
+                if ($runner && method_exists($runner, 'run')) {
+                    $runner->run();
+                }
+            }
+        } catch (\Throwable $e) {
+            Logger::warning('kickQueueRunner: ' . $e->getMessage(), [
+                'source' => 'migration',
+            ]);
         }
     }
 
@@ -474,7 +594,13 @@ class MigrationProgress
     public function cancelMigration(): array
     {
         if (function_exists('as_unschedule_all_actions')) {
-            as_unschedule_all_actions('yatra_migrate_data_type', [], 'yatra_migration');
+            as_unschedule_all_actions('', [], 'yatra_migration');
+        }
+        if (function_exists('wp_unschedule_hook')) {
+            wp_unschedule_hook('yatra_migration_background_run');
+        } else {
+            wp_clear_scheduled_hook('yatra_migration_background_run', [false]);
+            wp_clear_scheduled_hook('yatra_migration_background_run', [true]);
         }
 
         $progress = get_option('yatra_migration_progress', []);
@@ -532,6 +658,10 @@ class MigrationProgress
             }
 
             if (($status['status'] ?? '') === 'pending' || ($status['status'] ?? '') === 'running') {
+                $allComplete = false;
+            }
+
+            if (in_array(($status['status'] ?? ''), ['failed', 'cancelled'], true)) {
                 $allComplete = false;
             }
 
@@ -1173,22 +1303,6 @@ class MigrationProgress
             return;
         }
 
-        try {
-            if (class_exists('\ActionScheduler')) {
-                $runner = \ActionScheduler::runner();
-                if ($runner && method_exists($runner, 'run')) {
-                    $runner->run();
-                    return;
-                }
-            }
-
-            if (class_exists('\ActionScheduler_QueueRunner')) {
-                $runner = \ActionScheduler_QueueRunner::instance();
-                if ($runner && method_exists($runner, 'run')) {
-                    $runner->run();
-                }
-            }
-        } catch (\Throwable $e) {
-            }
+        $this->kickQueueRunner();
     }
 }

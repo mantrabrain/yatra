@@ -23,8 +23,8 @@
       "node_modules/@wordpress/vips/build-module/vips-worker.mjs"
     ]
   },
-  "_index-DHkBlElb.js": {
-    "file": "dist/js/index-DHkBlElb.js",
+  "_index-DhSfL6-d.js": {
+    "file": "dist/js/index-DhSfL6-d.js",
     "name": "index",
     "imports": [
       "_react-vendor-BHteVFHs.js",
@@ -58,7 +58,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-BHteVFHs.js",
-      "_index-DHkBlElb.js",
+      "_index-DhSfL6-d.js",
       "_default-i18n-DxhLUi3L.js"
     ]
   },
@@ -105,7 +105,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-BHteVFHs.js",
-      "_index-DHkBlElb.js",
+      "_index-DhSfL6-d.js",
       "_clsx-DgYk2OaC.js",
       "_default-i18n-DxhLUi3L.js"
     ]

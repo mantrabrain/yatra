@@ -9,57 +9,57 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-04T12:56:17+00:00\n"
+"POT-Creation-Date: 2026-04-05T11:13:06+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
 
-#: assets/admin/dist/js/app.js:29407
+#: assets/admin/dist/js/app.js:29443
 msgid "Failed to load reviews. Please try again."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29437
+#: assets/admin/dist/js/app.js:29473
 msgid "Select reviews to display as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29439
+#: assets/admin/dist/js/app.js:29475
 msgid "Save the trip first to select testimonials from reviews"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29444
+#: assets/admin/dist/js/app.js:29480
 msgid "Testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29445
+#: assets/admin/dist/js/app.js:29481
 msgid "Select approved reviews to display as testimonials on the trip page"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29451
+#: assets/admin/dist/js/app.js:29487
 msgid "Loading reviews..."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29462
+#: assets/admin/dist/js/app.js:29498
 msgid "Retry"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29467
+#: assets/admin/dist/js/app.js:29503
 msgid "No approved reviews yet"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29468
+#: assets/admin/dist/js/app.js:29504
 msgid "Reviews will appear here once customers submit and they are approved"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29473
+#: assets/admin/dist/js/app.js:29509
 msgid "Select reviews to feature as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29482
+#: assets/admin/dist/js/app.js:29518
 #: templates/listing-trip.php:266
 msgid "Clear all"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:29520
+#: assets/admin/dist/js/app.js:29556
 msgid "Selected as testimonial"
 msgstr ""
 
@@ -227,13 +227,14 @@ msgid "travelers"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1038
-#: app/Controllers/BookingSessionController.php:2412
+#: app/Controllers/BookingSessionController.php:2374
 #: app/Controllers/SingleTripController.php:462
 #: app/Controllers/SingleTripController.php:1812
 #: app/Controllers/SingleTripController.php:1847
 #: app/Controllers/SingleTripController.php:1961
 #: app/Models/Checkout.php:103
-#: app/Services/TransactionalEmailTemplateService.php:305
+#: app/Services/EmailTemplateDefaults.php:239
+#: app/Services/EmailTemplateSampleData.php:46
 #: templates/booking-confirmation.php:285
 #: templates/partials/availability-card.php:265
 #: templates/partials/booking-content.php:324
@@ -345,10 +346,11 @@ msgid "Travel Date"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1417
-#: app/Controllers/BookingSessionController.php:2002
-#: app/Controllers/BookingSessionController.php:2018
-#: app/Services/TransactionalEmailTemplateService.php:249
-#: app/Services/TransactionalEmailTemplateService.php:320
+#: app/Controllers/BookingSessionController.php:2000
+#: app/Controllers/BookingSessionController.php:2016
+#: app/Services/EmailTemplateDefaults.php:140
+#: app/Services/EmailTemplateDefaults.php:247
+#: app/Services/EmailTemplateDefaults.php:299
 #: templates/booking-confirmation.php:274
 #: templates/partials/availability-card.php:234
 #: templates/partials/booking-content.php:318
@@ -420,8 +422,6 @@ msgid "Paid"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1606
-#: app/Controllers/BookingSessionController.php:2086
-#: app/Controllers/BookingSessionController.php:2112
 #: app/Controllers/ReportsController.php:256
 #: assets/dist/js/account-page.js:1321
 #: assets/dist/js/account-page.js:1345
@@ -787,6 +787,7 @@ msgid "Enter ticket subject"
 msgstr ""
 
 #: assets/dist/js/account-page.js:2407
+#: app/Services/EmailTemplateDefaults.php:565
 #: templates/partials/single-trip/enquiry-modal.php:76
 msgid "Message"
 msgstr ""
@@ -1079,10 +1080,11 @@ msgid "Booking Number"
 msgstr ""
 
 #: assets/dist/js/account-page.js:839
-#: app/Controllers/BookingSessionController.php:1999
-#: app/Services/TransactionalEmailTemplateService.php:247
-#: app/Services/TransactionalEmailTemplateService.php:293
-#: app/Services/TransactionalEmailTemplateService.php:318
+#: app/Controllers/BookingSessionController.php:1997
+#: app/Services/EmailTemplateDefaults.php:138
+#: app/Services/EmailTemplateDefaults.php:211
+#: app/Services/EmailTemplateDefaults.php:245
+#: app/Services/EmailTemplateDefaults.php:297
 #: templates/partials/remaining-checkout-content.php:80
 #: templates/partials/remaining-checkout-content.php:139
 #: templates/shortcodes/activity.php:90
@@ -1162,7 +1164,7 @@ msgstr ""
 
 #: assets/dist/js/account-page.js:957
 #: app/Controllers/PaymentGatewayController.php:796
-#: app/Controllers/SettingsController.php:124
+#: app/Controllers/SettingsController.php:119
 #: app/Services/BookingTaxService.php:125
 #: app/Services/BookingTaxService.php:211
 #: app/Services/TaxService.php:45
@@ -1801,6 +1803,7 @@ msgstr ""
 #: assets/dist/js/index-C5mz5_GL.js:106413
 #: assets/dist/js/index-C7SOTaCX.js:720
 #: assets/dist/js/index-DHkBlElb.js:720
+#: assets/dist/js/index-DhSfL6-d.js:737
 msgid "Close"
 msgstr ""
 
@@ -2025,84 +2028,88 @@ msgstr ""
 msgid "Invalid username/email or password. Please try again."
 msgstr ""
 
-#: app/Controllers/AuthController.php:301
-msgid "Please enter your first name."
+#: app/Controllers/AuthController.php:293
+msgid "New customer registration is disabled."
 msgstr ""
 
 #: app/Controllers/AuthController.php:308
-msgid "Please enter your last name."
+msgid "Please enter your first name."
 msgstr ""
 
 #: app/Controllers/AuthController.php:315
-#: app/Controllers/AuthController.php:412
-msgid "Please enter a valid email address."
+msgid "Please enter your last name."
 msgstr ""
 
 #: app/Controllers/AuthController.php:322
+#: app/Controllers/AuthController.php:419
+msgid "Please enter a valid email address."
+msgstr ""
+
+#: app/Controllers/AuthController.php:329
 #: app/Controllers/BookingSessionController.php:967
 msgid "Password must be at least 8 characters long."
 msgstr ""
 
-#: app/Controllers/AuthController.php:329
+#: app/Controllers/AuthController.php:336
 #: app/Controllers/BookingSessionController.php:974
 msgid "Passwords do not match."
 msgstr ""
 
-#: app/Controllers/AuthController.php:336
+#: app/Controllers/AuthController.php:343
 msgid "An account with this email already exists. Please login instead."
 msgstr ""
 
-#: app/Controllers/AuthController.php:396
+#: app/Controllers/AuthController.php:403
 msgid "Registration successful! Please check your email to verify your account before logging in."
 msgstr ""
 
-#: app/Controllers/AuthController.php:421
-#: app/Controllers/AuthController.php:440
+#: app/Controllers/AuthController.php:428
+#: app/Controllers/AuthController.php:447
 msgid "If an account with this email exists and is pending verification, a new verification link has been sent."
 msgstr ""
 
-#: app/Controllers/AuthController.php:430
+#: app/Controllers/AuthController.php:437
 msgid "This email is already verified. You can login now."
 msgstr ""
 
-#: app/Controllers/AuthController.php:450
+#: app/Controllers/AuthController.php:457
 msgid "Please wait before requesting another verification email."
 msgstr ""
 
-#: app/Controllers/AuthController.php:471
+#: app/Controllers/AuthController.php:478
 msgid "A new verification link has been sent to your email address. Please check your inbox."
 msgstr ""
 
-#: app/Controllers/AuthController.php:491
-#: app/Controllers/AuthController.php:497
-#: app/Controllers/AuthController.php:505
+#: app/Controllers/AuthController.php:498
+#: app/Controllers/AuthController.php:504
+#: app/Controllers/AuthController.php:512
 msgid "Invalid verification link."
 msgstr ""
 
-#: app/Controllers/AuthController.php:513
+#: app/Controllers/AuthController.php:520
 msgid "Invalid or expired verification link."
 msgstr ""
 
-#: app/Controllers/AuthController.php:518
+#: app/Controllers/AuthController.php:525
 msgid "This verification link has expired. Please register again."
 msgstr ""
 
-#: app/Controllers/AuthController.php:539
+#: app/Controllers/AuthController.php:546
 #, php-format
 msgid "[%s] Please verify your email address"
 msgstr ""
 
-#: app/Controllers/AuthController.php:542
+#: app/Controllers/AuthController.php:549
 #, php-format
 msgid "You requested a new verification link for your account at %s."
 msgstr ""
 
-#: app/Controllers/AuthController.php:543
+#: app/Controllers/AuthController.php:550
 #, php-format
 msgid "Thank you for registering at %s."
 msgstr ""
 
-#: app/Controllers/AuthController.php:568
+#: app/Controllers/AuthController.php:575
 msgid "Verification Failed"
 msgstr ""
 
@@ -2157,16 +2164,16 @@ msgstr ""
 
 #: app/Controllers/BookingsController.php:734
 #: app/Controllers/BookingsController.php:795
-#: app/Controllers/BookingSessionController.php:1486
+#: app/Controllers/BookingSessionController.php:1484
 #: app/Controllers/CustomerController.php:289
 #: app/Controllers/PaymentGatewayController.php:189
 #: app/Controllers/PaymentGatewayController.php:249
 #: app/Controllers/TripDownloadController.php:181
 #: app/Controllers/TripDownloadController.php:320
-#: app/Services/BookingService.php:383
-#: app/Services/BookingService.php:467
-#: app/Services/BookingService.php:554
-#: app/Services/BookingService.php:976
+#: app/Services/BookingService.php:389
+#: app/Services/BookingService.php:473
+#: app/Services/BookingService.php:560
+#: app/Services/BookingService.php:1000
 #: app/Services/PaymentService.php:85
 msgid "Booking not found."
 msgstr ""
@@ -2236,9 +2243,9 @@ msgstr ""
 #: app/Controllers/BookingSessionController.php:400
 #: app/Controllers/BookingSessionController.php:680
 #: app/Controllers/BookingSessionController.php:837
-#: app/Controllers/BookingSessionController.php:2252
-#: app/Controllers/BookingSessionController.php:2736
-#: app/Services/BookingService.php:235
+#: app/Controllers/BookingSessionController.php:2214
+#: app/Controllers/BookingSessionController.php:2698
+#: app/Services/BookingService.php:239
 #: app/Services/EnquiryService.php:82
 #: app/Services/ReviewService.php:105
 #: app/Services/SavedTripService.php:54
@@ -2274,7 +2281,7 @@ msgid "No trip selected for booking."
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:798
-#: app/Controllers/BookingSessionController.php:1508
+#: app/Controllers/BookingSessionController.php:1506
 msgid "Email address is required."
 msgstr ""
 
@@ -2298,95 +2305,96 @@ msgstr ""
 msgid "An account with this email already exists. Please log in."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1111
-#: app/Controllers/BookingSessionController.php:1119
-#: app/Controllers/BookingSessionController.php:1127
+#: app/Controllers/BookingSessionController.php:1116
+#: app/Controllers/BookingSessionController.php:1124
+#: app/Controllers/BookingSessionController.php:1132
 msgid "Failed to create booking. Please try again."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1128
+#: app/Controllers/BookingSessionController.php:1133
 msgid "Booking ID was not generated."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1254
+#: app/Controllers/BookingSessionController.php:1262
 msgid "Booking created. Redirecting to payment..."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1267
+#: app/Controllers/BookingSessionController.php:1278
 msgid "Booking created. Complete payment..."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1278
+#: app/Controllers/BookingSessionController.php:1289
 msgid "Payment processing failed. Please try again."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1300
+#: app/Controllers/BookingSessionController.php:1311
 msgid "Booking received!"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1306
+#: app/Controllers/BookingSessionController.php:1317
 msgid "Booking confirmed!"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1311
+#: app/Controllers/BookingSessionController.php:1322
 msgid "Booking confirmed! Payment will be collected later."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1314
+#: app/Controllers/BookingSessionController.php:1325
 msgid "Booking received! We will contact you to arrange payment."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1319
+#: app/Controllers/BookingSessionController.php:1330
 msgid "Booking received! Please complete the bank transfer. We will confirm once payment is verified."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1468
+#: app/Controllers/BookingSessionController.php:1466
 msgid "Invalid booking for remaining payment."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1476
+#: app/Controllers/BookingSessionController.php:1474
 #: app/Controllers/PaymentGatewayController.php:200
 #: app/Controllers/PaymentGatewayController.php:261
 #: templates/partials/remaining-checkout-content.php:19
 msgid "This booking is already fully paid."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1496
+#: app/Controllers/BookingSessionController.php:1494
 #: app/Controllers/PaymentGatewayController.php:194
 #: app/Controllers/PaymentGatewayController.php:255
 msgid "You do not have permission to pay for this booking."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1516
+#: app/Controllers/BookingSessionController.php:1514
 msgid "Ready to process remaining payment."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1986
+#: app/Controllers/BookingSessionController.php:1984
 msgid "Thank you for your booking! Your reservation has been confirmed."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1987
+#: app/Controllers/BookingSessionController.php:1985
 msgid "Thank you for your booking! Your reservation has been received and is pending confirmation."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1990
+#: app/Controllers/BookingSessionController.php:1988
 #, php-format
 msgid "Please complete your payment before %s to avoid automatic cancellation."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1998
-#: app/Services/TransactionalEmailTemplateService.php:271
+#: app/Controllers/BookingSessionController.php:1996
+#: app/Services/EmailTemplateDefaults.php:177
 msgid "Booking reference"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2000
-#: app/Services/TransactionalEmailTemplateService.php:248
-#: app/Services/TransactionalEmailTemplateService.php:294
-#: app/Services/TransactionalEmailTemplateService.php:319
+#: app/Controllers/BookingSessionController.php:1998
+#: app/Services/EmailTemplateDefaults.php:139
+#: app/Services/EmailTemplateDefaults.php:212
+#: app/Services/EmailTemplateDefaults.php:246
+#: app/Services/EmailTemplateDefaults.php:298
 msgid "Travel date"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2001
+#: app/Controllers/BookingSessionController.php:1999
 #: app/Providers/FrontendAssetsProvider.php:437
 #: templates/partials/availability-card.php:164
 #: templates/partials/single-trip/quick-facts.php:16
@@ -2397,267 +2405,121 @@ msgstr ""
 msgid "Duration"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2001
+#: app/Controllers/BookingSessionController.php:1999
 #, php-format
 msgid "%d days / %d nights"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2004
+#: app/Controllers/BookingSessionController.php:2002
 msgid "Payment details"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2005
+#: app/Controllers/BookingSessionController.php:2003
 #, php-format
 msgid "Total: %s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2007
+#: app/Controllers/BookingSessionController.php:2005
 #, php-format
 msgid "Payment type: Deposit — due now %s, remaining %s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2009
+#: app/Controllers/BookingSessionController.php:2007
 #, php-format
 msgid "Payment type: Partial — due now %s, remaining %s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2011
+#: app/Controllers/BookingSessionController.php:2009
 msgid "Payment type: Full payment"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2014
+#: app/Controllers/BookingSessionController.php:2012
 msgid "Pay later — please contact us to arrange payment."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2016
+#: app/Controllers/BookingSessionController.php:2014
 msgid "Bank transfer — you will receive bank details separately."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2024
+#: app/Controllers/BookingSessionController.php:2022
 #, php-format
 msgid "Traveler %d: %s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2029
+#: app/Controllers/BookingSessionController.php:2027
 msgid "Full refund available"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2030
+#: app/Controllers/BookingSessionController.php:2028
 msgid "Partial refund available"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2031
+#: app/Controllers/BookingSessionController.php:2029
 msgid "No refund available"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2032
+#: app/Controllers/BookingSessionController.php:2030
 msgid "Flexible cancellation"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2034
+#: app/Controllers/BookingSessionController.php:2032
 msgid "Standard policy applies"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2036
+#: app/Controllers/BookingSessionController.php:2034
 msgid "Cancellation policy"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2037
+#: app/Controllers/BookingSessionController.php:2035
 #, php-format
 msgid "free cancellation up to %d days before departure"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2044
+#: app/Controllers/BookingSessionController.php:2042
 msgid "What’s next?"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2046
+#: app/Controllers/BookingSessionController.php:2044
 msgid "You will receive a detailed trip itinerary within 24–48 hours."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2047
+#: app/Controllers/BookingSessionController.php:2045
 msgid "Our team will contact you to confirm any special requirements."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2048
+#: app/Controllers/BookingSessionController.php:2046
 msgid "Please ensure passports are valid for at least 6 months."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2050
+#: app/Controllers/BookingSessionController.php:2048
 msgid "If you have any questions, contact us anytime."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2073
+#: app/Controllers/BookingSessionController.php:2071
 #, php-format
 msgid "— %s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2086
-msgid "Confirmed"
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2088
-#, php-format
-msgid "[%s] %s New Booking - %s"
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2090
-#, php-format
-msgid ""
-"A new booking has been received! Status: %s\n"
-"\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2092
-#, php-format
-msgid ""
-"Reference: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2093
-#, php-format
-msgid ""
-"Status: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2095
-#: app/Services/BookingCronService.php:228
-#: app/Services/BookingCronService.php:252
-#, php-format
-msgid ""
-"Trip: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2096
-#, php-format
-msgid ""
-"Travel Date: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2097
-#, php-format
-msgid ""
-"Travelers: %d\n"
-"\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2099
-msgid ""
-"CUSTOMER DETAILS\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2101
-#, php-format
-msgid ""
-"Name: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2102
-#, php-format
-msgid ""
-"Email: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2103
-#, php-format
-msgid ""
-"Phone: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2104
-#, php-format
-msgid ""
-"Country: %s\n"
-"\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2106
-msgid ""
-"PAYMENT\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2108
-#, php-format
-msgid ""
-"Total: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2109
-#, php-format
-msgid ""
-"Due Now: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2110
-#, php-format
-msgid ""
-"Method: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2111
-#, php-format
-msgid ""
-"Gateway: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2112
-#, php-format
-msgid ""
-"Payment Status: %s\n"
-"\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2115
-msgid ""
-"⚠️ ACTION REQUIRED: This booking is pending. Please verify payment and confirm.\n"
-"\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2118
-#, php-format
-msgid ""
-"View Booking: %s\n"
-""
-msgstr ""
-
-#: app/Controllers/BookingSessionController.php:2136
+#: app/Controllers/BookingSessionController.php:2098
 msgid "Please enter a coupon code."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2145
-#: app/Controllers/BookingSessionController.php:2243
-#: app/Controllers/BookingSessionController.php:2816
+#: app/Controllers/BookingSessionController.php:2107
+#: app/Controllers/BookingSessionController.php:2205
+#: app/Controllers/BookingSessionController.php:2778
 msgid "No active booking session found."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2168
-#: app/Controllers/BookingSessionController.php:2490
+#: app/Controllers/BookingSessionController.php:2130
+#: app/Controllers/BookingSessionController.php:2452
 msgid "This coupon is not valid for your booking."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2193
+#: app/Controllers/BookingSessionController.php:2155
 msgid "Coupon applied successfully!"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2466
+#: app/Controllers/BookingSessionController.php:2428
 #: app/Models/Checkout.php:188
 #: app/Services/CalculationService.php:490
 #: app/Services/CalculationService.php:521
@@ -2666,16 +2528,16 @@ msgstr ""
 msgid "Group Discount"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2730
+#: app/Controllers/BookingSessionController.php:2692
 #: templates/partials/pricing-summary.php:24
 msgid "Pricing information not available."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2796
+#: app/Controllers/BookingSessionController.php:2758
 msgid "Template not found."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2839
+#: app/Controllers/BookingSessionController.php:2801
 msgid "Coupon removed."
 msgstr ""
 
@@ -2810,9 +2672,9 @@ msgid "Discount deleted successfully"
 msgstr ""
 
 #: app/Controllers/EnquiryController.php:154
-#: app/Services/EnquiryService.php:192
-#: app/Services/EnquiryService.php:219
-#: app/Services/EnquiryService.php:262
+#: app/Services/EnquiryService.php:196
+#: app/Services/EnquiryService.php:223
+#: app/Services/EnquiryService.php:267
 msgid "Enquiry not found."
 msgstr ""
 
@@ -2827,7 +2689,7 @@ msgid "Invalid action."
 msgstr ""
 
 #: app/Controllers/EnquiryController.php:294
-#: app/Services/EnquiryService.php:223
+#: app/Services/EnquiryService.php:227
 msgid "Response message is required."
 msgstr ""
 
@@ -3001,8 +2863,9 @@ msgstr ""
 #: app/Controllers/PaymentGatewayController.php:813
 #: app/Controllers/PaymentGatewayController.php:929
 #: app/Controllers/PaymentGatewayController.php:1045
-#: app/Services/TransactionalEmailTemplateService.php:264
-#: app/Services/TransactionalEmailTemplateService.php:285
+#: app/Services/EmailTemplateDefaults.php:174
+#: app/Services/EmailTemplateDefaults.php:207
+#: app/Services/EmailTemplateDefaults.php:294
 msgid "Customer"
 msgstr ""
 
@@ -3100,7 +2963,7 @@ msgstr ""
 
 #: app/Controllers/SampleDataController.php:223
 #: app/Controllers/SampleDataController.php:263
-#: app/Services/SampleDataService.php:250
+#: app/Services/SampleDataService.php:245
 msgid "Sample data cleaned up successfully!"
 msgstr ""
 
@@ -3113,7 +2976,7 @@ msgid "An error occurred during cleanup. Please check the error logs."
 msgstr ""
 
 #: app/Controllers/SampleDataController.php:251
-#: app/Services/SampleDataService.php:227
+#: app/Services/SampleDataService.php:222
 #: templates/setup-wizard/complete.php:373
 msgid "Sample data imported successfully!"
 msgstr ""
@@ -3124,6 +2987,10 @@ msgstr ""
 
 #: app/Controllers/SampleDataController.php:270
 msgid "Cleanup failed. Please try again."
+msgstr ""
+
+#: app/Controllers/SettingsController.php:266
+msgid "Invalid request body."
 msgstr ""
 
 #: app/Controllers/SetupWizardController.php:71
@@ -3758,6 +3625,22 @@ msgid_plural "%d Nights"
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/Hooks/MigrationAdminNoticeHooks.php:76
+msgid "Yatra: Data migration required"
+msgstr ""
+
+#: app/Hooks/MigrationAdminNoticeHooks.php:77
+msgid "We detected tours, bookings, or other data from Yatra 2.x (or earlier). Run the migration tool to move everything into the new Yatra 3.0 database tables."
+msgstr ""
+
+#: app/Hooks/MigrationAdminNoticeHooks.php:85
+msgid "Open Tools → Migration"
+msgstr ""
+
+#: app/Hooks/MigrationAdminNoticeHooks.php:91
+msgid "Dismiss for this user"
+msgstr ""
+
 #: app/Hooks/ReviewHooks.php:38
 #: app/Hooks/ReviewHooks.php:140
 msgid "Security check failed."
@@ -3819,46 +3702,12 @@ msgstr ""
 msgid "Please specify at least one traveler."
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:191
+#: app/Hooks/ReviewHooks.php:176
 msgid "Your enquiry has been submitted successfully!"
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:193
+#: app/Hooks/ReviewHooks.php:179
 msgid "Failed to submit enquiry. Please try again."
-msgstr ""
-
-#: app/Hooks/ReviewHooks.php:214
-#, php-format
-msgid "New Enquiry from %s"
-msgstr ""
-
-#: app/Hooks/ReviewHooks.php:220
-#, php-format
-msgid "Name: %s"
-msgstr ""
-
-#: app/Hooks/ReviewHooks.php:221
-#, php-format
-msgid "Email: %s"
-msgstr ""
-
-#: app/Hooks/ReviewHooks.php:224
-#, php-format
-msgid "Phone: %s"
-msgstr ""
-
-#: app/Hooks/ReviewHooks.php:228
-#, php-format
-msgid "Trip: %s"
-msgstr ""
-
-#: app/Hooks/ReviewHooks.php:231
-#, php-format
-msgid "Travelers: %d Adults, %d Children"
-msgstr ""
-
-#: app/Hooks/ReviewHooks.php:232
-msgid "Message:"
 msgstr ""
 
 #: app/Hooks/UtilsHooks.php:51
@@ -3892,6 +3741,10 @@ msgstr ""
 
 #: app/Migrations/MigrationController.php:211
 msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: app/Migrations/MigrationProgress.php:198
+msgid "No background scheduler is available (Action Scheduler or WP-Cron)."
 msgstr ""
 
 #: app/Models/Checkout.php:209
@@ -4373,22 +4226,22 @@ msgid "Outstanding balance: %s — please pay before travel."
 msgstr ""
 
 #: app/Services/BookingCronService.php:144
-#: app/Services/BookingService.php:1014
+#: app/Services/BookingService.php:1038
 msgid "Preparation checklist"
 msgstr ""
 
 #: app/Services/BookingCronService.php:145
-#: app/Services/BookingService.php:1015
+#: app/Services/BookingService.php:1039
 msgid "Valid ID / passport"
 msgstr ""
 
 #: app/Services/BookingCronService.php:146
-#: app/Services/BookingService.php:1016
+#: app/Services/BookingService.php:1040
 msgid "Travel insurance"
 msgstr ""
 
 #: app/Services/BookingCronService.php:147
-#: app/Services/BookingService.php:1017
+#: app/Services/BookingService.php:1041
 msgid "Emergency contacts"
 msgstr ""
 
@@ -4421,6 +4274,14 @@ msgstr ""
 #, php-format
 msgid ""
 "Booking Reference: %s\n"
+""
+msgstr ""
+
+#: app/Services/BookingCronService.php:228
+#: app/Services/BookingCronService.php:252
+#, php-format
+msgid ""
+"Trip: %s\n"
 ""
 msgstr ""
 
@@ -4501,120 +4362,119 @@ msgstr ""
 msgid "Tax configuration error."
 msgstr ""
 
-#: app/Services/BookingService.php:209
+#: app/Services/BookingService.php:213
 msgid "Booking validation failed."
 msgstr ""
 
-#: app/Services/BookingService.php:243
+#: app/Services/BookingService.php:247
 msgid "Trip is not available for booking."
 msgstr ""
 
-#: app/Services/BookingService.php:282
+#: app/Services/BookingService.php:286
 msgid "Failed to create booking."
 msgstr ""
 
-#: app/Services/BookingService.php:353
+#: app/Services/BookingService.php:359
 msgid "Booking created successfully."
 msgstr ""
 
-#: app/Services/BookingService.php:407
+#: app/Services/BookingService.php:413
 msgid "Failed to update booking."
 msgstr ""
 
-#: app/Services/BookingService.php:433
+#: app/Services/BookingService.php:439
 msgid "Booking updated successfully."
 msgstr ""
 
-#: app/Services/BookingService.php:461
+#: app/Services/BookingService.php:467
 #: app/Services/CustomerService.php:196
-#: app/Services/EnquiryService.php:290
+#: app/Services/EnquiryService.php:295
 #: app/Services/PaymentService.php:149
 #: app/Services/ReviewService.php:215
 #: app/Services/ReviewService.php:251
 msgid "Invalid status."
 msgstr ""
 
-#: app/Services/BookingService.php:474
+#: app/Services/BookingService.php:480
 #: app/Services/CustomerService.php:208
 #: app/Services/PaymentService.php:161
 #: app/Services/ReviewService.php:227
 msgid "Failed to update status."
 msgstr ""
 
-#: app/Services/BookingService.php:539
+#: app/Services/BookingService.php:545
 #, php-format
 msgid "Booking status updated to %s."
 msgstr ""
 
-#: app/Services/BookingService.php:564
+#: app/Services/BookingService.php:570
 msgid "Failed to delete booking."
 msgstr ""
 
-#: app/Services/BookingService.php:575
+#: app/Services/BookingService.php:581
 msgid "Booking deleted successfully."
 msgstr ""
 
-#: app/Services/BookingService.php:818
+#: app/Services/BookingService.php:833
 msgid "Thank you for your booking! Here are your details:"
 msgstr ""
 
-#: app/Services/BookingService.php:861
+#: app/Services/BookingService.php:877
 msgid "Your booking has been confirmed! Here are your details:"
 msgstr ""
 
-#: app/Services/BookingService.php:872
+#: app/Services/BookingService.php:896
 #, php-format
 msgid "[%s] Booking Status Update - %s"
 msgstr ""
 
-#: app/Services/BookingService.php:896
+#: app/Services/BookingService.php:920
 msgid "Your booking has been confirmed!"
 msgstr ""
 
-#: app/Services/BookingService.php:897
-#: app/Services/TransactionalEmailTemplateService.php:290
+#: app/Services/BookingService.php:921
 msgid "Your booking has been cancelled."
 msgstr ""
 
-#: app/Services/BookingService.php:898
+#: app/Services/BookingService.php:922
 msgid "Your trip has been completed. Thank you for traveling with us!"
 msgstr ""
 
-#: app/Services/BookingService.php:901
+#: app/Services/BookingService.php:925
 #, php-format
 msgid "Your booking status has been updated to: %s"
 msgstr ""
 
-#: app/Services/BookingService.php:911
+#: app/Services/BookingService.php:935
 msgid "Booking Update"
 msgstr ""
 
-#: app/Services/BookingService.php:916
+#: app/Services/BookingService.php:940
 msgid "Reference:"
 msgstr ""
 
-#: app/Services/BookingService.php:917
+#: app/Services/BookingService.php:941
 msgid "Trip:"
 msgstr ""
 
-#: app/Services/BookingService.php:918
+#: app/Services/BookingService.php:942
 #: templates/pdf/voucher.php:168
 msgid "Travel Date:"
 msgstr ""
 
-#: app/Services/BookingService.php:957
+#: app/Services/BookingService.php:981
 msgid "Invalid traveler bulk action."
 msgstr ""
 
-#: app/Services/BookingService.php:980
+#: app/Services/BookingService.php:1004
 msgid "No email address found."
 msgstr ""
 
-#: app/Services/BookingService.php:993
+#: app/Services/BookingService.php:1017
 msgid "Unknown email type."
 msgstr ""
 
-#: app/Services/BookingService.php:998
+#: app/Services/BookingService.php:1022
 msgid "Email sent successfully."
 msgstr ""
 
@@ -4735,17 +4595,341 @@ msgstr ""
 msgid "Minimum amount of %s required for this coupon."
 msgstr ""
 
-#: app/Services/EmailService.php:174
+#: app/Services/EmailService.php:192
 msgid "Please configure all SMTP settings first."
 msgstr ""
 
-#: app/Services/EmailService.php:195
+#: app/Services/EmailService.php:213
 msgid "SMTP connection successful!"
 msgstr ""
 
-#: app/Services/EmailService.php:201
+#: app/Services/EmailService.php:219
 #, php-format
 msgid "SMTP connection failed: %s"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:110
+#: app/Services/ReviewReminderService.php:73
+msgid "there"
+msgstr ""
+
+#. translators: %s: customer name
+#: app/Services/EmailTemplateDefaults.php:117
+#: app/Services/EmailTemplateDefaults.php:149
+#: app/Services/EmailTemplateDefaults.php:218
+#, php-format
+msgid "Hello %s,"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:122
+#: app/Services/EmailTemplateDefaults.php:154
+msgid "Thank you for your booking. Here are your details:"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:129
+#: app/Services/EmailTemplateDefaults.php:162
+msgid "Booking update"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:132
+#: app/Services/EmailTemplateDefaults.php:165
+msgid "Your booking details are inside."
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:137
+#: app/Services/EmailTemplateDefaults.php:210
+#: app/Services/EmailTemplateDefaults.php:244
+#: app/Services/EmailTemplateDefaults.php:292
+msgid "Reference"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:141
+#: app/Services/EmailTemplateDefaults.php:300
+#: templates/partials/availability-card.php:441
+msgid "Total"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:142
+msgid "Amount due now"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:178
+msgid "Amount paid"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:179
+msgid "Method"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:180
+msgid "Transaction ID"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:186
+#: app/Services/EmailTemplateDefaults.php:260
+#, php-format
+msgid "Dear %s,"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:189
+msgid "We’ve received your payment — thank you! Here’s a quick summary."
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:195
+msgid "Payment received"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:198
+msgid "Payment confirmation"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:221
+msgid "Your booking has been cancelled as requested. If you have questions, just reply to this email."
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:227
+msgid "Booking cancelled"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:230
+msgid "Booking cancellation notice"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:253
+msgid "Balance due"
+msgstr ""
+
+#. translators: %s: number of days
+#: app/Services/EmailTemplateDefaults.php:266
+#, php-format
+msgid "Your adventure starts in %s days — we can’t wait to see you!"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:269
+msgid "Your trip is coming up soon — we look forward to seeing you!"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:276
+msgid "Trip reminder"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:279
+msgid "Upcoming trip reminder"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:293
+msgid "Booking ID"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:295
+#: templates/pdf/consent.php:160
+#: templates/pdf/itinerary.php:208
+msgid "Email"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:296
+msgid "Phone"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:301
+msgid "Booking status"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:302
+msgid "Payment status"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:311
+#: app/Services/EmailTemplateDefaults.php:383
+msgid "A new booking just landed. Review the snapshot below and open the admin to take action."
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:317
+#: app/Services/EmailTemplateDefaults.php:401
+msgid "Open in Yatra admin"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:320
+#: app/Services/EmailTemplateDefaults.php:404
+msgid "Site:"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:325
+msgid "New booking"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:327
+#: app/Services/EmailTemplateDefaults.php:411
+msgid "Admin notification"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:345
+msgid "View trip details →"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:360
+msgid "Great news — your booking is confirmed. Save this email for your records."
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:369
+msgid "Trip page →"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:373
+msgid "You're all set"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:419
+msgid "We’ve successfully received your payment. Thank you — you’re one step closer to takeoff!"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:441
+msgid "This email confirms that your booking has been cancelled. If this wasn’t expected, please contact us."
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:448
+msgid "Browse more trips →"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:463
+msgid "We hope you loved"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:464
+msgid "Thank you for choosing us — we’d be delighted to host you again."
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:484
+msgid "Friendly heads-up: your departure is in"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:486
+msgid "days. Here’s what you need at a glance."
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:510
+msgid "This is a gentle nudge about your booking"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:512
+msgid "for"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:514
+msgid "If a balance remains, please settle it before your travel date ({{travel_date}})."
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:535
+msgid "Thanks for reaching out about"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:537
+msgid "We’ve received your message and our team will reply shortly."
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:541
+msgid "Typical reply time: within one business day."
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:556
+msgid "Someone submitted an enquiry from your site. Follow up from the details below."
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:573
+msgid "Admin"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:581
+msgid "Here’s our reply to your enquiry:"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:585
+msgid "Questions? Just reply to this email."
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:601
+msgid "We hope"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:603
+msgid "was unforgettable. Would you share a quick review? It helps other travelers and our team."
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:608
+msgid "Leave a review"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:611
+msgid "Takes about a minute — thank you!"
+msgstr ""
+
+#: app/Services/EmailTemplateDefaults.php:636
+msgid "General enquiry"
+msgstr ""
+
+#: app/Services/EmailTemplateLayout.php:52
+msgid "You received this email because of a booking or enquiry on our site."
+msgstr ""
+
+#: app/Services/EmailTemplateLayout.php:67
+msgid "Yatra · Admin notification"
+msgstr ""
+
+#: app/Services/EmailTemplatePreviewService.php:23
+#: app/Services/EmailTemplatePreviewService.php:40
+msgid "Unknown email template."
+msgstr ""
+
+#: app/Services/EmailTemplateSampleData.php:44
+msgid "Alex Traveler"
+msgstr ""
+
+#: app/Services/EmailTemplateSampleData.php:52
+msgid "Sample Mountain Trek"
+msgstr ""
+
+#: app/Services/EmailTemplateSampleData.php:58
+msgid "confirmed"
+msgstr ""
+
+#: app/Services/EmailTemplateSampleData.php:59
+msgid "pending"
+msgstr ""
+
+#: app/Services/EmailTemplateSampleData.php:60
+msgid "Thank you for your booking. This preview uses sample data."
+msgstr ""
+
+#: app/Services/EmailTemplateSampleData.php:61
+msgid "Note"
+msgstr ""
+
+#: app/Services/EmailTemplateSampleData.php:61
+msgid "Optional line items appear here."
+msgstr ""
+
+#: app/Services/EmailTemplateSampleData.php:62
+msgid "We look forward to hosting you."
+msgstr ""
+
+#: app/Services/EmailTemplateSampleData.php:64
+msgid "Credit card"
+msgstr ""
+
+#: app/Services/EmailTemplateSampleData.php:68
+msgid "Reminder: check your packing list before departure."
+msgstr ""
+
+#: app/Services/EmailTemplateSampleData.php:73
+msgid "Could you confirm whether airport pickup is included on day one?"
+msgstr ""
+
+#: app/Services/EmailTemplateSampleData.php:74
+msgid "Hi Alex, yes — pickup is included for all guests. Safe travels!"
+msgstr ""
+
+#: app/Services/EmailTemplateSampleData.php:75
+msgid "Interested in the April departure dates."
 msgstr ""
 
 #: app/Services/EnquiryService.php:70
@@ -4756,100 +4940,58 @@ msgstr ""
 msgid "Failed to submit enquiry."
 msgstr ""
 
-#: app/Services/EnquiryService.php:176
+#: app/Services/EnquiryService.php:180
 msgid "Your enquiry has been submitted successfully. We will get back to you soon."
 msgstr ""
 
-#: app/Services/EnquiryService.php:198
+#: app/Services/EnquiryService.php:202
 msgid "Failed to update enquiry."
 msgstr ""
 
-#: app/Services/EnquiryService.php:203
+#: app/Services/EnquiryService.php:207
 msgid "Enquiry updated successfully."
 msgstr ""
 
-#: app/Services/EnquiryService.php:229
+#: app/Services/EnquiryService.php:233
 msgid "Failed to save response."
 msgstr ""
 
-#: app/Services/EnquiryService.php:247
+#: app/Services/EnquiryService.php:252
 msgid "Response sent successfully."
 msgstr ""
 
-#: app/Services/EnquiryService.php:268
+#: app/Services/EnquiryService.php:273
 msgid "Failed to delete enquiry."
 msgstr ""
 
-#: app/Services/EnquiryService.php:273
+#: app/Services/EnquiryService.php:278
 msgid "Enquiry deleted successfully."
 msgstr ""
 
-#: app/Services/EnquiryService.php:298
+#: app/Services/EnquiryService.php:303
 #, php-format
 msgid "%d enquiries updated."
 msgstr ""
 
-#: app/Services/EnquiryService.php:315
+#: app/Services/EnquiryService.php:320
 #, php-format
 msgid "%d enquiries deleted."
 msgstr ""
 
-#: app/Services/EnquiryService.php:400
+#. translators: 1: site name, 2: customer name
+#: app/Services/EnquiryService.php:409
 #, php-format
-msgid "[%s] New Enquiry from %s"
+msgid "💬 [%1$s] New enquiry · %2$s"
 msgstr ""
 
-#: app/Services/EnquiryService.php:406
+#: app/Services/EnquiryService.php:433
 #, php-format
-msgid ""
-"New enquiry received:\n"
-"\n"
-"Name: %s\n"
-"Email: %s\n"
-"Phone: %s\n"
-"Trip: %s\n"
-"\n"
-"Message:\n"
-"%s\n"
-"\n"
-"View in admin: %s"
+msgid "✉️ [%s] We received your message"
 msgstr ""
 
-#: app/Services/EnquiryService.php:432
+#: app/Services/EnquiryService.php:455
 #, php-format
-msgid "[%s] We received your enquiry"
-msgstr ""
-
-#: app/Services/EnquiryService.php:437
-#, php-format
-msgid ""
-"Hi %s,\n"
-"\n"
-"Thank you for your enquiry. We have received your message and will get back to you shortly.\n"
-"\n"
-"Best regards,\n"
-"%s"
-msgstr ""
-
-#: app/Services/EnquiryService.php:458
-#, php-format
-msgid "[%s] Response to your enquiry"
-msgstr ""
-
-#: app/Services/EnquiryService.php:463
-#, php-format
-msgid ""
-"Hi %s,\n"
-"\n"
-"Thank you for contacting us. Here is our response to your enquiry:\n"
-"\n"
-"%s\n"
-"\n"
-"Your original message:\n"
-"%s\n"
-"\n"
-"Best regards,\n"
-"%s"
+msgid "💬 [%s] Re: your enquiry"
 msgstr ""
 
 #: app/Services/ItineraryService.php:33
@@ -4876,31 +5018,12 @@ msgstr ""
 msgid "Day number must be at least 1"
 msgstr ""
 
-#: app/Services/NotificationService.php:68
-#, php-format
-msgid "[%s] New Booking Received - #%d"
-msgstr ""
-
-#: app/Services/NotificationService.php:71
-#, php-format
-msgid ""
-"A new booking has been received.\n"
-"\n"
-"Booking ID: %d\n"
-"Trip: %s\n"
-"Customer: %s %s\n"
-"Email: %s\n"
-"Total Amount: %s\n"
-"\n"
-"View booking details in admin panel."
-msgstr ""
-
-#: app/Services/NotificationService.php:89
+#: app/Services/NotificationService.php:108
 #, php-format
 msgid "[%s] Payment Received - Booking #%d"
 msgstr ""
 
-#: app/Services/NotificationService.php:92
+#: app/Services/NotificationService.php:111
 #, php-format
 msgid ""
 "Payment has been received.\n"
@@ -4911,16 +5034,16 @@ msgid ""
 "Transaction ID: %s"
 msgstr ""
 
-#: app/Services/NotificationService.php:116
+#: app/Services/NotificationService.php:135
 msgid "Online payment"
 msgstr ""
 
-#: app/Services/NotificationService.php:132
+#: app/Services/NotificationService.php:151
 #, php-format
 msgid "[%s] Booking Cancelled - #%d"
 msgstr ""
 
-#: app/Services/NotificationService.php:135
+#: app/Services/NotificationService.php:154
 #, php-format
 msgid ""
 "A booking has been cancelled.\n"
@@ -5024,27 +5147,15 @@ msgstr ""
 msgid "The response is no longer valid: either is too old or has been used previously"
 msgstr ""
 
-#: app/Services/ReviewReminderService.php:71
+#. translators: 1: site name, 2: trip title
+#: app/Services/ReviewReminderService.php:79
 #, php-format
-msgid "[%s] How was your trip? Share your experience!"
+msgid "⭐ [%1$s] How was %2$s?"
 msgstr ""
 
-#: app/Services/ReviewReminderService.php:78
-#, php-format
-msgid ""
-"Dear %s,\n"
-"\n"
-"We hope you enjoyed your trip to %s!\n"
-"\n"
-"We'd love to hear about your experience. Your feedback helps other travelers and helps us improve our services.\n"
-"\n"
-"Please take a moment to leave a review:\n"
-"%s\n"
-"\n"
-"Thank you for choosing %s!\n"
-"\n"
-"Best regards,\n"
-"%s"
+#: app/Services/ReviewReminderService.php:81
+#: app/Services/ReviewReminderService.php:86
+msgid "your trip"
 msgstr ""
 
 #: app/Services/ReviewService.php:99
@@ -5113,7 +5224,7 @@ msgstr ""
 msgid "You must be logged in to leave a review."
 msgstr ""
 
-#: app/Services/SampleDataService.php:235
+#: app/Services/SampleDataService.php:230
 #, php-format
 msgid "Error importing sample data: %s"
 msgstr ""
@@ -5350,118 +5461,42 @@ msgstr ""
 msgid "Total tax rate cannot exceed 100%"
 msgstr ""
 
-#: app/Services/TransactionalEmailTemplateService.php:176
+#: app/Services/TransactionalEmailTemplateService.php:260
 #, php-format
-msgid "[%s] Booking update — %s"
+msgid "✈️ [%s] Booking update · %s"
 msgstr ""
 
-#: app/Services/TransactionalEmailTemplateService.php:179
+#: app/Services/TransactionalEmailTemplateService.php:263
 #, php-format
-msgid "[%s] Payment received — %s"
+msgid "✅ [%s] Payment received · %s"
 msgstr ""
 
-#: app/Services/TransactionalEmailTemplateService.php:182
+#: app/Services/TransactionalEmailTemplateService.php:266
 #, php-format
-msgid "[%s] Booking cancelled — %s"
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:185
-#, php-format
-msgid "[%s] Your trip is coming up — %s"
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:188
-#, php-format
-msgid "[%s] Notification"
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:211
-msgid "This is an automated message from your travel site."
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:220
-msgid "there"
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:224
-#: app/Services/TransactionalEmailTemplateService.php:237
-msgid "Booking update"
-msgstr ""
-
-#. translators: %s: customer first name
-#: app/Services/TransactionalEmailTemplateService.php:226
-#: app/Services/TransactionalEmailTemplateService.php:240
-#: app/Services/TransactionalEmailTemplateService.php:289
-#, php-format
-msgid "Hello %s,"
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:229
-#: app/Services/TransactionalEmailTemplateService.php:243
-msgid "Thank you for your booking. Here are your details:"
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:245
-msgid "Booking details"
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:246
-#: app/Services/TransactionalEmailTemplateService.php:292
-#: app/Services/TransactionalEmailTemplateService.php:317
-msgid "Reference"
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:250
-#: templates/partials/availability-card.php:441
-msgid "Total"
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:251
-msgid "Amount due now"
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:267
-msgid "Payment received"
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:268
-#: app/Services/TransactionalEmailTemplateService.php:310
-#, php-format
-msgid "Dear %s,"
+msgid "📋 [%s] Booking cancelled · %s"
 msgstr ""
 
 #: app/Services/TransactionalEmailTemplateService.php:269
-msgid "We have received your payment. Thank you."
+#, php-format
+msgid "🗓️ [%s] Your trip is coming up · %s"
 msgstr ""
 
 #: app/Services/TransactionalEmailTemplateService.php:272
-msgid "Amount paid"
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:273
-msgid "Method"
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:274
-msgid "Transaction ID"
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:288
-msgid "Booking cancelled"
-msgstr ""
-
-#: app/Services/TransactionalEmailTemplateService.php:309
-msgid "Trip reminder"
-msgstr ""
-
-#. translators: %s: number of days
-#: app/Services/TransactionalEmailTemplateService.php:313
 #, php-format
-msgid "Your trip is coming up in %s days. We look forward to seeing you!"
+msgid "🔔 [%s] New booking · %s (#%s)"
 msgstr ""
 
-#: app/Services/TransactionalEmailTemplateService.php:322
-msgid "Balance due"
+#: app/Services/TransactionalEmailTemplateService.php:275
+#, php-format
+msgid "✉️ [%s] Notification"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:303
+msgid "Notification"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:304
+msgid "This is an automated message from your travel site."
 msgstr ""
 
 #: app/Services/TripListingService.php:517
@@ -7810,11 +7845,6 @@ msgstr ""
 
 #: templates/pdf/consent.php:156
 msgid "Signer Name"
-msgstr ""
-
-#: templates/pdf/consent.php:160
-#: templates/pdf/itinerary.php:208
-msgid "Email"
 msgstr ""
 
 #: templates/pdf/consent.php:164

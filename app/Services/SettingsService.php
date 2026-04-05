@@ -52,6 +52,7 @@ class SettingsService
         'booking_expiry_hours' => 24,
         'booking_reminder_days' => 3,
         'allow_waitlist' => true,
+        'waitlist_auto_confirm' => false,
         
         // Payment
         'currency' => 'USD',
@@ -257,6 +258,38 @@ class SettingsService
         return $merged;
     }
 
+    private static function isEmailIdentityKey(string $key): bool
+    {
+        return $key === 'admin_email' || $key === 'from_email' || $key === 'from_name';
+    }
+
+    private static function isEmptyScalar($value): bool
+    {
+        return $value === null || $value === false || $value === ''
+            || (is_string($value) && trim($value) === '');
+    }
+
+    /**
+     * When Yatra delivery options are empty, use WordPress site admin email / blog name (same as installer defaults).
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    private static function applyEmailIdentityFallback(string $key, $value)
+    {
+        if (!self::isEmailIdentityKey($key) || !self::isEmptyScalar($value)) {
+            return $value;
+        }
+        if ($key === 'from_name') {
+            $wp = (string) get_bloginfo('name');
+
+            return $wp !== '' ? $wp : $value;
+        }
+        $wp = (string) get_option('admin_email', '');
+
+        return $wp !== '' ? $wp : $value;
+    }
+
     /**
      * Get all settings
      *
@@ -299,7 +332,7 @@ class SettingsService
 
         // If setting exists in cache, return it
         if (isset(self::$settings[$key])) {
-            return self::$settings[$key];
+            return self::applyEmailIdentityFallback($key, self::$settings[$key]);
         }
         
         // Try to fetch from database directly for settings not in defaults
@@ -327,10 +360,13 @@ class SettingsService
             }
             // Cache the value
             self::$settings[$key] = $value;
-            return $value;
+
+            return self::applyEmailIdentityFallback($key, $value);
         }
-        
-        return $default ?? (self::$defaults[$key] ?? null);
+
+        $fallback = $default ?? (self::$defaults[$key] ?? null);
+
+        return self::applyEmailIdentityFallback($key, $fallback);
     }
 
     /**
@@ -411,6 +447,27 @@ class SettingsService
             }
             
             self::$settings[$key] = $value;
+        }
+
+        self::mergeAdminReviewOptionAliases();
+    }
+
+    /**
+     * REST/Settings UI uses yatra_require_booking, yatra_review_moderation, yatra_min_rating;
+     * internal helpers use require_booking_to_review, enable_review_moderation, minimum_rating.
+     */
+    private static function mergeAdminReviewOptionAliases(): void
+    {
+        $map = [
+            'require_booking' => 'require_booking_to_review',
+            'review_moderation' => 'enable_review_moderation',
+            'min_rating' => 'minimum_rating',
+        ];
+        foreach ($map as $adminKey => $internalKey) {
+            $v = get_option(self::OPTION_PREFIX . $adminKey, null);
+            if ($v !== null) {
+                self::$settings[$internalKey] = $v;
+            }
         }
     }
 
@@ -600,6 +657,14 @@ class SettingsService
     public static function isFlexiblePaymentsAvailable(): bool
     {
         return apply_filters('yatra_flexible_payments_enabled', false);
+    }
+
+    /**
+     * Global payment test/sandbox toggle (Settings → Payment).
+     */
+    public static function isPaymentTestMode(): bool
+    {
+        return self::isEnabled('payment_test_mode');
     }
 }
 

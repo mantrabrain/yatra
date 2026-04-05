@@ -46,8 +46,8 @@ class BookingValidator
 
         // Validate status
         if (isset($data['status'])) {
-            $validStatuses = ['pending', 'confirmed', 'cancelled', 'completed', 'refunded'];
-            if (!in_array($data['status'], $validStatuses)) {
+            $validStatuses = ['pending', 'confirmed', 'cancelled', 'completed', 'refunded', 'waitlist'];
+            if (!in_array($data['status'], $validStatuses, true)) {
                 $errors['status'][] = __('Invalid booking status', 'yatra');
             }
         }
@@ -139,8 +139,8 @@ class BookingValidator
         }
 
         if (isset($data['status'])) {
-            $validStatuses = ['pending', 'confirmed', 'cancelled', 'completed', 'refunded'];
-            if (!in_array($data['status'], $validStatuses)) {
+            $validStatuses = ['pending', 'confirmed', 'cancelled', 'completed', 'refunded', 'waitlist'];
+            if (!in_array($data['status'], $validStatuses, true)) {
                 $errors['status'][] = __('Invalid booking status', 'yatra');
             }
         }
@@ -236,8 +236,8 @@ class BookingValidator
 
         // Enum fields
         if (isset($data['status'])) {
-            $validStatuses = ['pending', 'confirmed', 'cancelled', 'completed', 'refunded'];
-            $sanitized['status'] = in_array($data['status'], $validStatuses) ? $data['status'] : 'pending';
+            $validStatuses = ['pending', 'confirmed', 'cancelled', 'completed', 'refunded', 'waitlist'];
+            $sanitized['status'] = in_array($data['status'], $validStatuses, true) ? $data['status'] : 'pending';
         }
 
         if (isset($data['payment_method'])) {

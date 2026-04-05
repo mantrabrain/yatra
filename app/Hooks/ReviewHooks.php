@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Hooks;
 
 use Yatra\Repositories\ReviewRepository;
-use Yatra\Repositories\EnquiryRepository;
+use Yatra\Services\EnquiryService;
 
 /**
  * Review and Enquiry AJAX Hooks
@@ -161,10 +161,8 @@ class ReviewHooks
             wp_send_json_error(['message' => __('Please specify at least one traveler.', 'yatra')]);
         }
 
-        // Save enquiry
-        $enquiryRepository = new EnquiryRepository();
-
-        $result = $enquiryRepository->create([
+        $enquiryService = new EnquiryService();
+        $result = $enquiryService->createEnquiry([
             'trip_id' => $trip_id > 0 ? $trip_id : null,
             'name' => $name,
             'email' => $email,
@@ -172,66 +170,12 @@ class ReviewHooks
             'message' => $message,
             'adults' => $adults,
             'children' => $children,
-            'status' => 'pending',
-            'created_at' => current_time('mysql'),
         ]);
 
-        if ($result) {
-            // Send email notification
-            self::sendEnquiryNotificationEmail($result, [
-                'trip_id' => $trip_id,
-                'name' => $name,
-                'email' => $email,
-                'phone' => $phone,
-                'message' => $message,
-                'adults' => $adults,
-                'children' => $children,
-            ]);
-
-            wp_send_json_success(['message' => __('Your enquiry has been submitted successfully!', 'yatra')]);
-        } else {
-            wp_send_json_error(['message' => __('Failed to submit enquiry. Please try again.', 'yatra')]);
-        }
-    }
-
-    /**
-     * Send enquiry notification email
-     */
-    private static function sendEnquiryNotificationEmail(int $enquiry_id, array $data): void
-    {
-        // Get admin email
-        $admin_email = get_option('admin_email');
-
-        // Get trip title if available
-        $trip_title = '';
-        if (!empty($data['trip_id'])) {
-            $tripRepository = new \Yatra\Repositories\TripRepository();
-            $trip = $tripRepository->find((int) $data['trip_id']);
-            $trip_title = $trip ? $trip->title : '';
+        if (!empty($result['success'])) {
+            wp_send_json_success(['message' => $result['message'] ?? __('Your enquiry has been submitted successfully!', 'yatra')]);
         }
 
-        // Build email subject
-        $subject = sprintf(__('New Enquiry from %s', 'yatra'), $data['name']);
-        if ($trip_title) {
-            $subject .= ' - ' . $trip_title;
-        }
-
-        // Build email body
-        $body = sprintf(__('Name: %s', 'yatra'), $data['name']) . "\n";
-        $body .= sprintf(__('Email: %s', 'yatra'), $data['email']) . "\n";
-
-        if (!empty($data['phone'])) {
-            $body .= sprintf(__('Phone: %s', 'yatra'), $data['phone']) . "\n";
-        }
-
-        if (!empty($trip_title)) {
-            $body .= sprintf(__('Trip: %s', 'yatra'), $trip_title) . "\n";
-        }
-
-        $body .= sprintf(__('Travelers: %d Adults, %d Children', 'yatra'), $data['adults'], $data['children']) . "\n\n";
-        $body .= sprintf(__('Message:', 'yatra')) . "\n" . $data['message'];
-
-        // Send email
-        wp_mail($admin_email, $subject, $body);
+        wp_send_json_error(['message' => $result['message'] ?? __('Failed to submit enquiry. Please try again.', 'yatra')]);
     }
 }

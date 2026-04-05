@@ -915,7 +915,37 @@ class BookingSessionController extends BaseController
         $subtotal_before_discount = $pricing['subtotal'];
         $discount_amount        = $pricing['total_discount_amount'];
         $discount_code          = $pricing['group_discount']['code'] ?? ($pricing['coupon_discount']['code'] ?? null);
-        
+
+        // ========================================
+        // CAPACITY / WAITLIST
+        // ========================================
+        $resolvedAvailabilityForWaitlist = null;
+        if ($travel_date !== '') {
+            try {
+                $availResolutionSvc = new \Yatra\Services\AvailabilityResolutionService();
+                $resolvedAvailabilityForWaitlist = $availResolutionSvc->resolveAvailabilityForDate(
+                    $trip_id,
+                    $travel_date,
+                    $departure_time !== '' ? $departure_time : null
+                );
+            } catch (\Throwable $e) {
+                // Leave null; legacy checkout without strict availability still works
+            }
+        }
+
+        $isWaitlistCheckout = false;
+        if (\Yatra\Services\WaitlistService::isInsufficientSeats($resolvedAvailabilityForWaitlist, $travelers_count)) {
+            if (\Yatra\Services\WaitlistService::canJoinWaitlist($trip, $resolvedAvailabilityForWaitlist, $travelers_count)) {
+                $isWaitlistCheckout = true;
+            } else {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => __('This departure is full. Waitlist is not available for this trip or date.', 'yatra'),
+                    'code' => 'sold_out',
+                ], 400);
+            }
+        }
+
         // Generate booking reference using the same method as BookingService
         $bookingRepository = new \Yatra\Repositories\BookingRepository();
         $booking_reference = $bookingRepository->generateReference();
@@ -1060,7 +1090,11 @@ class BookingSessionController extends BaseController
 
         // Create booking using BookingService
         $booking_service = new \Yatra\Services\BookingService();
-        
+
+        $is_offline_gateway = in_array($payment_gateway, ['pay_later', 'bank_transfer'], true);
+
+        // Always defer createBooking's copy: session sends one rich confirmation at the end, or
+        // transactional confirmation before payment redirect (see processPaymentGateway returns).
         $booking_data = [
             'reference' => $booking_reference,
             'trip_id' => $trip_id,
@@ -1099,8 +1133,16 @@ class BookingSessionController extends BaseController
             // Itinerary costs
             'itinerary_costs' => wp_json_encode($pricing['itinerary_costs'] ?? []),
             'itinerary_costs_total' => ($pricing['itinerary_costs_total'] ?? 0),
+            'skip_initial_customer_confirmation' => true,
         ];
-        
+
+        if ($isWaitlistCheckout && $resolvedAvailabilityForWaitlist) {
+            $booking_data['availability_id'] = (int) $resolvedAvailabilityForWaitlist->id;
+            $booking_data['status'] = 'waitlist';
+            $booking_data['payment_gateway'] = 'pay_later';
+            $booking_data['payment_method'] = 'full';
+        }
+
         try {
             $booking = $booking_service->createBooking($booking_data);
             // BookingService returns ['success'=>bool, 'booking_id'=>int, ...]
@@ -1127,6 +1169,13 @@ class BookingSessionController extends BaseController
                 'message' => __('Failed to create booking. Please try again.', 'yatra'),
                 'error' => __('Booking ID was not generated.', 'yatra'),
             ], 500);
+        }
+
+        if ($isWaitlistCheckout && $resolvedAvailabilityForWaitlist) {
+            \Yatra\Services\WaitlistService::incrementAvailabilityWaitlistCount(
+                (int) $resolvedAvailabilityForWaitlist->id,
+                $travelers_count
+            );
         }
 
         // Get the actual booking reference from database
@@ -1170,22 +1219,40 @@ class BookingSessionController extends BaseController
             );
         }
 
-        // ========================================
-        // HANDLE DEPARTURE CREATION/UPDATE
-        // ========================================
-        // Automatically create or update departure for the booking date
+        if ($isWaitlistCheckout && $resolvedAvailabilityForWaitlist) {
+            yatra_clear_booking_session();
+            if ($settings['booking_confirmation']) {
+                $booking_service->sendNewBookingTransactionalConfirmation((int) $booking_id);
+            }
+
+            return new WP_REST_Response([
+                'success' => true,
+                'message' => __('You are on the waitlist. We will contact you if a space opens up.', 'yatra'),
+                'data' => [
+                    'booking_id' => $booking_id,
+                    'reference' => $booking_reference,
+                    'status' => 'waitlist',
+                    'waitlist' => true,
+                    'redirect_url' => $this->getConfirmationUrl($booking_reference),
+                    'customer_email' => $contact_data['email'],
+                    'customer_name' => trim($contact_data['first_name'] . ' ' . $contact_data['last_name']),
+                    'trip_id' => $trip_id,
+                    'trip_date' => $travel_date,
+                    'currency' => $pricing['currency'] ?? \Yatra\Services\SettingsService::getCurrency(),
+                    'total_amount' => $total_amount,
+                    'amount_due' => $amount_due,
+                ],
+            ]);
+        }
+
+        // Departure link + booked_count: handled inside BookingService::createBooking (and inventory sync hooks).
+        // Persist travel window on the booking row for reporting (optional columns).
         if (!empty($travel_date)) {
             try {
-                // Calculate start_date and end_date
                 $start_date = $travel_date;
                 $duration_days = !empty($trip->duration_days) ? (int) $trip->duration_days : 1;
                 $end_date = date('Y-m-d', strtotime($start_date . ' + ' . ($duration_days - 1) . ' days'));
-
-                // Update booking with start_date and end_date (only if columns exist)
-                // Check if columns exist before trying to update
-                $bookingRepository = new \Yatra\Repositories\BookingRepository();
-                $bookingColumns = $bookingRepository->getTableColumns();
-                
+                $bookingColumns = $this->bookingRepository->getTableColumns();
                 $bookingUpdateData = [];
                 if (in_array('start_date', $bookingColumns, true)) {
                     $bookingUpdateData['start_date'] = $start_date;
@@ -1193,42 +1260,19 @@ class BookingSessionController extends BaseController
                 if (in_array('end_date', $bookingColumns, true)) {
                     $bookingUpdateData['end_date'] = $end_date;
                 }
-                
-                if (!empty($bookingUpdateData)) {
+                if ($bookingUpdateData !== []) {
                     $this->bookingRepository->update($booking_id, $bookingUpdateData);
                 }
-
-                // Get trip's default max capacity if available
-                $defaultMaxCapacity = null;
-                if (!empty($trip->max_capacity)) {
-                    $defaultMaxCapacity = (int) $trip->max_capacity;
-                }
-
-                // Find or create departure for this date
-                $departure = $this->departureService->findOrCreateForBooking(
-                    $trip_id,
-                    $start_date,
-                    $end_date,
-                    $travelers_count,
-                    $defaultMaxCapacity
-                );
-
-                // Link booking to departure
-                $this->departureService->linkBookingToDeparture($booking_id, $departure->id);
-
-                // Increment booked count for this departure
-                $this->departureService->incrementBookedCount($departure->id, $travelers_count);
-
-                } catch (\Exception $e) {
-                // Log error but don't fail the booking
-                }
+            } catch (\Exception $e) {
+                // Non-fatal
+            }
         }
 
         // Clear booking session
         yatra_clear_booking_session();
 
         // Check if this is an offline gateway
-        $is_offline = in_array($payment_gateway, ['pay_later', 'bank_transfer']);
+        $is_offline = $is_offline_gateway;
 
         // For online gateways, create payment intent and return redirect URL
         if (!$is_offline && $amount_due > 0) {
@@ -1249,6 +1293,9 @@ class BookingSessionController extends BaseController
             if ($payment_result['success']) {
                 // Handle redirect-based gateways (PayPal, eSewa, Khalti, etc.)
                 if (!empty($payment_result['payment_url'])) {
+                    if ($settings['booking_confirmation']) {
+                        $booking_service->sendNewBookingTransactionalConfirmation((int) $booking_id);
+                    }
                     return new WP_REST_Response([
                         'success' => true,
                         'message' => __('Booking created. Redirecting to payment...', 'yatra'),
@@ -1262,6 +1309,9 @@ class BookingSessionController extends BaseController
                 
                 // Handle client-side payment gateways (Stripe, Razorpay, Square, etc.)
                 if (!empty($payment_result['requires_action'])) {
+                    if ($settings['booking_confirmation']) {
+                        $booking_service->sendNewBookingTransactionalConfirmation((int) $booking_id);
+                    }
                     return new WP_REST_Response([
                         'success' => true,
                         'message' => __('Booking created. Complete payment...', 'yatra'),
@@ -1345,37 +1395,18 @@ class BookingSessionController extends BaseController
         // Use repository to update booking
         $this->bookingRepository->update($booking_id, $update_data);
 
-        // Link booking to departure
-        $this->departureService->linkBookingToDeparture($booking_id, $departure->id);
-
-        // Increment booked count for this departure
-        $this->departureService->incrementBookedCount($departure->id, $travelers_count);
-        if (!is_object($booking)) {
-            $booking = (object) [];
-        }
-        
         /**
-         * Action: Booking created
-         * Fires after a new booking is successfully created
-         * 
-         * @param int $booking_id The booking ID
-         * @param object $booking The booking object with trip data
-         * @since 3.0.0
+         * yatra_booking_created already fired from BookingService::createBooking — do not fire again here
+         * (duplicate admin + Pro automation).
+         *
+         * Synthetic pending→confirmed on the same request duplicates Pro "booking.confirmed" sequences with the
+         * checkout confirmation email. Skip by default; restore with:
+         * add_filter('yatra_skip_checkout_autoconfirm_status_changed_event', '__return_false');
          */
-        do_action('yatra_booking_created', (int) $booking_id, $booking);
-        
-        // If booking was auto-confirmed, also fire status changed action
         if ($booking_status === 'confirmed') {
-            /**
-             * Action: Booking status changed
-             * Fires when booking status changes
-             * 
-             * @param int $booking_id The booking ID
-             * @param string $old_status Previous status
-             * @param string $new_status New status
-             * @since 3.0.0
-             */
-            do_action('yatra_booking_status_changed', (int) $booking_id, 'pending', 'confirmed');
+            if (!apply_filters('yatra_skip_checkout_autoconfirm_status_changed_event', true, (int) $booking_id, 'pending', 'confirmed')) {
+                do_action('yatra_booking_status_changed', (int) $booking_id, 'pending', 'confirmed');
+            }
         }
 
         // ========================================

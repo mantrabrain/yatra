@@ -549,6 +549,7 @@ class BookingRepository extends BaseRepository
             'refunded' => (object) ['status' => 'refunded', 'count' => 0],
             'failed' => (object) ['status' => 'failed', 'count' => 0],
             'on_hold' => (object) ['status' => 'on_hold', 'count' => 0],
+            'waitlist' => (object) ['status' => 'waitlist', 'count' => 0],
             'trash' => (object) ['status' => 'trash', 'count' => 0],
         ];
 
@@ -562,14 +563,14 @@ class BookingRepository extends BaseRepository
             }
         }
 
-        // Total revenue
+        // Total revenue (exclude non-revenue / non-active states)
         $totalRevenue = (float)$this->wpdb->get_var(
-            "SELECT SUM(total_amount) FROM {$table} WHERE status NOT IN ('cancelled', 'refunded', 'failed')"
+            "SELECT SUM(total_amount) FROM {$table} WHERE status NOT IN ('cancelled', 'refunded', 'failed', 'waitlist')"
         );
 
         // Total collected
         $totalCollected = (float)$this->wpdb->get_var(
-            "SELECT SUM(amount_paid) FROM {$table} WHERE status NOT IN ('cancelled', 'refunded', 'failed')"
+            "SELECT SUM(amount_paid) FROM {$table} WHERE status NOT IN ('cancelled', 'refunded', 'failed', 'waitlist')"
         );
 
         // This month bookings
@@ -589,6 +590,7 @@ class BookingRepository extends BaseRepository
             'all' => array_sum(array_column((array)$byStatus, 'count')),
             'confirmed' => $byStatus['confirmed']->count ?? 0,
             'pending' => $byStatus['pending']->count ?? 0,
+            'waitlist' => $byStatus['waitlist']->count ?? 0,
             'trash' => $byStatus['trash']->count ?? 0,
             'cancelled' => $byStatus['cancelled']->count ?? 0,
             'completed' => $byStatus['completed']->count ?? 0,
@@ -1060,6 +1062,45 @@ class BookingRepository extends BaseRepository
         ));
 
         return $count;
+    }
+
+    /**
+     * @return list<object>
+     */
+    public function findWaitlistBookingsForAvailability(int $availabilityId, int $limit = 20): array
+    {
+        if ($availabilityId <= 0) {
+            return [];
+        }
+
+        $table = esc_sql($this->table);
+        $limit = max(1, min(100, $limit));
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $rows = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT * FROM `{$table}` WHERE availability_id = %d AND status = 'waitlist' ORDER BY created_at ASC, id ASC LIMIT %d",
+                $availabilityId,
+                $limit
+            )
+        );
+
+        return is_array($rows) ? $rows : [];
+    }
+
+    public function getTotalWaitlistTravelersForAvailability(int $availabilityId): int
+    {
+        if ($availabilityId <= 0) {
+            return 0;
+        }
+
+        $table = esc_sql($this->table);
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        return (int) $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COALESCE(SUM(travelers_count), 0) FROM `{$table}` WHERE availability_id = %d AND status = 'waitlist'",
+            $availabilityId
+        ));
     }
 }
 

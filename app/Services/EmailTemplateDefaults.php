@@ -619,4 +619,68 @@ final class EmailTemplateDefaults
             'Review request'
         );
     }
+
+    /**
+     * Merge-tag variables for enquiry templates (core wp_mail path when Pro does not own the channel).
+     *
+     * @param object $enquiry Row from EnquiryRepository::findWithTrip()
+     */
+    private static function enquiryVariablesForTemplates(object $enquiry, string $responsePlain): array
+    {
+        $trip = trim((string) ($enquiry->trip_title ?? ''));
+
+        return [
+            'customer_name' => (string) ($enquiry->name ?? ''),
+            'customer_email' => (string) ($enquiry->email ?? ''),
+            'customer_phone' => (string) ($enquiry->phone ?? ''),
+            'trip_name' => $trip !== '' ? $trip : __('General enquiry', 'yatra'),
+            'message' => nl2br(esc_html((string) ($enquiry->message ?? ''))),
+            'response' => $responsePlain !== '' ? nl2br(esc_html($responsePlain)) : '',
+            'response_message' => $responsePlain !== '' ? nl2br(esc_html($responsePlain)) : '',
+        ];
+    }
+
+    /**
+     * Full HTML body matching Pro/system enquiry_received (for free core sends).
+     */
+    public static function renderCoreEnquiryCustomerConfirmationHtml(object $enquiry): string
+    {
+        $vars = self::enquiryVariablesForTemplates($enquiry, '');
+
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlEnquiryCustomer(), $vars);
+    }
+
+    /**
+     * Full HTML body matching Pro/system enquiry_admin.
+     */
+    public static function renderCoreEnquiryAdminNotificationHtml(object $enquiry): string
+    {
+        $vars = self::enquiryVariablesForTemplates($enquiry, '');
+
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlEnquiryAdmin(), $vars);
+    }
+
+    /**
+     * Full HTML body matching Pro/system enquiry_response.
+     */
+    public static function renderCoreEnquiryResponseHtml(object $enquiry, string $response): string
+    {
+        $vars = self::enquiryVariablesForTemplates($enquiry, $response);
+
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlEnquiryResponse(), $vars);
+    }
+
+    /**
+     * Review reminder (cron): same shell as Pro review_request template.
+     */
+    public static function renderCoreReviewReminderHtml(string $customerName, string $tripName, string $reviewUrl): string
+    {
+        $vars = [
+            'customer_name' => $customerName,
+            'trip_name' => $tripName,
+            'review_url' => esc_url($reviewUrl),
+        ];
+
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlReviewRequest(), $vars);
+    }
 }

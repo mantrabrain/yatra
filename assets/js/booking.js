@@ -425,15 +425,24 @@
 
         /**
          * Show success message
+         * @param {string} message
+         * @param {string} reference
+         * @param {{ heading?: string, footerHtml?: string, iconColor?: string }|undefined} opts
          */
-        function showSuccessMessage(message, reference) {
+        function showSuccessMessage(message, reference, opts) {
+            opts = opts || {};
+            const heading = opts.heading || 'Booking Confirmed!';
+            const iconColor = opts.iconColor || '#22c55e';
+            const footerHtml = opts.footerHtml !== undefined
+                ? opts.footerHtml
+                : '<p style="margin-top: 24px; color: #6b7280;">A confirmation email has been sent to your email address.</p>';
             const $success = $('<div class="yatra-booking-success" style="text-align: center; padding: 60px 20px;">' +
-                '<svg style="width: 80px; height: 80px; color: #22c55e; margin-bottom: 24px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                '<svg style="width: 80px; height: 80px; color: ' + iconColor + '; margin-bottom: 24px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
                 '<circle cx="12" cy="12" r="10"></circle><polyline points="9,12 12,15 16,10"></polyline></svg>' +
-                '<h2 style="font-size: 28px; margin-bottom: 12px; color: #111827;">Booking Confirmed!</h2>' +
+                '<h2 style="font-size: 28px; margin-bottom: 12px; color: #111827;">' + heading + '</h2>' +
                 '<p style="font-size: 18px; color: #6b7280; margin-bottom: 8px;">' + message + '</p>' +
                 '<p style="font-size: 16px; color: #111827; font-weight: 600;">Reference: ' + reference + '</p>' +
-                '<p style="margin-top: 24px; color: #6b7280;">A confirmation email has been sent to your email address.</p>' +
+                footerHtml +
                 '</div>');
             
             $form.html($success);
@@ -687,13 +696,27 @@
             
             
             if (!response.success) {
-                
-                showFormError(response.message || 'An error occurred. Please try again.');
+                const errMsg = response.message || 'An error occurred. Please try again.';
+                showFormError(errMsg);
                 $submitBtn.prop('disabled', false).html(originalBtnHtml);
                 return;
             }
             
             const data = response.data || {};
+
+            if (data.waitlist) {
+                const reference = data.reference || 'N/A';
+                showSuccessMessage(
+                    response.message || "You're on the waitlist for this departure.",
+                    reference,
+                    {
+                        heading: "You're on the waitlist",
+                        iconColor: '#ca8a04',
+                        footerHtml: '<p style="margin-top: 24px; color: #6b7280;">We will contact you if a space opens up.</p>'
+                    }
+                );
+                return;
+            }
             
             
             // Check for redirect URLs first (PayPal, eSewa, Khalti, etc.)

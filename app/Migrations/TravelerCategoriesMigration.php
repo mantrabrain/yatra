@@ -518,19 +518,36 @@ class TravelerCategoriesMigration extends BaseMigration
             }
         }
 
-        // Append new price type
-        $priceTypes[] = [
+        // Canonical keys must match TripMigration::migrateTripPricing() and TripController
+        // (original_price / discounted_price / pricing_mode / min_travelers / max_travelers).
+        $regular = (float) ($data['regular_price'] ?? 0);
+        $sales = (float) ($data['sales_price'] ?? 0);
+        $discounted = ($sales > 0 && $sales < $regular) ? $sales : null;
+        $pricingPer = $data['pricing_per'] ?? 'person';
+        $pricingMode = ($pricingPer === 'group') ? 'per_group' : 'per_person';
+        $minPax = max(1, (int) ($data['minimum_pax'] ?? 1));
+        $maxPax = (int) ($data['maximum_pax'] ?? 0);
+        if ($maxPax < $minPax) {
+            $maxPax = $minPax;
+        }
+
+        $entry = [
             'category_id' => (int) $data['category_id'],
             'label' => $data['label'] ?? '',
-            'description' => $data['description'] ?? '',
-            'regular_price' => (float) ($data['regular_price'] ?? 0),
-            'sales_price' => (float) ($data['sales_price'] ?? 0),
-            'minimum_pax' => (int) ($data['minimum_pax'] ?? 1),
-            'maximum_pax' => (int) ($data['maximum_pax'] ?? 0),
-            'group_size' => (int) ($data['group_size'] ?? 1),
-            'pricing_per' => $data['pricing_per'] ?? 'person',
-            'is_active' => (int) ($data['is_active'] ?? 1),
+            'original_price' => $regular,
+            'discounted_price' => $discounted,
+            'pricing_mode' => $pricingMode,
+            'min_travelers' => $minPax,
+            'max_travelers' => $maxPax,
         ];
+        if (!empty($data['description'])) {
+            $entry['description'] = $data['description'];
+        }
+        if ($pricingMode === 'per_group') {
+            $entry['group_size'] = max(1, (int) ($data['group_size'] ?? 1));
+        }
+
+        $priceTypes[] = $entry;
 
         $updated = $this->wpdb->update(
             $tripsTable,

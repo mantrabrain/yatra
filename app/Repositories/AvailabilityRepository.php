@@ -381,6 +381,24 @@ class AvailabilityRepository extends BaseRepository
     }
 
     /**
+     * Atomically adjust seats_waitlist (negative delta when promoting from waitlist).
+     */
+    public function incrementSeatsWaitlist(int $id, int $delta): void
+    {
+        if ($id <= 0 || $delta === 0) {
+            return;
+        }
+
+        $table = esc_sql($this->table);
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $this->wpdb->query($this->wpdb->prepare(
+            "UPDATE `{$table}` SET seats_waitlist = GREATEST(0, COALESCE(seats_waitlist, 0) + %d) WHERE id = %d",
+            $delta,
+            $id
+        ));
+    }
+
+    /**
      * Check if table supports soft delete
      */
     protected function hasSoftDelete(): bool

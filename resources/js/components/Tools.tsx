@@ -182,6 +182,26 @@ const Tools: React.FC = () => {
   
   const { showToast } = useToast();
 
+  // Deep-link from WP admin notice: admin.php?page=yatra&subpage=tools&tools_tab=migration
+  useEffect(() => {
+    const allowed = new Set([
+      "export-import",
+      "jobs",
+      "system-status",
+      "logs",
+      "migration",
+    ]);
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const t = params.get("tools_tab");
+      if (t && allowed.has(t)) {
+        setActiveTab(t);
+      }
+    } catch {
+      // ignore invalid URL
+    }
+  }, []);
+
   // Helper function to format bytes
   const formatBytes = (bytes: number): string => {
     if (bytes === 0) return "0 Bytes";

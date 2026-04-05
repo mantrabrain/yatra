@@ -104,8 +104,8 @@ class Departure
      */
     public function calculateStatus(): string
     {
-        // If explicitly cancelled, return cancelled
-        if ($this->status === 'cancelled') {
+        // Empty auto-cancelled departures stay cancelled; reopen when bookings exist again
+        if ($this->status === 'cancelled' && $this->booked_count <= 0) {
             return 'cancelled';
         }
         

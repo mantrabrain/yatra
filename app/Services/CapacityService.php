@@ -44,14 +44,26 @@ class CapacityService
         if (!empty($recurringRules)) {
             // Sort by priority (if applicable) and get the first matching rule
             $matchingRule = reset($recurringRules);
-            // Recurring rules use 'seats_total' field for capacity
-            if (isset($matchingRule->seats_total) && $matchingRule->seats_total > 0) {
-                return (int) $matchingRule->seats_total;
+            $seats = (int) ($matchingRule->seats_total ?? 0);
+            if ($seats <= 0 && !empty($matchingRule->capacity_value)) {
+                $capType = $matchingRule->capacity_type ?? 'fixed';
+                if ($capType === 'fixed') {
+                    $seats = (int) $matchingRule->capacity_value;
+                }
+            }
+            if ($seats > 0) {
+                return $seats;
             }
         }
 
-        // 3. Fall back to trip's default capacity
+        // 3. Fall back to trip's default capacity (column is max_travelers; max_travellers kept for legacy rows)
         $trip = $this->tripRepository->find($tripId);
-        return $trip ? (int) ($trip->max_travellers ?? 0) : 0;
+        if (!$trip) {
+            return 0;
+        }
+
+        $cap = (int) ($trip->max_travelers ?? $trip->max_travellers ?? 0);
+
+        return $cap > 0 ? $cap : 0;
     }
 }

@@ -242,36 +242,42 @@ class RecurringAvailabilityRepository extends BaseRepository
         $allowed = [
             'trip_id', 'name', 'rule_type', 'days_of_week', 'week_of_month',
             'day_of_week', 'interval_days', 'interval_start_date', 'start_date',
-            'end_date', 'excluded_dates', 'months', 'time_slots', 'pricing_type', 'original_price', 
+            'end_date', 'excluded_dates', 'months', 'time_slots', 'original_price',
             'sale_price', 'traveler_pricing', 'seats_total', 'alert_threshold',
-            'departure_time', 'arrival_time', 'from_location', 'to_location', 
-            'cutoff_hours', 'advance_booking_days', 'day_overrides', 'status', 'priority'
+            'departure_time', 'arrival_time', 'from_location', 'to_location',
+            'cutoff_hours', 'advance_booking_days', 'day_overrides', 'status', 'priority',
         ];
-        
+
         $prepared = [];
-        
+
+        // Map API pricing_type to schema column price_type (enum fixed|percentage)
+        if (array_key_exists('pricing_type', $data)) {
+            $pt = $data['pricing_type'];
+            $prepared['price_type'] = ($pt === 'percentage' || $pt === 'percent') ? 'percentage' : 'fixed';
+        }
+
         foreach ($allowed as $field) {
             if (array_key_exists($field, $data)) {
                 $value = $data[$field];
-                
+
                 // JSON encode array fields
                 if (in_array($field, ['excluded_dates', 'months', 'time_slots', 'day_overrides', 'traveler_pricing'], true)) {
                     if (is_array($value)) {
                         $value = wp_json_encode($value);
                     }
                 }
-                
+
                 // Handle empty values
                 if ($value === '' || $value === null) {
                     if (in_array($field, ['end_date', 'interval_start_date', 'departure_time', 'arrival_time', 'advance_booking_days'], true)) {
                         $value = null;
                     }
                 }
-                
+
                 $prepared[$field] = $value;
             }
         }
-        
+
         return $prepared;
     }
 
@@ -306,7 +312,15 @@ class RecurringAvailabilityRepository extends BaseRepository
         } else {
             $rule->traveler_pricing = [];
         }
-        
+
+        // CapacityService reads seats_total; fall back to capacity_value when fixed capacity
+        if (empty($rule->seats_total) && !empty($rule->capacity_value)) {
+            $capType = $rule->capacity_type ?? 'fixed';
+            if ($capType === 'fixed') {
+                $rule->seats_total = (int) $rule->capacity_value;
+            }
+        }
+
         // Also enrich time_slots traveler_pricing
         if (!empty($rule->time_slots)) {
             foreach ($rule->time_slots as &$slot) {
@@ -323,13 +337,17 @@ class RecurringAvailabilityRepository extends BaseRepository
             $rule->days_of_week_array = [];
         }
         
-        // Decode months JSON field
+        // Decode months (JSON column or longtext)
         if (!empty($rule->months)) {
-            $rule->months = json_decode($rule->months, true) ?: [];
+            if (is_string($rule->months)) {
+                $rule->months = json_decode($rule->months, true) ?: [];
+            } elseif (!is_array($rule->months)) {
+                $rule->months = [];
+            }
         } else {
             $rule->months = [];
         }
-        
+
         return $rule;
     }
     

@@ -274,10 +274,41 @@ class InstallerService
     }
 
     /**
+     * Fill canonical + legacy email identity options when empty (upgrades, partial installs, or empty strings in DB).
+     * Idempotent; safe to run on each admin load via maybeBackfillEmailTemplateDefaults().
+     */
+    public static function maybeBackfillEmailDeliveryIdentity(): void
+    {
+        $wpAdmin = trim((string) get_option('admin_email', ''));
+        $wpName = trim((string) get_bloginfo('name'));
+
+        $isUnsetOrEmpty = static function ($v): bool {
+            return $v === false || $v === null || $v === '' || (is_string($v) && trim($v) === '');
+        };
+
+        if ($wpAdmin !== '') {
+            foreach (['yatra_admin_email', 'yatra_from_email', 'yatra_email_from_address'] as $opt) {
+                if ($isUnsetOrEmpty(get_option($opt, false))) {
+                    update_option($opt, $wpAdmin);
+                }
+            }
+        }
+        if ($wpName !== '') {
+            foreach (['yatra_from_name', 'yatra_email_from_name'] as $opt) {
+                if ($isUnsetOrEmpty(get_option($opt, false))) {
+                    update_option($opt, $wpName);
+                }
+            }
+        }
+    }
+
+    /**
      * One-time: persist default HTML subjects/bodies when options exist but are empty (pre-template-defaults installs).
      */
     public static function maybeBackfillEmailTemplateDefaults(): void
     {
+        self::maybeBackfillEmailDeliveryIdentity();
+
         // Default-on for new option on existing sites (add_option no-ops if already present).
         add_option('yatra_email_template_admin_new_booking', 1);
 

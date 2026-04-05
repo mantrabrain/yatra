@@ -10,6 +10,7 @@ use Yatra\Repositories\AvailabilityRepository;
 use Yatra\Repositories\BookingRepository;
 use Yatra\Repositories\DepartureRepository;
 use Yatra\Services\CapacityService;
+use Yatra\Services\WaitlistPromotionService;
 
 class AvailabilityInventoryHooks
 {
@@ -121,6 +122,8 @@ class AvailabilityInventoryHooks
         ]);
 
         self::syncDepartureWithAvailability($tripId, $availability, $bookedCount, $seatsTotal);
+
+        WaitlistPromotionService::processAvailableSlots($tripId, $availabilityId);
     }
 
     private static function syncDepartureWithAvailability(int $tripId, object $availability, int $bookedCount, int $seatsTotal): void
@@ -175,14 +178,9 @@ class AvailabilityInventoryHooks
     {
         $availabilityRepo = new AvailabilityRepository();
         $availability = $availabilityRepo->find($availabilityId);
-        
+
         if ($availability) {
-            self::syncDepartureWithAvailability(
-                (int) $availability->trip_id,
-                $availability, // Pass the full availability object, not just the date
-                0, // Will be recalculated from bookings
-                (int) ($availability->seats_total ?? 0)
-            );
+            self::syncAvailabilityId($availabilityId, (int) $availability->trip_id);
         }
     }
 

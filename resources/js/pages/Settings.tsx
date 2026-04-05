@@ -4521,7 +4521,7 @@ const Settings: React.FC = () => {
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     {__(
-                      "Send confirmation emails when bookings are made",
+                      "Controls post-checkout confirmation (page and customer email when templates/notifications allow).",
                       "yatra",
                     )}
                   </p>
@@ -4597,6 +4597,56 @@ const Settings: React.FC = () => {
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     {__(
                       "Allow customers to book without creating an account",
+                      "yatra",
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                <input
+                  type="checkbox"
+                  id="allow_waitlist"
+                  checked={formData.allow_waitlist}
+                  name="allow_waitlist"
+                  onChange={handleFieldChange}
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <div className="flex-1">
+                  <Label
+                    htmlFor="allow_waitlist"
+                    className="font-medium cursor-pointer"
+                  >
+                    {__("Allow waitlist when a date is full", "yatra")}
+                  </Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {__(
+                      "Customers can join a waitlist instead of being blocked when seats are gone (per-trip caps still apply).",
+                      "yatra",
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                <input
+                  type="checkbox"
+                  id="waitlist_auto_confirm"
+                  checked={formData.waitlist_auto_confirm}
+                  name="waitlist_auto_confirm"
+                  onChange={handleFieldChange}
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <div className="flex-1">
+                  <Label
+                    htmlFor="waitlist_auto_confirm"
+                    className="font-medium cursor-pointer"
+                  >
+                    {__("Auto-confirm promoted waitlist bookings", "yatra")}
+                  </Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {__(
+                      "When a spot opens, move the next waitlisted booking to confirmed; otherwise it becomes pending for staff review.",
                       "yatra",
                     )}
                   </p>
@@ -4749,7 +4799,7 @@ const Settings: React.FC = () => {
                 id="customer_account_page"
                 label={__("Customer Account Page", "yatra")}
                 description={__(
-                  "URL slug for customer account page (e.g., /my-account)",
+                  "URL path segment for the account area (e.g. my-account → /my-account/dashboard). Must match your frontend routes.",
                   "yatra",
                 )}
               >
@@ -4811,78 +4861,6 @@ const Settings: React.FC = () => {
                   </p>
                 </div>
               </div>
-
-              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                <input
-                  type="checkbox"
-                  id="customer_dashboard_enabled"
-                  checked={formData.customer_dashboard_enabled}
-                  name="customer_dashboard_enabled"
-                  onChange={handleFieldChange}
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <div className="flex-1">
-                  <Label
-                    htmlFor="customer_dashboard_enabled"
-                    className="font-medium cursor-pointer"
-                  >
-                    {__("Enable Customer Dashboard", "yatra")}
-                  </Label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__(
-                      "Show dashboard with bookings and account information",
-                      "yatra",
-                    )}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <SectionDivider title={__("Customer Fields", "yatra")} />
-
-            <div className="space-y-2">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                {__(
-                  "Select which fields to collect from customers during registration",
-                  "yatra",
-                )}
-              </p>
-              {[
-                "name",
-                "email",
-                "phone",
-                "address",
-                "city",
-                "country",
-                "date_of_birth",
-              ].map((field) => (
-                <div
-                  key={field}
-                  className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-md"
-                >
-                  <input
-                    type="checkbox"
-                    id={`field_${field}`}
-                    checked={formData.customer_fields.includes(field)}
-                    onChange={(e) => {
-                      const fields = e.target.checked
-                        ? [...formData.customer_fields, field]
-                        : formData.customer_fields.filter((f) => f !== field);
-                      setFormData((prev) =>
-                        prev ? { ...prev, customer_fields: fields } : prev,
-                      );
-                    }}
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <Label
-                    htmlFor={`field_${field}`}
-                    className="font-normal cursor-pointer"
-                  >
-                    {field.charAt(0).toUpperCase() +
-                      field.slice(1).replace("_", " ")}
-                  </Label>
-                </div>
-              ))}
             </div>
           </div>
         );
@@ -4890,6 +4868,12 @@ const Settings: React.FC = () => {
       case "review":
         return (
           <div className="space-y-6">
+            <div className="rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-gray-600 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-400">
+              {__(
+                "These options apply to trip review forms on the frontend (who may review, moderation, minimum stars, and reminder scheduling).",
+                "yatra",
+              )}
+            </div>
             <div className="space-y-4">
               <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
                 <input
@@ -5353,12 +5337,18 @@ const Settings: React.FC = () => {
                   {
                     id: "notify_customer_booking",
                     label: __("Notify Customer on Booking", "yatra"),
-                    desc: __("Send confirmation email to customer", "yatra"),
+                    desc: __(
+                      "Send booking confirmation email (also enable the template under Email → Templates)",
+                      "yatra",
+                    ),
                   },
                   {
                     id: "notify_customer_payment",
                     label: __("Notify Customer on Payment", "yatra"),
-                    desc: __("Send payment confirmation to customer", "yatra"),
+                    desc: __(
+                      "Send payment confirmation email (template under Email → Templates)",
+                      "yatra",
+                    ),
                   },
                 ].map((notif) => (
                   <div
@@ -5389,78 +5379,6 @@ const Settings: React.FC = () => {
                   </div>
                 ))}
               </div>
-            </div>
-
-            <SectionDivider
-              title={__("SMS Notifications (Optional)", "yatra")}
-            />
-
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                <input
-                  type="checkbox"
-                  id="sms_notifications"
-                  checked={formData.sms_notifications}
-                  name="sms_notifications"
-                  onChange={handleFieldChange}
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <div className="flex-1">
-                  <Label
-                    htmlFor="sms_notifications"
-                    className="font-medium cursor-pointer"
-                  >
-                    {__("Enable SMS Notifications", "yatra")}
-                  </Label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__(
-                      "Send SMS notifications for bookings and payments",
-                      "yatra",
-                    )}
-                  </p>
-                </div>
-              </div>
-
-              {formData.sms_notifications && (
-                <>
-                  <FormField
-                    id="sms_provider"
-                    label={__("SMS Provider", "yatra")}
-                    description={__(
-                      "Select your SMS service provider",
-                      "yatra",
-                    )}
-                  >
-                    <Select
-                      id="sms_provider"
-                      value={formData.sms_provider}
-                      name="sms_provider"
-                      onChange={handleFieldChange}
-                    >
-                      <option value="twilio">{__("Twilio", "yatra")}</option>
-                      <option value="nexmo">
-                        {__("Nexmo (Vonage)", "yatra")}
-                      </option>
-                      <option value="aws_sns">{__("AWS SNS", "yatra")}</option>
-                    </Select>
-                  </FormField>
-
-                  <FormField
-                    id="sms_api_key"
-                    label={__("SMS API Key", "yatra")}
-                    description={__("API key from your SMS provider", "yatra")}
-                  >
-                    <Input
-                      id="sms_api_key"
-                      type="password"
-                      value={formData.sms_api_key}
-                      name="sms_api_key"
-                      onChange={handleFieldChange}
-                      placeholder={__("Enter SMS API key", "yatra")}
-                    />
-                  </FormField>
-                </>
-              )}
             </div>
           </div>
         );
@@ -7148,29 +7066,11 @@ const Settings: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="space-y-4">
-              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                <input
-                  type="checkbox"
-                  id="debug_mode"
-                  checked={formData.debug_mode}
-                  name="debug_mode"
-                  onChange={handleFieldChange}
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <div className="flex-1">
-                  <Label
-                    htmlFor="debug_mode"
-                    className="font-medium cursor-pointer"
-                  >
-                    {__("Enable Debug Mode", "yatra")}
-                  </Label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__(
-                      "Show detailed error messages (disable in production)",
-                      "yatra",
-                    )}
-                  </p>
-                </div>
+              <div className="rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-gray-600 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-400">
+                {__(
+                  "For PHP-level debug output, use WordPress wp-config.php (WP_DEBUG). The options below are implemented by the plugin.",
+                  "yatra",
+                )}
               </div>
 
               <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
@@ -7218,56 +7118,6 @@ const Settings: React.FC = () => {
                     {__("Cache data to improve performance", "yatra")}
                   </p>
                 </div>
-              </div>
-
-              <FormField
-                id="api_key"
-                label={__("API Key", "yatra")}
-                description={__(
-                  "API key for external integrations and webhooks",
-                  "yatra",
-                )}
-              >
-                <Input
-                  id="api_key"
-                  type="password"
-                  value={formData.api_key}
-                  name="api_key"
-                  onChange={handleFieldChange}
-                  placeholder={__("Enter API Key", "yatra")}
-                />
-              </FormField>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  id="api_rate_limit"
-                  label={__("API Rate Limit", "yatra")}
-                  description={__("Maximum API requests per hour", "yatra")}
-                >
-                  <Input
-                    id="api_rate_limit"
-                    type="number"
-                    value={formData.api_rate_limit}
-                    name="api_rate_limit"
-                    onChange={handleFieldChange}
-                    min="1"
-                  />
-                </FormField>
-
-                <FormField
-                  id="session_timeout"
-                  label={__("Session Timeout (seconds)", "yatra")}
-                  description={__("User session timeout in seconds", "yatra")}
-                >
-                  <Input
-                    id="session_timeout"
-                    type="number"
-                    value={formData.session_timeout}
-                    name="session_timeout"
-                    onChange={handleFieldChange}
-                    min="60"
-                  />
-                </FormField>
               </div>
             </div>
           </div>

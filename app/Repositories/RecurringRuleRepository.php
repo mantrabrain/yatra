@@ -65,7 +65,7 @@ class RecurringRuleRepository extends BaseRepository
         $params = [$tripId];
         
         if ($activeOnly) {
-            $where[] = 'is_active = 1';
+            $where[] = "status = 'active'";
         }
         
         $query = "SELECT * FROM `{$table}` WHERE " . implode(' AND ', $where);
@@ -113,7 +113,9 @@ class RecurringRuleRepository extends BaseRepository
     public function create(array $data): int
     {
         $table = esc_sql($this->table);
-        
+
+        $maxCap = (int) ($data['max_capacity'] ?? 0);
+
         $insertData = [
             'trip_id' => (int) ($data['trip_id'] ?? 0),
             'name' => sanitize_text_field($data['name'] ?? 'Recurring Rule'),
@@ -121,24 +123,25 @@ class RecurringRuleRepository extends BaseRepository
             'recurrence_type' => sanitize_text_field($data['recurrence_type'] ?? 'weekly'),
             'start_date' => !empty($data['start_date']) ? sanitize_text_field($data['start_date']) : current_time('Y-m-d'),
             'end_date' => !empty($data['end_date']) ? sanitize_text_field($data['end_date']) : null,
-            'capacity_value' => (int) ($data['max_capacity'] ?? 0),
+            'capacity_value' => $maxCap > 0 ? $maxCap : null,
+            'capacity_type' => 'fixed',
             'price_override' => !empty($data['base_price']) ? (float) $data['base_price'] : null,
+            'seats_total' => $maxCap > 0 ? $maxCap : null,
             'created_at' => current_time('mysql'),
             'updated_at' => current_time('mysql'),
         ];
-        
-        // Handle weekdays as JSON
+
+        // Schema column is days_of_week (JSON), not weekdays
         if (!empty($data['weekdays'])) {
             if (is_array($data['weekdays'])) {
-                $insertData['weekdays'] = wp_json_encode(array_map('intval', $data['weekdays']));
+                $insertData['days_of_week'] = wp_json_encode(array_map('intval', $data['weekdays']));
             } else {
-                $insertData['weekdays'] = $data['weekdays'];
+                $insertData['days_of_week'] = $data['weekdays'];
             }
         } else {
-            $insertData['weekdays'] = null;
+            $insertData['days_of_week'] = null;
         }
-        
-        // Handle pricing_by_traveler_type as JSON
+
         if (!empty($data['pricing_by_traveler_type'])) {
             $insertData['pricing_by_traveler_type'] = is_array($data['pricing_by_traveler_type'])
                 ? wp_json_encode($data['pricing_by_traveler_type'])
@@ -146,12 +149,21 @@ class RecurringRuleRepository extends BaseRepository
         } else {
             $insertData['pricing_by_traveler_type'] = null;
         }
-        
-        $this->wpdb->insert($table, $insertData, [
-            '%d', '%s', '%s', '%s', '%d', '%f', '%d', '%s', '%s'
-        ]);
-        
-        return $this->wpdb->insert_id;
+
+        $formats = [];
+        foreach ($insertData as $value) {
+            if (is_int($value)) {
+                $formats[] = '%d';
+            } elseif (is_float($value)) {
+                $formats[] = '%f';
+            } else {
+                $formats[] = '%s';
+            }
+        }
+
+        $this->wpdb->insert($table, $insertData, $formats);
+
+        return (int) $this->wpdb->insert_id;
     }
 
     /**
@@ -167,15 +179,23 @@ class RecurringRuleRepository extends BaseRepository
         if (isset($data['recurrence_type'])) $updateData['recurrence_type'] = sanitize_text_field($data['recurrence_type']);
         if (isset($data['start_date'])) $updateData['start_date'] = !empty($data['start_date']) ? sanitize_text_field($data['start_date']) : null;
         if (isset($data['end_date'])) $updateData['end_date'] = !empty($data['end_date']) ? sanitize_text_field($data['end_date']) : null;
-        if (isset($data['max_capacity'])) $updateData['max_capacity'] = (int) $data['max_capacity'];
-        if (isset($data['base_price'])) $updateData['base_price'] = !empty($data['base_price']) ? (float) $data['base_price'] : null;
-        if (isset($data['is_active'])) $updateData['is_active'] = (bool) $data['is_active'];
-        
+        if (isset($data['max_capacity'])) {
+            $mc = (int) $data['max_capacity'];
+            $updateData['capacity_value'] = $mc;
+            $updateData['seats_total'] = $mc > 0 ? $mc : null;
+        }
+        if (isset($data['base_price'])) {
+            $updateData['price_override'] = !empty($data['base_price']) ? (float) $data['base_price'] : null;
+        }
+        if (isset($data['is_active'])) {
+            $updateData['status'] = !empty($data['is_active']) ? 'active' : 'inactive';
+        }
+
         if (isset($data['weekdays'])) {
             if (is_array($data['weekdays'])) {
-                $updateData['weekdays'] = wp_json_encode(array_map('intval', $data['weekdays']));
+                $updateData['days_of_week'] = wp_json_encode(array_map('intval', $data['weekdays']));
             } else {
-                $updateData['weekdays'] = $data['weekdays'];
+                $updateData['days_of_week'] = $data['weekdays'];
             }
         }
         

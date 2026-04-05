@@ -332,6 +332,8 @@ class FrontendAssetsProvider
             'partialPaymentPercentage' => \Yatra\Services\SettingsService::get('partial_payment_percentage', 0),
             'gatewayOrder' => \Yatra\Services\SettingsService::get('gateway_order', []),
             'autoConfirmPayLater' => \Yatra\Services\SettingsService::get('auto_confirm_pay_later', true),
+            'allowWaitlist' => \Yatra\Services\SettingsService::isEnabled('allow_waitlist'),
+            'waitlistAutoConfirm' => \Yatra\Services\SettingsService::isEnabled('waitlist_auto_confirm'),
             'gateways' => apply_filters('yatra_payment_gateways', \Yatra\Services\SettingsService::get('payment_gateways', [])),
             'enabledGateways' => \Yatra\Services\SettingsService::get('payment_gateways', []),
         ];

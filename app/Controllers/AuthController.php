@@ -287,6 +287,13 @@ class AuthController
      */
     public static function register(\WP_REST_Request $request): \WP_REST_Response
     {
+        if (!\Yatra\Services\SettingsService::isEnabled('customer_registration')) {
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => __('New customer registration is disabled.', 'yatra'),
+            ], 403);
+        }
+
         $first_name = sanitize_text_field($request->get_param('first_name') ?? '');
         $last_name = sanitize_text_field($request->get_param('last_name') ?? '');
         $email = sanitize_email($request->get_param('email') ?? '');

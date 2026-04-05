@@ -103,25 +103,60 @@ class TripMigration extends BaseMigration
                     ? (int) $maxTravelersMeta
                     : 10;
 
+                $minTravelersMeta = $this->getLegacyMetaValue($meta, [
+                    'yatra_tour_minimum_pax',
+                ]);
+                $minTravelers = $minTravelersMeta !== null && $minTravelersMeta !== ''
+                    ? max(1, (int) $minTravelersMeta)
+                    : 1;
+
+                $durationDays = intval($meta['yatra_tour_meta_tour_duration_days'] ?? 1);
+                $durationNights = intval($meta['yatra_tour_meta_tour_duration_nights'] ?? 0);
+                $tripType = ($durationDays <= 1 && $durationNights < 1) ? 'single_day' : 'multi_day';
+
+                $isFeatured = !empty($meta['yatra_tour_meta_tour_featured']) ? 1 : 0;
+
+                $legacyTourType = $meta['yatra_tour_meta_tour_type'] ?? 'regular';
+                $customFields = [];
+                if (!empty($meta['yatra_tour_meta_disable_booking'])) {
+                    $customFields['legacy_disable_booking'] = true;
+                }
+                if ($legacyTourType === 'external') {
+                    $extUrl = $meta['yatra_tour_meta_tour_external_url'] ?? '';
+                    if ($extUrl !== '') {
+                        $customFields['external_booking_url'] = esc_url_raw((string) $extUrl);
+                    }
+                    $extBtn = $meta['yatra_tour_meta_tour_external_button_text'] ?? '';
+                    if ($extBtn !== '') {
+                        $customFields['external_booking_button_text'] = sanitize_text_field((string) $extBtn);
+                    }
+                }
+
                 $tripData = [
                     'title' => $oldTrip->post_title,
                     'slug' => $slug,
                     'description' => $oldTrip->post_content,
                     'short_description' => $oldTrip->post_excerpt,
                     'trip_details' => $oldTrip->post_content,
-                    'duration_days' => intval($meta['yatra_tour_meta_tour_duration_days'] ?? 1),
-                    'duration_nights' => intval($meta['yatra_tour_meta_tour_duration_nights'] ?? 0),
+                    'trip_type' => $tripType,
+                    'duration_days' => $durationDays,
+                    'duration_nights' => $durationNights,
+                    'min_travelers' => $minTravelers,
                     'max_travelers' => $maxTravelers > 0 ? $maxTravelers : 10,
                     'original_price' => $regularPriceFloat,
                     'sale_price' => $salePriceFloat,
                     'discounted_price' => $salePriceFloat,
                     'featured_image' => $featuredImageId ?: null,
+                    'is_featured' => $isFeatured,
                     'status' => $status,
                     'created_at' => $oldTrip->post_date,
                     'updated_at' => $oldTrip->post_modified,
                     'created_by' => $createdBy,
                     'updated_by' => $createdBy,
                 ];
+                if (!empty($customFields)) {
+                    $tripData['custom_fields'] = wp_json_encode($customFields);
+                }
 
                 if ($existingTripId && !$this->isForceMigration()) {
                     // Regular migration: Update existing trip

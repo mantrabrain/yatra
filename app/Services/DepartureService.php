@@ -224,7 +224,18 @@ class DepartureService
             return false;
         }
         
-        return $this->repository->incrementBookedCount($id, $amount);
+        $ok = $this->repository->incrementBookedCount($id, $amount);
+        if ($ok) {
+            $dep = $this->repository->findModel($id);
+            if ($dep) {
+                $st = $dep->calculateStatus();
+                if ($st !== $dep->status) {
+                    $this->repository->update($id, ['status' => $st]);
+                }
+            }
+        }
+
+        return $ok;
     }
 
     /**
@@ -238,7 +249,18 @@ class DepartureService
             throw new \InvalidArgumentException('Departure not found');
         }
         
-        return $this->repository->decrementBookedCount($id, $amount);
+        $ok = $this->repository->decrementBookedCount($id, $amount);
+        if ($ok) {
+            $dep = $this->repository->findModel($id);
+            if ($dep) {
+                $st = $dep->calculateStatus();
+                if ($st !== $dep->status) {
+                    $this->repository->update($id, ['status' => $st]);
+                }
+            }
+        }
+
+        return $ok;
     }
 
     /**
@@ -400,39 +422,23 @@ class DepartureService
         }
 
         // Departure doesn't exist, create it
-        // Get trip to retrieve max_travelers and calculate end_date
         $trip = $this->tripRepository->find($tripId);
-        
+
         // Calculate end_date if not provided
         if (empty($endDate)) {
             $durationDays = $trip ? ($trip->duration_days ?? 1) : 1;
             $endDate = date('Y-m-d', strtotime($startDate . ' + ' . ($durationDays - 1) . ' days'));
         }
-        
-        // Determine max capacity in priority order:
-        // 1. Provided defaultMaxCapacity (if explicitly set)
-        // 2. Availability date (seats_total)
-        // 3. Recurring rule (max_capacity)
-        // 4. Trip's max_travelers
-        // 5. Default to 50
-        $maxCapacity = null;
-        
-        if ($defaultMaxCapacity !== null) {
+
+        // Keep capacity from availability/rules/trip (resolved above). Only use caller default if still unknown.
+        if ($maxCapacity <= 0 && $defaultMaxCapacity !== null && $defaultMaxCapacity > 0) {
             $maxCapacity = $defaultMaxCapacity;
-        } else {
-            // Use CapacityService to get the correct capacity based on priority
-            // Priority: Availability Date > Recurring Availability Rule > Trip Default
-            $maxCapacity = $this->capacityService->getCapacityForDate($tripId, $startDate);
-            
-            // If no capacity found, use trip default or 1 as minimum
-            if ($maxCapacity === null || $maxCapacity <= 0) {
-                $trip = $this->tripRepository->find($tripId);
-                $maxCapacity = $trip ? (int) ($trip->max_travelers ?? 1) : 1;
-            }
+        }
+        if ($maxCapacity <= 0) {
+            $maxCapacity = $trip ? max(1, (int) ($trip->max_travelers ?? $trip->max_travellers ?? 1)) : 1;
         }
 
-        // Get trip details to set default time if not provided
-        $trip = $this->tripRepository->find($tripId);
+        // Trip already loaded for end_date / capacity fallbacks
         $defaultTime = $time;
         
         // If no time provided, try to get from trip settings or use default
@@ -476,8 +482,14 @@ class DepartureService
         $result = $this->bookingDepartureRepository->link($bookingId, $departureId);
         
         if ($result) {
-            // Recalculate total revenue for the departure
             $this->recalculateDepartureRevenue($departureId);
+            $departure = $this->repository->findModel($departureId);
+            if ($departure) {
+                $newStatus = $departure->calculateStatus();
+                if ($newStatus !== $departure->status) {
+                    $this->repository->update($departureId, ['status' => $newStatus]);
+                }
+            }
         }
         
         return $result;
@@ -493,6 +505,9 @@ class DepartureService
      */
     public function unlinkBookingFromDeparture(int $bookingId, ?int $departureId = null): bool
     {
+        $booking = $this->bookingRepository->find($bookingId);
+        $travelersCount = $booking ? max(0, (int) ($booking->travelers_count ?? 0)) : 0;
+
         // Get departure ID if not provided
         if ($departureId === null) {
             $departureId = $this->bookingDepartureRepository->getDepartureIdForBooking($bookingId);
@@ -506,6 +521,10 @@ class DepartureService
         
         if (!$result) {
             return false;
+        }
+
+        if ($travelersCount > 0) {
+            $this->decrementBookedCount($departureId, $travelersCount);
         }
 
         // Recalculate total revenue for the departure
@@ -568,7 +587,7 @@ class DepartureService
         }
 
         $tripId = (int) $booking->trip_id;
-        $oldDepartureId = $this->bookingDepartureRepository->getDepartureForBooking($bookingId);
+        $oldDepartureId = $this->bookingDepartureRepository->getDepartureIdForBooking($bookingId);
 
         // Get trip for max capacity
         $trip = $this->tripRepository->find($tripId);
@@ -588,16 +607,14 @@ class DepartureService
         $travelersCount = (int) ($booking->travelers_count ?? 0);
         $this->incrementBookedCount($newDeparture->id, $travelersCount);
 
-        // Handle old departure
+        // Handle old departure (link was moved in updateDepartureForBooking; adjust counts explicitly)
         if ($oldDepartureId) {
-            $oldBookingCount = $this->bookingDepartureRepository->countBookingsForDeparture($oldDepartureId);
-            
-            if ($oldBookingCount === 0) {
-                // No more bookings, cancel old departure
-                $this->cancelDeparture($oldDepartureId, "Cancelled - Booking date changed (Booking ID: {$bookingId})");
-            } else {
-                // Still has other bookings, just decrement count
+            if ($travelersCount > 0) {
                 $this->decrementBookedCount($oldDepartureId, $travelersCount);
+            }
+            $oldBookingCount = $this->bookingDepartureRepository->countBookingsForDeparture($oldDepartureId);
+            if ($oldBookingCount === 0) {
+                $this->cancelDeparture($oldDepartureId, "Cancelled - Booking date changed (Booking ID: {$bookingId})");
             }
         }
 

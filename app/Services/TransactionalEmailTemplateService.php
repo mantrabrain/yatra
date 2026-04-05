@@ -148,6 +148,10 @@ class TransactionalEmailTemplateService
             return false;
         }
 
+        if ($type === self::TYPE_BOOKING_CONFIRMATION && !SettingsService::isEnabled('notify_customer_booking')) {
+            return false;
+        }
+
         $map = self::typeToSettingsKeys();
         if (!isset($map[$type])) {
             return false;

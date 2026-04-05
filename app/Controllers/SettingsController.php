@@ -26,6 +26,9 @@ class SettingsController extends BaseController
      */
     public function __construct()
     {
+        $wpAdminEmail = (string) get_option('admin_email', '');
+        $wpSiteName = (string) get_bloginfo('name');
+
         // Define base settings
         $base_settings = [
         // General Settings
@@ -78,10 +81,10 @@ class SettingsController extends BaseController
         'scheduled_payment_reminder_days' => 3, // Days before to send reminder
         'allow_save_payment_methods' => false,
         
-        // Email Settings
-        'admin_email' => '',
-        'from_email' => '',
-        'from_name' => '',
+        // Email Settings (WordPress site defaults when Yatra options are missing)
+        'admin_email' => $wpAdminEmail,
+        'from_email' => $wpAdminEmail,
+        'from_name' => $wpSiteName,
         'email_template_booking' => true,
         'email_template_confirmation' => true,
         'email_template_cancellation' => true,
@@ -313,6 +316,16 @@ class SettingsController extends BaseController
                 if ($value === false) {
                     $value = $default_value;
                 }
+
+                // Stored empty string should behave like "unset" for delivery identity (matches installer / backfill).
+                if (($key === 'admin_email' || $key === 'from_email') && is_string($value) && trim($value) === '') {
+                    $wp = (string) get_option('admin_email', '');
+                    $value = $wp !== '' ? $wp : $value;
+                }
+                if ($key === 'from_name' && is_string($value) && trim($value) === '') {
+                    $wp = (string) get_bloginfo('name');
+                    $value = $wp !== '' ? $wp : $value;
+                }
                 
                 // Handle serialized arrays (for fields like payment_gateways, customer_fields, etc.)
                 if (is_string($value) && is_serialized($value)) {
@@ -335,6 +348,8 @@ class SettingsController extends BaseController
             if (!empty($flexible_payment_settings)) {
                 $settings = array_merge($settings, $flexible_payment_settings);
             }
+
+            $settings = $this->syncAccountRouteSettingsForResponse($settings);
 
             return $this->success_response($settings);
         } catch (\Exception $e) {
@@ -436,6 +451,10 @@ class SettingsController extends BaseController
                 update_option('yatra_default_currency', $sync_currency);
             }
 
+            if (in_array('customer_account_page', $updated, true)) {
+                $this->persistAccountBaseFromCustomerAccountPage();
+            }
+
             if (!empty($errors)) {
                 $errorSummary = implode('; ', $errors);
                 return $this->error_response(
@@ -449,13 +468,14 @@ class SettingsController extends BaseController
             }
 
             // Flush rewrite rules if permalink settings were updated
-            if (in_array('trip_base', $updated, true) || 
-                in_array('destination_base', $updated, true) || 
+            if (in_array('trip_base', $updated, true) ||
+                in_array('destination_base', $updated, true) ||
                 in_array('activity_base', $updated, true) ||
                 in_array('trip_category_base', $updated, true) ||
                 in_array('booking_base', $updated, true) ||
                 in_array('use_booking_page', $updated, true) ||
-                in_array('booking_page_id', $updated, true)) {
+                in_array('booking_page_id', $updated, true) ||
+                in_array('customer_account_page', $updated, true)) {
                 // Use hard flush to ensure rules are saved to database
                 flush_rewrite_rules(true);
             }
@@ -886,6 +906,45 @@ class SettingsController extends BaseController
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
+    }
+
+    /**
+     * Keep Settings → Customer "account page" path aligned with {@see RouteMatcher} / {@see Router} (yatra_account_base).
+     *
+     * @param array<string, mixed> $settings
+     * @return array<string, mixed>
+     */
+    private function syncAccountRouteSettingsForResponse(array $settings): array
+    {
+        $stored = get_option('yatra_account_base', '');
+        if (is_string($stored) && $stored !== '') {
+            $settings['customer_account_page'] = '/' . $stored;
+
+            return $settings;
+        }
+
+        $cpp = (string) ($settings['customer_account_page'] ?? '');
+        $slug = self::accountSlugFromCustomerAccountPath($cpp !== '' ? $cpp : '/account');
+        update_option('yatra_account_base', $slug);
+        $settings['customer_account_page'] = '/' . $slug;
+
+        return $settings;
+    }
+
+    private function persistAccountBaseFromCustomerAccountPage(): void
+    {
+        $cpp = (string) get_option('yatra_customer_account_page', '');
+        update_option('yatra_account_base', self::accountSlugFromCustomerAccountPath($cpp));
+    }
+
+    private static function accountSlugFromCustomerAccountPath(string $path): string
+    {
+        $path = trim(str_replace('\\', '/', $path), '/');
+        $parts = array_values(array_filter(explode('/', $path), static fn ($p) => $p !== ''));
+        $segment = $parts !== [] ? end($parts) : 'account';
+        $slug = sanitize_title($segment);
+
+        return $slug !== '' ? $slug : 'account';
     }
 }
 

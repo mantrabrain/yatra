@@ -67,23 +67,27 @@ class ReviewReminderService
             return;
         }
         
-        $subject = sprintf(
-            __('[%s] How was your trip? Share your experience!', 'yatra'),
-            get_bloginfo('name')
-        );
-        
         $review_url = get_permalink($trip->id) . '#reviews';
-        
-        $message = sprintf(
-            __("Dear %s,\n\nWe hope you enjoyed your trip to %s!\n\nWe'd love to hear about your experience. Your feedback helps other travelers and helps us improve our services.\n\nPlease take a moment to leave a review:\n%s\n\nThank you for choosing %s!\n\nBest regards,\n%s", 'yatra'),
-            $booking->first_name ?? 'Customer',
-            $trip->title ?? 'your destination',
-            $review_url,
+        $customerName = trim((string) (($booking->first_name ?? '') . ' ' . ($booking->last_name ?? '')));
+        if ($customerName === '') {
+            $customerName = __('there', 'yatra');
+        }
+        $tripName = (string) ($trip->title ?? '');
+
+        $subject = sprintf(
+            /* translators: 1: site name, 2: trip title */
+            __('⭐ [%1$s] How was %2$s?', 'yatra'),
             get_bloginfo('name'),
-            get_bloginfo('name')
+            $tripName !== '' ? $tripName : __('your trip', 'yatra')
         );
-        
-        EmailService::send($booking->email, $subject, $message);
+
+        $body = EmailTemplateDefaults::renderCoreReviewReminderHtml(
+            $customerName,
+            $tripName !== '' ? $tripName : __('your trip', 'yatra'),
+            $review_url
+        );
+
+        EmailService::send($booking->email, $subject, $body, ['Content-Type: text/html; charset=UTF-8']);
     }
     
     /**

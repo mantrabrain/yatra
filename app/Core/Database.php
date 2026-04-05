@@ -117,7 +117,6 @@ class Database
         // ============================================
         
         update_option('yatra_db_version', YATRA_VERSION);
-      
     }
 
     /**
@@ -135,28 +134,29 @@ class Database
     {
         global $wpdb;
         
-        // Get all table names from our table classes
+        // Drop children before parents (FK-safe). Trips last.
         $tables = [
-            // Core tables
-            TripsTable::getTableName(),
-            BookingsTable::getTableName(),
+            TripAvailabilityDatesTable::getTableName(),
+            TripAvailabilityRulesTable::getTableName(),
+            BookingTravellerMetaTable::getTableName(),
+            BookingTravellersTable::getTableName(),
+            BookingDeparturesTable::getTableName(),
+            DeparturesTable::getTableName(),
             BookingPaymentsTable::getTableName(),
             ScheduledPaymentsTable::getTableName(),
             PaymentTokensTable::getTableName(),
+            BookingsTable::getTableName(),
             CustomersTable::getTableName(),
-            BookingTravellersTable::getTableName(),
-            BookingTravellerMetaTable::getTableName(),
-            BookingDeparturesTable::getTableName(),
             ReviewsTable::getTableName(),
             DiscountsTable::getTableName(),
+            EnquiriesTable::getTableName(),
             TripRevisionsTable::getTableName(),
-            
-            // Optimized tables
-            TripItineraryDaysTable::getTableName(),
             TripItineraryDayEntryTable::getTableName(),
-            ClassificationsTable::getTableName(),
+            TripItineraryDaysTable::getTableName(),
             TripClassificationsTable::getTableName(),
             TripContentTable::getTableName(),
+            ClassificationsTable::getTableName(),
+            TripsTable::getTableName(),
         ];
 
         foreach ($tables as $table) {
