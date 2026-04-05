@@ -20,6 +20,10 @@ class TransactionalEmailTemplateService
 
     public const TYPE_ADMIN_NEW_BOOKING = 'admin_new_booking';
 
+    public const TYPE_ADMIN_PAYMENT_RECEIVED = 'admin_payment_received';
+
+    public const TYPE_ADMIN_BOOKING_CANCELLED = 'admin_booking_cancelled_notice';
+
     /**
      * Map catalog / settings UI keys to internal render types.
      */
@@ -31,6 +35,8 @@ class TransactionalEmailTemplateService
             'booking_cancelled' => self::TYPE_BOOKING_CANCELLATION,
             'trip_reminder' => self::TYPE_BOOKING_REMINDER,
             'admin_new_booking' => self::TYPE_ADMIN_NEW_BOOKING,
+            'admin_payment_received' => self::TYPE_ADMIN_PAYMENT_RECEIVED,
+            'admin_booking_cancelled' => self::TYPE_ADMIN_BOOKING_CANCELLED,
         ];
 
         return $map[$templateKey] ?? null;
@@ -130,6 +136,16 @@ class TransactionalEmailTemplateService
                 'subject' => 'email_tpl_admin_booking_subject',
                 'body' => 'email_tpl_admin_booking_body',
             ],
+            self::TYPE_ADMIN_PAYMENT_RECEIVED => [
+                'flag' => 'email_template_admin_payment',
+                'subject' => 'email_tpl_admin_payment_subject',
+                'body' => 'email_tpl_admin_payment_body',
+            ],
+            self::TYPE_ADMIN_BOOKING_CANCELLED => [
+                'flag' => 'email_template_admin_cancellation',
+                'subject' => 'email_tpl_admin_cancellation_subject',
+                'body' => 'email_tpl_admin_cancellation_body',
+            ],
         ];
     }
 
@@ -145,10 +161,6 @@ class TransactionalEmailTemplateService
     {
         $to = sanitize_email($to);
         if ($to === '' || !is_email($to)) {
-            return false;
-        }
-
-        if ($type === self::TYPE_BOOKING_CONFIRMATION && !SettingsService::isEnabled('notify_customer_booking')) {
             return false;
         }
 
@@ -271,6 +283,12 @@ class TransactionalEmailTemplateService
             case self::TYPE_ADMIN_NEW_BOOKING:
                 return sprintf(__('🔔 [%s] New booking · %s (#%s)', 'yatra'), $site, $ref, $v['booking_id'] ?? '');
 
+            case self::TYPE_ADMIN_PAYMENT_RECEIVED:
+                return sprintf(__('✅ [%s] Payment received · %s (#%s)', 'yatra'), $site, $ref, $v['booking_id'] ?? '');
+
+            case self::TYPE_ADMIN_BOOKING_CANCELLED:
+                return sprintf(__('📋 [%s] Booking cancelled · %s (#%s)', 'yatra'), $site, $ref, $v['booking_id'] ?? '');
+
             default:
                 return sprintf(__('✉️ [%s] Notification', 'yatra'), $site);
         }
@@ -296,6 +314,12 @@ class TransactionalEmailTemplateService
 
             case self::TYPE_ADMIN_NEW_BOOKING:
                 return EmailTemplateDefaults::fallbackAdminNewBooking($v);
+
+            case self::TYPE_ADMIN_PAYMENT_RECEIVED:
+                return EmailTemplateDefaults::fallbackAdminPaymentReceived($v);
+
+            case self::TYPE_ADMIN_BOOKING_CANCELLED:
+                return EmailTemplateDefaults::fallbackAdminBookingCancelled($v);
 
             default:
                 return EmailTemplateLayout::customer(

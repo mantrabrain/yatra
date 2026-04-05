@@ -90,6 +90,8 @@ class SettingsController extends BaseController
         'email_template_cancellation' => true,
         'email_template_reminder' => true,
         'email_template_admin_new_booking' => true,
+        'email_template_admin_payment' => true,
+        'email_template_admin_cancellation' => true,
         'smtp_enabled' => false,
         'smtp_host' => 'smtp.gmail.com',
         'smtp_port' => 587,
@@ -134,15 +136,7 @@ class SettingsController extends BaseController
         'decimal_separator'=>'.',
         'thousand_separator'=>',',
         
-        
-        
-        // Notification Settings
-        'notify_new_booking' => true,
-        'notify_payment' => true,
-        'notify_cancellation' => true,
-        'notify_admin' => true,
-        'notify_customer_booking' => true,
-        'notify_customer_payment' => true,
+        // Notification Settings (SMS / future channels — booking email toggles live under Email → Templates)
         'sms_notifications' => false,
         'sms_provider' => '',
         'sms_api_key' => '',

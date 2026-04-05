@@ -11,35 +11,35 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-B2Z22w6V.js": {
-    "file": "dist/js/index-B2Z22w6V.js",
+  "_index-DbNWY5wC.js": {
+    "file": "dist/js/index-DbNWY5wC.js",
     "name": "index",
     "imports": [
-      "_clsx-DgYk2OaC.js",
-      "_react-vendor-BHteVFHs.js",
-      "_default-i18n-DxhLUi3L.js"
-    ],
-    "dynamicImports": [
-      "node_modules/@wordpress/vips/build-module/vips-worker.mjs"
-    ]
-  },
-  "_index-DhSfL6-d.js": {
-    "file": "dist/js/index-DhSfL6-d.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-BHteVFHs.js",
+      "_react-vendor-hl0AkJcc.js",
       "_default-i18n-DxhLUi3L.js"
     ],
     "css": [
       "admin/dist/css/index.css"
     ]
   },
+  "_index-HL72hacW.js": {
+    "file": "dist/js/index-HL72hacW.js",
+    "name": "index",
+    "imports": [
+      "_clsx-DgYk2OaC.js",
+      "_react-vendor-hl0AkJcc.js",
+      "_default-i18n-DxhLUi3L.js"
+    ],
+    "dynamicImports": [
+      "node_modules/@wordpress/vips/build-module/vips-worker.mjs"
+    ]
+  },
   "_react-vendor-!~{001}~.js": {
     "file": "admin/dist/css/react-vendor.css",
     "src": "_react-vendor-!~{001}~.js"
   },
-  "_react-vendor-BHteVFHs.js": {
-    "file": "admin/dist/js/react-vendor-BHteVFHs.js",
+  "_react-vendor-hl0AkJcc.js": {
+    "file": "admin/dist/js/react-vendor-hl0AkJcc.js",
     "name": "react-vendor",
     "css": [
       "admin/dist/css/react-vendor.css"
@@ -57,8 +57,8 @@
     "src": "resources/js/account-page.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-BHteVFHs.js",
-      "_index-DhSfL6-d.js",
+      "_react-vendor-hl0AkJcc.js",
+      "_index-DbNWY5wC.js",
       "_default-i18n-DxhLUi3L.js"
     ]
   },
@@ -68,8 +68,8 @@
     "src": "resources/js/blocks/activity/index.tsx",
     "isEntry": true,
     "imports": [
-      "_index-B2Z22w6V.js",
-      "_react-vendor-BHteVFHs.js",
+      "_index-HL72hacW.js",
+      "_react-vendor-hl0AkJcc.js",
       "_default-i18n-DxhLUi3L.js",
       "_clsx-DgYk2OaC.js"
     ]
@@ -80,8 +80,8 @@
     "src": "resources/js/blocks/destination/index.tsx",
     "isEntry": true,
     "imports": [
-      "_index-B2Z22w6V.js",
-      "_react-vendor-BHteVFHs.js",
+      "_index-HL72hacW.js",
+      "_react-vendor-hl0AkJcc.js",
       "_default-i18n-DxhLUi3L.js",
       "_clsx-DgYk2OaC.js"
     ]
@@ -92,8 +92,8 @@
     "src": "resources/js/blocks/tour/index.tsx",
     "isEntry": true,
     "imports": [
-      "_index-B2Z22w6V.js",
-      "_react-vendor-BHteVFHs.js",
+      "_index-HL72hacW.js",
+      "_react-vendor-hl0AkJcc.js",
       "_default-i18n-DxhLUi3L.js",
       "_clsx-DgYk2OaC.js"
     ]
@@ -104,8 +104,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-BHteVFHs.js",
-      "_index-DhSfL6-d.js",
+      "_react-vendor-hl0AkJcc.js",
+      "_index-DbNWY5wC.js",
       "_clsx-DgYk2OaC.js",
       "_default-i18n-DxhLUi3L.js"
     ]

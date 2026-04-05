@@ -264,6 +264,13 @@ const Tools: React.FC = () => {
   // Available data types for export/import based on Yatra database structure
   const dataTypes = [
     {
+      key: "all",
+      label: "All Yatra data",
+      description:
+        "Complete backup: all tables, settings, itinerary, payments, and Pro data (if present)",
+      icon: Database,
+    },
+    {
       key: "trips",
       label: "Trips",
       description: "All trip packages, itineraries, and details",
@@ -440,33 +447,71 @@ const Tools: React.FC = () => {
     }
   };
 
+  const selectableDataTypes = dataTypes.filter((dt) => dt.key !== "all");
+
   // Handle data type selection for export
   const handleExportDataToggle = (dataType: string) => {
-    setSelectedExportData((prev) =>
-      prev.includes(dataType)
-        ? prev.filter((type) => type !== dataType)
-        : [...prev, dataType],
-    );
+    if (dataType === "all") {
+      setSelectedExportData((prev) =>
+        prev.includes("all") ? [] : ["all"],
+      );
+      return;
+    }
+    setSelectedExportData((prev) => {
+      const withoutAll = prev.filter((t) => t !== "all");
+      return withoutAll.includes(dataType)
+        ? withoutAll.filter((t) => t !== dataType)
+        : [...withoutAll, dataType];
+    });
   };
 
-  // Handle select all for export
+  // Handle select all for export (individual types only, not the "all" preset)
   const handleExportSelectAll = () => {
-    if (selectedExportData.length === dataTypes.length) {
-      // If all are selected, deselect all
+    const keys = selectableDataTypes.map((dt) => dt.key);
+    const allRegularSelected =
+      keys.length > 0 &&
+      keys.every((k) => selectedExportData.includes(k)) &&
+      !selectedExportData.includes("all");
+    const onlyAll =
+      selectedExportData.length === 1 && selectedExportData.includes("all");
+
+    if (allRegularSelected || onlyAll) {
       setSelectedExportData([]);
     } else {
-      // Select all data types
-      setSelectedExportData(dataTypes.map((dt) => dt.key));
+      setSelectedExportData(keys);
     }
   };
 
   // Handle data type selection for import
   const handleImportDataToggle = (dataType: string) => {
-    setSelectedImportData((prev) =>
-      prev.includes(dataType)
-        ? prev.filter((type) => type !== dataType)
-        : [...prev, dataType],
-    );
+    if (dataType === "all") {
+      setSelectedImportData((prev) =>
+        prev.includes("all") ? [] : ["all"],
+      );
+      return;
+    }
+    setSelectedImportData((prev) => {
+      const withoutAll = prev.filter((t) => t !== "all");
+      return withoutAll.includes(dataType)
+        ? withoutAll.filter((t) => t !== dataType)
+        : [...withoutAll, dataType];
+    });
+  };
+
+  const handleImportSelectAll = () => {
+    const keys = selectableDataTypes.map((dt) => dt.key);
+    const allRegularSelected =
+      keys.length > 0 &&
+      keys.every((k) => selectedImportData.includes(k)) &&
+      !selectedImportData.includes("all");
+    const onlyAll =
+      selectedImportData.length === 1 && selectedImportData.includes("all");
+
+    if (allRegularSelected || onlyAll) {
+      setSelectedImportData([]);
+    } else {
+      setSelectedImportData(keys);
+    }
   };
 
   // Handle export button click - show modal
@@ -2669,18 +2714,28 @@ const Tools: React.FC = () => {
                   <label className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg cursor-pointer transition-colors">
                     <input
                       type="checkbox"
-                      checked={selectedExportData.length === dataTypes.length}
+                      checked={
+                        selectableDataTypes.length > 0 &&
+                        selectableDataTypes.every((dt) =>
+                          selectedExportData.includes(dt.key),
+                        ) &&
+                        !selectedExportData.includes("all")
+                      }
                       onChange={handleExportSelectAll}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-blue-700 dark:text-blue-400">
-                        {selectedExportData.length === dataTypes.length
+                        {selectableDataTypes.length > 0 &&
+                        selectableDataTypes.every((dt) =>
+                          selectedExportData.includes(dt.key),
+                        ) &&
+                        !selectedExportData.includes("all")
                           ? "Deselect All"
                           : "Select All"}
                       </span>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        ({dataTypes.length} data types)
+                        ({selectableDataTypes.length} individual types)
                       </span>
                     </div>
                   </label>
@@ -2877,6 +2932,36 @@ const Tools: React.FC = () => {
               </div>
 
               <div className="p-6 overflow-y-auto max-h-[60vh]">
+                <div className="mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
+                  <label className="flex items-center gap-3 p-3 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg cursor-pointer transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={
+                        selectableDataTypes.length > 0 &&
+                        selectableDataTypes.every((dt) =>
+                          selectedImportData.includes(dt.key),
+                        ) &&
+                        !selectedImportData.includes("all")
+                      }
+                      onChange={handleImportSelectAll}
+                      className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                    />
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-green-700 dark:text-green-400">
+                        {selectableDataTypes.length > 0 &&
+                        selectableDataTypes.every((dt) =>
+                          selectedImportData.includes(dt.key),
+                        ) &&
+                        !selectedImportData.includes("all")
+                          ? "Deselect All"
+                          : "Select All"}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        ({selectableDataTypes.length} individual types)
+                      </span>
+                    </div>
+                  </label>
+                </div>
                 <div className="grid grid-cols-1 gap-1">
                   {dataTypes.map((dataType) => (
                     <label

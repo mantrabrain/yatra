@@ -167,7 +167,6 @@ defined('ABSPATH') || exit;
             </svg>
             <?php esc_html_e('Back', 'yatra'); ?>
         </a>
-        <input type="hidden" name="save_step" value="complete">
         <button type="submit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="3" width="7" height="7"></rect>

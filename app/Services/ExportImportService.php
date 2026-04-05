@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\Services;
 
+use Yatra\Constants\ClassificationTypes;
 use Yatra\Utils\Logger;
 use Yatra\Repositories\ExportImportRepository;
 
@@ -21,6 +22,43 @@ class ExportImportService
     private const IMPORT_ACTION = 'yatra_process_import_job';
     private const JOB_OPTION_PREFIX = 'yatra_job_';
     private const BATCH_SIZE = 500;
+
+    /**
+     * Unprefixed physical table names (Yatra 3.x uses yatra_new_* — not legacy yatra_trips, etc.).
+     *
+     * @var array<string, string>
+     */
+    private const TABLE_SUFFIX_MAP = [
+        'trips' => 'yatra_new_trips',
+        'bookings' => 'yatra_new_bookings',
+        'customers' => 'yatra_new_customers',
+        'reviews' => 'yatra_new_reviews',
+        'payments' => 'yatra_new_booking_payments',
+        'enquiries' => 'yatra_new_enquiries',
+        'discounts' => 'yatra_new_discounts',
+        'travelers' => 'yatra_new_booking_travellers',
+        'traveler_meta' => 'yatra_new_booking_traveller_meta',
+        'availability' => 'yatra_new_trip_availability_dates',
+        'availability_rules' => 'yatra_new_trip_availability_rules',
+        'departures' => 'yatra_new_trip_departures',
+        'booking_departures' => 'yatra_new_booking_departures',
+        'trip_classifications' => 'yatra_new_trip_classifications',
+        'trip_content' => 'yatra_new_trip_content',
+        'trip_revisions' => 'yatra_new_trip_revisions',
+        'scheduled_payments' => 'yatra_new_scheduled_payments',
+        'payment_tokens' => 'yatra_new_payment_tokens',
+    ];
+
+    /**
+     * Free core map + optional suffixes from Yatra Pro (or other add-ons) via
+     * {@see 'yatra_export_import_table_map'}.
+     *
+     * @return array<string, string> data_type_key => table suffix without wp_prefix
+     */
+    private static function getMergedTableMap(): array
+    {
+        return array_merge(self::TABLE_SUFFIX_MAP, (array) apply_filters('yatra_export_import_table_map', []));
+    }
 
     public function __construct()
     {
@@ -53,6 +91,39 @@ class ExportImportService
     }
 
     /**
+     * Nudge WP-Cron and run Action Scheduler pending actions so queued export/import jobs
+     * actually start during the REST request (same approach as {@see MigrationProgress::kickQueueRunner}).
+     */
+    private static function kickActionSchedulerQueue(): void
+    {
+        if (function_exists('spawn_cron')) {
+            spawn_cron();
+        }
+
+        try {
+            if (class_exists(\ActionScheduler::class)) {
+                $runner = \ActionScheduler::runner();
+                if ($runner !== null && method_exists($runner, 'run')) {
+                    $runner->run();
+
+                    return;
+                }
+            }
+
+            if (class_exists(\ActionScheduler_QueueRunner::class)) {
+                $runner = \ActionScheduler_QueueRunner::instance();
+                if ($runner !== null && method_exists($runner, 'run')) {
+                    $runner->run();
+                }
+            }
+        } catch (\Throwable $e) {
+            Logger::warning('Action Scheduler queue kick failed: ' . $e->getMessage(), [
+                'source' => 'export_import',
+            ]);
+        }
+    }
+
+    /**
      * Create a new export job
      * 
      * @param array $dataTypes Data types to export
@@ -61,6 +132,8 @@ class ExportImportService
      */
     public static function createExportJob(array $dataTypes, int $userId): string
     {
+        $dataTypes = self::normalizeExportDataTypes($dataTypes);
+
         $jobId = 'export_' . uniqid() . '_' . time();
         
         // Store job metadata in options
@@ -83,11 +156,16 @@ class ExportImportService
         
         update_option(self::JOB_OPTION_PREFIX . $jobId, $jobData, false);
         
-        // Schedule the job with Action Scheduler
+        // Schedule with Action Scheduler, then kick the runner so work starts in this request
+        // (otherwise many hosts leave jobs pending until WP-Cron, and the UI stays at 0/0).
         if (function_exists('as_enqueue_async_action')) {
             as_enqueue_async_action(self::EXPORT_ACTION, [$jobId], 'yatra');
+            self::kickActionSchedulerQueue();
+            $fresh = self::getJobStatus($jobId);
+            if ($fresh && ($fresh['status'] ?? '') === 'pending') {
+                self::processExportJob($jobId);
+            }
         } else {
-            // Fallback: process immediately if Action Scheduler not available
             self::processExportJob($jobId);
         }
         
@@ -106,6 +184,14 @@ class ExportImportService
      */
     public static function createImportJob(string $filePath, array $dataTypes, int $userId): string
     {
+        $importAll = in_array('all', $dataTypes, true);
+        $dataTypes = array_values(array_filter(
+            array_unique($dataTypes),
+            static function ($t) {
+                return is_string($t) && $t !== 'all';
+            }
+        ));
+
         $jobId = 'import_' . uniqid() . '_' . time();
         
         $jobData = [
@@ -113,6 +199,7 @@ class ExportImportService
             'type' => 'import',
             'status' => 'pending',
             'data_types' => $dataTypes,
+            'import_all' => $importAll,
             'user_id' => $userId,
             'file_path' => $filePath,
             'progress' => 0,
@@ -126,11 +213,14 @@ class ExportImportService
         
         update_option(self::JOB_OPTION_PREFIX . $jobId, $jobData, false);
         
-        // Schedule the job with Action Scheduler
         if (function_exists('as_enqueue_async_action')) {
             as_enqueue_async_action(self::IMPORT_ACTION, [$jobId], 'yatra');
+            self::kickActionSchedulerQueue();
+            $fresh = self::getJobStatus($jobId);
+            if ($fresh && ($fresh['status'] ?? '') === 'pending') {
+                self::processImportJob($jobId);
+            }
         } else {
-            // Fallback: process immediately if Action Scheduler not available
             self::processImportJob($jobId);
         }
         
@@ -181,6 +271,17 @@ class ExportImportService
             Logger::error("Export job not found: {$jobId}");
             return;
         }
+
+        $status = $jobData['status'] ?? '';
+        if ($status === 'completed' || $status === 'failed') {
+            return;
+        }
+        if ($status === 'running') {
+            return;
+        }
+        if ($status !== 'pending') {
+            return;
+        }
         
         // Mark as running
         self::updateJob($jobId, [
@@ -197,51 +298,125 @@ class ExportImportService
                 'data' => []
             ];
             
-            $totalRecords = 0;
             $processedRecords = 0;
-            
-            // Count total records first
-            $totalRecords = self::countExportRecords($dataTypes);
+
+            $expandedTypes = self::expandDataTypesForExport($dataTypes);
+
+            $settingsBundleForExport = null;
+            if ($dataTypes === [] || in_array('settings', $dataTypes, true)) {
+                $settingsBundleForExport = self::collectAllYatraOptionsForExport();
+            }
+            $settingsWeight = $settingsBundleForExport !== null ? max(1, count($settingsBundleForExport)) : 0;
+
+            $totalRecords = self::countExportRecords($expandedTypes) + $settingsWeight;
             self::updateJob($jobId, ['total_records' => $totalRecords]);
-            
-            // Export each data type with batch processing
-            $tableMap = self::getTableMap();
-            
-            foreach ($dataTypes as $dataType) {
+
+            foreach ($expandedTypes as $dataType) {
+                if ($dataType === 'settings') {
+                    continue;
+                }
+
+                if ($dataType === 'itinerary') {
+                    $daysTable = $wpdb->prefix . 'yatra_new_trip_itinerary_days';
+                    $entriesTable = $wpdb->prefix . 'yatra_new_trip_itinerary_day_entry';
+                    $allDays = [];
+                    $allEntries = [];
+
+                    if ($repository->tableExists($daysTable)) {
+                        $dayTotal = $repository->getRecordCount($daysTable);
+                        for ($offset = 0; $offset < $dayTotal; $offset += self::BATCH_SIZE) {
+                            $batch = $repository->getBatchRecords($daysTable, $offset, self::BATCH_SIZE);
+                            $allDays = array_merge($allDays, $batch);
+                            $processedRecords += count($batch);
+                            $progress = $totalRecords > 0 ? round(($processedRecords / $totalRecords) * 100) : 0;
+                            self::updateJob($jobId, [
+                                'processed_records' => $processedRecords,
+                                'progress' => $progress,
+                            ]);
+                        }
+                    }
+
+                    if ($repository->tableExists($entriesTable)) {
+                        $entryTotal = $repository->getRecordCount($entriesTable);
+                        for ($offset = 0; $offset < $entryTotal; $offset += self::BATCH_SIZE) {
+                            $batch = $repository->getBatchRecords($entriesTable, $offset, self::BATCH_SIZE);
+                            $allEntries = array_merge($allEntries, $batch);
+                            $processedRecords += count($batch);
+                            $progress = $totalRecords > 0 ? round(($processedRecords / $totalRecords) * 100) : 0;
+                            self::updateJob($jobId, [
+                                'processed_records' => $processedRecords,
+                                'progress' => $progress,
+                            ]);
+                        }
+                    }
+
+                    $exportData['data']['itinerary'] = [
+                        'days' => $allDays,
+                        'entries' => $allEntries,
+                    ];
+                    continue;
+                }
+
+                $classType = self::classificationTypeForDataType($dataType);
+                if ($classType !== null) {
+                    $tableName = $wpdb->prefix . 'yatra_new_classifications';
+                    if (!$repository->tableExists($tableName)) {
+                        $exportData['data'][$dataType] = [];
+                        continue;
+                    }
+                    $total = $repository->getClassificationCount($tableName, $classType);
+                    $records = [];
+                    for ($offset = 0; $offset < $total; $offset += self::BATCH_SIZE) {
+                        $batch = $repository->getClassificationBatch($tableName, $classType, $offset, self::BATCH_SIZE);
+                        $records = array_merge($records, $batch);
+                        $processedRecords += count($batch);
+                        $progress = $totalRecords > 0 ? round(($processedRecords / $totalRecords) * 100) : 0;
+                        self::updateJob($jobId, [
+                            'processed_records' => $processedRecords,
+                            'progress' => $progress,
+                        ]);
+                    }
+                    $exportData['data'][$dataType] = $records;
+                    continue;
+                }
+
+                $tableMap = self::getMergedTableMap();
                 if (!isset($tableMap[$dataType])) {
                     continue;
                 }
-                
+
                 $tableName = $wpdb->prefix . $tableMap[$dataType];
-                $tableExists = $repository->tableExists($tableName);
-                
-                if (!$tableExists) {
+                if (!$repository->tableExists($tableName)) {
                     $exportData['data'][$dataType] = [];
                     continue;
                 }
-                
+
                 $total = $repository->getRecordCount($tableName);
                 $records = [];
-                
+
                 for ($offset = 0; $offset < $total; $offset += self::BATCH_SIZE) {
                     $batch = $repository->getBatchRecords($tableName, $offset, self::BATCH_SIZE);
                     $records = array_merge($records, $batch);
                     $processedRecords += count($batch);
-                    
-                    // Update progress
+
                     $progress = $totalRecords > 0 ? round(($processedRecords / $totalRecords) * 100) : 0;
                     self::updateJob($jobId, [
                         'processed_records' => $processedRecords,
                         'progress' => $progress,
                     ]);
                 }
-                
+
                 $exportData['data'][$dataType] = $records;
             }
             
-            // Export settings if requested
-            if (empty($dataTypes) || in_array('settings', $dataTypes)) {
-                $exportData['data']['settings'] = self::exportSettings();
+            if ($settingsBundleForExport !== null) {
+                $exportData['data']['settings'] = (array) apply_filters('yatra_export_settings_bundle', $settingsBundleForExport);
+                $processedRecords += $settingsWeight;
+                $progress = $totalRecords > 0 ? min(100, (int) round(($processedRecords / $totalRecords) * 100)) : 100;
+                self::updateJob($jobId, [
+                    'processed_records' => $processedRecords,
+                    'progress' => $progress,
+                ]);
             }
             
             // Write to file
@@ -294,6 +469,17 @@ class ExportImportService
         $jobData = self::getJobStatus($jobId);
         if (!$jobData) {
             Logger::error("Import job not found: {$jobId}");
+            return;
+        }
+
+        $status = $jobData['status'] ?? '';
+        if ($status === 'completed' || $status === 'failed') {
+            return;
+        }
+        if ($status === 'running') {
+            return;
+        }
+        if ($status !== 'pending') {
             return;
         }
         
@@ -362,110 +548,204 @@ class ExportImportService
                 throw new \Exception('Invalid import file format: No data structure found');
             }
             
-            // Count total records
+            if (!empty($jobData['import_all'])) {
+                $dataTypes = array_keys($dataContainer);
+            }
+
+            $dataTypes = self::sortImportDataTypes($dataTypes);
+
+            $mapper = new ExportImportIdMapper();
+
             $totalRecords = 0;
-            foreach ($dataTypes as $dataType) {
-                if (isset($dataContainer[$dataType]) && is_array($dataContainer[$dataType])) {
-                    $totalRecords += count($dataContainer[$dataType]);
+            foreach ($dataTypes as $dt) {
+                if (!isset($dataContainer[$dt])) {
+                    continue;
+                }
+                $payload = $dataContainer[$dt];
+                if ($dt === 'itinerary' && is_array($payload) && isset($payload['days'], $payload['entries']) && is_array($payload['days']) && is_array($payload['entries'])) {
+                    $totalRecords += count($payload['days']) + count($payload['entries']);
+                } elseif ($dt === 'settings' && is_array($payload)) {
+                    $totalRecords += max(1, count($payload));
+                } elseif (is_array($payload)) {
+                    $totalRecords += count($payload);
                 }
             }
-            
+
             self::updateJob($jobId, ['total_records' => $totalRecords]);
-            
+
             $processedRecords = 0;
-            $tableMap = self::getTableMap();
-            
-            // Initialize import statistics for tracking
             $importStats = [];
-            
+
             foreach ($dataTypes as $dataType) {
-                if (!isset($dataContainer[$dataType]) || !is_array($dataContainer[$dataType])) {
-                    Logger::warning("Skipping data type not found in import file: {$dataType}");
-                    continue;
-                }
-                
                 if ($dataType === 'settings') {
-                    self::importSettings($dataContainer['settings']);
-                    continue;
-                }
-                
-                if (!isset($tableMap[$dataType])) {
-                    continue;
-                }
-                
-                $tableName = $wpdb->prefix . $tableMap[$dataType];
-                $records = $dataContainer[$dataType];
-                
-                // Initialize statistics for this data type
-                $importStats[$dataType] = [
-                    'total' => count($records),
-                    'imported' => 0,
-                    'failed' => 0,
-                ];
-                
-                Logger::info("Importing {$dataType}: Found " . count($records) . " records");
-                
-                // Process in batches
-                $batches = array_chunk($records, self::BATCH_SIZE);
-                
-                foreach ($batches as $batch) {
-                    foreach ($batch as $record) {
-                        $record = (array) $record;
-                        unset($record['id']); // Remove ID to create new records
-                        
-                        try {
-                            // Get table columns to ensure we only insert valid fields
-                            $tableColumns = $repository->getTableColumns($tableName);
-                            
-                            // Filter record to only include valid columns
-                            $filteredRecord = [];
-                            foreach ($record as $key => $value) {
-                                if (in_array($key, $tableColumns)) {
-                                    $filteredRecord[$key] = $value;
-                                }
-                            }
-                            
-                            // Only insert if we have valid data
-                            if (!empty($filteredRecord)) {
-                                // Handle slug conflicts by generating unique slugs
-                                if (isset($filteredRecord['slug'])) {
-                                    // Get the table name without prefix for SlugHelper
-                                    $tableNameWithoutPrefix = str_replace($wpdb->prefix, '', $tableName);
-                                    
-                                    // Generate a unique slug
-                                    $filteredRecord['slug'] = \Yatra\Helpers\SlugHelper::generateUniqueFromDatabase(
-                                        $filteredRecord['slug'],
-                                        $tableNameWithoutPrefix,
-                                        'slug'
-                                    );
-                                    
-                                    Logger::info("Generated unique slug: {$filteredRecord['slug']} for import into {$tableNameWithoutPrefix}");
-                                }
-                                
-                                $result = $repository->insertRecord($tableName, $filteredRecord);
-                                if ($result === false) {
-                                    $importStats[$dataType]['failed']++;
-                                } else {
-                                    $processedRecords++;
-                                    $importStats[$dataType]['imported']++;
-                                }
-                            } else {
-                                Logger::warning("No valid columns found for record in {$tableName}");
-                            }
-                        } catch (\Exception $e) {
-                            Logger::error("Error inserting record: " . $e->getMessage());
-                            // Continue with next record instead of failing the whole import
-                            continue;
-                        }
+                    if (!isset($dataContainer['settings']) || !is_array($dataContainer['settings'])) {
+                        Logger::warning('Skipping settings: not found or invalid in import file');
+                        continue;
                     }
-                    
-                    // Update progress
+                    $settingsRows = $dataContainer['settings'];
+                    self::importSettings($settingsRows);
+                    $n = max(1, is_array($settingsRows) ? count($settingsRows) : 0);
+                    $importStats['settings'] = ['total' => $n, 'imported' => $n, 'failed' => 0];
+                    $processedRecords += $n;
                     $progress = $totalRecords > 0 ? round(($processedRecords / $totalRecords) * 100) : 0;
                     self::updateJob($jobId, [
                         'processed_records' => $processedRecords,
                         'progress' => $progress,
                     ]);
+                    continue;
                 }
+
+                if ($dataType === 'itinerary') {
+                    if (!isset($dataContainer['itinerary']) || !is_array($dataContainer['itinerary'])) {
+                        Logger::warning('Skipping itinerary: not found in import file');
+                        continue;
+                    }
+                    $payload = $dataContainer['itinerary'];
+                    if (!isset($payload['days'], $payload['entries']) || !is_array($payload['days']) || !is_array($payload['entries'])) {
+                        Logger::warning('Skipping itinerary: expected { days, entries } from Yatra 3 export; legacy flat arrays are not supported');
+                        continue;
+                    }
+                    $daysTable = $wpdb->prefix . 'yatra_new_trip_itinerary_days';
+                    $entriesTable = $wpdb->prefix . 'yatra_new_trip_itinerary_day_entry';
+                    $dayTotal = count($payload['days']);
+                    $entryTotal = count($payload['entries']);
+                    $importStats['itinerary'] = [
+                        'total' => $dayTotal + $entryTotal,
+                        'imported' => 0,
+                        'failed' => 0,
+                    ];
+
+                    foreach (array_chunk($payload['days'], self::BATCH_SIZE) as $batch) {
+                        foreach ($batch as $record) {
+                            $record = (array) $record;
+                            $oldDayId = (int) ($record['id'] ?? 0);
+                            unset($record['id']);
+                            try {
+                                if (isset($record['trip_id'])) {
+                                    $mappedTrip = $mapper->map('trips', $record['trip_id']);
+                                    $record['trip_id'] = $mappedTrip;
+                                }
+                                if (empty($record['trip_id'])) {
+                                    $importStats['itinerary']['failed']++;
+                                    continue;
+                                }
+                                $tableColumns = $repository->getTableColumns($daysTable);
+                                $filteredRecord = [];
+                                foreach ($record as $key => $value) {
+                                    if (in_array($key, $tableColumns, true)) {
+                                        $filteredRecord[$key] = $value;
+                                    }
+                                }
+                                if ($filteredRecord === []) {
+                                    $importStats['itinerary']['failed']++;
+                                    continue;
+                                }
+                                $newId = $repository->insertRecordReturningId($daysTable, $filteredRecord);
+                                if ($newId === null) {
+                                    $importStats['itinerary']['failed']++;
+                                    continue;
+                                }
+                                $processedRecords++;
+                                $importStats['itinerary']['imported']++;
+                                if ($oldDayId > 0) {
+                                    $mapper->remember('itinerary_days', $oldDayId, $newId);
+                                }
+                            } catch (\Exception $e) {
+                                Logger::error('Itinerary day import error: ' . $e->getMessage());
+                                $importStats['itinerary']['failed']++;
+                            }
+                        }
+                        $progress = $totalRecords > 0 ? round(($processedRecords / $totalRecords) * 100) : 0;
+                        self::updateJob($jobId, [
+                            'processed_records' => $processedRecords,
+                            'progress' => $progress,
+                        ]);
+                    }
+
+                    foreach (array_chunk($payload['entries'], self::BATCH_SIZE) as $batch) {
+                        foreach ($batch as $record) {
+                            $record = (array) $record;
+                            unset($record['id']);
+                            try {
+                                if (isset($record['day_id'])) {
+                                    $record['day_id'] = $mapper->map('itinerary_days', $record['day_id']);
+                                }
+                                if (isset($record['trip_id'])) {
+                                    $record['trip_id'] = $mapper->map('trips', $record['trip_id']);
+                                }
+                                if (array_key_exists('item_type_id', $record)) {
+                                    $record['item_type_id'] = $mapper->mapFkNullable('classifications', $record['item_type_id']);
+                                }
+                                if (array_key_exists('item_id', $record)) {
+                                    $record['item_id'] = $mapper->mapFkNullable('classifications', $record['item_id']);
+                                }
+                                if (empty($record['day_id']) || empty($record['trip_id'])) {
+                                    $importStats['itinerary']['failed']++;
+                                    continue;
+                                }
+                                $tableColumns = $repository->getTableColumns($entriesTable);
+                                $filteredRecord = [];
+                                foreach ($record as $key => $value) {
+                                    if (in_array($key, $tableColumns, true)) {
+                                        $filteredRecord[$key] = $value;
+                                    }
+                                }
+                                if ($filteredRecord === []) {
+                                    $importStats['itinerary']['failed']++;
+                                    continue;
+                                }
+                                $newId = $repository->insertRecordReturningId($entriesTable, $filteredRecord);
+                                if ($newId === null) {
+                                    $importStats['itinerary']['failed']++;
+                                    continue;
+                                }
+                                $processedRecords++;
+                                $importStats['itinerary']['imported']++;
+                            } catch (\Exception $e) {
+                                Logger::error('Itinerary entry import error: ' . $e->getMessage());
+                                $importStats['itinerary']['failed']++;
+                            }
+                        }
+                        $progress = $totalRecords > 0 ? round(($processedRecords / $totalRecords) * 100) : 0;
+                        self::updateJob($jobId, [
+                            'processed_records' => $processedRecords,
+                            'progress' => $progress,
+                        ]);
+                    }
+
+                    Logger::info(
+                        "Imported itinerary: {$importStats['itinerary']['imported']} ok, {$importStats['itinerary']['failed']} failed"
+                    );
+                    continue;
+                }
+
+                if (!isset($dataContainer[$dataType]) || !is_array($dataContainer[$dataType])) {
+                    Logger::warning("Skipping data type not found in import file: {$dataType}");
+                    continue;
+                }
+
+                $mergedMap = self::getMergedTableMap();
+                $classType = self::classificationTypeForDataType($dataType);
+                if ($classType !== null) {
+                    $tableName = $wpdb->prefix . 'yatra_new_classifications';
+                } elseif (isset($mergedMap[$dataType])) {
+                    $tableName = $wpdb->prefix . $mergedMap[$dataType];
+                } else {
+                    Logger::warning("Skipping unknown import data type: {$dataType}");
+                    continue;
+                }
+
+                self::importTableRowsWithMapping(
+                    $repository,
+                    $mapper,
+                    $jobId,
+                    $dataType,
+                    $tableName,
+                    $dataContainer[$dataType],
+                    $processedRecords,
+                    $totalRecords,
+                    $importStats
+                );
             }
             
             // Mark as completed with detailed statistics
@@ -494,80 +774,748 @@ class ExportImportService
     }
 
     /**
-     * Get table name mapping for data types
+     * @param string[] $dataTypes
+     * @return string[]
      */
-    private static function getTableMap(): array
+    private static function normalizeExportDataTypes(array $dataTypes): array
     {
-        return [
-            'trips' => 'yatra_trips',
-            'destinations' => 'yatra_destinations',
-            'activities' => 'yatra_activities',
-            'bookings' => 'yatra_bookings',
-            'customers' => 'yatra_customers',
-            'reviews' => 'yatra_reviews',
-            'payments' => 'yatra_booking_payments',
-            'enquiries' => 'yatra_enquiries',
-            'coupons' => 'yatra_coupons',
-            'travelers' => 'yatra_travelers',
-            'departures' => 'yatra_departures',
-            'categories' => 'yatra_trip_categories',
-            'difficulty_levels' => 'yatra_difficulty_levels',
-            'discounts' => 'yatra_discounts',
-            'availability' => 'yatra_trip_availability_dates',
-            'itinerary' => \Yatra\Database\Tables\TripItineraryDayEntryTable::getTableName(),
-        ];
+        $dataTypes = array_values(array_filter($dataTypes, static function ($t): bool {
+            return is_string($t) && $t !== '';
+        }));
+        if (in_array('all', $dataTypes, true)) {
+            return self::getAllExportableTypeKeys();
+        }
+
+        return array_values(array_unique($dataTypes));
     }
 
     /**
-     * Count total records to export
+     * @return string[]
+     */
+    private static function getAllExportableTypeKeys(): array
+    {
+        $base = [
+            'settings',
+            'destinations',
+            'activities',
+            'categories',
+            'difficulty_levels',
+            'trips',
+            'itinerary',
+        ];
+        $mergedKeys = array_keys(self::getMergedTableMap());
+        $keys = array_values(array_unique(array_merge($base, $mergedKeys)));
+
+        return array_values(array_unique((array) apply_filters('yatra_export_all_data_types', $keys)));
+    }
+
+    /**
+     * @param array<int, mixed> $records
+     * @param array<string, array{total: int, imported: int, failed: int}> $importStats
+     */
+    private static function importTableRowsWithMapping(
+        ExportImportRepository $repository,
+        ExportImportIdMapper $mapper,
+        string $jobId,
+        string $dataType,
+        string $tableName,
+        array $records,
+        int &$processedRecords,
+        int $totalRecords,
+        array &$importStats
+    ): void {
+        global $wpdb;
+
+        $importStats[$dataType] = [
+            'total' => count($records),
+            'imported' => 0,
+            'failed' => 0,
+        ];
+        Logger::info('Importing ' . $dataType . ': Found ' . count($records) . ' records');
+
+        foreach (array_chunk($records, self::BATCH_SIZE) as $batch) {
+            foreach ($batch as $record) {
+                $record = (array) $record;
+                $oldId = (int) ($record['id'] ?? 0);
+                unset($record['id']);
+
+                try {
+                    self::applyForeignKeyRemapping($mapper, $dataType, $record);
+
+                    if ($dataType === 'bookings' && isset($record['reference']) && $record['reference'] !== '') {
+                        $record['reference'] = self::ensureUniqueBookingReference((string) $record['reference']);
+                    }
+
+                    if (in_array($dataType, ['dynamic_pricing_rules', 'email_sequences'], true)) {
+                        if (array_key_exists('trip_ids', $record) && $record['trip_ids'] !== null && $record['trip_ids'] !== '') {
+                            $record['trip_ids'] = self::remapTripIdsTextField($mapper, (string) $record['trip_ids']);
+                        }
+                    }
+
+                    if ($dataType === 'consent_requests' && isset($record['token']) && $record['token'] !== '') {
+                        $record['token'] = self::ensureUniqueConsentRequestToken((string) $record['token']);
+                    }
+
+                    if ($dataType === 'email_templates' && isset($record['template_key']) && $record['template_key'] !== '') {
+                        $record['template_key'] = self::ensureUniqueEmailTemplateKey((string) $record['template_key']);
+                    }
+
+                    if ($dataType === 'discounts') {
+                        if (array_key_exists('trip_ids', $record)) {
+                            $tripIdsVal = $record['trip_ids'];
+                            $record['trip_ids'] = self::remapDiscountTripIdsField(
+                                $mapper,
+                                $tripIdsVal === null ? null : (string) $tripIdsVal
+                            );
+                        }
+                        if (isset($record['code']) && $record['code'] !== '') {
+                            $record['code'] = self::ensureUniqueDiscountCode((string) $record['code']);
+                        }
+                    }
+
+                    if (self::rowHasInvalidRequiredFks($dataType, $record)) {
+                        $importStats[$dataType]['failed']++;
+                        continue;
+                    }
+
+                    $tableColumns = $repository->getTableColumns($tableName);
+                    $filteredRecord = [];
+                    foreach ($record as $key => $value) {
+                        if (in_array($key, $tableColumns, true)) {
+                            $filteredRecord[$key] = $value;
+                        }
+                    }
+
+                    if ($filteredRecord === []) {
+                        $importStats[$dataType]['failed']++;
+                        continue;
+                    }
+
+                    if (isset($filteredRecord['slug'])) {
+                        $suffix = str_replace($wpdb->prefix, '', $tableName);
+                        $filteredRecord['slug'] = \Yatra\Helpers\SlugHelper::generateUniqueFromDatabase(
+                            (string) $filteredRecord['slug'],
+                            $suffix,
+                            'slug'
+                        );
+                    }
+
+                    $newId = $repository->insertRecordReturningId($tableName, $filteredRecord);
+                    if ($newId === null) {
+                        $importStats[$dataType]['failed']++;
+                        continue;
+                    }
+
+                    $processedRecords++;
+                    $importStats[$dataType]['imported']++;
+
+                    $entity = self::entityKeyForDataType($dataType);
+                    if ($entity !== null && $oldId > 0) {
+                        $mapper->remember($entity, $oldId, $newId);
+                    }
+                } catch (\Exception $e) {
+                    Logger::error('Error importing ' . $dataType . ': ' . $e->getMessage());
+                    $importStats[$dataType]['failed']++;
+                }
+            }
+
+            $progress = $totalRecords > 0 ? round(($processedRecords / $totalRecords) * 100) : 0;
+            self::updateJob($jobId, [
+                'processed_records' => $processedRecords,
+                'progress' => $progress,
+            ]);
+        }
+    }
+
+    private static function entityKeyForDataType(string $dataType): ?string
+    {
+        return match ($dataType) {
+            'destinations',
+            'activities',
+            'categories',
+            'difficulty_levels' => 'classifications',
+            'trips' => 'trips',
+            'customers' => 'customers',
+            'bookings' => 'bookings',
+            'payments' => 'payments',
+            'payment_tokens' => 'payment_tokens',
+            'scheduled_payments' => 'scheduled_payments',
+            'availability' => 'availability',
+            'departures' => 'departures',
+            'travelers' => 'travelers',
+            'discounts' => 'discounts',
+            'additional_service_catalog' => 'services',
+            'consent_forms' => 'consent_forms',
+            'signed_consents' => 'signed_consents',
+            'consent_requests' => 'consent_requests',
+            'dynamic_pricing_rules' => 'dynamic_pricing_rules',
+            'abandoned_bookings' => 'abandoned_bookings',
+            'email_templates' => 'email_templates',
+            'email_sequences' => 'email_sequences',
+            'email_sequence_steps' => 'email_sequence_steps',
+            default => null,
+        };
+    }
+
+    private static function rowHasInvalidRequiredFks(string $dataType, array $row): bool
+    {
+        return match ($dataType) {
+            'trip_classifications' => empty($row['trip_id'] ?? null) || empty($row['classification_id'] ?? null),
+            'trip_content', 'trip_revisions', 'availability_rules', 'availability', 'departures', 'trip_additional_services' => empty($row['trip_id'] ?? null),
+            'trip_consent_forms' => empty($row['trip_id'] ?? null) || empty($row['form_id'] ?? null),
+            'pricing_history', 'trip_demand_scores' => empty($row['trip_id'] ?? null),
+            'consent_requests' => empty($row['form_id'] ?? null) || empty($row['booking_id'] ?? null),
+            'signed_consents' => empty($row['form_id'] ?? null),
+            'abandoned_bookings' => empty($row['trip_id'] ?? null),
+            'recovery_email_logs' => empty($row['abandoned_booking_id'] ?? null),
+            'email_sequence_steps' => empty($row['sequence_id'] ?? null),
+            'booking_departures', 'travelers', 'payments' => empty($row['booking_id'] ?? null),
+            'traveler_meta' => empty($row['traveller_id'] ?? null),
+            'booking_additional_services' => empty($row['booking_id'] ?? null) || empty($row['service_id'] ?? null),
+            'payment_tokens' => empty($row['customer_id'] ?? null),
+            'bookings' => empty($row['trip_id'] ?? null),
+            'scheduled_payments' => empty($row['booking_id'] ?? null),
+            'reviews' => empty($row['trip_id'] ?? null),
+            default => false,
+        };
+    }
+
+    private static function applyForeignKeyRemapping(ExportImportIdMapper $m, string $dataType, array &$row): void
+    {
+        switch ($dataType) {
+            case 'trips':
+                if (array_key_exists('difficulty_level', $row)) {
+                    $row['difficulty_level'] = $m->mapFkNullable('classifications', $row['difficulty_level']);
+                }
+                break;
+            case 'trip_classifications':
+                if (isset($row['trip_id'])) {
+                    $row['trip_id'] = $m->map('trips', $row['trip_id']);
+                }
+                if (isset($row['classification_id'])) {
+                    $row['classification_id'] = $m->map('classifications', $row['classification_id']);
+                }
+                break;
+            case 'trip_content':
+            case 'trip_revisions':
+                if (isset($row['trip_id'])) {
+                    $row['trip_id'] = $m->map('trips', $row['trip_id']);
+                }
+                break;
+            case 'availability_rules':
+            case 'availability':
+                if (isset($row['trip_id'])) {
+                    $row['trip_id'] = $m->map('trips', $row['trip_id']);
+                }
+                break;
+            case 'departures':
+                if (isset($row['trip_id'])) {
+                    $row['trip_id'] = $m->map('trips', $row['trip_id']);
+                }
+                break;
+            case 'trip_additional_services':
+                if (isset($row['trip_id'])) {
+                    $row['trip_id'] = $m->map('trips', $row['trip_id']);
+                }
+                if (isset($row['service_id'])) {
+                    $row['service_id'] = $m->map('services', $row['service_id']);
+                }
+                break;
+            case 'payment_tokens':
+                if (isset($row['customer_id'])) {
+                    $row['customer_id'] = $m->map('customers', $row['customer_id']);
+                }
+                break;
+            case 'bookings':
+                if (isset($row['trip_id'])) {
+                    $row['trip_id'] = $m->map('trips', $row['trip_id']);
+                }
+                if (array_key_exists('customer_id', $row)) {
+                    $row['customer_id'] = $m->mapFkNullable('customers', $row['customer_id']);
+                }
+                if (array_key_exists('availability_id', $row)) {
+                    $row['availability_id'] = $m->mapFkNullable('availability', $row['availability_id']);
+                }
+                break;
+            case 'booking_departures':
+                if (isset($row['booking_id'])) {
+                    $row['booking_id'] = $m->map('bookings', $row['booking_id']);
+                }
+                if (isset($row['departure_id'])) {
+                    $row['departure_id'] = $m->map('departures', $row['departure_id']);
+                }
+                break;
+            case 'booking_additional_services':
+                if (isset($row['booking_id'])) {
+                    $row['booking_id'] = $m->map('bookings', $row['booking_id']);
+                }
+                if (isset($row['service_id'])) {
+                    $row['service_id'] = $m->map('services', $row['service_id']);
+                }
+                break;
+            case 'travelers':
+                if (isset($row['booking_id'])) {
+                    $row['booking_id'] = $m->map('bookings', $row['booking_id']);
+                }
+                break;
+            case 'traveler_meta':
+                if (isset($row['traveller_id'])) {
+                    $row['traveller_id'] = $m->map('travelers', $row['traveller_id']);
+                }
+                break;
+            case 'payments':
+                if (isset($row['booking_id'])) {
+                    $row['booking_id'] = $m->map('bookings', $row['booking_id']);
+                }
+                if (array_key_exists('customer_id', $row)) {
+                    $row['customer_id'] = $m->mapFkNullable('customers', $row['customer_id']);
+                }
+                break;
+            case 'scheduled_payments':
+                if (isset($row['booking_id'])) {
+                    $row['booking_id'] = $m->map('bookings', $row['booking_id']);
+                }
+                if (array_key_exists('customer_id', $row)) {
+                    $row['customer_id'] = $m->mapFkNullable('customers', $row['customer_id']);
+                }
+                if (array_key_exists('payment_token_id', $row)) {
+                    $row['payment_token_id'] = $m->mapFkNullable('payment_tokens', $row['payment_token_id']);
+                }
+                break;
+            case 'google_calendar_events':
+                if (isset($row['booking_id']) && (int) $row['booking_id'] !== 0) {
+                    $mapped = $m->map('bookings', $row['booking_id']);
+                    $row['booking_id'] = $mapped ?? 0;
+                }
+                if (array_key_exists('departure_id', $row)) {
+                    $row['departure_id'] = $m->mapFkNullable('departures', $row['departure_id']);
+                }
+                break;
+            case 'reviews':
+                if (isset($row['trip_id'])) {
+                    $row['trip_id'] = $m->map('trips', $row['trip_id']);
+                }
+                break;
+            case 'enquiries':
+                if (array_key_exists('trip_id', $row)) {
+                    $row['trip_id'] = $m->mapFkNullable('trips', $row['trip_id']);
+                }
+                break;
+            case 'destinations':
+            case 'activities':
+            case 'categories':
+            case 'difficulty_levels':
+                if (array_key_exists('parent_id', $row)) {
+                    $row['parent_id'] = $m->mapFkNullable('classifications', $row['parent_id']);
+                }
+                break;
+            case 'trip_consent_forms':
+                if (isset($row['trip_id'])) {
+                    $row['trip_id'] = $m->map('trips', $row['trip_id']);
+                }
+                if (isset($row['form_id'])) {
+                    $row['form_id'] = $m->map('consent_forms', $row['form_id']);
+                }
+                break;
+            case 'signed_consents':
+                if (isset($row['form_id'])) {
+                    $row['form_id'] = $m->map('consent_forms', $row['form_id']);
+                }
+                if (array_key_exists('booking_id', $row)) {
+                    $row['booking_id'] = $m->mapFkNullable('bookings', $row['booking_id']);
+                }
+                break;
+            case 'consent_requests':
+                if (isset($row['form_id'])) {
+                    $row['form_id'] = $m->map('consent_forms', $row['form_id']);
+                }
+                if (isset($row['booking_id'])) {
+                    $row['booking_id'] = $m->map('bookings', $row['booking_id']);
+                }
+                if (array_key_exists('signed_consent_id', $row)) {
+                    $row['signed_consent_id'] = $m->mapFkNullable('signed_consents', $row['signed_consent_id']);
+                }
+                break;
+            case 'pricing_history':
+            case 'trip_demand_scores':
+                if (isset($row['trip_id'])) {
+                    $row['trip_id'] = $m->map('trips', $row['trip_id']);
+                }
+                break;
+            case 'abandoned_bookings':
+                if (isset($row['trip_id'])) {
+                    $row['trip_id'] = $m->map('trips', $row['trip_id']);
+                }
+                if (array_key_exists('recovered_booking_id', $row)) {
+                    $row['recovered_booking_id'] = $m->mapFkNullable('bookings', $row['recovered_booking_id']);
+                }
+                break;
+            case 'recovery_email_logs':
+                if (isset($row['abandoned_booking_id'])) {
+                    $row['abandoned_booking_id'] = $m->map('abandoned_bookings', $row['abandoned_booking_id']);
+                }
+                break;
+            case 'email_sequence_steps':
+                if (isset($row['sequence_id'])) {
+                    $row['sequence_id'] = $m->map('email_sequences', $row['sequence_id']);
+                }
+                if (array_key_exists('template_id', $row)) {
+                    $row['template_id'] = $m->mapFkNullable('email_templates', $row['template_id']);
+                }
+                break;
+            case 'email_queue':
+                if (array_key_exists('sequence_id', $row)) {
+                    $row['sequence_id'] = $m->mapFkNullable('email_sequences', $row['sequence_id']);
+                }
+                if (array_key_exists('step_id', $row)) {
+                    $row['step_id'] = $m->mapFkNullable('email_sequence_steps', $row['step_id']);
+                }
+                if (array_key_exists('template_id', $row)) {
+                    $row['template_id'] = $m->mapFkNullable('email_templates', $row['template_id']);
+                }
+                break;
+            case 'email_logs':
+                if (array_key_exists('template_id', $row)) {
+                    $row['template_id'] = $m->mapFkNullable('email_templates', $row['template_id']);
+                }
+                if (array_key_exists('sequence_id', $row)) {
+                    $row['sequence_id'] = $m->mapFkNullable('email_sequences', $row['sequence_id']);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Remap trip id lists stored as JSON array, comma-separated ids, or a single id (Pro + discounts).
+     */
+    private static function remapTripIdsTextField(ExportImportIdMapper $m, string $value): string
+    {
+        $trimmed = trim($value);
+        if ($trimmed === '' || $trimmed === '[]') {
+            return $value;
+        }
+
+        $decoded = json_decode($trimmed, true);
+        if (is_array($decoded)) {
+            $out = [];
+            foreach ($decoded as $tid) {
+                $new = $m->map('trips', $tid);
+                if ($new !== null) {
+                    $out[] = $new;
+                }
+            }
+
+            return json_encode($out);
+        }
+
+        if (strpos($trimmed, ',') !== false) {
+            $parts = preg_split('/\s*,\s*/', $trimmed) ?: [];
+            $out = [];
+            foreach ($parts as $p) {
+                if ($p === '') {
+                    continue;
+                }
+                $new = $m->map('trips', $p);
+                if ($new !== null) {
+                    $out[] = (string) $new;
+                }
+            }
+
+            return implode(',', $out);
+        }
+
+        $single = $m->map('trips', $trimmed);
+
+        return $single !== null ? (string) $single : '';
+    }
+
+    private static function ensureUniqueConsentRequestToken(string $token): string
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_consent_requests';
+        $base = $token;
+        $candidate = $base;
+        for ($n = 0; $n < 5000; $n++) {
+            $exists = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM `{$table}` WHERE `token` = %s",
+                    $candidate
+                )
+            );
+            if ($exists === 0) {
+                return $candidate;
+            }
+            $candidate = $base . '-' . wp_generate_password(8, false);
+        }
+
+        return $base . '-' . wp_generate_password(12, false);
+    }
+
+    private static function ensureUniqueEmailTemplateKey(string $key): string
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_email_templates';
+        $base = $key;
+        $candidate = $base;
+        for ($n = 0; $n < 5000; $n++) {
+            $exists = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM `{$table}` WHERE `template_key` = %s",
+                    $candidate
+                )
+            );
+            if ($exists === 0) {
+                return $candidate;
+            }
+            $candidate = $base . '-i' . ($n + 1);
+        }
+
+        return $base . '-' . wp_generate_password(6, false);
+    }
+
+    private static function ensureUniqueDiscountCode(string $code): string
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_new_discounts';
+        $base = $code;
+        $candidate = $base;
+        for ($n = 0; $n < 5000; $n++) {
+            $exists = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM `{$table}` WHERE `code` = %s",
+                    $candidate
+                )
+            );
+            if ($exists === 0) {
+                return $candidate;
+            }
+            $candidate = $base . '-i' . ($n + 1);
+        }
+
+        return $base . '-' . wp_generate_password(6, false);
+    }
+
+    private static function ensureUniqueBookingReference(string $reference): string
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_new_bookings';
+        $base = $reference;
+        $candidate = $base;
+        for ($n = 0; $n < 5000; $n++) {
+            $exists = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM `{$table}` WHERE `reference` = %s",
+                    $candidate
+                )
+            );
+            if ($exists === 0) {
+                return $candidate;
+            }
+            $candidate = $base . '-i' . ($n + 1);
+        }
+
+        return $base . '-' . wp_generate_password(6, false);
+    }
+
+    private static function remapDiscountTripIdsField(ExportImportIdMapper $m, ?string $tripIdsJson): ?string
+    {
+        if ($tripIdsJson === null || $tripIdsJson === '') {
+            return $tripIdsJson;
+        }
+        $decoded = json_decode($tripIdsJson, true);
+        if (!is_array($decoded)) {
+            return $tripIdsJson;
+        }
+
+        return self::remapTripIdsTextField($m, $tripIdsJson);
+    }
+
+    private static function classificationTypeForDataType(string $dataType): ?string
+    {
+        return match ($dataType) {
+            'destinations' => ClassificationTypes::DESTINATION,
+            'activities' => ClassificationTypes::ACTIVITY,
+            'categories' => ClassificationTypes::CATEGORY,
+            'difficulty_levels' => ClassificationTypes::DIFFICULTY,
+            default => null,
+        };
+    }
+
+    /**
+     * @param string[] $dataTypes
+     * @return string[]
+     */
+    private static function expandDataTypesForExport(array $dataTypes): array
+    {
+        $out = array_values(array_unique($dataTypes));
+
+        if (in_array('trips', $out, true)) {
+            foreach (['trip_classifications', 'trip_content', 'trip_revisions'] as $extra) {
+                if (!in_array($extra, $out, true)) {
+                    $out[] = $extra;
+                }
+            }
+        }
+        if (in_array('travelers', $out, true) && !in_array('traveler_meta', $out, true)) {
+            $out[] = 'traveler_meta';
+        }
+        if (in_array('bookings', $out, true) && !in_array('booking_departures', $out, true)) {
+            $out[] = 'booking_departures';
+        }
+        if (in_array('availability', $out, true) && !in_array('availability_rules', $out, true)) {
+            $out[] = 'availability_rules';
+        }
+        if (in_array('payments', $out, true)) {
+            foreach (['scheduled_payments', 'payment_tokens'] as $extra) {
+                if (!in_array($extra, $out, true)) {
+                    $out[] = $extra;
+                }
+            }
+        }
+
+        return apply_filters('yatra_export_import_expand_types', $out, $dataTypes);
+    }
+
+    /**
+     * Best-effort ordering so parents (classifications, trips) import before dependents.
+     *
+     * @param string[] $dataTypes
+     * @return string[]
+     */
+    private static function sortImportDataTypes(array $dataTypes): array
+    {
+        $order = [
+            'settings',
+            'destinations',
+            'activities',
+            'categories',
+            'difficulty_levels',
+            'additional_service_catalog',
+            'consent_forms',
+            'email_templates',
+            'email_sequences',
+            'email_sequence_steps',
+            'trips',
+            'trip_content',
+            'trip_classifications',
+            'trip_revisions',
+            'itinerary',
+            'availability_rules',
+            'availability',
+            'trip_additional_services',
+            'trip_consent_forms',
+            'dynamic_pricing_rules',
+            'trip_demand_scores',
+            'pricing_history',
+            'departures',
+            'customers',
+            'payment_tokens',
+            'bookings',
+            'booking_departures',
+            'booking_additional_services',
+            'signed_consents',
+            'consent_requests',
+            'abandoned_bookings',
+            'recovery_email_logs',
+            'recovery_statistics',
+            'email_queue',
+            'email_logs',
+            'travelers',
+            'traveler_meta',
+            'payments',
+            'scheduled_payments',
+            'google_calendar_events',
+            'reviews',
+            'enquiries',
+            'discounts',
+        ];
+        $dataTypes = array_values(array_unique($dataTypes));
+        usort($dataTypes, static function (string $a, string $b) use ($order): int {
+            $ia = array_search($a, $order, true);
+            $ib = array_search($b, $order, true);
+            $ia = $ia === false ? 999 : $ia;
+            $ib = $ib === false ? 999 : $ib;
+
+            return $ia <=> $ib;
+        });
+
+        return $dataTypes;
+    }
+
+    /**
+     * Count total records to export (must stay aligned with {@see processExportJob()}).
      */
     private static function countExportRecords(array $dataTypes): int
     {
+        global $wpdb;
         $repository = new ExportImportRepository();
-        
         $total = 0;
-        $tableMap = self::getTableMap();
-        
+
         foreach ($dataTypes as $dataType) {
             if ($dataType === 'settings') {
                 continue;
             }
-            
-            if (!isset($tableMap[$dataType])) {
+            if ($dataType === 'itinerary') {
+                $daysTable = $wpdb->prefix . 'yatra_new_trip_itinerary_days';
+                $entriesTable = $wpdb->prefix . 'yatra_new_trip_itinerary_day_entry';
+                if ($repository->tableExists($daysTable)) {
+                    $total += $repository->getRecordCount($daysTable);
+                }
+                if ($repository->tableExists($entriesTable)) {
+                    $total += $repository->getRecordCount($entriesTable);
+                }
                 continue;
             }
-            
-            $tableName = $wpdb->prefix . $tableMap[$dataType];
-            $tableExists = $repository->tableExists($tableName);
-            
-            if ($tableExists) {
-                $count = $repository->getRecordCount($tableName);
-                $total += $count;
+            $classType = self::classificationTypeForDataType($dataType);
+            if ($classType !== null) {
+                $tableName = $wpdb->prefix . 'yatra_new_classifications';
+                if ($repository->tableExists($tableName)) {
+                    $total += $repository->getClassificationCount($tableName, $classType);
+                }
+                continue;
+            }
+            $merged = self::getMergedTableMap();
+            if (!isset($merged[$dataType])) {
+                continue;
+            }
+            $tableName = $wpdb->prefix . $merged[$dataType];
+            if ($repository->tableExists($tableName)) {
+                $total += $repository->getRecordCount($tableName);
             }
         }
-        
+
         return $total;
     }
 
     /**
-     * Export all Yatra settings
+     * @return array<string, mixed>
      */
-    private static function exportSettings(): array
+    private static function collectAllYatraOptionsForExport(): array
     {
-        return [
-            'yatra_settings' => get_option('yatra_settings', []),
-            'yatra_currency' => get_option('yatra_currency', 'USD'),
-            'yatra_version' => get_option('yatra_version', ''),
-            'yatra_db_version' => get_option('yatra_db_version', ''),
-            'yatra_license_key' => get_option('yatra_license_key', ''),
-            'yatra_license_status' => get_option('yatra_license_status', ''),
-            'yatra_email_settings' => get_option('yatra_email_settings', []),
-            'yatra_payment_settings' => get_option('yatra_payment_settings', []),
-            'yatra_booking_settings' => get_option('yatra_booking_settings', []),
-            'yatra_display_settings' => get_option('yatra_display_settings', []),
-            'yatra_security_settings' => get_option('yatra_security_settings', []),
-            'yatra_integration_settings' => get_option('yatra_integration_settings', []),
-        ];
+        global $wpdb;
+
+        $rows = $wpdb->get_results(
+            "SELECT option_name, option_value FROM {$wpdb->options} 
+             WHERE option_name LIKE 'yatra_%' 
+             AND option_name NOT LIKE 'yatra_job_%' 
+             AND option_name NOT LIKE 'yatra_migration_%'"
+        );
+        if (!is_array($rows)) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($rows as $row) {
+            $name = (string) $row->option_name;
+            if (strpos($name, 'yatra_transient') === 0) {
+                continue;
+            }
+            $out[$name] = maybe_unserialize($row->option_value);
+        }
+
+        return $out;
     }
 
     /**
@@ -576,9 +1524,13 @@ class ExportImportService
     private static function importSettings(array $settings): void
     {
         foreach ($settings as $key => $value) {
-            if (strpos($key, 'yatra_') === 0) {
-                update_option($key, $value);
+            if (!is_string($key) || strpos($key, 'yatra_') !== 0) {
+                continue;
             }
+            if (!preg_match('/^[a-zA-Z0-9_\-]+$/', $key)) {
+                continue;
+            }
+            update_option($key, $value);
         }
     }
 

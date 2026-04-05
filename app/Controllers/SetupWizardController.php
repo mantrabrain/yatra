@@ -10,6 +10,7 @@
 namespace Yatra\Controllers;
 
 use Yatra\Helpers\CurrencyHelper;
+use Yatra\Services\SettingsService;
 
 defined('ABSPATH') || exit;
 
@@ -71,10 +72,20 @@ class SetupWizardController
                 'name' => __('Welcome', 'yatra'),
                 'view' => array($this, 'setup_welcome'),
             ),
-            'general' => array(
-                'name' => __('Business Info', 'yatra'),
-                'view' => array($this, 'setup_general'),
-                'handler' => array($this, 'setup_general_save'),
+            'business' => array(
+                'name' => __('Business', 'yatra'),
+                'view' => array($this, 'setup_business'),
+                'handler' => array($this, 'setup_business_save'),
+            ),
+            'bookings' => array(
+                'name' => __('Bookings', 'yatra'),
+                'view' => array($this, 'setup_bookings'),
+                'handler' => array($this, 'setup_bookings_save'),
+            ),
+            'communications' => array(
+                'name' => __('Email & payments', 'yatra'),
+                'view' => array($this, 'setup_communications'),
+                'handler' => array($this, 'setup_communications_save'),
             ),
             'currency' => array(
                 'name' => __('Currency', 'yatra'),
@@ -87,11 +98,13 @@ class SetupWizardController
                 'handler' => array($this, 'setup_theme_save'),
             ),
             'complete' => array(
-                'name' => __('Complete', 'yatra'),
+                'name' => __('Done', 'yatra'),
                 'view' => array($this, 'setup_complete'),
                 'handler' => array($this, 'setup_complete_save'),
             ),
         );
+
+        $this->steps = apply_filters('yatra_setup_wizard_steps', $this->steps, $this);
 
         return $this->steps;
     }
@@ -128,6 +141,12 @@ class SetupWizardController
 
         $steps = $this->get_steps();
         $this->step = isset($_GET['step']) ? sanitize_key($_GET['step']) : current(array_keys($steps));
+
+        // Legacy URL: step=general → business
+        if ($this->step === 'general' && isset($steps['business'])) {
+            wp_safe_redirect(esc_url_raw($this->get_step_url('business')));
+            exit;
+        }
 
         // Process form submission BEFORE any output
         if (!empty($_POST['save_step'])) {
@@ -172,12 +191,13 @@ class SetupWizardController
         wp_localize_script('yatra-setup-wizard', 'yatraSetupWizard', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('yatra_setup_wizard_nonce'),
+            'skipConfirmMessage' => __('Skip this step? Nothing on this screen will be saved—you can finish later in Yatra Settings.', 'yatra'),
             'strings' => [
                 'confirm_leave' => __('Are you sure you want to leave the setup wizard?', 'yatra'),
                 'saving' => __('Saving...', 'yatra'),
                 'saved' => __('Saved!', 'yatra'),
-                'error' => __('Error occurred', 'yatra')
-            ]
+                'error' => __('Error occurred', 'yatra'),
+            ],
         ]);
     }
 
@@ -240,15 +260,19 @@ class SetupWizardController
                     <?php
                     $step_icons = array(
                         'welcome' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
-                        'general' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>',
+                        'business' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M5 21V7l8-4v18"></path><path d="M19 21V11l-6-4"></path></svg>',
+                        'bookings' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+                        'communications' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>',
                         'currency' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>',
-                        'pages' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>',
                         'theme' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>',
                         'complete' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></path></svg>'
                     );
                     
+                    $ordered_keys = array_keys($output_steps);
                     foreach ($output_steps as $step_key => $step) {
-                        $is_completed = array_search($this->step, array_keys($this->steps)) > array_search($step_key, array_keys($this->steps));
+                        $cur = array_search($this->step, $ordered_keys, true);
+                        $pos = array_search($step_key, $ordered_keys, true);
+                        $is_completed = $cur !== false && $pos !== false && $cur > $pos;
                         $icon = isset($step_icons[$step_key]) ? $step_icons[$step_key] : '';
 
                         if ($step_key === $this->step) {
@@ -300,32 +324,171 @@ class SetupWizardController
     }
 
     /**
-     * General settings step
+     * Human-readable progress for task steps (excludes decorative copy on welcome).
      */
-    public function setup_general()
+    public function get_wizard_progress_label(): string
     {
-        include YATRA_ABSPATH . 'templates/setup-wizard/general.php';
+        $steps = $this->get_steps();
+        $keys = array_keys($steps);
+        $idx = array_search($this->step, $keys, true);
+        if ($idx === false) {
+            return '';
+        }
+
+        return sprintf(
+            /* translators: 1: current step number, 2: total steps */
+            __('Step %1$d of %2$d', 'yatra'),
+            (int) $idx + 1,
+            count($keys)
+        );
     }
 
     /**
-     * Save general settings
+     * Business profile (company contact only).
      */
-    public function setup_general_save()
+    public function setup_business()
+    {
+        include YATRA_ABSPATH . 'templates/setup-wizard/business.php';
+    }
+
+    /**
+     * Save business profile.
+     */
+    public function setup_business_save()
     {
         check_admin_referer('yatra-setup');
 
-        // Save ONLY ESSENTIAL settings for travel booking system
         $settings = [
-            'company_name' => isset($_POST['company_name']) ? sanitize_text_field($_POST['company_name']) : '',
-            'company_email' => isset($_POST['company_email']) ? sanitize_email($_POST['company_email']) : '',
-            'company_phone' => isset($_POST['company_phone']) ? sanitize_text_field($_POST['company_phone']) : '',
-            'enable_guest_booking' => isset($_POST['enable_guest_booking']) && $_POST['enable_guest_booking'] === 'true',
-            'booking_confirmation' => isset($_POST['booking_confirmation']) && $_POST['booking_confirmation'] === 'true',
+            'company_name' => isset($_POST['company_name']) ? sanitize_text_field(wp_unslash($_POST['company_name'])) : '',
+            'company_email' => isset($_POST['company_email']) ? sanitize_email(wp_unslash($_POST['company_email'])) : '',
+            'company_phone' => isset($_POST['company_phone']) ? sanitize_text_field(wp_unslash($_POST['company_phone'])) : '',
         ];
 
         foreach ($settings as $key => $value) {
             update_option('yatra_' . $key, $value);
         }
+
+        $extra = apply_filters('yatra_setup_wizard_business_save', [], $_POST);
+        if (is_array($extra)) {
+            foreach ($extra as $optionKey => $value) {
+                if (! is_string($optionKey) || $optionKey === '') {
+                    continue;
+                }
+                if (strpos($optionKey, 'yatra_') === 0) {
+                    update_option($optionKey, $value);
+                } else {
+                    update_option('yatra_' . $optionKey, $value);
+                }
+            }
+        }
+
+        SettingsService::reload();
+
+        wp_safe_redirect(esc_url_raw($this->get_next_step_link()));
+        exit;
+    }
+
+    /**
+     * Booking behaviour (guest checkout, confirmations).
+     */
+    public function setup_bookings()
+    {
+        include YATRA_ABSPATH . 'templates/setup-wizard/bookings.php';
+    }
+
+    /**
+     * Save booking behaviour.
+     */
+    public function setup_bookings_save()
+    {
+        check_admin_referer('yatra-setup');
+
+        update_option('yatra_enable_guest_booking', isset($_POST['enable_guest_booking']) && $_POST['enable_guest_booking'] === 'true');
+        update_option('yatra_booking_confirmation', isset($_POST['booking_confirmation']) && $_POST['booking_confirmation'] === 'true');
+
+        $extra = apply_filters('yatra_setup_wizard_bookings_save', [], $_POST);
+        if (is_array($extra)) {
+            foreach ($extra as $optionKey => $value) {
+                if (! is_string($optionKey) || $optionKey === '') {
+                    continue;
+                }
+                if (strpos($optionKey, 'yatra_') === 0) {
+                    update_option($optionKey, $value);
+                } else {
+                    update_option('yatra_' . $optionKey, $value);
+                }
+            }
+        }
+
+        SettingsService::reload();
+
+        wp_safe_redirect(esc_url_raw($this->get_next_step_link()));
+        exit;
+    }
+
+    /**
+     * Email identity, notifications, payment safety.
+     */
+    public function setup_communications()
+    {
+        include YATRA_ABSPATH . 'templates/setup-wizard/communications.php';
+    }
+
+    /**
+     * Save communications & payment safety settings.
+     */
+    public function setup_communications_save()
+    {
+        check_admin_referer('yatra-setup');
+
+        $companyName = (string) SettingsService::get('company_name', '');
+        $companyEmail = (string) SettingsService::get('company_email', '');
+
+        $fromName = isset($_POST['email_from_name']) ? sanitize_text_field(wp_unslash($_POST['email_from_name'])) : '';
+        $fromEmail = isset($_POST['email_from_address']) ? sanitize_email(wp_unslash($_POST['email_from_address'])) : '';
+        if ($fromName === '') {
+            $fromName = $companyName;
+        }
+        if ($fromEmail === '') {
+            $fromEmail = $companyEmail;
+        }
+        update_option('yatra_from_name', $fromName);
+        update_option('yatra_from_email', $fromEmail);
+        update_option('yatra_email_from_name', $fromName);
+        update_option('yatra_email_from_address', $fromEmail);
+
+        update_option('yatra_payment_test_mode', isset($_POST['payment_test_mode']) && $_POST['payment_test_mode'] === 'true');
+
+        $extra = apply_filters('yatra_setup_wizard_communications_save', [], $_POST);
+        if (is_array($extra)) {
+            foreach ($extra as $optionKey => $value) {
+                if (! is_string($optionKey) || $optionKey === '') {
+                    continue;
+                }
+                if (strpos($optionKey, 'yatra_') === 0) {
+                    update_option($optionKey, $value);
+                } else {
+                    update_option('yatra_' . $optionKey, $value);
+                }
+            }
+        }
+
+        // Back-compat: extensions that hooked the old single "general" save.
+        $legacyExtra = apply_filters('yatra_setup_wizard_general_save', [], $_POST);
+        if (is_array($legacyExtra)) {
+            foreach ($legacyExtra as $optionKey => $value) {
+                if (! is_string($optionKey) || $optionKey === '') {
+                    continue;
+                }
+                if (strpos($optionKey, 'yatra_') === 0) {
+                    update_option($optionKey, $value);
+                } else {
+                    update_option('yatra_' . $optionKey, $value);
+                }
+            }
+        }
+
+        SettingsService::reload();
 
         wp_safe_redirect(esc_url_raw($this->get_next_step_link()));
         exit;
@@ -372,6 +535,8 @@ class SetupWizardController
             update_option($key, $value);
         }
 
+        SettingsService::reload();
+
         wp_safe_redirect(esc_url_raw($this->get_next_step_link()));
         exit;
     }
@@ -396,6 +561,9 @@ class SetupWizardController
             set_transient('yatra_install_resa_theme', 1, 300);
         }
 
+        update_option('yatra_setup_wizard_theme_step_done', '1');
+        SettingsService::reload();
+
         wp_safe_redirect(esc_url_raw($this->get_next_step_link()));
         exit;
     }
@@ -405,9 +573,6 @@ class SetupWizardController
      */
     public function setup_complete()
     {
-        // Mark wizard as completed with value '1' for legacy compatibility
-        update_option(self::WIZARD_COMPLETED_OPTION, '1');
-
         include YATRA_ABSPATH . 'templates/setup-wizard/complete.php';
     }
 
@@ -418,9 +583,10 @@ class SetupWizardController
     {
         check_admin_referer('yatra-setup');
 
-        // Sample data import is now handled via JavaScript API calls in the setup wizard templates
+        update_option(self::WIZARD_COMPLETED_OPTION, '1');
+        SettingsService::reload();
+        do_action('yatra_setup_wizard_completed');
 
-        // Redirect to dashboard
         wp_safe_redirect(admin_url('admin.php?page=yatra'));
         exit;
     }

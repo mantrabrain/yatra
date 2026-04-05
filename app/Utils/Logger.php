@@ -126,8 +126,9 @@ class Logger
         file_put_contents(self::$logFile, $logEntry, FILE_APPEND | LOCK_EX);
 
         // Also log to WordPress debug log for critical errors
-        if (in_array($level, [self::EMERGENCY, self::ALERT, self::CRITICAL, self::ERROR])) {
-            }
+        if (in_array($level, [self::EMERGENCY, self::ALERT, self::CRITICAL, self::ERROR], true) && (defined('WP_DEBUG') && WP_DEBUG)) {
+            error_log('[Yatra][' . $level . '] ' . $message . $contextStr);
+        }
     }
 
     /**

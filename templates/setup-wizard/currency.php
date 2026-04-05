@@ -32,15 +32,10 @@ foreach ($popular_currencies as $code => $data) {
     <?php wp_nonce_field('yatra-setup'); ?>
     <input type="hidden" name="save_step" value="currency">
     
-    <div class="wizard-header">
-        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px;">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
-                <line x1="12" y1="1" x2="12" y2="23"></line>
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-            <h1 style="margin: 0;"><?php esc_html_e('Currency Settings', 'yatra'); ?></h1>
-        </div>
-        <p style="text-align: center;"><?php esc_html_e('Set up how prices are displayed on your website', 'yatra'); ?></p>
+    <div class="wizard-header wizard-header--task">
+        <p class="wizard-header-kicker"><?php echo esc_html($this->get_wizard_progress_label()); ?></p>
+        <h1><?php esc_html_e('Currency & price display', 'yatra'); ?></h1>
+        <p class="wizard-header-lead"><?php esc_html_e('Trip prices, deposits, and totals will use these rules everywhere on the site.', 'yatra'); ?></p>
     </div>
 
     <div class="wizard-content">
@@ -102,27 +97,16 @@ foreach ($popular_currencies as $code => $data) {
     </div>
 
     <div class="wizard-footer">
-        <a href="<?php echo esc_url($this->get_step_url('general')); ?>" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
+        <a href="<?php echo esc_url($this->get_step_url('communications')); ?>" class="btn btn-secondary wizard-footer-back">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             <?php esc_html_e('Back', 'yatra'); ?>
         </a>
-        <a href="<?php echo esc_url($this->get_next_step_link()); ?>" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
-            <?php esc_html_e('Skip', 'yatra'); ?>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-                <polyline points="12 5 19 12 12 19" transform="translate(5, 0)"></polyline>
-            </svg>
-        </a>
-        <button type="submit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
-            <?php esc_html_e('Continue', 'yatra'); ?>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-        </button>
+        <div class="wizard-footer-actions">
+            <a href="<?php echo esc_url($this->get_next_step_link()); ?>" class="btn btn-secondary btn-skip"><?php esc_html_e('Skip', 'yatra'); ?></a>
+            <button type="submit" class="btn btn-primary">
+                <?php esc_html_e('Continue', 'yatra'); ?>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+        </div>
     </div>
 </form>

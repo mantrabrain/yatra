@@ -30,6 +30,8 @@ export const CORE_FREE_TEMPLATE_KEYS = [
   "booking_cancelled",
   "trip_reminder",
   "admin_new_booking",
+  "admin_payment_received",
+  "admin_booking_cancelled",
 ] as const;
 
 export type CoreFreeTemplateKey = (typeof CORE_FREE_TEMPLATE_KEYS)[number];
@@ -115,7 +117,7 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     event_key: "booking.created",
     name: __("Admin: New Booking", "yatra"),
     description: __(
-      "Sent to your admin email when a booking is created (respects notification settings).",
+      "Sent to your admin email when a booking is created. Turn off here to stop this email.",
       "yatra",
     ),
     category: "booking",
@@ -127,6 +129,42 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsBody: "email_tpl_admin_booking_body",
     mergeTags:
       "{{site_name}}, {{site_url}}, {{admin_url}}, {{booking_reference}}, {{booking_id}}, {{customer_name}}, {{customer_email}}, {{customer_phone}}, {{trip_name}}, {{travel_date}}, {{travelers_count}}, {{total_amount_formatted}}, {{currency}}, {{booking_status}}, {{payment_status}}",
+  },
+  {
+    template_key: "admin_payment_received",
+    event_key: "payment.received",
+    name: __("Admin: Payment received", "yatra"),
+    description: __(
+      "Sent to your admin email when a payment is recorded. Customer receipt uses the Payment Received template.",
+      "yatra",
+    ),
+    category: "payment",
+    recipient_type: "admin",
+    to_email: "{{admin_email}}",
+    isCoreFree: true,
+    settingsFlag: "email_template_admin_payment",
+    settingsSubject: "email_tpl_admin_payment_subject",
+    settingsBody: "email_tpl_admin_payment_body",
+    mergeTags:
+      "{{site_name}}, {{admin_url}}, {{booking_reference}}, {{booking_id}}, {{customer_name}}, {{payment_amount_formatted}}, {{payment_method}}, {{transaction_id}}",
+  },
+  {
+    template_key: "admin_booking_cancelled",
+    event_key: "booking.cancelled",
+    name: __("Admin: Booking cancelled", "yatra"),
+    description: __(
+      "Sent to your admin email when a booking is cancelled. Customer notice uses the Booking Cancellation template.",
+      "yatra",
+    ),
+    category: "booking",
+    recipient_type: "admin",
+    to_email: "{{admin_email}}",
+    isCoreFree: true,
+    settingsFlag: "email_template_admin_cancellation",
+    settingsSubject: "email_tpl_admin_cancellation_subject",
+    settingsBody: "email_tpl_admin_cancellation_body",
+    mergeTags:
+      "{{site_name}}, {{admin_url}}, {{booking_reference}}, {{booking_id}}, {{customer_name}}, {{trip_name}}, {{travel_date}}",
   },
   {
     template_key: "new_booking",

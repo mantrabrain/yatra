@@ -28,6 +28,10 @@ final class EmailTemplateDefaults
             'email_tpl_reminder_body' => self::htmlReminderCustomer(),
             'email_tpl_admin_booking_subject' => '🔔 [{{site_name}}] New booking · {{booking_reference}} (#{{booking_id}})',
             'email_tpl_admin_booking_body' => self::htmlAdminNewBooking(),
+            'email_tpl_admin_payment_subject' => '✅ [{{site_name}}] Payment received · {{booking_reference}} (#{{booking_id}})',
+            'email_tpl_admin_payment_body' => self::htmlAdminPaymentReceived(),
+            'email_tpl_admin_cancellation_subject' => '📋 [{{site_name}}] Booking cancelled · {{booking_reference}} (#{{booking_id}})',
+            'email_tpl_admin_cancellation_body' => self::htmlAdminBookingCancelled(),
         ];
     }
 
@@ -285,6 +289,83 @@ final class EmailTemplateDefaults
      *
      * @param array<string, string> $v
      */
+    /**
+     * Fallback HTML for admin payment-received notice.
+     *
+     * @param array<string, string> $v
+     */
+    public static function fallbackAdminPaymentReceived(array $v): string
+    {
+        $site = esc_html($v['site_name'] ?? get_bloginfo('name'));
+        $rows = array_values(array_filter([
+            ['label' => __('Booking ID', 'yatra'), 'value' => esc_html($v['booking_id'] ?? '')],
+            ['label' => __('Reference', 'yatra'), 'value' => esc_html($v['booking_reference'] ?? '')],
+            ['label' => __('Customer', 'yatra'), 'value' => esc_html($v['customer_name'] ?? '')],
+            ['label' => __('Amount', 'yatra'), 'value' => esc_html($v['payment_amount_formatted'] ?? '')],
+            ['label' => __('Method', 'yatra'), 'value' => esc_html($v['payment_method'] ?? '')],
+            ['label' => __('Transaction ID', 'yatra'), 'value' => esc_html($v['transaction_id'] ?? '')],
+        ], static function (array $row): bool {
+            return trim((string) ($row['value'] ?? '')) !== '';
+        }));
+
+        $adminUrl = esc_url($v['admin_url'] ?? admin_url('admin.php?page=yatra'));
+
+        $inner = '<p style="margin:0 0 20px;color:#475569;">'
+            . esc_html__('A payment was recorded for the booking below.', 'yatra')
+            . '</p>'
+            . EmailTemplateLayout::detailCard($rows)
+            . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 0;"><tr>'
+            . '<td style="border-radius:10px;background:#2563eb;">'
+            . '<a href="' . $adminUrl . '" style="display:inline-block;padding:14px 24px;font-family:\'Segoe UI\',Roboto,Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;">'
+            . esc_html__('Open in Yatra admin', 'yatra')
+            . '</a></td></tr></table>';
+
+        return EmailTemplateLayout::admin(
+            '✅',
+            __('Payment received', 'yatra'),
+            $inner,
+            $site . ' · ' . esc_html__('Admin notification', 'yatra')
+        );
+    }
+
+    /**
+     * Fallback HTML for admin booking-cancelled notice.
+     *
+     * @param array<string, string> $v
+     */
+    public static function fallbackAdminBookingCancelled(array $v): string
+    {
+        $site = esc_html($v['site_name'] ?? get_bloginfo('name'));
+        $rows = array_values(array_filter([
+            ['label' => __('Booking ID', 'yatra'), 'value' => esc_html($v['booking_id'] ?? '')],
+            ['label' => __('Reference', 'yatra'), 'value' => esc_html($v['booking_reference'] ?? '')],
+            ['label' => __('Customer', 'yatra'), 'value' => esc_html($v['customer_name'] ?? '')],
+            ['label' => __('Trip', 'yatra'), 'value' => esc_html($v['trip_name'] ?? '')],
+            ['label' => __('Travel date', 'yatra'), 'value' => esc_html($v['travel_date'] ?? '')],
+        ], static function (array $row): bool {
+            return trim((string) ($row['value'] ?? '')) !== '';
+        }));
+
+        $adminUrl = esc_url($v['admin_url'] ?? admin_url('admin.php?page=yatra'));
+
+        $inner = '<p style="margin:0 0 20px;color:#475569;">'
+            . esc_html__('A booking was cancelled. Summary below.', 'yatra')
+            . '</p>'
+            . EmailTemplateLayout::detailCard($rows)
+            . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 0;"><tr>'
+            . '<td style="border-radius:10px;background:#2563eb;">'
+            . '<a href="' . $adminUrl . '" style="display:inline-block;padding:14px 24px;font-family:\'Segoe UI\',Roboto,Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;">'
+            . esc_html__('Open in Yatra admin', 'yatra')
+            . '</a></td></tr></table>';
+
+        return EmailTemplateLayout::admin(
+            '📋',
+            __('Booking cancelled', 'yatra'),
+            $inner,
+            $site . ' · ' . esc_html__('Admin notification', 'yatra')
+        );
+    }
+
     public static function fallbackAdminNewBooking(array $v): string
     {
         $site = esc_html($v['site_name'] ?? get_bloginfo('name'));
@@ -374,6 +455,59 @@ final class EmailTemplateDefaults
             $inner,
             '{{site_name}}',
             'Booking confirmed'
+        );
+    }
+
+    private static function htmlAdminPaymentReceived(): string
+    {
+        $inner = '<p style="margin:0 0 20px;color:#475569;">'
+            . esc_html__('A payment was recorded for the booking below.', 'yatra')
+            . '</p>'
+            . EmailTemplateLayout::detailCard([
+                ['label' => 'Booking ID', 'value' => '{{booking_id}}'],
+                ['label' => 'Reference', 'value' => '{{booking_reference}}'],
+                ['label' => 'Customer', 'value' => '{{customer_name}}'],
+                ['label' => 'Amount', 'value' => '{{payment_amount_formatted}}'],
+                ['label' => 'Method', 'value' => '{{payment_method}}'],
+                ['label' => 'Transaction ID', 'value' => '{{transaction_id}}'],
+            ])
+            . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 0;"><tr>'
+            . '<td style="border-radius:10px;background:#2563eb;">'
+            . '<a href="{{admin_url}}" style="display:inline-block;padding:14px 24px;font-family:\'Segoe UI\',Roboto,Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;">'
+            . esc_html__('Open in Yatra admin', 'yatra')
+            . '</a></td></tr></table>';
+
+        return EmailTemplateLayout::admin(
+            '✅',
+            'Payment received',
+            $inner,
+            '{{site_name}} · ' . esc_html__('Admin notification', 'yatra')
+        );
+    }
+
+    private static function htmlAdminBookingCancelled(): string
+    {
+        $inner = '<p style="margin:0 0 20px;color:#475569;">'
+            . esc_html__('A booking was cancelled. Summary below.', 'yatra')
+            . '</p>'
+            . EmailTemplateLayout::detailCard([
+                ['label' => 'Booking ID', 'value' => '{{booking_id}}'],
+                ['label' => 'Reference', 'value' => '{{booking_reference}}'],
+                ['label' => 'Customer', 'value' => '{{customer_name}}'],
+                ['label' => 'Trip', 'value' => '{{trip_name}}'],
+                ['label' => 'Travel date', 'value' => '{{travel_date}}'],
+            ])
+            . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 0;"><tr>'
+            . '<td style="border-radius:10px;background:#2563eb;">'
+            . '<a href="{{admin_url}}" style="display:inline-block;padding:14px 24px;font-family:\'Segoe UI\',Roboto,Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;">'
+            . esc_html__('Open in Yatra admin', 'yatra')
+            . '</a></td></tr></table>';
+
+        return EmailTemplateLayout::admin(
+            '📋',
+            'Booking cancelled',
+            $inner,
+            '{{site_name}} · ' . esc_html__('Admin notification', 'yatra')
         );
     }
 

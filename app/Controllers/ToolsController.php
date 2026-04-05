@@ -213,7 +213,7 @@ class ToolsController extends BaseController
             return $this->success_response([
                 'message' => __('Export job created successfully. The export will be processed in the background.', 'yatra'),
                 'job_id' => $jobId,
-                'status_url' => rest_url('yatra/v1/tools/export-job/' . $jobId . '/status')
+                'status_url' => rest_url('yatra/v1/tools/export-job/' . $jobId)
             ]);
 
         } catch (\Exception $e) {
@@ -928,8 +928,10 @@ class ToolsController extends BaseController
                 return $this->error_response(__('Failed to save import file', 'yatra'), 500);
             }
             
-            // Parse file to get available data types if none specified
-            if (empty($dataTypes)) {
+            $importAll = in_array('all', $dataTypes, true);
+
+            // Parse file to get available data types if none specified (and not importing everything)
+            if (!$importAll && empty($dataTypes)) {
                 $content = file_get_contents($filePath);
                 $importData = json_decode($content, true);
                 
@@ -938,17 +940,19 @@ class ToolsController extends BaseController
                 }
             }
             
-            if (empty($dataTypes)) {
+            if (!$importAll && empty($dataTypes)) {
                 @unlink($filePath);
                 return $this->error_response(__('No valid data types found in import file', 'yatra'), 400);
             }
+
+            $typesForJob = $importAll ? ['all'] : $dataTypes;
             
-            $jobId = ExportImportService::createImportJob($filePath, $dataTypes, $userId);
+            $jobId = ExportImportService::createImportJob($filePath, $typesForJob, $userId);
             
             return $this->success_response([
                 'job_id' => $jobId,
                 'message' => __('Import job created and queued for processing', 'yatra'),
-                'data_types' => $dataTypes,
+                'data_types' => $typesForJob,
             ]);
             
         } catch (\Exception $e) {
@@ -1046,7 +1050,7 @@ class ToolsController extends BaseController
     /**
      * Get all jobs for current user (for Jobs tab)
      */
-    public function get_all_jobs(WP_REST_Request $request)
+    public function getAllJobs(WP_REST_Request $request)
     {
         try {
             $userId = get_current_user_id();

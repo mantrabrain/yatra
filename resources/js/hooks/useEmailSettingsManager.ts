@@ -23,6 +23,8 @@ const EMAIL_KEYS: (keyof EmailSettingsValues)[] = [
   "email_template_cancellation",
   "email_template_reminder",
   "email_template_admin_new_booking",
+  "email_template_admin_payment",
+  "email_template_admin_cancellation",
   "smtp_enabled",
   "smtp_host",
   "smtp_port",
@@ -39,6 +41,10 @@ const EMAIL_KEYS: (keyof EmailSettingsValues)[] = [
   "email_tpl_reminder_body",
   "email_tpl_admin_booking_subject",
   "email_tpl_admin_booking_body",
+  "email_tpl_admin_payment_subject",
+  "email_tpl_admin_payment_body",
+  "email_tpl_admin_cancellation_subject",
+  "email_tpl_admin_cancellation_body",
 ];
 
 const BOOL_KEYS = new Set<keyof EmailSettingsValues>([
@@ -47,6 +53,8 @@ const BOOL_KEYS = new Set<keyof EmailSettingsValues>([
   "email_template_cancellation",
   "email_template_reminder",
   "email_template_admin_new_booking",
+  "email_template_admin_payment",
+  "email_template_admin_cancellation",
   "smtp_enabled",
 ]);
 
@@ -59,6 +67,8 @@ export const EMAIL_SETTINGS_DEFAULTS: EmailSettingsValues = {
   email_template_cancellation: true,
   email_template_reminder: true,
   email_template_admin_new_booking: true,
+  email_template_admin_payment: true,
+  email_template_admin_cancellation: true,
   smtp_enabled: false,
   smtp_host: "smtp.gmail.com",
   smtp_port: 587,
@@ -75,6 +85,10 @@ export const EMAIL_SETTINGS_DEFAULTS: EmailSettingsValues = {
   email_tpl_reminder_body: "",
   email_tpl_admin_booking_subject: "",
   email_tpl_admin_booking_body: "",
+  email_tpl_admin_payment_subject: "",
+  email_tpl_admin_payment_body: "",
+  email_tpl_admin_cancellation_subject: "",
+  email_tpl_admin_cancellation_body: "",
 };
 
 function coerceEmailValues(

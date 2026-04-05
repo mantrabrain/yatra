@@ -18,15 +18,10 @@ $is_resa_active = ($current_theme_slug === 'resa') || ($current_theme->get('Name
     <?php wp_nonce_field('yatra-setup'); ?>
     <input type="hidden" name="save_step" value="theme">
     
-    <div class="wizard-header">
-        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px;">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2">
-                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
-            </svg>
-            <h1 style="margin: 0;"><?php esc_html_e('Recommended Theme', 'yatra'); ?></h1>
-        </div>
-        <p style="text-align: center;"><?php esc_html_e('Get the best experience with a theme designed for travel bookings', 'yatra'); ?></p>
+    <div class="wizard-header wizard-header--task">
+        <p class="wizard-header-kicker"><?php echo esc_html($this->get_wizard_progress_label()); ?></p>
+        <h1><?php esc_html_e('Site appearance', 'yatra'); ?></h1>
+        <p class="wizard-header-lead"><?php esc_html_e('Optional: Resa is built for travel layouts and pairs well with Yatra trip pages.', 'yatra'); ?></p>
     </div>
 
     <div class="wizard-content">
@@ -97,28 +92,17 @@ $is_resa_active = ($current_theme_slug === 'resa') || ($current_theme->get('Name
     </div>
 
     <div class="wizard-footer">
-        <a href="<?php echo esc_url($this->get_step_url('currency')); ?>" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
+        <a href="<?php echo esc_url($this->get_step_url('currency')); ?>" class="btn btn-secondary wizard-footer-back">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             <?php esc_html_e('Back', 'yatra'); ?>
         </a>
-        <a href="<?php echo esc_url($this->get_next_step_link()); ?>" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
-            <?php esc_html_e('Skip', 'yatra'); ?>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-                <polyline points="12 5 19 12 12 19" transform="translate(5, 0)"></polyline>
-            </svg>
-        </a>
-        <button type="submit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
-            <?php esc_html_e('Continue', 'yatra'); ?>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-        </button>
+        <div class="wizard-footer-actions">
+            <a href="<?php echo esc_url($this->get_next_step_link()); ?>" class="btn btn-secondary btn-skip"><?php esc_html_e('Skip', 'yatra'); ?></a>
+            <button type="submit" class="btn btn-primary">
+                <?php esc_html_e('Continue', 'yatra'); ?>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+        </div>
     </div>
 </form>
 

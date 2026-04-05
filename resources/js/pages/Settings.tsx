@@ -19,7 +19,6 @@ import {
   Star,
   Receipt,
   Globe,
-  Bell,
   Plug,
   Shield,
   Info,
@@ -610,7 +609,6 @@ type SettingsSection =
   | "review"
   | "tax"
   | "currency"
-  | "notification"
   | "integration"
   | "permalink"
   | "seo"
@@ -756,6 +754,8 @@ interface SettingsData {
   email_template_cancellation: boolean;
   email_template_reminder: boolean;
   email_template_admin_new_booking: boolean;
+  email_template_admin_payment: boolean;
+  email_template_admin_cancellation: boolean;
   smtp_enabled: boolean;
   smtp_host: string;
   smtp_port: number;
@@ -773,6 +773,10 @@ interface SettingsData {
   email_tpl_reminder_body: string;
   email_tpl_admin_booking_subject: string;
   email_tpl_admin_booking_body: string;
+  email_tpl_admin_payment_subject: string;
+  email_tpl_admin_payment_body: string;
+  email_tpl_admin_cancellation_subject: string;
+  email_tpl_admin_cancellation_body: string;
 
   // Customer Settings
   customer_registration: boolean;
@@ -812,13 +816,7 @@ interface SettingsData {
   decimal_separator: string;
 
 
-  // Notification Settings
-  notify_new_booking: boolean;
-  notify_payment: boolean;
-  notify_cancellation: boolean;
-  notify_admin: boolean;
-  notify_customer_booking: boolean;
-  notify_customer_payment: boolean;
+  // Notification Settings (SMS; booking emails use Email → Templates)
   sms_notifications: boolean;
   sms_provider: string;
   sms_api_key: string;
@@ -2006,8 +2004,8 @@ const Settings: React.FC = () => {
   const getInitialActiveSection = (): SettingsSection => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("yatra_settings_active_section");
-      if (saved === "email") {
-        return "notification";
+      if (saved === "email" || saved === "notification") {
+        return "general";
       }
       if (
         saved &&
@@ -2021,9 +2019,9 @@ const Settings: React.FC = () => {
           "review",
           "tax",
           "currency",
-          "notification",
           "integration",
           "permalink",
+          "seo",
           "advanced",
         ].includes(saved)
       ) {
@@ -2217,6 +2215,8 @@ const Settings: React.FC = () => {
       email_template_cancellation: true,
       email_template_reminder: true,
       email_template_admin_new_booking: true,
+      email_template_admin_payment: true,
+      email_template_admin_cancellation: true,
       smtp_enabled: false,
       smtp_host: "smtp.gmail.com",
       smtp_port: 587,
@@ -2233,6 +2233,10 @@ const Settings: React.FC = () => {
       email_tpl_reminder_body: "",
       email_tpl_admin_booking_subject: "",
       email_tpl_admin_booking_body: "",
+      email_tpl_admin_payment_subject: "",
+      email_tpl_admin_payment_body: "",
+      email_tpl_admin_cancellation_subject: "",
+      email_tpl_admin_cancellation_body: "",
             customer_registration: true,
       customer_fields: ["name", "email", "phone", "address"],
       require_email_verification: false,
@@ -2262,12 +2266,6 @@ const Settings: React.FC = () => {
       currency_decimals: 2,
       thousand_separator: ",",
       decimal_separator: ".",
-      notify_new_booking: true,
-      notify_payment: true,
-      notify_cancellation: true,
-      notify_admin: true,
-      notify_customer_booking: true,
-      notify_customer_payment: true,
       sms_notifications: false,
       sms_provider: "twilio",
       sms_api_key: "",
@@ -3316,11 +3314,6 @@ const Settings: React.FC = () => {
       id: "currency" as SettingsSection,
       label: __("Currency", "yatra"),
       icon: Globe,
-    },
-    {
-      id: "notification" as SettingsSection,
-      label: __("Notification", "yatra"),
-      icon: Bell,
     },
     {
       id: "integration" as SettingsSection,
@@ -5280,104 +5273,6 @@ const Settings: React.FC = () => {
                     placeholder={"."}
                   />
                 </FormField>
-              </div>
-            </div>
-          </div>
-        );
-
-      case "notification":
-        return (
-          <div className="space-y-6">
-            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-100">
-              <p className="font-medium">
-                {__("Customer email delivery & templates", "yatra")}
-              </p>
-              <p className="mt-1 text-blue-800/90 dark:text-blue-200/90">
-                {__(
-                  "SMTP, From/Admin addresses are under Email → Delivery; core templates (booking, payment, cancellation, reminder, and admin new-booking) are under Email → Templates.",
-                  "yatra",
-                )}
-              </p>
-              <a
-                href="admin.php?page=yatra&subpage=email-automation"
-                className="mt-2 inline-flex font-medium text-blue-700 underline underline-offset-2 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-200"
-              >
-                {__("Open Email", "yatra")}
-              </a>
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-                {__("Email Notifications", "yatra")}
-              </h3>
-              <div className="space-y-3">
-                {[
-                  {
-                    id: "notify_new_booking",
-                    label: __("Notify on New Booking", "yatra"),
-                    desc: __("Send email when new booking is created", "yatra"),
-                  },
-                  {
-                    id: "notify_payment",
-                    label: __("Notify on Payment", "yatra"),
-                    desc: __("Send email when payment is received", "yatra"),
-                  },
-                  {
-                    id: "notify_cancellation",
-                    label: __("Notify on Cancellation", "yatra"),
-                    desc: __("Send email when booking is cancelled", "yatra"),
-                  },
-                  {
-                    id: "notify_admin",
-                    label: __("Notify Admin on All Events", "yatra"),
-                    desc: __(
-                      "Admin receives notifications for all booking events",
-                      "yatra",
-                    ),
-                  },
-                  {
-                    id: "notify_customer_booking",
-                    label: __("Notify Customer on Booking", "yatra"),
-                    desc: __(
-                      "Send booking confirmation email (also enable the template under Email → Templates)",
-                      "yatra",
-                    ),
-                  },
-                  {
-                    id: "notify_customer_payment",
-                    label: __("Notify Customer on Payment", "yatra"),
-                    desc: __(
-                      "Send payment confirmation email (template under Email → Templates)",
-                      "yatra",
-                    ),
-                  },
-                ].map((notif) => (
-                  <div
-                    key={notif.id}
-                    className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md"
-                  >
-                    <input
-                      type="checkbox"
-                      id={notif.id}
-                      checked={
-                        formData[notif.id as keyof SettingsData] as boolean
-                      }
-                      name={notif.id}
-                      onChange={handleFieldChange}
-                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <div className="flex-1">
-                      <Label
-                        htmlFor={notif.id}
-                        className="font-medium cursor-pointer"
-                      >
-                        {notif.label}
-                      </Label>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        {notif.desc}
-                      </p>
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
           </div>

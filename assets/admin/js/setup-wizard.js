@@ -31,19 +31,19 @@
                 $submitBtn.css('pointer-events', 'none');
             });
 
-            // Currency preview
-            $('#currency, #currency_position, #thousand_separator, #decimal_separator, #number_of_decimals').on('change', function() {
+            // Currency preview (decimal field id matches currency.php: #decimal_places)
+            $('#currency, #currency_position, #thousand_separator, #decimal_separator, #decimal_places, #number_of_decimals').on('change input', function() {
                 YatraSetupWizard.updateCurrencyPreview();
             });
 
-            // Skip step confirmation
-            $('.yatra-setup-actions a.button').on('click', function(e) {
-                var $link = $(this);
-                if ($link.text().indexOf('Skip') !== -1) {
-                    if (!confirm(yatraSetupWizard.skipConfirmMessage || 'Are you sure you want to skip this step?')) {
-                        e.preventDefault();
-                        return false;
-                    }
+            // Skip step confirmation (matches .btn-skip links in wizard templates)
+            $(document).on('click', '.yatra-setup-content a.btn-skip', function(e) {
+                var msg = (typeof yatraSetupWizard !== 'undefined' && yatraSetupWizard.skipConfirmMessage)
+                    ? yatraSetupWizard.skipConfirmMessage
+                    : 'Skip this step without saving?';
+                if (!window.confirm(msg)) {
+                    e.preventDefault();
+                    return false;
                 }
             });
         },
@@ -107,7 +107,14 @@
             var position = $('#currency_position').val() || 'before';
             var thousandSep = $('#thousand_separator').val() || ',';
             var decimalSep = $('#decimal_separator').val() || '.';
-            var decimals = parseInt($('#number_of_decimals').val()) || 2;
+            var decimalsRaw = $('#decimal_places').val();
+            if (decimalsRaw === undefined || decimalsRaw === '') {
+                decimalsRaw = $('#number_of_decimals').val();
+            }
+            var decimals = parseInt(decimalsRaw, 10);
+            if (isNaN(decimals)) {
+                decimals = 2;
+            }
 
             // Get currency symbol (simplified)
             var symbols = {
@@ -134,14 +141,13 @@
             var preview = position === 'before' ? symbol + formatted : formatted + symbol;
 
             // Show preview if element exists
-            if ($('#currency-preview').length === 0) {
-                $('#number_of_decimals').closest('tr').after(
-                    '<tr id="currency-preview-row">' +
-                    '<th scope="row">Preview</th>' +
-                    '<td><strong id="currency-preview">' + preview + '</strong></td>' +
-                    '</tr>'
+            var $anchor = $('#decimal_places').length ? $('#decimal_places').closest('.form-group') : $('#currency').closest('.form-group');
+            if ($('#currency-preview').length === 0 && $anchor.length) {
+                $anchor.after(
+                    '<div class="form-group" id="currency-preview-wrap"><label class="form-label">Preview</label>' +
+                    '<p class="form-control" style="background:#f9fafb;font-weight:600;" id="currency-preview">' + preview + '</p></div>'
                 );
-            } else {
+            } else if ($('#currency-preview').length) {
                 $('#currency-preview').text(preview);
             }
         },

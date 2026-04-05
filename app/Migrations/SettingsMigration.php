@@ -7,6 +7,11 @@ use Yatra\Utils\Logger;
 
 class SettingsMigration extends BaseMigration
 {
+    /**
+     * True when legacy permalink slug options were written; triggers a rewrite flush after run().
+     */
+    private bool $rewriteRulesNeedFlush = false;
+
     public function __construct(MigrationProgress $service)
     {
         parent::__construct($service);
@@ -142,6 +147,14 @@ class SettingsMigration extends BaseMigration
                 'skipped' => $skipped,
                 'failed' => $failed
             ]);
+
+            if ($this->rewriteRulesNeedFlush && function_exists('flush_rewrite_rules')) {
+                flush_rewrite_rules(true);
+                Logger::info('Flushed rewrite rules after legacy permalink slug migration', [
+                    'source' => 'migration',
+                ]);
+                $this->rewriteRulesNeedFlush = false;
+            }
             
         } catch (\Exception $e) {
             Logger::error("Settings migration failed", [
@@ -411,14 +424,94 @@ class SettingsMigration extends BaseMigration
             ],
         ];
     }
+
+    /**
+     * Copy public URL slug options from legacy yatra_permalinks into 3.x wp_options.
+     *
+     * @return array{migrated: int, skipped: int}
+     */
+    private function migrateLegacyPermalinkBases(): array
+    {
+        $writes = 0;
+        $sanitize = static function ($value): string {
+            if ($value === null || $value === false || $value === '') {
+                return '';
+            }
+            $s = is_string($value) ? trim($value) : (string) $value;
+            $s = preg_replace('/[^a-z0-9_-]/i', '', $s) ?: '';
+
+            return $s;
+        };
+
+        $setSlugOption = function (string $optionName, $raw) use (&$writes, $sanitize): void {
+            $slug = $sanitize($raw);
+            if ($slug === '') {
+                return;
+            }
+            $current = get_option($optionName, '');
+            $curNorm = is_string($current) ? $sanitize($current) : '';
+            if ($curNorm === $slug) {
+                return;
+            }
+            update_option($optionName, $slug);
+            $writes++;
+            $this->rewriteRulesNeedFlush = true;
+        };
+
+        $oldPermalinks = get_option('yatra_permalinks', []);
+        if (!empty($oldPermalinks) && is_array($oldPermalinks)) {
+            $map = [
+                ['yatra_tour_base', 'yatra_trip_base'],
+                ['tour_base', 'yatra_trip_base'],
+                ['yatra_destination_base', 'yatra_destination_base'],
+                ['destination_base', 'yatra_destination_base'],
+                ['yatra_activity_base', 'yatra_activity_base'],
+                ['activity_base', 'yatra_activity_base'],
+                ['yatra_attributes_base', 'yatra_attributes_base'],
+                ['attributes_base', 'yatra_attributes_base'],
+                ['yatra_booking_base', 'yatra_booking_base'],
+                ['booking_base', 'yatra_booking_base'],
+                ['yatra_trip_category_base', 'yatra_trip_category_base'],
+                ['yatra_tour_category_base', 'yatra_trip_category_base'],
+                ['trip_category_base', 'yatra_trip_category_base'],
+                ['tour_category_base', 'yatra_trip_category_base'],
+                ['yatra_category_base', 'yatra_trip_category_base'],
+                ['category_base', 'yatra_trip_category_base'],
+                ['yatra_difficulty_base', 'yatra_difficulty_base'],
+                ['difficulty_base', 'yatra_difficulty_base'],
+                ['yatra_account_base', 'yatra_account_base'],
+                ['account_base', 'yatra_account_base'],
+            ];
+            foreach ($map as [$legacyKey, $optionName]) {
+                if (!empty($oldPermalinks[$legacyKey])) {
+                    $setSlugOption($optionName, $oldPermalinks[$legacyKey]);
+                }
+            }
+        }
+
+        $skipped = (!is_array($oldPermalinks) || empty($oldPermalinks)) ? 1 : 0;
+
+        if ($writes > 0) {
+            Logger::info("Migrated {$writes} permalink slug option(s) from yatra_permalinks", [
+                'source' => 'migration',
+            ]);
+        } elseif ($skipped) {
+            Logger::debug('Skipped permalinks (yatra_permalinks not found or empty)', ['source' => 'migration']);
+        }
+
+        return [
+            'migrated' => $writes,
+            'skipped' => $skipped,
+        ];
+    }
     
     /**
      * Migrate complex settings (arrays, objects, etc.)
      *
      * Verified from old plugin source:
      *   - yatra_payment_gateways: array of active gateway IDs (from class-yatra-install.php)
-     *   - yatra_permalinks: array with tour_base, activity_base, destination_base, attributes_base
-     *     (from admin/class-yatra-admin-permalinks.php)
+     *   - yatra_permalinks: array with tour/trip, booking, category, difficulty, account bases, etc.
+     *     (from admin/class-yatra-admin-permalinks.php; keys may be prefixed or short forms)
      *   - Individual gateway settings (yatra_paypal_settings, yatra_stripe_settings, etc.)
      * 
      * @return array ['migrated' => int, 'skipped' => int, 'failed' => int]
@@ -461,36 +554,9 @@ class SettingsMigration extends BaseMigration
         $migrated += $gatewayResults['migrated'];
         $skipped += $gatewayResults['skipped'];
 
-        // Migrate permalink settings
-        // Old: yatra_permalinks = ['yatra_tour_base' => '...', 'yatra_destination_base' => '...', ...]
-        $oldPermalinks = get_option('yatra_permalinks', []);
-        if (!empty($oldPermalinks) && is_array($oldPermalinks)) {
-            $permalinksMigrated = 0;
-            if (!empty($oldPermalinks['yatra_tour_base'])) {
-                update_option('yatra_trip_base', $oldPermalinks['yatra_tour_base']);
-                $permalinksMigrated++;
-            }
-            if (!empty($oldPermalinks['yatra_destination_base'])) {
-                update_option('yatra_destination_base', $oldPermalinks['yatra_destination_base']);
-                $permalinksMigrated++;
-            }
-            if (!empty($oldPermalinks['yatra_activity_base'])) {
-                update_option('yatra_activity_base', $oldPermalinks['yatra_activity_base']);
-                $permalinksMigrated++;
-            }
-            if (!empty($oldPermalinks['yatra_attributes_base'])) {
-                update_option('yatra_attributes_base', $oldPermalinks['yatra_attributes_base']);
-                $permalinksMigrated++;
-            }
-            
-            if ($permalinksMigrated > 0) {
-                $migrated += $permalinksMigrated;
-                Logger::info("Migrated {$permalinksMigrated} permalink settings", ['source' => 'migration']);
-            }
-        } else {
-            $skipped++;
-            Logger::debug("Skipped permalinks (not found or empty)", ['source' => 'migration']);
-        }
+        $permalinkResults = $this->migrateLegacyPermalinkBases();
+        $migrated += $permalinkResults['migrated'];
+        $skipped += $permalinkResults['skipped'];
         
         // Migrate enquiry/booking form settings
         $enquiryResults = $this->migrateEnquirySettings();

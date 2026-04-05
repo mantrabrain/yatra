@@ -185,6 +185,8 @@ class InstallerService
         update_option('yatra_email_template_cancellation', true);
         update_option('yatra_email_template_reminder', true);
         update_option('yatra_email_template_admin_new_booking', true);
+        update_option('yatra_email_template_admin_payment', true);
+        update_option('yatra_email_template_admin_cancellation', true);
         
         // Clear any existing Stripe/PayPal settings that might exist
         delete_option('yatra_stripe_settings');
@@ -311,6 +313,8 @@ class InstallerService
 
         // Default-on for new option on existing sites (add_option no-ops if already present).
         add_option('yatra_email_template_admin_new_booking', 1);
+        add_option('yatra_email_template_admin_payment', 1);
+        add_option('yatra_email_template_admin_cancellation', 1);
 
         if (!get_option('yatra_email_identity_synced_v1')) {
             $from = get_option('yatra_from_email', '');

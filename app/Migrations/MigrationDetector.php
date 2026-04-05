@@ -20,21 +20,56 @@ class MigrationDetector
         global $wpdb;
         $this->wpdb = $wpdb;
     }
+
+    /**
+     * Old Yatra 2.x stored its release in wp_options as yatra_plugin_version (not yatra_version).
+     * Fresh Yatra 3.x sites only have yatra_version / installer options — never this legacy key unless
+     * the old plugin ran on this database.
+     */
+    public function isRecordedLegacyYatraInstall(): bool
+    {
+        $legacyVer = get_option('yatra_plugin_version', '');
+        if ($legacyVer === '' || $legacyVer === false) {
+            return false;
+        }
+
+        return version_compare((string) $legacyVer, '3.0.0', '<');
+    }
+
+    /**
+     * Legacy CPTs, taxonomies, and tables from Yatra before 3.0 — excludes options (see countOldSettings).
+     */
+    public function hasStructuralLegacyData(): bool
+    {
+        return $this->countOldTrips() > 0
+            || $this->countOldBookings() > 0
+            || $this->countOldCustomers() > 0
+            || $this->countOldCoupons() > 0
+            || $this->countOldDestinations() > 0
+            || $this->countOldActivities() > 0
+            || $this->countOldAttributes() > 0
+            || $this->countOldReviews() > 0
+            || $this->countOldEnquiries() > 0
+            || $this->countOldTourDates() > 0
+            || $this->countOldItinerary() > 0
+            || $this->countOldServices() > 0
+            || $this->countOldAvailabilityConditions() > 0
+            || $this->countOldTravelerCategories() > 0;
+    }
     
     /**
-     * Check if old Yatra data exists
+     * Check if old Yatra data exists (for migration UI / notices).
+     *
+     * Do not treat normal Yatra 3.x wp_options as "legacy settings" — that caused false positives
+     * on fresh installs when countOldSettings() counted every yatra_* option.
      */
     public function hasOldData(): bool
     {
-        $oldData = $this->detectOldData();
-        
-        foreach ($oldData as $data) {
-            if ($data['count'] > 0) {
-                return true;
-            }
+        if ($this->isRecordedLegacyYatraInstall()) {
+            return true;
         }
-        
-        return false;
+
+        return $this->hasStructuralLegacyData();
     }
     
     /**
@@ -335,6 +370,10 @@ class MigrationDetector
      */
     private function countOldSettings(): int
     {
+        if (!$this->isRecordedLegacyYatraInstall() && !$this->hasStructuralLegacyData()) {
+            return 0;
+        }
+
         // Count old Yatra settings in wp_options
         $count = $this->wpdb->get_var(
             "SELECT COUNT(*) FROM {$this->wpdb->options} 

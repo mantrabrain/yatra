@@ -109,30 +109,15 @@ class MigrationProgress
     }
 
     /**
-     * Whether this site still has legacy Yatra (< 3.0) footprints worth migrating.
-     * Uses detector counts and/or the old plugin's yatra_plugin_version option.
+     * Whether this site still has legacy Yatra (before 3.0) footprints worth migrating.
+     *
+     * Delegates to {@see MigrationDetector::hasOldData()}: recorded yatra_plugin_version below 3.0.0
+     * (old plugin) and/or structural legacy data (tour CPT, old tables, etc.). Normal 3.x options alone
+     * must not qualify — see MigrationDetector::countOldSettings().
      */
     public function hasLegacyEnvironment(): bool
     {
-        if ($this->detector->hasOldData()) {
-            return true;
-        }
-
-        $legacyVer = get_option('yatra_plugin_version', '');
-        if ($legacyVer === '' || $legacyVer === false) {
-            return false;
-        }
-
-        if (version_compare((string) $legacyVer, '3.0.0', '>=')) {
-            return false;
-        }
-
-        global $wpdb;
-        $legacyTours = (int) $wpdb->get_var(
-            "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'tour' AND post_status != 'trash'"
-        );
-
-        return $legacyTours > 0;
+        return $this->detector->hasOldData();
     }
 
     /**

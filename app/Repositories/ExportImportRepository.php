@@ -42,8 +42,8 @@ class ExportImportRepository
         
         $jobs = [];
         foreach ($options as $option) {
-            $jobData = unserialize($option->option_value);
-            if ($jobData && isset($jobData['user_id']) && (int) $jobData['user_id'] === $userId) {
+            $jobData = maybe_unserialize($option->option_value);
+            if (is_array($jobData) && isset($jobData['user_id']) && (int) $jobData['user_id'] === $userId) {
                 $jobs[] = $jobData;
             }
         }
@@ -79,11 +79,47 @@ class ExportImportRepository
         
         return $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT * FROM $tableName LIMIT %d, %d",
+                "SELECT * FROM `{$tableName}` LIMIT %d, %d",
                 $offset,
                 $limit
             )
         );
+    }
+
+    /**
+     * Count rows in classifications table for a single type (destinations, activities, etc.).
+     */
+    public function getClassificationCount(string $tableName, string $type): int
+    {
+        global $wpdb;
+
+        return (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM `{$tableName}` WHERE `type` = %s",
+                $type
+            )
+        );
+    }
+
+    /**
+     * Batch fetch classification rows for export.
+     *
+     * @return array<int, object|array>
+     */
+    public function getClassificationBatch(string $tableName, string $type, int $offset, int $limit): array
+    {
+        global $wpdb;
+
+        $results = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM `{$tableName}` WHERE `type` = %s ORDER BY `id` ASC LIMIT %d, %d",
+                $type,
+                $offset,
+                $limit
+            )
+        );
+
+        return is_array($results) ? $results : [];
     }
 
     /**
@@ -100,14 +136,24 @@ class ExportImportRepository
      */
     public function insertRecord(string $tableName, array $record): bool
     {
+        return $this->insertRecordReturningId($tableName, $record) !== null;
+    }
+
+    /**
+     * Insert and return new auto-increment id, or null on failure.
+     */
+    public function insertRecordReturningId(string $tableName, array $record): ?int
+    {
         global $wpdb;
-        
+
         $result = $wpdb->insert($tableName, $record);
-        
+
         if ($result === false) {
-            return false;
+            return null;
         }
-        
-        return true;
+
+        $id = (int) $wpdb->insert_id;
+
+        return $id > 0 ? $id : null;
     }
 }

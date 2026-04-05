@@ -10,6 +10,8 @@ export type EmailSettingsValues = {
   email_template_cancellation: boolean;
   email_template_reminder: boolean;
   email_template_admin_new_booking: boolean;
+  email_template_admin_payment: boolean;
+  email_template_admin_cancellation: boolean;
   smtp_enabled: boolean;
   smtp_host: string;
   smtp_port: number;
@@ -26,6 +28,10 @@ export type EmailSettingsValues = {
   email_tpl_reminder_body: string;
   email_tpl_admin_booking_subject: string;
   email_tpl_admin_booking_body: string;
+  email_tpl_admin_payment_subject: string;
+  email_tpl_admin_payment_body: string;
+  email_tpl_admin_cancellation_subject: string;
+  email_tpl_admin_cancellation_body: string;
 };
 
 export type EmailFieldChangeHandler = ChangeEventHandler<
