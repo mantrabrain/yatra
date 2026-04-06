@@ -294,6 +294,33 @@ final class TripListingPageContextFactory
             if ($v === '' || $v === null || $v === []) {
                 continue;
             }
+            if ($k === 'attributes' && is_array($v)) {
+                $clean = [];
+                foreach ($v as $attrId => $attrVal) {
+                    if ($attrVal === '' || $attrVal === null) {
+                        continue;
+                    }
+                    if (is_array($attrVal)) {
+                        $inner = [];
+                        foreach ($attrVal as $ik => $iv) {
+                            if ($iv === '' || $iv === null) {
+                                continue;
+                            }
+                            $inner[$ik] = $iv;
+                        }
+                        if ($inner !== []) {
+                            $clean[$attrId] = $inner;
+                        }
+                    } else {
+                        $clean[$attrId] = $attrVal;
+                    }
+                }
+                if ($clean !== []) {
+                    $query['attributes'] = $clean;
+                }
+
+                continue;
+            }
             if (is_array($v)) {
                 $list = [];
                 foreach ($v as $item) {

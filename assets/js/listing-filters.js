@@ -16,6 +16,163 @@
         }
     }
 
+    /**
+     * Remove all trip-attribute filter params (attributes[ID]…) from the URL.
+     */
+    function stripAttributeParamsFromUrl(url) {
+        var toRemove = [];
+        url.searchParams.forEach(function(_, key) {
+            if (key.indexOf('attributes[') === 0) {
+                toRemove.push(key);
+            }
+        });
+        toRemove.forEach(function(key) {
+            url.searchParams.delete(key);
+        });
+    }
+
+    /**
+     * Parse name="attributes[12]", attributes[12][], attributes[12][min], etc.
+     */
+    function parseAttributeInputName(name) {
+        var m = String(name).match(/^attributes\[(\d+)\](.*)$/);
+        if (!m) {
+            return null;
+        }
+        var id = m[1];
+        var tail = m[2] || '';
+        if (tail === '' || tail === '[]') {
+            return { id: id, mode: tail === '[]' ? 'multi' : 'single' };
+        }
+        var sm = tail.match(/^\[(min|max|from|to)\]$/);
+        if (sm) {
+            return { id: id, mode: 'range', sub: sm[1] };
+        }
+        return null;
+    }
+
+    /**
+     * Read current trip-attribute filter values from the sidebar for URL rebuild.
+     */
+    function collectAttributeFilters() {
+        var sidebar = document.querySelector('.yatra-filter-sidebar');
+        if (!sidebar) {
+            return {};
+        }
+
+        var byId = {};
+
+        sidebar.querySelectorAll('input[name^="attributes["]').forEach(function(el) {
+            var parsed = parseAttributeInputName(el.getAttribute('name'));
+            if (!parsed) {
+                return;
+            }
+            var id = parsed.id;
+
+            if (parsed.mode === 'range') {
+                if (!byId[id] || byId[id].type === 'empty') {
+                    byId[id] = { type: 'range', parts: {} };
+                }
+                if (byId[id].type !== 'range') {
+                    return;
+                }
+                var rv = String(el.value || '').trim();
+                if (rv !== '') {
+                    byId[id].parts[parsed.sub] = rv;
+                }
+                return;
+            }
+
+            if (el.type === 'checkbox') {
+                if (!el.checked) {
+                    return;
+                }
+                if (parsed.mode === 'multi') {
+                    if (!byId[id] || byId[id].type === 'empty') {
+                        byId[id] = { type: 'multi', values: [] };
+                    }
+                    if (byId[id].type !== 'multi') {
+                        return;
+                    }
+                    byId[id].values.push(el.value);
+                } else {
+                    byId[id] = { type: 'single', value: el.value || '1' };
+                }
+                return;
+            }
+
+            if (parsed.mode === 'single' && (el.type === 'text' || el.type === 'search' || el.type === 'number' || el.type === 'date')) {
+                var sv = String(el.value || '').trim();
+                if (sv !== '') {
+                    byId[id] = { type: 'single', value: sv };
+                }
+            }
+        });
+
+        var out = {};
+        Object.keys(byId).forEach(function(id) {
+            var slot = byId[id];
+            if (!slot || slot.type === 'empty') {
+                return;
+            }
+            if (slot.type === 'multi' && slot.values.length) {
+                out[id] = { kind: 'multi', values: slot.values };
+            } else if (slot.type === 'single') {
+                out[id] = { kind: 'single', value: slot.value };
+            } else if (slot.type === 'range') {
+                var keys = Object.keys(slot.parts);
+                if (keys.length) {
+                    out[id] = { kind: 'range', parts: slot.parts };
+                }
+            }
+        });
+
+        return out;
+    }
+
+    function appendAttributeFiltersToUrl(url, attrMap) {
+        Object.keys(attrMap).forEach(function(id) {
+            var entry = attrMap[id];
+            if (entry.kind === 'multi') {
+                entry.values.forEach(function(v) {
+                    url.searchParams.append('attributes[' + id + '][]', v);
+                });
+            } else if (entry.kind === 'single') {
+                url.searchParams.set('attributes[' + id + ']', entry.value);
+            } else if (entry.kind === 'range') {
+                Object.keys(entry.parts).forEach(function(sub) {
+                    url.searchParams.set('attributes[' + id + '][' + sub + ']', entry.parts[sub]);
+                });
+            }
+        });
+    }
+
+    /**
+     * Text / number / date attribute fields: no separate "Apply" button — same model as price (apply on change).
+     */
+    function initializeAttributeFieldFilters() {
+        var sidebar = document.querySelector('.yatra-filter-sidebar');
+        if (!sidebar) {
+            return;
+        }
+        sidebar.querySelectorAll('input[name^="attributes["]').forEach(function(input) {
+            if (input.type === 'checkbox' || input.type === 'radio') {
+                return;
+            }
+            input.addEventListener('change', function() {
+                updateFiltersFromForm();
+            });
+            if (input.type === 'text' || input.type === 'search') {
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        updateFiltersFromForm();
+                    }
+                });
+            }
+        });
+    }
+
     // Initialize when DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
         initializeFilters();
@@ -46,6 +203,7 @@
         initializeRadioFilters();
         initializePriceRangeFilter();
         initializeRatingFilter();
+        initializeAttributeFieldFilters();
         initializeClearFilters();
         initializeFilterToggle();
         initializeFilterCollapsibles();
@@ -396,6 +554,8 @@
             url.searchParams.delete(param + '[]'); // Also clear array format
         });
 
+        stripAttributeParamsFromUrl(url);
+
         Object.keys(preserved).forEach(function(k) {
             url.searchParams.set(k, preserved[k]);
         });
@@ -412,6 +572,8 @@
                 url.searchParams.set(key, value);
             }
         });
+
+        appendAttributeFiltersToUrl(url, collectAttributeFilters());
 
         // Reset to first page when filters change (WordPress archives use paged)
         url.searchParams.delete('page');
@@ -537,6 +699,8 @@
             url.searchParams.delete(param);
             url.searchParams.delete(param + '[]'); // Also clear array format
         });
+
+        stripAttributeParamsFromUrl(url);
         
          // Debug log
 
@@ -586,6 +750,12 @@
             case 'age':
                 url.searchParams.delete('age');
                 url.searchParams.delete('age[]');
+                break;
+            case 'trip-type':
+                url.searchParams.delete('trip_type');
+                break;
+            case 'trip-attributes':
+                stripAttributeParamsFromUrl(url);
                 break;
         }
 

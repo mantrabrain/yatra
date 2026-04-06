@@ -639,9 +639,16 @@ yatra_get_header();
                                 </svg>
                                 <span><?php esc_html_e('Trip Attributes', 'yatra'); ?></span>
                             </div>
-                            <svg class="yatra-filter-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
+                            <div class="yatra-filter-actions">
+                                <span class="yatra-clear-section" data-section="trip-attributes" title="<?php esc_attr_e('Clear trip attribute filters', 'yatra'); ?>">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </span>
+                                <svg class="yatra-filter-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </div>
                         </div>
                         <div class="yatra-filter-content">
                             <?php foreach ($yatra_trip_list['attributes'] as $attribute) : ?>
