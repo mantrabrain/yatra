@@ -10,6 +10,8 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Complete travel booking and tour management system for WordPress. Create stunning travel websites, manage bookings, accept payments, and grow your travel business.
 
+**Author:** [MantraBrain](https://wpyatra.com/) · **Plugin directory:** [wordpress.org/plugins/yatra](https://wordpress.org/plugins/yatra/) · **Homepage:** [wpyatra.com](https://wpyatra.com/) · **Reviews:** [wordpress.org/support/plugin/yatra/reviews/?filter=5](https://wordpress.org/support/plugin/yatra/reviews/?filter=5) · **Contact:** [mantrabrain.com/contact](https://mantrabrain.com/contact)
+
 == Description ==
 
 **Yatra** is the most comprehensive travel booking and tour management plugin for WordPress. Built for travel agencies, tour operators, and travel businesses of all sizes, Yatra provides everything you need to create a professional travel booking website.

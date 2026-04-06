@@ -2,6 +2,8 @@
 
 A professional travel booking and management system for WordPress with modern React admin interface.
 
+**Author:** [MantraBrain](https://wpyatra.com/) · **WordPress.org:** [Plugin page](https://wordpress.org/plugins/yatra/) · **Support (reviews):** [5-star reviews on WordPress.org](https://wordpress.org/support/plugin/yatra/reviews/?filter=5) · **Contact:** [MantraBrain](https://mantrabrain.com/contact) · **Rate the plugin:** [Add a review](https://wordpress.org/support/plugin/yatra/reviews/#new-post)
+
 ## 🚀 Quick Start
 
 ### Prerequisites

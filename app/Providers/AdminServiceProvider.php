@@ -14,6 +14,8 @@ use Yatra\Core\Modules\ModuleManager;
  */
 class AdminServiceProvider extends ServiceProvider
 {
+    private const UPGRADE_TO_PRO_URL = 'https://wpyatra.com/pricing';
+
     /**
      * Register services
      */
@@ -21,6 +23,11 @@ class AdminServiceProvider extends ServiceProvider
     {
         // Register admin menu
         add_action('admin_menu', [$this, 'registerAdminMenu']);
+        // After core + other Yatra submenus register; append external “Upgrade” link (avoids add_submenu_page plugin_basename mangling URLs).
+        add_action('admin_menu', [$this, 'registerUpgradeProExternalSubmenu'], 100);
+
+        add_filter('plugin_action_links_' . YATRA_PLUGIN_BASENAME, [$this, 'addPluginUpgradeLink']);
+        add_filter('plugin_row_meta', [$this, 'filterPluginRowMeta'], 10, 4);
 
         // Enqueue admin assets - use priority 20 to run after WordPress core
         add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets'], 20);
@@ -30,6 +37,171 @@ class AdminServiceProvider extends ServiceProvider
         
         // Remove admin wrapper for our page
         add_action('admin_init', [$this, 'removeAdminWrapper']);
+
+        add_action('admin_head', [$this, 'printUpgradeProAdminStyles']);
+        add_action('admin_footer', [$this, 'upgradeProSubmenuOpenInNewTab']);
+    }
+
+    /**
+     * “Upgrade to Pro” on the Plugins list (free only).
+     *
+     * @param array<int,string> $links
+     * @return array<int,string>
+     */
+    public function addPluginUpgradeLink(array $links): array
+    {
+        if (apply_filters('yatra_is_pro_active', false)) {
+            return $links;
+        }
+
+        $upgrade = sprintf(
+            '<a href="%s" class="yatra-upgrade-to-pro-link" target="_blank" rel="noopener noreferrer">%s</a>',
+            esc_url(self::UPGRADE_TO_PRO_URL),
+            esc_html__('Upgrade to Pro', 'yatra')
+        );
+
+        array_unshift($links, $upgrade);
+
+        return $links;
+    }
+
+    /**
+     * Plugins list row meta: Version, By MantraBrain, View details, Support, Plugin Homepage, Contact, Rate (5★).
+     *
+     * @param string[]              $plugin_meta
+     * @param array<string, mixed> $plugin_data
+     * @return string[]
+     */
+    public function filterPluginRowMeta(array $plugin_meta, string $plugin_file, array $plugin_data, string $status): array
+    {
+        if ($plugin_file !== YATRA_PLUGIN_BASENAME) {
+            return $plugin_meta;
+        }
+
+        $home = 'https://wpyatra.com/';
+        $org_plugin_page = 'https://wordpress.org/plugins/yatra/';
+        $support_url = 'https://wordpress.org/support/plugin/yatra/reviews/?filter=5';
+        $contact_url = 'https://mantrabrain.com/contact';
+        $rate_url = 'https://wordpress.org/support/plugin/yatra/reviews/#new-post';
+
+        $row = [];
+
+        if (!empty($plugin_data['Version'])) {
+            $row[] = sprintf(
+                /* translators: %s: plugin version number. */
+                __('Version %s'),
+                $plugin_data['Version']
+            );
+        }
+
+        $row[] = sprintf(
+            /* translators: %s: linked author name (HTML). */
+            __('By %s'),
+            '<a href="' . esc_url($home) . '" target="_blank" rel="noopener noreferrer">MantraBrain</a>'
+        );
+
+        $row[] = sprintf(
+            '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+            esc_url($org_plugin_page),
+            esc_html__('View details', 'yatra')
+        );
+
+        $row[] = sprintf(
+            '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+            esc_url($support_url),
+            esc_html__('Support', 'yatra')
+        );
+
+        $row[] = sprintf(
+            '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+            esc_url($home),
+            esc_html__('Plugin Homepage', 'yatra')
+        );
+
+        $row[] = sprintf(
+            '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+            esc_url($contact_url),
+            esc_html__('Contact', 'yatra')
+        );
+
+        $row[] = sprintf(
+            '<a href="%s" target="_blank" rel="noopener noreferrer">%s <span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span></a>',
+            esc_url($rate_url),
+            esc_html__('Rate the plugin', 'yatra')
+        );
+
+        return $row;
+    }
+
+    /**
+     * Amber styling for Upgrade to Pro (admin menu + plugins list).
+     */
+    public function printUpgradeProAdminStyles(): void
+    {
+        if (apply_filters('yatra_is_pro_active', false)) {
+            return;
+        }
+
+        if (!is_admin()) {
+            return;
+        }
+
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+        $onPlugins = $screen && $screen->id === 'plugins';
+
+        $pricingHref = esc_attr(self::UPGRADE_TO_PRO_URL);
+
+        // Plain link emphasis only (same layout as other submenu items / plugin row links).
+        // Bright orange, bold — reads clearly on default admin submenu and Plugins screen (no button chrome).
+        echo '<style id="yatra-upgrade-pro-styles">'
+            . '#adminmenu .toplevel_page_yatra .wp-submenu a[href="' . $pricingHref . '"]{color:#f97316!important;font-weight:700!important;}'
+            . '#adminmenu .toplevel_page_yatra .wp-submenu a[href="' . $pricingHref . '"]:hover{color:#ea580c!important;}'
+            . ($onPlugins
+                ? '.plugins-php .yatra-upgrade-to-pro-link{color:#f97316!important;font-weight:700!important;}'
+                . '.plugins-php .yatra-upgrade-to-pro-link:hover{color:#ea580c!important;}'
+                : '')
+            . '</style>';
+    }
+
+    /**
+     * Open pricing link in a new tab (submenu HTML is generated by core without target="_blank").
+     */
+    public function upgradeProSubmenuOpenInNewTab(): void
+    {
+        if (apply_filters('yatra_is_pro_active', false)) {
+            return;
+        }
+
+        if (!is_admin()) {
+            return;
+        }
+
+        $url = wp_json_encode(self::UPGRADE_TO_PRO_URL, JSON_UNESCAPED_SLASHES);
+        echo '<script>(function(){var u=' . $url . ";document.querySelectorAll('#adminmenu .toplevel_page_yatra .wp-submenu a[href=\"'+u+'\"]').forEach(function(a){a.target='_blank';a.rel='noopener noreferrer';});})();</script>";
+    }
+
+    /**
+     * Direct external submenu link (WordPress prints href from slug when it is not a registered admin page file).
+     *
+     * @global array<string,array<int,array<int,mixed>>> $submenu
+     */
+    public function registerUpgradeProExternalSubmenu(): void
+    {
+        if (apply_filters('yatra_is_pro_active', false)) {
+            return;
+        }
+
+        global $submenu;
+        if (!isset($submenu['yatra']) || !is_array($submenu['yatra'])) {
+            return;
+        }
+
+        $submenu['yatra'][] = [
+            esc_html__('Upgrade to Pro', 'yatra'),
+            'manage_options',
+            self::UPGRADE_TO_PRO_URL,
+            esc_html__('Upgrade to Pro', 'yatra'),
+        ];
     }
     
     /**
@@ -73,6 +245,18 @@ class AdminServiceProvider extends ServiceProvider
             'dashicons-palmtree',
             30
         );
+
+        // WordPress would otherwise add a first submenu also titled "Yatra" (duplicate of the parent).
+        // A submenu with the same slug as the parent replaces that entry with a distinct label.
+        add_submenu_page(
+            'yatra',
+            __('Yatra Dashboard', 'yatra'),
+            __('Dashboard', 'yatra'),
+            'manage_options',
+            'yatra',
+            [$this, 'renderAdminPage']
+        );
+
     }
 
     /**

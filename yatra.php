@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name: Yatra - Travel Booking & Management
- * Plugin URI: https://yatra.com
+ * Plugin URI: https://wpyatra.com/
  * Description: Professional travel booking and management system for WordPress with modern React admin interface
  * Version: 3.0.0
  * Requires at least: 6.0
  * Requires PHP: 8.0
- * Author: Yatra Development Team
- * Author URI: https://yatra.com
+ * Author: MantraBrain
+ * Author URI: https://wpyatra.com/
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: yatra
