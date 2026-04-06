@@ -448,7 +448,28 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                             // Display value based on field type (simplified for booking sidebar)
                                             switch ($attribute['field_type']) {
                                                 case 'checkbox':
-                                                    echo $attribute['value'] ? esc_html__('Yes', 'yatra') : esc_html__('No', 'yatra');
+                                                    $cb_val = $attribute['value'] ?? null;
+                                                    $cb_options = json_decode($attribute['field_options'] ?? '[]', true);
+                                                    if (!is_array($cb_options)) {
+                                                        $cb_options = [];
+                                                    }
+                                                    if (is_array($cb_val)) {
+                                                        $labels = [];
+                                                        foreach ($cb_options as $opt) {
+                                                            if (!isset($opt['value'], $opt['label'])) {
+                                                                continue;
+                                                            }
+                                                            foreach ($cb_val as $v) {
+                                                                if ((string) $v === (string) $opt['value']) {
+                                                                    $labels[] = $opt['label'];
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                        echo esc_html($labels !== [] ? implode(', ', $labels) : '—');
+                                                    } else {
+                                                        echo $cb_val ? esc_html__('Yes', 'yatra') : esc_html__('No', 'yatra');
+                                                    }
                                                     break;
                                                 case 'select':
                                                 case 'radio':

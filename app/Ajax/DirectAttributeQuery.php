@@ -2,17 +2,14 @@
 
 namespace Yatra\App\Ajax;
 
-use Yatra\App\Repositories\AttributeRepository;
-use Yatra\Database\Tables\ClassificationsTable;
-use Yatra\Constants\ClassificationTypes;
+use Yatra\Repositories\AttributeRepository;
 
 /**
- * Attribute Query AJAX Handler
- * Uses repository layer with proper caching
+ * Attribute Query AJAX Handler (admin fallback when REST cache shape differs).
  */
 class DirectAttributeQuery
 {
-    private $attributeRepository;
+    private AttributeRepository $attributeRepository;
 
     public function __construct()
     {
@@ -22,49 +19,66 @@ class DirectAttributeQuery
     /**
      * Handle AJAX request for attribute data
      */
-    public function handle()
+    public function handle(): void
     {
-        // Verify nonce
         if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_admin_nonce')) {
             wp_send_json_error(__('Your session has expired. Please refresh the page and try again.', 'yatra'));
         }
 
-        $attributeId = intval($_POST['attribute_id'] ?? 0);
-        
-        if (!$attributeId) {
+        $attributeId = (int) ($_POST['attribute_id'] ?? 0);
+
+        if ($attributeId <= 0) {
             wp_send_json_error('Invalid attribute ID');
         }
 
         try {
-            // Use repository layer with proper caching
             $attribute = $this->attributeRepository->find($attributeId);
-            
+
             if (!$attribute) {
                 wp_send_json_error('Attribute not found');
             }
 
-            // Log the cached values
-            wp_send_json_success([
-                'id' => $attribute->id,
-                'name' => $attribute->name,
-                'slug' => $attribute->slug,
-                'description' => $attribute->description,
-                'field_type' => $attribute->field_type,
-                'field_options' => $attribute->field_options,
-                'default_value' => $attribute->default_value,
-                'placeholder' => $attribute->placeholder,
-                'required' => $attribute->required,
-                'validation_rules' => $attribute->validation_rules,
-                'display_order' => $attribute->display_order,
-                'show_on_frontend' => $attribute->show_on_frontend,
-                'show_in_filters' => $attribute->show_in_filters,
-                'filter_type' => $attribute->filter_type,
-                'searchable' => $attribute->searchable,
-                'status' => $attribute->status,
-                'created_at' => $attribute->created_at,
-                'updated_at' => $attribute->updated_at
-            ]);
+            $row = [
+                'id' => (int) $attribute->id,
+                'name' => (string) $attribute->name,
+                'slug' => (string) $attribute->slug,
+                'description' => (string) ($attribute->description ?? ''),
+                'status' => (string) ($attribute->status ?? 'draft'),
+                'icon' => null,
+                'created_at' => $attribute->created_at ?? null,
+                'updated_at' => $attribute->updated_at ?? null,
+            ];
 
+            if (!empty($attribute->icon)) {
+                $iconData = maybe_unserialize($attribute->icon);
+                if (is_array($iconData)) {
+                    $row['icon'] = $iconData;
+                } else {
+                    $row['icon'] = [
+                        'type' => 'icon',
+                        'value' => (string) $attribute->icon,
+                    ];
+                }
+            }
+
+            if (!empty($attribute->metadata)) {
+                $metadata = json_decode((string) $attribute->metadata, true);
+                if (is_array($metadata)) {
+                    $row['field_type'] = $metadata['field_type'] ?? 'text_field';
+                    $row['field_options'] = $metadata['field_options'] ?? '';
+                    $row['default_value'] = $metadata['default_value'] ?? '';
+                    $row['placeholder'] = $metadata['placeholder'] ?? '';
+                    $row['required'] = $metadata['required'] ?? false;
+                    $row['validation_rules'] = $metadata['validation_rules'] ?? '';
+                    $row['display_order'] = isset($metadata['display_order']) ? (int) $metadata['display_order'] : 0;
+                    $row['show_on_frontend'] = $metadata['show_on_frontend'] ?? false;
+                    $row['show_in_filters'] = $metadata['show_in_filters'] ?? false;
+                    $row['filter_type'] = $metadata['filter_type'] ?? 'exact';
+                    $row['searchable'] = $metadata['searchable'] ?? false;
+                }
+            }
+
+            wp_send_json_success($row);
         } catch (\Exception $e) {
             wp_send_json_error('Database query failed: ' . $e->getMessage());
         }
@@ -73,7 +87,7 @@ class DirectAttributeQuery
     /**
      * Register AJAX action
      */
-    public function register()
+    public function register(): void
     {
         add_action('wp_ajax_yatra_get_attribute_direct', [$this, 'handle']);
     }

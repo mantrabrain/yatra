@@ -114,16 +114,17 @@ class SetupWizardController
      */
     public function admin_menus()
     {
-        // Register the page so admin.php?page=yatra-setup works; do not show in the sidebar.
+        // Must stay registered in $submenu: WordPress runs user_can_access_admin_page() in menu.php
+        // before admin_init; remove_submenu_page() breaks parent resolution and causes 403 on this URL.
+        // The item is hidden from the sidebar via CSS in AdminServiceProvider.
         add_submenu_page(
             'yatra',
             __('Yatra Setup Wizard', 'yatra'),
-            '',
+            __('Setup wizard', 'yatra'),
             'manage_options',
             'yatra-setup',
             array($this, 'setup_wizard')
         );
-        remove_submenu_page('yatra', 'yatra-setup');
     }
 
 

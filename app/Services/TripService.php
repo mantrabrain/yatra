@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Services;
 
 use Yatra\Repositories\TripRepository;
+use Yatra\Repositories\AttributeRepository;
 use Yatra\Repositories\TripRevisionRepository;
 use Yatra\Repositories\TripAttributeRepository;
 use Yatra\Repositories\TripAvailabilityRepository;
@@ -507,7 +508,13 @@ class TripService extends BaseService
         }
         
         $data = $this->processBeforeCreate($data);
-        
+
+        $attrPayload = $relationships['attributes'] ?? [];
+        if (!is_array($attrPayload)) {
+            $attrPayload = [];
+        }
+        (new AttributeRepository())->validatePayloadCoversRequiredAttributes($attrPayload);
+
         return $this->repository->createWithRelations($data, $relationships);
     }
 
@@ -1138,7 +1145,9 @@ class TripService extends BaseService
             }
             
             return $result;
-            
+
+        } catch (\InvalidArgumentException $e) {
+            throw $e;
         } catch (\Exception $e) {
             Logger::error("Failed to bulk update trip attributes", [
                 'trip_id' => $tripId,
@@ -1186,6 +1195,8 @@ class TripService extends BaseService
      */
     private function saveTripAttributes(int $tripId, array $attributes): bool
     {
+        (new AttributeRepository())->validatePayloadCoversRequiredAttributes($attributes);
+
         $tripAttributeRepository = new \Yatra\Repositories\TripAttributeRepository();
         $result = $tripAttributeRepository->saveTripAttributes($tripId, $attributes);
         

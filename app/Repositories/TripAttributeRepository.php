@@ -168,7 +168,7 @@ class TripAttributeRepository extends BaseRepository
         }
         
         // Get attributes from the trip_classifications table joined with classifications
-        return $wpdb->get_results($wpdb->prepare(
+        $rows = $wpdb->get_results($wpdb->prepare(
             "SELECT tc.id as relationship_id, tc.metadata as relationship_metadata,
                     c.id as attribute_id, c.name, c.slug, c.description, c.icon, c.metadata,
                     JSON_UNQUOTE(JSON_EXTRACT(tc.metadata, '$.field_type')) as field_type,
@@ -185,7 +185,24 @@ class TripAttributeRepository extends BaseRepository
              AND c.status = 'publish'
              ORDER BY tc.sort_order ASC, c.name ASC",
             $tripId
-        ));
+        )) ?: [];
+
+        foreach ($rows as $row) {
+            if (!empty($row->relationship_metadata)) {
+                $rel = json_decode($row->relationship_metadata, true);
+                if (is_array($rel) && array_key_exists('value', $rel)) {
+                    $row->value = $rel['value'];
+                }
+            }
+            if (!empty($row->metadata)) {
+                $def = json_decode($row->metadata, true);
+                if (is_array($def) && isset($def['field_options']) && is_array($def['field_options'])) {
+                    $row->field_options = wp_json_encode($def['field_options']);
+                }
+            }
+        }
+
+        return $rows;
     }
 
     /**

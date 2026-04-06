@@ -42,6 +42,70 @@ interface TripAttributesSectionProps {
   tripAttributesData?: any; // Add this prop
 }
 
+function parseAttributeFieldOptions(
+  field_options: string | unknown,
+): Array<{ label: string; value: string }> {
+  if (Array.isArray(field_options)) {
+    return field_options
+      .filter((o) => o && typeof o === "object")
+      .map((o: { label?: string; value?: string }) => ({
+        label: String(o?.label ?? ""),
+        value: String(o?.value ?? ""),
+      }))
+      .filter((o) => o.label !== "" || o.value !== "");
+  }
+  if (typeof field_options === "string" && field_options.trim()) {
+    try {
+      const p = JSON.parse(field_options) as unknown;
+      if (Array.isArray(p)) {
+        return p
+          .filter((o) => o && typeof o === "object")
+          .map((o: { label?: string; value?: string }) => ({
+            label: String(o?.label ?? ""),
+            value: String(o?.value ?? ""),
+          }))
+          .filter((o) => o.label !== "" || o.value !== "");
+      }
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
+function normalizeAttributeStoredValue(
+  fieldType: string,
+  raw: unknown,
+): string | string[] {
+  if (fieldType === "checkbox") {
+    if (Array.isArray(raw)) {
+      return raw.map((v) => String(v));
+    }
+    if (typeof raw === "string") {
+      const t = raw.trim();
+      if (t.startsWith("[")) {
+        try {
+          const p = JSON.parse(t) as unknown;
+          if (Array.isArray(p)) {
+            return p.map((v) => String(v));
+          }
+        } catch {
+          /* fall through */
+        }
+      }
+      return t ? [t] : [];
+    }
+    if (typeof raw === "boolean") {
+      return raw ? ["1"] : [];
+    }
+    return [];
+  }
+  if (raw === null || raw === undefined) {
+    return "";
+  }
+  return typeof raw === "string" ? raw : String(raw);
+}
+
 const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
   formData,
   handleFieldChange,
@@ -146,17 +210,13 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
   const handleAttributeValueChange = (attributeId: number, value: any) => {
     const newAttributeValues = { ...attributeValues, [attributeId]: value };
     setAttributeValues(newAttributeValues);
-    console.log("TripAttributesSection: Updating attribute", {
-      attributeId,
-      value,
-      newAttributeValues
-    });
     handleFieldChange("attributes", newAttributeValues);
   };
 
   // Render attribute input based on field type
   const renderAttributeInput = (attribute: Attribute) => {
-    const value = attributeValues[attribute.id] || "";
+    const raw = attributeValues[attribute.id];
+    const value = normalizeAttributeStoredValue(attribute.field_type, raw);
 
     switch (attribute.field_type) {
       case "text_field":
@@ -206,49 +266,127 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
           />
         );
 
-      case "select":
-      case "radio":
-        let options = [];
-        try {
-          options = JSON.parse(attribute.field_options || "[]");
-        } catch {
-          options = [];
+      case "select": {
+        const options = parseAttributeFieldOptions(attribute.field_options);
+        const strVal = typeof value === "string" ? value : "";
+        if (options.length === 0) {
+          return (
+            <p className="mt-2 text-sm text-amber-600 dark:text-amber-500">
+              {__(
+                "This attribute has no options configured. Edit the attribute to add choices.",
+                "yatra",
+              )}
+            </p>
+          );
         }
-
         return (
           <Select
-            value={value}
+            value={strVal}
             onChange={(e) =>
               handleAttributeValueChange(attribute.id, e.target.value)
             }
             className="mt-2"
           >
             <option value="">{__("Select an option", "yatra")}</option>
-            {options.map((option: any, index: number) => (
-              <option key={index} value={option.value}>
-                {option.label}
+            {options.map((option, index) => (
+              <option key={`${option.value}-${index}`} value={option.value}>
+                {option.label || option.value}
               </option>
             ))}
           </Select>
         );
+      }
 
-      case "checkbox":
+      case "radio": {
+        const options = parseAttributeFieldOptions(attribute.field_options);
+        const strVal = typeof value === "string" ? value : "";
+        if (options.length === 0) {
+          return (
+            <p className="mt-2 text-sm text-amber-600 dark:text-amber-500">
+              {__(
+                "This attribute has no options configured. Edit the attribute to add choices.",
+                "yatra",
+              )}
+            </p>
+          );
+        }
         return (
-          <div className="mt-2">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={Boolean(value)}
-                onChange={(e) =>
-                  handleAttributeValueChange(attribute.id, e.target.checked)
-                }
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                {attribute.placeholder || __("Enable this option", "yatra")}
-              </span>
-            </label>
+          <div className="mt-2 space-y-2" role="radiogroup" aria-label={attribute.name}>
+            {options.map((option, index) => (
+              <label
+                key={`${option.value}-${index}`}
+                className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
+              >
+                <input
+                  type="radio"
+                  name={`yatra-attr-${attribute.id}`}
+                  value={option.value}
+                  checked={String(strVal) === String(option.value)}
+                  onChange={() =>
+                    handleAttributeValueChange(attribute.id, option.value)
+                  }
+                  className="border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span>{option.label || option.value}</span>
+              </label>
+            ))}
           </div>
+        );
+      }
+
+      case "checkbox": {
+        const options = parseAttributeFieldOptions(attribute.field_options);
+        const selected = Array.isArray(value) ? value.map(String) : [];
+        if (options.length === 0) {
+          return (
+            <p className="mt-2 text-sm text-amber-600 dark:text-amber-500">
+              {__(
+                "This attribute has no options configured. Edit the attribute to add choices.",
+                "yatra",
+              )}
+            </p>
+          );
+        }
+        const toggle = (optValue: string, checked: boolean) => {
+          const next = checked
+            ? [...selected.filter((v) => v !== optValue), optValue]
+            : selected.filter((v) => v !== optValue);
+          handleAttributeValueChange(attribute.id, next);
+        };
+        return (
+          <div className="mt-2 space-y-2">
+            {options.map((option, index) => (
+              <label
+                key={`${option.value}-${index}`}
+                className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
+              >
+                <input
+                  type="checkbox"
+                  checked={selected.includes(String(option.value))}
+                  onChange={(e) => toggle(String(option.value), e.target.checked)}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span>{option.label || option.value}</span>
+              </label>
+            ))}
+          </div>
+        );
+      }
+
+      case "file":
+        return (
+          <Input
+            type="text"
+            value={typeof value === "string" ? value : ""}
+            onChange={(e) =>
+              handleAttributeValueChange(attribute.id, e.target.value)
+            }
+            placeholder={
+              attribute.placeholder ||
+              __("File URL or attachment path", "yatra")
+            }
+            className="mt-2"
+          />
         );
 
       case "date":

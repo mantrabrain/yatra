@@ -88,6 +88,8 @@ class SampleDataService
                     $new_arr = $new_dep->modify('+' . $duration_days . ' days');
                     $dates[$idx]['departure_date'] = $new_dep->format('Y-m-d');
                     $dates[$idx]['arrival_date'] = $new_arr->format('Y-m-d');
+                    // DB + frontend expect return_date; sample JSON only had arrival_date
+                    $dates[$idx]['return_date'] = $new_arr->format('Y-m-d');
 
                     $cursor = $new_dep->modify('+' . $slot_gap_days . ' days');
                 }

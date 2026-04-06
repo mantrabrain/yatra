@@ -4,8 +4,8 @@
  */
 
 import React, { useState, useEffect, useMemo } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Save, Loader2, Edit2 } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Save, Loader2, Edit2, Plus, Trash2 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { useToast } from "../components/ui/toast";
 import { generateSlug } from "../lib/slug";
@@ -25,6 +25,62 @@ import { ConditionalRender } from "../components/ui/conditional-render";
 import { Switch } from "../components/ui/switch";
 import { IconPicker } from "../components/ui/icon-picker";
 
+type FieldOptionRow = { label: string; value: string };
+
+function parseFieldOptionRows(raw: unknown): FieldOptionRow[] {
+  if (Array.isArray(raw)) {
+    return raw.map((o: { label?: string; value?: string }) => ({
+      label: String(o?.label ?? ""),
+      value: String(o?.value ?? ""),
+    }));
+  }
+  if (typeof raw === "string" && raw.trim()) {
+    try {
+      const p = JSON.parse(raw) as unknown;
+      if (Array.isArray(p)) {
+        return p.map((o: { label?: string; value?: string }) => ({
+          label: String(o?.label ?? ""),
+          value: String(o?.value ?? ""),
+        }));
+      }
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
+/** REST may return the entity at the root or nested under `data`. */
+function unwrapAttributePayload(raw: unknown): Record<string, unknown> {
+  if (raw == null || typeof raw !== "object") {
+    return {};
+  }
+  const o = raw as Record<string, unknown>;
+  if ("id" in o) {
+    return o;
+  }
+  const inner = o.data;
+  if (
+    inner &&
+    typeof inner === "object" &&
+    !Array.isArray(inner) &&
+    "id" in (inner as object)
+  ) {
+    return inner as Record<string, unknown>;
+  }
+  return {};
+}
+
+type AttributeStatusUi = "publish" | "draft" | "trash";
+
+function normalizeAttributeStatusForForm(raw: unknown): AttributeStatusUi {
+  const s = typeof raw === "string" ? raw.trim().toLowerCase() : "";
+  if (s === "publish" || s === "draft" || s === "trash") {
+    return s;
+  }
+  return "publish";
+}
+
 interface AttributeFormData {
   name: string;
   slug: string;
@@ -34,7 +90,7 @@ interface AttributeFormData {
     value: string;
   } | null;
   field_type: string;
-  field_options: string;
+  field_option_rows: FieldOptionRow[];
   default_value: string;
   placeholder: string;
   required: boolean;
@@ -48,6 +104,7 @@ interface AttributeFormData {
 }
 
 const AttributeForm: React.FC = () => {
+  const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [formData, setFormData] = useState<AttributeFormData>({
     name: "",
@@ -55,7 +112,7 @@ const AttributeForm: React.FC = () => {
     description: "",
     icon: null,
     field_type: "text_field",
-    field_options: "",
+    field_option_rows: [],
     default_value: "",
     placeholder: "",
     required: false,
@@ -91,6 +148,8 @@ const AttributeForm: React.FC = () => {
     { value: "email", label: "Email" },
     { value: "url", label: "URL" },
     { value: "date", label: "Date" },
+    { value: "time", label: "Time" },
+    { value: "color", label: "Color" },
     { value: "select", label: "Select Dropdown" },
     { value: "radio", label: "Radio Buttons" },
     { value: "checkbox", label: "Checkbox" },
@@ -99,6 +158,29 @@ const AttributeForm: React.FC = () => {
 
   // Handle field changes
   const handleFieldChange = (field: keyof AttributeFormData, value: any) => {
+    if (field === "field_type") {
+      setFormData((prev) => {
+        const nextNeeds =
+          value === "select" || value === "radio" || value === "checkbox";
+        const wasNeeds =
+          prev.field_type === "select" ||
+          prev.field_type === "radio" ||
+          prev.field_type === "checkbox";
+        let rows = prev.field_option_rows;
+        if (nextNeeds && !wasNeeds && rows.length === 0) {
+          rows = [{ label: "", value: "" }];
+        }
+        return { ...prev, field_type: value, field_option_rows: rows };
+      });
+      if (errors.field_type) {
+        setErrors((prev) => ({ ...prev, field_type: "" }));
+      }
+      if (errors.field_options) {
+        setErrors((prev) => ({ ...prev, field_options: "" }));
+      }
+      return;
+    }
+
     setFormData((prev) => ({ ...prev, [field]: value }));
 
     // Auto-generate slug from name only in ADD mode (not in EDIT mode)
@@ -115,6 +197,38 @@ const AttributeForm: React.FC = () => {
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
     }
+  };
+
+  const updateOptionRow = (
+    index: number,
+    key: "label" | "value",
+    val: string,
+  ) => {
+    setFormData((prev) => {
+      const next = [...prev.field_option_rows];
+      next[index] = { ...next[index], [key]: val };
+      return { ...prev, field_option_rows: next };
+    });
+    if (errors.field_options) {
+      setErrors((prev) => ({ ...prev, field_options: "" }));
+    }
+  };
+
+  const addOptionRow = () => {
+    setFormData((prev) => ({
+      ...prev,
+      field_option_rows: [
+        ...prev.field_option_rows,
+        { label: "", value: "" },
+      ],
+    }));
+  };
+
+  const removeOptionRow = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      field_option_rows: prev.field_option_rows.filter((_, i) => i !== index),
+    }));
   };
 
   // Generate unique slug with numeric suffix if needed
@@ -163,26 +277,6 @@ const AttributeForm: React.FC = () => {
     setIsSlugEditable(!isSlugEditable);
   };
 
-  // Validate field options JSON format
-  const validateFieldOptions = (options: string): boolean => {
-    if (!options.trim()) return true; // Empty is allowed for non-select fields
-
-    try {
-      const parsed = JSON.parse(options);
-      return (
-        Array.isArray(parsed) &&
-        parsed.every(
-          (item) =>
-            typeof item === "object" &&
-            typeof item.label === "string" &&
-            typeof item.value === "string",
-        )
-      );
-    } catch {
-      return false;
-    }
-  };
-
   // Validate form
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -195,20 +289,24 @@ const AttributeForm: React.FC = () => {
       newErrors.field_type = __("Field type is required", "yatra");
     }
 
-    // Validate field options for select/radio/checkbox
+    // Validate field options for select/radio/checkbox (repeater rows)
     if (
       formData.field_type === "select" ||
       formData.field_type === "radio" ||
       formData.field_type === "checkbox"
     ) {
-      if (!formData.field_options.trim()) {
+      const built = formData.field_option_rows
+        .map((r) => {
+          const label = r.label.trim();
+          const value =
+            r.value.trim() || (label ? generateSlug(label) : "");
+          return { label, value };
+        })
+        .filter((r) => r.label !== "" && r.value !== "");
+
+      if (built.length === 0) {
         newErrors.field_options = __(
-          "Field options are required for this field type",
-          "yatra",
-        );
-      } else if (!validateFieldOptions(formData.field_options)) {
-        newErrors.field_options = __(
-          'Invalid JSON format. Use: [{"label": "Name", "value": "value"}]',
+          "Add at least one option with a label (value can be left blank to auto-generate from the label).",
           "yatra",
         );
       }
@@ -252,57 +350,71 @@ const AttributeForm: React.FC = () => {
   };
 
   useEffect(() => {
-    if (attribute) {
-      // Debug: Log the raw attribute data from API
-
-      // Try direct database query as fallback for caching issues
-      fetchDirectDatabaseValues(Number(attributeId) || 0).then((directData) => {
-        const finalAttribute = directData || attribute;
-
-        // Debug: Log the final attribute data being used
-
-        const convertedData = {
-          name: finalAttribute.name || "",
-          slug: finalAttribute.slug || "",
-          description: finalAttribute.description || "",
-          icon: finalAttribute.icon
-            ? {
-                type: finalAttribute.icon.type || "icon",
-                value: finalAttribute.icon.value || "",
-              }
-            : null,
-          field_type: finalAttribute.field_type || "text_field",
-          field_options: finalAttribute.field_options || "",
-          default_value: finalAttribute.default_value || "",
-          placeholder: finalAttribute.placeholder || "",
-          required:
-            finalAttribute.required === "1" ||
-            finalAttribute.required === 1 ||
-            finalAttribute.required === true,
-          validation_rules: finalAttribute.validation_rules || "",
-          display_order: Number(finalAttribute.display_order) || 0,
-          show_on_frontend:
-            finalAttribute.show_on_frontend === "1" ||
-            finalAttribute.show_on_frontend === 1 ||
-            finalAttribute.show_on_frontend === true,
-          show_in_filters:
-            finalAttribute.show_in_filters === "1" ||
-            finalAttribute.show_in_filters === 1 ||
-            finalAttribute.show_in_filters === true,
-          filter_type: finalAttribute.filter_type || "text",
-          searchable:
-            finalAttribute.searchable === "1" ||
-            finalAttribute.searchable === 1 ||
-            finalAttribute.searchable === true,
-          status: finalAttribute.status || "draft",
-        };
-
-        // Debug: Log the converted data being set to form
-
-        setFormData(convertedData);
-      });
+    if (!attribute || !attributeId) {
+      return;
     }
-  }, [attribute, isEditMode, attributeId]);
+    const fromRest = unwrapAttributePayload(attribute);
+
+    fetchDirectDatabaseValues(Number(attributeId) || 0).then((directData) => {
+      const direct =
+        directData && typeof directData === "object"
+          ? (directData as Record<string, unknown>)
+          : {};
+      const finalAttribute = { ...fromRest, ...direct };
+
+      const convertedData: AttributeFormData = {
+        name: String(finalAttribute.name ?? ""),
+        slug: String(finalAttribute.slug ?? ""),
+        description: String(finalAttribute.description ?? ""),
+        icon: (() => {
+          const ic = finalAttribute.icon;
+          if (!ic || typeof ic !== "object" || Array.isArray(ic)) {
+            return null;
+          }
+          const io = ic as { type?: string; value?: string };
+          return {
+            type: io.type === "image" ? "image" : "icon",
+            value: String(io.value ?? ""),
+          };
+        })(),
+        field_type: String(finalAttribute.field_type ?? "text_field"),
+        field_option_rows: (() => {
+          const rows = parseFieldOptionRows(finalAttribute.field_options);
+          return rows.length > 0
+            ? rows
+            : ["select", "radio", "checkbox"].includes(
+                  String(finalAttribute.field_type ?? ""),
+                )
+              ? [{ label: "", value: "" }]
+              : [];
+        })(),
+        default_value: String(finalAttribute.default_value ?? ""),
+        placeholder: String(finalAttribute.placeholder ?? ""),
+        required:
+          finalAttribute.required === "1" ||
+          finalAttribute.required === 1 ||
+          finalAttribute.required === true,
+        validation_rules: String(finalAttribute.validation_rules ?? ""),
+        display_order: Number(finalAttribute.display_order) || 0,
+        show_on_frontend:
+          finalAttribute.show_on_frontend === "1" ||
+          finalAttribute.show_on_frontend === 1 ||
+          finalAttribute.show_on_frontend === true,
+        show_in_filters:
+          finalAttribute.show_in_filters === "1" ||
+          finalAttribute.show_in_filters === 1 ||
+          finalAttribute.show_in_filters === true,
+        filter_type: String(finalAttribute.filter_type ?? "dropdown"),
+        searchable:
+          finalAttribute.searchable === "1" ||
+          finalAttribute.searchable === 1 ||
+          finalAttribute.searchable === true,
+        status: normalizeAttributeStatusForForm(finalAttribute.status),
+      };
+
+      setFormData(convertedData);
+    });
+  }, [attribute, attributeId]);
 
   // Handle attribute loading error
   useEffect(() => {
@@ -321,13 +433,28 @@ const AttributeForm: React.FC = () => {
         slug = await generateUniqueSlug(slug);
       }
 
+      const needsOptionRows =
+        data.field_type === "select" ||
+        data.field_type === "radio" ||
+        data.field_type === "checkbox";
+
+      const fieldOptionsPayload = needsOptionRows
+        ? data.field_option_rows
+            .map((r) => {
+              const label = r.label.trim();
+              const value =
+                r.value.trim() || (label ? generateSlug(label) : "");
+              return { label, value };
+            })
+            .filter((r) => r.label !== "" && r.value !== "")
+        : [];
+
       const payload: any = {
         name: data.name.trim(),
         slug: slug,
         description: data.description.trim(),
         icon: data.icon,
         field_type: data.field_type,
-        field_options: data.field_options.trim(),
         default_value: data.default_value.trim(),
         placeholder: data.placeholder.trim(),
         required: Boolean(data.required),
@@ -337,8 +464,12 @@ const AttributeForm: React.FC = () => {
         show_in_filters: Boolean(data.show_in_filters),
         filter_type: data.filter_type,
         searchable: Boolean(data.searchable),
-        status: data.status,
+        status: normalizeAttributeStatusForForm(data.status),
       };
+
+      if (needsOptionRows) {
+        payload.field_options = fieldOptionsPayload;
+      }
 
       // Debug: Log the payload being sent
 
@@ -367,6 +498,11 @@ const AttributeForm: React.FC = () => {
     },
     onSuccess: (response) => {
       setIsSubmitting(false);
+      queryClient.invalidateQueries({ queryKey: ["attributes"] });
+      queryClient.invalidateQueries({ queryKey: ["attributes-stats"] });
+      if (attributeId) {
+        queryClient.invalidateQueries({ queryKey: ["attribute", attributeId] });
+      }
       showToast(
         isEditMode
           ? __("Attribute updated successfully", "yatra")
@@ -700,33 +836,112 @@ const AttributeForm: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Field Options for select/radio/checkbox */}
+                  {/* Field Options for select/radio/checkbox — repeater (label / value) */}
                   {(formData.field_type === "select" ||
                     formData.field_type === "radio" ||
                     formData.field_type === "checkbox") && (
                     <div>
-                      <label
-                        htmlFor="field_options"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-                      >
-                        {__("Field Options", "yatra")}{" "}
-                        <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        id="field_options"
-                        value={formData.field_options}
-                        onChange={(e) =>
-                          handleFieldChange("field_options", e.target.value)
-                        }
-                        placeholder='[{"label": "Option 1", "value": "option1"}]'
-                        className={errors.field_options ? "border-red-500" : ""}
-                      />
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {__("Field Options", "yatra")}{" "}
+                          <span className="text-red-500">*</span>
+                        </label>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="gap-1 h-8"
+                          onClick={addOptionRow}
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          {__("Add option", "yatra")}
+                        </Button>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                         {__(
-                          'Format: [{"label": "Display Name", "value": "value"}]',
+                          "Each row is one choice. Leave value empty to auto-generate a slug from the label.",
                           "yatra",
                         )}
                       </p>
+                      <div
+                        className={`space-y-2 rounded-md border p-3 ${errors.field_options ? "border-red-500" : "border-gray-200 dark:border-gray-600"}`}
+                      >
+                        {(formData.field_option_rows.length > 0
+                          ? formData.field_option_rows
+                          : [{ label: "", value: "" }]
+                        ).map((row, index) => (
+                          <div
+                            key={index}
+                            className="flex flex-col sm:flex-row gap-2 sm:items-end"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1">
+                                {__("Label", "yatra")}
+                              </label>
+                              <Input
+                                value={row.label}
+                                onChange={(e) => {
+                                  if (formData.field_option_rows.length === 0) {
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      field_option_rows: [
+                                        {
+                                          label: e.target.value,
+                                          value: "",
+                                        },
+                                      ],
+                                    }));
+                                  } else {
+                                    updateOptionRow(index, "label", e.target.value);
+                                  }
+                                }}
+                                placeholder={__(
+                                  "Display name",
+                                  "yatra",
+                                )}
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1">
+                                {__("Value", "yatra")}
+                              </label>
+                              <Input
+                                value={row.value}
+                                onChange={(e) => {
+                                  if (formData.field_option_rows.length === 0) {
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      field_option_rows: [
+                                        {
+                                          label: "",
+                                          value: e.target.value,
+                                        },
+                                      ],
+                                    }));
+                                  } else {
+                                    updateOptionRow(index, "value", e.target.value);
+                                  }
+                                }}
+                                placeholder={__(
+                                  "Stored value (optional)",
+                                  "yatra",
+                                )}
+                              />
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-600 hover:text-red-700 shrink-0"
+                              onClick={() => removeOptionRow(index)}
+                              disabled={formData.field_option_rows.length <= 1}
+                              aria-label={__("Remove option", "yatra")}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
                       {errors.field_options && (
                         <p className="mt-1 text-sm text-red-500">
                           {errors.field_options}

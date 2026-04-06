@@ -337,6 +337,19 @@ class AvailabilityResolutionService
                 
                 // Use trip's price_types (rules don't have their own)
                 $avail->price_types = $trip_price_types;
+
+                // End dates for sidebar / JSON (rules only provide departure day)
+                $durationDays = max(1, (int) ($trip->duration_days ?? 1));
+                $offset = max(0, $durationDays - 1);
+                $dep = $avail->departure_date;
+                if ($dep !== '' && $dep !== null) {
+                    $end = date('Y-m-d', strtotime((string) $dep . ' +' . $offset . ' days'));
+                    $avail->arrival_date = $end;
+                    $avail->return_date = $end;
+                } else {
+                    $avail->arrival_date = null;
+                    $avail->return_date = null;
+                }
                 break;
 
             case 'availability_date':
@@ -344,10 +357,12 @@ class AvailabilityResolutionService
                 $avail->id = $source->id ?? 0;
                 $avail->trip_id = (int) $trip->id;
                 $avail->departure_date = $source->departure_date ?? '';
-                $avail->arrival_date = $source->arrival_date ?? null;
-                $avail->return_date = $source->return_date ?? null;
-                $avail->departure_time = $source->departure_time ?? null;
-                $avail->arrival_time = $source->arrival_time ?? null;
+                $arrival = isset($source->arrival_date) ? $source->arrival_date : null;
+                $return = isset($source->return_date) ? $source->return_date : null;
+                $avail->arrival_date = $arrival;
+                $avail->return_date = ($return !== null && $return !== '') ? $return : $arrival;
+                $avail->departure_time = isset($source->departure_time) ? $source->departure_time : null;
+                $avail->arrival_time = isset($source->arrival_time) ? $source->arrival_time : null;
                 $avail->seats_total = (int) ($source->seats_total ?? 0);
                 $avail->seats_available = (int) ($source->seats_available ?? 0);
                 $avail->seats_reserved = (int) ($source->seats_reserved ?? 0);
@@ -432,6 +447,26 @@ class AvailabilityResolutionService
 
         // Pro filter: allows Dynamic Pricing, Itinerary Pricing, etc. to modify per-date availability
         $avail = (object) apply_filters('yatra_resolve_availability_object', $avail, $trip, $sourceType);
+
+        return $this->normalizeResolvedAvailabilityObject($avail);
+    }
+
+    /**
+     * Ensure optional date fields exist and return_date falls back to arrival (DB / filters may omit keys).
+     */
+    private function normalizeResolvedAvailabilityObject(object $avail): object
+    {
+        foreach (['arrival_date', 'return_date', 'departure_time', 'arrival_time'] as $key) {
+            if (!property_exists($avail, $key)) {
+                $avail->{$key} = null;
+            }
+        }
+
+        $ret = $avail->return_date ?? null;
+        $arr = $avail->arrival_date ?? null;
+        if (($ret === null || $ret === '') && $arr !== null && $arr !== '') {
+            $avail->return_date = $arr;
+        }
 
         return $avail;
     }

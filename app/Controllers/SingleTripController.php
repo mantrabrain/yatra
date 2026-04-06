@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Controllers;
 
 use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Repositories\TripAttributeRepository;
 use Yatra\Database\Tables\ReviewsTable;
 use Yatra\Database\Tables\TripsTable;
 use Yatra\Database\Tables\TripAvailabilityDatesTable;
@@ -1288,51 +1289,32 @@ class SingleTripController
      */
     private function getTripAttributes(int $trip_id): array
     {
-        $table_classifications = ClassificationsTable::getTableName();
-        
-        // Check if table exists
-        $table_exists = $this->wpdb->get_var(
-            $this->wpdb->prepare(
-                "SHOW TABLES LIKE %s",
-                $table_classifications
-            )
-        ) === $table_classifications;
-        
-        if (!$table_exists) {
-            return [];
-        }
-        
-        $attributes = $this->wpdb->get_results(
-            $this->wpdb->prepare(
-                "SELECT c.id, c.name, c.slug, c.description, c.icon, c.metadata,
-                        JSON_EXTRACT(c.metadata, '$.field_type') as field_type,
-                        JSON_EXTRACT(c.metadata, '$.field_options') as field_options,
-                        JSON_EXTRACT(c.metadata, '$.value') as value,
-                        JSON_EXTRACT(c.metadata, '$.value_serialized') as value_serialized
-                 FROM {$table_classifications} c
-                 WHERE c.type = 'attribute'
-                 AND JSON_EXTRACT(c.metadata, '$.trip_id') = %d
-                 AND c.status = 'publish'
-                 ORDER BY c.sorting ASC, c.name ASC",
-                $trip_id
-            )
-        );
-        
+        $repo = new TripAttributeRepository();
+        $rows = $repo->getTripAttributes($trip_id);
+
         $formatted_attributes = [];
-        foreach ($attributes as $attr) {
-            $value = $attr->value;
-            if ($attr->value_serialized) {
-                $value = unserialize($value);
+        foreach ($rows as $attr) {
+            if (!$this->isAttributeMetaFlagEnabled($attr->show_on_frontend ?? null)) {
+                continue;
             }
-            
-            // Resolve image URLs for image type icons
+
+            $value = $attr->value;
+
+            $field_type = isset($attr->field_type) ? trim((string) $attr->field_type, '"') : 'text';
+            $field_options = $attr->field_options ?? null;
+            if (is_string($field_options)) {
+                $field_options = trim($field_options, '"');
+            } elseif (is_array($field_options)) {
+                $field_options = wp_json_encode($field_options);
+            }
+
             $icon_data = null;
             if (!empty($attr->icon)) {
                 $icon_data = maybe_unserialize($attr->icon);
                 if (is_array($icon_data) && $icon_data['type'] === 'image' && !empty($icon_data['value'])) {
                     $icon_value = $icon_data['value'];
                     $image_url = '';
-                    
+
                     if (is_numeric($icon_value)) {
                         $maybe_url = wp_get_attachment_image_url((int) $icon_value, 'large');
                         if (!empty($maybe_url)) {
@@ -1341,23 +1323,42 @@ class SingleTripController
                     } elseif (is_string($icon_value) && filter_var($icon_value, FILTER_VALIDATE_URL)) {
                         $image_url = $icon_value;
                     }
-                    
+
                     $icon_data['value'] = $image_url;
                 }
             }
-            
+
             $formatted_attributes[] = [
-                'id' => $attr->id,
-                'name' => $attr->name,
-                'field_type' => $attr->field_type,
-                'field_options' => $attr->field_options,
+                'id' => (int) $attr->attribute_id,
+                'name' => (string) $attr->name,
+                'field_type' => $field_type,
+                'field_options' => $field_options,
                 'value' => $value,
                 'icon' => $icon_data,
-                'description' => $attr->description
+                'description' => (string) ($attr->description ?? ''),
             ];
         }
-        
+
         return $formatted_attributes;
+    }
+
+    /**
+     * True when admin "Show on Frontend" (or similar) is enabled for JSON_EXTRACT / API values.
+     */
+    private function isAttributeMetaFlagEnabled($raw): bool
+    {
+        if ($raw === null) {
+            return false;
+        }
+        if (is_bool($raw)) {
+            return $raw;
+        }
+        if (is_numeric($raw)) {
+            return (int) $raw === 1;
+        }
+        $s = strtolower(trim((string) $raw, " \t\n\r\0\x0B\""));
+
+        return in_array($s, ['1', 'true', 'yes', 'on'], true);
     }
 
     /**

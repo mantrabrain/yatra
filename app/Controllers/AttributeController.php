@@ -714,8 +714,25 @@ class AttributeController extends BaseController
         
         if ($request->has_param('field_options')) {
             $options = $request->get_param('field_options');
+            if (is_string($options)) {
+                $decoded = json_decode(trim($options), true);
+                $options = is_array($decoded) ? $decoded : [];
+            }
             if (is_array($options)) {
-                $data['field_options'] = $options;
+                $data['field_options'] = array_values(array_filter(array_map(static function ($row) {
+                    if (!is_array($row)) {
+                        return null;
+                    }
+                    $label = isset($row['label']) ? sanitize_text_field((string) $row['label']) : '';
+                    $value = isset($row['value']) ? sanitize_text_field((string) $row['value']) : '';
+                    if ($label === '' && $value === '') {
+                        return null;
+                    }
+                    if ($value === '' && $label !== '') {
+                        $value = sanitize_title($label);
+                    }
+                    return ['label' => $label, 'value' => $value];
+                }, $options)));
             }
         }
         
@@ -759,7 +776,11 @@ class AttributeController extends BaseController
         }
         
         if ($request->has_param('status')) {
-            $data['status'] = sanitize_text_field($request->get_param('status'));
+            $raw = $request->get_param('status');
+            $s = is_string($raw) ? strtolower(trim(sanitize_text_field($raw))) : '';
+            if (in_array($s, ['publish', 'draft', 'trash'], true)) {
+                $data['status'] = $s;
+            }
         }
         
         return $data;
@@ -833,7 +854,7 @@ class AttributeController extends BaseController
                 'field_type' => [
                     'description' => 'Form field type.',
                     'type' => 'string',
-                    'enum' => ['text_field', 'number', 'email', 'url', 'textarea', 'select', 'radio', 'checkbox', 'date', 'time', 'color'],
+                    'enum' => ['text_field', 'number', 'email', 'url', 'textarea', 'select', 'radio', 'checkbox', 'date', 'time', 'color', 'file'],
                     'default' => 'text_field',
                 ],
                 'field_options' => [

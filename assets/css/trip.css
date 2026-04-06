@@ -9138,7 +9138,8 @@ a.yatra-card-book-btn:hover {
     margin-top: var(--yatra-element-gap);
 }
 
-.yatra-attribute-item {
+/* Scoped to single-trip attributes grid only — listing filters reuse class names with a different DOM (label + content stacked). */
+.yatra-attributes-grid > .yatra-attribute-item {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -9149,13 +9150,13 @@ a.yatra-card-book-btn:hover {
     transition: all 0.3s ease;
 }
 
-.yatra-attribute-item:hover {
+.yatra-attributes-grid > .yatra-attribute-item:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     border-color: var(--yatra-primary-color, #3b82f6);
 }
 
-.yatra-attribute-icon {
+.yatra-attributes-grid .yatra-attribute-icon {
     width: 36px;
     height: 36px;
     display: flex;
@@ -9174,12 +9175,12 @@ a.yatra-card-book-btn:hover {
     border-radius: 4px;
 }
 
-.yatra-attribute-content {
+.yatra-attributes-grid .yatra-attribute-content {
     flex: 1;
     min-width: 0;
 }
 
-.yatra-attribute-name {
+.yatra-attributes-grid .yatra-attribute-content .yatra-attribute-name {
     font-size: 14px;
     font-weight: 600;
     color: var(--yatra-text-primary, #1a1a1a);
@@ -9187,7 +9188,7 @@ a.yatra-card-book-btn:hover {
     line-height: 1.3;
 }
 
-.yatra-attribute-value {
+.yatra-attributes-grid .yatra-attribute-value {
     font-size: 13px;
     color: var(--yatra-text-secondary, #6b7280);
     margin-bottom: 4px;
@@ -9195,12 +9196,12 @@ a.yatra-card-book-btn:hover {
     line-height: 1.4;
 }
 
-.yatra-attribute-value a {
+.yatra-attributes-grid .yatra-attribute-value a {
     color: var(--yatra-primary-color, #3b82f6);
     text-decoration: none;
 }
 
-.yatra-attribute-value a:hover {
+.yatra-attributes-grid .yatra-attribute-value a:hover {
     text-decoration: underline;
 }
 
@@ -9214,7 +9215,7 @@ a.yatra-card-book-btn:hover {
     margin-right: 6px;
 }
 
-.yatra-attribute-description {
+.yatra-attributes-grid .yatra-attribute-description {
     font-size: 11px;
     color: var(--yatra-text-muted, #9ca3af);
     font-style: italic;
@@ -10931,26 +10932,54 @@ a.yatra-card-book-btn:hover {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 12px;
 }
 
-/* Similar Trips Price */
+/* Similar Trips Price — compact single-line row, baseline-aligned */
 .yatra-similar-price {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
+    min-width: 0;
+    flex: 1;
 }
 
 .yatra-similar-trip-price {
-    font-size: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 6px;
+    row-gap: 2px;
+    line-height: 1.25;
+    color: #111827;
+}
+
+.yatra-similar-price-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+}
+
+.yatra-similar-price-amount {
+    font-size: 15px;
     font-weight: 700;
     color: #111827;
 }
 
+.yatra-similar-price-contact {
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
 .yatra-similar-original-price {
-    font-size: 14px;
+    font-size: 11px;
+    font-weight: 500;
     color: #9ca3af;
     text-decoration: line-through;
-    margin-left: 8px;
+    margin-left: 0;
 }
 
 /* Similar Trips View Button */
@@ -10965,6 +10994,7 @@ a.yatra-card-book-btn:hover {
     text-decoration: none;
     transition: all 0.3s ease;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .yatra-similar-view-btn:hover {
@@ -11003,6 +11033,10 @@ a.yatra-card-book-btn:hover {
         align-items: flex-start;
         gap: 12px;
     }
+
+    .yatra-similar-price {
+        width: 100%;
+    }
     
     .yatra-similar-view-btn {
         width: 100%;
@@ -11031,10 +11065,6 @@ a.yatra-card-book-btn:hover {
     
     .yatra-similar-categories {
         margin-bottom: 16px;
-    }
-    
-    .yatra-similar-price {
-        font-size: 16px;
     }
 }
 

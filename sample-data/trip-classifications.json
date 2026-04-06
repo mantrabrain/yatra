@@ -12,7 +12,15 @@
       {"slug": "challenging", "type": "difficulty"},
       {"slug": "adult", "type": "traveler_type"},
       {"slug": "student", "type": "traveler_type"},
-      {"slug": "child", "type": "traveler_type"}
+      {"slug": "child", "type": "traveler_type"},
+      {"slug": "group-size", "type": "attribute", "field_type": "number", "value": "12"},
+      {"slug": "age-restriction", "type": "attribute", "field_type": "number", "value": "14"},
+      {"slug": "fitness-level", "type": "attribute", "field_type": "select", "value": "high"},
+      {"slug": "accommodation-type", "type": "attribute", "field_type": "select", "value": "lodge"},
+      {"slug": "meal-plan", "type": "attribute", "field_type": "select", "value": "half-board"},
+      {"slug": "transportation", "type": "attribute", "field_type": "select", "value": "walking"},
+      {"slug": "guide-language", "type": "attribute", "field_type": "checkbox", "value": ["english", "german"]},
+      {"slug": "season", "type": "attribute", "field_type": "select", "value": "summer"}
     ]
   },
   {
@@ -27,7 +35,15 @@
       {"slug": "adult", "type": "traveler_type"},
       {"slug": "child", "type": "traveler_type"},
       {"slug": "infant", "type": "traveler_type"},
-      {"slug": "family", "type": "traveler_type"}
+      {"slug": "family", "type": "traveler_type"},
+      {"slug": "group-size", "type": "attribute", "field_type": "number", "value": "20"},
+      {"slug": "age-restriction", "type": "attribute", "field_type": "number", "value": "0"},
+      {"slug": "fitness-level", "type": "attribute", "field_type": "select", "value": "low"},
+      {"slug": "accommodation-type", "type": "attribute", "field_type": "select", "value": "resort"},
+      {"slug": "meal-plan", "type": "attribute", "field_type": "select", "value": "all-inclusive"},
+      {"slug": "transportation", "type": "attribute", "field_type": "select", "value": "boat"},
+      {"slug": "guide-language", "type": "attribute", "field_type": "checkbox", "value": ["english"]},
+      {"slug": "season", "type": "attribute", "field_type": "select", "value": "year-round"}
     ]
   },
   {
@@ -42,7 +58,15 @@
       {"slug": "easy", "type": "difficulty"},
       {"slug": "adult", "type": "traveler_type"},
       {"slug": "student", "type": "traveler_type"},
-      {"slug": "senior", "type": "traveler_type"}
+      {"slug": "senior", "type": "traveler_type"},
+      {"slug": "group-size", "type": "attribute", "field_type": "number", "value": "15"},
+      {"slug": "age-restriction", "type": "attribute", "field_type": "number", "value": "5"},
+      {"slug": "fitness-level", "type": "attribute", "field_type": "select", "value": "moderate"},
+      {"slug": "accommodation-type", "type": "attribute", "field_type": "select", "value": "hotel"},
+      {"slug": "meal-plan", "type": "attribute", "field_type": "select", "value": "breakfast-only"},
+      {"slug": "transportation", "type": "attribute", "field_type": "select", "value": "train"},
+      {"slug": "guide-language", "type": "attribute", "field_type": "checkbox", "value": ["english", "japanese"]},
+      {"slug": "season", "type": "attribute", "field_type": "select", "value": "spring"}
     ]
   },
   {
@@ -58,7 +82,15 @@
       {"slug": "adult", "type": "traveler_type"},
       {"slug": "child", "type": "traveler_type"},
       {"slug": "solo-traveler", "type": "traveler_type"},
-      {"slug": "group-leader", "type": "traveler_type"}
+      {"slug": "group-leader", "type": "traveler_type"},
+      {"slug": "group-size", "type": "attribute", "field_type": "number", "value": "16"},
+      {"slug": "age-restriction", "type": "attribute", "field_type": "number", "value": "6"},
+      {"slug": "fitness-level", "type": "attribute", "field_type": "select", "value": "moderate"},
+      {"slug": "accommodation-type", "type": "attribute", "field_type": "select", "value": "camping"},
+      {"slug": "meal-plan", "type": "attribute", "field_type": "select", "value": "full-board"},
+      {"slug": "transportation", "type": "attribute", "field_type": "select", "value": "private-vehicle"},
+      {"slug": "guide-language", "type": "attribute", "field_type": "checkbox", "value": ["english"]},
+      {"slug": "season", "type": "attribute", "field_type": "select", "value": "winter"}
     ]
   },
   {
@@ -74,7 +106,15 @@
       {"slug": "easy", "type": "difficulty"},
       {"slug": "adult", "type": "traveler_type"},
       {"slug": "student", "type": "traveler_type"},
-      {"slug": "senior", "type": "traveler_type"}
+      {"slug": "senior", "type": "traveler_type"},
+      {"slug": "group-size", "type": "attribute", "field_type": "number", "value": "20"},
+      {"slug": "age-restriction", "type": "attribute", "field_type": "number", "value": "0"},
+      {"slug": "fitness-level", "type": "attribute", "field_type": "select", "value": "low"},
+      {"slug": "accommodation-type", "type": "attribute", "field_type": "select", "value": "hotel"},
+      {"slug": "meal-plan", "type": "attribute", "field_type": "select", "value": "breakfast-only"},
+      {"slug": "transportation", "type": "attribute", "field_type": "select", "value": "walking"},
+      {"slug": "guide-language", "type": "attribute", "field_type": "checkbox", "value": ["english", "french"]},
+      {"slug": "season", "type": "attribute", "field_type": "select", "value": "year-round"}
     ]
   },
   {
@@ -92,7 +132,15 @@
       {"slug": "adult", "type": "traveler_type"},
       {"slug": "child", "type": "traveler_type"},
       {"slug": "student", "type": "traveler_type"},
-      {"slug": "family", "type": "traveler_type"}
+      {"slug": "family", "type": "traveler_type"},
+      {"slug": "group-size", "type": "attribute", "field_type": "number", "value": "18"},
+      {"slug": "age-restriction", "type": "attribute", "field_type": "number", "value": "8"},
+      {"slug": "fitness-level", "type": "attribute", "field_type": "select", "value": "moderate"},
+      {"slug": "accommodation-type", "type": "attribute", "field_type": "select", "value": "resort"},
+      {"slug": "meal-plan", "type": "attribute", "field_type": "select", "value": "half-board"},
+      {"slug": "transportation", "type": "attribute", "field_type": "select", "value": "bus"},
+      {"slug": "guide-language", "type": "attribute", "field_type": "checkbox", "value": ["english"]},
+      {"slug": "season", "type": "attribute", "field_type": "select", "value": "summer"}
     ]
   },
   {
@@ -105,7 +153,15 @@
       {"slug": "iceland", "type": "destination"},
       {"slug": "moderate", "type": "difficulty"},
       {"slug": "adult", "type": "traveler_type"},
-      {"slug": "student", "type": "traveler_type"}
+      {"slug": "student", "type": "traveler_type"},
+      {"slug": "group-size", "type": "attribute", "field_type": "number", "value": "14"},
+      {"slug": "age-restriction", "type": "attribute", "field_type": "number", "value": "12"},
+      {"slug": "fitness-level", "type": "attribute", "field_type": "select", "value": "moderate"},
+      {"slug": "accommodation-type", "type": "attribute", "field_type": "select", "value": "guesthouse"},
+      {"slug": "meal-plan", "type": "attribute", "field_type": "select", "value": "full-board"},
+      {"slug": "transportation", "type": "attribute", "field_type": "select", "value": "private-vehicle"},
+      {"slug": "guide-language", "type": "attribute", "field_type": "checkbox", "value": ["english"]},
+      {"slug": "season", "type": "attribute", "field_type": "select", "value": "winter"}
     ]
   },
   {
@@ -120,7 +176,15 @@
       {"slug": "new-zealand", "type": "destination"},
       {"slug": "challenging", "type": "difficulty"},
       {"slug": "adult", "type": "traveler_type"},
-      {"slug": "student", "type": "traveler_type"}
+      {"slug": "student", "type": "traveler_type"},
+      {"slug": "group-size", "type": "attribute", "field_type": "number", "value": "10"},
+      {"slug": "age-restriction", "type": "attribute", "field_type": "number", "value": "15"},
+      {"slug": "fitness-level", "type": "attribute", "field_type": "select", "value": "high"},
+      {"slug": "accommodation-type", "type": "attribute", "field_type": "select", "value": "lodge"},
+      {"slug": "meal-plan", "type": "attribute", "field_type": "select", "value": "half-board"},
+      {"slug": "transportation", "type": "attribute", "field_type": "select", "value": "flight"},
+      {"slug": "guide-language", "type": "attribute", "field_type": "checkbox", "value": ["english"]},
+      {"slug": "season", "type": "attribute", "field_type": "select", "value": "summer"}
     ]
   },
   {
@@ -134,7 +198,15 @@
       {"slug": "peru", "type": "destination"},
       {"slug": "difficult", "type": "difficulty"},
       {"slug": "adult", "type": "traveler_type"},
-      {"slug": "student", "type": "traveler_type"}
+      {"slug": "student", "type": "traveler_type"},
+      {"slug": "group-size", "type": "attribute", "field_type": "number", "value": "12"},
+      {"slug": "age-restriction", "type": "attribute", "field_type": "number", "value": "16"},
+      {"slug": "fitness-level", "type": "attribute", "field_type": "select", "value": "very-high"},
+      {"slug": "accommodation-type", "type": "attribute", "field_type": "select", "value": "camping"},
+      {"slug": "meal-plan", "type": "attribute", "field_type": "select", "value": "full-board"},
+      {"slug": "transportation", "type": "attribute", "field_type": "select", "value": "walking"},
+      {"slug": "guide-language", "type": "attribute", "field_type": "checkbox", "value": ["english", "spanish"]},
+      {"slug": "season", "type": "attribute", "field_type": "select", "value": "fall"}
     ]
   },
   {
@@ -149,7 +221,15 @@
       {"slug": "easy", "type": "difficulty"},
       {"slug": "adult", "type": "traveler_type"},
       {"slug": "senior", "type": "traveler_type"},
-      {"slug": "family", "type": "traveler_type"}
+      {"slug": "family", "type": "traveler_type"},
+      {"slug": "group-size", "type": "attribute", "field_type": "number", "value": "24"},
+      {"slug": "age-restriction", "type": "attribute", "field_type": "number", "value": "8"},
+      {"slug": "fitness-level", "type": "attribute", "field_type": "select", "value": "moderate"},
+      {"slug": "accommodation-type", "type": "attribute", "field_type": "select", "value": "hotel"},
+      {"slug": "meal-plan", "type": "attribute", "field_type": "select", "value": "full-board"},
+      {"slug": "transportation", "type": "attribute", "field_type": "select", "value": "boat"},
+      {"slug": "guide-language", "type": "attribute", "field_type": "checkbox", "value": ["english", "german"]},
+      {"slug": "season", "type": "attribute", "field_type": "select", "value": "summer"}
     ]
   },
   {
@@ -162,7 +242,15 @@
       {"slug": "adult", "type": "traveler_type"},
       {"slug": "child", "type": "traveler_type"},
       {"slug": "senior", "type": "traveler_type"},
-      {"slug": "student", "type": "traveler_type"}
+      {"slug": "student", "type": "traveler_type"},
+      {"slug": "group-size", "type": "attribute", "field_type": "number", "value": "25"},
+      {"slug": "age-restriction", "type": "attribute", "field_type": "number", "value": "8"},
+      {"slug": "fitness-level", "type": "attribute", "field_type": "select", "value": "moderate"},
+      {"slug": "accommodation-type", "type": "attribute", "field_type": "select", "value": "hotel"},
+      {"slug": "meal-plan", "type": "attribute", "field_type": "select", "value": "breakfast-only"},
+      {"slug": "transportation", "type": "attribute", "field_type": "select", "value": "bus"},
+      {"slug": "guide-language", "type": "attribute", "field_type": "checkbox", "value": ["english"]},
+      {"slug": "season", "type": "attribute", "field_type": "select", "value": "year-round"}
     ]
   },
   {
@@ -175,7 +263,15 @@
       {"slug": "adult", "type": "traveler_type"},
       {"slug": "child", "type": "traveler_type"},
       {"slug": "senior", "type": "traveler_type"},
-      {"slug": "student", "type": "traveler_type"}
+      {"slug": "student", "type": "traveler_type"},
+      {"slug": "group-size", "type": "attribute", "field_type": "number", "value": "20"},
+      {"slug": "age-restriction", "type": "attribute", "field_type": "number", "value": "0"},
+      {"slug": "fitness-level", "type": "attribute", "field_type": "select", "value": "low"},
+      {"slug": "accommodation-type", "type": "attribute", "field_type": "select", "value": "hotel"},
+      {"slug": "meal-plan", "type": "attribute", "field_type": "select", "value": "breakfast-only"},
+      {"slug": "transportation", "type": "attribute", "field_type": "select", "value": "walking"},
+      {"slug": "guide-language", "type": "attribute", "field_type": "checkbox", "value": ["english", "french"]},
+      {"slug": "season", "type": "attribute", "field_type": "select", "value": "year-round"}
     ]
   },
   {
@@ -187,7 +283,15 @@
       {"slug": "easy", "type": "difficulty"},
       {"slug": "adult", "type": "traveler_type"},
       {"slug": "child", "type": "traveler_type"},
-      {"slug": "senior", "type": "traveler_type"}
+      {"slug": "senior", "type": "traveler_type"},
+      {"slug": "group-size", "type": "attribute", "field_type": "number", "value": "6"},
+      {"slug": "age-restriction", "type": "attribute", "field_type": "number", "value": "12"},
+      {"slug": "fitness-level", "type": "attribute", "field_type": "select", "value": "low"},
+      {"slug": "accommodation-type", "type": "attribute", "field_type": "select", "value": "hotel"},
+      {"slug": "meal-plan", "type": "attribute", "field_type": "select", "value": "breakfast-only"},
+      {"slug": "transportation", "type": "attribute", "field_type": "select", "value": "flight"},
+      {"slug": "guide-language", "type": "attribute", "field_type": "checkbox", "value": ["english"]},
+      {"slug": "season", "type": "attribute", "field_type": "select", "value": "year-round"}
     ]
   },
   {
@@ -200,7 +304,15 @@
       {"slug": "adult", "type": "traveler_type"},
       {"slug": "child", "type": "traveler_type"},
       {"slug": "senior", "type": "traveler_type"},
-      {"slug": "student", "type": "traveler_type"}
+      {"slug": "student", "type": "traveler_type"},
+      {"slug": "group-size", "type": "attribute", "field_type": "number", "value": "12"},
+      {"slug": "age-restriction", "type": "attribute", "field_type": "number", "value": "6"},
+      {"slug": "fitness-level", "type": "attribute", "field_type": "select", "value": "moderate"},
+      {"slug": "accommodation-type", "type": "attribute", "field_type": "select", "value": "hotel"},
+      {"slug": "meal-plan", "type": "attribute", "field_type": "select", "value": "half-board"},
+      {"slug": "transportation", "type": "attribute", "field_type": "select", "value": "train"},
+      {"slug": "guide-language", "type": "attribute", "field_type": "checkbox", "value": ["english", "japanese"]},
+      {"slug": "season", "type": "attribute", "field_type": "select", "value": "spring"}
     ]
   }
 ]

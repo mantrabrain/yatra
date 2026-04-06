@@ -43,7 +43,9 @@ if ($has_availability) {
             'id' => (int) $avail->id,
             'date' => $avail->departure_date,
             'departure_date' => $avail->departure_date,
-            'return_date' => $avail->return_date,
+            'return_date' => (isset($avail->return_date) && $avail->return_date !== '')
+                ? $avail->return_date
+                : (isset($avail->arrival_date) ? $avail->arrival_date : null),
             'price' => $avail->effective_price ?? $avail->original_price,
             'original_price' => $avail->original_price,
             'discounted_price' => $avail->discounted_price,

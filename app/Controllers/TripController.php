@@ -572,6 +572,8 @@ class TripController extends BaseController
                 'id' => $id,
                 'message' => __('Trip created successfully', 'yatra'),
             ], 201);
+        } catch (\InvalidArgumentException $e) {
+            return $this->error_response($e->getMessage(), $e->getCode() >= 400 ? $e->getCode() : 400);
         } catch (\Exception $e) {
             return $this->handle_exception($e);
         }
@@ -2344,6 +2346,8 @@ class TripController extends BaseController
             // Use TripService to update trip attributes
             $result = $this->service->updateTripAttributes($trip_id, $formattedAttributes);
             return $this->success_response(['message' => 'Trip attributes updated successfully']);
+        } catch (\InvalidArgumentException $e) {
+            return $this->error_response($e->getMessage(), $e->getCode() >= 400 ? $e->getCode() : 400);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }

@@ -343,6 +343,48 @@ class AttributeService extends BaseService
     }
 
     /**
+     * Normalize field_options from JSON string or array into a clean list of label/value pairs.
+     *
+     * @param array<string, mixed> $data
+     */
+    private function normalizeFieldOptionsInPlace(array &$data): void
+    {
+        if (!array_key_exists('field_options', $data)) {
+            return;
+        }
+        $fo = $data['field_options'];
+        if (is_string($fo)) {
+            $t = trim($fo);
+            if ($t === '') {
+                $data['field_options'] = [];
+                return;
+            }
+            $decoded = json_decode($t, true);
+            $fo = is_array($decoded) ? $decoded : [];
+        }
+        if (!is_array($fo)) {
+            $data['field_options'] = [];
+            return;
+        }
+        $clean = [];
+        foreach ($fo as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $label = isset($row['label']) ? sanitize_text_field((string) $row['label']) : '';
+            $value = isset($row['value']) ? sanitize_text_field((string) $row['value']) : '';
+            if ($label === '' && $value === '') {
+                continue;
+            }
+            if ($value === '' && $label !== '') {
+                $value = sanitize_title($label);
+            }
+            $clean[] = ['label' => $label, 'value' => $value];
+        }
+        $data['field_options'] = $clean;
+    }
+
+    /**
      * Create new attribute
      */
     public function createAttribute(array $data): int
@@ -375,14 +417,16 @@ class AttributeService extends BaseService
                 'display_order' => $this->attributeRepository->getMaxDisplayOrder() + 1
             ], $data);
 
+            $this->normalizeFieldOptionsInPlace($data);
+
             // Validate field type
-            $validFieldTypes = ['text_field', 'number', 'email', 'url', 'textarea', 'select', 'radio', 'checkbox', 'date', 'time', 'color'];
+            $validFieldTypes = ['text_field', 'number', 'email', 'url', 'textarea', 'select', 'radio', 'checkbox', 'date', 'time', 'color', 'file'];
             if (!in_array($data['field_type'], $validFieldTypes)) {
                 throw new \InvalidArgumentException('Invalid field type');
             }
 
             // Validate field options for select/radio/checkbox
-            if (in_array($data['field_type'], ['select', 'radio', 'checkbox']) && empty($data['field_options'])) {
+            if (in_array($data['field_type'], ['select', 'radio', 'checkbox'], true) && empty($data['field_options'])) {
                 throw new \InvalidArgumentException('Field options are required for select, radio, and checkbox fields');
             }
 
@@ -466,6 +510,10 @@ class AttributeService extends BaseService
             // Check slug uniqueness (excluding current attribute)
             if (isset($data['slug']) && $this->attributeRepository->slugExists($data['slug'], $id)) {
                 throw new \InvalidArgumentException('Attribute with this slug already exists');
+            }
+
+            if (array_key_exists('field_options', $data)) {
+                $this->normalizeFieldOptionsInPlace($data);
             }
 
             // Process field options
@@ -663,14 +711,24 @@ class AttributeService extends BaseService
                 break;
                 
             case 'checkbox':
-                if (!empty($value) && !is_array($value)) {
-                    throw new \InvalidArgumentException('Checkbox values must be an array');
+                $checkboxVals = $value;
+                if (is_bool($value)) {
+                    $checkboxVals = $value ? ['1'] : [];
+                } elseif (!is_array($value)) {
+                    $checkboxVals = ($value !== '' && $value !== null) ? [(string) $value] : [];
                 }
                 $options = $attribute->field_options ? json_decode($attribute->field_options, true) : [];
-                if (!empty($value)) {
+                if (!empty($checkboxVals) && is_array($options)) {
                     $validOptions = array_column($options, 'value');
-                    foreach ($value as $val) {
-                        if (!in_array($val, $validOptions)) {
+                    foreach ($checkboxVals as $val) {
+                        $match = false;
+                        foreach ($validOptions as $vo) {
+                            if ((string) $val === (string) $vo) {
+                                $match = true;
+                                break;
+                            }
+                        }
+                        if (!$match) {
                             throw new \InvalidArgumentException('Invalid checkbox option: ' . $val);
                         }
                     }
@@ -739,7 +797,8 @@ class AttributeService extends BaseService
     {
         Cache::delete('yatra_frontend_attributes');
         Cache::delete('yatra_filterable_attributes');
-        
+        Cache::delete(\Yatra\Utils\Cache::KEY_AVAILABLE_ATTRIBUTES);
+
         // Clear search cache by prefix
         Cache::clearByPrefix('yatra_search_attributes_');
     }
@@ -762,6 +821,8 @@ class AttributeService extends BaseService
                 return false;
             }
 
+            $this->attributeRepository->validatePayloadCoversRequiredAttributes($attributes);
+
             // Use repository layer for transaction handling
             $success = $this->tripAttributeRepository->saveTripAttributes($tripId, $attributes);
             
@@ -776,6 +837,8 @@ class AttributeService extends BaseService
             
             return $success;
             
+        } catch (\InvalidArgumentException $e) {
+            throw $e;
         } catch (\Exception $e) {
             Logger::error("Failed to bulk update trip attributes: " . $e->getMessage());
             return false;

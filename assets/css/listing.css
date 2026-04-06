@@ -960,9 +960,19 @@
     padding: 16px 0;
 }
 
-/* Attribute items within Trip Attributes filter */
+/* Attribute items within Trip Attributes filter (stacked layout; trip.css grid uses same class names horizontally) */
 .yatra-filter-content .yatra-attribute-item {
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin-bottom: 16px;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
 }
 
 .yatra-filter-content .yatra-attribute-item:last-child {
@@ -974,6 +984,8 @@
     align-items: center;
     gap: 10px;
     margin-bottom: 12px;
+    flex-shrink: 0;
+    max-width: 100%;
 }
 
 .yatra-filter-content .yatra-attribute-icon {
@@ -1003,16 +1015,22 @@
     font-weight: 600;
     color: #374151;
     line-height: 1.5;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .yatra-filter-content .yatra-attribute-content {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     display: block;
+    flex: 1 1 auto;
 }
 
 .yatra-filter-content .yatra-attribute-content input.yatra-filter-input {
     width: 100% !important;
     max-width: 100% !important;
+    min-width: 0 !important;
     box-sizing: border-box !important;
 }
 
@@ -1026,10 +1044,16 @@
 .yatra-filter-content .yatra-input-group input {
     width: 100% !important;
     max-width: 100% !important;
+    min-width: 0 !important;
     box-sizing: border-box !important;
 }
 
 /* Dark mode */
+.dark .yatra-filter-content .yatra-attribute-item {
+    background: #1f2937;
+    border-color: #374151;
+}
+
 .dark .yatra-filter-content .yatra-attribute-icon svg {
     color: #9ca3af;
 }

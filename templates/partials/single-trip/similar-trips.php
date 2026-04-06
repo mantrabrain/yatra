@@ -74,7 +74,6 @@ if (!defined('ABSPATH')) {
                         'current_price' => yatra_format_price($current_price),
                         'original_price' => $has_discount ? yatra_format_price($original_price) : '',
                         'has_discount' => $has_discount,
-                        'price_prefix' => __('From ', 'yatra')
                     ];
                     
                     $discount = [
@@ -211,16 +210,17 @@ if (!defined('ABSPATH')) {
                                 
                                 <div class="yatra-similar-trip-footer">
                                     <div class="yatra-similar-price">
-                                        <span class="yatra-similar-trip-price">
-                                            <?php if ($pricing['has_price']): ?>
-                                                <?php echo esc_html($pricing['price_prefix'] . $pricing['current_price']); ?>
+                                        <?php if ($pricing['has_price']): ?>
+                                            <div class="yatra-similar-trip-price">
+                                                <span class="yatra-similar-price-label"><?php esc_html_e('From', 'yatra'); ?></span>
+                                                <span class="yatra-similar-price-amount"><?php echo esc_html($pricing['current_price']); ?></span>
                                                 <?php if ($pricing['has_discount'] && !empty($pricing['original_price'])): ?>
                                                     <span class="yatra-similar-original-price"><?php echo esc_html($pricing['original_price']); ?></span>
                                                 <?php endif; ?>
-                                            <?php else: ?>
-                                                <?php esc_html_e('Contact for pricing', 'yatra'); ?>
-                                            <?php endif; ?>
-                                        </span>
+                                            </div>
+                                        <?php else: ?>
+                                            <span class="yatra-similar-trip-price yatra-similar-price-contact"><?php esc_html_e('Contact for pricing', 'yatra'); ?></span>
+                                        <?php endif; ?>
                                     </div>
                                     <?php if (!empty($permalink)): ?>
                                         <a href="<?php echo esc_url($permalink); ?>" class="yatra-similar-view-btn"><?php esc_html_e('View Details', 'yatra'); ?></a>

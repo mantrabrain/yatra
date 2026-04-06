@@ -13,6 +13,7 @@ use Yatra\Database\Tables\TripItineraryDayEntryTable;
 use Yatra\Database\Tables\TripItineraryDaysTable;
 use Yatra\Database\Tables\TripsTable;
 use Yatra\Repositories\TripDownloadRepository;
+use Yatra\Repositories\AttributeRepository;
 use Yatra\Models\Trip;
 use Yatra\Utils\Cache;
 use Yatra\Utils\QueryCache;
@@ -309,12 +310,32 @@ class TripRepository extends BaseRepository
         $classificationsTable = ClassificationsTable::getTableName();
         $tripClassificationsTable = TripClassificationsTable::getTableName();
 
-        // Keyword search
+        // Keyword search (trip fields + attribute values marked searchable in metadata)
         if (!empty($filters['search']) && is_string($filters['search'])) {
             $like = '%' . $wpdb->esc_like($filters['search']) . '%';
-            $wheres[] = '(t.title LIKE %s OR t.short_description LIKE %s OR t.description LIKE %s OR t.slug LIKE %s)';
+            $searchFlag = AttributeRepository::metadataEnabledSqlOnAlias('yatra_c_srch', 'searchable');
+            $wheres[] = '(t.title LIKE %s OR t.short_description LIKE %s OR t.description LIKE %s OR t.slug LIKE %s OR EXISTS (
+                SELECT 1 FROM `' . esc_sql($tripClassificationsTable) . '` yatra_tc_srch
+                INNER JOIN `' . esc_sql($classificationsTable) . '` yatra_c_srch
+                  ON yatra_c_srch.id = yatra_tc_srch.classification_id
+                WHERE yatra_tc_srch.trip_id = t.id
+                  AND yatra_tc_srch.classification_type = %s
+                  AND yatra_tc_srch.is_active = 1
+                  AND yatra_c_srch.type = %s
+                  AND yatra_c_srch.status = %s
+                  AND (' . $searchFlag . ')
+                  AND (
+                    LOWER(JSON_UNQUOTE(JSON_EXTRACT(yatra_tc_srch.metadata, \'$.value\'))) LIKE LOWER(%s)
+                    OR LOWER(yatra_tc_srch.metadata) LIKE LOWER(%s)
+                  )
+            ))';
             $params[] = $like;
             $params[] = $like;
+            $params[] = $like;
+            $params[] = $like;
+            $params[] = 'attribute';
+            $params[] = ClassificationTypes::ATTRIBUTE;
+            $params[] = 'publish';
             $params[] = $like;
             $params[] = $like;
         }
@@ -502,11 +523,15 @@ class TripRepository extends BaseRepository
             }
         }
 
-        // Dynamic attribute filters
+        // Dynamic attribute filters (only attributes allowed in public filters — admin setting "Show in Filters")
         if (!empty($filters['attribute_filters']) && is_array($filters['attribute_filters'])) {
+            $allowedFilterAttrIds = (new AttributeRepository())->getFilterableAttributeIds();
             foreach ($filters['attribute_filters'] as $attrId => $rawVal) {
                 $attrId = (int) $attrId;
                 if ($attrId <= 0) {
+                    continue;
+                }
+                if (!in_array($attrId, $allowedFilterAttrIds, true)) {
                     continue;
                 }
                 if (is_array($rawVal) && (isset($rawVal['min']) || isset($rawVal['max']))) {

@@ -40,7 +40,26 @@ class AdminServiceProvider extends ServiceProvider
 
         add_action('admin_head', [$this, 'printUpgradeProAdminStyles']);
         add_action('admin_head', [$this, 'printYatraAdminMenuIconStyles']);
+        add_action('admin_head', [$this, 'printHideYatraSetupWizardSubmenu']);
         add_action('admin_footer', [$this, 'upgradeProSubmenuOpenInNewTab']);
+    }
+
+    /**
+     * Hide Setup Wizard in the Yatra submenu while keeping it registered (required for direct URL access).
+     */
+    public function printHideYatraSetupWizardSubmenu(): void
+    {
+        if (!apply_filters('yatra_enable_setup_wizard', true)) {
+            return;
+        }
+
+        if (!apply_filters('yatra_hide_setup_wizard_submenu', true)) {
+            return;
+        }
+
+        echo '<style id="yatra-hide-setup-submenu">'
+            . '#adminmenu .toplevel_page_yatra .wp-submenu li:has(> a[href*="page=yatra-setup"]){display:none!important;}'
+            . '</style>';
     }
 
     /**

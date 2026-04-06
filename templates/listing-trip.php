@@ -695,6 +695,21 @@ yatra_get_header();
                                             unset($yatra_sidebar_cb_rows, $yatra_sidebar_cb_input_name, $yatra_sidebar_cb_active);
                                             ?>
 
+                                        <?php elseif ($attribute['field_type'] === 'checkbox' && !empty($field_options)) : ?>
+                                            <?php
+                                            $yatra_sidebar_cb_rows = [];
+                                            foreach ($field_options as $option) {
+                                                $yatra_sidebar_cb_rows[] = [
+                                                    'value' => $option['value'],
+                                                    'label' => $option['label'],
+                                                ];
+                                            }
+                                            $yatra_sidebar_cb_input_name = $attribute_filter_name . '[]';
+                                            $yatra_sidebar_cb_active = is_array($current_values) ? $current_values : [];
+                                            include __DIR__ . '/partials/listing-sidebar-collapsible-checkboxes.php';
+                                            unset($yatra_sidebar_cb_rows, $yatra_sidebar_cb_input_name, $yatra_sidebar_cb_active);
+                                            ?>
+
                                         <?php elseif ($attribute['field_type'] === 'checkbox') : ?>
                                             <div class="yatra-checkbox-group">
                                                 <label class="yatra-checkbox-label">
@@ -702,7 +717,7 @@ yatra_get_header();
                                                         type="checkbox"
                                                         name="<?php echo esc_attr($attribute_filter_name); ?>"
                                                         value="1"
-                                                        <?php echo in_array('1', $current_values) ? 'checked' : ''; ?>
+                                                        <?php echo in_array('1', (array) $current_values, true) ? 'checked' : ''; ?>
                                                     >
                                                     <span><?php _e('Yes', 'yatra'); ?></span>
                                                 </label>

@@ -278,7 +278,22 @@ class SampleDataRepository
                 }
                 $type_index = $type_counters[$cls_type];
                 $type_counters[$cls_type]++;
-                
+
+                $metadata_json = null;
+                if ($cls_type === 'attribute') {
+                    if (!empty($classification['metadata']) && is_array($classification['metadata'])) {
+                        $metadata_json = wp_json_encode($classification['metadata']);
+                    } elseif (array_key_exists('value', $classification) || !empty($classification['field_type'])) {
+                        $metadata_json = wp_json_encode([
+                            'field_type' => $classification['field_type'] ?? 'text_field',
+                            'value'      => $classification['value'] ?? '',
+                        ]);
+                    }
+                } elseif (!empty($classification['metadata'])) {
+                    $meta = $classification['metadata'];
+                    $metadata_json = is_string($meta) ? $meta : wp_json_encode($meta);
+                }
+
                 $result = $this->wpdb->insert(
                     $this->trip_classifications_table,
                     [
@@ -286,13 +301,14 @@ class SampleDataRepository
                         'classification_id'   => $classification_id,
                         'classification_type' => $cls_type,
                         'relationship_type'   => $type_index === 0 ? 'primary' : 'secondary',
+                        'metadata'            => $metadata_json,
                         'sort_order'          => $type_index,
                         'is_featured'         => $type_index === 0 ? 1 : 0,
                         'is_active'           => 1,
                         'created_at'          => $now,
                         'updated_at'          => $now,
                     ],
-                    ['%d', '%d', '%s', '%s', '%d', '%d', '%d', '%s', '%s']
+                    ['%d', '%d', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s']
                 );
                 
                 if ($result) {
@@ -443,6 +459,10 @@ class SampleDataRepository
                 continue;
             }
             $item['trip_id'] = $trip_ids[$trip_slug];
+
+            if (empty($item['return_date']) && !empty($item['arrival_date'])) {
+                $item['return_date'] = $item['arrival_date'];
+            }
             
             $result = $this->wpdb->insert($this->availability_dates_table, $item);
             if ($result) {
