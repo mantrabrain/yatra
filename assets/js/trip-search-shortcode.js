@@ -103,8 +103,9 @@ jQuery(document).ready(function() {
         var maxSlider = durationDropdown.querySelector('#durationMax');
         var minBadge = durationDropdown.querySelector('.yatra-duration-min-badge');
         var maxBadge = durationDropdown.querySelector('.yatra-duration-max-badge');
-        var minLabel = durationDropdown.querySelector('.yatra-duration-labels span:first-child');
-        var maxLabel = durationDropdown.querySelector('.yatra-duration-labels span:last-child');
+        var labelSpans = durationDropdown.querySelectorAll('.yatra-duration-labels span');
+        var minLabel = labelSpans[0];
+        var maxLabel = labelSpans[labelSpans.length - 1];
         var sliderRange = durationDropdown.querySelector('.yatra-slider-range');
         var valueSpan = durationDropdown.querySelector('.yatra-dropdown-value');
 

@@ -152,9 +152,14 @@
     background: #f9fafb;
 }
 
-.yatra-dropdown-trigger > svg:first-child {
+.yatra-dropdown-trigger > svg:first-of-type {
     color: #6b7280;
     flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    display: block;
 }
 
 .yatra-dropdown-content {
