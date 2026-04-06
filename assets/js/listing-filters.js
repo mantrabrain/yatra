@@ -8,9 +8,18 @@
 (function() {
     'use strict';
 
+    function showListingLoading() {
+        var el = document.getElementById('yatra-listing-loading-overlay');
+        if (el) {
+            el.classList.add('yatra-listing-loading-overlay--visible');
+            el.setAttribute('aria-hidden', 'false');
+        }
+    }
+
     // Initialize when DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
         initializeFilters();
+        initPaginationLoadingClicks();
     });
 
     function initializeFilters() {
@@ -24,6 +33,63 @@
         
         // Set initial filter states from URL
         setFiltersFromURL();
+        initTaxonomyTripContextUi();
+        initSortSelectNavigation();
+    }
+
+    /**
+     * Sync legacy horizontal search dropdowns when arriving from a taxonomy URL (data on #yatra-trip-context).
+     */
+    function initTaxonomyTripContextUi() {
+        var ctxEl = document.getElementById('yatra-trip-context');
+        if (!ctxEl) {
+            return;
+        }
+        var type = ctxEl.getAttribute('data-type');
+        var slug = ctxEl.getAttribute('data-slug');
+        var name = ctxEl.getAttribute('data-name');
+        if (!type || !slug) {
+            return;
+        }
+        if (type === 'destination') {
+            var destDropdown = document.querySelector('.yatra-search-dropdown[data-dropdown="destination"]');
+            if (destDropdown) {
+                var valueEl = destDropdown.querySelector('.yatra-dropdown-value');
+                if (valueEl && name) {
+                    valueEl.textContent = name;
+                }
+                var option = destDropdown.querySelector('.yatra-dropdown-option[data-value="' + slug + '"]');
+                if (option) {
+                    option.classList.add('active');
+                }
+            }
+        }
+        if (type === 'activity') {
+            var actDropdown = document.querySelector('.yatra-search-dropdown[data-dropdown="activities"]');
+            if (actDropdown) {
+                var valueEl2 = actDropdown.querySelector('.yatra-dropdown-value');
+                if (valueEl2 && name) {
+                    valueEl2.textContent = name;
+                }
+                var option2 = actDropdown.querySelector('.yatra-dropdown-option[data-value="' + slug + '"]');
+                if (option2) {
+                    option2.classList.add('active');
+                }
+            }
+        }
+    }
+
+    function initSortSelectNavigation() {
+        var sortEl = document.getElementById('yatra-sort-filter');
+        if (!sortEl) {
+            return;
+        }
+        sortEl.addEventListener('change', function() {
+            if (this.value) {
+                showListingLoading();
+                window.location.href = this.value;
+            }
+        });
     }
 
     /**
@@ -208,45 +274,45 @@
     function collectActiveFilters() {
         const filters = {};
 
-        // Price range - only include if user has explicitly set values
+        // Price range: send both bounds whenever the range is narrower than catalog min/max
+        // (avoids dropping one param or losing price when changing other filters).
         const minPrice = document.getElementById('priceMin');
         const maxPrice = document.getElementById('priceMax');
         const minSlider = document.getElementById('priceRangeMin');
         const maxSlider = document.getElementById('priceRangeMax');
-        
-        
-        
-        // Check if user has actually entered values in input fields
-        if (minPrice && minPrice.value && minPrice.value.trim() !== '') {
-            filters.price_min = minPrice.value;
-            
+
+        function parseBound(v, fallback) {
+            var n = parseInt(v, 10);
+            return isNaN(n) ? fallback : n;
         }
-        if (maxPrice && maxPrice.value && maxPrice.value.trim() !== '') {
-            filters.price_max = maxPrice.value;
-            
+
+        var fullMin = 0;
+        var fullMax = 1000000;
+        if (minSlider && minSlider.getAttribute('data-default') !== null) {
+            fullMin = parseBound(minSlider.getAttribute('data-default'), fullMin);
         }
-        
-        // Check slider values only if user has explicitly moved them or they have user-set data
-        if (minSlider && minSlider.value) {
-            const isUserSet = minSlider.getAttribute('data-user-set') === 'true';
-            const isDifferentFromDefault = minSlider.value !== minSlider.getAttribute('data-default');
-            
-            if (isUserSet || isDifferentFromDefault) {
-                filters.price_min = minSlider.value;
-                
-            }
+        if (maxSlider && maxSlider.getAttribute('data-default') !== null) {
+            fullMax = parseBound(maxSlider.getAttribute('data-default'), fullMax);
         }
-        if (maxSlider && maxSlider.value) {
-            const isUserSet = maxSlider.getAttribute('data-user-set') === 'true';
-            const isDifferentFromDefault = maxSlider.value !== maxSlider.getAttribute('data-default');
-            
-            if (isUserSet || isDifferentFromDefault) {
-                filters.price_max = maxSlider.value;
-                
-            }
+
+        var curMin = minSlider ? parseBound(minSlider.value, fullMin) : fullMin;
+        var curMax = maxSlider ? parseBound(maxSlider.value, fullMax) : fullMax;
+        if (minPrice && minPrice.value !== '' && minPrice.value.trim() !== '') {
+            curMin = parseBound(minPrice.value, curMin);
         }
-        
-        
+        if (maxPrice && maxPrice.value !== '' && maxPrice.value.trim() !== '') {
+            curMax = parseBound(maxPrice.value, curMax);
+        }
+        if (curMin > curMax) {
+            var swap = curMin;
+            curMin = curMax;
+            curMax = swap;
+        }
+
+        if (curMin > fullMin || curMax < fullMax) {
+            filters.price_min = String(curMin);
+            filters.price_max = String(curMax);
+        }
 
         // Radio button filters (trip type, etc.)
         const radioGroups = {
@@ -263,14 +329,14 @@
         // Checkbox filters
         const checkboxGroups = {
             'difficulty[]': 'difficulty',
-            'categories[]': 'categories', 
+            'categories[]': 'categories',
             'destinations[]': 'destinations',
             'activities[]': 'activities',
             'accommodation[]': 'accommodation',
-            'included_services[]': 'included_services',
-            'special_offers[]': 'special_offers',
-            'booking_options[]': 'booking_options',
-            'age_suitability[]': 'age_suitability',
+            'services[]': 'services',
+            'offers[]': 'offers',
+            'booking[]': 'booking',
+            'age[]': 'age',
             'rating[]': 'rating'
         };
 
@@ -292,15 +358,27 @@
     function updateFiltersFromForm() {
         const filters = collectActiveFilters();
         const url = new URL(window.location);
+
+        var preserved = {};
+        ['s', 'sort'].forEach(function(k) {
+            var v = url.searchParams.get(k);
+            if (v !== null && v !== '') {
+                preserved[k] = v;
+            }
+        });
         
         // Clear existing filter parameters (both single and array formats)
-        const filterParams = ['price_min', 'price_max', 'trip_type', 'difficulty', 'categories', 'destinations', 
-                             'activities', 'accommodation', 'included_services', 'special_offers', 
-                             'booking_options', 'age_suitability', 'rating'];
+        const filterParams = ['price_min', 'price_max', 'trip_type', 'difficulty', 'categories', 'destinations',
+            'activities', 'accommodation', 'services', 'offers', 'booking', 'age', 'rating',
+            'budget', 'duration', 'destination', 'activity', 'category'];
         
         filterParams.forEach(function(param) {
             url.searchParams.delete(param);
             url.searchParams.delete(param + '[]'); // Also clear array format
+        });
+
+        Object.keys(preserved).forEach(function(k) {
+            url.searchParams.set(k, preserved[k]);
         });
 
         // Add new filter parameters
@@ -316,11 +394,30 @@
             }
         });
 
-        // Reset to first page when filters change
+        // Reset to first page when filters change (WordPress archives use paged)
         url.searchParams.delete('page');
+        url.searchParams.delete('paged');
 
         // Update URL and reload
+        showListingLoading();
         window.location.href = url.toString();
+    }
+
+    function initPaginationLoadingClicks() {
+        var pag = document.querySelector('.yatra-listing-pagination');
+        if (!pag) {
+            return;
+        }
+        pag.addEventListener('click', function(e) {
+            var a = e.target.closest('a.yatra-pagination-btn');
+            if (!a || a.classList.contains('disabled')) {
+                return;
+            }
+            var href = a.getAttribute('href');
+            if (href && href.indexOf('javascript:') !== 0) {
+                showListingLoading();
+            }
+        });
     }
 
     /**
@@ -337,14 +434,20 @@
             const minInput = document.getElementById('priceMin');
             const minSlider = document.getElementById('priceRangeMin');
             if (minInput) minInput.value = priceMin;
-            if (minSlider) minSlider.value = priceMin;
+            if (minSlider) {
+                minSlider.value = priceMin;
+                minSlider.setAttribute('data-user-set', 'true');
+            }
         }
-        
+
         if (priceMax) {
             const maxInput = document.getElementById('priceMax');
             const maxSlider = document.getElementById('priceRangeMax');
             if (maxInput) maxInput.value = priceMax;
-            if (maxSlider) maxSlider.value = priceMax;
+            if (maxSlider) {
+                maxSlider.value = priceMax;
+                maxSlider.setAttribute('data-user-set', 'true');
+            }
         }
 
         // Set trip type radio button
@@ -360,18 +463,22 @@
         const checkboxParams = {
             'difficulty': 'difficulty[]',
             'categories': 'categories[]',
-            'destinations': 'destinations[]', 
+            'destinations': 'destinations[]',
             'activities': 'activities[]',
             'accommodation': 'accommodation[]',
-            'included_services': 'included_services[]',
-            'special_offers': 'special_offers[]',
-            'booking_options': 'booking_options[]',
-            'age_suitability': 'age_suitability[]',
+            'services': 'services[]',
+            'offers': 'offers[]',
+            'booking': 'booking[]',
+            'age': 'age[]',
             'rating': 'rating[]'
         };
 
         Object.keys(checkboxParams).forEach(function(param) {
-            const values = urlParams.getAll(param);
+            const bracketKey = param + '[]';
+            let values = urlParams.getAll(bracketKey);
+            if (values.length === 0) {
+                values = urlParams.getAll(param);
+            }
             const name = checkboxParams[param];
             
             values.forEach(function(value) {
@@ -404,8 +511,8 @@
         
         // Remove all filter parameters (both single and array formats)
         const filterParams = ['price_min', 'price_max', 'trip_type', 'difficulty', 'categories', 'destinations',
-                             'activities', 'accommodation', 'included_services', 'special_offers',
-                             'booking_options', 'age_suitability', 'rating', 'page'];
+            'activities', 'accommodation', 'services', 'offers', 'booking', 'age', 'rating', 'page', 'paged', 's',
+            'destination', 'activity', 'category', 'duration', 'sort', 'budget'];
         
         filterParams.forEach(function(param) {
             url.searchParams.delete(param);
@@ -414,7 +521,7 @@
         
          // Debug log
 
-        // Reload page without filters
+        showListingLoading();
         window.location.href = url.toString();
     }
 
@@ -449,12 +556,25 @@
                 url.searchParams.delete('activities');
                 url.searchParams.delete('activities[]');
                 break;
+            case 'offers':
+                url.searchParams.delete('offers');
+                url.searchParams.delete('offers[]');
+                break;
+            case 'booking':
+                url.searchParams.delete('booking');
+                url.searchParams.delete('booking[]');
+                break;
+            case 'age':
+                url.searchParams.delete('age');
+                url.searchParams.delete('age[]');
+                break;
         }
-        
+
         // Reset to first page when filters change
         url.searchParams.delete('page');
-        
-        // Reload page with updated filters
+        url.searchParams.delete('paged');
+
+        showListingLoading();
         window.location.href = url.toString();
     }
 

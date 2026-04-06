@@ -56,30 +56,48 @@ class ListingPageHandler extends BasePageHandler
         if ($listing_type === 'trip') {
             $tripListingService = new \Yatra\Services\TripListingService();
             
-            // Get current page from WordPress pagination parameter
-            $page = max(1, (int) (get_query_var('paged') ?: ($_GET['paged'] ?? 1)));
-            
+            // Pagination: route (pretty /trip/page/N/), query var, then ?paged= / ?page=
+            $page = max(1, (int) ($route_data['paged'] ?? (get_query_var('paged') ?: ($_GET['paged'] ?? $_GET['page'] ?? 1))));
+
             $requestParams = [
                 'page' => $page,
                 'per_page' => 12,
+                's' => isset($_GET['s']) ? (string) wp_unslash($_GET['s']) : '',
                 'destination' => $_GET['destination'] ?? '',
                 'activity' => $_GET['activity'] ?? '',
-                'trip_category' => $_GET['trip_category'] ?? '',
+                'trip_category' => $_GET['trip_category'] ?? ($_GET['category'] ?? ''),
                 'price_min' => $_GET['price_min'] ?? '',
                 'price_max' => $_GET['price_max'] ?? '',
+                'budget' => $_GET['budget'] ?? '',
                 'duration_min' => $_GET['duration_min'] ?? '',
                 'duration_max' => $_GET['duration_max'] ?? '',
+                'duration' => $_GET['duration'] ?? '',
                 'rating_min' => $_GET['rating_min'] ?? '',
-                'difficulty' => $_GET['difficulty'] ?? '',
+                'rating' => $_GET['rating'] ?? [],
+                'difficulty' => $_GET['difficulty'] ?? [],
+                'categories' => $_GET['categories'] ?? [],
+                'destinations' => $_GET['destinations'] ?? [],
+                'activities' => $_GET['activities'] ?? [],
+                'trip_type' => $_GET['trip_type'] ?? '',
+                'special_offers' => $_GET['offers'] ?? ($_GET['special_offers'] ?? []),
+                'booking_options' => $_GET['booking'] ?? ($_GET['booking_options'] ?? []),
+                'age_suitability' => $_GET['age'] ?? ($_GET['age_suitability'] ?? []),
+                'accommodation' => $_GET['accommodation'] ?? [],
+                'included_services' => $_GET['services'] ?? ($_GET['included_services'] ?? []),
                 'sort' => $_GET['sort'] ?? '',
-                'attributes' => $_GET['attributes'] ?? []
+                'attributes' => (isset($_GET['attributes']) && is_array($_GET['attributes'])) ? wp_unslash($_GET['attributes']) : [],
             ];
             
             // Get filtered trips
             $tripData = $tripListingService->getFilteredTrips($requestParams);
-            
-            // Set global variable for template
+
             $GLOBALS['yatra_trip_list'] = $tripData;
+            $GLOBALS['yatra_trip_listing_context'] = (new \Yatra\Services\TripListingPageContextFactory())->buildForTripArchive(
+                $tripData,
+                (string) ($_SERVER['REQUEST_URI'] ?? ''),
+                $GLOBALS['yatra_taxonomy_context'] ?? null,
+                $tripListingService->getFilterData()
+            );
         }
 
         // Add SEO meta tags for archive pages

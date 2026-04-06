@@ -324,18 +324,11 @@ class TripCategoryRepository extends BaseRepository
     }
 
     /**
-     * Get difficulty levels for templates
+     * Get difficulty levels for templates (published rows from classifications).
      */
     public function getDifficultyLevels(): array
     {
-        // For now, return static difficulty levels
-        return [
-            (object) ['id' => '1', 'slug' => 'easy', 'name' => __('Easy', 'yatra')],
-            (object) ['id' => '2', 'slug' => 'moderate', 'name' => __('Moderate', 'yatra')],
-            (object) ['id' => '3', 'slug' => 'challenging', 'name' => __('Challenging', 'yatra')],
-            (object) ['id' => '4', 'slug' => 'difficult', 'name' => __('Difficult', 'yatra')],
-            (object) ['id' => '5', 'slug' => 'extreme', 'name' => __('Extreme', 'yatra')]
-        ];
+        return (new \Yatra\Repositories\DifficultyLevelRepository())->getPublished();
     }
 }
 

@@ -1,158 +1,55 @@
 <?php
 /**
- * Trip Listing Page Template - Static Version with Dummy Data
- * 
+ * Trip listing template (presentation). Data is prepared in {@see TripListingPageContextFactory} and set by {@see ListingPageHandler}.
+ *
  * @package Yatra
  */
 
-use Yatra\Database\Tables\TripsTable;
-use Yatra\Database\Tables\TripClassificationsTable;
-use Yatra\Database\Tables\ClassificationsTable;
-use Yatra\Database\Tables\ReviewsTable;
-use Yatra\Constants\ClassificationTypes;
 use Yatra\Services\TripListingService;
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-// Initialize TripListingService for template data
 $tripListingService = new TripListingService();
 
-$tripTable = esc_sql(TripsTable::getTableName());
-$reviewsTable = esc_sql(ReviewsTable::getTableName());
-$tripClassificationsTable = esc_sql(TripClassificationsTable::getTableName());
-$classificationsTable = esc_sql(ClassificationsTable::getTableName());
-
-// Optional context when this template is reused for destination/activity URLs
-$yatra_taxonomy_context = $GLOBALS['yatra_taxonomy_context'] ?? null;
-// Trip list context for base /trip listing (with filters + pagination)
-$yatra_trip_list = $GLOBALS['yatra_trip_list'] ?? null;
-
-$current_filter_type = '';
-$current_filter_slug = '';
-$current_filter_name = '';
-
-if (is_array($yatra_taxonomy_context) && !empty($yatra_taxonomy_context['type']) && !empty($yatra_taxonomy_context['entity'])) {
-    $current_filter_type = $yatra_taxonomy_context['type'];
-    $entity              = $yatra_taxonomy_context['entity'];
-    $current_filter_slug = isset($entity->slug) ? (string) $entity->slug : '';
-    $current_filter_name = isset($entity->name) ? (string) $entity->name : '';
+$ctx = $GLOBALS['yatra_trip_listing_context'] ?? [];
+$filter_data = $ctx['filter_data'] ?? [];
+if ($filter_data === []) {
+    $filter_data = $tripListingService->getFilterData();
 }
-
-// Default listing title
-$yatra_listing_title = __('All Trips', 'yatra');
-
-if (!empty($current_filter_type) && !empty($current_filter_name)) {
-    if ($current_filter_type === 'destination') {
-        // Example: "Trips to Nepal"
-        $yatra_listing_title = sprintf(
-            /* translators: %s is destination name */
-            __('Trips to %s', 'yatra'),
-            $current_filter_name
-        );
-    } elseif ($current_filter_type === 'activity') {
-        // Example: "Trips with Trekking"
-        $yatra_listing_title = sprintf(
-            /* translators: %s is activity name */
-            __('Trips with %s', 'yatra'),
-            $current_filter_name
-        );
-    }
-}
-
-// Trip data source: prefer trip_list (base /trip), else taxonomy context, else dummy
-$trips_source      = [];
-$trip_total        = 0;
-$trip_total_pages  = 1;
-$trip_current_page = 1;
-$trip_dest_options = [];
-$trip_act_options  = [];
-// Helper function to safely get array from $_GET
-function yatra_get_filter_array($key, $sanitize_callback = 'sanitize_text_field') {
-    if (!isset($_GET[$key])) {
-        return [];
-    }
-    
-    $value = $_GET[$key];
-    
-    // If it's already an array, sanitize each element
-    if (is_array($value)) {
-        return array_map($sanitize_callback, $value);
-    }
-    
-    // If it's a string, convert to array and sanitize
-    if (is_string($value) && !empty($value)) {
-        // Handle comma-separated values
-        $array = explode(',', $value);
-        return array_map($sanitize_callback, array_filter($array));
-    }
-    
-    return [];
-}
-
-// Clean $_GET to remove malformed parameters from multiple ampersands
-$clean_get = array_filter($_GET, function($key) {
-    return !empty($key) && $key !== '';
-}, ARRAY_FILTER_USE_KEY);
-
-// Get active filters from URL parameters
-$active_filters = [
-    'destination'        => sanitize_text_field($clean_get['destination'] ?? ''),
-    'activity'           => sanitize_text_field($clean_get['activity'] ?? ''),
-    'price_min'          => !empty($clean_get['price_min']) ? intval($clean_get['price_min']) : '',
-    'price_max'          => !empty($clean_get['price_max']) ? intval($clean_get['price_max']) : '',
-    'trip_type'          => sanitize_text_field($clean_get['trip_type'] ?? ''),
-    'sort'               => sanitize_text_field($clean_get['sort'] ?? ''),
-    'difficulty'         => yatra_get_filter_array('difficulty', 'intval'),
-    'rating'             => yatra_get_filter_array('rating', 'intval'),
-    'categories'         => yatra_get_filter_array('categories', 'intval'),
-    'destinations'       => yatra_get_filter_array('destinations', 'intval'),
-    'activities'         => yatra_get_filter_array('activities', 'intval'),
-    'accommodation'      => yatra_get_filter_array('accommodation', 'sanitize_text_field'),
-    'included_services'  => yatra_get_filter_array('included_services', 'sanitize_text_field'),
-    'special_offers'     => yatra_get_filter_array('special_offers', 'sanitize_text_field'),
-    'booking_options'    => yatra_get_filter_array('booking_options', 'sanitize_text_field'),
-    'age_suitability'    => yatra_get_filter_array('age_suitability', 'sanitize_text_field'),
-    'attributes'         => isset($_GET['attributes']) && is_array($_GET['attributes']) ? array_map(function($attr_data) {
-        if (is_array($attr_data)) {
-            return array_map('sanitize_text_field', $attr_data);
-        }
-        return sanitize_text_field($attr_data);
-    }, $_GET['attributes']) : [],
+$yatra_trip_list = $ctx['trip_list'] ?? ($GLOBALS['yatra_trip_list'] ?? null);
+$trips_source = $ctx['trips'] ?? [];
+$trip_total = (int) ($ctx['total'] ?? 0);
+$trip_total_pages = (int) ($ctx['pages'] ?? 1);
+$trip_current_page = (int) ($ctx['current_page'] ?? 1);
+$trip_dest_options = $ctx['destinations'] ?? [];
+$trip_act_options = $ctx['activities'] ?? [];
+$active_filters = $ctx['active_filters'] ?? [];
+$yatra_listing_title = $ctx['listing_title'] ?? __('All Trips', 'yatra');
+$current_filter_type = $ctx['taxonomy_type'] ?? '';
+$current_filter_slug = $ctx['taxonomy_slug'] ?? '';
+$current_filter_name = $ctx['taxonomy_name'] ?? '';
+$yatra_results = $ctx['results'] ?? [
+    'display_total' => 0,
+    'start_item' => 0,
+    'end_item' => 0,
+    'per_page' => 12,
 ];
-
-if (is_array($yatra_trip_list) && !empty($yatra_trip_list['trips'])) {
-    $trips_source      = $yatra_trip_list['trips'];
-    $trip_total        = isset($yatra_trip_list['total']) ? (int) $yatra_trip_list['total'] : count($trips_source);
-    $trip_total_pages  = isset($yatra_trip_list['pages']) ? (int) $yatra_trip_list['pages'] : 1;
-    $trip_current_page = isset($yatra_trip_list['page']) ? (int) $yatra_trip_list['page'] : 1;
-    $trip_dest_options = $yatra_trip_list['destinations'] ?? [];
-    $trip_act_options  = $yatra_trip_list['activities'] ?? [];
-    if (!empty($yatra_trip_list['filters']) && is_array($yatra_trip_list['filters'])) {
-        foreach ($active_filters as $k => $v) {
-            if (isset($yatra_trip_list['filters'][$k])) {
-                $active_filters[$k] = $yatra_trip_list['filters'][$k];
-            }
-        }
-    }
-} elseif (!empty($yatra_taxonomy_context['trips'])) {
-    $trips_source = $yatra_taxonomy_context['trips'];
-    $trip_total   = count($trips_source);
-} else {
-    // No data from new system - ensure empty state to prevent fallback to old tour posts
-    $trips_source = [];
-    $trip_total = 0;
-    $trip_total_pages = 1;
-    $trip_current_page = 1;
-    $trip_dest_options = [];
-    $trip_act_options = [];
-}
+$yatra_pagination = $ctx['pagination'] ?? [
+    'total_pages' => 1,
+    'current_page' => 1,
+    'prev_url' => null,
+    'next_url' => null,
+    'items' => [],
+];
+$yatra_sort_options = $ctx['sort_options'] ?? [];
+$show_taxonomy_context = !empty($ctx['show_taxonomy_context']);
 
 yatra_get_header();
 ?>
 
-<?php if (!empty($current_filter_type) && !empty($current_filter_slug)) : ?>
+<?php if ($show_taxonomy_context) : ?>
     <div id="yatra-trip-context"
          data-type="<?php echo esc_attr($current_filter_type); ?>"
          data-slug="<?php echo esc_attr($current_filter_slug); ?>"
@@ -160,11 +57,19 @@ yatra_get_header();
          style="display:none;"></div>
 <?php endif; ?>
 
-<div class="yatra-listing-page yatra-trip-listing">
+<div class="yatra-listing-page yatra-trip-listing" id="yatra-trip-listing-root">
     <!-- Trip Search Shortcode - replaces hardcoded search UI -->
-    <?php echo do_shortcode('[yatra_search]'); ?>
+    <div class="yatra-trip-listing-search-wrap">
+        <?php echo do_shortcode('[yatra_search]'); ?>
+    </div>
 
-    <div class="yatra-listing-wrapper">
+    <div class="yatra-listing-wrapper yatra-listing-wrapper--overlay-host">
+        <div id="yatra-listing-loading-overlay" class="yatra-listing-loading-overlay" aria-hidden="true" role="status">
+            <div class="yatra-listing-loading-card">
+                <span class="yatra-listing-loading-spinner" aria-hidden="true"></span>
+                <p class="yatra-listing-loading-text"><?php esc_html_e('Updating trips…', 'yatra'); ?></p>
+            </div>
+        </div>
         <div class="yatra-listing-container">
             
             <!-- Results Header -->
@@ -173,17 +78,12 @@ yatra_get_header();
                     <h1><?php echo esc_html($yatra_listing_title); ?></h1>
                     <p class="yatra-results-count">
                         <?php
-                        $display_total = $trip_total ?: (is_array($trips_source) ? count($trips_source) : 0);
-                        $per_page_display = 12; // matches per_page in ListingPageHandler
-                        $start_item = ($trip_current_page - 1) * $per_page_display + 1;
-                        $end_item = min($trip_current_page * $per_page_display, $display_total);
-                        
-                        if ($display_total > 0) {
+                        if ($yatra_results['display_total'] > 0) {
                             echo sprintf(
                                 __('Showing <strong>%d-%d</strong> of %d trips (Page %d of %d)', 'yatra'),
-                                $start_item,
-                                $end_item,
-                                $display_total,
+                                (int) $yatra_results['start_item'],
+                                (int) $yatra_results['end_item'],
+                                (int) $yatra_results['display_total'],
                                 $trip_current_page,
                                 $trip_total_pages
                             );
@@ -197,50 +97,13 @@ yatra_get_header();
                     <div class="yatra-sort-control">
                         <label><?php esc_html_e('Sort by:', 'yatra'); ?></label>
                         <?php
-                        $sort_options = [
-                            ''              => __('Recommended', 'yatra'),
-                            'most_popular'  => __('Most Popular', 'yatra'),
-                            'price_low'     => __('Price: Low to High', 'yatra'),
-                            'price_high'    => __('Price: High to Low', 'yatra'),
-                            'rating_high'   => __('Rating: Highest', 'yatra'),
-                            'duration_short'=> __('Duration: Shortest', 'yatra'),
-                            'duration_long' => __('Duration: Longest', 'yatra'),
-                        ];
-
-                        $current_sort = $active_filters['sort'] ?? '';
                         ?>
-                        <select onchange="if(this.value){ window.location.href=this.value; }" id="yatra-sort-filter">
-                            <?php
-                            $base_url_sort = remove_query_arg('sort');
-                            foreach ($sort_options as $value => $label) {
-                                $args = [];
-                                
-                                // Add sort parameter
-                                if (!empty($value)) {
-                                    $args['sort'] = $value;
-                                }
-                                
-                                // Preserve all active filters
-                                foreach ($active_filters as $k => $v) {
-                                    if ($k === 'sort') continue;
-                                    
-                                    // Handle array filters (difficulty, rating, categories, etc.)
-                                    if (is_array($v) && !empty($v)) {
-                                        $args[$k] = $v;
-                                    }
-                                    // Handle string/numeric filters
-                                    elseif (!is_array($v) && $v !== '' && $v !== null) {
-                                        $args[$k] = $v;
-                                    }
-                                }
-                                
-                                $url = esc_url(add_query_arg($args, $base_url_sort));
-                                $selected = ($value === $current_sort) ? 'selected' : '';
-                                
-                                                       
-                                echo '<option value="' . $url . '" ' . $selected . '>' . esc_html($label) . '</option>';
-                            }
-                            ?>
+                        <select id="yatra-sort-filter" class="yatra-sort-filter-select">
+                            <?php foreach ($yatra_sort_options as $sort_opt) : ?>
+                                <option value="<?php echo esc_url($sort_opt['url']); ?>"<?php echo !empty($sort_opt['selected']) ? ' selected="selected"' : ''; ?>>
+                                    <?php echo esc_html($sort_opt['label']); ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="yatra-view-toggle">
@@ -268,9 +131,8 @@ yatra_get_header();
 
                     <!-- Price Range -->
                     <?php
-                    // Get price statistics from service
-                    $price_stats = $tripListingService->getPriceStats();
-                    
+                    $price_stats = $filter_data['price_stats'] ?? $tripListingService->getPriceStats();
+
                     $min_price = $price_stats ? (int)$price_stats->min_price : 0;
                     $max_price = $price_stats ? (int)$price_stats->max_price : 10000;
                     $step = max(1, (int)($max_price / 100)); // Dynamic step based on price range
@@ -340,7 +202,7 @@ yatra_get_header();
                             <div class="yatra-checkbox-group">
                                 <?php
                                 // Get trip type options from service
-                                $trip_type_options = $tripListingService->getFilterData()['trip_types'];
+                                $trip_type_options = $filter_data['trip_types'] ?? [];
                                 
                                 foreach ($trip_type_options as $type_option) :
                                 ?>
@@ -362,8 +224,7 @@ yatra_get_header();
 
                     <!-- Difficulty Level -->
                     <?php
-                    $difficulty_service = new \Yatra\Services\DifficultyLevelService();
-                    $difficulty_levels = $difficulty_service->getPublished(['order_by' => 'sorting', 'order' => 'ASC']);
+                    $difficulty_levels = $filter_data['difficulty_levels'] ?? [];
                     if (!empty($difficulty_levels)) :
                     ?>
                     <div class="yatra-filter-section">
@@ -388,11 +249,7 @@ yatra_get_header();
                         <div class="yatra-filter-content">
                             <div class="yatra-checkbox-group">
                                 <?php 
-                                // Get difficulty levels from service
-                                $difficulty_levels = $tripListingService->getFilterData()['difficulty_levels'];
-                                
-                                foreach ($difficulty_levels as $level) : 
-                                    // Show all difficulty levels, even with 0 count for better UX
+                                foreach ($difficulty_levels as $level) :
                                 ?>
                                 <label class="yatra-checkbox-label">
                                     <input type="checkbox" name="difficulty[]" value="<?php echo esc_attr($level->id); ?>" <?php echo in_array($level->id, $active_filters['difficulty'] ?? []) ? 'checked' : ''; ?>>
@@ -428,8 +285,7 @@ yatra_get_header();
                         <div class="yatra-filter-content">
                             <div class="yatra-rating-filter">
                                 <?php
-                                // Get rating options from service
-                                $rating_options = $tripListingService->getFilterData()['ratings'];
+                                $rating_options = $filter_data['ratings'] ?? [];
                                 
                                 foreach ($rating_options as $option) :
                                     // Show all rating options, even with 0 count for better UX
@@ -453,8 +309,7 @@ yatra_get_header();
 
                     <!-- Trip Categories -->
                     <?php
-                    $category_service = new \Yatra\Services\TripCategoryService();
-                    $categories = $category_service->getPublished(['order_by' => 'name', 'order' => 'ASC']);
+                    $categories = $filter_data['categories'] ?? [];
                     if (!empty($categories)) :
                     ?>
                     <div class="yatra-filter-section">
@@ -479,10 +334,7 @@ yatra_get_header();
                         <div class="yatra-filter-content">
                             <div class="yatra-checkbox-group">
                                 <?php 
-                                // Get categories from service
-                                $categories = $tripListingService->getFilterData()['categories'];
-                                
-                                foreach ($categories as $category) : 
+                                foreach ($categories as $category) :
                                 ?>
                                 <label class="yatra-checkbox-label">
                                     <input type="checkbox" name="categories[]" value="<?php echo esc_attr($category->id); ?>" <?php echo in_array($category->id, $active_filters['categories'] ?? []) ? 'checked' : ''; ?>>
@@ -497,8 +349,7 @@ yatra_get_header();
 
                     <!-- Destinations -->
                     <?php
-                    $destination_service = new \Yatra\Services\DestinationService();
-                    $destinations = $destination_service->getPublished(['order_by' => 'name', 'order' => 'ASC', 'limit' => 15]);
+                    $destinations = $filter_data['destinations'] ?? [];
                     if (!empty($destinations)) :
                     ?>
                     <div class="yatra-filter-section">
@@ -523,18 +374,14 @@ yatra_get_header();
                         <div class="yatra-filter-content">
                             <div class="yatra-checkbox-group">
                                 <?php 
-                                // Get destinations from service
-                                $destinations = $tripListingService->getFilterData()['destinations'];
-                                
-                                foreach ($destinations as $destination) : 
-                                    if ($destination->count > 0) :
+                                foreach ($destinations as $destination) :
                                 ?>
                                 <label class="yatra-checkbox-label">
                                     <input type="checkbox" name="destinations[]" value="<?php echo esc_attr($destination->id); ?>" <?php echo in_array($destination->id, $active_filters['destinations'] ?? []) ? 'checked' : ''; ?>>
                                     <span><?php echo esc_html($destination->name); ?></span>
                                     <span class="yatra-filter-count">(<?php echo (int)$destination->count; ?>)</span>
                                 </label>
-                                <?php endif; endforeach; ?>
+                                <?php endforeach; ?>
                             </div>
                         </div>
                     </div>
@@ -542,8 +389,7 @@ yatra_get_header();
 
                     <!-- Activities -->
                     <?php
-                    $activity_service = new \Yatra\Services\ActivityService();
-                    $activities = $activity_service->getPublished(['order_by' => 'name', 'order' => 'ASC', 'limit' => 10]);
+                    $activities = $filter_data['activities'] ?? [];
                     if (!empty($activities)) :
                     ?>
                     <div class="yatra-filter-section">
@@ -568,10 +414,7 @@ yatra_get_header();
                         <div class="yatra-filter-content">
                             <div class="yatra-checkbox-group">
                                 <?php 
-                                // Get activities from service
-                                $activities = $tripListingService->getFilterData()['activities'];
-                                
-                                foreach ($activities as $activity) : 
+                                foreach ($activities as $activity) :
                                 ?>
                                 <label class="yatra-checkbox-label">
                                     <input type="checkbox" name="activities[]" value="<?php echo esc_attr($activity->id); ?>" <?php echo in_array($activity->id, $active_filters['activities'] ?? []) ? 'checked' : ''; ?>>
@@ -587,7 +430,7 @@ yatra_get_header();
                     <!-- Accommodation Type -->
                     <?php
                     // Get accommodation types from service
-                    $accommodation_types = $tripListingService->getFilterData()['accommodations'];
+                    $accommodation_types = $filter_data['accommodations'] ?? [];
                     
                     if (!empty($accommodation_types)) :
                     ?>
@@ -620,7 +463,7 @@ yatra_get_header();
                     <!-- Included Services -->
                     <?php
                     // Get included services from service
-                    $included_services = $tripListingService->getFilterData()['included_services'];
+                    $included_services = $filter_data['included_services'] ?? [];
                     
                     if (!empty($included_services)) :
                     ?>
@@ -628,7 +471,7 @@ yatra_get_header();
                         <div class="yatra-filter-title" data-toggle="services">
                             <div class="yatra-filter-title-content">
                                 <svg class="yatra-filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 713.138-3.138z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
                                 </svg>
                                 <span><?php esc_html_e('Included Services', 'yatra'); ?></span>
                             </div>
@@ -653,7 +496,7 @@ yatra_get_header();
                     <!-- Special Offers -->
                     <?php
                     // Get special offers from service
-                    $special_offers = $tripListingService->getFilterData()['special_offers'];
+                    $special_offers = $filter_data['special_offers'] ?? [];
                     
                     if (!empty($special_offers)) :
                     ?>
@@ -686,7 +529,7 @@ yatra_get_header();
                     <!-- Booking Options -->
                     <?php
                     // Get booking options from service
-                    $booking_options = $tripListingService->getFilterData()['booking_options'];
+                    $booking_options = $filter_data['booking_options'] ?? [];
                     
                     if (!empty($booking_options)) :
                     ?>
@@ -719,7 +562,7 @@ yatra_get_header();
                     <!-- Age Suitability -->
                     <?php
                     // Get age restrictions from service
-                    $age_options = $tripListingService->getFilterData()['age_restrictions'];
+                    $age_options = $filter_data['age_restrictions'] ?? [];
                     
                     if (!empty($age_options)) :
                     ?>
@@ -903,124 +746,30 @@ yatra_get_header();
         </div>
     </div>
 
-    <!-- Pagination -->
-    <?php
-    $total_pages_to_render = max(1, (int) $trip_total_pages);
-    $current_page_to_render = max(1, (int) $trip_current_page);
-    if ($total_pages_to_render < $current_page_to_render) {
-        $current_page_to_render = $total_pages_to_render;
-    }
-
-    // Build pagination URLs using query parameter format
-    $build_page_url = function(int $page) use ($active_filters) {
-        // Get current URL without query string
-        $base_path = strtok($_SERVER['REQUEST_URI'], '?');
-        $base_path = rtrim($base_path, '/');
-        
-        // Remove any existing /page/X/ segment
-        $base_path = preg_replace('#/page/[0-9]+#', '', $base_path);
-        
-        // Build query parameters
-        $params = [];
-        foreach ($active_filters as $k => $v) {
-            if ($v !== '' && $v !== null && $v !== []) {
-                if (is_array($v)) {
-                    // Handle array parameters
-                    foreach ($v as $item) {
-                        if ($item !== '') {
-                            $params[$k . '[]'] = $item;
-                        }
-                    }
-                } else {
-                    $params[$k] = $v;
-                }
-            }
-        }
-        
-        // Add pagination parameter
-        if ($page > 1) {
-            $params['paged'] = $page;
-        }
-        
-        // Build final URL
-        $query_string = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
-        return esc_url($base_path . ($query_string ? '?' . $query_string : ''));
-    };
-    ?>
     <div class="yatra-listing-pagination">
-        <?php $prev_disabled = $current_page_to_render <= 1; ?>
-        <a class="yatra-pagination-btn <?php echo $prev_disabled ? 'disabled' : ''; ?>" href="<?php echo $prev_disabled ? 'javascript:void(0);' : $build_page_url($current_page_to_render - 1); ?>">
+        <?php
+        $prev_url = $yatra_pagination['prev_url'] ?? null;
+        $next_url = $yatra_pagination['next_url'] ?? null;
+        $prev_disabled = empty($prev_url);
+        $next_disabled = empty($next_url);
+        ?>
+        <a class="yatra-pagination-btn <?php echo $prev_disabled ? 'disabled' : ''; ?>" href="<?php echo $prev_disabled ? 'javascript:void(0);' : esc_url($prev_url); ?>">
             <?php esc_html_e('Previous', 'yatra'); ?>
         </a>
-        <?php
-        // Smart pagination with ellipsis
-        $range = 2; // Show 2 pages on each side of current page
-        $show_items = ($range * 2) + 1;
-        
-        for ($p = 1; $p <= $total_pages_to_render; $p++) {
-            // Always show first page, last page, and pages around current page
-            if ($p == 1 || $p == $total_pages_to_render || ($p >= $current_page_to_render - $range && $p <= $current_page_to_render + $range)) {
-                $active = $p === $current_page_to_render ? 'active' : '';
-                echo '<a class="yatra-pagination-btn ' . $active . '" href="' . $build_page_url($p) . '">' . esc_html($p) . '</a>';
-            } elseif ($p == $current_page_to_render - $range - 1 || $p == $current_page_to_render + $range + 1) {
-                // Show ellipsis
-                echo '<span class="yatra-pagination-ellipsis">...</span>';
-            }
-        }
-        ?>
-        <?php $next_disabled = $current_page_to_render >= $total_pages_to_render; ?>
-        <a class="yatra-pagination-btn <?php echo $next_disabled ? 'disabled' : ''; ?>" href="<?php echo $next_disabled ? 'javascript:void(0);' : $build_page_url($current_page_to_render + 1); ?>">
+        <?php foreach (($yatra_pagination['items'] ?? []) as $pitem) : ?>
+            <?php if (($pitem['type'] ?? '') === 'ellipsis') : ?>
+                <span class="yatra-pagination-ellipsis">...</span>
+            <?php elseif (($pitem['type'] ?? '') === 'page') : ?>
+                <a class="yatra-pagination-btn <?php echo !empty($pitem['is_current']) ? 'active' : ''; ?>" href="<?php echo esc_url((string) ($pitem['url'] ?? '')); ?>">
+                    <?php echo esc_html((string) ($pitem['page'] ?? '')); ?>
+                </a>
+            <?php endif; ?>
+        <?php endforeach; ?>
+        <a class="yatra-pagination-btn <?php echo $next_disabled ? 'disabled' : ''; ?>" href="<?php echo $next_disabled ? 'javascript:void(0);' : esc_url($next_url); ?>">
             <?php esc_html_e('Next', 'yatra'); ?>
         </a>
     </div>
 </div>
-
-<?php if (!empty($current_filter_type) && !empty($current_filter_slug)) : ?>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    var ctxEl = document.getElementById('yatra-trip-context');
-    if (!ctxEl) return;
-
-    var type = ctxEl.getAttribute('data-type');
-    var slug = ctxEl.getAttribute('data-slug');
-    var name = ctxEl.getAttribute('data-name');
-
-    if (!type || !slug) return;
-
-    // When coming from a single destination URL, show that destination as selected
-    if (type === 'destination') {
-        var destDropdown = document.querySelector('.yatra-search-dropdown[data-dropdown="destination"]');
-        if (destDropdown) {
-            var valueEl = destDropdown.querySelector('.yatra-dropdown-value');
-            if (valueEl && name) {
-                valueEl.textContent = name;
-            }
-
-            var option = destDropdown.querySelector('.yatra-dropdown-option[data-value="' + slug + '"]');
-            if (option) {
-                option.classList.add('active');
-            }
-        }
-    }
-
-    // When coming from a single activity URL, show that activity as selected
-    if (type === 'activity') {
-        var actDropdown = document.querySelector('.yatra-search-dropdown[data-dropdown="activities"]');
-        if (actDropdown) {
-            var valueEl2 = actDropdown.querySelector('.yatra-dropdown-value');
-            if (valueEl2 && name) {
-                valueEl2.textContent = name;
-            }
-
-            var option2 = actDropdown.querySelector('.yatra-dropdown-option[data-value="' + slug + '"]');
-            if (option2) {
-                option2.classList.add('active');
-            }
-        }
-    }
-});
-</script>
-<?php endif; ?>
 
 <?php
 yatra_get_footer();

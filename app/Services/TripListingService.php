@@ -61,7 +61,7 @@ class TripListingService extends BaseService
         
         // Extract pagination parameters
         $page = max(1, (int) ($requestParams['page'] ?? 1));
-        $perPage = max(1, min(50, (int) ($requestParams['per_page'] ?? 9))); // Cap at 50 for performance
+        $perPage = max(1, min(50, (int) ($requestParams['per_page'] ?? 12))); // Cap at 50 for performance
         
         // Create cache key for this specific request
         $cacheKey = $this->generateCacheKey($filters, $page, $perPage);
@@ -105,69 +105,190 @@ class TripListingService extends BaseService
     {
         $filters = [];
 
-        // Destination filter
-        if (!empty($params['destination'])) {
-            $filters['destination'] = sanitize_text_field($params['destination']);
+        // Keyword search (trip archive GET param `s`, same as shortcode input name)
+        if (!empty($params['s']) && is_string($params['s'])) {
+            $q = sanitize_text_field($params['s']);
+            if (strlen($q) > 0) {
+                $filters['search'] = $q;
+                $filters['s'] = $q;
+            }
         }
 
-        // Activity filter
-        if (!empty($params['activity'])) {
-            $filters['activity'] = sanitize_text_field($params['activity']);
+        // Sidebar / URL: classification IDs (OR within each group)
+        foreach (['categories' => 'category_ids', 'destinations' => 'destination_ids', 'activities' => 'activity_ids'] as $paramKey => $filterKey) {
+            if (empty($params[$paramKey])) {
+                continue;
+            }
+            $raw = $params[$paramKey];
+            $ids = is_array($raw) ? $raw : [$raw];
+            $ids = array_values(array_filter(array_map('intval', $ids), static fn (int $id): bool => $id > 0));
+            if ($ids !== []) {
+                $filters[$filterKey] = $ids;
+            }
+        }
+
+        // Destination filter (slug) — used when no destination_ids from checkboxes
+        if (empty($filters['destination_ids']) && !empty($params['destination'])) {
+            $filters['destination'] = sanitize_text_field((string) $params['destination']);
+        }
+
+        // Activity filter (slug)
+        if (empty($filters['activity_ids']) && !empty($params['activity'])) {
+            $filters['activity'] = sanitize_text_field((string) $params['activity']);
+        }
+
+        // Category / trip type (slug from search bar or legacy trip_category param)
+        if (empty($filters['category_ids'])) {
+            $cat = $params['trip_category'] ?? $params['category'] ?? '';
+            if (!empty($cat) && is_string($cat)) {
+                $filters['trip_category'] = sanitize_text_field($cat);
+            }
         }
 
         // Price range filters
-        if (isset($params['price_min']) && is_numeric($params['price_min']) && $params['price_min'] > 0) {
+        if (isset($params['price_min']) && is_numeric($params['price_min']) && (float) $params['price_min'] > 0) {
             $filters['price_min'] = (float) $params['price_min'];
         }
 
-        if (isset($params['price_max']) && is_numeric($params['price_max']) && $params['price_max'] > 0) {
+        if (isset($params['price_max']) && is_numeric($params['price_max']) && (float) $params['price_max'] > 0) {
             $filters['price_max'] = (float) $params['price_max'];
         }
 
-        // Duration filters
-        if (isset($params['duration_min']) && is_numeric($params['duration_min']) && $params['duration_min'] > 0) {
+        // Duration filters (explicit min/max take precedence over preset `duration`)
+        $hasDurMin = isset($params['duration_min']) && is_numeric($params['duration_min']) && (int) $params['duration_min'] > 0;
+        $hasDurMax = isset($params['duration_max']) && is_numeric($params['duration_max']) && (int) $params['duration_max'] > 0;
+        if ($hasDurMin) {
             $filters['duration_min'] = (int) $params['duration_min'];
         }
-
-        if (isset($params['duration_max']) && is_numeric($params['duration_max']) && $params['duration_max'] > 0) {
+        if ($hasDurMax) {
             $filters['duration_max'] = (int) $params['duration_max'];
         }
+        if (!$hasDurMin && !$hasDurMax && !empty($params['duration']) && is_string($params['duration'])) {
+            $preset = sanitize_text_field($params['duration']);
+            // Horizontal search bar: numeric range e.g. 2-14
+            if (preg_match('/^(\d+)-(\d+)$/', $preset, $m)) {
+                $filters['duration_min'] = max(1, (int) $m[1]);
+                $filters['duration_max'] = max((int) $m[1], (int) $m[2]);
+                $filters['duration'] = $preset;
+            } elseif ($preset === '1-3') {
+                $filters['duration_min'] = 1;
+                $filters['duration_max'] = 3;
+                $filters['duration'] = $preset;
+            } elseif ($preset === '4-7') {
+                $filters['duration_min'] = 4;
+                $filters['duration_max'] = 7;
+                $filters['duration'] = $preset;
+            } elseif ($preset === '8-14') {
+                $filters['duration_min'] = 8;
+                $filters['duration_max'] = 14;
+                $filters['duration'] = $preset;
+            } elseif ($preset === '15+') {
+                $filters['duration_min'] = 15;
+                $filters['duration_max'] = 3650;
+                $filters['duration'] = $preset;
+            } elseif ($preset !== '') {
+                $filters['duration'] = $preset;
+            }
+        }
 
-        // Rating filter
-        if (isset($params['rating_min']) && is_numeric($params['rating_min']) && $params['rating_min'] > 0) {
+        // Horizontal search "budget" presets (min-max or min+) → price range when explicit prices not set
+        if (
+            empty($filters['price_min']) && empty($filters['price_max'])
+            && !empty($params['budget']) && is_string($params['budget'])
+        ) {
+            $b = sanitize_text_field($params['budget']);
+            if (preg_match('/^(\d+)-(\d+)$/', $b, $m)) {
+                $filters['price_min'] = (float) $m[1];
+                $filters['price_max'] = (float) $m[2];
+            } elseif (preg_match('/^(\d+)\+$/', $b, $m)) {
+                $filters['price_min'] = (float) $m[1];
+            }
+        }
+
+        // Rating: star checkboxes use minimum selected threshold
+        $ratingCandidates = [];
+        if (!empty($params['rating']) && is_array($params['rating'])) {
+            foreach ($params['rating'] as $r) {
+                if (is_numeric($r) && (int) $r > 0) {
+                    $ratingCandidates[] = (int) $r;
+                }
+            }
+        }
+        if ($ratingCandidates !== []) {
+            $filters['rating_min'] = (float) min($ratingCandidates);
+            $filters['rating'] = $ratingCandidates;
+        } elseif (isset($params['rating_min']) && is_numeric($params['rating_min']) && (float) $params['rating_min'] > 0) {
             $filters['rating_min'] = (float) $params['rating_min'];
         }
 
-        // Difficulty filter - handle array of IDs
+        // Difficulty filter - sidebar uses IDs; search shortcode uses slug
         if (isset($params['difficulty'])) {
             if (is_array($params['difficulty'])) {
-                $filters['difficulty'] = array_map('intval', array_filter($params['difficulty'], function($id) {
-                    return is_numeric($id) && $id > 0;
-                }));
-            } elseif (is_numeric($params['difficulty']) && $params['difficulty'] > 0) {
+                $diff = array_values(array_filter(array_map('intval', $params['difficulty']), static fn (int $id): bool => $id > 0));
+                if ($diff !== []) {
+                    $filters['difficulty'] = $diff;
+                }
+            } elseif (is_numeric($params['difficulty']) && (int) $params['difficulty'] > 0) {
                 $filters['difficulty'] = [(int) $params['difficulty']];
+            } elseif (is_string($params['difficulty']) && trim($params['difficulty']) !== '') {
+                $slug = sanitize_text_field($params['difficulty']);
+                $diffRow = (new \Yatra\Repositories\DifficultyLevelRepository())->findBySlug($slug);
+                if ($diffRow && isset($diffRow->id)) {
+                    $filters['difficulty'] = [(int) $diffRow->id];
+                }
             }
+        }
+
+        // Trip duration type (DB column trip_type: single_day | multi_day | flexible)
+        if (!empty($params['trip_type']) && is_string($params['trip_type'])) {
+            $tt = sanitize_text_field($params['trip_type']);
+            if (in_array($tt, ['single_day', 'multi_day', 'flexible'], true)) {
+                $filters['trip_type'] = $tt;
+            }
+        }
+
+        $filters['special_offers'] = $this->sanitizeStringList($params['special_offers'] ?? []);
+        $filters['booking_options'] = $this->sanitizeStringList($params['booking_options'] ?? []);
+        $filters['age_suitability'] = $this->sanitizeStringList($params['age_suitability'] ?? []);
+
+        if (!empty($params['accommodation']) && is_array($params['accommodation'])) {
+            $filters['accommodation'] = array_values(array_filter(array_map('sanitize_text_field', $params['accommodation'])));
+        }
+
+        if (!empty($params['included_services']) && is_array($params['included_services'])) {
+            $filters['included_services'] = array_values(array_filter(array_map('sanitize_text_field', $params['included_services'])));
         }
 
         // Attribute filters
         if (isset($params['attributes']) && is_array($params['attributes'])) {
             $filters['attributes'] = [];
             foreach ($params['attributes'] as $attributeId => $attributeValue) {
-                if (is_numeric($attributeId) && $attributeId > 0) {
-                    // Sanitize attribute values based on type
-                    if (is_array($attributeValue)) {
-                        // For multi-select attributes
-                        $filters['attributes'][$attributeId] = array_map('sanitize_text_field', 
-                            array_filter($attributeValue, function($value) {
-                                return !empty($value);
-                            })
-                        );
-                    } else {
-                        // For single value attributes
-                        $sanitizedValue = sanitize_text_field($attributeValue);
-                        if (!empty($sanitizedValue)) {
-                            $filters['attributes'][$attributeId] = $sanitizedValue;
+                if (!is_numeric($attributeId) || (int) $attributeId <= 0) {
+                    continue;
+                }
+                $aid = (int) $attributeId;
+                if (is_array($attributeValue)) {
+                    if (isset($attributeValue['min']) || isset($attributeValue['max'])) {
+                        $range = [];
+                        if (isset($attributeValue['min']) && is_numeric($attributeValue['min'])) {
+                            $range['min'] = (float) $attributeValue['min'];
                         }
+                        if (isset($attributeValue['max']) && is_numeric($attributeValue['max'])) {
+                            $range['max'] = (float) $attributeValue['max'];
+                        }
+                        if ($range !== []) {
+                            $filters['attributes'][$aid] = $range;
+                        }
+                    } else {
+                        $vals = array_map('sanitize_text_field', array_filter($attributeValue, static fn ($v) => $v !== null && $v !== ''));
+                        if ($vals !== []) {
+                            $filters['attributes'][$aid] = $vals;
+                        }
+                    }
+                } else {
+                    $sanitizedValue = sanitize_text_field((string) $attributeValue);
+                    if ($sanitizedValue !== '') {
+                        $filters['attributes'][$aid] = $sanitizedValue;
                     }
                 }
             }
@@ -176,13 +297,50 @@ class TripListingService extends BaseService
         // Sort parameter
         if (!empty($params['sort'])) {
             $allowedSorts = ['most_popular', 'price_low', 'price_high', 'rating_high', 'duration_short', 'duration_long'];
-            $sort = sanitize_text_field($params['sort']);
-            if (in_array($sort, $allowedSorts)) {
+            $sort = sanitize_text_field((string) $params['sort']);
+            if (in_array($sort, $allowedSorts, true)) {
                 $filters['sort'] = $sort;
             }
         }
 
+        // Template / URL aliases (sidebar uses offers[], booking[], age[], services[])
+        if (!empty($filters['special_offers'])) {
+            $filters['offers'] = $filters['special_offers'];
+        }
+        if (!empty($filters['booking_options'])) {
+            $filters['booking'] = $filters['booking_options'];
+        }
+        if (!empty($filters['age_suitability'])) {
+            $filters['age'] = $filters['age_suitability'];
+        }
+        if (!empty($filters['included_services'])) {
+            $filters['services'] = $filters['included_services'];
+        }
+        if (!empty($filters['trip_category'])) {
+            $filters['category'] = $filters['trip_category'];
+        }
+
         return $filters;
+    }
+
+    /**
+     * @param mixed $raw
+     * @return list<string>
+     */
+    private function sanitizeStringList($raw): array
+    {
+        if ($raw === null || $raw === '') {
+            return [];
+        }
+        $items = is_array($raw) ? $raw : [$raw];
+        $out = [];
+        foreach ($items as $item) {
+            $s = sanitize_text_field((string) $item);
+            if ($s !== '') {
+                $out[] = $s;
+            }
+        }
+        return array_values(array_unique($out));
     }
 
     /**
@@ -238,7 +396,7 @@ class TripListingService extends BaseService
             'pages' => $tripResult['pages'],
             'page' => $tripResult['page'],
             'per_page' => $tripResult['per_page'],
-            'filters' => $filters,
+            'filters' => $this->stripInternalFilterKeys($filters),
             'destinations' => $filterOptions['destinations'],
             'activities' => $filterOptions['activities'],
             'attributes' => $filterOptions['attributes']
@@ -317,6 +475,19 @@ class TripListingService extends BaseService
     /**
      * Get trip statistics for analytics
      */
+    private function stripInternalFilterKeys(array $filters): array
+    {
+        unset(
+            $filters['attribute_filters'],
+            $filters['search'],
+            $filters['category_ids'],
+            $filters['destination_ids'],
+            $filters['activity_ids']
+        );
+
+        return $filters;
+    }
+
     public function getTripStatistics(): array
     {
         if ($this->isCacheEnabled()) {
@@ -404,9 +575,16 @@ class TripListingService extends BaseService
      */
     public function isValidSearchRequest(array $params): bool
     {
-        // Check if any meaningful filters are applied
-        $meaningfulParams = ['destination', 'activity', 'price_min', 'price_max', 'duration_min', 'duration_max', 'rating_min', 'difficulty', 'sort'];
-        
+        if (!empty($params['s'])) {
+            return true;
+        }
+        $meaningfulParams = [
+            'destination', 'activity', 'trip_category', 'category', 'price_min', 'price_max',
+            'duration_min', 'duration_max', 'duration', 'rating_min', 'difficulty', 'sort',
+            'categories', 'destinations', 'activities', 'trip_type', 'rating',
+            'special_offers', 'booking_options', 'age_suitability', 'offers', 'booking', 'age',
+        ];
+
         foreach ($meaningfulParams as $param) {
             if (!empty($params[$param])) {
                 return true;
@@ -424,7 +602,7 @@ class TripListingService extends BaseService
     public function getFilterData(): array
     {
         if ($this->isCacheEnabled()) {
-            return Cache::remember('trip_listing_filter_data', function() {
+            return Cache::remember('trip_listing_filter_data_v2', function() {
                 return $this->buildFilterData();
             }, 3600); // Cache for 1 hour
         }
@@ -551,7 +729,7 @@ class TripListingService extends BaseService
         $result = [];
 
         foreach ($destinations as $destination) {
-            $count = $this->tripRepository->countByCategory((int) $destination->id);
+            $count = $this->tripRepository->countByDestination((int) $destination->id);
             $result[] = (object) [
                 'id' => $destination->id,
                 'name' => $destination->name,
@@ -572,7 +750,7 @@ class TripListingService extends BaseService
         $result = [];
 
         foreach ($activities as $activity) {
-            $count = $this->tripRepository->countByCategory((int) $activity->id);
+            $count = $this->tripRepository->countByActivity((int) $activity->id);
             $result[] = (object) [
                 'id' => $activity->id,
                 'name' => $activity->name,
@@ -700,5 +878,40 @@ class TripListingService extends BaseService
     public function getPriceStats(): ?object
     {
         return $this->tripRepository->getPriceStats();
+    }
+
+    /**
+     * Dynamic budget tier values for the horizontal search bar (maps to ?budget= via sanitizeFilters).
+     *
+     * @return list<object{value: string, label: string}>
+     */
+    public function getSearchBudgetPresets(): array
+    {
+        $stats = $this->tripRepository->getPriceStats();
+        $min = $stats ? (int) floor((float) $stats->min_price) : 0;
+        $max = $stats ? (int) ceil((float) $stats->max_price) : 0;
+        if ($max <= $min) {
+            $max = $min + 1000;
+        }
+        $bands = 5;
+        $step = (int) max(1, ceil(($max - $min) / $bands));
+        $out = [];
+        for ($i = 0; $i < $bands; $i++) {
+            $lo = $min + $i * $step;
+            if ($lo > $max) {
+                break;
+            }
+            $hi = ($i === $bands - 1) ? $max : min($max, $lo + $step - 1);
+            if ($hi < $lo) {
+                $hi = $lo;
+            }
+            $sym = yatra_get_currency_symbol(get_option('yatra_currency', 'USD'));
+            $out[] = (object) [
+                'value' => $lo . '-' . $hi,
+                'label' => trim($sym . number_format_i18n($lo) . ' – ' . $sym . number_format_i18n($hi)),
+            ];
+        }
+
+        return $out;
     }
 }

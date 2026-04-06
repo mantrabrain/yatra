@@ -231,6 +231,53 @@ class TripRepository extends BaseRepository
     }
 
     /**
+     * Attach attribute filter map for findWithFilters() (trip ↔ attribute rows in trip_classifications).
+     *
+     * @param array<string,mixed> $filters
+     * @param array<int,mixed> $attributeFilters
+     * @return array<string,mixed>
+     */
+    public function filterByAttributes(array $filters, array $attributeFilters): array
+    {
+        if ($attributeFilters === []) {
+            return $filters;
+        }
+        $filters['attribute_filters'] = $attributeFilters;
+
+        return $filters;
+    }
+
+    /** @var array<string,bool> */
+    private static array $tripColumnExistsCache = [];
+
+    protected function tripTableHasColumn(string $column): bool
+    {
+        if (isset(self::$tripColumnExistsCache[$column])) {
+            return self::$tripColumnExistsCache[$column];
+        }
+        $table = $this->getTableName();
+        $n = (int) $this->wpdb->get_var($this->wpdb->prepare(
+            'SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+            $table,
+            $column
+        ));
+        self::$tripColumnExistsCache[$column] = $n > 0;
+
+        return self::$tripColumnExistsCache[$column];
+    }
+
+    /**
+     * SQL expression for trip "current" list price (matches TripPricingService::resolveRegularCurrentPrice).
+     */
+    protected function sqlTripEffectiveListPrice(): string
+    {
+        return '(CASE '
+            . 'WHEN CAST(t.discounted_price AS DECIMAL(10,2)) > 0 THEN CAST(t.discounted_price AS DECIMAL(10,2)) '
+            . 'WHEN CAST(t.sale_price AS DECIMAL(10,2)) > 0 THEN CAST(t.sale_price AS DECIMAL(10,2)) '
+            . 'ELSE CAST(t.original_price AS DECIMAL(10,2)) END)';
+    }
+
+    /**
      * Find trips with comprehensive filtering, pagination, and relationships
      *
      * @param array $filters Filter criteria
@@ -262,41 +309,241 @@ class TripRepository extends BaseRepository
         $classificationsTable = ClassificationsTable::getTableName();
         $tripClassificationsTable = TripClassificationsTable::getTableName();
 
-        // Destination filter
-        if (!empty($filters['destination'])) {
+        // Keyword search
+        if (!empty($filters['search']) && is_string($filters['search'])) {
+            $like = '%' . $wpdb->esc_like($filters['search']) . '%';
+            $wheres[] = '(t.title LIKE %s OR t.short_description LIKE %s OR t.description LIKE %s OR t.slug LIKE %s)';
+            $params[] = $like;
+            $params[] = $like;
+            $params[] = $like;
+            $params[] = $like;
+        }
+
+        // Trip duration type (DB column)
+        if (!empty($filters['trip_type']) && is_string($filters['trip_type'])) {
+            $allowedTypes = ['single_day', 'multi_day', 'flexible'];
+            if (in_array($filters['trip_type'], $allowedTypes, true)) {
+                $wheres[] = 't.trip_type = %s';
+                $params[] = $filters['trip_type'];
+            }
+        }
+
+        // Destination: checkbox classification IDs (OR) or single slug
+        if (!empty($filters['destination_ids']) && is_array($filters['destination_ids'])) {
+            $ids = array_values(array_filter(array_map('intval', $filters['destination_ids']), static fn (int $id): bool => $id > 0));
+            if ($ids !== []) {
+                $placeholders = implode(',', array_fill(0, count($ids), '%d'));
+                // Rely on joined classification row type only (some rows may have inconsistent classification_type).
+                $wheres[] = "EXISTS (SELECT 1 FROM {$tripClassificationsTable} tcdx INNER JOIN {$classificationsTable} destx ON destx.id = tcdx.classification_id AND destx.type = %s WHERE tcdx.trip_id = t.id AND tcdx.is_active = 1 AND tcdx.classification_id IN ({$placeholders}))";
+                $params[] = ClassificationTypes::DESTINATION;
+                $params = array_merge($params, $ids);
+            }
+        } elseif (!empty($filters['destination'])) {
             $joins[] = "LEFT JOIN {$tripClassificationsTable} tcd ON tcd.trip_id = t.id";
             $joins[] = "LEFT JOIN {$classificationsTable} dest ON dest.id = tcd.classification_id";
-            $wheres[] = "dest.type = %s AND dest.slug = %s";
+            $wheres[] = 'dest.type = %s AND dest.slug = %s';
             $params[] = ClassificationTypes::DESTINATION;
             $params[] = $filters['destination'];
         }
-        
-        // Activity filter
-        if (!empty($filters['activity'])) {
+
+        // Activity: IDs or slug
+        if (!empty($filters['activity_ids']) && is_array($filters['activity_ids'])) {
+            $ids = array_values(array_filter(array_map('intval', $filters['activity_ids']), static fn (int $id): bool => $id > 0));
+            if ($ids !== []) {
+                $placeholders = implode(',', array_fill(0, count($ids), '%d'));
+                $wheres[] = "EXISTS (SELECT 1 FROM {$tripClassificationsTable} tcax INNER JOIN {$classificationsTable} actx ON actx.id = tcax.classification_id AND actx.type = %s WHERE tcax.trip_id = t.id AND tcax.is_active = 1 AND tcax.classification_id IN ({$placeholders}))";
+                $params[] = ClassificationTypes::ACTIVITY;
+                $params = array_merge($params, $ids);
+            }
+        } elseif (!empty($filters['activity'])) {
             $joins[] = "LEFT JOIN {$tripClassificationsTable} tca ON tca.trip_id = t.id";
             $joins[] = "LEFT JOIN {$classificationsTable} act ON act.id = tca.classification_id";
-            $wheres[] = "act.type = %s AND act.slug = %s";
+            $wheres[] = 'act.type = %s AND act.slug = %s';
             $params[] = ClassificationTypes::ACTIVITY;
             $params[] = $filters['activity'];
         }
-        
-        // Trip Category filter
-        if (!empty($filters['trip_category'])) {
+
+        // Category: IDs or slug
+        if (!empty($filters['category_ids']) && is_array($filters['category_ids'])) {
+            $ids = array_values(array_filter(array_map('intval', $filters['category_ids']), static fn (int $id): bool => $id > 0));
+            if ($ids !== []) {
+                $placeholders = implode(',', array_fill(0, count($ids), '%d'));
+                $wheres[] = "EXISTS (SELECT 1 FROM {$tripClassificationsTable} tccx INNER JOIN {$classificationsTable} catx ON catx.id = tccx.classification_id AND catx.type = %s WHERE tccx.trip_id = t.id AND tccx.is_active = 1 AND tccx.classification_id IN ({$placeholders}))";
+                $params[] = ClassificationTypes::CATEGORY;
+                $params = array_merge($params, $ids);
+            }
+        } elseif (!empty($filters['trip_category'])) {
             $joins[] = "LEFT JOIN {$tripClassificationsTable} tcc ON tcc.trip_id = t.id";
             $joins[] = "LEFT JOIN {$classificationsTable} cat ON cat.id = tcc.classification_id";
-            $wheres[] = "cat.type = %s AND cat.slug = %s";
+            $wheres[] = 'cat.type = %s AND cat.slug = %s';
             $params[] = ClassificationTypes::CATEGORY;
             $params[] = $filters['trip_category'];
         }
-        
-        // Price range filter
+
+        // Special offers (OR within group)
+        if (!empty($filters['special_offers']) && is_array($filters['special_offers'])) {
+            $offerParts = [];
+            foreach (array_unique($filters['special_offers']) as $offer) {
+                if (!is_string($offer)) {
+                    continue;
+                }
+                switch ($offer) {
+                    case 'discount':
+                        $offerParts[] = '(t.discounted_price IS NOT NULL OR t.sale_price IS NOT NULL)';
+                        break;
+                    case 'early-bird':
+                        if ($this->tripTableHasColumn('early_bird_discount_enabled')) {
+                            $offerParts[] = 't.early_bird_discount_enabled = 1';
+                        }
+                        break;
+                    case 'last-minute':
+                        if ($this->tripTableHasColumn('last_minute_discount_enabled')) {
+                            $offerParts[] = 't.last_minute_discount_enabled = 1';
+                        }
+                        break;
+                    case 'instant-booking':
+                        if ($this->tripTableHasColumn('instant_booking')) {
+                            $offerParts[] = 't.instant_booking = 1';
+                        }
+                        break;
+                    case 'flexible-dates':
+                        if ($this->tripTableHasColumn('flexible_dates')) {
+                            $offerParts[] = 't.flexible_dates = 1';
+                        }
+                        break;
+                    case 'deposit-available':
+                        if ($this->tripTableHasColumn('deposit_required')) {
+                            $offerParts[] = 't.deposit_required = 1';
+                        }
+                        break;
+                }
+            }
+            if ($offerParts !== []) {
+                $wheres[] = '(' . implode(' OR ', $offerParts) . ')';
+            }
+        }
+
+        // Booking options (OR)
+        if (!empty($filters['booking_options']) && is_array($filters['booking_options'])) {
+            $bookParts = [];
+            foreach (array_unique($filters['booking_options']) as $opt) {
+                if (!is_string($opt)) {
+                    continue;
+                }
+                switch ($opt) {
+                    case 'instant':
+                        if ($this->tripTableHasColumn('instant_booking')) {
+                            $bookParts[] = 't.instant_booking = 1';
+                        }
+                        break;
+                    case 'flexible':
+                        if ($this->tripTableHasColumn('flexible_dates')) {
+                            $bookParts[] = 't.flexible_dates = 1';
+                        }
+                        break;
+                    case 'pay-later':
+                        if ($this->tripTableHasColumn('deposit_required')) {
+                            $bookParts[] = 't.deposit_required = 1';
+                        }
+                        break;
+                }
+            }
+            if ($bookParts !== []) {
+                $wheres[] = '(' . implode(' OR ', $bookParts) . ')';
+            }
+        }
+
+        // Age suitability (OR)
+        if (!empty($filters['age_suitability']) && is_array($filters['age_suitability'])) {
+            $ageParts = [];
+            foreach (array_unique($filters['age_suitability']) as $age) {
+                if (!is_string($age)) {
+                    continue;
+                }
+                switch ($age) {
+                    case 'family-friendly':
+                        $ageParts[] = '(t.age_min IS NULL OR t.age_min <= 5)';
+                        break;
+                    case 'kids-friendly':
+                        $ageParts[] = '(t.age_min IS NULL OR t.age_min <= 12)';
+                        break;
+                    case 'senior-friendly':
+                        $ageParts[] = '(t.age_max IS NULL OR t.age_max >= 65)';
+                        break;
+                    case 'adults-only':
+                        $ageParts[] = 't.age_min >= 18';
+                        break;
+                }
+            }
+            if ($ageParts !== []) {
+                $wheres[] = '(' . implode(' OR ', $ageParts) . ')';
+            }
+        }
+
+        // Accommodation type
+        if (!empty($filters['accommodation']) && is_array($filters['accommodation']) && $this->tripTableHasColumn('accommodation_type')) {
+            $acc = array_values(array_filter(array_map('sanitize_text_field', $filters['accommodation'])));
+            if ($acc !== []) {
+                $placeholders = implode(',', array_fill(0, count($acc), '%s'));
+                $wheres[] = "t.accommodation_type IN ({$placeholders})";
+                $params = array_merge($params, $acc);
+            }
+        }
+
+        // Included services (loose match on JSON text)
+        if (!empty($filters['included_services']) && is_array($filters['included_services'])) {
+            foreach (array_unique($filters['included_services']) as $svc) {
+                if (!is_string($svc) || $svc === '') {
+                    continue;
+                }
+                $like = '%' . $wpdb->esc_like($svc) . '%';
+                $wheres[] = 't.included_items LIKE %s';
+                $params[] = $like;
+            }
+        }
+
+        // Dynamic attribute filters
+        if (!empty($filters['attribute_filters']) && is_array($filters['attribute_filters'])) {
+            foreach ($filters['attribute_filters'] as $attrId => $rawVal) {
+                $attrId = (int) $attrId;
+                if ($attrId <= 0) {
+                    continue;
+                }
+                if (is_array($rawVal) && (isset($rawVal['min']) || isset($rawVal['max']))) {
+                    if (isset($rawVal['min']) && is_numeric($rawVal['min'])) {
+                        $wheres[] = "EXISTS (SELECT 1 FROM {$tripClassificationsTable} ta_n WHERE ta_n.trip_id = t.id AND ta_n.classification_type = 'attribute' AND ta_n.classification_id = {$attrId} AND ta_n.is_active = 1 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(ta_n.metadata, '$.value')) AS DECIMAL(14,4)) >= %f)";
+                        $params[] = (float) $rawVal['min'];
+                    }
+                    if (isset($rawVal['max']) && is_numeric($rawVal['max'])) {
+                        $wheres[] = "EXISTS (SELECT 1 FROM {$tripClassificationsTable} ta_x WHERE ta_x.trip_id = t.id AND ta_x.classification_type = 'attribute' AND ta_x.classification_id = {$attrId} AND ta_x.is_active = 1 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(ta_x.metadata, '$.value')) AS DECIMAL(14,4)) <= %f)";
+                        $params[] = (float) $rawVal['max'];
+                    }
+                } elseif (is_array($rawVal) && $rawVal !== []) {
+                    $vals = array_values(array_filter(array_map('sanitize_text_field', $rawVal)));
+                    if ($vals !== []) {
+                        $placeholders = implode(',', array_fill(0, count($vals), '%s'));
+                        $wheres[] = "EXISTS (SELECT 1 FROM {$tripClassificationsTable} ta_m WHERE ta_m.trip_id = t.id AND ta_m.classification_type = 'attribute' AND ta_m.classification_id = {$attrId} AND ta_m.is_active = 1 AND JSON_UNQUOTE(JSON_EXTRACT(ta_m.metadata, '$.value')) IN ({$placeholders}))";
+                        $params = array_merge($params, $vals);
+                    }
+                } else {
+                    $v = sanitize_text_field((string) $rawVal);
+                    if ($v !== '') {
+                        $wheres[] = "EXISTS (SELECT 1 FROM {$tripClassificationsTable} ta_s WHERE ta_s.trip_id = t.id AND ta_s.classification_type = 'attribute' AND ta_s.classification_id = {$attrId} AND ta_s.is_active = 1 AND JSON_UNQUOTE(JSON_EXTRACT(ta_s.metadata, '$.value')) = %s)";
+                        $params[] = $v;
+                    }
+                }
+            }
+        }
+
+        // Price range filter (effective list price, not original-only)
+        $effPrice = $this->sqlTripEffectiveListPrice();
         if (!empty($filters['price_min']) && $filters['price_min'] > 0) {
-            $wheres[] = "CAST(t.original_price AS DECIMAL(10,2)) >= %f";
+            $wheres[] = "{$effPrice} >= %f";
             $params[] = $filters['price_min'];
         }
-        
+
         if (!empty($filters['price_max']) && $filters['price_max'] > 0) {
-            $wheres[] = "CAST(t.original_price AS DECIMAL(10,2)) <= %f";
+            $wheres[] = "{$effPrice} <= %f";
             $params[] = $filters['price_max'];
         }
         
@@ -409,13 +656,14 @@ class TripRepository extends BaseRepository
      */
     protected function buildTripOrderClause(string $sort): string
     {
+        $effPrice = $this->sqlTripEffectiveListPrice();
         switch ($sort) {
             case 'most_popular':
                 return "ORDER BY booking_count DESC, t.created_at DESC";
             case 'price_low':
-                return "ORDER BY CAST(t.original_price AS DECIMAL(10,2)) ASC";
+                return "ORDER BY {$effPrice} ASC";
             case 'price_high':
-                return "ORDER BY CAST(t.original_price AS DECIMAL(10,2)) DESC";
+                return "ORDER BY {$effPrice} DESC";
             case 'rating_high':
                 return "ORDER BY average_rating DESC";
             case 'duration_short':
@@ -2031,6 +2279,33 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
     }
 
     /**
+     * Human-readable label for one included_items JSON element (title, name, label, or plain string).
+     */
+    private function extractIncludedItemLabel(mixed $item): string
+    {
+        if (is_string($item)) {
+            $t = sanitize_text_field($item);
+
+            return $t;
+        }
+        if (is_object($item)) {
+            $item = (array) $item;
+        }
+        if (!is_array($item)) {
+            return '';
+        }
+        foreach (['title', 'name', 'label', 'text'] as $k) {
+            if (!empty($item[$k]) && is_scalar($item[$k])) {
+                $t = sanitize_text_field((string) $item[$k]);
+
+                return $t;
+            }
+        }
+
+        return '';
+    }
+
+    /**
      * Get trip title by ID
      */
     public function getTripTitle(int $tripId): string
@@ -2164,10 +2439,19 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
         $table = $this->getTableName();
         return $this->wpdb->get_row(
             "SELECT 
-                MIN(CAST(original_price AS DECIMAL(10,2))) as min_price,
-                MAX(CAST(original_price AS DECIMAL(10,2))) as max_price
-             FROM {$table} 
-             WHERE status = 'publish' AND original_price > 0"
+                MIN(sub.eff_price) as min_price,
+                MAX(sub.eff_price) as max_price
+             FROM (
+                SELECT (CASE
+                    WHEN CAST(discounted_price AS DECIMAL(10,2)) > 0 THEN CAST(discounted_price AS DECIMAL(10,2))
+                    WHEN CAST(sale_price AS DECIMAL(10,2)) > 0 THEN CAST(sale_price AS DECIMAL(10,2))
+                    ELSE CAST(original_price AS DECIMAL(10,2))
+                END) AS eff_price
+                FROM {$table}
+                WHERE status IN ('publish', 'published')
+                  AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')
+             ) sub
+             WHERE sub.eff_price > 0"
         );
     }
 
@@ -2243,10 +2527,16 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
         // Use TripClassificationsTable for trip-category relationships
         $categoryTable = TripClassificationsTable::getTableName();
         
+        $c = ClassificationsTable::getTableName();
+
         return (int) $this->wpdb->get_var($this->wpdb->prepare(
-            "SELECT COUNT(DISTINCT t.id) FROM {$table} t 
-             INNER JOIN {$categoryTable} ttc ON t.id = ttc.trip_id 
-             WHERE ttc.classification_id = %d AND ttc.classification_type = 'category' AND t.status = 'publish'",
+            "SELECT COUNT(DISTINCT t.id) FROM {$table} t
+             INNER JOIN {$categoryTable} ttc ON t.id = ttc.trip_id AND ttc.is_active = 1
+             INNER JOIN {$c} cls ON cls.id = ttc.classification_id AND cls.type = %s
+             WHERE ttc.classification_id = %d
+               AND t.status IN ('publish', 'published')
+               AND (t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')",
+            ClassificationTypes::CATEGORY,
             $categoryId
         ));
     }
@@ -2260,14 +2550,17 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
     public function countByDestination(int $destinationId): int
     {
         $table = $this->getTableName();
-        
-        // Use TripClassificationsTable for trip-destination relationships
-        $destinationTable = TripClassificationsTable::getTableName();
-        
+        $tc = TripClassificationsTable::getTableName();
+        $c = ClassificationsTable::getTableName();
+
         return (int) $this->wpdb->get_var($this->wpdb->prepare(
-            "SELECT COUNT(DISTINCT t.id) FROM {$table} t 
-             INNER JOIN {$destinationTable} td ON t.id = td.trip_id 
-             WHERE td.destination_id = %d AND t.status = 'publish'",
+            "SELECT COUNT(DISTINCT t.id) FROM {$table} t
+             INNER JOIN {$tc} ttc ON t.id = ttc.trip_id AND ttc.is_active = 1
+             INNER JOIN {$c} cls ON cls.id = ttc.classification_id AND cls.type = %s
+             WHERE ttc.classification_id = %d
+               AND t.status IN ('publish', 'published')
+               AND (t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')",
+            ClassificationTypes::DESTINATION,
             $destinationId
         ));
     }
@@ -2281,14 +2574,17 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
     public function countByActivity(int $activityId): int
     {
         $table = $this->getTableName();
-        
-        // Use TripClassificationsTable for trip-activity relationships
-        $activityTable = TripClassificationsTable::getTableName();
-        
+        $tc = TripClassificationsTable::getTableName();
+        $c = ClassificationsTable::getTableName();
+
         return (int) $this->wpdb->get_var($this->wpdb->prepare(
-            "SELECT COUNT(DISTINCT t.id) FROM {$table} t 
-             INNER JOIN {$activityTable} ta ON t.id = ta.trip_id 
-             WHERE ta.activity_id = %d AND t.status = 'publish'",
+            "SELECT COUNT(DISTINCT t.id) FROM {$table} t
+             INNER JOIN {$tc} ttc ON t.id = ttc.trip_id AND ttc.is_active = 1
+             INNER JOIN {$c} cls ON cls.id = ttc.classification_id AND cls.type = %s
+             WHERE ttc.classification_id = %d
+               AND t.status IN ('publish', 'published')
+               AND (t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')",
+            ClassificationTypes::ACTIVITY,
             $activityId
         ));
     }
@@ -2329,11 +2625,20 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
         
         $result = $wpdb->get_row("
             SELECT 
-                MIN(CAST(original_price AS DECIMAL(10,2))) as min_price,
-                MAX(CAST(original_price AS DECIMAL(10,2))) as max_price,
-                AVG(CAST(original_price AS DECIMAL(10,2))) as avg_price
-            FROM {$table} 
-            WHERE status = 'publish' AND original_price > 0
+                MIN(sub.eff_price) as min_price,
+                MAX(sub.eff_price) as max_price,
+                AVG(sub.eff_price) as avg_price
+            FROM (
+                SELECT (CASE
+                    WHEN CAST(discounted_price AS DECIMAL(10,2)) > 0 THEN CAST(discounted_price AS DECIMAL(10,2))
+                    WHEN CAST(sale_price AS DECIMAL(10,2)) > 0 THEN CAST(sale_price AS DECIMAL(10,2))
+                    ELSE CAST(original_price AS DECIMAL(10,2))
+                END) AS eff_price
+                FROM {$table}
+                WHERE status IN ('publish', 'published')
+                  AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')
+            ) sub
+            WHERE sub.eff_price > 0
         ");
         
         return $result ? (object) [
@@ -2344,23 +2649,117 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
     }
 
     /**
-     * Get accommodation types (placeholder)
-     * 
-     * @return array
+     * Distinct accommodation_type values on published trips with counts.
+     *
+     * @return list<object{name: string, trip_count: int}>
      */
     public function getAccommodationTypes(): array
     {
-        return [];
+        if (!$this->tripTableHasColumn('accommodation_type')) {
+            return [];
+        }
+        $table = $this->getTableName();
+        $rows = $this->wpdb->get_results(
+            "SELECT TRIM(accommodation_type) AS name, COUNT(*) AS trip_count
+             FROM {$table}
+             WHERE status IN ('publish', 'published')
+               AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')
+               AND accommodation_type IS NOT NULL AND TRIM(accommodation_type) <> ''
+             GROUP BY TRIM(accommodation_type)
+             ORDER BY trip_count DESC, name ASC"
+        ) ?: [];
+
+        $out = [];
+        foreach ($rows as $r) {
+            $out[] = (object) [
+                'name' => (string) $r->name,
+                'trip_count' => (int) $r->trip_count,
+            ];
+        }
+
+        return $out;
     }
 
     /**
-     * Get included services (placeholder)
-     * 
-     * @return array
+     * Included item titles from trip.included_items JSON, aggregated by trip count.
+     *
+     * @return list<object{service_name: string, trip_count: int}>
      */
     public function getIncludedServices(): array
     {
-        return [];
+        if (!$this->tripTableHasColumn('included_items')) {
+            return [];
+        }
+        $table = $this->getTableName();
+        $jsons = $this->wpdb->get_col(
+            "SELECT included_items FROM {$table}
+             WHERE status IN ('publish', 'published')
+               AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')
+               AND included_items IS NOT NULL
+               AND included_items <> ''
+               AND included_items <> '[]'"
+        ) ?: [];
+
+        $counts = [];
+        foreach ($jsons as $json) {
+            $decoded = json_decode((string) $json, true);
+            if (!is_array($decoded)) {
+                continue;
+            }
+            $list = $decoded;
+            if (isset($decoded['items']) && is_array($decoded['items'])) {
+                $list = $decoded['items'];
+            }
+            foreach ($list as $item) {
+                $title = $this->extractIncludedItemLabel($item);
+                if ($title === '') {
+                    continue;
+                }
+                $counts[$title] = ($counts[$title] ?? 0) + 1;
+            }
+        }
+        arsort($counts, SORT_NUMERIC);
+        $out = [];
+        foreach ($counts as $name => $c) {
+            $out[] = (object) ['service_name' => $name, 'trip_count' => (int) $c];
+        }
+
+        return $out;
+    }
+
+    /**
+     * Min/max duration_days among published trips (for search UI). Falls back to 1–30 when empty.
+     *
+     * @return array{min: int, max: int}
+     */
+    public function getDurationDaysBounds(): array
+    {
+        if (!$this->tripTableHasColumn('duration_days')) {
+            return ['min' => 1, 'max' => 30];
+        }
+        $table = $this->getTableName();
+        $row = $this->wpdb->get_row(
+            "SELECT
+                MIN(NULLIF(CAST(duration_days AS UNSIGNED), 0)) AS min_days,
+                MAX(CAST(duration_days AS UNSIGNED)) AS max_days
+             FROM {$table}
+             WHERE status IN ('publish', 'published')
+               AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')"
+        );
+        $min = (int) ($row->min_days ?? 1);
+        $max = (int) ($row->max_days ?? 1);
+        if ($min < 1) {
+            $min = 1;
+        }
+        if ($max < $min) {
+            $max = $min;
+        }
+        // Sensible upper bound for dual slider UX
+        if ($max > 365) {
+            $max = 365;
+        }
+
+        return ['min' => $min, 'max' => $max];
     }
 
     /**
@@ -2399,11 +2798,9 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
     public function getTripTypes(): array
     {
         return [
-            (object) ['value' => 'adventure', 'label' => __('Adventure', 'yatra')],
-            (object) ['value' => 'cultural', 'label' => __('Cultural', 'yatra')],
-            (object) ['value' => 'wildlife', 'label' => __('Wildlife', 'yatra')],
-            (object) ['value' => 'pilgrimage', 'label' => __('Pilgrimage', 'yatra')],
-            (object) ['value' => 'educational', 'label' => __('Educational', 'yatra')]
+            (object) ['value' => 'single_day', 'label' => __('Single day', 'yatra')],
+            (object) ['value' => 'multi_day', 'label' => __('Multi-day', 'yatra')],
+            (object) ['value' => 'flexible', 'label' => __('Flexible', 'yatra')],
         ];
     }
 

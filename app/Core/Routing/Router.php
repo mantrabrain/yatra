@@ -135,8 +135,18 @@ class Router
             }
         }
 
-        // 3. Trip page
+        // 3. Trip archive pagination: {trip_base}/page/{n} (must run before single-trip slug match)
         $trip_base = \Yatra\Services\SettingsService::getTripBase();
+        if (preg_match('/^' . preg_quote($trip_base, '/') . '\/page\/(\d+)\/?$/', $path, $matches)) {
+            return [
+                'type' => 'listing',
+                'listing_type' => 'trip',
+                'base' => $trip_base,
+                'paged' => max(1, (int) $matches[1]),
+            ];
+        }
+
+        // 4. Single trip page
         if (preg_match('/^' . preg_quote($trip_base, '/') . '\/([^\/]+)\/?$/', $path, $matches)) {
             return [
                 'type' => 'trip',
@@ -145,7 +155,7 @@ class Router
             ];
         }
 
-        // 4. Taxonomy page
+        // 5. Taxonomy page
         $bases = [
             'destination' => \Yatra\Services\SettingsService::getString('destination_base', 'destination'),
             'activity' => \Yatra\Services\SettingsService::getString('activity_base', 'activity'),
@@ -163,7 +173,7 @@ class Router
             }
         }
 
-        // 5. Listing page
+        // 6. Listing page
         foreach ($bases as $type => $base) {
             if ($path === $base) {
                 return [
@@ -174,7 +184,7 @@ class Router
             }
         }
         
-        // 5b. Trip listing page
+        // 6b. Trip listing page
         if ($path === $trip_base) {
             return [
                 'type' => 'listing',
@@ -183,7 +193,7 @@ class Router
             ];
         }
 
-        // 6. Booking confirmation
+        // 7. Booking confirmation
         if (preg_match('/^book\/confirmation\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {
             return [
                 'type' => 'booking_confirmation',
@@ -191,7 +201,7 @@ class Router
             ];
         }
 
-        // 7. Checkout
+        // 8. Checkout
         if (preg_match('/^checkout\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {
             return [
                 'type' => 'checkout',
@@ -199,7 +209,7 @@ class Router
             ];
         }
 
-        // 8. Booking page
+        // 9. Booking page
         $booking_base = \Yatra\Services\SettingsService::getBookingBase();
         if ($path === $booking_base && !\Yatra\Services\SettingsService::useCustomBookingPage()) {
             return [

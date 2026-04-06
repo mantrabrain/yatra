@@ -1,37 +1,119 @@
 <?php
 /**
  * Trip Search Shortcode Template
- * 
- * Copied exactly from /trip page search UI for consistency
- * 
+ *
  * @package Yatra
  * @var array $atts Shortcode attributes
+ * @var array $destinations
+ * @var array $activities
+ * @var string $listing_url
+ * @var array{min:int,max:int} $duration_bounds
+ * @var list<object{value:string,label:string}> $budget_presets
  */
 
-// Prevent direct access
 if (!defined('ABSPATH')) {
     exit;
 }
 
-// Destinations and activities are passed from shortcode controller (proper MVC pattern)
-// This follows the separation of concerns principle - no database queries in templates
+$listing_url = $listing_url ?? home_url('/trip/');
+$duration_bounds = is_array($duration_bounds ?? null) ? $duration_bounds : ['min' => 1, 'max' => 30];
+$budget_presets = is_array($budget_presets ?? null) ? $budget_presets : [];
 
+$dmin = max(1, (int) ($duration_bounds['min'] ?? 1));
+$dmax = max($dmin, (int) ($duration_bounds['max'] ?? 30));
 
-// Get active filters from URL parameters
 $active_filters = [
-    'destination' => sanitize_text_field($_GET['destination'] ?? ''),
-    'activity' => sanitize_text_field($_GET['activity'] ?? ''),
-    'duration' => sanitize_text_field($_GET['duration'] ?? ''),
-    'budget' => sanitize_text_field($_GET['budget'] ?? ''),
+    's' => isset($_GET['s']) ? sanitize_text_field(wp_unslash((string) $_GET['s'])) : '',
+    'destination' => isset($_GET['destination']) ? sanitize_text_field(wp_unslash((string) $_GET['destination'])) : '',
+    'activity' => isset($_GET['activity']) ? sanitize_text_field(wp_unslash((string) $_GET['activity'])) : '',
+    'duration' => isset($_GET['duration']) ? sanitize_text_field(wp_unslash((string) $_GET['duration'])) : '',
+    'budget' => isset($_GET['budget']) ? sanitize_text_field(wp_unslash((string) $_GET['budget'])) : '',
 ];
+
+$dur_initial_min = $dmin;
+$dur_initial_max = $dmax;
+if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_filters['duration'], $dm)) {
+    $dur_initial_min = max($dmin, (int) $dm[1]);
+    $dur_initial_max = min($dmax, max($dur_initial_min, (int) $dm[2]));
+}
+
+$dest_label = __('Pick a destination', 'yatra');
+if ($active_filters['destination'] !== '') {
+    foreach ($destinations as $d) {
+        if ((string) ($d->slug ?? '') === $active_filters['destination']) {
+            $dest_label = (string) ($d->name ?? $active_filters['destination']);
+            break;
+        }
+    }
+    if ($dest_label === __('Pick a destination', 'yatra')) {
+        $dest_label = $active_filters['destination'];
+    }
+}
+
+$act_label = __('Choose an activity', 'yatra');
+if ($active_filters['activity'] !== '') {
+    foreach ($activities as $a) {
+        if ((string) ($a->slug ?? '') === $active_filters['activity']) {
+            $act_label = (string) ($a->name ?? $active_filters['activity']);
+            break;
+        }
+    }
+    if ($act_label === __('Choose an activity', 'yatra')) {
+        $act_label = $active_filters['activity'];
+    }
+}
+
+$budget_label = __('Your budget range', 'yatra');
+if ($active_filters['budget'] !== '') {
+    foreach ($budget_presets as $bp) {
+        if ((string) ($bp->value ?? '') === $active_filters['budget']) {
+            $budget_label = (string) ($bp->label ?? $active_filters['budget']);
+            break;
+        }
+    }
+    if ($budget_label === __('Your budget range', 'yatra')) {
+        $budget_label = $active_filters['budget'];
+    }
+}
+
+$dur_display_label = __('Trip duration', 'yatra');
+if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_filters['duration'], $dmDur)) {
+    $dur_display_label = sprintf(
+        /* translators: 1: min days, 2: max days */
+        __('%1$d – %2$d days', 'yatra'),
+        (int) $dmDur[1],
+        (int) $dmDur[2]
+    );
+}
 ?>
 
-<div class="yatra-trip-search-shortcode">
-    <!-- Horizontal Search Bar -->
+<div class="yatra-trip-search-shortcode" data-listing-url="<?php echo esc_url($listing_url); ?>">
     <div class="yatra-horizontal-search">
         <div class="yatra-horizontal-search-container">
             <div class="yatra-search-bar">
-                <!-- Destination Dropdown -->
+                <div class="yatra-search-keyword-segment">
+                    <label class="screen-reader-text" for="yatra-trip-search-s"><?php esc_html_e('Search trips', 'yatra'); ?></label>
+                    <div class="yatra-search-keyword-inner">
+                        <?php echo yatra_svg_icon('search', 'yatra-search-keyword-icon'); ?>
+                        <div class="yatra-search-keyword-fields">
+                            <span class="yatra-dropdown-label"><?php esc_html_e('Search', 'yatra'); ?></span>
+                            <input
+                                type="search"
+                                id="yatra-trip-search-s"
+                                name="s"
+                                class="yatra-search-keyword-input"
+                                autocomplete="off"
+                                inputmode="search"
+                                enterkeyhint="search"
+                                placeholder="<?php esc_attr_e('Trip name, place, keyword…', 'yatra'); ?>"
+                                value="<?php echo esc_attr($active_filters['s']); ?>"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="yatra-search-divider"></div>
+
                 <div class="yatra-search-dropdown" data-dropdown="destination">
                     <div class="yatra-dropdown-trigger">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,7 +122,7 @@ $active_filters = [
                         </svg>
                         <div class="yatra-dropdown-content">
                             <span class="yatra-dropdown-label"><?php esc_html_e('Destination', 'yatra'); ?></span>
-                            <span class="yatra-dropdown-value"><?php echo !empty($active_filters['destination']) ? esc_html($active_filters['destination']) : __('Pick a destination', 'yatra'); ?></span>
+                            <span class="yatra-dropdown-value"><?php echo esc_html($dest_label); ?></span>
                         </div>
                         <svg class="yatra-dropdown-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -48,20 +130,20 @@ $active_filters = [
                     </div>
                     <div class="yatra-dropdown-menu">
                         <?php if (!empty($destinations)) : ?>
+                            <div class="yatra-dropdown-option<?php echo $active_filters['destination'] === '' ? ' selected' : ''; ?>" data-value=""><?php esc_html_e('Any destination', 'yatra'); ?></div>
                             <?php foreach ($destinations as $dest) : ?>
-                                <div class="yatra-dropdown-option" data-value="<?php echo esc_attr($dest->slug ?? ''); ?>">
+                                <div class="yatra-dropdown-option<?php echo ($active_filters['destination'] === (string) ($dest->slug ?? '')) ? ' selected' : ''; ?>" data-value="<?php echo esc_attr($dest->slug ?? ''); ?>">
                                     <?php echo esc_html($dest->name ?? ''); ?>
                                 </div>
                             <?php endforeach; ?>
                         <?php else : ?>
-                            <div class="yatra-dropdown-option" data-value=""><?php esc_html_e('All Destinations', 'yatra'); ?></div>
+                            <div class="yatra-dropdown-option selected" data-value=""><?php esc_html_e('All destinations', 'yatra'); ?></div>
                         <?php endif; ?>
                     </div>
                 </div>
 
                 <div class="yatra-search-divider"></div>
 
-                <!-- Activities Dropdown -->
                 <div class="yatra-search-dropdown" data-dropdown="activities">
                     <div class="yatra-dropdown-trigger">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,7 +151,7 @@ $active_filters = [
                         </svg>
                         <div class="yatra-dropdown-content">
                             <span class="yatra-dropdown-label"><?php esc_html_e('Activities', 'yatra'); ?></span>
-                            <span class="yatra-dropdown-value"><?php echo !empty($active_filters['activity']) ? esc_html($active_filters['activity']) : __('Choose an activity', 'yatra'); ?></span>
+                            <span class="yatra-dropdown-value"><?php echo esc_html($act_label); ?></span>
                         </div>
                         <svg class="yatra-dropdown-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -77,28 +159,28 @@ $active_filters = [
                     </div>
                     <div class="yatra-dropdown-menu">
                         <?php if (!empty($activities)) : ?>
+                            <div class="yatra-dropdown-option<?php echo $active_filters['activity'] === '' ? ' selected' : ''; ?>" data-value=""><?php esc_html_e('Any activity', 'yatra'); ?></div>
                             <?php foreach ($activities as $act) : ?>
-                                <div class="yatra-dropdown-option" data-value="<?php echo esc_attr($act->slug ?? ''); ?>">
+                                <div class="yatra-dropdown-option<?php echo ($active_filters['activity'] === (string) ($act->slug ?? '')) ? ' selected' : ''; ?>" data-value="<?php echo esc_attr($act->slug ?? ''); ?>">
                                     <?php echo esc_html($act->name ?? ''); ?>
                                 </div>
                             <?php endforeach; ?>
                         <?php else : ?>
-                            <div class="yatra-dropdown-option" data-value=""><?php esc_html_e('All Activities', 'yatra'); ?></div>
+                            <div class="yatra-dropdown-option selected" data-value=""><?php esc_html_e('All activities', 'yatra'); ?></div>
                         <?php endif; ?>
                     </div>
                 </div>
 
                 <div class="yatra-search-divider"></div>
 
-                <!-- Duration Dropdown with Range Slider -->
-                <div class="yatra-search-dropdown" data-dropdown="duration">
+                <div class="yatra-search-dropdown" data-dropdown="duration" data-duration-min="<?php echo esc_attr((string) $dmin); ?>" data-duration-max="<?php echo esc_attr((string) $dmax); ?>">
                     <div class="yatra-dropdown-trigger">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 018 0z"/>
                         </svg>
                         <div class="yatra-dropdown-content">
                             <span class="yatra-dropdown-label"><?php esc_html_e('Duration', 'yatra'); ?></span>
-                            <span class="yatra-dropdown-value"><?php echo !empty($active_filters['duration']) ? esc_html($active_filters['duration']) : esc_html__('Trip duration', 'yatra'); ?></span>
+                            <span class="yatra-dropdown-value"><?php echo esc_html($dur_display_label); ?></span>
                         </div>
                         <svg class="yatra-dropdown-arrow yatra-arrow-up" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
@@ -111,18 +193,18 @@ $active_filters = [
                                 <div class="yatra-duration-subtitle"><?php esc_html_e('Choose your preferred trip length', 'yatra'); ?></div>
                             </div>
                             <div class="yatra-duration-badges">
-                                <span class="yatra-duration-badge yatra-duration-min-badge"><?php echo esc_html__('2 Days', 'yatra'); ?></span>
-                                <span class="yatra-duration-badge yatra-duration-max-badge"><?php echo esc_html__('29 Days', 'yatra'); ?></span>
+                                <span class="yatra-duration-badge yatra-duration-min-badge"></span>
+                                <span class="yatra-duration-badge yatra-duration-max-badge"></span>
                             </div>
                             <div class="yatra-dual-range-slider">
-                                <input type="range" id="durationMin" min="1" max="30" value="2" class="yatra-range-min">
-                                <input type="range" id="durationMax" min="1" max="30" value="29" class="yatra-range-max">
+                                <input type="range" id="durationMin" min="<?php echo esc_attr((string) $dmin); ?>" max="<?php echo esc_attr((string) $dmax); ?>" value="<?php echo esc_attr((string) $dur_initial_min); ?>" class="yatra-range-min">
+                                <input type="range" id="durationMax" min="<?php echo esc_attr((string) $dmin); ?>" max="<?php echo esc_attr((string) $dmax); ?>" value="<?php echo esc_attr((string) $dur_initial_max); ?>" class="yatra-range-max">
                                 <div class="yatra-slider-track"></div>
                                 <div class="yatra-slider-range"></div>
                             </div>
                             <div class="yatra-duration-labels">
-                                <span><?php echo esc_html__('2 Days', 'yatra'); ?></span>
-                                <span><?php echo esc_html__('29 Days', 'yatra'); ?></span>
+                                <span></span>
+                                <span></span>
                             </div>
                         </div>
                     </div>
@@ -130,7 +212,6 @@ $active_filters = [
 
                 <div class="yatra-search-divider"></div>
 
-                <!-- Budget Dropdown -->
                 <div class="yatra-search-dropdown" data-dropdown="budget">
                     <div class="yatra-dropdown-trigger">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,28 +219,34 @@ $active_filters = [
                         </svg>
                         <div class="yatra-dropdown-content">
                             <span class="yatra-dropdown-label"><?php esc_html_e('Budget', 'yatra'); ?></span>
-                            <span class="yatra-dropdown-value"><?php echo !empty($active_filters['budget']) ? esc_html($active_filters['budget']) : esc_html__('Your budget range', 'yatra'); ?></span>
+                            <span class="yatra-dropdown-value"><?php echo esc_html($budget_label); ?></span>
                         </div>
                         <svg class="yatra-dropdown-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </div>
                     <div class="yatra-dropdown-menu">
-                        <div class="yatra-dropdown-option" data-value="0-1000"><?php echo esc_html__('Under $1,000', 'yatra'); ?></div>
-                        <div class="yatra-dropdown-option" data-value="1000-2000"><?php echo esc_html__('$1,000 - $2,000', 'yatra'); ?></div>
-                        <div class="yatra-dropdown-option" data-value="2000-3000"><?php echo esc_html__('$2,000 - $3,000', 'yatra'); ?></div>
-                        <div class="yatra-dropdown-option" data-value="3000-5000"><?php echo esc_html__('$3,000 - $5,000', 'yatra'); ?></div>
-                        <div class="yatra-dropdown-option" data-value="5000+"><?php echo esc_html__('$5,000+', 'yatra'); ?></div>
+                        <?php if (!empty($budget_presets)) : ?>
+                            <div class="yatra-dropdown-option<?php echo $active_filters['budget'] === '' ? ' selected' : ''; ?>" data-value=""><?php esc_html_e('Any budget', 'yatra'); ?></div>
+                            <?php foreach ($budget_presets as $preset) : ?>
+                                <div class="yatra-dropdown-option<?php echo ($active_filters['budget'] === (string) ($preset->value ?? '')) ? ' selected' : ''; ?>" data-value="<?php echo esc_attr($preset->value ?? ''); ?>">
+                                    <?php echo esc_html($preset->label ?? ''); ?>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else : ?>
+                            <div class="yatra-dropdown-option selected" data-value=""><?php esc_html_e('No price data yet', 'yatra'); ?></div>
+                        <?php endif; ?>
                     </div>
                 </div>
 
-                <!-- Search Button -->
-                <button class="yatra-search-main-btn">
+                <div class="yatra-search-button-container">
+                <button type="button" class="yatra-search-main-btn">
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                     <?php esc_html_e('Search', 'yatra'); ?>
                 </button>
+                </div>
             </div>
         </div>
     </div>

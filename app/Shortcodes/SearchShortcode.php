@@ -50,16 +50,18 @@ class SearchShortcode extends BaseShortcode
             true
         );
         
-        // Get destinations and activities using repository (proper MVC pattern)
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $destinations = $tripRepository->getAllDestinationsForSearch();
         $activities = $tripRepository->getAllActivitiesForSearch();
-        
-        // Load the trip-search template with data from repository
+        $tripListingService = new \Yatra\Services\TripListingService();
+
         return $this->loadTemplate('shortcodes/trip-search.php', [
             'atts' => $atts,
             'destinations' => $destinations,
-            'activities' => $activities
+            'activities' => $activities,
+            'listing_url' => \function_exists('yatra_get_trip_listing_url') ? \yatra_get_trip_listing_url() : \home_url('/trip/'),
+            'duration_bounds' => $tripRepository->getDurationDaysBounds(),
+            'budget_presets' => $tripListingService->getSearchBudgetPresets(),
         ]);
     }
 }

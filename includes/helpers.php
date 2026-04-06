@@ -964,6 +964,16 @@ function yatra_get_trip_permalink($trip): string
 }
 
 /**
+ * Canonical URL for the trip archive / filter listing (respects Settings trip base).
+ */
+function yatra_get_trip_listing_url(): string
+{
+    $base = SettingsService::getTripBase();
+
+    return trailingslashit(home_url('/' . $base . '/'));
+}
+
+/**
  * Check if we're on a trip listing page
  * 
  * @return bool True if on a trip listing page
@@ -983,9 +993,15 @@ function yatra_is_trip_listing(): bool
     $parsed_url = parse_url($request_uri, PHP_URL_PATH);
     
     if ($parsed_url && strpos($parsed_url, '/' . $trip_base) === 0) {
-        // Exclude single trip pages (which have slug after base)
-        $path_parts = explode('/', trim($parsed_url, '/'));
-        if (count($path_parts) <= 2) { // Only /trips/ or /trips/page/2
+        $path_parts = array_values(array_filter(explode('/', trim($parsed_url, '/'))));
+        if ($path_parts === [] || ($path_parts[0] ?? '') !== $trip_base) {
+            return false;
+        }
+        // /trip/ or /trip/page/2/ (WordPress paged archives)
+        if (count($path_parts) === 1) {
+            return true;
+        }
+        if (count($path_parts) === 3 && ($path_parts[1] ?? '') === 'page' && ctype_digit((string) ($path_parts[2] ?? ''))) {
             return true;
         }
     }

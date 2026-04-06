@@ -1204,6 +1204,65 @@
 }
 
 /* Listing Layout */
+.yatra-listing-wrapper--overlay-host {
+    position: relative;
+}
+
+/* Loading overlay: hidden by default (markup lives in template for filter/sort navigation) */
+.yatra-listing-loading-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.yatra-listing-loading-overlay.yatra-listing-loading-overlay--visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.yatra-listing-loading-card {
+    text-align: center;
+    padding: 24px 32px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    border: 1px solid #e5e7eb;
+}
+
+.yatra-listing-loading-spinner {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: yatra-listing-spin 0.75s linear infinite;
+    margin-bottom: 12px;
+}
+
+@keyframes yatra-listing-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.yatra-listing-loading-text {
+    margin: 0;
+    font-size: 14px;
+    color: #374151;
+    font-weight: 500;
+}
+
 .yatra-listing-layout {
     display: flex;
     gap: 28px;

@@ -26,7 +26,7 @@ if (!defined('ABSPATH')) {
                     name="s" 
                     class="yatra-search-input" 
                     placeholder="<?php echo esc_attr($atts['placeholder']); ?>"
-                    value="<?php echo esc_attr(get_search_query()); ?>"
+                    value="<?php echo esc_attr(isset($_GET['s']) ? sanitize_text_field(wp_unslash($_GET['s'])) : ''); ?>"
                 >
                 <button type="submit" class="yatra-search-btn">
                     <?php echo esc_html($atts['button_text']); ?>
@@ -52,7 +52,7 @@ if (!defined('ABSPATH')) {
                                 <select id="yatra-search-category" name="category" class="yatra-filter-select">
                                     <option value=""><?php esc_html_e('All Categories', 'yatra'); ?></option>
                                     <?php foreach ($categories as $category): ?>
-                                        <option value="<?php echo esc_attr($category->slug); ?>" <?php selected(get_query_var('category'), $category->slug); ?>>
+                                        <option value="<?php echo esc_attr($category->slug); ?>" <?php selected(isset($_GET['category']) ? sanitize_text_field(wp_unslash($_GET['category'])) : '', $category->slug); ?>>
                                             <?php echo esc_html($category->name); ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -66,7 +66,7 @@ if (!defined('ABSPATH')) {
                                 <select id="yatra-search-destination" name="destination" class="yatra-filter-select">
                                     <option value=""><?php esc_html_e('All Destinations', 'yatra'); ?></option>
                                     <?php foreach ($destinations as $destination): ?>
-                                        <option value="<?php echo esc_attr($destination->slug); ?>" <?php selected(get_query_var('destination'), $destination->slug); ?>>
+                                        <option value="<?php echo esc_attr($destination->slug); ?>" <?php selected(isset($_GET['destination']) ? sanitize_text_field(wp_unslash($_GET['destination'])) : '', $destination->slug); ?>>
                                             <?php echo esc_html($destination->name); ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -80,7 +80,7 @@ if (!defined('ABSPATH')) {
                                 <select id="yatra-search-activity" name="activity" class="yatra-filter-select">
                                     <option value=""><?php esc_html_e('All Activities', 'yatra'); ?></option>
                                     <?php foreach ($activities as $activity): ?>
-                                        <option value="<?php echo esc_attr($activity->slug); ?>" <?php selected(get_query_var('activity'), $activity->slug); ?>>
+                                        <option value="<?php echo esc_attr($activity->slug); ?>" <?php selected(isset($_GET['activity']) ? sanitize_text_field(wp_unslash($_GET['activity'])) : '', $activity->slug); ?>>
                                             <?php echo esc_html($activity->name); ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -94,7 +94,7 @@ if (!defined('ABSPATH')) {
                                 <select id="yatra-search-difficulty" name="difficulty" class="yatra-filter-select">
                                     <option value=""><?php esc_html_e('All Levels', 'yatra'); ?></option>
                                     <?php foreach ($difficulties as $difficulty): ?>
-                                        <option value="<?php echo esc_attr($difficulty->slug); ?>" <?php selected(get_query_var('difficulty'), $difficulty->slug); ?>>
+                                        <option value="<?php echo esc_attr($difficulty->slug); ?>" <?php selected(isset($_GET['difficulty']) ? sanitize_text_field(wp_unslash($_GET['difficulty'])) : '', $difficulty->slug); ?>>
                                             <?php echo esc_html($difficulty->name); ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -111,7 +111,7 @@ if (!defined('ABSPATH')) {
                                         name="price_min" 
                                         class="yatra-price-input" 
                                         placeholder="<?php esc_attr_e('Min', 'yatra'); ?>"
-                                        value="<?php echo esc_attr(get_query_var('price_min')); ?>"
+                                        value="<?php echo esc_attr(isset($_GET['price_min']) ? sanitize_text_field(wp_unslash((string) $_GET['price_min'])) : ''); ?>"
                                         min="0"
                                     >
                                     <span class="yatra-price-separator">-</span>
@@ -120,7 +120,7 @@ if (!defined('ABSPATH')) {
                                         name="price_max" 
                                         class="yatra-price-input" 
                                         placeholder="<?php esc_attr_e('Max', 'yatra'); ?>"
-                                        value="<?php echo esc_attr(get_query_var('price_max')); ?>"
+                                        value="<?php echo esc_attr(isset($_GET['price_max']) ? sanitize_text_field(wp_unslash((string) $_GET['price_max'])) : ''); ?>"
                                         min="0"
                                     >
                                 </div>
@@ -132,10 +132,10 @@ if (!defined('ABSPATH')) {
                                 <label for="yatra-search-duration"><?php esc_html_e('Duration', 'yatra'); ?></label>
                                 <select id="yatra-search-duration" name="duration" class="yatra-filter-select">
                                     <option value=""><?php esc_html_e('Any Duration', 'yatra'); ?></option>
-                                    <option value="1-3" <?php selected(get_query_var('duration'), '1-3'); ?>>1-3 <?php esc_html_e('days', 'yatra'); ?></option>
-                                    <option value="4-7" <?php selected(get_query_var('duration'), '4-7'); ?>>4-7 <?php esc_html_e('days', 'yatra'); ?></option>
-                                    <option value="8-14" <?php selected(get_query_var('duration'), '8-14'); ?>>8-14 <?php esc_html_e('days', 'yatra'); ?></option>
-                                    <option value="15+" <?php selected(get_query_var('duration'), '15+'); ?>>15+ <?php esc_html_e('days', 'yatra'); ?></option>
+                                    <option value="1-3" <?php selected(isset($_GET['duration']) ? sanitize_text_field(wp_unslash($_GET['duration'])) : '', '1-3'); ?>>1-3 <?php esc_html_e('days', 'yatra'); ?></option>
+                                    <option value="4-7" <?php selected(isset($_GET['duration']) ? sanitize_text_field(wp_unslash($_GET['duration'])) : '', '4-7'); ?>>4-7 <?php esc_html_e('days', 'yatra'); ?></option>
+                                    <option value="8-14" <?php selected(isset($_GET['duration']) ? sanitize_text_field(wp_unslash($_GET['duration'])) : '', '8-14'); ?>>8-14 <?php esc_html_e('days', 'yatra'); ?></option>
+                                    <option value="15+" <?php selected(isset($_GET['duration']) ? sanitize_text_field(wp_unslash($_GET['duration'])) : '', '15+'); ?>>15+ <?php esc_html_e('days', 'yatra'); ?></option>
                                 </select>
                             </div>
                         <?php endif; ?>
