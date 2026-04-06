@@ -5,6 +5,9 @@ declare global {
     yatraAdmin?: {
       apiUrl: string;
       nonce: string;
+      /** PNG in assets/images/yatra-icon.png — sidebar branding */
+      brandLogoUrl?: string;
+      pluginUrl?: string;
       currency: string;
       currencyPosition: string;
       currencyDecimals: number;

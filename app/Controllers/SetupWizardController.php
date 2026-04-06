@@ -114,6 +114,7 @@ class SetupWizardController
      */
     public function admin_menus()
     {
+        // Register the page so admin.php?page=yatra-setup works; do not show in the sidebar.
         add_submenu_page(
             'yatra',
             __('Yatra Setup Wizard', 'yatra'),
@@ -122,6 +123,7 @@ class SetupWizardController
             'yatra-setup',
             array($this, 'setup_wizard')
         );
+        remove_submenu_page('yatra', 'yatra-setup');
     }
 
 

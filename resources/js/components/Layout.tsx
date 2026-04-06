@@ -456,9 +456,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="h-16 px-6 flex items-center justify-center border-b border-gray-200 dark:border-gray-700">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">Y</span>
-                </div>
+                {window.yatraAdmin?.brandLogoUrl ? (
+                  <img
+                    src={window.yatraAdmin.brandLogoUrl}
+                    alt={__("Yatra", "yatra")}
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 rounded-lg object-contain shrink-0 bg-blue-600 p-1 border border-blue-700 dark:border-blue-500"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                    <span className="text-white font-bold text-lg">Y</span>
+                  </div>
+                )}
                 <div className="flex flex-col">
                   <span className="text-xl font-bold text-gray-900 dark:text-white">
                     Yatra

@@ -546,6 +546,34 @@ function yatra_trip_field(string $field, string $escape = 'html', $default = '')
 }
 
 /**
+ * Public URL for the Yatra brand icon (admin menu + React sidebar). Empty if file is missing.
+ */
+function yatra_get_brand_icon_url(): string
+{
+    if (!defined('YATRA_PLUGIN_PATH') || !defined('YATRA_PLUGIN_URL')) {
+        return '';
+    }
+
+    $candidates = [
+        'assets/images/yatra-icon.png',
+        'assets/images/yara-icon.png',
+    ];
+
+    foreach ($candidates as $relative) {
+        $file = YATRA_PLUGIN_PATH . $relative;
+        if (!is_readable($file)) {
+            continue;
+        }
+
+        $url = YATRA_PLUGIN_URL . $relative;
+
+        return add_query_arg('ver', (string) filemtime($file), $url);
+    }
+
+    return '';
+}
+
+/**
  * ============================================
  * BOOKING SESSION MANAGEMENT
  * ============================================

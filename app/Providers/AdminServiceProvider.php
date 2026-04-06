@@ -39,7 +39,20 @@ class AdminServiceProvider extends ServiceProvider
         add_action('admin_init', [$this, 'removeAdminWrapper']);
 
         add_action('admin_head', [$this, 'printUpgradeProAdminStyles']);
+        add_action('admin_head', [$this, 'printYatraAdminMenuIconStyles']);
         add_action('admin_footer', [$this, 'upgradeProSubmenuOpenInNewTab']);
+    }
+
+    /**
+     * Size the custom Yatra menu icon (PNG) like core dashicons.
+     */
+    public function printYatraAdminMenuIconStyles(): void
+    {
+        if (!function_exists('yatra_get_brand_icon_url') || yatra_get_brand_icon_url() === '') {
+            return;
+        }
+
+        echo '<style id="yatra-admin-menu-brand-icon">#adminmenu .toplevel_page_yatra div.wp-menu-image img{opacity:1!important;width:20px!important;height:20px!important;padding:6px 0!important;object-fit:contain!important;}</style>';
     }
 
     /**
@@ -236,13 +249,17 @@ class AdminServiceProvider extends ServiceProvider
      */
     public function registerAdminMenu(): void
     {
+        $menu_icon = (function_exists('yatra_get_brand_icon_url') && yatra_get_brand_icon_url() !== '')
+            ? yatra_get_brand_icon_url()
+            : 'dashicons-palmtree';
+
         add_menu_page(
             __('Yatra', 'yatra'),
             __('Yatra', 'yatra'),
             'manage_options',
             'yatra',
             [$this, 'renderAdminPage'],
-            'dashicons-palmtree',
+            $menu_icon,
             30
         );
 
