@@ -154,6 +154,8 @@ class SettingsController extends BaseController
         'activity_base' => 'activity',
         'trip_category_base' => 'trip-category',
         'booking_base' => 'book',
+        // Wishlist (Pro) — stored in free options; active only when Pro + setting on
+        'enable_wishlist' => false,
         
         // Booking Page Settings
         'use_booking_page' => false,
@@ -397,6 +399,11 @@ class SettingsController extends BaseController
                         $flexible_payment_settings[$key] = $value;
                     }
                     // Skip saving in Free plugin - Pro handles these
+                    continue;
+                }
+
+                // Wishlist toggle: only meaningful with Yatra Pro active
+                if ($key === 'enable_wishlist' && !apply_filters('yatra_is_pro_active', false)) {
                     continue;
                 }
                 
@@ -910,6 +917,18 @@ class SettingsController extends BaseController
      */
     private function syncAccountRouteSettingsForResponse(array $settings): array
     {
+        // Prefer the full saved path so admin "View" matches Settings → Customer (not only yatra_account_base slug).
+        $savedPath = get_option('yatra_customer_account_page', '');
+        if (is_string($savedPath) && $savedPath !== '' && $savedPath !== '0') {
+            $normalized = '/' . trim(str_replace('\\', '/', $savedPath), '/');
+            if ($normalized === '/') {
+                $normalized = '/my-account';
+            }
+            $settings['customer_account_page'] = $normalized;
+
+            return $settings;
+        }
+
         $stored = get_option('yatra_account_base', '');
         if (is_string($stored) && $stored !== '') {
             $settings['customer_account_page'] = '/' . $stored;

@@ -50,10 +50,15 @@ class SearchShortcode extends BaseShortcode
             true
         );
         
-        $tripRepository = new \Yatra\Repositories\TripRepository();
-        $destinations = $tripRepository->getAllDestinationsForSearch();
-        $activities = $tripRepository->getAllActivitiesForSearch();
+        // Same source as trip listing sidebar filters: published classifications.
+        // TripRepository::*ForSearch() only returned rows linked via trip_classifications,
+        // so empty relations hid all dropdown options.
+        $destinationRepository = new \Yatra\Repositories\DestinationRepository();
+        $activityRepository = new \Yatra\Repositories\ActivityRepository();
+        $destinations = $destinationRepository->getPublished();
+        $activities = $activityRepository->getPublished();
         $tripListingService = new \Yatra\Services\TripListingService();
+        $tripRepository = new \Yatra\Repositories\TripRepository();
 
         return $this->loadTemplate('shortcodes/trip-search.php', [
             'atts' => $atts,

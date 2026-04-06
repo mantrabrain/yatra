@@ -8,19 +8,29 @@ import {
   MapPin,
 } from "lucide-react";
 import { __ } from "../../lib/i18n";
-import { formatDate, getBadge, currency } from "./utils";
+import { formatDate, getBadge, currency, phoneToTelHref } from "./utils";
 import { downloadVoucher } from "./utils/downloads";
 import type { Booking } from "./types";
 import BookingDetails from "./BookingDetails";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "../../lib/api-client";
+import { API_ENDPOINTS } from "../../lib/api-endpoints";
 
 interface BookingsProps {
   bookings: Booking[];
+  conciergePhone?: string;
+  conciergeEmail?: string;
   onSectionChange: (section: string) => void;
 }
 
-const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
+const Bookings: React.FC<BookingsProps> = ({
+  bookings,
+  conciergePhone = "",
+  conciergeEmail = "",
+  onSectionChange,
+}) => {
+  const conciergeTel = phoneToTelHref(conciergePhone);
+  const conciergeMail = String(conciergeEmail || "").trim();
   const [searchTerm, setSearchTerm] = useState("");
   const [bookingFilter, setBookingFilter] = useState<
     "all" | "upcoming" | "pending" | "completed"
@@ -28,71 +38,101 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
   const [selectedBookingId, setSelectedBookingId] = useState<number | null>(
     null,
   );
-  const [isLoadingBookingDetails, setIsLoadingBookingDetails] = useState(false);
-  const [bookingDetails, setBookingDetails] = useState<any>(null);
   const [payLoading, setPayLoading] = useState<number | null>(null);
 
-  // Fetch booking details when a booking is selected
-  const { data: bookingDetailsData } = useQuery({
+  const {
+    data: bookingDetailsData,
+    isPending: isBookingDetailLoading,
+    isError: isBookingDetailError,
+  } = useQuery({
     queryKey: ["booking-details", selectedBookingId],
     queryFn: async () => {
       if (!selectedBookingId) return null;
-      const response = await apiClient.get(`/bookings/${selectedBookingId}`);
-      return response.data;
+      const response = await apiClient.get(
+        API_ENDPOINTS.CUSTOMER_MY_BOOKING(selectedBookingId),
+      );
+      const inner =
+        response &&
+        typeof response === "object" &&
+        "data" in response &&
+        response.data &&
+        typeof response.data === "object"
+          ? response.data
+          : response;
+      return inner;
     },
     enabled: !!selectedBookingId,
   });
 
-  // Update booking details when data is loaded
-  React.useEffect(() => {
-    if (bookingDetailsData) {
-      setBookingDetails(bookingDetailsData);
-      setIsLoadingBookingDetails(false);
-    }
-  }, [bookingDetailsData]);
-
-  // Handle booking selection
   const handleBookingSelect = (bookingId: number) => {
     setSelectedBookingId(bookingId);
-    setIsLoadingBookingDetails(true);
   };
 
-  // Handle back to list
   const handleBackToList = () => {
     setSelectedBookingId(null);
-    setBookingDetails(null);
   };
 
-  // Handle download click
-  const handleDownloadClick = (bookingId: number) => {
-    downloadVoucher(bookingId);
+  const handleDownloadClick = async (bookingId: number) => {
+    try {
+      await downloadVoucher(bookingId);
+    } catch (e) {
+      const msg =
+        e instanceof Error ? e.message : __("Download failed.", "yatra");
+      window.alert(msg);
+    }
   };
 
-  // Handle remaining payment
   const startRemainingPaymentSession = async (bookingId: number) => {
     setPayLoading(bookingId);
     try {
       const response = await apiClient.post(
-        `/bookings/${bookingId}/pay-remaining`,
+        API_ENDPOINTS.PAYMENT_REMAINING_SESSION,
+        { booking_id: bookingId },
       );
-      const { payment_url } = response.data;
+      const payload =
+        response &&
+        typeof response === "object" &&
+        "data" in response &&
+        response.data &&
+        typeof response.data === "object"
+          ? response.data
+          : response;
+      const checkoutUrl =
+        payload &&
+        typeof payload === "object" &&
+        "checkout_url" in payload &&
+        typeof (payload as { checkout_url?: string }).checkout_url === "string"
+          ? (payload as { checkout_url: string }).checkout_url
+          : "";
 
-      if (payment_url) {
-        window.location.href = payment_url;
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      } else {
+        window.alert(
+          __("Could not start payment. Please try again.", "yatra"),
+        );
       }
     } catch (error) {
       console.error("Error initiating payment:", error);
+      const msg =
+        error instanceof Error && error.message
+          ? error.message
+          : __("Could not start payment.", "yatra");
+      window.alert(msg);
     } finally {
       setPayLoading(null);
     }
   };
 
-  // If booking details are being viewed
-  if (selectedBookingId && bookingDetails) {
+  if (selectedBookingId) {
     return (
       <BookingDetails
-        booking={bookingDetails}
-        isLoading={isLoadingBookingDetails}
+        booking={
+          isBookingDetailLoading || isBookingDetailError
+            ? null
+            : (bookingDetailsData as any)
+        }
+        isLoading={isBookingDetailLoading}
         onBack={handleBackToList}
       />
     );
@@ -466,14 +506,21 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                         {__("Pay Remaining Balance", "yatra")}
                       </button>
                     )}
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => onSectionChange("support")}
-                      className="yatra-booking-action yatra-booking-action-support inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer"
-                    >
-                      {__("Support", "yatra")}
-                    </div>
+                    {conciergeTel ? (
+                      <a
+                        href={conciergeTel}
+                        className="yatra-booking-action yatra-booking-action-support inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium no-underline"
+                      >
+                        {__("Call us", "yatra")}
+                      </a>
+                    ) : conciergeMail ? (
+                      <a
+                        href={`mailto:${encodeURIComponent(conciergeMail)}`}
+                        className="yatra-booking-action yatra-booking-action-support inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium no-underline"
+                      >
+                        {__("Email us", "yatra")}
+                      </a>
+                    ) : null}
                   </div>
                 </div>
               </div>

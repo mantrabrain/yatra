@@ -96,7 +96,7 @@ class SettingsService
         // Trip
         'trip_base' => 'trip',
         'trips_per_page' => 12,
-        'enable_wishlist' => true,
+        'enable_wishlist' => false,
         'enable_comparison' => false,
         'show_sold_out' => true,
         
@@ -584,6 +584,37 @@ class SettingsService
     }
 
     /**
+     * URL slug for the customer account area (Settings → Customer → account path).
+     * Derives from yatra_customer_account_page first so routing matches the configured path
+     * even when yatra_account_base was never saved or is out of sync.
+     */
+    public static function getAccountBase(): string
+    {
+        $customerPath = get_option('yatra_customer_account_page', '');
+        if (is_string($customerPath) && $customerPath !== '' && $customerPath !== '0') {
+            $slug = self::slugFromAccountPathString($customerPath);
+            if ($slug !== '') {
+                return $slug;
+            }
+        }
+
+        $base = self::getString('account_base', '');
+        $base = preg_replace('/[^a-z0-9_-]/i', '', $base) ?: '';
+
+        return $base !== '' ? $base : 'account';
+    }
+
+    private static function slugFromAccountPathString(string $path): string
+    {
+        $path = trim(str_replace('\\', '/', $path), '/');
+        $parts = array_values(array_filter(explode('/', $path), static fn ($p) => $p !== ''));
+        $segment = $parts !== [] ? end($parts) : 'account';
+        $slug = sanitize_title($segment);
+
+        return $slug !== '' ? $slug : 'account';
+    }
+
+    /**
      * Check if using custom booking page
      */
     public static function useCustomBookingPage(): bool
@@ -608,10 +639,14 @@ class SettingsService
     }
 
     /**
-     * Check if wishlist is enabled
+     * Wishlist (saved trips) is a Yatra Pro feature and must be enabled in settings.
      */
     public static function wishlistEnabled(): bool
     {
+        if (!apply_filters('yatra_is_pro_active', false)) {
+            return false;
+        }
+
         return self::isEnabled('enable_wishlist');
     }
 

@@ -255,9 +255,10 @@ if (!defined('ABSPATH')) {
                     <div class="yatra-side-image-item">
                         <img src="<?php echo esc_url($img_url); ?>"
                              alt="<?php echo esc_attr__('Gallery Image', 'yatra'); ?>">
-                        <?php if ($index === 0): ?>
+                        <?php if ($index === 0 && function_exists('yatra_wishlist_enabled') && yatra_wishlist_enabled() && !empty($trip->id)) : ?>
                             <button type="button" class="yatra-favorite-btn"
-                                    aria-label="<?php echo esc_attr__('Add to favorites', 'yatra'); ?>">
+                                    data-trip-id="<?php echo esc_attr((string) $trip->id); ?>"
+                                    aria-label="<?php echo esc_attr__('Save to wishlist', 'yatra'); ?>">
                                 <?php echo yatra_svg_icon('heart', 'yatra-icon-sm'); ?>
                             </button>
                         <?php endif; ?>

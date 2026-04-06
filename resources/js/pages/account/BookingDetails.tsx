@@ -296,6 +296,15 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
               {__("Booking Details", "yatra")}
             </h2>
           </div>
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={onBack}
+            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+          >
+            <ArrowRight className="w-4 h-4 rotate-180" />
+            {__("Back to Bookings", "yatra")}
+          </div>
         </div>
         <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
           <div className="animate-pulse space-y-4">

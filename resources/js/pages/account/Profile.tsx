@@ -15,9 +15,14 @@ import type { CustomerProfile } from "./types";
 interface ProfileProps {
   profile: CustomerProfile | null;
   savedTrips: any[];
+  wishlistEnabled?: boolean;
 }
 
-const Profile: React.FC<ProfileProps> = ({ profile, savedTrips }) => {
+const Profile: React.FC<ProfileProps> = ({
+  profile,
+  savedTrips,
+  wishlistEnabled = false,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -439,6 +444,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, savedTrips }) => {
           </div>
         </div>
 
+        {wishlistEnabled && (
         <div className="yatra-profile-saved-trips bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
           <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <Heart className="w-5 h-5 text-red-600 dark:text-red-400" />
@@ -476,6 +482,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, savedTrips }) => {
             )}
           </div>
         </div>
+        )}
       </div>
     </div>
   );

@@ -21,18 +21,49 @@ class RouteMatcher
      */
     public static function matchAccountPage(string $path): ?array
     {
-        $account_base = SettingsService::getString('account_base', 'account');
-        $slug = UrlParser::extractSlugFromPath($path, $account_base);
+        $account_base = SettingsService::getAccountBase();
+        $path_trim = rtrim($path, '/');
+        $base_trim = rtrim($account_base, '/');
 
-        if ($slug && in_array($slug, ['dashboard', 'profile', 'bookings', 'wishlist', 'settings'], true)) {
+        if ($path_trim === $base_trim) {
+            $tab = isset($_GET['tab']) ? sanitize_key((string) $_GET['tab']) : '';
+            $allowed = ['dashboard', 'bookings', 'payments', 'documents', 'profile', 'saved-trips'];
+            $page = ($tab !== '' && in_array($tab, $allowed, true)) ? $tab : 'dashboard';
+
             return [
                 'type' => 'account',
-                'page' => $slug,
-                'base' => $account_base
+                'page' => $page,
+                'base' => $account_base,
             ];
         }
 
-        return null;
+        $slug = UrlParser::extractSlugFromPath($path, $account_base);
+        if (!$slug) {
+            return null;
+        }
+
+        $slug = sanitize_title($slug);
+        $map = [
+            'dashboard' => 'dashboard',
+            'profile' => 'profile',
+            'bookings' => 'bookings',
+            'payments' => 'payments',
+            'documents' => 'documents',
+            'support' => 'dashboard',
+            'saved-trips' => 'saved-trips',
+            'wishlist' => 'saved-trips',
+            'settings' => 'profile',
+        ];
+        $page = $map[$slug] ?? null;
+        if ($page === null) {
+            return null;
+        }
+
+        return [
+            'type' => 'account',
+            'page' => $page,
+            'base' => $account_base,
+        ];
     }
 
     /**

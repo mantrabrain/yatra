@@ -22,6 +22,24 @@
         initPaginationLoadingClicks();
     });
 
+    /**
+     * Expand/collapse long checkbox lists in the sidebar ("Show more" / "Show less").
+     */
+    function initializeFilterCollapsibles() {
+        document.addEventListener('click', function(e) {
+            var btn = e.target.closest('.yatra-filter-show-more-toggle');
+            if (!btn) {
+                return;
+            }
+            var group = btn.closest('.yatra-filter-collapsible');
+            if (!group) {
+                return;
+            }
+            var expanded = group.classList.toggle('is-expanded');
+            btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        });
+    }
+
     function initializeFilters() {
         // Initialize all filter components
         initializeCheckboxFilters();
@@ -30,6 +48,7 @@
         initializeRatingFilter();
         initializeClearFilters();
         initializeFilterToggle();
+        initializeFilterCollapsibles();
         
         // Set initial filter states from URL
         setFiltersFromURL();

@@ -1,9 +1,11 @@
-// Wishlist functionality for trip listing page
+// Wishlist functionality for trip listing page (Yatra Pro + setting)
 class TripListingWishlist {
     constructor() {
-        this.apiUrl = window.yatraAdmin?.rest_url + 'yatra/v1' || '/wp-json/yatra/v1';
-        this.nonce = window.yatraAdmin?.nonce || '';
-        this.isLoggedIn = window.yatraAdmin?.is_logged_in || false;
+        var cfg = window.yatraWishlistConfig || {};
+        var base = (cfg.restUrl || '').replace(/\/$/, '');
+        this.apiUrl = base || (window.location && window.location.origin ? window.location.origin + '/wp-json/yatra/v1' : '/wp-json/yatra/v1');
+        this.nonce = cfg.nonce || '';
+        this.isLoggedIn = !!cfg.isLoggedIn;
         
         // Debug logging
         
@@ -14,7 +16,7 @@ class TripListingWishlist {
     init() {
         // Handle wishlist button clicks
         document.addEventListener('click', (e) => {
-            const btn = e.target.closest('.yatra-favorite-btn');
+            const btn = e.target.closest('.yatra-favorite-btn, .yatra-similar-favorite-btn');
             if (btn) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -29,7 +31,7 @@ class TripListingWishlist {
     }
 
     async checkAllSavedStatus() {
-        const buttons = document.querySelectorAll('.yatra-favorite-btn[data-trip-id]');
+        const buttons = document.querySelectorAll('.yatra-favorite-btn[data-trip-id], .yatra-similar-favorite-btn[data-trip-id]');
         buttons.forEach(async (btn) => {
             const tripId = btn.getAttribute('data-trip-id');
             if (tripId) {
@@ -81,14 +83,16 @@ class TripListingWishlist {
         btn.classList.add('loading');
 
         try {
+            const params = new URLSearchParams();
+            params.set('trip_id', String(parseInt(tripId, 10)));
             const response = await fetch(`${this.apiUrl}/saved-trips`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                     'X-WP-Nonce': this.nonce
                 },
                 credentials: 'same-origin',
-                body: JSON.stringify({ trip_id: parseInt(tripId) })
+                body: params.toString()
             });
 
             const data = await response.json();
@@ -284,7 +288,10 @@ class TripListingWishlist {
     }
 }
 
-// Initialize wishlist functionality
 document.addEventListener('DOMContentLoaded', function() {
+    var cfg = window.yatraWishlistConfig || {};
+    if (!cfg.enabled) {
+        return;
+    }
     window.tripListingWishlist = new TripListingWishlist();
 });

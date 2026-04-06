@@ -879,6 +879,8 @@ interface SettingsData {
   activity_base: string;
   trip_category_base: string;
   booking_base: string;
+  /** Wishlist (Yatra Pro) */
+  enable_wishlist?: boolean;
 
   // Booking Page Settings
   use_booking_page: boolean;
@@ -2279,6 +2281,7 @@ const Settings: React.FC = () => {
       activity_base: "activity",
       trip_category_base: "trip-category",
       booking_base: "book",
+      enable_wishlist: false,
       use_booking_page: false,
       booking_page_id: 0,
       debug_mode: false,
@@ -6334,6 +6337,40 @@ const Settings: React.FC = () => {
                 )}
               </p>
             </div>
+
+            {(window as any)?.yatraAdmin?.isPro ? (
+              <div className="flex items-start gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
+                <input
+                  type="checkbox"
+                  id="enable_wishlist"
+                  checked={!!formData.enable_wishlist}
+                  name="enable_wishlist"
+                  onChange={handleFieldChange}
+                  className="w-4 h-4 mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <div className="flex-1">
+                  <Label
+                    htmlFor="enable_wishlist"
+                    className="font-medium cursor-pointer"
+                  >
+                    {__("Enable wishlist (saved trips)", "yatra")}
+                  </Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {__(
+                      "Shows the heart control on trip cards and single trips, and the Saved Trips area in the customer account. Requires Yatra Pro.",
+                      "yatra",
+                    )}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 rounded-lg border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/30 text-sm text-amber-900 dark:text-amber-100">
+                {__(
+                  "Wishlist / saved trips are a Yatra Pro feature. Install Yatra Pro to enable them and turn them on here.",
+                  "yatra",
+                )}
+              </div>
+            )}
 
             <div className="space-y-4">
               <FormField

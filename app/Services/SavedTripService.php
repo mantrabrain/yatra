@@ -44,17 +44,26 @@ class SavedTripService
      */
     public function saveTrip(int $userId, int $tripId): array
     {
-        // Validate trip exists
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $trip = $tripRepository->find($tripId);
-        
+
         if (!$trip) {
             return [
                 'success' => false,
                 'message' => __('Trip not found.', 'yatra'),
             ];
         }
-        
+
+        // Block only non-public statuses; allow publish/published, empty/legacy rows, and custom “live” labels.
+        $status = strtolower(trim((string) ($trip->status ?? '')));
+        $blocked = ['draft', 'archived', 'trash', 'cancelled', 'canceled', 'pending', 'private'];
+        if ($status !== '' && in_array($status, $blocked, true)) {
+            return [
+                'success' => false,
+                'message' => __('Trip is not available.', 'yatra'),
+            ];
+        }
+
         $result = $this->repository->saveTrip($userId, $tripId);
         
         if ($result) {
@@ -79,15 +88,22 @@ class SavedTripService
      */
     public function removeTrip(int $userId, int $tripId): array
     {
+        if (!$this->repository->isSaved($userId, $tripId)) {
+            return [
+                'success' => true,
+                'message' => __('Trip removed from wishlist.', 'yatra'),
+            ];
+        }
+
         $result = $this->repository->removeTrip($userId, $tripId);
-        
+
         if ($result) {
             return [
                 'success' => true,
                 'message' => __('Trip removed from wishlist.', 'yatra'),
             ];
         }
-        
+
         return [
             'success' => false,
             'message' => __('Failed to remove trip.', 'yatra'),

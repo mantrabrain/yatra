@@ -91,15 +91,31 @@ class ApiError extends Error {
   }
 }
 
-class ApiClient {
-  private baseUrl: string;
-  private nonce: string;
+type YatraWindowGlobals = Window & {
+  yatraAccountPage?: { apiUrl?: string; nonce?: string };
+  yatraAdmin?: { apiUrl?: string; nonce?: string };
+};
 
-  constructor() {
-    // Ensure baseUrl doesn't have trailing slash
-    const rawUrl = window.yatraAdmin?.apiUrl || "/wp-json/yatra/v1";
-    this.baseUrl = rawUrl.endsWith("/") ? rawUrl.slice(0, -1) : rawUrl;
-    this.nonce = window.yatraAdmin?.nonce || "";
+class ApiClient {
+  /** Public account page uses `yatraAccountPage`; admin uses `yatraAdmin`. Resolve per request so module load order never leaves an empty nonce. */
+  private resolveBaseUrl(): string {
+    if (typeof window === "undefined") {
+      return "/wp-json/yatra/v1";
+    }
+    const w = window as YatraWindowGlobals;
+    const raw =
+      w.yatraAccountPage?.apiUrl ||
+      w.yatraAdmin?.apiUrl ||
+      "/wp-json/yatra/v1";
+    return raw.endsWith("/") ? raw.slice(0, -1) : raw;
+  }
+
+  private resolveNonce(): string {
+    if (typeof window === "undefined") {
+      return "";
+    }
+    const w = window as YatraWindowGlobals;
+    return w.yatraAccountPage?.nonce || w.yatraAdmin?.nonce || "";
   }
 
   private async request(
@@ -115,11 +131,12 @@ class ApiClient {
 
     // Build URL properly - handle query string format (rest_route) vs pretty permalinks
     let url: string;
+    const baseUrl = this.resolveBaseUrl();
 
     // Check if baseUrl uses query string format (contains ?rest_route=)
-    if (this.baseUrl.includes("?rest_route=")) {
+    if (baseUrl.includes("?rest_route=")) {
       // Query string format: append endpoint to rest_route value, then add other params with &
-      const [base, queryString] = this.baseUrl.split("?");
+      const [base, queryString] = baseUrl.split("?");
       const params = new URLSearchParams(queryString);
       const restRoute = params.get("rest_route") || "";
       params.set("rest_route", restRoute + cleanEndpoint);
@@ -140,7 +157,7 @@ class ApiClient {
       url = `${base}?${params.toString()}`;
     } else {
       // Pretty permalink format: append endpoint and add query params with ?
-      url = `${this.baseUrl}${cleanEndpoint}`;
+      url = `${baseUrl}${cleanEndpoint}`;
       if (endpointQuery || queryParams) {
         const params = new URLSearchParams();
         if (endpointQuery) {
@@ -163,7 +180,7 @@ class ApiClient {
 
     // Build headers
     const headers: HeadersInit = {
-      "X-WP-Nonce": this.nonce,
+      "X-WP-Nonce": this.resolveNonce(),
       ...options.headers,
     };
 
@@ -248,8 +265,9 @@ class ApiClient {
       : `/${endpointPath}`;
 
     let url: string;
-    if (this.baseUrl.includes("?rest_route=")) {
-      const [base, queryString] = this.baseUrl.split("?");
+    const baseUrl = this.resolveBaseUrl();
+    if (baseUrl.includes("?rest_route=")) {
+      const [base, queryString] = baseUrl.split("?");
       const params = new URLSearchParams(queryString);
       const restRoute = params.get("rest_route") || "";
       params.set("rest_route", restRoute + cleanEndpoint);
@@ -267,7 +285,7 @@ class ApiClient {
       }
       url = `${base}?${params.toString()}`;
     } else {
-      url = `${this.baseUrl}${cleanEndpoint}`;
+      url = `${baseUrl}${cleanEndpoint}`;
       if (endpointQuery || queryParams) {
         const params = new URLSearchParams();
         if (endpointQuery) {
@@ -288,7 +306,7 @@ class ApiClient {
     const isFormDataBody =
       typeof FormData !== "undefined" && options.body instanceof FormData;
     const headers: HeadersInit = {
-      "X-WP-Nonce": this.nonce,
+      "X-WP-Nonce": this.resolveNonce(),
       ...options.headers,
     };
     if (!isFormDataBody) {

@@ -667,12 +667,21 @@ function yatra_get_booking_session(?string $key = null, $default = null)
 }
 
 /**
- * Clear booking session data
+ * Clear booking session data (PHP session, booking token, and REST backup transient).
+ *
+ * Without removing the token and transient, yatra_get_booking_session() can repopulate
+ * checkout data from the transient on the next request after a completed booking.
  */
 function yatra_clear_booking_session(): void
 {
     yatra_start_session();
-    unset($_SESSION['yatra_booking']);
+
+    $token = $_SESSION['yatra_booking_token'] ?? null;
+    if (is_string($token) && $token !== '') {
+        delete_transient($token);
+    }
+
+    unset($_SESSION['yatra_booking'], $_SESSION['yatra_booking_token']);
 }
 
 /**
@@ -701,8 +710,8 @@ function yatra_set_remaining_session(array $data): void
 {
     yatra_start_session();
     
-    // Clear any existing booking session to avoid conflicts
-    unset($_SESSION['yatra_booking']);
+    // Clear checkout session fully (including token + transient) before remaining-payment flow
+    yatra_clear_booking_session();
     
     $_SESSION['yatra_remaining'] = array_merge(
         $data,
@@ -1047,13 +1056,26 @@ function yatra_is_destination_listing(): bool
  */
 function yatra_is_account_page(): bool
 {
+    if (!empty($GLOBALS['yatra_loading_react_account_page'])) {
+        return true;
+    }
+
+    if ((string) get_query_var('yatra_account_page') !== '') {
+        return true;
+    }
+
     global $post;
+    if ($post && function_exists('has_shortcode') && isset($post->post_content)
+        && has_shortcode((string) $post->post_content, 'yatra_my_account')) {
+        return true;
+    }
+
     if (!$post) {
         return false;
     }
 
     $accountPageId = get_option('yatra_my_account_page');
-    return $accountPageId && $post->ID == $accountPageId;
+    return $accountPageId && (int) $post->ID === (int) $accountPageId;
 }
 
 /**
@@ -1580,5 +1602,31 @@ if (!function_exists('yatra_render_tab_icon')) {
             // Default fallback
             echo yatra_svg_icon($default_icon, $css_class);
         }
+    }
+}
+
+if (!function_exists('yatra_listing_sidebar_filter_visible_cap')) {
+    /**
+     * How many sidebar checkbox rows to show before "Show more" on the trip listing.
+     *
+     * Filter: {@see 'yatra_listing_sidebar_filter_visible_count'} — default 8, clamped 3–40.
+     *
+     * @return int
+     */
+    function yatra_listing_sidebar_filter_visible_cap(): int
+    {
+        $n = (int) apply_filters('yatra_listing_sidebar_filter_visible_count', 8);
+
+        return max(3, min(40, $n));
+    }
+}
+
+if (!function_exists('yatra_wishlist_enabled')) {
+    /**
+     * Whether wishlist UI and REST should be active (Yatra Pro + setting).
+     */
+    function yatra_wishlist_enabled(): bool
+    {
+        return \Yatra\Services\SettingsService::wishlistEnabled();
     }
 }

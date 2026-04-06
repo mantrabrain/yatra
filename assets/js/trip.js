@@ -4502,6 +4502,9 @@
    */
   class WishlistHandler {
     constructor() {
+      if (!window.yatraTripData?.wishlistEnabled) {
+        return;
+      }
       this.apiUrl = window.yatraTripData?.apiUrl || '/wp-json/yatra/v1';
       this.nonce = window.yatraTripData?.nonce || '';
       this.tripId = window.yatraTripData?.tripId || 0;
@@ -4556,32 +4559,41 @@
         return;
       }
 
+      const btnTripId = parseInt(btn.getAttribute('data-trip-id'), 10) || this.tripId;
+      if (!btnTripId) {
+        return;
+      }
+
       const isSaved = btn.classList.contains('saved');
       if (isSaved) {
-        this.removeFromWishlist(btn);
+        this.removeFromWishlist(btn, btnTripId);
       } else {
-        this.addToWishlist(btn);
+        this.addToWishlist(btn, btnTripId);
       }
     }
 
-    async addToWishlist(btn) {
+    async addToWishlist(btn, tripId) {
+      const tid = tripId || this.tripId;
       btn.disabled = true;
       btn.classList.add('loading');
 
       try {
+        // application/x-www-form-urlencoded is parsed reliably across hosts; JSON body can be dropped on some stacks.
+        const params = new URLSearchParams();
+        params.set('trip_id', String(tid));
         const response = await fetch(`${this.apiUrl}/saved-trips`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
             'X-WP-Nonce': this.nonce
           },
           credentials: 'same-origin',
-          body: JSON.stringify({ trip_id: this.tripId })
+          body: params.toString()
         });
 
         const data = await response.json();
         if (data.success) {
-          this.updateButtonState(true);
+          this.updateButtonState(true, tid);
           this.showMessage(data.message || 'Trip saved to wishlist', 'success', btn);
         } else {
           this.showMessage(data.message || 'Failed to save trip', 'error', btn);
@@ -4595,12 +4607,13 @@
       }
     }
 
-    async removeFromWishlist(btn) {
+    async removeFromWishlist(btn, tripId) {
+      const tid = tripId || this.tripId;
       btn.disabled = true;
       btn.classList.add('loading');
 
       try {
-        const response = await fetch(`${this.apiUrl}/saved-trips/${this.tripId}`, {
+        const response = await fetch(`${this.apiUrl}/saved-trips/${tid}`, {
           method: 'DELETE',
           headers: {
             'X-WP-Nonce': this.nonce
@@ -4610,7 +4623,7 @@
 
         const data = await response.json();
         if (data.success) {
-          this.updateButtonState(false);
+          this.updateButtonState(false, tid);
           this.showMessage(data.message || 'Trip removed from wishlist', 'success', btn);
         } else {
           this.showMessage(data.message || 'Failed to remove trip', 'error', btn);
@@ -4624,8 +4637,12 @@
       }
     }
 
-    updateButtonState(isSaved) {
-      const buttons = document.querySelectorAll('.yatra-favorite-btn');
+    updateButtonState(isSaved, tripId) {
+      const tid = tripId || this.tripId;
+      const selector = tid
+        ? `.yatra-favorite-btn[data-trip-id="${tid}"]`
+        : '.yatra-favorite-btn';
+      const buttons = document.querySelectorAll(selector);
       buttons.forEach(btn => {
         if (isSaved) {
           btn.classList.add('saved', 'is-saved');

@@ -10,6 +10,17 @@ jQuery(document).ready(function() {
         return window.location.origin + '/trip/';
     }
 
+    function closeDropdownMenu(dropdown) {
+        if (!dropdown) {
+            return;
+        }
+        dropdown.classList.remove('open');
+        var m = dropdown.querySelector('.yatra-dropdown-menu');
+        if (m) {
+            m.classList.remove('show');
+        }
+    }
+
     function initHorizontalSearchDropdowns() {
         var dropdowns = document.querySelectorAll('.yatra-search-dropdown');
 
@@ -20,7 +31,7 @@ jQuery(document).ready(function() {
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.yatra-search-dropdown')) {
                 dropdowns.forEach(function(dropdown) {
-                    dropdown.classList.remove('open');
+                    closeDropdownMenu(dropdown);
                 });
             }
         });
@@ -30,8 +41,29 @@ jQuery(document).ready(function() {
 
             var trigger = dropdown.querySelector('.yatra-dropdown-trigger');
             var menu = dropdown.querySelector('.yatra-dropdown-menu');
-            var options = dropdown.querySelectorAll('.yatra-dropdown-option');
             var valueSpan = dropdown.querySelector('.yatra-dropdown-value');
+            var options = dropdown.querySelectorAll('.yatra-dropdown-option');
+
+            var filterableMenu = dropdown.querySelector('.yatra-dropdown-menu--filterable');
+            var filterInput = filterableMenu ? filterableMenu.querySelector('.yatra-dropdown-filter-input') : null;
+            var optionsContainer = filterableMenu ? filterableMenu.querySelector('.yatra-dropdown-options') : null;
+
+            if (filterInput && optionsContainer) {
+                filterInput.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+                filterInput.addEventListener('keydown', function(e) {
+                    e.stopPropagation();
+                });
+                filterInput.addEventListener('input', function() {
+                    var q = (filterInput.value || '').trim().toLowerCase();
+                    optionsContainer.querySelectorAll('.yatra-dropdown-option').forEach(function(opt) {
+                        var hay = (opt.getAttribute('data-search-text') || opt.textContent || '').trim().toLowerCase();
+                        var hide = q !== '' && hay.indexOf(q) === -1;
+                        opt.classList.toggle('yatra-dropdown-option--hidden', hide);
+                    });
+                });
+            }
 
             if (trigger) {
                 trigger.addEventListener('click', function(e) {
@@ -41,26 +73,27 @@ jQuery(document).ready(function() {
 
                     dropdowns.forEach(function(d) {
                         if (d !== dropdown) {
-                            d.classList.remove('open');
-                            var otherMenu = d.querySelector('.yatra-dropdown-menu');
-                            if (otherMenu) {
-                                otherMenu.classList.remove('show');
-                            }
+                            closeDropdownMenu(d);
                         }
                     });
 
-                    var m = dropdown.querySelector('.yatra-dropdown-menu');
-
                     if (dropdown.classList.contains('open')) {
-                        dropdown.classList.remove('open');
-                        if (m) {
-                            m.classList.remove('show');
-                        }
+                        closeDropdownMenu(dropdown);
                     } else {
                         dropdown.classList.add('open');
+                        var m = dropdown.querySelector('.yatra-dropdown-menu');
                         if (m) {
                             m.removeAttribute('style');
                             m.classList.add('show');
+                        }
+                        if (filterInput && optionsContainer) {
+                            filterInput.value = '';
+                            optionsContainer.querySelectorAll('.yatra-dropdown-option').forEach(function(opt) {
+                                opt.classList.remove('yatra-dropdown-option--hidden');
+                            });
+                            window.requestAnimationFrame(function() {
+                                filterInput.focus();
+                            });
                         }
                     }
                 }, true);
@@ -70,18 +103,20 @@ jQuery(document).ready(function() {
                 option.addEventListener('click', function(e) {
                     e.stopPropagation();
 
-                    options.forEach(function(opt) {
+                    var scope = optionsContainer || dropdown;
+                    var siblings = scope.querySelectorAll('.yatra-dropdown-option');
+                    siblings.forEach(function(opt) {
                         opt.classList.remove('selected');
                     });
 
                     this.classList.add('selected');
 
                     if (valueSpan) {
-                        valueSpan.textContent = this.textContent;
+                        valueSpan.textContent = (this.textContent || '').trim();
                         valueSpan.classList.add('selected');
                     }
 
-                    dropdown.classList.remove('open');
+                    closeDropdownMenu(dropdown);
                 });
             });
 

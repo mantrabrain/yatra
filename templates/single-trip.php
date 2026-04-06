@@ -111,19 +111,8 @@ if (!empty($itinerary_days)) {
 <!-- Flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-<!-- Single Trip JavaScript Data -->
+<!-- Trip pricing/availability for JS: merged in wp_localize_script (yatra-trip) so apiUrl/nonce/wishlist are not overwritten. -->
 <script>
-window.yatraTripData = {
-    tripId: <?php echo (int)$trip->id; ?>,
-    basePrice: <?php echo (float)$base_price; ?>,
-    currencySymbol: '<?php echo yatra_get_currency_symbol(\Yatra\Services\SettingsService::getCurrency()); ?>',
-    availabilityDates: <?php echo json_encode(array_map(function ($avail) {
-        return $avail->departure_date ?? $avail->date;
-    }, $trip->getAvailabilityDates())); ?>,
-    groupDiscountsUrl: '<?php echo esc_url(rest_url('yatra/v1/discounts/group-discounts')); ?>'
-};
-
-// WordPress REST API nonce
 window.yatraVars = {
     nonce: '<?php echo wp_create_nonce('wp_rest'); ?>'
 };

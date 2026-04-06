@@ -4,7 +4,6 @@ export type Section =
   | "payments"
   | "documents"
   | "profile"
-  | "support"
   | "saved-trips";
 
 export interface Booking {
@@ -66,12 +65,16 @@ export interface SupportTicket {
 export interface CustomerProfile {
   id: number;
   name: string;
+  first_name?: string;
+  last_name?: string;
   email: string;
   phone?: string;
   address?: string;
   city?: string;
   country?: string;
-  registered_at: string;
+  /** Member since; API may send `created_at` only. */
+  registered_at?: string;
+  created_at?: string;
   total_bookings: number;
   total_spent: number;
   loyalty_tier?: string;

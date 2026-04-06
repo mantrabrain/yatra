@@ -19,6 +19,30 @@ class SavedTripRepository extends BaseRepository
     private const META_KEY = 'yatra_saved_trips';
 
     /**
+     * Normalize stored meta to a list of trip IDs (handles legacy rows with trip_id keys).
+     *
+     * @param mixed $savedData
+     * @return list<int>
+     */
+    private function normalizeSavedTripIdsFromMeta($savedData): array
+    {
+        if (!is_array($savedData)) {
+            return [];
+        }
+
+        $ids = [];
+        foreach ($savedData as $item) {
+            if (is_array($item) && isset($item['trip_id'])) {
+                $ids[] = (int) $item['trip_id'];
+            } elseif (is_numeric($item)) {
+                $ids[] = (int) $item;
+            }
+        }
+
+        return array_values(array_unique($ids));
+    }
+
+    /**
      * Get full table name with prefix (not used, but required by BaseRepository)
      */
     protected function getTableName(): string
@@ -36,13 +60,9 @@ class SavedTripRepository extends BaseRepository
      */
     public function isSaved(int $userId, int $tripId): bool
     {
-        $savedTripIds = get_user_meta($userId, self::META_KEY, true);
-        
-        if (!is_array($savedTripIds)) {
-            return false;
-        }
-        
-        return in_array($tripId, $savedTripIds);
+        $raw = get_user_meta($userId, self::META_KEY, true);
+
+        return in_array($tripId, $this->normalizeSavedTripIdsFromMeta($raw), true);
     }
 
     /**
@@ -54,45 +74,35 @@ class SavedTripRepository extends BaseRepository
      */
     public function saveTrip(int $userId, int $tripId): bool
     {
-        // Get saved data from user meta
+        $tripId = (int) $tripId;
+        if ($tripId <= 0) {
+            return false;
+        }
+
         $savedData = get_user_meta($userId, self::META_KEY, true);
-        if (!is_array($savedData)) {
-            $savedData = [];
+        $savedTripIds = $this->normalizeSavedTripIdsFromMeta(is_array($savedData) ? $savedData : []);
+
+        if (in_array($tripId, $savedTripIds, true)) {
+            return true;
         }
-        
-        // Convert to array of IDs (handle both old and new formats)
-        $savedTripIds = [];
-        foreach ($savedData as $item) {
-            if (is_array($item) && isset($item['trip_id'])) {
-                // Old format: array with trip_id key
-                $savedTripIds[] = (int) $item['trip_id'];
-            } elseif (is_numeric($item) || is_int($item)) {
-                // New format: just trip ID
-                $savedTripIds[] = (int) $item;
-            }
-        }
-        
-        // Check if already saved
-        if (in_array($tripId, $savedTripIds)) {
-            return true; // Already saved
-        }
-        
-        // Verify trip exists
+
         $tripRepository = new TripRepository();
         $trip = $tripRepository->find($tripId);
-        
+
         if (!$trip) {
             return false;
         }
-        
-        // Add trip ID to saved trips (NOT user ID - ensure we're using $tripId, not $userId)
-        $savedTripIds[] = (int) $tripId;
-        
-        // Remove duplicates and re-index
+
+        $savedTripIds[] = $tripId;
         $savedTripIds = array_values(array_unique($savedTripIds));
-        
-        // Save only trip IDs to user meta (always use new format)
-        return update_user_meta($userId, self::META_KEY, $savedTripIds) !== false;
+
+        $updated = update_user_meta($userId, self::META_KEY, $savedTripIds);
+        if ($updated !== false) {
+            return true;
+        }
+
+        // update_user_meta() returns false when the value is unchanged; treat as success if the trip is stored.
+        return $this->isSaved($userId, $tripId);
     }
 
     /**
@@ -104,32 +114,32 @@ class SavedTripRepository extends BaseRepository
      */
     public function removeTrip(int $userId, int $tripId): bool
     {
-        // Get saved data from user meta
-        $savedData = get_user_meta($userId, self::META_KEY, true);
-        if (!is_array($savedData) || empty($savedData)) {
+        $tripId = (int) $tripId;
+        if ($tripId <= 0 || !$this->isSaved($userId, $tripId)) {
             return false;
         }
-        
-        // Handle both old format (array of trip objects) and new format (array of IDs)
-        $savedTripIds = [];
-        foreach ($savedData as $item) {
-            if (is_array($item) && isset($item['trip_id'])) {
-                // Old format: array with trip_id key
-                $itemId = (int) $item['trip_id'];
-                if ($itemId !== $tripId) {
-                    $savedTripIds[] = $itemId;
-                }
-            } elseif (is_numeric($item)) {
-                // New format: just trip ID
-                $itemId = (int) $item;
-                if ($itemId !== $tripId) {
-                    $savedTripIds[] = $itemId;
-                }
-            }
+
+        $savedData = get_user_meta($userId, self::META_KEY, true);
+        if (!is_array($savedData) || $savedData === []) {
+            return false;
         }
-        
-        // Save updated trip IDs to user meta (always save as new format - just IDs)
-        return update_user_meta($userId, self::META_KEY, $savedTripIds) !== false;
+
+        $before = $this->normalizeSavedTripIdsFromMeta($savedData);
+        $savedTripIds = array_values(array_filter(
+            $before,
+            static fn (int $id): bool => $id !== $tripId
+        ));
+
+        if (count($savedTripIds) === count($before)) {
+            return false;
+        }
+
+        $updated = update_user_meta($userId, self::META_KEY, $savedTripIds);
+        if ($updated !== false) {
+            return true;
+        }
+
+        return !$this->isSaved($userId, $tripId);
     }
 
     /**
@@ -208,7 +218,7 @@ class SavedTripRepository extends BaseRepository
             
             $tripStatus = $tripObj->status ?? '';
             // Only include published trips (accept both 'publish' and 'published')
-            if ($tripStatus !== 'publish') {
+            if (!in_array($tripStatus, ['publish', 'published'], true)) {
                 continue; // Trip not published, skip it
             }
             
@@ -226,6 +236,8 @@ class SavedTripRepository extends BaseRepository
             $displayPrice = $resolvedPricing['current_price'];
             $hasDiscount = $resolvedPricing['has_discount'];
             $discountPercent = $resolvedPricing['discount_percentage'];
+            $salePrice = (float) ($tripObj->sale_price ?? 0);
+            $discountedPrice = (float) ($tripObj->discounted_price ?? 0);
             
             // Get destinations for location
             $destinations = $tripRepository->getDestinations($tripId);

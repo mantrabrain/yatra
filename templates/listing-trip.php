@@ -247,17 +247,20 @@ yatra_get_header();
                             </div>
                         </div>
                         <div class="yatra-filter-content">
-                            <div class="yatra-checkbox-group">
-                                <?php 
-                                foreach ($difficulty_levels as $level) :
-                                ?>
-                                <label class="yatra-checkbox-label">
-                                    <input type="checkbox" name="difficulty[]" value="<?php echo esc_attr($level->id); ?>" <?php echo in_array($level->id, $active_filters['difficulty'] ?? []) ? 'checked' : ''; ?>>
-                                    <span><?php echo esc_html($level->name); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$level->count; ?>)</span>
-                                </label>
-                                <?php endforeach; ?>
-                            </div>
+                            <?php
+                            $yatra_sidebar_cb_rows = [];
+                            foreach ($difficulty_levels as $level) {
+                                $yatra_sidebar_cb_rows[] = [
+                                    'value' => $level->id,
+                                    'label' => $level->name,
+                                    'count' => (int) $level->count,
+                                ];
+                            }
+                            $yatra_sidebar_cb_input_name = 'difficulty[]';
+                            $yatra_sidebar_cb_active = $active_filters['difficulty'] ?? [];
+                            include __DIR__ . '/partials/listing-sidebar-collapsible-checkboxes.php';
+                            unset($yatra_sidebar_cb_rows, $yatra_sidebar_cb_input_name, $yatra_sidebar_cb_active);
+                            ?>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -332,17 +335,20 @@ yatra_get_header();
                             </div>
                         </div>
                         <div class="yatra-filter-content">
-                            <div class="yatra-checkbox-group">
-                                <?php 
-                                foreach ($categories as $category) :
-                                ?>
-                                <label class="yatra-checkbox-label">
-                                    <input type="checkbox" name="categories[]" value="<?php echo esc_attr($category->id); ?>" <?php echo in_array($category->id, $active_filters['categories'] ?? []) ? 'checked' : ''; ?>>
-                                    <span><?php echo esc_html($category->name); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$category->count; ?>)</span>
-                                </label>
-                                <?php endforeach; ?>
-                            </div>
+                            <?php
+                            $yatra_sidebar_cb_rows = [];
+                            foreach ($categories as $category) {
+                                $yatra_sidebar_cb_rows[] = [
+                                    'value' => $category->id,
+                                    'label' => $category->name,
+                                    'count' => (int) $category->count,
+                                ];
+                            }
+                            $yatra_sidebar_cb_input_name = 'categories[]';
+                            $yatra_sidebar_cb_active = $active_filters['categories'] ?? [];
+                            include __DIR__ . '/partials/listing-sidebar-collapsible-checkboxes.php';
+                            unset($yatra_sidebar_cb_rows, $yatra_sidebar_cb_input_name, $yatra_sidebar_cb_active);
+                            ?>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -372,17 +378,20 @@ yatra_get_header();
                             </div>
                         </div>
                         <div class="yatra-filter-content">
-                            <div class="yatra-checkbox-group">
-                                <?php 
-                                foreach ($destinations as $destination) :
-                                ?>
-                                <label class="yatra-checkbox-label">
-                                    <input type="checkbox" name="destinations[]" value="<?php echo esc_attr($destination->id); ?>" <?php echo in_array($destination->id, $active_filters['destinations'] ?? []) ? 'checked' : ''; ?>>
-                                    <span><?php echo esc_html($destination->name); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$destination->count; ?>)</span>
-                                </label>
-                                <?php endforeach; ?>
-                            </div>
+                            <?php
+                            $yatra_sidebar_cb_rows = [];
+                            foreach ($destinations as $destination) {
+                                $yatra_sidebar_cb_rows[] = [
+                                    'value' => $destination->id,
+                                    'label' => $destination->name,
+                                    'count' => (int) $destination->count,
+                                ];
+                            }
+                            $yatra_sidebar_cb_input_name = 'destinations[]';
+                            $yatra_sidebar_cb_active = $active_filters['destinations'] ?? [];
+                            include __DIR__ . '/partials/listing-sidebar-collapsible-checkboxes.php';
+                            unset($yatra_sidebar_cb_rows, $yatra_sidebar_cb_input_name, $yatra_sidebar_cb_active);
+                            ?>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -412,17 +421,20 @@ yatra_get_header();
                             </div>
                         </div>
                         <div class="yatra-filter-content">
-                            <div class="yatra-checkbox-group">
-                                <?php 
-                                foreach ($activities as $activity) :
-                                ?>
-                                <label class="yatra-checkbox-label">
-                                    <input type="checkbox" name="activities[]" value="<?php echo esc_attr($activity->id); ?>" <?php echo in_array($activity->id, $active_filters['activities'] ?? []) ? 'checked' : ''; ?>>
-                                    <span><?php echo esc_html($activity->name); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$activity->count; ?>)</span>
-                                </label>
-                                <?php endforeach; ?>
-                            </div>
+                            <?php
+                            $yatra_sidebar_cb_rows = [];
+                            foreach ($activities as $activity) {
+                                $yatra_sidebar_cb_rows[] = [
+                                    'value' => $activity->id,
+                                    'label' => $activity->name,
+                                    'count' => (int) $activity->count,
+                                ];
+                            }
+                            $yatra_sidebar_cb_input_name = 'activities[]';
+                            $yatra_sidebar_cb_active = $active_filters['activities'] ?? [];
+                            include __DIR__ . '/partials/listing-sidebar-collapsible-checkboxes.php';
+                            unset($yatra_sidebar_cb_rows, $yatra_sidebar_cb_input_name, $yatra_sidebar_cb_active);
+                            ?>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -447,15 +459,20 @@ yatra_get_header();
                             </svg>
                         </div>
                         <div class="yatra-filter-content">
-                            <div class="yatra-checkbox-group">
-                                <?php foreach ($accommodation_types as $accommodation) : ?>
-                                <label class="yatra-checkbox-label">
-                                    <input type="checkbox" name="accommodation[]" value="<?php echo esc_attr($accommodation->name); ?>" <?php echo in_array($accommodation->name, $active_filters['accommodation'] ?? []) ? 'checked' : ''; ?>>
-                                    <span><?php echo esc_html(ucwords(str_replace(['_', '-'], ' ', $accommodation->name))); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$accommodation->trip_count; ?>)</span>
-                                </label>
-                                <?php endforeach; ?>
-                            </div>
+                            <?php
+                            $yatra_sidebar_cb_rows = [];
+                            foreach ($accommodation_types as $accommodation) {
+                                $yatra_sidebar_cb_rows[] = [
+                                    'value' => $accommodation->name,
+                                    'label' => ucwords(str_replace(['_', '-'], ' ', $accommodation->name)),
+                                    'count' => (int) $accommodation->trip_count,
+                                ];
+                            }
+                            $yatra_sidebar_cb_input_name = 'accommodation[]';
+                            $yatra_sidebar_cb_active = $active_filters['accommodation'] ?? [];
+                            include __DIR__ . '/partials/listing-sidebar-collapsible-checkboxes.php';
+                            unset($yatra_sidebar_cb_rows, $yatra_sidebar_cb_input_name, $yatra_sidebar_cb_active);
+                            ?>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -480,15 +497,20 @@ yatra_get_header();
                             </svg>
                         </div>
                         <div class="yatra-filter-content">
-                            <div class="yatra-checkbox-group">
-                                <?php foreach ($included_services as $service) : ?>
-                                <label class="yatra-checkbox-label">
-                                    <input type="checkbox" name="services[]" value="<?php echo esc_attr($service->service_name); ?>" <?php echo in_array($service->service_name, $active_filters['services'] ?? []) ? 'checked' : ''; ?>>
-                                    <span><?php echo esc_html($service->service_name); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$service->trip_count; ?>)</span>
-                                </label>
-                                <?php endforeach; ?>
-                            </div>
+                            <?php
+                            $yatra_sidebar_cb_rows = [];
+                            foreach ($included_services as $service) {
+                                $yatra_sidebar_cb_rows[] = [
+                                    'value' => $service->service_name,
+                                    'label' => $service->service_name,
+                                    'count' => (int) $service->trip_count,
+                                ];
+                            }
+                            $yatra_sidebar_cb_input_name = 'services[]';
+                            $yatra_sidebar_cb_active = $active_filters['services'] ?? [];
+                            include __DIR__ . '/partials/listing-sidebar-collapsible-checkboxes.php';
+                            unset($yatra_sidebar_cb_rows, $yatra_sidebar_cb_input_name, $yatra_sidebar_cb_active);
+                            ?>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -513,15 +535,20 @@ yatra_get_header();
                             </svg>
                         </div>
                         <div class="yatra-filter-content">
-                            <div class="yatra-checkbox-group">
-                                <?php foreach ($special_offers as $offer) : ?>
-                                <label class="yatra-checkbox-label">
-                                    <input type="checkbox" name="offers[]" value="<?php echo esc_attr($offer->value); ?>" <?php echo in_array($offer->value, $active_filters['offers'] ?? []) ? 'checked' : ''; ?>>
-                                    <span><?php echo esc_html($offer->label); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$offer->count; ?>)</span>
-                                </label>
-                                <?php endforeach; ?>
-                            </div>
+                            <?php
+                            $yatra_sidebar_cb_rows = [];
+                            foreach ($special_offers as $offer) {
+                                $yatra_sidebar_cb_rows[] = [
+                                    'value' => $offer->value,
+                                    'label' => $offer->label,
+                                    'count' => (int) $offer->count,
+                                ];
+                            }
+                            $yatra_sidebar_cb_input_name = 'offers[]';
+                            $yatra_sidebar_cb_active = $active_filters['offers'] ?? [];
+                            include __DIR__ . '/partials/listing-sidebar-collapsible-checkboxes.php';
+                            unset($yatra_sidebar_cb_rows, $yatra_sidebar_cb_input_name, $yatra_sidebar_cb_active);
+                            ?>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -546,15 +573,20 @@ yatra_get_header();
                             </svg>
                         </div>
                         <div class="yatra-filter-content">
-                            <div class="yatra-checkbox-group">
-                                <?php foreach ($booking_options as $option) : ?>
-                                <label class="yatra-checkbox-label">
-                                    <input type="checkbox" name="booking[]" value="<?php echo esc_attr($option->value); ?>" <?php echo in_array($option->value, $active_filters['booking'] ?? []) ? 'checked' : ''; ?>>
-                                    <span><?php echo esc_html($option->label); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$option->count; ?>)</span>
-                                </label>
-                                <?php endforeach; ?>
-                            </div>
+                            <?php
+                            $yatra_sidebar_cb_rows = [];
+                            foreach ($booking_options as $option) {
+                                $yatra_sidebar_cb_rows[] = [
+                                    'value' => $option->value,
+                                    'label' => $option->label,
+                                    'count' => (int) $option->count,
+                                ];
+                            }
+                            $yatra_sidebar_cb_input_name = 'booking[]';
+                            $yatra_sidebar_cb_active = $active_filters['booking'] ?? [];
+                            include __DIR__ . '/partials/listing-sidebar-collapsible-checkboxes.php';
+                            unset($yatra_sidebar_cb_rows, $yatra_sidebar_cb_input_name, $yatra_sidebar_cb_active);
+                            ?>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -579,15 +611,20 @@ yatra_get_header();
                             </svg>
                         </div>
                         <div class="yatra-filter-content">
-                            <div class="yatra-checkbox-group">
-                                <?php foreach ($age_options as $option) : ?>
-                                <label class="yatra-checkbox-label">
-                                    <input type="checkbox" name="age[]" value="<?php echo esc_attr($option->value); ?>" <?php echo in_array($option->value, $active_filters['age'] ?? []) ? 'checked' : ''; ?>>
-                                    <span><?php echo esc_html($option->label); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$option->count; ?>)</span>
-                                </label>
-                                <?php endforeach; ?>
-                            </div>
+                            <?php
+                            $yatra_sidebar_cb_rows = [];
+                            foreach ($age_options as $option) {
+                                $yatra_sidebar_cb_rows[] = [
+                                    'value' => $option->value,
+                                    'label' => $option->label,
+                                    'count' => (int) $option->count,
+                                ];
+                            }
+                            $yatra_sidebar_cb_input_name = 'age[]';
+                            $yatra_sidebar_cb_active = $active_filters['age'] ?? [];
+                            include __DIR__ . '/partials/listing-sidebar-collapsible-checkboxes.php';
+                            unset($yatra_sidebar_cb_rows, $yatra_sidebar_cb_input_name, $yatra_sidebar_cb_active);
+                            ?>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -644,19 +681,19 @@ yatra_get_header();
                                     </div>
                                     <div class="yatra-attribute-content">
                                         <?php if (($attribute['field_type'] === 'select' || $attribute['field_type'] === 'radio') && !empty($field_options)) : ?>
-                                            <div class="yatra-checkbox-group">
-                                                <?php foreach ($field_options as $option) : ?>
-                                                    <label class="yatra-checkbox-label">
-                                                        <input
-                                                            type="checkbox"
-                                                            name="<?php echo esc_attr($attribute_filter_name); ?>[]"
-                                                            value="<?php echo esc_attr($option['value']); ?>"
-                                                            <?php echo in_array($option['value'], $current_values) ? 'checked' : ''; ?>
-                                                        >
-                                                        <span><?php echo esc_html($option['label']); ?></span>
-                                                    </label>
-                                                <?php endforeach; ?>
-                                            </div>
+                                            <?php
+                                            $yatra_sidebar_cb_rows = [];
+                                            foreach ($field_options as $option) {
+                                                $yatra_sidebar_cb_rows[] = [
+                                                    'value' => $option['value'],
+                                                    'label' => $option['label'],
+                                                ];
+                                            }
+                                            $yatra_sidebar_cb_input_name = $attribute_filter_name . '[]';
+                                            $yatra_sidebar_cb_active = $current_values;
+                                            include __DIR__ . '/partials/listing-sidebar-collapsible-checkboxes.php';
+                                            unset($yatra_sidebar_cb_rows, $yatra_sidebar_cb_input_name, $yatra_sidebar_cb_active);
+                                            ?>
 
                                         <?php elseif ($attribute['field_type'] === 'checkbox') : ?>
                                             <div class="yatra-checkbox-group">

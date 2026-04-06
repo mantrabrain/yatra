@@ -29,7 +29,10 @@ if (!$current_user->ID) {
     <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
-    <div id="yatra-account-page-root" style="width: 100%; min-height: 100vh; display: block;"></div>
+    <?php
+    $yatra_account_react_embed = false;
+    require YATRA_PLUGIN_PATH . 'templates/partials/account-react-root.php';
+    ?>
     <?php wp_footer(); ?>
 </body>
 </html>

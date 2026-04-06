@@ -123,16 +123,11 @@ class Router
             ];
         }
 
-        // 2. Account page
-        $account_base = \Yatra\Services\SettingsService::getString('account_base', 'account');
-        if (preg_match('/^' . preg_quote($account_base, '/') . '\/([^\/]+).*$/', $path, $matches)) {
-            if (in_array($matches[1], ['dashboard', 'profile', 'bookings', 'wishlist', 'settings'], true)) {
-                return [
-                    'type' => 'account',
-                    'page' => $matches[1],
-                    'base' => $account_base
-                ];
-            }
+        // 2. Account page (base path and /{base}/{section}; React uses ?tab= on the base URL)
+        $account_base = \Yatra\Services\SettingsService::getAccountBase();
+        $account_route = self::matchAccountRoute($path, $account_base);
+        if ($account_route !== null) {
+            return $account_route;
         }
 
         // 3. Trip archive pagination: {trip_base}/page/{n} (must run before single-trip slug match)
@@ -263,5 +258,68 @@ class Router
     {
         if (defined('WP_DEBUG') && WP_DEBUG) {
             }
+    }
+
+    /**
+     * @return array{type: string, page: string, base: string}|null
+     */
+    private static function matchAccountRoute(string $path, string $account_base): ?array
+    {
+        $path_trim = rtrim($path, '/');
+        $base_trim = rtrim($account_base, '/');
+
+        if ($path_trim === $base_trim) {
+            $tab = isset($_GET['tab']) ? sanitize_key((string) $_GET['tab']) : '';
+
+            return [
+                'type' => 'account',
+                'page' => self::accountQueryTabToPage($tab),
+                'base' => $account_base,
+            ];
+        }
+
+        $quoted = preg_quote($account_base, '/');
+        if (preg_match('/^' . $quoted . '\/([^\/]+)/', $path, $m)) {
+            $page = self::accountPathSegmentToPage($m[1]);
+            if ($page === null) {
+                return null;
+            }
+
+            return [
+                'type' => 'account',
+                'page' => $page,
+                'base' => $account_base,
+            ];
+        }
+
+        return null;
+    }
+
+    private static function accountQueryTabToPage(string $tab): string
+    {
+        $allowed = ['dashboard', 'bookings', 'payments', 'documents', 'profile', 'saved-trips'];
+        if ($tab === '' || !in_array($tab, $allowed, true)) {
+            return 'dashboard';
+        }
+
+        return $tab;
+    }
+
+    private static function accountPathSegmentToPage(string $segment): ?string
+    {
+        $segment = sanitize_title($segment);
+        $map = [
+            'dashboard' => 'dashboard',
+            'profile' => 'profile',
+            'bookings' => 'bookings',
+            'payments' => 'payments',
+            'documents' => 'documents',
+            'support' => 'dashboard',
+            'saved-trips' => 'saved-trips',
+            'wishlist' => 'saved-trips',
+            'settings' => 'profile',
+        ];
+
+        return $map[$segment] ?? null;
     }
 }

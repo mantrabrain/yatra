@@ -60,12 +60,19 @@ class ActivityRepository extends BaseRepository
     }
 
     /**
-     * Get published activities
+     * Get published activities (visible in listings and search).
+     *
+     * Accepts both `active` and `publish` status — some sites/data use either.
      */
     public function getPublished(array $args = []): array
     {
+        $statuses = apply_filters('yatra_activity_published_statuses', ['active', 'publish']);
+        if (!is_array($statuses) || $statuses === []) {
+            $statuses = ['active', 'publish'];
+        }
         $args['where']['type'] = ClassificationTypes::ACTIVITY;
-        $args['where']['status'] = 'active';
+        $args['where']['status'] = $statuses;
+
         return $this->all($args);
     }
 

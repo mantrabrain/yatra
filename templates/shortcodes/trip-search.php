@@ -128,17 +128,34 @@ if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </div>
-                    <div class="yatra-dropdown-menu">
-                        <?php if (!empty($destinations)) : ?>
-                            <div class="yatra-dropdown-option<?php echo $active_filters['destination'] === '' ? ' selected' : ''; ?>" data-value=""><?php esc_html_e('Any destination', 'yatra'); ?></div>
-                            <?php foreach ($destinations as $dest) : ?>
-                                <div class="yatra-dropdown-option<?php echo ($active_filters['destination'] === (string) ($dest->slug ?? '')) ? ' selected' : ''; ?>" data-value="<?php echo esc_attr($dest->slug ?? ''); ?>">
-                                    <?php echo esc_html($dest->name ?? ''); ?>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else : ?>
-                            <div class="yatra-dropdown-option selected" data-value=""><?php esc_html_e('All destinations', 'yatra'); ?></div>
-                        <?php endif; ?>
+                    <div class="yatra-dropdown-menu yatra-dropdown-menu--filterable">
+                        <div class="yatra-dropdown-search-wrap">
+                            <label class="screen-reader-text" for="yatra-trip-search-dest-filter"><?php esc_html_e('Search destinations', 'yatra'); ?></label>
+                            <input
+                                type="search"
+                                id="yatra-trip-search-dest-filter"
+                                class="yatra-dropdown-filter-input"
+                                placeholder="<?php esc_attr_e('Search destinations…', 'yatra'); ?>"
+                                autocomplete="off"
+                                tabindex="0"
+                            >
+                        </div>
+                        <div class="yatra-dropdown-options">
+                            <?php if (!empty($destinations)) : ?>
+                                <div class="yatra-dropdown-option<?php echo $active_filters['destination'] === '' ? ' selected' : ''; ?>" data-value="" data-search-text="<?php echo esc_attr(__('Any destination', 'yatra')); ?>"><?php esc_html_e('Any destination', 'yatra'); ?></div>
+                                <?php foreach ($destinations as $dest) : ?>
+                                    <?php
+                                    $dname = (string) ($dest->name ?? '');
+                                    $dslug = (string) ($dest->slug ?? '');
+                                    ?>
+                                    <div class="yatra-dropdown-option<?php echo ($active_filters['destination'] === $dslug) ? ' selected' : ''; ?>" data-value="<?php echo esc_attr($dslug); ?>" data-search-text="<?php echo esc_attr($dname . ' ' . $dslug); ?>">
+                                        <?php echo esc_html($dname); ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else : ?>
+                                <div class="yatra-dropdown-option selected" data-value="" data-search-text=""><?php esc_html_e('All destinations', 'yatra'); ?></div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
 
@@ -157,17 +174,34 @@ if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </div>
-                    <div class="yatra-dropdown-menu">
-                        <?php if (!empty($activities)) : ?>
-                            <div class="yatra-dropdown-option<?php echo $active_filters['activity'] === '' ? ' selected' : ''; ?>" data-value=""><?php esc_html_e('Any activity', 'yatra'); ?></div>
-                            <?php foreach ($activities as $act) : ?>
-                                <div class="yatra-dropdown-option<?php echo ($active_filters['activity'] === (string) ($act->slug ?? '')) ? ' selected' : ''; ?>" data-value="<?php echo esc_attr($act->slug ?? ''); ?>">
-                                    <?php echo esc_html($act->name ?? ''); ?>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else : ?>
-                            <div class="yatra-dropdown-option selected" data-value=""><?php esc_html_e('All activities', 'yatra'); ?></div>
-                        <?php endif; ?>
+                    <div class="yatra-dropdown-menu yatra-dropdown-menu--filterable">
+                        <div class="yatra-dropdown-search-wrap">
+                            <label class="screen-reader-text" for="yatra-trip-search-act-filter"><?php esc_html_e('Search activities', 'yatra'); ?></label>
+                            <input
+                                type="search"
+                                id="yatra-trip-search-act-filter"
+                                class="yatra-dropdown-filter-input"
+                                placeholder="<?php esc_attr_e('Search activities…', 'yatra'); ?>"
+                                autocomplete="off"
+                                tabindex="0"
+                            >
+                        </div>
+                        <div class="yatra-dropdown-options">
+                            <?php if (!empty($activities)) : ?>
+                                <div class="yatra-dropdown-option<?php echo $active_filters['activity'] === '' ? ' selected' : ''; ?>" data-value="" data-search-text="<?php echo esc_attr(__('Any activity', 'yatra')); ?>"><?php esc_html_e('Any activity', 'yatra'); ?></div>
+                                <?php foreach ($activities as $act) : ?>
+                                    <?php
+                                    $aname = (string) ($act->name ?? '');
+                                    $aslug = (string) ($act->slug ?? '');
+                                    ?>
+                                    <div class="yatra-dropdown-option<?php echo ($active_filters['activity'] === $aslug) ? ' selected' : ''; ?>" data-value="<?php echo esc_attr($aslug); ?>" data-search-text="<?php echo esc_attr($aname . ' ' . $aslug); ?>">
+                                        <?php echo esc_html($aname); ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else : ?>
+                                <div class="yatra-dropdown-option selected" data-value="" data-search-text=""><?php esc_html_e('All activities', 'yatra'); ?></div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
 

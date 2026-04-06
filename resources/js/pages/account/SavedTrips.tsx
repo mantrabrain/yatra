@@ -38,14 +38,7 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
       </div>
 
       {isLoading ? (
-        <div
-          className="yatra-trip-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-            gap: "24px",
-          }}
-        >
+        <div className="yatra-trip-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
             <div key={i} className="yatra-trip-card">
               <div
@@ -85,20 +78,23 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
           </a>
         </div>
       ) : (
-        <div
-          className="yatra-trip-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-            gap: "24px",
-          }}
-        >
+        <div className="yatra-trip-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {savedTrips.map((trip: any) => {
             const tripUrl =
               trip.permalink || `/trip/${trip.trip_slug || trip.trip_id}`;
+            const siteBase =
+              (typeof window !== "undefined" &&
+                ((window as unknown as { yatraAdmin?: { siteUrl?: string } })
+                  .yatraAdmin?.siteUrl ||
+                  (
+                    window as unknown as {
+                      yatraAccountPage?: { siteUrl?: string };
+                    }
+                  ).yatraAccountPage?.siteUrl)) ||
+              (typeof window !== "undefined" ? window.location.origin : "");
             const imageUrl =
               trip.trip_image ||
-              `${window.yatraAdmin?.siteUrl || ""}/wp-content/plugins/yatra/assets/images/trip-placeholder.svg`;
+              `${siteBase}/wp-content/plugins/yatra/assets/images/trip-placeholder.svg`;
             const hasDiscount =
               trip.discount_percent && trip.discount_percent > 0;
             const displayPrice =
@@ -129,7 +125,7 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
             return (
               <div
                 key={trip.id || trip.trip_id}
-                className="yatra-trip-card"
+                className="yatra-trip-card flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
                 data-price={displayPrice}
                 data-rating={avgRating}
                 data-duration={trip.duration_days || 0}
@@ -164,7 +160,7 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
                   </button>
                 </div>
 
-                <div className="yatra-trip-content">
+                <div className="yatra-trip-content flex flex-1 flex-col p-4">
                   <div className="yatra-trip-meta">
                     {trip.location && (
                       <>
@@ -187,7 +183,14 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
                     )}
                   </div>
 
-                  <h3 className="yatra-trip-title">{trip.trip_title}</h3>
+                  <h3 className="yatra-trip-title mb-2 text-lg font-semibold leading-snug text-gray-900 dark:text-white">
+                    <a
+                      href={tripUrl}
+                      className="text-blue-700 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300 focus-visible:outline focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm"
+                    >
+                      {trip.trip_title}
+                    </a>
+                  </h3>
 
                   {trip.highlights && trip.highlights.length > 0 && (
                     <div className="yatra-trip-highlights">
@@ -242,39 +245,32 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
                     )}
                   </div>
 
-                  <div className="yatra-trip-footer">
-                    <div className="yatra-trip-price">
+                  <div className="yatra-trip-footer mt-auto flex flex-row items-center justify-between gap-4 border-t border-gray-100 pt-4 dark:border-gray-700">
+                    <div className="yatra-trip-price flex min-w-0 flex-col items-start gap-1 text-left">
                       {hasDiscount &&
                         originalPrice &&
                         originalPrice > displayPrice &&
                         !trip.is_traveler_based && (
-                          <div className="yatra-original-price">
+                          <div className="yatra-original-price text-sm text-gray-500 line-through">
                             {formatPrice(originalPrice)}
                           </div>
                         )}
-                      <div className="yatra-current-price">
-                        {trip.is_traveler_based ? (
-                          <>
-                            <span
-                              className="yatra-starting-from"
-                              style={{
-                                fontSize: "0.75rem",
-                                fontWeight: "normal",
-                              }}
-                            >
-                              {__("Starting from", "yatra")}{" "}
-                            </span>
-                            {formatPrice(displayPrice)}
-                          </>
-                        ) : (
-                          formatPrice(displayPrice)
-                        )}
+                      {trip.is_traveler_based ? (
+                        <span className="yatra-starting-from text-xs font-normal leading-tight text-gray-500 dark:text-gray-400">
+                          {__("Starting from", "yatra")}
+                        </span>
+                      ) : null}
+                      <div className="yatra-current-price text-xl font-bold leading-none text-blue-600 tabular-nums dark:text-blue-400">
+                        {formatPrice(displayPrice)}
                       </div>
-                      <div className="yatra-price-note">
+                      <div className="yatra-price-note text-xs leading-tight text-gray-400 dark:text-gray-500">
                         {__("Per person", "yatra")}
                       </div>
                     </div>
-                    <a href={tripUrl} className="yatra-card-view-btn">
+                    <a
+                      href={tripUrl}
+                      className="yatra-card-view-btn inline-flex shrink-0 items-center justify-center self-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white no-underline transition-colors hover:bg-blue-700"
+                    >
                       {__("View Details", "yatra")}
                     </a>
                   </div>

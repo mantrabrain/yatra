@@ -104,7 +104,6 @@ class FrontendAssetsProvider
             'tour-viewer' => 'tour-viewer.js',
             'listing' => 'listing.js',
             'listing-filters' => 'listing-filters.js',
-            'listing-wishlist' => 'listing-wishlist.js',
             'stripe' => 'stripe.js',
             'trip' => 'trip.js',
         ];
@@ -127,6 +126,25 @@ class FrontendAssetsProvider
                 );
             }
         }
+
+        if (\Yatra\Services\SettingsService::wishlistEnabled()) {
+            $wishPath = YATRA_PLUGIN_PATH . 'assets/js/listing-wishlist.js';
+            if (file_exists($wishPath)) {
+                wp_enqueue_script(
+                    'yatra-listing-wishlist',
+                    YATRA_PLUGIN_URL . 'assets/js/listing-wishlist.js',
+                    ['jquery'],
+                    YATRA_VERSION . '.' . filemtime($wishPath),
+                    true
+                );
+                wp_localize_script('yatra-listing-wishlist', 'yatraWishlistConfig', [
+                    'enabled' => true,
+                    'restUrl' => rest_url('yatra/v1'),
+                    'nonce' => wp_create_nonce('wp_rest'),
+                    'isLoggedIn' => is_user_logged_in(),
+                ]);
+            }
+        }
     }
 
     /**
@@ -136,7 +154,12 @@ class FrontendAssetsProvider
      */
     private function enqueuePageSpecificAssets(): void
     {
-        
+        if (yatra_is_account_page()) {
+            $this->enqueueAccountAssets();
+
+            return;
+        }
+
         // Check current page context and enqueue specific assets using helper functions
         if (yatra_is_trip_listing()) {
             $this->enqueueTripListingAssets();
@@ -156,10 +179,6 @@ class FrontendAssetsProvider
 
         if (yatra_is_booking_page()) {
             $this->enqueueBookingAssets();
-        }
-
-        if (yatra_is_account_page()) {
-            $this->enqueueAccountAssets();
         }
 
         if (yatra_is_taxonomy_page()) {
@@ -206,10 +225,11 @@ class FrontendAssetsProvider
 
         $trip_id = null;
         $trip_slug = null;
-        if (isset($trip->id)) {
+        $has_trip = isset($trip) && is_object($trip) && isset($trip->id);
+        if ($has_trip) {
             $trip_id = (int) $trip->id;
         }
-        if (isset($trip->slug)) {
+        if ($has_trip && isset($trip->slug)) {
             $trip_slug = $trip->slug;
         }
 
@@ -222,13 +242,40 @@ class FrontendAssetsProvider
             'nonce' => wp_create_nonce('wp_rest'),
             'tripId' => $trip_id,
             'tripSlug' => $trip_slug,
+            'wishlistEnabled' => \Yatra\Services\SettingsService::wishlistEnabled(),
+            'isLoggedIn' => is_user_logged_in(),
             // Currency/settings
             'currency' => \Yatra\Services\SettingsService::getCurrency(),
             'currencyPosition' => \Yatra\Services\SettingsService::getString('currency_position', 'before'),
             'decimalPlaces' => (int) \Yatra\Services\SettingsService::getString('currency_decimals', '2'),
             'thousandSeparator' => \Yatra\Services\SettingsService::getString('thousand_separator', ','),
             'decimalSeparator' => \Yatra\Services\SettingsService::getString('decimal_separator', '.'),
+            'basePrice' => 0.0,
+            'currencySymbol' => function_exists('yatra_get_currency_symbol')
+                ? yatra_get_currency_symbol(\Yatra\Services\SettingsService::getCurrency())
+                : '$',
+            'availabilityDates' => [],
+            'groupDiscountsUrl' => rest_url('yatra/v1/discounts/group-discounts'),
         ];
+
+        if ($has_trip) {
+            if (function_exists('yatra_single_trip_calculate_base_price')) {
+                $pricing_data = yatra_single_trip_calculate_base_price($trip);
+                $tripData['basePrice'] = (float) ($pricing_data['base_price'] ?? 0);
+            }
+            if (method_exists($trip, 'getAvailabilityDates')) {
+                $tripData['availabilityDates'] = array_values(array_filter(array_map(static function ($avail) {
+                    if (is_object($avail)) {
+                        return $avail->departure_date ?? $avail->date ?? null;
+                    }
+                    if (is_array($avail)) {
+                        return $avail['departure_date'] ?? $avail['date'] ?? null;
+                    }
+
+                    return null;
+                }, $trip->getAvailabilityDates())));
+            }
+        }
 
         wp_localize_script('yatra-trip', 'yatraTripData', $tripData);
         wp_localize_script('yatra-booking', 'yatraBookingData', array_merge($tripData, [
@@ -348,27 +395,62 @@ class FrontendAssetsProvider
      */
     private function enqueueAccountAssets(): void
     {
-        // Enqueue React account page bundle
-        $accountJs = YATRA_PLUGIN_PATH . 'assets/dist/account-page.js';
-        if (file_exists($accountJs)) {
-            wp_enqueue_script(
-                'yatra-account-page',
-                YATRA_PLUGIN_URL . 'assets/dist/account-page.js',
-                ['jquery'],
-                YATRA_VERSION . '.' . filemtime($accountJs),
-                true
+        // Account bundle shares admin Vite chunks; CSS is extracted to admin/dist/css (ES modules do not auto-load it).
+        $reactVendorCss = YATRA_PLUGIN_PATH . 'assets/admin/dist/css/react-vendor.css';
+        if (file_exists($reactVendorCss)) {
+            wp_enqueue_style(
+                'yatra-account-react-vendor',
+                YATRA_PLUGIN_URL . 'assets/admin/dist/css/react-vendor.css',
+                [],
+                YATRA_VERSION . '.' . filemtime($reactVendorCss)
             );
-
-            // Localize account page script
-            wp_localize_script('yatra-account-page', 'yatraAccountPage', [
-                'apiUrl' => rest_url('yatra/v1'),
-                'nonce' => wp_create_nonce('wp_rest'),
-                'userId' => get_current_user_id(),
-                'currency' => \Yatra\Services\SettingsService::getCurrency(),
-                'locale' => get_locale(),
-                'translations' => $this->getFrontendTranslations(),
-            ]);
         }
+
+        $accountUiCss = YATRA_PLUGIN_PATH . 'assets/admin/dist/css/index.css';
+        $accountUiDeps = file_exists($reactVendorCss) ? ['yatra-account-react-vendor'] : [];
+        if (file_exists($accountUiCss)) {
+            wp_enqueue_style(
+                'yatra-account-ui',
+                YATRA_PLUGIN_URL . 'assets/admin/dist/css/index.css',
+                $accountUiDeps,
+                YATRA_VERSION . '.' . filemtime($accountUiCss)
+            );
+        }
+
+        // Vite build outputs to assets/dist/js/account-page.js (ES module + shared chunks).
+        $accountJs = YATRA_PLUGIN_PATH . 'assets/dist/js/account-page.js';
+        if (!file_exists($accountJs)) {
+            return;
+        }
+
+        wp_enqueue_script(
+            'yatra-account-page',
+            YATRA_PLUGIN_URL . 'assets/dist/js/account-page.js',
+            [],
+            YATRA_VERSION . '.' . filemtime($accountJs),
+            true
+        );
+
+        wp_script_add_data('yatra-account-page', 'type', 'module');
+
+        wp_localize_script('yatra-account-page', 'yatraAccountPage', [
+            'apiUrl' => rest_url('yatra/v1'),
+            'nonce' => wp_create_nonce('wp_rest'),
+            'userId' => get_current_user_id(),
+            'siteUrl' => site_url(),
+            'logoutUrl' => wp_logout_url(home_url('/')),
+            'companyPhone' => \Yatra\Services\SettingsService::getString('company_phone', ''),
+            'companyName' => \Yatra\Services\SettingsService::getString('company_name', ''),
+            'companyEmail' => \Yatra\Services\SettingsService::getString('company_email', ''),
+            'currency' => \Yatra\Services\SettingsService::getCurrency(),
+            'currencyPosition' => \Yatra\Services\SettingsService::getString('currency_position', 'before'),
+            'decimalPlaces' => (int) \Yatra\Services\SettingsService::getString('currency_decimals', '2'),
+            'thousandSeparator' => \Yatra\Services\SettingsService::getString('thousand_separator', ','),
+            'decimalSeparator' => \Yatra\Services\SettingsService::getString('decimal_separator', '.'),
+            'locale' => get_locale(),
+            'translations' => $this->getFrontendTranslations(),
+            'wishlistEnabled' => \Yatra\Services\SettingsService::wishlistEnabled(),
+        ]);
     }
 
     /**

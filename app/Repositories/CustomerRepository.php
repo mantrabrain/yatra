@@ -6,6 +6,7 @@ namespace Yatra\Repositories;
 
 use Yatra\Database\Tables\CustomersTable;
 use Yatra\Database\Tables\BookingPaymentsTable;
+use Yatra\Database\Tables\TripsTable;
 
 /**
  * Customer Repository
@@ -738,9 +739,9 @@ class CustomerRepository extends BaseRepository
     public function getPaymentsForBookingIds(array $bookingIds, int $limit = 50): array
     {
         global $wpdb;
-        $tripRepository = new \Yatra\Repositories\TripRepository();
-        $bookings_table = $bookingRepository->getTableName();
-        $trips_table = $tripRepository->getTableName();
+        $bookingRepository = new BookingRepository();
+        $bookings_table = $bookingRepository->getBookingsTableName();
+        $trips_table = TripsTable::getTableName();
         
         // Use BookingPaymentsTable for payments
         $payments_table = BookingPaymentsTable::getTableName();

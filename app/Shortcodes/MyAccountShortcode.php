@@ -7,7 +7,8 @@ namespace Yatra\Shortcodes;
 /**
  * My Account Shortcode
  *
- * Displays customer account dashboard with bookings, profile, and preferences
+ * Renders the same React account UI as the virtual account route (see AccountPageHandler + account-page.php).
+ * Use [yatra_my_account] on any page; legacy attributes are accepted for compatibility but do not change the React UI.
  */
 class MyAccountShortcode extends BaseShortcode
 {
@@ -17,38 +18,26 @@ class MyAccountShortcode extends BaseShortcode
             'show_bookings' => 'yes',
             'show_profile' => 'yes',
             'show_wishlist' => 'yes',
-            'bookings_limit' => '10'
+            'bookings_limit' => '10',
         ]);
     }
 
     /**
-     * Render the my account shortcode content
+     * Render the my account shortcode content (React mount only; same app as /account URL).
      */
     protected function renderContent(array $atts): string
     {
-        $atts = shortcode_atts($this->default_attributes, $atts, $this->tag);
-        
-        // Check if user is logged in
+        shortcode_atts($this->default_attributes, $atts, $this->tag);
+
         if (!is_user_logged_in()) {
             return $this->renderLoginForm();
         }
-        
-        // Get user data
-        $user = wp_get_current_user();
-        
-        // Get user's bookings and wishlist
-        $bookings = $this->getUserBookings($user->ID);
-        $wishlist = $this->getUserWishlist($user->ID);
-        
-        // Prepare data for template
-        $data = [
-            'user' => $user,
-            'bookings' => $bookings,
-            'wishlist' => $wishlist,
-            'atts' => $atts
-        ];
 
-        return $this->loadTemplate('shortcodes/my-account.php', $data);
+        $yatra_account_react_embed = true;
+        ob_start();
+        require YATRA_PLUGIN_PATH . 'templates/partials/account-react-root.php';
+
+        return (string) ob_get_clean();
     }
 
     /**
@@ -58,14 +47,14 @@ class MyAccountShortcode extends BaseShortcode
     {
         $login_url = wp_login_url(get_permalink());
         $register_url = wp_registration_url();
-        
+
         ob_start();
         ?>
         <div class="yatra-my-account-login">
             <div class="yatra-login-prompt">
                 <h3><?php esc_html_e('Login to Your Account', 'yatra'); ?></h3>
                 <p><?php esc_html_e('Please login to access your account dashboard, view bookings, and manage your wishlist.', 'yatra'); ?></p>
-                
+
                 <div class="yatra-login-actions">
                     <a href="<?php echo esc_url($login_url); ?>" class="yatra-btn yatra-btn-primary">
                         <?php esc_html_e('Login', 'yatra'); ?>
@@ -79,26 +68,7 @@ class MyAccountShortcode extends BaseShortcode
             </div>
         </div>
         <?php
-        return ob_get_clean();
-    }
 
-    /**
-     * Get user bookings
-     */
-    private function getUserBookings(int $user_id): array
-    {
-        // For now, return empty bookings array
-        // In a real implementation, this would query the Yatra booking system
-        return [];
-    }
-
-    /**
-     * Get user wishlist
-     */
-    private function getUserWishlist(int $user_id): array
-    {
-        // For now, return empty wishlist array
-        // In a real implementation, this would get from user meta
-        return [];
+        return (string) ob_get_clean();
     }
 }

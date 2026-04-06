@@ -11,8 +11,8 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-DbNWY5wC.js": {
-    "file": "dist/js/index-DbNWY5wC.js",
+  "_index-DGArbIol.js": {
+    "file": "dist/js/index-DGArbIol.js",
     "name": "index",
     "imports": [
       "_react-vendor-hl0AkJcc.js",
@@ -58,7 +58,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-hl0AkJcc.js",
-      "_index-DbNWY5wC.js",
+      "_index-DGArbIol.js",
       "_default-i18n-DxhLUi3L.js"
     ]
   },
@@ -105,7 +105,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-hl0AkJcc.js",
-      "_index-DbNWY5wC.js",
+      "_index-DGArbIol.js",
       "_clsx-DgYk2OaC.js",
       "_default-i18n-DxhLUi3L.js"
     ]

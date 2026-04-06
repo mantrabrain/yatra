@@ -13,8 +13,8 @@ export const API_ENDPOINTS = {
   BOOKING_DELETE: (id: string | number) => `/bookings/${id}`,
   BOOKINGS_BULK: "/bookings/bulk",
   BOOKINGS_STATS: "/bookings/stats",
-  BOOKING_PAY_REMAINING: (id: string | number) =>
-    `/bookings/${id}/pay-remaining`,
+  /** POST body: `{ booking_id }` — returns `{ checkout_url }` in `data`. */
+  PAYMENT_REMAINING_SESSION: "/payment/remaining/session",
   BOOKING_CONSENT_STATUS: (id: string | number) =>
     `/bookings/${id}/consent-status`,
 
@@ -30,8 +30,9 @@ export const API_ENDPOINTS = {
   CUSTOMER_MY_PAYMENTS: "/customers/my-payments",
   CUSTOMER_MY_DOCUMENTS: "/customers/my-documents",
   CUSTOMER_MY_SUPPORT_TICKETS: "/customers/my-support-tickets",
-  CUSTOMER_BOOKING_DOCUMENTS: (bookingId: string | number) =>
-    `/customer/bookings/${bookingId}/documents`,
+  /** GET single booking for current user (details view). */
+  CUSTOMER_MY_BOOKING: (id: string | number) =>
+    `/customers/my-bookings/${id}`,
 
   // Travelers
   TRAVELERS: "/travelers",

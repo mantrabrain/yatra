@@ -8,7 +8,6 @@ import {
   Calendar,
   CreditCard,
   User,
-  LifeBuoy,
   FileText,
   LogOut,
   ShieldCheck,
@@ -21,16 +20,18 @@ import type {
   Booking,
   Payment,
   TravelDocument,
-  SupportTicket,
   CustomerProfile,
 } from "./account/types";
-import { formatDate } from "./account/utils";
+import {
+  formatDate,
+  getYatraAccountPageGlobals,
+  phoneToTelHref,
+} from "./account/utils";
 import Dashboard from "./account/Dashboard";
 import Bookings from "./account/Bookings";
 import Payments from "./account/Payments";
 import Documents from "./account/Documents";
 import Profile from "./account/Profile";
-import Support from "./account/Support";
 import SavedTrips from "./account/SavedTrips";
 
 const navigation: Array<{
@@ -44,10 +45,19 @@ const navigation: Array<{
   { id: "documents", label: __("Documents", "yatra"), icon: FileText },
   { id: "saved-trips", label: __("Saved Trips", "yatra"), icon: Heart },
   { id: "profile", label: __("Profile", "yatra"), icon: User },
-  { id: "support", label: __("Support", "yatra"), icon: LifeBuoy },
 ];
 
 const AccountPage: React.FC = () => {
+  const accountShell = useMemo(() => getYatraAccountPageGlobals(), []);
+
+  const accountNavigation = React.useMemo(() => {
+    const wl =
+      typeof window !== "undefined" &&
+      !!(window as unknown as { yatraAccountPage?: { wishlistEnabled?: boolean } })
+        .yatraAccountPage?.wishlistEnabled;
+    return navigation.filter((n) => n.id !== "saved-trips" || wl);
+  }, []);
+
   // Track URL changes
   const [urlKey, setUrlKey] = useState(0);
 
@@ -77,8 +87,13 @@ const AccountPage: React.FC = () => {
   // Get section from URL parameter, localStorage, or default to 'dashboard'
   const getSectionFromUrl = (): Section => {
     if (typeof window !== "undefined") {
+      const wl = !!(window as unknown as { yatraAccountPage?: { wishlistEnabled?: boolean } })
+        .yatraAccountPage?.wishlistEnabled;
       const params = new URLSearchParams(window.location.search);
       const tab = params.get("tab");
+      if (tab === "saved-trips" && !wl) {
+        return "dashboard";
+      }
       if (
         tab &&
         [
@@ -87,7 +102,6 @@ const AccountPage: React.FC = () => {
           "payments",
           "documents",
           "profile",
-          "support",
           "saved-trips",
         ].includes(tab)
       ) {
@@ -95,6 +109,11 @@ const AccountPage: React.FC = () => {
       }
       // Fallback to localStorage
       const saved = localStorage.getItem("yatra-account-active-section");
+      const wlSaved = !!(window as unknown as { yatraAccountPage?: { wishlistEnabled?: boolean } })
+        .yatraAccountPage?.wishlistEnabled;
+      if (saved === "saved-trips" && !wlSaved) {
+        return "dashboard";
+      }
       if (
         saved &&
         [
@@ -103,7 +122,6 @@ const AccountPage: React.FC = () => {
           "payments",
           "documents",
           "profile",
-          "support",
           "saved-trips",
         ].includes(saved)
       ) {
@@ -188,20 +206,41 @@ const AccountPage: React.FC = () => {
       queryFn: async () => {
         try {
           const response = await apiClient.get(API_ENDPOINTS.CUSTOMER_ME);
-          // WP_REST_Response returns data directly when serialized
-          // Check if response has the expected profile structure
-          if (
+          const raw =
             response &&
             typeof response === "object" &&
-            ("id" in response || "name" in response || "email" in response)
+            "data" in response &&
+            response.data &&
+            typeof response.data === "object"
+              ? response.data
+              : response;
+          if (
+            !raw ||
+            typeof raw !== "object" ||
+            (!("id" in raw) &&
+              !("user_id" in raw) &&
+              !("email" in raw))
           ) {
-            return response;
+            return null;
           }
-          // If wrapped in data property, extract it
-          if (response && typeof response === "object" && "data" in response) {
-            return response.data;
-          }
-          return response || null;
+          const row = raw as CustomerProfile & { created_at?: string };
+          const fromParts = [row.first_name, row.last_name]
+            .filter(Boolean)
+            .join(" ")
+            .trim();
+          const name =
+            (typeof row.name === "string" && row.name.trim()) ||
+            fromParts ||
+            (typeof row.email === "string"
+              ? row.email.split("@")[0] || ""
+              : "") ||
+            "";
+          return {
+            ...row,
+            name,
+            registered_at:
+              row.registered_at || row.created_at || "",
+          } as CustomerProfile;
         } catch (error) {
           console.error("Error fetching profile:", error);
           return null;
@@ -263,30 +302,19 @@ const AccountPage: React.FC = () => {
     refetchOnMount: "always",
   });
 
-  // Fetch support tickets
-  const { data: supportTickets = [] } = useQuery<SupportTicket[]>({
-    queryKey: ["account-support"],
-    queryFn: async () => {
-      try {
-        const response = await apiClient.get(
-          API_ENDPOINTS.CUSTOMER_MY_SUPPORT_TICKETS,
-        );
-        return unwrapArrayResponse(response) as SupportTicket[];
-      } catch (error) {
-        console.error("Error fetching support tickets:", error);
-        return [];
-      }
-    },
-    refetchOnMount: "always",
-  });
-
   // Notifications (empty for now)
   const notifications: any[] = [];
 
   // Fetch saved trips
+  const wishlistEnabled =
+    typeof window !== "undefined" &&
+    !!(window as unknown as { yatraAccountPage?: { wishlistEnabled?: boolean } })
+      .yatraAccountPage?.wishlistEnabled;
+
   const { data: savedTripsData, isLoading: isLoadingSavedTrips } =
     useQuery<any>({
       queryKey: ["account-saved-trips"],
+      enabled: wishlistEnabled,
       queryFn: async () => {
         try {
           const response = await apiClient.get(API_ENDPOINTS.SAVED_TRIPS);
@@ -405,6 +433,8 @@ const AccountPage: React.FC = () => {
             displayProfile={displayProfile || null}
             stats={stats}
             notifications={notifications}
+            conciergePhone={accountShell.companyPhone}
+            conciergeEmail={accountShell.companyEmail}
             onSectionChange={(section: string) =>
               handleSectionChange(section as Section)
             }
@@ -414,6 +444,8 @@ const AccountPage: React.FC = () => {
         return (
           <Bookings
             bookings={bookings}
+            conciergePhone={accountShell.companyPhone}
+            conciergeEmail={accountShell.companyEmail}
             onSectionChange={(section: string) =>
               handleSectionChange(section as Section)
             }
@@ -431,15 +463,20 @@ const AccountPage: React.FC = () => {
       case "documents":
         return <Documents documents={documents} />;
       case "saved-trips":
+        if (!wishlistEnabled) {
+          return null;
+        }
         return (
           <SavedTrips savedTrips={savedTrips} isLoading={isLoadingSavedTrips} />
         );
       case "profile":
         return (
-          <Profile profile={displayProfile || null} savedTrips={savedTrips} />
+          <Profile
+            profile={displayProfile || null}
+            savedTrips={savedTrips}
+            wishlistEnabled={wishlistEnabled}
+          />
         );
-      case "support":
-        return <Support tickets={supportTickets} />;
       default:
         return null;
     }
@@ -471,7 +508,21 @@ const AccountPage: React.FC = () => {
               <div
                 role="button"
                 tabIndex={0}
-                onClick={() => {}}
+                onClick={() => {
+                  const url = accountShell.logoutUrl;
+                  if (url) {
+                    window.location.href = url;
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    const url = accountShell.logoutUrl;
+                    if (url) {
+                      window.location.href = url;
+                    }
+                  }
+                }}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer text-sm"
               >
                 <LogOut className="w-4 h-4" /> {__("Logout", "yatra")}
@@ -484,7 +535,7 @@ const AccountPage: React.FC = () => {
           <aside className="w-full lg:w-64 flex-shrink-0 space-y-4 lg:sticky lg:top-10 self-start bg-transparent">
             <nav className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-800 rounded-xl divide-y divide-gray-100 dark:divide-gray-800">
               <div className="p-4 space-y-1">
-                {navigation.map((item) => (
+                {accountNavigation.map((item) => (
                   <div
                     key={item.id}
                     role="button"
@@ -516,9 +567,24 @@ const AccountPage: React.FC = () => {
                 {__("Need help right away?", "yatra")}
               </p>
               <p className="font-semibold text-lg text-white">
-                {__("Concierge Desk", "yatra")}
+                {accountShell.companyName ||
+                  __("Concierge Desk", "yatra")}
               </p>
-              <p className="text-sm font-medium text-white">+1-800-555-0199</p>
+              {accountShell.companyPhone ? (
+                <a
+                  href={phoneToTelHref(accountShell.companyPhone)}
+                  className="text-sm font-medium text-white hover:underline"
+                >
+                  {accountShell.companyPhone}
+                </a>
+              ) : accountShell.companyEmail ? (
+                <a
+                  href={`mailto:${encodeURIComponent(accountShell.companyEmail)}`}
+                  className="text-sm font-medium text-white hover:underline break-all"
+                >
+                  {accountShell.companyEmail}
+                </a>
+              ) : null}
             </div>
           </aside>
 

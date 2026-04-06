@@ -7,8 +7,12 @@ namespace Yatra\Controllers;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
+use Yatra\Helpers\FormatHelper;
+use Yatra\Repositories\TripRepository;
 use Yatra\Services\BookingService;
 use Yatra\Services\PaymentService;
+use Yatra\Services\PdfService;
+use Yatra\Services\SettingsService;
 use Yatra\Validators\BookingValidator;
 use Yatra\Exceptions\ValidationException;
 use Yatra\Utils\Logger;
@@ -750,9 +754,9 @@ class BookingsController extends BaseController
 
         // Get payment for this booking
         $payments = $this->paymentService->getBookingPayments($bookingId);
-        
+
         if (empty($payments)) {
-            return new WP_Error('no_payment', __('No payment found for this booking.', 'yatra'), ['status' => 404]);
+            return $this->renderVoucherFromBookingData($booking, $isPreview);
         }
 
         // Use the first payment (or you could use the latest payment)
@@ -811,9 +815,9 @@ class BookingsController extends BaseController
 
         // Get payment for this booking
         $payments = $this->paymentService->getBookingPayments($bookingId);
-        
+
         if (empty($payments)) {
-            return new WP_Error('no_payment', __('No payment found for this booking.', 'yatra'), ['status' => 404]);
+            return $this->renderItineraryFromBookingData($booking, $isPreview);
         }
 
         // Use the first payment (or you could use the latest payment)
@@ -834,5 +838,197 @@ class BookingsController extends BaseController
         $paymentRequest->set_param('download', $isDownload ? '1' : '');
 
         return $paymentGatewayController->download_itinerary($paymentRequest);
+    }
+
+    /**
+     * Voucher PDF when the booking has no payment rows yet (matches payment-based voucher layout).
+     *
+     * @param array<string,mixed> $booking From BookingService::getBooking()
+     */
+    private function renderVoucherFromBookingData(array $booking, bool $isPreview)
+    {
+        $tripRepository = new TripRepository();
+        $trip = null;
+        $tripId = (int) ($booking['trip_id'] ?? 0);
+        if ($tripId > 0) {
+            $trip = $tripRepository->find($tripId);
+        }
+
+        $companyName = SettingsService::get('company_name', get_bloginfo('name'));
+        $companyAddress = SettingsService::get('company_address', '');
+        $companyEmail = SettingsService::get('company_email', get_option('admin_email'));
+        $companyPhone = SettingsService::get('company_phone', '');
+        $currency = SettingsService::getCurrency();
+        $currencySymbol = FormatHelper::getCurrencySymbol($currency);
+
+        $createdAt = $booking['created_at'] ?? $booking['booking_date'] ?? '';
+        $bookingDate = !empty($createdAt) ? date_i18n(get_option('date_format'), strtotime((string) $createdAt)) : '';
+        $travelDateRaw = $booking['travel_date'] ?? '';
+        $travelDate = !empty($travelDateRaw) ? date_i18n(get_option('date_format'), strtotime((string) $travelDateRaw)) : '';
+
+        $returnDate = '';
+        if (!empty($travelDateRaw) && $trip && !empty($trip->duration)) {
+            $returnTimestamp = strtotime((string) $travelDateRaw . ' +' . (int) $trip->duration . ' days');
+            $returnDate = date_i18n(get_option('date_format'), $returnTimestamp);
+        }
+
+        $statusRaw = (string) ($booking['booking_status'] ?? $booking['status'] ?? '');
+        $bookingRef = (string) ($booking['booking_number'] ?? $booking['reference'] ?? (string) ($booking['id'] ?? ''));
+        $filename = 'Travel Voucher #' . $bookingRef . '.pdf';
+
+        $customerName = trim(
+            (string) ($booking['contact_first_name'] ?? '') . ' ' . (string) ($booking['contact_last_name'] ?? '')
+        ) ?: (string) ($booking['customer_name'] ?? __('Customer', 'yatra'));
+
+        $templateData = [
+            'company_name' => $companyName,
+            'company_address' => $companyAddress,
+            'company_email' => $companyEmail,
+            'company_phone' => $companyPhone,
+            'customer_name' => $customerName,
+            'customer_email' => (string) ($booking['contact_email'] ?? $booking['customer_email'] ?? ''),
+            'booking_ref' => $bookingRef,
+            'booking_date' => $bookingDate,
+            'booking_status' => ucfirst($statusRaw ?: 'pending'),
+            'status_class' => in_array(strtolower($statusRaw), ['confirmed', 'completed', 'success'], true) ? 'confirmed' :
+                (in_array(strtolower($statusRaw), ['cancelled'], true) ? 'cancelled' : 'pending'),
+            'trip_title' => $trip ? ($trip->title ?? $booking['trip_title'] ?? __('Trip Booking', 'yatra')) : ($booking['trip_title'] ?? __('Trip Booking', 'yatra')),
+            'trip_duration' => $trip && $trip->duration ? sprintf(__('%d days', 'yatra'), (int) $trip->duration) : '',
+            'trip_difficulty' => $trip ? ($trip->difficulty_name ?? '') : '',
+            'departure_location' => $trip ? ($trip->departure_location ?? '') : '',
+            'destination' => $trip ? ($trip->destination ?? '') : '',
+            'travel_date' => $travelDate,
+            'return_date' => $returnDate,
+            'currency_symbol' => $currencySymbol,
+            'total_amount' => number_format((float) ($booking['total_amount'] ?? 0), 2),
+            'amount_paid' => number_format((float) ($booking['amount_paid'] ?? 0), 2),
+            'amount_due' => number_format((float) ($booking['amount_due'] ?? 0), 2),
+            'traveler_count' => (int) ($booking['travelers_count'] ?? $booking['travelers'] ?? 1),
+        ];
+
+        $pdfService = new PdfService();
+        if (!$pdfService->isAvailable()) {
+            return new WP_Error(
+                'pdf_engine_missing',
+                __('Voucher PDF generator is not installed. Please run composer install to install dompdf/dompdf.', 'yatra'),
+                ['status' => 500]
+            );
+        }
+
+        $pdfBinary = $pdfService->renderTemplateToPdfSafely('pdf/voucher.php', $templateData, [
+            'paper' => 'A4',
+            'orientation' => 'portrait',
+            'default_font' => 'DejaVu Sans',
+        ]);
+
+        if ($isPreview) {
+            return new WP_REST_Response([
+                'success' => true,
+                'pdf_data' => base64_encode($pdfBinary),
+                'filename' => $filename,
+            ]);
+        }
+
+        $pdfService->outputPdfDownload($pdfBinary, $filename);
+        exit;
+    }
+
+    /**
+     * Itinerary PDF when the booking has no payment rows yet.
+     *
+     * @param array<string,mixed> $booking From BookingService::getBooking()
+     */
+    private function renderItineraryFromBookingData(array $booking, bool $isPreview)
+    {
+        $tripRepository = new TripRepository();
+        $trip = null;
+        $tripId = (int) ($booking['trip_id'] ?? 0);
+        if ($tripId > 0) {
+            $trip = $tripRepository->find($tripId);
+        }
+
+        $companyName = SettingsService::get('company_name', get_bloginfo('name'));
+        $companyAddress = SettingsService::get('company_address', '');
+        $companyEmail = SettingsService::get('company_email', get_option('admin_email'));
+        $companyPhone = SettingsService::get('company_phone', '');
+        $currency = SettingsService::getCurrency();
+        $currencySymbol = FormatHelper::getCurrencySymbol($currency);
+
+        $createdAt = $booking['created_at'] ?? $booking['booking_date'] ?? '';
+        $bookingDate = !empty($createdAt) ? date_i18n(get_option('date_format'), strtotime((string) $createdAt)) : '';
+        $travelDateRaw = $booking['travel_date'] ?? '';
+        $travelDate = !empty($travelDateRaw) ? date_i18n(get_option('date_format'), strtotime((string) $travelDateRaw)) : '';
+
+        $returnDate = '';
+        if (!empty($travelDateRaw) && $trip && !empty($trip->duration)) {
+            $returnTimestamp = strtotime((string) $travelDateRaw . ' +' . (int) $trip->duration . ' days');
+            $returnDate = date_i18n(get_option('date_format'), $returnTimestamp);
+        }
+
+        $statusRaw = (string) ($booking['booking_status'] ?? $booking['status'] ?? '');
+        $bookingId = (int) ($booking['id'] ?? 0);
+        $bookingRef = 'YTR-' . strtoupper(str_pad((string) $bookingId, 8, '0', STR_PAD_LEFT));
+
+        $customerName = trim(
+            (string) ($booking['contact_first_name'] ?? '') . ' ' . (string) ($booking['contact_last_name'] ?? '')
+        ) ?: (string) ($booking['customer_name'] ?? __('Customer', 'yatra'));
+
+        $pdfService = new PdfService();
+        if (!$pdfService->isAvailable()) {
+            return new WP_Error(
+                'pdf_engine_missing',
+                __('Itinerary PDF generator is not installed. Please run composer install to install dompdf/dompdf.', 'yatra'),
+                ['status' => 500]
+            );
+        }
+
+        $filename = 'Travel-Itinerary-' . $bookingRef . '.pdf';
+
+        $templateData = [
+            'company_name' => $companyName,
+            'company_address' => $companyAddress,
+            'company_email' => $companyEmail,
+            'company_phone' => $companyPhone,
+            'customer_name' => $customerName,
+            'customer_email' => (string) ($booking['contact_email'] ?? $booking['customer_email'] ?? ''),
+            'booking_ref' => $bookingRef,
+            'booking_date' => $bookingDate,
+            'booking_status' => ucfirst($statusRaw ?: 'pending'),
+            'status_class' => in_array(strtolower($statusRaw), ['confirmed', 'completed', 'success'], true) ? 'confirmed' :
+                (in_array(strtolower($statusRaw), ['cancelled'], true) ? 'cancelled' : 'pending'),
+            'trip_title' => $trip ? ($trip->title ?? $booking['trip_title'] ?? __('Trip Booking', 'yatra')) : ($booking['trip_title'] ?? __('Trip Booking', 'yatra')),
+            'trip_description' => $trip ? ($trip->description ?? $trip->content ?? '') : '',
+            'trip_duration' => $trip && $trip->duration ? sprintf(__('%d days', 'yatra'), (int) $trip->duration) : '',
+            'trip_difficulty' => $trip ? ($trip->difficulty_name ?? '') : '',
+            'trip_highlights' => $trip ? ($trip->highlights ?? $trip->trip_highlights ?? '') : '',
+            'trip_includes' => $trip ? ($trip->includes ?? $trip->trip_includes ?? '') : '',
+            'trip_excludes' => $trip ? ($trip->excludes ?? $trip->trip_excludes ?? '') : '',
+            'departure_location' => $trip ? ($trip->departure_location ?? '') : '',
+            'destination' => $trip ? ($trip->destination ?? '') : '',
+            'travel_date' => $travelDate,
+            'return_date' => $returnDate,
+            'currency_symbol' => $currencySymbol,
+            'total_amount' => number_format((float) ($booking['total_amount'] ?? 0), 2),
+            'amount_paid' => number_format((float) ($booking['amount_paid'] ?? 0), 2),
+            'amount_due' => number_format((float) ($booking['amount_due'] ?? 0), 2),
+            'traveler_count' => (int) ($booking['travelers_count'] ?? $booking['travelers'] ?? 1),
+        ];
+
+        $pdfBinary = $pdfService->renderTemplateToPdfSafely('pdf/itinerary.php', $templateData, [
+            'paper' => 'A4',
+            'orientation' => 'portrait',
+            'default_font' => 'DejaVu Sans',
+        ]);
+
+        if ($isPreview) {
+            return new WP_REST_Response([
+                'success' => true,
+                'pdf_data' => base64_encode($pdfBinary),
+                'filename' => $filename,
+            ]);
+        }
+
+        $pdfService->outputPdfDownload($pdfBinary, $filename);
+        exit;
     }
 }

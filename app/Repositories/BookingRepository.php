@@ -57,6 +57,14 @@ class BookingRepository extends BaseRepository
     }
 
     /**
+     * Public accessor for resolved bookings table (e.g. joins from other repositories).
+     */
+    public function getBookingsTableName(): string
+    {
+        return $this->getResolvedBookingsTable();
+    }
+
+    /**
      * Get trips table name
      */
     protected function getTripsTable(): string

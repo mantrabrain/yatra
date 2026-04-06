@@ -299,7 +299,7 @@ class ExportImportService
             ];
             
             $processedRecords = 0;
-
+            
             $expandedTypes = self::expandDataTypesForExport($dataTypes);
 
             $settingsBundleForExport = null;
@@ -310,7 +310,7 @@ class ExportImportService
 
             $totalRecords = self::countExportRecords($expandedTypes) + $settingsWeight;
             self::updateJob($jobId, ['total_records' => $totalRecords]);
-
+            
             foreach ($expandedTypes as $dataType) {
                 if ($dataType === 'settings') {
                     continue;
@@ -384,28 +384,28 @@ class ExportImportService
                 if (!isset($tableMap[$dataType])) {
                     continue;
                 }
-
+                
                 $tableName = $wpdb->prefix . $tableMap[$dataType];
                 if (!$repository->tableExists($tableName)) {
                     $exportData['data'][$dataType] = [];
                     continue;
                 }
-
+                
                 $total = $repository->getRecordCount($tableName);
                 $records = [];
-
+                
                 for ($offset = 0; $offset < $total; $offset += self::BATCH_SIZE) {
                     $batch = $repository->getBatchRecords($tableName, $offset, self::BATCH_SIZE);
                     $records = array_merge($records, $batch);
                     $processedRecords += count($batch);
-
+                    
                     $progress = $totalRecords > 0 ? round(($processedRecords / $totalRecords) * 100) : 0;
                     self::updateJob($jobId, [
                         'processed_records' => $processedRecords,
                         'progress' => $progress,
                     ]);
                 }
-
+                
                 $exportData['data'][$dataType] = $records;
             }
             
@@ -570,18 +570,18 @@ class ExportImportService
                     $totalRecords += count($payload);
                 }
             }
-
+            
             self::updateJob($jobId, ['total_records' => $totalRecords]);
-
+            
             $processedRecords = 0;
             $importStats = [];
-
+            
             foreach ($dataTypes as $dataType) {
                 if ($dataType === 'settings') {
                     if (!isset($dataContainer['settings']) || !is_array($dataContainer['settings'])) {
                         Logger::warning('Skipping settings: not found or invalid in import file');
-                        continue;
-                    }
+                    continue;
+                }
                     $settingsRows = $dataContainer['settings'];
                     self::importSettings($settingsRows);
                     $n = max(1, is_array($settingsRows) ? count($settingsRows) : 0);
@@ -594,12 +594,12 @@ class ExportImportService
                     ]);
                     continue;
                 }
-
+                
                 if ($dataType === 'itinerary') {
                     if (!isset($dataContainer['itinerary']) || !is_array($dataContainer['itinerary'])) {
                         Logger::warning('Skipping itinerary: not found in import file');
-                        continue;
-                    }
+                    continue;
+                }
                     $payload = $dataContainer['itinerary'];
                     if (!isset($payload['days'], $payload['entries']) || !is_array($payload['days']) || !is_array($payload['entries'])) {
                         Logger::warning('Skipping itinerary: expected { days, entries } from Yatra 3 export; legacy flat arrays are not supported');
@@ -611,13 +611,13 @@ class ExportImportService
                     $entryTotal = count($payload['entries']);
                     $importStats['itinerary'] = [
                         'total' => $dayTotal + $entryTotal,
-                        'imported' => 0,
-                        'failed' => 0,
-                    ];
-
+                    'imported' => 0,
+                    'failed' => 0,
+                ];
+                
                     foreach (array_chunk($payload['days'], self::BATCH_SIZE) as $batch) {
-                        foreach ($batch as $record) {
-                            $record = (array) $record;
+                    foreach ($batch as $record) {
+                        $record = (array) $record;
                             $oldDayId = (int) ($record['id'] ?? 0);
                             unset($record['id']);
                             try {
@@ -630,12 +630,12 @@ class ExportImportService
                                     continue;
                                 }
                                 $tableColumns = $repository->getTableColumns($daysTable);
-                                $filteredRecord = [];
-                                foreach ($record as $key => $value) {
+                            $filteredRecord = [];
+                            foreach ($record as $key => $value) {
                                     if (in_array($key, $tableColumns, true)) {
-                                        $filteredRecord[$key] = $value;
-                                    }
+                                    $filteredRecord[$key] = $value;
                                 }
+                            }
                                 if ($filteredRecord === []) {
                                     $importStats['itinerary']['failed']++;
                                     continue;
@@ -645,12 +645,12 @@ class ExportImportService
                                     $importStats['itinerary']['failed']++;
                                     continue;
                                 }
-                                $processedRecords++;
+                                    $processedRecords++;
                                 $importStats['itinerary']['imported']++;
                                 if ($oldDayId > 0) {
                                     $mapper->remember('itinerary_days', $oldDayId, $newId);
-                                }
-                            } catch (\Exception $e) {
+                            }
+                        } catch (\Exception $e) {
                                 Logger::error('Itinerary day import error: ' . $e->getMessage());
                                 $importStats['itinerary']['failed']++;
                             }
@@ -706,12 +706,12 @@ class ExportImportService
                                 $importStats['itinerary']['failed']++;
                             }
                         }
-                        $progress = $totalRecords > 0 ? round(($processedRecords / $totalRecords) * 100) : 0;
-                        self::updateJob($jobId, [
-                            'processed_records' => $processedRecords,
-                            'progress' => $progress,
-                        ]);
-                    }
+                    $progress = $totalRecords > 0 ? round(($processedRecords / $totalRecords) * 100) : 0;
+                    self::updateJob($jobId, [
+                        'processed_records' => $processedRecords,
+                        'progress' => $progress,
+                    ]);
+                }
 
                     Logger::info(
                         "Imported itinerary: {$importStats['itinerary']['imported']} ok, {$importStats['itinerary']['failed']} failed"
@@ -1452,7 +1452,7 @@ class ExportImportService
         global $wpdb;
         $repository = new ExportImportRepository();
         $total = 0;
-
+        
         foreach ($dataTypes as $dataType) {
             if ($dataType === 'settings') {
                 continue;
@@ -1485,7 +1485,7 @@ class ExportImportService
                 $total += $repository->getRecordCount($tableName);
             }
         }
-
+        
         return $total;
     }
 

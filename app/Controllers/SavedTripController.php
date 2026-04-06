@@ -7,6 +7,7 @@ namespace Yatra\Controllers;
 use WP_REST_Request;
 use WP_REST_Response;
 use Yatra\Services\SavedTripService;
+use Yatra\Services\SettingsService;
 
 /**
  * Saved Trip REST API Controller
@@ -29,6 +30,10 @@ class SavedTripController extends BaseController
      */
     public function register_routes(): void
     {
+        if (!SettingsService::wishlistEnabled()) {
+            return;
+        }
+
         $namespace = 'yatra/v1';
         $base = 'saved-trips';
 
@@ -74,7 +79,56 @@ class SavedTripController extends BaseController
      */
     public function checkUserPermission(): bool
     {
-        return is_user_logged_in();
+        return SettingsService::wishlistEnabled() && is_user_logged_in();
+    }
+
+    /**
+     * Resolve trip ID from route params, merged params, and raw JSON body (some stacks omit JSON on get_param).
+     */
+    private function parseTripIdFromRequest(WP_REST_Request $request): int
+    {
+        foreach (['trip_id', 'tripId', 'id'] as $key) {
+            $v = $request->get_param($key);
+            if ($v !== null && $v !== '' && absint($v) > 0) {
+                return absint($v);
+            }
+        }
+
+        $bodyParams = $request->get_body_params();
+        if (is_array($bodyParams)) {
+            foreach (['trip_id', 'tripId', 'id'] as $key) {
+                if (isset($bodyParams[$key]) && $bodyParams[$key] !== '' && absint($bodyParams[$key]) > 0) {
+                    return absint($bodyParams[$key]);
+                }
+            }
+        }
+
+        if (!empty($_POST['trip_id']) && absint($_POST['trip_id']) > 0) {
+            return absint($_POST['trip_id']);
+        }
+
+        $data = $request->get_json_params();
+        if (is_array($data)) {
+            foreach (['trip_id', 'tripId', 'id'] as $key) {
+                if (isset($data[$key]) && $data[$key] !== '' && absint($data[$key]) > 0) {
+                    return absint($data[$key]);
+                }
+            }
+        }
+
+        $raw = $request->get_body();
+        if (is_string($raw) && $raw !== '') {
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded)) {
+                foreach (['trip_id', 'tripId', 'id'] as $key) {
+                    if (isset($decoded[$key]) && $decoded[$key] !== '' && absint($decoded[$key]) > 0) {
+                        return absint($decoded[$key]);
+                    }
+                }
+            }
+        }
+
+        return 0;
     }
 
     /**
@@ -101,22 +155,10 @@ class SavedTripController extends BaseController
     public function saveTrip(WP_REST_Request $request): WP_REST_Response
     {
         $userId = get_current_user_id();
-        $data = $request->get_json_params();
-        
-        // Debug: log received data
-        // Try multiple possible parameter names
-        $tripId = 0;
-        if (isset($data['trip_id'])) {
-            $tripId = (int) $data['trip_id'];
-        } elseif (isset($data['tripId'])) {
-            $tripId = (int) $data['tripId'];
-        } elseif (isset($data['id'])) {
-            $tripId = (int) $data['id'];
-        } elseif ($request->get_param('trip_id')) {
-            $tripId = (int) $request->get_param('trip_id');
-        }
 
-        if (!$tripId || $tripId <= 0) {
+        $tripId = $this->parseTripIdFromRequest($request);
+
+        if ($tripId <= 0) {
             return new WP_REST_Response([
                 'success' => false,
                 'message' => __('Trip ID is required.', 'yatra'),
@@ -142,7 +184,17 @@ class SavedTripController extends BaseController
     public function removeTrip(WP_REST_Request $request): WP_REST_Response
     {
         $userId = get_current_user_id();
-        $tripId = (int) $request->get_param('trip_id');
+        $tripId = absint($request->get_param('trip_id'));
+        if ($tripId <= 0) {
+            $tripId = $this->parseTripIdFromRequest($request);
+        }
+
+        if ($tripId <= 0) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Trip ID is required.', 'yatra'),
+            ], 400);
+        }
 
         $result = $this->savedTripService->removeTrip($userId, $tripId);
 

@@ -140,7 +140,7 @@ class AppServiceProvider extends ServiceProvider
             'yatra_auto_approve_reviews' => false,
             'yatra_enable_reviews' => true,
             'yatra_enable_enquiries' => true,
-            'yatra_enable_wishlist' => true,
+            'yatra_enable_wishlist' => false,
             'yatra_enable_coupons' => false,
             'yatra_enable_dynamic_pricing' => false,
             'yatra_enable_additional_services' => false,

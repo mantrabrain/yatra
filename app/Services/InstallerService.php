@@ -141,7 +141,7 @@ class InstallerService
         // Trip Settings - Match SettingsService defaults
         update_option('yatra_trip_base', 'trip');
         update_option('yatra_trips_per_page', 12);
-        update_option('yatra_enable_wishlist', true);
+        update_option('yatra_enable_wishlist', false);
         update_option('yatra_enable_comparison', false);
         update_option('yatra_show_sold_out', true);
         

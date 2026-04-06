@@ -105,6 +105,62 @@ class CustomerService
     }
 
     /**
+     * Account page /customers/me: Yatra customer when linked, otherwise WordPress user (display name, email).
+     */
+    public function getAccountProfileForUser(int $userId): ?array
+    {
+        if ($userId <= 0) {
+            return null;
+        }
+
+        $customer = $this->getCustomerByUserId($userId);
+        if ($customer !== null) {
+            return $customer;
+        }
+
+        $user = get_userdata($userId);
+        if (!$user instanceof \WP_User) {
+            return null;
+        }
+
+        return $this->buildProfileArrayFromWpUser($user);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildProfileArrayFromWpUser(\WP_User $user): array
+    {
+        $first = trim((string) $user->first_name);
+        $last = trim((string) $user->last_name);
+        $fromParts = trim($first . ' ' . $last);
+        $display = trim((string) $user->display_name);
+        $name = $fromParts !== '' ? $fromParts : $display;
+        if ($name === '') {
+            $name = (string) $user->user_login;
+        }
+
+        return [
+            'id' => 0,
+            'user_id' => (int) $user->ID,
+            'name' => $name,
+            'first_name' => $first,
+            'last_name' => $last,
+            'email' => (string) $user->user_email,
+            'phone' => '',
+            'country' => '',
+            'city' => '',
+            'status' => 'active',
+            'total_bookings' => 0,
+            'total_spent' => 0.0,
+            'loyalty_tier' => '',
+            'created_at' => $user->user_registered,
+            'last_booking_date' => null,
+            'registered_at' => $user->user_registered,
+        ];
+    }
+
+    /**
      * Create a new customer
      * 
      * @param array $data Customer data
@@ -698,10 +754,33 @@ class CustomerService
      */
     private function formatCustomer(object $customer): array
     {
+        $name = trim((string) ($customer->first_name ?? '') . ' ' . (string) ($customer->last_name ?? ''));
+        if ($name === '') {
+            $uid = (int) ($customer->user_id ?? 0);
+            if ($uid > 0) {
+                $u = get_userdata($uid);
+                if ($u instanceof \WP_User) {
+                    $name = trim((string) $u->display_name);
+                    if ($name === '') {
+                        $name = trim($u->first_name . ' ' . $u->last_name);
+                    }
+                    if ($name === '') {
+                        $name = (string) $u->user_login;
+                    }
+                }
+            }
+        }
+        if ($name === '' && !empty($customer->email)) {
+            $local = explode('@', (string) $customer->email)[0] ?? '';
+            $name = $local !== '' ? $local : $name;
+        }
+
+        $created = $customer->created_at ?? '';
+
         return [
             'id' => (int) $customer->id,
             'user_id' => $customer->user_id ? (int) $customer->user_id : null,
-            'name' => trim(($customer->first_name ?? '') . ' ' . ($customer->last_name ?? '')),
+            'name' => $name,
             'first_name' => $customer->first_name ?? '',
             'last_name' => $customer->last_name ?? '',
             'email' => $customer->email,
@@ -712,7 +791,8 @@ class CustomerService
             'total_bookings' => (int) ($customer->total_bookings ?? 0),
             'total_spent' => (float) ($customer->total_spent ?? 0),
             'loyalty_tier' => $customer->loyalty_tier ?? 'bronze',
-            'created_at' => $customer->created_at,
+            'created_at' => $created,
+            'registered_at' => $created,
             'last_booking_date' => $customer->last_booking_date ?? null,
         ];
     }

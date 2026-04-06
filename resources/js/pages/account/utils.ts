@@ -49,14 +49,41 @@ export const getBadge = (status: string | undefined | null) => {
   }
 };
 
+type PriceConfigWindow = Window & {
+  yatraAdmin?: Record<string, unknown>;
+  yatraAccountPage?: Record<string, unknown>;
+};
+
+function readPriceConfig() {
+  if (typeof window === "undefined") {
+    return {
+      globalCurrency: "USD",
+      currencyPosition: "before",
+      decimalPlaces: 2,
+      thousandSeparator: ",",
+      decimalSeparator: ".",
+    };
+  }
+  const w = window as PriceConfigWindow;
+  const a = (w.yatraAdmin || {}) as Record<string, unknown>;
+  const p = (w.yatraAccountPage || {}) as Record<string, unknown>;
+  return {
+    globalCurrency: (a.currency || p.currency || "USD") as string,
+    currencyPosition: (a.currencyPosition || p.currencyPosition || "before") as string,
+    decimalPlaces: Number(a.decimalPlaces ?? p.decimalPlaces ?? 2) || 2,
+    thousandSeparator: (a.thousandSeparator || p.thousandSeparator || ",") as string,
+    decimalSeparator: (a.decimalSeparator || p.decimalSeparator || ".") as string,
+  };
+}
+
 export const formatPrice = (price: number) => {
-  const globalCurrency = (window as any).yatraAdmin?.currency || "USD";
-  const currencyPosition =
-    (window as any).yatraAdmin?.currencyPosition || "before";
-  const decimalPlaces = (window as any).yatraAdmin?.decimalPlaces || 2;
-  const thousandSeparator =
-    (window as any).yatraAdmin?.thousandSeparator || ",";
-  const decimalSeparator = (window as any).yatraAdmin?.decimalSeparator || ".";
+  const {
+    globalCurrency,
+    currencyPosition,
+    decimalPlaces,
+    thousandSeparator,
+    decimalSeparator,
+  } = readPriceConfig();
 
   if (!price || price === 0) {
     return __("Contact for pricing", "yatra");
@@ -80,22 +107,19 @@ export const formatPrice = (price: number) => {
     .trim();
 
   if (currencyPosition === "right" || currencyPosition === "after") {
-    return `${formattedAmount} ${currencySymbol}`;
+    return `${formattedAmount}${currencySymbol}`;
   }
 
-  return `${currencySymbol} ${formattedAmount}`;
+  return `${currencySymbol}${formattedAmount}`;
 };
 
 export const formatPriceForBooking = (price: number, currency?: string) => {
-  const globalCurrency = (window as any).yatraAdmin?.currency || "USD";
-  const currencyPosition =
-    (window as any).yatraAdmin?.currencyPosition || "before";
-  const decimalPlaces = (window as any).yatraAdmin?.decimalPlaces || 2;
-  const thousandSeparator =
-    (window as any).yatraAdmin?.thousandSeparator || ",";
-  const decimalSeparator = (window as any).yatraAdmin?.decimalSeparator || ".";
+  const cfg = readPriceConfig();
+  const globalCurrency = currency || cfg.globalCurrency;
+  const { currencyPosition, decimalPlaces, thousandSeparator, decimalSeparator } =
+    cfg;
 
-  const currencyToUse = currency || globalCurrency;
+  const currencyToUse = globalCurrency;
 
   // Always format the price, even if 0 - don't show "Contact for pricing" for bookings
   const numPrice = Number(price) || 0;
@@ -118,10 +142,10 @@ export const formatPriceForBooking = (price: number, currency?: string) => {
     .trim();
 
   if (currencyPosition === "right" || currencyPosition === "after") {
-    return `${formattedAmount} ${currencySymbol}`;
+    return `${formattedAmount}${currencySymbol}`;
   }
 
-  return `${currencySymbol} ${formattedAmount}`;
+  return `${currencySymbol}${formattedAmount}`;
 };
 
 export const currency = (value: number, currencyCode: string = "USD") => {
@@ -136,3 +160,38 @@ export const currency = (value: number, currencyCode: string = "USD") => {
 
   return `${symbol}${formatted}`;
 };
+
+/** Values from `wp_localize_script(…, 'yatraAccountPage', …)` on the account page. */
+export function getYatraAccountPageGlobals(): {
+  logoutUrl: string;
+  companyPhone: string;
+  companyName: string;
+  companyEmail: string;
+} {
+  if (typeof window === "undefined") {
+    return {
+      logoutUrl: "",
+      companyPhone: "",
+      companyName: "",
+      companyEmail: "",
+    };
+  }
+  const p = (window as unknown as { yatraAccountPage?: Record<string, string> })
+    .yatraAccountPage;
+  const raw = p || {};
+  return {
+    logoutUrl: String(raw.logoutUrl || "").trim(),
+    companyPhone: String(raw.companyPhone || "").trim(),
+    companyName: String(raw.companyName || "").trim(),
+    companyEmail: String(raw.companyEmail || "").trim(),
+  };
+}
+
+export function phoneToTelHref(phone: string): string {
+  const t = String(phone).trim();
+  if (!t) {
+    return "";
+  }
+  const compact = t.replace(/[^\d+]/g, "");
+  return compact ? `tel:${compact}` : `tel:${encodeURIComponent(t)}`;
+}

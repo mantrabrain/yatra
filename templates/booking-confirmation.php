@@ -22,6 +22,10 @@ if (!$booking) {
     exit;
 }
 
+// Completed booking: ensure checkout session and its transient cannot repopulate the booking form.
+if (function_exists('yatra_clear_booking_session')) {
+    yatra_clear_booking_session();
+}
 
 // Format dates
 $travel_date_formatted = date_i18n(get_option('date_format'), strtotime($booking->travel_date));

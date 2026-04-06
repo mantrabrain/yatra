@@ -205,9 +205,9 @@ class CustomerController extends BaseController
     {
         $userId = get_current_user_id();
 
-        $customer = $this->customerService->getCustomerByUserId($userId);
+        $profile = $this->customerService->getAccountProfileForUser($userId);
 
-        if (!$customer) {
+        if ($profile === null) {
             return new WP_REST_Response([
                 'success' => false,
                 'message' => __('Customer profile not found.', 'yatra'),
@@ -216,7 +216,7 @@ class CustomerController extends BaseController
 
         return new WP_REST_Response([
             'success' => true,
-            'data' => $customer,
+            'data' => $profile,
         ]);
     }
 

@@ -17,7 +17,12 @@ import {
   Bell,
 } from "lucide-react";
 import { __ } from "../../lib/i18n";
-import { formatDate, getBadge, currency } from "./utils";
+import {
+  formatDate,
+  getBadge,
+  currency,
+  phoneToTelHref,
+} from "./utils";
 import type { Booking, Payment, CustomerProfile } from "./types";
 
 interface DashboardProps {
@@ -31,6 +36,9 @@ interface DashboardProps {
     badge?: string;
   }>;
   notifications: any[];
+  /** From Yatra Settings → General (company phone). */
+  conciergePhone?: string;
+  conciergeEmail?: string;
   onSectionChange: (section: string) => void;
 }
 
@@ -40,8 +48,12 @@ const Dashboard: React.FC<DashboardProps> = ({
   displayProfile,
   stats,
   notifications,
+  conciergePhone = "",
+  conciergeEmail = "",
   onSectionChange,
 }) => {
+  const conciergeTel = phoneToTelHref(conciergePhone);
+  const conciergeMail = String(conciergeEmail || "").trim();
   const upcomingBookings =
     bookings.filter((b) => new Date(b.travel_date) > new Date()).length > 0
       ? bookings.filter((b) => new Date(b.travel_date) > new Date()).slice(0, 3)
@@ -355,20 +367,33 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </div>
                 <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
               </div>
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={() => onSectionChange("support")}
-                className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <LifeBuoy className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
-                  <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                    {__("Get Support", "yatra")}
-                  </span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
-              </div>
+              {conciergeTel ? (
+                <a
+                  href={conciergeTel}
+                  className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm no-underline text-inherit"
+                >
+                  <div className="flex items-center gap-3">
+                    <LifeBuoy className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                    <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                      {__("Call us", "yatra")}
+                    </span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                </a>
+              ) : conciergeMail ? (
+                <a
+                  href={`mailto:${encodeURIComponent(conciergeMail)}`}
+                  className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm no-underline text-inherit"
+                >
+                  <div className="flex items-center gap-3">
+                    <LifeBuoy className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                    <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                      {__("Email us", "yatra")}
+                    </span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                </a>
+              ) : null}
             </div>
           </div>
 

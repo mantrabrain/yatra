@@ -126,9 +126,11 @@ if (!defined('ABSPATH')) {
                                 </div>
                                 <?php endif; ?>
                                 
-                                <button class="yatra-similar-favorite-btn" data-trip-id="<?php echo esc_attr($similar_trip->id); ?>" title="<?php esc_attr_e('Add to favorites', 'yatra'); ?>">
+                                <?php if (function_exists('yatra_wishlist_enabled') && yatra_wishlist_enabled()) : ?>
+                                <button type="button" class="yatra-favorite-btn yatra-similar-favorite-btn" data-trip-id="<?php echo esc_attr($similar_trip->id); ?>" title="<?php esc_attr_e('Save to wishlist', 'yatra'); ?>">
                                     <?php echo yatra_svg_icon('heart', ''); ?>
                                 </button>
+                                <?php endif; ?>
                                 
                                 <?php if ($difficulty['has_difficulty'] && !empty($difficulty['icon'])): ?>
                                     <div class="yatra-similar-difficulty-overlay">
