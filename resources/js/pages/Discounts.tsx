@@ -13,6 +13,7 @@ import {
   Edit,
   Trash2,
   Copy,
+  ClipboardCopy,
   Tag,
   Users,
   Lock,
@@ -490,6 +491,32 @@ const Discounts: React.FC = () => {
 
   const bulkActionOptions = getBulkActionOptionsForStatus(statusFilter);
 
+  const copyPromoCodeToClipboard = async (code: string) => {
+    const text = code.trim();
+    if (!text) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast(__("Coupon code copied to clipboard", "yatra"), "success");
+    } catch {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        showToast(__("Coupon code copied to clipboard", "yatra"), "success");
+      } catch {
+        showToast(__("Could not copy to clipboard", "yatra"), "error");
+      }
+    }
+  };
+
   const statusOptions = [
     { value: "all", label: __("All Status", "yatra") },
     { value: "publish", label: __("Publish", "yatra") },
@@ -581,13 +608,32 @@ const Discounts: React.FC = () => {
               </Badge>
             )}
           </div>
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
             <a
               href={`${baseAdminUrl}?page=yatra&subpage=discounts&action=edit&id=${discount.id}`}
               className="font-medium font-mono text-sm text-blue-600 dark:text-blue-400 hover:underline underline-offset-2"
             >
               {discount.code}
             </a>
+            {discount.discount_mode !== "group" && discount.code?.trim() ? (
+              <button
+                type="button"
+                className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-gray-300 bg-white text-gray-800 shadow-sm transition-colors hover:border-gray-400 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-gray-500 dark:bg-gray-800 dark:text-gray-100 dark:hover:border-gray-400 dark:hover:bg-gray-700"
+                title={__("Copy coupon code", "yatra")}
+                aria-label={__("Copy coupon code", "yatra")}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  void copyPromoCodeToClipboard(discount.code);
+                }}
+              >
+                <ClipboardCopy
+                  className="pointer-events-none h-4 w-4"
+                  strokeWidth={2.25}
+                  aria-hidden
+                />
+              </button>
+            ) : null}
           </div>
           {discount.description && (
             <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
