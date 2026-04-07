@@ -155,6 +155,10 @@ class SettingsMigration extends BaseMigration
                 ]);
                 $this->rewriteRulesNeedFlush = false;
             }
+
+            if (class_exists(\Yatra\Services\SettingsService::class)) {
+                \Yatra\Services\SettingsService::reload();
+            }
             
         } catch (\Exception $e) {
             Logger::error("Settings migration failed", [
@@ -198,13 +202,7 @@ class SettingsMigration extends BaseMigration
                 'old' => 'yatra_decimal_separator',
                 'new' => 'yatra_decimal_separator',
             ],
-            [
-                'old' => 'yatra_price_number_decimals',
-                'new' => 'yatra_price_number_decimals',
-                'transform' => function($value) {
-                    return intval($value);
-                }
-            ],
+            // yatra_price_number_decimals → yatra_decimal_places: see migrateLegacyRenamedFreeOptions()
             [
                 'old' => 'yatra_currency_symbol_type',
                 'new' => 'yatra_currency_symbol_type',
@@ -248,13 +246,7 @@ class SettingsMigration extends BaseMigration
             ],
 
             // Booking/Checkout Settings (verified from class-yatra-install.php + hooks)
-            [
-                'old' => 'yatra_enable_guest_checkout',
-                'new' => 'yatra_enable_guest_checkout',
-                'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
-                }
-            ],
+            // yatra_enable_guest_checkout → allow_guest_checkout + enable_guest_booking: migrateLegacyRenamedFreeOptions()
             [
                 'old' => 'yatra_booknow_button_text',
                 'new' => 'yatra_booknow_button_text',
@@ -333,14 +325,7 @@ class SettingsMigration extends BaseMigration
                 }
             ],
 
-            // Tax Settings (verified from yatra-pricing-functions.php)
-            [
-                'old' => 'yatra_payment_tax_rate',
-                'new' => 'yatra_tax_rate',
-                'transform' => function($value) {
-                    return floatval($value);
-                }
-            ],
+            // yatra_payment_tax_rate → yatra_tax_rate: migrateLegacyRenamedFreeOptions()
 
             // Layout/Design Settings (verified from hooks and setup wizard)
             [
@@ -504,6 +489,49 @@ class SettingsMigration extends BaseMigration
             'skipped' => $skipped,
         ];
     }
+
+    /**
+     * Free 2.x → 3.x option renames that SettingsService actually reads.
+     *
+     * The simple settings loop skips when old_key !== new_key and the 3.x option already exists with a
+     * different value — which would leave these stuck on defaults forever after upgrade.
+     */
+    private function migrateLegacyRenamedFreeOptions(): int
+    {
+        $n = 0;
+
+        $legacyGuest = get_option('yatra_enable_guest_checkout', null);
+        if ($legacyGuest !== null && $legacyGuest !== false && $legacyGuest !== '') {
+            $on = $legacyGuest === 'yes' || $legacyGuest === true || $legacyGuest === 1 || $legacyGuest === '1';
+            update_option('yatra_allow_guest_checkout', $on);
+            update_option('yatra_enable_guest_booking', $on);
+            Logger::info('Migrated yatra_enable_guest_checkout → yatra_allow_guest_checkout + yatra_enable_guest_booking', [
+                'source' => 'migration',
+                'enabled' => $on,
+            ]);
+            $n++;
+        }
+
+        $legacyDecimals = get_option('yatra_price_number_decimals', null);
+        if ($legacyDecimals !== null && $legacyDecimals !== false && $legacyDecimals !== '') {
+            update_option('yatra_decimal_places', max(0, min(10, (int) $legacyDecimals)));
+            Logger::info('Migrated yatra_price_number_decimals → yatra_decimal_places', [
+                'source' => 'migration',
+            ]);
+            $n++;
+        }
+
+        $legacyTax = get_option('yatra_payment_tax_rate', null);
+        if ($legacyTax !== null && $legacyTax !== false && $legacyTax !== '') {
+            update_option('yatra_tax_rate', (float) $legacyTax);
+            Logger::info('Migrated yatra_payment_tax_rate → yatra_tax_rate', [
+                'source' => 'migration',
+            ]);
+            $n++;
+        }
+
+        return $n;
+    }
     
     /**
      * Migrate complex settings (arrays, objects, etc.)
@@ -557,17 +585,70 @@ class SettingsMigration extends BaseMigration
         $permalinkResults = $this->migrateLegacyPermalinkBases();
         $migrated += $permalinkResults['migrated'];
         $skipped += $permalinkResults['skipped'];
+
+        // 2.x options renamed in 3.x (must not rely on simple map — getSettingsMap skips when new key already differs).
+        $migrated += $this->migrateLegacyRenamedFreeOptions();
         
         // Migrate enquiry/booking form settings
         $enquiryResults = $this->migrateEnquirySettings();
         $migrated += $enquiryResults['migrated'];
         $skipped += $enquiryResults['skipped'];
+
+        // Legacy Pro Google Calendar OAuth options → new Pro 3.x option names (no separate migration step).
+        $this->migrateLegacyProGoogleCalendarTokens();
+
+        // Legacy Pro review settings + partial payment (wp_options) → Yatra 3.x core settings keys.
+        $this->migrateLegacyReviewAndPartialPaymentOptions();
         
         return [
             'migrated' => $migrated,
             'skipped' => $skipped,
             'failed' => $failed,
         ];
+    }
+
+    /**
+     * Map legacy Pro Google Calendar token options to the keys used by Yatra Pro 3.x SettingsRepository.
+     * Skips when Pro 3.0+ is not active (same rule as other Pro table migrations).
+     */
+    private function migrateLegacyProGoogleCalendarTokens(): void
+    {
+        $refresh = (string) get_option('yatra_google_calendar_refresh_token', '');
+        $access = (string) get_option('yatra_google_calendar_access_token', '');
+        $expiresIn = get_option('yatra_google_calendar_expires_in', '');
+        $legacyEnable = get_option('yatra_enable_google_calendar', null);
+
+        if ($refresh === '' && $access === '' && ($expiresIn === '' || $expiresIn === null) && $legacyEnable === null) {
+            return;
+        }
+
+        $pro = ProMigrationReadiness::getState();
+        if (!$pro['ready']) {
+            Logger::warning('Skipping legacy Google Calendar token migration: Yatra Pro 3.0+ not ready', [
+                'source' => 'migration',
+                'pro_migration' => $pro,
+            ]);
+
+            return;
+        }
+
+        $tokenExpiresAt = get_option('yatra_google_calendar_token_expires_at', null);
+        if (($tokenExpiresAt === null || $tokenExpiresAt === '' || $this->isForceMigration()) && $expiresIn !== '' && $expiresIn !== null) {
+            $n = (int) $expiresIn;
+            if ($n > 0) {
+                update_option('yatra_google_calendar_token_expires_at', time() + $n);
+            }
+        }
+
+        if ($legacyEnable !== null) {
+            $enabled = ((string) $legacyEnable === '1' || $legacyEnable === 1 || $legacyEnable === true) ? 'yes' : 'no';
+            $existing = get_option('yatra_google_calendar_enabled', null);
+            if ($existing === null || $existing === '' || $this->isForceMigration()) {
+                update_option('yatra_google_calendar_enabled', $enabled);
+            }
+        }
+
+        Logger::info('Migrated legacy Google Calendar options for Yatra Pro 3.x.', ['source' => 'migration']);
     }
     
     /**
@@ -689,8 +770,17 @@ class SettingsMigration extends BaseMigration
         }
 
         // ── Razorpay ──────────────────────────────────────────────────────────
-        $razorKeyId     = get_option('yatra_payment_gateway_razorpay_key_id', '');
-        $razorKeySecret = get_option('yatra_payment_gateway_razorpay_key_secret', '');
+        // Old sites used either generic keys or separate live/test option names (Pro add-ons).
+        $razorKeyId     = (string) get_option('yatra_payment_gateway_razorpay_key_id', '');
+        $razorKeySecret = (string) get_option('yatra_payment_gateway_razorpay_key_secret', '');
+        if ($razorKeyId === '' && $razorKeySecret === '') {
+            $razorKeyId = $globalTestMode
+                ? (string) get_option('yatra_payment_gateway_razorpay_test_key_id', '')
+                : (string) get_option('yatra_payment_gateway_razorpay_live_key_id', '');
+            $razorKeySecret = $globalTestMode
+                ? (string) get_option('yatra_payment_gateway_razorpay_test_key_secret', '')
+                : (string) get_option('yatra_payment_gateway_razorpay_live_key_secret', '');
+        }
 
         if (!empty($razorKeyId) || !empty($razorKeySecret)) {
             $gatewayConfigs['razorpay'] = array_filter([
@@ -734,6 +824,90 @@ class SettingsMigration extends BaseMigration
             Logger::debug('Skipped 2Checkout gateway config — no keys found.', ['source' => 'migration']);
         }
 
+        // ── Mollie (legacy flat wp_options from Yatra 2.x / Pro gateway pack) ──
+        $mollieKey = $globalTestMode
+            ? (string) get_option('yatra_payment_gateway_mollie_test_api_key', '')
+            : (string) get_option('yatra_payment_gateway_mollie_live_api_key', '');
+        if ($mollieKey === '') {
+            $mollieKey = (string) get_option('yatra_payment_gateway_mollie_live_api_key', '');
+            if ($mollieKey === '') {
+                $mollieKey = (string) get_option('yatra_payment_gateway_mollie_test_api_key', '');
+            }
+        }
+        if ($mollieKey !== '') {
+            $gatewayConfigs['mollie'] = array_filter([
+                'api_key'        => $mollieKey,
+                'webhook_secret' => (string) get_option('yatra_payment_gateway_mollie_webhook_secret', ''),
+                'test_mode'      => $globalTestMode,
+                'title'          => get_option('yatra_payment_gateway_mollie_label_on_checkout', 'Pay with Mollie'),
+            ], fn($v) => $v !== '' && $v !== null);
+            $migrated++;
+            Logger::info('Migrated Mollie gateway config.', ['source' => 'migration']);
+        } else {
+            $skipped++;
+            Logger::debug('Skipped Mollie gateway config — no API key found.', ['source' => 'migration']);
+        }
+
+        // ── Square (flat keys; yatra_pro_square_settings merged later in mergeLegacyProBundledGatewayOptions)
+        $squareAppId = $globalTestMode
+            ? (string) get_option('yatra_payment_gateway_square_test_application_id', '')
+            : (string) get_option('yatra_payment_gateway_square_live_application_id', '');
+        $squareToken = $globalTestMode
+            ? (string) get_option('yatra_payment_gateway_square_test_access_token', '')
+            : (string) get_option('yatra_payment_gateway_square_live_access_token', '');
+        $squareLoc = $globalTestMode
+            ? (string) get_option('yatra_payment_gateway_square_test_location_id', '')
+            : (string) get_option('yatra_payment_gateway_square_live_location_id', '');
+        if ($squareAppId === '' && $squareToken === '') {
+            $squareAppId = (string) get_option('yatra_payment_gateway_square_live_application_id', '');
+            $squareToken = (string) get_option('yatra_payment_gateway_square_live_access_token', '');
+            $squareLoc = (string) get_option('yatra_payment_gateway_square_live_location_id', '');
+        }
+        if ($squareAppId !== '' || $squareToken !== '' || $squareLoc !== '') {
+            $gatewayConfigs['square'] = array_filter([
+                'application_id' => $squareAppId,
+                'access_token'   => $squareToken,
+                'location_id'    => $squareLoc,
+                'test_mode'      => $globalTestMode,
+                'title'          => get_option('yatra_payment_gateway_square_label_on_checkout', 'Pay With Card'),
+            ], fn($v) => $v !== '' && $v !== null && $v !== false);
+            $migrated++;
+            Logger::info('Migrated Square gateway config (flat legacy options).', ['source' => 'migration']);
+        } else {
+            $skipped++;
+            Logger::debug('Skipped Square flat gateway config — no keys found.', ['source' => 'migration']);
+        }
+
+        // ── Authorize.Net (flat keys + optional yatra_pro_authorizenet_settings later)
+        $authLogin = $globalTestMode
+            ? (string) get_option('yatra_payment_gateway_authorizenet_test_login_id', '')
+            : (string) get_option('yatra_payment_gateway_authorizenet_live_login_id', '');
+        $authTxn = $globalTestMode
+            ? (string) get_option('yatra_payment_gateway_authorizenet_test_transaction_key', '')
+            : (string) get_option('yatra_payment_gateway_authorizenet_live_transaction_key', '');
+        $authPub = (string) get_option('yatra_payment_gateway_authorizenet_public_client_key', '');
+        if ($authPub === '') {
+            $authPub = (string) get_option('yatra_payment_gateway_authorizenet_client_key', '');
+        }
+        if ($authLogin === '' && $authTxn === '') {
+            $authLogin = (string) get_option('yatra_payment_gateway_authorizenet_live_login_id', '');
+            $authTxn = (string) get_option('yatra_payment_gateway_authorizenet_live_transaction_key', '');
+        }
+        if ($authLogin !== '' || $authTxn !== '' || $authPub !== '') {
+            $gatewayConfigs['authorize_net'] = array_filter([
+                'api_login_id'       => $authLogin,
+                'transaction_key'    => $authTxn,
+                'public_client_key'  => $authPub,
+                'test_mode'          => $globalTestMode,
+                'title'              => get_option('yatra_payment_gateway_authorizenet_label_on_checkout', 'Pay with Cards'),
+            ], fn($v) => $v !== '' && $v !== null);
+            $migrated++;
+            Logger::info('Migrated Authorize.Net gateway config (flat legacy options).', ['source' => 'migration']);
+        } else {
+            $skipped++;
+            Logger::debug('Skipped Authorize.Net flat gateway config — no keys found.', ['source' => 'migration']);
+        }
+
         // ── Booking-Only / Pay-Later ──────────────────────────────────────────
         // Old slug was 'booking_only'; new system calls it 'pay_later'.
         $bookingOnlyLabel = get_option('yatra_payment_gateway_booking_only_label_on_checkout', 'Book Now Pay Later');
@@ -763,6 +937,7 @@ class SettingsMigration extends BaseMigration
                 'count'    => count($merged),
                 'gateways' => array_keys($merged),
             ]);
+            $this->ensureActivePaymentGatewaySlugsForConfigs($merged);
         }
 
         // ── Fix active-gateway slug: booking_only → pay_later ─────────────────
@@ -776,10 +951,182 @@ class SettingsMigration extends BaseMigration
             Logger::info('Renamed booking_only → pay_later in active gateways list.', ['source' => 'migration']);
         }
 
+        // Legacy Yatra Pro 2.x bundled gateway settings (yatra_pro_* options). Runs after free flat-key
+        // migration so yatra_gateway_configs from core/free wins on duplicate keys; Pro only fills gaps.
+        $this->mergeLegacyProBundledGatewayOptions();
+
         return [
             'migrated' => $migrated,
             'skipped'  => $skipped,
         ];
+    }
+
+    /**
+     * Merge legacy Pro payment gateway options into yatra_active_payment_gateways and yatra_gateway_configs.
+     *
+     * Free/core migration above already maps yatra_payment_gateways + yatra_payment_gateway_* flat keys.
+     * This handles Pro-only bundles (yatra_pro_*_settings) without a second migration step.
+     */
+    private function mergeLegacyProBundledGatewayOptions(): void
+    {
+        $legacyEnabled = get_option('yatra_pro_enabled_payment_gateways', []);
+        $legacyEnabled = is_array($legacyEnabled) ? $legacyEnabled : [];
+
+        $legacySettings = [
+            '2checkout' => get_option('yatra_pro_twocheckout_settings', null),
+            'square' => get_option('yatra_pro_square_settings', null),
+            'razorpay' => get_option('yatra_pro_razorpay_settings', null),
+            'authorize_net' => get_option('yatra_pro_authorizenet_settings', null),
+        ];
+
+        $hasAny = $legacyEnabled !== [];
+        foreach ($legacySettings as $v) {
+            if ($v !== null && $v !== '' && $v !== []) {
+                $hasAny = true;
+            }
+        }
+        if (!$hasAny) {
+            return;
+        }
+
+        $active = get_option('yatra_active_payment_gateways', []);
+        if (!is_array($active)) {
+            $active = [];
+        }
+
+        $enabledMapped = [];
+        foreach ($legacyEnabled as $g) {
+            $g = strtolower(trim((string) $g));
+            if ($g === '') {
+                continue;
+            }
+            $map = [
+                'booking_only' => 'pay_later',
+                'authorizenet' => 'authorize_net',
+                'authorize' => 'authorize_net',
+                'two_checkout' => '2checkout',
+                'twocheckout' => '2checkout',
+            ];
+            $enabledMapped[] = $map[$g] ?? $g;
+        }
+        $enabledMapped = array_values(array_filter($enabledMapped, static fn ($v) => $v !== ''));
+
+        // Free/core list first so ordering matches the main migration; Pro appends any missing slugs.
+        $finalActive = array_values(array_unique(array_merge($active, $enabledMapped)));
+        update_option('yatra_active_payment_gateways', $finalActive);
+
+        $configs = get_option('yatra_gateway_configs', []);
+        if (!is_array($configs)) {
+            $configs = [];
+        }
+
+        foreach ($legacySettings as $gatewayId => $settings) {
+            if (!is_array($settings) || $settings === []) {
+                continue;
+            }
+
+            if ($gatewayId === 'authorize_net' && isset($settings['client_key']) && !isset($settings['public_client_key'])) {
+                $settings['public_client_key'] = $settings['client_key'];
+            }
+
+            if (!isset($configs[$gatewayId]) || $this->isForceMigration()) {
+                $configs[$gatewayId] = array_merge($configs[$gatewayId] ?? [], $settings);
+            } else {
+                $configs[$gatewayId] = array_merge($settings, $configs[$gatewayId]);
+            }
+        }
+
+        update_option('yatra_gateway_configs', $configs);
+
+        $this->ensureActivePaymentGatewaySlugsForConfigs($configs);
+
+        Logger::info('Merged legacy Pro bundled gateway options into unified gateway settings.', [
+            'source' => 'migration',
+            'active_gateways' => $finalActive,
+            'config_keys' => array_keys($configs),
+        ]);
+    }
+
+    /**
+     * If unified configs contain real credentials but the gateway slug is missing from the active list
+     * (common when legacy sites only stored flat keys, not yatra_payment_gateways), append the slug.
+     *
+     * @param array<string, array<string, mixed>> $merged
+     */
+    private function ensureActivePaymentGatewaySlugsForConfigs(array $merged): void
+    {
+        $active = get_option('yatra_active_payment_gateways', []);
+        if (!is_array($active)) {
+            $active = [];
+        }
+
+        $rules = [
+            'paypal' => static fn (array $c): bool => !empty($c['email']),
+            'stripe' => static fn (array $c): bool => !empty($c['api_key']) || !empty($c['api_secret']),
+            'razorpay' => static fn (array $c): bool => !empty($c['key_id']) || !empty($c['key_secret']),
+            '2checkout' => static fn (array $c): bool => !empty($c['publishable_key']) || !empty($c['merchant_code']) || !empty($c['private_key']),
+            'mollie' => static fn (array $c): bool => !empty($c['api_key']),
+            'square' => static fn (array $c): bool => !empty($c['application_id']) || !empty($c['access_token']),
+            'authorize_net' => static fn (array $c): bool => !empty($c['api_login_id']) || !empty($c['transaction_key']),
+        ];
+
+        foreach ($rules as $slug => $hasCreds) {
+            if (empty($merged[$slug]) || !is_array($merged[$slug])) {
+                continue;
+            }
+            if (!$hasCreds($merged[$slug])) {
+                continue;
+            }
+            if (!in_array($slug, $active, true)) {
+                $active[] = $slug;
+            }
+        }
+
+        update_option('yatra_active_payment_gateways', array_values(array_unique($active)));
+    }
+
+    /**
+     * Map legacy Pro review + partial-payment options into Yatra 3.x SettingsService option keys.
+     * Only writes when the legacy option exists so fresh 3.x installs are untouched.
+     */
+    private function migrateLegacyReviewAndPartialPaymentOptions(): void
+    {
+        $revEnable = get_option('yatra_review_enable', null);
+        if ($revEnable !== null && $revEnable !== '') {
+            $on = $revEnable === 'yes' || $revEnable === true || $revEnable === 1 || $revEnable === '1';
+            update_option('yatra_enable_reviews', $on);
+            Logger::info('Migrated legacy yatra_review_enable → yatra_enable_reviews', ['source' => 'migration']);
+        }
+
+        $who = get_option('yatra_review_who_can', null);
+        if (is_string($who) && $who !== '') {
+            $w = strtolower($who);
+            if (str_contains($w, 'book')) {
+                update_option('yatra_require_booking_to_review', true);
+            } elseif ($w === 'logged_in' || str_contains($w, 'login')) {
+                update_option('yatra_require_booking_to_review', false);
+            }
+            Logger::info('Migrated legacy yatra_review_who_can', ['source' => 'migration', 'value' => $who]);
+        }
+
+        $auto = get_option('yatra_review_autopublish', null);
+        if ($auto !== null && $auto !== '') {
+            $publish = strtolower((string) $auto) === 'publish';
+            update_option('yatra_auto_approve_reviews', $publish);
+            update_option('yatra_enable_review_moderation', !$publish);
+            Logger::info('Migrated legacy yatra_review_autopublish', ['source' => 'migration', 'value' => $auto]);
+        }
+
+        $partial = get_option('yatra_enable_partial_payment', null);
+        if ($partial === 'yes' || $partial === true || $partial === 1 || $partial === '1') {
+            update_option('yatra_partial_payment', true);
+            $pct = (float) get_option('yatra_first_installment_payment', 0);
+            $type = (string) get_option('yatra_first_installment_payment_type', 'percentage');
+            if ($type === 'percentage' && $pct > 0 && $pct < 100) {
+                update_option('yatra_partial_payment_percentage', max(1, min(99, (int) round($pct))));
+            }
+            Logger::info('Migrated legacy partial payment options → yatra_partial_payment*', ['source' => 'migration']);
+        }
     }
     
     /**

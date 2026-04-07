@@ -1112,6 +1112,9 @@ const Tools: React.FC = () => {
           "Migration started for all data types. Processing in background...",
           "success",
         );
+        if (Array.isArray(data.warnings) && data.warnings.length > 0) {
+          showToast(String(data.warnings[0]), "warning");
+        }
         // Immediately load progress to initialize the display
         await loadMigrationProgress();
         startMigrationPolling();
@@ -2259,6 +2262,52 @@ const Tools: React.FC = () => {
               )}
             </div>
 
+            {migrationStatus?.has_old_data &&
+              (() => {
+                const pm =
+                  migrationProgress?.pro_migration ??
+                  migrationStatus?.pro_migration;
+                if (!pm || pm.ready) {
+                  return null;
+                }
+                return (
+                  <div className="mb-6 p-4 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 flex gap-3 items-start">
+                    <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <h4 className="font-medium text-amber-900 dark:text-amber-200">
+                        {__(
+                          "Yatra Pro 3.0+ required for full migration",
+                          "yatra",
+                        )}
+                      </h4>
+                      <p className="text-sm text-amber-800 dark:text-amber-300/90 mt-1">
+                        {pm.warning_message}
+                      </p>
+                      {pm.multiple_pro_plugins &&
+                        Array.isArray(pm.active_pro_plugins) &&
+                        pm.active_pro_plugins.length > 0 && (
+                          <ul className="text-xs text-amber-800 dark:text-amber-300/80 mt-2 list-disc pl-5 space-y-0.5">
+                            {pm.active_pro_plugins.map(
+                              (p: {
+                                file: string;
+                                name?: string;
+                                version?: string | null;
+                              }) => (
+                                <li key={p.file}>
+                                  {p.file}
+                                  {p.version != null && p.version !== ""
+                                    ? ` (${p.version})`
+                                    : ""}
+                                </li>
+                              ),
+                            )}
+                          </ul>
+                        )}
+                    </div>
+                  </div>
+                );
+              })()}
+
             {/* Loading State */}
             {isLoadingMigration ? (
               <div className="space-y-4">
@@ -3078,6 +3127,20 @@ const Tools: React.FC = () => {
                 </p>
               </div>
             </div>
+            {migrationStatus?.pro_migration &&
+              !migrationStatus.pro_migration.ready && (
+                <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-800 rounded-md flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
+                  <div>
+                    <p className="font-medium text-amber-900 dark:text-amber-200">
+                      {__("Yatra Pro", "yatra")}
+                    </p>
+                    <p className="mt-1 text-sm text-amber-800 dark:text-amber-300/90">
+                      {migrationStatus.pro_migration.warning_message}
+                    </p>
+                  </div>
+                </div>
+              )}
           </div>
         </Modal>
 

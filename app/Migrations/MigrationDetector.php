@@ -54,7 +54,13 @@ class MigrationDetector
             || $this->countOldItinerary() > 0
             || $this->countOldServices() > 0
             || $this->countOldAvailabilityConditions() > 0
-            || $this->countOldTravelerCategories() > 0;
+            || $this->countOldTravelerCategories() > 0
+            // Pro legacy footprints (may exist even when core legacy is already migrated)
+            || $this->countOldProFeatures() > 0
+            || $this->countOldProGatewaySettings() > 0
+            || $this->countOldProGoogleCalendar() > 0
+            || $this->countOldProReviewsCpt() > 0
+            || $this->countOldProDownloads() > 0;
     }
     
     /**
@@ -149,7 +155,7 @@ class MigrationDetector
             'settings' => [
                 'label' => 'Settings',
                 'count' => $this->countOldSettings(),
-                'description' => 'Plugin configuration and settings',
+                'description' => 'Core options plus payment gateways (free flat keys + legacy Pro yatra_pro_* bundles) and Google Calendar token remap when Pro 3.0+ is active',
                 'table' => 'options (yatra_* keys)',
             ],
             'services' => [
@@ -170,7 +176,101 @@ class MigrationDetector
                 'description' => 'Multiple pricing / traveler-based pricing options',
                 'table' => 'postmeta (yatra_multiple_pricing on tour posts)',
             ],
+            'pro_features' => [
+                'label' => 'Pro: Feature Toggles',
+                'count' => $this->countOldProFeatures(),
+                'description' => 'Legacy Pro feature/module toggles (yatra_pro_features option)',
+                'table' => 'options (yatra_pro_features)',
+            ],
+            'pro_reviews_cpt' => [
+                'label' => 'Pro: Reviews (CPT)',
+                'count' => $this->countOldProReviewsCpt(),
+                'description' => 'Legacy Pro reviews stored as yatra-review custom post type',
+                'table' => 'posts (post_type=yatra-review)',
+            ],
+            'pro_downloads' => [
+                'label' => 'Pro: Downloads',
+                'count' => $this->countOldProDownloads(),
+                'description' => 'Legacy downloadable files attached to tours',
+                'table' => 'options + postmeta (downloads_downloadable_files)',
+            ],
         ];
+    }
+
+    private function countOldProFeatures(): int
+    {
+        $features = get_option('yatra_pro_features', []);
+        if (!is_array($features)) {
+            return 0;
+        }
+        $features = array_filter($features, static fn ($v) => (bool) $v);
+
+        return $features !== [] ? 1 : 0;
+    }
+
+    private function countOldProGatewaySettings(): int
+    {
+        $enabled = get_option('yatra_pro_enabled_payment_gateways', []);
+        if (is_array($enabled) && $enabled !== []) {
+            return 1;
+        }
+
+        $keys = [
+            'yatra_pro_twocheckout_settings',
+            'yatra_pro_square_settings',
+            'yatra_pro_razorpay_settings',
+            'yatra_pro_authorizenet_settings',
+            'yatra_pro_razorpay_refunds',
+        ];
+        foreach ($keys as $k) {
+            $v = get_option($k, null);
+            if ($v !== null && $v !== '' && $v !== []) {
+                return 1;
+            }
+        }
+
+        return 0;
+    }
+
+    private function countOldProGoogleCalendar(): int
+    {
+        $token = get_option('yatra_google_calendar_refresh_token', '');
+        if (is_string($token) && $token !== '') {
+            return 1;
+        }
+        $enabled = get_option('yatra_enable_google_calendar', '');
+        if ($enabled !== '' && $enabled !== null) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    private function countOldProReviewsCpt(): int
+    {
+        $count = $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$this->wpdb->posts} WHERE post_type = 'yatra-review' AND post_status NOT IN ('trash','auto-draft')"
+        );
+
+        return (int) $count;
+    }
+
+    private function countOldProDownloads(): int
+    {
+        $global = get_option('yatra_global_downloadable_files', '');
+        if (is_string($global) && trim($global) !== '') {
+            return 1;
+        }
+        $count = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SELECT COUNT(*) FROM {$this->wpdb->postmeta} pm INNER JOIN {$this->wpdb->posts} p ON pm.post_id = p.ID
+                 WHERE p.post_type = %s AND pm.meta_key = %s AND pm.meta_value <> ''",
+                'tour',
+                'downloads_downloadable_files'
+            )
+        );
+
+        return (int) $count;
     }
     
     /**

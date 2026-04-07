@@ -31,6 +31,10 @@ use Yatra\Migration\SettingsMigration;
 use Yatra\Migration\ServicesMigration;
 use Yatra\Migration\ItineraryMigration;
 use Yatra\Migration\AvailabilityConditionsMigration;
+use Yatra\Migration\ProMigrationReadiness;
+use Yatra\Migration\ProFeaturesMigration;
+use Yatra\Migration\ProReviewCptMigration;
+use Yatra\Migration\ProDownloadsMigration;
 
 class MigrationProgress
 {
@@ -56,6 +60,7 @@ class MigrationProgress
      */
     private array $dataTypesOrder = [
         'settings',
+        'pro_features',
         'destinations',
         'activities',
         'attributes',
@@ -64,6 +69,9 @@ class MigrationProgress
         'reviews',
         'enquiries',
         'trips',
+        // Pro CPT downloads/reviews reference old tour posts → need _migrated_to_trip_id from TripMigration.
+        'pro_reviews_cpt',
+        'pro_downloads',
         'tour_dates',
         'bookings',
         'traveler_categories',
@@ -105,6 +113,7 @@ class MigrationProgress
             'has_old_data' => $this->detector->hasOldData(),
             'old_data' => $this->detector->detectOldData(),
             'migration_log' => $this->getMigrationLog(),
+            'pro_migration' => ProMigrationReadiness::getState(),
         ];
     }
 
@@ -122,7 +131,6 @@ class MigrationProgress
 
     /**
      * True when legacy data exists but migration is incomplete or had failures.
-     * Used for the WordPress admin bar notice (per-user dismiss).
      */
     public function legacyMigrationNeedsAttention(): bool
     {
@@ -184,14 +192,26 @@ class MigrationProgress
             }
 
             $this->kickQueueRunner();
-            
-            return [
+
+            $pro = ProMigrationReadiness::getState();
+            $payload = [
                 'success' => true,
                 'data_type' => $dataType,
                 'action_id' => $actionId,
                 'message' => "Migration scheduled for {$dataType}. Processing in background...",
+                'pro_migration' => $pro,
             ];
-            
+            if (!$pro['ready'] && $pro['warning_message'] !== '') {
+                $payload['warnings'] = [$pro['warning_message']];
+                Logger::warning($pro['warning_message'], [
+                    'source' => 'migration',
+                    'data_type' => $dataType,
+                    'pro_migration' => $pro,
+                ]);
+            }
+
+            return $payload;
+
         } catch (\Exception $e) {
             return [
                 'success' => false,
@@ -230,6 +250,15 @@ class MigrationProgress
         
         try {
             switch ($dataType) {
+                case 'pro_features':
+                    $result = (new ProFeaturesMigration($this))->run();
+                    break;
+                case 'pro_reviews_cpt':
+                    $result = (new ProReviewCptMigration($this))->run();
+                    break;
+                case 'pro_downloads':
+                    $result = (new ProDownloadsMigration($this))->run();
+                    break;
                 case 'trips':
                     $result = (new TripMigration($this))->run();
                     break;
@@ -406,12 +435,26 @@ class MigrationProgress
 
             $this->scheduleFullMigrationBackgroundRun($force);
 
-            return [
+            $pro = ProMigrationReadiness::getState();
+            if (!$pro['ready'] && $pro['warning_message'] !== '') {
+                Logger::warning($pro['warning_message'], [
+                    'source' => 'migration',
+                    'pro_migration' => $pro,
+                ]);
+            }
+
+            $payload = [
                 'success' => true,
                 'message' => 'Migration started successfully.',
                 'started_at' => current_time('mysql'),
                 'background' => true,
+                'pro_migration' => $pro,
             ];
+            if (!$pro['ready'] && $pro['warning_message'] !== '') {
+                $payload['warnings'] = [$pro['warning_message']];
+            }
+
+            return $payload;
 
         } catch (\Exception $e) {
             return [
@@ -664,6 +707,7 @@ class MigrationProgress
             'started_at' => $startedAt,
             'all_complete' => $allComplete,
             'any_running' => $anyRunning,
+            'pro_migration' => ProMigrationReadiness::getState(),
         ];
     }
 
