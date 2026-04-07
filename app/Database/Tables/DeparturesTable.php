@@ -37,7 +37,7 @@ class DeparturesTable extends BaseTable
             CREATE TABLE IF NOT EXISTS `{$table}` (
                 `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                 `trip_id` bigint(20) UNSIGNED NOT NULL,
-                `date` date NOT NULL COMMENT 'Legacy single-day key; keep in sync with start_date',
+                `date` date NOT NULL COMMENT 'Legacy single-day key — keep in sync with start_date',
                 `start_date` date DEFAULT NULL COMMENT 'Trip start (booking / calendar)',
                 `end_date` date DEFAULT NULL COMMENT 'Trip end (multi-day)',
                 `time` time DEFAULT NULL,

@@ -33,7 +33,8 @@ class BookingRepository extends BaseRepository
             $this->wpdb->prefix . 'yatra_bookings',
         ];
         foreach ($candidates as $candidate) {
-            $exists = $this->wpdb->get_var($this->wpdb->prepare("SHOW TABLES LIKE %s", $candidate));
+            $pattern = $this->wpdb->esc_like($candidate);
+            $exists = $this->wpdb->get_var($this->wpdb->prepare('SHOW TABLES LIKE %s', $pattern));
             if ($exists === $candidate) {
                 $this->resolvedBookingsTable = $candidate;
                 if (defined('WP_DEBUG') && WP_DEBUG) {

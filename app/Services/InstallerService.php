@@ -209,7 +209,7 @@ class InstallerService
      */
     public static function getRequiredTables(): array
     {
-        // Must match \Yatra\Core\Database::createTables() — used for health checks on load/activate.
+        // Must match \Yatra\Core\Database::createTables() — used for activation, migrations, and targeted checks.
         $table_classes = [
             \Yatra\Database\Tables\TripsTable::class,
             \Yatra\Database\Tables\BookingsTable::class,
@@ -243,6 +243,21 @@ class InstallerService
 
         return $table_names;
     }
+
+    /**
+     * Whether a prefixed table exists. Uses esc_like() because SQL LIKE treats "_" as a wildcard.
+     */
+    public static function databaseTableExists(string $fullTableName): bool
+    {
+        global $wpdb;
+        if ($fullTableName === '') {
+            return false;
+        }
+        $pattern = $wpdb->esc_like($fullTableName);
+        $found = $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $pattern));
+
+        return $found === $fullTableName;
+    }
     
     /**
      * Check if this is a fresh installation
@@ -266,11 +281,10 @@ class InstallerService
         }
         
         // Additional check: if core tables don't exist, it's fresh
-        global $wpdb;
         $required_tables = self::getRequiredTables();
         if (!empty($required_tables)) {
             $trips_table = $required_tables[0]; // Use first table (already has prefix)
-            if ($wpdb->get_var("SHOW TABLES LIKE '$trips_table'") !== $trips_table) {
+            if (!self::databaseTableExists($trips_table)) {
                 return true;
             }
         }

@@ -317,12 +317,9 @@ class Bootstrap
     public function upgrade(): void
     {
         $current_version = get_option('yatra_version', '1.0.0');
-        
-        if (version_compare($current_version, '3.0.0', '<')) {
-            // Create any new tables added in v3.0.0
+
+        if (version_compare($current_version, YATRA_VERSION, '<')) {
             Database::createTables();
-            
-            // Update version
             update_option('yatra_version', YATRA_VERSION);
         }
 

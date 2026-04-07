@@ -411,7 +411,16 @@ class SettingsMigration extends BaseMigration
     }
 
     /**
-     * Copy public URL slug options from legacy yatra_permalinks into 3.x wp_options.
+     * Copy legacy public URL slug settings into 3.x wp_options (yatra_*_base) and flush rewrites.
+     *
+     * Sources (in order):
+     * 1) {@see get_option('yatra_permalinks')} — 1.x/2.x array from Settings → Permalinks (and forks that
+     *    stored extra keys). Values may be serialized strings; non-scalar entries are ignored.
+     * 2) Standalone options — rare cases where yatra_tour_base (or others) existed outside the array.
+     *
+     * 1.x core only persisted: yatra_tour_base, yatra_destination_base, yatra_activity_base,
+     * yatra_attributes_base (see yatra-old class-yatra-admin-permalinks.php). 3.x uses yatra_trip_base
+     * for trips; tour_* / trip_* aliases are all mapped here.
      *
      * @return array{migrated: int, skipped: int}
      */
@@ -422,7 +431,12 @@ class SettingsMigration extends BaseMigration
             if ($value === null || $value === false || $value === '') {
                 return '';
             }
-            $s = is_string($value) ? trim($value) : (string) $value;
+            if (!is_scalar($value)) {
+                return '';
+            }
+            $s = trim((string) $value);
+            $s = function_exists('untrailingslashit') ? untrailingslashit($s) : rtrim($s, '/');
+            $s = trim($s, '/');
             $s = preg_replace('/[^a-z0-9_-]/i', '', $s) ?: '';
 
             return $s;
@@ -443,45 +457,112 @@ class SettingsMigration extends BaseMigration
             $this->rewriteRulesNeedFlush = true;
         };
 
-        $oldPermalinks = get_option('yatra_permalinks', []);
-        if (!empty($oldPermalinks) && is_array($oldPermalinks)) {
-            $map = [
-                ['yatra_tour_base', 'yatra_trip_base'],
-                ['tour_base', 'yatra_trip_base'],
-                ['yatra_destination_base', 'yatra_destination_base'],
-                ['destination_base', 'yatra_destination_base'],
-                ['yatra_activity_base', 'yatra_activity_base'],
-                ['activity_base', 'yatra_activity_base'],
-                ['yatra_attributes_base', 'yatra_attributes_base'],
-                ['attributes_base', 'yatra_attributes_base'],
-                ['yatra_booking_base', 'yatra_booking_base'],
-                ['booking_base', 'yatra_booking_base'],
-                ['yatra_trip_category_base', 'yatra_trip_category_base'],
-                ['yatra_tour_category_base', 'yatra_trip_category_base'],
-                ['trip_category_base', 'yatra_trip_category_base'],
-                ['tour_category_base', 'yatra_trip_category_base'],
-                ['yatra_category_base', 'yatra_trip_category_base'],
-                ['category_base', 'yatra_trip_category_base'],
-                ['yatra_difficulty_base', 'yatra_difficulty_base'],
-                ['difficulty_base', 'yatra_difficulty_base'],
-                ['yatra_account_base', 'yatra_account_base'],
-                ['account_base', 'yatra_account_base'],
-            ];
-            foreach ($map as [$legacyKey, $optionName]) {
-                if (!empty($oldPermalinks[$legacyKey])) {
-                    $setSlugOption($optionName, $oldPermalinks[$legacyKey]);
+        $rawPermalinks = get_option('yatra_permalinks', null);
+        $oldPermalinks = [];
+        if (is_string($rawPermalinks)) {
+            $maybe = maybe_unserialize($rawPermalinks);
+            $oldPermalinks = is_array($maybe) ? $maybe : [];
+        } elseif (is_array($rawPermalinks)) {
+            $oldPermalinks = $rawPermalinks;
+        }
+
+        // One winning value per 3.x option: prefer canonical yatra_* keys, then short aliases (1.x/2.x/forks).
+        $pickScalar = static function (array $row, array $keys) {
+            foreach ($keys as $key) {
+                if (!empty($row[$key]) && is_scalar($row[$key])) {
+                    return $row[$key];
                 }
+            }
+
+            return null;
+        };
+
+        $groups = [
+            'yatra_trip_base' => [
+                'yatra_tour_base',
+                'yatra_trip_base',
+                'yatra_tours_base',
+                'tour_base',
+                'trip_base',
+            ],
+            'yatra_destination_base' => ['yatra_destination_base', 'destination_base'],
+            'yatra_activity_base' => ['yatra_activity_base', 'activity_base'],
+            'yatra_attributes_base' => [
+                'yatra_attributes_base',
+                'yatra_attribute_base',
+                'attributes_base',
+                'attribute_base',
+            ],
+            'yatra_booking_base' => ['yatra_booking_base', 'booking_base'],
+            'yatra_trip_category_base' => [
+                'yatra_trip_category_base',
+                'yatra_tour_category_base',
+                'trip_category_base',
+                'tour_category_base',
+                'yatra_category_base',
+                'category_base',
+            ],
+            'yatra_difficulty_base' => ['yatra_difficulty_base', 'difficulty_base'],
+            'yatra_account_base' => ['yatra_account_base', 'yatra_my_account_base', 'account_base'],
+        ];
+
+        foreach ($groups as $optionName => $legacyKeys) {
+            $raw = $pickScalar($oldPermalinks, $legacyKeys);
+            if ($raw !== null) {
+                $setSlugOption($optionName, $raw);
             }
         }
 
-        $skipped = (!is_array($oldPermalinks) || empty($oldPermalinks)) ? 1 : 0;
+        // Orphan top-level options (imports, partial upgrades, or custom code) — do not override array data.
+        $tourFromArray = $pickScalar($oldPermalinks, $groups['yatra_trip_base']) !== null;
+        if (!$tourFromArray) {
+            $orphanTour = get_option('yatra_tour_base', '');
+            if (is_string($orphanTour) && $orphanTour !== '') {
+                $setSlugOption('yatra_trip_base', $orphanTour);
+            }
+        }
+
+        $standaloneBases = [
+            ['yatra_destination_base', 'yatra_destination_base', ['yatra_destination_base', 'destination_base']],
+            ['yatra_activity_base', 'yatra_activity_base', ['yatra_activity_base', 'activity_base']],
+            ['yatra_attributes_base', 'yatra_attributes_base', ['yatra_attributes_base', 'yatra_attribute_base', 'attributes_base', 'attribute_base']],
+            ['yatra_booking_base', 'yatra_booking_base', ['yatra_booking_base', 'booking_base']],
+            ['yatra_trip_category_base', 'yatra_trip_category_base', [
+                'yatra_trip_category_base', 'yatra_tour_category_base', 'trip_category_base', 'tour_category_base',
+                'yatra_category_base', 'category_base',
+            ]],
+            ['yatra_difficulty_base', 'yatra_difficulty_base', ['yatra_difficulty_base', 'difficulty_base']],
+            ['yatra_account_base', 'yatra_account_base', ['yatra_account_base', 'account_base', 'yatra_my_account_base']],
+        ];
+        foreach ($standaloneBases as [$optionKey, $destOption, $arrayKeys]) {
+            $fromArray = false;
+            foreach ($arrayKeys as $ak) {
+                if (!empty($oldPermalinks[$ak])) {
+                    $fromArray = true;
+                    break;
+                }
+            }
+            if ($fromArray) {
+                continue;
+            }
+            $val = get_option($optionKey, '');
+            if (!is_string($val) || $val === '') {
+                continue;
+            }
+            $setSlugOption($destOption, $val);
+        }
+
+        $hadPermalinkOption = $rawPermalinks !== null && $rawPermalinks !== false && $rawPermalinks !== '';
+        $skipped = ($writes === 0 && !$hadPermalinkOption) ? 1 : 0;
 
         if ($writes > 0) {
-            Logger::info("Migrated {$writes} permalink slug option(s) from yatra_permalinks", [
+            Logger::info("Migrated {$writes} permalink slug option(s) from legacy Yatra permalink data", [
                 'source' => 'migration',
             ]);
+        } elseif ($hadPermalinkOption && $writes === 0) {
+            Logger::debug('Legacy yatra_permalinks present but contained no migratable slug values', ['source' => 'migration']);
         } elseif ($skipped) {
-            Logger::debug('Skipped permalinks (yatra_permalinks not found or empty)', ['source' => 'migration']);
+            Logger::debug('Skipped permalinks (no yatra_permalinks option and no standalone bases)', ['source' => 'migration']);
         }
 
         return [

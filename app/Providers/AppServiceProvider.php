@@ -3,7 +3,6 @@
 namespace Yatra\Providers;
 
 use WP_REST_Request;
-use Yatra\Core\Database;
 use Yatra\Core\ServiceProvider;
 
 /**
@@ -24,8 +23,7 @@ class AppServiceProvider extends ServiceProvider
         // Deactivation hook
         register_deactivation_hook(YATRA_PLUGIN_FILE, [$this, 'deactivate']);
 
-        // Initialize database tables
-        $this->initDatabase();
+        // Database tables: created on activation (see activate()) and on version bump (Bootstrap::upgrade on admin_init).
 
         // Register shortcodes
         $this->registerShortcodes();
@@ -68,34 +66,6 @@ class AppServiceProvider extends ServiceProvider
         add_filter('yatra_require_email_verification', static function (): bool {
             return \Yatra\Services\SettingsService::isEnabled('require_email_verification');
         });
-    }
-
-    /**
-     * Initialize database tables
-     */
-    private function initDatabase(): void
-    {
-        // Check if tables exist, create them if they don't
-        $missing_table = false;
-        $required_tables = \Yatra\Services\InstallerService::getRequiredTables();
-
-        global $wpdb;
-        foreach ($required_tables as $table) {
-            // $table already includes prefix from Table class
-            if ($wpdb->get_var("SHOW TABLES LIKE '$table'") !== $table) {
-                $missing_table = true;
-                break;
-            }
-        }
-
-        if ($missing_table) {
-            // Use centralized InstallerService for table creation
-            \Yatra\Services\InstallerService::createDatabaseTables();
-        }
-
-        // Always run updateTables to ensure schema is up to date
-        // This handles migrations for existing installations
-        Database::updateTables();
     }
 
     /**

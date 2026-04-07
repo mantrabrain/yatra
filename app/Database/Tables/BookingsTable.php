@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `updated_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who last updated this booking',
     `confirmed_at` datetime DEFAULT NULL,
     `completed_at` datetime DEFAULT NULL,
-    `meta` longtext DEFAULT NULL COMMENT 'Optional JSON for integrations; use typed columns for core product fields',
+    `meta` longtext DEFAULT NULL COMMENT 'Optional JSON for integrations — use typed columns for core fields',
     
     PRIMARY KEY (`id`),
     UNIQUE KEY `reference` (`reference`),

@@ -117,11 +117,21 @@ class BookingDepartureRepository extends BaseRepository
     public function getBookingIdsForDeparture(int $departureId): array
     {
         $table = $this->getTableName();
-        
-        return $this->wpdb->get_col($this->wpdb->prepare(
+
+        $rows = $this->wpdb->get_col($this->wpdb->prepare(
             "SELECT booking_id FROM `{$table}` WHERE departure_id = %d",
             $departureId
         ));
+
+        $ids = [];
+        foreach ($rows as $id) {
+            $id = (int) $id;
+            if ($id > 0) {
+                $ids[] = $id;
+            }
+        }
+
+        return $ids;
     }
 
     /**

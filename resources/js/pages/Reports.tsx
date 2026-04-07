@@ -17,6 +17,7 @@ import {
   CardDescription,
 } from "../components/ui/card";
 import { Button } from '../components/ui/button';
+import { Select } from "../components/ui/select";
 import BookingsOverviewChart from "../components/charts/BookingsOverviewChart";
 import BookingStatusChart from "../components/charts/BookingStatusChart";
 import { getCurrencySymbol } from "../data/currencies";
@@ -2219,25 +2220,52 @@ const TravelBookingReports: React.FC = () => {
           </CardDescription>
         </CardHeader>
 
-        {/* Tab Navigation */}
-        <div className="border-b border-gray-200 dark:border-gray-700">
-          <nav className="flex overflow-x-auto px-6">
+        {/* Tab Navigation: dropdown on small screens; scrollable pill row on md+ */}
+        <div className="border-b border-gray-200 dark:border-gray-700 min-w-0">
+          <div className="px-4 pt-2 pb-3 md:hidden">
+            <label
+              htmlFor="yatra-report-section-select"
+              className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"
+            >
+              {__("Report section", "yatra")}
+            </label>
+            <Select
+              id="yatra-report-section-select"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              aria-label={__("Report section", "yatra")}
+            >
+              {TravelReportCategories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {__(category.title, "yatra")}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          <nav
+            className="hidden md:flex min-w-0 flex-nowrap items-stretch gap-1 overflow-x-auto overflow-y-hidden scroll-smooth px-4 pe-6 pb-1 sm:px-6 sm:pe-8 [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]"
+            aria-label={__("Report sections", "yatra")}
+          >
             {TravelReportCategories.map((category) => (
               <button
                 key={category.id}
+                type="button"
                 onClick={() => setSelectedCategory(category.id)}
-                className={`py-4 px-3 border-b-2 font-medium text-sm transition-colors flex items-center justify-between min-w-[140px] whitespace-nowrap ${
+                className={`shrink-0 snap-start inline-flex max-w-none items-center gap-2 rounded-t-md border-b-2 px-3 py-3 text-left text-sm font-medium whitespace-nowrap transition-colors sm:px-4 sm:py-3.5 ${
                   selectedCategory === category.id
-                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
+                    ? "border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50/60 dark:bg-blue-950/30"
+                    : "border-transparent text-gray-600 dark:text-gray-400 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900 dark:hover:border-gray-600 dark:hover:bg-gray-800/50 dark:hover:text-gray-200"
                 }`}
               >
-                <span className="flex items-center">
+                <span className="flex shrink-0 [&_svg]:h-5 [&_svg]:w-5">
                   {React.createElement(
                     SVGIcons[category.icon as keyof typeof SVGIcons],
                   )}
                 </span>
-                <span className="ml-2">{category.title}</span>
+                <span className="leading-tight">
+                  {__(category.title, "yatra")}
+                </span>
               </button>
             ))}
           </nav>

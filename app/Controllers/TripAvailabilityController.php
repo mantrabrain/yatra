@@ -211,7 +211,7 @@ class TripAvailabilityController extends BaseController
                     }
                     
                     // Add booking links and get travelers
-                    $bookingIds = $bookingDepartureRepo->getBookingsForDeparture($d->id);
+                    $bookingIds = $bookingDepartureRepo->getBookingIdsForDeparture($d->id);
                     $departureArray['booking_ids'] = $bookingIds;
                     $departureArray['bookings_count'] = count($bookingIds);
                     
@@ -386,7 +386,7 @@ class TripAvailabilityController extends BaseController
         $travellerRepo = new \Yatra\Repositories\TravellerRepository();
         $bookingRepo = new \Yatra\Repositories\BookingRepository();
 
-        $bookingIds = $bookingDepartureRepo->getBookingsForDeparture($departure->id);
+        $bookingIds = $bookingDepartureRepo->getBookingIdsForDeparture($departure->id);
         $departureArray['booking_ids'] = $bookingIds;
         $departureArray['bookings_count'] = count($bookingIds);
 
@@ -596,7 +596,7 @@ class TripAvailabilityController extends BaseController
                 }
                 
                 // Add booking links and get travelers
-                $bookingIds = $bookingDepartureRepo->getBookingsForDeparture($d->id);
+                $bookingIds = $bookingDepartureRepo->getBookingIdsForDeparture($d->id);
                 $departureArray['booking_ids'] = $bookingIds;
                 $departureArray['bookings_count'] = count($bookingIds);
                 
