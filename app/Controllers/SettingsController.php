@@ -673,7 +673,7 @@ class SettingsController extends BaseController
                 continue;
             }
             $sanitized_gateway = sanitize_key($gateway);
-            $sanitized[$sanitized_gateway] = [
+            $row = [
                 'enabled' => isset($config['enabled']) ? (bool) $config['enabled'] : false,
                 'icon' => isset($config['icon']) ? esc_url_raw($config['icon']) : '',
                 'title' => isset($config['title']) ? sanitize_text_field($config['title']) : '',
@@ -689,6 +689,32 @@ class SettingsController extends BaseController
                 'test_mode' => isset($config['test_mode']) ? (bool) $config['test_mode'] : false,
                 'sandbox' => isset($config['sandbox']) ? (bool) $config['sandbox'] : false,
             ];
+
+            if ($sanitized_gateway === 'paypal') {
+                $mode = isset($config['mode']) && in_array((string) $config['mode'], ['simple', 'advanced'], true)
+                    ? (string) $config['mode']
+                    : 'simple';
+                $row['email'] = isset($config['email']) ? sanitize_email((string) $config['email']) : '';
+                $row['mode'] = $mode;
+            }
+
+            if ($sanitized_gateway === 'pay_later') {
+                $row['payment_deadline_days'] = isset($config['payment_deadline_days'])
+                    ? max(1, min(60, (int) $config['payment_deadline_days']))
+                    : 7;
+                $row['auto_cancel_days'] = isset($config['auto_cancel_days'])
+                    ? max(0, min(30, (int) $config['auto_cancel_days']))
+                    : 3;
+                $row['require_deposit'] = isset($config['require_deposit']) ? (bool) $config['require_deposit'] : false;
+                $row['deposit_amount'] = isset($config['deposit_amount'])
+                    ? max(1, min(50, (int) $config['deposit_amount']))
+                    : 10;
+                $row['reminder_days'] = isset($config['reminder_days'])
+                    ? sanitize_text_field((string) $config['reminder_days'])
+                    : '7,3,1';
+            }
+
+            $sanitized[$sanitized_gateway] = $row;
         }
         return $sanitized;
     }

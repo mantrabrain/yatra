@@ -7,6 +7,7 @@ namespace Yatra\PaymentGateways\Gateways\PayPal;
 use Yatra\Database\Tables\BookingsTable;
 use Yatra\Database\Tables\BookingPaymentsTable;
 use Yatra\PaymentGateways\AbstractPaymentGateway;
+use Yatra\PaymentGateways\GatewayUserMessages;
 
 class PayPalGateway extends AbstractPaymentGateway
 {
@@ -78,6 +79,16 @@ class PayPalGateway extends AbstractPaymentGateway
         return ($this->config['mode'] ?? 'simple') === 'simple';
     }
 
+    public function isProperlyConfigured(): bool
+    {
+        if ($this->isSimpleMode()) {
+            return !empty(trim((string) ($this->config['email'] ?? '')));
+        }
+
+        return !empty(trim((string) ($this->config['client_id'] ?? '')))
+            && !empty(trim((string) ($this->config['client_secret'] ?? '')));
+    }
+
     private function getBaseUrl(): string
     {
         return \Yatra\Services\SettingsService::isPaymentTestMode()
@@ -135,7 +146,7 @@ class PayPalGateway extends AbstractPaymentGateway
     {
         $email = $this->config['email'] ?? '';
         if (empty($email)) {
-            return ['success' => false, 'error' => __('PayPal email is not configured.', 'yatra')];
+            return ['success' => false, 'error' => GatewayUserMessages::gatewayNotConfigured($this)];
         }
 
         $amount = number_format((float) ($paymentData['amount'] ?? 0), 2, '.', '');

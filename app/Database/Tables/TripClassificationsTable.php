@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     
     PRIMARY KEY (`id`),
     UNIQUE KEY `trip_classification_unique` (`trip_id`, `classification_id`, `classification_type`),
-    KEY `trip_id` (`trip_id`),
+    KEY `idx_trip_classification_type` (`trip_id`, `classification_type`),
     KEY `classification_id` (`classification_id`),
     KEY `classification_type` (`classification_type`),
     KEY `relationship_type` (`relationship_type`),

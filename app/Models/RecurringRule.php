@@ -26,6 +26,8 @@ class RecurringRule
     public ?int $month_of_year = null;
     public int $interval = 1;
     public string $availability_status = 'available';
+    /** @var int[]|null Months 1–12 when rule is limited to specific months; null = all months */
+    public ?array $allowed_months = null;
     public ?int $max_bookings = null;
     public ?float $price_override = null;
     public string $price_type = 'fixed';
@@ -78,6 +80,28 @@ class RecurringRule
         $rule->price_override = !empty($data['price_override']) ? (float) $data['price_override'] : null;
         $rule->created_at = $data['created_at'] ?? '';
         $rule->updated_at = $data['updated_at'] ?? '';
+        $rule->availability_status = sanitize_text_field($data['availability_status'] ?? 'available');
+
+        $allowedMonths = null;
+        if (isset($data['months']) && $data['months'] !== '' && $data['months'] !== null) {
+            $mRaw = $data['months'];
+            if (is_string($mRaw)) {
+                $decodedM = json_decode($mRaw, true);
+                $allowedMonths = is_array($decodedM) ? array_values(array_unique(array_map('intval', $decodedM))) : null;
+            } elseif (is_array($mRaw)) {
+                $allowedMonths = array_values(array_unique(array_map('intval', $mRaw)));
+            }
+        }
+        if (($allowedMonths === null || $allowedMonths === []) && !empty($data['recurrence_pattern'])) {
+            $rp = $data['recurrence_pattern'];
+            if (is_string($rp)) {
+                $rp = json_decode($rp, true);
+            }
+            if (is_array($rp) && !empty($rp['months']) && is_array($rp['months'])) {
+                $allowedMonths = array_values(array_unique(array_map('intval', $rp['months'])));
+            }
+        }
+        $rule->allowed_months = ($allowedMonths !== null && $allowedMonths !== []) ? $allowedMonths : null;
         
         // Handle days_of_week as JSON or comma-separated string
         if (isset($data['days_of_week'])) {
@@ -139,6 +163,10 @@ class RecurringRule
         if ($this->status !== 'active') {
             return false;
         }
+
+        if ($this->availability_status === 'unavailable') {
+            return false;
+        }
         
         // Check start date
         if ($this->start_date && $date < $this->start_date) {
@@ -148,6 +176,13 @@ class RecurringRule
         // Check end date
         if ($this->end_date && $date > $this->end_date) {
             return false;
+        }
+
+        if ($this->allowed_months !== null && $this->allowed_months !== []) {
+            $month = (int) date('n', strtotime($date . ' 00:00:00'));
+            if (!in_array($month, $this->allowed_months, true)) {
+                return false;
+            }
         }
         
         return true;

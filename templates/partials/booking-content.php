@@ -474,12 +474,26 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                                 case 'select':
                                                 case 'radio':
                                                     $options = json_decode($attribute['field_options'] ?? '[]', true);
-                                                    $selected_value = is_array($attribute['value']) ? $attribute['value'][0] : $attribute['value'];
+                                                    if (!is_array($options)) {
+                                                        $options = [];
+                                                    }
+                                                    $selected_value = is_array($attribute['value']) ? ($attribute['value'][0] ?? null) : ($attribute['value'] ?? null);
+                                                    $matched_label = null;
                                                     foreach ($options as $option) {
-                                                        if ($option['value'] === $selected_value) {
-                                                            echo esc_html($option['label']);
+                                                        if (!is_array($option) || !isset($option['value'], $option['label'])) {
+                                                            continue;
+                                                        }
+                                                        if ((string) $option['value'] === (string) $selected_value) {
+                                                            $matched_label = (string) $option['label'];
                                                             break;
                                                         }
+                                                    }
+                                                    if ($matched_label !== null) {
+                                                        echo esc_html($matched_label);
+                                                    } elseif ($selected_value !== null && $selected_value !== '') {
+                                                        echo esc_html((string) $selected_value);
+                                                    } else {
+                                                        echo esc_html('—');
                                                     }
                                                     break;
                                                 case 'date':

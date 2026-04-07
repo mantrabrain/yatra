@@ -19,7 +19,9 @@ use Yatra\Services\AvailabilityService;
 use Yatra\Services\CalculationService;
 use Yatra\Repositories\DepartureRepository;
 use Yatra\Repositories\BookingDepartureRepository;
+use Yatra\PaymentGateways\GatewayUserMessages;
 use Yatra\PaymentGateways\PaymentGatewayRegistry;
+use Yatra\Utils\Logger;
 
 /**
  * Booking Session REST API Controller
@@ -410,7 +412,7 @@ class BookingSessionController extends BaseController
         $departure_time = !empty($data['departure_time']) ? sanitize_text_field($data['departure_time']) : '';
         
         // Use centralized AvailabilityResolutionService to get resolved availability
-        // This follows priority: Recurring Rules → Availability Dates → Trip Default
+        // Priority: Availability Dates → Recurring Rules → Trip Default (specific rows override patterns)
         // Pass departure_time for day tours with multiple time slots on the same date
         $availability = null;
         if ($travel_date) {
@@ -717,10 +719,25 @@ class BookingSessionController extends BaseController
         $data = $request->get_json_params();
 
         // ========================================
-        // CHECK FOR REMAINING PAYMENT SESSION FIRST
+        // REMAINING PAYMENT vs NEW BOOKING
         // ========================================
+        // A leftover PHP session from "pay remaining balance" must not hijack a normal
+        // checkout POST (full traveler payload). Only treat as remaining-payment when the
+        // client is actually on that flow (hidden field) or sends no new-booking travelers.
         if (yatra_has_remaining_session()) {
-            return $this->process_remaining_payment($request);
+            $is_remaining_checkout = !empty($data['is_remaining_payment']);
+            $travelers_payload = $data['travelers'] ?? null;
+            $has_new_booking_travelers = is_array($travelers_payload) && count($travelers_payload) > 0;
+
+            if ($is_remaining_checkout) {
+                return $this->process_remaining_payment($request);
+            }
+
+            if ($has_new_booking_travelers) {
+                yatra_clear_remaining_session();
+            } else {
+                return $this->process_remaining_payment($request);
+            }
         }
 
         // ========================================
@@ -853,8 +870,11 @@ class BookingSessionController extends BaseController
             $travelers_count = count($travelers);
         }
         
-        $payment_method = sanitize_text_field($data['payment_method'] ?? 'full');
-        $payment_gateway = sanitize_text_field($data['payment_gateway'] ?? 'pay_later');
+        $payment_method = strtolower(trim(sanitize_text_field($data['payment_method'] ?? ($session['payment_method'] ?? 'full'))));
+        if ($payment_method === '') {
+            $payment_method = 'full';
+        }
+        $payment_gateway = strtolower(trim(sanitize_text_field($data['payment_gateway'] ?? 'pay_later')));
         
         // Get coupon code from request OR session
         $coupon_code = sanitize_text_field($data['coupon_code'] ?? '');
@@ -934,7 +954,34 @@ class BookingSessionController extends BaseController
         }
 
         $isWaitlistCheckout = false;
-        if (\Yatra\Services\WaitlistService::isInsufficientSeats($resolvedAvailabilityForWaitlist, $travelers_count)) {
+
+        if ($resolvedAvailabilityForWaitlist !== null) {
+            $availStatus = (string) ($resolvedAvailabilityForWaitlist->status ?? 'available');
+            if (in_array($availStatus, ['blocked', 'closed', 'cancelled'], true)) {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => __('This departure is not open for booking.', 'yatra'),
+                    'code' => 'date_blocked',
+                ], 400);
+            }
+            // Respect explicit sold_out even if seats_available is stale — waitlist only if allowed
+            if ($availStatus === 'sold_out') {
+                if (\Yatra\Services\WaitlistService::canJoinWaitlist($trip, $resolvedAvailabilityForWaitlist, $travelers_count)) {
+                    $isWaitlistCheckout = true;
+                } else {
+                    return new WP_REST_Response([
+                        'success' => false,
+                        'message' => __('This departure is sold out.', 'yatra'),
+                        'code' => 'sold_out',
+                    ], 400);
+                }
+            }
+        }
+
+        if (
+            !$isWaitlistCheckout
+            && \Yatra\Services\WaitlistService::isInsufficientSeats($resolvedAvailabilityForWaitlist, $travelers_count)
+        ) {
             if (\Yatra\Services\WaitlistService::canJoinWaitlist($trip, $resolvedAvailabilityForWaitlist, $travelers_count)) {
                 $isWaitlistCheckout = true;
             } else {
@@ -949,6 +996,19 @@ class BookingSessionController extends BaseController
         // Generate booking reference using the same method as BookingService
         $bookingRepository = new \Yatra\Repositories\BookingRepository();
         $booking_reference = $bookingRepository->generateReference();
+
+        Logger::debug('Yatra booking create: pricing and payment selection', [
+            'context' => 'booking_create_rest',
+            'trip_id' => $trip_id,
+            'booking_reference' => $booking_reference,
+            'flexible_payments_enabled' => (bool) apply_filters('yatra_flexible_payments_enabled', false),
+            'payment_method' => $payment_method,
+            'payment_gateway' => $payment_gateway,
+            'total_amount' => round((float) $total_amount, 4),
+            'amount_due' => round((float) $amount_due, 4),
+            'deposit_percentage' => (int) apply_filters('yatra_deposit_percentage', 20),
+            'partial_percentage' => (int) apply_filters('yatra_partial_payment_percentage', 30),
+        ]);
 
         // Prepare contact data
         $contact_data = [
@@ -1325,7 +1385,7 @@ class BookingSessionController extends BaseController
             
             // If payment processing failed, return error so user can fix the issue
             if (!$payment_result['success']) {
-                $errorMessage = $payment_result['error'] ?? __('Payment processing failed. Please try again.', 'yatra');
+                $errorMessage = $payment_result['error'] ?? $payment_result['message'] ?? __('Payment processing failed. Please try again.', 'yatra');
                 return new WP_REST_Response([
                     'success' => false,
                     'message' => $errorMessage,
@@ -1586,9 +1646,19 @@ class BookingSessionController extends BaseController
             if (!$gateway) {
                 return ['success' => false, 'message' => "Payment gateway '{$gatewayId}' not found"];
             }
-            
-            if (!$gateway->isAvailable()) {
-                return ['success' => false, 'message' => "Payment gateway '{$gatewayId}' is not available"];
+
+            if (!$gateway->isEnabled()) {
+                return [
+                    'success' => false,
+                    'message' => __('This payment method is not available.', 'yatra'),
+                ];
+            }
+
+            if (!$gateway->isProperlyConfigured()) {
+                return [
+                    'success' => false,
+                    'message' => GatewayUserMessages::gatewayNotConfigured($gateway),
+                ];
             }
             
             // Prepare payment data - pass all params, gateways extract what they need
@@ -2223,7 +2293,10 @@ class BookingSessionController extends BaseController
         $departure_time = sanitize_text_field($data['departure_time'] ?? ($session['departure_time'] ?? ''));
         $availability_id = $data['availability_id'] ?? ($session['availability_id'] ?? null);
         $pricing_type_from_request = sanitize_text_field($data['pricing_type'] ?? ($session['pricing_type'] ?? ''));
-        $payment_method = sanitize_text_field($data['payment_method'] ?? ($session['payment_method'] ?? 'full'));
+        $payment_method = strtolower(trim(sanitize_text_field($data['payment_method'] ?? ($session['payment_method'] ?? 'full'))));
+        if ($payment_method === '') {
+            $payment_method = 'full';
+        }
         $selected_service_ids_from_request = $data['additional_services'] ?? ($session['additional_services'] ?? null);
         
         // IMPORTANT: Always read coupon from SESSION (not request) to maintain applied discount
@@ -2630,6 +2703,17 @@ class BookingSessionController extends BaseController
         } elseif ($payment_method === 'partial') {
             $amount_due = $total_amount * ($partial_percentage / 100);
         }
+
+        Logger::debug('Yatra booking summary: payment method and amount due', [
+            'context' => 'booking_summary_rest',
+            'trip_id' => $trip_id,
+            'flexible_payments_enabled' => $flexible_payments_enabled,
+            'payment_method' => $payment_method,
+            'total_amount' => round($total_amount, 4),
+            'amount_due' => round($amount_due, 4),
+            'deposit_percentage' => $deposit_percentage,
+            'partial_percentage' => $partial_percentage,
+        ]);
         
         // Build pricing HTML for the summary section (using CalculationService data)
         $pricing_html = $this->buildPricingHtml([
@@ -2778,7 +2862,14 @@ class BookingSessionController extends BaseController
             $session['deposit_percentage'] = $data['deposit_percentage'];
         }
         if (!empty($data['partial_payment_percentage'])) {
+            $session['partial_payment_percentage'] = $data['partial_payment_percentage'];
+        }
+        if (!empty($data['partial_percentage'])) {
             $session['partial_payment_percentage'] = $data['partial_percentage'];
+        }
+
+        if (!empty($data['payment_method']) || !empty($data['deposit_percentage']) || !empty($data['partial_percentage']) || !empty($data['partial_payment_percentage'])) {
+            yatra_set_booking_session($session);
         }
         
         // Create Checkout model instance

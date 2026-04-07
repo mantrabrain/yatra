@@ -141,11 +141,15 @@ class MigrationProgress
         $oldData = $this->detector->detectOldData();
         $progress = get_option('yatra_migration_progress', []);
 
+        $anyCountable = false;
+
         foreach ($this->dataTypesOrder as $type) {
             $count = (int) ($oldData[$type]['count'] ?? 0);
             if ($count === 0) {
                 continue;
             }
+
+            $anyCountable = true;
 
             $st = $progress[$type] ?? [];
             $status = $st['status'] ?? '';
@@ -155,6 +159,11 @@ class MigrationProgress
             if ((int) ($st['failed'] ?? 0) > 0) {
                 return true;
             }
+        }
+
+        // Legacy environment matched but every per-type count is zero (edge cases / detector drift).
+        if (!$anyCountable) {
+            return true;
         }
 
         return false;

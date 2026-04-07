@@ -22,6 +22,19 @@ class MigrationDetector
     }
 
     /**
+     * Pad semver segments so PHP's version_compare matches human expectations (e.g. 3.0 === 3.0.0).
+     */
+    private static function normalizeSemverForCompare(string $version): string
+    {
+        $version = preg_replace('/^[vV]+/', '', trim($version));
+        $core = preg_split('/[-+]/', $version, 2)[0];
+        $segments = explode('.', $core);
+        $segments = array_pad($segments, 3, '0');
+
+        return implode('.', array_slice(array_map('intval', $segments), 0, 3));
+    }
+
+    /**
      * Old Yatra 2.x stored its release in wp_options as yatra_plugin_version (not yatra_version).
      * Fresh Yatra 3.x sites only have yatra_version / installer options — never this legacy key unless
      * the old plugin ran on this database.
@@ -33,7 +46,29 @@ class MigrationDetector
             return false;
         }
 
-        return version_compare((string) $legacyVer, '3.0.0', '<');
+        return version_compare(
+            self::normalizeSemverForCompare((string) $legacyVer),
+            self::normalizeSemverForCompare('3.0.0'),
+            '<'
+        );
+    }
+
+    /**
+     * Yatra 2.x stored enabled gateways as an associative array (slug => yes). Yatra 3.x uses numeric keys.
+     */
+    private function hasLegacyPaymentGatewaysOptionFootprint(): bool
+    {
+        $gw = get_option('yatra_payment_gateways', null);
+        if (!is_array($gw) || $gw === []) {
+            return false;
+        }
+        foreach (array_keys($gw) as $key) {
+            if (is_string($key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -41,7 +76,8 @@ class MigrationDetector
      */
     public function hasStructuralLegacyData(): bool
     {
-        return $this->countOldTrips() > 0
+        return $this->hasLegacyPaymentGatewaysOptionFootprint()
+            || $this->countOldTrips() > 0
             || $this->countOldBookings() > 0
             || $this->countOldCustomers() > 0
             || $this->countOldCoupons() > 0
@@ -280,7 +316,7 @@ class MigrationDetector
     {
         $count = $this->wpdb->get_var(
             "SELECT COUNT(*) FROM {$this->wpdb->posts} 
-             WHERE post_type = 'tour' AND post_status IN ('publish', 'draft', 'pending', 'private')"
+             WHERE post_type = 'tour' AND post_status != 'auto-draft'"
         );
         
         return (int) $count;
@@ -293,7 +329,7 @@ class MigrationDetector
     {
         $count = $this->wpdb->get_var(
             "SELECT COUNT(*) FROM {$this->wpdb->posts} 
-             WHERE post_type = 'yatra-booking' AND post_status NOT IN ('trash', 'auto-draft')"
+             WHERE post_type = 'yatra-booking' AND post_status != 'auto-draft'"
         );
         
         return (int) $count;
@@ -306,7 +342,7 @@ class MigrationDetector
     {
         $count = $this->wpdb->get_var(
             "SELECT COUNT(*) FROM {$this->wpdb->posts} 
-             WHERE post_type = 'yatra-customers' AND post_status NOT IN ('trash', 'auto-draft')"
+             WHERE post_type = 'yatra-customers' AND post_status != 'auto-draft'"
         );
         
         return (int) $count;
@@ -419,7 +455,7 @@ class MigrationDetector
     {
         $count = $this->wpdb->get_var(
             "SELECT COUNT(*) FROM {$this->wpdb->posts} 
-             WHERE post_type = 'yatra-coupons' AND post_status NOT IN ('trash', 'auto-draft')"
+             WHERE post_type = 'yatra-coupons' AND post_status != 'auto-draft'"
         );
         
         return (int) $count;
@@ -456,7 +492,7 @@ class MigrationDetector
                  FROM {$this->wpdb->posts} p
                  INNER JOIN {$this->wpdb->postmeta} pm ON p.ID = pm.post_id
                  WHERE p.post_type = 'tour' 
-                 AND p.post_status IN ('publish', 'draft', 'pending', 'private')
+                 AND p.post_status != 'auto-draft'
                  AND pm.meta_key IN ({$placeholders})",
                 ...$itineraryKeys
             )
@@ -470,7 +506,11 @@ class MigrationDetector
      */
     private function countOldSettings(): int
     {
-        if (!$this->isRecordedLegacyYatraInstall() && !$this->hasStructuralLegacyData()) {
+        if (
+            !$this->isRecordedLegacyYatraInstall()
+            && !$this->hasStructuralLegacyData()
+            && !$this->hasLegacyPaymentGatewaysOptionFootprint()
+        ) {
             return 0;
         }
 
@@ -527,7 +567,7 @@ class MigrationDetector
              AND p.post_type = 'tour'
              AND pm.meta_value != ''
              AND pm.meta_value != 'a:0:{}'
-             AND p.post_status != 'trash'"
+             AND p.post_status != 'auto-draft'"
         );
 
         return (int) $count;

@@ -269,6 +269,8 @@ if (!function_exists('yatra_format_price')) {
         // Get formatting settings from global settings
         $currency_position = SettingsService::getCurrencyPosition();
         $decimal_places = SettingsService::getInt('decimal_places', 2);
+        // Avoid absurd migrated values (e.g. 7+) breaking storefront display; cap at 4.
+        $decimal_places = max(0, min(4, $decimal_places));
         $thousand_separator = SettingsService::getString('thousand_separator', ',');
         $decimal_separator = SettingsService::getString('decimal_separator', '.');
         

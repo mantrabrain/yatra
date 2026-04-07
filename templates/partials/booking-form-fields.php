@@ -536,25 +536,26 @@ $has_flexible_options = $flexible_payments_enabled && !empty($payment_method_opt
 
 <!-- Payment Gateway Section -->
 <?php
-// Get gateways directly from registry (real-time)
-$real_time_gateways = [];
+// Always use the live registry list (same as BookingPageHandler). Do not intersect with $enabled_gateways
+// from older templates/sessions — that caused only stale gateways (e.g. Pay Later) to show.
+$display_gateways = [];
 if (class_exists('Yatra\PaymentGateways\PaymentGatewayRegistry')) {
     $registry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
-    $checkout_gateways = $registry->getForCheckout();
-    
-    foreach ($checkout_gateways as $gateway) {
-        $real_time_gateways[$gateway['id']] = $gateway;
+    foreach ($registry->getForCheckout() as $gateway) {
+        if (!empty($gateway['id'])) {
+            $display_gateways[$gateway['id']] = $gateway;
+        }
     }
 }
 ?>
-<?php if (!empty($real_time_gateways)) : ?>
+<?php if (!empty($display_gateways)) : ?>
 <div class="yatra-booking-section">
     <h2 class="yatra-section-title"><?php esc_html_e('Select Payment Gateway', 'yatra'); ?></h2>
     
     <div class="yatra-gateway-options">
         <?php 
         $first = true;
-        foreach ($real_time_gateways as $gateway_id => $gateway) : 
+        foreach ($display_gateways as $gateway_id => $gateway) : 
             $icon = !empty($gateway['icon']) ? $gateway['icon'] : plugins_url('assets/images/payment-placeholder.png', dirname(__DIR__));
         ?>
         <div class="yatra-gateway-option-wrapper">
@@ -566,6 +567,9 @@ if (class_exists('Yatra\PaymentGateways\PaymentGatewayRegistry')) {
                 <span class="yatra-gateway-content">
                     <strong class="yatra-gateway-title"><?php echo esc_html($gateway['title']); ?></strong>
                     <span class="yatra-gateway-desc"><?php echo esc_html($gateway['description']); ?></span>
+                    <?php if (empty($gateway['is_configured'])) : ?>
+                        <span class="yatra-gateway-desc yatra-gateway-setup-required"><?php esc_html_e('Setup incomplete — finish configuration under Yatra → Settings → Payment, or choose another method.', 'yatra'); ?></span>
+                    <?php endif; ?>
                 </span>
             </label>
             <div class="yatra-gateway-extra" id="yatra-gateway-extra-<?php echo esc_attr($gateway_id); ?>" data-gateway="<?php echo esc_attr($gateway_id); ?>"></div>

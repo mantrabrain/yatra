@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `updated_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who last updated this review',
     
     PRIMARY KEY (`id`),
-    KEY `idx_trip_id` (`trip_id`),
+    KEY `idx_trip_status` (`trip_id`, `status`),
     KEY `idx_user_id` (`user_id`),
     KEY `idx_status` (`status`),
     KEY `idx_rating` (`rating`),

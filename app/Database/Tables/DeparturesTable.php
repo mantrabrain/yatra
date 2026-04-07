@@ -52,12 +52,12 @@ class DeparturesTable extends BaseTable
                 `created_at` datetime NOT NULL,
                 `updated_at` datetime DEFAULT NULL,
                 PRIMARY KEY (`id`),
-                KEY `trip_id` (`trip_id`),
                 KEY `date` (`date`),
                 KEY `start_date` (`start_date`),
                 KEY `status` (`status`),
                 KEY `trip_date` (`trip_id`, `date`),
-                KEY `trip_start` (`trip_id`, `start_date`)
+                KEY `trip_start` (`trip_id`, `start_date`),
+                KEY `idx_trip_status` (`trip_id`, `status`)
             ) {$charset_collate};
         ";
     }

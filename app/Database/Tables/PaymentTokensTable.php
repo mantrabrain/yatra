@@ -47,7 +47,7 @@ class PaymentTokensTable extends BaseTable
 CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `customer_id` bigint(20) UNSIGNED NOT NULL,
-    `gateway` varchar(50) NOT NULL,
+    `gateway` varchar(80) NOT NULL,
     `gateway_customer_id` varchar(255) NOT NULL,
     `gateway_payment_method_id` varchar(255) NOT NULL,
     `token_type` enum('card','bank_account','paypal','wallet','other') DEFAULT 'card',

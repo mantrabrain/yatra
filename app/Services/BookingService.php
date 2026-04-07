@@ -211,6 +211,7 @@ class BookingService
                 return [
                     'success' => false,
                     'message' => $e->getMessage() ?: __('Booking validation failed.', 'yatra'),
+                    'errors' => $e->getErrors(),
                 ];
             }
             

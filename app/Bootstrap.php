@@ -61,6 +61,10 @@ class Bootstrap
                 \Yatra\Hooks\AvailabilityInventoryHooks::init();
             }
 
+            if (class_exists('\Yatra\Hooks\MigrationAdminNoticeHooks')) {
+                \Yatra\Hooks\MigrationAdminNoticeHooks::init();
+            }
+
             // Initialize Setup Wizard Service
             if (class_exists('\Yatra\Services\SetupWizardService')) {
                 \Yatra\Services\SetupWizardService::init();

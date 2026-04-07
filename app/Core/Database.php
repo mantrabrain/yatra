@@ -106,11 +106,6 @@ class Database
         
         // Unified content management (consolidates 4 old tables)
         dbDelta(TripContentTable::getSchema());
-        
-        // Unified classification system (consolidates 6 old tables including attributes, items, item types)
-        dbDelta(ClassificationsTable::getSchema());
-        
-        // Trip attributes relationship table
 
         // ============================================
         // DATABASE VERSION TRACKING

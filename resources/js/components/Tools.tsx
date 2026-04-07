@@ -168,6 +168,7 @@ const Tools: React.FC = () => {
   const [isLoadingMigration, setIsLoadingMigration] = useState(false);
   const [migrationProgress, setMigrationProgress] = useState<any>(null);
   const [isMigrating, setIsMigrating] = useState(false);
+  const [isStartingMigration, setIsStartingMigration] = useState(false);
   const migrationPollingRef = useRef<ReturnType<typeof setInterval> | null>(
     null,
   );
@@ -1104,6 +1105,7 @@ const Tools: React.FC = () => {
   // Migrate all data types
   const handleMigrateAll = async (force = false) => {
     setIsMigrating(true);
+    setIsStartingMigration(true);
     try {
       const data = await apiService.runMigrationAll({ force });
 
@@ -1118,14 +1120,17 @@ const Tools: React.FC = () => {
         // Immediately load progress to initialize the display
         await loadMigrationProgress();
         startMigrationPolling();
+        setIsStartingMigration(false);
       } else {
         showToast(data.error || data.message || "Migration failed", "error");
         setIsMigrating(false);
+        setIsStartingMigration(false);
       }
     } catch (error) {
       console.error("Migration error:", error);
       showToast("Migration failed. Please try again.", "error");
       setIsMigrating(false);
+      setIsStartingMigration(false);
     }
   };
 
@@ -2224,6 +2229,13 @@ const Tools: React.FC = () => {
               {/* Action Buttons */}
               {migrationStatus?.has_old_data && (
                 <div className="flex items-center gap-2">
+                  {(isMigrating || isStartingMigration) &&
+                    !migrationProgress?.all_complete && (
+                      <div className="hidden sm:flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 mr-1">
+                        <RefreshCw className="w-4 h-4 animate-spin text-purple-600 dark:text-purple-400" />
+                        <span>Migration running</span>
+                      </div>
+                    )}
                   <Button
                     variant="outline"
                     size="sm"
@@ -2231,7 +2243,7 @@ const Tools: React.FC = () => {
                       loadMigrationStatus();
                       if (isMigrating) loadMigrationProgress();
                     }}
-                    disabled={isMigrating && !migrationProgress?.all_complete}
+                    disabled={(isMigrating || isStartingMigration) && !migrationProgress?.all_complete}
                   >
                     <RefreshCw className={`w-4 h-4 mr-2 ${isMigrating && !migrationProgress?.all_complete ? "animate-spin" : ""}`} />
                     Refresh
@@ -2253,6 +2265,7 @@ const Tools: React.FC = () => {
                       onClick={() => setShowMigrationConfirm(true)}
                       className="bg-purple-600 hover:bg-purple-700"
                       size="sm"
+                      disabled={isStartingMigration}
                     >
                       <Database className="w-4 h-4 mr-2" />
                       {migrationProgress?.all_complete && migrationProgress?.started_at ? 'Migrate Again' : 'Start Migration'}
@@ -2350,6 +2363,26 @@ const Tools: React.FC = () => {
                 )}
 
                 {/* Advanced Progress Bar (only show during migration) */}
+                {(isMigrating || isStartingMigration) &&
+                  (!migrationProgress ||
+                    !migrationProgress.started_at ||
+                    Object.keys(migrationProgress.progress || {}).length ===
+                      0) && (
+                    <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <div className="flex items-center gap-2">
+                        <RefreshCw className="w-5 h-5 text-blue-600 dark:text-blue-400 animate-spin" />
+                        <div>
+                          <div className="font-medium text-blue-900 dark:text-blue-300">
+                            Starting migration…
+                          </div>
+                          <div className="text-sm text-blue-700 dark:text-blue-400">
+                            Initializing background tasks and loading progress.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                 {migrationProgress && !migrationProgress.all_complete && migrationProgress.started_at && Object.keys(migrationProgress.progress || {}).length > 0 && (
                   <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-4">

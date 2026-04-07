@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `created_by` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
     
     PRIMARY KEY (`id`),
-    KEY `trip_id` (`trip_id`),
+    KEY `idx_trip_created` (`trip_id`, `created_at`),
     KEY `version` (`version`),
     KEY `status` (`status`),
     KEY `created_at` (`created_at`),

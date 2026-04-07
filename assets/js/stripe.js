@@ -839,6 +839,27 @@ class YatraStripe {
         const bookingInfo = bookingResult.data;
         const effectiveAmount = this.getEffectiveAmount(bookingData, bookingInfo);
 
+        if (bookingInfo.client_secret) {
+            const customerEmail = bookingInfo.customer_email || bookingData.contact_email || bookingData.email;
+            const customerName = bookingInfo.customer_name ||
+                [bookingData.contact_first_name, bookingData.contact_last_name]
+                    .filter(Boolean)
+                    .join(' ') || bookingData.full_name;
+
+            if (!customerEmail) {
+                throw new Error('Email address is required.');
+            }
+
+            const billingDetails = this.getBillingDetails(bookingData, formElement);
+
+            return {
+                bookingInfo,
+                clientSecret: bookingInfo.client_secret,
+                billingDetails,
+                effectiveAmount,
+            };
+        }
+
         const customerEmail = bookingInfo.customer_email || bookingData.contact_email || bookingData.email;
         const customerName = bookingInfo.customer_name ||
             [bookingData.contact_first_name, bookingData.contact_last_name]
@@ -1022,18 +1043,41 @@ class YatraStripe {
     }
 
     getEffectiveAmount(bookingData, bookingInfo) {
+        // After /booking/create, server-calculated charge (deposit / partial / full) is authoritative.
+        // `amount` = charge for this checkout (matches gateway). Never fall back to `total_amount` (full order).
+        const serverFirst = [
+            parseFloat(bookingInfo?.amount),
+            parseFloat(bookingInfo?.amount_due)
+        ];
+        for (let i = 0; i < serverFirst.length; i++) {
+            const v = serverFirst[i];
+            if (!isNaN(v) && v > 0) {
+                return v;
+            }
+        }
+
+        const summaryDue = parseFloat(window.yatraBookingSummary?.amountDue);
+        if (!isNaN(summaryDue) && summaryDue > 0) {
+            return summaryDue;
+        }
+
         const candidates = [
-            parseFloat(bookingData.payment_due),
+            parseFloat(bookingData?.amount_due),
+            parseFloat(bookingData?.payment_due),
             parseFloat(this.paymentForm?.dataset.paymentDue),
-            parseFloat(window.yatraBookingData?.paymentDue),
-            parseFloat(bookingInfo.amount)
+            parseFloat(window.yatraBookingData?.paymentDue)
         ].map((val) => (isNaN(val) ? 0 : val));
 
-        const amountDue = candidates.find((val) => val > 0) ?? 0;
-        return amountDue > 0 ? amountDue : (parseFloat(bookingInfo.amount) || 0);
+        const picked = candidates.find((val) => val > 0) ?? 0;
+        return picked > 0 ? picked : 0;
     }
 
     getCurrentPaymentDue() {
+        const summaryDue = parseFloat(window.yatraBookingSummary?.amountDue);
+        if (!isNaN(summaryDue) && summaryDue > 0) {
+            return summaryDue;
+        }
+
         const candidates = [
             parseFloat(this.paymentForm?.dataset.paymentDue),
             parseFloat(window.yatraBookingData?.paymentDue)

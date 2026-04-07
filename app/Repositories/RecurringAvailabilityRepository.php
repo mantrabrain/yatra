@@ -330,9 +330,21 @@ class RecurringAvailabilityRepository extends BaseRepository
             }
         }
         
-        // Convert days_of_week string to array
+        // Convert days_of_week to array (JSON array from DB, or legacy comma-separated)
         if (!empty($rule->days_of_week)) {
-            $rule->days_of_week_array = array_map('intval', explode(',', $rule->days_of_week));
+            $dow = $rule->days_of_week;
+            if (is_string($dow)) {
+                $decoded = json_decode($dow, true);
+                if (is_array($decoded)) {
+                    $rule->days_of_week_array = array_map('intval', $decoded);
+                } else {
+                    $rule->days_of_week_array = array_map('intval', explode(',', $dow));
+                }
+            } elseif (is_array($dow)) {
+                $rule->days_of_week_array = array_map('intval', $dow);
+            } else {
+                $rule->days_of_week_array = [];
+            }
         } else {
             $rule->days_of_week_array = [];
         }

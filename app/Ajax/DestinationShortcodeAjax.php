@@ -23,8 +23,10 @@ class DestinationShortcodeAjax
         
         // Verify nonce
         if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_destination_shortcode_nonce')) {
-            error_log('Yatra Destination AJAX - Security check failed');
-            wp_die('Security check failed');
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('Yatra Destination AJAX - Security check failed');
+            }
+            wp_die(esc_html__('Security check failed', 'yatra'), '', ['response' => 403]);
         }
 
         // Parse shortcode attributes
@@ -83,7 +85,9 @@ class DestinationShortcodeAjax
             }
             
             wp_send_json_error([
-                'message' => 'Error loading destinations: ' . $e->getMessage()
+                'message' => (defined('WP_DEBUG') && WP_DEBUG)
+                    ? 'Error loading destinations: ' . $e->getMessage()
+                    : __('Unable to load destinations. Please try again.', 'yatra'),
             ]);
         }
     }

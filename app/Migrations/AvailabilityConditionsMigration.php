@@ -24,19 +24,11 @@ class AvailabilityConditionsMigration extends BaseMigration
         try {
             $table = TripAvailabilityRulesTable::getTableName();
 
-            // Check if availability conditions data exists in database (regardless of plugin/module status)
             $conditions_count = $wpdb->get_var(
                 "SELECT COUNT(*) FROM {$wpdb->term_taxonomy} WHERE taxonomy = 'availability_conditions'"
             );
-            
-            // List all taxonomies for debugging
-            $all_taxonomies = $wpdb->get_results(
-                "SELECT DISTINCT taxonomy, COUNT(*) as count FROM {$wpdb->term_taxonomy} GROUP BY taxonomy"
-            );
-            foreach ($all_taxonomies as $tax) {
-                }
-            
-            if ($conditions_count == 0) {
+
+            if ((int) $conditions_count === 0) {
                 return [
                     'migrated' => 0,
                     'skipped' => 0,
@@ -44,7 +36,6 @@ class AvailabilityConditionsMigration extends BaseMigration
                 ];
             }
 
-            // Get all availability condition terms directly from database
             $conditions = $wpdb->get_results(
                 "SELECT t.term_id, t.name, t.slug, tt.description 
                  FROM {$wpdb->terms} t
@@ -53,142 +44,104 @@ class AvailabilityConditionsMigration extends BaseMigration
             );
 
             $total = count($conditions);
-            if ($total > 0) {
-                foreach ($conditions as $condition) {
-                    // Get all meta for this condition
-                    $condition_meta = $wpdb->get_results($wpdb->prepare(
-                        "SELECT meta_key, meta_value FROM {$wpdb->termmeta} WHERE term_id = %d",
-                        $condition->term_id
-                    ));
-                    
-                    if ($condition_meta) {
-                        foreach ($condition_meta as $meta) {
-                            $value = maybe_unserialize($meta->meta_value);
-                            if (is_array($value)) {
-                                $value = implode(',', $value);
-                            }
-                            }
-                    }
-                    
-                    // Get tours associated with this condition
-                    $tours = $wpdb->get_results($wpdb->prepare(
-                        "SELECT tr.object_id, p.post_title 
-                         FROM {$wpdb->term_relationships} tr
-                         LEFT JOIN {$wpdb->posts} p ON tr.object_id = p.ID
-                         WHERE tr.term_taxonomy_id IN (
-                             SELECT term_taxonomy_id FROM {$wpdb->term_taxonomy} 
-                             WHERE term_id = %d AND taxonomy = 'availability_conditions'
-                         )",
-                        $condition->term_id
-                    ));
-                    
-                    if ($tours) {
-                        foreach ($tours as $tour) {
-                            }
-                    } else {
-                        }
-                    }
-            }
+
             foreach ($conditions as $condition) {
                 try {
-                    // Get condition meta directly from database
                     $months_raw = $wpdb->get_var($wpdb->prepare(
                         "SELECT meta_value FROM {$wpdb->termmeta} WHERE term_id = %d AND meta_key = 'months'",
                         $condition->term_id
                     ));
                     $months = $months_raw ? maybe_unserialize($months_raw) : [];
                     $months = is_array($months) ? $months : [];
-                    
+
                     $week_days_raw = $wpdb->get_var($wpdb->prepare(
                         "SELECT meta_value FROM {$wpdb->termmeta} WHERE term_id = %d AND meta_key = 'week_days'",
                         $condition->term_id
                     ));
                     $week_days = $week_days_raw ? maybe_unserialize($week_days_raw) : [];
                     $week_days = is_array($week_days) ? $week_days : [];
-                    
+
                     $start_date = $wpdb->get_var($wpdb->prepare(
                         "SELECT meta_value FROM {$wpdb->termmeta} WHERE term_id = %d AND meta_key = 'start_date'",
                         $condition->term_id
                     ));
-                    
+
                     $end_date = $wpdb->get_var($wpdb->prepare(
                         "SELECT meta_value FROM {$wpdb->termmeta} WHERE term_id = %d AND meta_key = 'end_date'",
                         $condition->term_id
                     ));
-                    
+
                     $availability = $wpdb->get_var($wpdb->prepare(
                         "SELECT meta_value FROM {$wpdb->termmeta} WHERE term_id = %d AND meta_key = 'availability'",
                         $condition->term_id
                     ));
 
-                    // Get tours associated with this condition
-                    $tours = $wpdb->get_results($wpdb->prepare(
-                        "SELECT object_id FROM {$wpdb->term_relationships} 
-                         WHERE term_taxonomy_id IN (
-                             SELECT term_taxonomy_id FROM {$wpdb->term_taxonomy} 
-                             WHERE term_id = %d AND taxonomy = 'availability_conditions'
-                         )",
-                        $condition->term_id
-                    ));
+                    $tourObjectIds = $this->resolveTourObjectIdsForCondition((int) $condition->term_id);
 
-                    if (empty($tours)) {
+                    if ($tourObjectIds === []) {
                         $skipped++;
                         continue;
                     }
 
-                    // Migrate to recurring rules for each associated trip
-                    foreach ($tours as $tour) {
-                        $newTripId = $this->getRawPostMeta((int) $tour->object_id, '_migrated_to_trip_id');
-                        
+                    foreach ($tourObjectIds as $oldTourId) {
+                        $newTripId = $this->getMigratedTripId($oldTourId);
+
                         if (!$newTripId) {
                             continue;
                         }
 
-                        // Check if this condition was already migrated for this trip
                         if (!$this->isForceMigration()) {
-                            $table = TripAvailabilityRulesTable::getTableName();
                             $existing = $wpdb->get_var($wpdb->prepare(
-                                "SELECT id FROM {$table} WHERE trip_id = %d AND name = %s",
+                                "SELECT id FROM `{$table}` WHERE trip_id = %d AND name = %s",
                                 $newTripId,
                                 $condition->name
                             ));
-                            
+
                             if ($existing) {
                                 $skipped++;
                                 continue;
                             }
                         }
 
-                        // Convert availability condition to recurring rule
-                        $ruleData = $this->convertToRecurringRule($condition, $months, $week_days, $start_date, $end_date, $availability);
-                        
-                        if ($ruleData) {
-                            $result = $this->insertRecurringRule($newTripId, $ruleData, $condition->term_id);
-                            
-                            if ($result) {
-                                $migrated++;
-                                } else {
-                                $failed++;
-                                }
+                        $ruleData = $this->convertToRecurringRule(
+                            $condition,
+                            $months,
+                            $week_days,
+                            $start_date ? (string) $start_date : null,
+                            $end_date ? (string) $end_date : null,
+                            $availability ? (string) $availability : null
+                        );
+
+                        $result = $this->insertRecurringRule($newTripId, $ruleData);
+
+                        if ($result) {
+                            $migrated++;
+                        } else {
+                            $failed++;
+                            Logger::error('Availability condition: insert failed', [
+                                'source' => 'migration',
+                                'condition_id' => $condition->term_id,
+                                'old_tour_id' => $oldTourId,
+                                'new_trip_id' => $newTripId,
+                                'db_error' => $wpdb->last_error,
+                            ]);
                         }
                     }
-
                 } catch (\Exception $e) {
                     $failed++;
-                    Logger::error("Availability condition migration exception", [
+                    Logger::error('Availability condition migration exception', [
                         'source' => 'migration',
                         'condition_id' => $condition->term_id,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
 
                 $this->updateProgress('availability_conditions', 'running', $migrated, $skipped, $failed, $total, null, null);
             }
-
         } catch (\Throwable $e) {
-            Logger::error("Availability conditions migration failed", [
+            Logger::error('Availability conditions migration failed', [
                 'source' => 'migration',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
 
@@ -200,90 +153,158 @@ class AvailabilityConditionsMigration extends BaseMigration
     }
 
     /**
+     * Tours linked via term_relationships and/or legacy Pro meta _yatra_availability_conditions_ids_order (term_taxonomy_ids).
+     *
+     * @return int[] Old tour post IDs
+     */
+    private function resolveTourObjectIdsForCondition(int $termId): array
+    {
+        global $wpdb;
+
+        $ttId = (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT term_taxonomy_id FROM {$wpdb->term_taxonomy}
+             WHERE term_id = %d AND taxonomy = 'availability_conditions' LIMIT 1",
+            $termId
+        ));
+
+        $seen = [];
+
+        if ($ttId > 0) {
+            $fromRel = $wpdb->get_col($wpdb->prepare(
+                "SELECT object_id FROM {$wpdb->term_relationships} WHERE term_taxonomy_id = %d",
+                $ttId
+            ));
+            foreach ($fromRel as $oid) {
+                $seen[(int) $oid] = true;
+            }
+
+            // Meta stores comma-separated term_taxonomy_id values (see yatra-pro set_object_terms).
+            $fromMeta = $wpdb->get_col($wpdb->prepare(
+                "SELECT pm.post_id FROM {$wpdb->postmeta} pm
+                 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+                 WHERE pm.meta_key = '_yatra_availability_conditions_ids_order'
+                   AND p.post_type = 'tour'
+                   AND p.post_status NOT IN ('trash', 'auto-draft')
+                   AND FIND_IN_SET(%d, REPLACE(pm.meta_value, ' ', ''))",
+                $ttId
+            ));
+            foreach ($fromMeta as $oid) {
+                $seen[(int) $oid] = true;
+            }
+        }
+
+        return array_keys($seen);
+    }
+
+    /**
+     * Map legacy yatra_tour_availability_status keys (booking|enquiry|none) to new enum.
+     */
+    private function mapLegacyAvailabilityStatus(?string $legacy): string
+    {
+        $key = $legacy !== null ? strtolower(trim($legacy)) : '';
+        return match ($key) {
+            'none', 'unavailable' => 'unavailable',
+            'enquiry', 'limited' => 'limited',
+            default => 'available',
+        };
+    }
+
+    /**
      * Convert old availability condition to new recurring rule format
      */
-    private function convertToRecurringRule($condition, array $months, array $week_days, $start_date, $end_date, $availability): ?array
-    {
-        // Old plugin only had weekly availability rules
-        $rule_type = 'weekly';
+    private function convertToRecurringRule(
+        object $condition,
+        array $months,
+        array $week_days,
+        ?string $start_date,
+        ?string $end_date,
+        ?string $availability
+    ): array {
+        $days_of_week = array_values(array_unique(array_map('intval', $week_days)));
+        if ($days_of_week === []) {
+            $days_of_week = [0, 1, 2, 3, 4, 5, 6];
+        }
 
-        // Convert weekday indices (0-6, Sunday=0) to our format (0-6, Sunday=0)
-        $days_of_week = array_map('intval', $week_days);
-
-        // Prepare days_of_week as comma-separated string for weekly rules
-        $days_of_week_string = !empty($days_of_week) ? implode(',', $days_of_week) : null;
-
-        // Normalize months to 1-12 range (old data stored 0-11 where 0 = January)
         $normalized_months = [];
-        if (!empty($months)) {
-            $normalized_months = array_map(function ($month) {
+        if ($months !== []) {
+            foreach ($months as $month) {
                 $monthInt = (int) $month;
                 if ($monthInt >= 0 && $monthInt <= 11) {
-                    return $monthInt + 1; // Convert 0-based to 1-based
+                    $normalized_months[] = $monthInt + 1;
+                } elseif ($monthInt >= 1 && $monthInt <= 12) {
+                    $normalized_months[] = $monthInt;
                 }
-                if ($monthInt < 1) {
-                    return 1;
-                }
-                if ($monthInt > 12) {
-                    return 12;
-                }
-                return $monthInt;
-            }, $months);
+            }
             $normalized_months = array_values(array_unique($normalized_months));
         }
 
-        // Prepare months as JSON array string (e.g., "[1,12]" not "0,11")
-        $months_string = !empty($normalized_months) ? json_encode($normalized_months) : null;
-
-        // Build recurrence_pattern JSON with months data if available
         $recurrencePattern = [];
-        if (!empty($normalized_months)) {
+        if ($normalized_months !== []) {
             $recurrencePattern['months'] = $normalized_months;
         }
 
-        $ruleData = [
+        $availabilityStatus = $this->mapLegacyAvailabilityStatus($availability);
+
+        return [
             'name' => $condition->name,
-            'recurrence_type' => $rule_type,
+            'rule_type' => 'weekly',
+            'recurrence_type' => 'weekly',
             'status' => 'active',
             'start_date' => !empty($start_date) ? $start_date : current_time('Y-m-d'),
             'end_date' => !empty($end_date) ? $end_date : null,
-            'days_of_week' => !empty($days_of_week) ? json_encode($days_of_week) : null,
-            'recurrence_pattern' => !empty($recurrencePattern) ? json_encode($recurrencePattern) : null,
+            'days_of_week' => wp_json_encode($days_of_week),
+            'recurrence_pattern' => $recurrencePattern !== [] ? wp_json_encode($recurrencePattern) : null,
+            'months' => $normalized_months !== [] ? wp_json_encode($normalized_months) : null,
             'interval' => 1,
+            'availability_status' => $availabilityStatus,
             'created_at' => current_time('mysql'),
         ];
-
-        return $ruleData;
     }
 
     /**
      * Insert recurring rule into new system
      */
-    private function insertRecurringRule(int $tripId, array $ruleData, ?int $oldConditionId = null): bool
+    private function insertRecurringRule(int $tripId, array $ruleData): bool
     {
         global $wpdb;
         $table = TripAvailabilityRulesTable::getTableName();
-        
+
         $insertData = [
             'trip_id' => $tripId,
             'name' => $ruleData['name'],
+            'rule_type' => $ruleData['rule_type'],
             'recurrence_type' => $ruleData['recurrence_type'],
             'status' => $ruleData['status'],
             'start_date' => $ruleData['start_date'],
             'end_date' => $ruleData['end_date'],
             'days_of_week' => $ruleData['days_of_week'],
             'recurrence_pattern' => $ruleData['recurrence_pattern'],
-            'interval' => $ruleData['interval'],
+            'months' => $ruleData['months'],
+            'interval' => (int) $ruleData['interval'],
+            'availability_status' => $ruleData['availability_status'],
             'created_at' => $ruleData['created_at'],
             'updated_at' => current_time('mysql'),
         ];
 
-        $result = $wpdb->insert($table, $insertData);
+        $formats = [
+            '%d',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%d',
+            '%s',
+            '%s',
+            '%s',
+        ];
 
-        if (!$result) {
-            return false;
-        }
+        $result = $wpdb->insert($table, $insertData, $formats);
 
-        return true;
+        return $result !== false;
     }
 }

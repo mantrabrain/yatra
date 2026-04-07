@@ -64,7 +64,10 @@ class CalculationService
         $travel_date     = $params['travel_date'] ?? '';
         $departure_time  = $params['departure_time'] ?? '';
         $coupon_code     = $params['coupon_code'] ?? '';
-        $payment_method  = $params['payment_method'] ?? 'full';
+        $payment_method  = strtolower(trim((string) ($params['payment_method'] ?? 'full')));
+        if ($payment_method === '') {
+            $payment_method = 'full';
+        }
         $selected_services = $params['selected_services'] ?? [];
         $availability_id = $params['availability_id'] ?? null;
         
@@ -617,18 +620,16 @@ class CalculationService
         // Apply Pro FlexiblePayments filter for deposit/partial
         $amount_due = (float) apply_filters('yatra_calculate_amount_due', $amount_due, $final_total, $payment_method);
         
-        // Fallback: if no Pro module handled it, use basic logic
-        if ($amount_due === $final_total && $payment_method !== 'full') {
-            $flexible_enabled    = apply_filters('yatra_flexible_payments_enabled', false);
-            $deposit_percentage  = (int) apply_filters('yatra_deposit_percentage', 20);
-            $partial_percentage  = (int) apply_filters('yatra_partial_payment_percentage', 30);
-            
-            if ($flexible_enabled) {
-                if ($payment_method === 'deposit') {
-                    $amount_due = round($final_total * ($deposit_percentage / 100), 2);
-                } elseif ($payment_method === 'partial') {
-                    $amount_due = round($final_total * ($partial_percentage / 100), 2);
-                }
+        // Fallback: if no Pro module handled it, use basic logic (never use === on floats)
+        $flexible_enabled   = apply_filters('yatra_flexible_payments_enabled', false);
+        $unchanged          = abs($amount_due - $final_total) < 0.000001;
+        if ($unchanged && $payment_method !== 'full' && $flexible_enabled) {
+            $deposit_percentage = (int) apply_filters('yatra_deposit_percentage', 20);
+            $partial_percentage = (int) apply_filters('yatra_partial_payment_percentage', 30);
+            if ($payment_method === 'deposit') {
+                $amount_due = round($final_total * ($deposit_percentage / 100), 2);
+            } elseif ($payment_method === 'partial') {
+                $amount_due = round($final_total * ($partial_percentage / 100), 2);
             }
         }
         
@@ -656,6 +657,11 @@ class CalculationService
         
         if (empty($trip_id)) {
             throw new \InvalidArgumentException('Trip ID is required in session data');
+        }
+
+        $payment_method = strtolower(trim($payment_method));
+        if ($payment_method === '') {
+            $payment_method = 'full';
         }
         
         $params = [

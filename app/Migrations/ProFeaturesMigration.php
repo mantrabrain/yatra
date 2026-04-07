@@ -18,9 +18,37 @@ use Yatra\Utils\Logger;
  * - review_ratings        → no module (reviews: ReviewMigration + ProReviewCptMigration; settings in SettingsMigration)
  * - downloads             → no module (data: ProDownloadsMigration)
  * - available_conditions  → no module (data: AvailabilityConditionsMigration in core)
+ *
+ * When every legacy Pro 2.x feature flag in yatra_pro_features is on, we enable all Pro 3.x modules
+ * that exist in the new plugin (extras like trip_consent were not in 2.x but match "everything on").
  */
 class ProFeaturesMigration extends BaseMigration
 {
+    /** Keys from old yatra-pro Admin\Features::get_available_features(). */
+    private const LEGACY_PRO_FEATURE_KEYS = [
+        'payment_gateways',
+        'services',
+        'partial_payment',
+        'review_ratings',
+        'google_calendar',
+        'downloads',
+        'available_conditions',
+    ];
+
+    /** Pro 3.x module slugs (see yatra-pro ProModuleRepository::$modules). */
+    private const PRO_3_MODULE_SLUGS = [
+        'google_calendar',
+        'additional_services',
+        'trip_consent',
+        'email_automation',
+        'dynamic_form_field',
+        'advanced_discount',
+        'mailchimp',
+        'facebook_pixel',
+        'flexible_payments',
+        'dynamic_pricing',
+    ];
+
     public function run(): array
     {
         $migrated = 0;
@@ -49,24 +77,29 @@ class ProFeaturesMigration extends BaseMigration
         try {
             $legacy = is_array($legacy) ? $legacy : [];
 
-            // Map legacy feature keys to new Pro module slugs where there is an equivalent.
-            $map = [
-                // Old services taxonomy feature → new Additional Services module.
-                'services' => 'additional_services',
-                // Old google calendar feature → new module.
-                'google_calendar' => 'google_calendar',
-                // Old partial payment → closest equivalent in new Pro.
-                'partial_payment' => 'flexible_payments',
-                // Other legacy features are now handled by core migrations or were deprecated.
-            ];
-
             $enabled = [];
-            foreach ($map as $legacyKey => $newSlug) {
-                if (!empty($legacy[$legacyKey])) {
-                    $enabled[] = $newSlug;
+
+            if ($this->allLegacyProFeaturesWereEnabled($legacy)) {
+                $enabled = self::PRO_3_MODULE_SLUGS;
+                Logger::info('ProFeaturesMigration: all legacy Pro feature toggles on — enabling full Pro 3.x module set.', [
+                    'source' => 'migration',
+                    'modules' => $enabled,
+                ]);
+            } else {
+                // Map legacy feature keys to new Pro module slugs where there is an equivalent.
+                $map = [
+                    'services' => 'additional_services',
+                    'google_calendar' => 'google_calendar',
+                    'partial_payment' => 'flexible_payments',
+                ];
+
+                foreach ($map as $legacyKey => $newSlug) {
+                    if (!empty($legacy[$legacyKey])) {
+                        $enabled[] = $newSlug;
+                    }
                 }
+                $enabled = array_values(array_unique($enabled));
             }
-            $enabled = array_values(array_unique($enabled));
 
             $existing = get_option('yatra_pro_modules_enabled', []);
             if (!is_array($existing)) {
@@ -91,6 +124,23 @@ class ProFeaturesMigration extends BaseMigration
         }
 
         return compact('migrated', 'skipped', 'failed');
+    }
+
+    /**
+     * True when every legacy Pro 2.x feature we know about is enabled in the saved option.
+     * Uses a count so slightly different option shapes (missing keys) still match "all on" when appropriate.
+     */
+    private function allLegacyProFeaturesWereEnabled(array $legacy): bool
+    {
+        $required = count(self::LEGACY_PRO_FEATURE_KEYS);
+        $enabledCount = 0;
+        foreach (self::LEGACY_PRO_FEATURE_KEYS as $key) {
+            if (!empty($legacy[$key])) {
+                $enabledCount++;
+            }
+        }
+
+        return $enabledCount >= $required;
     }
 }
 

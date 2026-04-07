@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `updated_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who last updated this record',
     
     PRIMARY KEY (`id`),
-    KEY `trip_id` (`trip_id`),
+    KEY `idx_trip_content_type` (`trip_id`, `content_type`),
     KEY `content_type` (`content_type`),
     KEY `is_featured` (`is_featured`),
     KEY `is_downloadable` (`is_downloadable`),

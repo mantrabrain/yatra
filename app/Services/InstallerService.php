@@ -209,26 +209,29 @@ class InstallerService
      */
     public static function getRequiredTables(): array
     {
+        // Must match \Yatra\Core\Database::createTables() — used for health checks on load/activate.
         $table_classes = [
             \Yatra\Database\Tables\TripsTable::class,
             \Yatra\Database\Tables\BookingsTable::class,
+            \Yatra\Database\Tables\BookingPaymentsTable::class,
+            \Yatra\Database\Tables\ScheduledPaymentsTable::class,
+            \Yatra\Database\Tables\PaymentTokensTable::class,
+            \Yatra\Database\Tables\CustomersTable::class,
             \Yatra\Database\Tables\BookingTravellersTable::class,
+            \Yatra\Database\Tables\BookingTravellerMetaTable::class,
+            \Yatra\Database\Tables\BookingDeparturesTable::class,
+            \Yatra\Database\Tables\ReviewsTable::class,
+            \Yatra\Database\Tables\DiscountsTable::class,
+            \Yatra\Database\Tables\EnquiriesTable::class,
+            \Yatra\Database\Tables\TripAvailabilityDatesTable::class,
+            \Yatra\Database\Tables\TripAvailabilityRulesTable::class,
+            \Yatra\Database\Tables\TripRevisionsTable::class,
+            \Yatra\Database\Tables\DeparturesTable::class,
+            \Yatra\Database\Tables\TripItineraryDaysTable::class,
+            \Yatra\Database\Tables\TripItineraryDayEntryTable::class,
             \Yatra\Database\Tables\ClassificationsTable::class,
             \Yatra\Database\Tables\TripClassificationsTable::class,
-            \Yatra\Database\Tables\ReviewsTable::class,
-            \Yatra\Database\Tables\EnquiriesTable::class,
-            \Yatra\Database\Tables\PaymentsTable::class,
-            \Yatra\Database\Tables\TripAvailabilityDatesTable::class,
-            \Yatra\Database\Tables\DeparturesTable::class,
-            \Yatra\Database\Tables\DepartureBookingsTable::class,
-            \Yatra\Database\Tables\CustomersTable::class,
-            \Yatra\Database\Tables\BookingTravellerMetaTable::class,
-            \Yatra\Database\Tables\AdditionalServicesTable::class,
-            \Yatra\Database\Tables\TripServicesTable::class,
-            \Yatra\Database\Tables\BookingServicesTable::class,
-            \Yatra\Database\Tables\BookingSessionsTable::class,
-            \Yatra\Database\Tables\CouponsTable::class,
-            \Yatra\Database\Tables\BookingCouponsTable::class,
+            \Yatra\Database\Tables\TripContentTable::class,
         ];
 
         $table_names = [];

@@ -86,6 +86,16 @@ class PaymentGatewayRegistry
     }
 
     /**
+     * Gateways enabled in settings (may still lack API keys). Used for checkout UI.
+     *
+     * @return array<string, PaymentGatewayInterface>
+     */
+    public function getEnabledGateways(): array
+    {
+        return array_filter($this->gateways, fn($gateway) => $gateway->isEnabled());
+    }
+
+    /**
      * Get list of premium gateway IDs (requires Yatra Pro)
      */
     public function getPremiumGatewayIds(): array
@@ -269,14 +279,14 @@ class PaymentGatewayRegistry
     }
 
     /**
-     * Get available gateways for checkout
+     * Gateways to show on checkout: all enabled in settings.
+     * Configuration is validated when processing payment (see processPayment).
      */
     public function getForCheckout(): array
     {
         $checkoutGateways = [];
-        $available = $this->getAvailable();
-        
-        foreach ($available as $id => $gateway) {
+
+        foreach ($this->getEnabledGateways() as $id => $gateway) {
             $config = $gateway->getConfig();
             $checkoutGateways[] = [
                 'id' => $id,
@@ -285,6 +295,7 @@ class PaymentGatewayRegistry
                 'icon' => !empty($config['icon']) ? $config['icon'] : $gateway->getIcon(),
                 'is_offline' => $gateway->isOffline(),
                 'supports' => $gateway->getSupports(),
+                'is_configured' => $gateway->isProperlyConfigured(),
             ];
         }
 
@@ -317,10 +328,18 @@ class PaymentGatewayRegistry
             ];
         }
 
-        if (!$gateway->isAvailable()) {
+        if (!$gateway->isEnabled()) {
             return [
                 'success' => false,
                 'error' => __('Payment gateway is not available', 'yatra'),
+            ];
+        }
+
+        if (!$gateway->isProperlyConfigured()) {
+            return [
+                'success' => false,
+                'error' => GatewayUserMessages::gatewayNotConfigured($gateway),
+                'code' => 'gateway_not_configured',
             ];
         }
 

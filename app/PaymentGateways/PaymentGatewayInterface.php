@@ -36,6 +36,11 @@ interface PaymentGatewayInterface
     public function isAvailable(): bool;
 
     /**
+     * Whether required credentials/settings are present for live checkout (enabled is checked separately).
+     */
+    public function isProperlyConfigured(): bool;
+
+    /**
      * Check if this is an offline payment method
      */
     public function isOffline(): bool;

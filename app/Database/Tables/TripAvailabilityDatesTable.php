@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     
     PRIMARY KEY (`id`),
     UNIQUE KEY `trip_departure_date_time` (`trip_id`, `departure_date`, `departure_time`),
-    KEY `trip_id` (`trip_id`),
+    KEY `idx_trip_status_departure` (`trip_id`, `status`, `departure_date`),
     KEY `departure_date` (`departure_date`),
     KEY `arrival_date` (`arrival_date`),
     KEY `return_date` (`return_date`),

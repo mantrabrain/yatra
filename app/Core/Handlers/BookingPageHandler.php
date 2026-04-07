@@ -112,41 +112,30 @@ class BookingPageHandler extends BasePageHandler
                     }
                 }
 
-                // Resolve enabled gateways - always get full gateway data from registry
+                // Checkout must always reflect current Settings + registry — never filter by session.
+                // Session snapshots enabled_gateways at "add to booking" time; admin/site changes and older
+                // sessions would otherwise hide newly enabled gateways (e.g. only Pay Later forever).
                 $gatewayRegistry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
-                $availableGateways = $gatewayRegistry->getForCheckout();
                 $enabled_gateways = [];
-                
-                // Get gateway IDs from session (if any)
-                $session_gateway_ids = $session['enabled_gateways'] ?? [];
-                
-                // If session has gateway IDs (as strings), filter available gateways
-                if (!empty($session_gateway_ids) && is_array($session_gateway_ids)) {
-                    // Check if session has full gateway data or just IDs
-                    $first_item = reset($session_gateway_ids);
-                    if (is_array($first_item) && isset($first_item['id'])) {
-                        // Session has full gateway data
-                        $enabled_gateways = $session_gateway_ids;
-                    } else {
-                        // Session has just IDs, resolve to full gateway data
-                        foreach ($availableGateways as $gateway) {
-                            if (!empty($gateway['id']) && in_array($gateway['id'], $session_gateway_ids)) {
-                                $enabled_gateways[$gateway['id']] = $gateway;
-                            }
-                        }
-                    }
-                } else {
-                    // No session gateways, use all available gateways
-                    foreach ($availableGateways as $gateway) {
-                        if (!empty($gateway['id'])) {
-                            $enabled_gateways[$gateway['id']] = $gateway;
-                        }
+                foreach ($gatewayRegistry->getForCheckout() as $gateway) {
+                    if (!empty($gateway['id'])) {
+                        $enabled_gateways[$gateway['id']] = $gateway;
                     }
                 }
 
-                // Debug log to verify gateways are being resolved
-                if (!empty($enabled_gateways)) {
+                if (function_exists('yatra_start_session')) {
+                    yatra_start_session();
+                    if (isset($_SESSION['yatra_booking']) && is_array($_SESSION['yatra_booking'])) {
+                        $_SESSION['yatra_booking']['enabled_gateways'] = $enabled_gateways;
+                        $token = $_SESSION['yatra_booking_token'] ?? '';
+                        if (is_string($token) && $token !== '') {
+                            $transient_payload = array_merge($_SESSION['yatra_booking'], [
+                                'enabled_gateways' => $enabled_gateways,
+                            ]);
+                            set_transient($token, $transient_payload, 1800);
+                        }
                     }
+                }
                 // Calculate pricing using CalculationService (single source of truth)
                 $calculationService = new \Yatra\Services\CalculationService();
                 $pricing_calculation = [];

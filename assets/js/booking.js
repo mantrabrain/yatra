@@ -50,6 +50,8 @@
         const currency = window.yatraBookingData?.currency || $('input[name="currency"]').val() || 'USD';
         const depositPercentage = window.yatraBookingData?.depositPercentage || 20;
         const partialPercentage = window.yatraBookingData?.partialPercentage || 30;
+
+        window.yatraBookingSummary = window.yatraBookingSummary || {};
         
         // Coupon state
         let appliedCoupon = null;
@@ -179,7 +181,11 @@
         function formatCurrency(amount, currencyCode) {
             // Get currency formatting settings from global settings
             const currencyPosition = window.yatraBookingData?.currencyPosition || 'before';
-            const decimalPlaces = window.yatraBookingData?.decimalPlaces || 2;
+            let decimalPlaces = parseInt(String(window.yatraBookingData?.decimalPlaces ?? '2'), 10);
+            if (Number.isNaN(decimalPlaces)) {
+                decimalPlaces = 2;
+            }
+            decimalPlaces = Math.max(0, Math.min(4, decimalPlaces));
             const thousandSeparator = window.yatraBookingData?.thousandSeparator || ',';
             const decimalSeparator = window.yatraBookingData?.decimalSeparator || '.';
             
@@ -220,22 +226,86 @@
         }
 
         /**
-         * Update button text based on selected gateway
+         * Build JSON body for /booking/summary (payment method, travelers, services).
+         * Keeps sidebar + window.yatraBookingSummary aligned with Pro flexible payments.
          */
-        function updateButtonText(gateway, amount) {
+        function buildPricingSummaryPayload() {
+            const payload = {};
+            const pm = $('input[name="payment_method"]:checked').val();
+            if (pm) {
+                payload.payment_method = pm;
+            }
+            const travelDate = $('#travel-date').val() || $('input[name="travel_date"]').first().val();
+            if (travelDate) {
+                payload.travel_date = travelDate;
+            }
+            const depTime = $('input[name="departure_time"]').first().val();
+            if (depTime) {
+                payload.departure_time = depTime;
+            }
+            if ($('.yatra-qty-input[data-category-id]').length) {
+                const travelerCounts = {};
+                $('.yatra-qty-input[data-category-id]').each(function() {
+                    const catId = $(this).data('category-id');
+                    travelerCounts[catId] = parseInt($(this).val(), 10) || 0;
+                });
+                payload.traveler_counts = travelerCounts;
+            }
+            const serviceIds = [];
+            $('#yatra-additional-services input[type="checkbox"]:checked').each(function() {
+                const id = parseInt($(this).closest('.yatra-service-item').data('service-id'), 10);
+                if (!Number.isNaN(id)) {
+                    serviceIds.push(id);
+                }
+            });
+            if (serviceIds.length) {
+                payload.additional_services = serviceIds;
+            }
+            const pricingType = $('#yatra-summary-pricing').data('pricing-type');
+            if (pricingType) {
+                payload.pricing_type = pricingType;
+            }
+            return payload;
+        }
+
+        /**
+         * Update pay button label and amount (offline gateways still show amount due for deposit/partial).
+         */
+        function updateCheckoutButtonState() {
             const $buttonText = $('#pay-button-text');
             const $payAmount = $('#pay-amount');
-            
-            // Check if it's an offline gateway
+            const gateway = $('input[name="payment_gateway"]:checked').val() || 'pay_later';
             const offlineGateways = ['pay_later', 'bank_transfer'];
             const isOffline = offlineGateways.includes(gateway);
-            
+            const paymentMethod = $('input[name="payment_method"]:checked').val() || 'full';
+            const summary = window.yatraBookingSummary || {};
+            let due = parseFloat(summary.amountDue);
+            const total = parseFloat(summary.totalAmount);
+            if (Number.isNaN(due)) {
+                due = parseFloat($form.attr('data-payment-due')) || 0;
+            }
+            let totalSafe = total;
+            if (Number.isNaN(totalSafe)) {
+                totalSafe = parseFloat($form.attr('data-payment-due')) || 0;
+            }
+            const flexDue = paymentMethod === 'deposit' || paymentMethod === 'partial';
+
             if (isOffline) {
                 $buttonText.text('Complete Booking');
-                $payAmount.hide();
+                const showAmount = flexDue ? due : totalSafe;
+                if (showAmount > 0) {
+                    $payAmount.text(formatCurrency(showAmount, currency)).show();
+                } else {
+                    $payAmount.hide();
+                }
             } else {
                 $buttonText.text('Pay Now');
-                $payAmount.show();
+                const payVal = flexDue && due > 0 ? due : totalSafe;
+                if (payVal > 0) {
+                    $payAmount.text(formatCurrency(payVal, currency)).show();
+                } else {
+                    $payAmount.hide();
+                }
             }
         }
 
@@ -615,12 +685,33 @@
             .then(data => {
                 if (!data.success) {
                     console.warn('Failed to update booking session:', data.message);
+                    return;
                 }
+                schedulePricingSummaryRefresh();
             })
             .catch(error => {
                 console.error('Error updating booking session:', error);
             });
         }
+
+        // Initial summary figures from server-rendered sidebar (before any AJAX)
+        if (!isRemainingPayment) {
+            const $sbInit = $('.yatra-booking-summary').first();
+            if ($sbInit.length) {
+                const t = parseFloat($sbInit.attr('data-summary-total'));
+                const du = parseFloat($sbInit.attr('data-summary-due'));
+                window.yatraBookingSummary = {
+                    totalAmount: Number.isNaN(t) ? null : t,
+                    amountDue: Number.isNaN(du) ? null : du,
+                    amountPaid: 0
+                };
+            }
+            updateCheckoutButtonState();
+        }
+
+        $(document).on('change', 'input[name="payment_method"]', function() {
+            schedulePricingSummaryRefresh();
+        });
 
         // Update when gateway changes
         $('input[name="payment_gateway"]').on('change', function() {
@@ -646,6 +737,8 @@
             } else if ($gatewayInfo.length) {
                 $gatewayInfo.hide();
             }
+
+            updateCheckoutButtonState();
 
             // Toggle gateway-specific content containers
             $('.yatra-gateway-extra').removeClass('active');
@@ -999,9 +1092,31 @@
             }
         }
         
-        function refreshPricingSummary() {
-            // Reload the entire pricing summary section via AJAX
-            // All data is retrieved from session on the server side
+        function applySummaryResponse(response) {
+            if (!response.success || !response.data) {
+                return;
+            }
+            const d = response.data;
+            if (d.pricing_html) {
+                $('#yatra-summary-pricing').html(d.pricing_html);
+            }
+            window.yatraBookingSummary = {
+                totalAmount: typeof d.total_amount === 'number' ? d.total_amount : parseFloat(d.total_amount),
+                amountDue: typeof d.amount_due === 'number' ? d.amount_due : parseFloat(d.amount_due),
+                amountPaid: typeof d.amount_paid === 'number' ? d.amount_paid : parseFloat(d.amount_paid || 0) || 0
+            };
+            const $sb = $('.yatra-booking-summary').first();
+            if ($sb.length && !Number.isNaN(window.yatraBookingSummary.totalAmount)) {
+                $sb.attr('data-summary-total', String(window.yatraBookingSummary.totalAmount));
+            }
+            if ($sb.length && !Number.isNaN(window.yatraBookingSummary.amountDue)) {
+                $sb.attr('data-summary-due', String(window.yatraBookingSummary.amountDue));
+                $form.attr('data-payment-due', String(window.yatraBookingSummary.amountDue));
+            }
+            updateCheckoutButtonState();
+        }
+
+        function refreshPricingSummary(extraPayload) {
             const { base: restBase, isPlain } = getRestBase();
             const siteBase = (window.yatraBookingData?.siteUrl || window.location.origin || '').replace(/\/$/, '');
             let summaryUrl;
@@ -1013,6 +1128,8 @@
                 summaryUrl = `${restBase}/yatra/v1/booking/summary`;
             }
 
+            const body = Object.assign(buildPricingSummaryPayload(), extraPayload || {});
+
             fetch(summaryUrl, {
                 method: 'POST',
                 headers: {
@@ -1020,18 +1137,25 @@
                     'X-WP-Nonce': nonce
                 },
                 credentials: 'same-origin',
-                body: JSON.stringify({})
+                body: JSON.stringify(body)
             })
             .then(response => response.json())
             .then(response => {
-                if (response.success && response.data && response.data.pricing_html) {
-                    // Replace only the pricing summary HTML section
-                    $('#yatra-summary-pricing').html(response.data.pricing_html);
-                }
+                applySummaryResponse(response);
             })
             .catch(error => {
                 console.error('Error refreshing pricing summary:', error);
             });
+        }
+
+        function schedulePricingSummaryRefresh() {
+            if (isRemainingPayment) {
+                return;
+            }
+            clearTimeout(summaryDebounceTimer);
+            summaryDebounceTimer = setTimeout(function() {
+                refreshPricingSummary();
+            }, 250);
         }
         
         function updatePriceWithDiscount(couponData) {
@@ -1213,8 +1337,7 @@
             .then(response => response.json())
             .then(response => {
                 if (response.success) {
-                    // Session updated successfully
-                    
+                    schedulePricingSummaryRefresh();
                 }
             })
             .catch(error => {

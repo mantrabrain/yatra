@@ -28,8 +28,10 @@ class DiscountShortcodeAjax
         
         // Verify nonce
         if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_trip_shortcode_nonce')) {
-            error_log('Yatra Discount AJAX - Security check failed');
-            wp_die('Security check failed');
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('Yatra Discount AJAX - Security check failed');
+            }
+            wp_die(esc_html__('Security check failed', 'yatra'), '', ['response' => 403]);
         }
 
         // Parse shortcode attributes
@@ -80,7 +82,9 @@ class DiscountShortcodeAjax
             }
             
             wp_send_json_error([
-                'message' => 'Error loading discount trips: ' . $e->getMessage()
+                'message' => (defined('WP_DEBUG') && WP_DEBUG)
+                    ? 'Error loading discount trips: ' . $e->getMessage()
+                    : __('Unable to load trips. Please try again.', 'yatra'),
             ]);
         }
     }

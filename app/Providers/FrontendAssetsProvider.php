@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yatra\Providers;
 
+use Yatra\Core\Modules\ModuleManager;
+use Yatra\Utils\Logger;
+
 /**
  * Frontend Assets Provider
  *
@@ -359,6 +362,27 @@ class FrontendAssetsProvider
         $permalink_structure = get_option('permalink_structure') ?: '';
         $is_plain = empty($permalink_structure);
 
+        $deposit_pct_store = (int) \Yatra\Services\SettingsService::get('deposit_percentage', 20);
+        $partial_pct_store = (int) \Yatra\Services\SettingsService::get('partial_payment_percentage', 30);
+        $deposit_pct_resolved = (int) apply_filters('yatra_deposit_percentage', $deposit_pct_store);
+        $partial_pct_resolved = (int) apply_filters('yatra_partial_payment_percentage', $partial_pct_store);
+        $flexible_payments_enabled = (bool) apply_filters('yatra_flexible_payments_enabled', false);
+        $flexible_module_on = class_exists(ModuleManager::class)
+            ? ModuleManager::isModuleEnabled('flexible_payments')
+            : false;
+
+        Logger::debug('Yatra booking localize: flexible payment snapshot', [
+            'context' => 'booking_localize',
+            'flexible_payments_enabled' => $flexible_payments_enabled,
+            'flexible_payments_module' => $flexible_module_on,
+            'partial_payment_setting' => (bool) \Yatra\Services\SettingsService::get('partial_payment', false),
+            'deposit_required_setting' => (bool) \Yatra\Services\SettingsService::get('deposit_required', false),
+            'deposit_percentage_store' => $deposit_pct_store,
+            'partial_percentage_store' => $partial_pct_store,
+            'deposit_percentage_resolved' => $deposit_pct_resolved,
+            'partial_percentage_resolved' => $partial_pct_resolved,
+        ]);
+
         $bookingData = [
             'apiUrl' => rest_url('yatra/v1'),
             'restUrl' => rest_url(),
@@ -377,6 +401,11 @@ class FrontendAssetsProvider
             'paymentTestMode' => \Yatra\Services\SettingsService::get('payment_test_mode', false),
             'partialPayment' => \Yatra\Services\SettingsService::get('partial_payment', false),
             'partialPaymentPercentage' => \Yatra\Services\SettingsService::get('partial_payment_percentage', 0),
+            // Flexible payments (Pro) — keep these keys stable for frontend booking.js.
+            // Values are resolved via generic filters so Pro can override without hard-coding premium logic here.
+            'depositRequired' => (bool) \Yatra\Services\SettingsService::get('deposit_required', false),
+            'depositPercentage' => $deposit_pct_resolved,
+            'partialPercentage' => $partial_pct_resolved,
             'gatewayOrder' => \Yatra\Services\SettingsService::get('gateway_order', []),
             'autoConfirmPayLater' => \Yatra\Services\SettingsService::get('auto_confirm_pay_later', true),
             'allowWaitlist' => \Yatra\Services\SettingsService::isEnabled('allow_waitlist'),

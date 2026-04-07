@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `booking_id` bigint(20) UNSIGNED NOT NULL,
     `customer_id` bigint(20) UNSIGNED DEFAULT NULL,
-    `gateway` varchar(50) NOT NULL,
+    `gateway` varchar(80) NOT NULL,
     `gateway_customer_id` varchar(255) DEFAULT NULL,
     `payment_token_id` bigint(20) UNSIGNED DEFAULT NULL,
     `amount` decimal(12,2) NOT NULL,

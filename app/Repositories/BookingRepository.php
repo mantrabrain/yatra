@@ -371,6 +371,9 @@ class BookingRepository extends BaseRepository
         if (!$hasEndDate && isset($insertData['end_date'])) {
             unset($insertData['end_date']);
         }
+        if (!in_array('meta', $columns, true) && isset($insertData['meta'])) {
+            unset($insertData['meta']);
+        }
 
         $result = $this->wpdb->insert($table, $insertData);
 
@@ -406,6 +409,9 @@ class BookingRepository extends BaseRepository
         }
         if (!$hasEndDate && isset($updateData['end_date'])) {
             unset($updateData['end_date']);
+        }
+        if (!in_array('meta', $columns, true) && isset($updateData['meta'])) {
+            unset($updateData['meta']);
         }
 
         if (empty($updateData)) {
@@ -788,7 +794,7 @@ class BookingRepository extends BaseRepository
 
         $boolFields = ['newsletter_optin', 'terms_accepted', 'reminder_sent', 'tax_inclusive'];
 
-        $jsonFields = ['contact_data', 'emergency_contact', 'tax_details', 'itinerary_costs'];
+        $jsonFields = ['contact_data', 'emergency_contact', 'tax_details', 'itinerary_costs', 'meta'];
 
         $dateFields = ['travel_date', 'start_date', 'end_date', 'payment_date', 'cancelled_at', 'confirmed_at', 'completed_at', 'reminder_sent_at'];
 
@@ -848,6 +854,9 @@ class BookingRepository extends BaseRepository
         }
         if (!in_array('end_date', $columns, true)) {
             unset($prepared['end_date']);
+        }
+        if (!in_array('meta', $columns, true)) {
+            unset($prepared['meta']);
         }
 
         if (array_key_exists('user_agent', $data)) {

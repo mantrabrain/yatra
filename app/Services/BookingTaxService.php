@@ -59,9 +59,12 @@ class BookingTaxService
             return $bookingData;
         }
         
-        // Skip recalculation if tax data is already provided (e.g., from CalculationService)
-        // This prevents double-taxing when the caller has already computed taxes
-        if (isset($bookingData['tax_amount']) && $bookingData['tax_amount'] > 0 && !empty($bookingData['tax_details'])) {
+        // Skip recalculation when checkout already sent a tax snapshot from CalculationService.
+        // Important: tax_amount may legitimately be 0 while tax is enabled — still skip to avoid
+        // resetting total_amount / amount_due (breaks deposit & partial "pay now" vs balance).
+        if (array_key_exists('tax_amount', $bookingData)
+            && array_key_exists('tax_details', $bookingData)
+            && array_key_exists('tax_inclusive', $bookingData)) {
             return $bookingData;
         }
         

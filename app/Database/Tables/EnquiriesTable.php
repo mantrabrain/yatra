@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `created_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who created this enquiry record',
     
     PRIMARY KEY (`id`),
-    KEY `idx_trip_id` (`trip_id`),
+    KEY `idx_trip_status` (`trip_id`, `status`),
     KEY `idx_email` (`email`),
     KEY `idx_status` (`status`),
     KEY `idx_created_at` (`created_at`)

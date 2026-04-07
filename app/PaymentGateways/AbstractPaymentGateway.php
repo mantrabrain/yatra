@@ -91,7 +91,14 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
         if (is_string($allConfigs)) {
             $allConfigs = maybe_unserialize($allConfigs);
         }
-        $this->config = $allConfigs[$this->id] ?? $this->getDefaultConfig();
+        $defaults = $this->getDefaultConfig();
+        $stored = $allConfigs[$this->id] ?? null;
+        if (!is_array($stored) || $stored === []) {
+            $this->config = $defaults;
+
+            return;
+        }
+        $this->config = array_merge($defaults, $stored);
     }
 
     /**
@@ -123,7 +130,12 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
 
     public function isAvailable(): bool
     {
-        return $this->isEnabled();
+        return $this->isEnabled() && $this->isProperlyConfigured();
+    }
+
+    public function isProperlyConfigured(): bool
+    {
+        return true;
     }
     
     /**

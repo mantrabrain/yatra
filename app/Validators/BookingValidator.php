@@ -73,29 +73,37 @@ class BookingValidator
             }
         }
 
-        // Validate payment method
-        // Validate payment method or gateway (frontend may send either)
-        if (isset($data['payment_method']) || isset($data['payment_gateway'])) {
-            $value = $data['payment_method'] ?? $data['payment_gateway'];
-            $validMethods = [
-                'full',
-                'partial',
-                'cash',
-                'bank_transfer',
-                'credit_card',
-                'paypal',
-                'stripe',
-                'razorpay',
-                'pay_later',
-                'paystack',
-                'mollie',
-                'square',
-                'authorize_net',
-                'esewa',
-                'khalti',
-            ];
-            if (!in_array($value, $validMethods, true)) {
-                $errors['payment_method'][] = __('Invalid payment method', 'yatra');
+        // Payment: booking "amount type" (full / deposit / partial) vs gateway (processor).
+        // Checkout sends both; Pro Flexible Payments uses payment_method=deposit|partial|full.
+        $bookingAmountMethods = ['full', 'partial', 'deposit'];
+        $gatewayIds = apply_filters('yatra_valid_booking_payment_gateway_ids', [
+            'cash',
+            'bank_transfer',
+            'credit_card',
+            'paypal',
+            'stripe',
+            'razorpay',
+            'pay_later',
+            'paystack',
+            'mollie',
+            'square',
+            'authorize_net',
+            'esewa',
+            'khalti',
+        ]);
+
+        if (isset($data['payment_method']) && $data['payment_method'] !== '') {
+            if (!in_array($data['payment_method'], $bookingAmountMethods, true)) {
+                // Legacy: some clients put the gateway id in payment_method only
+                if (!in_array($data['payment_method'], $gatewayIds, true)) {
+                    $errors['payment_method'][] = __('Invalid payment method', 'yatra');
+                }
+            }
+        }
+
+        if (isset($data['payment_gateway']) && $data['payment_gateway'] !== '') {
+            if (!in_array($data['payment_gateway'], $gatewayIds, true)) {
+                $errors['payment_gateway'][] = __('Invalid payment gateway', 'yatra');
             }
         }
 

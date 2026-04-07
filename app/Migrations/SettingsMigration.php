@@ -524,6 +524,13 @@ class SettingsMigration extends BaseMigration
         $legacyTax = get_option('yatra_payment_tax_rate', null);
         if ($legacyTax !== null && $legacyTax !== false && $legacyTax !== '') {
             update_option('yatra_tax_rate', (float) $legacyTax);
+            // Old system treated tax as enabled when rate > 0. New system also requires enable_tax flag.
+            if ((float) $legacyTax > 0) {
+                $existingEnable = get_option('yatra_enable_tax', null);
+                if ($existingEnable === null || $existingEnable === '' || $this->isForceMigration()) {
+                    update_option('yatra_enable_tax', true);
+                }
+            }
             Logger::info('Migrated yatra_payment_tax_rate → yatra_tax_rate', [
                 'source' => 'migration',
             ]);
@@ -557,7 +564,7 @@ class SettingsMigration extends BaseMigration
         //   Active gateways are retrieved via array_keys() — the value is always 'yes'.
         //
         // NEW format expected by yatra 3.x:
-        //   yatra_active_payment_gateways = ['booking_only', 'paypal']  (indexed array)
+        //   yatra_payment_gateways = ['pay_later', 'paypal']  (indexed array)
         //
         // We must convert the associative slug=>yes map to a plain indexed list.
         $oldGateways = get_option('yatra_payment_gateways', []);
@@ -566,7 +573,12 @@ class SettingsMigration extends BaseMigration
             $activeGatewayIds = array_keys(array_filter($oldGateways, function($v) {
                 return $v === 'yes' || $v === true || $v === 1;
             }));
-            update_option('yatra_active_payment_gateways', $activeGatewayIds);
+            // Normalize legacy slug booking_only → pay_later
+            $activeGatewayIds = array_map(
+                static fn ($slug) => $slug === 'booking_only' ? 'pay_later' : $slug,
+                $activeGatewayIds
+            );
+            update_option('yatra_payment_gateways', array_values(array_unique($activeGatewayIds)));
             $migrated++;
             Logger::info("Migrated active payment gateways (indexed)", [
                 'source' => 'migration',
@@ -596,6 +608,9 @@ class SettingsMigration extends BaseMigration
 
         // Legacy Pro Google Calendar OAuth options → new Pro 3.x option names (no separate migration step).
         $this->migrateLegacyProGoogleCalendarTokens();
+
+        // Legacy Pro license options (yatra_pro_license_key/status/...) → new Pro 3.x license storage.
+        $this->migrateLegacyProLicenseOptions();
 
         // Legacy Pro review settings + partial payment (wp_options) → Yatra 3.x core settings keys.
         $this->migrateLegacyReviewAndPartialPaymentOptions();
@@ -649,6 +664,93 @@ class SettingsMigration extends BaseMigration
         }
 
         Logger::info('Migrated legacy Google Calendar options for Yatra Pro 3.x.', ['source' => 'migration']);
+    }
+
+    /**
+     * Migrate legacy Yatra Pro license options.
+     *
+     * Old Pro stored UI values in:
+     *   - yatra_pro_license_key
+     *   - yatra_pro_license_status
+     *   - yatra_pro_license_expires (optional; may be empty)
+     *
+     * New Pro's updater reads from unified:
+     *   - yatra_license['yatra-pro'] = ['license_key','status','server_response','last_checked']
+     *
+     * We sync the key/status into yatra_license so updates/licensing work, and also keep the
+     * yatra_pro_* options populated because Pro's SettingsController currently returns them.
+     *
+     * IMPORTANT: We do NOT auto-activate (network request) during migration. Activation is done via Pro UI/API.
+     */
+    private function migrateLegacyProLicenseOptions(): void
+    {
+        $legacyKey = (string) get_option('yatra_pro_license_key', '');
+        $legacyStatus = (string) get_option('yatra_pro_license_status', '');
+        $legacyExpires = (string) get_option('yatra_pro_license_expires', '');
+
+        if ($legacyKey === '' && $legacyStatus === '' && $legacyExpires === '') {
+            return;
+        }
+
+        // If Pro isn't ready, skip writing to unified store (keeps behavior consistent with other Pro migrations).
+        $pro = ProMigrationReadiness::getState();
+        if (!$pro['ready']) {
+            Logger::warning('Skipping legacy Pro license migration: Yatra Pro 3.0+ not ready', [
+                'source' => 'migration',
+                'pro_migration' => $pro,
+            ]);
+            return;
+        }
+
+        $pluginSlug = 'yatra-pro';
+        $license = get_option('yatra_license', []);
+        $license = is_array($license) ? $license : [];
+        $existing = isset($license[$pluginSlug]) && is_array($license[$pluginSlug]) ? $license[$pluginSlug] : [];
+
+        $normalizedStatus = strtolower(trim($legacyStatus));
+        $map = [
+            'valid' => 'active',
+            'active' => 'active',
+            'inactive' => 'inactive',
+            'expired' => 'expired',
+            'disabled' => 'disabled',
+            'invalid' => 'invalid',
+        ];
+        if ($normalizedStatus === '') {
+            $normalizedStatus = 'inactive';
+        }
+        $normalizedStatus = $map[$normalizedStatus] ?? $normalizedStatus;
+
+        $shouldWrite = $this->isForceMigration()
+            || empty($existing['license_key'])
+            || empty($existing['status']);
+
+        if ($shouldWrite) {
+            $license[$pluginSlug] = array_merge($existing, [
+                'license_key' => $legacyKey !== '' ? $legacyKey : (string) ($existing['license_key'] ?? ''),
+                'status' => $normalizedStatus !== '' ? $normalizedStatus : (string) ($existing['status'] ?? 'inactive'),
+                'server_response' => is_array($existing['server_response'] ?? null) ? $existing['server_response'] : [],
+                'last_checked' => (int) ($existing['last_checked'] ?? 0) ?: current_time('timestamp'),
+            ]);
+            update_option('yatra_license', $license);
+            Logger::info('Migrated legacy Pro license options into unified yatra_license store.', [
+                'source' => 'migration',
+                'slug' => $pluginSlug,
+                'status' => $license[$pluginSlug]['status'] ?? '',
+                'has_key' => !empty($license[$pluginSlug]['license_key']),
+            ]);
+        }
+
+        // Keep legacy yatra_pro_* options populated for admin UI reads.
+        if ($legacyKey !== '' && ($this->isForceMigration() || get_option('yatra_pro_license_key', '') === '')) {
+            update_option('yatra_pro_license_key', $legacyKey);
+        }
+        if ($legacyStatus !== '' && ($this->isForceMigration() || get_option('yatra_pro_license_status', '') === '')) {
+            update_option('yatra_pro_license_status', $legacyStatus);
+        }
+        if ($legacyExpires !== '' && ($this->isForceMigration() || get_option('yatra_pro_license_expires', '') === '')) {
+            update_option('yatra_pro_license_expires', $legacyExpires);
+        }
     }
     
     /**
@@ -925,30 +1027,27 @@ class SettingsMigration extends BaseMigration
             if (!is_array($existing)) {
                 $existing = [];
             }
-            if ($this->isForceMigration()) {
-                $merged = array_merge($existing, $gatewayConfigs);
-            } else {
-                // Non-force: only fill in gateways not already configured.
-                $merged = array_merge($gatewayConfigs, $existing);
-            }
+            $merged = $this->mergeGatewayConfigs($existing, $gatewayConfigs, $this->isForceMigration());
+            // Enable gateways when we have credentials/config for them.
+            $merged = $this->applyGatewayEnabledFlagsFromSlugs($merged, array_keys($gatewayConfigs));
             update_option('yatra_gateway_configs', $merged);
             Logger::info('Saved yatra_gateway_configs.', [
                 'source'   => 'migration',
                 'count'    => count($merged),
                 'gateways' => array_keys($merged),
             ]);
-            $this->ensureActivePaymentGatewaySlugsForConfigs($merged);
+            $this->ensurePaymentGatewaySlugsForConfigs($merged);
         }
 
         // ── Fix active-gateway slug: booking_only → pay_later ─────────────────
-        $activeGateways = get_option('yatra_active_payment_gateways', []);
+        $activeGateways = get_option('yatra_payment_gateways', []);
         if (is_array($activeGateways) && in_array('booking_only', $activeGateways, true)) {
             $activeGateways = array_map(
-                fn($slug) => $slug === 'booking_only' ? 'pay_later' : $slug,
+                static fn($slug) => $slug === 'booking_only' ? 'pay_later' : $slug,
                 $activeGateways
             );
-            update_option('yatra_active_payment_gateways', array_values(array_unique($activeGateways)));
-            Logger::info('Renamed booking_only → pay_later in active gateways list.', ['source' => 'migration']);
+            update_option('yatra_payment_gateways', array_values(array_unique($activeGateways)));
+            Logger::info('Renamed booking_only → pay_later in payment gateways list.', ['source' => 'migration']);
         }
 
         // Legacy Yatra Pro 2.x bundled gateway settings (yatra_pro_* options). Runs after free flat-key
@@ -962,15 +1061,15 @@ class SettingsMigration extends BaseMigration
     }
 
     /**
-     * Merge legacy Pro payment gateway options into yatra_active_payment_gateways and yatra_gateway_configs.
+     * Merge legacy Pro payment gateway options into yatra_payment_gateways and yatra_gateway_configs.
      *
      * Free/core migration above already maps yatra_payment_gateways + yatra_payment_gateway_* flat keys.
      * This handles Pro-only bundles (yatra_pro_*_settings) without a second migration step.
      */
     private function mergeLegacyProBundledGatewayOptions(): void
     {
-        $legacyEnabled = get_option('yatra_pro_enabled_payment_gateways', []);
-        $legacyEnabled = is_array($legacyEnabled) ? $legacyEnabled : [];
+        $rawLegacyEnabled = get_option('yatra_pro_enabled_payment_gateways', []);
+        $rawLegacyEnabled = is_array($rawLegacyEnabled) ? $rawLegacyEnabled : [];
 
         $legacySettings = [
             '2checkout' => get_option('yatra_pro_twocheckout_settings', null),
@@ -979,17 +1078,30 @@ class SettingsMigration extends BaseMigration
             'authorize_net' => get_option('yatra_pro_authorizenet_settings', null),
         ];
 
-        $hasAny = $legacyEnabled !== [];
+        $proFeatures = get_option('yatra_pro_features', []);
+        $proFeatures = is_array($proFeatures) ? $proFeatures : [];
+        $paymentFeatureOn = !empty($proFeatures['payment_gateways']);
+
+        $hasBundledSettings = false;
         foreach ($legacySettings as $v) {
             if ($v !== null && $v !== '' && $v !== []) {
-                $hasAny = true;
+                $hasBundledSettings = true;
+                break;
             }
         }
+
+        // Old Pro often left yatra_pro_enabled_payment_gateways empty while get_enabled_gateways() defaulted
+        // to all gateways at runtime — infer from core yatra_payment_gateways + Pro feature toggle.
+        $legacyEnabled = $this->buildLegacyProEnabledGatewayList($rawLegacyEnabled, $paymentFeatureOn);
+
+        $hasAny = $legacyEnabled !== []
+            || $hasBundledSettings
+            || $paymentFeatureOn;
         if (!$hasAny) {
             return;
         }
 
-        $active = get_option('yatra_active_payment_gateways', []);
+        $active = get_option('yatra_payment_gateways', []);
         if (!is_array($active)) {
             $active = [];
         }
@@ -1013,7 +1125,7 @@ class SettingsMigration extends BaseMigration
 
         // Free/core list first so ordering matches the main migration; Pro appends any missing slugs.
         $finalActive = array_values(array_unique(array_merge($active, $enabledMapped)));
-        update_option('yatra_active_payment_gateways', $finalActive);
+        update_option('yatra_payment_gateways', $finalActive);
 
         $configs = get_option('yatra_gateway_configs', []);
         if (!is_array($configs)) {
@@ -1025,20 +1137,23 @@ class SettingsMigration extends BaseMigration
                 continue;
             }
 
+            $settings = $this->mapLegacyProBundledGatewaySettingsToUnifiedConfigs($gatewayId, $settings);
+
             if ($gatewayId === 'authorize_net' && isset($settings['client_key']) && !isset($settings['public_client_key'])) {
                 $settings['public_client_key'] = $settings['client_key'];
             }
 
-            if (!isset($configs[$gatewayId]) || $this->isForceMigration()) {
-                $configs[$gatewayId] = array_merge($configs[$gatewayId] ?? [], $settings);
-            } else {
-                $configs[$gatewayId] = array_merge($settings, $configs[$gatewayId]);
-            }
+            $configs[$gatewayId] = $this->mergeGatewayConfigRow(
+                is_array($configs[$gatewayId] ?? null) ? $configs[$gatewayId] : [],
+                $settings,
+                $this->isForceMigration()
+            );
         }
 
+        $configs = $this->applyGatewayEnabledFlagsFromSlugs($configs, $finalActive);
         update_option('yatra_gateway_configs', $configs);
 
-        $this->ensureActivePaymentGatewaySlugsForConfigs($configs);
+        $this->ensurePaymentGatewaySlugsForConfigs($configs);
 
         Logger::info('Merged legacy Pro bundled gateway options into unified gateway settings.', [
             'source' => 'migration',
@@ -1048,14 +1163,78 @@ class SettingsMigration extends BaseMigration
     }
 
     /**
+     * Rebuild the effective list of Pro 2.x "enabled" gateway IDs for migration.
+     *
+     * @param array<int|string, mixed> $storedOption Value of yatra_pro_enabled_payment_gateways
+     */
+    private function buildLegacyProEnabledGatewayList(array $storedOption, bool $paymentFeatureOn): array
+    {
+        $slugMap = [
+            'booking_only' => 'pay_later',
+            'authorizenet' => 'authorize_net',
+            'authorize' => 'authorize_net',
+            'two_checkout' => '2checkout',
+            'twocheckout' => '2checkout',
+        ];
+
+        $normalizeSlug = static function (string $s) use ($slugMap): string {
+            $s = strtolower(trim($s));
+
+            return $slugMap[$s] ?? $s;
+        };
+
+        $fromStored = [];
+        foreach ($storedOption as $g) {
+            $g = strtolower(trim((string) $g));
+            if ($g === '') {
+                continue;
+            }
+            $fromStored[] = $normalizeSlug($g);
+        }
+        $fromStored = array_values(array_unique(array_filter($fromStored)));
+
+        $fromCore = [];
+        $core = get_option('yatra_payment_gateways', []);
+        if (is_array($core) && $core !== []) {
+            foreach ($core as $key => $val) {
+                $on = $val === 'yes' || $val === true || $val === 1 || $val === '1';
+                if (!$on) {
+                    continue;
+                }
+                if (is_int($key)) {
+                    $fromCore[] = $normalizeSlug((string) $val);
+                } else {
+                    $fromCore[] = $normalizeSlug((string) $key);
+                }
+            }
+        }
+        $fromCore = array_values(array_unique(array_filter($fromCore)));
+
+        // Pro gateways only (core free PayPal etc. are handled by migratePaymentGatewayConfigs).
+        $proSlugs = ['stripe', 'square', 'razorpay', 'authorize_net', '2checkout', 'mollie'];
+        $filterPro = static function (array $slugs) use ($proSlugs): array {
+            return array_values(array_intersect($slugs, $proSlugs));
+        };
+
+        $merged = array_values(array_unique(array_merge($fromStored, $filterPro($fromCore))));
+
+        // Match old PaymentGateways::get_enabled_gateways() default when the option was never persisted.
+        if ($merged === [] && $paymentFeatureOn) {
+            return ['stripe', 'square', 'razorpay', 'authorize_net', '2checkout', 'mollie'];
+        }
+
+        return $merged;
+    }
+
+    /**
      * If unified configs contain real credentials but the gateway slug is missing from the active list
      * (common when legacy sites only stored flat keys, not yatra_payment_gateways), append the slug.
      *
      * @param array<string, array<string, mixed>> $merged
      */
-    private function ensureActivePaymentGatewaySlugsForConfigs(array $merged): void
+    private function ensurePaymentGatewaySlugsForConfigs(array $merged): void
     {
-        $active = get_option('yatra_active_payment_gateways', []);
+        $active = get_option('yatra_payment_gateways', []);
         if (!is_array($active)) {
             $active = [];
         }
@@ -1082,7 +1261,151 @@ class SettingsMigration extends BaseMigration
             }
         }
 
-        update_option('yatra_active_payment_gateways', array_values(array_unique($active)));
+        update_option('yatra_payment_gateways', array_values(array_unique($active)));
+    }
+
+    /**
+     * Ensure configs reflect enabled gateways list (sets config['enabled']=true for those slugs).
+     *
+     * @param array<string, mixed> $configs
+     * @param array<int, string> $enabledSlugs
+     * @return array<string, mixed>
+     */
+    private function applyGatewayEnabledFlagsFromSlugs(array $configs, array $enabledSlugs): array
+    {
+        $enabled = array_values(array_unique(array_map(
+            static fn ($s) => strtolower(trim((string) $s)),
+            $enabledSlugs
+        )));
+
+        $map = [
+            'booking_only' => 'pay_later',
+            'authorizenet' => 'authorize_net',
+            'authorize' => 'authorize_net',
+            'two_checkout' => '2checkout',
+            'twocheckout' => '2checkout',
+        ];
+        $enabled = array_map(static fn ($s) => $map[$s] ?? $s, $enabled);
+
+        foreach ($enabled as $slug) {
+            if ($slug === '') {
+                continue;
+            }
+            if (!isset($configs[$slug]) || !is_array($configs[$slug])) {
+                $configs[$slug] = [];
+            }
+            $configs[$slug]['enabled'] = true;
+        }
+
+        return $configs;
+    }
+
+    /**
+     * Merge full gateway configs map.
+     *
+     * Non-force mode: do NOT overwrite non-empty existing values (installer creates empty placeholders).
+     * Force mode: incoming values overwrite existing.
+     *
+     * @param array<string, mixed> $existing
+     * @param array<string, mixed> $incoming
+     * @return array<string, mixed>
+     */
+    private function mergeGatewayConfigs(array $existing, array $incoming, bool $force): array
+    {
+        $merged = $existing;
+
+        foreach ($incoming as $gatewayId => $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $mergedRow = is_array($merged[$gatewayId] ?? null) ? $merged[$gatewayId] : [];
+            $merged[$gatewayId] = $this->mergeGatewayConfigRow($mergedRow, $row, $force);
+        }
+
+        return $merged;
+    }
+
+    /**
+     * Merge a single gateway config row.
+     *
+     * @param array<string, mixed> $existing
+     * @param array<string, mixed> $incoming
+     * @return array<string, mixed>
+     */
+    private function mergeGatewayConfigRow(array $existing, array $incoming, bool $force): array
+    {
+        if ($force) {
+            // Force: incoming wins, but keep any extra existing keys not present in incoming.
+            return array_merge($existing, $incoming);
+        }
+
+        // Non-force: only fill missing/empty values.
+        $out = $existing;
+        foreach ($incoming as $k => $v) {
+            $hasExisting = array_key_exists($k, $existing);
+            $existingVal = $hasExisting ? $existing[$k] : null;
+
+            $existingEmpty = ($existingVal === null)
+                || ($existingVal === '')
+                || ($existingVal === [])
+                || ($existingVal === false);
+
+            if (!$hasExisting || $existingEmpty) {
+                $out[$k] = $v;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * Legacy Pro stored gateway settings in separate option arrays (yatra_pro_*_settings) with keys that
+     * don't always match the unified Yatra 3.x gateway config schema.
+     *
+     * This normalizes those arrays to the keys the new gateway classes actually read.
+     *
+     * @param array<string, mixed> $settings
+     * @return array<string, mixed>
+     */
+    private function mapLegacyProBundledGatewaySettingsToUnifiedConfigs(string $gatewayId, array $settings): array
+    {
+        $out = $settings;
+
+        // Normalize enable flag to boolean; unified configs use config['enabled'] bool.
+        if (isset($out['enabled'])) {
+            $enabled = $out['enabled'];
+            $out['enabled'] = ($enabled === 'yes' || $enabled === true || $enabled === 1 || $enabled === '1' || $enabled === 'on');
+        }
+
+        // Normalize common test mode flags; unified system uses global yatra_payment_test_mode primarily,
+        // but we preserve per-gateway flag when present for backward compatibility.
+        if (isset($out['test_mode'])) {
+            $tm = $out['test_mode'];
+            $out['test_mode'] = ($tm === 'yes' || $tm === true || $tm === 1 || $tm === '1' || $tm === 'on');
+        }
+
+        // Gateway-specific key mapping
+        switch ($gatewayId) {
+            case '2checkout':
+                // Legacy Pro: seller_id, secret_word
+                // Unified configs (migration flat keys): merchant_code, ins_secret_word
+                if (!isset($out['merchant_code']) && isset($out['seller_id'])) {
+                    $out['merchant_code'] = (string) $out['seller_id'];
+                }
+                if (!isset($out['ins_secret_word']) && isset($out['secret_word'])) {
+                    $out['ins_secret_word'] = (string) $out['secret_word'];
+                }
+                break;
+
+            case 'authorize_net':
+                // Legacy Pro array sometimes used signature_key as the public client key; in new gateway it is public_client_key.
+                if (!isset($out['public_client_key']) && isset($out['signature_key'])) {
+                    $out['public_client_key'] = (string) $out['signature_key'];
+                }
+                break;
+        }
+
+        return $out;
     }
 
     /**
@@ -1125,6 +1448,47 @@ class SettingsMigration extends BaseMigration
             if ($type === 'percentage' && $pct > 0 && $pct < 100) {
                 update_option('yatra_partial_payment_percentage', max(1, min(99, (int) round($pct))));
             }
+
+            // Pro 3.x: partial payment lives inside Flexible Payments module.
+            // Enable module + persist Pro settings so UI/runtime behaves like legacy.
+            $pro = ProMigrationReadiness::getState();
+            if ($pro['ready']) {
+                // Free plugin module flag (controls whether Pro module loads at all).
+                // This is what both Pro's ModuleManager::shouldLoadModule() and admin UI checks rely on.
+                if (class_exists('\\Yatra\\Core\\Modules\\ModuleManager')) {
+                    // Triggers yatra_module_active hook, which Pro listens to for module activation side-effects.
+                    \Yatra\Core\Modules\ModuleManager::setModuleStatus('flexible_payments', true);
+                } else {
+                    // Fallback: set raw option if module manager isn't loaded for some reason.
+                    $mods = get_option('yatra_modules', []);
+                    $mods = is_array($mods) ? $mods : [];
+                    $mods['flexible_payments'] = array_merge($mods['flexible_payments'] ?? [], [
+                        'enabled' => true,
+                        'updated_at' => current_time('mysql'),
+                    ]);
+                    update_option('yatra_modules', $mods);
+                }
+
+                $modules = get_option('yatra_pro_modules_enabled', []);
+                $modules = is_array($modules) ? $modules : [];
+                if (!in_array('flexible_payments', $modules, true)) {
+                    $modules[] = 'flexible_payments';
+                    update_option('yatra_pro_modules_enabled', array_values(array_unique($modules)));
+                }
+
+                $proFlex = get_option('yatra_pro_flexible_payments', []);
+                $proFlex = is_array($proFlex) ? $proFlex : [];
+                $proFlex['partial_payment'] = true;
+                if ($type === 'percentage' && $pct > 0 && $pct < 100) {
+                    $proFlex['partial_payment_percentage'] = max(1, min(99, (int) round($pct)));
+                }
+                // Legacy didn't use deposit as "partial payment" — keep deposit disabled unless user had it separately.
+                if (!array_key_exists('enable_deposit', $proFlex)) {
+                    $proFlex['enable_deposit'] = false;
+                }
+                update_option('yatra_pro_flexible_payments', $proFlex);
+            }
+
             Logger::info('Migrated legacy partial payment options → yatra_partial_payment*', ['source' => 'migration']);
         }
     }

@@ -200,11 +200,6 @@ class PaymentGatewayController extends BaseController
             return new WP_Error('no_balance_due', __('This booking is already fully paid.', 'yatra'), ['status' => 400]);
         }
 
-        $gateway = $this->registry->get($method);
-        if (!$gateway) {
-            return new WP_Error('invalid_gateway', __('Selected payment method is unavailable.', 'yatra'), ['status' => 400]);
-        }
-
         $customerEmail = $booking->contact_email ?? ($booking->customer_email ?? '');
         $customerName = trim(($booking->contact_first_name ?? '') . ' ' . ($booking->contact_last_name ?? ''));
 
@@ -219,7 +214,7 @@ class PaymentGatewayController extends BaseController
             'cancel_url' => home_url('/my-account?tab=payments&payment=cancelled'),
         ];
 
-        $result = $gateway->processPayment($paymentData);
+        $result = $this->registry->processPayment($method, $paymentData);
 
         if (!$result['success']) {
             $message = $result['error'] ?? $result['message'] ?? __('Unable to initiate payment.', 'yatra');

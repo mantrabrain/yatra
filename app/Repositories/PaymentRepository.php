@@ -217,8 +217,14 @@ class PaymentRepository extends BaseRepository
      */
     public function findLatestByBookingId(int $bookingId): ?object
     {
-        $payments = $this->findByBookingId($bookingId);
-        return $payments[0] ?? null;
+        $table = $this->getTableName();
+
+        $query = $this->wpdb->prepare(
+            "SELECT * FROM {$table} WHERE booking_id = %d ORDER BY created_at DESC, id DESC LIMIT 1",
+            $bookingId
+        );
+
+        return $this->wpdb->get_row($query) ?: null;
     }
 
     /**
@@ -431,6 +437,12 @@ class PaymentRepository extends BaseRepository
 
         if (array_key_exists('notes', $data)) {
             $prepared['notes'] = sanitize_textarea_field((string) $data['notes']);
+        }
+
+        if (array_key_exists('meta', $data)) {
+            $prepared['meta'] = is_string($data['meta'])
+                ? $data['meta']
+                : wp_json_encode($data['meta']);
         }
 
         if (array_key_exists('processed_at', $data) && $data['processed_at']) {
