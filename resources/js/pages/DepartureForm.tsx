@@ -66,7 +66,7 @@ const DepartureForm: React.FC = () => {
   useEffect(() => {
     if (departureData) {
       setFormData({
-        date: departureData.date || "",
+        date: departureData.date || departureData.start_date || "",
         time: departureData.time || "",
         max_capacity: departureData.max_capacity?.toString() || "",
         price_override: departureData.price_override?.toString() || "",

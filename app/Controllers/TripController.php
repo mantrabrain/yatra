@@ -2285,20 +2285,38 @@ class TripController extends BaseController
 
             $formatted_attributes = [];
             foreach ($attributes as $attr) {
-                $value = $attr->value;
-                if ($attr->value_serialized) {
-                    $value = unserialize($value);
+                $row = is_array($attr) ? (object) $attr : $attr;
+
+                $value = $row->value ?? null;
+                if (isset($row->value_serialized) && $row->value_serialized && $value !== null && $value !== '') {
+                    $unserialized = @unserialize((string) $value, ['allowed_classes' => false]);
+                    if ($unserialized !== false || (string) $value === 'b:0;') {
+                        $value = $unserialized;
+                    }
                 }
-                
+
+                $fieldType = isset($row->field_type) ? trim((string) $row->field_type, '"') : 'text';
+                $fieldOptions = $row->field_options ?? null;
+                if (is_string($fieldOptions)) {
+                    $fieldOptions = trim($fieldOptions, '"');
+                    $decoded = json_decode($fieldOptions, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $fieldOptions = $decoded;
+                    }
+                }
+
+                $linkId = (int) ($row->relationship_id ?? $row->id ?? 0);
+                $attributeId = (int) ($row->attribute_id ?? 0);
+
                 $formatted_attributes[] = [
-                    'id' => $attr->id,
-                    'attribute_id' => $attr->attribute_id,
-                    'name' => $attr->name,
-                    'field_type' => $attr->field_type,
-                    'field_options' => $attr->field_options,
+                    'id' => $linkId > 0 ? $linkId : $attributeId,
+                    'attribute_id' => $attributeId,
+                    'name' => (string) ($row->name ?? ''),
+                    'field_type' => $fieldType,
+                    'field_options' => $fieldOptions,
                     'value' => $value,
-                    'created_at' => $attr->created_at,
-                    'updated_at' => $attr->updated_at
+                    'created_at' => (string) ($row->created_at ?? ''),
+                    'updated_at' => (string) ($row->updated_at ?? ''),
                 ];
             }
 

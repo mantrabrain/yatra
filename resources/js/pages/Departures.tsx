@@ -3,7 +3,7 @@
  * Manage trip departures (manual and recurring-generated)
  */
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Plus,
@@ -506,16 +506,78 @@ const Departures: React.FC = () => {
     }
   };
 
-  // Delete departure mutation
+  /** Trip id for REST URLs: each row includes trip_id for /departures; filter supplies it when one trip is selected. */
+  const tripIdForDeparture = useCallback(
+    (departure: Departure): number | null => {
+      if (departure.trip_id > 0) {
+        return departure.trip_id;
+      }
+      if (selectedTripId != null && selectedTripId > 0) {
+        return selectedTripId;
+      }
+      return null;
+    },
+    [selectedTripId],
+  );
+
+  const navigateToAdd = () => {
+    if (!selectedTripId) {
+      showToast(__("Please select a trip first", "yatra"), "error");
+      return;
+    }
+    window.location.href = `?page=yatra&subpage=departures&action=create&trip_id=${selectedTripId}`;
+  };
+
+  const navigateToEdit = useCallback(
+    (departure: Departure) => {
+      const tid = tripIdForDeparture(departure);
+      if (!tid) {
+        showToast(
+          __(
+            "Cannot open edit: this departure has no trip id. Select a trip filter or refresh the list.",
+            "yatra",
+          ),
+          "error",
+        );
+        return;
+      }
+      window.location.href = `?page=yatra&subpage=departures&action=edit&id=${departure.id}&trip_id=${tid}`;
+    },
+    [tripIdForDeparture, showToast],
+  );
+
+  const navigateToView = useCallback(
+    (departure: Departure) => {
+      const tid = tripIdForDeparture(departure);
+      if (!tid) {
+        showToast(
+          __(
+            "Cannot open departure: missing trip id. Select a trip filter or refresh the list.",
+            "yatra",
+          ),
+          "error",
+        );
+        return;
+      }
+      window.location.href = `?page=yatra&subpage=departures&action=view&id=${departure.id}&trip_id=${tid}`;
+    },
+    [tripIdForDeparture, showToast],
+  );
+
+  // Delete departure mutation (per-row trip id supports "All trips" list)
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      if (!selectedTripId) return;
-      await apiClient.delete(`/trips/${selectedTripId}/departures/${id}`);
+    mutationFn: async ({
+      id,
+      tripId: tid,
+    }: {
+      id: number;
+      tripId: number;
+    }) => {
+      await apiClient.delete(`/trips/${tid}/departures/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["departures", selectedTripId],
-      });
+      queryClient.invalidateQueries({ queryKey: ["departures"] });
+      queryClient.invalidateQueries({ queryKey: ["departures-stats"] });
       showToast(__("Departure deleted successfully", "yatra"), "success");
     },
     onError: (error: any) => {
@@ -526,13 +588,24 @@ const Departures: React.FC = () => {
     },
   });
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (departure: Departure) => {
+    const tid = tripIdForDeparture(departure);
+    if (!tid) {
+      showToast(
+        __(
+          "Cannot delete: missing trip id for this departure.",
+          "yatra",
+        ),
+        "error",
+      );
+      return;
+    }
     if (
       !confirm(__("Are you sure you want to delete this departure?", "yatra"))
     ) {
       return;
     }
-    deleteMutation.mutate(id);
+    deleteMutation.mutate({ id: departure.id, tripId: tid });
   };
 
   const isAllSelected =
@@ -599,24 +672,6 @@ const Departures: React.FC = () => {
         {__("Booking Created", "yatra")}
       </Badge>
     );
-  };
-
-  const navigateToAdd = () => {
-    if (!selectedTripId) {
-      showToast(__("Please select a trip first", "yatra"), "error");
-      return;
-    }
-    window.location.href = `?page=yatra&subpage=departures&action=create&trip_id=${selectedTripId}`;
-  };
-
-  const navigateToEdit = (id: number) => {
-    if (!selectedTripId) return;
-    window.location.href = `?page=yatra&subpage=departures&action=edit&id=${id}&trip_id=${selectedTripId}`;
-  };
-
-  const navigateToView = (id: number) => {
-    if (!selectedTripId) return;
-    window.location.href = `?page=yatra&subpage=departures&action=view&id=${id}&trip_id=${selectedTripId}`;
   };
 
   const clearDateFilters = () => {
@@ -782,7 +837,14 @@ const Departures: React.FC = () => {
   );
 
   const handleMoveToTrash = async (departure: Departure) => {
-    if (!selectedTripId) return;
+    const tid = tripIdForDeparture(departure);
+    if (!tid) {
+      showToast(
+        __("Cannot move to trash: missing trip id for this departure.", "yatra"),
+        "error",
+      );
+      return;
+    }
     if (
       !window.confirm(
         __("Are you sure you want to move this departure to trash?", "yatra"),
@@ -791,19 +853,12 @@ const Departures: React.FC = () => {
       return;
     }
     try {
-      await apiClient.patch(
-        `/trips/${selectedTripId}/departures/${departure.id}`,
-        {
-          status: "trash",
-        },
-      );
+      await apiClient.patch(`/trips/${tid}/departures/${departure.id}`, {
+        status: "trash",
+      });
       showToast(__("Departure moved to trash.", "yatra"), "success");
-      queryClient.invalidateQueries({
-        queryKey: ["departures", selectedTripId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["departures-stats", selectedTripId],
-      });
+      queryClient.invalidateQueries({ queryKey: ["departures"] });
+      queryClient.invalidateQueries({ queryKey: ["departures-stats"] });
     } catch (error: any) {
       showToast(
         error?.message || __("Failed to move departure to trash", "yatra"),
@@ -813,7 +868,14 @@ const Departures: React.FC = () => {
   };
 
   const handleRestore = async (departure: Departure) => {
-    if (!selectedTripId) return;
+    const tid = tripIdForDeparture(departure);
+    if (!tid) {
+      showToast(
+        __("Cannot restore: missing trip id for this departure.", "yatra"),
+        "error",
+      );
+      return;
+    }
     if (
       !window.confirm(
         __("Are you sure you want to restore this departure?", "yatra"),
@@ -822,19 +884,12 @@ const Departures: React.FC = () => {
       return;
     }
     try {
-      await apiClient.patch(
-        `/trips/${selectedTripId}/departures/${departure.id}`,
-        {
-          status: "upcoming",
-        },
-      );
+      await apiClient.patch(`/trips/${tid}/departures/${departure.id}`, {
+        status: "upcoming",
+      });
       showToast(__("Departure restored.", "yatra"), "success");
-      queryClient.invalidateQueries({
-        queryKey: ["departures", selectedTripId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["departures-stats", selectedTripId],
-      });
+      queryClient.invalidateQueries({ queryKey: ["departures"] });
+      queryClient.invalidateQueries({ queryKey: ["departures-stats"] });
     } catch (error: any) {
       showToast(
         error?.message || __("Failed to restore departure", "yatra"),
@@ -849,13 +904,13 @@ const Departures: React.FC = () => {
         key: "view",
         label: __("View", "yatra"),
         icon: <Eye className="w-4 h-4" />,
-        onClick: (departure: Departure) => navigateToView(departure.id),
+        onClick: (departure: Departure) => navigateToView(departure),
       },
       {
         key: "edit",
         label: __("Edit", "yatra"),
         icon: <Edit className="w-4 h-4" />,
-        onClick: (departure: Departure) => navigateToEdit(departure.id),
+        onClick: (departure: Departure) => navigateToEdit(departure),
         condition: (departure: Departure) => departure.status !== "trash",
       },
     ];
@@ -871,7 +926,7 @@ const Departures: React.FC = () => {
         key: "delete",
         label: __("Delete Permanently", "yatra"),
         icon: <Trash2 className="w-4 h-4" />,
-        onClick: (departure: Departure) => handleDelete(departure.id),
+        onClick: (departure: Departure) => handleDelete(departure),
       } as any);
     } else {
       actions.push({
@@ -887,6 +942,7 @@ const Departures: React.FC = () => {
   }, [
     statusFilter,
     navigateToEdit,
+    navigateToView,
     handleDelete,
     handleRestore,
     handleMoveToTrash,

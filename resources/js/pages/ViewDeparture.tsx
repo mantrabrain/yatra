@@ -251,7 +251,8 @@ const ViewDeparture: React.FC = () => {
         throw new Error(__("Invalid departure or trip ID", "yatra"));
       }
       const response = await apiClient.get(`/trips/${tripId}/departures/${id}`);
-      return response?.data || {};
+      const payload = response?.data ?? response;
+      return payload && typeof payload === "object" ? payload : {};
     },
   });
 

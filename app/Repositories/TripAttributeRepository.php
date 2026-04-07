@@ -170,6 +170,7 @@ class TripAttributeRepository extends BaseRepository
         // Get attributes from the trip_classifications table joined with classifications
         $rows = $wpdb->get_results($wpdb->prepare(
             "SELECT tc.id as relationship_id, tc.metadata as relationship_metadata,
+                    tc.created_at, tc.updated_at,
                     c.id as attribute_id, c.name, c.slug, c.description, c.icon, c.metadata,
                     JSON_UNQUOTE(JSON_EXTRACT(tc.metadata, '$.field_type')) as field_type,
                     JSON_UNQUOTE(JSON_EXTRACT(tc.metadata, '$.value')) as value,
