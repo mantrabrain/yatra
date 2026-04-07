@@ -3,7 +3,9 @@
 /node_modules/
 
 # Build outputs
-
+# Release zips from ./build.sh (do not commit)
+build/
+*.zip
 
 # IDE
 .idea/
@@ -26,7 +28,6 @@ yarn-error.log*
 .env
 .env.local
 
-# Build
+# Build / tooling artifacts
 dist/
-build/
 
