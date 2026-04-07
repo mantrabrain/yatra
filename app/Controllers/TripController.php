@@ -21,6 +21,7 @@ use Yatra\Exceptions\TripNotFoundException;
 use Yatra\Services\SettingsService;
 use Yatra\Exceptions\ValidationException;
 use Yatra\Database\Tables\TripAvailabilityDatesTable;
+use Yatra\Services\TripPricingService;
 
 /**
  * Trip REST API Controller
@@ -1775,11 +1776,22 @@ class TripController extends BaseController
                     if (!isset($pt['max_pax'])) $pt['max_pax'] = $meta['max_pax'];
                 }
 
-                // Compute effective_price if not set
+                // Payable amount (honors price / sale_price / discounted_price like TripPricingService)
                 if (!isset($pt['effective_price'])) {
-                    $original = (float) ($pt['original_price'] ?? 0);
-                    $discounted = (float) ($pt['discounted_price'] ?? 0);
-                    $pt['effective_price'] = ($discounted > 0 && $discounted < $original) ? $discounted : $original;
+                    $eff = TripPricingService::resolveCategoryEffectivePrice($pt);
+                    $pt['effective_price'] = $eff;
+                    $orig = (float) ($pt['original_price'] ?? 0);
+                    if ($orig <= 0 && isset($pt['price'])) {
+                        $orig = (float) $pt['price'];
+                    }
+                    if ($orig > 0 && $eff > 0 && $eff < $orig) {
+                        if (!isset($pt['discounted_price']) || (float) $pt['discounted_price'] <= 0) {
+                            $pt['discounted_price'] = $eff;
+                        }
+                    }
+                    if ($orig > 0 && (!isset($pt['original_price']) || (float) $pt['original_price'] <= 0)) {
+                        $pt['original_price'] = $orig;
+                    }
                 }
 
                 return $pt;

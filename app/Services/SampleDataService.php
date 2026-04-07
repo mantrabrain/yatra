@@ -98,6 +98,13 @@ class SampleDataService
             $base_data['availability_dates'] = $dates;
         }
 
+        if (!empty($base_data['availability_dates'])) {
+            $base_data['availability_dates'] = $this->alignSampleAvailabilitySeatConsistency(
+                $base_data['availability_dates'],
+                $base_data['trips'] ?? []
+            );
+        }
+
         if (!empty($base_data['availability_rules'])) {
             foreach ($base_data['availability_rules'] as $i => $rule) {
                 $orig_start = \DateTimeImmutable::createFromFormat(
@@ -130,6 +137,65 @@ class SampleDataService
         }
 
         return $base_data;
+    }
+
+    /**
+     * Keep seats_total / seats_available / seats_reserved consistent and align status
+     * (available | limited | sold_out) with seat counts so demo data matches the UI.
+     */
+    private function alignSampleAvailabilitySeatConsistency(array $dates, array $trips): array
+    {
+        $tripCap = [];
+        foreach ($trips as $t) {
+            if (!empty($t['slug'])) {
+                $tripCap[(string) $t['slug']] = max(1, (int) ($t['max_travelers'] ?? 20));
+            }
+        }
+
+        foreach ($dates as $i => $row) {
+            $slug = (string) ($row['trip_slug'] ?? '');
+            $defaultCap = $tripCap[$slug] ?? 20;
+
+            $total = (int) ($row['seats_total'] ?? 0);
+            if ($total <= 0) {
+                $total = $defaultCap;
+            }
+
+            $avail = (int) ($row['seats_available'] ?? 0);
+            $reserved = (int) ($row['seats_reserved'] ?? 0);
+
+            if ($avail < 0) {
+                $avail = 0;
+            }
+            if ($reserved < 0) {
+                $reserved = 0;
+            }
+            if ($avail > $total) {
+                $avail = $total;
+            }
+            if ($avail + $reserved !== $total) {
+                $reserved = max(0, min($total, $total - $avail));
+                $avail = max(0, $total - $reserved);
+            }
+
+            $status = 'available';
+            if ($avail <= 0) {
+                $status = 'sold_out';
+            } elseif ($total > 0 && $avail <= max(1, (int) ceil($total * 0.2))) {
+                $status = 'limited';
+            }
+
+            if (in_array($row['status'] ?? '', ['blocked', 'closed', 'cancelled', 'unavailable'], true)) {
+                $status = $row['status'];
+            }
+
+            $dates[$i]['seats_total'] = $total;
+            $dates[$i]['seats_available'] = $avail;
+            $dates[$i]['seats_reserved'] = $reserved;
+            $dates[$i]['status'] = $status;
+        }
+
+        return $dates;
     }
 
     /**

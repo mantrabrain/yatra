@@ -171,9 +171,11 @@ class RecurringRuleService
      */
     private function buildDateInfo(string $date, RecurringRule $rule): array
     {
+        $cap = (int) ($rule->capacity_value ?? 0);
+
         return [
             'date' => $date,
-            'max_capacity' => $rule->capacity_value,
+            'max_capacity' => $cap,
             'base_price' => $rule->price_override,
             'pricing_by_traveler_type' => null, // This field doesn't exist in the new schema
             'source' => 'recurring_rule',

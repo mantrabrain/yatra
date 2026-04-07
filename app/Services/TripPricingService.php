@@ -264,6 +264,9 @@ class TripPricingService
         if (!empty($category['original_price']) && (float) $category['original_price'] > 0) {
             return (float) $category['original_price'];
         }
+        if (!empty($category['price']) && (float) $category['price'] > 0) {
+            return (float) $category['price'];
+        }
         return 0.0;
     }
 
@@ -321,9 +324,15 @@ class TripPricingService
             $pt = (array) $pt;
             if (empty($pt)) continue;
 
+            $origFromPrice = isset($pt['price']) ? (float) $pt['price'] : null;
+            $orig = isset($pt['original_price']) ? (float) $pt['original_price'] : null;
+            if (($orig === null || $orig <= 0) && $origFromPrice !== null && $origFromPrice > 0) {
+                $orig = $origFromPrice;
+            }
+
             $normalized[] = [
                 'category_id'      => isset($pt['category_id']) ? (int) $pt['category_id'] : null,
-                'original_price'   => isset($pt['original_price']) ? (float) $pt['original_price'] : null,
+                'original_price'   => $orig !== null && $orig > 0 ? $orig : null,
                 'discounted_price' => isset($pt['discounted_price']) ? (float) $pt['discounted_price'] : null,
                 'sale_price'       => isset($pt['sale_price']) ? (float) $pt['sale_price'] : null,
                 'label'            => $pt['label'] ?? ($pt['category_label'] ?? ($pt['title'] ?? null)),

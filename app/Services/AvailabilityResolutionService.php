@@ -306,8 +306,15 @@ class AvailabilityResolutionService
                 $avail->id = 'recurring_' . $source['date'] . '_' . ($source['rule_id'] ?? 0);
                 $avail->trip_id = (int) $trip->id;
                 $avail->departure_date = $source['date'];
-                $avail->seats_total = $source['max_capacity'] ?? 0;
-                $avail->seats_available = $source['max_capacity'] ?? 0;
+                $ruleCap = (int) ($source['max_capacity'] ?? 0);
+                if ($ruleCap <= 0) {
+                    $ruleCap = (int) ($trip->max_travelers ?? $trip->max_travellers ?? 0);
+                }
+                if ($ruleCap <= 0) {
+                    $ruleCap = 20;
+                }
+                $avail->seats_total = $ruleCap;
+                $avail->seats_available = $ruleCap;
                 $avail->seats_reserved = 0;
                 $avail->status = 'available';
                 $avail->is_recurring = true;
@@ -374,14 +381,20 @@ class AvailabilityResolutionService
                 // Inherit trip's pricing_type
                 $avail->pricing_type = $trip_pricing_type;
                 
-                // Use availability's price_types if set, otherwise trip's price_types
+                // Use availability's price_types if set, otherwise trip's price_types (normalize legacy `price` keys)
                 $avail_price_types = null;
                 if (!empty($source->price_types)) {
-                    $avail_price_types = is_string($source->price_types) 
-                        ? json_decode($source->price_types, true) 
+                    $avail_price_types = is_string($source->price_types)
+                        ? json_decode($source->price_types, true)
                         : $source->price_types;
                 }
-                $avail->price_types = !empty($avail_price_types) ? $avail_price_types : $trip_price_types;
+                if (!empty($avail_price_types) && is_array($avail_price_types)) {
+                    $avail->price_types = TripPricingService::resolvePriceTypes(
+                        (object) ['price_types' => $avail_price_types]
+                    );
+                } else {
+                    $avail->price_types = $trip_price_types;
+                }
                 break;
 
             case 'trip_default':
@@ -500,20 +513,26 @@ class AvailabilityResolutionService
     {
         global $wpdb;
         $table = \Yatra\Database\Tables\TripsTable::getTableName();
-        
-        // Get price_types JSON from trips table
+
         $json = $wpdb->get_var(
             $wpdb->prepare(
                 "SELECT price_types FROM {$table} WHERE id = %d",
                 $tripId
             )
         );
-        
+
         if (empty($json)) {
             return [];
         }
-        
+
         $decoded = json_decode($json, true);
-        return is_array($decoded) ? $decoded : [];
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        // Map legacy `price` keys to original_price so card pricing never resolves to 0
+        $tripStub = (object) ['price_types' => $decoded];
+
+        return TripPricingService::resolvePriceTypes($tripStub);
     }
 }
