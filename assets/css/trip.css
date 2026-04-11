@@ -20,7 +20,7 @@
 /* Inner container with max-width */
 .yatra-single-trip > .yatra-trip-hero-new,
 .yatra-single-trip > .yatra-trip-tags,
-.yatra-single-trip > .yatra-trip-quick-facts,
+.yatra-single-trip > .yatra-trip-quick-facts-section,
 .yatra-single-trip > .yatra-trip-container {
     width: 100%;
     max-width: var(--yatra-container-max-width, 1300px);
@@ -102,12 +102,12 @@
 /* Unified Container System */
 .yatra-single-trip > .yatra-trip-hero-new,
 .yatra-single-trip > .yatra-trip-tags,
-.yatra-single-trip > .yatra-trip-quick-facts,
+.yatra-single-trip > .yatra-trip-quick-facts-section,
 .yatra-single-trip > .yatra-trip-attributes,
 .yatra-single-trip > .yatra-trip-container,
-.yatra-single-trip > .yatra-group-discounts,
-.yatra-single-trip > .yatra-similar-trips,
-.yatra-single-trip > .yatra-trip-reviews {
+.yatra-single-trip > .yatra-group-discounts-section,
+.yatra-single-trip > .yatra-similar-section,
+.yatra-single-trip > .yatra-reviews-section {
     width: 100%;
     max-width: var(--yatra-container-max-width, 1300px);
     margin-left: auto;
@@ -116,7 +116,10 @@
     padding-right: var(--yatra-container-padding);
 }
 
-/* Unified Section Spacing */
+/* Unified Section Spacing
+   One rhythm between stacked blocks: previous section’s bottom spacing only.
+   --yatra-section-padding: top of the first block (hero) below the page chrome only.
+   Do not stack padding-top: section-padding on a section that already follows margin/padding-bottom: section-gap. */
 .yatra-trip-hero-new {
     padding-top: var(--yatra-section-padding);
     padding-bottom: var(--yatra-section-gap);
@@ -127,10 +130,11 @@
     padding-bottom: var(--yatra-section-gap);
 }
 
+.yatra-trip-quick-facts-section,
 .yatra-trip-attributes {
-    padding-top: var(--yatra-section-padding);
+    padding-top: 0;
     padding-bottom: var(--yatra-section-gap);
-    background: var(--yatra-bg-page, #f8f9fa);
+    background: transparent;
 }
 
 .yatra-trip-container {
@@ -138,18 +142,9 @@
     padding-bottom: var(--yatra-section-gap);
 }
 
-.yatra-group-discounts {
-    padding-top: var(--yatra-section-padding);
-    padding-bottom: var(--yatra-section-gap);
-}
-
-.yatra-similar-trips {
-    padding-top: var(--yatra-section-padding);
-    padding-bottom: var(--yatra-section-gap);
-}
-
-.yatra-trip-reviews {
-    padding-top: var(--yatra-section-padding);
+/* Full-width sections (match template class names) — see also SIMILAR TRIPS / REVIEWS blocks */
+.yatra-group-discounts-section {
+    padding-top: 0;
     padding-bottom: var(--yatra-section-gap);
 }
 
@@ -1407,76 +1402,138 @@ button.yatra-booking-button svg path {
 
 
 /* ============================================
-   QUICK FACTS BAR (Yatra design system)
+   SPEC SHEET WRAPPER — white ring so hairline grid never bleeds into rounded corners
+   (Gray “caps” / holes happen when line-color fills the grid box under border-radius.)
+   ============================================ */
+.yatra-spec-sheet {
+    --yatra-spec-line: #d6d3d1;
+    border: 1px solid var(--yatra-spec-line);
+    border-radius: 12px;
+    background: #fff;
+    padding: 1px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.yatra-spec-sheet--quick-facts {
+    width: 100%;
+    margin: 0;
+}
+
+/* Same as .yatra-trip-attributes .yatra-spec-sheet: inner card fills the padded shell */
+.yatra-trip-quick-facts-section .yatra-spec-sheet--quick-facts {
+    width: 100%;
+}
+
+.yatra-trip-attributes .yatra-spec-sheet--attributes-grid {
+    width: 100%;
+}
+
+/* Inner grid: 1px gaps only — line color never touches the outer rounded clip */
+.yatra-spec-sheet > .yatra-trip-quick-facts,
+.yatra-spec-sheet > .yatra-attributes-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+    gap: 1px;
+    align-items: stretch;
+    padding: 0;
+    margin: 0;
+    background: var(--yatra-spec-line, #d6d3d1);
+    border: none;
+    border-radius: 11px;
+    overflow: hidden;
+}
+
+.yatra-spec-sheet > .yatra-attributes-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* ============================================
+   QUICK FACTS BAR — neutral “spec sheet” (no tinted icon wells)
    ============================================ */
 .yatra-trip-quick-facts {
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: var(--yatra-small-gap);
-    padding: var(--yatra-element-gap);
-    margin: 0 auto var(--yatra-section-gap);
-    background: var(--yatra-bg-muted, #f8fafc);
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
 .yatra-quick-fact {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
     text-align: left;
     gap: 12px;
-    padding: 12px 14px;
+    padding: 14px 16px;
     background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    border-radius: 0;
+    transition: background-color 0.15s ease;
+    min-width: 0;
+    min-height: 100%;
+    box-sizing: border-box;
+    align-self: stretch;
 }
 
 .yatra-quick-fact:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12);
+    background: #fafaf9;
 }
 
 .yatra-quick-fact-icon {
-    width: 40px;
-    height: 40px;
-    background: #f1f5f9;
-    border-radius: 10px;
+    width: auto;
+    height: auto;
+    min-width: 28px;
+    min-height: 28px;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #64748b;
+    color: #57534e;
     flex-shrink: 0;
+    overflow: visible;
 }
 
 .yatra-quick-fact-icon svg {
+    display: block;
     width: 22px;
     height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    flex-shrink: 0;
+    overflow: visible;
+    opacity: 0.92;
+}
+
+.yatra-quick-fact-icon svg[fill="none"] {
+    stroke: currentColor;
+}
+
+.yatra-quick-fact-icon svg[fill="currentColor"] {
+    stroke: none;
+    opacity: 1;
 }
 
 .yatra-quick-fact-content {
     flex: 1;
     min-width: 0;
+    padding-top: 1px;
 }
 
 .yatra-quick-fact-label {
     font-size: 11px;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 4px;
-    font-weight: 600;
-    line-height: 1.2;
+    color: #78716c;
+    text-transform: none;
+    letter-spacing: 0.01em;
+    margin-bottom: 3px;
+    font-weight: 500;
+    line-height: 1.25;
     display: block;
 }
 
 .yatra-quick-fact-value {
     font-size: 15px;
     font-weight: 600;
-    color: #0f172a;
+    color: #1c1917;
     margin: 0;
     line-height: 1.35;
     display: block;
@@ -1531,7 +1588,7 @@ button.yatra-booking-button svg path {
 .yatra-quick-fact-price {
     font-size: 15px;
     font-weight: 600;
-    color: #3b82f6;
+    color: #1c1917;
     line-height: 1.35;
     margin: 0;
     display: block;
@@ -5219,9 +5276,9 @@ input.yatra-datepicker,
    SIMILAR TRIPS - UNIFIED SPACING
    ============================================ */
 .yatra-similar-section {
-    background: #f8fafc;
-    padding-top: var(--yatra-section-padding);
+    padding-top: 0;
     padding-bottom: var(--yatra-section-gap);
+    background: #f8fafc;
     margin-top: 0;
     border-top: 1px solid var(--yatra-border-color, #e5e7eb);
 }
@@ -5571,9 +5628,9 @@ input.yatra-datepicker,
     }
     
     .yatra-similar-section {
-        padding-top: var(--yatra-section-gap);
+        padding-top: 0;
         padding-bottom: var(--yatra-section-gap);
-        margin-top: var(--yatra-element-gap);
+        margin-top: 0;
     }
     
     .yatra-similar-section-title {
@@ -5805,9 +5862,9 @@ input.yatra-datepicker,
    REVIEWS SECTION - UNIFIED SPACING
    ============================================ */
 .yatra-reviews-section {
-    background: #fff;
-    padding-top: var(--yatra-section-padding);
+    padding-top: 0;
     padding-bottom: var(--yatra-section-gap);
+    background: #fff;
     border-top: 1px solid #e5e7eb;
 }
 
@@ -5959,11 +6016,6 @@ input.yatra-datepicker,
 }
 
 @media (max-width: 768px) {
-    .yatra-reviews-section {
-        padding-top: var(--yatra-section-padding);
-        padding-bottom: var(--yatra-section-gap);
-    }
-    
     .yatra-reviews-section-title {
         font-size: 22px;
     }
@@ -6914,10 +6966,10 @@ input.yatra-datepicker,
         grid-template-columns: 1fr;
     }
 
-    .yatra-trip-quick-facts {
+    .yatra-spec-sheet > .yatra-trip-quick-facts {
         grid-template-columns: repeat(3, 1fr);
-        gap: var(--yatra-element-gap);
-        padding: var(--yatra-element-gap) var(--yatra-element-gap);
+        gap: 1px;
+        padding: 0;
     }
 
     .yatra-hero-images {
@@ -7011,10 +7063,10 @@ input.yatra-datepicker,
         font-size: 1.125rem;
     }
 
-    .yatra-trip-quick-facts {
+    .yatra-spec-sheet > .yatra-trip-quick-facts {
         grid-template-columns: repeat(2, 1fr);
-        gap: var(--yatra-element-gap);
-        padding: var(--yatra-element-gap) var(--yatra-element-gap);
+        gap: 1px;
+        padding: 0;
     }
 
     .yatra-trip-quick-facts .yatra-rating-display {
@@ -7117,25 +7169,28 @@ input.yatra-datepicker,
     }
 
     .yatra-quick-fact {
-        gap: 10px;
+        gap: 12px;
+        padding: 12px 14px;
     }
 
-    .yatra-quick-fact-icon {
-        width: 48px;
-        height: 48px;
+    .yatra-quick-fact-icon svg {
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+        min-height: 22px;
     }
 
     .yatra-quick-fact-label {
-        font-size: 9px;
-        margin-bottom: 6px;
+        font-size: 11px;
+        margin-bottom: 4px;
     }
 
     .yatra-quick-fact-value {
-        font-size: 18px;
+        font-size: 15px;
     }
 
     .yatra-quick-fact-price {
-        font-size: 18px;
+        font-size: 15px;
     }
 
     .yatra-quick-fact-price-label {
@@ -7256,10 +7311,10 @@ input.yatra-datepicker,
         grid-template-columns: 1fr;
     }
 
-    .yatra-trip-quick-facts {
+    .yatra-spec-sheet > .yatra-trip-quick-facts {
         grid-template-columns: 1fr;
-        gap: var(--yatra-small-gap);
-        padding: var(--yatra-small-gap);
+        gap: 1px;
+        padding: 0;
     }
 }
 
@@ -9243,77 +9298,132 @@ a.yatra-card-book-btn:hover {
 }
 
 /* ============================================
-   TRIP ATTRIBUTES SECTION
+   TRIP ATTRIBUTES SECTION — matches quick facts: hairline grid, neutral icons
+   (Vertical spacing: unified block above — no extra padding-top here.)
    ============================================ */
 .yatra-trip-attributes {
-    padding-top: var(--yatra-section-padding);
-    padding-bottom: var(--yatra-section-gap);
-    background: var(--yatra-bg-page, #f8f9fa);
+    --yatra-attr-divider: #d6d3d1;
 }
 
+.yatra-trip-attributes .yatra-section-header {
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--yatra-attr-divider);
+}
+
+.yatra-trip-attributes .yatra-section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #1c1917;
+    margin: 0 0 6px 0;
+    line-height: 1.25;
+}
+
+.yatra-trip-attributes .yatra-section-description {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #78716c;
+    margin: 0;
+    max-width: 42em;
+}
+
+/* Layout + hairlines when wrapped by .yatra-spec-sheet (see SPEC SHEET WRAPPER block). */
 .yatra-attributes-grid {
+    margin-top: 0;
+}
+
+.yatra-attributes-filter-wrapper .yatra-attributes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--yatra-small-gap);
-    margin-top: var(--yatra-element-gap);
 }
 
 /* Scoped to single-trip attributes grid only — listing filters reuse class names with a different DOM (label + content stacked). */
 .yatra-attributes-grid > .yatra-attribute-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
-    padding: 16px;
-    background: var(--yatra-bg-card, #ffffff);
-    border: 1px solid var(--yatra-border-color, #e5e7eb);
-    border-radius: 8px;
-    transition: all 0.3s ease;
+    padding: 14px 16px;
+    background: #fff;
+    border: none;
+    border-radius: 0;
+    transition: background-color 0.15s ease;
+    min-width: 0;
+    min-height: 100%;
+    box-sizing: border-box;
+    align-self: stretch;
 }
 
 .yatra-attributes-grid > .yatra-attribute-item:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    border-color: var(--yatra-primary-color, #3b82f6);
+    background: #fafaf9;
 }
 
 .yatra-attributes-grid .yatra-attribute-icon {
-    width: 36px;
-    height: 36px;
+    width: auto;
+    height: auto;
+    min-width: 28px;
+    min-height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--yatra-primary-light, #eff6ff);
-    color: var(--yatra-primary-color, #3b82f6);
-    border-radius: 8px;
+    background: transparent;
+    color: #57534e;
+    border-radius: 0;
     flex-shrink: 0;
+    overflow: visible;
+}
+
+.yatra-attributes-grid .yatra-attribute-icon svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    flex-shrink: 0;
+    overflow: visible;
+    opacity: 0.92;
+}
+
+.yatra-attributes-grid .yatra-attribute-icon svg[fill="none"] {
+    stroke: currentColor;
+}
+
+.yatra-attributes-grid .yatra-attribute-icon svg[fill="currentColor"] {
+    stroke: none;
+    opacity: 1;
 }
 
 .yatra-attribute-icon-img {
-    width: 24px;
-    height: 24px;
-    object-fit: cover;
+    width: 26px;
+    height: 26px;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
     border-radius: 4px;
 }
 
 .yatra-attributes-grid .yatra-attribute-content {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 0;
 }
 
 .yatra-attributes-grid .yatra-attribute-content .yatra-attribute-name {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
-    color: var(--yatra-text-primary, #1a1a1a);
-    margin-bottom: 4px;
-    line-height: 1.3;
+    color: #292524;
+    margin-bottom: 3px;
+    line-height: 1.35;
 }
 
 .yatra-attributes-grid .yatra-attribute-value {
     font-size: 13px;
-    color: var(--yatra-text-secondary, #6b7280);
-    margin-bottom: 4px;
+    color: #57534e;
+    margin-bottom: 0;
     word-wrap: break-word;
-    line-height: 1.4;
+    line-height: 1.45;
 }
 
 .yatra-attributes-grid .yatra-attribute-value a {
@@ -9336,10 +9446,11 @@ a.yatra-card-book-btn:hover {
 }
 
 .yatra-attributes-grid .yatra-attribute-description {
+    margin-top: 6px;
     font-size: 11px;
-    color: var(--yatra-text-muted, #9ca3af);
+    color: #a8a29e;
     font-style: italic;
-    line-height: 1.3;
+    line-height: 1.35;
 }
 
 /* ============================================
@@ -10198,7 +10309,7 @@ a.yatra-card-book-btn:hover {
         justify-content: center;
     }
     
-    .yatra-attributes-grid {
+    .yatra-attributes-filter-wrapper .yatra-attributes-grid {
         grid-template-columns: 1fr;
         gap: 16px;
     }

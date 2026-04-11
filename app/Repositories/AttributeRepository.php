@@ -257,7 +257,7 @@ class AttributeRepository extends BaseRepository
             }
             if (is_numeric($k)) {
                 $kid = (int) $k;
-                $out[$kid] = is_array($v) ? $v : ['value' => $v, 'field_type' => 'text'];
+                $out[$kid] = is_array($v) ? $v : ['value' => $v];
             }
         }
 
@@ -309,13 +309,19 @@ class AttributeRepository extends BaseRepository
         }
 
         if (is_array($entry) && array_key_exists('value', $entry)) {
-            $fieldType = (string) ($entry['field_type'] ?? $fieldType);
             $val = $entry['value'];
+            if (isset($entry['field_type']) && is_string($entry['field_type']) && $entry['field_type'] !== '') {
+                $fieldType = $entry['field_type'];
+            }
         } else {
             $val = $entry;
         }
 
         if ($fieldType === 'checkbox') {
+            if (is_array($val)) {
+                return $val !== [];
+            }
+
             return $val === true || $val === 1 || $val === '1' || $val === 'true' || $val === 'on';
         }
 

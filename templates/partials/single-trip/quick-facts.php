@@ -6,6 +6,8 @@ if (!defined('ABSPATH')) {
 // Quick Facts Section for Single Trip Page
 // Expected variables: $trip
 ?>
+<div class="yatra-trip-quick-facts-section">
+<div class="yatra-spec-sheet yatra-spec-sheet--quick-facts">
 <div class="yatra-trip-quick-facts">
     <!-- Duration -->
     <div class="yatra-quick-fact">
@@ -150,4 +152,6 @@ if (!defined('ABSPATH')) {
             </div>
         </div>
     <?php endif; ?>
+</div>
+</div>
 </div>

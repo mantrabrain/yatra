@@ -768,24 +768,15 @@ class AttributeService extends BaseService
     public function bulkUpdateTripAttributes(int $tripId, array $attributes): bool
     {
         try {
-            if (!$tripId || empty($attributes)) {
+            if (!$tripId) {
                 return false;
             }
 
             $this->attributeRepository->validatePayloadCoversRequiredAttributes($attributes);
 
-            // Use repository layer for transaction handling
+            // Repository commits, busts trip attribute cache, fires yatra_trip_attributes_bulk_updated.
             $success = $this->tripAttributeRepository->saveTripAttributes($tripId, $attributes);
-            
-            if ($success) {
-                // Fire bulk update hook
-                do_action('yatra_trip_attributes_bulk_updated', $tripId, $attributes);
-                
-                // Clear cache
-                $this->clearTripAttributeCache($tripId);
-            } else {
-                }
-            
+
             return $success;
             
         } catch (\InvalidArgumentException $e) {

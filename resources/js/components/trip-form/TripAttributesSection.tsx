@@ -40,6 +40,8 @@ interface TripAttributesSectionProps {
   tripId?: number;
   isEditMode?: boolean;
   tripAttributesData?: any; // Add this prop
+  /** False while parent is loading GET /trips/:id/attributes in edit mode; avoids init effect locking empty before data arrives */
+  tripAttributesReady?: boolean;
 }
 
 function parseAttributeFieldOptions(
@@ -112,6 +114,7 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
   tripId,
   isEditMode = false,
   tripAttributesData = {}, // Add this prop
+  tripAttributesReady = true,
 }) => {
   const [selectedAttributes, setSelectedAttributes] = useState<number[]>([]);
   const [attributeValues, setAttributeValues] = useState<Record<number, any>>(
@@ -145,6 +148,11 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
     // Only run initialization logic, not when user is typing or deleting
     if (!isInitializing.current) return;
 
+    // Edit mode: wait for GET /trips/:id/attributes — otherwise we mark initialized empty and never hydrate when data arrives
+    if (isEditMode && tripId && !tripAttributesReady) {
+      return;
+    }
+
     // In edit mode, prioritize trip attributes from prop (from main form)
     if (
       isEditMode &&
@@ -174,7 +182,13 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
     } else {
       isInitializing.current = false;
     }
-  }, [tripAttributesData, formData.attributes, isEditMode, tripId]);
+  }, [
+    tripAttributesData,
+    formData.attributes,
+    isEditMode,
+    tripId,
+    tripAttributesReady,
+  ]);
 
   // Add attribute to selected list
   const handleAddAttribute = (attributeId: number) => {
@@ -445,6 +459,22 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
       (attr: Attribute) =>
         attr.status === "publish" && !selectedAttributes.includes(attr.id),
     ) || [];
+
+  if (isEditMode && tripId && !tripAttributesReady) {
+    return (
+      <div className="space-y-4" aria-busy="true">
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3 animate-pulse" />
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (isLoadingAttributes) {
     return (

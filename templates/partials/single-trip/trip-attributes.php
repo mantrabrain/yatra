@@ -12,6 +12,7 @@ if (!defined('ABSPATH')) {
         <p class="yatra-section-description"><?php echo esc_html__('Key features and characteristics', 'yatra'); ?></p>
     </div>
 
+    <div class="yatra-spec-sheet yatra-spec-sheet--attributes-grid">
     <div class="yatra-attributes-grid">
         <?php foreach ($trip->getAttributes() as $attribute): ?>
             <div class="yatra-attribute-item">
@@ -20,10 +21,10 @@ if (!defined('ABSPATH')) {
                         <?php if ($attribute['icon']['type'] === 'image'): ?>
                             <img src="<?php echo esc_url($attribute['icon']['value']); ?>" alt="<?php echo esc_attr($attribute['name']); ?>" class="yatra-attribute-icon-img">
                         <?php else: ?>
-                            <?php echo yatra_svg_icon($attribute['icon']['value'], 'yatra-icon-sm'); ?>
+                            <?php echo yatra_svg_icon($attribute['icon']['value'], 'yatra-icon'); ?>
                         <?php endif; ?>
                     <?php else: ?>
-                        <?php echo yatra_svg_icon('tag', 'yatra-icon-sm'); ?>
+                        <?php echo yatra_svg_icon('tag', 'yatra-icon'); ?>
                     <?php endif; ?>
                 </div>
 
@@ -92,22 +93,43 @@ if (!defined('ABSPATH')) {
                                 echo '<span class="yatra-color-swatch" style="background-color: ' . esc_attr($attribute['value']) . ';" title="' . esc_attr($attribute['value']) . '"></span>' . esc_html($attribute['value']);
                                 break;
                             case 'url':
-                                echo '<a href="' . esc_url($attribute['value']) . '" target="_blank" rel="noopener noreferrer">' . esc_html($attribute['value']) . '</a>';
+                            case 'file':
+                                $link = (string) ($attribute['value'] ?? '');
+                                if ($link !== '' && filter_var($link, FILTER_VALIDATE_URL)) {
+                                    echo '<a href="' . esc_url($link) . '" target="_blank" rel="noopener noreferrer">' . esc_html($link) . '</a>';
+                                } else {
+                                    echo esc_html($link !== '' ? $link : '—');
+                                }
                                 break;
                             case 'email':
                                 echo '<a href="mailto:' . esc_attr($attribute['value']) . '">' . esc_html($attribute['value']) . '</a>';
                                 break;
                             case 'textarea':
                                 // Truncate long textareas for compact display
-                                $text = wp_strip_all_tags($attribute['value']);
-                                echo esc_html(substr($text, 0, 50) . (strlen($text) > 50 ? '...' : ''));
+                                $text = wp_strip_all_tags((string) ($attribute['value'] ?? ''));
+                                $snippet = function_exists('mb_substr') ? mb_substr($text, 0, 50) : substr($text, 0, 50);
+                                $long = function_exists('mb_strlen') ? mb_strlen($text) : strlen($text);
+                                echo esc_html($snippet . ($long > 50 ? '...' : ''));
                                 break;
                             case 'number':
-                                echo esc_html(number_format($attribute['value'], 0));
+                                $nv = $attribute['value'] ?? null;
+                                echo esc_html(is_numeric($nv) ? (string) (0 + $nv) : (string) $nv);
                                 break;
+                            case 'text_field':
                             default:
-                                // Truncate long text for compact display
-                                echo esc_html(substr($attribute['value'], 0, 30) . (strlen($attribute['value']) > 30 ? '...' : ''));
+                                $raw = $attribute['value'] ?? '';
+                                if (is_array($raw)) {
+                                    $flat = [];
+                                    foreach ($raw as $piece) {
+                                        $flat[] = is_scalar($piece) ? (string) $piece : '';
+                                    }
+                                    echo esc_html(implode(', ', array_filter($flat, static fn ($s) => $s !== '')));
+                                } else {
+                                    $text = wp_strip_all_tags((string) $raw);
+                                    $snippet = function_exists('mb_substr') ? mb_substr($text, 0, 30) : substr($text, 0, 30);
+                                    $long = function_exists('mb_strlen') ? mb_strlen($text) : strlen($text);
+                                    echo esc_html($snippet . ($long > 30 ? '...' : ''));
+                                }
                                 break;
                         }
                         ?>
@@ -118,5 +140,6 @@ if (!defined('ABSPATH')) {
                 </div>
             </div>
         <?php endforeach; ?>
+    </div>
     </div>
 </div>

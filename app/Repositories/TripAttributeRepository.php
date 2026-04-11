@@ -33,119 +33,177 @@ class TripAttributeRepository extends BaseRepository
     }
 
     /**
+     * Resolve field_type from the attribute definition (classifications.metadata).
+     */
+    private function resolveFieldTypeFromAttributeDefinition(int $attributeId): string
+    {
+        $attrRepo = new AttributeRepository();
+        $def = $attrRepo->find($attributeId);
+        if (!$def || empty($def->metadata)) {
+            return 'text';
+        }
+        $meta = json_decode((string) $def->metadata, true);
+        if (is_array($meta) && !empty($meta['field_type']) && is_string($meta['field_type'])) {
+            return $meta['field_type'];
+        }
+
+        return 'text';
+    }
+
+    /**
+     * @param array<mixed> $arr
+     */
+    private function isListArray(array $arr): bool
+    {
+        if (function_exists('array_is_list')) {
+            return array_is_list($arr);
+        }
+
+        $i = 0;
+        foreach ($arr as $k => $_) {
+            if ($k !== $i++) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function bustTripAttributeQueryCache(int $tripId): void
+    {
+        Cache::delete(Cache::KEY_TRIP_ATTRIBUTES . '_' . $tripId);
+    }
+
+    /**
      * Save trip attributes
      */
     public function saveTripAttributes(int $tripId, array $attributes): bool
     {
-        // Use Cache for caching trip attributes
-        $cacheKey = Cache::PREFIX_ATTRIBUTES . $tripId . '_' . md5(serialize($attributes));
-        
-        return $this->cacheQueryResult($cacheKey, function() use ($tripId, $attributes) {
-            global $wpdb;
-            $table_trip_classifications = $this->getTableNameInternal();
-            
-            // Check if table exists first
-            $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$table_trip_classifications}'");
-            if (!$table_exists) {
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    }
-                return false;
+        // Writes must not go through read-cache (Cache::remember).
+        global $wpdb;
+        $table_trip_classifications = $this->getTableNameInternal();
+
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$table_trip_classifications}'");
+        if (!$table_exists) {
+            return false;
+        }
+
+        $wpdb->query('START TRANSACTION');
+
+        try {
+            $wpdb->query($wpdb->prepare(
+                "DELETE FROM {$table_trip_classifications} 
+                 WHERE trip_id = %d 
+                 AND classification_type = 'attribute'",
+                $tripId
+            ));
+
+            if ($attributes === []) {
+                $wpdb->query('COMMIT');
+                $this->bustTripAttributeQueryCache($tripId);
+                do_action('yatra_trip_attributes_bulk_updated', $tripId, []);
+
+                return true;
             }
-            
-            $wpdb->query('START TRANSACTION');
-            
-            try {
-                // Delete existing attribute relationships for this trip
-                $wpdb->query($wpdb->prepare(
-                    "DELETE FROM {$table_trip_classifications} 
-                     WHERE trip_id = %d 
-                     AND classification_type = 'attribute'",
-                    $tripId
-                ));
-                
-                // Insert new attribute relationships
-                $attributeCount = 0;
-                foreach ($attributes as $attributeId => $value) {
-                    // Handle both Record<number, any> format and array format
-                    $actualAttributeId = null;
-                    $fieldType = null;
-                    $actualValue = null;
-                    
-                    if (is_numeric($attributeId) && is_array($value)) {
-                        // Record<number, any> format: {attribute_id: {field_type, value, ...}}
-                        $actualAttributeId = (int) $attributeId;
-                        $fieldType = $value['field_type'] ?? 'text';
-                        $actualValue = $value['value'] ?? '';
-                        } elseif (is_numeric($attributeId) && !is_array($value)) {
-                        // Simple format: {attribute_id: value}
-                        $actualAttributeId = (int) $attributeId;
-                        $fieldType = 'text'; // Default field type
+
+            foreach ($attributes as $attributeId => $value) {
+                $actualAttributeId = null;
+                $fieldType = null;
+                $actualValue = null;
+
+                if (is_numeric($attributeId) && is_array($value)) {
+                    $actualAttributeId = (int) $attributeId;
+                    $resolvedType = $this->resolveFieldTypeFromAttributeDefinition($actualAttributeId);
+
+                    if (array_key_exists('value', $value)) {
+                        $fieldType = isset($value['field_type']) && is_string($value['field_type']) && $value['field_type'] !== ''
+                            ? $value['field_type']
+                            : $resolvedType;
+                        $actualValue = $value['value'];
+                    } elseif ($this->isListArray($value)) {
+                        $fieldType = $resolvedType;
                         $actualValue = $value;
-                        } elseif (is_array($value)) {
-                        // Array format: [attribute_data] or {id: 123, value: 'xxx'}
-                        $actualAttributeId = isset($value['id']) ? (int) $value['id'] : 
-                                       (isset($value['attribute_id']) ? (int) $value['attribute_id'] : null);
-                        $fieldType = $value['field_type'] ?? 'text';
-                        $actualValue = $value['value'] ?? '';
-                        } else {
-                        // Skip invalid format
+                    } else {
+                        $fieldType = isset($value['field_type']) && is_string($value['field_type']) && $value['field_type'] !== ''
+                            ? $value['field_type']
+                            : $resolvedType;
+                        $actualValue = $value['value'] ?? $value;
+                    }
+                } elseif (is_numeric($attributeId) && !is_array($value)) {
+                    $actualAttributeId = (int) $attributeId;
+                    $fieldType = $this->resolveFieldTypeFromAttributeDefinition($actualAttributeId);
+                    $actualValue = $value;
+                } elseif (is_array($value)) {
+                    $actualAttributeId = isset($value['id']) ? (int) $value['id'] :
+                        (isset($value['attribute_id']) ? (int) $value['attribute_id'] : null);
+                    if ($actualAttributeId === null || $actualAttributeId <= 0) {
                         continue;
                     }
-                    
-                    if ($actualAttributeId === null) {
-                        continue;
+                    $resolvedType = $this->resolveFieldTypeFromAttributeDefinition($actualAttributeId);
+
+                    if (array_key_exists('value', $value)) {
+                        $fieldType = isset($value['field_type']) && is_string($value['field_type']) && $value['field_type'] !== ''
+                            ? $value['field_type']
+                            : $resolvedType;
+                        $actualValue = $value['value'];
+                    } elseif ($this->isListArray($value)) {
+                        $fieldType = $resolvedType;
+                        $actualValue = $value;
+                    } else {
+                        $fieldType = isset($value['field_type']) && is_string($value['field_type']) && $value['field_type'] !== ''
+                            ? $value['field_type']
+                            : $resolvedType;
+                        $actualValue = $value['value'] ?? $value;
                     }
-                    
-                    // Only save essential data: field_type and value
-                    $metadata = [
-                        'field_type' => $fieldType,
-                        'value' => $actualValue
-                    ];
-                    
-                    // Insert the relationship record
-                    $result = $wpdb->insert(
-                        $table_trip_classifications,
-                        [
-                            'trip_id' => $tripId,
-                            'classification_id' => $actualAttributeId,
-                            'classification_type' => 'attribute',
-                            'relationship_type' => 'primary',
-                            'metadata' => json_encode($metadata),
-                            'sort_order' => 0,
-                            'is_featured' => 0,
-                            'is_active' => 1,
-                            'created_at' => current_time('mysql'),
-                            'updated_at' => current_time('mysql')
-                        ],
-                        ['%d', '%d', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s']
-                    );
-                    
-                    if ($result === false) {
-                        throw new \Exception('Failed to insert trip attribute relationship');
-                    }
-                    
-                    $attributeCount++;
-                }
-                
-                if ($attributeCount > 0) {
-                    $wpdb->query('COMMIT');
-                    // Fire bulk update hook
-                    do_action('yatra_trip_attributes_bulk_updated', $tripId, $attributes);
-                    
-                    return true;
                 } else {
-                    $wpdb->query('ROLLBACK');
-                    return false;
+                    continue;
                 }
-                
-            } catch (\Exception $e) {
-                $wpdb->query('ROLLBACK');
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    }
-                return false;
+
+                if ($actualAttributeId === null || $actualAttributeId <= 0) {
+                    continue;
+                }
+
+                if ($fieldType === 'text' || $fieldType === '') {
+                    $fieldType = $this->resolveFieldTypeFromAttributeDefinition($actualAttributeId);
+                }
+
+                $metadata = [
+                    'field_type' => $fieldType,
+                    'value' => $actualValue,
+                ];
+
+                $result = $wpdb->insert(
+                    $table_trip_classifications,
+                    [
+                        'trip_id' => $tripId,
+                        'classification_id' => $actualAttributeId,
+                        'classification_type' => 'attribute',
+                        'relationship_type' => 'primary',
+                        'metadata' => wp_json_encode($metadata),
+                        'sort_order' => 0,
+                        'is_featured' => 0,
+                        'is_active' => 1,
+                        'created_at' => current_time('mysql'),
+                        'updated_at' => current_time('mysql'),
+                    ],
+                    ['%d', '%d', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s']
+                );
+
+                if ($result === false) {
+                    throw new \Exception('Failed to insert trip attribute relationship');
+                }
             }
-            
-        }, 3600); // Cache for 1 hour
+
+            $wpdb->query('COMMIT');
+            $this->bustTripAttributeQueryCache($tripId);
+            do_action('yatra_trip_attributes_bulk_updated', $tripId, $attributes);
+
+            return true;
+        } catch (\Exception $e) {
+            $wpdb->query('ROLLBACK');
+
+            return false;
+        }
     }
 
     /**
@@ -199,6 +257,9 @@ class TripAttributeRepository extends BaseRepository
                 $def = json_decode($row->metadata, true);
                 if (is_array($def) && isset($def['field_options']) && is_array($def['field_options'])) {
                     $row->field_options = wp_json_encode($def['field_options']);
+                }
+                if (is_array($def) && !empty($def['field_type']) && is_string($def['field_type'])) {
+                    $row->field_type = $def['field_type'];
                 }
             }
         }

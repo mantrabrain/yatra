@@ -1801,8 +1801,10 @@ const TripForm: React.FC = () => {
     [tripError],
   );
 
-  // Fetch trip attributes if editing
-  const { data: tripAttributesData } = useQuery({
+  // Fetch trip attributes if editing (TripAttributesSection waits until resolved to avoid empty-first-render bug)
+  const tripAttributesQueryEnabled = Boolean(tripId && isEditMode);
+  const { data: tripAttributesData, isPending: isTripAttributesPending } =
+    useQuery({
     queryKey: ["trip-attributes", tripId],
     queryFn: async () => {
       if (!tripId) return {};
@@ -1863,9 +1865,11 @@ const TripForm: React.FC = () => {
         return {};
       }
     },
-    enabled: !!tripId && isEditMode,
+    enabled: tripAttributesQueryEnabled,
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
+  const tripAttributesReady =
+    !tripAttributesQueryEnabled || !isTripAttributesPending;
 
   // Helper function to normalize array of items to IDs
   // Helper to normalize highlights (can be array of strings or objects)
@@ -6041,6 +6045,7 @@ const TripForm: React.FC = () => {
                   tripId={tripId || undefined}
                   isEditMode={isEditMode}
                   tripAttributesData={tripAttributesData}
+                  tripAttributesReady={tripAttributesReady}
                 />
               </div>
             </div>
