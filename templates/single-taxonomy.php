@@ -20,7 +20,6 @@ if (!$taxonomy_data) {
 
 $type = $taxonomy_data->type;
 $entity = $taxonomy_data; // Use the taxonomy object itself as entity
-$trips = $taxonomy_data->trips ?? []; // This will be populated by the handler
 
 // Helper function to safely get array from $_GET
 function yatra_get_filter_array($key, $sanitize_callback = 'sanitize_text_field') {
@@ -86,15 +85,14 @@ $type_labels = [
 
 $labels = $type_labels[$type] ?? $type_labels['category'];
 
-// Basic pagination for trips on taxonomy pages (10 trips per page)
-$per_page     = 10;
-$current_page = max(1, (int) (get_query_var('paged') ?: ($_GET['paged'] ?? 1)));
-$total_trips  = is_array($trips) ? count($trips) : 0;
-$total_pages  = $total_trips > 0 ? (int) ceil($total_trips / $per_page) : 1;
-$current_page = min($current_page, $total_pages);
-
-$offset      = ($current_page - 1) * $per_page;
-$paged_trips = $total_trips > 0 ? array_slice($trips, $offset, $per_page) : [];
+// Pagination: repository + handler totals; page size from WordPress Reading (posts per page)
+$trips        = is_array($taxonomy_data->trips ?? null) ? $taxonomy_data->trips : [];
+$per_page     = isset($taxonomy_data->trips_per_page) ? (int) $taxonomy_data->trips_per_page : yatra_get_posts_per_page();
+$total_trips  = isset($taxonomy_data->trips_total) ? (int) $taxonomy_data->trips_total : count($trips);
+$total_pages  = isset($taxonomy_data->trips_pages) ? max(1, (int) $taxonomy_data->trips_pages) : ($total_trips > 0 ? (int) ceil($total_trips / max(1, $per_page)) : 1);
+$current_page = isset($taxonomy_data->trips_current_page) ? (int) $taxonomy_data->trips_current_page : yatra_get_archive_listing_paged();
+$current_page = min(max(1, $current_page), $total_pages);
+$paged_trips  = $trips;
 
 // Get entity image (no external hardcoded external URL)
 $entity_image = '';
@@ -167,7 +165,7 @@ yatra_get_header();
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
                     </svg>
-                    <?php echo sprintf(_n('%d Trip', '%d Trips', count($trips), 'yatra'), count($trips)); ?>
+                    <?php echo sprintf(_n('%d Trip', '%d Trips', $total_trips, 'yatra'), (int) $total_trips); ?>
                 </span>
             </div>
         </div>
@@ -251,8 +249,9 @@ yatra_get_header();
                 </div>
                 <h3><?php echo esc_html__('No trips found', 'yatra'); ?></h3>
                 <p><?php echo sprintf(esc_html__('There are no trips available for %s at the moment. Please check back later or explore other options.', 'yatra'), esc_html($taxonomy_data->name)); ?></p>
-                <a href="<?php echo esc_url(home_url('/' . \Yatra\Services\SettingsService::getTripBase() . '/')); ?>" class="yatra-btn-primary">
-                    <?php echo esc_html__('Browse All Trips', 'yatra'); ?>
+                <a href="<?php echo esc_url(home_url('/' . \Yatra\Services\SettingsService::getTripBase() . '/')); ?>" class="yatra-btn yatra-btn-primary yatra-archive-card-cta">
+                    <?php echo yatra_svg_icon('globe', 'yatra-btn-icon'); ?>
+                    <span><?php echo esc_html__('Browse All Trips', 'yatra'); ?></span>
                 </a>
             </div>
             <?php endif; ?>
@@ -262,66 +261,50 @@ yatra_get_header();
                     <?php
                     $prev_page = max(1, $current_page - 1);
                     $next_page = min($total_pages, $current_page + 1);
-                    
-                    // Build pagination URLs using query parameter format
-                    $build_page_url = function($page) {
-                        // Get current URL without query string
-                        $base_path = strtok($_SERVER['REQUEST_URI'], '?');
-                        $base_path = rtrim($base_path, '/');
-                        
-                        // Remove any existing /page/X/ segment
-                        $base_path = preg_replace('#/page/[0-9]+#', '', $base_path);
-                        
-                        // Get existing query parameters
-                        $query_string = $_SERVER['QUERY_STRING'] ?? '';
-                        parse_str($query_string, $params);
-                        
-                        // Set or remove paged parameter
-                        if ($page > 1) {
-                            $params['paged'] = $page;
-                        } else {
-                            unset($params['paged']);
-                        }
-                        
-                        // Build final URL
-                        $query = http_build_query($params);
-                        return esc_url($base_path . ($query ? '?' . $query : ''));
-                    };
                     ?>
 
                     <?php if ($current_page <= 1): ?>
                         <span class="yatra-pagination-btn disabled" aria-disabled="true">
-                            <?php echo esc_html__('Previous', 'yatra'); ?>
+                            <?php echo yatra_svg_icon('chevron-left', 'yatra-btn-icon'); ?>
+                            <span><?php echo esc_html__('Previous', 'yatra'); ?></span>
                         </span>
                     <?php else: ?>
-                        <a class="yatra-pagination-btn" href="<?php echo $build_page_url($prev_page); ?>">
-                            <?php echo esc_html__('Previous', 'yatra'); ?>
+                        <a class="yatra-pagination-btn" href="<?php echo esc_url(yatra_build_current_request_paged_url($prev_page)); ?>">
+                            <?php echo yatra_svg_icon('chevron-left', 'yatra-btn-icon'); ?>
+                            <span><?php echo esc_html__('Previous', 'yatra'); ?></span>
                         </a>
                     <?php endif; ?>
 
                     <?php
-                    // Smart pagination with ellipsis
                     $range = 2;
-                    for ($i = 1; $i <= $total_pages; $i++):
-                        if ($i == 1 || $i == $total_pages || ($i >= $current_page - $range && $i <= $current_page + $range)):
-                            $active = $i === $current_page ? ' active' : '';
+                    for ($i = 1; $i <= $total_pages; $i++) :
+                        if ($i == 1 || $i == $total_pages || ($i >= $current_page - $range && $i <= $current_page + $range)) :
+                            if ($i === $current_page) :
+                                ?>
+                                <span class="yatra-pagination-btn active"><?php echo esc_html((string) $i); ?></span>
+                                <?php
+                            else :
+                                ?>
+                                <a class="yatra-pagination-btn" href="<?php echo esc_url(yatra_build_current_request_paged_url($i)); ?>"><?php echo esc_html((string) $i); ?></a>
+                                <?php
+                            endif;
+                        elseif ($i == $current_page - $range - 1 || $i == $current_page + $range + 1) :
                             ?>
-                            <a class="yatra-pagination-btn<?php echo $active; ?>" href="<?php echo $build_page_url($i); ?>">
-                                <?php echo (int) $i; ?>
-                            </a>
-                        <?php elseif ($i == $current_page - $range - 1 || $i == $current_page + $range + 1): ?>
                             <span class="yatra-pagination-ellipsis">...</span>
-                        <?php endif;
+                            <?php
+                        endif;
                     endfor;
                     ?>
 
                     <?php if ($current_page >= $total_pages): ?>
                         <span class="yatra-pagination-btn disabled" aria-disabled="true">
-                            <?php echo esc_html__('Next', 'yatra'); ?>
+                            <span><?php echo esc_html__('Next', 'yatra'); ?></span>
+                            <?php echo yatra_svg_icon('chevron-right', 'yatra-btn-icon'); ?>
                         </span>
                     <?php else: ?>
-                        <a class="yatra-pagination-btn" href="<?php echo $build_page_url($next_page); ?>">
-                            <?php echo esc_html__('Next', 'yatra'); ?>
+                        <a class="yatra-pagination-btn" href="<?php echo esc_url(yatra_build_current_request_paged_url($next_page)); ?>">
+                            <span><?php echo esc_html__('Next', 'yatra'); ?></span>
+                            <?php echo yatra_svg_icon('chevron-right', 'yatra-btn-icon'); ?>
                         </a>
                     <?php endif; ?>
                 </div>
@@ -334,23 +317,9 @@ yatra_get_header();
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // View toggle
-    const viewBtns = document.querySelectorAll('.yatra-view-btn');
+    // Grid/list view: handled by assets/js/listing.js (per-page localStorage via grid id)
+
     const tripGrid = document.getElementById('trip-grid');
-    
-    viewBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            viewBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            
-            const view = this.dataset.view;
-            if (view === 'list') {
-                tripGrid.classList.add('yatra-list-view');
-            } else {
-                tripGrid.classList.remove('yatra-list-view');
-            }
-        });
-    });
 
     // Sort functionality
     const sortSelect = document.getElementById('yatra-sort-select');

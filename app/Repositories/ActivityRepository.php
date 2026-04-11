@@ -165,6 +165,17 @@ class ActivityRepository extends BaseRepository
         // avg_rating is computed from approved reviews across all those trips.
         // starting_price is computed in PHP using both regular trip prices and
         // traveler-based pricing from recurring availability rules.
+        // Status must match {@see getPublished()} — many sites use `publish`, not only `active`.
+        $statuses = apply_filters('yatra_activity_published_statuses', ['active', 'publish']);
+        if (!is_array($statuses) || $statuses === []) {
+            $statuses = ['active', 'publish'];
+        }
+        $statuses = array_values(array_intersect($statuses, ['active', 'publish']));
+        if ($statuses === []) {
+            $statuses = ['active', 'publish'];
+        }
+        $statusIn = implode(',', array_fill(0, count($statuses), '%s'));
+
         $sql = "SELECT a.*, 
                        COUNT(DISTINCT tc.trip_id) AS trips_count,
                        COALESCE(AVG(r.rating), 0) AS avg_rating,
@@ -177,10 +188,14 @@ class ActivityRepository extends BaseRepository
                   ON t.id = tc.trip_id
                 LEFT JOIN `{$reviewsTable}` r
                   ON r.trip_id = t.id AND r.status = 'approved'
-                WHERE a.type = %s AND a.status = 'active'
+                WHERE a.type = %s AND a.status IN ({$statusIn})
                 GROUP BY a.id";
 
-        $rows = $this->wpdb->get_results($this->wpdb->prepare($sql, ClassificationTypes::ACTIVITY, ClassificationTypes::ACTIVITY)) ?: [];
+        $params = array_merge(
+            [ClassificationTypes::ACTIVITY, ClassificationTypes::ACTIVITY],
+            $statuses
+        );
+        $rows = $this->wpdb->get_results($this->wpdb->prepare($sql, ...$params)) ?: [];
 
         if (empty($rows)) {
             return [];
@@ -304,7 +319,7 @@ class ActivityRepository extends BaseRepository
         $cacheKey = Cache::KEY_ACTIVITY_TRIP_COUNT . '_' . $activityId;
         
         // Cache backends often return strings for scalars; force int on read + write.
-        return (int) Cache::remember($cacheKey, function () use ($activityId): int {
+        return (int) $this->cacheQueryResult($cacheKey, function () use ($activityId): int {
             global $wpdb;
             $tripRepository = new \Yatra\Repositories\TripRepository();
             $tripsTable = $tripRepository->getTableName();
@@ -336,7 +351,7 @@ class ActivityRepository extends BaseRepository
         $cacheKey = Cache::KEY_ACTIVITY_TRIP_COUNT_DIRECT . '_' . $activityId;
         
         // Cache backends often return strings for scalars; force int on read + write.
-        return (int) Cache::remember($cacheKey, function () use ($activityId): int {
+        return (int) $this->cacheQueryResult($cacheKey, function () use ($activityId): int {
             global $wpdb;
             $tripRepository = new \Yatra\Repositories\TripRepository();
             $tripTable = $tripRepository->getTableName();

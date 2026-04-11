@@ -70,6 +70,9 @@ function yatra_get_seo_service(string $pageType, $pageObject = null): \Yatra\Ser
             \Yatra\Services\SEOService::PAGE_TYPE_DESTINATION,
             \Yatra\Services\SEOService::PAGE_TYPE_ACTIVITY,
             \Yatra\Services\SEOService::PAGE_TYPE_CATEGORY,
+            \Yatra\Services\SEOService::PAGE_TYPE_DESTINATION_LISTING,
+            \Yatra\Services\SEOService::PAGE_TYPE_ACTIVITY_LISTING,
+            \Yatra\Services\SEOService::PAGE_TYPE_CATEGORY_LISTING,
         ];
         
         if (!in_array($pageType, $validTypes, true)) {

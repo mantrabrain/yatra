@@ -7,6 +7,7 @@ namespace Yatra\Core\Handlers;
 use Yatra\Controllers\SingleTripController;
 use Yatra\Core\Assets\TripAssetManager;
 use Yatra\Core\Template\TemplateRenderer;
+use Yatra\Services\SettingsService;
 
 /**
  * Trip Page Handler
@@ -42,6 +43,7 @@ class TripPageHandler extends BasePageHandler
             'yatra_trip_id' => $trip->id,
             'yatra_trip' => $trip,
             'yatra_trip_slug' => $trip_slug,
+            'yatra_page' => $route_data['base'] ?? SettingsService::getTripBase(),
         ]);
 
         // Create asset manager and render template

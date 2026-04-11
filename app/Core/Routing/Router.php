@@ -13,7 +13,8 @@ use Yatra\Core\Handlers\BookingPageHandler;
 use Yatra\Core\Handlers\BookingConfirmationPageHandler;
 use Yatra\Core\Handlers\CheckoutPageHandler;
 use Yatra\Core\Handlers\LoginPageHandler;
-use Yatra\Core\Routing\RouteMatcher;
+use Yatra\Core\Routing\PlainPageMatcher;
+use Yatra\Core\Routing\PrettyRouteMatcher;
 
 /**
  * Router
@@ -61,160 +62,57 @@ class Router
      */
     public function route(): bool
     {
+        $plain = PlainPageMatcher::match();
+        if ($plain !== null) {
+            return $this->handleRouteData($plain);
+        }
+
         $request_path = UrlParser::getCleanRequestPath();
 
-        // Plain permalink fallback: if booking query var is present, dispatch booking handler
-        $booking_page_query = get_query_var('yatra_booking_page');
-        if (!empty($booking_page_query) && !\Yatra\Services\SettingsService::useCustomBookingPage()) {
-            $handler = $this->getHandler('booking');
-            if ($handler) {
-                return $handler->handle([
-                    'type' => 'booking',
-                    'page' => $booking_page_query,
-                    'base' => \Yatra\Services\SettingsService::getBookingBase(),
-                ]);
-            }
+        if ($request_path === '') {
             return false;
         }
 
-        if (empty($request_path)) {
-            return false;
-        }
-
-        // Try to match route using various matchers
         $route_data = $this->matchRoute($request_path);
 
-        if (!$route_data) {
+        if ($route_data === null) {
             return false;
         }
 
-        // Get appropriate handler
+        return $this->handleRouteData($route_data);
+    }
+
+    /**
+     * @param array<string, mixed> $route_data
+     */
+    private function handleRouteData(array $route_data): bool
+    {
         $handler = $this->getHandler($route_data['type']);
 
         if (!$handler) {
             $this->logError("No handler found for route type: {$route_data['type']}");
+
             return false;
         }
 
-        // Handle the route
         try {
             return $handler->handle($route_data);
         } catch (\Exception $e) {
             $this->logError("Handler error for route type {$route_data['type']}: " . $e->getMessage());
+
             return false;
         }
     }
 
     /**
-     * Match route using RouteMatcher
+     * Match pretty-permalink path (non-plain) to route data.
      *
      * @param string $path Request path
      * @return array|null Route data or null if no match
      */
     private function matchRoute(string $path): ?array
     {
-        // Try different route matchers in order of specificity
-
-        // 1. Email verification
-        if (preg_match('/^yatra-verify-email\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {
-            return [
-                'type' => 'email_verification',
-                'token' => $matches[1]
-            ];
-        }
-
-        // 2. Account page (base path and /{base}/{section}; React uses ?tab= on the base URL)
-        $account_base = \Yatra\Services\SettingsService::getAccountBase();
-        $account_route = self::matchAccountRoute($path, $account_base);
-        if ($account_route !== null) {
-            return $account_route;
-        }
-
-        // 3. Trip archive pagination: {trip_base}/page/{n} (must run before single-trip slug match)
-        $trip_base = \Yatra\Services\SettingsService::getTripBase();
-        if (preg_match('/^' . preg_quote($trip_base, '/') . '\/page\/(\d+)\/?$/', $path, $matches)) {
-            return [
-                'type' => 'listing',
-                'listing_type' => 'trip',
-                'base' => $trip_base,
-                'paged' => max(1, (int) $matches[1]),
-            ];
-        }
-
-        // 4. Single trip page
-        if (preg_match('/^' . preg_quote($trip_base, '/') . '\/([^\/]+)\/?$/', $path, $matches)) {
-            return [
-                'type' => 'trip',
-                'slug' => $matches[1],
-                'base' => $trip_base
-            ];
-        }
-
-        // 5. Taxonomy page
-        $bases = [
-            'destination' => \Yatra\Services\SettingsService::getString('destination_base', 'destination'),
-            'activity' => \Yatra\Services\SettingsService::getString('activity_base', 'activity'),
-            'category' => \Yatra\Services\SettingsService::getString('trip_category_base', 'trip-category'),
-        ];
-
-        foreach ($bases as $type => $base) {
-            if (preg_match('/^' . preg_quote($base, '/') . '\/([^\/]+)\/?$/', $path, $matches)) {
-                return [
-                    'type' => 'taxonomy',
-                    'taxonomy_type' => $type,
-                    'slug' => $matches[1],
-                    'base' => $base
-                ];
-            }
-        }
-
-        // 6. Listing page
-        foreach ($bases as $type => $base) {
-            if ($path === $base) {
-                return [
-                    'type' => 'listing',
-                    'listing_type' => $type,
-                    'base' => $base
-                ];
-            }
-        }
-        
-        // 6b. Trip listing page
-        if ($path === $trip_base) {
-            return [
-                'type' => 'listing',
-                'listing_type' => 'trip',
-                'base' => $trip_base
-            ];
-        }
-
-        // 7. Booking confirmation
-        if (preg_match('/^book\/confirmation\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {
-            return [
-                'type' => 'booking_confirmation',
-                'confirmation_id' => $matches[1]
-            ];
-        }
-
-        // 8. Checkout
-        if (preg_match('/^checkout\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {
-            return [
-                'type' => 'checkout',
-                'token' => $matches[1]
-            ];
-        }
-
-        // 9. Booking page
-        $booking_base = \Yatra\Services\SettingsService::getBookingBase();
-        if ($path === $booking_base && !\Yatra\Services\SettingsService::useCustomBookingPage()) {
-            return [
-                'type' => 'booking',
-                'page' => 'main',
-                'base' => $booking_base
-            ];
-        }
-
-        return null;
+        return PrettyRouteMatcher::match($path);
     }
 
     /**
@@ -239,7 +137,7 @@ class Router
             }
             
             return $handler;
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             // Log error for debugging
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 error_log('Yatra Router: Failed to load handler "' . $route_type . '": ' . $e->getMessage());
@@ -260,66 +158,4 @@ class Router
             }
     }
 
-    /**
-     * @return array{type: string, page: string, base: string}|null
-     */
-    private static function matchAccountRoute(string $path, string $account_base): ?array
-    {
-        $path_trim = rtrim($path, '/');
-        $base_trim = rtrim($account_base, '/');
-
-        if ($path_trim === $base_trim) {
-            $tab = isset($_GET['tab']) ? sanitize_key((string) $_GET['tab']) : '';
-
-            return [
-                'type' => 'account',
-                'page' => self::accountQueryTabToPage($tab),
-                'base' => $account_base,
-            ];
-        }
-
-        $quoted = preg_quote($account_base, '/');
-        if (preg_match('/^' . $quoted . '\/([^\/]+)/', $path, $m)) {
-            $page = self::accountPathSegmentToPage($m[1]);
-            if ($page === null) {
-                return null;
-            }
-
-            return [
-                'type' => 'account',
-                'page' => $page,
-                'base' => $account_base,
-            ];
-        }
-
-        return null;
-    }
-
-    private static function accountQueryTabToPage(string $tab): string
-    {
-        $allowed = ['dashboard', 'bookings', 'payments', 'documents', 'profile', 'saved-trips'];
-        if ($tab === '' || !in_array($tab, $allowed, true)) {
-            return 'dashboard';
-        }
-
-        return $tab;
-    }
-
-    private static function accountPathSegmentToPage(string $segment): ?string
-    {
-        $segment = sanitize_title($segment);
-        $map = [
-            'dashboard' => 'dashboard',
-            'profile' => 'profile',
-            'bookings' => 'bookings',
-            'payments' => 'payments',
-            'documents' => 'documents',
-            'support' => 'dashboard',
-            'saved-trips' => 'saved-trips',
-            'wishlist' => 'saved-trips',
-            'settings' => 'profile',
-        ];
-
-        return $map[$segment] ?? null;
-    }
 }

@@ -12,7 +12,6 @@ use Yatra\Repositories\TripAvailabilityRepository;
 use Yatra\Models\Trip;
 use Yatra\Services\CacheService;
 use Yatra\Services\AttributeService;
-use Yatra\Utils\Cache;
 use Yatra\Utils\Logger;
 use Yatra\Database\Tables\TripAvailabilityDatesTable;
 use Yatra\Database\Tables\TripAvailabilityRulesTable;
@@ -76,60 +75,28 @@ class TripService extends BaseService
     }
 
     /**
-     * Get trip by ID with caching
+     * Get trip by ID with caching (repository layer)
      */
     public function getById(int $id): ?\stdClass
     {
-        // Try cache first
-        $cached = CacheService::getCachedTrip($id);
-        if ($cached !== null) {
-            Logger::debug("Trip loaded from cache", ['trip_id' => $id]);
-            return $cached;
-        }
-
-        // Load from database
-        $trip = $this->repository->find($id);
-        
+        $trip = $this->repository->findByIdCached($id);
         if ($trip) {
-            // Cache the result
-            CacheService::cacheTrip($id, $trip);
-            Logger::debug("Trip loaded from database and cached", ['trip_id' => $id]);
+            Logger::debug('Trip loaded (repository cache)', ['trip_id' => $id]);
         }
 
         return $trip;
     }
 
     /**
-     * Get trip with relationships and caching (enhanced version)
+     * Get trip with relationships and caching (repository layer)
      */
     public function getWithRelationsCached(int $id): ?\stdClass
     {
-        $cacheKey = "trip_with_relations_{$id}";
-        
-        if ($this->isCacheEnabled()) {
-            return Cache::remember($cacheKey, function() use ($id) {
-                return $this->loadTripWithRelations($id);
-            }, Cache::DURATION_TRIP_DATA);
-        } else {
-            // Bypass cache and get fresh data
-            Logger::debug("Cache disabled, getting fresh trip with relations", ['trip_id' => $id]);
-            return $this->loadTripWithRelations($id);
-        }
-    }
-
-    /**
-     * Load trip with relationships
-     */
-    private function loadTripWithRelations(int $id): ?\stdClass
-    {
-        $trip = $this->repository->find($id);
-        
+        $trip = $this->repository->findWithRelationsCached($id);
         if ($trip) {
-            // Load relationships
-            $this->repository->loadTripRelationships($trip);
-            Logger::debug("Trip with relationships loaded", ['trip_id' => $id]);
+            Logger::debug('Trip with relationships loaded (repository cache)', ['trip_id' => $id]);
         }
-        
+
         return $trip;
     }
 
@@ -162,10 +129,6 @@ class TripService extends BaseService
             $this->saveTripAttributes($id, $attributes);
         }
 
-        // Clear related caches
-        Cache::clearByPrefix(Cache::PREFIX_QUERY_RESULT);
-        Cache::clearByPrefix(Cache::PREFIX_STATS);
-
         Logger::info("Trip created", ['trip_id' => $id]);
         return $id;
     }
@@ -196,9 +159,7 @@ class TripService extends BaseService
         }
 
         if ($result) {
-            // Invalidate caches
-            CacheService::invalidateEntity('trip', $id);
-            Logger::info("Trip updated and cache invalidated", ['trip_id' => $id]);
+            Logger::info("Trip updated", ['trip_id' => $id]);
         }
 
         return $result;
@@ -212,9 +173,7 @@ class TripService extends BaseService
         $result = $this->repository->delete($id);
 
         if ($result) {
-            // Invalidate caches
-            CacheService::invalidateEntity('trip', $id);
-            Logger::info("Trip deleted and cache invalidated", ['trip_id' => $id]);
+            Logger::info("Trip deleted", ['trip_id' => $id]);
         }
 
         return $result;

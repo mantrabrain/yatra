@@ -709,7 +709,7 @@ class AttributeRepository extends BaseRepository
         }
         
         // Use QueryCache for caching attributes
-        return Cache::remember(Cache::KEY_AVAILABLE_ATTRIBUTES, function() {
+        return $this->cacheQueryResult(Cache::KEY_AVAILABLE_ATTRIBUTES, function() {
             $formattedAttributes = [];
             foreach ($this->getFilterableAttributes() as $row) {
                 $meta = !empty($row->metadata) ? json_decode((string) $row->metadata, true) : [];

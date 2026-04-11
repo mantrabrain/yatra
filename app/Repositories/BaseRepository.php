@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Repositories\Concerns\CachesQueryResults;
+
 /**
  * Base Repository Class
  * Provides common database operations using $wpdb
  */
 abstract class BaseRepository
 {
+    use CachesQueryResults;
+
     /**
      * @var \wpdb
      */
@@ -134,7 +138,10 @@ abstract class BaseRepository
             throw new \Exception('Failed to create record: ' . $this->wpdb->last_error);
         }
 
-        return $this->wpdb->insert_id;
+        $newId = (int) $this->wpdb->insert_id;
+        $this->afterWrite('create', $newId, []);
+
+        return $newId;
     }
 
     /**
@@ -155,10 +162,10 @@ abstract class BaseRepository
         );
 
         $success = $result !== false;
-        
-        // DEBUG: Log the result
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            }
+
+        if ($success) {
+            $this->afterWrite('update', $id, []);
+        }
 
         return $success;
     }
@@ -179,14 +186,23 @@ abstract class BaseRepository
         );
 
         $success = $result !== false;
-        
-        // DEBUG: Log repository delete result
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            if (!$success) {
-                }
+
+        if ($success) {
+            $this->afterWrite('delete', $id, []);
         }
 
         return $success;
+    }
+
+    /**
+     * Called after a successful create, update, or delete. Override in entity repositories to
+     * invalidate caches or fire domain hooks; default is no-op.
+     *
+     * @param 'create'|'update'|'delete' $operation
+     * @param array<string, mixed> $context
+     */
+    protected function afterWrite(string $operation, int $id, array $context = []): void
+    {
     }
 
     /**

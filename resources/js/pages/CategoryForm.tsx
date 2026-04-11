@@ -12,6 +12,7 @@ import { useToast } from "../components/ui/toast";
 import { fetchSettings } from "../api/settings-api";
 import { apiClient } from "../lib/api-client";
 import { generateSlug } from "../lib/slug";
+import { buildYatraSinglePreviewUrl } from "../lib/frontend-permalink-urls";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
@@ -395,20 +396,12 @@ const CategoryForm: React.FC = () => {
             {formData.slug && (
               <Button
                 variant="outline"
-                onClick={async () => {
-                  const siteUrl = (window as any)?.yatraAdmin?.siteUrl || "";
-                  const categoryBase = settings?.trip_category_base || "trip-categories";
-                  const categorySlug = formData.slug || "";
-                  const permalinkStructure = (window as any)?.yatraAdmin?.permalinkStructure;
-                  const isPlainPermalink = permalinkStructure === "plain";
-
-                  // Fallback: Pretty permalink path
-                  const baseSite = siteUrl.replace(/\/$/, "");
-                  const prettyUrl = `${baseSite}/${categoryBase}/${categorySlug}`;
-                  const plainUrl = `${baseSite}/?${categoryBase}=${encodeURIComponent(categorySlug)}`;
-
-                  // Honor site permalink structure (default to pretty when unknown)
-                  const targetUrl = isPlainPermalink ? plainUrl : prettyUrl;
+                onClick={() => {
+                  const targetUrl = buildYatraSinglePreviewUrl({
+                    entity: "category",
+                    slug: formData.slug || "",
+                    bases: settings as Record<string, unknown> | null,
+                  });
                   window.open(targetUrl, "_blank", "noopener,noreferrer");
                 }}
                 className="flex items-center gap-2"

@@ -71,7 +71,16 @@ class SEOManager
                 return $title;
             }
 
-            $allowsNullObject = ($pageType === SEOService::PAGE_TYPE_TRIP_ARCHIVE);
+            $allowsNullObject = \in_array(
+                $pageType,
+                [
+                    SEOService::PAGE_TYPE_TRIP_ARCHIVE,
+                    SEOService::PAGE_TYPE_DESTINATION_LISTING,
+                    SEOService::PAGE_TYPE_ACTIVITY_LISTING,
+                    SEOService::PAGE_TYPE_CATEGORY_LISTING,
+                ],
+                true
+            );
             if (!$allowsNullObject && !$pageObject) {
                 return $title;
             }
@@ -105,6 +114,11 @@ class SEOManager
             // Check if we're on trip archive page
             if (self::isTripArchivePage()) {
                 return SEOService::PAGE_TYPE_TRIP_ARCHIVE;
+            }
+
+            $listingType = self::getTaxonomyListingPageType();
+            if ($listingType !== '') {
+                return $listingType;
             }
 
             // Check taxonomy pages with validation
@@ -197,5 +211,81 @@ class SEOManager
     {
         global $trip;
         return !empty($trip) && !empty($trip->id);
+    }
+
+    /**
+     * Browse-all taxonomy listing (/destination/, /activity/, …) including paged and plain ?yatra_page=.
+     */
+    private static function getTaxonomyListingPageType(): string
+    {
+        try {
+            if (self::matchesTaxonomyListingRoot('destination')) {
+                return SEOService::PAGE_TYPE_DESTINATION_LISTING;
+            }
+            if (self::matchesTaxonomyListingRoot('activity')) {
+                return SEOService::PAGE_TYPE_ACTIVITY_LISTING;
+            }
+            if (self::matchesTaxonomyListingRoot('category')) {
+                return SEOService::PAGE_TYPE_CATEGORY_LISTING;
+            }
+        } catch (\Exception $e) {
+            error_log('Yatra SEOManager getTaxonomyListingPageType Error: ' . $e->getMessage());
+        }
+
+        return '';
+    }
+
+    /**
+     * True when the request is the index listing for a taxonomy (not a single term).
+     */
+    private static function matchesTaxonomyListingRoot(string $type): bool
+    {
+        $bases = [
+            'destination' => SettingsService::getString('destination_base', 'destination'),
+            'activity' => SettingsService::getString('activity_base', 'activity'),
+            'category' => SettingsService::getString('trip_category_base', 'trip-category'),
+        ];
+        $legacyKeys = [
+            'destination' => 'yatra_destination_slug',
+            'activity' => 'yatra_activity_slug',
+            'category' => 'yatra_category_slug',
+        ];
+        if (!isset($bases[$type], $legacyKeys[$type])) {
+            return false;
+        }
+
+        $base = trim((string) $bases[$type], '/');
+        if ($base === '') {
+            return false;
+        }
+
+        $path = (string) (parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH) ?? '');
+        $path = trim($path, '/');
+        if ($path === $base) {
+            return true;
+        }
+        if (preg_match('/^' . preg_quote($base, '/') . '\/page\/[0-9]+\/?$/', $path)) {
+            return true;
+        }
+
+        $yp = isset($_GET['yatra_page']) ? sanitize_text_field(wp_unslash((string) $_GET['yatra_page'])) : '';
+        if ($yp !== '' && $yp === $base) {
+            $baseKey = preg_replace('/[^a-z0-9_-]/i', '', $base) ?: '';
+            $slug = '';
+            if ($baseKey !== '') {
+                $fromBase = $_GET[$baseKey] ?? null;
+                if (is_string($fromBase)) {
+                    $slug = sanitize_title(wp_unslash($fromBase));
+                }
+            }
+            if ($slug === '') {
+                $legacy = $_GET[$legacyKeys[$type]] ?? '';
+                $slug = is_string($legacy) ? sanitize_title(wp_unslash($legacy)) : '';
+            }
+
+            return $slug === '';
+        }
+
+        return false;
     }
 }

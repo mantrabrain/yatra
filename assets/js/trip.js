@@ -4046,35 +4046,8 @@
       this.initializeDefaultState();
     }
 
-    // Initialize default state: collapse all except first day
-    initializeDefaultState() {
-      this.days.forEach((day, index) => {
-        const content = day.querySelector('.yatra-itinerary-day-content');
-        const toggle = day.querySelector('.yatra-day-toggle');
-
-        if (content) {
-          if (index === 0) {
-            // Keep first day expanded
-            content.style.display = 'block';
-            day.setAttribute('data-expanded', 'true');
-            if (toggle) {
-              toggle.setAttribute('aria-expanded', 'true');
-              const icon = toggle.querySelector('.yatra-chevron-icon');
-              if (icon) icon.style.transform = 'rotate(0deg)';
-            }
-          } else {
-            // Collapse all other days
-            content.style.display = 'none';
-            day.setAttribute('data-expanded', 'false');
-            if (toggle) {
-              toggle.setAttribute('aria-expanded', 'false');
-              const icon = toggle.querySelector('.yatra-chevron-icon');
-              if (icon) icon.style.transform = 'rotate(-90deg)';
-            }
-          }
-        }
-      });
-    }
+    /** First day is expanded via PHP (`.is-day-expanded`); no inline styles. */
+    initializeDefaultState() {}
 
     attachEventListeners() {
       // Toggle All button
@@ -4091,65 +4064,40 @@
           header.addEventListener('click', (e) => {
             // Don't toggle if clicking on a link inside header
             if (e.target.tagName === 'A') return;
-            this.toggleDay(day, content, toggle);
+            this.toggleDay(day, toggle);
           });
         }
       });
     }
 
-    toggleDay(day, content, toggle) {
-      const isExpanded = content.style.display !== 'none';
-
+    toggleDay(day, toggle) {
+      const isExpanded = day.classList.contains('is-day-expanded');
       if (isExpanded) {
-        content.style.display = 'none';
+        day.classList.remove('is-day-expanded');
         day.setAttribute('data-expanded', 'false');
-        if (toggle) {
-          toggle.setAttribute('aria-expanded', 'false');
-          const icon = toggle.querySelector('.yatra-chevron-icon');
-          if (icon) icon.style.transform = 'rotate(-90deg)';
-        }
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
       } else {
-        content.style.display = 'block';
+        day.classList.add('is-day-expanded');
         day.setAttribute('data-expanded', 'true');
-        if (toggle) {
-          toggle.setAttribute('aria-expanded', 'true');
-          const icon = toggle.querySelector('.yatra-chevron-icon');
-          if (icon) icon.style.transform = 'rotate(0deg)';
-        }
+        if (toggle) toggle.setAttribute('aria-expanded', 'true');
       }
     }
 
     toggleAll() {
       if (this.isAllExpanded) {
-        // Collapse all
         this.days.forEach(day => {
-          const content = day.querySelector('.yatra-itinerary-day-content');
           const toggle = day.querySelector('.yatra-day-toggle');
-          if (content) {
-            content.style.display = 'none';
-            day.setAttribute('data-expanded', 'false');
-            if (toggle) {
-              toggle.setAttribute('aria-expanded', 'false');
-              const icon = toggle.querySelector('.yatra-chevron-icon');
-              if (icon) icon.style.transform = 'rotate(-90deg)';
-            }
-          }
+          day.classList.remove('is-day-expanded');
+          day.setAttribute('data-expanded', 'false');
+          if (toggle) toggle.setAttribute('aria-expanded', 'false');
         });
         this.updateToggleButton(false);
       } else {
-        // Expand all
         this.days.forEach(day => {
-          const content = day.querySelector('.yatra-itinerary-day-content');
           const toggle = day.querySelector('.yatra-day-toggle');
-          if (content) {
-            content.style.display = 'block';
-            day.setAttribute('data-expanded', 'true');
-            if (toggle) {
-              toggle.setAttribute('aria-expanded', 'true');
-              const icon = toggle.querySelector('.yatra-chevron-icon');
-              if (icon) icon.style.transform = 'rotate(0deg)';
-            }
-          }
+          day.classList.add('is-day-expanded');
+          day.setAttribute('data-expanded', 'true');
+          if (toggle) toggle.setAttribute('aria-expanded', 'true');
         });
         this.updateToggleButton(true);
       }
@@ -4158,21 +4106,10 @@
 
     updateToggleButton(isExpanded) {
       if (!this.toggleAllBtn) return;
-      
-      const expandIcon = this.toggleAllBtn.querySelector('.expand-icon');
-      const collapseIcon = this.toggleAllBtn.querySelector('.collapse-icon');
+      this.toggleAllBtn.classList.toggle('is-all-expanded', isExpanded);
       const toggleText = this.toggleAllBtn.querySelector('.toggle-text');
-      
-      if (isExpanded) {
-        // Show collapse state
-        if (expandIcon) expandIcon.style.display = 'none';
-        if (collapseIcon) collapseIcon.style.display = 'block';
-        if (toggleText) toggleText.textContent = 'Collapse All';
-      } else {
-        // Show expand state
-        if (expandIcon) expandIcon.style.display = 'block';
-        if (collapseIcon) collapseIcon.style.display = 'none';
-        if (toggleText) toggleText.textContent = 'Expand All';
+      if (toggleText) {
+        toggleText.textContent = isExpanded ? 'Collapse All' : 'Expand All';
       }
     }
   }

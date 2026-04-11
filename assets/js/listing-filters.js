@@ -537,7 +537,8 @@
         const url = new URL(window.location);
 
         var preserved = {};
-        ['s', 'sort'].forEach(function(k) {
+        /* Plain permalinks: keep yatra_page=trip_base on trip archive when changing filters */
+        ['s', 'sort', 'yatra_page'].forEach(function(k) {
             var v = url.searchParams.get(k);
             if (v !== null && v !== '') {
                 preserved[k] = v;

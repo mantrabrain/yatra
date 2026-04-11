@@ -40,7 +40,7 @@ class TripAttributeRepository extends BaseRepository
         // Use Cache for caching trip attributes
         $cacheKey = Cache::PREFIX_ATTRIBUTES . $tripId . '_' . md5(serialize($attributes));
         
-        return Cache::remember($cacheKey, function() use ($tripId, $attributes) {
+        return $this->cacheQueryResult($cacheKey, function() use ($tripId, $attributes) {
             global $wpdb;
             $table_trip_classifications = $this->getTableNameInternal();
             

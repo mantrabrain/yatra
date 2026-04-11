@@ -42,10 +42,10 @@ class TripListingController
      *
      * @param string $taxonomyType 'destination' or 'activity'
      * @param string $slug Taxonomy slug
-     * @param int $limit Number of trips to show
+     * @param int|null $limit Number of trips to show; null uses WordPress posts per page.
      * @return void
      */
-    public function handleTaxonomyListing(string $taxonomyType, string $slug, int $limit = 10): void
+    public function handleTaxonomyListing(string $taxonomyType, string $slug, ?int $limit = null): void
     {
         // Get trips for this taxonomy
         $tripData = $this->tripListingService->getTripsByTaxonomy($taxonomyType, $slug, $limit);

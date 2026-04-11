@@ -4,13 +4,21 @@ declare(strict_types=1);
 
 namespace Yatra\Ajax;
 
+use Yatra\Repositories\GeocodingRepository;
+
 /**
  * AJAX handlers for Geocoding functionality
+ *
+ * Rate limiting uses WordPress transients (always on). Response caching goes through
+ * {@see GeocodingRepository} → {@see \Yatra\Utils\Cache} (not options).
  */
 class GeocodingAjax
 {
+    private GeocodingRepository $geocodingRepository;
+
     public function __construct()
     {
+        $this->geocodingRepository = new GeocodingRepository();
         add_action('wp_ajax_yatra_search_locations', [$this, 'searchLocations']);
         add_action('wp_ajax_nopriv_yatra_search_locations', [$this, 'searchLocations']);
         add_action('wp_ajax_yatra_reverse_geocode', [$this, 'reverseGeocode']);
@@ -53,31 +61,28 @@ class GeocodingAjax
             set_transient($cache_key, $request_count + 1, 60);
         }
 
-        // Check cache first
-        $cache_key = 'yatra_location_search_' . md5($query . $limit);
-        $cached_results = get_transient($cache_key);
-
-        if ($cached_results !== false) {
-            wp_send_json_success(['results' => $cached_results]);
+        $resultCacheKey = $this->geocodingRepository->cacheKeySearch($query, $limit);
+        $cached = $this->geocodingRepository->getPayload($resultCacheKey);
+        if (is_array($cached)) {
+            wp_send_json_success(['results' => $cached]);
             return;
         }
 
-        // Make API request
         $url = add_query_arg([
             'format' => 'json',
             'q' => $query,
             'limit' => $limit,
             'addressdetails' => 1,
             'accept-language' => 'en-US,en;q=0.9',
-            'countrycodes' => 'id,np,us,gb,fr,de,it,es,au,nz'
+            'countrycodes' => 'id,np,us,gb,fr,de,it,es,au,nz',
         ], 'https://nominatim.openstreetmap.org/search');
 
         $response = wp_remote_get($url, [
             'timeout' => 10,
             'user-agent' => 'Yatra Travel Plugin (https://wpyatra.com/)',
             'headers' => [
-                'Accept' => 'application/json'
-            ]
+                'Accept' => 'application/json',
+            ],
         ]);
 
         if (is_wp_error($response)) {
@@ -87,14 +92,12 @@ class GeocodingAjax
 
         $body = wp_remote_retrieve_body($response);
         $data = json_decode($body, true);
-
-        if (empty($data)) {
+        if (!is_array($data) || empty($data)) {
             wp_send_json_success(['results' => []]);
             return;
         }
 
-        // Cache results for 5 minutes
-        set_transient($cache_key, $data, 300);
+        $this->geocodingRepository->setPayload($resultCacheKey, $data, 300);
 
         wp_send_json_success(['results' => $data]);
     }
@@ -118,31 +121,28 @@ class GeocodingAjax
             return;
         }
 
-        // Check cache first
-        $cache_key = 'yatra_reverse_geocode_' . md5($lat . '_' . $lng);
-        $cached_result = get_transient($cache_key);
-
-        if ($cached_result !== false) {
-            wp_send_json_success(['result' => $cached_result]);
+        $resultCacheKey = $this->geocodingRepository->cacheKeyReverse($lat, $lng);
+        $cached = $this->geocodingRepository->getPayload($resultCacheKey);
+        if (is_array($cached)) {
+            wp_send_json_success(['result' => $cached]);
             return;
         }
 
-        // Make API request
         $url = add_query_arg([
             'format' => 'json',
             'lat' => $lat,
             'lon' => $lng,
             'zoom' => 18,
             'addressdetails' => 1,
-            'accept-language' => 'en-US,en;q=0.9'
+            'accept-language' => 'en-US,en;q=0.9',
         ], 'https://nominatim.openstreetmap.org/reverse');
 
         $response = wp_remote_get($url, [
             'timeout' => 10,
             'user-agent' => 'Yatra Travel Plugin (https://wpyatra.com/)',
             'headers' => [
-                'Accept' => 'application/json'
-            ]
+                'Accept' => 'application/json',
+            ],
         ]);
 
         if (is_wp_error($response)) {
@@ -152,9 +152,12 @@ class GeocodingAjax
 
         $body = wp_remote_retrieve_body($response);
         $data = json_decode($body, true);
+        if (!is_array($data)) {
+            wp_send_json_error(['message' => 'Reverse geocoding failed']);
+            return;
+        }
 
-        // Cache result for 10 minutes
-        set_transient($cache_key, $data, 600);
+        $this->geocodingRepository->setPayload($resultCacheKey, $data, 600);
 
         wp_send_json_success(['result' => $data]);
     }

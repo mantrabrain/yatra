@@ -387,32 +387,26 @@ abstract class BaseService implements ServiceInterface
     }
 
     /**
-     * Check if caching is enabled
+     * Check if caching is enabled (delegates to {@see Cache::isEnabled()} then backend probe).
      */
     protected function isCacheEnabled(): bool
     {
         try {
-            // Check WordPress option for cache status
-            $cacheEnabled = get_option('yatra_cache_enabled', true);
-            
-            // Also check if we're in debug mode (disable cache in debug)
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                $cacheEnabled = false;
+            if (!\Yatra\Utils\Cache::isEnabled()) {
+                return false;
             }
-            
-            // Check if cache backend is available
-            if ($cacheEnabled && !$this->isCacheBackendAvailable()) {
+
+            if (!$this->isCacheBackendAvailable()) {
                 Logger::warning("Cache enabled but backend not available, disabling cache");
-                $cacheEnabled = false;
+                return false;
             }
-            
-            return (bool) $cacheEnabled;
-            
+
+            return true;
         } catch (\Exception $e) {
             Logger::error("Failed to check cache enabled status", [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
-            return false; // Fail safe - disable cache on error
+            return false;
         }
     }
 
@@ -516,7 +510,7 @@ abstract class BaseService implements ServiceInterface
         
         try {
             if ($this->isCacheEnabled()) {
-                $result = CacheService::remember($cacheKey, $callback, $duration);
+                $result = Cache::remember($cacheKey, $callback, $duration);
                 
                 // Record cache performance metrics
                 $this->recordCacheMetrics($cacheKey, $startTime, true);

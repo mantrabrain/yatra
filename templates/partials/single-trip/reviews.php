@@ -176,7 +176,7 @@ if (!defined('ABSPATH')) {
                 <?php else: ?>
                     <div class="yatra-no-reviews-message">
                         <div class="yatra-no-reviews-icon">
-                            <?php echo yatra_svg_icon('message', 'yatra-icon-lg'); ?>
+                            <?php echo yatra_svg_icon('message-circle', 'yatra-icon-lg'); ?>
                         </div>
                         <p><?php echo esc_html__('No reviews yet. Be the first to review this trip!', 'yatra'); ?></p>
                     </div>

@@ -29,12 +29,16 @@ class BookingPageHandler extends BasePageHandler
         $page = $route_data['page'] ?? 'main';
         $base = $route_data['base'];
 
+        if (!empty($route_data['trip']) && is_string($route_data['trip'])) {
+            $_GET['trip'] = sanitize_title($route_data['trip']);
+        }
+
         // Prevent 404 handling
         $this->prevent404();
 
         // Set up query vars for backward compatibility
         $this->setQueryVars([
-            'yatra_booking_page' => $page,
+            'yatra_page' => $base,
         ]);
 
         // Hydrate global $booking from session so templates don't crash

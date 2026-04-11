@@ -26,7 +26,7 @@ final class TripListingPageContextFactory
         $currentPage = 1;
         $destOptions = [];
         $actOptions = [];
-        $perPage = max(1, (int) ($tripListData['per_page'] ?? 12));
+        $perPage = max(1, (int) ($tripListData['per_page'] ?? \yatra_get_posts_per_page()));
 
         if (array_key_exists('trips', $tripListData)) {
             $trips = $tripListData['trips'];
@@ -44,6 +44,9 @@ final class TripListingPageContextFactory
                     }
                 }
             }
+
+            // Plain permalinks: trip archive is ?yatra_page={trip_base}&paged=N — must survive pagination/sort links.
+            $activeFilters['yatra_page'] = $this->getYatraPageRoutingParam($_GET);
         } elseif (is_array($taxonomyContext) && !empty($taxonomyContext['trips'])) {
             $trips = $taxonomyContext['trips'];
             $total = count($trips);
@@ -147,6 +150,7 @@ final class TripListingPageContextFactory
         }
 
         return [
+            'yatra_page' => $this->getYatraPageRoutingParam($get),
             's' => isset($get['s']) ? sanitize_text_field(wp_unslash((string) $get['s'])) : '',
             'category' => isset($get['category']) ? sanitize_text_field(wp_unslash((string) $get['category'])) : '',
             'destination' => isset($get['destination']) ? sanitize_text_field(wp_unslash((string) $get['destination'])) : '',
@@ -180,6 +184,31 @@ final class TripListingPageContextFactory
      * @param callable(string):mixed $sanitizeCallback
      * @return list<mixed>
      */
+    /**
+     * Plain routing base (e.g. trip_base "tour") for ?yatra_page= — required on every trip listing URL when using query-string routing.
+     *
+     * @param array<string, mixed> $get
+     */
+    private function getYatraPageRoutingParam(array $get): string
+    {
+        if (isset($get['yatra_page']) && is_string($get['yatra_page'])) {
+            $v = trim(wp_unslash($get['yatra_page']));
+            if ($v !== '') {
+                return preg_replace('/[^a-zA-Z0-9_-]/', '', $v) ?? '';
+            }
+        }
+
+        $qv = get_query_var('yatra_page');
+        if ($qv !== null && $qv !== '' && is_scalar($qv)) {
+            $v = trim((string) $qv);
+            if ($v !== '') {
+                return preg_replace('/[^a-zA-Z0-9_-]/', '', $v) ?? '';
+            }
+        }
+
+        return '';
+    }
+
     private function parseGetArray(array $get, string $key, callable $sanitizeCallback): array
     {
         if (!isset($get[$key])) {
@@ -357,8 +386,16 @@ final class TripListingPageContextFactory
      */
     private function buildUrl(string $basePath, array $query): string
     {
-        $qs = http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+        $path = trim((string) $basePath, '/');
+        $base = $path === ''
+            ? \home_url('/')
+            : \trailingslashit(\home_url('/' . $path . '/'));
 
-        return $basePath . ($qs !== '' ? '?' . $qs : '');
+        $qs = http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+        if ($qs === '') {
+            return \esc_url($base);
+        }
+
+        return \esc_url($base . '?' . $qs);
     }
 }

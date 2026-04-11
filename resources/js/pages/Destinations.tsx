@@ -29,6 +29,10 @@ import { useToast } from "../components/ui/toast";
 import { fetchSettings } from "../api/settings-api";
 import { apiClient } from "../lib/api-client";
 import { getErrorContext } from "../lib/errors";
+import {
+  buildYatraSinglePublicUrls,
+  isWordPressPlainPermalink,
+} from "../lib/frontend-permalink-urls";
 import { Button } from "../components/ui/button";
 import { PageHeader } from "../components/common/PageHeader";
 import { Card, CardContent } from "../components/ui/card";
@@ -210,45 +214,46 @@ const Destinations: React.FC = () => {
   };
 
   const handleView = async (destination: Destination) => {
-    const siteUrl = (window as any)?.yatraAdmin?.siteUrl || "";
-    const destinationBase = settings?.destination_base || "destination";
     const destinationSlug = destination.slug || "";
-    let apiPermalink =
-      (destination as any)?.permalink || (destination as any)?.url;
-    // permalinkStructure is optional in yatraAdmin; default to unknown => fall back to pretty
-    const permalinkStructure = (window as any)?.yatraAdmin?.permalinkStructure;
-    const isPlainPermalink = permalinkStructure === "plain";
+    const { plainUrl, prettyUrl } = buildYatraSinglePublicUrls({
+      entity: "destination",
+      slug: destinationSlug,
+      bases: settings as Record<string, unknown> | null,
+    });
 
-    if (!destinationSlug && !apiPermalink) {
-      showToast(__("Destination slug is missing", "yatra"), "error");
+    if (isWordPressPlainPermalink()) {
+      if (!destinationSlug) {
+        showToast(__("Destination slug is missing", "yatra"), "error");
+        return;
+      }
+      window.open(plainUrl, "_blank", "noopener,noreferrer");
       return;
     }
 
-    // If permalink is missing, try fetching the single destination to get the backend-computed permalink
+    let apiPermalink =
+      (destination as any)?.permalink || (destination as any)?.url;
+
     if (!apiPermalink && destination.id) {
       try {
         const detail = await apiClient.get(`/destinations/${destination.id}`);
         apiPermalink =
           (detail as any)?.permalink || (detail as any)?.url || apiPermalink;
       } catch (e) {
-        // Ignore and fall back to pretty URL
+        // fall through to prettyUrl
       }
     }
 
-    // Prefer server-provided permalink when available (respects current permalink structure)
     if (apiPermalink) {
       window.open(apiPermalink, "_blank", "noopener,noreferrer");
       return;
     }
 
-    // Fallback: Pretty permalink path
-    const baseSite = siteUrl.replace(/\/$/, "");
-    const prettyUrl = `${baseSite}/${destinationBase}/${destinationSlug}`;
-    const plainUrl = `${baseSite}/?${destinationBase}=${encodeURIComponent(destinationSlug)}`;
+    if (!destinationSlug) {
+      showToast(__("Destination slug is missing", "yatra"), "error");
+      return;
+    }
 
-    // Honor site permalink structure (default to plain when unknown)
-    const targetUrl = isPlainPermalink ? plainUrl : prettyUrl;
-    window.open(targetUrl, "_blank", "noopener,noreferrer");
+    window.open(prettyUrl, "_blank", "noopener,noreferrer");
   };
 
   const handleDelete = (destination: Destination) => {

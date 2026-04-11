@@ -46,6 +46,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
+import { prepareWordPressMediaFrameOpen } from "../lib/wp-media-open";
 import { usePermissions } from "../hooks/usePermissions";
 import { useToast } from "../components/ui/toast";
 import { apiClient, apiService } from "../lib/api-client";
@@ -80,6 +81,7 @@ import {
 } from "../components/ui/card";
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
+import { buildYatraListingPublicUrl } from "../lib/frontend-permalink-urls";
 import { getCurrencyOptions } from "../data/currencies";
 import { SearchableSelect } from "../components/ui/searchable-select";
 import { MultiSelect, MultiSelectOption } from "../components/ui/multi-select";
@@ -6395,7 +6397,13 @@ const Settings: React.FC = () => {
           </div>
         );
 
-      case "permalink":
+      case "permalink": {
+        const listingSite = (
+          ((window as any)?.yatraAdmin?.siteUrl || "") as string
+        ).replace(/\/$/, "");
+        const listingHref = (segment: string) =>
+          buildYatraListingPublicUrl(segment, listingSite || undefined);
+
         return (
           <div className="space-y-6">
             <div>
@@ -6429,29 +6437,17 @@ const Settings: React.FC = () => {
                 />
                 {formData.trip_base && (
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
-                    <span>
-                      {__("Example URL:", "yatra")}{" "}
-                      <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
-                        {(window as any)?.yatraAdmin?.permalinkStructure ===
-                        "plain"
-                          ? `?yatra_trip_slug=trip-name`
-                          : `/${formData.trip_base || "trip"}/trip-name`}
+                    <span className="min-w-0">
+                      {__("Listing URL:", "yatra")}{" "}
+                      <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded break-all">
+                        {listingHref(formData.trip_base || "trip")}
                       </code>
                     </span>
                     <a
-                      href={
-                        (window as any)?.yatraAdmin?.siteUrl
-                          ? `${(window as any).yatraAdmin.siteUrl.replace(/\/$/, "")}${
-                              (window as any)?.yatraAdmin
-                                ?.permalinkStructure === "plain"
-                                ? `?yatra_trip_slug=trip-name`
-                                : `/${formData.trip_base || "trip"}/trip-name`
-                            }`
-                          : `/${formData.trip_base || "trip"}/trip-name`
-                      }
+                      href={listingHref(formData.trip_base || "trip")}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline shrink-0"
                     >
                       <ExternalLink className="w-3 h-3" /> {__("View", "yatra")}
                     </a>
@@ -6477,29 +6473,21 @@ const Settings: React.FC = () => {
                 />
                 {formData.destination_base && (
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
-                    <span>
-                      {__("Example URL:", "yatra")}{" "}
-                      <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
-                        {(window as any)?.yatraAdmin?.permalinkStructure ===
-                        "plain"
-                          ? `?yatra_destination_slug=nepal`
-                          : `/${formData.destination_base || "destination"}/nepal`}
+                    <span className="min-w-0">
+                      {__("Listing URL:", "yatra")}{" "}
+                      <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded break-all">
+                        {listingHref(
+                          formData.destination_base || "destination",
+                        )}
                       </code>
                     </span>
                     <a
-                      href={
-                        (window as any)?.yatraAdmin?.siteUrl
-                          ? `${(window as any).yatraAdmin.siteUrl.replace(/\/$/, "")}${
-                              (window as any)?.yatraAdmin
-                                ?.permalinkStructure === "plain"
-                                ? `?yatra_destination_slug=nepal`
-                                : `/${formData.destination_base || "destination"}/nepal`
-                            }`
-                          : `/${formData.destination_base || "destination"}/nepal`
-                      }
+                      href={listingHref(
+                        formData.destination_base || "destination",
+                      )}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline shrink-0"
                     >
                       <ExternalLink className="w-3 h-3" /> {__("View", "yatra")}
                     </a>
@@ -6525,29 +6513,19 @@ const Settings: React.FC = () => {
                 />
                 {formData.activity_base && (
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
-                    <span>
-                      {__("Example URL:", "yatra")}{" "}
-                      <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
-                        {(window as any)?.yatraAdmin?.permalinkStructure ===
-                        "plain"
-                          ? `?yatra_activity_slug=trekking`
-                          : `/${formData.activity_base || "activity"}/trekking`}
+                    <span className="min-w-0">
+                      {__("Listing URL:", "yatra")}{" "}
+                      <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded break-all">
+                        {listingHref(formData.activity_base || "activity")}
                       </code>
                     </span>
                     <a
-                      href={
-                        (window as any)?.yatraAdmin?.siteUrl
-                          ? `${(window as any).yatraAdmin.siteUrl.replace(/\/$/, "")}${
-                              (window as any)?.yatraAdmin
-                                ?.permalinkStructure === "plain"
-                                ? `?yatra_activity_slug=trekking`
-                                : `/${formData.activity_base || "activity"}/trekking`
-                            }`
-                          : `/${formData.activity_base || "activity"}/trekking`
-                      }
+                      href={listingHref(
+                        formData.activity_base || "activity",
+                      )}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline shrink-0"
                     >
                       <ExternalLink className="w-3 h-3" /> {__("View", "yatra")}
                     </a>
@@ -6573,29 +6551,21 @@ const Settings: React.FC = () => {
                 />
                 {formData.trip_category_base && (
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
-                    <span>
-                      {__("Example URL:", "yatra")}{" "}
-                      <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
-                        {(window as any)?.yatraAdmin?.permalinkStructure ===
-                        "plain"
-                          ? `?yatra_category_slug=adventure`
-                          : `/${formData.trip_category_base || "trip-category"}/adventure`}
+                    <span className="min-w-0">
+                      {__("Listing URL:", "yatra")}{" "}
+                      <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded break-all">
+                        {listingHref(
+                          formData.trip_category_base || "trip-category",
+                        )}
                       </code>
                     </span>
                     <a
-                      href={
-                        (window as any)?.yatraAdmin?.siteUrl
-                          ? `${(window as any).yatraAdmin.siteUrl.replace(/\/$/, "")}${
-                              (window as any)?.yatraAdmin
-                                ?.permalinkStructure === "plain"
-                                ? `?yatra_category_slug=adventure`
-                                : `/${formData.trip_category_base || "trip-category"}/adventure`
-                            }`
-                          : `/${formData.trip_category_base || "trip-category"}/adventure`
-                      }
+                      href={listingHref(
+                        formData.trip_category_base || "trip-category",
+                      )}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline shrink-0"
                     >
                       <ExternalLink className="w-3 h-3" /> {__("View", "yatra")}
                     </a>
@@ -6635,29 +6605,17 @@ const Settings: React.FC = () => {
                   />
                   {formData.booking_base && (
                     <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
-                      <span>
-                        {__("Example URL:", "yatra")}{" "}
-                        <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
-                          {(window as any)?.yatraAdmin?.permalinkStructure ===
-                          "plain"
-                            ? `?yatra_booking_page=main`
-                            : `/${formData.booking_base || "book"}/trip-name`}
+                      <span className="min-w-0">
+                        {__("Booking hub URL:", "yatra")}{" "}
+                        <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded break-all">
+                          {listingHref(formData.booking_base || "book")}
                         </code>
                       </span>
                       <a
-                        href={
-                          (window as any)?.yatraAdmin?.siteUrl
-                            ? `${(window as any).yatraAdmin.siteUrl.replace(/\/$/, "")}${
-                                (window as any)?.yatraAdmin
-                                  ?.permalinkStructure === "plain"
-                                  ? `?yatra_booking_page=main`
-                                  : `/${formData.booking_base || "book"}/trip-name`
-                              }`
-                            : `/${formData.booking_base || "book"}/trip-name`
-                        }
+                        href={listingHref(formData.booking_base || "book")}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                        className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline shrink-0"
                       >
                         <ExternalLink className="w-3 h-3" />{" "}
                         {__("View", "yatra")}
@@ -6830,6 +6788,7 @@ const Settings: React.FC = () => {
             </div>
           </div>
         );
+      }
 
       case "seo":
         return (
@@ -6975,6 +6934,7 @@ const Settings: React.FC = () => {
                                     );
                                   });
                                   
+                                  prepareWordPressMediaFrameOpen();
                                   mediaUploader.open();
                                 }
                               }}
@@ -7016,6 +6976,7 @@ const Settings: React.FC = () => {
                                 );
                               });
                               
+                              prepareWordPressMediaFrameOpen();
                               mediaUploader.open();
                             }
                           }}
@@ -7071,6 +7032,31 @@ const Settings: React.FC = () => {
               <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
                 <input
                   type="checkbox"
+                  id="debug_mode"
+                  checked={formData.debug_mode}
+                  name="debug_mode"
+                  onChange={handleFieldChange}
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <div className="flex-1">
+                  <Label
+                    htmlFor="debug_mode"
+                    className="font-medium cursor-pointer"
+                  >
+                    {__("Debug mode", "yatra")}
+                  </Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {__(
+                      "Extra plugin-side diagnostics. When on, Yatra object cache is bypassed (same as when WP_DEBUG is true in wp-config).",
+                      "yatra",
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                <input
+                  type="checkbox"
                   id="cache_enabled"
                   checked={formData.cache_enabled}
                   name="cache_enabled"
@@ -7085,7 +7071,10 @@ const Settings: React.FC = () => {
                     {__("Enable Cache", "yatra")}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__("Cache data to improve performance", "yatra")}
+                    {__(
+                      "Stores frequently used data for faster loads. Stays off while WP_DEBUG or Debug mode (above) is on.",
+                      "yatra",
+                    )}
                   </p>
                 </div>
               </div>

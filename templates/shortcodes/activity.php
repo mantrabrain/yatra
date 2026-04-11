@@ -127,9 +127,10 @@ $column_class = 'yatra-activity-grid-' . min(max($columns, 1), 4);
                 <?php echo yatra_svg_icon('activity', 'yatra-empty-icon-svg'); ?>
             </div>
             <h3><?php esc_html_e('No Activities Found', 'yatra'); ?></h3>
-            <p><?php esc_html_e('We couldn\'t find any activities. Please check back later or browse our tours directly.', 'yatra'); ?></p>
-            <a href="<?php echo esc_url(get_post_type_archive_link('trip')); ?>" class="yatra-btn yatra-btn-primary">
-                <?php esc_html_e('Browse All Tours', 'yatra'); ?>
+            <p><?php esc_html_e('We couldn\'t find any activities. Please check back later or browse our trips directly.', 'yatra'); ?></p>
+            <a href="<?php echo esc_url(get_post_type_archive_link('trip')); ?>" class="yatra-btn yatra-btn-primary yatra-archive-card-cta">
+                <?php echo yatra_svg_icon('globe', 'yatra-btn-icon'); ?>
+                <span><?php esc_html_e('Browse All Trips', 'yatra'); ?></span>
             </a>
         </div>
     <?php endif; ?>

@@ -12,9 +12,9 @@ if (!defined('ABSPATH')) {
         $navigation_items = \Yatra\Controllers\SingleTripController::getStickyNavigationItems($trip);
         foreach ($navigation_items as $item):
         ?>
-            <a href="<?php echo esc_url($item['href']); ?>" class="yatra-sticky-nav-item">
+            <a href="<?php echo esc_url($item['href']); ?>" class="yatra-sticky-nav-item" aria-label="<?php echo esc_attr($item['label']); ?>">
                 <?php yatra_render_tab_icon($item['icon'], 'book', 'yatra-sticky-nav-icon', $item['label']); ?>
-                <span><?php echo esc_html($item['label']); ?></span>
+                <span class="yatra-sticky-nav-label"><?php echo esc_html($item['label']); ?></span>
             </a>
         <?php endforeach; ?>
     </div>

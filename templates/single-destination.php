@@ -239,7 +239,10 @@ yatra_get_header();
                                     </div>
                                     <div class="yatra-price-note"><?php esc_html_e('per person', 'yatra'); ?></div>
                                 </div>
-                                <a href="<?php echo esc_url($trip->permalink ?? ''); ?>" class="yatra-card-view-btn"><?php esc_html_e('View Details', 'yatra'); ?></a>
+                                <a href="<?php echo esc_url($trip->permalink ?? ''); ?>" class="yatra-btn yatra-btn-primary yatra-archive-card-cta yatra-card-view-btn">
+                                    <?php echo yatra_svg_icon('file-text', 'yatra-btn-icon'); ?>
+                                    <span><?php esc_html_e('View Details', 'yatra'); ?></span>
+                                </a>
                             </div>
                         </div>
                     </div>

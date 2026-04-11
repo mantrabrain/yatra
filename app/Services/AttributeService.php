@@ -49,18 +49,13 @@ class AttributeService extends BaseService
     public function getFrontendAttributes(): array
     {
         try {
-            $cacheKey = 'yatra_frontend_attributes';
-            
-            if ($this->isCacheEnabled()) {
-                return Cache::remember($cacheKey, function () {
+            return $this->attributeRepository->withQueryCache(
+                'yatra_frontend_attributes',
+                function () {
                     return $this->attributeRepository->getAllPublished();
-                }, 3600); // Cache for 1 hour
-            } else {
-                // Bypass cache and get fresh data
-                Logger::debug("Cache disabled, getting fresh frontend attributes");
-                return $this->attributeRepository->getAllPublished();
-            }
-            
+                },
+                3600
+            );
         } catch (\Exception $e) {
             Logger::error('Failed to get frontend attributes: ' . $e->getMessage());
             return [];
@@ -73,18 +68,13 @@ class AttributeService extends BaseService
     public function getFilterableAttributes(): array
     {
         try {
-            $cacheKey = 'yatra_filterable_attributes';
-            
-            if ($this->isCacheEnabled()) {
-                return Cache::remember($cacheKey, function () {
+            return $this->attributeRepository->withQueryCache(
+                'yatra_filterable_attributes',
+                function () {
                     return $this->attributeRepository->getFilterableAttributes();
-                }, 1800); // Cache for 30 minutes
-            } else {
-                // Bypass cache and get fresh data
-                Logger::debug("Cache disabled, getting fresh filterable attributes");
-                return $this->attributeRepository->getFilterableAttributes();
-            }
-            
+                },
+                1800
+            );
         } catch (\Exception $e) {
             Logger::error('Failed to get filterable attributes: ' . $e->getMessage());
             return [];
@@ -97,18 +87,13 @@ class AttributeService extends BaseService
     public function getTripAttributes(int $tripId): array
     {
         try {
-            $cacheKey = "yatra_trip_attributes_{$tripId}";
-            
-            if ($this->isCacheEnabled()) {
-                return Cache::remember($cacheKey, function () use ($tripId) {
+            return $this->tripAttributeRepository->withQueryCache(
+                "yatra_trip_attributes_{$tripId}",
+                function () use ($tripId) {
                     return $this->tripAttributeRepository->getTripAttributes($tripId);
-                }, 1800); // Cache for 30 minutes
-            } else {
-                // Bypass cache and get fresh data
-                Logger::debug("Cache disabled, getting fresh trip attributes", ['trip_id' => $tripId]);
-                return $this->tripAttributeRepository->getTripAttributes($tripId);
-            }
-            
+                },
+                1800
+            );
         } catch (\Exception $e) {
             Logger::error("Failed to get attributes for trip {$tripId}: " . $e->getMessage());
             return [];
@@ -192,36 +177,21 @@ class AttributeService extends BaseService
     public function getTripsByAttributeValue(int $attributeId, string $value): array
     {
         try {
-            $cacheKey = "yatra_trips_by_attr_{$attributeId}_" . md5($value);
-            
-            if ($this->isCacheEnabled()) {
-                return Cache::remember($cacheKey, function () use ($attributeId, $value) {
-                    // This method is not available - implement a basic version
+            return $this->attributeRepository->withQueryCache(
+                "yatra_trips_by_attr_{$attributeId}_" . md5($value),
+                function () use ($attributeId, $value) {
                     $tripAttributeTable = $this->tripAttributeRepository->getTableName();
                     $query = "SELECT DISTINCT t.* FROM {$this->attributeRepository->getTableName()} a
                              INNER JOIN {$tripAttributeTable} ta ON ta.attribute_id = a.id
                              INNER JOIN {$this->attributeRepository->getTripsTableName()} t ON t.id = ta.trip_id
                              WHERE a.id = %d AND ta.value = %s AND t.status = 'publish'";
-                    
+
                     return $this->attributeRepository->wpdb->get_results(
                         $this->attributeRepository->wpdb->prepare($query, $attributeId, $value)
                     ) ?: [];
-                }, 1800); // Cache for 30 minutes
-            } else {
-                // Bypass cache and get fresh data
-                Logger::debug("Cache disabled, getting fresh trips by attribute value", ['attribute_id' => $attributeId, 'value' => $value]);
-                // This method is not available - implement a basic version
-                $tripAttributeTable = $this->tripAttributeRepository->getTableName();
-                $query = "SELECT DISTINCT t.* FROM {$this->attributeRepository->getTableName()} a
-                         INNER JOIN {$tripAttributeTable} ta ON ta.attribute_id = a.id
-                         INNER JOIN {$this->attributeRepository->getTripsTableName()} t ON t.id = ta.trip_id
-                         WHERE a.id = %d AND ta.value = %s AND t.status = 'publish'";
-                
-                return $this->attributeRepository->wpdb->get_results(
-                    $this->attributeRepository->wpdb->prepare($query, $attributeId, $value)
-                ) ?: [];
-            }
-            
+                },
+                1800
+            );
         } catch (\Exception $e) {
             Logger::error("Failed to get trips by attribute value: " . $e->getMessage());
             return [];
@@ -234,34 +204,20 @@ class AttributeService extends BaseService
     public function getAttributeValues(int $attributeId): array
     {
         try {
-            $cacheKey = "yatra_attribute_values_{$attributeId}";
-            
-            if ($this->isCacheEnabled()) {
-                return Cache::remember($cacheKey, function () use ($attributeId) {
-                    // This method is not available - implement a basic version
+            return $this->attributeRepository->withQueryCache(
+                "yatra_attribute_values_{$attributeId}",
+                function () use ($attributeId) {
                     $tripAttributeTable = $this->tripAttributeRepository->getTableName();
                     $query = "SELECT DISTINCT value, COUNT(*) as count FROM {$tripAttributeTable}
                              WHERE attribute_id = %d AND value IS NOT NULL AND value != ''
                              GROUP BY value ORDER BY count DESC, value ASC";
-                    
+
                     return $this->attributeRepository->wpdb->get_results(
                         $this->attributeRepository->wpdb->prepare($query, $attributeId)
                     ) ?: [];
-                }, 3600); // Cache for 1 hour
-            } else {
-                // Bypass cache and get fresh data
-                Logger::debug("Cache disabled, getting fresh attribute values", ['attribute_id' => $attributeId]);
-                // This method is not available - implement a basic version
-                $tripAttributeTable = $this->tripAttributeRepository->getTableName();
-                $query = "SELECT DISTINCT value, COUNT(*) as count FROM {$tripAttributeTable}
-                         WHERE attribute_id = %d AND value IS NOT NULL AND value != ''
-                         GROUP BY value ORDER BY count DESC, value ASC";
-                
-                return $this->attributeRepository->wpdb->get_results(
-                    $this->attributeRepository->wpdb->prepare($query, $attributeId)
-                ) ?: [];
-            }
-            
+                },
+                3600
+            );
         } catch (\Exception $e) {
             Logger::error("Failed to get attribute values: " . $e->getMessage());
             return [];
@@ -274,18 +230,13 @@ class AttributeService extends BaseService
     public function search(string $term): array
     {
         try {
-            $cacheKey = 'yatra_search_attributes_' . md5($term);
-            
-            if ($this->isCacheEnabled()) {
-                return Cache::remember($cacheKey, function () use ($term) {
+            return $this->attributeRepository->withQueryCache(
+                'yatra_search_attributes_' . md5($term),
+                function () use ($term) {
                     return $this->attributeRepository->search($term);
-                }, 1800); // Cache for 30 minutes
-            } else {
-                // Bypass cache and get fresh data
-                Logger::debug("Cache disabled, searching attributes directly", ['term' => $term]);
-                return $this->attributeRepository->search($term);
-            }
-            
+                },
+                1800
+            );
         } catch (\Exception $e) {
             Logger::error("Failed to search attributes: " . $e->getMessage());
             return [];

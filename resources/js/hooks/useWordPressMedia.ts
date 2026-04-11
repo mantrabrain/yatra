@@ -5,6 +5,7 @@
 
 import { useCallback } from "react";
 import { __ } from "../lib/i18n";
+import { prepareWordPressMediaFrameOpen } from "../lib/wp-media-open";
 
 declare global {
   interface Window {
@@ -219,6 +220,7 @@ export const useWordPressMedia = (
             }
           });
 
+          prepareWordPressMediaFrameOpen();
           // Open the media library popup
           frame.open();
         })

@@ -81,6 +81,7 @@ import { wpService } from "../lib/api-client";
 import { Button } from "../components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
+import { prepareWordPressMediaFrameOpen } from "../lib/wp-media-open";
 import { Modal } from "../components/ui/modal";
 import { Select } from "../components/ui/select";
 import { Alert } from "../components/ui/alert";
@@ -103,6 +104,10 @@ import { MultiSelect } from "../components/ui/multi-select";
 import { TestimonialsSelector } from "../components/trip-form/TestimonialsSelector";
 import { LocationPicker, LocationData } from "../components/trip-form/LocationPicker";
 import { getErrorContext } from "../lib/errors";
+import {
+  buildYatraSinglePublicUrls,
+  isWordPressPlainPermalink,
+} from "../lib/frontend-permalink-urls";
 
 type SectionId =
   | "basic" // 1. Basic Information (title, description, highlights, featured image, trip type, duration)
@@ -2726,6 +2731,7 @@ const TripForm: React.FC = () => {
         }
       });
 
+      prepareWordPressMediaFrameOpen();
       mediaUploader.open();
     } else {
       // Fallback for when wp.media is not available
@@ -2838,6 +2844,7 @@ const TripForm: React.FC = () => {
         );
       });
 
+      prepareWordPressMediaFrameOpen();
       mediaUploader.open();
     } else {
       // Fallback for when wp.media is not available
@@ -3455,14 +3462,6 @@ const TripForm: React.FC = () => {
 
   const handlePreview = async () => {
     const slug = (formData.slug || "").trim();
-    const siteUrl = (window as any)?.yatraAdmin?.siteUrl || "";
-    const tripBase =
-      settingsData?.trip_base ||
-      (window as any)?.yatraAdmin?.tripBase ||
-      "trip";
-    const permalinkStructure = (window as any)?.yatraAdmin?.permalinkStructure;
-    const isPlainPermalink = permalinkStructure === "plain";
-
     if (!slug) {
       showToast(
         __(
@@ -3474,16 +3473,28 @@ const TripForm: React.FC = () => {
       return;
     }
 
+    const siteUrl = (window as any)?.yatraAdmin?.siteUrl || "";
+    const { plainUrl, prettyUrl } = buildYatraSinglePublicUrls({
+      entity: "trip",
+      slug,
+      siteUrl,
+      bases: settingsData as Record<string, unknown> | null,
+    });
+
+    if (isWordPressPlainPermalink()) {
+      window.open(plainUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
     let apiPermalink = (tripData as any)?.permalink || (tripData as any)?.url;
 
-    // If backend permalink missing but trip exists, try to fetch it (matches Trips list behavior)
     if (!apiPermalink && tripId) {
       try {
         const detail = await apiClient.get(`/trips/${tripId}`);
         apiPermalink =
           (detail as any)?.permalink || (detail as any)?.url || apiPermalink;
       } catch (error) {
-        // Fail silently and fall back to computed URL
+        // fall through to prettyUrl
       }
     }
 
@@ -3492,13 +3503,7 @@ const TripForm: React.FC = () => {
       return;
     }
 
-    // Fallback: honor permalink structure with pretty vs plain URLs
-    const baseSite = siteUrl.replace(/\/$/, "");
-    const prettyUrl = `${baseSite}/${tripBase}/${slug}`;
-    const plainUrl = `${baseSite}/?yatra_trip_slug=${encodeURIComponent(slug)}`;
-    const targetUrl = isPlainPermalink ? plainUrl : prettyUrl;
-
-    window.open(targetUrl, "_blank", "noopener,noreferrer");
+    window.open(prettyUrl, "_blank", "noopener,noreferrer");
   };
 
   const handleRevisionClick = (revisionId: number) => {
@@ -4174,6 +4179,7 @@ const TripForm: React.FC = () => {
                             .toJSON();
                           handleFieldChange("featured_image", attachment.id);
                         });
+                        prepareWordPressMediaFrameOpen();
                         mediaUploader.open();
                       }
                     }}

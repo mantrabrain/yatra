@@ -13,7 +13,6 @@ use Yatra\Repositories\DepartureRepository;
 use Yatra\Repositories\BookingDepartureRepository;
 use Yatra\Validators\BookingValidator;
 use Yatra\Utils\Logger;
-use Yatra\Services\CacheService;
 use Yatra\Services\BookingTaxService;
 
 /**
@@ -338,9 +337,6 @@ class BookingService
             if (!$skipInitialCustomerConfirmation) {
                 $this->sendBookingConfirmationEmail($bookingId);
             }
-            
-            // Clear related caches
-            CacheService::invalidateEntity('booking', $bookingId);
             
             $executionTime = microtime(true) - $startTime;
             Logger::info("Booking created successfully", [

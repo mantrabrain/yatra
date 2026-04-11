@@ -651,11 +651,15 @@ class SettingsService
     }
 
     /**
-     * Get trips per page
+     * Trips per page on front-end listings (aligned with WordPress Reading "posts per page").
      */
     public static function getTripsPerPage(): int
     {
-        return self::getInt('trips_per_page', 12);
+        if (function_exists('yatra_get_posts_per_page')) {
+            return yatra_get_posts_per_page();
+        }
+
+        return max(1, absint((int) get_option('posts_per_page', 10)));
     }
 
     /**

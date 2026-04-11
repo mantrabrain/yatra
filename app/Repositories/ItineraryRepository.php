@@ -37,7 +37,7 @@ class ItineraryRepository extends BaseRepository
         // Use QueryCache for caching day existence checks
         $cacheKey = Cache::KEY_DAY_EXISTS . "_{$tripId}_day_{$dayNumber}";
         
-        $existingDay = Cache::remember($cacheKey, function() use ($tripId, $dayNumber) {
+        $existingDay = $this->cacheQueryResult($cacheKey, function() use ($tripId, $dayNumber) {
             global $wpdb;
             $tableDays = TripItineraryDaysTable::getTableName();
             
@@ -55,7 +55,7 @@ class ItineraryRepository extends BaseRepository
             // If not allowing existing days (for new day creation), throw error
             if (!$allowExisting) {
                 // Get all existing day numbers for this trip
-                $existingDays = Cache::remember(Cache::KEY_DAY_EXISTS . '_existing_days_trip_' . $tripId, function() use ($tripId) {
+                $existingDays = $this->cacheQueryResult(Cache::KEY_DAY_EXISTS . '_existing_days_trip_' . $tripId, function() use ($tripId) {
                     global $wpdb;
                     $tableDays = TripItineraryDaysTable::getTableName();
                     
@@ -70,7 +70,7 @@ class ItineraryRepository extends BaseRepository
                 }, Cache::DURATION_SHORT);
                 
                 // Get next available day number
-                $maxDay = Cache::remember(Cache::KEY_DAY_EXISTS . '_max_day_trip_' . $tripId, function() use ($tripId) {
+                $maxDay = $this->cacheQueryResult(Cache::KEY_DAY_EXISTS . '_max_day_trip_' . $tripId, function() use ($tripId) {
                     global $wpdb;
                     $tableDays = TripItineraryDaysTable::getTableName();
                     
@@ -177,7 +177,9 @@ class ItineraryRepository extends BaseRepository
                     ['%s', '%s'],
                     ['%d']
                 );
-                
+
+                do_action('yatra_itinerary_day_updated', (int) $existingDay->id, $data);
+
                 return (int) $existingDay->id;
             } else {
                 // Create new day
@@ -537,8 +539,8 @@ class ItineraryRepository extends BaseRepository
     {
         // Use QueryCache for caching activity type lookups
         $cacheKey = Cache::KEY_ACTIVITY_TYPE_LOOKUP . '_' . md5($activityType);
-        
-        return Cache::remember($cacheKey, function() use ($activityType) {
+
+        $result = $this->cacheQueryResult($cacheKey, function () use ($activityType) {
             global $wpdb;
             $itemRepository = new \Yatra\Repositories\ItemRepository();
             $itemTypeRepository = new \Yatra\Repositories\ItemTypeRepository();
@@ -577,7 +579,9 @@ class ItineraryRepository extends BaseRepository
             }
 
             return null;
-        }, Cache::DURATION_LOOKUPS) ? [
+        }, Cache::DURATION_LOOKUPS);
+
+        return $result ? [
             'item_type_id' => (int) $result->item_type_id,
             'item_id' => (int) $result->item_id,
         ] : null;
@@ -595,7 +599,7 @@ class ItineraryRepository extends BaseRepository
         // Use QueryCache for caching activity type lookups
         $cacheKey = Cache::KEY_ACTIVITY_TYPE_FROM_ITEMS . '_' . $itemTypeId . '_' . $itemId;
         
-        return Cache::remember($cacheKey, function() use ($itemTypeId, $itemId) {
+        return $this->cacheQueryResult($cacheKey, function() use ($itemTypeId, $itemId) {
             global $wpdb;
             $itemRepository = new \Yatra\Repositories\ItemRepository();
             $itemTypeRepository = new \Yatra\Repositories\ItemTypeRepository();
@@ -630,7 +634,7 @@ class ItineraryRepository extends BaseRepository
         // Use QueryCache for caching activity entry with joins
         $cacheKey = Cache::KEY_ACTIVITY_ENTRY . '_' . $entryId;
         
-        return Cache::remember($cacheKey, function() use ($entryId) {
+        return $this->cacheQueryResult($cacheKey, function() use ($entryId) {
             global $wpdb;
             $tableEntries = $this->getTableName();
             $tableDays = TripItineraryDaysTable::getTableName();
@@ -699,7 +703,7 @@ class ItineraryRepository extends BaseRepository
         // Use QueryCache for caching this expensive query with joins
         $cacheKey = Cache::KEY_ITINERARY_ENTRY_WITH_RELATIONS . '_' . $entryId;
         
-        return Cache::remember($cacheKey, function() use ($entryId) {
+        return $this->cacheQueryResult($cacheKey, function() use ($entryId) {
             global $wpdb;
             $tableEntries = $this->getTableName();
             $tableDays = TripItineraryDaysTable::getTableName();
@@ -1071,7 +1075,7 @@ class ItineraryRepository extends BaseRepository
         // Use Cache for caching this expensive query with joins (Updated: 2026-02-28)
         $cacheKey = Cache::KEY_ITINERARY_BY_TRIP_ID . '_' . $tripId;
         
-        return Cache::remember($cacheKey, function() use ($tripId) {
+        return $this->cacheQueryResult($cacheKey, function() use ($tripId) {
             global $wpdb;
             $tableEntries = $this->getTableName();
             $tableDays = TripItineraryDaysTable::getTableName();

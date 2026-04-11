@@ -35,10 +35,10 @@ if (!defined('ABSPATH')) {
             <div class="yatra-quick-fact-icon">
                 <?php 
                 $difficulty_icons = [
-                    'easy' => 'smile',
+                    'easy' => 'heart',
                     'moderate' => 'activity',
-                    'challenging' => 'alert-triangle',
-                    'difficult' => 'trending-up'
+                    'challenging' => 'zap',
+                    'difficult' => 'flame',
                 ];
                 $icon = $difficulty_icons[$difficulty_level] ?? 'mountain';
                 echo yatra_svg_icon($icon, 'yatra-icon-lg');
@@ -128,7 +128,7 @@ if (!defined('ABSPATH')) {
                 <?php echo yatra_svg_icon('star', 'yatra-icon-lg'); ?>
             </div>
             <div class="yatra-quick-fact-content">
-                <div class="yatra-quick-fact-label"><?php echo esc_html__('Review', 'yatra'); ?></div>
+                <div class="yatra-quick-fact-label"><?php echo esc_html__('Reviews', 'yatra'); ?></div>
                 <div class="yatra-quick-fact-value">
                     <div class="yatra-rating-display">
                         <span class="yatra-rating-number"><?php echo esc_html(number_format($avg_rating, 1)); ?></span>
@@ -151,186 +151,3 @@ if (!defined('ABSPATH')) {
         </div>
     <?php endif; ?>
 </div>
-
-<style>
-/* Simple Quick Facts Styles */
-.yatra-trip-quick-facts {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 16px;
-    padding: 20px;
-    background: #f8fafc;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    width: 100%;
-}
-
-@media (min-width: 768px) {
-    .yatra-trip-quick-facts {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 20px;
-    }
-}
-
-@media (min-width: 1024px) {
-    .yatra-trip-quick-facts {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 24px;
-    }
-}
-
-.yatra-quick-fact {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: white;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    transition: all 0.2s ease;
-}
-
-.yatra-quick-fact:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
-}
-
-.yatra-quick-fact-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    background: #f3f4f6;
-    color: #6b7280;
-    flex-shrink: 0;
-}
-
-.yatra-quick-fact-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.yatra-quick-fact-label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #6b7280;
-    margin-bottom: 2px;
-}
-
-.yatra-quick-fact-value {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #374151;
-    line-height: 1.2;
-}
-
-/* Rating Display */
-.yatra-rating-display {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-.yatra-rating-number {
-    font-weight: 600;
-    color: #374151;
-}
-
-.yatra-rating-stars {
-    display: flex;
-    gap: 1px;
-    font-size: 0.8rem;
-}
-
-.star-filled {
-    color: #fbbf24;
-}
-
-.star-empty {
-    color: #d1d5db;
-}
-
-.yatra-review-count {
-    font-size: 0.8rem;
-    color: #6b7280;
-    font-weight: 400;
-}
-
-/* Price Display */
-.yatra-price-current {
-    color: #059669;
-    font-weight: 600;
-}
-
-.yatra-price-original {
-    color: #9ca3af;
-    text-decoration: line-through;
-    font-weight: 400;
-    font-size: 0.85em;
-}
-
-.yatra-no-reviews {
-    color: #9ca3af;
-    font-style: italic;
-    font-size: 0.85rem;
-}
-
-/* Responsive design */
-@media (max-width: 1024px) {
-    .yatra-trip-quick-facts {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .yatra-trip-quick-facts {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        padding: 16px;
-    }
-    
-    .yatra-quick-fact {
-        padding: 10px;
-        gap: 10px;
-    }
-    
-    .yatra-quick-fact-icon {
-        width: 36px;
-        height: 36px;
-    }
-    
-    .yatra-quick-fact-value {
-        font-size: 0.85rem;
-    }
-    
-    .yatra-rating-display {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2px;
-    }
-}
-
-@media (max-width: 480px) {
-    .yatra-trip-quick-facts {
-        grid-template-columns: 1fr;
-        gap: 10px;
-        padding: 12px;
-    }
-    
-    .yatra-quick-fact {
-        padding: 8px;
-    }
-    
-    .yatra-quick-fact-icon {
-        width: 32px;
-        height: 32px;
-    }
-    
-    .yatra-quick-fact-value {
-        font-size: 0.8rem;
-    }
-}
-</style>

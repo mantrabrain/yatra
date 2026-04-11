@@ -19,6 +19,10 @@ import { useToast } from "../components/ui/toast";
 import { fetchSettings } from "../api/settings-api";
 import { apiClient } from "../lib/api-client";
 import { getErrorContext } from "../lib/errors";
+import {
+  buildYatraSinglePublicUrls,
+  isWordPressPlainPermalink,
+} from "../lib/frontend-permalink-urls";
 import { Button } from "../components/ui/button";
 import { Select } from "../components/ui/select";
 import { PageHeader } from "../components/common/PageHeader";
@@ -512,44 +516,45 @@ export const Categories: React.FC = () => {
   };
 
   const handleView = async (category: Category) => {
-    const siteUrl = (window as any)?.yatraAdmin?.siteUrl || "";
-    const categoryBase = settings?.trip_category_base || "trip-categories";
     const categorySlug = category.slug || "";
-    let apiPermalink = (category as any)?.permalink || (category as any)?.url;
-    // permalinkStructure is optional in yatraAdmin; default to unknown => fall back to pretty
-    const permalinkStructure = (window as any)?.yatraAdmin?.permalinkStructure;
-    const isPlainPermalink = permalinkStructure === "plain";
+    const { plainUrl, prettyUrl } = buildYatraSinglePublicUrls({
+      entity: "category",
+      slug: categorySlug,
+      bases: settings as Record<string, unknown> | null,
+    });
 
-    if (!categorySlug && !apiPermalink) {
-      showToast(__("Category slug is missing", "yatra"), "error");
+    if (isWordPressPlainPermalink()) {
+      if (!categorySlug) {
+        showToast(__("Category slug is missing", "yatra"), "error");
+        return;
+      }
+      window.open(plainUrl, "_blank", "noopener,noreferrer");
       return;
     }
 
-    // If permalink is missing, try fetching the single category to get the backend-computed permalink
+    let apiPermalink = (category as any)?.permalink || (category as any)?.url;
+
     if (!apiPermalink && category.id) {
       try {
         const detail = await apiClient.get(`/trip-categories/${category.id}`);
         apiPermalink =
           (detail as any)?.permalink || (detail as any)?.url || apiPermalink;
       } catch (e) {
-        // Ignore and fall back to pretty URL
+        // fall through to prettyUrl
       }
     }
 
-    // Prefer server-provided permalink when available (respects current permalink structure)
     if (apiPermalink) {
       window.open(apiPermalink, "_blank", "noopener,noreferrer");
       return;
     }
 
-    // Fallback: Pretty permalink path
-    const baseSite = siteUrl.replace(/\/$/, "");
-    const prettyUrl = `${baseSite}/${categoryBase}/${categorySlug}`;
-    const plainUrl = `${baseSite}/?${categoryBase}=${encodeURIComponent(categorySlug)}`;
+    if (!categorySlug) {
+      showToast(__("Category slug is missing", "yatra"), "error");
+      return;
+    }
 
-    // Honor site permalink structure (default to plain when unknown)
-    const targetUrl = isPlainPermalink ? plainUrl : prettyUrl;
-    window.open(targetUrl, "_blank", "noopener,noreferrer");
+    window.open(prettyUrl, "_blank", "noopener,noreferrer");
   };
 
   const confirmDelete = () => {

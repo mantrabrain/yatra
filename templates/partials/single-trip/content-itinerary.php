@@ -11,10 +11,10 @@ if (!defined('ABSPATH')) {
         </h2>
         <div class="yatra-itinerary-actions">
             <button type="button" class="yatra-toggle-all-btn" id="yatra-toggle-all">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="toggle-icon expand-icon">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="toggle-icon expand-icon" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
                 </svg>
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="toggle-icon collapse-icon" style="display: none;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="toggle-icon collapse-icon" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25"/>
                 </svg>
                 <span class="toggle-text">Expand All</span>
@@ -62,12 +62,12 @@ if (!defined('ABSPATH')) {
                 </p>
             </div>
         <?php else: ?>
-            <?php foreach ($itinerary_days as $day): ?>
-            <div class="yatra-itinerary-day" data-day="<?php echo esc_attr($day['day']); ?>">
+            <?php foreach ($itinerary_days as $idx => $day): ?>
+            <div class="yatra-itinerary-day<?php echo (int) $idx === 0 ? ' is-day-expanded' : ''; ?>" data-day="<?php echo esc_attr($day['day']); ?>">
                 <div class="yatra-itinerary-day-header">
                     <div class="yatra-day-badge"><?php esc_html_e('Day', 'yatra'); ?> <?php echo esc_html($day['day']); ?></div>
                     <h3 class="yatra-day-title"><?php echo esc_html($day['day_title']); ?></h3>
-                    <button type="button" class="yatra-day-toggle" aria-expanded="true">
+                    <button type="button" class="yatra-day-toggle" aria-expanded="<?php echo (int) $idx === 0 ? 'true' : 'false'; ?>">
                         <svg class="yatra-chevron-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
@@ -76,7 +76,7 @@ if (!defined('ABSPATH')) {
 
                 <div class="yatra-itinerary-day-content">
                     <?php if (!empty($day['day_description'])): ?>
-                        <div class="yatra-day-description" style="margin-bottom: 20px; color: #4b5563; font-size: 15px; line-height: 1.6;">
+                        <div class="yatra-day-description">
                             <?php echo wp_kses_post(wpautop($day['day_description'])); ?>
                         </div>
                     <?php endif; ?>
@@ -289,7 +289,7 @@ if (!defined('ABSPATH')) {
 
 <!-- Hidden Gallery Section for JavaScript Collection -->
 <?php if (!empty($yatra_itinerary_gallery_images)): ?>
-    <div class="yatra-itinerary-trip-gallery" data-gallery="itinerary-gallery" style="display: none;">
+    <div class="yatra-itinerary-trip-gallery" data-gallery="itinerary-gallery" aria-hidden="true">
         <?php foreach ($yatra_itinerary_gallery_images as $index => $image_url): ?>
             <?php if ($image_url): ?>
                 <div class="yatra-gallery-item" data-image-index="<?php echo esc_attr($index); ?>" itemscope itemtype="https://schema.org/ImageObject">

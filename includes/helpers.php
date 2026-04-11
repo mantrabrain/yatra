@@ -228,14 +228,12 @@ function yatra_get_booking_url(string $trip_slug, array $params = []): string
     // Using default dynamic URL
     $booking_base = SettingsService::getBookingBase();
     if ($is_plain) {
-        // Plain permalinks: rely on query var to route booking page
         $params['trip'] = $trip_slug;
-        $url = add_query_arg(
-            array_merge(['yatra_booking_page' => 'main'], $params),
+
+        return add_query_arg(
+            array_merge(['yatra_page' => $booking_base], $params),
             home_url('/')
         );
-        // params already appended; avoid double-adding later
-        return $url;
     }
 
     $url = home_url('/' . $booking_base . '/' . $trip_slug);
@@ -426,6 +424,106 @@ if (!function_exists('yatra_svg_icon')) {
 }
 
 /**
+ * Extract SVG icon slug from a stored icon field (same shape as admin / archive cards).
+ *
+ * @param mixed $icon Raw value from DB (serialized array with type/value, URL, attachment id, or legacy slug string).
+ */
+function yatra_icon_slug_from_stored_field($icon): string
+{
+    if ($icon === null || $icon === '') {
+        return '';
+    }
+
+    $icon = maybe_unserialize($icon);
+
+    if (is_array($icon)) {
+        $type  = $icon['type'] ?? $icon[0] ?? '';
+        $value = $icon['value'] ?? $icon[1] ?? '';
+        if ($type === 'icon' && !empty($value) && is_string($value)) {
+            return $value;
+        }
+
+        return '';
+    }
+
+    if (is_string($icon)) {
+        if (filter_var($icon, FILTER_VALIDATE_URL)) {
+            return '';
+        }
+        $slug = trim($icon);
+
+        return $slug !== '' ? $slug : '';
+    }
+
+    return '';
+}
+
+/**
+ * SVG markup for archive listing CTAs: use admin icon when present and valid in icons.json; else default slug.
+ *
+ * @param string $resolved_icon_slug From the listing loop (same source as card hero icon when type is "icon").
+ * @param string $default_slug       icons.json key when no admin icon.
+ */
+function yatra_archive_listing_cta_icon_markup(string $resolved_icon_slug, string $default_slug, string $class = 'yatra-btn-icon'): string
+{
+    $slug = trim($resolved_icon_slug);
+    if ($slug !== '' && function_exists('yatra_svg_icon')) {
+        $out = yatra_svg_icon($slug, $class);
+        if ($out !== '') {
+            return $out;
+        }
+    }
+
+    $fallback = trim($default_slug);
+    if ($fallback !== '' && function_exists('yatra_svg_icon')) {
+        return yatra_svg_icon($fallback, $class);
+    }
+
+    return '';
+}
+
+/**
+ * Icon slug for trip listing card "View Details" — category, then destination, then difficulty (backend order).
+ *
+ * @param array<int, object|array<string, mixed>> $categories  Trip categories from getCategories()
+ * @param array<int, object|array<string, mixed>> $destinations Trip destinations from getDestinations()
+ * @param array<string, mixed>                    $difficulty   From Trip::getDifficulty()
+ */
+function yatra_trip_listing_card_cta_icon_slug(array $categories, array $destinations, array $difficulty): string
+{
+    foreach ($categories as $row) {
+        if (empty($row)) {
+            continue;
+        }
+        $raw = is_object($row) ? ($row->icon ?? null) : ($row['icon'] ?? null);
+        $slug = yatra_icon_slug_from_stored_field($raw);
+        if ($slug !== '') {
+            return $slug;
+        }
+    }
+
+    foreach ($destinations as $row) {
+        if (empty($row)) {
+            continue;
+        }
+        $raw = is_object($row) ? ($row->icon ?? null) : ($row['icon'] ?? null);
+        $slug = yatra_icon_slug_from_stored_field($raw);
+        if ($slug !== '') {
+            return $slug;
+        }
+    }
+
+    if (!empty($difficulty['icon']) && is_string($difficulty['icon'])) {
+        $try = trim($difficulty['icon']);
+        if ($try !== '') {
+            return $try;
+        }
+    }
+
+    return '';
+}
+
+/**
  * Get booking base URL slug
  * 
  * @return string The booking base slug
@@ -463,8 +561,8 @@ function yatra_is_booking_page(): bool
         }
     }
     
-    // Check for booking page query var (set by BookingPageHandler)
-    if (!empty($wp_query->get('yatra_booking_page'))) {
+    $booking_base = SettingsService::getBookingBase();
+    if (!empty($wp_query->get('yatra_page')) && (string) $wp_query->get('yatra_page') === $booking_base) {
         return true;
     }
     
@@ -870,8 +968,7 @@ function yatra_get_checkout_url(): string
     // Default dynamic URL using booking base from settings
     $base = SettingsService::getBookingBase();
     if ($is_plain) {
-        // Plain permalinks: route via query var
-        return add_query_arg(['yatra_booking_page' => 'main'], home_url('/'));
+        return add_query_arg(['yatra_page' => $base], home_url('/'));
     }
 
     return home_url('/' . $base . '/');
@@ -919,6 +1016,212 @@ function yatra_get_booking_confirmation_url(string $reference = ''): string
 
 /**
  * ============================================
+ * ARCHIVE LISTING (plain permalinks pagination)
+ * ============================================
+ */
+
+/**
+ * Items per page from WordPress Reading settings ("Blog pages show at most").
+ * Used for Yatra front-end listings (trips, taxonomies, activity/destination/category archives).
+ *
+ * @return int At least 1.
+ */
+function yatra_get_posts_per_page(): int
+{
+    $n = absint((int) get_option('posts_per_page', 10));
+
+    return (int) apply_filters('yatra_posts_per_page', max(1, $n));
+}
+
+/**
+ * Current page number for Yatra archive templates (activity, destination, trip category).
+ * Handles plain URLs where WordPress may use {@see 'paged'} or {@see 'page'} on the front page.
+ */
+function yatra_get_archive_listing_paged(): int
+{
+    if (isset($_GET['paged']) && $_GET['paged'] !== '') {
+        return max(1, absint(wp_unslash($_GET['paged'])));
+    }
+
+    if (!empty($_GET['yatra_page']) && isset($_GET['page']) && $_GET['page'] !== '') {
+        return max(1, absint(wp_unslash($_GET['page'])));
+    }
+
+    $p = (int) get_query_var('paged');
+    if ($p > 0) {
+        return max(1, $p);
+    }
+
+    $p = (int) get_query_var('page');
+
+    return max(1, $p);
+}
+
+/**
+ * Result summary for destination / activity / trip-category browse pages (parity with trip grid header).
+ *
+ * @param string $items_label Plural noun, e.g. translated "destinations".
+ */
+function yatra_archive_browse_results_line(int $start, int $end, int $total, int $page, int $pages, string $items_label): string
+{
+    if ($total <= 0) {
+        return '';
+    }
+
+    return sprintf(
+        /* translators: 1–2: range, 3: total, 4: item type, 5–6: pagination */
+        __('Showing %1$d–%2$d of %3$d %4$s (page %5$d of %6$d)', 'yatra'),
+        $start,
+        $end,
+        $total,
+        $items_label,
+        $page,
+        $pages
+    );
+}
+
+/**
+ * Full URL for the same archive request with a different page (preserves yatra_page and other args).
+ * Uses home_url + add_query_arg so links are never query-only (esc_url rejects "?foo=bar" in some cases).
+ */
+function yatra_build_archive_listing_url(int $page_num): string
+{
+    $params = !empty($_GET) && is_array($_GET) ? wp_unslash($_GET) : [];
+
+    $qvYatra = (string) get_query_var('yatra_page');
+    if ($qvYatra !== '' && (!isset($params['yatra_page']) || $params['yatra_page'] === '')) {
+        $params['yatra_page'] = $qvYatra;
+    }
+
+    if (!empty($params['yatra_page']) || isset($params['yatra_trip'])) {
+        unset($params['page']);
+    }
+
+    if ($page_num > 1) {
+        $params['paged'] = (string) $page_num;
+    } else {
+        unset($params['paged']);
+    }
+
+    return esc_url(add_query_arg($params, home_url('/')));
+}
+
+/**
+ * Same request path with a different paged query arg (strips an existing /page/N/ segment first).
+ * For taxonomy trip lists and other templates not rooted at home_url('/').
+ */
+function yatra_build_current_request_paged_url(int $page_num): string
+{
+    $page_num = max(1, $page_num);
+    $request_uri = isset($_SERVER['REQUEST_URI']) ? (string) wp_unslash($_SERVER['REQUEST_URI']) : '/';
+    $base_path = strtok($request_uri, '?') ?: '/';
+    $base_path = rtrim($base_path, '/');
+    $base_path = preg_replace('#/page/[0-9]+#', '', $base_path);
+    $base_path = rtrim($base_path, '/');
+
+    $query_string = isset($_SERVER['QUERY_STRING']) ? (string) $_SERVER['QUERY_STRING'] : '';
+    parse_str($query_string, $params);
+    if (!is_array($params)) {
+        $params = [];
+    }
+
+    if ($page_num > 1) {
+        $params['paged'] = (string) $page_num;
+    } else {
+        unset($params['paged'], $params['page']);
+    }
+
+    $query = http_build_query($params);
+
+    return esc_url($base_path . ($query !== '' ? '?' . $query : ''));
+}
+
+/**
+ * Compare two archive listing rows (activity, destination, or category) by sort key.
+ */
+function yatra_compare_archive_listing_row_pair(object $a, object $b, string $sort): int
+{
+    $nameA   = isset($a->name) ? strtolower((string) $a->name) : '';
+    $nameB   = isset($b->name) ? strtolower((string) $b->name) : '';
+    $tripsA  = isset($a->trips_count) ? (int) $a->trips_count : 0;
+    $tripsB  = isset($b->trips_count) ? (int) $b->trips_count : 0;
+    $ratingA = isset($a->avg_rating) ? (float) $a->avg_rating : 0.0;
+    $ratingB = isset($b->avg_rating) ? (float) $b->avg_rating : 0.0;
+
+    switch ($sort) {
+        case 'trips_desc':
+            return $tripsB <=> $tripsA;
+        case 'trips_asc':
+            return $tripsA <=> $tripsB;
+        case 'name_asc':
+            return $nameA <=> $nameB;
+        case 'name_desc':
+            return $nameB <=> $nameA;
+        case 'rating_desc':
+        default:
+            $cmp = $ratingB <=> $ratingA;
+            if (0 === $cmp) {
+                return $tripsB <=> $tripsA;
+            }
+
+            return $cmp;
+    }
+}
+
+/**
+ * Invokable comparator for {@see yatra_sort_archive_listing_stats_rows()}.
+ *
+ * @internal
+ */
+final class Yatra_Archive_Listing_Stats_Comparator
+{
+    /** @var string */
+    private $sort;
+
+    public function __construct(string $sort)
+    {
+        $this->sort = $sort;
+    }
+
+    /**
+     * @param object $a
+     * @param object $b
+     */
+    public function __invoke($a, $b): int
+    {
+        return yatra_compare_archive_listing_row_pair($a, $b, $this->sort);
+    }
+}
+
+/**
+ * Sort archive listing rows in place (stats objects from repository).
+ */
+function yatra_sort_archive_listing_stats_rows(array &$items, string $sort): void
+{
+    if (empty($items)) {
+        return;
+    }
+
+    usort($items, new Yatra_Archive_Listing_Stats_Comparator($sort));
+}
+
+/**
+ * Sort dropdown URL: same archive, page reset to 1, yatra_sort applied (preserves yatra_page etc.).
+ */
+function yatra_build_archive_listing_sort_url(string $yatra_sort): string
+{
+    $params = !empty($_GET) && is_array($_GET) ? wp_unslash($_GET) : [];
+    unset($params['paged'], $params['page']);
+    if (!empty($params['yatra_page']) || isset($params['yatra_trip'])) {
+        unset($params['page']);
+    }
+    $params['yatra_sort'] = $yatra_sort;
+
+    return esc_url(add_query_arg($params, home_url('/')));
+}
+
+/**
+ * ============================================
  * PERMALINK HELPERS
  * ============================================
  */
@@ -948,7 +1251,15 @@ function yatra_get_destination_permalink($destination): string
     }
     
     $base = SettingsService::getString('destination_base', 'destination');
-    
+    $permalink_structure = get_option('permalink_structure');
+    $is_plain = empty($permalink_structure);
+
+    if ($is_plain) {
+        $key = preg_replace('/[^a-z0-9_-]/i', '', $base) ?: 'destination';
+
+        return add_query_arg([$key => $slug], home_url('/'));
+    }
+
     return home_url('/' . $base . '/' . $slug . '/');
 }
 
@@ -977,7 +1288,15 @@ function yatra_get_activity_permalink($activity): string
     }
     
     $base = SettingsService::getString('activity_base', 'activity');
-    
+    $permalink_structure = get_option('permalink_structure');
+    $is_plain = empty($permalink_structure);
+
+    if ($is_plain) {
+        $key = preg_replace('/[^a-z0-9_-]/i', '', $base) ?: 'activity';
+
+        return add_query_arg([$key => $slug], home_url('/'));
+    }
+
     return home_url('/' . $base . '/' . $slug . '/');
 }
 
@@ -1006,7 +1325,15 @@ function yatra_get_category_permalink($category): string
     }
     
     $base = SettingsService::getString('trip_category_base', 'trip-category');
-    
+    $permalink_structure = get_option('permalink_structure');
+    $is_plain = empty($permalink_structure);
+
+    if ($is_plain) {
+        $key = preg_replace('/[^a-z0-9_-]/i', '', $base) ?: 'trip-category';
+
+        return add_query_arg([$key => $slug], home_url('/'));
+    }
+
     return home_url('/' . $base . '/' . $slug . '/');
 }
 
@@ -1038,7 +1365,9 @@ function yatra_get_trip_permalink($trip): string
     $is_plain = empty($permalink_structure);
     
     if ($is_plain) {
-        return add_query_arg(['yatra_trip_slug' => $slug], home_url('/'));
+        $key = preg_replace('/[^a-z0-9_-]/i', '', $base) ?: 'trip';
+
+        return add_query_arg([$key => $slug], home_url('/'));
     }
     
     return home_url('/' . $base . '/' . $slug . '/');
@@ -1046,12 +1375,269 @@ function yatra_get_trip_permalink($trip): string
 
 /**
  * Canonical URL for the trip archive / filter listing (respects Settings trip base).
+ * Plain permalinks use ?yatra_page={base}; pretty permalinks use /{base}/.
  */
 function yatra_get_trip_listing_url(): string
 {
     $base = SettingsService::getTripBase();
+    $base = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $base) ?: 'trip';
+    $permalink_structure = (string) get_option('permalink_structure', '');
 
-    return trailingslashit(home_url('/' . $base . '/'));
+    if ($permalink_structure === '') {
+        $url = esc_url(add_query_arg('yatra_page', $base, home_url('/')));
+    } else {
+        $url = trailingslashit(home_url('/' . $base . '/'));
+    }
+
+    return (string) apply_filters('yatra_trip_listing_url', $url, $base);
+}
+
+/**
+ * Canonical URL for browse-all taxonomy listings (destinations, activities, trip categories).
+ * Plain permalinks use ?yatra_page={base}; pretty permalinks use /{base}/.
+ *
+ * @param string $listing_type One of: destination, activity, category
+ */
+function yatra_get_taxonomy_listing_url(string $listing_type): string
+{
+    $map = [
+        'destination' => SettingsService::getString('destination_base', 'destination'),
+        'activity' => SettingsService::getString('activity_base', 'activity'),
+        'category' => SettingsService::getString('trip_category_base', 'trip-category'),
+    ];
+    $base = $map[$listing_type] ?? '';
+    $base = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $base) ?: 'destination';
+    $permalink_structure = (string) get_option('permalink_structure', '');
+
+    if ($permalink_structure === '') {
+        $url = esc_url(add_query_arg('yatra_page', $base, home_url('/')));
+    } else {
+        $url = trailingslashit(home_url('/' . $base . '/'));
+    }
+
+    return (string) apply_filters('yatra_taxonomy_listing_url', $url, $listing_type, $base);
+}
+
+/**
+ * Decode trips.price_types for listing-card logic (DB may store JSON string or array).
+ *
+ * @return array<int, array<string, mixed>>
+ */
+function yatra_trip_listing_decode_price_types(object $trip): array
+{
+    $pts = $trip->price_types ?? null;
+    if (is_string($pts) && $pts !== '') {
+        $decoded = json_decode($pts, true);
+        $pts = is_array($decoded) ? $decoded : [];
+    } elseif (!is_array($pts)) {
+        $pts = [];
+    }
+    if ($pts === [] && method_exists($trip, 'getPriceTypes')) {
+        $got = $trip->getPriceTypes();
+        $pts = is_array($got) ? $got : [];
+    }
+
+    return $pts;
+}
+
+/**
+ * Lowercase keys for traveler tier labels (used to strip mis-tagged classifications).
+ *
+ * @return array<string, true>
+ */
+function yatra_trip_listing_traveler_tier_label_keys(object $trip): array
+{
+    if (($trip->pricing_type ?? '') !== 'traveler_based') {
+        return [];
+    }
+    $keys = [];
+    foreach (yatra_trip_listing_decode_price_types($trip) as $pt) {
+        if (!is_array($pt)) {
+            continue;
+        }
+        foreach (['label', 'category_label', 'title'] as $k) {
+            if (!empty($pt[$k]) && is_string($pt[$k])) {
+                $t = strtolower(trim($pt[$k]));
+                if ($t !== '') {
+                    $keys[$t] = true;
+                }
+                break;
+            }
+        }
+    }
+
+    return $keys;
+}
+
+/**
+ * Ordered unique labels for the listing card “Traveler types” row.
+ *
+ * @return list<string>
+ */
+function yatra_trip_listing_traveler_type_labels_for_card(object $trip): array
+{
+    if (($trip->pricing_type ?? '') !== 'traveler_based') {
+        return [];
+    }
+    $labels = [];
+    $seen = [];
+    foreach (yatra_trip_listing_decode_price_types($trip) as $pt) {
+        if (!is_array($pt)) {
+            continue;
+        }
+        foreach (['label', 'category_label', 'title'] as $k) {
+            if (!empty($pt[$k]) && is_string($pt[$k])) {
+                $lab = trim($pt[$k]);
+                if ($lab === '') {
+                    break;
+                }
+                $lk = strtolower($lab);
+                if (!isset($seen[$lk])) {
+                    $seen[$lk] = true;
+                    $labels[] = $lab;
+                }
+                break;
+            }
+        }
+    }
+
+    return $labels;
+}
+
+/**
+ * Format start → end for listing cards; avoids repeating the same country when both
+ * strings are "City, Country".
+ */
+function yatra_format_trip_listing_route_line(string $start, string $end): string
+{
+    $start = trim($start);
+    $end = trim($end);
+    if ($start === '') {
+        return $end;
+    }
+    if ($end === '') {
+        return $start;
+    }
+    if (strcasecmp($start, $end) === 0) {
+        return $start;
+    }
+    if (strpos($start, ',') !== false && strpos($end, ',') !== false) {
+        $s_parts = array_map('trim', explode(',', $start, 2));
+        $e_parts = array_map('trim', explode(',', $end, 2));
+        if (count($s_parts) === 2 && count($e_parts) === 2
+            && strcasecmp($s_parts[1], $e_parts[1]) === 0) {
+            return $s_parts[0] . ' → ' . $e_parts[0] . ', ' . $s_parts[1];
+        }
+    }
+
+    return $start . ' → ' . $end;
+}
+
+/**
+ * Human label for trip_type column (listing card meta).
+ */
+function yatra_trip_listing_trip_type_label(?string $trip_type): string
+{
+    $t = (string) $trip_type;
+    $map = [
+        'single_day' => __('Single day', 'yatra'),
+        'multi_day' => __('Multi-day', 'yatra'),
+        'flexible' => __('Flexible', 'yatra'),
+    ];
+
+    return $map[$t] ?? '';
+}
+
+/**
+ * Rating block for listing cards: prefers SQL aggregates (average_rating, review_count)
+ * when the hydrated reviews array is empty.
+ *
+ * @param array{has_rating: bool, average_rating: float, review_count: int, formatted_rating: string} $from_reviews
+ * @return array{has_rating: bool, average_rating: float, review_count: int, formatted_rating: string}
+ */
+function yatra_trip_listing_card_rating_data(object $trip, array $from_reviews): array
+{
+    $has = !empty($from_reviews['has_rating']);
+    $avg = (float) ($from_reviews['average_rating'] ?? 0);
+    $cnt = (int) ($from_reviews['review_count'] ?? 0);
+    $fmt = (string) ($from_reviews['formatted_rating'] ?? '0.0');
+
+    if ($cnt === 0 || !$has || $avg <= 0) {
+        $q_avg = isset($trip->average_rating) ? (float) $trip->average_rating : null;
+        $q_cnt = isset($trip->review_count) ? (int) $trip->review_count : null;
+        if (($q_cnt === null || $q_cnt === 0) && isset($trip->reviews_count)) {
+            $q_cnt = (int) $trip->reviews_count;
+        }
+        if ($q_cnt !== null && $q_cnt > 0 && $q_avg !== null && $q_avg > 0) {
+            $avg = round($q_avg, 1);
+            $cnt = $q_cnt;
+            $fmt = number_format($avg, 1);
+            $has = true;
+        }
+    }
+
+    return [
+        'has_rating' => $has && $avg > 0 && $cnt > 0,
+        'average_rating' => $avg,
+        'review_count' => $cnt,
+        'formatted_rating' => $fmt,
+    ];
+}
+
+/**
+ * Avoid repeating the same classification label in the destination, activity, and category
+ * rows on listing cards (traveler tier labels wrongly linked as classifications, or same
+ * term attached in multiple roles).
+ *
+ * @param array<int, object> $destinations
+ * @param array<int, object> $activities
+ * @param array<int, object> $categories
+ * @return array{0: array<int, object>, 1: array<int, object>, 2: array<int, object>}
+ */
+function yatra_trip_listing_filter_classification_duplicates(array $destinations, array $activities, array $categories, object $trip): array
+{
+    $tier_keys = yatra_trip_listing_traveler_tier_label_keys($trip);
+
+    $strip_tiers = static function (array $items) use ($tier_keys): array {
+        if ($tier_keys === []) {
+            return $items;
+        }
+
+        return array_values(array_filter($items, static function ($item) use ($tier_keys) {
+            $n = strtolower(trim((string) ($item->name ?? '')));
+
+            return $n === '' || !isset($tier_keys[$n]);
+        }));
+    };
+
+    $destinations = $strip_tiers($destinations);
+    $activities = $strip_tiers($activities);
+    $categories = $strip_tiers($categories);
+
+    $seen = [];
+    $dedupe = static function (array $items) use (&$seen): array {
+        $out = [];
+        foreach ($items as $item) {
+            $n = strtolower(trim((string) ($item->name ?? '')));
+            if ($n === '') {
+                $out[] = $item;
+                continue;
+            }
+            if (isset($seen[$n])) {
+                continue;
+            }
+            $seen[$n] = true;
+            $out[] = $item;
+        }
+
+        return $out;
+    };
+
+    $destinations = $dedupe($destinations);
+    $activities = $dedupe($activities);
+    $categories = $dedupe($categories);
+
+    return [$destinations, $activities, $categories];
 }
 
 /**

@@ -8,6 +8,7 @@ import { Upload, X, Video, Plus } from "lucide-react";
 import { Button } from "./button";
 import { Card, CardContent } from "./card";
 import { __ } from "../../lib/i18n";
+import { prepareWordPressMediaFrameOpen } from "../../lib/wp-media-open";
 import { MediaItem } from "../trip-form/types";
 
 interface MediaUploadProps {
@@ -109,6 +110,7 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
         }
       });
 
+      prepareWordPressMediaFrameOpen();
       mediaUploader.open();
     } else {
       // Fallback for non-WordPress environments

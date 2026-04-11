@@ -1588,6 +1588,7 @@ class SingleTripController
                 (object) ['id' => 'trip_story', 'label' => 'Story', 'enabled' => true, 'order' => 8, 'content_type' => 'trip_story', 'custom_content' => '', 'icon' => 'book'],
                 (object) ['id' => 'what_makes_special', 'label' => 'Special', 'enabled' => true, 'order' => 9, 'content_type' => 'what_makes_special', 'custom_content' => '', 'icon' => 'star'],
                 (object) ['id' => 'testimonials', 'label' => 'Testimonials', 'enabled' => true, 'order' => 10, 'content_type' => 'testimonials', 'icon' => 'message-circle'],
+                (object) ['id' => 'gallery', 'label' => 'Gallery', 'enabled' => false, 'order' => 11, 'content_type' => 'gallery', 'icon' => 'camera'],
             ];
         }
         
@@ -1638,6 +1639,10 @@ class SingleTripController
                     'tab' => $tab,
                     'itinerary_entries' => $itinerary_entries
                 ]);
+                break;
+
+            case 'gallery':
+                yatra_get_template('partials/single-trip/content-gallery', ['trip' => $trip, 'tab' => $tab]);
                 break;
 
             case 'important_info':
@@ -1716,6 +1721,7 @@ class SingleTripController
                 (object) ['id' => 'trip_story', 'label' => 'Story', 'enabled' => true, 'order' => 8, 'content_type' => 'trip_story', 'custom_content' => '', 'icon' => 'book'],
                 (object) ['id' => 'what_makes_special', 'label' => 'Special', 'enabled' => true, 'order' => 9, 'content_type' => 'what_makes_special', 'custom_content' => '', 'icon' => 'star'],
                 (object) ['id' => 'testimonials', 'label' => 'Testimonials', 'enabled' => true, 'order' => 10, 'content_type' => 'testimonials', 'icon' => 'message-circle'],
+                (object) ['id' => 'gallery', 'label' => 'Gallery', 'enabled' => false, 'order' => 11, 'content_type' => 'gallery', 'icon' => 'camera'],
             ];
         }
 
@@ -2080,6 +2086,7 @@ class SingleTripController
             'itinerary' => 'calendar',
             'included_excluded' => 'check',
             'location' => 'map-pin',
+            'gallery' => 'camera',
             'important_info' => 'info',
             'downloads' => 'download',
             'faq' => 'help-circle',
@@ -2094,6 +2101,7 @@ class SingleTripController
             'itinerary' => '#itinerary',
             'included' => '#included',
             'location' => '#location',
+            'gallery' => '#gallery',
             'important_info' => '#important-info',
             'downloads' => '#downloads',
             'faq' => '#faq',
@@ -2158,6 +2166,7 @@ class SingleTripController
             (object) ['id' => 'trip_story', 'label' => 'Story', 'enabled' => true, 'order' => 8, 'content_type' => 'trip_story', 'custom_content' => '', 'icon' => 'book'],
             (object) ['id' => 'what_makes_special', 'label' => 'Special', 'enabled' => true, 'order' => 9, 'content_type' => 'what_makes_special', 'custom_content' => '', 'icon' => 'star'],
             (object) ['id' => 'testimonials', 'label' => 'Testimonials', 'enabled' => true, 'order' => 10, 'content_type' => 'testimonials', 'icon' => 'message-circle'],
+            (object) ['id' => 'gallery', 'label' => 'Gallery', 'enabled' => false, 'order' => 11, 'content_type' => 'gallery', 'icon' => 'camera'],
         ];
 
         // If no database data, return defaults

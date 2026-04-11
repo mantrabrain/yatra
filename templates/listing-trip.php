@@ -34,7 +34,7 @@ $yatra_results = $ctx['results'] ?? [
     'display_total' => 0,
     'start_item' => 0,
     'end_item' => 0,
-    'per_page' => 12,
+    'per_page' => yatra_get_posts_per_page(),
 ];
 $yatra_pagination = $ctx['pagination'] ?? [
     'total_pages' => 1,
@@ -76,6 +76,16 @@ yatra_get_header();
             <div class="yatra-results-header">
                 <div class="yatra-results-info">
                     <h1><?php echo esc_html($yatra_listing_title); ?></h1>
+                    <?php if (empty($show_taxonomy_context)) : ?>
+                        <p class="yatra-listing-archive-lede"><?php esc_html_e('Compare trips, filter by budget and trip style, then open a trip for full details and booking.', 'yatra'); ?></p>
+                    <?php elseif (!empty($current_filter_name) || !empty($current_filter_slug)) : ?>
+                        <p class="yatra-listing-archive-lede"><?php
+                        printf(
+                            esc_html__('Filtered by: %s', 'yatra'),
+                            esc_html($current_filter_name !== '' ? $current_filter_name : (string) $current_filter_slug)
+                        );
+                        ?></p>
+                    <?php endif; ?>
                     <p class="yatra-results-count">
                         <?php
                         if ($yatra_results['display_total'] > 0) {
@@ -785,7 +795,7 @@ yatra_get_header();
                 <!-- Main Content Area -->
                 <main class="yatra-listing-content">
                     <?php if (count($trips_source) > 0) : ?>
-                        <div class="yatra-trip-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="yatra-trip-grid" id="trip-grid">
                             <?php foreach ($trips_source as $trip) : ?>
                                 <!-- Use the reusable trip-listing-card.php component -->
                                 <?php include(dirname(__FILE__) . '/trip-listing-card.php'); ?>
@@ -800,33 +810,35 @@ yatra_get_header();
                             <p class="mt-1 text-gray-500 dark:text-gray-400"><?php esc_html_e('Try adjusting your search or filter to find what you\'re looking for.', 'yatra'); ?></p>
                         </div>
                     <?php endif; ?>
+
+                    <div class="yatra-listing-pagination yatra-listing-pagination--trip-content">
+                        <?php
+                        $prev_url = $yatra_pagination['prev_url'] ?? null;
+                        $next_url = $yatra_pagination['next_url'] ?? null;
+                        $prev_disabled = empty($prev_url);
+                        $next_disabled = empty($next_url);
+                        ?>
+                        <a class="yatra-pagination-btn <?php echo $prev_disabled ? 'disabled' : ''; ?>" href="<?php echo $prev_disabled ? 'javascript:void(0);' : esc_url($prev_url); ?>">
+                            <?php echo yatra_svg_icon('chevron-left', 'yatra-btn-icon'); ?>
+                            <span><?php esc_html_e('Previous', 'yatra'); ?></span>
+                        </a>
+                        <?php foreach (($yatra_pagination['items'] ?? []) as $pitem) : ?>
+                            <?php if (($pitem['type'] ?? '') === 'ellipsis') : ?>
+                                <span class="yatra-pagination-ellipsis">...</span>
+                            <?php elseif (($pitem['type'] ?? '') === 'page') : ?>
+                                <a class="yatra-pagination-btn <?php echo !empty($pitem['is_current']) ? 'active' : ''; ?>" href="<?php echo esc_url((string) ($pitem['url'] ?? '')); ?>">
+                                    <?php echo esc_html((string) ($pitem['page'] ?? '')); ?>
+                                </a>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                        <a class="yatra-pagination-btn <?php echo $next_disabled ? 'disabled' : ''; ?>" href="<?php echo $next_disabled ? 'javascript:void(0);' : esc_url($next_url); ?>">
+                            <span><?php esc_html_e('Next', 'yatra'); ?></span>
+                            <?php echo yatra_svg_icon('chevron-right', 'yatra-btn-icon'); ?>
+                        </a>
+                    </div>
                 </main>
             </div>
         </div>
-    </div>
-
-    <div class="yatra-listing-pagination">
-        <?php
-        $prev_url = $yatra_pagination['prev_url'] ?? null;
-        $next_url = $yatra_pagination['next_url'] ?? null;
-        $prev_disabled = empty($prev_url);
-        $next_disabled = empty($next_url);
-        ?>
-        <a class="yatra-pagination-btn <?php echo $prev_disabled ? 'disabled' : ''; ?>" href="<?php echo $prev_disabled ? 'javascript:void(0);' : esc_url($prev_url); ?>">
-            <?php esc_html_e('Previous', 'yatra'); ?>
-        </a>
-        <?php foreach (($yatra_pagination['items'] ?? []) as $pitem) : ?>
-            <?php if (($pitem['type'] ?? '') === 'ellipsis') : ?>
-                <span class="yatra-pagination-ellipsis">...</span>
-            <?php elseif (($pitem['type'] ?? '') === 'page') : ?>
-                <a class="yatra-pagination-btn <?php echo !empty($pitem['is_current']) ? 'active' : ''; ?>" href="<?php echo esc_url((string) ($pitem['url'] ?? '')); ?>">
-                    <?php echo esc_html((string) ($pitem['page'] ?? '')); ?>
-                </a>
-            <?php endif; ?>
-        <?php endforeach; ?>
-        <a class="yatra-pagination-btn <?php echo $next_disabled ? 'disabled' : ''; ?>" href="<?php echo $next_disabled ? 'javascript:void(0);' : esc_url($next_url); ?>">
-            <?php esc_html_e('Next', 'yatra'); ?>
-        </a>
     </div>
 </div>
 

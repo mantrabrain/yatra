@@ -167,7 +167,7 @@ class ItemTypeRepository extends BaseRepository
         $cacheKey = Cache::KEY_ITEMS_COUNT_BY_TYPE . '_' . $item_type_id;
         
         // Cache backends often store scalars as strings; force int on read + write.
-        return (int) Cache::remember($cacheKey, function () use ($item_type_id): int {
+        return (int) $this->cacheQueryResult($cacheKey, function () use ($item_type_id): int {
             global $wpdb;
             
             // Use ClassificationsTable for items with parent_id relationship

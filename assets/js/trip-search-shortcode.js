@@ -7,7 +7,13 @@ jQuery(document).ready(function() {
         if (u) {
             return u;
         }
-        return window.location.origin + '/trip/';
+        if (window.yatraTripSearchConfig && window.yatraTripSearchConfig.listingUrl) {
+            return window.yatraTripSearchConfig.listingUrl;
+        }
+        if (window.yatraListing && window.yatraListing.tripListingUrl) {
+            return window.yatraListing.tripListingUrl;
+        }
+        return window.location.href.split('?')[0].replace(/\/page\/\d+\/?$/, '').replace(/\/$/, '') + '/';
     }
 
     function closeDropdownMenu(dropdown) {
@@ -262,7 +268,12 @@ jQuery(document).ready(function() {
         }
 
         var listing = getListingUrl();
-        var url = new URL(listing, window.location.href);
+        var url;
+        try {
+            url = new URL(listing);
+        } catch (e) {
+            url = new URL(listing, window.location.href);
+        }
 
         Object.keys(filters).forEach(function(key) {
             if (filters[key]) {

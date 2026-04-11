@@ -174,17 +174,17 @@ if (!empty($downloads)):
         <?php yatra_get_template('partials/single-trip/group-discounts', ['trip' => $trip, 'group_discounts_data' => $group_discounts['group_discounts_data']]); ?>
     <?php endif; ?>
 
+    <!-- Reviews Section - Full Width (before similar trips for social proof) -->
+    <?php if (yatra_reviews_enabled()): ?>
+        <?php yatra_get_template('partials/single-trip/reviews', ['trip' => $trip]); ?>
+    <?php endif; ?>
+
     <!-- Similar Trips Section -->
     <?php 
     $similar_trips = $trip->getSimilarTrips();
     if (!empty($similar_trips)): 
     ?>
         <?php yatra_get_template('partials/single-trip/similar-trips', ['trip' => $trip]); ?>
-    <?php endif; ?>
-
-    <!-- Reviews Section - Full Width -->
-    <?php if (yatra_reviews_enabled()): ?>
-        <?php yatra_get_template('partials/single-trip/reviews', ['trip' => $trip]); ?>
     <?php endif; ?>
 </div>
 

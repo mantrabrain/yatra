@@ -25,6 +25,10 @@ class SEOService
     public const PAGE_TYPE_DESTINATION = 'destination';
     public const PAGE_TYPE_ACTIVITY = 'activity';
     public const PAGE_TYPE_CATEGORY = 'category';
+    /** Browse-all index: /destination/, /activity/, /trip-category/ (and plain ?yatra_page=). */
+    public const PAGE_TYPE_DESTINATION_LISTING = 'destination_listing';
+    public const PAGE_TYPE_ACTIVITY_LISTING = 'activity_listing';
+    public const PAGE_TYPE_CATEGORY_LISTING = 'category_listing';
 
     /**
      * Valid page types for validation
@@ -35,6 +39,9 @@ class SEOService
         self::PAGE_TYPE_DESTINATION,
         self::PAGE_TYPE_ACTIVITY,
         self::PAGE_TYPE_CATEGORY,
+        self::PAGE_TYPE_DESTINATION_LISTING,
+        self::PAGE_TYPE_ACTIVITY_LISTING,
+        self::PAGE_TYPE_CATEGORY_LISTING,
     ];
 
     /**
@@ -129,6 +136,7 @@ class SEOService
             $this->outputOpenGraphTags();
             $this->outputTwitterCardTags();
             $this->outputAdvancedMetaTags();
+            $this->outputPaginationRelLinks();
             $this->outputSchemaMarkup();
             
         } catch (\Exception $e) {
@@ -163,17 +171,38 @@ class SEOService
     }
 
     /**
-     * Get current page URL
-     * 
-     * @return string Current page URL
+     * Canonical URL for the current HTTP request (og:url, link rel=canonical).
+     * Must not use the HTTP referer.
      */
     private function getCurrentUrl(): string
     {
-        if (function_exists('wp_get_referer')) {
-            return wp_get_referer() ?: home_url('/');
+        if (!empty($_SERVER['HTTP_HOST'])) {
+            $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                || (!empty($_SERVER['SERVER_PORT']) && (string) $_SERVER['SERVER_PORT'] === '443')
+                || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])
+                    && strtolower((string) $_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
+            $scheme = $https ? 'https' : 'http';
+            $host = strtolower(\sanitize_text_field(\wp_unslash((string) $_SERVER['HTTP_HOST'])));
+            $uri = $_SERVER['REQUEST_URI'] ?? '/';
+            $uri = \is_string($uri) && $uri !== '' ? $uri : '/';
+            $url = $scheme . '://' . $host . $uri;
+            $validated = \filter_var($url, \FILTER_VALIDATE_URL);
+            if ($validated) {
+                return \esc_url_raw($validated);
+            }
         }
-        
-        return home_url('/');
+
+        global $wp;
+        if (isset($wp->request) && \is_string($wp->request)) {
+            $base = \home_url(\user_trailingslashit($wp->request));
+            if (!empty($_GET) && \is_array($_GET)) {
+                $base = \add_query_arg(\array_map('sanitize_text_field', \wp_unslash($_GET)), $base);
+            }
+
+            return \esc_url_raw($base);
+        }
+
+        return \home_url('/');
     }
 
     /**
@@ -236,6 +265,15 @@ class SEOService
                 case self::PAGE_TYPE_CATEGORY:
                     $this->collectCategoryData();
                     break;
+                case self::PAGE_TYPE_DESTINATION_LISTING:
+                    $this->collectDestinationListingData();
+                    break;
+                case self::PAGE_TYPE_ACTIVITY_LISTING:
+                    $this->collectActivityListingData();
+                    break;
+                case self::PAGE_TYPE_CATEGORY_LISTING:
+                    $this->collectCategoryListingData();
+                    break;
                 case self::PAGE_TYPE_TRIP:
                     $this->collectTripData();
                     break;
@@ -276,6 +314,17 @@ class SEOService
             $this->seoData['title'] = $this->sanitizeText(SettingsService::getString('seo_trip_meta_title', ''));
             $this->seoData['description'] = $this->sanitizeText(SettingsService::getString('seo_trip_meta_description', ''));
             $this->seoData['keywords'] = $this->sanitizeText(SettingsService::getString('seo_trip_meta_keywords', ''));
+            if ($this->seoData['title'] === '') {
+                $this->seoData['title'] = $this->sanitizeText(\__('All Trips', 'yatra'));
+            }
+            if ($this->seoData['description'] === '') {
+                $tagline = $this->sanitizeText(\get_bloginfo('description'));
+                $this->seoData['description'] = $tagline !== ''
+                    ? $tagline
+                    : $this->sanitizeText(
+                        \__('Browse and compare trips, then open a trip for full details and booking.', 'yatra')
+                    );
+            }
             
             // Get image from settings (attachment ID) with validation
             $imageId = SettingsService::getInt('seo_trip_meta_image', 0);
@@ -288,8 +337,7 @@ class SEOService
                 }
             }
             
-            $tripBase = SettingsService::getTripBase();
-            $this->seoData['url'] = $this->validateUrl(home_url('/' . $tripBase . '/'));
+            $this->seoData['url'] = $this->validateUrl($this->getCurrentUrl());
             $this->seoData['type'] = 'website';
             $this->seoData['published_time'] = date('c');
             $this->seoData['modified_time'] = date('c');
@@ -302,6 +350,54 @@ class SEOService
         }
     }
 
+    private function collectDestinationListingData(): void
+    {
+        $this->seoData['title'] = $this->sanitizeText(\__('All Destinations', 'yatra'));
+        $this->seoData['description'] = $this->sanitizeText(
+            \__('Explore destinations we visit and find trips that match where you want to go.', 'yatra')
+        );
+        $this->seoData['keywords'] = '';
+        $this->seoData['image'] = '';
+        $this->seoData['url'] = $this->validateUrl($this->getCurrentUrl());
+        $this->seoData['type'] = 'website';
+        $this->seoData['published_time'] = \date('c');
+        $this->seoData['modified_time'] = \date('c');
+        $this->seoData['author'] = $this->sanitizeText(\get_bloginfo('name'));
+        $this->seoData['publisher'] = $this->sanitizeText(\get_bloginfo('name'));
+    }
+
+    private function collectActivityListingData(): void
+    {
+        $this->seoData['title'] = $this->sanitizeText(\__('All Activities', 'yatra'));
+        $this->seoData['description'] = $this->sanitizeText(
+            \__('Browse experiences and find trips built around the activities you love.', 'yatra')
+        );
+        $this->seoData['keywords'] = '';
+        $this->seoData['image'] = '';
+        $this->seoData['url'] = $this->validateUrl($this->getCurrentUrl());
+        $this->seoData['type'] = 'website';
+        $this->seoData['published_time'] = \date('c');
+        $this->seoData['modified_time'] = \date('c');
+        $this->seoData['author'] = $this->sanitizeText(\get_bloginfo('name'));
+        $this->seoData['publisher'] = $this->sanitizeText(\get_bloginfo('name'));
+    }
+
+    private function collectCategoryListingData(): void
+    {
+        $this->seoData['title'] = $this->sanitizeText(\__('Trip Categories', 'yatra'));
+        $this->seoData['description'] = $this->sanitizeText(
+            \__('Browse trips by style or theme—adventure, family, luxury, and more.', 'yatra')
+        );
+        $this->seoData['keywords'] = '';
+        $this->seoData['image'] = '';
+        $this->seoData['url'] = $this->validateUrl($this->getCurrentUrl());
+        $this->seoData['type'] = 'website';
+        $this->seoData['published_time'] = \date('c');
+        $this->seoData['modified_time'] = \date('c');
+        $this->seoData['author'] = $this->sanitizeText(\get_bloginfo('name'));
+        $this->seoData['publisher'] = $this->sanitizeText(\get_bloginfo('name'));
+    }
+
     /**
      * Collect SEO data for destination page
      */
@@ -312,20 +408,27 @@ class SEOService
         }
 
         $destination = $this->pageObject;
-        $metadata = $destination->metadata ?? [];
+        $metadata = [];
+        if (!empty($destination->metadata)) {
+            if (\is_array($destination->metadata)) {
+                $metadata = $destination->metadata;
+            } else {
+                $maybe = \maybe_unserialize($destination->metadata);
+                $metadata = \is_array($maybe) ? $maybe : [];
+            }
+        }
 
-        $this->seoData['title'] = $metadata['seo_title'] ?? $destination->name ?? '';
-        $this->seoData['description'] = $metadata['seo_description'] ?? $destination->description ?? '';
-        $this->seoData['keywords'] = $metadata['seo_keywords'] ?? '';
+        $title = $metadata['seo_title'] ?? $destination->name ?? '';
+        $this->seoData['title'] = $this->sanitizeText((string) $title);
+        $descRaw = $metadata['seo_description'] ?? $destination->description ?? '';
+        $this->seoData['description'] = $this->sanitizeText(\wp_trim_words(\wp_strip_all_tags((string) $descRaw), 45, '…'));
+        $this->seoData['keywords'] = $this->sanitizeText((string) ($metadata['seo_keywords'] ?? ''));
         
         // Get featured image or gallery image
         $this->seoData['image'] = $destination->featured_image_url ?? 
                                ($destination->gallery_images[0] ?? '');
         
-        $destinationBase = SettingsService::getString('destination_base', 'destination');
-        $this->seoData['url'] = function_exists('yatra_get_destination_permalink') 
-            ? yatra_get_destination_permalink($destination) 
-            : home_url('/' . $destinationBase . '/' . ($destination->slug ?? ''));
+        $this->seoData['url'] = $this->validateUrl($this->getCurrentUrl());
         
         $this->seoData['type'] = 'place';
         $this->seoData['published_time'] = date('c', strtotime($destination->created_at ?? 'now'));
@@ -344,20 +447,26 @@ class SEOService
         }
 
         $activity = $this->pageObject;
-        $metadata = $activity->metadata ?? [];
+        $metadata = [];
+        if (!empty($activity->metadata)) {
+            if (\is_array($activity->metadata)) {
+                $metadata = $activity->metadata;
+            } else {
+                $maybe = \maybe_unserialize($activity->metadata);
+                $metadata = \is_array($maybe) ? $maybe : [];
+            }
+        }
 
-        $this->seoData['title'] = $metadata['seo_title'] ?? $activity->name ?? '';
-        $this->seoData['description'] = $metadata['seo_description'] ?? $activity->description ?? '';
-        $this->seoData['keywords'] = $metadata['seo_keywords'] ?? '';
+        $this->seoData['title'] = $this->sanitizeText((string) ($metadata['seo_title'] ?? $activity->name ?? ''));
+        $descRaw = $metadata['seo_description'] ?? $activity->description ?? '';
+        $this->seoData['description'] = $this->sanitizeText(\wp_trim_words(\wp_strip_all_tags((string) $descRaw), 45, '…'));
+        $this->seoData['keywords'] = $this->sanitizeText((string) ($metadata['seo_keywords'] ?? ''));
         
         // Get featured image or gallery image
         $this->seoData['image'] = $activity->featured_image_url ?? 
                                ($activity->gallery_images[0] ?? '');
         
-        $activityBase = SettingsService::getString('activity_base', 'activity');
-        $this->seoData['url'] = function_exists('yatra_get_activity_permalink') 
-            ? yatra_get_activity_permalink($activity) 
-            : home_url('/' . $activityBase . '/' . ($activity->slug ?? ''));
+        $this->seoData['url'] = $this->validateUrl($this->getCurrentUrl());
         
         $this->seoData['type'] = 'article';
         $this->seoData['published_time'] = date('c', strtotime($activity->created_at ?? 'now'));
@@ -376,20 +485,26 @@ class SEOService
         }
 
         $category = $this->pageObject;
-        $metadata = $category->metadata ?? [];
+        $metadata = [];
+        if (!empty($category->metadata)) {
+            if (\is_array($category->metadata)) {
+                $metadata = $category->metadata;
+            } else {
+                $maybe = \maybe_unserialize($category->metadata);
+                $metadata = \is_array($maybe) ? $maybe : [];
+            }
+        }
 
-        $this->seoData['title'] = $metadata['seo_title'] ?? $category->name ?? '';
-        $this->seoData['description'] = $metadata['seo_description'] ?? $category->description ?? '';
-        $this->seoData['keywords'] = $metadata['seo_keywords'] ?? '';
+        $this->seoData['title'] = $this->sanitizeText((string) ($metadata['seo_title'] ?? $category->name ?? ''));
+        $descRaw = $metadata['seo_description'] ?? $category->description ?? '';
+        $this->seoData['description'] = $this->sanitizeText(\wp_trim_words(\wp_strip_all_tags((string) $descRaw), 45, '…'));
+        $this->seoData['keywords'] = $this->sanitizeText((string) ($metadata['seo_keywords'] ?? ''));
         
         // Get featured image or gallery image
         $this->seoData['image'] = $category->featured_image_url ?? 
                                ($category->gallery_images[0] ?? '');
         
-        $categoryBase = SettingsService::getString('trip_category_base', 'trip-categories');
-        $this->seoData['url'] = function_exists('yatra_get_category_permalink') 
-            ? yatra_get_category_permalink($category) 
-            : home_url('/' . $categoryBase . '/' . ($category->slug ?? ''));
+        $this->seoData['url'] = $this->validateUrl($this->getCurrentUrl());
         
         $this->seoData['type'] = 'article';
         $this->seoData['published_time'] = date('c', strtotime($category->created_at ?? 'now'));
@@ -564,6 +679,92 @@ class SEOService
     }
 
     /**
+     * rel="prev" / rel="next" for paginated trip archive and taxonomy listings (Google-supported series hints).
+     */
+    private function outputPaginationRelLinks(): void
+    {
+        $prevUrl = '';
+        $nextUrl = '';
+
+        switch ($this->pageType) {
+            case self::PAGE_TYPE_TRIP_ARCHIVE:
+                $ctx = $GLOBALS['yatra_trip_listing_context'] ?? null;
+                if (!\is_array($ctx)) {
+                    return;
+                }
+                $pagination = $ctx['pagination'] ?? null;
+                if (!\is_array($pagination)) {
+                    return;
+                }
+                if (!empty($pagination['prev_url']) && \is_string($pagination['prev_url'])) {
+                    $prevUrl = $pagination['prev_url'];
+                }
+                if (!empty($pagination['next_url']) && \is_string($pagination['next_url'])) {
+                    $nextUrl = $pagination['next_url'];
+                }
+                break;
+
+            case self::PAGE_TYPE_DESTINATION:
+            case self::PAGE_TYPE_ACTIVITY:
+            case self::PAGE_TYPE_CATEGORY:
+                $td = $GLOBALS['yatra_taxonomy_data'] ?? null;
+                if (!$td || !\is_object($td)) {
+                    return;
+                }
+                $total = \max(1, (int) ($td->trips_pages ?? 1));
+                $current = (int) ($td->trips_current_page ?? 1);
+                if ($current < 1) {
+                    $current = 1;
+                }
+                $current = \min($current, $total);
+                if (!\function_exists('yatra_build_current_request_paged_url')) {
+                    return;
+                }
+                if ($current > 1) {
+                    $prevUrl = (string) yatra_build_current_request_paged_url($current - 1);
+                }
+                if ($current < $total) {
+                    $nextUrl = (string) yatra_build_current_request_paged_url($current + 1);
+                }
+                break;
+
+            case self::PAGE_TYPE_DESTINATION_LISTING:
+            case self::PAGE_TYPE_ACTIVITY_LISTING:
+            case self::PAGE_TYPE_CATEGORY_LISTING:
+                $meta = $GLOBALS['yatra_archive_browse_pagination'] ?? null;
+                if (!\is_array($meta)) {
+                    return;
+                }
+                $total = \max(1, (int) ($meta['total_pages'] ?? 1));
+                $current = (int) ($meta['current_page'] ?? 1);
+                if ($current < 1) {
+                    $current = 1;
+                }
+                $current = \min($current, $total);
+                if (!\function_exists('yatra_build_archive_listing_url')) {
+                    return;
+                }
+                if ($current > 1) {
+                    $prevUrl = (string) yatra_build_archive_listing_url($current - 1);
+                }
+                if ($current < $total) {
+                    $nextUrl = (string) yatra_build_archive_listing_url($current + 1);
+                }
+                break;
+
+            default:
+                return;
+        }
+
+        if ($prevUrl !== '') {
+            echo '<link rel="prev" href="' . esc_url($prevUrl) . '">' . "\n";
+        }
+        if ($nextUrl !== '') {
+            echo '<link rel="next" href="' . esc_url($nextUrl) . '">' . "\n";
+        }
+    }
+
+    /**
      * Output Schema markup
      */
     private function outputSchemaMarkup(): void
@@ -606,6 +807,9 @@ class SEOService
 
         switch ($this->pageType) {
             case self::PAGE_TYPE_TRIP_ARCHIVE:
+            case self::PAGE_TYPE_DESTINATION_LISTING:
+            case self::PAGE_TYPE_ACTIVITY_LISTING:
+            case self::PAGE_TYPE_CATEGORY_LISTING:
                 return $this->generateCollectionPageSchema($baseSchema);
             case self::PAGE_TYPE_DESTINATION:
                 return $this->generatePlaceSchema($baseSchema);

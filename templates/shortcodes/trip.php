@@ -53,7 +53,7 @@ $total_found = $trips['total_found'] ?? $total_found ?? 0;
             <p><?php esc_html_e('No trips found on this page. Try navigating to other pages.', 'yatra'); ?></p>
         </div>
     <?php else: ?>
-        <!-- No tours found at all -->
+        <!-- No trips found at all -->
         <div class="yatra-tour-empty">
             <div class="yatra-empty-icon">
                 <?php echo yatra_svg_icon('map', 'yatra-empty-icon-svg'); ?>
@@ -63,8 +63,9 @@ $total_found = $trips['total_found'] ?? $total_found ?? 0;
             
             
             
-            <a href="<?php echo esc_url(home_url('/trips')); ?>" class="yatra-btn yatra-btn-primary">
-                <?php esc_html_e('Browse All Trips', 'yatra'); ?>
+            <a href="<?php echo esc_url(home_url('/trips')); ?>" class="yatra-btn yatra-btn-primary yatra-archive-card-cta">
+                <?php echo yatra_svg_icon('globe', 'yatra-btn-icon'); ?>
+                <span><?php esc_html_e('Browse All Trips', 'yatra'); ?></span>
             </a>
         </div>
     <?php endif; ?>
@@ -79,8 +80,8 @@ $total_found = $trips['total_found'] ?? $total_found ?? 0;
                 $prev_url = add_query_arg('trip_page', $current_page - 1, $current_url);
             ?>
                 <a href="#" class="yatra-pagination-link yatra-pagination-prev" data-page="<?php echo esc_attr($current_page - 1); ?>">
-                    <?php echo yatra_svg_icon('chevron-left', ''); ?>
-                    <?php esc_html_e('Previous', 'yatra'); ?>
+                    <?php echo yatra_svg_icon('chevron-left', 'yatra-btn-icon'); ?>
+                    <span><?php esc_html_e('Previous', 'yatra'); ?></span>
                 </a>
             <?php endif; ?>
             <?php
@@ -98,8 +99,8 @@ $total_found = $trips['total_found'] ?? $total_found ?? 0;
                 $next_url = add_query_arg('trip_page', $current_page + 1, $current_url);
             ?>
                 <a href="#" class="yatra-pagination-link yatra-pagination-next" data-page="<?php echo esc_attr($current_page + 1); ?>">
-                    <?php esc_html_e('Next', 'yatra'); ?>
-                    <?php echo yatra_svg_icon('chevron-right', ''); ?>
+                    <span><?php esc_html_e('Next', 'yatra'); ?></span>
+                    <?php echo yatra_svg_icon('chevron-right', 'yatra-btn-icon'); ?>
                 </a>
             <?php endif; ?>
         </div>

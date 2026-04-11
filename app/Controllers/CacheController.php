@@ -126,12 +126,15 @@ class CacheController extends BaseController
     {
         try {
             $metrics = get_option('yatra_cache_metrics', []);
+            $status = \Yatra\Utils\Cache::getStatus();
             $stats = [
                 'total_operations' => count($metrics),
                 'cache_hits' => 0,
                 'cache_misses' => 0,
                 'avg_execution_time' => 0,
-                'cache_enabled' => get_option('yatra_cache_enabled', true),
+                'cache_enabled' => $status['cache_enabled'],
+                'cache_effective' => $status['effective_status'],
+                'cache_reason_disabled' => $status['reason_disabled'],
                 'cache_backend_available' => function_exists('get_transient'),
                 'recent_operations' => array_slice($metrics, -10)
             ];

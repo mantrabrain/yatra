@@ -6,8 +6,14 @@ namespace Yatra\Utils;
 
 /**
  * Yatra Cache Manager
- * 
- * Provides lightweight caching using WordPress native transients and in-memory cache
+ *
+ * Performance and entity/query caching. Use {@see self::isEnabled()} before relying on stored data.
+ * Controlled by option `yatra_cache_enabled`, {@see WP_DEBUG}, and option `yatra_debug_mode`
+ * (Settings → Advanced).
+ *
+ * **Not routed through this class (by design):** WordPress transients used for rate limiting, OAuth
+ * state, booking session tokens, telemetry throttles, and Pro Trip Consent draft storage — these are
+ * security/session flows, not optional performance caches.
  */
 class Cache
 {
@@ -105,19 +111,24 @@ class Cache
     private static ?array $availableBackends = null;
 
     /**
-     * Check if caching is enabled
+     * Check if caching is enabled (single source of truth for runtime).
+     *
+     * Requires: Advanced → Enable Cache on, WP_DEBUG off, and Yatra Advanced → Debug mode off.
      */
     public static function isEnabled(): bool
     {
-        // Check WordPress option for cache status
-        $cacheEnabled = get_option('yatra_cache_enabled', true);
-        
-        // Also check if we're in debug mode (disable cache in debug)
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            return false; // Disable cache in debug mode
+        if (!(bool) get_option('yatra_cache_enabled', true)) {
+            return false;
         }
-        
-        return (bool) $cacheEnabled;
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            return false;
+        }
+        // Align with Settings → Advanced → Debug mode (yatra_debug_mode).
+        if ((bool) get_option('yatra_debug_mode', false)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -125,16 +136,28 @@ class Cache
      */
     public static function getStatus(): array
     {
-        $cacheEnabled = get_option('yatra_cache_enabled', true);
-        $debugMode = defined('WP_DEBUG') && WP_DEBUG;
-        
+        $optOn = (bool) get_option('yatra_cache_enabled', true);
+        $wpDebug = defined('WP_DEBUG') && WP_DEBUG;
+        $pluginDebug = (bool) get_option('yatra_debug_mode', false);
+        $effective = $optOn && !$wpDebug && !$pluginDebug;
+
+        $reason = null;
+        if (!$optOn) {
+            $reason = 'yatra_cache_enabled is false';
+        } elseif ($wpDebug) {
+            $reason = 'WP_DEBUG is enabled (wp-config.php)';
+        } elseif ($pluginDebug) {
+            $reason = 'Yatra Advanced Debug mode is enabled';
+        }
+
         return [
-            'cache_enabled' => (bool) $cacheEnabled,
-            'debug_mode' => $debugMode,
-            'effective_status' => !$debugMode && (bool) $cacheEnabled,
+            'cache_enabled' => $optOn,
+            'debug_mode' => $wpDebug,
+            'yatra_debug_mode' => $pluginDebug,
+            'effective_status' => $effective,
             'wp_debug' => defined('WP_DEBUG') ? WP_DEBUG : false,
-            'option_value' => $cacheEnabled,
-            'reason_disabled' => $debugMode ? 'WP_DEBUG is enabled' : (!$cacheEnabled ? 'yatra_cache_enabled is false' : null)
+            'option_value' => $optOn,
+            'reason_disabled' => $reason,
         ];
     }
 
@@ -367,6 +390,84 @@ class Cache
         self::clearByPrefix(self::PREFIX_STATS);
         
         Logger::info("Cache invalidated for booking", ['booking_id' => $bookingId]);
+    }
+
+    /**
+     * Trip / activity / destination listing caches (admin + frontend grids).
+     * Kept in sync with {@see \Yatra\Hooks\CacheHooks} expectations.
+     */
+    public static function invalidateListingCaches(): void
+    {
+        self::clearByPrefix(self::PREFIX_QUERY_RESULT);
+        self::clearByPrefix('trip_listing_');
+        self::clearByPrefix('activity_listing_');
+        self::clearByPrefix('destination_listing_');
+    }
+
+    /**
+     * Dashboard and report aggregate keys (beyond {@see PREFIX_STATS}).
+     */
+    public static function invalidateDashboardReportCaches(): void
+    {
+        self::clearByPrefix('dashboard_stats_');
+        self::clearByPrefix('report_stats_');
+    }
+
+    /**
+     * After a trip row write from {@see \Yatra\Repositories\TripRepository} (create / update / delete).
+     * Matches {@see CacheHooks} trip handlers so hooks and repository stay aligned.
+     */
+    public static function invalidateAfterTripWrite(string $operation, int $tripId): void
+    {
+        $operation = strtolower($operation);
+        if ($operation === 'create') {
+            // Listings + stats (matches legacy TripService::create follow-up clears).
+            self::invalidateListingCaches();
+            self::clearByPrefix(self::PREFIX_STATS);
+
+            return;
+        }
+        if ($tripId <= 0) {
+            return;
+        }
+        self::invalidateTrip($tripId);
+        self::invalidateListingCaches();
+    }
+
+    /**
+     * After bulk UPDATEs on the trips table (cron: scheduled publish/archive, seasonal) that bypass
+     * per-row {@see \Yatra\Repositories\TripRepository::afterWrite}.
+     */
+    public static function invalidateAfterBulkTripTableWrites(): void
+    {
+        self::invalidateListingCaches();
+        self::clearByPrefix(self::PREFIX_STATS);
+        self::invalidateDashboardReportCaches();
+        self::clearByPrefix(self::PREFIX_TRIP_DATA);
+    }
+
+    /**
+     * After booking mutations from {@see \Yatra\Repositories\BookingRepository}.
+     * Aligns with {@see CacheHooks::onBookingUpdated} and related handlers.
+     */
+    public static function invalidateAfterBookingWrite(int $bookingId): void
+    {
+        self::invalidateBooking($bookingId);
+        self::invalidateDashboardReportCaches();
+    }
+
+    /**
+     * Pro Dynamic Pricing rule list/detail caches (see {@see KEY_PRO_PRICING_RULES} / {@see KEY_PRO_PRICING_RULE}).
+     */
+    public static function invalidateProDynamicPricingCaches(?int $ruleId = null): void
+    {
+        self::clearByPrefix(self::KEY_PRO_PRICING_RULES);
+        self::clearByPrefix(self::KEY_PRO_ACTIVE_RULES);
+        if ($ruleId !== null && $ruleId > 0) {
+            self::delete(self::KEY_PRO_PRICING_RULE . '_' . $ruleId);
+        } else {
+            self::clearByPrefix(self::KEY_PRO_PRICING_RULE);
+        }
     }
 
     /**

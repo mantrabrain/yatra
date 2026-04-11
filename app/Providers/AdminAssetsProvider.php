@@ -16,6 +16,57 @@ namespace Yatra\Providers;
 class AdminAssetsProvider
 {
     /**
+     * Full `window.yatraAdmin` payload — must match what addMediaLibraryCompatScript used to merge
+     * (permalinkStructure, tripBase, locale, etc.) so View links and REST helpers work in all modes.
+     *
+     * @return array<string, mixed>
+     */
+    private function buildAdminLocalizedData(): array
+    {
+        $current_user = wp_get_current_user();
+        $capabilities = [];
+        if ($current_user->ID > 0) {
+            $user_caps = $current_user->allcaps;
+            foreach ($user_caps as $cap => $has_cap) {
+                if ($has_cap && strpos((string) $cap, 'yatra_') === 0) {
+                    $capabilities[$cap] = true;
+                }
+            }
+        }
+
+        return apply_filters('yatra_admin_localized_data', [
+            'apiUrl' => rest_url('yatra/v1'),
+            'licenseStatus' => 'inactive',
+            'restUrl' => rest_url(),
+            'nonce' => wp_create_nonce('wp_rest'),
+            'currentUser' => $current_user->ID,
+            'currentUserEmail' => $current_user->user_email,
+            'currentUserDisplayName' => $current_user->display_name,
+            'currentUserLogin' => $current_user->user_login,
+            'currentUserAvatar' => get_avatar($current_user->ID, 96),
+            'siteUrl' => home_url(),
+            'adminUrl' => admin_url('admin.php'),
+            'pluginUrl' => YATRA_PLUGIN_URL,
+            'brandLogoUrl' => function_exists('yatra_get_brand_icon_url') ? yatra_get_brand_icon_url() : '',
+            'permalinkStructure' => (get_option('permalink_structure') ?: '') ?: 'plain',
+            'tripBase' => \Yatra\Services\SettingsService::getTripBase(),
+            'bookingBase' => \Yatra\Services\SettingsService::getBookingBase(),
+            'capabilities' => $capabilities,
+            'roles' => $current_user->roles,
+            'isPro' => defined('YATRA_PRO_VERSION'),
+            'version' => defined('YATRA_VERSION') ? YATRA_VERSION : '1.0.0',
+            'proVersion' => defined('YATRA_PRO_VERSION') ? YATRA_PRO_VERSION : null,
+
+            'locale' => get_locale(),
+            'currency' => \Yatra\Services\SettingsService::getCurrency(),
+            'date_format' => \Yatra\Services\SettingsService::get('date_format', 'Y-m-d'),
+            'time_format' => \Yatra\Services\SettingsService::get('time_format', 'H:i'),
+            'geocodingNonce' => wp_create_nonce('yatra_geocoding_nonce'),
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+        ]);
+    }
+
+    /**
      * Enqueue all admin assets
      *
      * @param string $hook Current admin page hook
@@ -37,50 +88,18 @@ class AdminAssetsProvider
         // Enqueue admin React app assets
         $this->enqueueAdminReactApp();
 
-        // Senior Engineer Solution: Complete forms CSS removal
-        // First, remove any existing forms style
-        wp_dequeue_style('forms');
-        wp_deregister_style('forms');
-        
-        // Get all registered styles that depend on forms
-        global $wp_styles;
-        $dependent_styles = [];
-        
-        if (isset($wp_styles->registered) && is_array($wp_styles->registered)) {
-            foreach ($wp_styles->registered as $handle => $style) {
-                if (isset($style->deps) && is_array($style->deps) && in_array('forms', $style->deps)) {
-                    $dependent_styles[] = $handle;
-                }
-            }
-        }
-        
-        // Register forms as empty style to satisfy dependencies
-        wp_register_style('forms', false);
-        
-        // Re-enqueue dependent styles without forms dependency
-        foreach ($dependent_styles as $handle) {
-            if ($handle !== 'forms') {
-                wp_dequeue_style($handle);
-                $style = $wp_styles->registered[$handle] ?? null;
-                if ($style && isset($style->deps)) {
-                    // Remove forms from dependencies
-                    $style->deps = array_diff($style->deps, ['forms']);
-                    wp_enqueue_style($handle);
-                }
-            }
-        }
-        
-        // Aggressive WordPress Admin CSS removal
+        // Do not strip styles required by wp_enqueue_media() / wp.media(): stripping `media-views`
+        // (and replacing `forms` with an empty handle) makes the media modal invisible or broken.
+        // See: TripForm gallery / featured image / downloadable file pickers.
+
+        // Aggressive WordPress Admin CSS removal (keep media modal + its dependency chain intact)
         $admin_css_handles = [
-            'dashicons',
-            'admin-bar', 
-            'common',
+            'admin-bar',
             'admin-menu',
             'dashboard',
             'list-tables',
             'edit',
             'revisions',
-            'media',
             'themes',
             'about',
             'nav-menus',
@@ -88,17 +107,14 @@ class AdminAssetsProvider
             'widgets',
             'site-icon',
             'l10n',
-            'buttons',
             'wp-auth-check',
             'wp-components',
             'wp-commands',
-            'media-views',
             'login',
             'install',
             'wp-reset-editor-styles',
             'wp-admin',
             'colors',
-            'thickbox'
         ];
         
         // Dequeue all WordPress admin CSS and register empty placeholders
@@ -110,15 +126,7 @@ class AdminAssetsProvider
         }
         
         // Final safety dequeue at print time
-        add_action('wp_print_styles', function() use ($dependent_styles, $admin_css_handles) {
-            wp_dequeue_style('forms');
-            foreach ($dependent_styles as $handle) {
-                if ($handle !== 'forms') {
-                    wp_dequeue_style($handle);
-                }
-            }
-            
-            // Ensure admin CSS is removed at render time
+        add_action('wp_print_styles', function () use ($admin_css_handles) {
             foreach ($admin_css_handles as $handle) {
                 wp_dequeue_style($handle);
             }
@@ -236,45 +244,11 @@ class AdminAssetsProvider
         if ($isDevMode && $this->isViteDevServerRunning($viteDevServer)) {
             // In dev mode, inject localized data and Vite's HMR client
             add_action('admin_head', function() use ($viteDevServer) {
-                // Get current user for permissions
-                $current_user = wp_get_current_user();
-                
-                // Get user capabilities
-                $capabilities = [];
-                if ($current_user->ID > 0) {
-                    $user_caps = $current_user->allcaps;
-                    foreach ($user_caps as $cap => $has_cap) {
-                        if ($has_cap && strpos($cap, 'yatra_') === 0) {
-                            $capabilities[$cap] = true;
-                        }
-                    }
-                }
-                
-                // Localize data for dev mode
-                $localized_data = apply_filters('yatra_admin_localized_data', [
-                    'apiUrl' => rest_url('yatra/v1'),
-                    'licenseStatus' => 'inactive',
-                    'restUrl' => rest_url(),
-                    'nonce' => wp_create_nonce('wp_rest'),
-                    'currentUser' => $current_user->ID,
-                    'currentUserEmail' => $current_user->user_email,
-                    'currentUserDisplayName' => $current_user->display_name,
-                    'currentUserLogin' => $current_user->user_login,
-                    'currentUserAvatar' => get_avatar($current_user->ID, 96),
-                    'siteUrl' => home_url(),
-                    'adminUrl' => admin_url('admin.php'),
-                    'pluginUrl' => YATRA_PLUGIN_URL,
-                    'brandLogoUrl' => function_exists('yatra_get_brand_icon_url') ? yatra_get_brand_icon_url() : '',
-                    'capabilities' => $capabilities,
-                    'roles' => $current_user->roles,
-                    'isPro' => defined('YATRA_PRO_VERSION'),
-                    'version' => defined('YATRA_VERSION') ? YATRA_VERSION : '1.0.0',
-                    'proVersion' => defined('YATRA_PRO_VERSION') ? YATRA_PRO_VERSION : null,
-                ]);
-                
+                $localized_data = $this->buildAdminLocalizedData();
+
                 ?>
                 <script>
-                    window.yatraAdmin = <?php echo json_encode($localized_data); ?>;
+                    window.yatraAdmin = <?php echo wp_json_encode($localized_data); ?>;
                 </script>
                 <script type="module">
                     import { injectIntoGlobalHook } from "<?php echo $viteDevServer; ?>/@react-refresh";
@@ -300,41 +274,7 @@ class AdminAssetsProvider
             if (file_exists($appJs)) {
                 $jsVersion = YATRA_VERSION . '.' . filemtime($appJs) . '.view-icon-fix.' . time() . '.' . microtime(true);
 
-                // Get current user for permissions
-                $current_user = wp_get_current_user();
-                
-                // Get user capabilities
-                $capabilities = [];
-                if ($current_user->ID > 0) {
-                    $user_caps = $current_user->allcaps;
-                    foreach ($user_caps as $cap => $has_cap) {
-                        if ($has_cap && strpos($cap, 'yatra_') === 0) {
-                            $capabilities[$cap] = true;
-                        }
-                    }
-                }
-                
-                // Localize data for production
-                $localized_data = apply_filters('yatra_admin_localized_data', [
-                    'apiUrl' => rest_url('yatra/v1'),
-                    'licenseStatus' => 'inactive',
-                    'restUrl' => rest_url(),
-                    'nonce' => wp_create_nonce('wp_rest'),
-                    'currentUser' => $current_user->ID,
-                    'currentUserEmail' => $current_user->user_email,
-                    'currentUserDisplayName' => $current_user->display_name,
-                    'currentUserLogin' => $current_user->user_login,
-                    'currentUserAvatar' => get_avatar($current_user->ID, 96),
-                    'siteUrl' => home_url(),
-                    'adminUrl' => admin_url('admin.php'),
-                    'pluginUrl' => YATRA_PLUGIN_URL,
-                    'brandLogoUrl' => function_exists('yatra_get_brand_icon_url') ? yatra_get_brand_icon_url() : '',
-                    'capabilities' => $capabilities,
-                    'roles' => $current_user->roles,
-                    'isPro' => defined('YATRA_PRO_VERSION'),
-                    'version' => defined('YATRA_VERSION') ? YATRA_VERSION : '1.0.0',
-                    'proVersion' => defined('YATRA_PRO_VERSION') ? YATRA_PRO_VERSION : null,
-                ]);
+                $localized_data = $this->buildAdminLocalizedData();
 
                 // Enqueue our script with media library as dependency
                 wp_enqueue_script(
@@ -390,54 +330,7 @@ class AdminAssetsProvider
      */
     private function addMediaLibraryCompatScript(): void
     {
-        // Get current user for permissions
-        $current_user = wp_get_current_user();
-
-        // Get user capabilities
-        $capabilities = [];
-        if ($current_user->ID > 0) {
-            $user_caps = $current_user->allcaps;
-            foreach ($user_caps as $cap => $has_cap) {
-                if ($has_cap && strpos($cap, 'yatra_') === 0) {
-                    $capabilities[$cap] = true;
-                }
-            }
-        }
-
-        // Localize script with API data, permissions, and translations
-        $localized_data = apply_filters('yatra_admin_localized_data', [
-            'apiUrl' => rest_url('yatra/v1'),
-            'licenseStatus' => 'inactive',
-            'restUrl' => rest_url(),
-            'nonce' => wp_create_nonce('wp_rest'),
-            'currentUser' => $current_user->ID,
-            'currentUserEmail' => $current_user->user_email,
-            'currentUserDisplayName' => $current_user->display_name,
-            'currentUserLogin' => $current_user->user_login,
-            'currentUserAvatar' => get_avatar($current_user->ID, 96),
-            'siteUrl' => home_url(),
-            'adminUrl' => admin_url('admin.php'),
-            'pluginUrl' => YATRA_PLUGIN_URL,
-            'brandLogoUrl' => function_exists('yatra_get_brand_icon_url') ? yatra_get_brand_icon_url() : '',
-            'permalinkStructure' => (get_option('permalink_structure') ?: '') ?: 'plain',
-            'tripBase' => \Yatra\Services\SettingsService::getTripBase(),
-            'bookingBase' => \Yatra\Services\SettingsService::getBookingBase(),
-            'capabilities' => $capabilities,
-            'roles' => $current_user->roles,
-            'isPro' => defined('YATRA_PRO_VERSION'),
-            'version' => defined('YATRA_VERSION') ? YATRA_VERSION : '1.0.0',
-            'proVersion' => defined('YATRA_PRO_VERSION') ? YATRA_PRO_VERSION : null,
-
-            'locale' => get_locale(),
-            'currency' => \Yatra\Services\SettingsService::getCurrency(),
-            'date_format' => \Yatra\Services\SettingsService::get('date_format', 'Y-m-d'),
-            'time_format' => \Yatra\Services\SettingsService::get('time_format', 'H:i'),
-            'geocodingNonce' => wp_create_nonce('yatra_geocoding_nonce'),
-            'ajaxUrl' => admin_url('admin-ajax.php'),
-        ]);
-
-        wp_localize_script('yatra-admin', 'yatraAdmin', $localized_data);
-
+        // `yatraAdmin` is localized once in enqueueAdminReactJs via buildAdminLocalizedData().
         // Load WordPress translation data for the yatra domain
         $this->loadWordPressTranslations();
     }

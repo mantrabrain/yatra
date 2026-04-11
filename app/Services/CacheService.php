@@ -125,6 +125,17 @@ class CacheService
     }
 
     /**
+     * Clear a single trip and listing/query caches (e.g. after attribute changes via {@see TripService}).
+     */
+    public static function clearTripCache(int $tripId): void
+    {
+        if ($tripId <= 0) {
+            return;
+        }
+        Cache::invalidateAfterTripWrite('update', $tripId);
+    }
+
+    /**
      * Invalidate entity cache when data changes
      */
     public static function invalidateEntity(string $entityType, int $entityId): void

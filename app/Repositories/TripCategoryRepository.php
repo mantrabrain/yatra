@@ -184,19 +184,25 @@ class TripCategoryRepository extends BaseRepository
         $trip_cat_table = esc_sql(\Yatra\Database\Tables\TripClassificationsTable::getTableName());
         $reviews_table = esc_sql(\Yatra\Database\Tables\ReviewsTable::getTableName());
 
-        $query = "
-            SELECT c.*, 
+        // TripClassificationsTable uses classification_id + classification_type (not category_id).
+        // ClassificationsTable holds all taxonomy rows — restrict to type = category.
+        $query = $this->wpdb->prepare(
+            "SELECT c.*, 
                    COUNT(DISTINCT tc.trip_id) AS trips_count,
                    COALESCE(AVG(r.rating), 0) AS avg_rating,
                    GROUP_CONCAT(DISTINCT tc.trip_id) AS trip_ids
             FROM `{$table}` c
-            LEFT JOIN `{$trip_cat_table}` tc ON tc.category_id = c.id
+            LEFT JOIN `{$trip_cat_table}` tc
+              ON tc.classification_id = c.id
+              AND tc.classification_type = %s
             LEFT JOIN `{$trip_table}` t ON t.id = tc.trip_id AND t.status = 'publish'
             LEFT JOIN `{$reviews_table}` r ON r.trip_id = t.id AND r.status = 'approved'
-            WHERE c.status = 'publish'
+            WHERE c.type = %s AND c.status = 'publish'
             GROUP BY c.id
-            ORDER BY c.name ASC
-        ";
+            ORDER BY c.name ASC",
+            ClassificationTypes::CATEGORY,
+            ClassificationTypes::CATEGORY
+        );
 
         $categories = $this->wpdb->get_results($query) ?: [];
 
@@ -309,9 +315,11 @@ class TripCategoryRepository extends BaseRepository
             "SELECT COUNT(DISTINCT t.id)
              FROM `{$tripTable}` t
              INNER JOIN `{$tripCatTable}` tc ON tc.trip_id = t.id
-             WHERE tc.trip_category_id = %d
+             WHERE tc.classification_id = %d
+               AND tc.classification_type = %s
                AND t.status != 'trash'",
-            $categoryId
+            $categoryId,
+            ClassificationTypes::CATEGORY
         ));
     }
 

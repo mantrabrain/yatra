@@ -24,7 +24,6 @@
         // Search functionality moved to shortcode-specific JS
         // initHorizontalSearchDropdowns();
         // initDurationSlider();
-        initListGridToggle();
     }
 
     // Advanced search toggle
@@ -120,47 +119,50 @@
         });
     }
 
-    // View toggle (grid/list) with localStorage persistence
+    // View toggle (grid/list): one grid per page; localStorage key is per grid id (not global).
     function initViewToggle() {
-        const viewButtons = document.querySelectorAll('.yatra-view-btn[data-view]');
-
-        // Find all grids that support view toggle
         const grids = [
             document.getElementById('trip-grid'),
             document.getElementById('category-grid'),
             document.getElementById('destination-grid'),
             document.getElementById('activity-grid')
-        ].filter(grid => grid !== null);
+        ].filter(function (el) {
+            return el !== null;
+        });
 
-        if (viewButtons.length === 0 || grids.length === 0) return;
+        if (grids.length === 0) {
+            return;
+        }
 
-        const storageKey = 'yatra_listing_view';
+        const grid = grids[0];
+        const storageKey = 'yatra_listing_view_' + (grid.id || 'listing');
+
+        const viewButtons = document.querySelectorAll('.yatra-view-btn[data-view]');
+        if (viewButtons.length === 0) {
+            return;
+        }
+
+        const listingRoot = grid.closest('.yatra-listing-page') || document.body;
 
         function applyView(view) {
             if (view !== 'list') {
                 view = 'grid';
             }
 
-            // Update active state for all toggle groups
-            document.querySelectorAll('.yatra-results-controls').forEach(container => {
-                const buttons = container.querySelectorAll('.yatra-view-btn[data-view]');
-                buttons.forEach(btn => {
-                    const btnView = btn.getAttribute('data-view');
-                    btn.classList.toggle('active', btnView === view);
-                });
+            listingRoot.querySelectorAll('.yatra-results-controls .yatra-view-btn[data-view]').forEach(function (btn) {
+                const btnView = btn.getAttribute('data-view');
+                btn.classList.toggle('active', btnView === view);
             });
 
-            // Toggle grid/list view for all grids on the page
-            grids.forEach(grid => {
-                if (view === 'list') {
-                    grid.classList.add('list-view');
-                } else {
-                    grid.classList.remove('list-view');
-                }
-            });
+            if (view === 'list') {
+                grid.classList.add('list-view');
+                grid.classList.remove('yatra-list-view');
+            } else {
+                grid.classList.remove('list-view');
+                grid.classList.remove('yatra-list-view');
+            }
         }
 
-        // Initial view from localStorage (shared across listing pages)
         let initialView = 'grid';
         try {
             const saved = window.localStorage.getItem(storageKey);
@@ -173,9 +175,8 @@
 
         applyView(initialView);
 
-        // Handle clicks
-        viewButtons.forEach(button => {
-            button.addEventListener('click', function() {
+        viewButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
                 const view = this.getAttribute('data-view') || 'grid';
                 applyView(view);
                 try {
@@ -369,43 +370,6 @@
 
         // Initial display
         updateDurationDisplay();
-    }
-
-    // List/Grid view toggle
-    function initListGridToggle() {
-        const viewButtons = document.querySelectorAll('.yatra-view-btn');
-        const grid = document.querySelector('.yatra-trip-grid, .yatra-destination-grid, .yatra-activity-grid');
-        
-        if (!viewButtons.length || !grid) return;
-        
-        viewButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const view = this.getAttribute('data-view');
-                
-                // Update active button
-                viewButtons.forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Update grid layout
-                if (view === 'list') {
-                    grid.classList.add('list-view');
-                    grid.classList.remove('grid-view');
-                } else {
-                    grid.classList.add('grid-view');
-                    grid.classList.remove('list-view');
-                }
-                
-                // Store preference in localStorage
-                localStorage.setItem('yatra-view-preference', view);
-            });
-        });
-        
-        // Load saved preference
-        const savedView = localStorage.getItem('yatra-view-preference') || 'grid';
-        const savedButton = document.querySelector(`[data-view="${savedView}"]`);
-        if (savedButton) {
-            savedButton.click();
-        }
     }
 
 })();

@@ -10,6 +10,7 @@ use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\ReviewsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Database\Tables\TripsTable;
+use Yatra\Utils\Cache;
 
 /**
  * Booking Repository
@@ -382,7 +383,10 @@ class BookingRepository extends BaseRepository
             throw new \Exception('Failed to create booking: ' . $this->wpdb->last_error);
         }
 
-        return $this->wpdb->insert_id;
+        $newId = (int) $this->wpdb->insert_id;
+        $this->afterWrite('create', $newId, []);
+
+        return $newId;
     }
 
     /**
@@ -427,6 +431,10 @@ class BookingRepository extends BaseRepository
             ['%d']
         );
 
+        if ($result !== false) {
+            $this->afterWrite('update', $id, []);
+        }
+
         return $result !== false;
     }
 
@@ -464,6 +472,10 @@ class BookingRepository extends BaseRepository
 
         $result = $this->wpdb->update($table, $data, ['id' => $id]);
 
+        if ($result !== false) {
+            $this->afterWrite('update', $id, []);
+        }
+
         return $result !== false;
     }
 
@@ -486,6 +498,10 @@ class BookingRepository extends BaseRepository
             ],
             ['id' => $id]
         );
+
+        if ($result !== false) {
+            $this->afterWrite('update', $id, []);
+        }
 
         return $result !== false;
     }
@@ -521,6 +537,10 @@ class BookingRepository extends BaseRepository
             ['id' => $id]
         );
 
+        if ($result !== false) {
+            $this->afterWrite('update', $id, []);
+        }
+
         return $result !== false;
     }
 
@@ -536,7 +556,24 @@ class BookingRepository extends BaseRepository
 
         $result = $this->wpdb->delete($table, ['id' => $id], ['%d']);
 
+        if ($result !== false) {
+            $this->afterWrite('delete', $id, []);
+        }
+
         return $result !== false;
+    }
+
+    /**
+     * Invalidate booking-related caches after repository writes.
+     *
+     * @param 'create'|'update'|'delete' $operation
+     */
+    protected function afterWrite(string $operation, int $id, array $context = []): void
+    {
+        Cache::invalidateAfterBookingWrite($id);
+        if ($operation === 'update') {
+            do_action('yatra_booking_updated', $id);
+        }
     }
 
     /**

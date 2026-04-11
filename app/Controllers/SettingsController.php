@@ -481,6 +481,10 @@ class SettingsController extends BaseController
                 flush_rewrite_rules(true);
             }
 
+            if (!empty($updated)) {
+                \Yatra\Services\SettingsService::reload();
+            }
+
             return $this->success_response([
                 'message' => 'Settings updated successfully',
                 'updated' => $updated,
@@ -533,8 +537,15 @@ class SettingsController extends BaseController
             }, $value);
         }
 
-        // Handle booleans
+        // Handle booleans (REST may send true/false strings)
         if (is_bool($default)) {
+            if (is_bool($value)) {
+                return $value;
+            }
+            if (is_string($value)) {
+                $parsed = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                return $parsed !== null ? $parsed : (bool) $value;
+            }
             return (bool) $value;
         }
 

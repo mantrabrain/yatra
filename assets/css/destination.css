@@ -42,46 +42,12 @@
   letter-spacing: 0.08em;
 }
 
-/* View toggle buttons (grid / list) */
-.yatra-destination-listing .yatra-view-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0;
-  border-radius: 9999px;
-  overflow: hidden;
-  background-color: #e5e7eb !important; /* gray-200 */
-}
-
-.yatra-destination-listing .yatra-view-btn {
-  border: none;
-  background: transparent !important;
-  padding: 0.35rem 0.6rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #2563eb !important; /* blue-600 */
-  cursor: pointer;
-}
-
-.yatra-destination-listing .yatra-view-btn svg {
+/* View toggle: listing.css defines base; keep only layout tweaks if needed */
+.yatra-destination-listing .yatra-view-toggle .yatra-view-btn svg {
   display: block;
 }
 
-.yatra-destination-listing .yatra-view-btn.active {
-  background-color: #2563eb !important; /* blue-600 */
-  color: #ffffff !important;
-}
-
-.yatra-destination-listing .yatra-view-btn:not(.active):hover {
-  background-color: #d1d5db !important; /* gray-300 */
-}
-
-/* Grid/List toggle */
-.yatra-destination-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
-}
+/* Grid columns: listing.css (unified 1/2/3-col breakpoints). Default card layout: */
 
 /* Default card layout in grid mode: vertical card */
 .yatra-destination-grid .yatra-destination-card {
@@ -115,30 +81,3 @@
   pointer-events: none;
 }
 
-/* Explore Destination button */
-.yatra-destination-listing a.yatra-destination-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.5rem;
-  border-radius: 9999px;
-  background-color: #10b981; /* emerald-500 */
-  color: #ffffff !important;
-  font-weight: 600;
-  font-size: 0.875rem;
-  text-decoration: none !important;
-  border: none;
-  cursor: pointer;
-  transition: background-color 150ms ease, transform 150ms ease;
-}
-
-.yatra-destination-listing a.yatra-destination-btn:hover,
-.yatra-destination-listing a.yatra-destination-btn:focus {
-  background-color: #059669; /* emerald-600 */
-  color: #ffffff !important; /* keep white, avoid blue link color */
-  text-decoration: none !important;
-}
-
-.yatra-destination-listing a.yatra-destination-btn:active {
-  transform: translateY(1px);
-}

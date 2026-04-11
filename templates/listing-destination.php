@@ -32,42 +32,35 @@ $destinations = $destination_service->getPublishedWithStats();
 $sort = isset($_GET['yatra_sort']) ? sanitize_text_field(wp_unslash($_GET['yatra_sort'])) : 'popular';
 
 if (!empty($destinations) && is_array($destinations)) {
-    usort($destinations, function ($a, $b) use ($sort) {
-        $nameA = isset($a->name) ? strtolower($a->name) : '';
-        $nameB = isset($b->name) ? strtolower($b->name) : '';
-        $tripsA = isset($a->trips_count) ? (int) $a->trips_count : 0;
-        $tripsB = isset($b->trips_count) ? (int) $b->trips_count : 0;
-        $ratingA = isset($a->avg_rating) ? (float) $a->avg_rating : 0.0;
-        $ratingB = isset($b->avg_rating) ? (float) $b->avg_rating : 0.0;
-
-        switch ($sort) {
-            case 'trips_desc': // Most Trips
-                return $tripsB <=> $tripsA;
-            case 'trips_asc':
-                return $tripsA <=> $tripsB;
-            case 'name_asc': // Name: A-Z
-                return $nameA <=> $nameB;
-            case 'name_desc': // Name: Z-A
-                return $nameB <=> $nameA;
-            case 'rating_desc': // Most Popular (by rating then trips)
-            default:
-                $cmp = $ratingB <=> $ratingA;
-                if (0 === $cmp) {
-                    return $tripsB <=> $tripsA;
-                }
-                return $cmp;
-        }
-    });
+    yatra_sort_archive_listing_stats_rows($destinations, $sort);
 }
 
-$per_page     = 6;
-$current_page = max(1, (int) (get_query_var('paged') ?: ($_GET['paged'] ?? 1)));
+$per_page     = yatra_get_posts_per_page();
+$current_page = yatra_get_archive_listing_paged();
 $total_items  = is_array($destinations) ? count($destinations) : 0;
 $total_pages  = $total_items > 0 ? (int) ceil($total_items / $per_page) : 1;
 $current_page = min($current_page, $total_pages);
 
 $offset             = ($current_page - 1) * $per_page;
 $paged_destinations = $total_items > 0 ? array_slice($destinations, $offset, $per_page) : [];
+
+$yatra_browse_start = $total_items > 0 ? $offset + 1 : 0;
+$yatra_browse_end = $total_items > 0 ? min($offset + $per_page, $total_items) : 0;
+$yatra_browse_line = function_exists('yatra_archive_browse_results_line')
+    ? yatra_archive_browse_results_line(
+        $yatra_browse_start,
+        $yatra_browse_end,
+        $total_items,
+        $current_page,
+        $total_pages,
+        __('destinations', 'yatra')
+    )
+    : '';
+
+$GLOBALS['yatra_archive_browse_pagination'] = [
+    'current_page' => (int) $current_page,
+    'total_pages' => (int) $total_pages,
+];
 
 yatra_get_header();
 ?>
@@ -85,30 +78,33 @@ yatra_get_header();
 
 <div class="yatra-listing-page yatra-destination-listing">
     <div class="yatra-listing-wrapper">
+        <main id="yatra-primary" class="yatra-listing-main">
         <div class="yatra-listing-container">
             
             <!-- Page Header -->
             <div class="yatra-destination-header">
                 <div class="yatra-destination-header-content">
                     <h1><?php esc_html_e('All Destinations', 'yatra'); ?></h1>
-                    <p><?php esc_html_e('Explore breathtaking destinations around the world', 'yatra'); ?></p>
+                    <p class="yatra-archive-listing-lede"><?php esc_html_e('Pick a place, then open it to see trips that visit there. Cards show trip count and typical pricing when available.', 'yatra'); ?></p>
+                    <?php if ($yatra_browse_line !== '') : ?>
+                        <p class="yatra-archive-listing-results" role="status"><?php echo esc_html($yatra_browse_line); ?></p>
+                    <?php endif; ?>
                 </div>
                 <div class="yatra-results-controls">
                     <div class="yatra-sort-control">
                         <label><?php esc_html_e('Sort by:', 'yatra'); ?></label>
                         <select onchange="if (this.value) window.location.href=this.value;">
                             <?php
-                            $base_url = remove_query_arg(['yatra_page', 'yatra_sort']);
-                            $options  = [
+                            $options = [
                                 'rating_desc' => __('Most Popular', 'yatra'),
                                 'trips_desc'  => __('Most Trips', 'yatra'),
                                 'name_asc'    => __('Name: A-Z', 'yatra'),
                                 'name_desc'   => __('Name: Z-A', 'yatra'),
                             ];
                             foreach ($options as $value => $label) {
-                                $url      = esc_url(add_query_arg(['yatra_sort' => $value], $base_url));
+                                $url      = yatra_build_archive_listing_sort_url($value);
                                 $selected = $sort === $value ? 'selected' : '';
-                                echo '<option value="' . $url . '" ' . $selected . '>' . esc_html($label) . '</option>';
+                                echo '<option value="' . esc_attr($url) . '" ' . $selected . '>' . esc_html($label) . '</option>';
                             }
                             ?>
                         </select>
@@ -228,7 +224,7 @@ yatra_get_header();
                             </div>
                             <div class="yatra-destination-content">
                                 <?php if (!empty($description)) : ?>
-                                    <p><?php echo esc_html($description); ?></p>
+                                    <p class="yatra-archive-card-excerpt"><?php echo esc_html(wp_trim_words(wp_strip_all_tags((string) $description), 28)); ?></p>
                                 <?php endif; ?>
                                 <?php if ($has_avg_rating || $has_trips_count || $has_starting_price) : ?>
                                     <div class="yatra-destination-stats">
@@ -261,8 +257,9 @@ yatra_get_header();
                                     </div>
                                 <?php endif; ?>
                                 <?php if (!empty($permalink)) : ?>
-                                    <a class="yatra-destination-btn" href="<?php echo esc_url($permalink); ?>">
-                                        <?php echo esc_html__('Explore Destination', 'yatra'); ?>
+                                    <a class="yatra-btn yatra-btn-primary yatra-archive-card-cta" href="<?php echo esc_url($permalink); ?>">
+                                        <?php echo yatra_archive_listing_cta_icon_markup($icon_class, 'map-pin'); ?>
+                                        <span><?php echo esc_html__('Explore Destination', 'yatra'); ?></span>
                                     </a>
                                 <?php endif; ?>
                             </div>
@@ -281,67 +278,53 @@ yatra_get_header();
                     <?php
                     $prev_page = max(1, $current_page - 1);
                     $next_page = min($total_pages, $current_page + 1);
-                    
-                    // Build pagination URLs preserving all query parameters
-                    $build_page_url = function($page) use ($sort) {
-                        // Get current URL without query string
-                        $base_path = strtok($_SERVER['REQUEST_URI'], '?');
-                        $base_path = rtrim($base_path, '/');
-                        
-                        // Preserve all existing query parameters
-                        $query_string = $_SERVER['QUERY_STRING'] ?? '';
-                        parse_str($query_string, $params);
-                        
-                        if ($page > 1) {
-                            $params['paged'] = $page;
-                        } else {
-                            unset($params['paged']);
-                        }
-                        
-                        if (!empty($sort)) {
-                            $params['yatra_sort'] = $sort;
-                        }
-                        
-                        $query = http_build_query($params);
-                        return esc_url($base_path . ($query ? '?' . $query : ''));
-                    };
                     ?>
                     <?php if ($current_page <= 1) : ?>
                         <span class="yatra-pagination-btn disabled" aria-disabled="true">
-                            <?php esc_html_e('Previous', 'yatra'); ?>
+                            <?php echo yatra_svg_icon('chevron-left', 'yatra-btn-icon'); ?>
+                            <span><?php esc_html_e('Previous', 'yatra'); ?></span>
                         </span>
                     <?php else : ?>
-                        <a class="yatra-pagination-btn" href="<?php echo $build_page_url($prev_page); ?>">
-                            <?php esc_html_e('Previous', 'yatra'); ?>
+                        <a class="yatra-pagination-btn" href="<?php echo esc_url(yatra_build_archive_listing_url($prev_page)); ?>">
+                            <?php echo yatra_svg_icon('chevron-left', 'yatra-btn-icon'); ?>
+                            <span><?php esc_html_e('Previous', 'yatra'); ?></span>
                         </a>
                     <?php endif; ?>
                     <?php
-                    // Smart pagination with ellipsis
                     $range = 2;
                     for ($i = 1; $i <= $total_pages; $i++) :
                         if ($i == 1 || $i == $total_pages || ($i >= $current_page - $range && $i <= $current_page + $range)) :
-                            $active = $i === $current_page ? ' active' : '';
+                            if ($i === $current_page) :
+                                ?>
+                                <span class="yatra-pagination-btn active"><?php echo esc_html((string) $i); ?></span>
+                                <?php
+                            else :
+                                ?>
+                                <a class="yatra-pagination-btn" href="<?php echo esc_url(yatra_build_archive_listing_url($i)); ?>"><?php echo esc_html((string) $i); ?></a>
+                                <?php
+                            endif;
+                        elseif ($i == $current_page - $range - 1 || $i == $current_page + $range + 1) :
                             ?>
-                            <a class="yatra-pagination-btn<?php echo $active; ?>" href="<?php echo $build_page_url($i); ?>">
-                                <?php echo esc_html($i); ?>
-                            </a>
-                        <?php elseif ($i == $current_page - $range - 1 || $i == $current_page + $range + 1) : ?>
                             <span class="yatra-pagination-ellipsis">...</span>
-                        <?php endif;
+                            <?php
+                        endif;
                     endfor;
                     ?>
                     <?php if ($current_page >= $total_pages) : ?>
                         <span class="yatra-pagination-btn disabled" aria-disabled="true">
-                            <?php esc_html_e('Next', 'yatra'); ?>
+                            <span><?php esc_html_e('Next', 'yatra'); ?></span>
+                            <?php echo yatra_svg_icon('chevron-right', 'yatra-btn-icon'); ?>
                         </span>
                     <?php else : ?>
-                        <a class="yatra-pagination-btn" href="<?php echo $build_page_url($next_page); ?>">
-                            <?php esc_html_e('Next', 'yatra'); ?>
+                        <a class="yatra-pagination-btn" href="<?php echo esc_url(yatra_build_archive_listing_url($next_page)); ?>">
+                            <span><?php esc_html_e('Next', 'yatra'); ?></span>
+                            <?php echo yatra_svg_icon('chevron-right', 'yatra-btn-icon'); ?>
                         </a>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>
+        </main>
     </div>
   </div>
 

@@ -59,9 +59,12 @@ class TripListingService extends BaseService
         // Sanitize and validate input parameters
         $filters = $this->sanitizeFilters($requestParams);
         
-        // Extract pagination parameters
+        // Extract pagination parameters (default per page = WordPress Reading > "Blog pages show at most")
         $page = max(1, (int) ($requestParams['page'] ?? 1));
-        $perPage = max(1, min(50, (int) ($requestParams['per_page'] ?? 12))); // Cap at 50 for performance
+        $defaultPerPage = \yatra_get_posts_per_page();
+        $maxCap = max((int) apply_filters('yatra_trip_listing_max_per_page', 100), $defaultPerPage);
+        $perPage = (int) ($requestParams['per_page'] ?? $defaultPerPage);
+        $perPage = max(1, min($maxCap, $perPage));
         
         // Create cache key for this specific request
         $cacheKey = $this->generateCacheKey($filters, $page, $perPage);
@@ -73,17 +76,13 @@ class TripListingService extends BaseService
             'cache_key' => substr($cacheKey, 0, 50) . '...'
         ]);
         
-        // Check if cache is enabled before using it
-        if ($this->isCacheEnabled()) {
-            // Try to get cached result
-            $result = Cache::remember($cacheKey, function() use ($filters, $page, $perPage) {
+        $result = $this->tripRepository->withQueryCache(
+            $cacheKey,
+            function () use ($filters, $page, $perPage) {
                 return $this->buildTripListingResult($filters, $page, $perPage);
-            }, Cache::DURATION_QUERY_RESULT);
-        } else {
-            // Bypass cache and get fresh data
-            Logger::debug("Cache disabled, getting fresh trip listing", ['filters' => $filters, 'page' => $page]);
-            $result = $this->buildTripListingResult($filters, $page, $perPage);
-        }
+            },
+            Cache::DURATION_QUERY_RESULT
+        );
         
         $executionTime = microtime(true) - $startTime;
         Logger::debug("Trip listing request completed", [
@@ -408,23 +407,17 @@ class TripListingService extends BaseService
      */
     private function getFilterOptions(): array
     {
-        if ($this->isCacheEnabled()) {
-            return Cache::remember('trip_listing_filter_options', function() {
+        return $this->tripRepository->withQueryCache(
+            'trip_listing_filter_options',
+            function () {
                 return [
                     'destinations' => $this->destinationRepository->getPublished(),
                     'activities' => $this->activityRepository->getPublished(),
-                    'attributes' => $this->getAvailableAttributes()
+                    'attributes' => $this->getAvailableAttributes(),
                 ];
-            }, Cache::DURATION_DESTINATION_DATA); // Cache for 1 hour since destinations/activities don't change often
-        } else {
-            // Bypass cache and get fresh data
-            Logger::debug("Cache disabled, getting fresh filter options");
-            return [
-                'destinations' => $this->destinationRepository->getPublished(),
-                'activities' => $this->activityRepository->getPublished(),
-                'attributes' => $this->getAvailableAttributes()
-            ];
-        }
+            },
+            Cache::DURATION_DESTINATION_DATA
+        );
     }
 
     /**
@@ -490,15 +483,13 @@ class TripListingService extends BaseService
 
     public function getTripStatistics(): array
     {
-        if ($this->isCacheEnabled()) {
-            return Cache::remember('trip_listing_statistics', function() {
+        return $this->tripRepository->withQueryCache(
+            'trip_listing_statistics',
+            function () {
                 return $this->calculateTripStatistics();
-            }, Cache::DURATION_STATS);
-        } else {
-            // Bypass cache and get fresh data
-            Logger::debug("Cache disabled, calculating fresh trip statistics");
-            return $this->calculateTripStatistics();
-        }
+            },
+            Cache::DURATION_STATS
+        );
     }
 
     /**
@@ -539,13 +530,16 @@ class TripListingService extends BaseService
      *
      * @param string $taxonomyType 'destination' or 'activity'
      * @param string $slug Taxonomy slug
-     * @param int $limit Number of trips to return
+     * @param int|null $limit Number of trips to return; null uses WordPress posts per page.
      * @return array
      */
-    public function getTripsByTaxonomy(string $taxonomyType, string $slug, int $limit = 10): array
+    public function getTripsByTaxonomy(string $taxonomyType, string $slug, ?int $limit = null): array
     {
+        $limit = $limit ?? \yatra_get_posts_per_page();
+        $limit = max(1, $limit);
+
         $filters = [$taxonomyType => $slug];
-        
+
         $result = $this->tripRepository->findWithFilters($filters, 1, $limit);
         
         // Load reviews for each trip (same approach as getFilteredTrips)
@@ -601,13 +595,13 @@ class TripListingService extends BaseService
      */
     public function getFilterData(): array
     {
-        if ($this->isCacheEnabled()) {
-            return Cache::remember('trip_listing_filter_data_v2', function() {
+        return $this->tripRepository->withQueryCache(
+            'trip_listing_filter_data_v2',
+            function () {
                 return $this->buildFilterData();
-            }, 3600); // Cache for 1 hour
-        }
-
-        return $this->buildFilterData();
+            },
+            3600
+        );
     }
 
     /**

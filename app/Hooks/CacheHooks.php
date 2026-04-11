@@ -29,7 +29,7 @@ class CacheHooks
         add_action('yatra_booking_created', [self::class, 'onBookingCreated'], 10, 1);
         add_action('yatra_booking_updated', [self::class, 'onBookingUpdated'], 10, 1);
         add_action('yatra_booking_deleted', [self::class, 'onBookingDeleted'], 10, 1);
-        add_action('yatra_booking_status_changed', [self::class, 'onBookingStatusChanged'], 10, 2);
+        add_action('yatra_booking_status_changed', [self::class, 'onBookingStatusChanged'], 10, 3);
 
         // Customer-related hooks
         add_action('yatra_customer_created', [self::class, 'onCustomerCreated'], 10, 1);
@@ -79,21 +79,19 @@ class CacheHooks
      */
     public static function onTripCreated(int $tripId): void
     {
-        self::invalidateListingCaches();
+        Cache::invalidateAfterTripWrite('create', $tripId);
         Logger::info("Cache invalidated for trip creation", ['trip_id' => $tripId]);
     }
 
     public static function onTripUpdated(int $tripId): void
     {
-        CacheService::invalidateEntity('trip', $tripId);
-        self::invalidateListingCaches();
+        Cache::invalidateAfterTripWrite('update', $tripId);
         Logger::info("Cache invalidated for trip update", ['trip_id' => $tripId]);
     }
 
     public static function onTripDeleted(int $tripId): void
     {
-        CacheService::invalidateEntity('trip', $tripId);
-        self::invalidateListingCaches();
+        Cache::invalidateAfterTripWrite('delete', $tripId);
         Logger::info("Cache invalidated for trip deletion", ['trip_id' => $tripId]);
     }
 
@@ -102,32 +100,29 @@ class CacheHooks
      */
     public static function onBookingCreated(int $bookingId): void
     {
-        Cache::invalidateBooking($bookingId);
-        self::invalidateStatsCaches();
+        Cache::invalidateAfterBookingWrite($bookingId);
         Logger::info("Cache invalidated for booking creation", ['booking_id' => $bookingId]);
     }
 
     public static function onBookingUpdated(int $bookingId): void
     {
-        Cache::invalidateBooking($bookingId);
-        self::invalidateStatsCaches();
+        Cache::invalidateAfterBookingWrite($bookingId);
         Logger::info("Cache invalidated for booking update", ['booking_id' => $bookingId]);
     }
 
     public static function onBookingDeleted(int $bookingId): void
     {
-        Cache::invalidateBooking($bookingId);
-        self::invalidateStatsCaches();
+        Cache::invalidateAfterBookingWrite($bookingId);
         Logger::info("Cache invalidated for booking deletion", ['booking_id' => $bookingId]);
     }
 
-    public static function onBookingStatusChanged(int $bookingId, string $newStatus): void
+    public static function onBookingStatusChanged(int $bookingId, string $oldStatus, string $newStatus): void
     {
-        Cache::invalidateBooking($bookingId);
-        self::invalidateStatsCaches();
+        Cache::invalidateAfterBookingWrite($bookingId);
         Logger::info("Cache invalidated for booking status change", [
             'booking_id' => $bookingId,
-            'new_status' => $newStatus
+            'old_status' => $oldStatus,
+            'new_status' => $newStatus,
         ]);
     }
 
@@ -274,17 +269,13 @@ class CacheHooks
      */
     private static function invalidateListingCaches(): void
     {
-        Cache::clearByPrefix(Cache::PREFIX_QUERY_RESULT);
-        Cache::clearByPrefix('trip_listing_');
-        Cache::clearByPrefix('activity_listing_');
-        Cache::clearByPrefix('destination_listing_');
+        Cache::invalidateListingCaches();
     }
 
     private static function invalidateStatsCaches(): void
     {
         Cache::clearByPrefix(Cache::PREFIX_STATS);
-        Cache::clearByPrefix('dashboard_stats_');
-        Cache::clearByPrefix('report_stats_');
+        Cache::invalidateDashboardReportCaches();
     }
 
     /**

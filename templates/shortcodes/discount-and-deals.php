@@ -52,8 +52,9 @@ $column_class = 'yatra-discount-grid-' . min(max($columns, 1), 4);
         
         <?php if (count($trips) >= (int) $atts['per_page']): ?>
             <div class="yatra-discount-more">
-                <a href="<?php echo esc_url(get_post_type_archive_link('trip')); ?>" class="yatra-btn yatra-btn-outline">
-                    <?php esc_html_e('View All Deals', 'yatra'); ?>
+                <a href="<?php echo esc_url(get_post_type_archive_link('trip')); ?>" class="yatra-btn yatra-btn-outline yatra-archive-card-cta">
+                    <span><?php esc_html_e('View All Deals', 'yatra'); ?></span>
+                    <?php echo yatra_svg_icon('chevron-right', 'yatra-btn-icon'); ?>
                 </a>
             </div>
         <?php endif; ?>
@@ -66,8 +67,9 @@ $column_class = 'yatra-discount-grid-' . min(max($columns, 1), 4);
             </div>
             <h3><?php esc_html_e('No Deals Available', 'yatra'); ?></h3>
             <p><?php esc_html_e('There are no special deals or discounts available at the moment. Check back soon for amazing offers!', 'yatra'); ?></p>
-            <a href="<?php echo esc_url(get_post_type_archive_link('trip')); ?>" class="yatra-btn yatra-btn-primary">
-                <?php esc_html_e('Browse All Tours', 'yatra'); ?>
+            <a href="<?php echo esc_url(get_post_type_archive_link('trip')); ?>" class="yatra-btn yatra-btn-primary yatra-archive-card-cta">
+                <?php echo yatra_svg_icon('globe', 'yatra-btn-icon'); ?>
+                <span><?php esc_html_e('Browse All Trips', 'yatra'); ?></span>
             </a>
         </div>
     <?php endif; ?>

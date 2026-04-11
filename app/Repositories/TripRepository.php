@@ -85,7 +85,7 @@ class TripRepository extends BaseRepository
     public function publishScheduledTrips(string $now): void
     {
         $table = esc_sql($this->table);
-        $this->wpdb->query(
+        $affected = $this->wpdb->query(
             $this->wpdb->prepare(
                 "UPDATE {$table}
                  SET status = 'publish', scheduled_publish_date = NULL, updated_at = %s
@@ -96,6 +96,9 @@ class TripRepository extends BaseRepository
                 $now
             )
         );
+        if ($affected !== false && (int) $affected > 0) {
+            Cache::invalidateAfterBulkTripTableWrites();
+        }
     }
 
     /**
@@ -104,7 +107,7 @@ class TripRepository extends BaseRepository
     public function archiveScheduledTrips(string $now): void
     {
         $table = esc_sql($this->table);
-        $this->wpdb->query(
+        $affected = $this->wpdb->query(
             $this->wpdb->prepare(
                 "UPDATE {$table}
                  SET status = 'archived', scheduled_unpublish_date = NULL, updated_at = %s
@@ -115,6 +118,9 @@ class TripRepository extends BaseRepository
                 $now
             )
         );
+        if ($affected !== false && (int) $affected > 0) {
+            Cache::invalidateAfterBulkTripTableWrites();
+        }
     }
 
     /**
@@ -123,7 +129,7 @@ class TripRepository extends BaseRepository
     public function enableSeasonalTrips(string $today, string $now): void
     {
         $table = esc_sql($this->table);
-        $this->wpdb->query(
+        $affected = $this->wpdb->query(
             $this->wpdb->prepare(
                 "UPDATE {$table}
                  SET status = 'publish', updated_at = %s
@@ -135,6 +141,9 @@ class TripRepository extends BaseRepository
                 $today
             )
         );
+        if ($affected !== false && (int) $affected > 0) {
+            Cache::invalidateAfterBulkTripTableWrites();
+        }
     }
 
     /**
@@ -143,7 +152,7 @@ class TripRepository extends BaseRepository
     public function disableSeasonalTrips(string $today, string $now): void
     {
         $table = esc_sql($this->table);
-        $this->wpdb->query(
+        $affected = $this->wpdb->query(
             $this->wpdb->prepare(
                 "UPDATE {$table}
                  SET status = 'archived', updated_at = %s
@@ -155,6 +164,9 @@ class TripRepository extends BaseRepository
                 $today
             )
         );
+        if ($affected !== false && (int) $affected > 0) {
+            Cache::invalidateAfterBulkTripTableWrites();
+        }
     }
 
     /**
@@ -163,6 +175,48 @@ class TripRepository extends BaseRepository
     protected function getTableName(): string
     {
      return TripsTable::getTableName();
+    }
+
+    /**
+     * Cached single trip row (same key family as {@see CacheService::cacheTrip} consumers).
+     */
+    public function findByIdCached(int $id): ?\stdClass
+    {
+        return $this->cacheQueryResult(
+            Cache::PREFIX_TRIP_DATA . $id,
+            function () use ($id): ?\stdClass {
+                return $this->find($id);
+            },
+            Cache::DURATION_TRIP_DATA
+        );
+    }
+
+    /**
+     * Trip row with relationships loaded — used where {@see TripService::getWithRelationsCached} applied.
+     */
+    public function findWithRelationsCached(int $id): ?\stdClass
+    {
+        $key = Cache::PREFIX_QUERY_RESULT . 'trip_with_relations_' . $id;
+
+        return $this->cacheQueryResult($key, function () use ($id): ?\stdClass {
+            $trip = $this->find($id);
+            if ($trip) {
+                $this->loadTripRelationships($trip);
+            }
+
+            return $trip;
+        }, Cache::DURATION_TRIP_DATA);
+    }
+
+    /**
+     * Create trip row; {@see afterWrite} handles cache; fires action `yatra_trip_created` once per insert.
+     */
+    public function create(array $data): int
+    {
+        $id = parent::create($data);
+        do_action('yatra_trip_created', $id);
+
+        return $id;
     }
 
     /**
@@ -197,7 +251,28 @@ class TripRepository extends BaseRepository
             ['%d']
         );
 
+        if ($result !== false) {
+            $this->afterWrite('update', $id, []);
+        }
+
         return $result !== false;
+    }
+
+    /**
+     * Invalidate trip/listing caches. Trip created hook is fired from {@see create()} after relations
+     * are irrelevant for cache; update/delete hooks fire here.
+     *
+     * @param 'create'|'update'|'delete' $operation
+     */
+    protected function afterWrite(string $operation, int $id, array $context = []): void
+    {
+        Cache::invalidateAfterTripWrite($operation, $id);
+
+        if ($operation === 'update') {
+            do_action('yatra_trip_updated', $id);
+        } elseif ($operation === 'delete') {
+            do_action('yatra_trip_deleted', $id);
+        }
     }
 
     /**
@@ -291,7 +366,7 @@ class TripRepository extends BaseRepository
         // Create cache key based on filters and pagination
         $cacheKey = Cache::KEY_TRIPS_WITH_FILTERS . '_' . md5(serialize($filters) . "_page_{$page}_per_page_{$perPage}");
         
-        return Cache::remember($cacheKey, function() use ($filters, $page, $perPage) {
+        return $this->cacheQueryResult($cacheKey, function() use ($filters, $page, $perPage) {
             global $wpdb;
         
         // Table references
@@ -812,6 +887,8 @@ class TripRepository extends BaseRepository
             }
         }
 
+        $price_types_by_trip = $this->batchLoadPriceTypesByTripIds($trip_ids);
+
         // Apply enriched data to each trip — use centralized TripPricingService
         foreach ($trips as $trip) {
             $trip->effective_price_min = \Yatra\Services\TripPricingService::getEffectivePrice($trip);
@@ -820,6 +897,7 @@ class TripRepository extends BaseRepository
             $trip->destinations = $destinations_data[$trip->id] ?? [];
             $trip->activities = $activities_data[$trip->id] ?? [];
             $trip->categories = $categories_data[$trip->id] ?? [];
+            $trip->price_types = $price_types_by_trip[$trip->id] ?? [];
         }
     }
     
@@ -1031,27 +1109,22 @@ class TripRepository extends BaseRepository
     }
 
     /**
-     * Get price types for a trip
+     * Normalize decoded price_types JSON (trips.price_types column).
+     *
+     * @param mixed $json Raw column value or already-decoded array
+     * @return array<int, array<string, mixed>>
      */
-    public function getPriceTypes(int $tripId): array
+    protected function parsePriceTypesJson($json): array
     {
-        // Read price_types JSON from trips table
-        $table = esc_sql($this->table);
-        $json  = $this->wpdb->get_var(
-            $this->wpdb->prepare("SELECT price_types FROM `{$table}` WHERE id = %d", $tripId)
-        );
-
-        if (empty($json)) {
+        if ($json === null || $json === '') {
             return [];
         }
 
-        // Decode JSON safely
         $decoded = is_string($json) ? json_decode($json, true) : $json;
         if (!is_array($decoded)) {
             return [];
         }
 
-        // Normalize each price type entry (preserve all fields needed for pricing)
         return array_values(array_filter(array_map(function ($pt) {
             if (!is_array($pt)) {
                 return null;
@@ -1064,11 +1137,54 @@ class TripRepository extends BaseRepository
                 'label'            => $pt['label'] ?? ($pt['title'] ?? null),
                 'pricing_mode'     => $pt['pricing_mode'] ?? 'per_person',
             ];
-            // Preserve optional metadata if present
-            if (isset($pt['category_label'])) $normalized['category_label'] = $pt['category_label'];
-            if (isset($pt['description'])) $normalized['description'] = $pt['description'];
+            if (isset($pt['category_label'])) {
+                $normalized['category_label'] = $pt['category_label'];
+            }
+            if (isset($pt['description'])) {
+                $normalized['description'] = $pt['description'];
+            }
+
             return $normalized;
         }, $decoded)));
+    }
+
+    /**
+     * Batch-load price_types for many trips (single query).
+     *
+     * @param int[] $trip_ids
+     * @return array<int, array<int, array<string, mixed>>>
+     */
+    protected function batchLoadPriceTypesByTripIds(array $trip_ids): array
+    {
+        $trip_ids = array_values(array_unique(array_map('intval', array_filter($trip_ids))));
+        if ($trip_ids === []) {
+            return [];
+        }
+
+        $table = esc_sql($this->table);
+        $placeholders = implode(',', array_fill(0, count($trip_ids), '%d'));
+        $sql = "SELECT id, price_types FROM `{$table}` WHERE id IN ({$placeholders})";
+        $rows = $this->wpdb->get_results($this->wpdb->prepare($sql, ...$trip_ids)) ?: [];
+
+        $out = [];
+        foreach ($rows as $row) {
+            $out[(int) $row->id] = $this->parsePriceTypesJson($row->price_types ?? null);
+        }
+
+        return $out;
+    }
+
+    /**
+     * Get price types for a trip
+     */
+    public function getPriceTypes(int $tripId): array
+    {
+        $table = esc_sql($this->table);
+        $json  = $this->wpdb->get_var(
+            $this->wpdb->prepare("SELECT price_types FROM `{$table}` WHERE id = %d", $tripId)
+        );
+
+        return $this->parsePriceTypesJson($json);
     }
 
     /**
@@ -1993,6 +2109,9 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
             $this->saveAttributes($tripId, $attributes);
         }
 
+        // Full bust after junction/related tables are written (create() already invalidated listings/stats).
+        Cache::invalidateAfterTripWrite('update', $tripId);
+
         do_action('yatra_trip_created_with_relations', $tripId, $relationships, $data);
         
         return $tripId;
@@ -2083,6 +2202,11 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
         
         if ($attributes !== null) {
             $this->saveAttributes($id, $attributes);
+        }
+
+        if ($result) {
+            // Ensure caches reflect relationship writes (update() runs before saves; this runs after).
+            Cache::invalidateAfterTripWrite('update', $id);
         }
 
         do_action('yatra_trip_updated_with_relations', $id, $relationships, $data);

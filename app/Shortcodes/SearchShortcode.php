@@ -49,7 +49,19 @@ class SearchShortcode extends BaseShortcode
             YATRA_VERSION,
             true
         );
-        
+
+        $listing_url = \function_exists('yatra_get_trip_listing_url')
+            ? \yatra_get_trip_listing_url()
+            : \trailingslashit(\home_url('/trip/'));
+
+        \wp_localize_script(
+            'yatra-trip-search-shortcode',
+            'yatraTripSearchConfig',
+            [
+                'listingUrl' => $listing_url,
+            ]
+        );
+
         // Same source as trip listing sidebar filters: published classifications.
         // TripRepository::*ForSearch() only returned rows linked via trip_classifications,
         // so empty relations hid all dropdown options.
@@ -64,7 +76,7 @@ class SearchShortcode extends BaseShortcode
             'atts' => $atts,
             'destinations' => $destinations,
             'activities' => $activities,
-            'listing_url' => \function_exists('yatra_get_trip_listing_url') ? \yatra_get_trip_listing_url() : \home_url('/trip/'),
+            'listing_url' => $listing_url,
             'duration_bounds' => $tripRepository->getDurationDaysBounds(),
             'budget_presets' => $tripListingService->getSearchBudgetPresets(),
         ]);

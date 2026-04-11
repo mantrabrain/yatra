@@ -37,6 +37,10 @@ import { HelpText } from "../components/ui/help-text";
 import { fetchSettings } from "../api/settings-api";
 import { apiClient } from "../lib/api-client";
 import { getErrorContext } from "../lib/errors";
+import {
+  buildYatraSinglePublicUrls,
+  isWordPressPlainPermalink,
+} from "../lib/frontend-permalink-urls";
 import { useToast } from "../components/ui/toast";
 import { generateSlug } from "../lib/slug";
 import { getCurrencySymbol, getCurrency } from "../data/currencies";
@@ -557,44 +561,45 @@ const Trips: React.FC = () => {
     "USD";
 
   const handleView = async (trip: Trip) => {
-    const siteUrl = (window as any)?.yatraAdmin?.siteUrl || "";
-    const tripBase = settings?.trip_base || "trip";
     const tripSlug = trip.slug || "";
-    let apiPermalink = (trip as any)?.permalink || (trip as any)?.url;
-    // permalinkStructure is optional in yatraAdmin; default to unknown => fall back to pretty
-    const permalinkStructure = (window as any)?.yatraAdmin?.permalinkStructure;
-    const isPlainPermalink = permalinkStructure === "plain";
+    const { plainUrl, prettyUrl } = buildYatraSinglePublicUrls({
+      entity: "trip",
+      slug: tripSlug,
+      bases: settings as Record<string, unknown> | null,
+    });
 
-    if (!tripSlug && !apiPermalink) {
-      showToast(__("Trip slug is missing", "yatra"), "error");
+    if (isWordPressPlainPermalink()) {
+      if (!tripSlug) {
+        showToast(__("Trip slug is missing", "yatra"), "error");
+        return;
+      }
+      window.open(plainUrl, "_blank", "noopener,noreferrer");
       return;
     }
 
-    // If permalink is missing, try fetching the single trip to get the backend-computed permalink
+    let apiPermalink = (trip as any)?.permalink || (trip as any)?.url;
+
     if (!apiPermalink && trip.id) {
       try {
         const detail = await apiClient.get(`/trips/${trip.id}`);
         apiPermalink =
           (detail as any)?.permalink || (detail as any)?.url || apiPermalink;
       } catch (e) {
-        // Ignore and fall back to pretty URL
+        // fall through to prettyUrl
       }
     }
 
-    // Prefer server-provided permalink when available (respects current permalink structure)
     if (apiPermalink) {
       window.open(apiPermalink, "_blank", "noopener,noreferrer");
       return;
     }
 
-    // Fallback: Pretty permalink path (matches TripPageHandler route)
-    const baseSite = siteUrl.replace(/\/$/, "");
-    const prettyUrl = `${baseSite}/${tripBase}/${tripSlug}`;
-    const plainUrl = `${baseSite}/?yatra_trip_slug=${encodeURIComponent(tripSlug)}`;
+    if (!tripSlug) {
+      showToast(__("Trip slug is missing", "yatra"), "error");
+      return;
+    }
 
-    // Honor site permalink structure (default to plain when unknown)
-    const targetUrl = isPlainPermalink ? plainUrl : prettyUrl;
-    window.open(targetUrl, "_blank", "noopener,noreferrer");
+    window.open(prettyUrl, "_blank", "noopener,noreferrer");
   };
 
   const handleCreateTrip = () => {

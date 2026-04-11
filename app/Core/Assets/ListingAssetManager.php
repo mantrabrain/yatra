@@ -20,10 +20,16 @@ class ListingAssetManager extends BaseAssetManager
         $this->addStyle('yatra-listing');
         $this->addScript('yatra-listing');
 
-        $this->addLocalization('yatra-listing', 'yatraListing', [
+        $data = [
             'type' => $listing_type,
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('yatra_listing_nonce'),
-        ]);
+        ];
+
+        if ($listing_type === 'trip' && function_exists('yatra_get_trip_listing_url')) {
+            $data['tripListingUrl'] = \yatra_get_trip_listing_url();
+        }
+
+        $this->addLocalization('yatra-listing', 'yatraListing', $data);
     }
 }

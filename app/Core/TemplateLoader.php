@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Yatra\Core;
 
 use Yatra\Core\Routing\Router;
+use Yatra\Core\Routing\PermalinkCanonical;
 use Yatra\Services\SettingsService;
-use Yatra\Core\Handlers\TripPageHandler;
-use Yatra\Core\Handlers\TaxonomyPageHandler;
 use Yatra\Core\Handlers\BookingConfirmationPageHandler;
 use Yatra\Repositories\BookingRepository;
 
@@ -39,6 +38,8 @@ class TemplateLoader
         // Early template include for booking confirmation (plain permalinks safety net)
         add_filter('template_include', [self::class, 'maybeLoadBookingConfirmationTemplate'], 0);
 
+        add_action('template_redirect', [PermalinkCanonical::class, 'enforce'], 0);
+
         // Initialize the main router for template handling
         add_action('template_redirect', [self::class, 'handleTemplateRedirect'], 1);
     }
@@ -48,6 +49,11 @@ class TemplateLoader
      */
     public static function maybeLoadBookingConfirmationTemplate(string $template): string
     {
+        global $wp_query;
+        if (!empty($wp_query->is_404)) {
+            return $template;
+        }
+
         $confirmationId = get_query_var('yatra_booking_confirmation') ?: ($_GET['yatra_booking_confirmation'] ?? ($_GET['reference'] ?? ''));
         if (empty($confirmationId)) {
             return $template;
@@ -89,6 +95,19 @@ class TemplateLoader
      */
     public static function handleTemplateRedirect(): void
     {
+        global $wp_query;
+
+        // WordPress often sets 404 for ?paged=N on the front page when the main blog query has no Nth page.
+        // Yatra listings use the same query vars (?yatra_page=…&paged=2); clear 404 so routing can run.
+        if (!empty($wp_query->is_404) && self::shouldClear404ForYatraRouting()) {
+            $wp_query->is_404 = false;
+            status_header(200);
+        }
+
+        if (!empty($wp_query->is_404)) {
+            return;
+        }
+
         // Early plain-permalink handling for booking confirmation via query var
         $confirmationId = get_query_var('yatra_booking_confirmation') ?: ($_GET['yatra_booking_confirmation'] ?? ($_GET['reference'] ?? ''));
         if (!empty($confirmationId)) {
@@ -118,64 +137,7 @@ class TemplateLoader
 
         // If router didn't handle it, let WordPress continue normally
         if (!$handled) {
-            // Get dynamic bases for plain permalink support
-            $trip_base = SettingsService::getTripBase();
-            $destination_base = SettingsService::getString('destination_base', 'destination');
-            $activity_base = SettingsService::getString('activity_base', 'activity');
-            $category_base = SettingsService::getString('trip_category_base', 'trip-category');
-
-            // Plain permalink fallback: handle ?yatra_trip_slug= or ?{trip_base}= requests
-            $slug = get_query_var('yatra_trip_slug') ?: (get_query_var($trip_base) ?: ($_GET['yatra_trip_slug'] ?? ($_GET[$trip_base] ?? '')));
-            if (!empty($slug)) {
-                $handler = new TripPageHandler();
-                $handled = $handler->handle([
-                    'type' => 'trip',
-                    'slug' => sanitize_title($slug),
-                    'base' => $trip_base,
-                ]);
-            }
-
-            // Plain permalink fallback: handle ?yatra_activity_slug= or ?{activity_base}= requests
-            if (!$handled) {
-                $slug = get_query_var('yatra_activity_slug') ?: (get_query_var($activity_base) ?: ($_GET['yatra_activity_slug'] ?? ($_GET[$activity_base] ?? '')));
-                if (!empty($slug)) {
-                    $handler = new TaxonomyPageHandler();
-                    $handled = $handler->handle([
-                        'type' => 'taxonomy',
-                        'taxonomy_type' => 'activity',
-                        'slug' => sanitize_title($slug),
-                        'base' => $activity_base,
-                    ]);
-                }
-            }
-
-            // Plain permalink fallback: handle ?yatra_destination_slug= or ?{destination_base}= requests
-            if (!$handled) {
-                $slug = get_query_var('yatra_destination_slug') ?: (get_query_var($destination_base) ?: ($_GET['yatra_destination_slug'] ?? ($_GET[$destination_base] ?? '')));
-                if (!empty($slug)) {
-                    $handler = new TaxonomyPageHandler();
-                    $handled = $handler->handle([
-                        'type' => 'taxonomy',
-                        'taxonomy_type' => 'destination',
-                        'slug' => sanitize_title($slug),
-                        'base' => $destination_base,
-                    ]);
-                }
-            }
-
-            // Plain permalink fallback: handle ?yatra_category_slug= or ?{category_base}= requests
-            if (!$handled) {
-                $slug = get_query_var('yatra_category_slug') ?: (get_query_var($category_base) ?: ($_GET['yatra_category_slug'] ?? ($_GET[$category_base] ?? '')));
-                if (!empty($slug)) {
-                    $handler = new TaxonomyPageHandler();
-                    $handled = $handler->handle([
-                        'type' => 'taxonomy',
-                        'taxonomy_type' => 'category',
-                        'slug' => sanitize_title($slug),
-                        'base' => $category_base,
-                    ]);
-                }
-            }
+            // Plain permalinks: routing uses ?yatra_page={base from settings} (see PlainPageMatcher).
 
             // Plain permalink fallback: handle ?yatra_booking_confirmation=
             if (!$handled) {
@@ -226,6 +188,60 @@ class TemplateLoader
     }
 
     /**
+     * True when this request should be routed by Yatra even if WP marked it 404 (paged home quirk).
+     */
+    private static function shouldClear404ForYatraRouting(): bool
+    {
+        if (is_admin() || wp_doing_ajax() || wp_doing_cron()) {
+            return false;
+        }
+
+        $yatraPage = isset($_GET['yatra_page']) ? trim((string) wp_unslash($_GET['yatra_page'])) : '';
+        if ($yatraPage !== '') {
+            return true;
+        }
+
+        $qv = (string) get_query_var('yatra_page');
+        if ($qv !== '') {
+            return true;
+        }
+
+        // Plain trip / taxonomy slug keys (same idea as {@see PermalinkCanonical::requestHasPlainYatraRoutingQuery})
+        $tripKey = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) SettingsService::getTripBase()) ?: 'trip';
+        if (isset($_GET[$tripKey]) && is_string($_GET[$tripKey]) && trim(wp_unslash($_GET[$tripKey])) !== '') {
+            return true;
+        }
+
+        foreach (
+            [
+                SettingsService::getString('destination_base', 'destination'),
+                SettingsService::getString('activity_base', 'activity'),
+                SettingsService::getString('trip_category_base', 'trip-category'),
+            ] as $base
+        ) {
+            $bk = preg_replace('/[^a-zA-Z0-9_-]/', '', $base) ?: '';
+            if ($bk === '' || $bk === $tripKey) {
+                continue;
+            }
+            if (isset($_GET[$bk]) && is_string($_GET[$bk]) && trim(wp_unslash($_GET[$bk])) !== '') {
+                return true;
+            }
+        }
+
+        foreach (['yatra_trip', 'yatra_trip_slug', 'yatra_destination_slug', 'yatra_activity_slug', 'yatra_category_slug', 'yatra_booking_confirmation'] as $key) {
+            if (!isset($_GET[$key])) {
+                continue;
+            }
+            $v = wp_unslash($_GET[$key]);
+            if (is_string($v) && trim($v) !== '') {
+                return true;
+            }
+        }
+
+        return (bool) apply_filters('yatra_clear_404_for_routing', false);
+    }
+
+    /**
      * Add rewrite rules for trip permalinks and listing pages
      */
     public static function addTripRewriteRules(): void
@@ -245,9 +261,8 @@ class TemplateLoader
         $trip_category_base = preg_replace('/[^a-z0-9_-]/i', '', $trip_category_base) ?: 'trip-category';
 
         // Add query vars first (must be registered before rewrite rules)
-        add_rewrite_tag('%yatra_trip_slug%', '([^&]+)');
-        add_rewrite_tag('%yatra_listing_page%', '([^&]+)');
-        add_rewrite_tag('%yatra_booking_page%', '([^&]+)');
+        // Single-trip slug query var matches trip URL base (e.g. trip=, tours=)
+        add_rewrite_tag('%' . $trip_base . '%', '([^&]+)');
         add_rewrite_tag('%yatra_booking_confirmation%', '([^&]+)');
         add_rewrite_tag('%yatra_remaining_checkout%', '([^&]+)');
         add_rewrite_tag('%yatra_verify_email%', '([^&]+)');
@@ -256,7 +271,7 @@ class TemplateLoader
         add_rewrite_tag('%yatra_destination_slug%', '([^&]+)');
         add_rewrite_tag('%yatra_activity_slug%', '([^&]+)');
         add_rewrite_tag('%yatra_category_slug%', '([^&]+)');
-        add_rewrite_tag('%yatra_page%', '([0-9]+)');
+        add_rewrite_tag('%yatra_page%', '([a-zA-Z0-9_-]+)');
         add_rewrite_tag('%paged%', '([0-9]+)');
 
         // Add rewrite rule for email verification: /yatra-verify-email/{token}/
@@ -273,60 +288,93 @@ class TemplateLoader
             'top'
         );
 
-        // Add rewrite rule for trip listing with pagination: {trip_base}/page/{page}/
+        // Trip listing pagination: {trip_base}/page/{n}/
         add_rewrite_rule(
             '^' . $trip_base . '/page/([0-9]+)/?$',
-            'index.php?yatra_listing_page=trip&paged=$matches[1]',
+            'index.php?yatra_page=' . $trip_base . '&paged=$matches[1]',
             'top'
         );
-        
-        // Add rewrite rule for trip single page: {trip_base}/{trip_slug}
+
+        // Trip listing (page 1): {trip_base}/
+        add_rewrite_rule(
+            '^' . $trip_base . '/?$',
+            'index.php?yatra_page=' . $trip_base,
+            'top'
+        );
+
+        // Single trip: {trip_base}/{trip_slug}/
         add_rewrite_rule(
             '^' . $trip_base . '/([^/]+)/?$',
-            'index.php?yatra_trip_slug=$matches[1]',
+            'index.php?yatra_page=' . $trip_base . '&' . $trip_base . '=$matches[1]',
             'top'
         );
 
-        // Add rewrite rules for SINGLE taxonomy pages (must come before listing pages)
-        // Single destination with pagination: /destination/{slug}/page/{page}/
+        // Taxonomy: single + pagination (yatra_page = base from settings; paged = WP pagination)
         add_rewrite_rule(
             '^' . $destination_base . '/([^/]+)/page/([0-9]+)/?$',
-            'index.php?yatra_destination_slug=$matches[1]&yatra_page=$matches[2]',
+            'index.php?yatra_page=' . $destination_base . '&yatra_destination_slug=$matches[1]&paged=$matches[2]',
             'top'
         );
-        
-        // Single destination: /destination/{slug}/
+
         add_rewrite_rule(
             '^' . $destination_base . '/([^/]+)/?$',
-            'index.php?yatra_destination_slug=$matches[1]',
+            'index.php?yatra_page=' . $destination_base . '&yatra_destination_slug=$matches[1]',
             'top'
         );
 
-        // Single activity with pagination: /activity/{slug}/page/{page}/
+        add_rewrite_rule(
+            '^' . $destination_base . '/?$',
+            'index.php?yatra_page=' . $destination_base,
+            'top'
+        );
+
         add_rewrite_rule(
             '^' . $activity_base . '/([^/]+)/page/([0-9]+)/?$',
-            'index.php?yatra_activity_slug=$matches[1]&yatra_page=$matches[2]',
-            'top'
-        );
-        
-        // Single activity: /activity/{slug}/
-        add_rewrite_rule(
-            '^' . $activity_base . '/([^/]+)/?$',
-            'index.php?yatra_activity_slug=$matches[1]',
+            'index.php?yatra_page=' . $activity_base . '&yatra_activity_slug=$matches[1]&paged=$matches[2]',
             'top'
         );
 
-        // Single category with pagination: /trip-category/{slug}/page/{page}/
         add_rewrite_rule(
-            '^' . $trip_category_base . '/([^/]+)/page/([0-9]+)/?$',
-            'index.php?yatra_category_slug=$matches[1]&yatra_page=$matches[2]',
+            '^' . $activity_base . '/([^/]+)/?$',
+            'index.php?yatra_page=' . $activity_base . '&yatra_activity_slug=$matches[1]',
             'top'
         );
-        
-        // Single category: /trip-category/{slug}/
+
+        add_rewrite_rule(
+            '^' . $activity_base . '/?$',
+            'index.php?yatra_page=' . $activity_base,
+            'top'
+        );
+
+        add_rewrite_rule(
+            '^' . $trip_category_base . '/([^/]+)/page/([0-9]+)/?$',
+            'index.php?yatra_page=' . $trip_category_base . '&yatra_category_slug=$matches[1]&paged=$matches[2]',
+            'top'
+        );
+
         add_rewrite_rule(
             '^' . $trip_category_base . '/([^/]+)/?$',
-            'index.php?yatra_category_slug=$matches[1]',
+            'index.php?yatra_page=' . $trip_category_base . '&yatra_category_slug=$matches[1]',
+            'top'
+        );
+
+        add_rewrite_rule(
+            '^' . $trip_category_base . '/?$',
+            'index.php?yatra_page=' . $trip_category_base,
+            'top'
+        );
+
+        // Booking with trip slug: /{booking_base}/{trip}/
+        add_rewrite_rule(
+            '^' . $booking_base . '/([^/]+)/?$',
+            'index.php?yatra_page=' . $booking_base . '&trip=$matches[1]',
+            'top'
+        );
+
+        // Booking hub (Settings → booking base, e.g. /book/)
+        add_rewrite_rule(
+            '^' . $booking_base . '/?$',
+            'index.php?yatra_page=' . $booking_base,
             'top'
         );
 
@@ -353,7 +401,7 @@ class TemplateLoader
         
         // Check if rewrite rules need flushing (only flush once after plugin update/activation)
         $rewrite_version = get_option('yatra_rewrite_rules_version', '0');
-        $current_version = '1.0.3'; // Increment this when rewrite rules change
+        $current_version = '1.0.6'; // Increment this when rewrite rules change
         if ($rewrite_version !== $current_version) {
             flush_rewrite_rules(false);
             update_option('yatra_rewrite_rules_version', $current_version);
@@ -366,9 +414,7 @@ class TemplateLoader
     public static function addCustomQueryVars(array $vars): array
     {
         $yatra_vars = [
-            'yatra_trip_slug',
-            'yatra_listing_page',
-            'yatra_booking_page',
+            'yatra_trip', // legacy plain/pretty query var for trip slug
             'yatra_booking_confirmation',
             'yatra_remaining_checkout',
             'yatra_verify_email',
