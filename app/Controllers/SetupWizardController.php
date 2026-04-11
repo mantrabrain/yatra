@@ -9,6 +9,7 @@
 
 namespace Yatra\Controllers;
 
+use Yatra\Admin\StatsUsage;
 use Yatra\Helpers\CurrencyHelper;
 use Yatra\Services\SettingsService;
 
@@ -71,6 +72,7 @@ class SetupWizardController
             'welcome' => array(
                 'name' => __('Welcome', 'yatra'),
                 'view' => array($this, 'setup_welcome'),
+                'handler' => array($this, 'setup_welcome_save'),
             ),
             'business' => array(
                 'name' => __('Business', 'yatra'),
@@ -144,6 +146,14 @@ class SetupWizardController
 
         $steps = $this->get_steps();
         $this->step = isset($_GET['step']) ? sanitize_key($_GET['step']) : current(array_keys($steps));
+
+        if (class_exists(StatsUsage::class)) {
+            $usage = StatsUsage::instance();
+            if ($this->step === 'welcome') {
+                $usage->mark_onboarding_started();
+            }
+            $usage->set_onboarding_step($this->step);
+        }
 
         // Legacy URL: step=general → business
         if ($this->step === 'general' && isset($steps['business'])) {
@@ -324,6 +334,27 @@ class SetupWizardController
     public function setup_welcome()
     {
         include YATRA_ABSPATH . 'templates/setup-wizard/welcome.php';
+    }
+
+    /**
+     * Save welcome step (usage opt-in) and continue to Business.
+     */
+    public function setup_welcome_save()
+    {
+        check_admin_referer('yatra-setup');
+
+        $allow_tracking = !empty($_POST['yatra_allow_usage_tracking']);
+        update_option('yatra_allow_usage_tracking', $allow_tracking);
+        if (class_exists(StatsUsage::class)) {
+            if ($allow_tracking) {
+                StatsUsage::instance()->enable(true);
+            } else {
+                StatsUsage::instance()->disable();
+            }
+        }
+
+        wp_safe_redirect(esc_url_raw($this->get_next_step_link()));
+        exit;
     }
 
     /**
@@ -626,6 +657,19 @@ class SetupWizardController
      */
     public function skip_setup_wizard()
     {
+        update_option('yatra_allow_usage_tracking', false);
+        if (class_exists(StatsUsage::class)) {
+            $u = StatsUsage::instance();
+            $u->patch_onboarding_meta([
+                'dropoff_step' => 'welcome',
+                'skipped_at' => time(),
+            ]);
+            if ($u->is_enabled()) {
+                $u->record_event('setup_abandoned');
+            }
+            $u->disable();
+        }
+
         // Mark wizard as completed
         update_option(self::WIZARD_COMPLETED_OPTION, '1');
         

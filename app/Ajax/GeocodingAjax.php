@@ -74,7 +74,7 @@ class GeocodingAjax
 
         $response = wp_remote_get($url, [
             'timeout' => 10,
-            'user-agent' => 'Yatra Travel Plugin (https://yatra.local)',
+            'user-agent' => 'Yatra Travel Plugin (https://wpyatra.com/)',
             'headers' => [
                 'Accept' => 'application/json'
             ]
@@ -139,7 +139,7 @@ class GeocodingAjax
 
         $response = wp_remote_get($url, [
             'timeout' => 10,
-            'user-agent' => 'Yatra Travel Plugin (https://yatra.local)',
+            'user-agent' => 'Yatra Travel Plugin (https://wpyatra.com/)',
             'headers' => [
                 'Accept' => 'application/json'
             ]

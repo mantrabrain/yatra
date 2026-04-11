@@ -100,7 +100,7 @@ The Vite dev server will start on `http://localhost:3000` with:
 
 Open your WordPress admin:
 ```
-https://yatra.local/wp-admin/admin.php?page=yatra
+https://your-site.test/wp-admin/admin.php?page=yatra
 ```
 
 **Features in Development Mode:**

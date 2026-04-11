@@ -70,6 +70,10 @@ class Bootstrap
                 \Yatra\Services\SetupWizardService::init();
             }
 
+            if (class_exists('\Yatra\Admin\StatsUsage')) {
+                \Yatra\Admin\StatsUsage::instance()->init();
+            }
+
             // Initialize Dynamic Pricing Service
             // DISABLED: Automatic dynamic pricing was adding 15% markup for trips with ≤5 spots
             // if (class_exists('\Yatra\Services\DynamicPricingService')) {

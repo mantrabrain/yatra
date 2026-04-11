@@ -559,7 +559,7 @@ No data is sent to external servers except:
 * Payment processing through chosen payment gateways
 * Optional analytics if enabled
 
-For full privacy details, see our [Privacy Policy](https://wpyatra.com/privacy-policy).
+For full privacy details, see our [Privacy Policy](https://mantrabrain.com/privacy-policy/).
 
 = Contributing =
 

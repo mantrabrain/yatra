@@ -354,7 +354,7 @@ class BookingService
                 $booking = (object) [];
             }
 
-            do_action('yatra_booking_created', (int) $bookingId, $booking);
+            do_action(\Yatra\Hooks\TelemetryHookNames::BOOKING_CREATED, (int) $bookingId, $booking);
 
             return [
                 'success' => true,

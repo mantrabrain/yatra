@@ -77,6 +77,14 @@ export const API_ENDPOINTS = {
   PAYMENT_GET: (id: string | number) => `/payments/${id}`,
   PAYMENT_DELETE: (id: string | number) => `/payments/${id}`,
 
+  // Usage tracking (opt-in telemetry)
+  USAGE_TRACKING_STATUS: "/usage-tracking/status",
+  USAGE_TRACKING_SETTINGS: "/usage-tracking/settings",
+  USAGE_TRACKING_SEND: "/usage-tracking/send",
+  USAGE_TRACKING_PREVIEW: "/usage-tracking/preview",
+  USAGE_TRACKING_CLEAR_CACHE: "/usage-tracking/clear-cache",
+  USAGE_TRACKING_DELETE_SNAPSHOTS: "/usage-tracking/delete-snapshots",
+
   // Settings
   SETTINGS: "/settings",
   SETTINGS_GROUP: (group: string) => `/settings?group=${group}`,

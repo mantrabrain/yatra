@@ -64,15 +64,15 @@ $is_remaining_payment = true;
             <div class="yatra-remaining-banner">
                 <div>
                     <strong><?php esc_html_e('Amount Due Now', 'yatra'); ?>:</strong>
-                    <span><?php echo esc_html(yatra_format_price($remaining_amount)); ?></span>
+                    <span><?php echo esc_html(yatra_format_price((float) $remaining_amount, null, false)); ?></span>
                 </div>
                 <div>
                     <strong><?php esc_html_e('Amount Paid', 'yatra'); ?>:</strong>
-                    <span><?php echo esc_html(yatra_format_price($amount_paid)); ?></span>
+                    <span><?php echo esc_html(yatra_format_price((float) $amount_paid, null, false)); ?></span>
                 </div>
                 <div>
                     <strong><?php esc_html_e('Total Cost', 'yatra'); ?>:</strong>
-                    <span><?php echo esc_html(yatra_format_price($total_amount)); ?></span>
+                    <span><?php echo esc_html(yatra_format_price((float) $total_amount, null, false)); ?></span>
                 </div>
             </div>
             <div class="yatra-remaining-details">
@@ -118,7 +118,7 @@ $is_remaining_payment = true;
                         <line x1="1" y1="10" x2="23" y2="10"></line>
                     </svg>
                     <span id="pay-button-text"><?php esc_html_e('Pay Remaining Balance', 'yatra'); ?></span>
-                    <span id="pay-amount"><?php echo esc_html(yatra_format_price($remaining_amount)); ?></span>
+                    <span id="pay-amount"><?php echo esc_html(yatra_format_price((float) $remaining_amount, null, false)); ?></span>
                 </button>
                 <a href="<?php echo esc_url(home_url('/my-account?tab=bookings')); ?>" class="yatra-booking-cancel-btn">
                     <?php esc_html_e('Back to My Bookings', 'yatra'); ?>
@@ -152,15 +152,15 @@ $is_remaining_payment = true;
             <div class="yatra-price-summary">
                 <div class="yatra-price-row">
                     <span><?php esc_html_e('Total Amount', 'yatra'); ?></span>
-                    <strong><?php echo esc_html(yatra_format_price($total_amount)); ?></strong>
+                    <strong><?php echo esc_html(yatra_format_price((float) $total_amount, null, false)); ?></strong>
                 </div>
                 <div class="yatra-price-row">
                     <span><?php esc_html_e('Paid', 'yatra'); ?></span>
-                    <strong><?php echo esc_html(yatra_format_price($amount_paid)); ?></strong>
+                    <strong><?php echo esc_html(yatra_format_price((float) $amount_paid, null, false)); ?></strong>
                 </div>
                 <div class="yatra-price-row due">
                     <span><?php esc_html_e('Due Now', 'yatra'); ?></span>
-                    <strong><?php echo esc_html(yatra_format_price($remaining_amount)); ?></strong>
+                    <strong><?php echo esc_html(yatra_format_price((float) $remaining_amount, null, false)); ?></strong>
                 </div>
             </div>
 

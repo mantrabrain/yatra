@@ -289,20 +289,8 @@ class SettingsMigration extends BaseMigration
             ],
 
             // Payment Gateway Settings (verified from function-yatra-payments.php)
-            [
-                'old' => 'yatra_payment_gateway_test_mode',
-                'new' => 'yatra_payment_gateway_test_mode',
-                'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
-                }
-            ],
-            [
-                'old' => 'yatra_payment_gateway_enable_logging',
-                'new' => 'yatra_payment_gateway_enable_logging',
-                'transform' => function($value) {
-                    return $value === 'yes' || $value === true || $value === 1;
-                }
-            ],
+            // yatra_payment_gateway_test_mode → yatra_payment_test_mode: migrateLegacyRenamedFreeOptions()
+            // yatra_payment_gateway_enable_logging → yatra_enable_logging: migrateLegacyRenamedFreeOptions()
 
             // Email Settings (verified from class-yatra-email.php)
             [
@@ -618,6 +606,74 @@ class SettingsMigration extends BaseMigration
             $n++;
         }
 
+        // 2.x stored payment test mode under yatra_payment_gateway_test_mode ('yes'/'no'); 3.x SettingsService reads yatra_payment_test_mode (bool).
+        $legacyPayTest = get_option('yatra_payment_gateway_test_mode', null);
+        if ($legacyPayTest !== null && $legacyPayTest !== false && $legacyPayTest !== '') {
+            $on = $legacyPayTest === 'yes' || $legacyPayTest === true || $legacyPayTest === 1 || $legacyPayTest === '1';
+            update_option('yatra_payment_test_mode', $on);
+            Logger::info('Migrated yatra_payment_gateway_test_mode → yatra_payment_test_mode', [
+                'source' => 'migration',
+                'test_mode' => $on,
+            ]);
+            $n++;
+        }
+
+        // 2.x gateway log toggle → 3.x yatra_enable_logging (LoggingService / Settings UI).
+        $legacyGwLog = get_option('yatra_payment_gateway_enable_logging', null);
+        if ($legacyGwLog !== null && $legacyGwLog !== false && $legacyGwLog !== '') {
+            $on = $legacyGwLog === 'yes' || $legacyGwLog === true || $legacyGwLog === 1 || $legacyGwLog === '1';
+            update_option('yatra_enable_logging', $on);
+            Logger::info('Migrated yatra_payment_gateway_enable_logging → yatra_enable_logging', [
+                'source' => 'migration',
+                'enabled' => $on,
+            ]);
+            $n++;
+        }
+
+        return $n;
+    }
+
+    /**
+     * Map Yatra 2.x email notification checkboxes to 3.x template enable flags.
+     *
+     * 2.x keys (class-yatra-settings-emails.php) do not match 3.x; without this, fresh 3.x defaults (all on)
+     * would ignore a site that had turned emails off.
+     *
+     * 3.x naming note: {@see TransactionalEmailTemplateService::typeToSettingsKeys()} — email_template_confirmation
+     * drives payment confirmation, not “booking status change”; we only map toggles where semantics align.
+     */
+    private function migrateLegacyEmailTemplateToggles(): int
+    {
+        $n = 0;
+        $yes = static function ($v): bool {
+            return $v === 'yes' || $v === true || $v === 1 || $v === '1';
+        };
+
+        $bc = get_option('yatra_enable_booking_notification_email_for_customer', null);
+        $sc = get_option('yatra_enable_booking_status_change_notification_email_for_customer', null);
+        if ($bc !== null || $sc !== null) {
+            $customerOn = ($bc !== null && $yes($bc)) || ($sc !== null && $yes($sc));
+            update_option('yatra_email_template_booking', $customerOn);
+            Logger::info('Migrated legacy customer booking/status email toggles → yatra_email_template_booking', [
+                'source' => 'migration',
+                'enabled' => $customerOn,
+            ]);
+            $n++;
+        }
+
+        $ba = get_option('yatra_enable_booking_notification_email_for_admin', null);
+        if ($ba !== null) {
+            update_option('yatra_email_template_admin_new_booking', $yes($ba));
+            Logger::info('Migrated legacy admin booking notification toggle → yatra_email_template_admin_new_booking', [
+                'source' => 'migration',
+                'enabled' => $yes($ba),
+            ]);
+            $n++;
+        }
+
+        // Admin “booking status change” emails have no separate flag in 3.x core; do not map to
+        // email_template_admin_cancellation (that is cancellation-specific).
+
         return $n;
     }
     
@@ -686,6 +742,9 @@ class SettingsMigration extends BaseMigration
         $enquiryResults = $this->migrateEnquirySettings();
         $migrated += $enquiryResults['migrated'];
         $skipped += $enquiryResults['skipped'];
+
+        // 2.x per-template email on/off → 3.x yatra_email_template_* flags (TransactionalEmailTemplateService).
+        $migrated += $this->migrateLegacyEmailTemplateToggles();
 
         // Legacy Pro Google Calendar OAuth options → new Pro 3.x option names (no separate migration step).
         $this->migrateLegacyProGoogleCalendarTokens();

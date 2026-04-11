@@ -43,6 +43,7 @@ import {
   Image,
   X,
   TrendingUp,
+  BarChart3,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { usePermissions } from "../hooks/usePermissions";
@@ -57,6 +58,12 @@ import {
   postInsertBookingShortcode,
   saveSettings,
 } from "../api/settings-api";
+import {
+  fetchUsageTrackingStatus,
+  postUsageTrackingSettings,
+  postUsageTrackingSend,
+  type UsageTrackingStatus,
+} from "../api/usage-tracking-api";
 import { Button } from "../components/ui/button";
 import { ProFeature, ProBadge } from "../components/ProFeature";
 import { PremiumUpgradeDialog } from "../components/modules/PremiumUpgradeDialog";
@@ -2046,6 +2053,11 @@ const Settings: React.FC = () => {
   >({});
   const [gatewayOrder, setGatewayOrder] = useState<string[]>([]);
   const [draggedGateway, setDraggedGateway] = useState<string | null>(null);
+  const [usageStatus, setUsageStatus] = useState<UsageTrackingStatus | null>(
+    null,
+  );
+  const [usageBusy, setUsageBusy] = useState(false);
+  const [usageLoading, setUsageLoading] = useState(false);
 
   // Initialize viewingSection from activeSection on mount
   useEffect(() => {
@@ -2092,6 +2104,32 @@ const Settings: React.FC = () => {
     enabled: can("manage_yatra"),
     staleTime: Infinity,
   });
+
+  useEffect(() => {
+    if (viewingSection !== "advanced" || !can("manage_yatra")) {
+      return;
+    }
+    let cancelled = false;
+    setUsageLoading(true);
+    (async () => {
+      try {
+        const s = await fetchUsageTrackingStatus();
+        if (!cancelled) {
+          setUsageStatus(s);
+        }
+      } catch {
+        if (!cancelled) {
+          setUsageStatus(null);
+        }
+      } finally {
+        // Always clear loading — otherwise a strict-mode remount / dependency churn can leave the spinner stuck.
+        setUsageLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [viewingSection, can]);
 
   // Default settings fallback
   const defaultSettings: SettingsData = useMemo<SettingsData>(
@@ -7051,6 +7089,143 @@ const Settings: React.FC = () => {
                   </p>
                 </div>
               </div>
+            </div>
+
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" />
+                {__("Help us improve Yatra", "yatra")}
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                {__(
+                  "Share non-sensitive technical details so we can make Yatra better. You can turn this off anytime. See what we collect on our site:",
+                  "yatra",
+                )}{" "}
+                <a
+                  className="text-blue-600 hover:underline inline-flex items-center gap-0.5"
+                  href="https://wpyatra.com/what-we-collect/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {__("What we collect", "yatra")}
+                  <ExternalLink className="w-3 h-3" aria-hidden />
+                </a>
+                {" · "}
+                <a
+                  className="text-blue-600 hover:underline"
+                  href="https://mantrabrain.com/privacy-policy/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {__("Privacy policy", "yatra")}
+                </a>
+              </p>
+
+              {usageLoading && (
+                <p className="text-sm text-gray-500 flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {__("Loading…", "yatra")}
+                </p>
+              )}
+
+              {!usageLoading && !usageStatus && (
+                <p className="text-sm text-amber-600">
+                  {__(
+                    "Could not load this section. You may need permission to manage Yatra.",
+                    "yatra",
+                  )}
+                </p>
+              )}
+
+              {!usageLoading && usageStatus && (
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                    <input
+                      type="checkbox"
+                      id="yatra_usage_tracking_enabled"
+                      checked={usageStatus.enabled}
+                      disabled={usageBusy}
+                      onChange={async (e) => {
+                        setUsageBusy(true);
+                        try {
+                          const r = await postUsageTrackingSettings(
+                            e.target.checked,
+                          );
+                          setUsageStatus((prev) =>
+                            prev
+                              ? { ...prev, enabled: r.enabled }
+                              : prev,
+                          );
+                          showToast(__("Preference saved.", "yatra"), "success");
+                        } catch (err: any) {
+                          showToast(
+                            err?.message ||
+                              __("Could not save your preference.", "yatra"),
+                            "error",
+                          );
+                        } finally {
+                          setUsageBusy(false);
+                        }
+                      }}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 shrink-0"
+                    />
+                    <div className="flex-1 min-w-[200px]">
+                      <Label
+                        htmlFor="yatra_usage_tracking_enabled"
+                        className="font-medium cursor-pointer"
+                      >
+                        {__(
+                          "Help us improve the product by sharing non-sensitive data",
+                          "yatra",
+                        )}
+                      </Label>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        {__(
+                          "Sent periodically while enabled. Learn more: ",
+                          "yatra",
+                        )}
+                        <a
+                          className="text-blue-600 hover:underline inline-flex items-center gap-0.5"
+                          href="https://wpyatra.com/what-we-collect/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {__("What we collect", "yatra")}
+                          <ExternalLink className="w-3 h-3" aria-hidden />
+                        </a>
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="default"
+                      size="sm"
+                      disabled={usageBusy}
+                      onClick={async () => {
+                        setUsageBusy(true);
+                        try {
+                          await postUsageTrackingSend({
+                            force: !usageStatus.enabled,
+                          });
+                          const s = await fetchUsageTrackingStatus();
+                          setUsageStatus(s);
+                          showToast(__("Sent successfully.", "yatra"), "success");
+                        } catch (err: any) {
+                          showToast(
+                            err?.message || __("Send failed.", "yatra"),
+                            "error",
+                          );
+                        } finally {
+                          setUsageBusy(false);
+                        }
+                      }}
+                    >
+                      <RefreshCw className="w-4 h-4 mr-1" />
+                      {__("Send now", "yatra")}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
             </div>
           </div>
         );

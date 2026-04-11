@@ -709,8 +709,14 @@ class BookingSessionController extends BaseController
     }
 
     /**
-     * Create a new booking OR process remaining payment
-     * Server-side detection: if remaining session exists, process payment only
+     * Create a new booking OR process remaining payment (same REST route).
+     *
+     * Regular checkout: persists the booking first (BookingService::createBooking), then starts
+     * online payment if needed; payment rows are written when the gateway confirms success
+     * (confirm endpoint, webhooks, IPN, or recordGatewayPayment for immediate captures).
+     *
+     * Remaining / balance payment: does not create a booking — only charges the existing row
+     * and records a payment on success via the same gateway completion paths.
      */
     public function create_booking(WP_REST_Request $request): WP_REST_Response
     {
@@ -724,6 +730,7 @@ class BookingSessionController extends BaseController
         // A leftover PHP session from "pay remaining balance" must not hijack a normal
         // checkout POST (full traveler payload). Only treat as remaining-payment when the
         // client is actually on that flow (hidden field) or sends no new-booking travelers.
+        // Early return: process_remaining_payment() — no createBooking().
         if (yatra_has_remaining_session()) {
             $is_remaining_checkout = !empty($data['is_remaining_payment']);
             $travelers_payload = $data['travelers'] ?? null;
@@ -739,6 +746,11 @@ class BookingSessionController extends BaseController
                 return $this->process_remaining_payment($request);
             }
         }
+
+        // ========================================
+        // NEW BOOKING CHECKOUT (not pay-remaining)
+        // ========================================
+        // Below: createBooking() runs once; payment is initiated afterward if amount_due > 0.
 
         // ========================================
         // GET BOOKING SETTINGS
@@ -1151,7 +1163,7 @@ class BookingSessionController extends BaseController
         // Create booking using BookingService
         $booking_service = new \Yatra\Services\BookingService();
 
-        $is_offline_gateway = in_array($payment_gateway, ['pay_later', 'bank_transfer'], true);
+        $is_offline_gateway = $this->isOfflineGateway($payment_gateway);
 
         // Always defer createBooking's copy: session sends one rich confirmation at the end, or
         // transactional confirmation before payment redirect (see processPaymentGateway returns).
@@ -1514,44 +1526,58 @@ class BookingSessionController extends BaseController
     
     
     /**
-     * Get confirmation page URL
+     * Get confirmation page URL (see yatra_get_booking_confirmation_url()).
      */
     private function getConfirmationUrl(string $reference): string
     {
-        // Check if a custom confirmation page is set
-        $confirmation_page_id = \Yatra\Services\SettingsService::get('booking_confirmation_page');
-
-        $permalinkStructure = get_option('permalink_structure');
-        $isPlain = empty($permalinkStructure);
-
-        if ($isPlain) {
-            // Plain permalinks: use the query var consumed by BookingConfirmationPageHandler
-            // Use root home URL (avoid any path segment to prevent 404)
-            return add_query_arg('yatra_booking_confirmation', $reference, home_url('/'));
-        }
-
-        $baseUrl = $confirmation_page_id ? get_permalink($confirmation_page_id) : home_url('/booking-confirmation/');
-
-        return trailingslashit($baseUrl) . $reference . '/';
+        return yatra_get_booking_confirmation_url($reference);
     }
 
     /**
-     * Process remaining payment (no new booking created)
+     * Whether the gateway completes without an external payment step (registry flag + fallback).
+     */
+    private function isOfflineGateway(string $gatewayId): bool
+    {
+        try {
+            $registry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
+            $gateway = $registry->get($gatewayId);
+            if ($gateway) {
+                return $gateway->isOffline();
+            }
+        } catch (\Throwable $e) {
+            // Fall through to legacy IDs
+        }
+
+        return in_array($gatewayId, ['pay_later', 'bank_transfer'], true);
+    }
+
+    /**
+     * Pay balance due on an existing booking only.
+     *
+     * Does not call BookingService::createBooking() or insert a second booking row.
+     * Initiates gateway flow with the stored booking_id; on success, payment is recorded
+     * via PaymentGatewayController::handle_successful_payment, webhooks, or recordGatewayPayment
+     * — same completion paths as initial checkout.
      */
     private function process_remaining_payment(WP_REST_Request $request): WP_REST_Response
     {
+        $data = $request->get_json_params();
+        if (!is_array($data)) {
+            $data = [];
+        }
+        $payment_gateway = strtolower(trim(sanitize_text_field($data['payment_gateway'] ?? 'pay_later')));
+
         $session = yatra_get_remaining_session();
-        
+
         $booking_id = (int) ($session['booking_id'] ?? 0);
-        $booking_reference = $session['booking_reference'] ?? '';
-        $remaining_amount = (float) ($session['remaining_amount'] ?? 0);
-        $currency = $session['currency'] ?? 'USD';
-        $contact_email = $session['contact_email'] ?? '';
-        $contact_first_name = $session['contact_first_name'] ?? '';
-        $contact_last_name = $session['contact_last_name'] ?? '';
+        $booking_reference = (string) ($session['booking_reference'] ?? '');
+        $currency = (string) ($session['currency'] ?? '');
+        $contact_email = (string) ($session['contact_email'] ?? '');
+        $contact_first_name = (string) ($session['contact_first_name'] ?? '');
+        $contact_last_name = (string) ($session['contact_last_name'] ?? '');
         $trip_id = (int) ($session['trip_id'] ?? 0);
-        $trip_title = $session['trip_title'] ?? '';
-        $travel_date = $session['travel_date'] ?? '';
+        $trip_title = (string) ($session['trip_title'] ?? '');
+        $travel_date = (string) ($session['travel_date'] ?? '');
 
         if ($booking_id <= 0) {
             return new WP_REST_Response([
@@ -1560,15 +1586,6 @@ class BookingSessionController extends BaseController
             ], 400);
         }
 
-        if ($remaining_amount <= 0) {
-            yatra_clear_remaining_session();
-            return new WP_REST_Response([
-                'success' => false,
-                'message' => __('This booking is already fully paid.', 'yatra'),
-            ], 400);
-        }
-
-        // Verify booking exists
         $booking = $this->bookingRepository->find($booking_id);
         if (!$booking) {
             yatra_clear_remaining_session();
@@ -1576,6 +1593,27 @@ class BookingSessionController extends BaseController
                 'success' => false,
                 'message' => __('Booking not found.', 'yatra'),
             ], 404);
+        }
+
+        if ($booking_reference === '' && !empty($booking->reference)) {
+            $booking_reference = (string) $booking->reference;
+        }
+
+        // Authoritative balance from DB (do not rely on session alone)
+        $remaining_amount = (float) ($booking->amount_due ?? 0);
+        if ($remaining_amount <= 0 && isset($booking->total_amount)) {
+            $remaining_amount = max(
+                0,
+                (float) $booking->total_amount - (float) ($booking->amount_paid ?? 0)
+            );
+        }
+
+        if ($remaining_amount <= 0) {
+            yatra_clear_remaining_session();
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('This booking is already fully paid.', 'yatra'),
+            ], 400);
         }
 
         // Verify user owns this booking
@@ -1588,23 +1626,102 @@ class BookingSessionController extends BaseController
             ], 403);
         }
 
-        // Use contact info from session or booking
-        $customer_email = $contact_email ?: ($booking->contact_email ?? $booking->customer_email ?? '');
-        $customer_name = trim($contact_first_name . ' ' . $contact_last_name) ?: 
-            trim(($booking->contact_first_name ?? '') . ' ' . ($booking->contact_last_name ?? ''));
+        if ($currency === '') {
+            $currency = (string) ($booking->currency ?? SettingsService::getCurrency());
+        }
 
-        if (empty($customer_email)) {
+        // Use contact info from session or booking
+        $customer_email = $contact_email !== '' ? $contact_email : (string) ($booking->contact_email ?? $booking->customer_email ?? '');
+        $customer_name = trim($contact_first_name . ' ' . $contact_last_name);
+        if ($customer_name === '') {
+            $customer_name = trim(($booking->contact_first_name ?? '') . ' ' . ($booking->contact_last_name ?? ''));
+        }
+
+        if ($customer_email === '') {
             return new WP_REST_Response([
                 'success' => false,
                 'message' => __('Email address is required.', 'yatra'),
             ], 400);
         }
 
-        // Return booking info for payment processing (Stripe will create intent)
-        // Do NOT clear session yet - it will be cleared after successful payment
+        $is_offline_gateway = $this->isOfflineGateway($payment_gateway);
+
+        // Online gateways: delegate to the same flow as new-booking checkout (PayPal redirect, Stripe intent, etc.).
+        // Do not put confirmation URL in redirect_url here — that caused the browser to skip payment entirely.
+        if (!$is_offline_gateway && $remaining_amount > 0) {
+            $payment_params = array_merge($data, [
+                'booking_id' => $booking_id,
+                'reference' => $booking_reference,
+                'amount' => $remaining_amount,
+                'currency' => $currency,
+                'customer_email' => $customer_email,
+                'customer_name' => $customer_name !== '' ? $customer_name : $customer_email,
+                'trip_title' => $trip_title,
+            ]);
+
+            $payment_result = $this->processPaymentGateway($payment_gateway, $payment_params);
+
+            if (!empty($payment_result['success'])) {
+                if (!empty($payment_result['payment_url'])) {
+                    return new WP_REST_Response([
+                        'success' => true,
+                        'message' => __('Redirecting to payment...', 'yatra'),
+                        'data' => [
+                            'booking_id' => $booking_id,
+                            'reference' => $booking_reference,
+                            'payment_url' => $payment_result['payment_url'],
+                            'is_remaining_payment' => true,
+                        ],
+                    ]);
+                }
+
+                if (!empty($payment_result['requires_action'])) {
+                    return new WP_REST_Response([
+                        'success' => true,
+                        'message' => __('Complete payment...', 'yatra'),
+                        'data' => array_merge(
+                            [
+                                'booking_id' => $booking_id,
+                                'reference' => $booking_reference,
+                                'is_remaining_payment' => true,
+                            ],
+                            $payment_result
+                        ),
+                    ]);
+                }
+
+                if (!empty($payment_result['redirect_url'])) {
+                    return new WP_REST_Response([
+                        'success' => true,
+                        'message' => __('Payment processed.', 'yatra'),
+                        'data' => [
+                            'booking_id' => $booking_id,
+                            'reference' => $booking_reference,
+                            'redirect_url' => $payment_result['redirect_url'],
+                            'is_remaining_payment' => true,
+                        ],
+                    ]);
+                }
+            }
+
+            $err = $payment_result['message'] ?? $payment_result['error'] ?? __('Payment processing failed. Please try again.', 'yatra');
+
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => $err,
+                'data' => [
+                    'payment_error' => true,
+                    'booking_id' => $booking_id,
+                ],
+            ], 400);
+        }
+
+        // Offline gateways: no external redirect — confirmation page only
+        yatra_clear_remaining_session();
+
         return new WP_REST_Response([
             'success' => true,
-            'message' => __('Ready to process remaining payment.', 'yatra'),
+            'message' => __('Continue to confirmation.', 'yatra'),
             'data' => [
                 'booking_id' => $booking_id,
                 'reference' => $booking_reference,
@@ -1661,8 +1778,11 @@ class BookingSessionController extends BaseController
                 ];
             }
             
-            // Prepare payment data - pass all params, gateways extract what they need
-            // Note: Don't set return_url here - let each gateway set its own with gateway-specific query params
+            // Prepare payment data - pass all params, gateways extract what they need.
+            // Default return_url to the configured booking confirmation URL so redirect gateways
+            // (e.g. PayPal Advanced, Mollie, Paystack) do not fall back to wrong paths; gateways
+            // may still append their own query args on top of this URL.
+            $ref = isset($params['reference']) ? trim((string) $params['reference']) : '';
             $paymentData = array_merge($params, [
                 'description' => $params['trip_title'] ?? '',
                 'cancel_url' => home_url('/book/?payment=cancelled&ref=' . ($params['reference'] ?? '')),
@@ -1671,6 +1791,9 @@ class BookingSessionController extends BaseController
                     'reference' => $params['reference'] ?? ''
                 ]
             ]);
+            if ($ref !== '' && empty($paymentData['return_url'])) {
+                $paymentData['return_url'] = $this->getConfirmationUrl($ref);
+            }
             
             // Process the payment through the gateway
             $result = $gateway->processPayment($paymentData);
@@ -1837,7 +1960,7 @@ class BookingSessionController extends BaseController
                         'description' => $params['trip_title'],
                     ]],
                     'application_context' => [
-                        'return_url' => $this->getConfirmationUrl($params['reference']) . '?payment=success',
+                        'return_url' => add_query_arg('payment', 'success', $this->getConfirmationUrl($params['reference'])),
                         'cancel_url' => home_url('/book/?payment=cancelled&ref=' . $params['reference']),
                     ],
                 ]),
@@ -1955,7 +2078,10 @@ class BookingSessionController extends BaseController
             'tAmt' => $params['amount'],
             'pid' => $params['reference'],
             'scd' => $merchant_id,
-            'su' => $this->getConfirmationUrl($params['reference']) . '?payment=success&gateway=esewa',
+            'su' => add_query_arg(
+                ['payment' => 'success', 'gateway' => 'esewa'],
+                $this->getConfirmationUrl($params['reference'])
+            ),
             'fu' => home_url('/book/?payment=failed&ref=' . $params['reference']),
         ], $base_url);
         
@@ -1982,7 +2108,10 @@ class BookingSessionController extends BaseController
                     'Content-Type' => 'application/json',
                 ],
                 'body' => wp_json_encode([
-                    'return_url' => $this->getConfirmationUrl($params['reference']) . '?payment=success&gateway=khalti',
+                    'return_url' => add_query_arg(
+                        ['payment' => 'success', 'gateway' => 'khalti'],
+                        $this->getConfirmationUrl($params['reference'])
+                    ),
                     'website_url' => home_url(),
                     'amount' => (int) ($params['amount'] * 100), // Amount in paisa
                     'purchase_order_id' => $params['reference'],

@@ -310,6 +310,45 @@ $pricing_type = isset($pricing_type) ? $pricing_type : 'regular';
 $price_types = isset($price_types) ? $price_types : [];
 $traveler_counts = isset($traveler_counts) ? $traveler_counts : [];
 
+/**
+ * Coerce JSON / serialized / object values to a list for foreach-safe iteration.
+ *
+ * @param mixed $value
+ * @return array<int|string, mixed>
+ */
+$yatra_normalize_booking_arrayish = static function ($value): array {
+    if ($value === null || $value === false || $value === '') {
+        return [];
+    }
+    if (is_array($value)) {
+        return $value;
+    }
+    if ($value instanceof \stdClass) {
+        return (array) $value;
+    }
+    if (is_string($value)) {
+        $trim = trim($value);
+        if ($trim === '') {
+            return [];
+        }
+        $decoded = json_decode($value, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return $decoded;
+        }
+        if (function_exists('maybe_unserialize')) {
+            $un = maybe_unserialize($value);
+            if (is_array($un)) {
+                return $un;
+            }
+        }
+    }
+
+    return [];
+};
+
+$price_types = $yatra_normalize_booking_arrayish($price_types);
+$traveler_counts = $yatra_normalize_booking_arrayish($traveler_counts);
+
 // Build traveler-to-category mapping for traveler-based pricing
 $traveler_category_map = [];
 if ($pricing_type === 'traveler_based' && !empty($price_types) && !empty($traveler_counts)) {

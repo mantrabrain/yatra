@@ -154,7 +154,7 @@ class PayPalGateway extends AbstractPaymentGateway
         $bookingId = $paymentData['booking_id'] ?? 0;
         $reference = $paymentData['reference'] ?? $bookingId;
         $description = $paymentData['description'] ?? sprintf(__('Booking #%s', 'yatra'), $reference);
-        $returnUrl = $paymentData['return_url'] ?? home_url('/booking-confirmation/' . $reference . '/');
+        $returnUrl = $paymentData['return_url'] ?? yatra_get_booking_confirmation_url((string) $reference);
         $cancelUrl = $paymentData['cancel_url'] ?? home_url('/book/?payment=cancelled&ref=' . $reference);
 
         // PayPal Standard base URL
@@ -211,7 +211,8 @@ class PayPalGateway extends AbstractPaymentGateway
         $amount = number_format((float) ($paymentData['amount'] ?? 0), 2, '.', '');
         $currency = $paymentData['currency'] ?? 'USD';
         $bookingId = $paymentData['booking_id'] ?? 0;
-        $returnUrl = $paymentData['return_url'] ?? home_url('/booking-success/');
+        $referenceForReturn = (string) ($paymentData['reference'] ?? $bookingId);
+        $returnUrl = $paymentData['return_url'] ?? yatra_get_booking_confirmation_url($referenceForReturn);
         $cancelUrl = $paymentData['cancel_url'] ?? home_url('/book/?payment=cancelled');
         $savePayment = !empty($paymentData['save_payment']);
 

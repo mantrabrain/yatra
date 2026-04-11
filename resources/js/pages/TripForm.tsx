@@ -2519,21 +2519,6 @@ const TripForm: React.FC = () => {
     },
   ];
 
-  // Calculate completion percentage
-  const completedSections = [
-    ...essentialsSections,
-    ...detailsSections,
-    ...optimizationSections,
-  ].filter((s) => s.completed).length;
-  const totalRequiredSections = essentialsSections.filter(
-    (s) => s.required,
-  ).length;
-  const completionPercentage =
-    totalRequiredSections > 0
-      ? Math.round((completedSections / totalRequiredSections) * 100)
-      : 0;
-
-  // Get current step number and total steps for navigation
   const allSections = [
     ...essentialsSections,
     ...detailsSections,
@@ -2543,8 +2528,6 @@ const TripForm: React.FC = () => {
   const currentStepIndex = allSections.findIndex(
     (s) => s.id === currentSection,
   );
-  const currentStepNumber = currentStepIndex >= 0 ? currentStepIndex + 1 : 1;
-  const totalSteps = allSections.length;
 
   // Navigation helpers
   const goToNextSection = () => {
@@ -8227,7 +8210,7 @@ const TripForm: React.FC = () => {
         </div>
       </div>
 
-      {/* Navigation Bar with Progress */}
+      {/* Navigation Bar */}
       <div className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700 px-4 py-2.5">
         <div className="flex items-center justify-between gap-4">
           {/* Previous Button */}
@@ -8241,28 +8224,6 @@ const TripForm: React.FC = () => {
             <ChevronLeft className="w-4 h-4" />
             {__("Previous", "yatra")}
           </Button>
-
-          {/* Progress Indicator - Compact */}
-          <div className="flex-1 flex flex-col items-center gap-1 min-w-0 max-w-md mx-4">
-            <div className="flex items-center gap-1.5 text-[10px] font-medium w-full">
-              <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                {__("Step", "yatra")} {currentStepNumber}/{totalSteps}
-              </span>
-              <span className="text-gray-400 dark:text-gray-500">•</span>
-              <span className="text-blue-600 dark:text-blue-400 font-semibold whitespace-nowrap">
-                {completionPercentage}%
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
-              <div
-                className="bg-gradient-to-r from-blue-500 to-blue-600 h-1.5 rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${completionPercentage}%` }}
-              />
-            </div>
-            <div className="text-[9px] font-medium text-gray-600 dark:text-gray-400 truncate w-full text-center">
-              {allSections[currentStepIndex]?.label || __("Overview", "yatra")}
-            </div>
-          </div>
 
           {/* Next Button */}
           <Button

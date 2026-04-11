@@ -252,12 +252,14 @@ function yatra_get_booking_url(string $trip_slug, array $params = []): string
  * 
  * @param float       $amount   The amount to format
  * @param string|null $currency The currency code (optional, uses global setting if not provided)
+ * @param bool        $zero_is_unknown When true (default), 0 is shown as "Contact for pricing" (trip/listing).
+ *                                     Set false for checkout, payments, and invoices where 0 is a real amount.
  * @return string Formatted price
  */
 if (!function_exists('yatra_format_price')) {
-    function yatra_format_price(float $amount, ?string $currency = null): string
+    function yatra_format_price(float $amount, ?string $currency = null, bool $zero_is_unknown = true): string
     {
-        if (empty($amount) || $amount == 0) {
+        if ($zero_is_unknown && (empty($amount) || $amount == 0)) {
             return __('Contact for pricing', 'yatra');
         }
         
@@ -873,6 +875,46 @@ function yatra_get_checkout_url(): string
     }
 
     return home_url('/' . $base . '/');
+}
+
+/**
+ * Front-end URL for booking confirmation for a given reference.
+ *
+ * Uses the configured confirmation page (if set), plain-permalink query routing
+ * (?yatra_booking_confirmation=ref), or the default /booking-confirmation/ base.
+ *
+ * @param string $reference Booking reference segment (may be empty for base URL only).
+ * @return string Full URL.
+ */
+function yatra_get_booking_confirmation_url(string $reference = ''): string
+{
+    $reference = (string) $reference;
+    $permalink_structure = get_option('permalink_structure');
+    $is_plain = empty($permalink_structure);
+
+    if ($is_plain) {
+        if ($reference === '') {
+            $url = home_url('/');
+        } else {
+            $url = add_query_arg('yatra_booking_confirmation', $reference, home_url('/'));
+        }
+    } else {
+        $confirmation_page_id = SettingsService::get('booking_confirmation_page');
+        $base_url = $confirmation_page_id ? get_permalink((int) $confirmation_page_id) : home_url('/booking-confirmation/');
+        if ($reference === '') {
+            $url = trailingslashit($base_url);
+        } else {
+            $url = trailingslashit($base_url) . $reference . '/';
+        }
+    }
+
+    /**
+     * Filter the booking confirmation URL.
+     *
+     * @param string $url       Built URL.
+     * @param string $reference Booking reference (may be empty).
+     */
+    return (string) apply_filters('yatra_booking_confirmation_url', $url, $reference);
 }
 
 /**
@@ -1658,5 +1700,21 @@ if (!function_exists('yatra_wishlist_enabled')) {
     function yatra_wishlist_enabled(): bool
     {
         return \Yatra\Services\SettingsService::wishlistEnabled();
+    }
+}
+
+if (!function_exists('yatra_usage_track_event')) {
+    /**
+     * Record an anonymous product telemetry event (requires opt-in).
+     *
+     * @param string $event Event key (sanitized).
+     * @param int    $delta Counter increment.
+     */
+    function yatra_usage_track_event(string $event, int $delta = 1): void
+    {
+        if (!class_exists(\Yatra\Admin\StatsUsage::class)) {
+            return;
+        }
+        \Yatra\Admin\StatsUsage::instance()->record_event($event, $delta);
     }
 }

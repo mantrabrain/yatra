@@ -115,7 +115,7 @@ export default defineConfig({
       port: 5173,
       clientPort: 5173,
     },
-    // Allow WordPress admin on http://yatra.local to load assets from this dev server
+    // Allow WordPress admin on your local site URL to load assets from this dev server
     cors: true,
     // Disable module preload in dev to prevent chunk loader generation
     preTransformRequests: false,

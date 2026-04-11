@@ -56,6 +56,27 @@ class BookingPageHandler extends BasePageHandler
                         'travel_date' => '',
                         'timestamp' => time(),
                     ];
+                } elseif (function_exists('yatra_has_remaining_session') && yatra_has_remaining_session()) {
+                    // "Pay remaining balance" from My Account clears booking session and only sets
+                    // yatra remaining session — hydrate a virtual booking session so checkout can render.
+                    $rem = yatra_get_remaining_session();
+                    if (!empty($rem['trip_id'])) {
+                        if (function_exists('yatra_start_session')) {
+                            yatra_start_session();
+                        }
+                        $session = [
+                            'trip_id' => (int) $rem['trip_id'],
+                            'travelers' => max(1, (int) ($rem['travelers'] ?? 1)),
+                            'travel_date' => is_string($rem['travel_date'] ?? null) ? $rem['travel_date'] : '',
+                            'timestamp' => time(),
+                            'remaining_amount' => isset($rem['remaining_amount']) ? (float) $rem['remaining_amount'] : null,
+                            'amount_paid' => isset($rem['amount_paid']) ? (float) $rem['amount_paid'] : null,
+                            'total_amount' => isset($rem['total_amount']) ? (float) $rem['total_amount'] : null,
+                            'booking_reference' => $rem['booking_reference'] ?? '',
+                            'booking_id' => (int) ($rem['booking_id'] ?? 0),
+                            'is_remaining_payment' => true,
+                        ];
+                    }
                 }
             }
             
@@ -224,6 +245,8 @@ class BookingPageHandler extends BasePageHandler
                     'amount_paid' => $session['amount_paid'] ?? null,
                     'remaining_amount' => $session['remaining_amount'] ?? null,
                     'booking_reference' => $session['booking_reference'] ?? null,
+                    'is_remaining_payment' => !empty($session['is_remaining_payment']),
+                    'existing_booking_id' => (int) ($session['booking_id'] ?? 0),
                     // Checkout model for clean template access
                     'checkout' => $checkout,
                 ];

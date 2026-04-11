@@ -294,6 +294,10 @@ class PaymentGatewayController extends BaseController
         yatra_set_remaining_session($remainingSessionData);
 
         $checkoutUrl = yatra_get_checkout_url();
+        // Custom booking page is a normal WP page: pass trip slug so embedded booking UI can resolve the trip.
+        if (!empty($trip->slug) && SettingsService::useCustomBookingPage()) {
+            $checkoutUrl = add_query_arg('trip', rawurlencode((string) $trip->slug), $checkoutUrl);
+        }
 
         return new WP_REST_Response([
             'success' => true,
@@ -330,6 +334,16 @@ class PaymentGatewayController extends BaseController
         }
 
         $saved = $gateway->saveConfig($config);
+
+        if ($saved) {
+            /**
+             * Fires after a payment gateway configuration is saved (telemetry / integrations).
+             *
+             * @param string               $gatewayId Gateway id.
+             * @param array<string, mixed> $config    Sanitized-bound request body.
+             */
+            do_action('yatra_payment_gateway_config_saved', (string) $gatewayId, is_array($config) ? $config : []);
+        }
 
         return new WP_REST_Response([
             'success' => $saved,
@@ -368,7 +382,7 @@ class PaymentGatewayController extends BaseController
 
         if (empty($paymentData['return_url'])) {
             $reference = $paymentData['reference'] ?? (string) $paymentData['booking_id'];
-            $paymentData['return_url'] = $this->getConfirmationUrl($reference) . '?payment=success';
+            $paymentData['return_url'] = add_query_arg('payment', 'success', $this->getConfirmationUrl($reference));
         }
 
         $cancelParam = esc_url_raw($request->get_param('cancel_url'));
@@ -390,19 +404,7 @@ class PaymentGatewayController extends BaseController
 
     private function getConfirmationUrl(string $reference): string
     {
-        $confirmation_page_id = \Yatra\Services\SettingsService::get('booking_confirmation_page');
-
-        $permalinkStructure = get_option('permalink_structure');
-        $isPlain = empty($permalinkStructure);
-
-        $baseUrl = $confirmation_page_id ? get_permalink($confirmation_page_id) : home_url('/booking-confirmation/');
-
-        if ($isPlain) {
-            // For plain permalinks, avoid path-based 404s – use site root with query arg
-            return add_query_arg('yatra_booking_confirmation', $reference, home_url('/'));
-        }
-
-        return trailingslashit($baseUrl) . $reference . '/';
+        return yatra_get_booking_confirmation_url($reference);
     }
 
     /**
@@ -523,7 +525,8 @@ class PaymentGatewayController extends BaseController
     }
 
     /**
-     * Handle successful payment
+     * Record a completed charge against an existing booking (initial or remaining balance).
+     * Does not create bookings — only PaymentRepository::create + booking amount/status updates.
      */
     private function handle_successful_payment(
         int $bookingId, 

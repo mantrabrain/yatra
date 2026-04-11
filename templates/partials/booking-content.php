@@ -117,14 +117,14 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                         <?php if ($is_remaining_payment && !empty($remaining_amount)) : ?>
                             <div class="yatra-remaining-banner">
                                 <strong><?php esc_html_e('Amount Due Now', 'yatra'); ?>:</strong>
-                                <span><?php echo esc_html(yatra_format_price($remaining_amount)); ?></span>
-                                <?php if (!empty($amount_paid)) : ?>
+                                <span><?php echo esc_html(yatra_format_price((float) $remaining_amount, null, false)); ?></span>
+                                <?php if ($amount_paid !== null) : ?>
                                     <small>
                                         <?php
                                         printf(
                                             /* translators: %s formatted amount */
                                             esc_html__('Amount already paid: %s', 'yatra'),
-                                            yatra_format_price($amount_paid)
+                                            yatra_format_price((float) $amount_paid, null, false)
                                         );
                                         ?>
                                     </small>
@@ -171,7 +171,7 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                 <line x1="1" y1="10" x2="23" y2="10"></line>
                             </svg>
                             <span id="pay-button-text"><?php esc_html_e('Complete Booking', 'yatra'); ?></span>
-                            <span id="pay-amount"><?php echo esc_html(yatra_format_price($summary_due_amount ?? 0)); ?></span>
+                            <span id="pay-amount"><?php echo esc_html(yatra_format_price((float) ($summary_due_amount ?? 0), null, false)); ?></span>
                         </button>
                         <a href="<?php echo esc_url(home_url('/trip/' . $trip->slug)); ?>" class="yatra-booking-cancel-btn">
                             <?php esc_html_e('Cancel', 'yatra'); ?>
@@ -240,7 +240,7 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                     <div class="yatra-remaining-breakdown">
                         <div class="yatra-remaining-row">
                             <span><?php esc_html_e('Original Booking Total', 'yatra'); ?></span>
-                            <span><?php echo esc_html(yatra_format_price($total_amount)); ?></span>
+                            <span><?php echo esc_html(yatra_format_price((float) ($total_amount ?? 0), null, false)); ?></span>
                         </div>
                         <div class="yatra-remaining-row yatra-remaining-paid">
                             <span>
@@ -250,11 +250,11 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                 </svg>
                                 <?php esc_html_e('Amount Already Paid', 'yatra'); ?>
                             </span>
-                            <span class="yatra-paid-amount"><?php echo esc_html(yatra_format_price($amount_paid)); ?></span>
+                            <span class="yatra-paid-amount"><?php echo esc_html(yatra_format_price((float) ($amount_paid ?? 0), null, false)); ?></span>
                         </div>
                         <div class="yatra-remaining-row yatra-remaining-due">
                             <span><strong><?php esc_html_e('Remaining Balance', 'yatra'); ?></strong></span>
-                            <span class="yatra-due-amount"><strong><?php echo esc_html(yatra_format_price($remaining_amount)); ?></strong></span>
+                            <span class="yatra-due-amount"><strong><?php echo esc_html(yatra_format_price((float) ($remaining_amount ?? 0), null, false)); ?></strong></span>
                         </div>
                     </div>
 
@@ -268,7 +268,7 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                             <?php esc_html_e('Amount Due Now', 'yatra'); ?>
                         </div>
                         <div class="yatra-due-now-amount" id="summary-due">
-                            <?php echo esc_html(yatra_format_price($remaining_amount)); ?>
+                            <?php echo esc_html(yatra_format_price((float) ($remaining_amount ?? 0), null, false)); ?>
                         </div>
                     </div>
 
