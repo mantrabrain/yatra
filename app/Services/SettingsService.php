@@ -183,10 +183,10 @@ class SettingsService
             ],
             'traveler_form' => [
                 'title' => 'Traveler Information',
-                'description' => 'Please provide details for each traveler (passport details required for international trips)',
+                'description' => 'Please provide details for each traveler',
                 'fields' => [
-                    ['id' => 'first_name', 'type' => 'text', 'label' => 'First Name', 'placeholder' => 'As in passport', 'required' => true, 'enabled' => true, 'order' => 1, 'width' => 'half'],
-                    ['id' => 'last_name', 'type' => 'text', 'label' => 'Last Name', 'placeholder' => 'As in passport', 'required' => true, 'enabled' => true, 'order' => 2, 'width' => 'half'],
+                    ['id' => 'first_name', 'type' => 'text', 'label' => 'First Name', 'placeholder' => 'Legal first name', 'required' => true, 'enabled' => true, 'order' => 1, 'width' => 'half'],
+                    ['id' => 'last_name', 'type' => 'text', 'label' => 'Last Name', 'placeholder' => 'Legal last name', 'required' => true, 'enabled' => true, 'order' => 2, 'width' => 'half'],
                     ['id' => 'date_of_birth', 'type' => 'date', 'label' => 'Date of Birth', 'placeholder' => '', 'required' => true, 'enabled' => true, 'order' => 3, 'width' => 'half'],
                     ['id' => 'gender', 'type' => 'select', 'label' => 'Gender', 'placeholder' => 'Select Gender', 'required' => true, 'enabled' => true, 'order' => 4, 'width' => 'half', 'options' => [
                         ['value' => 'male', 'label' => 'Male'],
@@ -194,9 +194,7 @@ class SettingsService
                         ['value' => 'other', 'label' => 'Other'],
                     ]],
                     ['id' => 'nationality', 'type' => 'country', 'label' => 'Nationality', 'placeholder' => 'Select Nationality', 'required' => true, 'enabled' => true, 'order' => 5, 'width' => 'full'],
-                    ['id' => 'passport', 'type' => 'text', 'label' => 'Passport Number', 'placeholder' => 'Enter passport number', 'required' => true, 'enabled' => true, 'order' => 6, 'width' => 'half', 'section' => 'passport'],
-                    ['id' => 'passport_expiry', 'type' => 'date', 'label' => 'Passport Expiry', 'placeholder' => '', 'required' => true, 'enabled' => true, 'order' => 7, 'width' => 'half', 'section' => 'passport'],
-                    ['id' => 'dietary', 'type' => 'select', 'label' => 'Dietary Requirements', 'placeholder' => 'Select', 'required' => false, 'enabled' => true, 'order' => 8, 'width' => 'half', 'section' => 'dietary_medical', 'options' => [
+                    ['id' => 'dietary', 'type' => 'select', 'label' => 'Dietary Requirements', 'placeholder' => 'Select', 'required' => false, 'enabled' => true, 'order' => 6, 'width' => 'half', 'section' => 'dietary_medical', 'options' => [
                         ['value' => 'none', 'label' => 'No special requirements'],
                         ['value' => 'vegetarian', 'label' => 'Vegetarian'],
                         ['value' => 'vegan', 'label' => 'Vegan'],
@@ -206,7 +204,7 @@ class SettingsService
                         ['value' => 'lactose_free', 'label' => 'Lactose Free'],
                         ['value' => 'other', 'label' => 'Other (specify in notes)'],
                     ]],
-                    ['id' => 'medical', 'type' => 'text', 'label' => 'Medical Conditions / Allergies', 'placeholder' => 'Any allergies or conditions we should know', 'required' => false, 'enabled' => true, 'order' => 9, 'width' => 'half', 'section' => 'dietary_medical'],
+                    ['id' => 'medical', 'type' => 'text', 'label' => 'Medical Conditions / Allergies', 'placeholder' => 'Any allergies or conditions we should know', 'required' => false, 'enabled' => true, 'order' => 7, 'width' => 'half', 'section' => 'dietary_medical'],
                 ],
             ],
         ];
@@ -222,9 +220,9 @@ class SettingsService
         $saved_config = self::get('booking_form_config', []);
         $default_config = self::getDefaultBookingFormConfig();
         
-        // If no saved config, return defaults
+        // If no saved config, return defaults (Pro may filter)
         if (empty($saved_config)) {
-            return $default_config;
+            return apply_filters('yatra_booking_form_config', $default_config);
         }
         
         // Build a map of locked field IDs from defaults
@@ -255,7 +253,7 @@ class SettingsService
             }
         }
         
-        return $merged;
+        return apply_filters('yatra_booking_form_config', $merged);
     }
 
     private static function isEmailIdentityKey(string $key): bool

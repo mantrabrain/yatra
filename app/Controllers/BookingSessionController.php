@@ -1046,7 +1046,14 @@ class BookingSessionController extends BaseController
             if (is_array($traveler)) {
                 $sanitized_traveler = [];
                 foreach ($traveler as $key => $value) {
-                    $sanitized_traveler[sanitize_key($key)] = sanitize_text_field($value);
+                    $sk = sanitize_key((string) $key);
+                    if (is_array($value)) {
+                        $sanitized_traveler[$sk] = array_map(static function ($v) {
+                            return sanitize_text_field(is_scalar($v) ? (string) $v : '');
+                        }, $value);
+                    } else {
+                        $sanitized_traveler[$sk] = sanitize_text_field((string) $value);
+                    }
                 }
                 $sanitized_travelers[] = $sanitized_traveler;
             }
@@ -2275,7 +2282,7 @@ class BookingSessionController extends BaseController
         <ol style="padding-left:20px;">
             <li><?php esc_html_e('You will receive a detailed trip itinerary within 24–48 hours.', 'yatra'); ?></li>
             <li><?php esc_html_e('Our team will contact you to confirm any special requirements.', 'yatra'); ?></li>
-            <li><?php esc_html_e('Please ensure passports are valid for at least 6 months.', 'yatra'); ?></li>
+            <li><?php esc_html_e('Please ensure travel documents meet entry requirements for your destination.', 'yatra'); ?></li>
         </ol>
         <p><?php esc_html_e('If you have any questions, contact us anytime.', 'yatra'); ?></p>
         <p><a href="<?php echo esc_url(home_url('/')); ?>"><?php echo esc_html(home_url('/')); ?></a></p>

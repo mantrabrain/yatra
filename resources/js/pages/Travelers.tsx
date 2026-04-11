@@ -583,7 +583,7 @@ const Travelers: React.FC = () => {
                 <Input
                   type="text"
                   placeholder={__(
-                    "Search by name, email, phone, passport...",
+                    "Search by name, email, phone...",
                     "yatra",
                   )}
                   value={searchTerm}

@@ -553,7 +553,7 @@ do_action('yatra_booking_confirmation_header', $booking);
                         <span class="yatra-step-number">3</span>
                         <div class="yatra-step-content">
                             <h4><?php esc_html_e('Prepare for Adventure', 'yatra'); ?></h4>
-                            <p><?php esc_html_e('Ensure all travelers have valid passports (with 6+ months validity) and any required visas.', 'yatra'); ?></p>
+                            <p><?php esc_html_e('Ensure all travelers have valid ID or travel documents and any required visas for your destination.', 'yatra'); ?></p>
                         </div>
                     </div>
                 </div>

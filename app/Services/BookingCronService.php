@@ -142,7 +142,7 @@ class BookingCronService
                 . '<p>' . esc_html(sprintf(__('Outstanding balance: %s — please pay before travel.', 'yatra'), yatra_format_price($amount_due))) . '</p>';
         }
         $extra .= '<p><strong>' . esc_html__('Preparation checklist', 'yatra') . '</strong></p><ul>'
-            . '<li>' . esc_html__('Valid ID / passport', 'yatra') . '</li>'
+            . '<li>' . esc_html__('Valid government-issued ID', 'yatra') . '</li>'
             . '<li>' . esc_html__('Travel insurance', 'yatra') . '</li>'
             . '<li>' . esc_html__('Emergency contacts', 'yatra') . '</li>'
             . '</ul>';

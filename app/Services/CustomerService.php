@@ -815,8 +815,6 @@ class CustomerService
         $formatted['date_of_birth'] = $customer->date_of_birth ?? null;
         $formatted['gender'] = $customer->gender ?? null;
         $formatted['nationality'] = $customer->nationality ?? null;
-        $formatted['passport_number'] = $customer->passport_number ?? null;
-        $formatted['passport_expiry'] = $customer->passport_expiry ?? null;
 
         // Emergency contact
         $formatted['emergency_contact'] = [

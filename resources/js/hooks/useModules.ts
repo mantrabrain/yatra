@@ -112,6 +112,14 @@ export const useToggleModule = () => {
         window.yatraAdmin.dynamicFormFieldEnabled = enabledModules.some(
           (m) => m.slug === "dynamic_form_field",
         );
+        window.yatraAdmin.showGoogleCalendarSettingsUI = enabledModules.some(
+          (m) =>
+            m.slug === "google_calendar" || m.slug === "google-calendar",
+        );
+        window.yatraAdmin.advancedDiscountEnabled = enabledModules.some(
+          (m) =>
+            m.slug === "advanced_discount" || m.slug === "advanced-discount",
+        );
         // Add flags for Pro feature modules
         window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(
           (m) => m.slug === "mailchimp",
@@ -208,6 +216,14 @@ export const useBulkToggleModules = () => {
         );
         window.yatraAdmin.dynamicFormFieldEnabled = enabledModules.some(
           (m) => m.slug === "dynamic_form_field",
+        );
+        window.yatraAdmin.showGoogleCalendarSettingsUI = enabledModules.some(
+          (m) =>
+            m.slug === "google_calendar" || m.slug === "google-calendar",
+        );
+        window.yatraAdmin.advancedDiscountEnabled = enabledModules.some(
+          (m) =>
+            m.slug === "advanced_discount" || m.slug === "advanced-discount",
         );
         // Add flags for Pro feature modules
         window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(

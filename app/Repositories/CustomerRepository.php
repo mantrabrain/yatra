@@ -307,14 +307,6 @@ class CustomerRepository extends BaseRepository
             $updateData['gender'] = sanitize_text_field($data['gender']);
         }
 
-        // Passport
-        if (array_key_exists('passport_number', $data)) {
-            $updateData['passport_number'] = sanitize_text_field($data['passport_number']);
-        }
-        if (array_key_exists('passport_expiry', $data)) {
-            $updateData['passport_expiry'] = sanitize_text_field($data['passport_expiry']);
-        }
-
         // Emergency contact
         if (array_key_exists('emergency_name', $data)) {
             $updateData['emergency_name'] = sanitize_text_field($data['emergency_name']);

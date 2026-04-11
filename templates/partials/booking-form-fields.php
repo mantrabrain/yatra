@@ -98,13 +98,32 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
                 $width_class = 'yatra-field-full';
         }
     }
+    $field_type = $field['type'] ?? 'text';
     ?>
-    <div class="yatra-form-group <?php echo esc_attr($width_class); ?>">
+    <div class="yatra-form-group <?php echo esc_attr($width_class); ?> <?php echo $field_type === 'checkbox' ? 'yatra-form-group--checkbox' : ''; ?>">
+        <?php if ($field_type !== 'checkbox') : ?>
         <label for="<?php echo $field_id; ?>">
             <?php echo esc_html($field['label']); ?> <?php echo $required_star; ?>
         </label>
+        <?php endif; ?>
         <?php
         switch ($field['type']) {
+            case 'checkbox':
+                $is_checked = ($prefill_value === '1' || $prefill_value === 'on' || $prefill_value === 'true');
+                ?>
+                <label for="<?php echo $field_id; ?>" class="yatra-inline-checkbox-label">
+                    <input
+                        type="checkbox"
+                        id="<?php echo $field_id; ?>"
+                        name="<?php echo $field_name; ?>"
+                        value="1"
+                        <?php checked($is_checked, true, false); ?>
+                        <?php echo $required_attr; ?>
+                    />
+                    <span><?php echo esc_html($field['label']); ?><?php echo $required_star; ?></span>
+                </label>
+                <?php
+                break;
             case 'select':
                 ?>
                 <select id="<?php echo $field_id; ?>" name="<?php echo $field_name; ?>" <?php echo $required_attr; ?>>
@@ -147,10 +166,6 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
                 
             case 'date':
                 $min_attr = '';
-                if ($field['id'] === 'passport_expiry') {
-                    $min_date = date('Y-m-d', strtotime('+6 months'));
-                    $min_attr = 'min="' . esc_attr($min_date) . '"';
-                }
                 ?>
                 <input 
                     type="date" 
@@ -198,7 +213,7 @@ function yatra_render_form_section($section_config, $prefix = '', $countries = [
         return ($a['order'] ?? 0) - ($b['order'] ?? 0);
     });
     
-    // Group fields by section (for subsections like passport, dietary)
+    // Group fields by section (for subsections like dietary)
     $grouped_fields = [];
     $current_section = null;
     
@@ -225,7 +240,7 @@ function yatra_render_form_section($section_config, $prefix = '', $countries = [
                         <?php
                         switch ($section_key) {
                             case 'passport':
-                                esc_html_e('Passport Details', 'yatra');
+                                esc_html_e('Additional details', 'yatra');
                                 break;
                             case 'dietary_medical':
                                 esc_html_e('Dietary & Medical Requirements', 'yatra');
@@ -496,7 +511,7 @@ $initial_due_amount = $initial_total_amount;
                             <?php
                             switch ($section_key) {
                                 case 'passport':
-                                    esc_html_e('Passport Details', 'yatra');
+                                    esc_html_e('Additional details', 'yatra');
                                     break;
                                 case 'dietary_medical':
                                     esc_html_e('Dietary & Medical Requirements', 'yatra');

@@ -67,12 +67,6 @@ class CustomerValidator
             }
         }
 
-        if (isset($data['passport_number']) && !empty($data['passport_number'])) {
-            if (strlen($data['passport_number']) < 6 || strlen($data['passport_number']) > 20) {
-                $errors['passport_number'][] = __('Passport number must be between 6 and 20 characters', 'yatra');
-            }
-        }
-
         if (isset($data['emergency_contact_phone']) && !empty($data['emergency_contact_phone'])) {
             if (!preg_match('/^[\+]?[0-9\s\-\(\)]{7,20}$/', $data['emergency_contact_phone'])) {
                 $errors['emergency_contact_phone'][] = __('Invalid emergency contact phone format', 'yatra');
@@ -148,12 +142,6 @@ class CustomerValidator
             }
         }
 
-        if (isset($data['passport_number']) && !empty($data['passport_number'])) {
-            if (strlen($data['passport_number']) < 6 || strlen($data['passport_number']) > 20) {
-                $errors['passport_number'][] = __('Passport number must be between 6 and 20 characters', 'yatra');
-            }
-        }
-
         if (isset($data['emergency_contact_phone']) && !empty($data['emergency_contact_phone'])) {
             if (!preg_match('/^[\+]?[0-9\s\-\(\)]{7,20}$/', $data['emergency_contact_phone'])) {
                 $errors['emergency_contact_phone'][] = __('Invalid emergency contact phone format', 'yatra');
@@ -207,10 +195,6 @@ class CustomerValidator
 
         if (isset($data['postal_code'])) {
             $sanitized['postal_code'] = sanitize_text_field($data['postal_code']);
-        }
-
-        if (isset($data['passport_number'])) {
-            $sanitized['passport_number'] = sanitize_text_field($data['passport_number']);
         }
 
         if (isset($data['emergency_contact_name'])) {

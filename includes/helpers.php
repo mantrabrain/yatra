@@ -61,12 +61,15 @@ function yatra_get_booking_form_config(): array
     $is_dynamic_enabled = apply_filters('yatra_dynamic_form_field_enabled', false);
     
     if ($is_dynamic_enabled) {
-        // Pro module is active - use customizable form config
+        // Pro module is active — merged config from options (filtered in SettingsService::getBookingFormConfig)
         return SettingsService::getBookingFormConfig();
     }
-    
-    // Free version - return default static form config
-    return SettingsService::getDefaultBookingFormConfig();
+
+    // Module off: still allow filters to adjust defaults (tests / edge integrations)
+    return apply_filters(
+        'yatra_booking_form_config',
+        SettingsService::getDefaultBookingFormConfig()
+    );
 }
 
 /**

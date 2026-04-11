@@ -60,8 +60,6 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `date_of_birth` date DEFAULT NULL,
     `gender` enum('male','female','other','prefer_not_to_say') DEFAULT NULL,
     `nationality` varchar(100) DEFAULT NULL,
-    `passport_number` varchar(50) DEFAULT NULL,
-    `passport_expiry` date DEFAULT NULL,
     `emergency_name` varchar(200) DEFAULT NULL,
     `emergency_phone` varchar(50) DEFAULT NULL,
     `emergency_relationship` varchar(100) DEFAULT NULL,

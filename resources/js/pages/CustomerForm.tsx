@@ -37,8 +37,6 @@ interface CustomerFormData {
   nationality: string;
   date_of_birth: string;
   gender: string;
-  passport_number: string;
-  passport_expiry: string;
   emergency_name: string;
   emergency_phone: string;
   emergency_relationship: string;
@@ -72,8 +70,6 @@ const CustomerForm: React.FC = () => {
     nationality: "",
     date_of_birth: "",
     gender: "",
-    passport_number: "",
-    passport_expiry: "",
     emergency_name: "",
     emergency_phone: "",
     emergency_relationship: "",
@@ -129,8 +125,6 @@ const CustomerForm: React.FC = () => {
         nationality: data.nationality || "",
         date_of_birth: data.date_of_birth || "",
         gender: data.gender || "",
-        passport_number: data.passport_number || "",
-        passport_expiry: data.passport_expiry || "",
         emergency_name: (data as any).emergency_name || emergency.name || "",
         emergency_phone: (data as any).emergency_phone || emergency.phone || "",
         emergency_relationship:
@@ -610,51 +604,6 @@ const CustomerForm: React.FC = () => {
                           handleFieldChange("postal_code", e.target.value)
                         }
                         placeholder={__("Enter postal code", "yatra")}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Passport Information */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">
-                    {__("Passport Information", "yatra")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <label
-                        htmlFor="passport_number"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-                      >
-                        {__("Passport Number", "yatra")}
-                      </label>
-                      <Input
-                        id="passport_number"
-                        type="text"
-                        value={formData.passport_number}
-                        onChange={(e) =>
-                          handleFieldChange("passport_number", e.target.value)
-                        }
-                        placeholder={__("Enter passport number", "yatra")}
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="passport_expiry"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-                      >
-                        {__("Passport Expiry", "yatra")}
-                      </label>
-                      <DatePicker
-                        value={formData.passport_expiry}
-                        onChange={(value: string) =>
-                          handleFieldChange("passport_expiry", value)
-                        }
-                        placeholder={__("Select passport expiry date", "yatra")}
                       />
                     </div>
                   </div>

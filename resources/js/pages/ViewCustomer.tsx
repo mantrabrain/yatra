@@ -16,7 +16,6 @@ import {
   FileText,
   Edit,
   Award,
-  CreditCard,
   Globe,
   User,
   AlertCircle,
@@ -62,8 +61,6 @@ interface Customer {
   nationality?: string;
   date_of_birth?: string;
   gender?: string;
-  passport_number?: string;
-  passport_expiry?: string;
   emergency_name?: string;
   emergency_phone?: string;
   emergency_relationship?: string;
@@ -791,40 +788,6 @@ const ViewCustomer: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Passport Info */}
-            {(customer.passport_number || customer.passport_expiry) && (
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <CreditCard className="w-4 h-4" />
-                    {__("Passport", "yatra")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {customer.passport_number && (
-                    <div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                        {__("Number", "yatra")}
-                      </div>
-                      <div className="text-sm text-gray-900 dark:text-white font-mono">
-                        {customer.passport_number}
-                      </div>
-                    </div>
-                  )}
-                  {customer.passport_expiry && (
-                    <div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                        {__("Expiry Date", "yatra")}
-                      </div>
-                      <div className="text-sm text-gray-900 dark:text-white">
-                        {formatShortDate(customer.passport_expiry)}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
 
             {/* Timeline */}
             <Card>

@@ -30,6 +30,7 @@ declare global {
       showMailchimpSettingsUI?: boolean;
       showFacebookPixelSettingsUI?: boolean;
       showGoogleAnalyticsSettingsUI?: boolean;
+      flexiblePaymentsEnabled?: boolean;
       currency?: string;
       date_format?: string;
       time_format?: string;

@@ -816,7 +816,7 @@ class SettingsController extends BaseController
             }
         }
         
-        return $sanitized;
+        return apply_filters('yatra_save_booking_form_config', $sanitized, $config);
     }
 
     /**
