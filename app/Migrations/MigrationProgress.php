@@ -21,6 +21,7 @@ use Yatra\Migration\BookingMigration;
 use Yatra\Migration\CustomerMigration;
 use Yatra\Migration\DestinationMigration;
 use Yatra\Migration\ActivityMigration;
+use Yatra\Migration\TripCategoryMigration;
 use Yatra\Migration\ReviewMigration;
 use Yatra\Migration\EnquiryMigration;
 use Yatra\Migration\CouponMigration;
@@ -63,6 +64,7 @@ class MigrationProgress
         'pro_features',
         'destinations',
         'activities',
+        'trip_categories',
         'attributes',
         'customers',
         'coupons',
@@ -282,6 +284,9 @@ class MigrationProgress
                     break;
                 case 'activities':
                     $result = (new ActivityMigration($this))->run();
+                    break;
+                case 'trip_categories':
+                    $result = (new TripCategoryMigration($this))->run();
                     break;
                 case 'attributes':
                     $result = (new AttributeMigration($this))->run();
@@ -562,6 +567,7 @@ class MigrationProgress
 
         update_option('yatra_migration_progress', $progress);
         update_option('yatra_migration_started_at', current_time('mysql'));
+        delete_option('yatra_migration_rewrite_flushed_for_started_at');
     }
 
     /**
@@ -614,6 +620,9 @@ class MigrationProgress
             }
         }
 
+        // Flush rewrite rules once all types are completed (also retries if finalize was skipped mid-run).
+        $this->finalizeProgressIfAllComplete();
+
         return [
             'success' => $overallSuccess,
             'message' => $overallSuccess
@@ -665,6 +674,29 @@ class MigrationProgress
     }
 
     /**
+     * Types with total 0 never get a {@see processMigration()} run; mark them completed so
+     * {@see finalizeProgressIfAllComplete()} can detect an all-done run and flush rewrite rules.
+     *
+     * @param array<string, array<string, mixed>> $progress
+     * @return array{0: array<string, array<string, mixed>>, 1: bool}
+     */
+    private function applyZeroCountAutoComplete(array $progress): array
+    {
+        $changed = false;
+        foreach ($progress as $dataType => $status) {
+            $total = isset($status['total']) ? (int) $status['total'] : 0;
+
+            if ($total === 0 && ($status['status'] ?? '') !== 'completed') {
+                $progress[$dataType]['status'] = 'completed';
+                $progress[$dataType]['completed_at'] = $status['completed_at'] ?? current_time('mysql');
+                $changed = true;
+            }
+        }
+
+        return [$progress, $changed];
+    }
+
+    /**
      * Get migration progress for all data types.
      */
     public function getMigrationProgress(): array
@@ -683,16 +715,12 @@ class MigrationProgress
         $allComplete = !empty($progress);
         $anyRunning = false;
 
-        foreach ($progress as $dataType => $status) {
-            $total = isset($status['total']) ? (int) $status['total'] : 0;
+        [$progress, $zeroChanged] = $this->applyZeroCountAutoComplete($progress);
+        if ($zeroChanged) {
+            $progressChanged = true;
+        }
 
-            // If there is nothing to migrate for this type, auto-complete it
-            if ($total === 0 && ($status['status'] ?? '') !== 'completed') {
-                $progress[$dataType]['status'] = 'completed';
-                $progress[$dataType]['completed_at'] = $status['completed_at'] ?? current_time('mysql');
-                $progressChanged = true;
-                $status = $progress[$dataType];
-            }
+        foreach ($progress as $dataType => $status) {
 
             if (($status['status'] ?? '') === 'pending' || ($status['status'] ?? '') === 'running') {
                 $allComplete = false;
@@ -709,6 +737,10 @@ class MigrationProgress
 
         if ($progressChanged) {
             update_option('yatra_migration_progress', $progress);
+        }
+
+        if ($allComplete && !empty($progress)) {
+            $this->finalizeProgressIfAllComplete();
         }
 
         return [
@@ -948,6 +980,7 @@ class MigrationProgress
         delete_option('yatra_migration_progress');
         delete_option('yatra_migration_started_at');
         delete_option('yatra_migration_log');
+        delete_option('yatra_migration_rewrite_flushed_for_started_at');
 
         return [
             'success' => true,
@@ -967,15 +1000,53 @@ class MigrationProgress
             return;
         }
 
+        [$progress, $zeroChanged] = $this->applyZeroCountAutoComplete($progress);
+        if ($zeroChanged) {
+            update_option('yatra_migration_progress', $progress);
+        }
+
         foreach ($progress as $status) {
             if (($status['status'] ?? '') !== 'completed') {
                 return;
             }
         }
 
+        $this->flushRewriteRulesOnceForCurrentMigrationRun();
+
         // Keep the progress data so the UI can display the summary
         // Only clear logs to save space
         delete_option('yatra_migration_log');
+    }
+
+    /**
+     * Permalinks and trip/archive routes need a rewrite flush after legacy data moves to 3.x structures.
+     * Runs once per migration run (keyed by {@see initializeProgress()} started_at).
+     */
+    private function flushRewriteRulesOnceForCurrentMigrationRun(): void
+    {
+        if (!function_exists('flush_rewrite_rules')) {
+            return;
+        }
+
+        $startedAt = get_option('yatra_migration_started_at');
+        if ($startedAt === null || $startedAt === '') {
+            return;
+        }
+
+        $startedAtStr = is_string($startedAt) ? $startedAt : (string) $startedAt;
+        $doneFor = get_option('yatra_migration_rewrite_flushed_for_started_at', '');
+
+        if ($doneFor === $startedAtStr) {
+            return;
+        }
+
+        flush_rewrite_rules(true);
+        update_option('yatra_migration_rewrite_flushed_for_started_at', $startedAtStr, false);
+
+        Logger::info('Rewrite rules flushed after Yatra migration completed.', [
+            'source' => 'migration',
+            'migration_started_at' => $startedAtStr,
+        ]);
     }
     
     /**

@@ -34,6 +34,10 @@ define('YATRA_VERSION', '3.0.0');
 define('YATRA_MIN_PHP_VERSION', '8.0');
 define('YATRA_MIN_WP_VERSION', '6.0');
 
+// Deactivate incompatible Yatra Pro (&lt; 3.0) and normalize plugin load order before Composer (prevents fatals from old Pro extending removed classes).
+require_once YATRA_PLUGIN_PATH . 'includes/incompatible-pro-guard.php';
+yatra_run_incompatible_pro_guard();
+
 // Load Composer autoloader
 $autoloader = YATRA_PLUGIN_PATH . 'vendor/autoload.php';
 if (!file_exists($autoloader)) {
@@ -70,3 +74,11 @@ try {
         ['back_link' => true]
     );
 }
+
+register_activation_hook(YATRA_PLUGIN_FILE, static function (): void {
+    if (!function_exists('yatra_normalize_yatra_plugins_active_order')) {
+        require_once YATRA_PLUGIN_PATH . 'includes/incompatible-pro-guard.php';
+    }
+    yatra_normalize_yatra_plugins_active_order();
+    yatra_deactivate_incompatible_old_pro();
+});

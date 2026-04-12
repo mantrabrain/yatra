@@ -242,6 +242,11 @@ const Discounts: React.FC = () => {
           "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
         label: __("Publish", "yatra"),
       },
+      active: {
+        className:
+          "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
+        label: __("Publish", "yatra"),
+      },
       draft: {
         className:
           "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",

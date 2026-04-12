@@ -1106,7 +1106,10 @@ class DiscountService extends BaseService
         // Find discount by code
         $discount = $this->repository->findByCode($coupon_code);
         
-        if (!$discount || $discount->status !== 'publish') {
+        $status = (string) ($discount->status ?? '');
+        // Migrated coupons once used "active"; 3.x uses "publish" for live discounts.
+        $isLive = ($status === 'publish' || $status === 'active');
+        if (!$discount || !$isLive) {
             return $default;
         }
         

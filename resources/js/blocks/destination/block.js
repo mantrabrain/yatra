@@ -51,7 +51,10 @@
             label: __("Number of Destinations", "yatra"),
             value: attributes.per_page,
             onChange: function (value) {
-              setAttributes({ per_page: value || 1 });
+              setAttributes({
+                per_page:
+                  value !== undefined && value !== null ? value : 10,
+              });
             },
             min: 1,
             max: 50,
@@ -104,7 +107,7 @@
       },
       per_page: {
         type: "number",
-        default: 1,
+        default: 10,
       },
       title: {
         type: "string",

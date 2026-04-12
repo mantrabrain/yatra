@@ -7,6 +7,8 @@ namespace Yatra\Providers;
 use Yatra\Blocks\TourBlock;
 use Yatra\Blocks\ActivityBlock;
 use Yatra\Blocks\DestinationBlock;
+use Yatra\Core\Container;
+use Yatra\Core\ServiceProvider;
 
 /**
  * Block Service Provider
@@ -17,15 +19,24 @@ use Yatra\Blocks\DestinationBlock;
  * @package Yatra\Providers
  * @since 3.0.0
  */
-class BlockServiceProvider
+class BlockServiceProvider extends ServiceProvider
 {
+    public function __construct(Container $container)
+    {
+        parent::__construct($container);
+    }
+
     /**
      * Register blocks
      */
     public function register(): void
     {
-        // Register blocks on init hook when WordPress is ready
-        add_action('init', [$this, 'registerBlocksOnInit'], 10);
+        // Priority 5 so yatra/* blocks exist before core/editor validates content (avoids "doesn't include support for the block").
+        if (did_action('init')) {
+            $this->registerBlocksOnInit();
+        } else {
+            add_action('init', [$this, 'registerBlocksOnInit'], 5);
+        }
         
         // Register Yatra block category
         add_filter('block_categories_all', [$this, 'registerBlockCategory'], 10, 2);

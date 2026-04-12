@@ -2,6 +2,7 @@
 
 namespace Yatra\Migration;
 
+use Yatra\Core\Modules\ModuleManager;
 use Yatra\Utils\Logger;
 
 /**
@@ -111,6 +112,19 @@ class ProFeaturesMigration extends BaseMigration
                 : array_values(array_unique(array_merge($enabled, $existing)));
 
             update_option('yatra_pro_modules_enabled', $final);
+
+            // Core 3.x reads module on/off from yatra_modules (ModuleManager). Legacy Pro only set
+            // yatra_pro_modules_enabled — without this, Additional Services and other Pro modules stay disabled in UI/runtime.
+            if (class_exists(ModuleManager::class)) {
+                $knownSlugs = array_column(ModuleManager::getDefaultModules(), 'slug');
+                foreach ($final as $slug) {
+                    $slug = is_string($slug) ? trim($slug) : '';
+                    if ($slug === '' || !in_array($slug, $knownSlugs, true)) {
+                        continue;
+                    }
+                    ModuleManager::setModuleStatus($slug, true);
+                }
+            }
 
             $migrated = 1;
             $this->updateProgress('pro_features', 'running', $migrated, $skipped, $failed, $total, null, null);

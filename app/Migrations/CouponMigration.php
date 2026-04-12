@@ -27,6 +27,22 @@ class CouponMigration extends BaseMigration
         parent::__construct($service);
     }
 
+    /**
+     * Map legacy CPT post_status to 3.x discount status (draft|publish|trash).
+     * Live coupons must use DiscountService convention "publish", not "active".
+     * Legacy Yatra 2.x coupon lookup used get_posts(), which only returned published posts by default.
+     */
+    private function mapLegacyCouponPostStatusToDiscountStatus(string $postStatus): string
+    {
+        $postStatus = strtolower($postStatus);
+
+        if ($postStatus === 'publish') {
+            return 'publish';
+        }
+
+        return 'draft';
+    }
+
     public function run(): array
     {
         $migrated = 0;
@@ -86,7 +102,7 @@ class CouponMigration extends BaseMigration
                     'usage_limit' => $usageLimit,
                     'usage_count' => $usageCount,
                     'expiry_date' => $expiryDate ?: null,
-                    'status' => $oldCoupon->post_status === 'publish' ? 'active' : 'draft',
+                    'status' => $this->mapLegacyCouponPostStatusToDiscountStatus((string) $oldCoupon->post_status),
                     'created_at' => $oldCoupon->post_date,
                     'updated_at' => $oldCoupon->post_modified,
                     'created_by' => (int) $oldCoupon->post_author ?: 0,

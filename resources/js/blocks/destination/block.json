@@ -19,7 +19,7 @@
     },
     "per_page": {
       "type": "number",
-      "default": 1
+      "default": 10
     },
     "title": {
       "type": "string",
@@ -34,5 +34,5 @@
     "html": false,
     "align": ["wide", "full"]
   },
-  "editorScript": "file:./index.js"
+  "editorScript": "yatra-destination-block-editor"
 }

@@ -135,11 +135,11 @@ abstract class BaseMigration
      * Migrates old WordPress taxonomy terms into the unified ClassificationsTable
      * (wp_yatra_new_classifications) using the `type` column to differentiate.
      *
-     * @param string $taxonomy Old WordPress taxonomy slug (e.g. 'destination', 'activity', 'attributes')
+     * @param string|array<int, string> $taxonomy One taxonomy slug, or several (e.g. `trip_category` + `tour_category`) merged into one classification type.
      * @param string $classificationType The classification type value for the new table (e.g. 'destination', 'activity', 'attribute')
      * @param string $dataType Progress tracking key (e.g. 'destinations', 'activities', 'attributes')
      */
-    protected function migrateTaxonomy(string $taxonomy, string $classificationType, string $dataType): array
+    protected function migrateTaxonomy(string|array $taxonomy, string $classificationType, string $dataType): array
     {
         $migrated = 0;
         $skipped = 0;
@@ -147,27 +147,35 @@ abstract class BaseMigration
 
         $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
 
-        $terms = $this->wpdb->get_results(
-            $this->wpdb->prepare(
-                "SELECT t.*, tt.description, tt.parent
+        $taxes = is_array($taxonomy) ? array_values(array_filter($taxonomy, static fn ($t) => is_string($t) && $t !== '')) : [$taxonomy];
+        if ($taxes === []) {
+            return compact('migrated', 'skipped', 'failed');
+        }
+
+        $placeholders = implode(',', array_fill(0, count($taxes), '%s'));
+        $sql = "SELECT t.*, tt.description, tt.parent, tt.taxonomy AS source_taxonomy
                  FROM {$this->wpdb->terms} t
                  INNER JOIN {$this->wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
-                 WHERE tt.taxonomy = %s",
-                $taxonomy
-            )
-        );
+                 WHERE tt.taxonomy IN ({$placeholders})";
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- placeholders match $taxes count
+        $terms = $this->wpdb->get_results($this->wpdb->prepare($sql, ...$taxes));
 
         $total = count($terms);
-        $metaKey = sprintf('_yatra_migrated_%s_id', $taxonomy);
 
         foreach ($terms as $term) {
+            $termTax = isset($term->source_taxonomy) && is_string($term->source_taxonomy) && $term->source_taxonomy !== ''
+                ? $term->source_taxonomy
+                : (string) $taxes[0];
+            $metaKey = sprintf('_yatra_migrated_%s_id', $termTax);
+
             try {
                 // Prepare slug
                 $baseSlug = $term->slug;
                 if (empty($baseSlug)) {
                     $baseSlug = function_exists('sanitize_title')
-                        ? sanitize_title($term->name ?: uniqid($taxonomy . '-'))
-                        : preg_replace('/[^a-z0-9\-]+/i', '-', strtolower($term->name ?: uniqid($taxonomy . '-')));
+                        ? sanitize_title($term->name ?: uniqid($termTax . '-'))
+                        : preg_replace('/[^a-z0-9\-]+/i', '-', strtolower($term->name ?: uniqid($termTax . '-')));
                 }
 
                 $slug = $baseSlug;
@@ -208,10 +216,25 @@ abstract class BaseMigration
                     }
                 }
 
-                // Get term meta for featured image / icon using raw SQL
-                $termImage = $this->getRawTermMeta((int) $term->term_id, 'yatra_term_image');
+                // Featured image: old sites used different term meta keys (yatra_term_image, thumbnail_id, …).
+                $termImage = $this->resolveLegacyTermFeaturedImageId((int) $term->term_id);
                 $metadata = [];
-                if (!empty($termImage)) {
+
+                // When updating an existing row, merge with current JSON so we do not wipe featured_image / other keys if only part of the resolver runs.
+                if ($existingId && !$this->isForceMigration()) {
+                    $existingJson = $this->wpdb->get_var($this->wpdb->prepare(
+                        "SELECT metadata FROM {$classificationsTable} WHERE id = %d",
+                        (int) $existingId
+                    ));
+                    if (is_string($existingJson) && $existingJson !== '') {
+                        $decoded = json_decode($existingJson, true);
+                        if (is_array($decoded)) {
+                            $metadata = $decoded;
+                        }
+                    }
+                }
+
+                if ($termImage !== null && $termImage !== '') {
                     $metadata['featured_image'] = $termImage;
                 }
 
@@ -220,8 +243,8 @@ abstract class BaseMigration
                     'name' => $term->name,
                     'slug' => $slug,
                     'description' => $term->description ?? '',
-                    'parent_id' => !empty($term->parent) ? $this->getParentClassificationId($term->parent, $taxonomy, $classificationType) : null,
-                    'metadata' => !empty($metadata) ? json_encode($metadata) : null,
+                    'parent_id' => !empty($term->parent) ? $this->getParentClassificationId((int) $term->parent, $termTax, $classificationType) : null,
+                    'metadata' => $metadata !== [] ? wp_json_encode($metadata) : null,
                     'status' => 'publish',
                     'updated_at' => current_time('mysql'),
                 ];
@@ -242,9 +265,9 @@ abstract class BaseMigration
                         usleep(50000);
                     } else {
                         $failed++;
-                        Logger::error("Failed to update {$taxonomy}: {$this->wpdb->last_error}", [
+                        Logger::error("Failed to update {$termTax}: {$this->wpdb->last_error}", [
                             'source' => 'migration',
-                            'taxonomy' => $taxonomy,
+                            'taxonomy' => $termTax,
                             'term_slug' => $term->slug
                         ]);
                         $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
@@ -265,9 +288,9 @@ abstract class BaseMigration
                         usleep(50000);
                     } else {
                         $failed++;
-                        Logger::error("Failed to insert {$taxonomy}: {$this->wpdb->last_error}", [
+                        Logger::error("Failed to insert {$termTax}: {$this->wpdb->last_error}", [
                             'source' => 'migration',
-                            'taxonomy' => $taxonomy,
+                            'taxonomy' => $termTax,
                             'term_slug' => $term->slug
                         ]);
                         $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
@@ -275,9 +298,9 @@ abstract class BaseMigration
                 }
             } catch (\Throwable $e) {
                 $failed++;
-                Logger::error("Exception migrating {$taxonomy}: " . $e->getMessage(), [
+                Logger::error("Exception migrating {$termTax}: " . $e->getMessage(), [
                     'source' => 'migration',
-                    'taxonomy' => $taxonomy,
+                    'taxonomy' => $termTax,
                     'term_slug' => $term->slug ?? 'unknown'
                 ]);
                 $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
@@ -288,12 +311,125 @@ abstract class BaseMigration
     }
 
     /**
+     * Legacy taxonomy terms stored the featured image attachment ID under different meta keys (or as a media URL).
+     *
+     * Yatra 2.x core uses destination_image_id and activity_image_id on term meta
+     * (old class-yatra-taxonomy-destination.php / class-yatra-taxonomy-activity.php).
+     */
+    protected function resolveLegacyTermFeaturedImageId(int $termId): ?string
+    {
+        $keys = [
+            'destination_image_id',
+            'activity_image_id',
+            'yatra_term_image',
+            'thumbnail_id',
+            '_thumbnail_id',
+            'yatra_destination_image',
+            'yatra_activity_image',
+            'yatra_category_image',
+            'yatra_trip_category_image',
+            'yatra_tour_category_image',
+            'trip_category_image',
+            'tour_category_image',
+            'category_thumbnail_id',
+            'term_thumbnail',
+            'featured_image',
+            'image',
+        ];
+
+        foreach ($keys as $key) {
+            $fetched = $this->getRawTermMeta($termId, $key);
+            if ($fetched === null || $fetched === '' || $fetched === '0') {
+                continue;
+            }
+            $trimmed = trim($fetched);
+            if ($trimmed === '') {
+                continue;
+            }
+            $resolved = $this->coerceLegacyTermImageToAttachmentId($trimmed);
+            if ($resolved !== null) {
+                return $resolved;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Normalize a single term meta value to an attachment ID string (3.x uses metadata.featured_image as ID).
+     */
+    private function coerceLegacyTermImageToAttachmentId(string $raw): ?string
+    {
+        if ($raw === '' || $raw === '0') {
+            return null;
+        }
+
+        if (is_numeric($raw)) {
+            $id = (int) $raw;
+
+            return $id > 0 ? (string) $id : null;
+        }
+
+        if (function_exists('is_serialized') && is_serialized($raw)) {
+            $un = maybe_unserialize($raw);
+            if (is_numeric($un)) {
+                $id = (int) $un;
+
+                return $id > 0 ? (string) $id : null;
+            }
+            if (is_array($un)) {
+                foreach ($un as $v) {
+                    if (is_numeric($v)) {
+                        $id = (int) $v;
+
+                        return $id > 0 ? (string) $id : null;
+                    }
+                }
+            }
+        }
+
+        if (function_exists('attachment_url_to_postid')) {
+            if (filter_var($raw, FILTER_VALIDATE_URL)) {
+                $aid = attachment_url_to_postid($raw);
+                if ($aid > 0) {
+                    return (string) $aid;
+                }
+            } elseif (strlen($raw) > 0 && $raw[0] === '/' && function_exists('home_url')) {
+                $aid = attachment_url_to_postid(home_url($raw));
+                if ($aid > 0) {
+                    return (string) $aid;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Look up the new classifications table ID for a parent term
      */
     private function getParentClassificationId(int $parentTermId, string $taxonomy, string $classificationType): ?int
     {
         $metaKey = sprintf('_yatra_migrated_%s_id', $taxonomy);
         $parentNewId = $this->getRawTermMeta($parentTermId, $metaKey);
-        return $parentNewId ? (int) $parentNewId : null;
+        if ($parentNewId) {
+            return (int) $parentNewId;
+        }
+        // Parent may belong to a sibling taxonomy merged into the same classification type (e.g. tour_category vs trip_category).
+        $alternates = [];
+        if ($taxonomy === 'trip_category') {
+            $alternates[] = 'tour_category';
+        } elseif ($taxonomy === 'tour_category') {
+            $alternates[] = 'trip_category';
+        }
+        foreach ($alternates as $alt) {
+            $altKey = sprintf('_yatra_migrated_%s_id', $alt);
+            $pid = $this->getRawTermMeta($parentTermId, $altKey);
+            if ($pid) {
+                return (int) $pid;
+            }
+        }
+
+        return null;
     }
 }

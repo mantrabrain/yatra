@@ -319,10 +319,13 @@ class BlockDataService
                 : 'asc';
         }
         
-        // Per page - support both formats
+        // Per page (blocks previously defaulted to -1; server clamped that to 1 — use 10 to match shortcode default)
         if (isset($attributes['per_page'])) {
             $perPage = (int) $attributes['per_page'];
-            $mapped['per_page'] = $perPage === -1 ? '-1' : (string) max(1, $perPage);
+            if ($perPage === -1) {
+                $perPage = 10;
+            }
+            $mapped['per_page'] = (string) max(1, min(100, $perPage));
         }
         
         // Columns
@@ -360,10 +363,13 @@ class BlockDataService
                 : 'asc';
         }
         
-        // Per page - support both formats
+        // Per page — legacy block saves used -1 (clamped to 1 in PHP); treat as 10 like shortcode default
         if (isset($attributes['per_page'])) {
             $perPage = (int) $attributes['per_page'];
-            $mapped['per_page'] = $perPage === -1 ? '-1' : (string) max(1, $perPage);
+            if ($perPage === -1) {
+                $perPage = 10;
+            }
+            $mapped['per_page'] = (string) max(1, min(100, $perPage));
         }
         
         // Columns

@@ -972,19 +972,43 @@ class SettingsMigration extends BaseMigration
 
         // ── Stripe ────────────────────────────────────────────────────────────
         // Keys differ between live and test mode; pick the appropriate set.
-        $stripePubKey    = $globalTestMode
-            ? get_option('yatra_payment_gateway_stripe_test_publishable_key', '')
-            : get_option('yatra_payment_gateway_stripe_live_publishable_key', '');
-        $stripeSecretKey = $globalTestMode
-            ? get_option('yatra_payment_gateway_stripe_test_secret_key', '')
-            : get_option('yatra_payment_gateway_stripe_live_secret_key', '');
-        $stripeWebhook   = get_option('yatra_payment_gateway_stripe_webhook_endpoint_secret', '');
+        // Also merge legacy serialized yatra_stripe_settings (some installs stored keys only there).
+        $stripeLegacy = get_option('yatra_stripe_settings', null);
+        if (is_string($stripeLegacy)) {
+            $maybe = maybe_unserialize($stripeLegacy);
+            $stripeLegacy = is_array($maybe) ? $maybe : null;
+        }
+        if (!is_array($stripeLegacy)) {
+            $stripeLegacy = [];
+        }
 
-        // Also store the opposite-mode keys so the admin can switch without re-entering them.
-        $stripeLivePub    = get_option('yatra_payment_gateway_stripe_live_publishable_key', '');
-        $stripeLiveSecret = get_option('yatra_payment_gateway_stripe_live_secret_key', '');
-        $stripeTestPub    = get_option('yatra_payment_gateway_stripe_test_publishable_key', '');
-        $stripeTestSecret = get_option('yatra_payment_gateway_stripe_test_secret_key', '');
+        $stripeLivePub    = (string) ($stripeLegacy['live_publishable_key'] ?? $stripeLegacy['publishable_key'] ?? get_option('yatra_payment_gateway_stripe_live_publishable_key', ''));
+        $stripeLiveSecret = (string) ($stripeLegacy['live_secret_key'] ?? $stripeLegacy['secret_key'] ?? get_option('yatra_payment_gateway_stripe_live_secret_key', ''));
+        $stripeTestPub    = (string) ($stripeLegacy['test_publishable_key'] ?? get_option('yatra_payment_gateway_stripe_test_publishable_key', ''));
+        $stripeTestSecret = (string) ($stripeLegacy['test_secret_key'] ?? get_option('yatra_payment_gateway_stripe_test_secret_key', ''));
+
+        $stripePubKey    = $globalTestMode ? $stripeTestPub : $stripeLivePub;
+        $stripeSecretKey = $globalTestMode ? $stripeTestSecret : $stripeLiveSecret;
+
+        // Stripe needs BOTH keys. If the mode-selected pair is incomplete, use whichever full pair exists (common: test mode flag wrong vs keys).
+        $pairComplete = $stripePubKey !== '' && $stripeSecretKey !== '';
+        if (!$pairComplete) {
+            if ($stripeLivePub !== '' && $stripeLiveSecret !== '') {
+                $stripePubKey = $stripeLivePub;
+                $stripeSecretKey = $stripeLiveSecret;
+            } elseif ($stripeTestPub !== '' && $stripeTestSecret !== '') {
+                $stripePubKey = $stripeTestPub;
+                $stripeSecretKey = $stripeTestSecret;
+            }
+        }
+
+        $stripeWebhook   = (string) ($stripeLegacy['webhook_secret'] ?? $stripeLegacy['webhook_endpoint_secret'] ?? get_option('yatra_payment_gateway_stripe_webhook_endpoint_secret', ''));
+
+        // Refresh flat copies for storing all four keys on the unified row.
+        $stripeLivePub = (string) get_option('yatra_payment_gateway_stripe_live_publishable_key', '') ?: $stripeLivePub;
+        $stripeLiveSecret = (string) get_option('yatra_payment_gateway_stripe_live_secret_key', '') ?: $stripeLiveSecret;
+        $stripeTestPub = (string) get_option('yatra_payment_gateway_stripe_test_publishable_key', '') ?: $stripeTestPub;
+        $stripeTestSecret = (string) get_option('yatra_payment_gateway_stripe_test_secret_key', '') ?: $stripeTestSecret;
 
         if (!empty($stripePubKey) || !empty($stripeSecretKey)) {
             $gatewayConfigs['stripe'] = array_filter([

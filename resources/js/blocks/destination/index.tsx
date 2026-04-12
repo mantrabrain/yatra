@@ -16,7 +16,7 @@ registerBlockType("yatra/destination", {
     },
     per_page: {
       type: "number",
-      default: -1,
+      default: 10,
     },
     title: {
       type: "string",

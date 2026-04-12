@@ -474,18 +474,20 @@ button.yatra-booking-button svg path {
 .yatra-rating-stars {
     display: flex;
     gap: 2px;
-    color: #fbbf24;
     font-size: 20px;
     line-height: 1;
 }
 
-.yatra-star {
+/* Do not set gold on the container — it made every star look filled. Empty = gray, .filled = gold. */
+.yatra-rating-stars > .yatra-star,
+.yatra-rating-stars .yatra-star {
     display: inline-block;
-    font-size:20px;
+    font-size: 20px;
+    color: #d1d5db;
 }
 
-.yatra-star.filled {
-    color: #fbbf24;
+.yatra-rating-stars .yatra-star.filled {
+    color: var(--yatra-star, #fbbf24);
 }
 
 .yatra-no-rating .yatra-star {
@@ -497,13 +499,16 @@ button.yatra-booking-button svg path {
     font-style: italic;
 }
 
-.yatra-star.filled {
-    color: #fbbf24;
-}
-
-.yatra-star.half {
-    color: #fbbf24;
-    opacity: 0.5;
+.yatra-rating-stars .yatra-star.half {
+    background: linear-gradient(
+        90deg,
+        var(--yatra-star, #fbbf24) 50%,
+        #d1d5db 50%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
 }
 
 .yatra-rating-number {
@@ -6064,7 +6069,7 @@ input.yatra-datepicker,
 
 .yatra-rating-bar-fill {
     height: 100%;
-    background: #3b82f6;
+    background: var(--yatra-star, #fbbf24);
     border-radius: 4px;
     transition: width 0.3s ease;
 }
@@ -6348,14 +6353,19 @@ input.yatra-datepicker,
 }
 
 .yatra-star-icon.filled {
-    color: #1e3a5f;
+    color: var(--yatra-star, #fbbf24);
 }
 
 .yatra-star-icon.half {
-    background: linear-gradient(90deg, #1e3a5f 50%, #d1d5db 50%);
+    background: linear-gradient(
+        90deg,
+        var(--yatra-star, #fbbf24) 50%,
+        #d1d5db 50%
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    color: transparent;
 }
 
 .yatra-reviews-based-on {

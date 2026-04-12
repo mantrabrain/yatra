@@ -328,6 +328,7 @@ class Bootstrap
         }
 
         \Yatra\Services\InstallerService::maybeBackfillEmailTemplateDefaults();
+        \Yatra\Services\InstallerService::maybeNormalizeMigratedCouponDiscountStatuses();
     }
 
     /**

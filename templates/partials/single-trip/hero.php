@@ -29,9 +29,23 @@ if (!defined('ABSPATH')) {
         <div class="yatra-hero-meta">
             <div class="yatra-hero-rating" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
                 <?php if ($trip->getAverageRating() > 0): ?>
+                    <?php
+                    $hero_avg = (float) $trip->getAverageRating();
+                    $hero_full = (int) floor($hero_avg);
+                    $hero_half = ($hero_avg - $hero_full) >= 0.3;
+                    ?>
                     <div class="yatra-rating-stars">
-                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                            <span class="yatra-star <?php echo $i <= round($trip->getAverageRating()) ? 'filled' : ''; ?>" aria-label="<?php echo esc_attr(sprintf(_n('%d star', '%d stars', $i, 'yatra'), $i)); ?>">★</span>
+                        <?php for ($i = 1; $i <= 5; $i++) : ?>
+                            <?php
+                            if ($i <= $hero_full) {
+                                $hero_star_class = 'yatra-star filled';
+                            } elseif ($i === $hero_full + 1 && $hero_half) {
+                                $hero_star_class = 'yatra-star half';
+                            } else {
+                                $hero_star_class = 'yatra-star';
+                            }
+                            ?>
+                            <span class="<?php echo esc_attr($hero_star_class); ?>" aria-label="<?php echo esc_attr(sprintf(_n('%d star', '%d stars', $i, 'yatra'), $i)); ?>">★</span>
                         <?php endfor; ?>
                     </div>
                     <span class="yatra-rating-number" itemprop="ratingValue"><?php echo esc_html(number_format($trip->getAverageRating(), 1)); ?></span>

@@ -413,6 +413,37 @@ class ApiClient {
 
 export const apiClient = new ApiClient();
 
+/**
+ * GET /payments/{id} returns the payment entity as the JSON body. Some admin screens expect
+ * { success: true, data: payment }; normalize so both shapes work.
+ */
+async function fetchPaymentNormalized(
+  id: string | number,
+): Promise<
+  | { success: true; data: Record<string, unknown> }
+  | { success: false; message: string }
+  | null
+> {
+  const raw = await apiClient.get(API_ENDPOINTS.PAYMENT_GET(id));
+  if (raw == null) {
+    return null;
+  }
+  if (typeof raw !== "object") {
+    return null;
+  }
+  const r = raw as Record<string, unknown>;
+  if (r.success === true && r.data != null && typeof r.data === "object") {
+    return { success: true, data: r.data as Record<string, unknown> };
+  }
+  if (r.id !== undefined && r.id !== null) {
+    return { success: true, data: r as Record<string, unknown> };
+  }
+  return {
+    success: false,
+    message: String(r.message ?? "Payment not found"),
+  };
+}
+
 class WpApiClient {
   private baseUrl: string;
   private nonce: string;
@@ -542,8 +573,7 @@ export const apiService = {
     ),
 
   // Payments
-  getPayment: (id: string | number) =>
-    apiClient.get(API_ENDPOINTS.PAYMENT_GET(id)),
+  getPayment: (id: string | number) => fetchPaymentNormalized(id),
   deletePayment: (id: string | number) =>
     apiClient.delete(API_ENDPOINTS.PAYMENT_DELETE(id)),
   getPayments: (params?: Record<string, any>) =>

@@ -293,6 +293,31 @@ class InstallerService
     }
 
     /**
+     * One-time: coupon migration incorrectly stored status "active"; 3.x uses "publish" (admin + checkout).
+     */
+    public static function maybeNormalizeMigratedCouponDiscountStatuses(): void
+    {
+        if (get_option('yatra_discount_active_status_normalized_v1')) {
+            return;
+        }
+
+        if (!class_exists('Yatra\\Database\\Tables\\DiscountsTable')) {
+            return;
+        }
+
+        $table = \Yatra\Database\Tables\DiscountsTable::getTableName();
+        if (!self::databaseTableExists($table)) {
+            return;
+        }
+
+        global $wpdb;
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name from schema helper
+        $wpdb->query("UPDATE `{$table}` SET `status` = 'publish' WHERE `status` = 'active'");
+
+        update_option('yatra_discount_active_status_normalized_v1', '1', false);
+    }
+
+    /**
      * Fill canonical + legacy email identity options when empty (upgrades, partial installs, or empty strings in DB).
      * Idempotent; safe to run on each admin load via maybeBackfillEmailTemplateDefaults().
      */

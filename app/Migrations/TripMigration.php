@@ -646,13 +646,13 @@ class TripMigration extends BaseMigration
     {
         global $wpdb;
         
-        // Get categories assigned to this trip via 'trip_category' taxonomy
+        // Categories: legacy sites used `trip_category` (3.x) or `tour_category` (some 2.x builds).
         $categories = $wpdb->get_results($wpdb->prepare(
-            "SELECT t.term_id, t.name, t.slug
+            "SELECT t.term_id, t.name, t.slug, tt.taxonomy AS source_taxonomy
              FROM {$wpdb->terms} t
              INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
              INNER JOIN {$wpdb->term_relationships} tr ON tt.term_taxonomy_id = tr.term_taxonomy_id
-             WHERE tr.object_id = %d AND tt.taxonomy = 'trip_category'",
+             WHERE tr.object_id = %d AND tt.taxonomy IN ('trip_category', 'tour_category')",
             $oldTripId
         ));
 
@@ -672,8 +672,22 @@ class TripMigration extends BaseMigration
             ));
 
             if (!$newCategoryId) {
-                // Try looking up by term meta mapping
-                $mappedId = $this->getRawTermMeta((int) $category->term_id, '_yatra_migrated_category_id');
+                // Term meta from {@see BaseMigration::migrateTaxonomy}: _yatra_migrated_{taxonomy}_id
+                $sourceTax = isset($category->source_taxonomy) && is_string($category->source_taxonomy)
+                    ? $category->source_taxonomy
+                    : 'trip_category';
+                $mappedId = $this->getRawTermMeta(
+                    (int) $category->term_id,
+                    sprintf('_yatra_migrated_%s_id', $sourceTax)
+                );
+                if (!$mappedId && $sourceTax === 'trip_category') {
+                    $mappedId = $this->getRawTermMeta((int) $category->term_id, '_yatra_migrated_tour_category_id');
+                } elseif (!$mappedId && $sourceTax === 'tour_category') {
+                    $mappedId = $this->getRawTermMeta((int) $category->term_id, '_yatra_migrated_trip_category_id');
+                }
+                if (!$mappedId) {
+                    $mappedId = $this->getRawTermMeta((int) $category->term_id, '_yatra_migrated_category_id');
+                }
                 if ($mappedId) {
                     $newCategoryId = (int) $mappedId;
                 }

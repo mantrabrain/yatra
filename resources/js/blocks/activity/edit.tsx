@@ -46,9 +46,12 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             label={__("Number of Activities", "yatra")}
             value={attributes.per_page}
             onChange={(value: number | undefined) =>
-              setAttributes({ per_page: value || -1 })
+              setAttributes({
+                per_page:
+                  value !== undefined && value !== null ? value : 10,
+              })
             }
-            min={-1}
+            min={1}
             max={50}
           />
           <RangeControl
@@ -109,9 +112,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             }}
           >
             {__("Showing ", "yatra")}
-            {attributes.per_page === -1
-              ? __("all", "yatra")
-              : attributes.per_page}
+            {attributes.per_page}
             {__(" activities in ", "yatra")}
             {attributes.columns}
             {__(" columns", "yatra")}

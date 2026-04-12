@@ -55,13 +55,6 @@ class ServicesMigration extends BaseMigration
                 "SELECT COUNT(*) FROM {$wpdb->term_taxonomy} WHERE taxonomy = 'services'"
             );
             
-            // List all taxonomies for debugging
-            $all_taxonomies = $wpdb->get_results(
-                "SELECT DISTINCT taxonomy, COUNT(*) as count FROM {$wpdb->term_taxonomy} GROUP BY taxonomy"
-            );
-            foreach ($all_taxonomies as $tax) {
-                }
-            
             if ($services_count == 0) {
                 return [
                     'migrated' => 0,
@@ -79,38 +72,6 @@ class ServicesMigration extends BaseMigration
             );
 
             $total = count($services);
-            if ($total > 0) {
-                foreach ($services as $service) {
-                    // Get all meta for this service
-                    $service_meta = $wpdb->get_results($wpdb->prepare(
-                        "SELECT meta_key, meta_value FROM {$wpdb->termmeta} WHERE term_id = %d",
-                        $service->term_id
-                    ));
-                    
-                    if ($service_meta) {
-                        foreach ($service_meta as $meta) {
-                            }
-                    }
-                    
-                    // Get tours associated with this service
-                    $tours = $wpdb->get_results($wpdb->prepare(
-                        "SELECT tr.object_id, p.post_title 
-                         FROM {$wpdb->term_relationships} tr
-                         LEFT JOIN {$wpdb->posts} p ON tr.object_id = p.ID
-                         WHERE tr.term_taxonomy_id IN (
-                             SELECT term_taxonomy_id FROM {$wpdb->term_taxonomy} 
-                             WHERE term_id = %d AND taxonomy = 'services'
-                         )",
-                        $service->term_id
-                    ));
-                    
-                    if ($tours) {
-                        foreach ($tours as $tour) {
-                            }
-                    } else {
-                        }
-                    }
-            }
             foreach ($services as $service) {
                 try {
                     // Get service meta directly from database
@@ -135,10 +96,10 @@ class ServicesMigration extends BaseMigration
                     ));
 
                     // Migrate service associations with tours/trips to custom table
-                    $services_migrated = $this->migrateServiceToTrips($service->term_id, $service->name, $service->slug, $service->description, $price_type, $price_per, $service_price, $is_required);
+                    $services_migrated = $this->migrateServiceToTrips($service->term_id, $service->name, $service->description, $price_type, $price_per, $service_price, $is_required);
 
                     $migrated += $services_migrated;
-                    } catch (\Exception $e) {
+                } catch (\Exception $e) {
                     $failed++;
                     Logger::error("Service migration exception", [
                         'source' => 'migration',
@@ -167,7 +128,7 @@ class ServicesMigration extends BaseMigration
     /**
      * Migrate service from old taxonomy to Yatra Pro additional services tables
      */
-    private function migrateServiceToTrips(int $oldServiceId, string $serviceName, string $serviceSlug, string $description, string $priceType, string $pricePer, float $servicePrice, bool $isRequired): int
+    private function migrateServiceToTrips(int $oldServiceId, string $serviceName, string $description, string $priceType, string $pricePer, float $servicePrice, bool $isRequired): int
     {
         global $wpdb;
         $services_table = \YatraPro\Database\Tables\AdditionalServicesTable::getTableName();
@@ -180,6 +141,15 @@ class ServicesMigration extends BaseMigration
             $serviceName
         ));
 
+        $priceTypeNorm = in_array($priceType, ['fixed', 'percentage'], true) ? $priceType : 'fixed';
+        // Legacy 2.x used price_per=tour; 3.x enum is person|booking|day.
+        $pricePerNorm = match ($pricePer) {
+            'person' => 'person',
+            'day' => 'day',
+            'tour', 'booking' => 'booking',
+            default => 'booking',
+        };
+
         // If service doesn't exist, create it in master table
         if (!$service_id) {
             $inserted = $wpdb->insert(
@@ -188,8 +158,8 @@ class ServicesMigration extends BaseMigration
                     'name' => $serviceName,
                     'description' => $description,
                     'price' => $servicePrice,
-                    'price_type' => $priceType,
-                    'price_per' => $pricePer,
+                    'price_type' => $priceTypeNorm,
+                    'price_per' => $pricePerNorm,
                     'status' => 'publish',
                     'applicable_to' => 'specific_trips',
                     'is_required' => $isRequired ? 1 : 0,

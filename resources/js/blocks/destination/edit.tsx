@@ -49,7 +49,10 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             label={__("Number of Destinations", "yatra")}
             value={attributes.per_page}
             onChange={(value: number | undefined) =>
-              setAttributes({ per_page: value || 1 })
+              setAttributes({
+                per_page:
+                  value !== undefined && value !== null ? value : 10,
+              })
             }
             min={1}
             max={50}
