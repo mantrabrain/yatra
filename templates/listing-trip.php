@@ -110,7 +110,7 @@ yatra_get_header();
                         ?>
                         <select id="yatra-sort-filter" class="yatra-sort-filter-select">
                             <?php foreach ($yatra_sort_options as $sort_opt) : ?>
-                                <option value="<?php echo esc_url($sort_opt['url']); ?>"<?php echo !empty($sort_opt['selected']) ? ' selected="selected"' : ''; ?>>
+                                <option value="<?php echo esc_attr(esc_url($sort_opt['url'])); ?>"<?php echo !empty($sort_opt['selected']) ? ' selected="selected"' : ''; ?>>
                                     <?php echo esc_html($sort_opt['label']); ?>
                                 </option>
                             <?php endforeach; ?>
@@ -136,7 +136,7 @@ yatra_get_header();
                 <aside class="yatra-filter-sidebar">
                     <div class="yatra-filter-header">
                         <h2><?php esc_html_e('Filters', 'yatra'); ?></h2>
-                        <span class="yatra-clear-filters"><?php esc_html_e('Clear all', 'yatra'); ?></span>
+                        <button type="button" class="yatra-clear-filters"><?php esc_html_e('Clear all', 'yatra'); ?></button>
                     </div>
 
                     <!-- Price Range -->
@@ -180,6 +180,8 @@ yatra_get_header();
                                     </div>
                                 </div>
                                 <div class="yatra-price-slider">
+                                    <div class="yatra-price-slider-track" aria-hidden="true"></div>
+                                    <div class="yatra-price-slider-range" aria-hidden="true"></div>
                                     <input type="range" min="<?php echo $min_price; ?>" max="<?php echo $max_price; ?>" step="<?php echo $step; ?>" value="<?php echo !empty($active_filters['price_min']) ? esc_attr($active_filters['price_min']) : $min_price; ?>" class="yatra-range-min" id="priceRangeMin" data-default="<?php echo $min_price; ?>" data-user-set="<?php echo !empty($active_filters['price_min']) ? 'true' : 'false'; ?>">
                                     <input type="range" min="<?php echo $min_price; ?>" max="<?php echo $max_price; ?>" step="<?php echo $step; ?>" value="<?php echo !empty($active_filters['price_max']) ? esc_attr($active_filters['price_max']) : $max_price; ?>" class="yatra-range-max" id="priceRangeMax" data-default="<?php echo $max_price; ?>" data-user-set="<?php echo !empty($active_filters['price_max']) ? 'true' : 'false'; ?>">
                                 </div>

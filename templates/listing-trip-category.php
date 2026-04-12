@@ -29,7 +29,7 @@ $category_service = new \Yatra\Services\TripCategoryService();
 $categories = $category_service->getPublishedWithStats();
 
 // Apply simple server-side sorting and pagination for UX.
-$sort = isset($_GET['yatra_sort']) ? sanitize_text_field(wp_unslash($_GET['yatra_sort'])) : 'popular';
+$sort = isset($_GET['yatra_sort']) ? sanitize_text_field(wp_unslash($_GET['yatra_sort'])) : 'rating_desc';
 
 if (!empty($categories) && is_array($categories)) {
     yatra_sort_archive_listing_stats_rows($categories, $sort);

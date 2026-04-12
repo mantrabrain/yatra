@@ -37,7 +37,8 @@ if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_
     $dur_initial_max = min($dmax, max($dur_initial_min, (int) $dm[2]));
 }
 
-$dest_label = __('Pick a destination', 'yatra');
+$dest_default = __('Destination', 'yatra');
+$dest_label = $dest_default;
 if ($active_filters['destination'] !== '') {
     foreach ($destinations as $d) {
         if ((string) ($d->slug ?? '') === $active_filters['destination']) {
@@ -45,12 +46,13 @@ if ($active_filters['destination'] !== '') {
             break;
         }
     }
-    if ($dest_label === __('Pick a destination', 'yatra')) {
+    if ($dest_label === $dest_default) {
         $dest_label = $active_filters['destination'];
     }
 }
 
-$act_label = __('Choose an activity', 'yatra');
+$act_default = __('Activity', 'yatra');
+$act_label = $act_default;
 if ($active_filters['activity'] !== '') {
     foreach ($activities as $a) {
         if ((string) ($a->slug ?? '') === $active_filters['activity']) {
@@ -58,12 +60,13 @@ if ($active_filters['activity'] !== '') {
             break;
         }
     }
-    if ($act_label === __('Choose an activity', 'yatra')) {
+    if ($act_label === $act_default) {
         $act_label = $active_filters['activity'];
     }
 }
 
-$budget_label = __('Your budget range', 'yatra');
+$budget_default = __('Budget', 'yatra');
+$budget_label = $budget_default;
 if ($active_filters['budget'] !== '') {
     foreach ($budget_presets as $bp) {
         if ((string) ($bp->value ?? '') === $active_filters['budget']) {
@@ -71,12 +74,12 @@ if ($active_filters['budget'] !== '') {
             break;
         }
     }
-    if ($budget_label === __('Your budget range', 'yatra')) {
+    if ($budget_label === $budget_default) {
         $budget_label = $active_filters['budget'];
     }
 }
 
-$dur_display_label = __('Trip duration', 'yatra');
+$dur_display_label = __('Duration', 'yatra');
 if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_filters['duration'], $dmDur)) {
     $dur_display_label = sprintf(
         /* translators: 1: min days, 2: max days */
@@ -94,8 +97,8 @@ if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_
                 <div class="yatra-search-keyword-segment">
                     <label class="screen-reader-text" for="yatra-trip-search-s"><?php esc_html_e('Search trips', 'yatra'); ?></label>
                     <div class="yatra-search-keyword-inner">
-                        <?php echo yatra_svg_icon('search', 'yatra-search-keyword-icon'); ?>
-                        <div class="yatra-search-keyword-fields">
+                        <span class="yatra-search-keyword-leading" aria-hidden="true"><?php echo yatra_svg_icon('search'); ?></span>
+                        <div class="yatra-search-keyword-stack">
                             <span class="yatra-dropdown-label"><?php esc_html_e('Search', 'yatra'); ?></span>
                             <input
                                 type="search"
@@ -105,7 +108,7 @@ if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_
                                 autocomplete="off"
                                 inputmode="search"
                                 enterkeyhint="search"
-                                placeholder="<?php esc_attr_e('Trip name, place, keyword…', 'yatra'); ?>"
+                                placeholder="<?php esc_attr_e('Trip name or keyword…', 'yatra'); ?>"
                                 value="<?php echo esc_attr($active_filters['s']); ?>"
                             >
                         </div>
@@ -216,8 +219,8 @@ if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_
                             <span class="yatra-dropdown-label"><?php esc_html_e('Duration', 'yatra'); ?></span>
                             <span class="yatra-dropdown-value"><?php echo esc_html($dur_display_label); ?></span>
                         </div>
-                        <svg class="yatra-dropdown-arrow yatra-arrow-up" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                        <svg class="yatra-dropdown-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </div>
                     <div class="yatra-dropdown-menu yatra-duration-menu">
@@ -235,10 +238,6 @@ if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_
                                 <input type="range" id="durationMax" min="<?php echo esc_attr((string) $dmin); ?>" max="<?php echo esc_attr((string) $dmax); ?>" value="<?php echo esc_attr((string) $dur_initial_max); ?>" class="yatra-range-max">
                                 <div class="yatra-slider-track"></div>
                                 <div class="yatra-slider-range"></div>
-                            </div>
-                            <div class="yatra-duration-labels">
-                                <span></span>
-                                <span></span>
                             </div>
                         </div>
                     </div>
@@ -274,12 +273,9 @@ if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_
                 </div>
 
                 <div class="yatra-search-button-container">
-                <button type="button" class="yatra-search-main-btn">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                    <?php esc_html_e('Search', 'yatra'); ?>
-                </button>
+                    <button type="button" class="yatra-search-main-btn">
+                        <?php esc_html_e('Search', 'yatra'); ?>
+                    </button>
                 </div>
             </div>
         </div>

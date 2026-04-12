@@ -33,12 +33,16 @@ class SearchShortcode extends BaseShortcode
     {
         $atts = shortcode_atts($this->default_attributes, $atts, $this->tag);
         
-        // Enqueue search-specific CSS
+        // Enqueue search CSS after theme (no deps) — filemtime busts cache when stylesheet changes.
+        $tripSearchCssPath = YATRA_PLUGIN_PATH . 'assets/css/shortcodes/trip-search-shortcode.css';
+        $tripSearchCssVer = is_readable($tripSearchCssPath)
+            ? (string) filemtime($tripSearchCssPath)
+            : YATRA_VERSION;
         wp_enqueue_style(
             'yatra-trip-search-shortcode',
             YATRA_PLUGIN_URL . 'assets/css/shortcodes/trip-search-shortcode.css',
             [],
-            YATRA_VERSION
+            $tripSearchCssVer
         );
         
         // Enqueue JavaScript for dropdown interactions

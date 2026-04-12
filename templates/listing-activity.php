@@ -29,7 +29,7 @@ $activity_service = new \Yatra\Services\ActivityService();
 $activities = $activity_service->getPublishedWithStats();
 
 // Apply simple server-side sorting and pagination for UX.
-$sort = isset($_GET['yatra_sort']) ? sanitize_text_field(wp_unslash($_GET['yatra_sort'])) : 'popular';
+$sort = isset($_GET['yatra_sort']) ? sanitize_text_field(wp_unslash($_GET['yatra_sort'])) : 'rating_desc';
 
 if (!empty($activities) && is_array($activities)) {
     yatra_sort_archive_listing_stats_rows($activities, $sort);

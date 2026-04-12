@@ -71,6 +71,24 @@ final class PermalinkCanonical
     }
 
     /**
+     * True when the request path is the trip archive or its paged variant (e.g. /trip/, /trip/page/2/).
+     * Query params {@see destination_base} / {@see activity_base} are listing filters here, not plain taxonomy routing.
+     */
+    private static function isTripArchivePath(): bool
+    {
+        $tripSeg = preg_replace('/[^a-z0-9_-]/i', '', SettingsService::getTripBase()) ?: 'trip';
+        if ($tripSeg === '') {
+            return false;
+        }
+        $cleanPath = trim(UrlParser::getCleanRequestPath(), '/');
+        if ($cleanPath === $tripSeg) {
+            return true;
+        }
+
+        return (bool) preg_match('/^' . preg_quote($tripSeg, '/') . '\/page\/\d+$/', $cleanPath);
+    }
+
+    /**
      * True when the request carries plain-style Yatra routing parameters (query string).
      */
     public static function requestHasPlainYatraRoutingQuery(): bool
@@ -103,6 +121,9 @@ final class PermalinkCanonical
                 continue;
             }
             if (isset($_GET[$bk]) && is_string($_GET[$bk]) && trim(wp_unslash($_GET[$bk])) !== '') {
+                if (self::isTripArchivePath()) {
+                    continue;
+                }
                 return true;
             }
         }
@@ -196,6 +217,9 @@ final class PermalinkCanonical
         }
 
         if ($page === '') {
+            if (self::isTripArchivePath()) {
+                return null;
+            }
             foreach (
                 [
                     [$dest_base, 'yatra_destination_slug'],

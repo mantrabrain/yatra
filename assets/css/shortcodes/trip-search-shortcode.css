@@ -1,727 +1,747 @@
 /**
- * Trip Search Shortcode CSS
- * 
- * Copied exactly from /trip page search UI for consistency
- * Based on listing.css search styles
- * 
+ * Yatra trip search bar — full reset + layout (shortcode only).
+ * All rules scoped under body .yatra-trip-search-shortcode to beat typical theme CSS.
+ * Use with: [yatra_search] → root .yatra-trip-search-shortcode
+ *
  * @package Yatra
  */
 
+/* -------------------------------------------------------------------------
+   Scope: high specificity (body + block class). box-sizing for predictable layout.
+   ------------------------------------------------------------------------- */
+body .yatra-trip-search-shortcode {
+    --yatra-ts-accent: #2563eb;
+    --yatra-ts-accent-hover: #1d4ed8;
+    --yatra-ts-surface: #ffffff;
+    --yatra-ts-text: #0f172a;
+    --yatra-ts-muted: #64748b;
+    --yatra-ts-border: #e2e8f0;
+    --yatra-ts-radius: 14px;
+    --yatra-ts-row: 52px;
+    --yatra-ts-z-dropdown: 10050;
 
-/* ============================================
-   HORIZONTAL SEARCH BAR - Clean Modern Design
-   ============================================ */
-.yatra-trip-search-shortcode {
+    display: block;
     width: 100%;
-}
-
-.yatra-horizontal-search {
-    background: #f1f5f9;
-    padding: 40px 0;
+    max-width: 100%;
     position: relative;
     z-index: 1000;
-}
-
-.yatra-horizontal-search-container {
-    width: 100%;
-    max-width: var(--yatra-container-max-width, 1200px);
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0 var(--yatra-container-padding, 20px);
-    position: relative;
-    z-index: 1001;
-}
-
-.yatra-search-bar {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 6px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e2e8f0;
-    transition: box-shadow 0.2s ease, border-color 0.2s ease;
     isolation: isolate;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.4;
+    color: var(--yatra-ts-text);
+    -webkit-font-smoothing: antialiased;
+}
+
+body .yatra-trip-search-shortcode *,
+body .yatra-trip-search-shortcode *::before,
+body .yatra-trip-search-shortcode *::after {
+    box-sizing: border-box !important;
+}
+
+body .yatra-trip-search-shortcode button,
+body .yatra-trip-search-shortcode input,
+body .yatra-trip-search-shortcode select {
+    font-family: inherit !important;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+/* -------------------------------------------------------------------------
+   Horizontal strip (background behind bar)
+   ------------------------------------------------------------------------- */
+body .yatra-trip-search-shortcode .yatra-horizontal-search {
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
+    padding: 32px 0 36px !important;
+    margin: 0 !important;
     position: relative;
+    z-index: 1;
 }
 
-.yatra-search-bar:hover {
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.06);
-    border-color: #cbd5e1;
+body .yatra-trip-listing-search-wrap .yatra-trip-search-shortcode .yatra-horizontal-search {
+    padding-top: 0 !important;
+    padding-bottom: 28px !important;
+    background: transparent !important;
 }
 
-.yatra-search-divider {
-    width: 1px;
-    height: 40px;
-    background: #e5e7eb;
-    flex-shrink: 0;
-    margin: 0 8px;
-}
-
-/* Keyword segment — matches dropdown trigger visual language */
-.yatra-search-keyword-segment {
-    flex: 2.25;
-    min-width: 220px;
-    max-width: 440px;
-}
-
-.yatra-search-keyword-inner {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 20px;
-    min-height: 56px;
-    border-radius: 12px;
-    background: #ffffff;
-    border: 1px solid transparent;
-    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
-}
-
-.yatra-search-keyword-inner:hover {
-    background: #f8fafc;
-    border-color: #e2e8f0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.yatra-search-keyword-inner:focus-within {
-    background: #fafbff;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
-    outline: none;
-}
-
-.yatra-search-keyword-icon {
-    flex-shrink: 0;
-    width: 20px;
-    height: 20px;
-    color: #6b7280;
-    transition: color 0.15s ease;
-}
-
-.yatra-search-keyword-icon svg {
-    display: block;
-    width: 20px;
-    height: 20px;
-}
-
-.yatra-search-keyword-inner:hover .yatra-search-keyword-icon,
-.yatra-search-keyword-inner:focus-within .yatra-search-keyword-icon {
-    color: #374151;
-}
-
-.yatra-search-keyword-fields {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    flex: 1;
-    min-width: 0;
-}
-
-.yatra-search-keyword-fields .yatra-dropdown-label {
-    margin: 0;
-}
-
-.yatra-search-keyword-input {
-    display: block;
-    width: 100%;
-    min-width: 0;
-    border: none;
-    background: transparent;
-    padding: 0;
-    margin: 0;
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.35;
-    color: #111827;
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-.yatra-search-keyword-input::placeholder {
-    color: #9ca3af;
-    font-weight: 500;
-}
-
-.yatra-search-keyword-input:focus {
-    outline: none;
-}
-
-/* Remove default search cancel / clear styling inconsistencies */
-.yatra-search-keyword-input::-webkit-search-decoration,
-.yatra-search-keyword-input::-webkit-search-cancel-button {
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-.yatra-search-dropdown {
+body .yatra-trip-search-shortcode .yatra-horizontal-search-container {
+    width: 100% !important;
+    max-width: var(--yatra-container-max-width, 1200px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: var(--yatra-container-padding, 20px) !important;
+    padding-right: var(--yatra-container-padding, 20px) !important;
     position: relative;
-    flex: 1;
-    min-width: 180px;
+    z-index: 2;
 }
 
-.yatra-dropdown-trigger {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0;
-    cursor: pointer;
-    border-radius: 12px;
-    transition: all 0.15s ease;
-    border: 1px solid transparent;
-    background: #ffffff;
-    width: 100%;
-    min-height: 56px;
-    position: relative;
+/* -------------------------------------------------------------------------
+   Main bar
+   ------------------------------------------------------------------------- */
+body .yatra-trip-search-shortcode .yatra-search-bar {
+    display: flex !important;
+    flex-direction: row;
+    align-items: stretch !important;
+    flex-wrap: nowrap;
+    gap: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 5px 6px 5px 8px !important;
+    background: var(--yatra-ts-surface) !important;
+    border: 1px solid var(--yatra-ts-border) !important;
+    border-radius: var(--yatra-ts-radius) !important;
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.04),
+        0 8px 24px rgba(15, 23, 42, 0.06) !important;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-.yatra-dropdown-trigger:hover {
-    background: #f8fafc;
-    border-color: #e2e8f0;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+body .yatra-trip-search-shortcode .yatra-search-bar:hover {
+    border-color: #cbd5e1 !important;
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.05),
+        0 12px 32px rgba(15, 23, 42, 0.08) !important;
 }
 
-.yatra-dropdown-trigger:active {
-    background: #f1f5f9;
-    transform: translateY(0);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+body .yatra-trip-search-shortcode .yatra-search-divider {
+    width: 1px !important;
+    flex-shrink: 0 !important;
+    align-self: center !important;
+    height: 28px !important;
+    margin: 0 2px !important;
+    padding: 0 !important;
+    border: none !important;
+    background: rgba(148, 163, 184, 0.45) !important;
 }
 
-.yatra-dropdown-trigger:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+/* -------------------------------------------------------------------------
+   Keyword column
+   ------------------------------------------------------------------------- */
+body .yatra-trip-search-shortcode .yatra-search-keyword-segment {
+    display: flex !important;
+    flex: 2.5;
+    align-items: stretch !important;
+    min-width: 260px;
+    max-width: 480px;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-/* first-of-type: whitespace text nodes before <svg> break :first-child in many templates */
-.yatra-dropdown-trigger svg:first-of-type {
-    flex-shrink: 0;
-    width: 20px;
-    height: 20px;
-    min-width: 20px;
-    min-height: 20px;
-    color: #6b7280;
-    transition: color 0.15s ease;
-    display: block;
-    box-sizing: content-box;
+body .yatra-trip-search-shortcode .yatra-search-keyword-inner {
+    display: flex !important;
+    flex-direction: row;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    min-height: var(--yatra-ts-row) !important;
+    padding: 8px 12px !important;
+    margin: 0 !important;
+    border: 1px solid transparent !important;
+    border-radius: calc(var(--yatra-ts-radius) - 6px) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.yatra-dropdown-trigger:hover svg:first-of-type {
-    color: #374151;
+body .yatra-trip-search-shortcode .yatra-search-keyword-inner:hover {
+    background: #f8fafc !important;
 }
 
-.yatra-dropdown-content {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    flex: 1;
-    min-width: 0;
+body .yatra-trip-search-shortcode .yatra-search-keyword-inner:focus-within {
+    background: #fafafa !important;
+    border-color: rgba(37, 99, 235, 0.28) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+    outline: none !important;
 }
 
-.yatra-dropdown-label {
-    font-size: 11px;
-    color: #6b7280;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    line-height: 1;
+body .yatra-trip-search-shortcode .yatra-search-keyword-leading {
+    display: flex !important;
+    flex-shrink: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 20px !important;
+    height: 20px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    color: #64748b !important;
 }
 
-.yatra-dropdown-value {
-    font-size: 15px;
-    color: #111827;
-    font-weight: 600;
-    line-height: 1.3;
-    transition: color 0.15s ease;
+body .yatra-trip-search-shortcode .yatra-search-keyword-leading svg {
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+    max-width: none !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    vertical-align: middle !important;
 }
 
-.yatra-dropdown-value.selected {
-    color: #111827;
+body .yatra-trip-search-shortcode .yatra-search-keyword-inner:focus-within .yatra-search-keyword-leading {
+    color: var(--yatra-ts-accent) !important;
 }
 
-.yatra-dropdown-arrow {
-    flex-shrink: 0;
-    width: 16px;
-    height: 16px;
-    color: #9ca3af;
+body .yatra-trip-search-shortcode .yatra-search-keyword-stack {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-keyword-stack .yatra-dropdown-label {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-keyword-input {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 1.3 !important;
+    color: var(--yatra-ts-text) !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-keyword-input::placeholder {
+    color: #94a3b8 !important;
+    font-weight: 500 !important;
+    opacity: 1 !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-keyword-input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-keyword-input::-webkit-search-decoration,
+body .yatra-trip-search-shortcode .yatra-search-keyword-input::-webkit-search-cancel-button {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+}
+
+/* -------------------------------------------------------------------------
+   Dropdown columns
+   ------------------------------------------------------------------------- */
+body .yatra-trip-search-shortcode .yatra-search-dropdown {
+    position: relative !important;
+    flex: 1 1 auto !important;
+    min-width: 180px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    isolation: isolate;
+}
+
+body .yatra-trip-search-shortcode .yatra-dropdown-trigger {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    min-height: var(--yatra-ts-row) !important;
+    margin: 0 !important;
+    padding: 8px 12px !important;
+    border: 1px solid transparent !important;
+    border-radius: calc(var(--yatra-ts-radius) - 6px) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+    text-align: left !important;
+    overflow: visible !important;
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body .yatra-trip-search-shortcode .yatra-dropdown-trigger:hover {
+    background: #f8fafc !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-dropdown-trigger:active {
+    background: #f1f5f9 !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-dropdown-trigger:focus {
+    outline: none !important;
+    border-color: rgba(37, 99, 235, 0.3) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-dropdown-trigger svg:first-of-type {
+    flex-shrink: 0 !important;
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #64748b !important;
+    fill: none !important;
+    stroke: currentColor !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-dropdown-trigger:hover svg:first-of-type {
+    color: #475569 !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-dropdown-content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-dropdown-label {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    color: var(--yatra-ts-muted) !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-dropdown-value {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 1.3 !important;
+    color: #111827 !important;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body .yatra-trip-search-shortcode .yatra-dropdown-arrow {
+    flex-shrink: 0 !important;
+    display: block !important;
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    min-height: 16px !important;
+    margin: 0 0 0 auto !important;
+    padding: 0 !important;
+    color: #9ca3af !important;
+    fill: none !important;
+    stroke: currentColor !important;
     transition: transform 0.15s ease;
-    margin-left: auto;
 }
 
-.yatra-search-dropdown.open .yatra-dropdown-arrow {
+body .yatra-trip-search-shortcode .yatra-search-dropdown.open .yatra-dropdown-arrow {
     transform: rotate(180deg);
 }
 
-.yatra-search-dropdown.open .yatra-dropdown-arrow.yatra-arrow-up {
-    transform: rotate(0deg);
+/* -------------------------------------------------------------------------
+   Dropdown menus & options
+   ------------------------------------------------------------------------- */
+body .yatra-trip-search-shortcode .yatra-dropdown-search-wrap {
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-.yatra-search-divider {
-    width: 1px;
-    height: 40px;
-    background: #e5e7eb;
-    flex-shrink: 0;
+body .yatra-trip-search-shortcode .yatra-dropdown-filter-input {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 8px 10px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    line-height: 1.35 !important;
+    color: #111827 !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 6px !important;
+    background: #f8fafc !important;
+    box-shadow: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
 }
 
-.yatra-dropdown-search-wrap {
-    flex-shrink: 0;
+body .yatra-trip-search-shortcode .yatra-dropdown-filter-input::placeholder {
+    color: #9ca3af !important;
+    opacity: 1 !important;
 }
 
-.yatra-dropdown-filter-input {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 8px 10px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #111827;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    background: #f8fafc;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+body .yatra-trip-search-shortcode .yatra-dropdown-filter-input:focus {
+    outline: none !important;
+    border-color: #3b82f6 !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
 }
 
-.yatra-dropdown-filter-input::placeholder {
-    color: #9ca3af;
-    font-weight: 400;
+body .yatra-trip-search-shortcode .yatra-dropdown-options {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    max-height: 280px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    margin: 0 !important;
+    padding: 2px 0 !important;
+    list-style: none !important;
 }
 
-.yatra-dropdown-filter-input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
-}
-
-.yatra-dropdown-options {
-    flex: 1;
-    min-height: 0;
-    max-height: 280px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 2px 0;
-    margin: 0;
-}
-
-.yatra-dropdown-option--hidden {
+body .yatra-trip-search-shortcode .yatra-dropdown-option--hidden {
     display: none !important;
 }
 
-.yatra-dropdown-menu {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    min-width: 260px;
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.1), 0 4px 12px rgba(15, 23, 42, 0.06);
-    border: 1px solid #e2e8f0;
-    padding: 6px;
-    z-index: 10050;
+body .yatra-trip-search-shortcode .yatra-dropdown-menu {
+    position: absolute !important;
+    top: calc(100% + 4px) !important;
+    left: 0 !important;
+    right: auto !important;
+    min-width: 260px !important;
+    margin: 0 !important;
+    padding: 6px !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    box-shadow:
+        0 10px 40px rgba(15, 23, 42, 0.1),
+        0 4px 12px rgba(15, 23, 42, 0.06) !important;
+    z-index: var(--yatra-ts-z-dropdown) !important;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px) scale(0.95);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     display: none !important;
-    backdrop-filter: blur(10px);
-    isolation: isolate;
-    transform-style: preserve-3d;
 }
 
-.yatra-search-dropdown.open .yatra-dropdown-menu,
-.yatra-dropdown-menu.show {
+body .yatra-trip-search-shortcode .yatra-search-dropdown.open .yatra-dropdown-menu,
+body .yatra-trip-search-shortcode .yatra-dropdown-menu.show {
+    display: block !important;
     opacity: 1 !important;
     visibility: visible !important;
     transform: translateY(0) scale(1) !important;
-    z-index: 10050 !important;
 }
 
-.yatra-search-dropdown.open .yatra-dropdown-menu:not(.yatra-dropdown-menu--filterable),
-.yatra-dropdown-menu.show:not(.yatra-dropdown-menu--filterable) {
-    display: block !important;
-}
-
-.yatra-search-dropdown.open .yatra-dropdown-menu.yatra-dropdown-menu--filterable,
-.yatra-dropdown-menu.yatra-dropdown-menu--filterable.show {
+body .yatra-trip-search-shortcode .yatra-search-dropdown.open .yatra-dropdown-menu.yatra-dropdown-menu--filterable,
+body .yatra-trip-search-shortcode .yatra-dropdown-menu.yatra-dropdown-menu--filterable.show {
     display: flex !important;
-    flex-direction: column;
-    gap: 6px;
-    padding: 8px;
-    max-height: min(380px, 70vh);
+    flex-direction: column !important;
+    gap: 6px !important;
+    padding: 8px !important;
+    max-height: min(380px, 70vh) !important;
 }
 
-/* Ensure parent containers don't create stacking context issues */
-.yatra-search-dropdown {
-    position: relative;
-    flex: 1;
-    min-width: 180px;
-    isolation: isolate;
+body .yatra-trip-search-shortcode .yatra-dropdown-option {
+    margin: 0 !important;
+    padding: 8px 10px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    line-height: 1.35 !important;
+    color: #374151 !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    position: relative !important;
+    background: transparent !important;
+    border: none !important;
+    text-align: left !important;
+    width: 100% !important;
+    box-shadow: none !important;
 }
 
-.yatra-dropdown-option {
-    padding: 8px 10px;
-    font-size: 13px;
-    color: #374151;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.12s ease, color 0.12s ease;
-    font-weight: 500;
-    line-height: 1.35;
-    margin: 0;
-    min-height: 0;
-    display: flex;
-    align-items: center;
-    position: relative;
+body .yatra-trip-search-shortcode .yatra-dropdown-option:hover {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
 }
 
-.yatra-dropdown-option:last-child {
-    margin-bottom: 0;
+body .yatra-trip-search-shortcode .yatra-dropdown-option.selected {
+    background: #eff6ff !important;
+    color: #1d4ed8 !important;
+    font-weight: 600 !important;
+    padding-right: 26px !important;
 }
 
-.yatra-dropdown-option:hover {
-    background: #f1f5f9;
-    color: #0f172a;
-}
-
-.yatra-dropdown-option:active {
-    background: #e2e8f0;
-}
-
-.yatra-dropdown-option.selected {
-    background: #eff6ff;
-    color: #1d4ed8;
-    font-weight: 600;
-    position: relative;
-    padding-right: 26px;
-}
-
-/* SVG checkmark (avoids UTF-8 ✓ in CSS mojibake on some servers/encodings) */
-.yatra-dropdown-option.selected::before {
-    content: '';
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 16px 16px;
-}
-
-/* Duration slider panel — compact to match other dropdowns */
-.yatra-duration-menu {
-    min-width: 260px;
-    padding: 8px;
-}
-
-.yatra-duration-slider-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.yatra-duration-header {
-    text-align: center;
-    margin-bottom: 0;
-}
-
-.yatra-duration-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 2px;
-}
-
-.yatra-duration-subtitle {
-    font-size: 11px;
-    color: #6b7280;
-    font-weight: 500;
-    line-height: 1.3;
-}
-
-.yatra-duration-badges {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 10px;
-    background: #f8fafc;
-    border-radius: 6px;
-    border: 1px solid #e2e8f0;
-}
-
-.yatra-duration-badge {
-    font-size: 11px;
-    font-weight: 600;
-    color: #1f2937;
-    padding: 4px 8px;
-    background: #ffffff;
-    border-radius: 4px;
-    border: 1px solid #3b82f6;
-    transition: all 0.15s ease;
-}
-
-.yatra-dual-range-slider {
-    position: relative;
-    height: 36px;
-    margin: 6px 0 10px 0;
-    padding: 0 6px;
-}
-
-.yatra-slider-track {
-    position: absolute;
-    width: calc(100% - 16px);
-    height: 6px;
-    background: #e5e7eb;
-    border-radius: 3px;
-    top: 50%;
-    left: 8px;
-    transform: translateY(-50%);
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.yatra-slider-range {
-    position: absolute;
-    height: 6px;
-    background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
-    border-radius: 3px;
-    top: 50%;
-    transform: translateY(-50%);
-    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
-    transition: all 0.15s ease;
-}
-
-.yatra-dual-range-slider input[type="range"] {
-    position: absolute;
-    width: 100%;
-    height: 6px;
-    background: transparent;
-    -webkit-appearance: none;
-    appearance: none;
-    pointer-events: none;
-    top: 37%;
-}
-
-.yatra-dual-range-slider input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border: 3px solid #3b82f6;
-    cursor: pointer;
-    pointer-events: all;
-    position: relative;
-    z-index: 3;
-    box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3), 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.yatra-dual-range-slider input[type="range"]::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4), 0 3px 6px rgba(0, 0, 0, 0.15);
-}
-
-.yatra-dual-range-slider input[type="range"]::-webkit-slider-thumb:active {
-    transform: scale(1.1);
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4), 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.yatra-dual-range-slider input[type="range"]::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border: 3px solid #3b82f6;
-    cursor: pointer;
-    pointer-events: all;
-    position: relative;
-    z-index: 3;
-    box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3), 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.yatra-dual-range-slider input[type="range"]::-moz-range-thumb:hover {
-    transform: scale(1.2);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4), 0 3px 6px rgba(0, 0, 0, 0.15);
-}
-
-.yatra-dual-range-slider input[type="range"]::-moz-range-thumb:active {
-    transform: scale(1.1);
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4), 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.yatra-duration-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    color: #374151;
-    margin-top: 4px;
-    padding: 0 6px;
-}
-
-.yatra-duration-labels span {
-    font-weight: 600;
-    background: #f8fafc;
-    padding: 4px 8px;
-    border-radius: 4px;
-    border: 1px solid #e2e8f0;
-}
-
-/* Slider thumb focus states */
-.yatra-dual-range-slider input[type="range"]:focus::-webkit-slider-thumb {
-    outline: none;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3), 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
-.yatra-dual-range-slider input[type="range"]:focus::-moz-range-thumb {
-    outline: none;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3), 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
-/* Search Button Container */
-.yatra-search-button-container {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    padding-left: 8px;
-    margin-left: 4px;
-}
-
-/* Search Main Button - Enhanced UX */
-.yatra-search-main-btn {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    color: white;
-    border: none;
-    padding: 18px 36px;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    position: relative;
-    overflow: hidden;
-    min-height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.yatra-search-main-btn:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
-}
-
-.yatra-search-main-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-}
-
-.yatra-search-main-btn:focus {
-    outline: none;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3), 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
-.yatra-search-main-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
-}
-
-.yatra-search-main-btn:hover::before {
-    left: 100%;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .yatra-search-bar {
-        flex-direction: column;
-        gap: 12px;
-        padding: 16px;
-    }
-
-    .yatra-search-keyword-segment {
-        max-width: none;
-        width: 100%;
-    }
-    
-    .yatra-search-dropdown {
-        width: 100%;
-        min-width: auto;
-    }
-    
-    .yatra-search-divider {
-        width: 100%;
-        height: 1px;
-        margin: 8px 0;
-    }
-    
-    .yatra-search-button-container {
-        margin-left: 0;
-        width: 100%;
-    }
-    
-    .yatra-search-main-btn {
-        width: 100%;
-    }
-    
-    .yatra-dropdown-menu {
-        min-width: auto;
-        left: 0;
-        right: 0;
-    }
-    
-    .yatra-duration-menu {
-        min-width: auto;
-        padding: 8px;
-    }
-}
-
-/* Search Button Icon */
-.yatra-search-main-btn svg {
-    width: 18px;
-    height: 18px;
-    min-width: 18px;
-    min-height: 18px;
-    display: block;
-    flex-shrink: 0;
-}
-
-/* Hard isolation when listing.css / theme loads later (equal-specificity overrides) */
-.yatra-trip-search-shortcode .yatra-dropdown-trigger {
-    overflow: visible;
-}
-
-.yatra-trip-search-shortcode .yatra-dropdown-trigger svg:first-of-type {
-    width: 20px !important;
-    height: 20px !important;
-    min-width: 20px;
-    min-height: 20px;
-    flex-shrink: 0 !important;
-    display: block !important;
-    color: #6b7280;
-}
-
-.yatra-trip-search-shortcode .yatra-dropdown-arrow {
+body .yatra-trip-search-shortcode .yatra-dropdown-option.selected::before {
+    content: '' !important;
+    position: absolute !important;
+    right: 8px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
     width: 16px !important;
     height: 16px !important;
-    min-width: 16px;
-    min-height: 16px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 16px 16px !important;
+}
+
+/* -------------------------------------------------------------------------
+   Duration panel
+   ------------------------------------------------------------------------- */
+body .yatra-trip-search-shortcode .yatra-duration-menu {
+    min-width: 260px !important;
+    padding: 8px !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-duration-slider-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-duration-header {
+    text-align: center !important;
+    margin: 0 !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-duration-title {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+    margin: 0 0 2px !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-duration-subtitle {
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    color: #6b7280 !important;
+    line-height: 1.3 !important;
+    margin: 0 !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-duration-badges {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 8px 10px !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 6px !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-duration-badge {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+    padding: 4px 8px !important;
+    background: #ffffff !important;
+    border: 1px solid #3b82f6 !important;
+    border-radius: 4px !important;
+}
+
+/* Same horizontal inset as .yatra-duration-badges (padding 8px 10px) so the track matches the badge row */
+body .yatra-trip-search-shortcode .yatra-dual-range-slider {
+    position: relative !important;
+    height: 36px !important;
+    box-sizing: border-box !important;
+    width: calc(100% - 20px) !important;
+    max-width: calc(100% - 20px) !important;
+    margin: 6px auto 10px !important;
+    padding: 0 !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-slider-track {
+    position: absolute !important;
+    width: calc(100% - 16px) !important;
+    height: 6px !important;
+    left: 8px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: #e5e7eb !important;
+    border-radius: 3px !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+    box-sizing: border-box !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-slider-range {
+    position: absolute !important;
+    height: 6px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%) !important;
+    border-radius: 3px !important;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3) !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range'] {
+    position: absolute !important;
+    width: 100% !important;
+    height: 6px !important;
+    top: 37% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    pointer-events: none;
+}
+
+body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+    border: 3px solid #3b82f6 !important;
+    cursor: pointer !important;
+    pointer-events: all !important;
+    z-index: 3 !important;
+    box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3), 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range']::-moz-range-thumb {
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+    border: 3px solid #3b82f6 !important;
+    cursor: pointer !important;
+    pointer-events: all !important;
+    z-index: 3 !important;
+    box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3), 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* -------------------------------------------------------------------------
+   Submit button
+   ------------------------------------------------------------------------- */
+body .yatra-trip-search-shortcode .yatra-search-button-container {
+    display: flex !important;
     flex-shrink: 0 !important;
-    display: block !important;
+    align-items: stretch !important;
+    margin: 0 0 0 4px !important;
+    padding: 4px 4px 4px 10px !important;
+    border: none !important;
+    border-left: 1px solid rgba(148, 163, 184, 0.35) !important;
+    background: transparent !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-main-btn {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 120px !important;
+    min-height: var(--yatra-ts-row) !important;
+    margin: 0 !important;
+    padding: 0 22px !important;
+    border: none !important;
+    border-radius: 10px !important;
+    background: var(--yatra-ts-accent) !important;
+    background-color: var(--yatra-ts-accent) !important;
+    color: #ffffff !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em !important;
+    text-transform: none !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.06),
+        0 4px 14px rgba(37, 99, 235, 0.28) !important;
+    transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.15s ease !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-main-btn:hover {
+    background: var(--yatra-ts-accent-hover) !important;
+    background-color: var(--yatra-ts-accent-hover) !important;
+    color: #ffffff !important;
+    box-shadow:
+        0 2px 6px rgba(15, 23, 42, 0.08),
+        0 8px 22px rgba(37, 99, 235, 0.35) !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-main-btn:active {
+    transform: scale(0.99);
+}
+
+body .yatra-trip-search-shortcode .yatra-search-main-btn:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35) !important;
+}
+
+/* -------------------------------------------------------------------------
+   Responsive
+   ------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+    body .yatra-trip-search-shortcode .yatra-search-bar {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+
+    body .yatra-trip-search-shortcode .yatra-search-dropdown {
+        min-width: calc(50% - 20px) !important;
+        flex: 1 1 calc(50% - 20px) !important;
+    }
+
+    body .yatra-trip-search-shortcode .yatra-search-divider {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    body .yatra-trip-search-shortcode .yatra-search-bar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 4px !important;
+        padding: 12px !important;
+    }
+
+    body .yatra-trip-search-shortcode .yatra-search-keyword-segment {
+        max-width: none !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    body .yatra-trip-search-shortcode .yatra-search-dropdown {
+        width: 100% !important;
+        min-width: 100% !important;
+        flex: 1 1 auto !important;
+    }
+
+    body .yatra-trip-search-shortcode .yatra-search-divider {
+        display: block !important;
+        width: 100% !important;
+        height: 1px !important;
+        margin: 6px 0 !important;
+    }
+
+    body .yatra-trip-search-shortcode .yatra-search-button-container {
+        width: 100% !important;
+        margin-left: 0 !important;
+        padding: 10px 0 4px !important;
+        border-left: none !important;
+        border-top: 1px solid rgba(148, 163, 184, 0.35) !important;
+    }
+
+    body .yatra-trip-search-shortcode .yatra-search-main-btn {
+        width: 100% !important;
+        min-height: 48px !important;
+        margin-top: 0 !important;
+    }
+
+    body .yatra-trip-search-shortcode .yatra-dropdown-menu {
+        left: 0 !important;
+        right: 0 !important;
+        min-width: 100% !important;
+    }
+
+    body .yatra-trip-search-shortcode .yatra-duration-menu {
+        min-width: 100% !important;
+    }
 }

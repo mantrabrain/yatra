@@ -3,15 +3,25 @@ jQuery(document).ready(function() {
 
     function getListingUrl() {
         var root = document.querySelector('.yatra-trip-search-shortcode');
-        var u = root && root.getAttribute('data-listing-url');
-        if (u) {
-            return u;
+        var configured = root && root.getAttribute('data-listing-url');
+        if (!configured && window.yatraTripSearchConfig && window.yatraTripSearchConfig.listingUrl) {
+            configured = window.yatraTripSearchConfig.listingUrl;
         }
-        if (window.yatraTripSearchConfig && window.yatraTripSearchConfig.listingUrl) {
-            return window.yatraTripSearchConfig.listingUrl;
+        if (!configured && window.yatraListing && window.yatraListing.tripListingUrl) {
+            configured = window.yatraListing.tripListingUrl;
         }
-        if (window.yatraListing && window.yatraListing.tripListingUrl) {
-            return window.yatraListing.tripListingUrl;
+        if (configured) {
+            try {
+                var cur = new URL(window.location.href);
+                var cfg = new URL(configured, window.location.href);
+                var cpath = cur.pathname.replace(/\/$/, '') || '/';
+                var bpath = cfg.pathname.replace(/\/$/, '') || '/';
+                var escaped = bpath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                if (cpath === bpath || new RegExp('^' + escaped + '/page/\\d+$').test(cpath)) {
+                    return cfg.origin + bpath + '/';
+                }
+            } catch (e) {}
+            return configured;
         }
         return window.location.href.split('?')[0].replace(/\/page\/\d+\/?$/, '').replace(/\/$/, '') + '/';
     }
@@ -144,9 +154,6 @@ jQuery(document).ready(function() {
         var maxSlider = durationDropdown.querySelector('#durationMax');
         var minBadge = durationDropdown.querySelector('.yatra-duration-min-badge');
         var maxBadge = durationDropdown.querySelector('.yatra-duration-max-badge');
-        var labelSpans = durationDropdown.querySelectorAll('.yatra-duration-labels span');
-        var minLabel = labelSpans[0];
-        var maxLabel = labelSpans[labelSpans.length - 1];
         var sliderRange = durationDropdown.querySelector('.yatra-slider-range');
         var valueSpan = durationDropdown.querySelector('.yatra-dropdown-value');
 
@@ -184,12 +191,6 @@ jQuery(document).ready(function() {
             }
             if (maxBadge) {
                 maxBadge.textContent = max + ' Days';
-            }
-            if (minLabel) {
-                minLabel.textContent = min + ' Days';
-            }
-            if (maxLabel) {
-                maxLabel.textContent = max + ' Days';
             }
 
             if (valueSpan) {

@@ -14,7 +14,6 @@
     color: var(--yatra-text-primary, #1a1a1a);
     width: 100%;
     min-height: 100vh;
-    background: var(--yatra-bg-page, #f8f9fa);
 }
 
 /* Inner container with max-width */
@@ -106,14 +105,26 @@
 .yatra-single-trip > .yatra-trip-attributes,
 .yatra-single-trip > .yatra-trip-container,
 .yatra-single-trip > .yatra-group-discounts-section,
-.yatra-single-trip > .yatra-similar-section,
-.yatra-single-trip > .yatra-reviews-section {
+.yatra-single-trip > .yatra-similar-section {
     width: 100%;
     max-width: var(--yatra-container-max-width, 1300px);
     margin-left: auto;
     margin-right: auto;
     padding-left: var(--yatra-container-padding);
     padding-right: var(--yatra-container-padding);
+}
+
+/* Reviews: descendant selector so width matches .yatra-trip-container even if wrapped; align-self fixes flex parents with align-items:center */
+.yatra-single-trip .yatra-reviews-section {
+    width: 100%;
+    max-width: var(--yatra-container-max-width, 1300px);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--yatra-container-padding);
+    padding-right: var(--yatra-container-padding);
+    box-sizing: border-box;
+    align-self: stretch;
+    min-width: 0;
 }
 
 /* Unified Section Spacing
@@ -140,6 +151,11 @@
 .yatra-trip-container {
     padding-top: 0;
     padding-bottom: var(--yatra-section-gap);
+}
+
+/* When reviews follows the main grid directly, avoid double gap (trip bottom + reviews top) */
+.yatra-trip-container:has(+ .yatra-reviews-section) {
+    padding-bottom: 0;
 }
 
 /* Full-width sections (match template class names) — see also SIMILAR TRIPS / REVIEWS blocks */
@@ -1371,7 +1387,7 @@ button.yatra-booking-button svg path {
     align-items: center;
     gap: 8px;
     padding: 8px 16px;
-    background: #f3f4f6;
+    background: #e5e7eb;
     border-radius: 20px;
     font-size: 14px;
 }
@@ -2268,6 +2284,15 @@ button.yatra-booking-button svg path {
 
 .yatra-mobile-date-section {
     order: 3;
+    display: flex;
+    align-items: center;
+    flex: 0 1 auto;
+    flex-shrink: 1;
+    min-width: 0;
+    /* Keep compact so Check / Enquire stay visible (do not stretch like flex: 1) */
+    max-width: min(112px, 30vw);
+    width: auto;
+    touch-action: manipulation;
 }
 
 .yatra-mobile-travelers-section {
@@ -2295,12 +2320,17 @@ button.yatra-booking-button svg path {
     background: #f9fafb;
     border: 1px solid #e5e7eb;
     border-radius: 6px;
-    padding: 6px 8px;
+    padding: 0 8px;
+    box-sizing: border-box;
     min-width: 0;
+    min-height: 36px;
+    height: 36px;
+    max-height: 36px;
     flex-shrink: 0;
+    touch-action: manipulation;
 }
 
-/* Compact Mobile Date Picker */
+/* Compact Mobile Date Picker — same vertical footprint as Adult / Check / Enquire */
 .yatra-mobile-compact-datepicker {
     display: flex;
     align-items: center;
@@ -2308,11 +2338,21 @@ button.yatra-booking-button svg path {
     background: #f9fafb;
     border: 1px solid #e5e7eb;
     border-radius: 6px;
-    padding: 6px 8px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
     min-width: 0;
-    flex-shrink: 0;
+    min-height: 36px;
+    height: 36px;
+    max-height: 36px;
+    flex-shrink: 1;
     cursor: pointer;
     transition: all 0.2s ease;
+    position: relative;
+    z-index: 2;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .yatra-mobile-compact-datepicker:hover {
@@ -2327,20 +2367,35 @@ button.yatra-booking-button svg path {
     flex-shrink: 0;
 }
 
+.yatra-mobile-compact-datepicker .yatra-mobile-icon {
+    width: 14px;
+    height: 14px;
+}
+
 .yatra-mobile-datepicker-input {
     border: none;
     background: transparent;
-    font-size: 11px;
+    font-size: 12px;
+    line-height: 1.2;
     color: #374151;
     outline: none;
-    min-width: 40px;
+    min-width: 0;
+    width: 0;
+    flex: 1 1 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-weight: 500;
     cursor: pointer;
-    flex: 1;
     padding: 0;
+    margin: 0;
+    min-height: 0 !important;
+    height: auto;
+    max-height: 100%;
+    vertical-align: middle;
+    -webkit-appearance: none;
+    appearance: none;
+    touch-action: manipulation;
 }
 
 .yatra-mobile-datepicker-input::placeholder {
@@ -2464,7 +2519,8 @@ button.yatra-booking-button svg path {
 .yatra-mobile-travelers-display {
     border: none;
     background: transparent;
-    font-size: 14px;
+    font-size: 12px;
+    line-height: 1.2;
     color: #374151;
     outline: none;
     min-width: 80px;
@@ -2524,8 +2580,13 @@ button.yatra-booking-button svg path {
 .yatra-mobile-check-btn {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 4px;
-    padding: 6px 10px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    min-height: 36px;
+    height: 36px;
+    max-height: 36px;
     font-size: 12px;
     font-weight: 600;
     border-radius: 6px;
@@ -2537,6 +2598,7 @@ button.yatra-booking-button svg path {
     color: white;
     box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
     flex-shrink: 0;
+    touch-action: manipulation;
 }
 
 .yatra-mobile-check-btn:hover {
@@ -2748,9 +2810,16 @@ button.yatra-booking-button svg path {
     background: #f3f4f6;
     color: #374151;
     border: 1px solid #d1d5db;
-    padding: 6px 10px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    min-height: 36px;
+    height: 36px;
+    max-height: 36px;
     font-size: 12px;
     flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
 }
 
 .yatra-mobile-enquire-btn:hover {
@@ -2948,6 +3017,10 @@ button.yatra-booking-button svg path {
 
 /* Responsive adjustments for three-row layout */
 @media (max-width: 480px) {
+    .yatra-mobile-date-section {
+        max-width: min(100px, 28vw);
+    }
+
     .yatra-mobile-sticky-content {
         padding: 8px;
         gap: 6px;
@@ -2960,12 +3033,26 @@ button.yatra-booking-button svg path {
     }
     
     .yatra-mobile-booking-field {
-        padding: 4px 6px;
+        padding: 0 6px;
+        min-height: 34px;
+        height: 34px;
+        max-height: 34px;
     }
     
-    .yatra-mobile-compact-date {
-        padding: 4px 6px;
+    .yatra-mobile-compact-date,
+    .yatra-mobile-compact-datepicker {
+        padding: 0 6px;
         gap: 4px;
+        min-height: 34px;
+        height: 34px;
+        max-height: 34px;
+    }
+
+    .yatra-mobile-check-btn,
+    .yatra-mobile-enquire-btn {
+        min-height: 34px;
+        height: 34px;
+        max-height: 34px;
     }
     
     .yatra-mobile-price-section {
@@ -2985,7 +3072,7 @@ button.yatra-booking-button svg path {
     
     .yatra-mobile-check-btn,
     .yatra-mobile-enquire-btn {
-        padding: 4px 6px;
+        padding: 0 6px;
         font-size: 10px;
     }
     
@@ -3035,12 +3122,26 @@ button.yatra-booking-button svg path {
     }
     
     .yatra-mobile-booking-field {
-        padding: 3px 4px;
+        padding: 0 4px;
+        min-height: 32px;
+        height: 32px;
+        max-height: 32px;
     }
     
-    .yatra-mobile-compact-date {
-        padding: 3px 4px;
+    .yatra-mobile-compact-date,
+    .yatra-mobile-compact-datepicker {
+        padding: 0 4px;
         gap: 3px;
+        min-height: 32px;
+        height: 32px;
+        max-height: 32px;
+    }
+
+    .yatra-mobile-check-btn,
+    .yatra-mobile-enquire-btn {
+        min-height: 32px;
+        height: 32px;
+        max-height: 32px;
     }
     
     .yatra-mobile-price-section {
@@ -3060,7 +3161,7 @@ button.yatra-booking-button svg path {
     
     .yatra-mobile-check-btn,
     .yatra-mobile-enquire-btn {
-        padding: 3px 4px;
+        padding: 0 4px;
         font-size: 9px;
     }
     
@@ -5276,20 +5377,23 @@ input.yatra-datepicker,
    SIMILAR TRIPS - UNIFIED SPACING
    ============================================ */
 .yatra-similar-section {
-    padding-top: 0;
+    /* Breathing room from reviews (or previous block); section already has bottom rhythm */
+    padding-top: var(--yatra-section-gap);
     padding-bottom: var(--yatra-section-gap);
     background: #f8fafc;
     margin-top: 0;
     border-top: 1px solid var(--yatra-border-color, #e5e7eb);
 }
 
-.yatra-similar-section-container {
+/* Parent .yatra-similar-section already has unified max-width + horizontal padding (see .yatra-single-trip > rules).
+   Higher specificity than common.css .yatra-similar-section-container legacy rule. */
+.yatra-single-trip .yatra-similar-section > .yatra-similar-section-container {
     width: 100%;
-    max-width: var(--yatra-container-max-width, 1300px);
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: var(--yatra-container-padding);
-    padding-right: var(--yatra-container-padding);
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .yatra-similar-section-header {
@@ -5628,7 +5732,7 @@ input.yatra-datepicker,
     }
     
     .yatra-similar-section {
-        padding-top: 0;
+        padding-top: var(--yatra-section-gap);
         padding-bottom: var(--yatra-section-gap);
         margin-top: 0;
     }
@@ -5860,21 +5964,24 @@ input.yatra-datepicker,
 
 /* ============================================
    REVIEWS SECTION - UNIFIED SPACING
+   Outer width: see .yatra-single-trip .yatra-reviews-section (top of file). Inner fills the section.
    ============================================ */
 .yatra-reviews-section {
-    padding-top: 0;
+    padding-top: var(--yatra-section-gap);
     padding-bottom: var(--yatra-section-gap);
     background: #fff;
     border-top: 1px solid #e5e7eb;
 }
 
-.yatra-reviews-section-container {
+/* Inner wrapper: use full content width of the section (no second max-width / no double horizontal inset) */
+.yatra-single-trip .yatra-reviews-section > .yatra-reviews-section-container {
     width: 100%;
-    max-width: var(--yatra-container-max-width, 1300px);
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: var(--yatra-container-padding);
-    padding-right: var(--yatra-container-padding);
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    box-sizing: border-box;
 }
 
 .yatra-reviews-section .yatra-reviews-header {
@@ -6623,6 +6730,7 @@ input.yatra-datepicker,
 .yatra-review-form-section {
     margin-top: 40px;
     padding-top: 40px;
+    padding-bottom: var(--yatra-element-gap);
     border-top: 1px solid #e5e7eb;
 }
 

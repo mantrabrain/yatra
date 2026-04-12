@@ -356,12 +356,14 @@
    LEGACY COMPATIBILITY
    Keep old class names working while transitioning
    ============================================ */
-.yatra-listing-page,
-.yatra-single-trip,
 .yatra-booking-page {
     width: 100%;
     min-height: 100vh;
-    background: var(--yatra-bg-page);
+}
+
+.yatra-single-trip {
+    width: 100%;
+    min-height: 100vh;
 }
 
 .yatra-listing-container,

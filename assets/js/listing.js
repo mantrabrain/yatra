@@ -324,16 +324,22 @@
         const maxSlider = durationDropdown.querySelector('#durationMax');
         const minBadge = durationDropdown.querySelector('.yatra-duration-min-badge');
         const maxBadge = durationDropdown.querySelector('.yatra-duration-max-badge');
-        const minLabel = durationDropdown.querySelector('.yatra-duration-labels span:first-child');
-        const maxLabel = durationDropdown.querySelector('.yatra-duration-labels span:last-child');
         const sliderRange = durationDropdown.querySelector('.yatra-slider-range');
         const valueSpan = durationDropdown.querySelector('.yatra-dropdown-value');
 
         if (!minSlider || !maxSlider) return;
 
+        function durationBounds() {
+            const lo = parseInt(durationDropdown.getAttribute('data-duration-min') || minSlider.min, 10);
+            const hi = parseInt(durationDropdown.getAttribute('data-duration-max') || maxSlider.max, 10);
+            const safeLo = isNaN(lo) ? 1 : lo;
+            const safeHi = isNaN(hi) || hi < safeLo ? safeLo : hi;
+            return { lo: safeLo, hi: safeHi, span: Math.max(1, safeHi - safeLo) };
+        }
+
         function updateDurationDisplay() {
-            let min = parseInt(minSlider.value);
-            let max = parseInt(maxSlider.value);
+            let min = parseInt(minSlider.value, 10);
+            let max = parseInt(maxSlider.value, 10);
 
             // Ensure min doesn't exceed max
             if (min > max) {
@@ -345,10 +351,6 @@
             // Update badges
             if (minBadge) minBadge.textContent = min + ' Days';
             if (maxBadge) maxBadge.textContent = max + ' Days';
-            
-            // Update labels
-            if (minLabel) minLabel.textContent = min + ' Days';
-            if (maxLabel) maxLabel.textContent = max + ' Days';
 
             // Update the dropdown value display
             if (valueSpan) {
@@ -358,10 +360,11 @@
 
             // Update the slider range track
             if (sliderRange) {
-                const minPercent = ((min - 1) / 29) * 100;
-                const maxPercent = ((max - 1) / 29) * 100;
+                const b = durationBounds();
+                const minPercent = ((min - b.lo) / b.span) * 100;
+                const maxPercent = ((max - b.lo) / b.span) * 100;
                 sliderRange.style.left = minPercent + '%';
-                sliderRange.style.width = (maxPercent - minPercent) + '%';
+                sliderRange.style.width = Math.max(0, maxPercent - minPercent) + '%';
             }
         }
 

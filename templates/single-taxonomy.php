@@ -203,13 +203,22 @@ yatra_get_header();
                         <div class="yatra-results-controls">
                             <div class="yatra-sort-control">
                                 <label><?php echo esc_html__('Sort by:', 'yatra'); ?></label>
-                                <select id="yatra-sort-select">
-                                    <option value="recommended"><?php echo esc_html__('Recommended', 'yatra'); ?></option>
-                                    <option value="price-low"><?php echo esc_html__('Price: Low to High', 'yatra'); ?></option>
-                                    <option value="price-high"><?php echo esc_html__('Price: High to Low', 'yatra'); ?></option>
-                                    <option value="rating"><?php echo esc_html__('Rating: Highest', 'yatra'); ?></option>
-                                    <option value="duration-short"><?php echo esc_html__('Duration: Shortest', 'yatra'); ?></option>
-                                    <option value="duration-long"><?php echo esc_html__('Duration: Longest', 'yatra'); ?></option>
+                                <?php
+                                $current_trip_sort = isset($_GET['sort']) ? sanitize_text_field(wp_unslash((string) $_GET['sort'])) : '';
+                                $sort_definitions = [
+                                    '' => __('Recommended', 'yatra'),
+                                    'most_popular' => __('Most Popular', 'yatra'),
+                                    'price_low' => __('Price: Low to High', 'yatra'),
+                                    'price_high' => __('Price: High to Low', 'yatra'),
+                                    'rating_high' => __('Rating: Highest', 'yatra'),
+                                    'duration_short' => __('Duration: Shortest', 'yatra'),
+                                    'duration_long' => __('Duration: Longest', 'yatra'),
+                                ];
+                                ?>
+                                <select id="yatra-sort-filter" class="yatra-sort-filter-select">
+                                    <?php foreach ($sort_definitions as $sort_key => $sort_label) : ?>
+                                        <option value="<?php echo esc_attr(esc_url(yatra_build_current_request_sort_url($sort_key))); ?>"<?php selected($sort_key, $current_trip_sort, true); ?>><?php echo esc_html($sort_label); ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                             <div class="yatra-view-toggle">
@@ -319,35 +328,7 @@ yatra_get_header();
 document.addEventListener('DOMContentLoaded', function() {
     // Grid/list view: handled by assets/js/listing.js (per-page localStorage via grid id)
 
-    const tripGrid = document.getElementById('trip-grid');
-
-    // Sort functionality
-    const sortSelect = document.getElementById('yatra-sort-select');
-    if (sortSelect && tripGrid) {
-        sortSelect.addEventListener('change', function() {
-            const cards = Array.from(tripGrid.querySelectorAll('.yatra-trip-card'));
-            const sortValue = this.value;
-            
-            cards.sort((a, b) => {
-                switch (sortValue) {
-                    case 'price-low':
-                        return parseFloat(a.dataset.price || 0) - parseFloat(b.dataset.price || 0);
-                    case 'price-high':
-                        return parseFloat(b.dataset.price || 0) - parseFloat(a.dataset.price || 0);
-                    case 'rating':
-                        return parseFloat(b.dataset.rating || 0) - parseFloat(a.dataset.rating || 0);
-                    case 'duration-short':
-                        return parseFloat(a.dataset.duration || 0) - parseFloat(b.dataset.duration || 0);
-                    case 'duration-long':
-                        return parseFloat(b.dataset.duration || 0) - parseFloat(a.dataset.duration || 0);
-                    default:
-                        return 0;
-                }
-            });
-            
-            cards.forEach(card => tripGrid.appendChild(card));
-        });
-    }
+    // Sort: server-side (#yatra-sort-filter + listing-filters.js).
 
     // Make trip image area clickable via JS (preserve markup/design)
     const imageWrappers = document.querySelectorAll('.yatra-trip-card .yatra-trip-image[data-permalink]');

@@ -1084,8 +1084,26 @@ function yatra_archive_browse_results_line(int $start, int $end, int $total, int
 }
 
 /**
+ * Request path (leading slash, no query string) for same-page links. Strips /page/N/ pagination segments.
+ */
+function yatra_get_current_request_path_for_query_urls(): string
+{
+    $request_uri = isset($_SERVER['REQUEST_URI']) ? (string) wp_unslash($_SERVER['REQUEST_URI']) : '/';
+    $base_path = strtok($request_uri, '?') ?: '/';
+    $base_path = rtrim((string) $base_path, '/');
+    $base_path = preg_replace('#/page/[0-9]+#', '', $base_path);
+    $base_path = rtrim($base_path, '/');
+
+    if ($base_path === '') {
+        return '/';
+    }
+
+    return $base_path[0] === '/' ? $base_path : '/' . $base_path;
+}
+
+/**
  * Full URL for the same archive request with a different page (preserves yatra_page and other args).
- * Uses home_url + add_query_arg so links are never query-only (esc_url rejects "?foo=bar" in some cases).
+ * Uses the current request path so /destination/, /activity/, /trip-category/ stay on the same listing.
  */
 function yatra_build_archive_listing_url(int $page_num): string
 {
@@ -1103,10 +1121,13 @@ function yatra_build_archive_listing_url(int $page_num): string
     if ($page_num > 1) {
         $params['paged'] = (string) $page_num;
     } else {
-        unset($params['paged']);
+        unset($params['paged'], $params['page']);
     }
 
-    return esc_url(add_query_arg($params, home_url('/')));
+    $path = yatra_get_current_request_path_for_query_urls();
+    $query = http_build_query($params);
+
+    return esc_url($path . ($query !== '' ? '?' . $query : ''));
 }
 
 /**
@@ -1116,17 +1137,7 @@ function yatra_build_archive_listing_url(int $page_num): string
 function yatra_build_current_request_paged_url(int $page_num): string
 {
     $page_num = max(1, $page_num);
-    $request_uri = isset($_SERVER['REQUEST_URI']) ? (string) wp_unslash($_SERVER['REQUEST_URI']) : '/';
-    $base_path = strtok($request_uri, '?') ?: '/';
-    $base_path = rtrim($base_path, '/');
-    $base_path = preg_replace('#/page/[0-9]+#', '', $base_path);
-    $base_path = rtrim($base_path, '/');
-
-    $query_string = isset($_SERVER['QUERY_STRING']) ? (string) $_SERVER['QUERY_STRING'] : '';
-    parse_str($query_string, $params);
-    if (!is_array($params)) {
-        $params = [];
-    }
+    $params = !empty($_GET) && is_array($_GET) ? wp_unslash($_GET) : [];
 
     if ($page_num > 1) {
         $params['paged'] = (string) $page_num;
@@ -1134,9 +1145,36 @@ function yatra_build_current_request_paged_url(int $page_num): string
         unset($params['paged'], $params['page']);
     }
 
+    $path = yatra_get_current_request_path_for_query_urls();
     $query = http_build_query($params);
 
-    return esc_url($base_path . ($query !== '' ? '?' . $query : ''));
+    return esc_url($path . ($query !== '' ? '?' . $query : ''));
+}
+
+/**
+ * Same request path with trip sort (TripRepository / TripListingService). Resets pagination.
+ *
+ * @param string $sort Allowed: '' (recommended), most_popular, price_low, price_high, rating_high, duration_short, duration_long.
+ */
+function yatra_build_current_request_sort_url(string $sort): string
+{
+    $allowed = ['', 'most_popular', 'price_low', 'price_high', 'rating_high', 'duration_short', 'duration_long'];
+    if (!in_array($sort, $allowed, true)) {
+        $sort = '';
+    }
+
+    $params = !empty($_GET) && is_array($_GET) ? wp_unslash($_GET) : [];
+    unset($params['paged'], $params['page']);
+    if ($sort !== '') {
+        $params['sort'] = $sort;
+    } else {
+        unset($params['sort']);
+    }
+
+    $path = yatra_get_current_request_path_for_query_urls();
+    $query = http_build_query($params);
+
+    return esc_url($path . ($query !== '' ? '?' . $query : ''));
 }
 
 /**
@@ -1220,7 +1258,10 @@ function yatra_build_archive_listing_sort_url(string $yatra_sort): string
     }
     $params['yatra_sort'] = $yatra_sort;
 
-    return esc_url(add_query_arg($params, home_url('/')));
+    $path = yatra_get_current_request_path_for_query_urls();
+    $query = http_build_query($params);
+
+    return esc_url($path . ($query !== '' ? '?' . $query : ''));
 }
 
 /**

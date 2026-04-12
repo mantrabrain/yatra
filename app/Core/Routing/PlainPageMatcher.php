@@ -48,12 +48,19 @@ final class PlainPageMatcher
         }
 
         if ($raw === '') {
-            $taxPlain = self::matchTaxonomyPlainBaseSlugs(
-                self::sanitizeBaseSegment($trip_base),
-                $dest_base,
-                $act_base,
-                $cat_base
-            );
+            // On pretty permalinks, trip listing is /{trip_base}/?destination=…&activity=… — those keys
+            // match taxonomy plain routing below and must NOT be treated as /{destination_base}/slug/ singles.
+            $tripSeg = self::sanitizeBaseSegment($trip_base);
+            $cleanPath = trim((string) UrlParser::getCleanRequestPath(), '/');
+            $taxPlain = null;
+            if (!self::isTripArchiveRequestPath($cleanPath, $tripSeg)) {
+                $taxPlain = self::matchTaxonomyPlainBaseSlugs(
+                    $tripSeg,
+                    $dest_base,
+                    $act_base,
+                    $cat_base
+                );
+            }
             if ($taxPlain !== null) {
                 return $taxPlain;
             }
@@ -177,6 +184,21 @@ final class PlainPageMatcher
      *
      * @return array<string, mixed>|null
      */
+    /**
+     * Trip archive (or /{trip_base}/page/N/) — query params like ?destination= are filters, not taxonomy singles.
+     */
+    private static function isTripArchiveRequestPath(string $cleanPath, string $tripBaseSanitized): bool
+    {
+        if ($tripBaseSanitized === '') {
+            return false;
+        }
+        if ($cleanPath === $tripBaseSanitized) {
+            return true;
+        }
+
+        return (bool) preg_match('/^' . preg_quote($tripBaseSanitized, '/') . '\/page\/\d+$/', $cleanPath);
+    }
+
     private static function matchTaxonomyPlainBaseSlugs(
         string $trip_base_sanitized,
         string $dest_base,

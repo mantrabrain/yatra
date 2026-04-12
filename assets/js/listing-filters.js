@@ -310,8 +310,27 @@
         const minSlider = document.getElementById('priceRangeMin');
         const maxSlider = document.getElementById('priceRangeMax');
         const priceDisplay = document.querySelector('.yatra-price-display');
+        const priceRangeEl = document.querySelector('.yatra-price-slider-range');
 
         if (!minInput || !maxInput || !minSlider || !maxSlider) return;
+
+        function updatePriceRangeVisual() {
+            if (!priceRangeEl) {
+                return;
+            }
+            var lo = parseInt(minSlider.min, 10);
+            var hi = parseInt(maxSlider.max, 10);
+            if (isNaN(lo) || isNaN(hi) || hi <= lo) {
+                return;
+            }
+            var span = hi - lo;
+            var min = parseInt(minSlider.value, 10);
+            var max = parseInt(maxSlider.value, 10);
+            var minPercent = ((min - lo) / span) * 100;
+            var maxPercent = ((max - lo) / span) * 100;
+            priceRangeEl.style.left = minPercent + '%';
+            priceRangeEl.style.width = Math.max(0, maxPercent - minPercent) + '%';
+        }
 
         // Sync inputs with sliders
         function syncInputsWithSliders() {
@@ -352,6 +371,7 @@
                 const maxPrice = parseInt(maxSlider.value);
                 priceDisplay.textContent = window.yatra_format_price(minPrice) + ' - ' + window.yatra_format_price(maxPrice);
             }
+            updatePriceRangeVisual();
         }
 
         // Event listeners
@@ -359,6 +379,24 @@
         maxSlider.addEventListener('input', syncInputsWithSliders);
         minInput.addEventListener('input', syncSlidersWithInputs);
         maxInput.addEventListener('input', syncSlidersWithInputs);
+
+        /* Dual range: bring active thumb above so it stays grabbable when handles overlap */
+        function elevateThumb(el) {
+            minSlider.style.zIndex = el === minSlider ? '6' : '4';
+            maxSlider.style.zIndex = el === maxSlider ? '6' : '4';
+        }
+        function resetThumbStack() {
+            minSlider.style.zIndex = '';
+            maxSlider.style.zIndex = '';
+        }
+        minSlider.addEventListener('pointerdown', function() {
+            elevateThumb(minSlider);
+        });
+        maxSlider.addEventListener('pointerdown', function() {
+            elevateThumb(maxSlider);
+        });
+        document.addEventListener('pointerup', resetThumbStack);
+        document.addEventListener('pointercancel', resetThumbStack);
 
         // Apply filters on change (with debounce)
         let priceTimeout;
@@ -373,6 +411,8 @@
         maxSlider.addEventListener('change', debouncedPriceUpdate);
         minInput.addEventListener('change', debouncedPriceUpdate);
         maxInput.addEventListener('change', debouncedPriceUpdate);
+
+        updatePriceDisplay();
     }
 
     /**

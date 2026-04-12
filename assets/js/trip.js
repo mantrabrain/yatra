@@ -4729,6 +4729,10 @@ class TripPage {
     Object.entries(this.instances).forEach(([key, instance]) => {
       window[key] = instance;
     });
+    // Templates use window.YatraEnquiry.open() — alias to EnquiryModal instance
+    if (this.instances.enquiryModal) {
+      window.YatraEnquiry = this.instances.enquiryModal;
+    }
     // Also expose orchestrator for potential future hooks
     window.tripPage = this;
   }

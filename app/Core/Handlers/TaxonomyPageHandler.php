@@ -38,7 +38,28 @@ class TaxonomyPageHandler extends BasePageHandler
 
         $pageNum = !empty($route_data['paged']) ? max(1, (int) $route_data['paged']) : \yatra_get_archive_listing_paged();
         $perPage = \yatra_get_posts_per_page();
-        $trips_data = $tripRepository->findWithFilters([$filter_key => $slug], $pageNum, $perPage);
+
+        $filters = [$filter_key => $slug];
+        // AND with complementary slug filters from the query string (same semantics as /trip/?destination=&activity=).
+        if ($taxonomy_type === 'destination' && !empty($_GET['activity']) && is_string($_GET['activity'])) {
+            $a = sanitize_text_field(wp_unslash($_GET['activity']));
+            if ($a !== '') {
+                $filters['activity'] = $a;
+            }
+        }
+        if ($taxonomy_type === 'activity' && !empty($_GET['destination']) && is_string($_GET['destination'])) {
+            $d = sanitize_text_field(wp_unslash($_GET['destination']));
+            if ($d !== '') {
+                $filters['destination'] = $d;
+            }
+        }
+        $sort = isset($_GET['sort']) ? sanitize_text_field(wp_unslash((string) $_GET['sort'])) : '';
+        $allowedSorts = ['most_popular', 'price_low', 'price_high', 'rating_high', 'duration_short', 'duration_long'];
+        if ($sort !== '' && in_array($sort, $allowedSorts, true)) {
+            $filters['sort'] = $sort;
+        }
+
+        $trips_data = $tripRepository->findWithFilters($filters, $pageNum, $perPage);
 
         $taxonomy_data->trips_total = (int) ($trips_data['total'] ?? 0);
         $taxonomy_data->trips_pages = (int) ($trips_data['pages'] ?? 1);

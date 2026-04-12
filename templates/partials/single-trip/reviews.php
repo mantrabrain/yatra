@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 // Reviews Section
 // Expected variables: $trip
 ?>
-<!-- Reviews Section - Full Width -->
+<!-- Reviews: full width within unified trip container (same max-width + padding as .yatra-trip-container) -->
 <section class="yatra-reviews-section" id="reviews" itemscope itemtype="https://schema.org/Review">
     <div class="yatra-reviews-section-container">
         <div class="yatra-reviews-header">

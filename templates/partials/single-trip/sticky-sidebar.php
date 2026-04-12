@@ -168,7 +168,7 @@ if ($effective_min > 0) {
                     <input type="text"
                            id="mobile_travel_date"
                            name="travel_date"
-                           class="yatra-mobile-datepicker-input"
+                           class="yatra-mobile-datepicker-input yatra-mobile-datepicker"
                            placeholder="<?php esc_attr_e('Date', 'yatra'); ?>"
                            data-min-date="<?php echo esc_attr($trip->getAvailableFrom() ?: date('Y-m-d')); ?>"
                            data-max-date="<?php echo esc_attr($trip->getAvailableTo() ?: ''); ?>"
@@ -236,7 +236,7 @@ if ($effective_min > 0) {
                     </svg>
                     <span><?php echo esc_html__('Check', 'yatra'); ?></span>
                 </button>
-                <button type="button" class="yatra-mobile-enquire-btn" id="mobile-open-enquiry-modal" onclick="window.YatraEnquiry?.open?.(); return false;">
+                <button type="button" class="yatra-mobile-enquire-btn" id="mobile-open-enquiry-modal" onclick="if (window.enquiryModal) { window.enquiryModal.open(); } else if (window.YatraEnquiry) { window.YatraEnquiry.open(); } return false;">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
                     </svg>
@@ -380,50 +380,64 @@ function initializeMobileBookingForm() {
                 console.log('Error accessing yatraTripData:', e);
             }
             
+            var mobileFpCommon = {
+                clickOpens: true,
+                appendTo: document.body,
+                static: false,
+                onReady: function(selectedDates, dateStr, instance) {
+                    if (instance.calendarContainer) {
+                        instance.calendarContainer.style.zIndex = '100050';
+                    }
+                },
+                onChange: function(selectedDates, dateStr, instance) {
+                    var mainDateInput = document.getElementById('travel_date');
+                    if (mainDateInput && mainDateInput._flatpickr) {
+                        mainDateInput._flatpickr.setDate(dateStr);
+                    }
+                    updateMobileTotal();
+                }
+            };
+            function yatraBindMobileDatepickerTouch(inputEl) {
+                if (!inputEl || !inputEl._flatpickr) {
+                    return;
+                }
+                var fp = inputEl._flatpickr;
+                var wrap = inputEl.closest('.yatra-mobile-compact-datepicker');
+                if (!wrap) {
+                    return;
+                }
+                wrap.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (!fp.isOpen) {
+                        fp.open();
+                    }
+                });
+            }
             // Initialize Flatpickr with same configuration as main date picker
             if (availabilityDates.length > 0) {
                 // Availability-based booking - enable only specific dates
-                flatpickr(mobileDateInput, {
+                flatpickr(mobileDateInput, Object.assign({}, mobileFpCommon, {
                     dateFormat: 'Y-m-d',
                     minDate: 'today',
-                    enable: availabilityDates,
-                    onChange: function(selectedDates, dateStr, instance) {
-                        // Sync with main form date picker
-                        const mainDateInput = document.getElementById('travel_date');
-                        if (mainDateInput && mainDateInput._flatpickr) {
-                            mainDateInput._flatpickr.setDate(dateStr);
-                        }
-                        updateMobileTotal();
-                    }
-                });
+                    enable: availabilityDates
+                }));
             } else {
                 // Regular booking - flexible dates with min/max constraints
-                const config = {
+                var config = Object.assign({}, mobileFpCommon, {
                     dateFormat: 'Y-m-d',
-                    minDate: 'today',
-                    onChange: function(selectedDates, dateStr, instance) {
-                        // Sync with main form date picker
-                        const mainDateInput = document.getElementById('travel_date');
-                        if (mainDateInput && mainDateInput._flatpickr) {
-                            mainDateInput._flatpickr.setDate(dateStr);
-                        }
-                        updateMobileTotal();
-                    }
-                };
-                
-                // Add min/max date constraints if available
-                const minDate = mobileDateInput.getAttribute('data-min-date');
-                const maxDate = mobileDateInput.getAttribute('data-max-date');
-                
+                    minDate: 'today'
+                });
+                var minDate = mobileDateInput.getAttribute('data-min-date');
+                var maxDate = mobileDateInput.getAttribute('data-max-date');
                 if (minDate) {
                     config.minDate = minDate;
                 }
                 if (maxDate) {
                     config.maxDate = maxDate;
                 }
-                
                 flatpickr(mobileDateInput, config);
             }
+            yatraBindMobileDatepickerTouch(mobileDateInput);
         }
         
         console.log('Mobile date picker initialized successfully');
