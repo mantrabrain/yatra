@@ -249,6 +249,14 @@ abstract class BaseMigration
                     'updated_at' => current_time('mysql'),
                 ];
 
+                // 3.x admin + single templates read `icon` (serialized {type: image, value: attachment_id}), not only metadata.featured_image.
+                if ($termImage !== null && $termImage !== '' && (int) $termImage > 0) {
+                    $data['icon'] = maybe_serialize([
+                        'type' => 'image',
+                        'value' => (int) $termImage,
+                    ]);
+                }
+
                 if ($existingId && !$this->isForceMigration()) {
                     // Regular migration: Update existing record
                     $updated = $this->wpdb->update(
@@ -334,11 +342,17 @@ abstract class BaseMigration
             'category_thumbnail_id',
             'term_thumbnail',
             'featured_image',
+            'featured_image_id',
             'image',
+            'term_image',
+            'photo',
+            'cover_image',
+            'banner_image',
         ];
 
         foreach ($keys as $key) {
-            $fetched = $this->getRawTermMeta($termId, $key);
+            // Prefer latest meta row if duplicates exist (admin re-saves).
+            $fetched = $this->getRawTermMetaLatest($termId, $key);
             if ($fetched === null || $fetched === '' || $fetched === '0') {
                 continue;
             }
@@ -347,6 +361,53 @@ abstract class BaseMigration
                 continue;
             }
             $resolved = $this->coerceLegacyTermImageToAttachmentId($trimmed);
+            if ($resolved !== null) {
+                return $resolved;
+            }
+        }
+
+        return $this->scanAllTermMetaForFeaturedImage($termId);
+    }
+
+    /**
+     * Last-write-wins term meta (same key can exist more than once in edge-case DBs).
+     */
+    private function getRawTermMetaLatest(int $termId, string $metaKey): ?string
+    {
+        return $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SELECT meta_value FROM {$this->wpdb->termmeta} WHERE term_id = %d AND meta_key = %s ORDER BY meta_id DESC LIMIT 1",
+                $termId,
+                $metaKey
+            )
+        );
+    }
+
+    /**
+     * Fallback: inspect every term meta row for attachment IDs / URLs when known keys miss (imports, Pro, custom).
+     */
+    private function scanAllTermMetaForFeaturedImage(int $termId): ?string
+    {
+        $rows = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT meta_key, meta_value FROM {$this->wpdb->termmeta} WHERE term_id = %d ORDER BY meta_id DESC",
+                $termId
+            )
+        );
+        if (empty($rows)) {
+            return null;
+        }
+
+        foreach ($rows as $row) {
+            $key = (string) ($row->meta_key ?? '');
+            if ($key === '' || str_starts_with($key, '_yatra_migrated_')) {
+                continue;
+            }
+            if (! preg_match('/(image|thumb|photo|cover|banner|featured|attachment|media|picture)/i', $key)) {
+                continue;
+            }
+            $raw = (string) ($row->meta_value ?? '');
+            $resolved = $this->coerceLegacyTermImageToAttachmentId(trim($raw));
             if ($resolved !== null) {
                 return $resolved;
             }
@@ -378,12 +439,30 @@ abstract class BaseMigration
                 return $id > 0 ? (string) $id : null;
             }
             if (is_array($un)) {
+                foreach (['value', 'id', 'attachment_id', 'image_id', 'thumbnail_id', 'attachment', 'image'] as $k) {
+                    if (isset($un[$k]) && is_numeric($un[$k])) {
+                        $id = (int) $un[$k];
+
+                        return $id > 0 ? (string) $id : null;
+                    }
+                }
                 foreach ($un as $v) {
                     if (is_numeric($v)) {
                         $id = (int) $v;
 
                         return $id > 0 ? (string) $id : null;
                     }
+                }
+            }
+        }
+
+        $json = json_decode($raw, true);
+        if (is_array($json)) {
+            foreach (['id', 'value', 'attachment_id', 'image_id'] as $k) {
+                if (isset($json[$k]) && is_numeric($json[$k])) {
+                    $id = (int) $json[$k];
+
+                    return $id > 0 ? (string) $id : null;
                 }
             }
         }
