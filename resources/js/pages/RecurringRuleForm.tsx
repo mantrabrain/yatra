@@ -353,11 +353,10 @@ const RecurringRuleForm: React.FC = () => {
         ...prev,
         ...(selectedTrip || tripForLocations
           ? {
-              pricing_type: ((
-                selectedTrip?.pricing_type ||
+              pricing_type: (selectedTrip?.pricing_type ||
                 (tripForLocations as Trip)?.pricing_type ||
-                "regular"
-              ) || "regular") as "regular" | "traveler_based",
+                "regular" ||
+                "regular") as "regular" | "traveler_based",
             }
           : {}),
         ...(tripForLocations
@@ -372,14 +371,10 @@ const RecurringRuleForm: React.FC = () => {
                 "",
               from_latitude:
                 prev.from_latitude ||
-                coordFromApi(
-                  (tripForLocations as Trip).starting_latitude,
-                ),
+                coordFromApi((tripForLocations as Trip).starting_latitude),
               from_longitude:
                 prev.from_longitude ||
-                coordFromApi(
-                  (tripForLocations as Trip).starting_longitude,
-                ),
+                coordFromApi((tripForLocations as Trip).starting_longitude),
               to_latitude:
                 prev.to_latitude ||
                 coordFromApi((tripForLocations as Trip).ending_latitude),
@@ -2213,12 +2208,13 @@ const RecurringRuleForm: React.FC = () => {
                               {__("Where the journey begins", "yatra")}
                             </p>
                           </div>
-                          {formData.from_latitude && formData.from_longitude && (
-                            <div
-                              className="w-2 h-2 bg-blue-500 rounded-full"
-                              title={__("Coordinates set", "yatra")}
-                            />
-                          )}
+                          {formData.from_latitude &&
+                            formData.from_longitude && (
+                              <div
+                                className="w-2 h-2 bg-blue-500 rounded-full"
+                                title={__("Coordinates set", "yatra")}
+                              />
+                            )}
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -2246,8 +2242,7 @@ const RecurringRuleForm: React.FC = () => {
                             helpText=""
                             required={false}
                             defaultMapCenter={
-                              formData.from_latitude &&
-                              formData.from_longitude
+                              formData.from_latitude && formData.from_longitude
                                 ? [
                                     parseFloat(formData.from_latitude),
                                     parseFloat(formData.from_longitude),
@@ -2256,7 +2251,9 @@ const RecurringRuleForm: React.FC = () => {
                                     tripForLocations?.starting_longitude
                                   ? [
                                       parseFloat(
-                                        String(tripForLocations.starting_latitude),
+                                        String(
+                                          tripForLocations.starting_latitude,
+                                        ),
                                       ),
                                       parseFloat(
                                         String(
@@ -2339,7 +2336,9 @@ const RecurringRuleForm: React.FC = () => {
                                     tripForLocations?.ending_longitude
                                   ? [
                                       parseFloat(
-                                        String(tripForLocations.ending_latitude),
+                                        String(
+                                          tripForLocations.ending_latitude,
+                                        ),
                                       ),
                                       parseFloat(
                                         String(

@@ -107,8 +107,7 @@ const PaymentForm: React.FC = () => {
         payment_status: (String(paymentData.payment_status || "pending") ||
           "pending") as PaymentFormData["payment_status"],
         payment_date: String(
-          paymentData.payment_date ||
-            new Date().toISOString().split("T")[0],
+          paymentData.payment_date || new Date().toISOString().split("T")[0],
         ),
         transaction_id: String(paymentData.transaction_id ?? ""),
         notes: String(paymentData.notes ?? ""),

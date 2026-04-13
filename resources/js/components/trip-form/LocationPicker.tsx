@@ -20,8 +20,8 @@ const defaultTranslate = (key: string) => {
       "Click on the map to set the location, or search for a place above.",
     "GPS Coordinates": "GPS Coordinates",
     "Manual override": "Manual override",
-    "Latitude": "Latitude",
-    "Longitude": "Longitude",
+    Latitude: "Latitude",
+    Longitude: "Longitude",
     "e.g. -8.3405": "e.g. -8.3405",
     "e.g. 115.0920": "e.g. 115.0920",
     "Use Current Location": "Use Current Location",
@@ -529,16 +529,15 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
       </div>
 
       {/* Coordinates Display (compact) — hidden when manual fields are shown below */}
-      {!showManualCoordinateFields &&
-        (value.latitude || value.longitude) && (
-          <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <Globe className="w-4 h-4 text-gray-500" />
-            <span className="text-xs text-gray-600 dark:text-gray-400">
-              {translate("Coordinates:")} {value.latitude || "0"},{" "}
-              {value.longitude || "0"}
-            </span>
-          </div>
-        )}
+      {!showManualCoordinateFields && (value.latitude || value.longitude) && (
+        <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <Globe className="w-4 h-4 text-gray-500" />
+          <span className="text-xs text-gray-600 dark:text-gray-400">
+            {translate("Coordinates:")} {value.latitude || "0"},{" "}
+            {value.longitude || "0"}
+          </span>
+        </div>
+      )}
 
       {/* Map Interface */}
       {showMap && (
@@ -579,7 +578,9 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
               type="button"
               onClick={() => {
                 if (!navigator.geolocation) {
-                  alert(translate("Geolocation is not supported by your browser"));
+                  alert(
+                    translate("Geolocation is not supported by your browser"),
+                  );
                   return;
                 }
                 navigator.geolocation.getCurrentPosition(
@@ -591,10 +592,11 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
                     });
                   },
                   (error) => {
-                    let message = translate(
-                      "Unable to get your location",
-                    );
-                    if (error.code === 1 && error.message.includes("secure origins")) {
+                    let message = translate("Unable to get your location");
+                    if (
+                      error.code === 1 &&
+                      error.message.includes("secure origins")
+                    ) {
                       message = translate(
                         "Location access requires HTTPS. This feature will work on your live HTTPS site.",
                       );

@@ -862,10 +862,7 @@ const AvailabilityForm: React.FC = () => {
                       }));
                     }}
                     label=""
-                    placeholder={__(
-                      "Search for starting location...",
-                      "yatra",
-                    )}
+                    placeholder={__("Search for starting location...", "yatra")}
                     helpText=""
                     required={false}
                     defaultMapCenter={
@@ -939,10 +936,7 @@ const AvailabilityForm: React.FC = () => {
                       }));
                     }}
                     label=""
-                    placeholder={__(
-                      "Search for ending location...",
-                      "yatra",
-                    )}
+                    placeholder={__("Search for ending location...", "yatra")}
                     helpText=""
                     required={false}
                     defaultMapCenter={

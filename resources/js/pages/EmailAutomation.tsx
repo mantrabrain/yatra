@@ -98,8 +98,9 @@ const EmailSequencesList: React.FC = () => {
     },
   });
 
-  const sequences = (Array.isArray(sequencesData) ? sequencesData : []) as
-    EmailSequence[];
+  const sequences = (
+    Array.isArray(sequencesData) ? sequencesData : []
+  ) as EmailSequence[];
 
   const navigateToCreate = () => {
     window.location.href =
