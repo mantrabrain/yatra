@@ -67,7 +67,7 @@ class TripShortcodeAjax
             $current_page = $trips_data['current_page'] ?? 1;
             $total_found = $trips_data['total_found'] ?? 0;
             $columns = (int) $atts['columns'];
-            $column_class = 'yatra-tour-grid-' . min(max($columns, 1), 4);
+            $column_class = 'yatra-tour-grid-' . min(max($columns, 1), 6);
             
             // Debug: Log AJAX data with comprehensive pagination info
             if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -97,7 +97,7 @@ class TripShortcodeAjax
             $current_page = $trips_data['current_page'] ?? 1;
             $total_found = $trips_data['total_found'] ?? 0;
             $columns = (int) $atts['columns'];
-            $column_class = 'yatra-tour-grid-' . min(max($columns, 1), 4);
+            $column_class = 'yatra-tour-grid-' . min(max($columns, 1), 6);
             
             // Ensure atts includes the current_page for data-atts
             $atts['current_page'] = $current_page;

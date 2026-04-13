@@ -255,20 +255,29 @@
     gap: 30px;
 }
 
-.yatra-activity-shortcode .yatra-activity-grid-1 {
+/* Chained classes beat listing.css generic .yatra-activity-grid rules */
+.yatra-activity-shortcode .yatra-activity-grid.yatra-activity-grid-1 {
     grid-template-columns: 1fr;
 }
 
-.yatra-activity-shortcode .yatra-activity-grid-2 {
+.yatra-activity-shortcode .yatra-activity-grid.yatra-activity-grid-2 {
     grid-template-columns: repeat(2, 1fr);
 }
 
-.yatra-activity-shortcode .yatra-activity-grid-3 {
+.yatra-activity-shortcode .yatra-activity-grid.yatra-activity-grid-3 {
     grid-template-columns: repeat(3, 1fr);
 }
 
-.yatra-activity-shortcode .yatra-activity-grid-4 {
+.yatra-activity-shortcode .yatra-activity-grid.yatra-activity-grid-4 {
     grid-template-columns: repeat(4, 1fr);
+}
+
+.yatra-activity-shortcode .yatra-activity-grid.yatra-activity-grid-5 {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.yatra-activity-shortcode .yatra-activity-grid.yatra-activity-grid-6 {
+    grid-template-columns: repeat(6, 1fr);
 }
 
 /* Activity Card Design - Modern UI/UX */
@@ -841,8 +850,10 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .yatra-activity-shortcode .yatra-activity-grid-3,
-    .yatra-activity-shortcode .yatra-activity-grid-4 {
+    .yatra-activity-shortcode .yatra-activity-grid.yatra-activity-grid-3,
+    .yatra-activity-shortcode .yatra-activity-grid.yatra-activity-grid-4,
+    .yatra-activity-shortcode .yatra-activity-grid.yatra-activity-grid-5,
+    .yatra-activity-shortcode .yatra-activity-grid.yatra-activity-grid-6 {
         grid-template-columns: repeat(2, 1fr);
     }
     
@@ -858,9 +869,11 @@
 }
 
 @media (max-width: 480px) {
-    .yatra-activity-shortcode .yatra-activity-grid-2,
-    .yatra-activity-shortcode .yatra-activity-grid-3,
-    .yatra-activity-shortcode .yatra-activity-grid-4 {
+    .yatra-activity-shortcode .yatra-activity-grid.yatra-activity-grid-2,
+    .yatra-activity-shortcode .yatra-activity-grid.yatra-activity-grid-3,
+    .yatra-activity-shortcode .yatra-activity-grid.yatra-activity-grid-4,
+    .yatra-activity-shortcode .yatra-activity-grid.yatra-activity-grid-5,
+    .yatra-activity-shortcode .yatra-activity-grid.yatra-activity-grid-6 {
         grid-template-columns: 1fr;
     }
     

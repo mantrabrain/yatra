@@ -41,11 +41,9 @@ class DestinationBlock
      */
     public function register(): void
     {
-        if (\WP_Block_Type_Registry::get_instance()->is_registered('yatra/destination')) {
-            return;
-        }
+        BlockEditorScript::reclaimBlockName('yatra/destination');
 
-        $editorDeps = ['wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n'];
+        $editorDeps = BlockEditorScript::editorDependencies();
         if (! BlockEditorScript::register('yatra-destination-block-editor', 'destination', $editorDeps)) {
             return;
         }
@@ -98,6 +96,7 @@ class DestinationBlock
                 'supports' => [
                     'align' => ['wide', 'full'],
                     'html' => false,
+                    'inserter' => true,
                 ],
             ]);
         }

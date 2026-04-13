@@ -795,14 +795,6 @@ button.yatra-booking-button svg path {
     flex: 1;
 }
 
-.yatra-tour-title {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 6px;
-    line-height: 1.2;
-    color: white;
-}
-
 .yatra-tour-type {
     font-size: 15px;
     opacity: 0.9;

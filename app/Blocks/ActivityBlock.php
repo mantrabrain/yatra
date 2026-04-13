@@ -35,11 +35,9 @@ class ActivityBlock
 
     public function register(): void
     {
-        if (\WP_Block_Type_Registry::get_instance()->is_registered('yatra/activity')) {
-            return;
-        }
+        BlockEditorScript::reclaimBlockName('yatra/activity');
 
-        $editorDeps = ['wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n'];
+        $editorDeps = BlockEditorScript::editorDependencies();
         if (! BlockEditorScript::register('yatra-activity-block-editor', 'activity', $editorDeps)) {
             return;
         }
@@ -92,6 +90,7 @@ class ActivityBlock
                 'supports' => [
                     'align' => ['wide', 'full'],
                     'html' => false,
+                    'inserter' => true,
                 ],
             ]);
         }

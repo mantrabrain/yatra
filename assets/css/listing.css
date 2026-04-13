@@ -276,9 +276,9 @@
 /* Grid View Styles (Default) — same columns on trip, destination, activity, category listings */
 .yatra-trip-grid:not(.list-view):not(.yatra-list-view),
 .yatra-listing-content-full .yatra-trip-grid:not(.list-view):not(.yatra-list-view),
-.yatra-destination-grid:not(.list-view),
-.yatra-activity-grid:not(.list-view),
-.yatra-category-grid:not(.list-view) {
+.yatra-listing-page .yatra-destination-grid:not(.list-view),
+.yatra-listing-page .yatra-activity-grid:not(.list-view),
+.yatra-listing-page .yatra-category-grid:not(.list-view) {
     display: grid;
     gap: 24px;
     grid-template-columns: 1fr;
@@ -293,9 +293,9 @@
 @media (min-width: 768px) {
     .yatra-trip-grid:not(.list-view):not(.yatra-list-view),
     .yatra-listing-content-full .yatra-trip-grid:not(.list-view):not(.yatra-list-view),
-    .yatra-destination-grid:not(.list-view),
-    .yatra-activity-grid:not(.list-view),
-    .yatra-category-grid:not(.list-view) {
+    .yatra-listing-page .yatra-destination-grid:not(.list-view),
+    .yatra-listing-page .yatra-activity-grid:not(.list-view),
+    .yatra-listing-page .yatra-category-grid:not(.list-view) {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
@@ -313,9 +313,9 @@
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    .yatra-destination-grid:not(.list-view),
-    .yatra-activity-grid:not(.list-view),
-    .yatra-category-grid:not(.list-view) {
+    .yatra-listing-page .yatra-destination-grid:not(.list-view),
+    .yatra-listing-page .yatra-activity-grid:not(.list-view),
+    .yatra-listing-page .yatra-category-grid:not(.list-view) {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
@@ -573,9 +573,9 @@
 @media (max-width: 767px) {
     .yatra-trip-grid:not(.list-view):not(.yatra-list-view),
     .yatra-listing-content-full .yatra-trip-grid:not(.list-view):not(.yatra-list-view),
-    .yatra-destination-grid:not(.list-view),
-    .yatra-activity-grid:not(.list-view),
-    .yatra-category-grid:not(.list-view) {
+    .yatra-listing-page .yatra-destination-grid:not(.list-view),
+    .yatra-listing-page .yatra-activity-grid:not(.list-view),
+    .yatra-listing-page .yatra-category-grid:not(.list-view) {
         gap: 16px;
     }
 
@@ -2340,9 +2340,9 @@ span.yatra-pagination-btn.disabled {
 
     .yatra-trip-grid:not(.list-view):not(.yatra-list-view),
     .yatra-listing-content-full .yatra-trip-grid:not(.list-view):not(.yatra-list-view),
-    .yatra-destination-grid:not(.list-view),
-    .yatra-activity-grid:not(.list-view),
-    .yatra-category-grid:not(.list-view) {
+    .yatra-listing-page .yatra-destination-grid:not(.list-view),
+    .yatra-listing-page .yatra-activity-grid:not(.list-view),
+    .yatra-listing-page .yatra-category-grid:not(.list-view) {
         grid-template-columns: 1fr;
     }
 
@@ -3375,5 +3375,55 @@ span.yatra-pagination-btn.disabled {
     border-radius: 6px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Gutenberg: live listing preview (ServerSideRender) */
+.yatra-block-editor-preview {
+    min-height: 48px;
+}
+
+.yatra-block-editor-preview .components-placeholder {
+    min-height: 120px;
+}
+
+/**
+ * Listing block section titles — same look in the editor (theme/iframe) as on the page.
+ * Trip uses .yatra-tour-header like activity/destination; these rules beat theme h2 resets.
+ */
+.wp-block-yatra-tour .yatra-tour-header .yatra-tour-title,
+.wp-block-yatra-activity .yatra-activity-header .yatra-activity-title,
+.wp-block-yatra-destination .yatra-destination-header .yatra-destination-title,
+.editor-styles-wrapper .yatra-tour-header .yatra-tour-title,
+.editor-styles-wrapper .yatra-activity-header .yatra-activity-title,
+.editor-styles-wrapper .yatra-destination-header .yatra-destination-title,
+.block-editor-block-list__layout .yatra-tour-header .yatra-tour-title,
+.block-editor-block-list__layout .yatra-activity-header .yatra-activity-title,
+.block-editor-block-list__layout .yatra-destination-header .yatra-destination-title {
+    margin: 0;
+    padding: 0;
+    color: #1f2937;
+    font-size: 1.875rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: normal;
+    text-transform: none;
+    font-style: normal;
+    font-family: inherit;
+}
+
+.wp-block-yatra-tour .yatra-tour-header .yatra-tour-count,
+.wp-block-yatra-activity .yatra-activity-header .yatra-activity-count,
+.wp-block-yatra-destination .yatra-destination-header .yatra-destination-count,
+.editor-styles-wrapper .yatra-tour-header .yatra-tour-count,
+.editor-styles-wrapper .yatra-activity-header .yatra-activity-count,
+.editor-styles-wrapper .yatra-destination-header .yatra-destination-count,
+.block-editor-block-list__layout .yatra-tour-header .yatra-tour-count,
+.block-editor-block-list__layout .yatra-activity-header .yatra-activity-count,
+.block-editor-block-list__layout .yatra-destination-header .yatra-destination-count {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
 }
 

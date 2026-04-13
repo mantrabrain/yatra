@@ -1,32 +1,20 @@
-import { registerBlockType } from "@wordpress/blocks";
+import {
+  getBlockType,
+  registerBlockType,
+  unregisterBlockType,
+  type BlockConfiguration,
+} from "@wordpress/blocks";
 import Edit from "./edit";
+import blockMetadata from "./block.json";
 
-registerBlockType("yatra/destination", {
-  title: "Destination",
-  icon: "admin-site",
-  category: "yatra",
-  attributes: {
-    order: {
-      type: "string",
-      default: "asc",
-    },
-    columns: {
-      type: "number",
-      default: 3,
-    },
-    per_page: {
-      type: "number",
-      default: 10,
-    },
-    title: {
-      type: "string",
-      default: "Destination Showcase",
-    },
-    show_pagination: {
-      type: "boolean",
-      default: true,
-    },
-  },
+const { $schema: _$schema, editorScript: _$editorScript, ...metadata } = blockMetadata;
+
+if (getBlockType(metadata.name)) {
+  unregisterBlockType(metadata.name);
+}
+
+registerBlockType(metadata.name, {
+  ...metadata,
   edit: Edit,
   save: () => null,
-});
+} as BlockConfiguration);

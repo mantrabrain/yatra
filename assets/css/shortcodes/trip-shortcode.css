@@ -56,25 +56,34 @@
     font-size: 0.875rem;
 }
 
-.yatra-tour-grid {
+/* Scoped to shortcode/block so listing.css archive grids never override column counts */
+.yatra-tour-shortcode .yatra-tour-grid {
     display: grid;
     gap: 30px;
 }
 
-.yatra-tour-grid-1 {
+.yatra-tour-shortcode .yatra-tour-grid.yatra-tour-grid-1 {
     grid-template-columns: 1fr;
 }
 
-.yatra-tour-grid-2 {
+.yatra-tour-shortcode .yatra-tour-grid.yatra-tour-grid-2 {
     grid-template-columns: repeat(2, 1fr);
 }
 
-.yatra-tour-grid-3 {
+.yatra-tour-shortcode .yatra-tour-grid.yatra-tour-grid-3 {
     grid-template-columns: repeat(3, 1fr);
 }
 
-.yatra-tour-grid-4 {
+.yatra-tour-shortcode .yatra-tour-grid.yatra-tour-grid-4 {
     grid-template-columns: repeat(4, 1fr);
+}
+
+.yatra-tour-shortcode .yatra-tour-grid.yatra-tour-grid-5 {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.yatra-tour-shortcode .yatra-tour-grid.yatra-tour-grid-6 {
+    grid-template-columns: repeat(6, 1fr);
 }
 
 .yatra-tour-empty {
@@ -168,8 +177,10 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .yatra-tour-grid-3,
-    .yatra-tour-grid-4 {
+    .yatra-tour-shortcode .yatra-tour-grid.yatra-tour-grid-3,
+    .yatra-tour-shortcode .yatra-tour-grid.yatra-tour-grid-4,
+    .yatra-tour-shortcode .yatra-tour-grid.yatra-tour-grid-5,
+    .yatra-tour-shortcode .yatra-tour-grid.yatra-tour-grid-6 {
         grid-template-columns: repeat(2, 1fr);
     }
     
@@ -181,9 +192,11 @@
 }
 
 @media (max-width: 480px) {
-    .yatra-tour-grid-2,
-    .yatra-tour-grid-3,
-    .yatra-tour-grid-4 {
+    .yatra-tour-shortcode .yatra-tour-grid.yatra-tour-grid-2,
+    .yatra-tour-shortcode .yatra-tour-grid.yatra-tour-grid-3,
+    .yatra-tour-shortcode .yatra-tour-grid.yatra-tour-grid-4,
+    .yatra-tour-shortcode .yatra-tour-grid.yatra-tour-grid-5,
+    .yatra-tour-shortcode .yatra-tour-grid.yatra-tour-grid-6 {
         grid-template-columns: 1fr;
     }
     

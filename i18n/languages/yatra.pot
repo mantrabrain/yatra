@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-12T14:25:26+00:00\n"
+"POT-Creation-Date: 2026-04-13T03:45:40+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -350,7 +350,7 @@ msgid "Payment Information"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1276
-#: app/Providers/FrontendAssetsProvider.php:534
+#: app/Providers/FrontendAssetsProvider.php:545
 msgid "Payment Status"
 msgstr ""
 
@@ -453,7 +453,7 @@ msgid "Travelers"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1569
-#: app/Providers/FrontendAssetsProvider.php:533
+#: app/Providers/FrontendAssetsProvider.php:544
 #: templates/partials/remaining-checkout-content.php:154
 #: templates/pdf/voucher.php:182
 #: assets/dist/js/account-page.js:1290
@@ -805,6 +805,7 @@ msgstr ""
 
 #: assets/dist/js/account-page.js:2385
 #: assets/dist/js/index-2kjAoHiQ.js:106333
+#: assets/dist/js/index-7UTxJjNT.js:106333
 #: assets/dist/js/index-B2Z22w6V.js:106333
 #: assets/dist/js/index-BoxTf9b_.js:106333
 #: assets/dist/js/index-C5mz5_GL.js:106333
@@ -813,7 +814,7 @@ msgstr ""
 #: templates/partials/booking-content.php:177
 #: templates/partials/single-trip/enquiry-modal.php:85
 #: assets/dist/js/account-page.js:2254
-#: assets/js/stripe.js:145
+#: assets/js/stripe.js:151
 msgid "Cancel"
 msgstr ""
 
@@ -839,6 +840,7 @@ msgstr ""
 
 #: assets/dist/js/account-page.js:2459
 #: assets/dist/js/index-2kjAoHiQ.js:103493
+#: assets/dist/js/index-7UTxJjNT.js:103493
 #: assets/dist/js/index-B2Z22w6V.js:103493
 #: assets/dist/js/index-BoxTf9b_.js:103493
 #: assets/dist/js/index-C5mz5_GL.js:103493
@@ -906,7 +908,7 @@ msgid "Per person"
 msgstr ""
 
 #: assets/dist/js/account-page.js:2642
-#: app/Providers/FrontendAssetsProvider.php:535
+#: app/Providers/FrontendAssetsProvider.php:546
 #: templates/partials/single-trip/similar-trips.php:226
 #: templates/single-activity.php:226
 #: templates/single-destination.php:244
@@ -980,7 +982,7 @@ msgid "Manage bookings, payments, and documents – everything for your adventur
 msgstr ""
 
 #: assets/dist/js/account-page.js:2996
-#: app/Providers/FrontendAssetsProvider.php:526
+#: app/Providers/FrontendAssetsProvider.php:537
 #: app/Shortcodes/LoginShortcode.php:147
 msgid "Logout"
 msgstr ""
@@ -1059,8 +1061,8 @@ msgid "N/A"
 msgstr ""
 
 #: assets/dist/js/account-page.js:73
-#: app/Providers/FrontendAssetsProvider.php:505
-#: app/Providers/FrontendAssetsProvider.php:544
+#: app/Providers/FrontendAssetsProvider.php:516
+#: app/Providers/FrontendAssetsProvider.php:555
 #: includes/helpers.php:264
 #: templates/partials/single-trip/content-sidebar.php:229
 #: templates/partials/single-trip/similar-trips.php:222
@@ -1073,7 +1075,7 @@ msgid "Booking not found or error loading booking"
 msgstr ""
 
 #: assets/dist/js/account-page.js:931
-#: app/Providers/FrontendAssetsProvider.php:531
+#: app/Providers/FrontendAssetsProvider.php:542
 #: templates/pdf/voucher.php:110
 #: assets/dist/js/account-page.js:867
 #: assets/dist/js/account-page.js:892
@@ -1099,7 +1101,7 @@ msgid "Booking Number"
 msgstr ""
 
 #: assets/dist/js/account-page.js:970
-#: app/Blocks/TourBlock.php:82
+#: app/Blocks/TourBlock.php:80
 #: app/Controllers/BookingSessionController.php:2236
 #: app/Services/EmailTemplateDefaults.php:142
 #: app/Services/EmailTemplateDefaults.php:215
@@ -1127,6 +1129,7 @@ msgid "Booking Date"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:102051
+#: assets/dist/js/index-7UTxJjNT.js:102051
 #: assets/dist/js/index-B2Z22w6V.js:102051
 #: assets/dist/js/index-BoxTf9b_.js:102051
 #: assets/dist/js/index-C5mz5_GL.js:102051
@@ -1136,6 +1139,7 @@ msgid "Sort ascending"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:102052
+#: assets/dist/js/index-7UTxJjNT.js:102052
 #: assets/dist/js/index-B2Z22w6V.js:102052
 #: assets/dist/js/index-BoxTf9b_.js:102052
 #: assets/dist/js/index-C5mz5_GL.js:102052
@@ -1146,6 +1150,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102116
+#: assets/dist/js/index-7UTxJjNT.js:102116
 #: assets/dist/js/index-B2Z22w6V.js:102116
 #: assets/dist/js/index-BoxTf9b_.js:102116
 #: assets/dist/js/index-C5mz5_GL.js:102116
@@ -1156,6 +1161,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is none of: Admin, Editor".
 #: assets/dist/js/index-2kjAoHiQ.js:102120
+#: assets/dist/js/index-7UTxJjNT.js:102120
 #: assets/dist/js/index-B2Z22w6V.js:102120
 #: assets/dist/js/index-BoxTf9b_.js:102120
 #: assets/dist/js/index-C5mz5_GL.js:102120
@@ -1166,6 +1172,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102146
+#: assets/dist/js/index-7UTxJjNT.js:102146
 #: assets/dist/js/index-B2Z22w6V.js:102146
 #: assets/dist/js/index-BoxTf9b_.js:102146
 #: assets/dist/js/index-C5mz5_GL.js:102146
@@ -1176,6 +1183,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is any: Admin, Editor".
 #: assets/dist/js/index-2kjAoHiQ.js:102150
+#: assets/dist/js/index-7UTxJjNT.js:102150
 #: assets/dist/js/index-B2Z22w6V.js:102150
 #: assets/dist/js/index-BoxTf9b_.js:102150
 #: assets/dist/js/index-C5mz5_GL.js:102150
@@ -1186,6 +1194,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102179
+#: assets/dist/js/index-7UTxJjNT.js:102179
 #: assets/dist/js/index-B2Z22w6V.js:102179
 #: assets/dist/js/index-BoxTf9b_.js:102179
 #: assets/dist/js/index-C5mz5_GL.js:102179
@@ -1196,6 +1205,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author includes all: Admin, Editor".
 #: assets/dist/js/index-2kjAoHiQ.js:102183
+#: assets/dist/js/index-7UTxJjNT.js:102183
 #: assets/dist/js/index-B2Z22w6V.js:102183
 #: assets/dist/js/index-BoxTf9b_.js:102183
 #: assets/dist/js/index-C5mz5_GL.js:102183
@@ -1206,6 +1216,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102207
+#: assets/dist/js/index-7UTxJjNT.js:102207
 #: assets/dist/js/index-B2Z22w6V.js:102207
 #: assets/dist/js/index-BoxTf9b_.js:102207
 #: assets/dist/js/index-C5mz5_GL.js:102207
@@ -1216,6 +1227,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Item count"). 2: Filter value min. 3: Filter value max. e.g.: "Item count between (inc): 10 and 180".
 #: assets/dist/js/index-2kjAoHiQ.js:102211
+#: assets/dist/js/index-7UTxJjNT.js:102211
 #: assets/dist/js/index-B2Z22w6V.js:102211
 #: assets/dist/js/index-BoxTf9b_.js:102211
 #: assets/dist/js/index-C5mz5_GL.js:102211
@@ -1226,6 +1238,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102235
+#: assets/dist/js/index-7UTxJjNT.js:102235
 #: assets/dist/js/index-B2Z22w6V.js:102235
 #: assets/dist/js/index-BoxTf9b_.js:102235
 #: assets/dist/js/index-C5mz5_GL.js:102235
@@ -1236,6 +1249,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "7 days"): "Date is in the past: 7 days".
 #: assets/dist/js/index-2kjAoHiQ.js:102239
+#: assets/dist/js/index-7UTxJjNT.js:102239
 #: assets/dist/js/index-B2Z22w6V.js:102239
 #: assets/dist/js/index-BoxTf9b_.js:102239
 #: assets/dist/js/index-C5mz5_GL.js:102239
@@ -1246,6 +1260,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102263
+#: assets/dist/js/index-7UTxJjNT.js:102263
 #: assets/dist/js/index-B2Z22w6V.js:102263
 #: assets/dist/js/index-BoxTf9b_.js:102263
 #: assets/dist/js/index-C5mz5_GL.js:102263
@@ -1256,6 +1271,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "7 days"): "Date is over: 7 days".
 #: assets/dist/js/index-2kjAoHiQ.js:102267
+#: assets/dist/js/index-7UTxJjNT.js:102267
 #: assets/dist/js/index-B2Z22w6V.js:102267
 #: assets/dist/js/index-BoxTf9b_.js:102267
 #: assets/dist/js/index-C5mz5_GL.js:102267
@@ -1266,6 +1282,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102289
+#: assets/dist/js/index-7UTxJjNT.js:102289
 #: assets/dist/js/index-B2Z22w6V.js:102289
 #: assets/dist/js/index-BoxTf9b_.js:102289
 #: assets/dist/js/index-C5mz5_GL.js:102289
@@ -1276,6 +1293,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102307
+#: assets/dist/js/index-7UTxJjNT.js:102307
 #: assets/dist/js/index-B2Z22w6V.js:102307
 #: assets/dist/js/index-BoxTf9b_.js:102307
 #: assets/dist/js/index-C5mz5_GL.js:102307
@@ -1286,6 +1304,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102325
+#: assets/dist/js/index-7UTxJjNT.js:102325
 #: assets/dist/js/index-B2Z22w6V.js:102325
 #: assets/dist/js/index-BoxTf9b_.js:102325
 #: assets/dist/js/index-C5mz5_GL.js:102325
@@ -1296,6 +1315,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is less than: 10".
 #: assets/dist/js/index-2kjAoHiQ.js:102329
+#: assets/dist/js/index-7UTxJjNT.js:102329
 #: assets/dist/js/index-B2Z22w6V.js:102329
 #: assets/dist/js/index-BoxTf9b_.js:102329
 #: assets/dist/js/index-C5mz5_GL.js:102329
@@ -1306,6 +1326,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102347
+#: assets/dist/js/index-7UTxJjNT.js:102347
 #: assets/dist/js/index-B2Z22w6V.js:102347
 #: assets/dist/js/index-BoxTf9b_.js:102347
 #: assets/dist/js/index-C5mz5_GL.js:102347
@@ -1316,6 +1337,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is greater than: 10".
 #: assets/dist/js/index-2kjAoHiQ.js:102351
+#: assets/dist/js/index-7UTxJjNT.js:102351
 #: assets/dist/js/index-B2Z22w6V.js:102351
 #: assets/dist/js/index-BoxTf9b_.js:102351
 #: assets/dist/js/index-C5mz5_GL.js:102351
@@ -1326,6 +1348,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102371
+#: assets/dist/js/index-7UTxJjNT.js:102371
 #: assets/dist/js/index-B2Z22w6V.js:102371
 #: assets/dist/js/index-BoxTf9b_.js:102371
 #: assets/dist/js/index-C5mz5_GL.js:102371
@@ -1336,6 +1359,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is less than or equal to: 10".
 #: assets/dist/js/index-2kjAoHiQ.js:102375
+#: assets/dist/js/index-7UTxJjNT.js:102375
 #: assets/dist/js/index-B2Z22w6V.js:102375
 #: assets/dist/js/index-BoxTf9b_.js:102375
 #: assets/dist/js/index-C5mz5_GL.js:102375
@@ -1346,6 +1370,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102395
+#: assets/dist/js/index-7UTxJjNT.js:102395
 #: assets/dist/js/index-B2Z22w6V.js:102395
 #: assets/dist/js/index-BoxTf9b_.js:102395
 #: assets/dist/js/index-C5mz5_GL.js:102395
@@ -1356,6 +1381,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is greater than or equal to: 10".
 #: assets/dist/js/index-2kjAoHiQ.js:102399
+#: assets/dist/js/index-7UTxJjNT.js:102399
 #: assets/dist/js/index-B2Z22w6V.js:102399
 #: assets/dist/js/index-BoxTf9b_.js:102399
 #: assets/dist/js/index-C5mz5_GL.js:102399
@@ -1366,6 +1392,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102419
+#: assets/dist/js/index-7UTxJjNT.js:102419
 #: assets/dist/js/index-B2Z22w6V.js:102419
 #: assets/dist/js/index-BoxTf9b_.js:102419
 #: assets/dist/js/index-C5mz5_GL.js:102419
@@ -1376,6 +1403,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is before: 2024-01-01".
 #: assets/dist/js/index-2kjAoHiQ.js:102423
+#: assets/dist/js/index-7UTxJjNT.js:102423
 #: assets/dist/js/index-B2Z22w6V.js:102423
 #: assets/dist/js/index-BoxTf9b_.js:102423
 #: assets/dist/js/index-C5mz5_GL.js:102423
@@ -1386,6 +1414,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102442
+#: assets/dist/js/index-7UTxJjNT.js:102442
 #: assets/dist/js/index-B2Z22w6V.js:102442
 #: assets/dist/js/index-BoxTf9b_.js:102442
 #: assets/dist/js/index-C5mz5_GL.js:102442
@@ -1396,6 +1425,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is after: 2024-01-01".
 #: assets/dist/js/index-2kjAoHiQ.js:102446
+#: assets/dist/js/index-7UTxJjNT.js:102446
 #: assets/dist/js/index-B2Z22w6V.js:102446
 #: assets/dist/js/index-BoxTf9b_.js:102446
 #: assets/dist/js/index-C5mz5_GL.js:102446
@@ -1406,6 +1436,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102465
+#: assets/dist/js/index-7UTxJjNT.js:102465
 #: assets/dist/js/index-B2Z22w6V.js:102465
 #: assets/dist/js/index-BoxTf9b_.js:102465
 #: assets/dist/js/index-C5mz5_GL.js:102465
@@ -1416,6 +1447,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is on or before: 2024-01-01".
 #: assets/dist/js/index-2kjAoHiQ.js:102469
+#: assets/dist/js/index-7UTxJjNT.js:102469
 #: assets/dist/js/index-B2Z22w6V.js:102469
 #: assets/dist/js/index-BoxTf9b_.js:102469
 #: assets/dist/js/index-C5mz5_GL.js:102469
@@ -1426,6 +1458,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102490
+#: assets/dist/js/index-7UTxJjNT.js:102490
 #: assets/dist/js/index-B2Z22w6V.js:102490
 #: assets/dist/js/index-BoxTf9b_.js:102490
 #: assets/dist/js/index-C5mz5_GL.js:102490
@@ -1436,6 +1469,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is on or after: 2024-01-01".
 #: assets/dist/js/index-2kjAoHiQ.js:102494
+#: assets/dist/js/index-7UTxJjNT.js:102494
 #: assets/dist/js/index-B2Z22w6V.js:102494
 #: assets/dist/js/index-BoxTf9b_.js:102494
 #: assets/dist/js/index-C5mz5_GL.js:102494
@@ -1446,6 +1480,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102515
+#: assets/dist/js/index-7UTxJjNT.js:102515
 #: assets/dist/js/index-B2Z22w6V.js:102515
 #: assets/dist/js/index-BoxTf9b_.js:102515
 #: assets/dist/js/index-C5mz5_GL.js:102515
@@ -1456,6 +1491,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title contains: Hello".
 #: assets/dist/js/index-2kjAoHiQ.js:102519
+#: assets/dist/js/index-7UTxJjNT.js:102519
 #: assets/dist/js/index-B2Z22w6V.js:102519
 #: assets/dist/js/index-BoxTf9b_.js:102519
 #: assets/dist/js/index-C5mz5_GL.js:102519
@@ -1466,6 +1502,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102537
+#: assets/dist/js/index-7UTxJjNT.js:102537
 #: assets/dist/js/index-B2Z22w6V.js:102537
 #: assets/dist/js/index-BoxTf9b_.js:102537
 #: assets/dist/js/index-C5mz5_GL.js:102537
@@ -1476,6 +1513,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title doesn't contain: Hello".
 #: assets/dist/js/index-2kjAoHiQ.js:102541
+#: assets/dist/js/index-7UTxJjNT.js:102541
 #: assets/dist/js/index-B2Z22w6V.js:102541
 #: assets/dist/js/index-BoxTf9b_.js:102541
 #: assets/dist/js/index-C5mz5_GL.js:102541
@@ -1486,6 +1524,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102561
+#: assets/dist/js/index-7UTxJjNT.js:102561
 #: assets/dist/js/index-B2Z22w6V.js:102561
 #: assets/dist/js/index-BoxTf9b_.js:102561
 #: assets/dist/js/index-C5mz5_GL.js:102561
@@ -1496,6 +1535,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title starts with: Hello".
 #: assets/dist/js/index-2kjAoHiQ.js:102565
+#: assets/dist/js/index-7UTxJjNT.js:102565
 #: assets/dist/js/index-B2Z22w6V.js:102565
 #: assets/dist/js/index-BoxTf9b_.js:102565
 #: assets/dist/js/index-C5mz5_GL.js:102565
@@ -1506,6 +1546,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102583
+#: assets/dist/js/index-7UTxJjNT.js:102583
 #: assets/dist/js/index-B2Z22w6V.js:102583
 #: assets/dist/js/index-BoxTf9b_.js:102583
 #: assets/dist/js/index-C5mz5_GL.js:102583
@@ -1516,6 +1557,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is: 2024-01-01".
 #: assets/dist/js/index-2kjAoHiQ.js:102587
+#: assets/dist/js/index-7UTxJjNT.js:102587
 #: assets/dist/js/index-B2Z22w6V.js:102587
 #: assets/dist/js/index-BoxTf9b_.js:102587
 #: assets/dist/js/index-C5mz5_GL.js:102587
@@ -1526,6 +1568,7 @@ msgstr ""
 
 #. DataViews operator name
 #: assets/dist/js/index-2kjAoHiQ.js:102606
+#: assets/dist/js/index-7UTxJjNT.js:102606
 #: assets/dist/js/index-B2Z22w6V.js:102606
 #: assets/dist/js/index-BoxTf9b_.js:102606
 #: assets/dist/js/index-C5mz5_GL.js:102606
@@ -1536,6 +1579,7 @@ msgstr ""
 
 #. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is not: 2024-01-01".
 #: assets/dist/js/index-2kjAoHiQ.js:102610
+#: assets/dist/js/index-7UTxJjNT.js:102610
 #: assets/dist/js/index-B2Z22w6V.js:102610
 #: assets/dist/js/index-BoxTf9b_.js:102610
 #: assets/dist/js/index-C5mz5_GL.js:102610
@@ -1545,6 +1589,7 @@ msgid "<Name>%1$s is not: </Name><Value>%2$s</Value>"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:102722
+#: assets/dist/js/index-7UTxJjNT.js:102722
 #: assets/dist/js/index-B2Z22w6V.js:102722
 #: assets/dist/js/index-BoxTf9b_.js:102722
 #: assets/dist/js/index-C5mz5_GL.js:102722
@@ -1556,6 +1601,7 @@ msgid "Days"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:102723
+#: assets/dist/js/index-7UTxJjNT.js:102723
 #: assets/dist/js/index-B2Z22w6V.js:102723
 #: assets/dist/js/index-BoxTf9b_.js:102723
 #: assets/dist/js/index-C5mz5_GL.js:102723
@@ -1565,6 +1611,7 @@ msgid "Weeks"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:102724
+#: assets/dist/js/index-7UTxJjNT.js:102724
 #: assets/dist/js/index-B2Z22w6V.js:102724
 #: assets/dist/js/index-BoxTf9b_.js:102724
 #: assets/dist/js/index-C5mz5_GL.js:102724
@@ -1574,6 +1621,7 @@ msgid "Months"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:102725
+#: assets/dist/js/index-7UTxJjNT.js:102725
 #: assets/dist/js/index-B2Z22w6V.js:102725
 #: assets/dist/js/index-BoxTf9b_.js:102725
 #: assets/dist/js/index-C5mz5_GL.js:102725
@@ -1583,6 +1631,7 @@ msgid "Years"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:102728
+#: assets/dist/js/index-7UTxJjNT.js:102728
 #: assets/dist/js/index-B2Z22w6V.js:102728
 #: assets/dist/js/index-BoxTf9b_.js:102728
 #: assets/dist/js/index-C5mz5_GL.js:102728
@@ -1592,6 +1641,7 @@ msgid "Days ago"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:102729
+#: assets/dist/js/index-7UTxJjNT.js:102729
 #: assets/dist/js/index-B2Z22w6V.js:102729
 #: assets/dist/js/index-BoxTf9b_.js:102729
 #: assets/dist/js/index-C5mz5_GL.js:102729
@@ -1601,6 +1651,7 @@ msgid "Weeks ago"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:102730
+#: assets/dist/js/index-7UTxJjNT.js:102730
 #: assets/dist/js/index-B2Z22w6V.js:102730
 #: assets/dist/js/index-BoxTf9b_.js:102730
 #: assets/dist/js/index-C5mz5_GL.js:102730
@@ -1610,6 +1661,7 @@ msgid "Months ago"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:102731
+#: assets/dist/js/index-7UTxJjNT.js:102731
 #: assets/dist/js/index-B2Z22w6V.js:102731
 #: assets/dist/js/index-BoxTf9b_.js:102731
 #: assets/dist/js/index-C5mz5_GL.js:102731
@@ -1619,6 +1671,7 @@ msgid "Years ago"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:102789
+#: assets/dist/js/index-7UTxJjNT.js:102789
 #: assets/dist/js/index-B2Z22w6V.js:102789
 #: assets/dist/js/index-BoxTf9b_.js:102789
 #: assets/dist/js/index-C5mz5_GL.js:102789
@@ -1628,6 +1681,7 @@ msgid "Unit"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:102934
+#: assets/dist/js/index-7UTxJjNT.js:102934
 #: assets/dist/js/index-B2Z22w6V.js:102934
 #: assets/dist/js/index-BoxTf9b_.js:102934
 #: assets/dist/js/index-C5mz5_GL.js:102934
@@ -1637,6 +1691,7 @@ msgid "Date time"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:102984
+#: assets/dist/js/index-7UTxJjNT.js:102984
 #: assets/dist/js/index-B2Z22w6V.js:102984
 #: assets/dist/js/index-BoxTf9b_.js:102984
 #: assets/dist/js/index-C5mz5_GL.js:102984
@@ -1646,6 +1701,7 @@ msgid "Today"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:102989
+#: assets/dist/js/index-7UTxJjNT.js:102989
 #: assets/dist/js/index-B2Z22w6V.js:102989
 #: assets/dist/js/index-BoxTf9b_.js:102989
 #: assets/dist/js/index-C5mz5_GL.js:102989
@@ -1655,6 +1711,7 @@ msgid "Yesterday"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:102997
+#: assets/dist/js/index-7UTxJjNT.js:102997
 #: assets/dist/js/index-B2Z22w6V.js:102997
 #: assets/dist/js/index-BoxTf9b_.js:102997
 #: assets/dist/js/index-C5mz5_GL.js:102997
@@ -1664,6 +1721,7 @@ msgid "Past week"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:103005
+#: assets/dist/js/index-7UTxJjNT.js:103005
 #: assets/dist/js/index-B2Z22w6V.js:103005
 #: assets/dist/js/index-BoxTf9b_.js:103005
 #: assets/dist/js/index-C5mz5_GL.js:103005
@@ -1673,6 +1731,7 @@ msgid "Past month"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:103015
+#: assets/dist/js/index-7UTxJjNT.js:103015
 #: assets/dist/js/index-B2Z22w6V.js:103015
 #: assets/dist/js/index-BoxTf9b_.js:103015
 #: assets/dist/js/index-C5mz5_GL.js:103015
@@ -1682,6 +1741,7 @@ msgid "Last 7 days"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:103023
+#: assets/dist/js/index-7UTxJjNT.js:103023
 #: assets/dist/js/index-B2Z22w6V.js:103023
 #: assets/dist/js/index-BoxTf9b_.js:103023
 #: assets/dist/js/index-C5mz5_GL.js:103023
@@ -1691,6 +1751,7 @@ msgid "Last 30 days"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:103031
+#: assets/dist/js/index-7UTxJjNT.js:103031
 #: assets/dist/js/index-B2Z22w6V.js:103031
 #: assets/dist/js/index-BoxTf9b_.js:103031
 #: assets/dist/js/index-C5mz5_GL.js:103031
@@ -1700,6 +1761,7 @@ msgid "Month to date"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:103039
+#: assets/dist/js/index-7UTxJjNT.js:103039
 #: assets/dist/js/index-B2Z22w6V.js:103039
 #: assets/dist/js/index-BoxTf9b_.js:103039
 #: assets/dist/js/index-C5mz5_GL.js:103039
@@ -1709,6 +1771,7 @@ msgid "Last year"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:103047
+#: assets/dist/js/index-7UTxJjNT.js:103047
 #: assets/dist/js/index-B2Z22w6V.js:103047
 #: assets/dist/js/index-BoxTf9b_.js:103047
 #: assets/dist/js/index-C5mz5_GL.js:103047
@@ -1718,6 +1781,7 @@ msgid "Year to date"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:103297
+#: assets/dist/js/index-7UTxJjNT.js:103297
 #: assets/dist/js/index-B2Z22w6V.js:103297
 #: assets/dist/js/index-BoxTf9b_.js:103297
 #: assets/dist/js/index-C5mz5_GL.js:103297
@@ -1728,6 +1792,7 @@ msgid "Date"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:103421
+#: assets/dist/js/index-7UTxJjNT.js:103421
 #: assets/dist/js/index-B2Z22w6V.js:103421
 #: assets/dist/js/index-BoxTf9b_.js:103421
 #: assets/dist/js/index-C5mz5_GL.js:103421
@@ -1738,6 +1803,7 @@ msgid "Required"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:103423
+#: assets/dist/js/index-7UTxJjNT.js:103423
 #: assets/dist/js/index-B2Z22w6V.js:103423
 #: assets/dist/js/index-BoxTf9b_.js:103423
 #: assets/dist/js/index-C5mz5_GL.js:103423
@@ -1747,6 +1813,7 @@ msgid "Optional"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:103473
+#: assets/dist/js/index-7UTxJjNT.js:103473
 #: assets/dist/js/index-B2Z22w6V.js:103473
 #: assets/dist/js/index-BoxTf9b_.js:103473
 #: assets/dist/js/index-C5mz5_GL.js:103473
@@ -1756,6 +1823,7 @@ msgid "Custom"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:103506
+#: assets/dist/js/index-7UTxJjNT.js:103506
 #: assets/dist/js/index-B2Z22w6V.js:103506
 #: assets/dist/js/index-BoxTf9b_.js:103506
 #: assets/dist/js/index-C5mz5_GL.js:103506
@@ -1765,6 +1833,7 @@ msgid "To"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:103777
+#: assets/dist/js/index-7UTxJjNT.js:103777
 #: assets/dist/js/index-B2Z22w6V.js:103777
 #: assets/dist/js/index-BoxTf9b_.js:103777
 #: assets/dist/js/index-C5mz5_GL.js:103777
@@ -1774,6 +1843,7 @@ msgid "The max. value must be greater than the min. value."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:103782
+#: assets/dist/js/index-7UTxJjNT.js:103782
 #: assets/dist/js/index-B2Z22w6V.js:103782
 #: assets/dist/js/index-BoxTf9b_.js:103782
 #: assets/dist/js/index-C5mz5_GL.js:103782
@@ -1783,6 +1853,7 @@ msgid "Min."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:103794
+#: assets/dist/js/index-7UTxJjNT.js:103794
 #: assets/dist/js/index-B2Z22w6V.js:103794
 #: assets/dist/js/index-BoxTf9b_.js:103794
 #: assets/dist/js/index-C5mz5_GL.js:103794
@@ -1792,6 +1863,7 @@ msgid "Max."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:104168
+#: assets/dist/js/index-7UTxJjNT.js:104168
 #: assets/dist/js/index-B2Z22w6V.js:104168
 #: assets/dist/js/index-BoxTf9b_.js:104168
 #: assets/dist/js/index-C5mz5_GL.js:104168
@@ -1801,6 +1873,7 @@ msgid "Open color picker"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:104259
+#: assets/dist/js/index-7UTxJjNT.js:104259
 #: assets/dist/js/index-B2Z22w6V.js:104259
 #: assets/dist/js/index-BoxTf9b_.js:104259
 #: assets/dist/js/index-C5mz5_GL.js:104259
@@ -1810,6 +1883,7 @@ msgid "Hide password"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:104259
+#: assets/dist/js/index-7UTxJjNT.js:104259
 #: assets/dist/js/index-B2Z22w6V.js:104259
 #: assets/dist/js/index-BoxTf9b_.js:104259
 #: assets/dist/js/index-C5mz5_GL.js:104259
@@ -1819,6 +1893,7 @@ msgid "Show password"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:104461
+#: assets/dist/js/index-7UTxJjNT.js:104461
 #: assets/dist/js/index-B2Z22w6V.js:104461
 #: assets/dist/js/index-BoxTf9b_.js:104461
 #: assets/dist/js/index-C5mz5_GL.js:104461
@@ -1828,6 +1903,7 @@ msgid "Value must be a valid email address."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:104555
+#: assets/dist/js/index-7UTxJjNT.js:104555
 #: assets/dist/js/index-B2Z22w6V.js:104555
 #: assets/dist/js/index-BoxTf9b_.js:104555
 #: assets/dist/js/index-C5mz5_GL.js:104555
@@ -1837,6 +1913,7 @@ msgid "Value must be an integer."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:104635
+#: assets/dist/js/index-7UTxJjNT.js:104635
 #: assets/dist/js/index-B2Z22w6V.js:104635
 #: assets/dist/js/index-BoxTf9b_.js:104635
 #: assets/dist/js/index-C5mz5_GL.js:104635
@@ -1846,6 +1923,7 @@ msgid "Value must be a number."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:104841
+#: assets/dist/js/index-7UTxJjNT.js:104841
 #: assets/dist/js/index-B2Z22w6V.js:104841
 #: assets/dist/js/index-BoxTf9b_.js:104841
 #: assets/dist/js/index-C5mz5_GL.js:104841
@@ -1855,6 +1933,7 @@ msgid "True"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:104844
+#: assets/dist/js/index-7UTxJjNT.js:104844
 #: assets/dist/js/index-B2Z22w6V.js:104844
 #: assets/dist/js/index-BoxTf9b_.js:104844
 #: assets/dist/js/index-C5mz5_GL.js:104844
@@ -1864,6 +1943,7 @@ msgid "False"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:104851
+#: assets/dist/js/index-7UTxJjNT.js:104851
 #: assets/dist/js/index-B2Z22w6V.js:104851
 #: assets/dist/js/index-BoxTf9b_.js:104851
 #: assets/dist/js/index-C5mz5_GL.js:104851
@@ -1873,6 +1953,7 @@ msgid "Value must be true, false, or undefined"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:104919
+#: assets/dist/js/index-7UTxJjNT.js:104919
 #: assets/dist/js/index-B2Z22w6V.js:104919
 #: assets/dist/js/index-BoxTf9b_.js:104919
 #: assets/dist/js/index-C5mz5_GL.js:104919
@@ -1882,6 +1963,7 @@ msgid "Value must be an array."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:104922
+#: assets/dist/js/index-7UTxJjNT.js:104922
 #: assets/dist/js/index-B2Z22w6V.js:104922
 #: assets/dist/js/index-BoxTf9b_.js:104922
 #: assets/dist/js/index-C5mz5_GL.js:104922
@@ -1891,6 +1973,7 @@ msgid "Every value must be a string."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:105042
+#: assets/dist/js/index-7UTxJjNT.js:105042
 #: assets/dist/js/index-B2Z22w6V.js:105042
 #: assets/dist/js/index-BoxTf9b_.js:105042
 #: assets/dist/js/index-C5mz5_GL.js:105042
@@ -1900,6 +1983,7 @@ msgid "Value must be a valid color."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:105801
+#: assets/dist/js/index-7UTxJjNT.js:105801
 #: assets/dist/js/index-B2Z22w6V.js:105801
 #: assets/dist/js/index-BoxTf9b_.js:105801
 #: assets/dist/js/index-C5mz5_GL.js:105801
@@ -1909,6 +1993,7 @@ msgid "Could not validate elements."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:105846
+#: assets/dist/js/index-7UTxJjNT.js:105846
 #: assets/dist/js/index-B2Z22w6V.js:105846
 #: assets/dist/js/index-BoxTf9b_.js:105846
 #: assets/dist/js/index-C5mz5_GL.js:105846
@@ -1918,6 +2003,7 @@ msgid "Unknown error when running elements validation asynchronously."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:105905
+#: assets/dist/js/index-7UTxJjNT.js:105905
 #: assets/dist/js/index-B2Z22w6V.js:105905
 #: assets/dist/js/index-BoxTf9b_.js:105905
 #: assets/dist/js/index-C5mz5_GL.js:105905
@@ -1927,6 +2013,7 @@ msgid "Validation could not be processed."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:105920
+#: assets/dist/js/index-7UTxJjNT.js:105920
 #: assets/dist/js/index-B2Z22w6V.js:105920
 #: assets/dist/js/index-BoxTf9b_.js:105920
 #: assets/dist/js/index-C5mz5_GL.js:105920
@@ -1936,6 +2023,7 @@ msgid "Unknown error when running custom validation asynchronously."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:105950
+#: assets/dist/js/index-7UTxJjNT.js:105950
 #: assets/dist/js/index-B2Z22w6V.js:105950
 #: assets/dist/js/index-BoxTf9b_.js:105950
 #: assets/dist/js/index-C5mz5_GL.js:105950
@@ -1945,6 +2033,7 @@ msgid "Value does not match the required pattern."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:105958
+#: assets/dist/js/index-7UTxJjNT.js:105958
 #: assets/dist/js/index-B2Z22w6V.js:105958
 #: assets/dist/js/index-BoxTf9b_.js:105958
 #: assets/dist/js/index-C5mz5_GL.js:105958
@@ -1954,6 +2043,7 @@ msgid "Value is below the minimum."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:105966
+#: assets/dist/js/index-7UTxJjNT.js:105966
 #: assets/dist/js/index-B2Z22w6V.js:105966
 #: assets/dist/js/index-BoxTf9b_.js:105966
 #: assets/dist/js/index-C5mz5_GL.js:105966
@@ -1963,6 +2053,7 @@ msgid "Value is above the maximum."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:105974
+#: assets/dist/js/index-7UTxJjNT.js:105974
 #: assets/dist/js/index-B2Z22w6V.js:105974
 #: assets/dist/js/index-BoxTf9b_.js:105974
 #: assets/dist/js/index-C5mz5_GL.js:105974
@@ -1972,6 +2063,7 @@ msgid "Value is too short."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:105982
+#: assets/dist/js/index-7UTxJjNT.js:105982
 #: assets/dist/js/index-B2Z22w6V.js:105982
 #: assets/dist/js/index-BoxTf9b_.js:105982
 #: assets/dist/js/index-C5mz5_GL.js:105982
@@ -1981,6 +2073,7 @@ msgid "Value is too long."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:105990
+#: assets/dist/js/index-7UTxJjNT.js:105990
 #: assets/dist/js/index-B2Z22w6V.js:105990
 #: assets/dist/js/index-BoxTf9b_.js:105990
 #: assets/dist/js/index-C5mz5_GL.js:105990
@@ -1990,6 +2083,7 @@ msgid "Value must be one of the elements."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:106013
+#: assets/dist/js/index-7UTxJjNT.js:106013
 #: assets/dist/js/index-B2Z22w6V.js:106013
 #: assets/dist/js/index-BoxTf9b_.js:106013
 #: assets/dist/js/index-C5mz5_GL.js:106013
@@ -1999,6 +2093,7 @@ msgid "Unknown error when running custom validation."
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:106047
+#: assets/dist/js/index-7UTxJjNT.js:106047
 #: assets/dist/js/index-B2Z22w6V.js:106047
 #: assets/dist/js/index-BoxTf9b_.js:106047
 #: assets/dist/js/index-C5mz5_GL.js:106047
@@ -2008,6 +2103,7 @@ msgid "Validating…"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:106342
+#: assets/dist/js/index-7UTxJjNT.js:106342
 #: assets/dist/js/index-B2Z22w6V.js:106342
 #: assets/dist/js/index-BoxTf9b_.js:106342
 #: assets/dist/js/index-C5mz5_GL.js:106342
@@ -2018,6 +2114,7 @@ msgid "Apply"
 msgstr ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:106413
+#: assets/dist/js/index-7UTxJjNT.js:106413
 #: assets/dist/js/index-B-boFLyl.js:780
 #: assets/dist/js/index-B2Z22w6V.js:106413
 #: assets/dist/js/index-B7Uoe-LV.js:720
@@ -2034,11 +2131,14 @@ msgstr ""
 #: assets/dist/js/index-DkBH5waT.js:106413
 #: assets/dist/js/index-DznrAtWW.js:753
 #: assets/dist/js/index-HL72hacW.js:106413
+#: assets/dist/js/index-JPS7_hhh.js:780
+#: assets/dist/js/index-u8EE7rEl.js:780
 msgid "Close"
 msgstr ""
 
 #. %d: Number of fields that need attention
 #: assets/dist/js/index-2kjAoHiQ.js:106602
+#: assets/dist/js/index-7UTxJjNT.js:106602
 #: assets/dist/js/index-B2Z22w6V.js:106602
 #: assets/dist/js/index-BoxTf9b_.js:106602
 #: assets/dist/js/index-C5mz5_GL.js:106602
@@ -2050,12 +2150,206 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: assets/dist/js/index-2kjAoHiQ.js:106933
+#: assets/dist/js/index-7UTxJjNT.js:106933
 #: assets/dist/js/index-B2Z22w6V.js:106933
 #: assets/dist/js/index-BoxTf9b_.js:106933
 #: assets/dist/js/index-C5mz5_GL.js:106933
 #: assets/dist/js/index-DkBH5waT.js:106933
 #: assets/dist/js/index-HL72hacW.js:106933
 msgid "More details"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25297
+#: assets/dist/js/index-B3TFNODv.js:25288
+msgid "Black"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25302
+#: assets/dist/js/index-B3TFNODv.js:25293
+msgid "Cyan bluish gray"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25307
+#: assets/dist/js/index-B3TFNODv.js:25298
+msgid "White"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25312
+#: assets/dist/js/index-B3TFNODv.js:25303
+msgid "Pale pink"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25316
+#: assets/dist/js/index-B3TFNODv.js:25307
+msgid "Vivid red"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25318
+#: assets/dist/js/index-B3TFNODv.js:25309
+msgid "Luminous vivid orange"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25323
+#: assets/dist/js/index-B3TFNODv.js:25314
+msgid "Luminous vivid amber"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25328
+#: assets/dist/js/index-B3TFNODv.js:25319
+msgid "Light green cyan"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25333
+#: assets/dist/js/index-B3TFNODv.js:25324
+msgid "Vivid green cyan"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25338
+#: assets/dist/js/index-B3TFNODv.js:25329
+msgid "Pale cyan blue"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25343
+#: assets/dist/js/index-B3TFNODv.js:25334
+msgid "Vivid cyan blue"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25348
+#: assets/dist/js/index-B3TFNODv.js:25339
+msgid "Vivid purple"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25385
+#: assets/dist/js/index-B3TFNODv.js:25376
+msgid "Thumbnail"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25386
+#: assets/dist/js/index-B3TFNODv.js:25377
+msgid "Medium"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25387
+#: assets/dist/js/index-B3TFNODv.js:25378
+msgid "Large"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25388
+#: assets/dist/js/index-B3TFNODv.js:25379
+msgid "Full Size"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25439
+#: assets/dist/js/index-B3TFNODv.js:25430
+msgid "Vivid cyan blue to vivid purple"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25444
+#: assets/dist/js/index-B3TFNODv.js:25435
+msgid "Light green cyan to vivid green cyan"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25449
+#: assets/dist/js/index-B3TFNODv.js:25440
+msgid "Luminous vivid amber to luminous vivid orange"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25454
+#: assets/dist/js/index-B3TFNODv.js:25445
+msgid "Luminous vivid orange to vivid red"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25459
+#: assets/dist/js/index-B3TFNODv.js:25450
+msgid "Very light gray to cyan bluish gray"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25464
+#: assets/dist/js/index-B3TFNODv.js:25455
+msgid "Cool to warm spectrum"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25469
+#: assets/dist/js/index-B3TFNODv.js:25460
+msgid "Blush light purple"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25474
+#: assets/dist/js/index-B3TFNODv.js:25465
+msgid "Blush bordeaux"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25479
+#: assets/dist/js/index-B3TFNODv.js:25470
+msgid "Luminous dusk"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25484
+#: assets/dist/js/index-B3TFNODv.js:25475
+msgid "Pale ocean"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25489
+#: assets/dist/js/index-B3TFNODv.js:25480
+msgid "Electric grass"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25494
+#: assets/dist/js/index-B3TFNODv.js:25485
+msgid "Midnight"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:27559
+#: assets/dist/js/index-B3TFNODv.js:27550
+msgid "Desktop"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:27564
+#: assets/dist/js/index-B3TFNODv.js:27555
+msgid "Tablet"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:27569
+#: assets/dist/js/index-B3TFNODv.js:27560
+msgid "Mobile"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:28218
+#: assets/dist/js/index-B3TFNODv.js:28209
+msgid "My patterns"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:28221
+#: assets/dist/js/index-B3TFNODv.js:28212
+msgid "Starter content"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:30275
+#: assets/dist/js/index-B3TFNODv.js:30266
+msgid "You are currently in zoom-out mode."
+msgstr ""
+
+#. %s: number of selected blocks
+#: assets/dist/js/index-6oWBOph2.js:30752
+#: assets/dist/js/index-B3TFNODv.js:30743
+msgid "%s block selected."
+msgid_plural "%s blocks selected."
+msgstr[0] ""
+msgstr[1] ""
+
+#: assets/dist/js/index-6oWBOph2.js:31069
+#: assets/dist/js/index-B3TFNODv.js:31060
+msgid "Blocks can't be inserted into other blocks with bindings"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:31521
+#: assets/dist/js/index-B3TFNODv.js:31512
+msgid "You are currently in Write mode."
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:31523
+#: assets/dist/js/index-B3TFNODv.js:31514
+msgid "You are currently in Design mode."
 msgstr ""
 
 #: assets/dist/js/default-i18n-DxhLUi3L.js:585
@@ -2065,6 +2359,7 @@ msgstr ""
 
 #. %s: Field name.
 #: assets/dist/js/index-2kjAoHiQ.js:105582
+#: assets/dist/js/index-7UTxJjNT.js:105582
 #: assets/dist/js/index-B2Z22w6V.js:105582
 #: assets/dist/js/index-BoxTf9b_.js:105582
 #: assets/dist/js/index-C5mz5_GL.js:105582
@@ -2076,6 +2371,7 @@ msgstr ""
 
 #. %s: Field name.
 #: assets/dist/js/index-2kjAoHiQ.js:105586
+#: assets/dist/js/index-7UTxJjNT.js:105586
 #: assets/dist/js/index-B2Z22w6V.js:105586
 #: assets/dist/js/index-BoxTf9b_.js:105586
 #: assets/dist/js/index-C5mz5_GL.js:105586
@@ -2083,6 +2379,42 @@ msgstr ""
 #: assets/dist/js/index-HL72hacW.js:105586
 msgctxt "field"
 msgid "Edit %s"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25357
+#: assets/dist/js/index-B3TFNODv.js:25348
+msgctxt "font size name"
+msgid "Small"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25362
+#: assets/dist/js/index-B3TFNODv.js:25353
+msgctxt "font size name"
+msgid "Normal"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25367
+#: assets/dist/js/index-B3TFNODv.js:25358
+msgctxt "font size name"
+msgid "Medium"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25372
+#: assets/dist/js/index-B3TFNODv.js:25363
+msgctxt "font size name"
+msgid "Large"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:25377
+#: assets/dist/js/index-B3TFNODv.js:25368
+msgctxt "font size name"
+msgid "Huge"
+msgstr ""
+
+#: assets/dist/js/index-6oWBOph2.js:28215
+#: assets/dist/js/index-B3TFNODv.js:28206
+msgctxt "patterns"
+msgid "All"
 msgstr ""
 
 #. Plugin Name of the plugin
@@ -2181,18 +2513,18 @@ msgstr ""
 msgid "Login successful! Redirecting..."
 msgstr ""
 
-#: app/Blocks/ActivityBlock.php:82
+#: app/Blocks/ActivityBlock.php:80
 #: templates/shortcodes/search.php:79
 #: templates/shortcodes/trip-search.php:54
 #: templates/single-taxonomy.php:75
 msgid "Activity"
 msgstr ""
 
-#: app/Blocks/ActivityBlock.php:84
+#: app/Blocks/ActivityBlock.php:82
 msgid "Display activity listings with customizable options"
 msgstr ""
 
-#: app/Blocks/DestinationBlock.php:88
+#: app/Blocks/DestinationBlock.php:86
 #: templates/pdf/itinerary.php:172
 #: templates/shortcodes/search.php:65
 #: templates/shortcodes/trip-search.php:40
@@ -2201,11 +2533,11 @@ msgstr ""
 msgid "Destination"
 msgstr ""
 
-#: app/Blocks/DestinationBlock.php:90
+#: app/Blocks/DestinationBlock.php:88
 msgid "Display destination listings with customizable options"
 msgstr ""
 
-#: app/Blocks/TourBlock.php:84
+#: app/Blocks/TourBlock.php:82
 msgid "Display trip listings with customizable options"
 msgstr ""
 
@@ -2732,7 +3064,7 @@ msgid "Travel date"
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2238
-#: app/Providers/FrontendAssetsProvider.php:550
+#: app/Providers/FrontendAssetsProvider.php:561
 #: templates/partials/availability-card.php:164
 #: templates/partials/single-trip/quick-facts.php:18
 #: templates/pdf/itinerary.php:151
@@ -3817,7 +4149,7 @@ msgstr ""
 
 #: app/Core/Handlers/LoginPageHandler.php:134
 #: app/Core/Handlers/LoginPageHandler.php:140
-#: app/Providers/FrontendAssetsProvider.php:527
+#: app/Providers/FrontendAssetsProvider.php:538
 #: app/Shortcodes/MyAccountShortcode.php:60
 #: templates/partials/booking-auth.php:25
 #: templates/shortcodes/login.php:98
@@ -4383,7 +4715,7 @@ msgid "Plugin Homepage"
 msgstr ""
 
 #: app/Providers/AdminServiceProvider.php:156
-#: app/Providers/FrontendAssetsProvider.php:560
+#: app/Providers/FrontendAssetsProvider.php:571
 msgid "Contact"
 msgstr ""
 
@@ -4401,81 +4733,81 @@ msgstr ""
 msgid "Yatra Dashboard"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:523
+#: app/Providers/FrontendAssetsProvider.php:534
 #: app/Shortcodes/LoginShortcode.php:144
 #: templates/account-page.php:28
 msgid "My Account"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:524
+#: app/Providers/FrontendAssetsProvider.php:535
 msgid "My Bookings"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:525
+#: app/Providers/FrontendAssetsProvider.php:536
 msgid "Account Settings"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:528
+#: app/Providers/FrontendAssetsProvider.php:539
 #: app/Shortcodes/MyAccountShortcode.php:64
 #: templates/partials/booking-auth.php:31
 msgid "Register"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:532
+#: app/Providers/FrontendAssetsProvider.php:543
 #: templates/pdf/itinerary.php:186
 msgid "Booking Status"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:538
+#: app/Providers/FrontendAssetsProvider.php:549
 #: templates/partials/single-trip/content-itinerary.php:329
 #: templates/partials/single-trip/gallery-modal.php:29
 msgid "Loading..."
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:539
+#: app/Providers/FrontendAssetsProvider.php:550
 msgid "No data available"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:540
+#: app/Providers/FrontendAssetsProvider.php:551
 msgid "Error loading data"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:541
+#: app/Providers/FrontendAssetsProvider.php:552
 msgid "Please try again"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:545
+#: app/Providers/FrontendAssetsProvider.php:556
 msgid "Free"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:546
+#: app/Providers/FrontendAssetsProvider.php:557
 #: templates/partials/single-trip/quick-facts.php:105
 msgid "Price"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:549
+#: app/Providers/FrontendAssetsProvider.php:560
 #: templates/pdf/itinerary.php:144
 msgid "Trip Details"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:551
+#: app/Providers/FrontendAssetsProvider.php:562
 #: templates/partials/single-trip/quick-facts.php:50
 #: templates/shortcodes/search.php:93
 #: templates/trip-listing-card.php:313
 msgid "Difficulty"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:552
+#: app/Providers/FrontendAssetsProvider.php:563
 #: templates/partials/single-trip/quick-facts.php:84
 msgid "Group Size"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:555
+#: app/Providers/FrontendAssetsProvider.php:566
 #: templates/partials/single-trip/hero.php:11
 msgid "Home"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:556
+#: app/Providers/FrontendAssetsProvider.php:567
 #: templates/listing-activity.php:238
 #: templates/listing-destination.php:245
 #: templates/listing-trip-category.php:250
@@ -4483,13 +4815,13 @@ msgstr ""
 msgid "Trips"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:557
+#: app/Providers/FrontendAssetsProvider.php:568
 #: templates/listing-trip.php:379
 #: templates/single-taxonomy.php:71
 msgid "Destinations"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:558
+#: app/Providers/FrontendAssetsProvider.php:569
 #: templates/listing-trip.php:422
 #: templates/shortcodes/trip-search.php:173
 #: templates/single-taxonomy.php:76
@@ -4497,7 +4829,7 @@ msgstr ""
 msgid "Activities"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:559
+#: app/Providers/FrontendAssetsProvider.php:570
 msgid "About Us"
 msgstr ""
 
@@ -7076,7 +7408,7 @@ msgstr ""
 
 #: templates/partials/availability-card.php:494
 #: templates/partials/availability-section.php:120
-#: templates/partials/single-trip/hero.php:247
+#: templates/partials/single-trip/hero.php:261
 msgid "Book Now"
 msgstr ""
 
@@ -8038,8 +8370,8 @@ msgid "Trip Gallery"
 msgstr ""
 
 #: templates/partials/single-trip/gallery-modal.php:28
-#: templates/partials/single-trip/hero.php:257
-#: templates/partials/single-trip/hero.php:277
+#: templates/partials/single-trip/hero.php:271
+#: templates/partials/single-trip/hero.php:291
 msgid "Gallery Image"
 msgstr ""
 
@@ -8095,8 +8427,8 @@ msgstr ""
 msgid "Group discounts are applied automatically when you select the required number of travelers. No coupon codes needed!"
 msgstr ""
 
-#: templates/partials/single-trip/hero.php:34
-#: templates/partials/single-trip/hero.php:47
+#: templates/partials/single-trip/hero.php:48
+#: templates/partials/single-trip/hero.php:61
 #: templates/partials/single-trip/reviews.php:255
 #, php-format
 msgid "%d star"
@@ -8104,17 +8436,17 @@ msgid_plural "%d stars"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/partials/single-trip/hero.php:40
+#: templates/partials/single-trip/hero.php:54
 msgid "Review"
 msgid_plural "Reviews"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/partials/single-trip/hero.php:50
+#: templates/partials/single-trip/hero.php:64
 msgid "No reviews yet"
 msgstr ""
 
-#: templates/partials/single-trip/hero.php:66
+#: templates/partials/single-trip/hero.php:80
 #: templates/partials/single-trip/similar-trips.php:48
 #, php-format
 msgid "%d day %d night"
@@ -8122,7 +8454,7 @@ msgid_plural "%d days %d nights"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/partials/single-trip/hero.php:68
+#: templates/partials/single-trip/hero.php:82
 #: templates/partials/single-trip/similar-trips.php:49
 #, php-format
 msgid "%d day"
@@ -8130,21 +8462,21 @@ msgid_plural "%d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/partials/single-trip/hero.php:124
+#: templates/partials/single-trip/hero.php:138
 msgid "SAVE"
 msgstr ""
 
-#: templates/partials/single-trip/hero.php:178
+#: templates/partials/single-trip/hero.php:192
 #, php-format
 msgid "Main image for %s"
 msgstr ""
 
-#: templates/partials/single-trip/hero.php:189
+#: templates/partials/single-trip/hero.php:203
 #, php-format
 msgid "Placeholder image for %s"
 msgstr ""
 
-#: templates/partials/single-trip/hero.php:261
+#: templates/partials/single-trip/hero.php:275
 #: templates/partials/single-trip/similar-trips.php:129
 #: templates/single-activity.php:161
 #: templates/single-destination.php:161
@@ -8152,7 +8484,7 @@ msgstr ""
 msgid "Save to wishlist"
 msgstr ""
 
-#: templates/partials/single-trip/hero.php:269
+#: templates/partials/single-trip/hero.php:283
 #, php-format
 msgid "View all %d photos"
 msgstr ""
@@ -9519,85 +9851,105 @@ msgstr ""
 msgid "More categories"
 msgstr ""
 
-#: assets/js/stripe.js:139
+#: assets/js/stripe.js:145
 msgid "Complete Your Payment"
 msgstr ""
 
-#: assets/js/stripe.js:142
-#: assets/js/stripe.js:172
+#: assets/js/stripe.js:148
+#: assets/js/stripe.js:178
 msgid "Pay"
 msgstr ""
 
-#: assets/js/stripe.js:159
+#: assets/js/stripe.js:165
 msgid "Processing..."
 msgstr ""
 
-#: assets/js/stripe.js:226
+#: assets/js/stripe.js:232
 msgid "One-tap checkout"
 msgstr ""
 
-#: assets/js/stripe.js:237
+#: assets/js/stripe.js:243
 msgid "Checking your device for wallet support…"
 msgstr ""
 
-#: assets/js/stripe.js:375
+#: assets/js/stripe.js:382
 msgid "Please pay using the Apple Pay or Google Pay button above."
 msgstr ""
 
-#: assets/js/stripe.js:460
+#: assets/js/stripe.js:467
 msgid "Apple Pay and Google Pay are not available on this browser/device."
 msgstr ""
 
-#: assets/js/stripe.js:464
+#: assets/js/stripe.js:471
 msgid "Use card payment instead or switch to a supported device."
 msgstr ""
 
-#: assets/js/stripe.js:471
+#: assets/js/stripe.js:478
 msgid "Great! Apple Pay or Google Pay is available on this device."
 msgstr ""
 
-#: assets/js/stripe.js:502
+#: assets/js/stripe.js:509
 msgid "Unable to load Apple Pay / Google Pay. Please try again later or use card payment."
 msgstr ""
 
-#: assets/js/stripe.js:505
+#: assets/js/stripe.js:512
 msgid "Wallet payment failed to load."
 msgstr ""
 
-#: assets/js/stripe.js:562
+#: assets/js/stripe.js:514
+msgid "Wallet payments could not be initialized. Use your card below, or try again after refreshing the page."
+msgstr ""
+
+#: assets/js/stripe.js:560
+msgid "Google Pay is not available in this browser. Try Chrome or Edge on desktop or Android, use HTTPS, and ensure you have a card in your Google account."
+msgstr ""
+
+#: assets/js/stripe.js:563
+msgid "Apple Pay is not available here. Use Safari on iPhone, iPad, or Mac, serve this page over HTTPS, and add your domain in Stripe for Apple Pay."
+msgstr ""
+
+#: assets/js/stripe.js:584
 msgid "Choose a payment option"
 msgstr ""
 
-#: assets/js/stripe.js:566
+#: assets/js/stripe.js:588
 msgid "Payment methods"
 msgstr ""
 
-#: assets/js/stripe.js:570
+#: assets/js/stripe.js:592
 msgid "Pick the option that works best for you."
 msgstr ""
 
-#: assets/js/stripe.js:579
+#: assets/js/stripe.js:601
 msgid "Card"
 msgstr ""
 
-#: assets/js/stripe.js:580
+#: assets/js/stripe.js:602
 msgid "Use any major debit or credit card via Stripe Elements."
 msgstr ""
 
-#: assets/js/stripe.js:588
+#: assets/js/stripe.js:610
 msgid "Google Pay"
 msgstr ""
 
-#: assets/js/stripe.js:589
+#: assets/js/stripe.js:611
 msgid "Pay instantly with the cards saved to your Google account."
 msgstr ""
 
-#: assets/js/stripe.js:597
+#: assets/js/stripe.js:619
 msgid "Apple Pay"
 msgstr ""
 
-#: assets/js/stripe.js:598
+#: assets/js/stripe.js:620
 msgid "Use Apple Wallet on iPhone, iPad, or Mac to pay securely."
+msgstr ""
+
+#: assets/js/stripe.js:765
+msgid "Checking if Google Pay or Apple Pay is available on this device…"
+msgstr ""
+
+#: assets/js/stripe.js:772
+msgid "This wallet is not available on this device or browser. Use card payment instead."
 msgstr ""
 
 #: resources/js/blocks/activity/block.json
@@ -9670,6 +10022,16 @@ msgstr ""
 #: resources/js/blocks/tour/block.json
 msgctxt "block keyword"
 msgid "trip"
+msgstr ""
+
+#: resources/js/blocks/tour/block.json
+msgctxt "block keyword"
+msgid "trips"
+msgstr ""
+
+#: resources/js/blocks/tour/block.json
+msgctxt "block keyword"
+msgid "tours"
 msgstr ""
 
 #: resources/js/blocks/tour/block.json

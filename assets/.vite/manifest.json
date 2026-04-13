@@ -1,34 +1,13 @@
 {
-  "_clsx-DgYk2OaC.js": {
-    "file": "dist/js/clsx-DgYk2OaC.js",
-    "name": "clsx"
-  },
-  "_default-i18n-DxhLUi3L.js": {
-    "file": "dist/js/default-i18n-DxhLUi3L.js",
-    "name": "default-i18n"
-  },
   "_index-!~{002}~.js": {
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-2kjAoHiQ.js": {
-    "file": "dist/js/index-2kjAoHiQ.js",
+  "_index-COw08JLb.js": {
+    "file": "dist/js/index-COw08JLb.js",
     "name": "index",
     "imports": [
-      "_clsx-DgYk2OaC.js",
-      "_react-vendor-D4Bz_CyV.js",
-      "_default-i18n-DxhLUi3L.js"
-    ],
-    "dynamicImports": [
-      "node_modules/@wordpress/vips/build-module/vips-worker.mjs"
-    ]
-  },
-  "_index-B-boFLyl.js": {
-    "file": "dist/js/index-B-boFLyl.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-D4Bz_CyV.js",
-      "_default-i18n-DxhLUi3L.js"
+      "_react-vendor-BHHBpqb5.js"
     ],
     "css": [
       "admin/dist/css/index.css"
@@ -38,18 +17,12 @@
     "file": "admin/dist/css/react-vendor.css",
     "src": "_react-vendor-!~{001}~.js"
   },
-  "_react-vendor-D4Bz_CyV.js": {
-    "file": "admin/dist/js/react-vendor-D4Bz_CyV.js",
+  "_react-vendor-BHHBpqb5.js": {
+    "file": "dist/js/react-vendor-BHHBpqb5.js",
     "name": "react-vendor",
     "css": [
       "admin/dist/css/react-vendor.css"
     ]
-  },
-  "node_modules/@wordpress/vips/build-module/vips-worker.mjs": {
-    "file": "dist/js/vips-worker-B7gea0rj.js",
-    "name": "vips-worker",
-    "src": "node_modules/@wordpress/vips/build-module/vips-worker.mjs",
-    "isDynamicEntry": true
   },
   "resources/js/account-page.tsx": {
     "file": "dist/js/account-page.js",
@@ -57,45 +30,8 @@
     "src": "resources/js/account-page.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-D4Bz_CyV.js",
-      "_index-B-boFLyl.js",
-      "_default-i18n-DxhLUi3L.js"
-    ]
-  },
-  "resources/js/blocks/activity/index.tsx": {
-    "file": "dist/blocks/activity.js",
-    "name": "blocks/activity",
-    "src": "resources/js/blocks/activity/index.tsx",
-    "isEntry": true,
-    "imports": [
-      "_index-2kjAoHiQ.js",
-      "_react-vendor-D4Bz_CyV.js",
-      "_default-i18n-DxhLUi3L.js",
-      "_clsx-DgYk2OaC.js"
-    ]
-  },
-  "resources/js/blocks/destination/index.tsx": {
-    "file": "dist/blocks/destination.js",
-    "name": "blocks/destination",
-    "src": "resources/js/blocks/destination/index.tsx",
-    "isEntry": true,
-    "imports": [
-      "_index-2kjAoHiQ.js",
-      "_react-vendor-D4Bz_CyV.js",
-      "_default-i18n-DxhLUi3L.js",
-      "_clsx-DgYk2OaC.js"
-    ]
-  },
-  "resources/js/blocks/tour/index.tsx": {
-    "file": "dist/blocks/tour.js",
-    "name": "blocks/tour",
-    "src": "resources/js/blocks/tour/index.tsx",
-    "isEntry": true,
-    "imports": [
-      "_index-2kjAoHiQ.js",
-      "_react-vendor-D4Bz_CyV.js",
-      "_default-i18n-DxhLUi3L.js",
-      "_clsx-DgYk2OaC.js"
+      "_react-vendor-BHHBpqb5.js",
+      "_index-COw08JLb.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -104,10 +40,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-D4Bz_CyV.js",
-      "_index-B-boFLyl.js",
-      "_clsx-DgYk2OaC.js",
-      "_default-i18n-DxhLUi3L.js"
+      "_react-vendor-BHHBpqb5.js",
+      "_index-COw08JLb.js"
     ]
   }
 }

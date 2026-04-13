@@ -19,6 +19,11 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './resources/js'),
+      // Avoid circular chunk split between block-editor barrel and inspector-controls (Rollup warning / broken load order).
+      '@yatra/wp-inspector-controls': path.resolve(
+        __dirname,
+        'node_modules/@wordpress/block-editor/build-module/components/inspector-controls/index.mjs'
+      ),
     },
   },
   build: {
@@ -35,9 +40,7 @@ export default defineConfig({
       input: {
         app: path.resolve(__dirname, 'resources/js/main.tsx'),
         'account-page': path.resolve(__dirname, 'resources/js/account-page.tsx'),
-        'blocks/tour': path.resolve(__dirname, 'resources/js/blocks/tour/index.tsx'),
-        'blocks/activity': path.resolve(__dirname, 'resources/js/blocks/activity/index.tsx'),
-        'blocks/destination': path.resolve(__dirname, 'resources/js/blocks/destination/index.tsx'),
+        // Gutenberg blocks: built separately (vite.blocks.config.ts) as IIFE — no ES modules in the editor.
       },
       output: {
         entryFileNames: (chunkInfo) => {
@@ -46,18 +49,23 @@ export default defineConfig({
             return 'admin/dist/js/[name].js';
           }
           // Blocks go to dist/blocks/
-          if (chunkInfo.name.startsWith('blocks/')) {
-            return 'dist/[name].js';
-          }
           // Frontend account page goes to dist/js/
           return 'dist/js/[name].js';
         },
         chunkFileNames: (chunkInfo) => {
-          // Admin chunks go to admin/dist/js/
-          if (chunkInfo.name.includes('app') || chunkInfo.name.includes('react-vendor') || chunkInfo.name.includes('query-vendor')) {
-            return 'admin/dist/js/[name]-[hash].js';
+          // Account page vendors stay under dist/js/
+          if (chunkInfo.name.includes('account-react-vendor') || chunkInfo.name.includes('account-query-vendor')) {
+            return 'dist/js/[name]-[hash].js';
           }
-          // Frontend chunks go to dist/js/
+          // Shared React / TanStack chunks used by the admin app AND Gutenberg block bundles:
+          // keep them under assets/dist/js/ so dist/blocks/*.js only need ../js/*.js (no ../../admin/...).
+          if (chunkInfo.name.includes('react-vendor') || chunkInfo.name.includes('query-vendor')) {
+            return 'dist/js/[name]-[hash].js';
+          }
+          // Admin app entry only
+          if (chunkInfo.name.includes('app')) {
+            return 'admin/dist/js/[name].js';
+          }
           return 'dist/js/[name]-[hash].js';
         },
         assetFileNames: (assetInfo) => {

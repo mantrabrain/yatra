@@ -32,6 +32,7 @@
   },
   "supports": {
     "html": false,
+    "inserter": true,
     "align": ["wide", "full"]
   },
   "editorScript": "yatra-activity-block-editor"

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yatra\Services;
 
-use Yatra\Shortcodes\TripShortcode;
 use Yatra\Shortcodes\ActivityShortcode;
 use Yatra\Shortcodes\DestinationShortcode;
 
@@ -19,6 +18,101 @@ use Yatra\Shortcodes\DestinationShortcode;
  */
 class BlockDataService
 {
+    /** Max grid columns for tour / activity / destination listing blocks (matches block editor RangeControl). */
+    private const LISTING_COLUMNS_MAX = 6;
+
+    /**
+     * Defaults aligned with each block's block.json (REST and ServerSideRender rely on full merge).
+     *
+     * @return array<string, mixed>
+     */
+    private static function defaultTourBlockAttributes(): array
+    {
+        return [
+            'order' => 'desc',
+            'featured' => false,
+            'per_page' => 10,
+            'columns' => 3,
+            'title' => 'Our Trips',
+            'show_pagination' => true,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function defaultActivityBlockAttributes(): array
+    {
+        return [
+            'order' => 'asc',
+            'columns' => 3,
+            'per_page' => 10,
+            'title' => 'Activity Listings',
+            'show_pagination' => true,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function defaultDestinationBlockAttributes(): array
+    {
+        return [
+            'order' => 'asc',
+            'columns' => 3,
+            'per_page' => 10,
+            'title' => 'Destination Showcase',
+            'show_pagination' => true,
+        ];
+    }
+
+    /**
+     * Coerce REST/block booleans and legacy string values.
+     *
+     * @param mixed $value
+     */
+    private static function coerceToBool($value, bool $default): bool
+    {
+        if ($value === null || $value === '') {
+            return $default;
+        }
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_int($value) || is_float($value)) {
+            return (bool) $value;
+        }
+        $s = strtolower((string) $value);
+
+        return in_array($s, ['1', 'true', 'yes', 'on'], true);
+    }
+
+    /**
+     * Normalize trip/tour attributes in place (shortcode extras like category are preserved).
+     *
+     * @param array<string, mixed> $atts
+     */
+    private static function normalizeTripShortcodeAttributes(array &$atts): void
+    {
+        $order = strtolower((string) ($atts['order'] ?? 'desc'));
+        $atts['order'] = in_array($order, ['asc', 'desc'], true) ? $order : 'desc';
+
+        $atts['featured'] = self::coerceToBool($atts['featured'] ?? false, false) ? '1' : '0';
+
+        $perPage = (int) ($atts['per_page'] ?? 10);
+        if ($perPage === -1) {
+            $perPage = 10;
+        }
+        $atts['per_page'] = (string) max(1, min(100, $perPage));
+
+        $cols = (int) ($atts['columns'] ?? 3);
+        $atts['columns'] = (string) max(1, min(self::LISTING_COLUMNS_MAX, $cols));
+
+        $atts['title'] = sanitize_text_field((string) ($atts['title'] ?? 'Our Trips'));
+
+        $atts['show_pagination'] = self::coerceToBool($atts['show_pagination'] ?? true, true) ? 'yes' : 'no';
+    }
+
     /**
      * Render trip/tour - Shared method for both blocks and shortcodes
      * 
@@ -28,17 +122,13 @@ class BlockDataService
     public static function renderTrip(array $attributes): string
     {
         try {
-            // Map attributes to expected format
-            $atts = self::mapTripAttributes($attributes);
-            
+            $atts = wp_parse_args(is_array($attributes) ? $attributes : [], self::defaultTourBlockAttributes());
+            self::normalizeTripShortcodeAttributes($atts);
+
             // Get trips using Yatra's service
             $trips_data = self::getTrips($atts);
             
-            // Extract per_page from attributes
-            $per_page = 10; // default
-            if (!empty($atts['per_page']) && is_numeric($atts['per_page'])) {
-                $per_page = (int) $atts['per_page'];
-            }
+            $per_page = max(1, (int) ($atts['per_page'] ?? 10));
             $atts['per_page'] = $per_page;
 
             // Prepare data for template
@@ -150,20 +240,22 @@ class BlockDataService
             
             // Get current page from query string or attributes (for AJAX)
             $current_page = isset($atts['current_page']) ? (int) $atts['current_page'] : (isset($_GET['trip_page']) ? (int) $_GET['trip_page'] : 1);
-            // Use per_page parameter only
-            $per_page = (int) $atts['per_page'];
+            $per_page = max(1, (int) ($atts['per_page'] ?? 10));
             $offset = ($current_page - 1) * $per_page;
-            
-               // Start with very basic arguments to ensure we get trips
+
+            $order = strtolower((string) ($atts['order'] ?? 'desc'));
+
+            // Start with very basic arguments to ensure we get trips
             $args = [
                 'limit' => $per_page,
                 'offset' => $offset,
                 'order_by' => 'created_at',
-                'order' => $atts['order'] === 'asc' ? 'ASC' : 'DESC'
+                'order' => $order === 'asc' ? 'ASC' : 'DESC',
             ];
 
             // Add featured filter if requested
-            if ($atts['featured'] === '1') {
+            $featured = (string) ($atts['featured'] ?? '0');
+            if ($featured === '1') {
                 $args['where']['is_featured'] = 1;
             }
 
@@ -230,12 +322,11 @@ class BlockDataService
     {
         // Create shortcode instance to reuse its logic
         $shortcode = new ActivityShortcode();
-        
-        // Map block attributes to shortcode attributes
-        $shortcodeAtts = self::mapActivityAttributes($attributes);
-        
+
+        $merged = wp_parse_args(is_array($attributes) ? $attributes : [], self::defaultActivityBlockAttributes());
+
         // Use shortcode's render method
-        return $shortcode->render($shortcodeAtts);
+        return $shortcode->render(self::mapActivityAttributes($merged));
     }
     
     /**
@@ -248,145 +339,68 @@ class BlockDataService
     {
         // Create shortcode instance to reuse its logic
         $shortcode = new DestinationShortcode();
-        
-        // Map block attributes to shortcode attributes
-        $shortcodeAtts = self::mapDestinationAttributes($attributes);
-        
+
+        $merged = wp_parse_args(is_array($attributes) ? $attributes : [], self::defaultDestinationBlockAttributes());
+
         // Use shortcode's render method
-        return $shortcode->render($shortcodeAtts);
+        return $shortcode->render(self::mapDestinationAttributes($merged));
     }
-    
+
     /**
-     * Map trip/tour block attributes to shortcode format
-     * Handles backward compatibility with old plugin's posts_per_page
-     * 
-     * @param array $attributes Block attributes
-     * @return array Shortcode attributes
-     */
-    private static function mapTripAttributes(array $attributes): array
-    {
-        $mapped = [];
-        
-        // Order
-        if (isset($attributes['order'])) {
-            $mapped['order'] = in_array(strtolower($attributes['order']), ['asc', 'desc']) 
-                ? strtolower($attributes['order']) 
-                : 'desc';
-        }
-        
-        // Featured
-        if (isset($attributes['featured'])) {
-            $mapped['featured'] = $attributes['featured'] ? '1' : '0';
-        }
-        
-        // Per page
-        if (isset($attributes['per_page'])) {
-            $mapped['per_page'] = max(1, (int) $attributes['per_page']);
-        }
-        
-        // Columns
-        if (isset($attributes['columns'])) {
-            $mapped['columns'] = (string) max(1, min(4, (int) $attributes['columns']));
-        }
-        
-        // Title
-        if (isset($attributes['title'])) {
-            $mapped['title'] = sanitize_text_field($attributes['title']);
-        }
-        
-        // Show pagination
-        if (isset($attributes['show_pagination'])) {
-            $mapped['show_pagination'] = $attributes['show_pagination'] ? 'yes' : 'no';
-        }
-        
-        return $mapped;
-    }
-    
-    /**
-     * Map activity block attributes to shortcode format
-     * 
-     * @param array $attributes Block attributes
-     * @return array Shortcode attributes
+     * Map activity block attributes to shortcode format (full set for shortcode_atts merge).
+     *
+     * @param array<string, mixed> $attributes Merged with defaults
+     * @return array<string, string>
      */
     private static function mapActivityAttributes(array $attributes): array
     {
-        $mapped = [];
-        
-        // Order
-        if (isset($attributes['order'])) {
-            $mapped['order'] = in_array(strtolower($attributes['order']), ['asc', 'desc']) 
-                ? strtolower($attributes['order']) 
-                : 'asc';
+        $order = strtolower((string) ($attributes['order'] ?? 'asc'));
+        $order = in_array($order, ['asc', 'desc'], true) ? $order : 'asc';
+
+        $perPage = (int) ($attributes['per_page'] ?? 10);
+        if ($perPage === -1) {
+            $perPage = 10;
         }
-        
-        // Per page (blocks previously defaulted to -1; server clamped that to 1 — use 10 to match shortcode default)
-        if (isset($attributes['per_page'])) {
-            $perPage = (int) $attributes['per_page'];
-            if ($perPage === -1) {
-                $perPage = 10;
-            }
-            $mapped['per_page'] = (string) max(1, min(100, $perPage));
-        }
-        
-        // Columns
-        if (isset($attributes['columns'])) {
-            $mapped['columns'] = (string) max(1, min(4, (int) $attributes['columns']));
-        }
-        
-        // Title
-        if (isset($attributes['title'])) {
-            $mapped['title'] = sanitize_text_field($attributes['title']);
-        }
-        
-        // Show pagination
-        if (isset($attributes['show_pagination'])) {
-            $mapped['show_pagination'] = $attributes['show_pagination'] ? 'yes' : 'no';
-        }
-        
-        return $mapped;
+        $perPage = max(1, min(100, $perPage));
+
+        $cols = max(1, min(self::LISTING_COLUMNS_MAX, (int) ($attributes['columns'] ?? 3)));
+
+        $showPag = self::coerceToBool($attributes['show_pagination'] ?? true, true);
+
+        return [
+            'order' => $order,
+            'per_page' => (string) $perPage,
+            'columns' => (string) $cols,
+            'title' => sanitize_text_field((string) ($attributes['title'] ?? 'Activity Listings')),
+            'show_pagination' => $showPag ? 'yes' : 'no',
+        ];
     }
-    
+
     /**
-     * Map destination block attributes to shortcode format
-     * 
-     * @param array $attributes Block attributes
-     * @return array Shortcode attributes
+     * @param array<string, mixed> $attributes Merged with defaults
+     * @return array<string, string>
      */
     private static function mapDestinationAttributes(array $attributes): array
     {
-        $mapped = [];
-        
-        // Order
-        if (isset($attributes['order'])) {
-            $mapped['order'] = in_array(strtolower($attributes['order']), ['asc', 'desc']) 
-                ? strtolower($attributes['order']) 
-                : 'asc';
+        $order = strtolower((string) ($attributes['order'] ?? 'asc'));
+        $order = in_array($order, ['asc', 'desc'], true) ? $order : 'asc';
+
+        $perPage = (int) ($attributes['per_page'] ?? 10);
+        if ($perPage === -1) {
+            $perPage = 10;
         }
-        
-        // Per page — legacy block saves used -1 (clamped to 1 in PHP); treat as 10 like shortcode default
-        if (isset($attributes['per_page'])) {
-            $perPage = (int) $attributes['per_page'];
-            if ($perPage === -1) {
-                $perPage = 10;
-            }
-            $mapped['per_page'] = (string) max(1, min(100, $perPage));
-        }
-        
-        // Columns
-        if (isset($attributes['columns'])) {
-            $mapped['columns'] = (string) max(1, min(4, (int) $attributes['columns']));
-        }
-        
-        // Title
-        if (isset($attributes['title'])) {
-            $mapped['title'] = sanitize_text_field($attributes['title']);
-        }
-        
-        // Show pagination
-        if (isset($attributes['show_pagination'])) {
-            $mapped['show_pagination'] = $attributes['show_pagination'] ? 'yes' : 'no';
-        }
-        
-        return $mapped;
+        $perPage = max(1, min(100, $perPage));
+
+        $cols = max(1, min(self::LISTING_COLUMNS_MAX, (int) ($attributes['columns'] ?? 3)));
+
+        $showPag = self::coerceToBool($attributes['show_pagination'] ?? true, true);
+
+        return [
+            'order' => $order,
+            'per_page' => (string) $perPage,
+            'columns' => (string) $cols,
+            'title' => sanitize_text_field((string) ($attributes['title'] ?? 'Destination Showcase')),
+            'show_pagination' => $showPag ? 'yes' : 'no',
+        ];
     }
 }

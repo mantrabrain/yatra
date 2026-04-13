@@ -15,30 +15,40 @@ if (!defined('ABSPATH')) {
     exit;
 }
 $columns = (int) $atts['columns'];
-$column_class = 'yatra-tour-grid-' . min(max($columns, 1), 4);
+$column_class = 'yatra-tour-grid-' . min(max($columns, 1), 6);
 // Extract pagination variables from trips data structure
 $current_page = $trips['current_page'] ?? $current_page ?? 1;
 $max_pages = $trips['max_pages'] ?? $max_pages ?? 1;
-$total_found = $trips['total_found'] ?? $total_found ?? 0;
+$total_found = (int) ($trips['total_found'] ?? $total_found ?? 0);
+$trip_items = $trips['trips'] ?? [];
+
+// Section title: align with activity/destination blocks (always same header structure).
+if (!empty($atts['title'])) {
+    $display_title = (string) $atts['title'];
+} elseif (!empty($atts['featured']) && $atts['featured'] === '1') {
+    $display_title = __('Featured Trips', 'yatra');
+} else {
+    $display_title = __('Our Trips', 'yatra');
+}
 ?>
 <div class="yatra-tour-shortcode" data-atts='<?php echo esc_attr(json_encode($atts)); ?>'>
-    <?php if (!empty($atts['title'])): ?>
-        <h2 class="yatra-tour-title"><?php echo esc_html($atts['title']); ?></h2>
-    <?php elseif (!empty($atts['featured']) && $atts['featured'] === '1'): ?>
-        <h2 class="yatra-tour-title"><?php esc_html_e('Featured Trips', 'yatra'); ?></h2>
+    <div class="yatra-tour-header">
+        <h2 class="yatra-tour-title"><?php echo esc_html($display_title); ?></h2>
+        <?php if (!empty($trip_items) && $total_found > 0) : ?>
             <div class="yatra-tour-count">
-                <?php 
+                <?php
                 printf(
                     esc_html__('Showing %d of %d trips', 'yatra'),
-                    esc_html(count($trips['trips'])),
-                    esc_html($total_found)
+                    count($trip_items),
+                    $total_found
                 );
                 ?>
             </div>
         <?php endif; ?>
-    <?php if (!empty($trips['trips'])): ?>
+    </div>
+    <?php if (!empty($trip_items)): ?>
         <div class="yatra-tour-grid <?php echo esc_attr($column_class); ?>">
-            <?php foreach ($trips['trips'] as $trip): ?>
+            <?php foreach ($trip_items as $trip): ?>
                 <div class="yatra-tour-item">
                     <?php 
                     // Load the trip card template

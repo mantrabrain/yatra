@@ -93,6 +93,7 @@
   }
 
   registerBlockType("yatra/activity", {
+    apiVersion: 3,
     title: "Activity",
     icon: "heart",
     category: "yatra",

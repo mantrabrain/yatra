@@ -93,6 +93,7 @@
   }
 
   registerBlockType("yatra/destination", {
+    apiVersion: 3,
     title: "Destination",
     icon: "location",
     category: "yatra",

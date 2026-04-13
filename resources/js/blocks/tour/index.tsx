@@ -1,36 +1,22 @@
-import { registerBlockType } from "@wordpress/blocks";
+import {
+  getBlockType,
+  registerBlockType,
+  unregisterBlockType,
+  type BlockConfiguration,
+} from "@wordpress/blocks";
 import Edit from "./edit";
+import blockMetadata from "./block.json";
 
-registerBlockType("yatra/tour", {
-  title: "Trip",
-  icon: "palmtree",
-  category: "yatra",
-  attributes: {
-    order: {
-      type: "string",
-      default: "desc",
-    },
-    featured: {
-      type: "boolean",
-      default: false,
-    },
-    per_page: {
-      type: "number",
-      default: 10,
-    },
-    columns: {
-      type: "number",
-      default: 3,
-    },
-    title: {
-      type: "string",
-      default: "Our Trips",
-    },
-    show_pagination: {
-      type: "boolean",
-      default: true,
-    },
-  },
+// Merge full block.json so keywords, supports.inserter, and description stay in sync for the inserter/search.
+const { $schema: _$schema, editorScript: _$editorScript, ...metadata } = blockMetadata;
+
+// If a stale registration exists (no edit / partial merge), replace it so the inserter works.
+if (getBlockType(metadata.name)) {
+  unregisterBlockType(metadata.name);
+}
+
+registerBlockType(metadata.name, {
+  ...metadata,
   edit: Edit,
   save: () => null,
-});
+} as BlockConfiguration);

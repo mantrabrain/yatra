@@ -6,7 +6,7 @@
   "category": "yatra",
   "icon": "palmtree",
   "description": "Display trip listings with customizable options",
-  "keywords": ["tour", "trip", "travel", "yatra"],
+  "keywords": ["tour", "trip", "trips", "tours", "travel", "yatra"],
   "textdomain": "yatra",
   "attributes": {
     "order": {
@@ -36,6 +36,7 @@
   },
   "supports": {
     "html": false,
+    "inserter": true,
     "align": ["wide", "full"]
   },
   "editorScript": "yatra-tour-block-editor"

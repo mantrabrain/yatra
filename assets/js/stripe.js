@@ -26,7 +26,13 @@ class YatraStripe {
             google_pay: false,
             apple_pay: false,
         };
+        this.walletMethodHints = {
+            google_pay: '',
+            apple_pay: '',
+        };
         this.walletAvailabilityKnown = false;
+        /** Short labels for each method switcher option (tooltip base copy). */
+        this.methodHelpText = {};
 
         this.stripeSettings = window.yatraBookingData?.stripe || {};
         let enabledMethods = this.stripeSettings.enabledMethods || ['card'];
@@ -297,7 +303,8 @@ class YatraStripe {
     }
 
     initializeStripe() {
-        const publishableKey = window.yatraBookingData?.stripe?.publishableKey;
+        const publishableKey = window.yatraBookingData?.stripe?.publishableKey
+            || window.yatraBookingData?.stripe?.publishable_key;
         if (!publishableKey) {
             this.displayError('Stripe publishable key is missing. Please contact support.');
             return;
@@ -504,6 +511,9 @@ class YatraStripe {
             );
             this.showWalletPlaceholder(__('Wallet payment failed to load.', 'yatra'));
             this.updateWalletCapabilities(null);
+            const errHint = __('Wallet payments could not be initialized. Use your card below, or try again after refreshing the page.', 'yatra');
+            this.walletMethodHints.google_pay = errHint;
+            this.walletMethodHints.apple_pay = errHint;
             this.syncMethodButtonsState();
         }
     }
@@ -545,6 +555,18 @@ class YatraStripe {
         }
 
         this.walletCapabilities = availability;
+
+        const hintGoogle = !availability.google_pay && this.enabledMethods.includes('google_pay')
+            ? __('Google Pay is not available in this browser. Try Chrome or Edge on desktop or Android, use HTTPS, and ensure you have a card in your Google account.', 'yatra')
+            : '';
+        const hintApple = !availability.apple_pay && this.enabledMethods.includes('apple_pay')
+            ? __('Apple Pay is not available here. Use Safari on iPhone, iPad, or Mac, serve this page over HTTPS, and add your domain in Stripe for Apple Pay.', 'yatra')
+            : '';
+
+        this.walletMethodHints = {
+            google_pay: hintGoogle,
+            apple_pay: hintApple,
+        };
         this.walletAvailabilityKnown = true;
     }
 
@@ -604,6 +626,7 @@ class YatraStripe {
         buttons.className = 'yatra-method-switcher__buttons';
 
         availableButtons.forEach((method) => {
+            this.methodHelpText[method.id] = method.description;
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'yatra-method-button';
@@ -613,7 +636,7 @@ class YatraStripe {
                 <div class="method-content">
                     <span class="method-label">${method.label}</span>
                 </div>
-                <span class="method-tooltip" role="tooltip" aria-label="${method.description}" data-tooltip="${method.description}">
+                <span class="method-tooltip">
                     <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
                         <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.3" fill="none"></circle>
                         <circle cx="10" cy="6" r="1.2" fill="currentColor"></circle>
@@ -621,7 +644,13 @@ class YatraStripe {
                     </svg>
                 </span>
             `;
-            btn.addEventListener('click', () => this.setActiveMethod(method.id));
+            this.applyMethodTooltipText(btn.querySelector('.method-tooltip'), method.description);
+            btn.addEventListener('click', () => {
+                if (btn.getAttribute('aria-disabled') === 'true') {
+                    return;
+                }
+                this.setActiveMethod(method.id);
+            });
             this.methodButtons[method.id] = btn;
             buttons.appendChild(btn);
         });
@@ -656,7 +685,7 @@ class YatraStripe {
             ${close}`,
             apple_pay: `${base}
                 <svg viewBox="0 0 40 24" role="presentation" focusable="false">
-                    <g transform="translate(7 3)" fill="#ffffff">
+                    <g transform="translate(7 3)" fill="currentColor">
                         <path d="M15.1 4.8c-.7.9-1.8 1.4-2.8 1.3-.1-1 .3-2 1-2.7.7-.8 2.1-1.5 3.2-1.5.1 1.1-.3 2.2-1.4 2.9z"></path>
                         <path d="M18.3 12.7c-.5 1.1-1.2 2.2-2.1 3.2-.9 1-1.8 1.9-3 1.9s-1.5-.6-2.9-.6-1.9.6-3 .6c-1.3 0-2.3-1.1-3.2-2.1C2.3 13.7 1 10 2.7 7.5c.8-1.2 2.2-2 3.6-2 1.4 0 2.4.9 3 .9.7 0 2-.9 3.6-.9.6 0 2.5.2 3.6 1.9.1.1 2 .7 1.8 5.3z"></path>
                         <rect x="20.5" y="4.3" width="1.9" height="9.4" rx="0.5"></rect>
@@ -722,26 +751,42 @@ class YatraStripe {
             const isActive = method === this.activeMethod;
             button.classList.toggle('is-active', isActive);
             button.classList.remove('is-disabled', 'is-pending');
-            button.disabled = false;
+            button.removeAttribute('aria-disabled');
+
+            const tooltipEl = button.querySelector('.method-tooltip');
+            const baseHelp = this.methodHelpText[method] || '';
 
             if (this.isWalletMethod(method)) {
                 if (!this.walletAvailabilityKnown) {
                     button.classList.add('is-pending');
+                    button.setAttribute('aria-disabled', 'true');
+                    this.applyMethodTooltipText(
+                        tooltipEl,
+                        __('Checking if Google Pay or Apple Pay is available on this device…', 'yatra')
+                    );
                 } else {
                     const isSupported = !!this.walletCapabilities[method];
                     if (!isSupported) {
                         button.classList.add('is-disabled');
-                        button.disabled = true;
+                        button.setAttribute('aria-disabled', 'true');
+                        const why = this.walletMethodHints[method] || __('This wallet is not available on this device or browser. Use card payment instead.', 'yatra');
+                        this.applyMethodTooltipText(tooltipEl, why);
                         if (isActive) {
                             this.setActiveMethod('card');
                         }
+                    } else {
+                        this.applyMethodTooltipText(tooltipEl, baseHelp);
                     }
                 }
+            } else {
+                this.applyMethodTooltipText(tooltipEl, baseHelp);
             }
         });
 
         // Ensure at least one method is visible if everything else disabled
-        if (!this.activeMethod || (this.methodButtons[this.activeMethod]?.disabled)) {
+        const activeBtn = this.activeMethod ? this.methodButtons[this.activeMethod] : null;
+        const activeBlocked = activeBtn && activeBtn.getAttribute('aria-disabled') === 'true';
+        if (!this.activeMethod || activeBlocked) {
             const fallback = this.supportsCard ? 'card'
                 : (this.walletCapabilities.google_pay ? 'google_pay'
                     : (this.walletCapabilities.apple_pay ? 'apple_pay' : null));
@@ -749,6 +794,20 @@ class YatraStripe {
                 this.setActiveMethod(fallback);
             }
         }
+    }
+
+    /**
+     * @param {HTMLElement | null} el
+     * @param {string} text
+     */
+    applyMethodTooltipText(el, text) {
+        if (!el) {
+            return;
+        }
+        const t = String(text);
+        el.setAttribute('data-tooltip', t);
+        el.setAttribute('aria-label', t);
+        el.setAttribute('title', t);
     }
 
     isWalletMethod(method) {
@@ -762,7 +821,7 @@ class YatraStripe {
 
         if (this.isWalletMethod(method)) {
             if (!this.walletAvailabilityKnown) {
-                return true;
+                return false;
             }
             return !!this.walletCapabilities[method];
         }

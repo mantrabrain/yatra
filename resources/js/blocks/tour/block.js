@@ -98,6 +98,7 @@
   }
 
   registerBlockType("yatra/tour", {
+    apiVersion: 3,
     title: "Trip",
     icon: "palmtree",
     category: "yatra",

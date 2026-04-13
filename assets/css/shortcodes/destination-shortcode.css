@@ -255,20 +255,28 @@
     gap: 30px;
 }
 
-.yatra-destination-shortcode .yatra-destination-grid-1 {
+.yatra-destination-shortcode .yatra-destination-grid.yatra-destination-grid-1 {
     grid-template-columns: 1fr;
 }
 
-.yatra-destination-shortcode .yatra-destination-grid-2 {
+.yatra-destination-shortcode .yatra-destination-grid.yatra-destination-grid-2 {
     grid-template-columns: repeat(2, 1fr);
 }
 
-.yatra-destination-shortcode .yatra-destination-grid-3 {
+.yatra-destination-shortcode .yatra-destination-grid.yatra-destination-grid-3 {
     grid-template-columns: repeat(3, 1fr);
 }
 
-.yatra-destination-shortcode .yatra-destination-grid-4 {
+.yatra-destination-shortcode .yatra-destination-grid.yatra-destination-grid-4 {
     grid-template-columns: repeat(4, 1fr);
+}
+
+.yatra-destination-shortcode .yatra-destination-grid.yatra-destination-grid-5 {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.yatra-destination-shortcode .yatra-destination-grid.yatra-destination-grid-6 {
+    grid-template-columns: repeat(6, 1fr);
 }
 
 /* Destination Card Design - Modern UI/UX */
@@ -1000,8 +1008,10 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .yatra-destination-shortcode .yatra-destination-grid-3,
-    .yatra-destination-shortcode .yatra-destination-grid-4 {
+    .yatra-destination-shortcode .yatra-destination-grid.yatra-destination-grid-3,
+    .yatra-destination-shortcode .yatra-destination-grid.yatra-destination-grid-4,
+    .yatra-destination-shortcode .yatra-destination-grid.yatra-destination-grid-5,
+    .yatra-destination-shortcode .yatra-destination-grid.yatra-destination-grid-6 {
         grid-template-columns: repeat(2, 1fr);
     }
     
@@ -1017,9 +1027,11 @@
 }
 
 @media (max-width: 480px) {
-    .yatra-destination-shortcode .yatra-destination-grid-2,
-    .yatra-destination-shortcode .yatra-destination-grid-3,
-    .yatra-destination-shortcode .yatra-destination-grid-4 {
+    .yatra-destination-shortcode .yatra-destination-grid.yatra-destination-grid-2,
+    .yatra-destination-shortcode .yatra-destination-grid.yatra-destination-grid-3,
+    .yatra-destination-shortcode .yatra-destination-grid.yatra-destination-grid-4,
+    .yatra-destination-shortcode .yatra-destination-grid.yatra-destination-grid-5,
+    .yatra-destination-shortcode .yatra-destination-grid.yatra-destination-grid-6 {
         grid-template-columns: 1fr;
     }
     

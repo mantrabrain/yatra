@@ -725,9 +725,118 @@ class SettingsController extends BaseController
                     : '7,3,1';
             }
 
+            if ($sanitized_gateway === 'stripe') {
+                $allowedStripeMethods = ['card', 'google_pay', 'apple_pay'];
+                $methodsRaw = isset($config['enabled_methods']) ? (string) $config['enabled_methods'] : '';
+                if ($methodsRaw !== '') {
+                    $parts = array_filter(array_map('trim', explode(',', $methodsRaw)));
+                    $normalized = [];
+                    foreach ($parts as $part) {
+                        $slug = strtolower($part);
+                        if (in_array($slug, $allowedStripeMethods, true)) {
+                            $normalized[] = $slug;
+                        }
+                    }
+                    $row['enabled_methods'] = $normalized !== [] ? implode(',', $normalized) : 'card,google_pay,apple_pay';
+                } else {
+                    $row['enabled_methods'] = 'card,google_pay,apple_pay';
+                }
+                foreach (['live_publishable_key', 'live_secret_key', 'test_publishable_key', 'test_secret_key'] as $stripeKey) {
+                    if (array_key_exists($stripeKey, $config)) {
+                        $row[$stripeKey] = sanitize_text_field((string) $config[$stripeKey]);
+                    }
+                }
+            }
+
+            if ($sanitized_gateway === 'razorpay') {
+                $row['key_id'] = isset($config['key_id']) ? sanitize_text_field((string) $config['key_id']) : '';
+                $row['key_secret'] = isset($config['key_secret']) ? sanitize_text_field((string) $config['key_secret']) : '';
+            }
+
+            if ($sanitized_gateway === 'mollie') {
+                $row['api_key'] = isset($config['api_key']) ? sanitize_text_field((string) $config['api_key']) : '';
+                $row['webhook_url'] = isset($config['webhook_url']) ? esc_url_raw((string) $config['webhook_url']) : '';
+                $allowedMollie = ['creditcard', 'ideal', 'bancontact', 'sofort', 'eps', 'giropay', 'paypal', 'sepadirectdebit'];
+                $row['payment_methods'] = $this->sanitizeGatewayStringList(
+                    $config['payment_methods'] ?? [],
+                    $allowedMollie,
+                    ['creditcard', 'ideal', 'paypal']
+                );
+            }
+
+            if ($sanitized_gateway === 'paystack') {
+                $row['public_key'] = isset($config['public_key']) ? sanitize_text_field((string) $config['public_key']) : '';
+                $row['secret_key'] = isset($config['secret_key']) ? sanitize_text_field((string) $config['secret_key']) : '';
+                $row['webhook_url'] = isset($config['webhook_url']) ? esc_url_raw((string) $config['webhook_url']) : '';
+                $allowedPaystack = ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer'];
+                $row['payment_channels'] = $this->sanitizeGatewayStringList(
+                    $config['payment_channels'] ?? [],
+                    $allowedPaystack,
+                    ['card', 'bank', 'ussd']
+                );
+                unset($row['private_key']);
+            }
+
+            if ($sanitized_gateway === 'square') {
+                $row['application_id'] = isset($config['application_id']) ? sanitize_text_field((string) $config['application_id']) : '';
+                $row['access_token'] = isset($config['access_token']) ? sanitize_text_field((string) $config['access_token']) : '';
+                $row['location_id'] = isset($config['location_id']) ? sanitize_text_field((string) $config['location_id']) : '';
+            }
+
+            if ($sanitized_gateway === 'authorize_net') {
+                $row['api_login_id'] = isset($config['api_login_id']) ? sanitize_text_field((string) $config['api_login_id']) : '';
+                $row['transaction_key'] = isset($config['transaction_key']) ? sanitize_text_field((string) $config['transaction_key']) : '';
+                $row['public_client_key'] = isset($config['public_client_key']) ? sanitize_text_field((string) $config['public_client_key']) : '';
+            }
+
+            if ($sanitized_gateway === 'bank_transfer') {
+                $row['bank_name'] = isset($config['bank_name']) ? sanitize_text_field((string) $config['bank_name']) : '';
+                $row['account_name'] = isset($config['account_name']) ? sanitize_text_field((string) $config['account_name']) : '';
+                $row['account_number'] = isset($config['account_number']) ? sanitize_text_field((string) $config['account_number']) : '';
+                $row['routing_code'] = isset($config['routing_code']) ? sanitize_text_field((string) $config['routing_code']) : '';
+                $row['instructions'] = isset($config['instructions']) ? sanitize_textarea_field((string) $config['instructions']) : '';
+            }
+
+            /**
+             * Allow Pro add-ons or custom code to append keys after core sanitization.
+             *
+             * @param array<string, mixed> $row
+             * @param array<string, mixed> $config
+             * @return array<string, mixed>
+             */
+            $row = apply_filters('yatra_sanitize_gateway_config_row', $row, $sanitized_gateway, $config);
+
             $sanitized[$sanitized_gateway] = $row;
         }
         return $sanitized;
+    }
+
+    /**
+     * Normalize multiselect gateway options (Mollie methods, Paystack channels, etc.).
+     *
+     * @param mixed $input
+     * @param array<int, string> $allowed
+     * @param array<int, string> $default
+     * @return array<int, string>
+     */
+    private function sanitizeGatewayStringList($input, array $allowed, array $default): array
+    {
+        if (is_string($input) && $input !== '') {
+            $input = array_map('trim', explode(',', $input));
+        }
+        if (!is_array($input)) {
+            return $default;
+        }
+        $out = [];
+        foreach ($input as $v) {
+            $slug = sanitize_key((string) $v);
+            if ($slug !== '' && in_array($slug, $allowed, true)) {
+                $out[] = $slug;
+            }
+        }
+        $out = array_values(array_unique($out));
+
+        return $out !== [] ? $out : $default;
     }
 
     /**

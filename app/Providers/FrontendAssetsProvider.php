@@ -281,13 +281,22 @@ class FrontendAssetsProvider
         }
 
         wp_localize_script('yatra-trip', 'yatraTripData', $tripData);
-        wp_localize_script('yatra-booking', 'yatraBookingData', array_merge($tripData, [
-            // booking page expects these keys; leave placeholders if not set on trip view
-            'isRemainingPayment' => false,
-            'remainingAmount' => 0,
-            'totalAmount' => 0,
-            'amountPaid' => 0,
-        ]));
+        $tripTitle = '';
+        if ($has_trip && isset($trip->title)) {
+            $tripTitle = is_string($trip->title) ? $trip->title : '';
+        }
+        wp_localize_script('yatra-booking', 'yatraBookingData', array_merge(
+            $tripData,
+            $this->getStripeFrontendBookingPayload(),
+            [
+                'tripTitle' => $tripTitle !== '' ? $tripTitle : ($tripData['tripTitle'] ?? 'Trip Booking'),
+                // booking page expects these keys; leave placeholders if not set on trip view
+                'isRemainingPayment' => false,
+                'remainingAmount' => 0,
+                'totalAmount' => 0,
+                'amountPaid' => 0,
+            ]
+        ));
     }
 
     /**
@@ -413,6 +422,8 @@ class FrontendAssetsProvider
             'gateways' => apply_filters('yatra_payment_gateways', \Yatra\Services\SettingsService::get('payment_gateways', [])),
             'enabledGateways' => \Yatra\Services\SettingsService::get('payment_gateways', []),
         ];
+
+        $bookingData = array_merge($bookingData, $this->getStripeFrontendBookingPayload());
 
         wp_localize_script('yatra-booking', 'yatraBookingData', $bookingData);
     }
@@ -640,5 +651,65 @@ class FrontendAssetsProvider
         $basePath = $type === 'css' ? 'assets/css/' : 'assets/js/';
         $fullPath = YATRA_PLUGIN_PATH . $basePath . $path;
         return file_exists($fullPath);
+    }
+
+    /**
+     * Stripe Elements (assets/js/stripe.js) expects publishableKey under yatraBookingData.stripe.
+     * Mirror YatraPro StripeGateway::loadConfig() live/test selection; never expose secret keys.
+     *
+     * @return array<string, mixed>
+     */
+    private function getStripeFrontendBookingPayload(): array
+    {
+        $allConfigs = get_option('yatra_gateway_configs', []);
+        if (is_string($allConfigs)) {
+            $maybe = maybe_unserialize($allConfigs);
+            $allConfigs = is_array($maybe) ? $maybe : [];
+        }
+        if (!is_array($allConfigs)) {
+            $allConfigs = [];
+        }
+
+        $stripe = isset($allConfigs['stripe']) && is_array($allConfigs['stripe'])
+            ? $allConfigs['stripe']
+            : [];
+
+        $test = filter_var(\Yatra\Services\SettingsService::get('payment_test_mode', true), FILTER_VALIDATE_BOOLEAN);
+
+        $livePub = trim((string) ($stripe['live_publishable_key'] ?? ''));
+        $testPub = trim((string) ($stripe['test_publishable_key'] ?? ''));
+
+        $publishableKey = trim((string) ($stripe['api_key'] ?? ''));
+        if ($test) {
+            if ($testPub !== '') {
+                $publishableKey = $testPub;
+            }
+        } elseif ($livePub !== '') {
+            $publishableKey = $livePub;
+        }
+
+        // Match StripeGateway default + admin multi-select when unset (was dropped by old sanitizer).
+        $defaultMethods = 'card,google_pay,apple_pay';
+        $enabledMethods = $stripe['enabled_methods'] ?? $defaultMethods;
+        if (is_array($enabledMethods)) {
+            // stripe.js accepts an array of method ids
+        } elseif (!is_string($enabledMethods) || trim($enabledMethods) === '') {
+            $enabledMethods = $defaultMethods;
+        }
+
+        $companyCountry = trim((string) \Yatra\Services\SettingsService::get('company_country', ''));
+        if ($companyCountry === '') {
+            $companyCountry = 'US';
+        }
+
+        $payload = [
+            'stripe' => [
+                'publishableKey' => $publishableKey,
+                'enabledMethods' => $enabledMethods,
+            ],
+            'companyCountry' => $companyCountry,
+        ];
+
+        return apply_filters('yatra_booking_stripe_frontend_data', $payload, $stripe, $test);
     }
 }

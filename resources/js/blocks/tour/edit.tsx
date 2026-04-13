@@ -7,6 +7,7 @@ import {
   ToggleControl,
 } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
+import ServerSideRender from "@wordpress/server-side-render";
 
 interface TourBlockAttributes {
   order: "desc" | "asc";
@@ -53,7 +54,12 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
           <RangeControl
             label={__("Columns", "yatra")}
             value={attributes.columns}
-            onChange={(value) => setAttributes({ columns: value || 3 })}
+            onChange={(value) =>
+              setAttributes({
+                columns:
+                  value !== undefined && value !== null ? value : 3,
+              })
+            }
             min={1}
             max={6}
           />
@@ -70,50 +76,12 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
         </PanelBody>
       </InspectorControls>
 
-      <div
-        className="yatra-block-placeholder"
-        style={{
-          padding: "20px",
-          border: "2px dashed #0073aa",
-          borderRadius: "4px",
-          textAlign: "center",
-          backgroundColor: "#f8f9f9",
-        }}
-      >
-        <div>
-          <h3
-            style={{
-              margin: "0 0 10px 0",
-              color: "#0073aa",
-              fontSize: "16px",
-            }}
-          >
-            {attributes.title || __("Tour Block", "yatra")}
-          </h3>
-          <p
-            style={{
-              margin: "0 0 10px 0",
-              color: "#666",
-            }}
-          >
-            {__("This block will display ", "yatra")}
-            {attributes.featured && __("featured ", "yatra")}
-            {__("tour listings on the frontend", "yatra")}
-          </p>
-          <div
-            style={{
-              fontSize: "12px",
-              color: "#999",
-              marginTop: "10px",
-            }}
-          >
-            {__("Showing ", "yatra")}
-            {attributes.per_page}
-            {__(" tours in ", "yatra")}
-            {attributes.columns}
-            {__(" columns", "yatra")}
-          </div>
-        </div>
+      <div className="yatra-block-editor-preview">
+        <ServerSideRender
+          block="yatra/tour"
+          attributes={attributes}
+          key={JSON.stringify(attributes)}
+        />
       </div>
     </>
   );

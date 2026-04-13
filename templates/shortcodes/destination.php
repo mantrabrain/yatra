@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) {
 }
 
 $columns = (int) $atts['columns'];
-$column_class = 'yatra-destination-grid-' . min(max($columns, 1), 4);
+$column_class = 'yatra-destination-grid-' . min(max($columns, 1), 6);
 ?>
 
 <div class="yatra-destination-shortcode" data-atts='<?php echo esc_attr(json_encode($atts)); ?>'>

@@ -35,11 +35,9 @@ class TourBlock
 
     public function register(): void
     {
-        if (\WP_Block_Type_Registry::get_instance()->is_registered('yatra/tour')) {
-            return;
-        }
+        BlockEditorScript::reclaimBlockName('yatra/tour');
 
-        $editorDeps = ['wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n'];
+        $editorDeps = BlockEditorScript::editorDependencies();
         if (! BlockEditorScript::register('yatra-tour-block-editor', 'tour', $editorDeps)) {
             return;
         }
@@ -92,6 +90,7 @@ class TourBlock
                 'supports' => [
                     'align' => ['wide', 'full'],
                     'html' => false,
+                    'inserter' => true,
                 ],
             ]);
         }

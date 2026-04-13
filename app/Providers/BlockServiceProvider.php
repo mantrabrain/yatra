@@ -31,11 +31,11 @@ class BlockServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Priority 5 so yatra/* blocks exist before core/editor validates content (avoids "doesn't include support for the block").
+        // Priority 100 so other plugins (or old stubs) register first; we reclaim + register full assets last.
         if (did_action('init')) {
             $this->registerBlocksOnInit();
         } else {
-            add_action('init', [$this, 'registerBlocksOnInit'], 5);
+            add_action('init', [$this, 'registerBlocksOnInit'], 100);
         }
         
         // Register Yatra block category
