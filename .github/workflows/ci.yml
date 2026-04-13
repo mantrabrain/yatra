@@ -600,7 +600,10 @@ jobs:
   typescript-quality:
     name: TypeScript/React Quality
     runs-on: ubuntu-latest
-    
+    # GitHub/org NODE_ENV=production skips devDependencies on npm ci (no eslint, prettier, typescript).
+    env:
+      NODE_ENV: development
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
