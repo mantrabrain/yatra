@@ -251,6 +251,8 @@ class TemplateLoader
         // Use centralized SettingsService for all settings
         $trip_base = SettingsService::getTripBase();
         $booking_base = SettingsService::getBookingBase();
+        $account_base = SettingsService::getAccountBase();
+        $account_base = preg_replace('/[^a-z0-9_-]/i', '', $account_base) ?: 'account';
 
         // Get other bases with sanitization
         $destination_base = SettingsService::getString('destination_base', 'destination');
@@ -301,6 +303,20 @@ class TemplateLoader
         add_rewrite_rule(
             '^' . $trip_base . '/?$',
             'index.php?yatra_page=' . $trip_base,
+            'top'
+        );
+
+        // Customer account (pageless): /{account_base}/ and /{account_base}/{tab}/
+        // Must be real rewrite rules so WordPress doesn't 404 before Yatra Router runs.
+        add_rewrite_rule(
+            '^' . $account_base . '/?$',
+            'index.php?yatra_page=' . $account_base . '&yatra_account_page=dashboard',
+            'top'
+        );
+
+        add_rewrite_rule(
+            '^' . $account_base . '/([^/]+)/?$',
+            'index.php?yatra_page=' . $account_base . '&yatra_account_page=$matches[1]',
             'top'
         );
 
@@ -403,7 +419,7 @@ class TemplateLoader
         
         // Check if rewrite rules need flushing (only flush once after plugin update/activation)
         $rewrite_version = get_option('yatra_rewrite_rules_version', '0');
-        $current_version = '1.0.7'; // Increment this when rewrite rules change
+        $current_version = '1.0.8'; // Increment this when rewrite rules change
         if ($rewrite_version !== $current_version) {
             flush_rewrite_rules(false);
             update_option('yatra_rewrite_rules_version', $current_version);

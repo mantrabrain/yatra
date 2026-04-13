@@ -82,6 +82,7 @@ import {
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
 import {
+  buildYatraAccountViewUrl,
   buildYatraListingPublicUrl,
   isWordPressPlainPermalink,
 } from "../lib/frontend-permalink-urls";
@@ -4917,15 +4918,12 @@ const Settings: React.FC = () => {
                   />
                   {formData.customer_account_page &&
                     (() => {
-                      const siteUrl = (window as any).yatraAdmin?.siteUrl || "";
-                      const slug = formData.customer_account_page.trim();
-                      // Ensure slug starts with / for proper URL construction
-                      const accountSlug = slug.startsWith("/")
-                        ? slug
-                        : "/" + slug;
-                      // Construct URL: siteUrl + slug (WordPress will handle permalink structure)
-                      const accountUrl =
-                        siteUrl.replace(/\/$/, "") + accountSlug;
+                      const siteUrl =
+                        ((window as any).yatraAdmin?.siteUrl || "") as string;
+                      const accountUrl = buildYatraAccountViewUrl(
+                        siteUrl,
+                        formData.customer_account_page,
+                      );
                       return (
                         <a
                           href={accountUrl}

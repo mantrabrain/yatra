@@ -166,3 +166,20 @@ export function buildYatraListingPublicUrl(
   }
   return `${siteBase}/${seg}/`;
 }
+
+/**
+ * Customer account root for Settings → Customer “View Page”.
+ * Matches {@see SettingsService::getAccountBase()} (last path segment) and the same plain/pretty rules as
+ * {@see buildYatraListingPublicUrl}: `?yatra_page={base}` when WP permalinks are plain, `/{base}/` when pretty.
+ */
+export function buildYatraAccountViewUrl(
+  siteUrl: string,
+  customerAccountPath: string,
+): string {
+  const raw = (customerAccountPath || "").trim().replace(/^\/+/, "");
+  const parts = raw.split("/").filter((p) => p.length > 0);
+  const segment =
+    parts.length > 0 ? parts[parts.length - 1] : "my-account";
+  const slug = (segment || "my-account").trim();
+  return buildYatraListingPublicUrl(slug, siteUrl || undefined);
+}
