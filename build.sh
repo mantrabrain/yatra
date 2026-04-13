@@ -36,8 +36,12 @@ echo "    Output: ${ZIP_PATH}"
 mkdir -p "${BUILD_DIR}"
 
 if command -v composer >/dev/null 2>&1 && [[ -f "${PLUGIN_DIR}/composer.json" ]]; then
-  echo "==> composer install --no-dev --optimize-autoloader"
-  (cd "${PLUGIN_DIR}" && composer install --no-dev --optimize-autoloader --no-interaction)
+  if [[ ! -f "${PLUGIN_DIR}/composer.lock" ]]; then
+    echo "Error: composer.lock is missing. Commit composer.lock for reproducible production installs." >&2
+    exit 1
+  fi
+  echo "==> Clean vendor + composer install --no-dev (production only; no require-dev)"
+  (cd "${PLUGIN_DIR}" && rm -rf vendor && composer install --no-dev --optimize-autoloader --no-interaction)
 else
   echo "Warning: composer not found or no composer.json; using existing vendor/ if present." >&2
 fi
@@ -80,28 +84,7 @@ eslint.config.js
 .prettierrc*
 prettier.config.*
 babel.config.*
-# Source TS/React (exclude) but keep resources/js/blocks/ for block.json + legacy block.js
-resources/js/App.tsx
-resources/js/main.tsx
-resources/js/account-page.tsx
-resources/js/tsconfig.json
-resources/js/pages/
-resources/js/components/
-resources/js/hooks/
-resources/js/lib/
-resources/js/data/
-resources/js/services/
-resources/js/css/
-resources/js/types/
-resources/js/blocks/tour/edit.tsx
-resources/js/blocks/tour/index.tsx
-resources/js/blocks/tour/index.js
-resources/js/blocks/activity/edit.tsx
-resources/js/blocks/activity/index.tsx
-resources/js/blocks/destination/edit.tsx
-resources/js/blocks/destination/index.tsx
-resources/scss/
-resources/css/
+# resources/js (TS/JS source) is included for WordPress.org and transparency
 tests/
 phpunit.xml
 phpunit.xml.dist
@@ -135,7 +118,7 @@ if [[ ! -f "${STAGE_DIR}/yatra.php" ]]; then
 fi
 
 if [[ ! -f "${STAGE_DIR}/vendor/autoload.php" ]]; then
-  echo "Error: staged copy missing vendor/autoload.php. Run: composer install --no-dev --optimize-autoloader" >&2
+  echo "Error: staged copy missing vendor/autoload.php. Run: composer run install:prod" >&2
   exit 1
 fi
 

@@ -54,28 +54,7 @@ eslint.config.js
 .prettierrc*
 prettier.config.*
 babel.config.*
-# Source TS/React (exclude) but keep resources/js/blocks/ for block.json + legacy block.js
-resources/js/App.tsx
-resources/js/main.tsx
-resources/js/account-page.tsx
-resources/js/tsconfig.json
-resources/js/pages/
-resources/js/components/
-resources/js/hooks/
-resources/js/lib/
-resources/js/data/
-resources/js/services/
-resources/js/css/
-resources/js/types/
-resources/js/blocks/tour/edit.tsx
-resources/js/blocks/tour/index.tsx
-resources/js/blocks/tour/index.js
-resources/js/blocks/activity/edit.tsx
-resources/js/blocks/activity/index.tsx
-resources/js/blocks/destination/edit.tsx
-resources/js/blocks/destination/index.tsx
-resources/scss/
-resources/css/
+# resources/js (TS/JS source) is included for WordPress.org and transparency
 tests/
 phpunit.xml
 phpunit.xml.dist

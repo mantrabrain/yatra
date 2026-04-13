@@ -33,6 +33,12 @@
         "squizlabs/php_codesniffer": "^3.7",
         "wp-coding-standards/wpcs": "^3.0"
     },
+    "scripts": {
+        "install:prod": "@composer install --no-dev --optimize-autoloader --no-interaction"
+    },
+    "scripts-descriptions": {
+        "install:prod": "Install only production packages into vendor/ (omit require-dev). Use for releases and live sites; CI should run plain composer install."
+    },
     "config": {
         "optimize-autoloader": true,
         "sort-packages": true,

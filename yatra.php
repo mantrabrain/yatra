@@ -44,7 +44,7 @@ yatra_run_incompatible_pro_guard();
 $autoloader = YATRA_PLUGIN_PATH . 'vendor/autoload.php';
 if (!file_exists($autoloader)) {
     wp_die(
-        'Yatra plugin requires Composer dependencies. Please run "composer install" in the plugin directory.',
+        'Yatra plugin requires Composer dependencies. From the plugin directory run: composer install --no-dev --optimize-autoloader (or: composer run install:prod).',
         'Yatra Plugin Error',
         ['back_link' => true]
     );
@@ -59,7 +59,7 @@ if (!\Yatra\Core\Requirements::check()) {
 // Bootstrap the plugin
 try {
     if (!class_exists('Yatra\Bootstrap')) {
-        throw new \Exception('Bootstrap class not found. Please run "composer install" to generate autoloader.');
+        throw new \Exception('Bootstrap class not found. Run composer install --no-dev --optimize-autoloader (or composer run install:prod) in the plugin directory.');
     }
 
     $yatra = new \Yatra\Bootstrap();

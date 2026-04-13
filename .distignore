@@ -1,0 +1,58 @@
+# Excluded from WordPress.org SVN deploy (10up/action-wordpress-plugin-deploy).
+# Same spirit as .gitattributes export-ignore — do NOT list resources/js; source ships with the plugin.
+
+# VCS / CI
+.git
+.github
+.gitignore
+.gitattributes
+.distignore
+
+# WordPress.org repo assets (banner, screenshots) — action uploads these separately
+.wordpress-org
+
+# Node / Composer dev metadata (vendor is produced by release workflow / composer install)
+node_modules
+package.json
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+npm-debug.log*
+composer.json
+composer.lock
+
+# Tooling & tests
+phpcs.xml
+phpcs.xml.dist
+phpunit.xml
+phpunit.xml.dist
+.phpunit.result.cache
+tests
+scripts
+docs
+
+# Build config (built assets already under assets/dist and assets/admin/dist)
+vite.config.ts
+tsconfig.json
+tsconfig.node.json
+tailwind.config.js
+postcss.config.js
+babel.config.cjs
+vite
+eslint.config.js
+.prettierrc
+.prettierrc.json
+prettier.config.js
+
+# Local / release helpers
+build.sh
+copy.sh
+build
+*.map
+assets/.vite
+
+# GitHub / internal only
+README.md
+UNUSED_SETTINGS_ANALYSIS.md
+.env
+.env.*
