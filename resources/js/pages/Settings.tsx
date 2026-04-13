@@ -81,7 +81,10 @@ import {
 } from "../components/ui/card";
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
-import { buildYatraListingPublicUrl } from "../lib/frontend-permalink-urls";
+import {
+  buildYatraListingPublicUrl,
+  isWordPressPlainPermalink,
+} from "../lib/frontend-permalink-urls";
 import { getCurrencyOptions } from "../data/currencies";
 import { SearchableSelect } from "../components/ui/searchable-select";
 import { MultiSelect, MultiSelectOption } from "../components/ui/multi-select";
@@ -6743,6 +6746,17 @@ const Settings: React.FC = () => {
         const listingHref = (segment: string) =>
           buildYatraListingPublicUrl(segment, listingSite || undefined);
 
+        const bookingConfirmationPreviewUrl = (bookingBase: string) => {
+          const bb = (bookingBase || "book").replace(/^\/|\/$/g, "");
+          const site = listingSite || "";
+          if (isWordPressPlainPermalink()) {
+            return site
+              ? `${site}/?yatra_booking_confirmation=`
+              : "/?yatra_booking_confirmation=";
+          }
+          return site ? `${site}/${bb}/confirmation/` : `/${bb}/confirmation/`;
+        };
+
         return (
           <div className="space-y-6">
             <div>
@@ -6941,23 +6955,44 @@ const Settings: React.FC = () => {
                     className="font-mono"
                   />
                   {formData.booking_base && (
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
-                      <span className="min-w-0">
-                        {__("Booking hub URL:", "yatra")}{" "}
-                        <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded break-all">
-                          {listingHref(formData.booking_base || "book")}
-                        </code>
-                      </span>
-                      <a
-                        href={listingHref(formData.booking_base || "book")}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline shrink-0"
-                      >
-                        <ExternalLink className="w-3 h-3" />{" "}
-                        {__("View", "yatra")}
-                      </a>
-                    </div>
+                    <>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
+                        <span className="min-w-0">
+                          {__("Booking hub URL:", "yatra")}{" "}
+                          <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded break-all">
+                            {listingHref(formData.booking_base || "book")}
+                          </code>
+                        </span>
+                        <a
+                          href={listingHref(formData.booking_base || "book")}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline shrink-0"
+                        >
+                          <ExternalLink className="w-3 h-3" />{" "}
+                          {__("View", "yatra")}
+                        </a>
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                        <span className="min-w-0">
+                          {__(
+                            "Booking confirmation base (pageless, same slug as above):",
+                            "yatra",
+                          )}{" "}
+                          <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded break-all">
+                            {bookingConfirmationPreviewUrl(
+                              formData.booking_base || "book",
+                            )}
+                          </code>
+                          <span className="text-gray-400 dark:text-gray-500 ml-1">
+                            {__(
+                              "append booking reference after checkout",
+                              "yatra",
+                            )}
+                          </span>
+                        </span>
+                      </div>
+                    </>
                   )}
                 </FormField>
 

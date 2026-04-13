@@ -54,7 +54,8 @@ class TemplateLoader
             return $template;
         }
 
-        $confirmationId = get_query_var('yatra_booking_confirmation') ?: ($_GET['yatra_booking_confirmation'] ?? ($_GET['reference'] ?? ''));
+        $confirmationId = get_query_var('yatra_booking_confirmation')
+            ?: ($_GET['yatra_booking_confirmation'] ?? ($_GET['reference'] ?? ($_GET['booking_id'] ?? '')));
         if (empty($confirmationId)) {
             return $template;
         }
@@ -63,7 +64,7 @@ class TemplateLoader
             }
 
         $bookingRepo = new BookingRepository();
-        $booking = $bookingRepo->findByReferenceWithTrip($confirmationId) ?: $bookingRepo->findByReference($confirmationId);
+        $booking = $bookingRepo->findByConfirmationSegment((string) $confirmationId);
         if (!$booking) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 }
@@ -109,10 +110,11 @@ class TemplateLoader
         }
 
         // Early plain-permalink handling for booking confirmation via query var
-        $confirmationId = get_query_var('yatra_booking_confirmation') ?: ($_GET['yatra_booking_confirmation'] ?? ($_GET['reference'] ?? ''));
+        $confirmationId = get_query_var('yatra_booking_confirmation')
+            ?: ($_GET['yatra_booking_confirmation'] ?? ($_GET['reference'] ?? ($_GET['booking_id'] ?? '')));
         if (!empty($confirmationId)) {
             $bookingRepo = new BookingRepository();
-            $booking = $bookingRepo->findByReferenceWithTrip($confirmationId) ?: $bookingRepo->findByReference($confirmationId);
+            $booking = $bookingRepo->findByConfirmationSegment((string) $confirmationId);
             if ($booking) {
                 global $wp_query;
                 $wp_query->is_404 = false;
@@ -364,6 +366,13 @@ class TemplateLoader
             'top'
         );
 
+        // Pageless booking confirmation: /{booking_base}/confirmation/{reference}/ (before trip slug rule)
+        add_rewrite_rule(
+            '^' . $booking_base . '/confirmation/([a-zA-Z0-9_-]+)/?$',
+            'index.php?yatra_booking_confirmation=$matches[1]',
+            'top'
+        );
+
         // Booking with trip slug: /{booking_base}/{trip}/
         add_rewrite_rule(
             '^' . $booking_base . '/([^/]+)/?$',
@@ -375,13 +384,6 @@ class TemplateLoader
         add_rewrite_rule(
             '^' . $booking_base . '/?$',
             'index.php?yatra_page=' . $booking_base,
-            'top'
-        );
-
-        // Add rewrite rule for booking confirmation: book/confirmation/{id}
-        add_rewrite_rule(
-            '^book/confirmation/([a-zA-Z0-9_-]+)/?$',
-            'index.php?yatra_booking_confirmation=$matches[1]',
             'top'
         );
 
@@ -401,7 +403,7 @@ class TemplateLoader
         
         // Check if rewrite rules need flushing (only flush once after plugin update/activation)
         $rewrite_version = get_option('yatra_rewrite_rules_version', '0');
-        $current_version = '1.0.6'; // Increment this when rewrite rules change
+        $current_version = '1.0.7'; // Increment this when rewrite rules change
         if ($rewrite_version !== $current_version) {
             flush_rewrite_rules(false);
             update_option('yatra_rewrite_rules_version', $current_version);

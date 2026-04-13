@@ -980,8 +980,12 @@ function yatra_get_checkout_url(): string
 /**
  * Front-end URL for booking confirmation for a given reference.
  *
- * Uses the configured confirmation page (if set), plain-permalink query routing
- * (?yatra_booking_confirmation=ref), or the default /booking-confirmation/ base.
+ * Booking confirmation is pageless: Yatra serves it via rewrite rules and query vars,
+ * not a WordPress page permalink. Pretty URLs use /{booking_base}/confirmation/{reference}/.
+ * Plain permalinks use ?yatra_booking_confirmation={reference}.
+ *
+ * To use a real WordPress page as the base (advanced), filter {@see 'yatra_booking_confirmation_base_url'}.
+ * Legacy /booking-confirmation/{reference}/ remains registered in rewrites for old links.
  *
  * @param string $reference Booking reference segment (may be empty for base URL only).
  * @return string Full URL.
@@ -999,8 +1003,25 @@ function yatra_get_booking_confirmation_url(string $reference = ''): string
             $url = add_query_arg('yatra_booking_confirmation', $reference, home_url('/'));
         }
     } else {
-        $confirmation_page_id = SettingsService::get('booking_confirmation_page');
-        $base_url = $confirmation_page_id ? get_permalink((int) $confirmation_page_id) : home_url('/booking-confirmation/');
+        $booking_base = trim((string) SettingsService::getBookingBase(), '/');
+        if ($booking_base === '') {
+            $booking_base = 'book';
+        }
+        $virtual_base = home_url('/' . $booking_base . '/confirmation/');
+
+        /**
+         * Override the base URL for booking confirmation (before the reference path segment).
+         * Return a non-empty string to use a custom base (e.g. get_permalink( $page_id )).
+         * Default null keeps the pageless virtual URL from Settings → booking base.
+         *
+         * @param string|null $base_url  Custom base, or null to use virtual URL.
+         * @param string      $reference Booking reference (may be empty).
+         */
+        $base_url = apply_filters('yatra_booking_confirmation_base_url', null, $reference);
+        if (!is_string($base_url) || $base_url === '') {
+            $base_url = $virtual_base;
+        }
+
         if ($reference === '') {
             $url = trailingslashit($base_url);
         } else {

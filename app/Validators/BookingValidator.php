@@ -366,6 +366,10 @@ class BookingValidator
         if (isset($data['itinerary_costs_total'])) {
             $sanitized['itinerary_costs_total'] = (float)$data['itinerary_costs_total'];
         }
+        if (isset($data['departure_time'])) {
+            $t = trim((string) $data['departure_time']);
+            $sanitized['departure_time'] = $t !== '' ? sanitize_text_field($t) : '';
+        }
 
         return $sanitized;
     }

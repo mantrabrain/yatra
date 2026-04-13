@@ -433,8 +433,7 @@ class YatraStripe {
                     amount: effectiveAmount,
                     currency: bookingInfo.currency || bookingData.currency || 'USD'
                 });
-                window.location.href = bookingInfo.redirect_url || 
-                    `${window.location.origin}/booking-confirmation?booking_id=${bookingInfo.booking_id}`;
+                window.location.href = this.buildConfirmationUrlFromBookingInfo(bookingInfo);
             } else {
                 throw new Error('Payment processing was not completed. Please check your payment details and try again.');
             }
@@ -866,8 +865,7 @@ class YatraStripe {
                 });
             }
 
-            window.location.href = bookingInfo.redirect_url || 
-                `${window.location.origin}/booking-confirmation?booking_id=${bookingInfo.booking_id}`;
+            window.location.href = this.buildConfirmationUrlFromBookingInfo(bookingInfo);
         } catch (error) {
             console.error('Stripe payment request error:', error);
             if (event && typeof event.complete === 'function') {
@@ -944,7 +942,7 @@ class YatraStripe {
                 trip_date: bookingInfo.trip_date || bookingData.travel_date || '',
                 customer_email: customerEmail,
                 customer_name: customerName,
-                return_url: bookingInfo.redirect_url || `${window.location.origin}/booking-confirmation?booking_id=${bookingInfo.booking_id}`
+                return_url: this.buildReturnUrl(bookingInfo)
             })
         });
 
@@ -1157,8 +1155,42 @@ class YatraStripe {
         return Math.max(50, Math.round(value * 100));
     }
 
+    /**
+     * Pageless confirmation URLs use the same base as Settings → Default Booking URL Base
+     * (e.g. book → /book/confirmation/{reference}/). Never hard-code /booking-confirmation/.
+     */
+    buildConfirmationUrlFromBookingInfo(bookingInfo) {
+        if (bookingInfo.redirect_url) {
+            return bookingInfo.redirect_url;
+        }
+        const d = window.yatraBookingData || {};
+        const site = (d.siteUrl || window.location.origin || '').replace(/\/$/, '');
+        const ref = String(bookingInfo.reference || '').trim();
+        const id = bookingInfo.booking_id;
+        const segment = ref || (id != null && id !== '' ? String(id) : '');
+
+        if (!segment) {
+            return `${site}/`;
+        }
+
+        if (d.permalinkStructure === 'plain') {
+            return `${site}/?yatra_booking_confirmation=${encodeURIComponent(segment)}`;
+        }
+
+        const bb = String(d.bookingBase || 'book').replace(/^\/|\/$/g, '');
+        return `${site}/${bb}/confirmation/${encodeURIComponent(segment)}/`;
+    }
+
     buildReturnUrl(bookingInfo) {
-        return `${window.location.origin}${window.location.pathname}?booking_id=${bookingInfo.booking_id}&payment_intent=success`;
+        const base = this.buildConfirmationUrlFromBookingInfo(bookingInfo);
+        try {
+            const url = new URL(base, window.location.origin);
+            url.searchParams.set('stripe_return', '1');
+            return url.toString();
+        } catch (e) {
+            const join = base.includes('?') ? '&' : '?';
+            return `${base}${join}stripe_return=1`;
+        }
     }
 
     async notifyPaymentSuccess({ bookingId, transactionId, saveCard, amount, currency }) {

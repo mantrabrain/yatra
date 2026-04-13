@@ -300,13 +300,22 @@ class BookingService
                     }
                     $travelersCount = (int) ($data['travelers_count'] ?? 0);
 
+                    $departureTime = null;
+                    if (!empty($data['departure_time']) && is_string($data['departure_time'])) {
+                        $departureTime = trim($data['departure_time']);
+                        if ($departureTime === '') {
+                            $departureTime = null;
+                        }
+                    }
+
                     // Find or create departure
                     $departure = $this->departureService->findOrCreateForBooking(
                         (int) $data['trip_id'],
                         $data['start_date'],
                         $data['end_date'],
                         $travelersCount,
-                        $maxCapacity
+                        $maxCapacity,
+                        $departureTime
                     );
 
                     // Link booking to departure

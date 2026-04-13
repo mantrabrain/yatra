@@ -163,15 +163,6 @@ class AvailabilityController extends BaseController
                 $this->service->updateBookingAvailabilityIds((int) $tripId, $availabilityIdByDate);
             }
 
-            $activeBookingStatuses = [
-                'pending',
-                'confirmed',
-                'processing',
-                'completed',
-                'on_hold',
-            ];
-            $placeholders = implode(',', array_fill(0, count($activeBookingStatuses), '%s'));
-
             // Aggregate bookings count per availability date for this trip
             // Use AvailabilityService to get booking counts
             $countsByAvailabilityId = [];

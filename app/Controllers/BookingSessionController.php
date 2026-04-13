@@ -1172,6 +1172,28 @@ class BookingSessionController extends BaseController
 
         $is_offline_gateway = $this->isOfflineGateway($payment_gateway);
 
+        // Ensure DB availability row is linked so inventory sync can subtract seats after booking.
+        if (!$isWaitlistCheckout && empty($availability_id) && $trip_id > 0 && $travel_date !== '') {
+            try {
+                $dtForResolve = is_string($departure_time) ? trim($departure_time) : '';
+                $dtForResolve = $dtForResolve !== '' ? $dtForResolve : null;
+                $resolvedCheckout = (new \Yatra\Services\AvailabilityResolutionService())->resolveAvailabilityForDate(
+                    $trip_id,
+                    sanitize_text_field($travel_date),
+                    $dtForResolve
+                );
+                if (is_object($resolvedCheckout)
+                    && ($resolvedCheckout->source ?? '') === 'availability_date'
+                    && isset($resolvedCheckout->id)
+                    && is_numeric($resolvedCheckout->id)
+                    && (int) $resolvedCheckout->id > 0) {
+                    $availability_id = (int) $resolvedCheckout->id;
+                }
+            } catch (\Throwable $e) {
+                // Recurring / trip-default checkout: no single availability_dates row
+            }
+        }
+
         // Always defer createBooking's copy: session sends one rich confirmation at the end, or
         // transactional confirmation before payment redirect (see processPaymentGateway returns).
         $booking_data = [
@@ -1188,6 +1210,7 @@ class BookingSessionController extends BaseController
             'emergency_contact' => wp_json_encode($emergency_data),
             'travel_date' => sanitize_text_field($travel_date),
             'availability_id' => !empty($availability_id) ? (int) $availability_id : null,
+            'departure_time' => is_string($departure_time) ? trim($departure_time) : '',
             'travelers_count' => $travelers_count,
             'total_amount' => $total_amount,
             'amount_paid' => 0,

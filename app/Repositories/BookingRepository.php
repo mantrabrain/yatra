@@ -216,6 +216,30 @@ class BookingRepository extends BaseRepository
     }
 
     /**
+     * Resolve a booking for the confirmation page: reference string, or numeric primary key (legacy ?booking_id= / Stripe fallback).
+     */
+    public function findByConfirmationSegment(string $segment): ?object
+    {
+        $segment = trim(sanitize_text_field($segment));
+        if ($segment === '') {
+            return null;
+        }
+
+        $byRef = $this->findByReferenceWithTrip($segment) ?: $this->findByReference($segment);
+        if ($byRef !== null) {
+            return $byRef;
+        }
+
+        if (ctype_digit($segment)) {
+            $id = (int) $segment;
+
+            return $this->findWithTrip($id) ?: $this->find($id);
+        }
+
+        return null;
+    }
+
+    /**
      * Find booking by reference with trip data
      *
      * @param string $reference Booking reference
@@ -964,6 +988,16 @@ class BookingRepository extends BaseRepository
     }
 
     /**
+     * Booking statuses that consume seats on a dated availability row (must match {@see AvailabilityInventoryHooks}).
+     *
+     * @return list<string>
+     */
+    public static function getCapacityConsumingBookingStatuses(): array
+    {
+        return ['pending', 'confirmed', 'processing', 'completed', 'on_hold'];
+    }
+
+    /**
      * Count booked travelers by availability ID
      *
      * @param int $availabilityId Availability ID
@@ -972,11 +1006,15 @@ class BookingRepository extends BaseRepository
     public function countBookedTravelersByAvailabilityId(int $availabilityId): int
     {
         $table = $this->getTableName();
-        return (int)$this->wpdb->get_var($this->wpdb->prepare(
+        $statuses = self::getCapacityConsumingBookingStatuses();
+        $ph = implode(',', array_fill(0, count($statuses), '%s'));
+        $params = array_merge([$availabilityId], $statuses);
+
+        return (int) $this->wpdb->get_var($this->wpdb->prepare(
             "SELECT COALESCE(SUM(travelers_count), 0) 
              FROM {$table} 
-             WHERE availability_id = %d AND status NOT IN ('cancelled', 'refunded', 'failed')",
-            $availabilityId
+             WHERE availability_id = %d AND status IN ({$ph})",
+            $params
         ));
     }
 
@@ -994,14 +1032,17 @@ class BookingRepository extends BaseRepository
             return [];
         }
 
-        $placeholders = implode(',', array_fill(0, count($availabilityIds), '%d'));
+        $idPlaceholders = implode(',', array_fill(0, count($availabilityIds), '%d'));
+        $statuses = self::getCapacityConsumingBookingStatuses();
+        $stPlaceholders = implode(',', array_fill(0, count($statuses), '%s'));
+        $params = array_merge($availabilityIds, $statuses);
 
         return $this->wpdb->get_results($this->wpdb->prepare(
             "SELECT availability_id, SUM(travelers_count) AS booked_count
              FROM {$table} 
-             WHERE availability_id IN ({$placeholders}) AND status NOT IN ('cancelled', 'refunded', 'failed')
+             WHERE availability_id IN ({$idPlaceholders}) AND status IN ({$stPlaceholders})
              GROUP BY availability_id",
-            ...$availabilityIds
+            $params
         ));
     }
 
@@ -1101,7 +1142,7 @@ class BookingRepository extends BaseRepository
         $table = esc_sql($this->table);
 
         if (empty($statuses)) {
-            $statuses = ['pending', 'confirmed', 'processing', 'completed', 'on_hold'];
+            $statuses = self::getCapacityConsumingBookingStatuses();
         }
 
         $placeholders = implode(',', array_fill(0, count($statuses), '%s'));

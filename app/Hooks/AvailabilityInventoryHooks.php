@@ -7,6 +7,7 @@ namespace Yatra\Hooks;
 use Yatra\Database\Tables\BookingsTable;
 use Yatra\Database\Tables\TripAvailabilityDatesTable;
 use Yatra\Repositories\AvailabilityRepository;
+use Yatra\Repositories\BookingDepartureRepository;
 use Yatra\Repositories\BookingRepository;
 use Yatra\Repositories\DepartureRepository;
 use Yatra\Services\CapacityService;
@@ -54,21 +55,12 @@ class AvailabilityInventoryHooks
 
             $tripId = (int) ($booking->trip_id ?? 0);
             $availabilityId = isset($booking->availability_id) ? (int) $booking->availability_id : 0;
+            $travelDate = (string) ($booking->travel_date ?? '');
 
-            if ($tripId > 0 && $availabilityId <= 0) {
-                $travelDate = (string) ($booking->travel_date ?? '');
-
-                if ($travelDate !== '') {
-                    $availabilityRepo = new AvailabilityRepository();
-                    $availabilityRecords = $availabilityRepo->findByTripAndDate($tripId, $travelDate);
-                    
-                    if (is_array($availabilityRecords) && count($availabilityRecords) === 1 && !empty($availabilityRecords[0]->id)) {
-                        $availabilityId = (int) $availabilityRecords[0]->id;
-                        
-                        // Update booking with availability_id
-                        $bookingRepo = new BookingRepository();
-                        $bookingRepo->update($bookingId, ['availability_id' => $availabilityId]);
-                    }
+            if ($tripId > 0 && $availabilityId <= 0 && $travelDate !== '') {
+                $availabilityId = self::resolveAvailabilityIdForBooking($bookingId, $tripId, $travelDate);
+                if ($availabilityId > 0) {
+                    (new BookingRepository())->update($bookingId, ['availability_id' => $availabilityId]);
                 }
             }
 
@@ -93,11 +85,12 @@ class AvailabilityInventoryHooks
 
         $departureTime = isset($availability->departure_time) ? (string) $availability->departure_time : '';
 
-        $activeBookingStatuses = ['pending', 'confirmed', 'processing', 'completed', 'on_hold'];
-        
-        // Get booked count using repository
         $bookingRepo = new BookingRepository();
-        $bookedCount = $bookingRepo->getTotalTravelersByTripAndAvailability($tripId, $availabilityId, $activeBookingStatuses);
+        $bookedCount = $bookingRepo->getTotalTravelersByTripAndAvailability(
+            $tripId,
+            $availabilityId,
+            BookingRepository::getCapacityConsumingBookingStatuses()
+        );
 
         $seatsTotal = (int) ($availability->seats_total ?? 0);
         $seatsReserved = $bookedCount;
@@ -220,5 +213,58 @@ class AvailabilityInventoryHooks
         }
         
         unset($processing[$departureId]);
+    }
+
+    /**
+     * Infer yatra_new_trip_availability_dates.id when the booking row missed availability_id
+     * (common when checkout omits it). Uses booking→departure time to disambiguate multiple slots per day.
+     */
+    private static function resolveAvailabilityIdForBooking(int $bookingId, int $tripId, string $travelDate): int
+    {
+        $availabilityRepo = new AvailabilityRepository();
+        $bdRepo = new BookingDepartureRepository();
+        $depId = $bdRepo->getDepartureIdForBooking($bookingId);
+
+        if ($depId) {
+            $depRepo = new DepartureRepository();
+            $dep = $depRepo->find($depId);
+            if (is_object($dep)) {
+                $date = (string) ($dep->start_date ?? $dep->date ?? '');
+                if ($date === '') {
+                    $date = $travelDate;
+                }
+                $timeRaw = isset($dep->time) ? trim((string) $dep->time) : '';
+                if ($timeRaw !== '' && $timeRaw !== '00:00:00') {
+                    $candidates = array_values(array_unique(array_filter([
+                        $timeRaw,
+                        self::normalizeTimeForAvailabilityMatch($timeRaw),
+                    ])));
+                    foreach ($candidates as $t) {
+                        $row = $availabilityRepo->findByTripIdAndDateTime($tripId, $date, $t, true);
+                        if ($row && !empty($row->id)) {
+                            return (int) $row->id;
+                        }
+                    }
+                }
+                $row = $availabilityRepo->findByTripIdAndDateTime($tripId, $date, null, true);
+                if ($row && !empty($row->id)) {
+                    return (int) $row->id;
+                }
+            }
+        }
+
+        $records = $availabilityRepo->findByTripAndDate($tripId, $travelDate);
+        if (count($records) === 1 && !empty($records[0]->id)) {
+            return (int) $records[0]->id;
+        }
+
+        return 0;
+    }
+
+    private static function normalizeTimeForAvailabilityMatch(string $time): string
+    {
+        $ts = strtotime($time);
+
+        return $ts !== false ? date('H:i:s', $ts) : $time;
     }
 }

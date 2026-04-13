@@ -114,8 +114,9 @@ final class PrettyRouteMatcher
             ];
         }
 
-        // 8. Booking confirmation (both rewrite styles)
-        if (preg_match('/^book\/confirmation\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {
+        // 8. Booking confirmation (pageless: /{booking_base}/confirmation/{ref}/ + legacy slug)
+        $booking_base = SettingsService::getBookingBase();
+        if (preg_match('/^' . preg_quote($booking_base, '/') . '\/confirmation\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {
             return [
                 'type' => 'booking_confirmation',
                 'confirmation_id' => $matches[1],
@@ -145,7 +146,6 @@ final class PrettyRouteMatcher
         }
 
         // 10. Booking hub / trip booking
-        $booking_base = SettingsService::getBookingBase();
         if (!SettingsService::useCustomBookingPage()) {
             if (preg_match('/^' . preg_quote($booking_base, '/') . '\/([^\/]+)\/?$/', $path, $matches)) {
                 return [

@@ -87,28 +87,31 @@ class AvailabilityRepository extends BaseRepository
      * @param string|null $departureTime Departure time (HH:MM:SS or HH:MM)
      * @return object|null Availability object or null
      */
-    public function findByTripIdAndDateTime(int $tripId, string $departureDate, ?string $departureTime = null): ?object
+    public function findByTripIdAndDateTime(int $tripId, string $departureDate, ?string $departureTime = null, bool $includeAnyStatus = false): ?object
     {
         $table = esc_sql($this->table);
+        $statusClause = $includeAnyStatus ? '1=1' : "status IN ('available', 'limited')";
 
         if (!empty($departureTime)) {
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $statusClause is fixed safe SQL fragment
             $result = $this->wpdb->get_row($this->wpdb->prepare(
                 "SELECT * FROM `{$table}` 
                  WHERE trip_id = %d 
                  AND departure_date = %s
                  AND departure_time = %s
-                 AND status IN ('available', 'limited')
+                 AND {$statusClause}
                  LIMIT 1",
                 $tripId,
                 $departureDate,
                 $departureTime
             ));
         } else {
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             $result = $this->wpdb->get_row($this->wpdb->prepare(
                 "SELECT * FROM `{$table}` 
                  WHERE trip_id = %d 
                  AND departure_date = %s
-                 AND status IN ('available', 'limited')
+                 AND {$statusClause}
                  LIMIT 1",
                 $tripId,
                 $departureDate

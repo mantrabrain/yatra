@@ -173,35 +173,38 @@ class RouteMatcher
      */
     public static function matchBookingConfirmationPage(string $path): ?array
     {
-        // Try /book/confirmation/{token} pattern first
-        $token = UrlParser::extractTokenFromPath($path, '/^book\/confirmation\/([a-zA-Z0-9_-]+)$/');
-        
+        $booking_base = trim((string) SettingsService::getBookingBase(), '/');
+        if ($booking_base === '') {
+            $booking_base = 'book';
+        }
+
+        $token = UrlParser::extractTokenFromPath(
+            $path,
+            '/^' . preg_quote($booking_base, '/') . '\/confirmation\/([a-zA-Z0-9_-]+)$/'
+        );
+
         if ($token) {
             return [
                 'type' => 'booking_confirmation',
-                'confirmation_id' => $token
+                'confirmation_id' => $token,
             ];
         }
-        
-        // Try /booking-confirmation/{token} pattern
+
         $token = UrlParser::extractTokenFromPath($path, '/^booking-confirmation\/([a-zA-Z0-9_-]+)$/');
-        
+
         if ($token) {
             return [
                 'type' => 'booking_confirmation',
-                'confirmation_id' => $token
+                'confirmation_id' => $token,
             ];
         }
-        
-        // Try /booking-confirmation?booking_id={token} pattern (query parameter)
-        if (strpos($path, 'booking-confirmation') !== false) {
-            $booking_id = $_GET['booking_id'] ?? null;
-            if ($booking_id) {
-                return [
-                    'type' => 'booking_confirmation',
-                    'confirmation_id' => $booking_id
-                ];
-            }
+
+        $booking_id = $_GET['booking_id'] ?? null;
+        if ($booking_id && (strpos($path, $booking_base . '/confirmation') !== false || strpos($path, 'booking-confirmation') !== false)) {
+            return [
+                'type' => 'booking_confirmation',
+                'confirmation_id' => (string) $booking_id,
+            ];
         }
 
         return null;
