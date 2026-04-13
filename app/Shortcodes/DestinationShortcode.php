@@ -294,7 +294,7 @@ class DestinationShortcode extends BaseShortcode
                     'trips' => $trips,
                     'trip_count' => $trip_count,
                     'description' => $destinationData->description ?? '',
-                    'image' => $this->getDestinationImage($destinationData),
+                    'image' => $this->getDestinationImage($destinationData, $trips),
                     'link' => $this->getDestinationLink($destinationData),
                     'country' => $destinationData->country ?? '',
                     'region' => $destinationData->region ?? '',
@@ -358,9 +358,83 @@ class DestinationShortcode extends BaseShortcode
 
     
     /**
-     * Get destination image
+     * Resolve image URL from destination `icon` (same shape as admin: type image|icon, value = attachment ID or URL).
      */
-    private function getDestinationImage($destination): string
+    private function getImageUrlFromDestinationIcon(mixed $icon): string
+    {
+        if ($icon === null || $icon === '') {
+            return '';
+        }
+
+        if (is_string($icon)) {
+            $decoded = json_decode($icon, true);
+            if (is_array($decoded)) {
+                $icon = $decoded;
+            } else {
+                $icon = maybe_unserialize($icon);
+            }
+        }
+
+        if (!is_array($icon)) {
+            return '';
+        }
+
+        $type = $icon['type'] ?? $icon[0] ?? '';
+        $value = $icon['value'] ?? $icon[1] ?? '';
+
+        if ($type !== 'image' || $value === '' || $value === null) {
+            return '';
+        }
+
+        if (is_numeric($value)) {
+            $url = wp_get_attachment_image_url((int) $value, 'large');
+
+            return $url ?: '';
+        }
+
+        if (is_string($value) && filter_var($value, FILTER_VALIDATE_URL)) {
+            return $value;
+        }
+
+        return '';
+    }
+
+    /**
+     * Decode metadata column to array (JSON or PHP serialized).
+     *
+     * @return array<string, mixed>
+     */
+    private function decodeDestinationMetadata(mixed $raw): array
+    {
+        if ($raw === null || $raw === '') {
+            return [];
+        }
+
+        if (is_array($raw)) {
+            return $raw;
+        }
+
+        if (!is_string($raw)) {
+            return [];
+        }
+
+        $decoded = json_decode($raw, true);
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+
+        $unserialized = maybe_unserialize($raw);
+
+        return is_array($unserialized) ? $unserialized : [];
+    }
+
+    /**
+     * Get destination image URL for shortcode cards.
+     *
+     * @param object $destination Classification row from DB
+     * @param array<int, object> $trips Associated trips (newest first), used for featured_image fallback
+     */
+    private function getDestinationImage($destination, array $trips = []): string
     {
         // Check for destination image in metadata
         if (isset($destination->image) && !empty($destination->image)) {
@@ -374,7 +448,7 @@ class DestinationShortcode extends BaseShortcode
 
         // Check for destination thumbnail/featured image
         if (isset($destination->thumbnail) && !empty($destination->thumbnail)) {
-            return is_numeric($destination->thumbnail) ? wp_get_attachment_url($destination->thumbnail) : $destination->thumbnail;
+            return is_numeric($destination->thumbnail) ? (string) wp_get_attachment_url((int) $destination->thumbnail) : $destination->thumbnail;
         }
 
         // Check for destination cover image
@@ -387,28 +461,42 @@ class DestinationShortcode extends BaseShortcode
             return $destination->hero_image;
         }
 
-        // Check for metadata with image
-        if (isset($destination->metadata) && !empty($destination->metadata)) {
-            $metadata = maybe_unserialize($destination->metadata);
-            if (is_array($metadata)) {
-                // Check for various image fields in metadata
-                $image_fields = ['image', 'thumbnail', 'banner', 'featured_image', 'cover_image', 'hero_image'];
+        $fromIcon = $this->getImageUrlFromDestinationIcon($destination->icon ?? null);
+        if ($fromIcon !== '') {
+            return $fromIcon;
+        }
+
+        // Check for metadata with image (JSON or serialized)
+        if (isset($destination->metadata) && $destination->metadata !== '') {
+            $metadata = $this->decodeDestinationMetadata($destination->metadata);
+            if ($metadata !== []) {
+                $image_fields = ['image', 'thumbnail', 'banner', 'featured_image', 'cover_image', 'hero_image', 'image_id'];
                 foreach ($image_fields as $field) {
-                    if (isset($metadata[$field]) && !empty($metadata[$field])) {
-                        return is_numeric($metadata[$field]) ? wp_get_attachment_url($metadata[$field]) : $metadata[$field];
+                    if (!empty($metadata[$field])) {
+                        $val = $metadata[$field];
+
+                        return is_numeric($val) ? (string) wp_get_attachment_url((int) $val) : (string) $val;
                     }
+                }
+            }
+        }
+
+        foreach ($trips as $trip) {
+            if (!empty($trip->featured_image) && is_numeric($trip->featured_image)) {
+                $url = wp_get_attachment_image_url((int) $trip->featured_image, 'large');
+                if ($url !== false && $url !== '') {
+                    return $url;
                 }
             }
         }
 
         // Fallback to placeholder
         $fallback_url = YATRA_PLUGIN_URL . 'assets/images/placeholder.png';
-        
-        // Debug: Log the image URL being used
+
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('Yatra DestinationShortcode Using fallback image: ' . $fallback_url);
         }
-        
+
         return $fallback_url;
     }
 
