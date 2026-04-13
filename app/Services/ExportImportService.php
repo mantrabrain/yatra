@@ -929,55 +929,101 @@ class ExportImportService
 
     private static function entityKeyForDataType(string $dataType): ?string
     {
-        return match ($dataType) {
-            'destinations',
-            'activities',
-            'categories',
-            'difficulty_levels' => 'classifications',
-            'trips' => 'trips',
-            'customers' => 'customers',
-            'bookings' => 'bookings',
-            'payments' => 'payments',
-            'payment_tokens' => 'payment_tokens',
-            'scheduled_payments' => 'scheduled_payments',
-            'availability' => 'availability',
-            'departures' => 'departures',
-            'travelers' => 'travelers',
-            'discounts' => 'discounts',
-            'additional_service_catalog' => 'services',
-            'consent_forms' => 'consent_forms',
-            'signed_consents' => 'signed_consents',
-            'consent_requests' => 'consent_requests',
-            'dynamic_pricing_rules' => 'dynamic_pricing_rules',
-            'abandoned_bookings' => 'abandoned_bookings',
-            'email_templates' => 'email_templates',
-            'email_sequences' => 'email_sequences',
-            'email_sequence_steps' => 'email_sequence_steps',
-            default => null,
-        };
+        switch ($dataType) {
+            case 'destinations':
+            case 'activities':
+            case 'categories':
+            case 'difficulty_levels':
+                return 'classifications';
+            case 'trips':
+                return 'trips';
+            case 'customers':
+                return 'customers';
+            case 'bookings':
+                return 'bookings';
+            case 'payments':
+                return 'payments';
+            case 'payment_tokens':
+                return 'payment_tokens';
+            case 'scheduled_payments':
+                return 'scheduled_payments';
+            case 'availability':
+                return 'availability';
+            case 'departures':
+                return 'departures';
+            case 'travelers':
+                return 'travelers';
+            case 'discounts':
+                return 'discounts';
+            case 'additional_service_catalog':
+                return 'services';
+            case 'consent_forms':
+                return 'consent_forms';
+            case 'signed_consents':
+                return 'signed_consents';
+            case 'consent_requests':
+                return 'consent_requests';
+            case 'dynamic_pricing_rules':
+                return 'dynamic_pricing_rules';
+            case 'abandoned_bookings':
+                return 'abandoned_bookings';
+            case 'email_templates':
+                return 'email_templates';
+            case 'email_sequences':
+                return 'email_sequences';
+            case 'email_sequence_steps':
+                return 'email_sequence_steps';
+            default:
+                return null;
+        }
     }
 
     private static function rowHasInvalidRequiredFks(string $dataType, array $row): bool
     {
-        return match ($dataType) {
-            'trip_classifications' => empty($row['trip_id'] ?? null) || empty($row['classification_id'] ?? null),
-            'trip_content', 'trip_revisions', 'availability_rules', 'availability', 'departures', 'trip_additional_services' => empty($row['trip_id'] ?? null),
-            'trip_consent_forms' => empty($row['trip_id'] ?? null) || empty($row['form_id'] ?? null),
-            'pricing_history', 'trip_demand_scores' => empty($row['trip_id'] ?? null),
-            'consent_requests' => empty($row['form_id'] ?? null) || empty($row['booking_id'] ?? null),
-            'signed_consents' => empty($row['form_id'] ?? null),
-            'abandoned_bookings' => empty($row['trip_id'] ?? null),
-            'recovery_email_logs' => empty($row['abandoned_booking_id'] ?? null),
-            'email_sequence_steps' => empty($row['sequence_id'] ?? null),
-            'booking_departures', 'travelers', 'payments' => empty($row['booking_id'] ?? null),
-            'traveler_meta' => empty($row['traveller_id'] ?? null),
-            'booking_additional_services' => empty($row['booking_id'] ?? null) || empty($row['service_id'] ?? null),
-            'payment_tokens' => empty($row['customer_id'] ?? null),
-            'bookings' => empty($row['trip_id'] ?? null),
-            'scheduled_payments' => empty($row['booking_id'] ?? null),
-            'reviews' => empty($row['trip_id'] ?? null),
-            default => false,
-        };
+        switch ($dataType) {
+            case 'trip_classifications':
+                return empty($row['trip_id'] ?? null) || empty($row['classification_id'] ?? null);
+            case 'trip_content':
+            case 'trip_revisions':
+            case 'availability_rules':
+            case 'availability':
+            case 'departures':
+            case 'trip_additional_services':
+                return empty($row['trip_id'] ?? null);
+            case 'trip_consent_forms':
+                return empty($row['trip_id'] ?? null) || empty($row['form_id'] ?? null);
+            case 'pricing_history':
+            case 'trip_demand_scores':
+                return empty($row['trip_id'] ?? null);
+            case 'consent_requests':
+                return empty($row['form_id'] ?? null) || empty($row['booking_id'] ?? null);
+            case 'signed_consents':
+                return empty($row['form_id'] ?? null);
+            case 'abandoned_bookings':
+                return empty($row['trip_id'] ?? null);
+            case 'recovery_email_logs':
+                return empty($row['abandoned_booking_id'] ?? null);
+            case 'email_sequence_steps':
+                return empty($row['sequence_id'] ?? null);
+            case 'booking_departures':
+            case 'travelers':
+            case 'payments':
+                return empty($row['booking_id'] ?? null);
+            case 'traveler_meta':
+                return empty($row['traveller_id'] ?? null);
+            case 'booking_additional_services':
+                return empty($row['booking_id'] ?? null) || empty($row['service_id'] ?? null);
+            case 'payment_tokens':
+                return empty($row['customer_id'] ?? null);
+            case 'bookings':
+                return empty($row['trip_id'] ?? null);
+            case 'scheduled_payments':
+                return empty($row['booking_id'] ?? null);
+            case 'reviews':
+                return empty($row['trip_id'] ?? null);
+            default:
+                return false;
+        }
     }
 
     private static function applyForeignKeyRemapping(ExportImportIdMapper $m, string $dataType, array &$row): void
@@ -1334,13 +1380,18 @@ class ExportImportService
 
     private static function classificationTypeForDataType(string $dataType): ?string
     {
-        return match ($dataType) {
-            'destinations' => ClassificationTypes::DESTINATION,
-            'activities' => ClassificationTypes::ACTIVITY,
-            'categories' => ClassificationTypes::CATEGORY,
-            'difficulty_levels' => ClassificationTypes::DIFFICULTY,
-            default => null,
-        };
+        switch ($dataType) {
+            case 'destinations':
+                return ClassificationTypes::DESTINATION;
+            case 'activities':
+                return ClassificationTypes::ACTIVITY;
+            case 'categories':
+                return ClassificationTypes::CATEGORY;
+            case 'difficulty_levels':
+                return ClassificationTypes::DIFFICULTY;
+            default:
+                return null;
+        }
     }
 
     /**

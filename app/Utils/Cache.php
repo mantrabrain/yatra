@@ -183,8 +183,10 @@ class Cache
 
     /**
      * Get cached value
+     *
+     * @return mixed
      */
-    public static function get(string $key): mixed
+    public static function get(string $key)
     {
         // Check if caching is enabled
         if (!self::isEnabled()) {
@@ -215,8 +217,10 @@ class Cache
 
     /**
      * Set cached value
+     *
+     * @param mixed $value
      */
-    public static function set(string $key, mixed $value, int $duration = 3600): bool
+    public static function set(string $key, $value, int $duration = 3600): bool
     {
         // Check if caching is enabled
         if (!self::isEnabled()) {
@@ -296,8 +300,10 @@ class Cache
 
     /**
      * Get or set cached value (cache-aside pattern)
+     *
+     * @return mixed
      */
-    public static function remember(string $key, callable $callback, int $duration = 3600): mixed
+    public static function remember(string $key, callable $callback, int $duration = 3600)
     {
         // Check if caching is enabled
         if (!self::isEnabled()) {
@@ -331,8 +337,10 @@ class Cache
 
     /**
      * Cache trip data
+     *
+     * @return mixed
      */
-    public static function getTripData(int $tripId, callable $fetchCallback): mixed
+    public static function getTripData(int $tripId, callable $fetchCallback)
     {
         $key = self::PREFIX_TRIP_DATA . $tripId;
         
@@ -341,8 +349,10 @@ class Cache
 
     /**
      * Cache booking data
+     *
+     * @return mixed
      */
-    public static function getBookingData(int $bookingId, callable $fetchCallback): mixed
+    public static function getBookingData(int $bookingId, callable $fetchCallback)
     {
         $key = self::PREFIX_BOOKING_DATA . $bookingId;
         
@@ -351,8 +361,10 @@ class Cache
 
     /**
      * Cache query results
+     *
+     * @return mixed
      */
-    public static function getQueryResult(string $queryHash, callable $queryCallback): mixed
+    public static function getQueryResult(string $queryHash, callable $queryCallback)
     {
         $key = self::PREFIX_QUERY_RESULT . $queryHash;
         
@@ -361,8 +373,10 @@ class Cache
 
     /**
      * Cache statistics
+     *
+     * @return mixed
      */
-    public static function getStats(string $statsKey, callable $calculateCallback): mixed
+    public static function getStats(string $statsKey, callable $calculateCallback)
     {
         $key = self::PREFIX_STATS . $statsKey;
         
@@ -510,8 +524,10 @@ class Cache
 
     /**
      * Get value from specific backend
+     *
+     * @return mixed
      */
-    private static function getFromBackend(string $backend, string $key): mixed
+    private static function getFromBackend(string $backend, string $key)
     {
         switch ($backend) {
             case 'transient':
@@ -525,8 +541,10 @@ class Cache
 
     /**
      * Set value to specific backend
+     *
+     * @param mixed $value
      */
-    private static function setToBackend(string $backend, string $key, mixed $value, int $duration): bool
+    private static function setToBackend(string $backend, string $key, $value, int $duration): bool
     {
         switch ($backend) {
             case 'transient':
@@ -568,11 +586,12 @@ class Cache
         }
     }
 
-    
     /**
      * WordPress Transient backend methods
+     *
+     * @return mixed
      */
-    private static function getFromTransient(string $key): mixed
+    private static function getFromTransient(string $key)
     {
         if (!function_exists('get_transient')) return null;
         
@@ -580,7 +599,10 @@ class Cache
         return $value !== false ? $value : null;
     }
 
-    private static function setToTransient(string $key, mixed $value, int $duration): bool
+    /**
+     * @param mixed $value
+     */
+    private static function setToTransient(string $key, $value, int $duration): bool
     {
         if (!function_exists('set_transient')) return false;
         

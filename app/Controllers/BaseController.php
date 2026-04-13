@@ -388,8 +388,10 @@ abstract class BaseController
 
     /**
      * Convert attachment ID to URL in icon field
+     *
+     * @return mixed
      */
-    protected function convert_icon_attachment_id_to_url($icon): mixed
+    protected function convert_icon_attachment_id_to_url($icon)
     {
         if (empty($icon)) {
             return $icon;

@@ -5,7 +5,7 @@
  * Description: Tours and activities on WordPress — trips, bookings, PayPal and Pay Later, guest accounts, emails, reports. Yatra Pro adds premium gateways and modules.
  * Version: 3.0.0
  * Requires at least: 6.0
- * Requires PHP: 8.0
+ * Requires PHP: 7.4
  * Author: MantraBrain
  * Author URI: https://wpyatra.com/
  * License: GPL v2 or later
@@ -23,6 +23,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once __DIR__ . '/includes/php-compat.php';
+
 // Define plugin constants
 define('YATRA_PLUGIN_FILE', __FILE__);
 define('YATRA_PLUGIN_PATH', plugin_dir_path(__FILE__));
@@ -31,7 +33,7 @@ define('YATRA_PLUGIN_BASENAME', plugin_basename(__FILE__));
 define('YATRA_ABSPATH', plugin_dir_path(__FILE__));
 define('YATRA_PLUGIN_URI', plugin_dir_url(__FILE__));
 define('YATRA_VERSION', '3.0.0');
-define('YATRA_MIN_PHP_VERSION', '8.0');
+define('YATRA_MIN_PHP_VERSION', '7.4');
 define('YATRA_MIN_WP_VERSION', '6.0');
 
 // Deactivate incompatible Yatra Pro (&lt; 3.0) and normalize plugin load order before Composer (prevents fatals from old Pro extending removed classes).

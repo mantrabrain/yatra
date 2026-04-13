@@ -158,13 +158,13 @@ class TemplateLoader
                 if (!empty($loginPage)) {
                     try {
                         // Security: Validate login page request
-                        if ($this->validateLoginRequest()) {
+                        if (self::validateLoginRequest()) {
                             $handler = new \Yatra\Core\Handlers\LoginPageHandler();
                             $handled = $handler->handle([]);
                         } else {
                             // Log security violation
                             if (defined('WP_DEBUG') && WP_DEBUG) {
-                                error_log('Yatra TemplateLoader: Invalid login request detected from IP: ' . $this->getClientIp());
+                                error_log('Yatra TemplateLoader: Invalid login request detected from IP: ' . self::getClientIp());
                             }
                         }
                     } catch (Exception $e) {
@@ -462,7 +462,7 @@ class TemplateLoader
     /**
      * Validate login page request for security
      */
-    private function validateLoginRequest(): bool
+    private static function validateLoginRequest(): bool
     {
         // Check request method
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -478,7 +478,7 @@ class TemplateLoader
         }
 
         // Rate limiting check
-        $ip = $this->getClientIp();
+        $ip = self::getClientIp();
         $transient_key = 'yatra_login_request_limit_' . md5($ip);
         $requests = get_transient($transient_key) ?: 0;
         
@@ -495,7 +495,7 @@ class TemplateLoader
     /**
      * Get client IP address
      */
-    private function getClientIp(): string
+    private static function getClientIp(): string
     {
         $ip_keys = ['HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'HTTP_CLIENT_IP', 'REMOTE_ADDR'];
         

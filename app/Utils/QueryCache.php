@@ -13,8 +13,10 @@ class QueryCache
 {
     /**
      * Cache expensive query results with automatic invalidation
+     *
+     * @return mixed
      */
-    public static function getQueryResult(string $sql, array $params = [], int $duration = 600): mixed
+    public static function getQueryResult(string $sql, array $params = [], int $duration = 600)
     {
         // Create cache key from SQL and parameters
         $cacheKey = self::generateQueryCacheKey($sql, $params);
@@ -71,8 +73,10 @@ class QueryCache
 
     /**
      * Cache single value query results
+     *
+     * @return mixed
      */
-    public static function getVar(string $sql, array $params = [], int $duration = 600): mixed
+    public static function getVar(string $sql, array $params = [], int $duration = 600)
     {
         $cacheKey = self::generateQueryCacheKey($sql . '_VAR', $params);
         

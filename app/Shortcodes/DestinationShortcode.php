@@ -360,7 +360,7 @@ class DestinationShortcode extends BaseShortcode
     /**
      * Resolve image URL from destination `icon` (same shape as admin: type image|icon, value = attachment ID or URL).
      */
-    private function getImageUrlFromDestinationIcon(mixed $icon): string
+    private function getImageUrlFromDestinationIcon($icon): string
     {
         if ($icon === null || $icon === '') {
             return '';
@@ -404,7 +404,7 @@ class DestinationShortcode extends BaseShortcode
      *
      * @return array<string, mixed>
      */
-    private function decodeDestinationMetadata(mixed $raw): array
+    private function decodeDestinationMetadata($raw): array
     {
         if ($raw === null || $raw === '') {
             return [];

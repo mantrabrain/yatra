@@ -16,7 +16,7 @@ class AvailabilityRepository extends BaseRepository
     /**
      * Normalize optional latitude/longitude for storage (null if empty/invalid).
      */
-    private function sanitizeCoordinate(mixed $value): ?string
+    private function sanitizeCoordinate($value): ?string
     {
         if ($value === null || $value === '') {
             return null;

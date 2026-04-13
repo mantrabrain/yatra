@@ -503,8 +503,10 @@ abstract class BaseService implements ServiceInterface
 
     /**
      * Get cached result or execute callback with performance monitoring
+     *
+     * @return mixed
      */
-    protected function getCachedResult(string $cacheKey, callable $callback, int $duration = 1800): mixed
+    protected function getCachedResult(string $cacheKey, callable $callback, int $duration = 1800)
     {
         $startTime = microtime(true);
         

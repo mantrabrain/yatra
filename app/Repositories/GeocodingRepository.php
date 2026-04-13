@@ -22,12 +22,15 @@ final class GeocodingRepository
         return 'yatra_geo_reverse_' . md5((string) $lat . '_' . (string) $lng);
     }
 
-    public function getPayload(string $key): mixed
+    /**
+     * @return mixed
+     */
+    public function getPayload(string $key)
     {
         return Cache::get($key);
     }
 
-    public function setPayload(string $key, mixed $value, int $ttlSeconds): bool
+    public function setPayload(string $key, $value, int $ttlSeconds): bool
     {
         return Cache::set($key, $value, $ttlSeconds);
     }

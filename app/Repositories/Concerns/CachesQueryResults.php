@@ -17,8 +17,10 @@ trait CachesQueryResults
 {
     /**
      * @param callable(): mixed $callback
+     *
+     * @return mixed
      */
-    protected function cacheQueryResult(string $key, callable $callback, int $duration = 3600): mixed
+    protected function cacheQueryResult(string $key, callable $callback, int $duration = 3600)
     {
         return Cache::remember($key, $callback, $duration);
     }
@@ -27,8 +29,10 @@ trait CachesQueryResults
      * Lets application services keep orchestration while storing cache keys and TTLs on the repository.
      *
      * @param callable(): mixed $callback
+     *
+     * @return mixed
      */
-    public function withQueryCache(string $key, callable $callback, int $duration = 3600): mixed
+    public function withQueryCache(string $key, callable $callback, int $duration = 3600)
     {
         return $this->cacheQueryResult($key, $callback, $duration);
     }

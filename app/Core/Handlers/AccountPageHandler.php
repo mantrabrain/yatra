@@ -87,10 +87,13 @@ class AccountPageHandler extends BasePageHandler
 
     private function accountPageToReactTab(string $page): string
     {
-        return match ($page) {
-            'wishlist' => 'saved-trips',
-            'settings' => 'profile',
-            default => $page,
-        };
+        switch ($page) {
+            case 'wishlist':
+                return 'saved-trips';
+            case 'settings':
+                return 'profile';
+            default:
+                return $page;
+        }
     }
 }

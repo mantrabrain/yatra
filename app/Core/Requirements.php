@@ -14,7 +14,7 @@ class Requirements
     /**
      * Minimum PHP version required
      */
-    private const MIN_PHP_VERSION = '8.0';
+    private const MIN_PHP_VERSION = '7.4';
 
     /**
      * Minimum WordPress version required

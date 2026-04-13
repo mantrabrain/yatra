@@ -202,11 +202,16 @@ class AvailabilityConditionsMigration extends BaseMigration
     private function mapLegacyAvailabilityStatus(?string $legacy): string
     {
         $key = $legacy !== null ? strtolower(trim($legacy)) : '';
-        return match ($key) {
-            'none', 'unavailable' => 'unavailable',
-            'enquiry', 'limited' => 'limited',
-            default => 'available',
-        };
+        switch ($key) {
+            case 'none':
+            case 'unavailable':
+                return 'unavailable';
+            case 'enquiry':
+            case 'limited':
+                return 'limited';
+            default:
+                return 'available';
+        }
     }
 
     /**

@@ -2434,7 +2434,7 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
     /**
      * Human-readable label for one included_items JSON element (title, name, label, or plain string).
      */
-    private function extractIncludedItemLabel(mixed $item): string
+    private function extractIncludedItemLabel($item): string
     {
         if (is_string($item)) {
             $t = sanitize_text_field($item);

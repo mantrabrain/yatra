@@ -139,7 +139,7 @@ abstract class BaseMigration
      * @param string $classificationType The classification type value for the new table (e.g. 'destination', 'activity', 'attribute')
      * @param string $dataType Progress tracking key (e.g. 'destinations', 'activities', 'attributes')
      */
-    protected function migrateTaxonomy(string|array $taxonomy, string $classificationType, string $dataType): array
+    protected function migrateTaxonomy($taxonomy, string $classificationType, string $dataType): array
     {
         $migrated = 0;
         $skipped = 0;

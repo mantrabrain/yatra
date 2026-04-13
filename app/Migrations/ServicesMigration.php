@@ -143,12 +143,19 @@ class ServicesMigration extends BaseMigration
 
         $priceTypeNorm = in_array($priceType, ['fixed', 'percentage'], true) ? $priceType : 'fixed';
         // Legacy 2.x used price_per=tour; 3.x enum is person|booking|day.
-        $pricePerNorm = match ($pricePer) {
-            'person' => 'person',
-            'day' => 'day',
-            'tour', 'booking' => 'booking',
-            default => 'booking',
-        };
+        switch ($pricePer) {
+            case 'person':
+                $pricePerNorm = 'person';
+                break;
+            case 'day':
+                $pricePerNorm = 'day';
+                break;
+            case 'tour':
+            case 'booking':
+            default:
+                $pricePerNorm = 'booking';
+                break;
+        }
 
         // If service doesn't exist, create it in master table
         if (!$service_id) {

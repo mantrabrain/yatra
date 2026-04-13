@@ -12,7 +12,7 @@ use Yatra\Database\Tables\TripAvailabilityRulesTable;
  */
 class RecurringAvailabilityRepository extends BaseRepository
 {
-    private function sanitizeCoordinate(mixed $value): ?string
+    private function sanitizeCoordinate($value): ?string
     {
         if ($value === null || $value === '') {
             return null;

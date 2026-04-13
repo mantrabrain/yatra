@@ -497,8 +497,11 @@ class SettingsController extends BaseController
     /**
      * Sanitize and validate setting value
      * Pro plugins can handle sanitization of their own settings via filter
+     *
+     * @param mixed $value
+     * @return mixed
      */
-    private function sanitize_setting(string $key, mixed $value): mixed
+    private function sanitize_setting(string $key, $value)
     {
         $default = $this->default_settings[$key] ?? null;
         $default_type = gettype($default);

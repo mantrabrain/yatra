@@ -57,7 +57,7 @@ class YatraException extends Exception
     /**
      * Add context data
      */
-    public function addContext(string $key, mixed $value): self
+    public function addContext(string $key, $value): self
     {
         $this->context[$key] = $value;
         return $this;

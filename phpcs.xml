@@ -1,7 +1,13 @@
 <?xml version="1.0"?>
 <ruleset name="Yatra WordPress Plugin">
     <description>Yatra WordPress Plugin - PHP 7.4 Compatibility Focus</description>
-    
+
+    <!-- Minimum PHP for this plugin (composer + runtime checks). -->
+    <config name="testVersion" value="7.4"/>
+
+    <!-- WordPress-aware PHPCompatibility (uses core polyfills; fewer false positives). -->
+    <rule ref="PHPCompatibilityWP"/>
+
     <!-- Only check for syntax errors that would break PHP 7.4 compatibility -->
     <rule ref="Generic.PHP.Syntax"/>
     <rule ref="Generic.PHP.DisallowShortOpenTag"/>

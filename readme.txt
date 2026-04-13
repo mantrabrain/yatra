@@ -71,7 +71,7 @@ Tours & activities on WordPress: trips, departures, PayPal & Pay Later, guest ac
 
 **Quality and extensibility**
 
-* Modern PHP (8.0+), structured codebase
+* PHP 7.4 or newer, structured codebase
 * Hooks and filters for customization; template overrides in your theme
 * REST-oriented flows for booking and account experiences in 3.x
 
