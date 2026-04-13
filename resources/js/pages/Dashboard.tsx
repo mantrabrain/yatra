@@ -122,8 +122,8 @@ const Dashboard: React.FC = () => {
     queryKey: ["dashboard-booking-stats"],
     queryFn: async () => {
       const response = await apiClient.get("/bookings/stats");
-      // Shape: { success: true, data: { total, by_status, total_revenue, total_collected, this_month, upcoming } }
-      return response?.data || {};
+      // REST returns a flat stats object; some endpoints nest under `data` — prefer the flat body.
+      return (response?.data ?? response) ?? {};
     },
   });
 

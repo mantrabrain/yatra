@@ -21,16 +21,28 @@ if (!defined('ABSPATH')) {
         // Use dynamic reviews from database (via SingleTripController)
         $display_reviews = !empty($trip->reviews) && is_array($trip->reviews) ? $trip->reviews : [];
 
-        // Calculate rating stats from actual reviews
-        $total_reviews = count($display_reviews);
-        $avg_rating = (isset($trip->average_rating) && $trip->average_rating > 0) ? $trip->average_rating : 0;
+        // Total approved count and average come from SQL on the Trip model (list may be capped at N rows).
+        $total_reviews = (int) ($trip->review_count ?? 0);
+        if ($total_reviews < 1) {
+            $total_reviews = count($display_reviews);
+        }
+        $avg_rating = (isset($trip->average_rating) && (float) $trip->average_rating > 0)
+            ? (float) $trip->average_rating
+            : 0.0;
 
-        // Calculate rating distribution (5★, 4★, 3★, 2★, 1★)
+        // Rating distribution: prefer full aggregate from Trip (accurate when review list is limited).
         $rating_distribution = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
-        foreach ($display_reviews as $review) {
-            $review_rating = (int) (is_object($review) ? ($review->rating ?? 0) : ($review['rating'] ?? 0));
-            if ($review_rating >= 1 && $review_rating <= 5) {
-                $rating_distribution[$review_rating]++;
+        $dist = $trip->rating_distribution ?? null;
+        if (is_array($dist) && $dist !== [] && ($trip->review_count ?? 0) > 0) {
+            foreach ([5, 4, 3, 2, 1] as $star) {
+                $rating_distribution[$star] = (int) ($dist[$star] ?? $dist[(string) $star] ?? 0);
+            }
+        } else {
+            foreach ($display_reviews as $review) {
+                $review_rating = (int) (is_object($review) ? ($review->rating ?? 0) : ($review['rating'] ?? 0));
+                if ($review_rating >= 1 && $review_rating <= 5) {
+                    $rating_distribution[$review_rating]++;
+                }
             }
         }
 

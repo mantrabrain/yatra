@@ -42,6 +42,20 @@ class ReviewRepository extends BaseRepository
     }
 
     /**
+     * SQL predicate: review counts as approved on the frontend (ENUM-safe, trims whitespace).
+     *
+     * @param string $expr Column or qualified name, e.g. "status" or "r.status"
+     */
+    public function sqlApprovedReviewsWhere(string $expr = 'status'): string
+    {
+        if (!preg_match('/^[a-zA-Z0-9_.]+$/', $expr)) {
+            $expr = 'status';
+        }
+
+        return "LOWER(TRIM(CAST({$expr} AS CHAR))) = 'approved'";
+    }
+
+    /**
      * Get paginated reviews with filters
      * 
      * @param array $filters Filter options
@@ -163,7 +177,7 @@ class ReviewRepository extends BaseRepository
             "SELECT r.*, u.display_name as user_display_name
              FROM {$table} r
              LEFT JOIN {$users_table} u ON r.user_id = u.ID
-             WHERE r.trip_id = %d AND r.status = 'approved'
+             WHERE r.trip_id = %d AND {$this->sqlApprovedReviewsWhere('r.status')}
              ORDER BY r.created_at DESC
              LIMIT %d",
             $tripId,
@@ -364,8 +378,9 @@ class ReviewRepository extends BaseRepository
     {
         $table = $this->getTableName();
 
+        $approved = $this->sqlApprovedReviewsWhere('status');
         $result = $this->wpdb->get_var($this->wpdb->prepare(
-            "SELECT AVG(rating) FROM {$table} WHERE trip_id = %d AND status = 'approved'",
+            "SELECT AVG(rating) FROM {$table} WHERE trip_id = %d AND {$approved}",
             $tripId
         ));
 
@@ -382,8 +397,10 @@ class ReviewRepository extends BaseRepository
     {
         $table = $this->getTableName();
 
+        $approved = $this->sqlApprovedReviewsWhere('status');
+
         return (int) $this->wpdb->get_var($this->wpdb->prepare(
-            "SELECT COUNT(*) FROM {$table} WHERE trip_id = %d AND status = 'approved'",
+            "SELECT COUNT(*) FROM {$table} WHERE trip_id = %d AND {$approved}",
             $tripId
         ));
     }
@@ -398,10 +415,11 @@ class ReviewRepository extends BaseRepository
     {
         $table = $this->getTableName();
 
+        $approved = $this->sqlApprovedReviewsWhere('status');
         $results = $this->wpdb->get_results($this->wpdb->prepare(
             "SELECT rating, COUNT(*) as count 
              FROM {$table} 
-             WHERE trip_id = %d AND status = 'approved'
+             WHERE trip_id = %d AND {$approved}
              GROUP BY rating
              ORDER BY rating DESC",
             $tripId
@@ -409,7 +427,11 @@ class ReviewRepository extends BaseRepository
 
         $distribution = [];
         for ($i = 5; $i >= 1; $i--) {
-            $distribution[$i] = (int) ($results[$i]->count ?? 0);
+            $row = null;
+            if (is_array($results)) {
+                $row = $results[$i] ?? $results[(string) $i] ?? null;
+            }
+            $distribution[$i] = ($row && isset($row->count)) ? (int) $row->count : 0;
         }
 
         return $distribution;
@@ -433,9 +455,10 @@ class ReviewRepository extends BaseRepository
         // Pending count
         $pending = (int) ($statusStats['pending']->count ?? 0);
 
-        // Average rating
+        // Average rating (approved only)
+        $approved = $this->sqlApprovedReviewsWhere('status');
         $avgRating = (float) $this->wpdb->get_var(
-            "SELECT AVG(rating) FROM {$table} WHERE status = 'approved'"
+            "SELECT AVG(rating) FROM {$table} WHERE {$approved}"
         );
 
         // This month

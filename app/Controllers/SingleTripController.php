@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Controllers;
 
 use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Repositories\ReviewRepository;
 use Yatra\Repositories\TripAttributeRepository;
 use Yatra\Database\Tables\ReviewsTable;
 use Yatra\Database\Tables\TripsTable;
@@ -289,9 +290,21 @@ class SingleTripController
         $trip->testimonials = $this->getTestimonials($trip_id);
         $trip->similar_trips = $this->getSimilarTrips($trip);
 
-        // Calculate rating
-        $trip->average_rating = $this->calculateAverageRating($trip->reviews);
-        $trip->review_count = count($trip->reviews);
+        // Count / average / breakdown from all approved reviews (getReviews() is capped for the list UI).
+        $reviewRepo = new ReviewRepository();
+        $sqlCount = $reviewRepo->getReviewCount($trip_id);
+        $sqlAvg = $reviewRepo->getAverageRating($trip_id);
+        $loadedCount = count($trip->reviews);
+        $trip->review_count = max($sqlCount, $loadedCount);
+        $trip->average_rating = $sqlAvg;
+        if ((float) $trip->average_rating <= 0 && $loadedCount > 0) {
+            $trip->average_rating = $this->averageRatingFromReviewRows($trip->reviews);
+        }
+        $trip->avg_rating = (float) $trip->average_rating;
+        $trip->rating_distribution = $reviewRepo->getRatingDistribution($trip_id);
+        if ($trip->review_count > 0) {
+            $trip->reviews_count = $trip->review_count;
+        }
 
         // Calculate base price for template display
         $trip->base_price = $this->calculateBasePrice($trip);
@@ -1121,22 +1134,18 @@ class SingleTripController
      */
     private function getReviews(int $trip_id): array
     {
-        $table_exists = $this->wpdb->get_var(
-            $this->wpdb->prepare(
-                "SHOW TABLES LIKE %s",
-                $this->table_reviews
-            )
-        );
-
-        if (!$table_exists) {
+        $reviewRepo = new ReviewRepository();
+        if (!$reviewRepo->tableExists()) {
             return [];
         }
+
+        $approved = $reviewRepo->sqlApprovedReviewsWhere('status');
 
         return $this->wpdb->get_results(
             $this->wpdb->prepare(
                 "SELECT * FROM {$this->table_reviews} 
                  WHERE trip_id = %d 
-                 AND status = 'approved' 
+                 AND {$approved}
                  ORDER BY created_at DESC 
                  LIMIT 10",
                 $trip_id
@@ -1187,7 +1196,7 @@ class SingleTripController
                  FROM {$this->table_reviews} r
                  LEFT JOIN {$this->wpdb->users} u ON r.user_id = u.ID
                  WHERE r.id IN ($placeholders)
-                 AND r.status = 'approved'
+                 AND " . (new ReviewRepository())->sqlApprovedReviewsWhere('r.status') . "
                  ORDER BY r.created_at DESC",
                 ...$review_ids
             )
@@ -1362,18 +1371,17 @@ class SingleTripController
     }
 
     /**
-     * Calculate average rating from reviews
+     * Average rating from loaded review rows (fallback when SQL AVG returns 0).
      *
-     * @param array $reviews Reviews array
-     * @return float Average rating
+     * @param array<int, object> $reviews
      */
-    private function calculateAverageRating(array $reviews): float
+    private function averageRatingFromReviewRows(array $reviews): float
     {
-        if (empty($reviews)) {
+        if ($reviews === []) {
             return 0.0;
         }
 
-        $total = 0;
+        $total = 0.0;
         foreach ($reviews as $review) {
             $total += (float) ($review->rating ?? 0);
         }

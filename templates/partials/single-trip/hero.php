@@ -28,7 +28,7 @@ if (!defined('ABSPATH')) {
         <h1 class="yatra-trip-hero-title-new" itemprop="name"><?php echo esc_html($trip->getTitle()); ?></h1>
         <div class="yatra-hero-meta">
             <div class="yatra-hero-rating" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
-                <?php if ($trip->getAverageRating() > 0): ?>
+                <?php if ($trip->getAverageRating() > 0 || $trip->getReviewCount() > 0): ?>
                     <?php
                     $hero_avg = (float) $trip->getAverageRating();
                     $hero_full = (int) floor($hero_avg);

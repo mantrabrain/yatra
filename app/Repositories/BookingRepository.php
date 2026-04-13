@@ -661,15 +661,33 @@ class BookingRepository extends BaseRepository
             date('Y-m-d')
         ));
 
-        // Normalize counts for UI expectations
+        $allBookings = (int) array_sum(array_map(static function ($row) {
+            return isset($row->count) ? (int) $row->count : 0;
+        }, (array) $byStatus));
+
+        $byStatusForApi = [];
+        foreach ($byStatus as $key => $row) {
+            $byStatusForApi[$key] = [
+                'status' => $row->status ?? $key,
+                'count' => isset($row->count) ? (int) $row->count : 0,
+            ];
+        }
+
+        // Normalize counts for UI expectations (admin list + dashboard)
         return [
-            'all' => array_sum(array_column((array)$byStatus, 'count')),
-            'confirmed' => $byStatus['confirmed']->count ?? 0,
-            'pending' => $byStatus['pending']->count ?? 0,
-            'waitlist' => $byStatus['waitlist']->count ?? 0,
-            'trash' => $byStatus['trash']->count ?? 0,
-            'cancelled' => $byStatus['cancelled']->count ?? 0,
-            'completed' => $byStatus['completed']->count ?? 0,
+            'all' => $allBookings,
+            'total' => $allBookings,
+            'confirmed' => (int) ($byStatus['confirmed']->count ?? 0),
+            'pending' => (int) ($byStatus['pending']->count ?? 0),
+            'waitlist' => (int) ($byStatus['waitlist']->count ?? 0),
+            'trash' => (int) ($byStatus['trash']->count ?? 0),
+            'cancelled' => (int) ($byStatus['cancelled']->count ?? 0),
+            'completed' => (int) ($byStatus['completed']->count ?? 0),
+            'by_status' => $byStatusForApi,
+            'total_revenue' => $totalRevenue,
+            'total_collected' => $totalCollected,
+            'this_month' => (int) $thisMonth,
+            'upcoming' => (int) $upcoming,
         ];
     }
 

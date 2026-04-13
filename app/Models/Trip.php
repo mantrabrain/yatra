@@ -218,6 +218,8 @@ class Trip
     public float $avg_rating = 0.00;
     public ?float $average_rating = null;
     public int $reviews_count = 0;
+    /** Approved reviews count (frontend); must be declared so fromStdClass() copies it from SingleTripController. */
+    public int $review_count = 0;
     public ?string $last_viewed_at = null;
     public ?string $last_booked_at = null;
 
@@ -251,6 +253,8 @@ class Trip
     public array $packing_list = [];
     public array $itinerary = [];
     public array $reviews = [];
+    /** Per-star counts for approved reviews (from SQL); used when review list is capped. */
+    public array $rating_distribution = [];
     public array $departures = [];
     public array $bookings = [];
     public array $downloadable_items = [];
@@ -1660,7 +1664,12 @@ class Trip
      */
     public function getAverageRating(): float
     {
-        return (float) ($this->average_rating ?? 0);
+        $a = (float) ($this->average_rating ?? 0);
+        if ($a > 0) {
+            return $a;
+        }
+
+        return (float) ($this->avg_rating ?? 0);
     }
 
     /**
@@ -1668,7 +1677,12 @@ class Trip
      */
     public function getReviewCount(): int
     {
-        return (int) ($this->review_count ?? 0);
+        $n = (int) ($this->review_count ?? 0);
+        if ($n > 0) {
+            return $n;
+        }
+
+        return (int) ($this->reviews_count ?? 0);
     }
 
     /**

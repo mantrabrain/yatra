@@ -396,10 +396,10 @@ class ReviewService
         $averageRating = $this->reviewRepository->getAverageRating($tripId);
         $reviewCount = $this->reviewRepository->getReviewCount($tripId);
 
-        // Update trip record with cached values via repository
+        // Trips table columns are avg_rating + reviews_count (not average_rating / review_count).
         $this->tripRepository->update($tripId, [
-            'average_rating' => $averageRating,
-            'review_count' => $reviewCount,
+            'avg_rating' => $averageRating,
+            'reviews_count' => $reviewCount,
         ]);
     }
 }

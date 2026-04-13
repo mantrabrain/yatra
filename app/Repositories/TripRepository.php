@@ -234,7 +234,7 @@ class TripRepository extends BaseRepository
                 $formats[] = '%d';
             } elseif (in_array($key, ['created_at', 'updated_at'], true)) {
                 $formats[] = '%s';
-            } elseif (in_array($key, ['original_price', 'discounted_price', 'sale_price', 'deposit_amount', 'deposit_percentage'], true)) {
+            } elseif (in_array($key, ['original_price', 'discounted_price', 'sale_price', 'deposit_amount', 'deposit_percentage', 'avg_rating', 'revenue_total', 'conversion_rate'], true)) {
                 $formats[] = '%f';
             } elseif (in_array($key, ['transportation_included', 'is_featured', 'seasonal_auto_enable'], true)) {
                 $formats[] = '%d'; // boolean as integer
