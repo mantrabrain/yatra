@@ -1,576 +1,254 @@
 === Yatra - Travel Booking & Tour Management ===
 Contributors: MantraBrain
-Tags: travel, booking, tour, tourism, travel agency, tour operator, trip booking, travel booking, tour management, itinerary, destinations, activities
+Tags: travel, booking, tour, tourism, calendar
 Requires at least: 6.0
 Tested up to: 6.9
-Requires PHP: 8.0
+Requires PHP: 7.4
 Stable tag: 3.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Complete travel booking and tour management system for WordPress. Create stunning travel websites, manage bookings, accept payments, and grow your travel business.
-
-**Author:** [MantraBrain](https://wpyatra.com/) · **Plugin directory:** [wordpress.org/plugins/yatra](https://wordpress.org/plugins/yatra/) · **Homepage:** [wpyatra.com](https://wpyatra.com/) · **Reviews:** [wordpress.org/support/plugin/yatra/reviews/?filter=5](https://wordpress.org/support/plugin/yatra/reviews/?filter=5) · **Contact:** [mantrabrain.com/contact](https://mantrabrain.com/contact)
+Tours & activities on WordPress: trips, departures, PayPal & Pay Later, guest accounts, emails, reports. Yatra Pro adds card gateways, deposits, and modules.
 
 == Description ==
 
-**Yatra** is the most comprehensive travel booking and tour management plugin for WordPress. Built for travel agencies, tour operators, and travel businesses of all sizes, Yatra provides everything you need to create a professional travel booking website.
+**✈️ Yatra** is a WordPress plugin built for **tour operators, activity providers, and travel brands** that need real trip inventory—not a generic shop. The free version includes a full booking office: trips, availability, checkout, customer records, and essential emails. **[Yatra Pro](https://wpyatra.com/pricing/)** unlocks premium payment methods and a suite of Pro modules you can turn on as your business grows.
 
-= 🌟 Why Choose Yatra? =
+**Official site:** 🌐 [wpyatra.com](https://wpyatra.com/) · 📖 [docs.wpyatra.com](https://docs.wpyatra.com) · 💬 [WordPress.org forum](https://wordpress.org/support/plugin/yatra/)
 
-Yatra combines powerful features with an intuitive interface, making it easy to manage your travel business online. Whether you're running a small tour company or a large travel agency, Yatra scales with your business.
+= 🎬 See Yatra in action =
 
-**Perfect for:**
-* Travel Agencies
-* Tour Operators
-* Adventure Travel Companies
-* City Tour Providers
-* Multi-day Trek Organizers
-* Destination Management Companies
-* Travel Bloggers & Influencers
+🎥 **[Watch the Yatra 3.0 walkthrough on YouTube](https://youtu.be/cHmC-x7y0TQ)** — trips, bookings, checkout, and traveler accounts in a few minutes. For release highlights and upgrade notes, see **[Yatra 3.0 on wpyatra.com](https://wpyatra.com/yatra-3-0/)**. More tutorials: **[MantraBrain on YouTube](https://www.youtube.com/@MantraBrain)**.
 
-= 🚀 Core Features (FREE) =
+= ✈️ Why teams pick Yatra =
 
-**Trip Management**
-* Unlimited trips with detailed information
-* Single-day and multi-day trip support
-* Rich text descriptions with Quill editor
-* Trip highlights and key features
-* Gallery images with lightbox
-* Trip difficulty levels
-* Duration management (days/nights)
-* Starting location and meeting points
-* Included/excluded items
-* Trip itinerary builder with day-by-day planning
-* FAQ section for each trip
-* Custom trip attributes and tags
+* 🗺️ **Travel-first data model** — Departures, capacity, traveler types, and itineraries match how tours are actually sold.
+* 🧭 **One admin workspace** — Modern Yatra dashboard inside wp-admin; less tab-hopping than bolting travel onto a generic commerce stack.
+* ⚖️ **Honest Free vs Pro** — Core booking, CRM-style records, reviews, and PayPal / Pay Later are in the free plugin. Card gateways and advanced modules are in Pro—no surprise paywalls on basics like “save a trip” (saved trips / wishlist are a **Pro** feature when enabled in settings).
+* 🔒 **Your site, your data** — Bookings and customer data stay in your WordPress database; payments go through the gateways you configure.
 
-**Booking System**
-* Real-time booking management
-* Guest checkout support
-* Customer account system
-* Booking status tracking (pending, confirmed, completed, cancelled)
-* Booking reference numbers
-* Traveler information collection
-* Booking notes and special requests
-* Email notifications (booking confirmation, reminders)
-* Booking expiry management
-* Waitlist functionality
+= 🎁 Free plugin — what you get =
 
-**Pricing & Availability**
-* Regular pricing (original price + sale price)
-* Traveler-based pricing (adults, children, seniors, etc.)
-* Per-person and per-group pricing modes
-* Availability calendar with date management
-* Seat/capacity management
-* Departure dates with time slots
-* Recurring availability rules
-* Seasonal pricing support
-* Real-time availability checking
+**Trips and catalog**
 
-**Payment Gateways**
-* PayPal Standard (FREE)
-* Pay Later / Book Now Pay Later (FREE)
-* Secure payment processing
-* Payment status tracking
-* Payment history and receipts
-* Multiple currency support
-* Flexible currency formatting
+* Unlimited trips with rich descriptions, gallery, difficulty, duration, meeting points, included/excluded lists
+* Itinerary builder (day-by-day)
+* Per-trip FAQs and custom attributes
+* Destinations, activities, categories, and archives visitors can browse
 
-**Taxonomies & Organization**
-* Destinations (countries, cities, regions)
-* Activities (trekking, cultural tours, adventure, etc.)
-* Trip Categories
-* Custom classification system
-* Taxonomy-based filtering
-* Archive pages for each taxonomy
+**Bookings and customers**
 
-**Customer Management**
-* Customer profiles and accounts
-* Booking history
-* Saved trips / Wishlist
-* Customer dashboard
-* Profile management
-* Guest and registered user support
+* Booking lifecycle (e.g. pending, confirmed, completed, cancelled) with references
+* Traveler details, notes, and operational views your staff use daily
+* Customer accounts: booking history, payments, profile, and document access (e.g. invoices, vouchers, itineraries) where you enable them
+* Guest checkout and registered users
 
-**Reviews & Ratings**
-* 5-star rating system
-* Customer reviews and testimonials
-* Review moderation
-* Average rating calculation
-* Review display on trip pages
-* Verified booking reviews (optional)
+**Pricing and availability**
 
-**Reports & Analytics**
-* Booking statistics
-* Revenue reports
-* Trip performance metrics
-* Booking trends and charts
-* Status breakdown
-* Departure management reports
-* Payment analytics
+* Sale and regular pricing, traveler-based pricing (adults, children, custom types)
+* Departures, capacity, and recurring availability rules
+* Discounts and coupons
 
-**Modern Admin Interface**
-* React-based admin dashboard
-* Intuitive trip editor
-* Drag-and-drop itinerary builder
-* Real-time data updates
-* Responsive design
-* Dark mode support
-* Quick actions and shortcuts
+**Payments (free)**
 
-**SEO & Performance**
-* SEO-friendly URLs
-* Schema.org markup for trips
-* Fast page loading
-* Optimized database queries
-* Image optimization support
-* Sitemap integration
-* Meta tags and descriptions
+* **PayPal**
+* **Pay Later** (book now, confirm or pay offline—ideal for bank transfer, cash on arrival, or invoice workflows)
 
-**Developer Friendly**
-* REST API endpoints
-* Action and filter hooks
-* Template override system
-* Custom post types
-* Well-documented code
-* PSR-4 autoloading
-* Modern PHP 8.0+ codebase
+**Email**
 
-= 💎 Pro Features (Premium Add-on) =
+* Core delivery settings and essential traveler templates (e.g. booking, payment, cancellation, reminder)
 
-Upgrade to **Yatra Pro** for advanced features:
+**Front end**
 
-**Advanced Payment Gateways**
-* Stripe - Credit card payments
-* Razorpay - India payments
-* Mollie - European payments
-* Paystack - African payments
-* Square - US/Canada payments
-* Authorize.Net - US payments
-* Bank Transfer - Manual payments
+* Templates for trip listings, single trip, booking flow, checkout, and account
+* Blocks and shortcodes to place trips, search, login, and account on any page
+* Responsive layouts; works with well-coded block and classic themes
 
-**Flexible Payments**
-* Deposit/Partial payments
-* Installment plans
-* Scheduled payments
-* Payment reminders
-* Saved payment methods
-* Auto-charge functionality
+**Reviews and reporting**
 
-**Dynamic Pricing**
-* Seasonal pricing rules
-* Early bird discounts
-* Last-minute deals
-* Group discounts (tiered pricing)
-* Coupon codes and promotions
-* Discount management system
-* Bulk pricing rules
+* Reviews with moderation and trip-level display
+* Admin reports for bookings, revenue, and trends
 
-**Email Automation**
-* Automated booking confirmations
-* Payment reminders
-* Trip departure reminders
-* Custom email templates
-* Email scheduling
-* Personalized content
-* Email analytics
+**Quality and extensibility**
 
-**Advanced Features**
-* Multi-currency support with live rates
-* PDF invoices and vouchers
+* Modern PHP (8.0+), structured codebase
+* Hooks and filters for customization; template overrides in your theme
+* REST-oriented flows for booking and account experiences in 3.x
+
+= 🧩 Blocks and shortcodes =
+
+Use the **block editor** or **classic shortcodes** to drop catalog widgets, search, and account UI into any page.
+
+**Blocks** (search the inserter for “Yatra” or the block name):
+
+* **Tour** — block name `yatra/tour` (trip grid; same data options as the **`[yatra_trip]`** shortcode).
+* **Activity** — `yatra/activity`.
+* **Destination** — `yatra/destination`.
+
+**Shortcodes** (attributes shown are the main filters; all accept string values as in the plugin defaults—use `yes` / `no` or `0` / `1` where noted):
+
+* **`[yatra_trip]`** — Trip listing. Alias: **`[yatra_tour]`** (same output; kept for backward compatibility). Useful attributes include `order` (asc or desc), `featured` (0 or 1), `per_page`, `category`, `destination`, `activity`, `difficulty`, `price_min`, `price_max`, `duration_min`, `duration_max`, `search`, `columns`, `show_pagination` (yes or no), `title`. Example: `[yatra_trip featured="1" per_page="6" columns="3"]`
+* **`[yatra_activity]`** — Activity archive-style listing. Attributes include `order`, `per_page`, `columns`, `activity` (slug or comma-separated slugs), `show_trip_count`, `show_description`, `show_image`, `show_pagination`, `hide_empty` (yes or no), `title`.
+* **`[yatra_destination]`** — Destination showcase. Attributes include `order`, `per_page`, `columns`, `destination` (slug or comma-separated slugs), `show_trip_count`, `show_description`, `show_image`, `show_pagination`, `hide_empty`, `featured_only` (yes or no), `title`.
+* **`[yatra_search]`** — Advanced tour search form. Toggle parts with `show_filters`, `show_categories`, `show_destinations`, `show_activities`, `show_price_range`, `show_duration`, `show_difficulty` (yes or no), plus `placeholder` and `button_text`.
+* **`[yatra_login]`** — Customer login form. Attributes include `show_register`, `show_forgot_password`, `remember_me` (yes or no), `redirect_url`, `title`, `subtitle`.
+* **`[yatra_my_account]`** — Account dashboard for logged-in users (same React experience as the virtual account URL). Legacy attributes are accepted for backward compatibility but do not change the 3.x UI.
+* **`[yatra_discount_and_deals]`** — Discounted trips. Attributes include `order`, `per_page`, `columns`, `discount_type` (all, percentage, fixed, or group), `min_discount`, `max_discount`, `category`, `destination`, `show_original_price`, `show_percentage`, `show_time_left`, `show_pagination`, `show_filters`, `title`.
+
+**Note:** Older Yatra 2.x docs sometimes mentioned **`[yatra_cart]`**, **`[yatra_checkout]`**, or **`[yatra_mini_cart]`**. Those shortcodes are **not registered in Yatra 3.x**—checkout and booking flow use the plugin’s front-end routes and templates instead. See **[docs.wpyatra.com](https://docs.wpyatra.com)** for URLs and page setup.
+
+= 🎨 Compatible with popular themes =
+
+Yatra works with most well-coded block themes, classic themes, and major page builders. **Recommended themes** (optional—not required):
+
+* 🧳 **[Resa](https://wordpress.org/themes/resa/?ref=yatrapluginorg)** — official Yatra travel theme by MantraBrain
+* 🧱 **[Blocksy](https://wordpress.org/themes/blocksy/?ref=yatrapluginorg)** — modern block theme
+* ⚡ **[Kadence](https://wordpress.org/themes/kadence/?ref=yatrapluginorg)** — fast, flexible theme
+
+= 🔗 Quick links =
+
+* 📖 **[Documentation](https://docs.wpyatra.com/)** — installation, blocks, shortcodes, and operations
+* ✨ **[All features](https://wpyatra.com/features/)** — full capability list with Free vs Pro labels (use this instead of a separate “extensions” catalog; Pro modules are summarized there and on 💳 **[Pricing](https://wpyatra.com/pricing/)**)
+* 🎯 **[Live demo](https://demo.wpyatra.com/)** — see Yatra on a real WordPress demo
+* 🆘 **[Support portal / contact](https://mantrabrain.com/contact)** — help and commercial support routing
+
+= 💙 Join the community =
+
+* ⭐ **[Rate Yatra five stars](https://wordpress.org/support/plugin/yatra/reviews/?filter=5)** — helps other operators find the plugin
+* 💬 **[Facebook community](https://www.facebook.com/groups/yatrawordpressplugin)** — connect with other Yatra users
+* 📧 **[Email support](mailto:mantrabrain@gmail.com)** — direct email for product questions
+* 🐛 **[GitHub — issues & contributions](https://github.com/MantraBrain/yatra)** — bug reports and pull requests
+
+= 🚀 Try Yatra risk-free =
+
+* 🧪 **[Create a free demo site (WordPress Playground)](https://try.new/plugins/yatra)** — spin up a temporary WordPress with Yatra pre-installed; no local setup required
+
+= 💎 Yatra Pro — when you are ready to scale =
+
+**[Compare plans and buy Yatra Pro](https://wpyatra.com/pricing/)** — same Pro software on every tier; plans differ by **site activations** and **support level**.
+
+**Premium gateways (examples)**
+
+* Stripe, Razorpay, Mollie, Paystack, Square, Authorize.Net, bank transfer (region and account dependent)
+
+**Pro modules (enable under Yatra → Modules)**
+
+* Flexible Payments — deposits and partial payments
+* Dynamic Pricing — rules for seasonality, demand, early bird, last minute
+* Advanced Discount — group-style discounts alongside coupons
 * Google Calendar sync
-* iCal export/import
-* Advanced reporting
-* Custom booking forms
-* Inquiry management
-* Lead generation tools
+* Additional Services — sell extras with the trip
+* Trip Consent — digital waivers and signatures
+* Email Automation — extended templates, sequences, logs
+* Custom booking questions — drag-and-drop extra fields
+* Mailchimp, Facebook Pixel, Google Analytics 4 Enhanced
+* Abandoned Booking Recovery
 
-**Premium Support**
-* Priority email support
-* Live chat assistance
-* Regular updates
-* Feature requests priority
-* 30-day money-back guarantee
+**Traveler experience**
 
-[Learn more about Yatra Pro →](https://wpyatra.com/pricing)
+* Saved trips / wishlist when Pro is active and wishlist is enabled in settings
 
-= 🎨 Beautiful Frontend Templates =
+**Support**
 
-Yatra includes professionally designed templates for:
-* Trip listing pages
-* Single trip pages with hero sections
-* Booking forms
-* Customer account pages
-* Checkout process
-* Booking confirmation
-* Search and filter pages
-* Destination archives
-* Activity archives
-
-All templates are:
-* Fully responsive
-* Mobile-optimized
-* Customizable via theme
-* Translation ready
-* RTL compatible
-
-= 🌍 Translation Ready =
-
-Yatra is fully translatable and includes:
-* POT file for translations
-* RTL language support
-* WPML compatible
-* Polylang compatible
-* Translation functions throughout
-
-= 📚 Documentation & Support =
-
-**Free Support**
-* Comprehensive documentation
-* Video tutorials
-* Community forum
-* Regular updates
-* Bug fixes
-
-**Premium Support (Pro)**
-* Priority email support
-* Live chat assistance
-* Custom development help
-* Migration assistance
-
-= 🔧 Technical Requirements =
-
-* WordPress 6.0 or higher
-* PHP 8.0 or higher
-* MySQL 5.7 or higher
-* Modern browser (Chrome, Firefox, Safari, Edge)
-
-= 🚀 Quick Start =
-
-1. Install and activate the plugin
-2. Run the setup wizard
-3. Configure your settings
-4. Add your first trip
-5. Set up payment gateways
-6. Start accepting bookings!
-
-= 🎯 Use Cases =
-
-**Adventure Travel**
-* Trekking expeditions
-* Mountain climbing
-* Safari tours
-* Scuba diving trips
-* Rafting adventures
-
-**Cultural Tours**
-* City walking tours
-* Historical site visits
-* Museum tours
-* Food tours
-* Wine tasting tours
-
-**Multi-Day Tours**
-* Package tours
-* Guided tours
-* Self-guided tours
-* Group tours
-* Private tours
-
-**Day Trips**
-* Sightseeing tours
-* Day excursions
-* Shore excursions
-* Transfer services
-
-= 🏆 What Makes Yatra Different? =
-
-**Modern Technology Stack**
-* Built with React for admin interface
-* RESTful API architecture
-* Modern PHP 8.0+ codebase
-* PSR-4 autoloading
-* Clean, maintainable code
-
-**Business-Focused**
-* Designed for real travel businesses
-* Scalable architecture
-* Performance optimized
-* Security hardened
-* GDPR compliant
-
-**Continuous Development**
-* Regular updates
-* New features added frequently
-* Active development team
-* Community-driven improvements
-
-= 🔗 Useful Links =
-
-* [Official Website](https://wpyatra.com)
-* [Documentation](https://docs.wpyatra.com)
-* [Video Tutorials](https://wpyatra.com/tutorials)
-* [Demo Site](https://demo.wpyatra.com)
-* [Support Forum](https://wordpress.org/support/plugin/yatra/)
-* [GitHub Repository](https://github.com/MantraBrain/yatra)
+* Premium or priority support depending on plan; see [wpyatra.com](https://wpyatra.com/) for current terms and **money-back window** for paid licenses.
 
 == Installation ==
 
-= Automatic Installation =
+🛠️ **Quick setup**
 
-1. Log in to your WordPress admin panel
-2. Go to Plugins > Add New
-3. Search for "Yatra"
-4. Click "Install Now" on the Yatra plugin
-5. Activate the plugin
-6. Follow the setup wizard to configure basic settings
-
-= Manual Installation =
-
-1. Download the plugin ZIP file
-2. Log in to your WordPress admin panel
-3. Go to Plugins > Add New > Upload Plugin
-4. Choose the downloaded ZIP file
-5. Click "Install Now"
-6. Activate the plugin
-7. Follow the setup wizard
-
-= After Installation =
-
-1. **Run Setup Wizard**: Configure basic settings, currency, and payment gateways
-2. **Add Destinations**: Create destinations (countries, cities) under Yatra > Destinations
-3. **Add Activities**: Create activity types under Yatra > Activities
-4. **Create Your First Trip**: Go to Yatra > Trips > Add New
-5. **Set Up Availability**: Add departure dates and manage capacity
-6. **Configure Payment Gateways**: Go to Yatra > Settings > Payment
-7. **Customize Templates**: Override templates in your theme if needed
-
-= Configuration =
-
-**General Settings**
-* Company information
-* Date and time formats
-* Booking settings
-* Customer account settings
-
-**Payment Settings**
-* Currency selection
-* Currency formatting
-* Payment gateway configuration
-* Test mode settings
-
-**Email Settings**
-* Email sender information
-* Notification settings
-* Email templates
-
-**Permalink Settings**
-* Custom URL slugs for trips, destinations, activities
-* SEO-friendly URL structure
+1. Install and activate **Yatra** from this screen or upload the ZIP under Plugins → Add New → Upload.
+2. Complete the setup wizard (currency, basics, permalinks as prompted).
+3. Add destinations and activities, then create your first trip under **Yatra → Trips**.
+4. Configure **PayPal** and/or **Pay Later** under Yatra payment settings (free). Add **Yatra Pro** when you need card gateways or Pro modules.
+5. Place the booking experience on your site using Yatra templates, **blocks**, or **shortcodes** (see **🧩 Blocks and shortcodes** in the description above and [docs.wpyatra.com](https://docs.wpyatra.com)).
 
 == Frequently Asked Questions ==
 
 = Is Yatra free? =
 
-Yes! Yatra core plugin is completely free and includes all essential features for running a travel booking website. Premium features are available through Yatra Pro add-on.
+Yes. The plugin on WordPress.org is free and includes the core booking stack for many operators. **Yatra Pro** is a paid upgrade for premium gateways and Pro modules.
 
-= Do I need coding knowledge to use Yatra? =
+= Do I need code skills? =
 
-No coding knowledge required! Yatra features an intuitive interface and setup wizard. However, developers will appreciate the extensive hooks and API for customization.
+No for day-to-day operation. Developers can override templates and use hooks for custom workflows.
 
-= Which payment gateways are supported? =
+= Which payments are free vs Pro? =
 
-**Free version includes:**
-* PayPal Standard
-* Pay Later (Book Now, Pay Later)
+**Free:** PayPal and Pay Later. **Pro:** Stripe, Razorpay, Mollie, Paystack, Square, Authorize.Net, bank transfer (as supported for your account and region).
 
-**Pro version adds:**
-* Stripe
-* Razorpay
-* Mollie
-* Paystack
-* Square
-* Authorize.Net
-* Bank Transfer
+= Can I take bookings without charging a card immediately? =
 
-= Can I accept bookings without payment? =
-
-Yes! The "Pay Later" gateway allows customers to book trips and pay later via bank transfer, cash, or other offline methods.
+Yes. Use **Pay Later** for offline confirmation, invoices, or pay-on-arrival flows.
 
 = Does Yatra work with my theme? =
 
-Yes! Yatra works with any properly coded WordPress theme. It includes its own templates that can be overridden in your theme for custom designs.
+It works with most modern WordPress themes. Yatra ships front-end templates; your theme controls global layout and typography. For suggested pairings, see **🎨 Compatible with popular themes** in the description above.
 
-= Can I translate Yatra? =
+= Are invoices and vouchers only in Pro? =
 
-Absolutely! Yatra is fully translation-ready with POT files included. It's compatible with WPML, Polylang, and other translation plugins.
+Travelers can access invoices, vouchers, and itineraries from the account area on the free plugin when your site is configured for it. Pro expands payment choices and business modules—it does not remove core documents by default.
 
-= How do I manage availability and capacity? =
+= How do saved trips / wishlist work? =
 
-Yatra includes a comprehensive availability system where you can:
-* Set departure dates
-* Manage seat capacity
-* Create recurring availability rules
-* Block specific dates
-* Set seasonal pricing
+Saved trips appear when **Yatra Pro** is active and **wishlist** is enabled in Yatra settings.
 
-= Can customers create accounts? =
+= Is Yatra GDPR-friendly? =
 
-Yes! Customers can create accounts to:
-* View booking history
-* Save favorite trips
-* Manage profile information
-* Track payments
-* Rebook previous trips
+Use WordPress privacy tools together with Yatra: export or delete user-related data as required by your policy. Payment data is handled by your chosen gateways under their terms.
 
-= Is Yatra GDPR compliant? =
+= Where is documentation? =
 
-Yes! Yatra follows WordPress GDPR guidelines and includes:
-* Data export tools
-* Data deletion tools
-* Privacy policy integration
-* Consent management
+See **[docs.wpyatra.com](https://docs.wpyatra.com)** and **[wpyatra.com](https://wpyatra.com/)** for features, Pro, and updates.
 
-= Can I import data from other plugins? =
+= Where are shortcodes and blocks documented? =
 
-Yatra includes migration tools for importing data from:
-* WP Travel
-* Tour Operator
-* Other travel plugins (contact support for assistance)
+See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (pages, permalinks, checkout URLs) are in the documentation.
 
-= Does Yatra support multi-currency? =
+= Does Yatra provide cart or checkout shortcodes? =
 
-The free version supports single currency. Yatra Pro includes multi-currency support with live exchange rates.
-
-= Can I customize email templates? =
-
-Yes! Email templates can be customized through the admin interface or by overriding template files in your theme.
-
-= Is there a mobile app? =
-
-Currently, Yatra is a web-based solution with a fully responsive design that works perfectly on mobile devices. Native mobile apps are planned for future releases.
-
-= How do I get support? =
-
-**Free users:**
-* WordPress.org support forum
-* Documentation at docs.wpyatra.com
-* Community support
-
-**Pro users:**
-* Priority email support
-* Live chat assistance
-* Dedicated support tickets
-
-= Can I sell tours on multiple websites? =
-
-Yes! Install Yatra on each website. For centralized management across multiple sites, contact us about enterprise solutions.
+**Not in 3.x.** Use the plugin’s booking and checkout routes and templates. Catalog, search, login, and account still have shortcodes and blocks as listed in the description.
 
 == Screenshots ==
 
-1. **Modern Admin Dashboard** - React-based interface with booking statistics, revenue charts, and quick actions
-2. **Trip Editor** - Intuitive trip creation with all details, pricing, and availability in one place
-3. **Booking Management** - Comprehensive booking list with filters, search, and status management
-4. **Beautiful Trip Pages** - Professional frontend design with hero images, itinerary, and booking form
-5. **Availability Calendar** - Easy-to-use calendar for managing departure dates and capacity
-6. **Payment Gateways** - Multiple payment options with secure processing
-7. **Customer Dashboard** - User-friendly account area for customers to manage bookings
-8. **Reports & Analytics** - Detailed insights into bookings, revenue, and trip performance
-9. **Responsive Design** - Perfect display on all devices from desktop to mobile
-10. **Itinerary Builder** - Drag-and-drop interface for creating day-by-day trip plans
+📷 **Screenshots** (as shown on WordPress.org)
+
+1. Yatra dashboard inside WordPress — bookings, revenue, and quick access to daily tasks
+2. Trip editor — content, pricing, media, and settings in one workspace
+3. Bookings list — search, filters, and status at a glance
+4. Single trip on the front end — hero, itinerary, and book flow
+5. Availability and departures — dates, capacity, and recurring rules
+6. Payment settings — PayPal and Pay Later (free); Pro adds premium gateways
+7. Traveler account — bookings, payments, and documents
+8. Reports — booking and payment trends for planning
+9. Mobile-friendly trip and checkout layouts
+10. Itinerary builder — structured day-by-day plans
 
 == Changelog ==
 
-= 3.0.0 - 2024-03-30 =
-**Major Release - Complete Rewrite**
+= 3.0.0 =
+* Major 3.0 release: redesigned admin experience, streamlined booking and traveler account flows, expanded gateway and module architecture for Pro, and ongoing hardening for production travel sites.
+* See the plugin’s release notes and [wpyatra.com](https://wpyatra.com/yatra-3-0/) for highlights. **Always back up** before upgrading from 2.x; follow migration guidance in documentation.
 
-* **New:** Modern React-based admin interface
-* **New:** RESTful API architecture
-* **New:** Comprehensive booking system with status tracking
-* **New:** Advanced availability management with recurring rules
-* **New:** Traveler-based pricing system
-* **New:** Tax calculation system with country-specific rates
-* **New:** Customer account dashboard
-* **New:** Wishlist / Saved trips functionality
-* **New:** Review and rating system
-* **New:** Reports and analytics dashboard
-* **New:** Migration tool from Yatra 2.x
-* **New:** Setup wizard for easy configuration
-* **Improved:** Database structure for better performance
-* **Improved:** Template system with modern design
-* **Improved:** Security enhancements
-* **Improved:** Code quality (PHP 8.0+, PSR-4)
-* **Fixed:** Multiple pagination issues
-* **Fixed:** Discount calculation accuracy
-* **Fixed:** Booking form validation
-* **Fixed:** Email notification triggers
-
-= 2.1.5 - 2023-12-15 =
-* Fixed: Security vulnerability in booking form
-* Improved: Payment gateway compatibility
-* Updated: Translation files
-
-= 2.1.0 - 2023-10-20 =
-* Added: Group discount support
-* Added: Booking export functionality
-* Improved: Admin interface performance
-* Fixed: Calendar display issues
-
-= 2.0.0 - 2023-08-10 =
-* Major update with new features
-* Added: Multi-day trip support
-* Added: Itinerary builder
-* Improved: Booking workflow
-* Fixed: Various bugs
-
-[View complete changelog →](https://wpyatra.com/changelog)
+= Earlier versions =
+* For 2.x changelog entries, see the plugin’s GitHub releases or historical notes on the vendor site.
 
 == Upgrade Notice ==
 
 = 3.0.0 =
-Major release with complete rewrite. Includes automatic migration from 2.x. Backup your site before upgrading. Review new features and settings after upgrade.
-
-= 2.1.5 =
-Security update. Please upgrade immediately.
+Major release. Back up your site and database before upgrading from 2.x. Update free Yatra from WordPress.org first; then align Yatra Pro with a version compatible with 3.0.
 
 == Additional Information ==
 
+= Privacy =
+
+Booking and customer data are stored in your WordPress database. Payment processing is performed by the gateways you enable; review each provider’s privacy and PCI documentation.
+
 = Credits =
 
-Yatra is developed and maintained by MantraBrain.
-
-**Third-party Libraries:**
-* React - UI framework
-* Vite - Build tool
-* TanStack Query - Data fetching
-* Lucide Icons - Icon library
-* Action Scheduler - Background processing
-
-= Privacy Policy =
-
-Yatra stores booking and customer information in your WordPress database. This data includes:
-* Customer names and contact information
-* Booking details and travel dates
-* Payment information (processed securely through payment gateways)
-* User account data
-
-No data is sent to external servers except:
-* Payment processing through chosen payment gateways
-* Optional analytics if enabled
-
-For full privacy details, see our [Privacy Policy](https://mantrabrain.com/privacy-policy/).
+Yatra is developed by **MantraBrain**. Third-party libraries include components such as React (admin UI), Vite, TanStack Query, and others as shipped in the plugin package.
 
 = Contributing =
 
-Yatra is open source! Contribute on [GitHub](https://github.com/MantraBrain/yatra).
+Issues and contributions: [GitHub — Yatra](https://github.com/MantraBrain/yatra)
 
-= Support the Plugin =
-
-If you find Yatra useful, please:
-* Rate it 5 stars on WordPress.org
-* Share it with other travel businesses
-* Contribute to development on GitHub
-* Upgrade to Yatra Pro to support continued development
-
-Thank you for choosing Yatra! 🚀✈️
+If Yatra helps your business, a ⭐ **five-star review** on WordPress.org and considering **💎 Yatra Pro** when you need paid features both help sustain development. Thank you for using Yatra.
