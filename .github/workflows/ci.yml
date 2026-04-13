@@ -181,7 +181,18 @@ jobs:
           )
           
           for pat in "${patterns[@]}"; do
-            MATCHES=$(grep -rPn "$pat" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null || true)
+            RAW=$(grep -rPn "$pat" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null || true)
+            MATCHES=""
+            while IFS= read -r line; do
+              [ -z "$line" ] && continue
+              # Strip path:lineno: — ignore matches on single-line // # or * comment lines (e.g. "system (…)" in prose)
+              content="${line#*:*:}"
+              trimmed=$(echo "$content" | sed 's/^[[:space:]]*//')
+              if [[ "$trimmed" =~ ^// ]] || [[ "$trimmed" =~ ^# ]] || [[ "$trimmed" =~ ^\* ]]; then
+                continue
+              fi
+              MATCHES="${MATCHES}${line}"$'\n'
+            done <<< "$RAW"
             if [ -n "$MATCHES" ]; then
               FOUND="${FOUND}Disallowed pattern '${pat}' found:\n${MATCHES}\n\n"
             fi
