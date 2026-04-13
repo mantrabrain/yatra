@@ -1,6 +1,6 @@
 === Yatra - Travel Booking & Tour Management ===
 Contributors: MantraBrain
-Tags: travel, booking, tour, tourism, calendar
+Tags: travel, booking, tour, travel agency, tour booking
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
