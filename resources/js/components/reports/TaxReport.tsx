@@ -1,37 +1,39 @@
 /**
  * Tax Report Component
- * 
+ *
  * Displays tax analytics and reporting for admin dashboard
- * 
+ *
  * @package Yatra.Components.Reports
  * @since 3.0.0
  */
 
-import React from 'react';
-import { taxService } from '../../services/TaxService';
+import React from "react";
+import { taxService } from "../../services/TaxService";
 
 interface TaxReportProps {
   bookings: any[];
   className?: string;
 }
 
-const TaxReport: React.FC<TaxReportProps> = ({ bookings, className = '' }) => {
+const TaxReport: React.FC<TaxReportProps> = ({ bookings, className = "" }) => {
   // Calculate tax summary
   const taxSummary = React.useMemo(() => {
     return taxService.getTaxSummary(bookings);
   }, [bookings]);
 
   // Format currency
-  const formatCurrency = (amount: number, currency: string = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
+  const formatCurrency = (amount: number, currency: string = "USD") => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
       currency: currency,
     }).format(amount);
   };
 
   if (taxSummary.total_bookings_with_tax === 0) {
     return (
-      <div className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 ${className}`}>
+      <div
+        className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 ${className}`}
+      >
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Tax Report
         </h3>
@@ -46,7 +48,9 @@ const TaxReport: React.FC<TaxReportProps> = ({ bookings, className = '' }) => {
   }
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 ${className}`}>
+    <div
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 ${className}`}
+    >
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
         Tax Report
       </h3>
@@ -89,13 +93,17 @@ const TaxReport: React.FC<TaxReportProps> = ({ bookings, className = '' }) => {
           </h4>
           <div className="space-y-3">
             {Object.entries(taxSummary.tax_breakdown).map(([name, data]) => (
-              <div key={name} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+              <div
+                key={name}
+                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+              >
                 <div>
                   <div className="font-medium text-gray-900 dark:text-white">
                     {name}
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {data.count} bookings • {data.average_rate.toFixed(2)}% avg rate
+                    {data.count} bookings • {data.average_rate.toFixed(2)}% avg
+                    rate
                   </div>
                 </div>
                 <div className="text-right">
@@ -103,7 +111,11 @@ const TaxReport: React.FC<TaxReportProps> = ({ bookings, className = '' }) => {
                     {formatCurrency(data.total_amount)}
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {((data.total_amount / taxSummary.total_tax_collected) * 100).toFixed(1)}% of total
+                    {(
+                      (data.total_amount / taxSummary.total_tax_collected) *
+                      100
+                    ).toFixed(1)}
+                    % of total
                   </div>
                 </div>
               </div>

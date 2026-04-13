@@ -108,9 +108,7 @@ const Bookings: React.FC<BookingsProps> = ({
       if (checkoutUrl) {
         window.location.href = checkoutUrl;
       } else {
-        window.alert(
-          __("Could not start payment. Please try again.", "yatra"),
-        );
+        window.alert(__("Could not start payment. Please try again.", "yatra"));
       }
     } catch (error) {
       console.error("Error initiating payment:", error);

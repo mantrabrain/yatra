@@ -43,21 +43,21 @@ function extractGravatarUrl(avatarHtml: string, size: number): string {
   if (!avatarHtml) {
     return `https://www.gravatar.com/avatar/00000000000000000000000000000000?s=${size}&d=identicon&r=pg`;
   }
-  
+
   // Extract src attribute from img tag
   const imgMatch = avatarHtml.match(/<img[^>]+src=["']([^"']+)["']/i);
   if (imgMatch && imgMatch[1]) {
     // Replace size parameter if needed
     return imgMatch[1].replace(/s=\d+/, `s=${size}`);
   }
-  
+
   // Fallback to default
   return `https://www.gravatar.com/avatar/00000000000000000000000000000000?s=${size}&d=identicon&r=pg`;
 }
 
 // Helper function to get Gravatar URL using WordPress data
 function getGravatarUrl(size: number): string {
-  const avatarHtml = (window as any)?.yatraAdmin?.currentUserAvatar || '';
+  const avatarHtml = (window as any)?.yatraAdmin?.currentUserAvatar || "";
   return extractGravatarUrl(avatarHtml, size);
 }
 
@@ -127,7 +127,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     });
   };
 
-
   // Track URL changes to update menu state
   const [urlKey, setUrlKey] = useState(0);
   const [navRefreshKey, setNavRefreshKey] = useState(0);
@@ -135,16 +134,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (modulesPanelRef.current && !modulesPanelRef.current.contains(event.target as Node)) {
+      if (
+        modulesPanelRef.current &&
+        !modulesPanelRef.current.contains(event.target as Node)
+      ) {
         setIsModulesPanelOpen(false);
       }
-      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target as Node)) {
+      if (
+        userDropdownRef.current &&
+        !userDropdownRef.current.contains(event.target as Node)
+      ) {
         setIsUserDropdownOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -686,7 +691,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
                         : ""
                     }`}
-                  >        
+                  >
                     <Wrench className="w-4 h-4" />
                     {__("Tools", "yatra")}
                   </Button>
@@ -846,18 +851,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     aria-label={__("User menu", "yatra")}
                   >
                     <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
-                      <img 
+                      <img
                         src={getGravatarUrl(32)}
                         alt={__("User avatar", "yatra")}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                          e.currentTarget.parentElement!.innerHTML = '<svg class="w-5 h-5 text-gray-600 dark:text-gray-400 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>';
+                          e.currentTarget.style.display = "none";
+                          e.currentTarget.parentElement!.innerHTML =
+                            '<svg class="w-5 h-5 text-gray-600 dark:text-gray-400 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>';
                         }}
                       />
                     </div>
                   </button>
-                  
+
                   {isUserDropdownOpen && (
                     <div
                       ref={userDropdownRef}
@@ -868,27 +874,33 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                           <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
-                                <img 
+                                <img
                                   src={getGravatarUrl(40)}
                                   alt={__("User avatar", "yatra")}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
-                                    e.currentTarget.style.display = 'none';
-                                    e.currentTarget.parentElement!.innerHTML = '<svg class="w-6 h-6 text-gray-600 dark:text-gray-400 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>';
+                                    e.currentTarget.style.display = "none";
+                                    e.currentTarget.parentElement!.innerHTML =
+                                      '<svg class="w-6 h-6 text-gray-600 dark:text-gray-400 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>';
                                   }}
                                 />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                  {(window as any)?.yatraAdmin?.currentUserDisplayName || (window as any)?.yatraAdmin?.currentUserLogin || "Admin"}
+                                  {(window as any)?.yatraAdmin
+                                    ?.currentUserDisplayName ||
+                                    (window as any)?.yatraAdmin
+                                      ?.currentUserLogin ||
+                                    "Admin"}
                                 </div>
                                 <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                  {(window as any)?.yatraAdmin?.currentUserEmail || ""}
+                                  {(window as any)?.yatraAdmin
+                                    ?.currentUserEmail || ""}
                                 </div>
                               </div>
                             </div>
                           </div>
-                          
+
                           <a
                             href={`${(window as any)?.yatraAdmin?.siteUrl || ""}/wp-admin/profile.php`}
                             target="_blank"
@@ -898,19 +910,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             <User className="w-4 h-4" />
                             {__("Edit Profile", "yatra")}
                           </a>
-                          
+
                           <a
                             href={`${(window as any)?.yatraAdmin?.siteUrl || ""}/wp-admin/`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                              />
                             </svg>
                             {__("Back to WordPress", "yatra")}
                           </a>
-                          
+
                           <button
                             onClick={() => {
                               const admin = (window as any)?.yatraAdmin;
@@ -919,8 +941,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             }}
                             className="w-full text-left px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 flex items-center gap-3 transition-colors"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                              />
                             </svg>
                             {__("Logout", "yatra")}
                           </button>

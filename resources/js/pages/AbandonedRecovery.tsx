@@ -121,11 +121,22 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
   // Set active tab based on URL parameter, with dashboard as default
   const [activeTab, setActiveTab] = useState<
     "dashboard" | "bookings" | "settings"
-  >(tab === "abandoned-booking" ? "bookings" : tab === "settings" ? "settings" : "dashboard");
+  >(
+    tab === "abandoned-booking"
+      ? "bookings"
+      : tab === "settings"
+        ? "settings"
+        : "dashboard",
+  );
 
   // Update tab when URL changes
   useEffect(() => {
-    const newTab = tab === "abandoned-booking" ? "bookings" : tab === "settings" ? "settings" : "dashboard";
+    const newTab =
+      tab === "abandoned-booking"
+        ? "bookings"
+        : tab === "settings"
+          ? "settings"
+          : "dashboard";
     setActiveTab(newTab);
   }, [tab]);
   const [page, setPage] = useState(1);
@@ -249,7 +260,9 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
   const { data: modalBookingData, isLoading: isModalLoading } = useQuery({
     queryKey: ["abandoned-booking-modal", selectedBooking?.id],
     queryFn: async () => {
-      const response = await apiService.getAbandonedBooking(selectedBooking!.id);
+      const response = await apiService.getAbandonedBooking(
+        selectedBooking!.id,
+      );
       return response.data;
     },
     enabled: !!selectedBooking?.id && viewModalOpen,
@@ -362,9 +375,25 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
 
   const viewFilters = [
     { key: "all", label: __("All"), count: stats.total_abandoned || 0 },
-    { key: "abandoned", label: __("Abandoned"), count: stats.total_abandoned - stats.total_recovered - stats.total_expired - stats.total_contacted || 0 },
-    { key: "contacted", label: __("Contacted"), count: stats.total_contacted || 0 },
-    { key: "recovered", label: __("Recovered"), count: stats.total_recovered || 0 },
+    {
+      key: "abandoned",
+      label: __("Abandoned"),
+      count:
+        stats.total_abandoned -
+          stats.total_recovered -
+          stats.total_expired -
+          stats.total_contacted || 0,
+    },
+    {
+      key: "contacted",
+      label: __("Contacted"),
+      count: stats.total_contacted || 0,
+    },
+    {
+      key: "recovered",
+      label: __("Recovered"),
+      count: stats.total_recovered || 0,
+    },
     { key: "expired", label: __("Expired"), count: stats.total_expired || 0 },
   ];
 
@@ -553,7 +582,7 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
   <li><strong>Starting from:</strong> {total_amount}</li>
 </ul>
 <p><a href="{trip_link}">View Trip Details</a></p>
-<p>Discover more about this incredible journey!</p>`
+<p>Discover more about this incredible journey!</p>`,
       },
       second: {
         subject: __("Still Thinking About {trip_name}? - {site_name}"),
@@ -567,7 +596,7 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
   <li><strong>Starting from:</strong> {total_amount}</li>
 </ul>
 <p><a href="{trip_link}">Explore This Adventure</a></p>
-<p>Find your next great adventure with us!</p>`
+<p>Find your next great adventure with us!</p>`,
       },
       final: {
         subject: __("Don't Miss {trip_name}! - {site_name}"),
@@ -581,15 +610,15 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
 </ul>
 <p><a href="{trip_link}">View Trip Before It's Gone</a></p>
 <p><strong>Important:</strong> Popular trips like this fill up quickly. Don't miss your chance!</p>
-<p>This is your final opportunity to explore this incredible journey.</p>`
-      }
+<p>This is your final opportunity to explore this incredible journey.</p>`,
+      },
     };
 
     const template = defaultTemplates[type];
-    setSettings(prev => ({
+    setSettings((prev) => ({
       ...prev,
       [`${type}_email_subject`]: template.subject,
-      [`${type}_email_message`]: template.message
+      [`${type}_email_message`]: template.message,
     }));
   };
 
@@ -1431,7 +1460,9 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
                 </div>
                 <div>
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="second_email_message">{__("Message")}</Label>
+                    <Label htmlFor="second_email_message">
+                      {__("Message")}
+                    </Label>
                     <Button
                       type="button"
                       variant="outline"
@@ -1654,7 +1685,7 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
           </div>
         </div>
       </Modal>
-      
+
       {/* View Details Modal */}
       <Modal
         isOpen={viewModalOpen}
@@ -1688,79 +1719,131 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
           <div className="space-y-6">
             {/* Customer Information */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">{__("Customer Information")}</h3>
+              <h3 className="text-lg font-semibold mb-3">
+                {__("Customer Information")}
+              </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-sm text-gray-500">{__("Name")}</Label>
-                  <p className="font-medium">{modalBookingData.customer_name || __("Unknown")}</p>
+                  <p className="font-medium">
+                    {modalBookingData.customer_name || __("Unknown")}
+                  </p>
                 </div>
                 <div>
                   <Label className="text-sm text-gray-500">{__("Email")}</Label>
-                  <p className="font-medium">{modalBookingData.customer_email || __("Not provided")}</p>
+                  <p className="font-medium">
+                    {modalBookingData.customer_email || __("Not provided")}
+                  </p>
                 </div>
                 <div>
                   <Label className="text-sm text-gray-500">{__("Phone")}</Label>
-                  <p className="font-medium">{modalBookingData.customer_phone || __("Not provided")}</p>
+                  <p className="font-medium">
+                    {modalBookingData.customer_phone || __("Not provided")}
+                  </p>
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-500">{__("Session ID")}</Label>
-                  <p className="font-mono text-sm">{modalBookingData.session_id}</p>
+                  <Label className="text-sm text-gray-500">
+                    {__("Session ID")}
+                  </Label>
+                  <p className="font-mono text-sm">
+                    {modalBookingData.session_id}
+                  </p>
                 </div>
               </div>
             </div>
-            
+
             {/* Trip Information */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">{__("Trip Information")}</h3>
+              <h3 className="text-lg font-semibold mb-3">
+                {__("Trip Information")}
+              </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-sm text-gray-500">{__("Trip")}</Label>
-                  <p className="font-medium">{modalBookingData.trip_name || __("Unknown Trip")}</p>
+                  <p className="font-medium">
+                    {modalBookingData.trip_name || __("Unknown Trip")}
+                  </p>
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-500">{__("Departure Date")}</Label>
-                  <p className="font-medium">{modalBookingData.departure_date || __("Not set")}</p>
+                  <Label className="text-sm text-gray-500">
+                    {__("Departure Date")}
+                  </Label>
+                  <p className="font-medium">
+                    {modalBookingData.departure_date || __("Not set")}
+                  </p>
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-500">{__("Travelers")}</Label>
-                  <p className="font-medium">{modalBookingData.travelers_count || 1}</p>
+                  <Label className="text-sm text-gray-500">
+                    {__("Travelers")}
+                  </Label>
+                  <p className="font-medium">
+                    {modalBookingData.travelers_count || 1}
+                  </p>
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-500">{__("Total Amount")}</Label>
-                  <p className="font-medium">{formatPrice(modalBookingData.total_amount || 0)}</p>
+                  <Label className="text-sm text-gray-500">
+                    {__("Total Amount")}
+                  </Label>
+                  <p className="font-medium">
+                    {formatPrice(modalBookingData.total_amount || 0)}
+                  </p>
                 </div>
               </div>
             </div>
-            
+
             {/* Status and Dates */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">{__("Status & Dates")}</h3>
+              <h3 className="text-lg font-semibold mb-3">
+                {__("Status & Dates")}
+              </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-sm text-gray-500">{__("Status")}</Label>
-                  <Badge variant={modalBookingData.status === 'recovered' ? 'success' : 'warning'}>
+                  <Label className="text-sm text-gray-500">
+                    {__("Status")}
+                  </Label>
+                  <Badge
+                    variant={
+                      modalBookingData.status === "recovered"
+                        ? "success"
+                        : "warning"
+                    }
+                  >
                     {modalBookingData.status}
                   </Badge>
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-500">{__("Created")}</Label>
-                  <p className="font-medium">{new Date(modalBookingData.created_at).toLocaleString()}</p>
+                  <Label className="text-sm text-gray-500">
+                    {__("Created")}
+                  </Label>
+                  <p className="font-medium">
+                    {new Date(modalBookingData.created_at).toLocaleString()}
+                  </p>
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-500">{__("Expires")}</Label>
-                  <p className="font-medium">{new Date(modalBookingData.expires_at).toLocaleString()}</p>
+                  <Label className="text-sm text-gray-500">
+                    {__("Expires")}
+                  </Label>
+                  <p className="font-medium">
+                    {new Date(modalBookingData.expires_at).toLocaleString()}
+                  </p>
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-500">{__("Emails Sent")}</Label>
-                  <p className="font-medium">{modalBookingData.recovery_emails_sent || 0}</p>
+                  <Label className="text-sm text-gray-500">
+                    {__("Emails Sent")}
+                  </Label>
+                  <p className="font-medium">
+                    {modalBookingData.recovery_emails_sent || 0}
+                  </p>
                 </div>
               </div>
             </div>
-            
+
             {/* Form Data (Debug) */}
             {modalBookingData.booking_data && (
               <div>
-                <h3 className="text-lg font-semibold mb-3">{__("Form Data")}</h3>
+                <h3 className="text-lg font-semibold mb-3">
+                  {__("Form Data")}
+                </h3>
                 <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-md max-h-40 overflow-y-auto">
                   <pre className="text-xs">
                     {JSON.stringify(modalBookingData.booking_data, null, 2)}

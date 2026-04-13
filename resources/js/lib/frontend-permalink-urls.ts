@@ -112,20 +112,12 @@ export function buildYatraSinglePublicUrls(params: {
       };
     case "destination":
       return {
-        plainUrl: buildTaxonomyPlainUrl(
-          baseSite,
-          bases.destination_base,
-          slug,
-        ),
+        plainUrl: buildTaxonomyPlainUrl(baseSite, bases.destination_base, slug),
         prettyUrl: `${baseSite}/${bases.destination_base}/${slug}`,
       };
     case "activity":
       return {
-        plainUrl: buildTaxonomyPlainUrl(
-          baseSite,
-          bases.activity_base,
-          slug,
-        ),
+        plainUrl: buildTaxonomyPlainUrl(baseSite, bases.activity_base, slug),
         prettyUrl: `${baseSite}/${bases.activity_base}/${slug}`,
       };
     case "category":
@@ -161,8 +153,7 @@ export function buildYatraListingPublicUrl(
   siteUrl?: string,
 ): string {
   const seg = (baseSegment || "trip").trim();
-  const raw =
-    siteUrl !== undefined ? siteUrl : getYatraSiteUrlFromWindow();
+  const raw = siteUrl !== undefined ? siteUrl : getYatraSiteUrlFromWindow();
   const siteBase = raw.replace(/\/$/, "");
   if (isWordPressPlainPermalink()) {
     if (!siteBase) {

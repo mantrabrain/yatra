@@ -102,7 +102,10 @@ import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
 import { useToast } from "../components/ui/toast";
 import { MultiSelect } from "../components/ui/multi-select";
 import { TestimonialsSelector } from "../components/trip-form/TestimonialsSelector";
-import { LocationPicker, LocationData } from "../components/trip-form/LocationPicker";
+import {
+  LocationPicker,
+  LocationData,
+} from "../components/trip-form/LocationPicker";
 import { getErrorContext } from "../lib/errors";
 import {
   buildYatraSinglePublicUrls,
@@ -340,7 +343,7 @@ interface TripFormData {
   physical_requirements: string;
   visa_requirements: string;
   vaccination_requirements: string;
-  
+
   // Fallback Settings (for trips without availability dates/rules)
   has_default_time_slots: boolean; // For day tours: enable multiple time slots
   default_time_slots: TimeSlot[]; // Array of time slot objects for day tours
@@ -526,9 +529,11 @@ const TripForm: React.FC = () => {
   const [showCategorySelector, setShowCategorySelector] = useState(false);
   const [showLandmarkDialog, setShowLandmarkDialog] = useState(false);
   const [landmarkInput, setLandmarkInput] = useState("");
-  
+
   // Sub-tab state for Trip Details section (itinerary)
-  const [tripDetailsTab, setTripDetailsTab] = useState<"itinerary" | "included">("itinerary");
+  const [tripDetailsTab, setTripDetailsTab] = useState<
+    "itinerary" | "included"
+  >("itinerary");
 
   // Track visited sections for lazy loading and update URL
   useEffect(() => {
@@ -1805,69 +1810,69 @@ const TripForm: React.FC = () => {
   const tripAttributesQueryEnabled = Boolean(tripId && isEditMode);
   const { data: tripAttributesData, isPending: isTripAttributesPending } =
     useQuery({
-    queryKey: ["trip-attributes", tripId],
-    queryFn: async () => {
-      if (!tripId) return {};
-      try {
-        const response = await apiClient.get(`/trips/${tripId}/attributes`);
+      queryKey: ["trip-attributes", tripId],
+      queryFn: async () => {
+        if (!tripId) return {};
+        try {
+          const response = await apiClient.get(`/trips/${tripId}/attributes`);
 
-        // Try different ways to extract the data
-        let payload = response?.data;
-        if (!payload || !Array.isArray(payload)) {
-          payload = response;
-        }
-        if (!payload || !Array.isArray(payload)) {
-          payload = response?.data?.data;
-        }
-
-        const attributes = Array.isArray(payload)
-          ? payload
-          : Array.isArray(payload?.data)
-            ? payload.data
-            : [];
-
-        // Convert to attributeId => value mapping for form
-        const attributesMap: Record<number, any> = {};
-        attributes.forEach((attr: any) => {
-          const attributeId = Number(attr.attribute_id || attr.id);
-          if (attributeId) {
-            let value = "";
-
-            // Read from relationship_metadata (contains complete attribute data)
-            if (attr.relationship_metadata) {
-              try {
-                const metadata =
-                  typeof attr.relationship_metadata === "string"
-                    ? JSON.parse(attr.relationship_metadata)
-                    : attr.relationship_metadata;
-
-                value = metadata.value || "";
-              } catch (e) {
-                console.warn(
-                  "Failed to parse relationship_metadata:",
-                  attr.relationship_metadata,
-                  e,
-                );
-                value = "";
-              }
-            } else {
-              // Fallback to old format if metadata is not available
-              value = attr.value || "";
-            }
-
-            attributesMap[attributeId] = value;
+          // Try different ways to extract the data
+          let payload = response?.data;
+          if (!payload || !Array.isArray(payload)) {
+            payload = response;
           }
-        });
+          if (!payload || !Array.isArray(payload)) {
+            payload = response?.data?.data;
+          }
 
-        return attributesMap;
-      } catch (error) {
-        console.error("Failed to fetch trip attributes:", error);
-        return {};
-      }
-    },
-    enabled: tripAttributesQueryEnabled,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-  });
+          const attributes = Array.isArray(payload)
+            ? payload
+            : Array.isArray(payload?.data)
+              ? payload.data
+              : [];
+
+          // Convert to attributeId => value mapping for form
+          const attributesMap: Record<number, any> = {};
+          attributes.forEach((attr: any) => {
+            const attributeId = Number(attr.attribute_id || attr.id);
+            if (attributeId) {
+              let value = "";
+
+              // Read from relationship_metadata (contains complete attribute data)
+              if (attr.relationship_metadata) {
+                try {
+                  const metadata =
+                    typeof attr.relationship_metadata === "string"
+                      ? JSON.parse(attr.relationship_metadata)
+                      : attr.relationship_metadata;
+
+                  value = metadata.value || "";
+                } catch (e) {
+                  console.warn(
+                    "Failed to parse relationship_metadata:",
+                    attr.relationship_metadata,
+                    e,
+                  );
+                  value = "";
+                }
+              } else {
+                // Fallback to old format if metadata is not available
+                value = attr.value || "";
+              }
+
+              attributesMap[attributeId] = value;
+            }
+          });
+
+          return attributesMap;
+        } catch (error) {
+          console.error("Failed to fetch trip attributes:", error);
+          return {};
+        }
+      },
+      enabled: tripAttributesQueryEnabled,
+      staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    });
   const tripAttributesReady =
     !tripAttributesQueryEnabled || !isTripAttributesPending;
 
@@ -2155,9 +2160,11 @@ const TripForm: React.FC = () => {
       visa_requirements: tripData.visa_requirements || "",
       vaccination_requirements: tripData.vaccination_requirements || "",
       has_default_time_slots: tripData.has_default_time_slots || false,
-      default_time_slots: Array.isArray(tripData.default_time_slots) 
-        ? tripData.default_time_slots 
-        : (tripData.default_time_slots ? JSON.parse(tripData.default_time_slots) : []),
+      default_time_slots: Array.isArray(tripData.default_time_slots)
+        ? tripData.default_time_slots
+        : tripData.default_time_slots
+          ? JSON.parse(tripData.default_time_slots)
+          : [],
       departure_time: tripData.departure_time || "09:00",
       included_items: normalizeAmenityItems(tripData.included_items),
       excluded_items: normalizeAmenityItems(tripData.excluded_items),
@@ -2437,11 +2444,13 @@ const TripForm: React.FC = () => {
       icon: Calendar,
       required: false,
       completed: !!(
-        formData.available_from || 
-        formData.available_to || 
+        formData.available_from ||
+        formData.available_to ||
         (formData.min_travelers && formData.max_travelers)
       ),
-      hasErrors: getSectionErrors("duration").length > 0 || getSectionErrors("booking").length > 0,
+      hasErrors:
+        getSectionErrors("duration").length > 0 ||
+        getSectionErrors("booking").length > 0,
     },
   ];
 
@@ -2453,11 +2462,13 @@ const TripForm: React.FC = () => {
       label: __("Trip Details", "yatra"),
       icon: BookOpen,
       required: false,
-      completed: 
+      completed:
         formData.itinerary_days.length > 0 ||
         formData.included_items.length > 0 ||
         formData.excluded_items.length > 0,
-      hasErrors: getSectionErrors("itinerary").length > 0 || getSectionErrors("included").length > 0,
+      hasErrors:
+        getSectionErrors("itinerary").length > 0 ||
+        getSectionErrors("included").length > 0,
     },
   ];
 
@@ -2484,7 +2495,7 @@ const TripForm: React.FC = () => {
           },
         ] as Section[])
       : []),
-    
+
     // 7. Categories & Attributes - Classification + Custom Attributes (merged 2 sections)
     {
       id: "categorization",
@@ -2497,9 +2508,11 @@ const TripForm: React.FC = () => {
         formData.tags.length > 0 ||
         (formData.attributes && Object.keys(formData.attributes).length > 0)
       ),
-      hasErrors: getSectionErrors("categorization").length > 0 || getSectionErrors("attributes").length > 0,
+      hasErrors:
+        getSectionErrors("categorization").length > 0 ||
+        getSectionErrors("attributes").length > 0,
     },
-    
+
     // 8. SEO & Marketing - SEO + FAQs (merged, fixed duplicate)
     {
       id: "seo",
@@ -2507,11 +2520,13 @@ const TripForm: React.FC = () => {
       icon: Search,
       required: false,
       completed: !!(
-        formData.meta_title || 
+        formData.meta_title ||
         formData.meta_description ||
         formData.faqs.length > 0
       ),
-      hasErrors: getSectionErrors("seo").length > 0 || getSectionErrors("faqs").length > 0,
+      hasErrors:
+        getSectionErrors("seo").length > 0 ||
+        getSectionErrors("faqs").length > 0,
     },
   ];
 
@@ -3147,10 +3162,18 @@ const TripForm: React.FC = () => {
         ending_location: data.ending_location.trim(),
         countries: data.countries || [],
         regions: data.regions || [],
-        starting_latitude: data.starting_latitude ? parseFloat(data.starting_latitude) : null,
-        starting_longitude: data.starting_longitude ? parseFloat(data.starting_longitude) : null,
-        ending_latitude: data.ending_latitude ? parseFloat(data.ending_latitude) : null,
-        ending_longitude: data.ending_longitude ? parseFloat(data.ending_longitude) : null,
+        starting_latitude: data.starting_latitude
+          ? parseFloat(data.starting_latitude)
+          : null,
+        starting_longitude: data.starting_longitude
+          ? parseFloat(data.starting_longitude)
+          : null,
+        ending_latitude: data.ending_latitude
+          ? parseFloat(data.ending_latitude)
+          : null,
+        ending_longitude: data.ending_longitude
+          ? parseFloat(data.ending_longitude)
+          : null,
         landmarks: data.landmarks || [],
         trip_type: data.trip_type,
         duration_days: data.duration_days ? parseInt(data.duration_days) : null,
@@ -4640,13 +4663,15 @@ const TripForm: React.FC = () => {
                     {__("Trip Locations", "yatra")}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                    {__("Set precise starting and ending points with location names and GPS coordinates. Use manual entry or visual map selection for maximum accuracy.", "yatra")}
+                    {__(
+                      "Set precise starting and ending points with location names and GPS coordinates. Use manual entry or visual map selection for maximum accuracy.",
+                      "yatra",
+                    )}
                   </p>
                 </div>
 
                 {/* Locations Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  
                   {/* STARTING LOCATION */}
                   <div className="space-y-6">
                     {/* Location Header */}
@@ -4664,11 +4689,18 @@ const TripForm: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         {formData.starting_location && (
-                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="Location set"></div>
+                          <div
+                            className="w-2 h-2 bg-green-500 rounded-full animate-pulse"
+                            title="Location set"
+                          ></div>
                         )}
-                        {formData.starting_latitude && formData.starting_longitude && (
-                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" title="Coordinates set"></div>
-                        )}
+                        {formData.starting_latitude &&
+                          formData.starting_longitude && (
+                            <div
+                              className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"
+                              title="Coordinates set"
+                            ></div>
+                          )}
                       </div>
                     </div>
 
@@ -4677,43 +4709,65 @@ const TripForm: React.FC = () => {
                       <div className="flex items-center justify-between">
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                           <div className="w-4 h-4 bg-blue-100 dark:bg-blue-900 rounded flex items-center justify-center">
-                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400">1</span>
+                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
+                              1
+                            </span>
                           </div>
                           {__("Starting Location", "yatra")}
                         </label>
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {formData.starting_location ? "✓" : __("Required", "yatra")}
+                            {formData.starting_location
+                              ? "✓"
+                              : __("Required", "yatra")}
                           </span>
-                          {formData.starting_latitude && formData.starting_longitude && (
-                            <div className="flex items-center gap-1 text-xs text-green-600">
-                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                              {__("Coords Set", "yatra")}
-                            </div>
-                          )}
+                          {formData.starting_latitude &&
+                            formData.starting_longitude && (
+                              <div className="flex items-center gap-1 text-xs text-green-600">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                {__("Coords Set", "yatra")}
+                              </div>
+                            )}
                         </div>
                       </div>
-                      
+
                       {/* LocationPicker - Primary Interface */}
                       <div className="space-y-3">
                         <LocationPicker
                           value={{
                             name: formData.starting_location,
                             latitude: formData.starting_latitude,
-                            longitude: formData.starting_longitude
+                            longitude: formData.starting_longitude,
                           }}
                           onChange={(locationData) => {
-                            handleFieldChange("starting_location", locationData.name);
-                            handleFieldChange("starting_latitude", locationData.latitude);
-                            handleFieldChange("starting_longitude", locationData.longitude);
+                            handleFieldChange(
+                              "starting_location",
+                              locationData.name,
+                            );
+                            handleFieldChange(
+                              "starting_latitude",
+                              locationData.latitude,
+                            );
+                            handleFieldChange(
+                              "starting_longitude",
+                              locationData.longitude,
+                            );
                           }}
                           label=""
-                          placeholder={__("Search for starting location...", "yatra")}
+                          placeholder={__(
+                            "Search for starting location...",
+                            "yatra",
+                          )}
                           helpText=""
                           required={false}
-                          defaultMapCenter={formData.starting_latitude && formData.starting_longitude ? 
-                            [parseFloat(formData.starting_latitude), parseFloat(formData.starting_longitude)] : 
-                            [-8.3405, 115.0920]
+                          defaultMapCenter={
+                            formData.starting_latitude &&
+                            formData.starting_longitude
+                              ? [
+                                  parseFloat(formData.starting_latitude),
+                                  parseFloat(formData.starting_longitude),
+                                ]
+                              : [-8.3405, 115.092]
                           }
                           defaultZoom={13}
                           mapHeight="300px"
@@ -4731,10 +4785,14 @@ const TripForm: React.FC = () => {
                       <div className="flex items-center justify-between">
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                           <div className="w-4 h-4 bg-blue-100 dark:bg-blue-900 rounded flex items-center justify-center">
-                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400">2</span>
+                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
+                              2
+                            </span>
                           </div>
                           {__("GPS Coordinates", "yatra")}
-                          <span className="text-xs text-gray-500 dark:text-gray-400">({__("Manual override", "yatra")})</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            ({__("Manual override", "yatra")})
+                          </span>
                         </label>
                         <div className="flex items-center gap-2">
                           <button
@@ -4743,53 +4801,94 @@ const TripForm: React.FC = () => {
                               if (navigator.geolocation) {
                                 navigator.geolocation.getCurrentPosition(
                                   (position) => {
-                                    handleFieldChange("starting_latitude", position.coords.latitude.toString());
-                                    handleFieldChange("starting_longitude", position.coords.longitude.toString());
+                                    handleFieldChange(
+                                      "starting_latitude",
+                                      position.coords.latitude.toString(),
+                                    );
+                                    handleFieldChange(
+                                      "starting_longitude",
+                                      position.coords.longitude.toString(),
+                                    );
                                   },
                                   (error) => {
-                                    let message = __("Unable to get your location", "yatra");
+                                    let message = __(
+                                      "Unable to get your location",
+                                      "yatra",
+                                    );
                                     let showHttpsNotice = false;
-                                    
+
                                     switch (error.code) {
                                       case 1: // PERMISSION_DENIED
-                                        if (error.message.includes('secure origins')) {
-                                          message = __("Location access requires HTTPS. This feature will work on your live HTTPS site.", "yatra");
+                                        if (
+                                          error.message.includes(
+                                            "secure origins",
+                                          )
+                                        ) {
+                                          message = __(
+                                            "Location access requires HTTPS. This feature will work on your live HTTPS site.",
+                                            "yatra",
+                                          );
                                           showHttpsNotice = true;
                                         } else {
-                                          message = __("Location access denied. Please allow location access in your browser.", "yatra");
+                                          message = __(
+                                            "Location access denied. Please allow location access in your browser.",
+                                            "yatra",
+                                          );
                                         }
                                         break;
                                       case 2: // POSITION_UNAVAILABLE
-                                        message = __("Location information is unavailable. Please try again.", "yatra");
+                                        message = __(
+                                          "Location information is unavailable. Please try again.",
+                                          "yatra",
+                                        );
                                         break;
                                       case 3: // TIMEOUT
-                                        message = __("Location request timed out. Please try again.", "yatra");
+                                        message = __(
+                                          "Location request timed out. Please try again.",
+                                          "yatra",
+                                        );
                                         break;
                                     }
-                                    
+
                                     if (showHttpsNotice) {
-                                      alert(message + "\n\n" + __("For local development, you can:\n1. Use a browser extension that allows geolocation on HTTP\n2. Set up a local HTTPS certificate\n3. Test on your live HTTPS site", "yatra"));
+                                      alert(
+                                        message +
+                                          "\n\n" +
+                                          __(
+                                            "For local development, you can:\n1. Use a browser extension that allows geolocation on HTTP\n2. Set up a local HTTPS certificate\n3. Test on your live HTTPS site",
+                                            "yatra",
+                                          ),
+                                      );
                                     } else {
                                       alert(message);
                                     }
-                                  }
+                                  },
                                 );
                               } else {
-                                alert(__("Geolocation is not supported by your browser", "yatra"));
+                                alert(
+                                  __(
+                                    "Geolocation is not supported by your browser",
+                                    "yatra",
+                                  ),
+                                );
                               }
                             }}
                             className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg hover:bg-green-200 transition-colors flex items-center gap-1"
                           >
                             <div className="w-3 h-3">
                               <svg fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                                <path
+                                  fillRule="evenodd"
+                                  d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                  clipRule="evenodd"
+                                />
                               </svg>
                             </div>
                             {__("Use Current Location", "yatra")}
                           </button>
                         </div>
                       </div>
-                      
+
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-2">
                           <label className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
@@ -4799,7 +4898,12 @@ const TripForm: React.FC = () => {
                           <Input
                             type="text"
                             value={formData.starting_latitude}
-                            onChange={(e) => handleFieldChange("starting_latitude", e.target.value)}
+                            onChange={(e) =>
+                              handleFieldChange(
+                                "starting_latitude",
+                                e.target.value,
+                              )
+                            }
                             className="w-full text-sm"
                           />
                         </div>
@@ -4811,14 +4915,22 @@ const TripForm: React.FC = () => {
                           <Input
                             type="text"
                             value={formData.starting_longitude}
-                            onChange={(e) => handleFieldChange("starting_longitude", e.target.value)}
+                            onChange={(e) =>
+                              handleFieldChange(
+                                "starting_longitude",
+                                e.target.value,
+                              )
+                            }
                             placeholder={__("e.g., 115.0920", "yatra")}
                             className="w-full text-sm"
                           />
                         </div>
                       </div>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {__("Manual coordinate entry. These will be auto-filled when you select a location from the map above.", "yatra")}
+                        {__(
+                          "Manual coordinate entry. These will be auto-filled when you select a location from the map above.",
+                          "yatra",
+                        )}
                       </p>
                     </div>
                   </div>
@@ -4840,7 +4952,10 @@ const TripForm: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         {formData.ending_location && (
-                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="Location set"></div>
+                          <div
+                            className="w-2 h-2 bg-green-500 rounded-full animate-pulse"
+                            title="Location set"
+                          ></div>
                         )}
                       </div>
                     </div>
@@ -4850,43 +4965,65 @@ const TripForm: React.FC = () => {
                       <div className="flex items-center justify-between">
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                           <div className="w-4 h-4 bg-green-100 dark:bg-green-900 rounded flex items-center justify-center">
-                            <span className="text-xs font-bold text-green-600 dark:text-green-400">1</span>
+                            <span className="text-xs font-bold text-green-600 dark:text-green-400">
+                              1
+                            </span>
                           </div>
                           {__("Ending Location", "yatra")}
                         </label>
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {formData.ending_location ? "✓" : __("Required", "yatra")}
+                            {formData.ending_location
+                              ? "✓"
+                              : __("Required", "yatra")}
                           </span>
-                          {formData.ending_latitude && formData.ending_longitude && (
-                            <div className="flex items-center gap-1 text-xs text-green-600">
-                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                              {__("Coords Set", "yatra")}
-                            </div>
-                          )}
+                          {formData.ending_latitude &&
+                            formData.ending_longitude && (
+                              <div className="flex items-center gap-1 text-xs text-green-600">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                {__("Coords Set", "yatra")}
+                              </div>
+                            )}
                         </div>
                       </div>
-                      
+
                       {/* LocationPicker - Primary Interface */}
                       <div className="space-y-3">
                         <LocationPicker
                           value={{
                             name: formData.ending_location,
                             latitude: formData.ending_latitude,
-                            longitude: formData.ending_longitude
+                            longitude: formData.ending_longitude,
                           }}
                           onChange={(locationData) => {
-                            handleFieldChange("ending_location", locationData.name);
-                            handleFieldChange("ending_latitude", locationData.latitude);
-                            handleFieldChange("ending_longitude", locationData.longitude);
+                            handleFieldChange(
+                              "ending_location",
+                              locationData.name,
+                            );
+                            handleFieldChange(
+                              "ending_latitude",
+                              locationData.latitude,
+                            );
+                            handleFieldChange(
+                              "ending_longitude",
+                              locationData.longitude,
+                            );
                           }}
                           label=""
-                          placeholder={__("Search for ending location...", "yatra")}
+                          placeholder={__(
+                            "Search for ending location...",
+                            "yatra",
+                          )}
                           helpText=""
                           required={false}
-                          defaultMapCenter={formData.ending_latitude && formData.ending_longitude ? 
-                            [parseFloat(formData.ending_latitude), parseFloat(formData.ending_longitude)] : 
-                            [-8.5069, 115.2625]
+                          defaultMapCenter={
+                            formData.ending_latitude &&
+                            formData.ending_longitude
+                              ? [
+                                  parseFloat(formData.ending_latitude),
+                                  parseFloat(formData.ending_longitude),
+                                ]
+                              : [-8.5069, 115.2625]
                           }
                           defaultZoom={13}
                           mapHeight="300px"
@@ -4904,13 +5041,17 @@ const TripForm: React.FC = () => {
                       <div className="flex items-center justify-between">
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                           <div className="w-4 h-4 bg-green-100 dark:bg-green-900 rounded flex items-center justify-center">
-                            <span className="text-xs font-bold text-green-600 dark:text-green-400">2</span>
+                            <span className="text-xs font-bold text-green-600 dark:text-green-400">
+                              2
+                            </span>
                           </div>
                           {__("GPS Coordinates", "yatra")}
-                          <span className="text-xs text-gray-500 dark:text-gray-400">({__("Optional", "yatra")})</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            ({__("Optional", "yatra")})
+                          </span>
                         </label>
                       </div>
-                      
+
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-2">
                           <label className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
@@ -4920,7 +5061,12 @@ const TripForm: React.FC = () => {
                           <Input
                             type="text"
                             value={formData.ending_latitude || ""}
-                            onChange={(e) => handleFieldChange("ending_latitude", e.target.value)}
+                            onChange={(e) =>
+                              handleFieldChange(
+                                "ending_latitude",
+                                e.target.value,
+                              )
+                            }
                             placeholder={__("e.g., -8.5069", "yatra")}
                             className="w-full text-sm"
                           />
@@ -4933,20 +5079,27 @@ const TripForm: React.FC = () => {
                           <Input
                             type="text"
                             value={formData.ending_longitude || ""}
-                            onChange={(e) => handleFieldChange("ending_longitude", e.target.value)}
+                            onChange={(e) =>
+                              handleFieldChange(
+                                "ending_longitude",
+                                e.target.value,
+                              )
+                            }
                             placeholder={__("e.g., 115.2625", "yatra")}
                             className="w-full text-sm"
                           />
                         </div>
                       </div>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {__("Optional: Manual coordinate entry. Auto-filled when you select a location from the map above.", "yatra")}
+                        {__(
+                          "Optional: Manual coordinate entry. Auto-filled when you select a location from the map above.",
+                          "yatra",
+                        )}
                       </p>
                     </div>
                   </div>
                 </div>
-
-                              </div>
+              </div>
 
               {/* Landmarks */}
               <div>
@@ -5028,10 +5181,7 @@ const TripForm: React.FC = () => {
               </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__(
-                "When is it available & who can book it?",
-                "yatra",
-              )}
+              {__("When is it available & who can book it?", "yatra")}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {__(
                   "Set your trip's availability period, capacity limits, and booking requirements. This helps automate bookings and prevent overbooking.",
@@ -5048,105 +5198,112 @@ const TripForm: React.FC = () => {
                   {__("Availability Period", "yatra")}
                 </h3>
                 <div className="space-y-4">
-              {/* Availability Dates */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="available_from"
-                    className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                  >
-                    {__("Available From", "yatra")}
-                  </label>
-                  <DatePicker
-                    value={formData.available_from}
-                    onChange={(val) => handleFieldChange("available_from", val)}
-                    placeholder={__("Select date", "yatra")}
-                  />
-                  <HelpText
-                    text={__(
-                      "Earliest date this trip becomes available for booking",
-                      "yatra",
-                    )}
-                    className="mt-2"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="available_to"
-                    className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                  >
-                    {__("Available To", "yatra")}
-                  </label>
-                  <DatePicker
-                    value={formData.available_to}
-                    onChange={(val) => handleFieldChange("available_to", val)}
-                    placeholder={__("Select date", "yatra")}
-                  />
-                  <HelpText
-                    text={__(
-                      "Latest date this trip is available for booking",
-                      "yatra",
-                    )}
-                    className="mt-2"
-                  />
-                </div>
-              </div>
+                  {/* Availability Dates */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label
+                        htmlFor="available_from"
+                        className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                      >
+                        {__("Available From", "yatra")}
+                      </label>
+                      <DatePicker
+                        value={formData.available_from}
+                        onChange={(val) =>
+                          handleFieldChange("available_from", val)
+                        }
+                        placeholder={__("Select date", "yatra")}
+                      />
+                      <HelpText
+                        text={__(
+                          "Earliest date this trip becomes available for booking",
+                          "yatra",
+                        )}
+                        className="mt-2"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="available_to"
+                        className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                      >
+                        {__("Available To", "yatra")}
+                      </label>
+                      <DatePicker
+                        value={formData.available_to}
+                        onChange={(val) =>
+                          handleFieldChange("available_to", val)
+                        }
+                        placeholder={__("Select date", "yatra")}
+                      />
+                      <HelpText
+                        text={__(
+                          "Latest date this trip is available for booking",
+                          "yatra",
+                        )}
+                        className="mt-2"
+                      />
+                    </div>
+                  </div>
 
-              {/* Booking Window */}
-              <div>
-                <label
-                  htmlFor="booking_window_days"
-                  className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                >
-                  {__("Booking Window (Days in Advance)", "yatra")}
-                </label>
-                <Input
-                  id="booking_window_days"
-                  type="number"
-                  min="0"
-                  value={formData.booking_window_days}
-                  onChange={(e) =>
-                    handleFieldChange("booking_window_days", e.target.value)
-                  }
-                  placeholder={__("e.g., 30", "yatra")}
-                />
-                <HelpText
-                  text={__(
-                    "Minimum days in advance customers can book this trip",
-                    "yatra",
-                  )}
-                  className="mt-2"
-                />
-              </div>
+                  {/* Booking Window */}
+                  <div>
+                    <label
+                      htmlFor="booking_window_days"
+                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                    >
+                      {__("Booking Window (Days in Advance)", "yatra")}
+                    </label>
+                    <Input
+                      id="booking_window_days"
+                      type="number"
+                      min="0"
+                      value={formData.booking_window_days}
+                      onChange={(e) =>
+                        handleFieldChange("booking_window_days", e.target.value)
+                      }
+                      placeholder={__("e.g., 30", "yatra")}
+                    />
+                    <HelpText
+                      text={__(
+                        "Minimum days in advance customers can book this trip",
+                        "yatra",
+                      )}
+                      className="mt-2"
+                    />
+                  </div>
 
-              {/* Seasonal Availability */}
-              <div>
-                <label
-                  htmlFor="seasonal_availability"
-                  className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                >
-                  {__("Seasonal Availability Notes", "yatra")}
-                </label>
-                <Input
-                  id="seasonal_availability"
-                  type="text"
-                  value={formData.seasonal_availability}
-                  onChange={(e) =>
-                    handleFieldChange("seasonal_availability", e.target.value)
-                  }
-                  placeholder={__(
-                    "e.g., Available year-round except monsoon season",
-                    "yatra",
-                  )}
-                />
-                <HelpText
-                  text={__(
-                    "General notes about when this trip is typically available",
-                    "yatra",
-                  )}
-                  className="mt-2"
-                />
-              </div>
+                  {/* Seasonal Availability */}
+                  <div>
+                    <label
+                      htmlFor="seasonal_availability"
+                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                    >
+                      {__("Seasonal Availability Notes", "yatra")}
+                    </label>
+                    <Input
+                      id="seasonal_availability"
+                      type="text"
+                      value={formData.seasonal_availability}
+                      onChange={(e) =>
+                        handleFieldChange(
+                          "seasonal_availability",
+                          e.target.value,
+                        )
+                      }
+                      placeholder={__(
+                        "e.g., Available year-round except monsoon season",
+                        "yatra",
+                      )}
+                    />
+                    <HelpText
+                      text={__(
+                        "General notes about when this trip is typically available",
+                        "yatra",
+                      )}
+                      className="mt-2"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -5215,19 +5372,29 @@ const TripForm: React.FC = () => {
                       <h4 className="text-sm font-medium text-gray-900 dark:text-white">
                         {__("Fallback Settings", "yatra")}
                       </h4>
-                      <span title={__("These settings are used when the trip has no availability dates or recurring rules set. They provide default values for flexible booking.", "yatra")}>
+                      <span
+                        title={__(
+                          "These settings are used when the trip has no availability dates or recurring rules set. They provide default values for flexible booking.",
+                          "yatra",
+                        )}
+                      >
                         <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
                       </span>
                     </div>
-                    
+
                     {/* Info Banner */}
                     <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
                       <div className="flex items-start gap-2">
                         <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
                         <div className="text-xs text-amber-800 dark:text-amber-200">
-                          <p className="font-medium mb-1">{__("When are these settings used?", "yatra")}</p>
+                          <p className="font-medium mb-1">
+                            {__("When are these settings used?", "yatra")}
+                          </p>
                           <p className="text-amber-700 dark:text-amber-300">
-                            {__("These settings apply ONLY when your trip has ZERO availability dates AND ZERO recurring rules. They provide defaults for flexible booking scenarios.", "yatra")}
+                            {__(
+                              "These settings apply ONLY when your trip has ZERO availability dates AND ZERO recurring rules. They provide defaults for flexible booking scenarios.",
+                              "yatra",
+                            )}
                           </p>
                         </div>
                       </div>
@@ -5242,7 +5409,7 @@ const TripForm: React.FC = () => {
                             <Clock className="w-4 h-4" />
                             {__("Day Tour Time Settings", "yatra")}
                           </h5>
-                          
+
                           {/* Enable Multiple Time Slots Toggle */}
                           <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
                             <div className="flex items-start gap-3">
@@ -5250,15 +5417,26 @@ const TripForm: React.FC = () => {
                                 type="checkbox"
                                 id="has_default_time_slots"
                                 checked={formData.has_default_time_slots}
-                                onChange={(e) => handleFieldChange("has_default_time_slots", e.target.checked)}
+                                onChange={(e) =>
+                                  handleFieldChange(
+                                    "has_default_time_slots",
+                                    e.target.checked,
+                                  )
+                                }
                                 className="mt-0.5 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                               />
                               <div className="flex-1">
-                                <label htmlFor="has_default_time_slots" className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">
+                                <label
+                                  htmlFor="has_default_time_slots"
+                                  className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer"
+                                >
                                   {__("Enable Multiple Time Slots", "yatra")}
                                 </label>
                                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                  {__("Allow customers to select from multiple departure times (e.g., Morning, Afternoon, Evening tours)", "yatra")}
+                                  {__(
+                                    "Allow customers to select from multiple departure times (e.g., Morning, Afternoon, Evening tours)",
+                                    "yatra",
+                                  )}
                                 </p>
                               </div>
                             </div>
@@ -5273,7 +5451,10 @@ const TripForm: React.FC = () => {
                                     {__("Time Slots Configuration", "yatra")}
                                   </label>
                                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                    {__("Add multiple departure times for customers to choose from.", "yatra")}
+                                    {__(
+                                      "Add multiple departure times for customers to choose from.",
+                                      "yatra",
+                                    )}
                                   </p>
                                 </div>
                                 <Button
@@ -5284,9 +5465,12 @@ const TripForm: React.FC = () => {
                                     const newSlot: TimeSlot = {
                                       id: `slot-${Date.now()}`,
                                       time: "09:00",
-                                      label: ""
+                                      label: "",
                                     };
-                                    handleFieldChange("default_time_slots", [...formData.default_time_slots, newSlot]);
+                                    handleFieldChange("default_time_slots", [
+                                      ...formData.default_time_slots,
+                                      newSlot,
+                                    ]);
                                   }}
                                   className="flex items-center gap-1"
                                 >
@@ -5309,9 +5493,11 @@ const TripForm: React.FC = () => {
                                       const newSlot: TimeSlot = {
                                         id: `slot-${Date.now()}`,
                                         time: "09:00",
-                                        label: "Morning Tour"
+                                        label: "Morning Tour",
                                       };
-                                      handleFieldChange("default_time_slots", [newSlot]);
+                                      handleFieldChange("default_time_slots", [
+                                        newSlot,
+                                      ]);
                                     }}
                                   >
                                     <Plus className="w-4 h-4 mr-1" />
@@ -5320,61 +5506,94 @@ const TripForm: React.FC = () => {
                                 </div>
                               ) : (
                                 <div className="space-y-3">
-                                  {formData.default_time_slots.map((slot, index) => (
-                                    <div key={slot.id} className="flex items-start gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                                      <div className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex-shrink-0 mt-1">
-                                        <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
-                                          {index + 1}
-                                        </span>
-                                      </div>
-                                      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <div>
-                                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                            {__("Time", "yatra")}
-                                          </label>
-                                          <Input
-                                            type="time"
-                                            value={slot.time}
-                                            onChange={(e) => {
-                                              const updated = [...formData.default_time_slots];
-                                              updated[index] = { ...slot, time: e.target.value };
-                                              handleFieldChange("default_time_slots", updated);
-                                            }}
-                                            className="w-full"
-                                          />
-                                        </div>
-                                        <div>
-                                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                            {__("Label", "yatra")}
-                                          </label>
-                                          <Input
-                                            type="text"
-                                            value={slot.label}
-                                            onChange={(e) => {
-                                              const updated = [...formData.default_time_slots];
-                                              updated[index] = { ...slot, label: e.target.value };
-                                              handleFieldChange("default_time_slots", updated);
-                                            }}
-                                            placeholder={__("e.g., Morning Tour, Afternoon Tour", "yatra")}
-                                            className="w-full"
-                                          />
-                                        </div>
-                                      </div>
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => {
-                                          const updated = formData.default_time_slots.filter((_, i) => i !== index);
-                                          handleFieldChange("default_time_slots", updated);
-                                        }}
-                                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 flex-shrink-0 mt-1"
-                                        title={__("Remove time slot", "yatra")}
+                                  {formData.default_time_slots.map(
+                                    (slot, index) => (
+                                      <div
+                                        key={slot.id}
+                                        className="flex items-start gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
                                       >
-                                        <X className="w-4 h-4" />
-                                      </Button>
-                                    </div>
-                                  ))}
+                                        <div className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex-shrink-0 mt-1">
+                                          <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                                            {index + 1}
+                                          </span>
+                                        </div>
+                                        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+                                          <div>
+                                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                              {__("Time", "yatra")}
+                                            </label>
+                                            <Input
+                                              type="time"
+                                              value={slot.time}
+                                              onChange={(e) => {
+                                                const updated = [
+                                                  ...formData.default_time_slots,
+                                                ];
+                                                updated[index] = {
+                                                  ...slot,
+                                                  time: e.target.value,
+                                                };
+                                                handleFieldChange(
+                                                  "default_time_slots",
+                                                  updated,
+                                                );
+                                              }}
+                                              className="w-full"
+                                            />
+                                          </div>
+                                          <div>
+                                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                              {__("Label", "yatra")}
+                                            </label>
+                                            <Input
+                                              type="text"
+                                              value={slot.label}
+                                              onChange={(e) => {
+                                                const updated = [
+                                                  ...formData.default_time_slots,
+                                                ];
+                                                updated[index] = {
+                                                  ...slot,
+                                                  label: e.target.value,
+                                                };
+                                                handleFieldChange(
+                                                  "default_time_slots",
+                                                  updated,
+                                                );
+                                              }}
+                                              placeholder={__(
+                                                "e.g., Morning Tour, Afternoon Tour",
+                                                "yatra",
+                                              )}
+                                              className="w-full"
+                                            />
+                                          </div>
+                                        </div>
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => {
+                                            const updated =
+                                              formData.default_time_slots.filter(
+                                                (_, i) => i !== index,
+                                              );
+                                            handleFieldChange(
+                                              "default_time_slots",
+                                              updated,
+                                            );
+                                          }}
+                                          className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 flex-shrink-0 mt-1"
+                                          title={__(
+                                            "Remove time slot",
+                                            "yatra",
+                                          )}
+                                        >
+                                          <X className="w-4 h-4" />
+                                        </Button>
+                                      </div>
+                                    ),
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -5383,18 +5602,29 @@ const TripForm: React.FC = () => {
                           {/* Single Departure Time (if multiple slots disabled) */}
                           {!formData.has_default_time_slots && (
                             <div>
-                              <label htmlFor="departure_time_single" className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                              <label
+                                htmlFor="departure_time_single"
+                                className="block text-sm font-medium text-gray-900 dark:text-white mb-2"
+                              >
                                 {__("Default Departure Time", "yatra")}
                               </label>
                               <Input
                                 id="departure_time_single"
                                 type="time"
                                 value={formData.departure_time}
-                                onChange={(e) => handleFieldChange("departure_time", e.target.value)}
+                                onChange={(e) =>
+                                  handleFieldChange(
+                                    "departure_time",
+                                    e.target.value,
+                                  )
+                                }
                                 className="max-w-xs"
                               />
                               <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                {__("Single departure time for all bookings when multiple time slots are not enabled.", "yatra")}
+                                {__(
+                                  "Single departure time for all bookings when multiple time slots are not enabled.",
+                                  "yatra",
+                                )}
                               </p>
                             </div>
                           )}
@@ -5408,20 +5638,31 @@ const TripForm: React.FC = () => {
                             <Calendar className="w-4 h-4" />
                             {__("Multi-Day Trip Departure Settings", "yatra")}
                           </h5>
-                          
+
                           <div>
-                            <label htmlFor="departure_time_multiday" className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                            <label
+                              htmlFor="departure_time_multiday"
+                              className="block text-sm font-medium text-gray-900 dark:text-white mb-2"
+                            >
                               {__("Default Departure Time", "yatra")}
                             </label>
                             <Input
                               id="departure_time_multiday"
                               type="time"
                               value={formData.departure_time}
-                              onChange={(e) => handleFieldChange("departure_time", e.target.value)}
+                              onChange={(e) =>
+                                handleFieldChange(
+                                  "departure_time",
+                                  e.target.value,
+                                )
+                              }
                               className="max-w-xs"
                             />
                             <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                              {__("Default departure time for trips without specific availability dates.", "yatra")}
+                              {__(
+                                "Default departure time for trips without specific availability dates.",
+                                "yatra",
+                              )}
                             </p>
                           </div>
                         </div>
@@ -5431,7 +5672,10 @@ const TripForm: React.FC = () => {
                       {!formData.trip_type && (
                         <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 text-center">
                           <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {__("Please select a trip type (Day Tour or Multi-Day) to configure fallback settings.", "yatra")}
+                            {__(
+                              "Please select a trip type (Day Tour or Multi-Day) to configure fallback settings.",
+                              "yatra",
+                            )}
                           </p>
                         </div>
                       )}
@@ -5523,7 +5767,10 @@ const TripForm: React.FC = () => {
                           id="physical_requirements"
                           value={formData.physical_requirements}
                           onChange={(e) =>
-                            handleFieldChange("physical_requirements", e.target.value)
+                            handleFieldChange(
+                              "physical_requirements",
+                              e.target.value,
+                            )
                           }
                           placeholder={__(
                             "e.g., Moderate fitness level required. Some walking involved but no strenuous activities.",
@@ -5544,7 +5791,10 @@ const TripForm: React.FC = () => {
                           id="visa_requirements"
                           value={formData.visa_requirements}
                           onChange={(e) =>
-                            handleFieldChange("visa_requirements", e.target.value)
+                            handleFieldChange(
+                              "visa_requirements",
+                              e.target.value,
+                            )
                           }
                           placeholder={__(
                             "e.g., Tourist visa required. Can be obtained on arrival or in advance.",
@@ -5565,7 +5815,10 @@ const TripForm: React.FC = () => {
                           id="vaccination_requirements"
                           value={formData.vaccination_requirements}
                           onChange={(e) =>
-                            handleFieldChange("vaccination_requirements", e.target.value)
+                            handleFieldChange(
+                              "vaccination_requirements",
+                              e.target.value,
+                            )
                           }
                           placeholder={__(
                             "e.g., No mandatory vaccinations. Recommended: Hepatitis A, Typhoid, and routine vaccinations.",
@@ -5620,9 +5873,15 @@ const TripForm: React.FC = () => {
                         type="text"
                         value={formData.accommodation_type}
                         onChange={(e) =>
-                          handleFieldChange("accommodation_type", e.target.value)
+                          handleFieldChange(
+                            "accommodation_type",
+                            e.target.value,
+                          )
                         }
-                        placeholder={__("e.g., Hotel, Resort, Teahouse, Camping", "yatra")}
+                        placeholder={__(
+                          "e.g., Hotel, Resort, Teahouse, Camping",
+                          "yatra",
+                        )}
                       />
                     </div>
                     <div>
@@ -5639,12 +5898,24 @@ const TripForm: React.FC = () => {
                           handleFieldChange("meal_plan", e.target.value)
                         }
                       >
-                        <option value="">{__("Select meal plan", "yatra")}</option>
-                        <option value="breakfast">{__("Breakfast Only", "yatra")}</option>
-                        <option value="half_board">{__("Half Board (Breakfast + Dinner)", "yatra")}</option>
-                        <option value="full_board">{__("Full Board (All Meals)", "yatra")}</option>
-                        <option value="all_inclusive">{__("All Inclusive", "yatra")}</option>
-                        <option value="none">{__("No Meals Included", "yatra")}</option>
+                        <option value="">
+                          {__("Select meal plan", "yatra")}
+                        </option>
+                        <option value="breakfast">
+                          {__("Breakfast Only", "yatra")}
+                        </option>
+                        <option value="half_board">
+                          {__("Half Board (Breakfast + Dinner)", "yatra")}
+                        </option>
+                        <option value="full_board">
+                          {__("Full Board (All Meals)", "yatra")}
+                        </option>
+                        <option value="all_inclusive">
+                          {__("All Inclusive", "yatra")}
+                        </option>
+                        <option value="none">
+                          {__("No Meals Included", "yatra")}
+                        </option>
                       </Select>
                     </div>
                   </div>
@@ -5659,7 +5930,10 @@ const TripForm: React.FC = () => {
                       id="accommodation_details"
                       value={formData.accommodation_details}
                       onChange={(e) =>
-                        handleFieldChange("accommodation_details", e.target.value)
+                        handleFieldChange(
+                          "accommodation_details",
+                          e.target.value,
+                        )
                       }
                       placeholder={__(
                         "e.g., 4-star beachfront resort with private balconies, infinity pool, and spa facilities",
@@ -5685,7 +5959,10 @@ const TripForm: React.FC = () => {
                       id="transportation_included"
                       checked={formData.transportation_included}
                       onChange={(e) =>
-                        handleFieldChange("transportation_included", e.target.checked)
+                        handleFieldChange(
+                          "transportation_included",
+                          e.target.checked,
+                        )
                       }
                       className="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                     />
@@ -5711,9 +5988,15 @@ const TripForm: React.FC = () => {
                             type="text"
                             value={formData.pickup_location}
                             onChange={(e) =>
-                              handleFieldChange("pickup_location", e.target.value)
+                              handleFieldChange(
+                                "pickup_location",
+                                e.target.value,
+                              )
                             }
-                            placeholder={__("e.g., Airport, Hotel, City Center", "yatra")}
+                            placeholder={__(
+                              "e.g., Airport, Hotel, City Center",
+                              "yatra",
+                            )}
                           />
                         </div>
                         <div>
@@ -5728,9 +6011,15 @@ const TripForm: React.FC = () => {
                             type="text"
                             value={formData.dropoff_location}
                             onChange={(e) =>
-                              handleFieldChange("dropoff_location", e.target.value)
+                              handleFieldChange(
+                                "dropoff_location",
+                                e.target.value,
+                              )
                             }
-                            placeholder={__("e.g., Airport, Hotel, City Center", "yatra")}
+                            placeholder={__(
+                              "e.g., Airport, Hotel, City Center",
+                              "yatra",
+                            )}
                           />
                         </div>
                       </div>
@@ -5745,7 +6034,10 @@ const TripForm: React.FC = () => {
                           id="transportation_details"
                           value={formData.transportation_details}
                           onChange={(e) =>
-                            handleFieldChange("transportation_details", e.target.value)
+                            handleFieldChange(
+                              "transportation_details",
+                              e.target.value,
+                            )
                           }
                           placeholder={__(
                             "e.g., Private air-conditioned vehicle with professional driver",
@@ -5796,217 +6088,224 @@ const TripForm: React.FC = () => {
                   {__("Categories & Classification", "yatra")}
                 </h3>
                 <div className="space-y-4">
-              {/* Trip Category */}
-              <div>
-                <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__("Trip Categories", "yatra")}
-                </label>
-                {tripCategories && tripCategories.length > 0 ? (
-                  <MultiSelect
-                    value={formData.trip_category}
-                    onChange={(values) =>
-                      handleFieldChange(
-                        "trip_category",
-                        values.map((v) => Number(v)),
-                      )
-                    }
-                    options={(() => {
-                      // Flatten categories with hierarchy indication
-                      const flattenCategories = (
-                        cats: any[],
-                        prefix = "",
-                      ): { value: number; label: string }[] => {
-                        const result: { value: number; label: string }[] = [];
-                        cats.forEach((cat) => {
-                          result.push({
-                            value: cat.id,
-                            label: prefix + cat.name,
-                          });
-                          if (
-                            cat.subcategories &&
-                            cat.subcategories.length > 0
-                          ) {
-                            result.push(
-                              ...flattenCategories(
-                                cat.subcategories,
-                                prefix + "— ",
-                              ),
-                            );
-                          }
-                        });
-                        return result;
-                      };
-                      return flattenCategories(tripCategories);
-                    })()}
-                    placeholder={__("Select categories...", "yatra")}
-                    searchPlaceholder={__("Search categories...", "yatra")}
-                  />
-                ) : (
-                  <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {__("No categories available. ", "yatra")}
-                      <a
-                        href="/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-700 underline"
-                      >
-                        {__("Create categories here", "yatra")}
-                      </a>
-                    </p>
-                  </div>
-                )}
-                <HelpText
-                  text={__(
-                    "Select one or more categories for this trip",
-                    "yatra",
-                  )}
-                  className="mt-2"
-                />
-              </div>
-
-              {/* Difficulty Level */}
-              <div>
-                <label
-                  htmlFor="difficulty_level"
-                  className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                >
-                  {__("Difficulty Level", "yatra")}
-                </label>
-                <Select
-                  id="difficulty_level"
-                  value={formData.difficulty_level}
-                  onChange={(e) =>
-                    handleFieldChange("difficulty_level", e.target.value)
-                  }
-                  disabled={isLoadingDifficultyLevels}
-                >
-                  <option value="">{__("Select difficulty", "yatra")}</option>
-                  {isLoadingDifficultyLevels && (
-                    <option value="" disabled>
-                      {__("Loading difficulty levels...", "yatra")}
-                    </option>
-                  )}
-                  {!isLoadingDifficultyLevels &&
-                    difficultyLevels.length === 0 && (
-                      <option value="" disabled>
-                        {__(
-                          "No difficulty levels available - Click below to create",
-                          "yatra",
-                        )}
-                      </option>
+                  {/* Trip Category */}
+                  <div>
+                    <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
+                      {__("Trip Categories", "yatra")}
+                    </label>
+                    {tripCategories && tripCategories.length > 0 ? (
+                      <MultiSelect
+                        value={formData.trip_category}
+                        onChange={(values) =>
+                          handleFieldChange(
+                            "trip_category",
+                            values.map((v) => Number(v)),
+                          )
+                        }
+                        options={(() => {
+                          // Flatten categories with hierarchy indication
+                          const flattenCategories = (
+                            cats: any[],
+                            prefix = "",
+                          ): { value: number; label: string }[] => {
+                            const result: { value: number; label: string }[] =
+                              [];
+                            cats.forEach((cat) => {
+                              result.push({
+                                value: cat.id,
+                                label: prefix + cat.name,
+                              });
+                              if (
+                                cat.subcategories &&
+                                cat.subcategories.length > 0
+                              ) {
+                                result.push(
+                                  ...flattenCategories(
+                                    cat.subcategories,
+                                    prefix + "— ",
+                                  ),
+                                );
+                              }
+                            });
+                            return result;
+                          };
+                          return flattenCategories(tripCategories);
+                        })()}
+                        placeholder={__("Select categories...", "yatra")}
+                        searchPlaceholder={__("Search categories...", "yatra")}
+                      />
+                    ) : (
+                      <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {__("No categories available. ", "yatra")}
+                          <a
+                            href="/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-700 underline"
+                          >
+                            {__("Create categories here", "yatra")}
+                          </a>
+                        </p>
+                      </div>
                     )}
-                  {!isLoadingDifficultyLevels &&
-                    difficultyLevels.map((level) => (
-                      <option
-                        key={`difficulty-${level.id}`}
-                        value={level.id?.toString() || ""}
-                      >
-                        {level.name}
-                      </option>
-                    ))}
-                </Select>
-                {!isLoadingDifficultyLevels &&
-                  difficultyLevels.length === 0 && (
-                    <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
-                      <p className="text-sm text-amber-700 dark:text-amber-300">
-                        {__("No difficulty levels available. ", "yatra")}
-                        <a
-                          href="/wp-admin/admin.php?page=yatra&subpage=trips&tab=difficulty-levels"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-amber-800 hover:text-amber-900 underline font-medium"
-                        >
-                          {__("Create difficulty levels here", "yatra")}
-                        </a>
-                      </p>
-                    </div>
-                  )}
-                <HelpText
-                  text={__(
-                    "Physical difficulty level required for this trip",
-                    "yatra",
-                  )}
-                  className="mt-2"
-                />
-              </div>
-
-              {/* Activity Types */}
-              <div>
-                <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__("Activity Types", "yatra")}
-                </label>
-                {activitiesData && activitiesData.length > 0 ? (
-                  <MultiSelect
-                    value={formData.activity_types}
-                    onChange={(values) =>
-                      handleFieldChange(
-                        "activity_types",
-                        values.map((v) => Number(v)),
-                      )
-                    }
-                    options={activitiesData.map((activity: any) => ({
-                      value: activity.id,
-                      label: activity.name,
-                    }))}
-                    placeholder={__("Select activities...", "yatra")}
-                    searchPlaceholder={__("Search activities...", "yatra")}
-                  />
-                ) : (
-                  <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {__("No activities available. ", "yatra")}
-                      <a
-                        href="/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-700 underline"
-                      >
-                        {__("Create activities here", "yatra")}
-                      </a>
-                    </p>
+                    <HelpText
+                      text={__(
+                        "Select one or more categories for this trip",
+                        "yatra",
+                      )}
+                      className="mt-2"
+                    />
                   </div>
-                )}
-                <HelpText
-                  text={__(
-                    "Select all activities included in this trip",
-                    "yatra",
-                  )}
-                  className="mt-2"
-                />
-              </div>
 
-              {/* Featured Priority */}
-              <div>
-                <label
-                  htmlFor="featured_priority"
-                  className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                >
-                  {__("Featured Priority", "yatra")}
-                </label>
-                <Select
-                  id="featured_priority"
-                  value={formData.featured_priority}
-                  onChange={(e) =>
-                    handleFieldChange(
-                      "featured_priority",
-                      e.target.value as TripFormData["featured_priority"],
-                    )
-                  }
-                >
-                  <option value="none">{__("None", "yatra")}</option>
-                  <option value="featured">{__("Featured", "yatra")}</option>
-                  <option value="new">{__("New", "yatra")}</option>
-                  <option value="limited">{__("Limited Time", "yatra")}</option>
-                </Select>
-                <HelpText
-                  text={__(
-                    "Special designation for frontend display and promotion",
-                    "yatra",
-                  )}
-                  className="mt-2"
-                />
-              </div>
+                  {/* Difficulty Level */}
+                  <div>
+                    <label
+                      htmlFor="difficulty_level"
+                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                    >
+                      {__("Difficulty Level", "yatra")}
+                    </label>
+                    <Select
+                      id="difficulty_level"
+                      value={formData.difficulty_level}
+                      onChange={(e) =>
+                        handleFieldChange("difficulty_level", e.target.value)
+                      }
+                      disabled={isLoadingDifficultyLevels}
+                    >
+                      <option value="">
+                        {__("Select difficulty", "yatra")}
+                      </option>
+                      {isLoadingDifficultyLevels && (
+                        <option value="" disabled>
+                          {__("Loading difficulty levels...", "yatra")}
+                        </option>
+                      )}
+                      {!isLoadingDifficultyLevels &&
+                        difficultyLevels.length === 0 && (
+                          <option value="" disabled>
+                            {__(
+                              "No difficulty levels available - Click below to create",
+                              "yatra",
+                            )}
+                          </option>
+                        )}
+                      {!isLoadingDifficultyLevels &&
+                        difficultyLevels.map((level) => (
+                          <option
+                            key={`difficulty-${level.id}`}
+                            value={level.id?.toString() || ""}
+                          >
+                            {level.name}
+                          </option>
+                        ))}
+                    </Select>
+                    {!isLoadingDifficultyLevels &&
+                      difficultyLevels.length === 0 && (
+                        <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
+                          <p className="text-sm text-amber-700 dark:text-amber-300">
+                            {__("No difficulty levels available. ", "yatra")}
+                            <a
+                              href="/wp-admin/admin.php?page=yatra&subpage=trips&tab=difficulty-levels"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-amber-800 hover:text-amber-900 underline font-medium"
+                            >
+                              {__("Create difficulty levels here", "yatra")}
+                            </a>
+                          </p>
+                        </div>
+                      )}
+                    <HelpText
+                      text={__(
+                        "Physical difficulty level required for this trip",
+                        "yatra",
+                      )}
+                      className="mt-2"
+                    />
+                  </div>
+
+                  {/* Activity Types */}
+                  <div>
+                    <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
+                      {__("Activity Types", "yatra")}
+                    </label>
+                    {activitiesData && activitiesData.length > 0 ? (
+                      <MultiSelect
+                        value={formData.activity_types}
+                        onChange={(values) =>
+                          handleFieldChange(
+                            "activity_types",
+                            values.map((v) => Number(v)),
+                          )
+                        }
+                        options={activitiesData.map((activity: any) => ({
+                          value: activity.id,
+                          label: activity.name,
+                        }))}
+                        placeholder={__("Select activities...", "yatra")}
+                        searchPlaceholder={__("Search activities...", "yatra")}
+                      />
+                    ) : (
+                      <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {__("No activities available. ", "yatra")}
+                          <a
+                            href="/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-700 underline"
+                          >
+                            {__("Create activities here", "yatra")}
+                          </a>
+                        </p>
+                      </div>
+                    )}
+                    <HelpText
+                      text={__(
+                        "Select all activities included in this trip",
+                        "yatra",
+                      )}
+                      className="mt-2"
+                    />
+                  </div>
+
+                  {/* Featured Priority */}
+                  <div>
+                    <label
+                      htmlFor="featured_priority"
+                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                    >
+                      {__("Featured Priority", "yatra")}
+                    </label>
+                    <Select
+                      id="featured_priority"
+                      value={formData.featured_priority}
+                      onChange={(e) =>
+                        handleFieldChange(
+                          "featured_priority",
+                          e.target.value as TripFormData["featured_priority"],
+                        )
+                      }
+                    >
+                      <option value="none">{__("None", "yatra")}</option>
+                      <option value="featured">
+                        {__("Featured", "yatra")}
+                      </option>
+                      <option value="new">{__("New", "yatra")}</option>
+                      <option value="limited">
+                        {__("Limited Time", "yatra")}
+                      </option>
+                    </Select>
+                    <HelpText
+                      text={__(
+                        "Special designation for frontend display and promotion",
+                        "yatra",
+                      )}
+                      className="mt-2"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -6017,7 +6316,10 @@ const TripForm: React.FC = () => {
                   {__("Custom Attributes", "yatra")}
                 </h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                  {__("Add custom attributes for advanced filtering and search capabilities.", "yatra")}
+                  {__(
+                    "Add custom attributes for advanced filtering and search capabilities.",
+                    "yatra",
+                  )}
                 </p>
                 <TripAttributesSection
                   formData={formData}
@@ -7255,7 +7557,10 @@ const TripForm: React.FC = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               {__("What will travelers experience?", "yatra")}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {__("Build your day-by-day itinerary and list what's included/excluded to set clear expectations.", "yatra")}
+                {__(
+                  "Build your day-by-day itinerary and list what's included/excluded to set clear expectations.",
+                  "yatra",
+                )}
               </span>
             </p>
 
@@ -7342,7 +7647,10 @@ const TripForm: React.FC = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               {__("How will people find & trust this trip?", "yatra")}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {__("Optimize for search engines and answer common questions to build trust and improve discoverability.", "yatra")}
+                {__(
+                  "Optimize for search engines and answer common questions to build trust and improve discoverability.",
+                  "yatra",
+                )}
               </span>
             </p>
 
@@ -7354,88 +7662,88 @@ const TripForm: React.FC = () => {
                   {__("Search Engine Optimization", "yatra")}
                 </h3>
                 <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="meta_title"
-                  className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                >
-                  {__("Meta Title", "yatra")}
-                </label>
-                <Input
-                  id="meta_title"
-                  type="text"
-                  value={formData.meta_title}
-                  onChange={(e) =>
-                    handleFieldChange("meta_title", e.target.value)
-                  }
-                  placeholder={formData.title || __("Trip Title", "yatra")}
-                  maxLength={60}
-                />
-                <HelpText
-                  text={__(
-                    "Best for search engines: 50-60 characters. Include main keywords.",
-                    "yatra",
-                  )}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="meta_description"
-                  className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                >
-                  {__("Meta Description", "yatra")}
-                </label>
-                <textarea
-                  id="meta_description"
-                  value={formData.meta_description}
-                  onChange={(e) =>
-                    handleFieldChange("meta_description", e.target.value)
-                  }
-                  rows={3}
-                  maxLength={160}
-                  className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
-                  placeholder={__(
-                    "Compelling description that includes key travel terms...",
-                    "yatra",
-                  )}
-                />
-                <HelpText
-                  text={__(
-                    "160 characters max. Include location, duration, and key features.",
-                    "yatra",
-                  )}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="meta_keywords"
-                  className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                >
-                  {__("Meta Keywords", "yatra")}
-                </label>
-                <Input
-                  id="meta_keywords"
-                  type="text"
-                  value={formData.meta_keywords}
-                  onChange={(e) =>
-                    handleFieldChange("meta_keywords", e.target.value)
-                  }
-                  placeholder={__(
-                    "adventure, travel, tour, guide, experience",
-                    "yatra",
-                  )}
-                />
-                <HelpText
-                  text={__(
-                    "Comma-separated keywords. Include location, activities, and travel terms.",
-                    "yatra",
-                  )}
-                  className="mt-1"
-                />
-              </div>
-            </div>
+                  <div>
+                    <label
+                      htmlFor="meta_title"
+                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                    >
+                      {__("Meta Title", "yatra")}
+                    </label>
+                    <Input
+                      id="meta_title"
+                      type="text"
+                      value={formData.meta_title}
+                      onChange={(e) =>
+                        handleFieldChange("meta_title", e.target.value)
+                      }
+                      placeholder={formData.title || __("Trip Title", "yatra")}
+                      maxLength={60}
+                    />
+                    <HelpText
+                      text={__(
+                        "Best for search engines: 50-60 characters. Include main keywords.",
+                        "yatra",
+                      )}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="meta_description"
+                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                    >
+                      {__("Meta Description", "yatra")}
+                    </label>
+                    <textarea
+                      id="meta_description"
+                      value={formData.meta_description}
+                      onChange={(e) =>
+                        handleFieldChange("meta_description", e.target.value)
+                      }
+                      rows={3}
+                      maxLength={160}
+                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                      placeholder={__(
+                        "Compelling description that includes key travel terms...",
+                        "yatra",
+                      )}
+                    />
+                    <HelpText
+                      text={__(
+                        "160 characters max. Include location, duration, and key features.",
+                        "yatra",
+                      )}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="meta_keywords"
+                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                    >
+                      {__("Meta Keywords", "yatra")}
+                    </label>
+                    <Input
+                      id="meta_keywords"
+                      type="text"
+                      value={formData.meta_keywords}
+                      onChange={(e) =>
+                        handleFieldChange("meta_keywords", e.target.value)
+                      }
+                      placeholder={__(
+                        "adventure, travel, tour, guide, experience",
+                        "yatra",
+                      )}
+                    />
+                    <HelpText
+                      text={__(
+                        "Comma-separated keywords. Include location, activities, and travel terms.",
+                        "yatra",
+                      )}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
 
                 {/* SEO Preview */}
                 <Card>
@@ -7456,7 +7764,9 @@ const TripForm: React.FC = () => {
                       <div className="space-y-2">
                         <div className="text-blue-800 dark:text-blue-400 text-sm font-medium">
                           {sanitizeTextForSEO(
-                            formData.meta_title || formData.title || "Trip Title",
+                            formData.meta_title ||
+                              formData.title ||
+                              "Trip Title",
                             60,
                           )}
                         </div>
@@ -7484,7 +7794,10 @@ const TripForm: React.FC = () => {
                   {__("Frequently Asked Questions", "yatra")}
                 </h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                  {__("Answer common questions to build trust and reduce support inquiries. FAQs also help with SEO.", "yatra")}
+                  {__(
+                    "Answer common questions to build trust and reduce support inquiries. FAQs also help with SEO.",
+                    "yatra",
+                  )}
                 </p>
                 <div className="space-y-4">
                   {formData.faqs.map((faq, index) => (
@@ -8243,7 +8556,10 @@ const TripForm: React.FC = () => {
                     {__("PHASE 1: ESSENTIALS", "yatra")}
                   </h3>
                 </div>
-                <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800">
+                <Badge
+                  variant="outline"
+                  className="text-[9px] px-1.5 py-0 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800"
+                >
                   {__("Must Complete", "yatra")}
                 </Badge>
               </div>
@@ -8300,7 +8616,9 @@ const TripForm: React.FC = () => {
                       <span className="flex-1 min-w-0 break-words leading-snug">
                         {section.label}
                         {section.required && (
-                          <span className="ml-1 text-[9px] text-red-500">*</span>
+                          <span className="ml-1 text-[9px] text-red-500">
+                            *
+                          </span>
                         )}
                       </span>
                       {section.hasErrors && (
@@ -8324,7 +8642,10 @@ const TripForm: React.FC = () => {
                     {__("PHASE 2: DETAILS", "yatra")}
                   </h3>
                 </div>
-                <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800">
+                <Badge
+                  variant="outline"
+                  className="text-[9px] px-1.5 py-0 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800"
+                >
                   {__("Recommended", "yatra")}
                 </Badge>
               </div>
@@ -8394,7 +8715,10 @@ const TripForm: React.FC = () => {
                     {__("PHASE 3: OPTIMIZATION", "yatra")}
                   </h3>
                 </div>
-                <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800">
+                <Badge
+                  variant="outline"
+                  className="text-[9px] px-1.5 py-0 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800"
+                >
                   {__("Optional", "yatra")}
                 </Badge>
               </div>
@@ -8402,7 +8726,11 @@ const TripForm: React.FC = () => {
                 {optimizationSections.map((section, index) => {
                   const Icon = section.icon;
                   const isActive = currentSection === section.id;
-                  const sectionNumber = essentialsSections.length + detailsSections.length + index + 1;
+                  const sectionNumber =
+                    essentialsSections.length +
+                    detailsSections.length +
+                    index +
+                    1;
                   return (
                     <button
                       key={section.id}
@@ -8464,7 +8792,10 @@ const TripForm: React.FC = () => {
                     {__("PHASE 4: ADVANCED", "yatra")}
                   </h3>
                 </div>
-                <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-gray-50 dark:bg-gray-900/20 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-800">
+                <Badge
+                  variant="outline"
+                  className="text-[9px] px-1.5 py-0 bg-gray-50 dark:bg-gray-900/20 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-800"
+                >
                   {__("Power Users", "yatra")}
                 </Badge>
               </div>
@@ -8472,7 +8803,12 @@ const TripForm: React.FC = () => {
                 {advancedSections.map((section, index) => {
                   const Icon = section.icon;
                   const isActive = currentSection === section.id;
-                  const sectionNumber = essentialsSections.length + detailsSections.length + optimizationSections.length + index + 1;
+                  const sectionNumber =
+                    essentialsSections.length +
+                    detailsSections.length +
+                    optimizationSections.length +
+                    index +
+                    1;
                   return (
                     <button
                       key={section.id}
@@ -8510,7 +8846,6 @@ const TripForm: React.FC = () => {
                 })}
               </div>
             </div>
-
           </div>
         </div>
 

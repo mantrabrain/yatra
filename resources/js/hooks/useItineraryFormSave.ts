@@ -327,8 +327,12 @@ export const useItineraryFormSave = ({
             title: activityData.title!.trim(),
             description: (activityData.description || "").trim(),
             location: (activityData.location || "").trim(),
-            location_latitude: activityData.location_latitude ? parseFloat(activityData.location_latitude) : null,
-            location_longitude: activityData.location_longitude ? parseFloat(activityData.location_longitude) : null,
+            location_latitude: activityData.location_latitude
+              ? parseFloat(activityData.location_latitude)
+              : null,
+            location_longitude: activityData.location_longitude
+              ? parseFloat(activityData.location_longitude)
+              : null,
             duration:
               (activityData.duration || "").trim() ||
               (activityData.start_time &&
@@ -381,8 +385,12 @@ export const useItineraryFormSave = ({
         title: data.title.trim(),
         description: data.description.trim(),
         location: data.location.trim(),
-        location_latitude: data.location_latitude ? parseFloat(data.location_latitude) : null,
-        location_longitude: data.location_longitude ? parseFloat(data.location_longitude) : null,
+        location_latitude: data.location_latitude
+          ? parseFloat(data.location_latitude)
+          : null,
+        location_longitude: data.location_longitude
+          ? parseFloat(data.location_longitude)
+          : null,
         duration: data.duration.trim() || calculateDuration(),
         start_time: data.start_time,
         end_time: data.end_time,

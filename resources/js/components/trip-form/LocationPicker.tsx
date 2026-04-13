@@ -13,10 +13,11 @@ const defaultTranslate = (key: string) => {
     "Enter location name": "Enter location name",
     "Show Map": "Show Map",
     "Hide Map": "Hide Map",
-    "Clear": "Clear",
+    Clear: "Clear",
     "Coordinates:": "Coordinates:",
     "Search for a location...": "Search for a location...",
-    "Click on the map to set the location, or search for a place above.": "Click on the map to set the location, or search for a place above."
+    "Click on the map to set the location, or search for a place above.":
+      "Click on the map to set the location, or search for a place above.",
   };
   return translations[key] || key;
 };
@@ -31,36 +32,36 @@ interface LocationPickerProps {
   // Core functionality
   value: LocationData;
   onChange: (location: LocationData) => void;
-  
+
   // Display options
   label?: string;
   placeholder?: string;
   helpText?: string;
   required?: boolean;
-  
+
   // Map options
   showMapButton?: boolean;
   defaultMapCenter?: [number, number]; // [lat, lng]
   defaultZoom?: number;
   mapHeight?: string;
-  
+
   // Search options
   searchPlaceholder?: string;
   searchLimit?: number;
-  
+
   // Styling
   className?: string;
   inputClassName?: string;
   mapClassName?: string;
-  
+
   // Translation function (optional)
   __?: (key: string, domain?: string) => string;
-  
+
   // Events
   onLocationSelect?: (location: LocationData) => void;
   onLocationClear?: () => void;
   onMapToggle?: (isOpen: boolean) => void;
-  
+
   // Validation
   validateCoordinates?: (lat: string, lng: string) => boolean;
   errorMessage?: string;
@@ -100,14 +101,14 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     if (mapInstanceRef.current && value.latitude && value.longitude) {
       const lat = parseFloat(value.latitude);
       const lng = parseFloat(value.longitude);
-      
+
       if (!isNaN(lat) && !isNaN(lng)) {
         // Small delay to ensure map is fully ready
         setTimeout(() => {
           if (mapInstanceRef.current) {
             // Add or update marker
             addMarker(mapInstanceRef.current, lat, lng);
-            
+
             // Update map view to new coordinates
             mapInstanceRef.current.setView([lat, lng], defaultZoom);
           }
@@ -122,13 +123,18 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
       loadMap();
     }
   }, [showMap]);
-  
+
   // Add marker when map becomes ready with existing coordinates
   useEffect(() => {
-    if (mapReady && mapInstanceRef.current && value.latitude && value.longitude) {
+    if (
+      mapReady &&
+      mapInstanceRef.current &&
+      value.latitude &&
+      value.longitude
+    ) {
       const lat = parseFloat(value.latitude);
       const lng = parseFloat(value.longitude);
-      
+
       if (!isNaN(lat) && !isNaN(lng)) {
         setTimeout(() => {
           if (mapInstanceRef.current) {
@@ -142,23 +148,25 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
 
   const loadMap = async () => {
     setMapLoading(true);
-    
+
     try {
       // Load Leaflet CSS and JS
       if (!document.querySelector('link[href*="leaflet.css"]')) {
-        const leafletCSS = document.createElement('link');
-        leafletCSS.rel = 'stylesheet';
-        leafletCSS.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        leafletCSS.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-        leafletCSS.crossOrigin = '';
+        const leafletCSS = document.createElement("link");
+        leafletCSS.rel = "stylesheet";
+        leafletCSS.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+        leafletCSS.integrity =
+          "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";
+        leafletCSS.crossOrigin = "";
         document.head.appendChild(leafletCSS);
       }
 
       if (!window.L) {
-        const leafletJS = document.createElement('script');
-        leafletJS.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-        leafletJS.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
-        leafletJS.crossOrigin = '';
+        const leafletJS = document.createElement("script");
+        leafletJS.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+        leafletJS.integrity =
+          "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";
+        leafletJS.crossOrigin = "";
         document.head.appendChild(leafletJS);
 
         leafletJS.onload = initializeMap;
@@ -166,7 +174,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         initializeMap();
       }
     } catch (error) {
-      console.error('Error loading map:', error);
+      console.error("Error loading map:", error);
       setMapLoading(false);
     }
   };
@@ -175,17 +183,22 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     if (!mapRef.current || !window.L) return;
 
     const L = window.L;
-    
+
     // Initialize map with default view or current coordinates
-    const lat = value.latitude ? parseFloat(value.latitude) : defaultMapCenter[0];
-    const lng = value.longitude ? parseFloat(value.longitude) : defaultMapCenter[1];
-    
+    const lat = value.latitude
+      ? parseFloat(value.latitude)
+      : defaultMapCenter[0];
+    const lng = value.longitude
+      ? parseFloat(value.longitude)
+      : defaultMapCenter[1];
+
     const map = L.map(mapRef.current).setView([lat, lng], defaultZoom);
 
     // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution:
+        '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
     }).addTo(map);
 
     // Add marker if coordinates exist
@@ -194,10 +207,10 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     }
 
     // Handle map clicks
-    map.on('click', function(e: any) {
+    map.on("click", function (e: any) {
       const { lat, lng } = e.latlng;
       addMarker(map, lat, lng);
-      
+
       // Reverse geocode to get location name
       reverseGeocode(lat, lng);
     });
@@ -209,7 +222,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
 
   const addMarker = (map: any, lat: number, lng: number) => {
     const L = window.L;
-    
+
     // Remove existing marker
     if (markerRef.current) {
       map.removeLayer(markerRef.current);
@@ -220,29 +233,29 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
       html: '<div style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"><svg style="transform: rotate(45deg); width: 14px; height: 14px;" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg></div>',
       iconSize: [30, 30],
       iconAnchor: [15, 30],
-      className: 'yatra-custom-marker'
+      className: "yatra-custom-marker",
     });
 
-    const marker = L.marker([lat, lng], { 
+    const marker = L.marker([lat, lng], {
       icon: customIcon,
-      draggable: true
+      draggable: true,
     }).addTo(map);
     markerRef.current = marker;
 
     // Handle marker drag events
-    marker.on('dragend', function(e: any) {
+    marker.on("dragend", function (e: any) {
       const position = e.target.getLatLng();
       const newLat = position.lat;
       const newLng = position.lng;
-      
+
       // Update form values
       const newLocation = {
         ...value,
         latitude: newLat.toString(),
-        longitude: newLng.toString()
+        longitude: newLng.toString(),
       };
       onChange(newLocation);
-      
+
       // Reverse geocode to get updated location name
       reverseGeocode(newLat, newLng);
     });
@@ -251,7 +264,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     const newLocation = {
       ...value,
       latitude: lat.toString(),
-      longitude: lng.toString()
+      longitude: lng.toString(),
     };
     onChange(newLocation);
   };
@@ -260,49 +273,56 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     try {
       // Use WordPress AJAX endpoint to avoid CORS issues
       const formData = new FormData();
-      formData.append('action', 'yatra_reverse_geocode');
-      formData.append('lat', lat.toString());
-      formData.append('lng', lng.toString());
-      formData.append('nonce', (window as any).yatraAdmin?.geocodingNonce || '');
+      formData.append("action", "yatra_reverse_geocode");
+      formData.append("lat", lat.toString());
+      formData.append("lng", lng.toString());
+      formData.append(
+        "nonce",
+        (window as any).yatraAdmin?.geocodingNonce || "",
+      );
 
-      const response = await fetch((window as any).yatraAdmin?.ajaxUrl || '/wp-admin/admin-ajax.php', {
-        method: 'POST',
-        body: formData
-      });
-      
+      const response = await fetch(
+        (window as any).yatraAdmin?.ajaxUrl || "/wp-admin/admin-ajax.php",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+
       if (response.ok) {
         const result = await response.json();
         if (result.success && result.data.result) {
           const data = result.data.result;
-          const locationName = data.display_name || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+          const locationName =
+            data.display_name || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
           const newLocation = {
             ...value,
             name: locationName,
             latitude: lat.toString(),
-            longitude: lng.toString()
+            longitude: lng.toString(),
           };
           onChange(newLocation);
           return;
         }
       }
     } catch (error) {
-      console.error('Error reverse geocoding:', error);
+      console.error("Error reverse geocoding:", error);
     }
-    
+
     // Fallback: always update with coordinates if reverse geocoding fails
     const locationName = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
     const newLocation = {
       ...value,
       name: locationName,
       latitude: lat.toString(),
-      longitude: lng.toString()
+      longitude: lng.toString(),
     };
     onChange(newLocation);
   };
 
   // Debounced search for better performance
   const searchTimeoutRef = useRef<number>();
-  
+
   const searchLocations = async (query: string) => {
     if (!query.trim() || query.length < 2) {
       setSearchResults([]);
@@ -313,27 +333,33 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     try {
       // Use WordPress AJAX endpoint to avoid CORS issues
       const formData = new FormData();
-      formData.append('action', 'yatra_search_locations');
-      formData.append('query', query);
-      formData.append('limit', searchLimit.toString());
-      formData.append('nonce', (window as any).yatraAdmin?.geocodingNonce || '');
+      formData.append("action", "yatra_search_locations");
+      formData.append("query", query);
+      formData.append("limit", searchLimit.toString());
+      formData.append(
+        "nonce",
+        (window as any).yatraAdmin?.geocodingNonce || "",
+      );
 
-      const response = await fetch((window as any).yatraAdmin?.ajaxUrl || '/wp-admin/admin-ajax.php', {
-        method: 'POST',
-        body: formData
-      });
+      const response = await fetch(
+        (window as any).yatraAdmin?.ajaxUrl || "/wp-admin/admin-ajax.php",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
 
       if (response.ok) {
         const result = await response.json();
         if (result.success) {
           setSearchResults(result.data.results);
         } else {
-          console.error('Search error:', result.data.message);
+          console.error("Search error:", result.data.message);
           setSearchResults([]);
         }
       }
     } catch (error) {
-      console.error('Error searching locations:', error);
+      console.error("Error searching locations:", error);
       setSearchResults([]);
     } finally {
       setSearchLoading(false);
@@ -343,12 +369,12 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
-    
+
     // Clear existing timeout
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
-    
+
     // Debounce search with 300ms delay
     searchTimeoutRef.current = setTimeout(() => {
       searchLocations(query);
@@ -358,13 +384,13 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   const selectLocation = (location: any) => {
     const lat = parseFloat(location.lat);
     const lng = parseFloat(location.lon);
-    
+
     const newLocation = {
       name: location.display_name,
       latitude: lat.toString(),
-      longitude: lng.toString()
+      longitude: lng.toString(),
     };
-    
+
     onChange(newLocation);
     onLocationSelect?.(newLocation);
 
@@ -383,7 +409,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     const emptyLocation = { name: "", latitude: "", longitude: "" };
     onChange(emptyLocation);
     onLocationClear?.();
-    
+
     if (markerRef.current && mapInstanceRef.current) {
       mapInstanceRef.current.removeLayer(markerRef.current);
       markerRef.current = null;
@@ -425,7 +451,9 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
             onChange={(e) => {
               const query = e.target.value;
               setSearchQuery(query);
-              handleSearchChange({ target: { value: query } } as React.ChangeEvent<HTMLInputElement>);
+              handleSearchChange({
+                target: { value: query },
+              } as React.ChangeEvent<HTMLInputElement>);
               // Also update the location name directly for manual entry
               onChange({ ...value, name: query });
             }}
@@ -434,7 +462,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
           />
           {searchLoading ? (
             <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 animate-spin text-gray-400" />
-          ) : (searchQuery || value.name) ? (
+          ) : searchQuery || value.name ? (
             <button
               type="button"
               onClick={() => {
@@ -450,7 +478,10 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
 
         {/* Search Results Dropdown */}
         {searchResults.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-64 overflow-y-auto" style={{ zIndex: 9999 }}>
+          <div
+            className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-64 overflow-y-auto"
+            style={{ zIndex: 9999 }}
+          >
             {searchResults.map((result, index) => (
               <button
                 key={index}
@@ -464,10 +495,10 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-gray-900 dark:text-white text-sm truncate">
-                      {result.display_name.split(',')[0]}
+                      {result.display_name.split(",")[0]}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
-                      {result.display_name.split(',').slice(1).join(',').trim()}
+                      {result.display_name.split(",").slice(1).join(",").trim()}
                     </div>
                   </div>
                 </div>
@@ -482,7 +513,8 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <Globe className="w-4 h-4 text-gray-500" />
           <span className="text-xs text-gray-600 dark:text-gray-400">
-            {translate("Coordinates:")} {value.latitude || "0"}, {value.longitude || "0"}
+            {translate("Coordinates:")} {value.latitude || "0"},{" "}
+            {value.longitude || "0"}
           </span>
         </div>
       )}
@@ -499,14 +531,16 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
             )}
             <div
               ref={mapRef}
-              style={{ height: mapHeight, width: '100%' }}
+              style={{ height: mapHeight, width: "100%" }}
               className={`bg-gray-100 ${mapClassName}`}
             />
           </div>
 
           {/* Instructions */}
           <div className="p-3 bg-gray-50 dark:bg-gray-800 text-xs text-gray-600 dark:text-gray-400">
-            {translate("Click on the map to set the location, or drag the marker to adjust coordinates.")}
+            {translate(
+              "Click on the map to set the location, or drag the marker to adjust coordinates.",
+            )}
           </div>
         </div>
       )}

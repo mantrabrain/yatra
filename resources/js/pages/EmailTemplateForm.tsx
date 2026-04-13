@@ -211,7 +211,11 @@ const EmailTemplateForm: React.FC = () => {
 
   const saveCoreMutation = useMutation({
     mutationFn: async () => {
-      if (!coreDef?.settingsFlag || !coreDef.settingsSubject || !coreDef.settingsBody) {
+      if (
+        !coreDef?.settingsFlag ||
+        !coreDef.settingsSubject ||
+        !coreDef.settingsBody
+      ) {
         throw new Error(__("Invalid template", "yatra"));
       }
       if (!settings) {
@@ -230,9 +234,7 @@ const EmailTemplateForm: React.FC = () => {
     },
     onError: (error: unknown) => {
       const message =
-        error instanceof Error
-          ? error.message
-          : __("Failed to save", "yatra");
+        error instanceof Error ? error.message : __("Failed to save", "yatra");
       showToast(message, "error");
     },
   });
@@ -326,8 +328,7 @@ const EmailTemplateForm: React.FC = () => {
   };
 
   const showEditSkeleton =
-    !isCreateMode &&
-    (isCoreSettingsEdit ? settingsLoading : isLoading);
+    !isCreateMode && (isCoreSettingsEdit ? settingsLoading : isLoading);
 
   if (showEditSkeleton) {
     return (
@@ -533,7 +534,9 @@ const EmailTemplateForm: React.FC = () => {
                   }
                   placeholder={__("Enter template name")}
                   readOnly={isCoreSettingsEdit}
-                  className={isCoreSettingsEdit ? "bg-gray-50 dark:bg-gray-900/40" : ""}
+                  className={
+                    isCoreSettingsEdit ? "bg-gray-50 dark:bg-gray-900/40" : ""
+                  }
                 />
               </div>
 
@@ -550,7 +553,9 @@ const EmailTemplateForm: React.FC = () => {
                     "Brief description of when this email is sent",
                   )}
                   readOnly={isCoreSettingsEdit}
-                  className={isCoreSettingsEdit ? "bg-gray-50 dark:bg-gray-900/40" : ""}
+                  className={
+                    isCoreSettingsEdit ? "bg-gray-50 dark:bg-gray-900/40" : ""
+                  }
                 />
               </div>
 
@@ -745,7 +750,10 @@ const EmailTemplateForm: React.FC = () => {
                       <Input
                         value={formData.from_name}
                         onChange={(e) =>
-                          setFormData({ ...formData, from_name: e.target.value })
+                          setFormData({
+                            ...formData,
+                            from_name: e.target.value,
+                          })
                         }
                         placeholder={__("e.g., Travel Agency Name")}
                       />
@@ -761,7 +769,10 @@ const EmailTemplateForm: React.FC = () => {
                         type="email"
                         value={formData.from_email}
                         onChange={(e) =>
-                          setFormData({ ...formData, from_email: e.target.value })
+                          setFormData({
+                            ...formData,
+                            from_email: e.target.value,
+                          })
                         }
                         placeholder={__("e.g., noreply@yoursite.com")}
                       />
@@ -1055,14 +1066,15 @@ const EmailTemplateForm: React.FC = () => {
                         (isCoreSettingsEdit
                           ? coreDef?.recipient_type
                           : String(templateData?.recipient_type ?? "")) ===
-                          "admin"
+                        "admin"
                           ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
                           : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
                       }`}
                     >
                       {(isCoreSettingsEdit
                         ? coreDef?.recipient_type
-                        : String(templateData?.recipient_type ?? "")) === "admin"
+                        : String(templateData?.recipient_type ?? "")) ===
+                      "admin"
                         ? __("Admin")
                         : __("Customer")}
                     </span>

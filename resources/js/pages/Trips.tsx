@@ -1232,7 +1232,9 @@ const Trips: React.FC = () => {
             </span>
           );
         }
-        const availableCount = dates.filter(d => d.status === 'available').length;
+        const availableCount = dates.filter(
+          (d) => d.status === "available",
+        ).length;
         return (
           <div className="text-sm">
             <div className="text-gray-700 dark:text-gray-300">
@@ -1273,7 +1275,9 @@ const Trips: React.FC = () => {
       sortable: false,
       visible: visibleColumns.attributes,
       render: (trip: Trip) => {
-        const attrCount = trip.attributes ? Object.keys(trip.attributes).length : 0;
+        const attrCount = trip.attributes
+          ? Object.keys(trip.attributes).length
+          : 0;
         if (!attrCount) {
           return (
             <span className="text-xs text-gray-400 dark:text-gray-500">

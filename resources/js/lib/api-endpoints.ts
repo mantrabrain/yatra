@@ -31,8 +31,7 @@ export const API_ENDPOINTS = {
   CUSTOMER_MY_DOCUMENTS: "/customers/my-documents",
   CUSTOMER_MY_SUPPORT_TICKETS: "/customers/my-support-tickets",
   /** GET single booking for current user (details view). */
-  CUSTOMER_MY_BOOKING: (id: string | number) =>
-    `/customers/my-bookings/${id}`,
+  CUSTOMER_MY_BOOKING: (id: string | number) => `/customers/my-bookings/${id}`,
 
   // Travelers
   TRAVELERS: "/travelers",
@@ -125,7 +124,8 @@ export const API_ENDPOINTS = {
   // Google Analytics 4
   GOOGLE_ANALYTICS_SETTINGS: "/google-analytics/settings",
   GOOGLE_ANALYTICS_TEST: "/google-analytics/test",
-  GOOGLE_ANALYTICS_VALIDATE_MEASUREMENT_ID: "/google-analytics/validate/measurement-id",
+  GOOGLE_ANALYTICS_VALIDATE_MEASUREMENT_ID:
+    "/google-analytics/validate/measurement-id",
   GOOGLE_ANALYTICS_VALIDATE_API_SECRET: "/google-analytics/validate/api-secret",
   GOOGLE_ANALYTICS_EVENTS: "/google-analytics/events",
   GOOGLE_ANALYTICS_EVENT_LOGS: "/google-analytics/logs",
@@ -212,8 +212,7 @@ export const API_ENDPOINTS = {
   EMAIL_TEMPLATE_GET: (id: string | number) => `/email-templates/${id}`,
   EMAIL_TEMPLATE_PREVIEW: (id: string | number) =>
     `/email-templates/${id}/preview`,
-  EMAIL_TEMPLATE_TEST: (id: string | number) =>
-    `/email-templates/${id}/test`,
+  EMAIL_TEMPLATE_TEST: (id: string | number) => `/email-templates/${id}/test`,
   EMAIL_TEMPLATE_DUPLICATE: (id: string | number) =>
     `/email-templates/${id}/duplicate`,
   EMAIL_TEMPLATE_VARIABLES: "/email-templates/variables",

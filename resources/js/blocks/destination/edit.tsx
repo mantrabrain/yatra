@@ -51,8 +51,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             value={attributes.per_page}
             onChange={(value: number | undefined) =>
               setAttributes({
-                per_page:
-                  value !== undefined && value !== null ? value : 10,
+                per_page: value !== undefined && value !== null ? value : 10,
               })
             }
             min={1}
@@ -63,8 +62,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             value={attributes.columns}
             onChange={(value: number | undefined) =>
               setAttributes({
-                columns:
-                  value !== undefined && value !== null ? value : 3,
+                columns: value !== undefined && value !== null ? value : 3,
               })
             }
             min={1}

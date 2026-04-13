@@ -188,12 +188,11 @@ const Payments: React.FC = () => {
 
   const payments: Payment[] = data?.data || [];
   const listMeta = (data as any)?.meta;
-  const total = Number(
-    listMeta?.total ?? (data as any)?.total ?? 0,
-  );
+  const total = Number(listMeta?.total ?? (data as any)?.total ?? 0);
   const perPage =
-    Number(listMeta?.per_page ?? (data as any)?.per_page ?? PAYMENTS_PER_PAGE) ||
-    PAYMENTS_PER_PAGE;
+    Number(
+      listMeta?.per_page ?? (data as any)?.per_page ?? PAYMENTS_PER_PAGE,
+    ) || PAYMENTS_PER_PAGE;
   const totalPages = Math.max(
     1,
     Number(listMeta?.total_pages ?? (data as any)?.total_pages) ||
@@ -828,7 +827,11 @@ const Payments: React.FC = () => {
                 setPage(1);
               }}
               statusOptions={[
-                { key: "all", label: __("All", "yatra"), count: countFor("all") },
+                {
+                  key: "all",
+                  label: __("All", "yatra"),
+                  count: countFor("all"),
+                },
                 {
                   key: "completed",
                   label: __("Completed", "yatra"),

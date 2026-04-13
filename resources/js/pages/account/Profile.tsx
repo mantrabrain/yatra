@@ -445,43 +445,43 @@ const Profile: React.FC<ProfileProps> = ({
         </div>
 
         {wishlistEnabled && (
-        <div className="yatra-profile-saved-trips bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
-          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <Heart className="w-5 h-5 text-red-600 dark:text-red-400" />
-            {__("Saved Trips", "yatra")}
-          </h3>
-          <div className="yatra-saved-trips-list space-y-3">
-            {savedTrips.length > 0 ? (
-              savedTrips.map((trip: any) => (
-                <div
-                  key={trip.id || trip.trip_id}
-                  className="yatra-saved-trip-item flex items-center justify-between border border-gray-100 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-900/40 transition-colors"
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                      {trip.trip_title || trip.title}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {formatDate(trip.next_departure)}
-                    </p>
+          <div className="yatra-profile-saved-trips bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <Heart className="w-5 h-5 text-red-600 dark:text-red-400" />
+              {__("Saved Trips", "yatra")}
+            </h3>
+            <div className="yatra-saved-trips-list space-y-3">
+              {savedTrips.length > 0 ? (
+                savedTrips.map((trip: any) => (
+                  <div
+                    key={trip.id || trip.trip_id}
+                    className="yatra-saved-trip-item flex items-center justify-between border border-gray-100 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-900/40 transition-colors"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        {trip.trip_title || trip.title}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {formatDate(trip.next_departure)}
+                      </p>
+                    </div>
+                    <div className="text-right ml-4 flex-shrink-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {__("From", "yatra")}
+                      </p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                        {currency(trip.price_from || trip.price || 0)}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-right ml-4 flex-shrink-0">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {__("From", "yatra")}
-                    </p>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                      {currency(trip.price_from || trip.price || 0)}
-                    </p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                {__("No saved trips yet", "yatra")}
-              </p>
-            )}
+                ))
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+                  {__("No saved trips yet", "yatra")}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
         )}
       </div>
     </div>

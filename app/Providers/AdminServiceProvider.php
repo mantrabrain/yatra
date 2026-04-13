@@ -121,14 +121,14 @@ class AdminServiceProvider extends ServiceProvider
         if (!empty($plugin_data['Version'])) {
             $row[] = sprintf(
                 /* translators: %s: plugin version number. */
-                __('Version %s'),
+                __('Version %s', 'yatra'),
                 $plugin_data['Version']
             );
         }
 
         $row[] = sprintf(
             /* translators: %s: linked author name (HTML). */
-            __('By %s'),
+            __('By %s', 'yatra'),
             '<a href="' . esc_url($home) . '" target="_blank" rel="noopener noreferrer">MantraBrain</a>'
         );
 

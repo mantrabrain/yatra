@@ -69,10 +69,16 @@ function readPriceConfig() {
   const p = (w.yatraAccountPage || {}) as Record<string, unknown>;
   return {
     globalCurrency: (a.currency || p.currency || "USD") as string,
-    currencyPosition: (a.currencyPosition || p.currencyPosition || "before") as string,
+    currencyPosition: (a.currencyPosition ||
+      p.currencyPosition ||
+      "before") as string,
     decimalPlaces: Number(a.decimalPlaces ?? p.decimalPlaces ?? 2) || 2,
-    thousandSeparator: (a.thousandSeparator || p.thousandSeparator || ",") as string,
-    decimalSeparator: (a.decimalSeparator || p.decimalSeparator || ".") as string,
+    thousandSeparator: (a.thousandSeparator ||
+      p.thousandSeparator ||
+      ",") as string,
+    decimalSeparator: (a.decimalSeparator ||
+      p.decimalSeparator ||
+      ".") as string,
   };
 }
 
@@ -116,8 +122,12 @@ export const formatPrice = (price: number) => {
 export const formatPriceForBooking = (price: number, currency?: string) => {
   const cfg = readPriceConfig();
   const globalCurrency = currency || cfg.globalCurrency;
-  const { currencyPosition, decimalPlaces, thousandSeparator, decimalSeparator } =
-    cfg;
+  const {
+    currencyPosition,
+    decimalPlaces,
+    thousandSeparator,
+    decimalSeparator,
+  } = cfg;
 
   const currencyToUse = globalCurrency;
 

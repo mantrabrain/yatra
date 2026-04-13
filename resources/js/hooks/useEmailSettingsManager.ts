@@ -103,7 +103,9 @@ function coerceEmailValues(
 
     if (key === "smtp_port") {
       const n = typeof v === "number" ? v : parseInt(String(v), 10);
-      out.smtp_port = Number.isFinite(n) ? n : EMAIL_SETTINGS_DEFAULTS.smtp_port;
+      out.smtp_port = Number.isFinite(n)
+        ? n
+        : EMAIL_SETTINGS_DEFAULTS.smtp_port;
     } else if (BOOL_KEYS.has(key)) {
       (out as Record<string, unknown>)[key as string] =
         v === true || v === "true" || v === 1 || v === "1";
@@ -177,29 +179,32 @@ export function useEmailSettingsManager() {
   const values = localSlice ?? serverSlice;
   const isDirty = localSlice ? !sliceEqual(localSlice, serverSlice) : false;
 
-  const handleFieldChange: EmailFieldChangeHandler = useCallback((e) => {
-    const field = (e.target.name || e.target.id) as keyof EmailSettingsValues;
-    if (!(EMAIL_KEYS as readonly string[]).includes(field as string)) return;
+  const handleFieldChange: EmailFieldChangeHandler = useCallback(
+    (e) => {
+      const field = (e.target.name || e.target.id) as keyof EmailSettingsValues;
+      if (!(EMAIL_KEYS as readonly string[]).includes(field as string)) return;
 
-    let value: string | number | boolean;
-    if (e.target.type === "checkbox") {
-      value = (e.target as HTMLInputElement).checked;
-    } else if (e.target.type === "number") {
-      const num = parseFloat(e.target.value);
-      value = Number.isFinite(num) ? num : 0;
-    } else {
-      value = e.target.value;
-    }
+      let value: string | number | boolean;
+      if (e.target.type === "checkbox") {
+        value = (e.target as HTMLInputElement).checked;
+      } else if (e.target.type === "number") {
+        const num = parseFloat(e.target.value);
+        value = Number.isFinite(num) ? num : 0;
+      } else {
+        value = e.target.value;
+      }
 
-    setLocalSlice((prev) => {
-      const base =
-        prev ??
-        (settings
-          ? coerceEmailValues(settings as Record<string, unknown>)
-          : { ...EMAIL_SETTINGS_DEFAULTS });
-      return { ...base, [field]: value } as EmailSettingsValues;
-    });
-  }, [settings]);
+      setLocalSlice((prev) => {
+        const base =
+          prev ??
+          (settings
+            ? coerceEmailValues(settings as Record<string, unknown>)
+            : { ...EMAIL_SETTINGS_DEFAULTS });
+        return { ...base, [field]: value } as EmailSettingsValues;
+      });
+    },
+    [settings],
+  );
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -238,10 +243,6 @@ export function useEmailSettingsManager() {
     isLoading,
     ready,
     isSaving: saveMutation.isPending,
-    canSave:
-      ready &&
-      Boolean(localSlice) &&
-      isDirty &&
-      !saveMutation.isPending,
+    canSave: ready && Boolean(localSlice) && isDirty && !saveMutation.isPending,
   };
 }

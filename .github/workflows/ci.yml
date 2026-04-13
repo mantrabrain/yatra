@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
+        php: ['8.0', '8.1', '8.2', '8.3', '8.4']
         
     steps:
       - name: Checkout code
@@ -171,12 +171,19 @@ jobs:
         run: |
           echo "Checking for disallowed functions..."
           FOUND=""
-          disallowed_functions=("eval(" "exec(" "shell_exec(" "system(" "passthru(")
+          # Word-boundary style patterns (avoid curl_exec, collect_system(), etc.)
+          patterns=(
+            '(?<![A-Za-z0-9_])eval\s*\('
+            '(?<![A-Za-z0-9_])exec\s*\('
+            '(?<![A-Za-z0-9_])shell_exec\s*\('
+            '(?<![A-Za-z0-9_])system\s*\('
+            '(?<![A-Za-z0-9_])passthru\s*\('
+          )
           
-          for func in "${disallowed_functions[@]}"; do
-            MATCHES=$(grep -rn "$func" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null || true)
+          for pat in "${patterns[@]}"; do
+            MATCHES=$(grep -rPn "$pat" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null || true)
             if [ -n "$MATCHES" ]; then
-              FOUND="${FOUND}Disallowed function '${func}' found:\n${MATCHES}\n\n"
+              FOUND="${FOUND}Disallowed pattern '${pat}' found:\n${MATCHES}\n\n"
             fi
           done
           
@@ -316,7 +323,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
+        php: ['8.0', '8.1', '8.2', '8.3', '8.4']
     
     steps:
       - name: Checkout code
@@ -428,11 +435,11 @@ jobs:
           echo "Checking for deprecated functions in PHP ${{ matrix.php }}..." >&2
           echo "Checking for deprecated functions in PHP ${{ matrix.php }}..." | tee -a php${{ matrix.php }}-compat.txt
           
-          # PHP 7.4 deprecations
-          if [ "${{ matrix.php }}" = "7.4" ] || [ "${{ matrix.php }}" = "8.0" ] || [ "${{ matrix.php }}" = "8.1" ] || [ "${{ matrix.php }}" = "8.2" ] || [ "${{ matrix.php }}" = "8.3" ] || [ "${{ matrix.php }}" = "8.4" ]; then
+          # Legacy PHP API usage (all matrix versions are 8.0+)
+          if [ "${{ matrix.php }}" = "8.0" ] || [ "${{ matrix.php }}" = "8.1" ] || [ "${{ matrix.php }}" = "8.2" ] || [ "${{ matrix.php }}" = "8.3" ] || [ "${{ matrix.php }}" = "8.4" ]; then
             DEPRECATED=$(grep -rn "create_function\(\|each(\|money_format(\|ezmlm_hash(" app includes templates --include="*.php" 2>/dev/null || true)
             if [ -n "$DEPRECATED" ]; then
-              echo "⚠️ PHP 7.4+ deprecated functions found:" | tee -a php${{ matrix.php }}-compat.txt
+              echo "⚠️ Deprecated PHP APIs found:" | tee -a php${{ matrix.php }}-compat.txt
               echo "$DEPRECATED" | tee -a php${{ matrix.php }}-compat.txt
             fi
           fi
@@ -558,8 +565,8 @@ jobs:
             ERRORS="${ERRORS}Custom functions with wp_ prefix found (should use unique prefix):\n${WP_FUNCS}\n\n"
           fi
           
-          # Check for proper text domain usage
-          TEXT_DOMAIN_ISSUES=$(grep -rn "__(" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null | grep -v "'yatra'" | grep -v '"yatra"' | head -50 || true)
+          # Check for proper text domain usage (plain __() only — not esc_html__, esc_attr__, etc.)
+          TEXT_DOMAIN_ISSUES=$(grep -rPn '(?<![A-Za-z0-9_])__\(' . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null | grep -v "'yatra'" | grep -v '"yatra"' | head -50 || true)
           if [ -n "$TEXT_DOMAIN_ISSUES" ]; then
             ERRORS="${ERRORS}Translation functions possibly missing 'yatra' text domain:\n${TEXT_DOMAIN_ISSUES}\n\n"
           fi
@@ -613,7 +620,7 @@ jobs:
         if: always()
         run: |
           echo "Running ESLint..."
-          npx eslint resources/js/ --ext .ts,.tsx --format=compact > eslint-errors.txt 2>&1 || {
+          npm run lint > eslint-errors.txt 2>&1 || {
             echo "ESLint check failed:"
             cat eslint-errors.txt
             exit 1
@@ -625,7 +632,7 @@ jobs:
         if: always()
         run: |
           echo "Running Prettier format check..."
-          npx prettier --check "resources/js/**/*.{ts,tsx,js,jsx}" > prettier-errors.txt 2>&1 || {
+          npm run format:check > prettier-errors.txt 2>&1 || {
             echo "Prettier format check failed:"
             cat prettier-errors.txt
             exit 1
@@ -711,7 +718,7 @@ jobs:
           # ============================================================
           echo "## 📋 COMPLETE ERROR REPORT — Copy everything below this line to AI" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "I need help fixing the following CI errors in my WordPress plugin called **Yatra** (a travel booking plugin). The plugin uses PHP 8.1+, TypeScript, React, TailwindCSS, and Vite. Please provide specific code fixes for each error below." >> $GITHUB_STEP_SUMMARY
+          echo "I need help fixing the following CI errors in my WordPress plugin called **Yatra** (a travel booking plugin). The plugin uses PHP 8.0+, TypeScript, React, TailwindCSS, and Vite. Please provide specific code fixes for each error below." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # List all downloaded artifacts for debugging
@@ -809,11 +816,11 @@ jobs:
           
           # --- PHP COMPATIBILITY ---
           HAS_PHP_COMPAT_ERRORS=false
-          echo "### 8. PHP Version Compatibility (7.4, 8.0, 8.1, 8.2, 8.3, 8.4)" >> $GITHUB_STEP_SUMMARY
+          echo "### 8. PHP Version Compatibility (8.0, 8.1, 8.2, 8.3, 8.4)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           HAS_PHP_COMPAT_ERRORS=true
           
-          for version in 7.4 8.0 8.1 8.2 8.3 8.4; do
+          for version in 8.0 8.1 8.2 8.3 8.4; do
             HAS_VERSION_ERRORS=false
             if [ -d "error-reports/php${version}-compatibility" ]; then
               # Check if any files have content

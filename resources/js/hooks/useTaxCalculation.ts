@@ -1,14 +1,14 @@
 /**
  * Tax Calculation Hook
- * 
+ *
  * Provides tax calculation functionality for booking forms
- * 
+ *
  * @package Yatra.Hooks
  * @since 3.0.0
  */
 
-import { useState, useEffect, useMemo } from 'react';
-import { taxService } from '../services/TaxService';
+import { useState, useEffect, useMemo } from "react";
+import { taxService } from "../services/TaxService";
 
 interface BookingTaxCalculation {
   subtotal: number;
@@ -56,14 +56,14 @@ export const useTaxCalculation = ({
         setIsLoading(true);
         await taxService.loadTaxSettings();
         setTaxSettingsLoaded(true);
-        
+
         // Validate tax configuration
         const validation = taxService.validateTaxConfiguration();
         if (!validation.valid) {
-          setError('Tax configuration error: ' + validation.errors.join(', '));
+          setError("Tax configuration error: " + validation.errors.join(", "));
         }
       } catch (err) {
-        setError('Failed to load tax settings');
+        setError("Failed to load tax settings");
       } finally {
         setIsLoading(false);
       }
@@ -85,7 +85,7 @@ export const useTaxCalculation = ({
     try {
       return taxService.calculateBookingTax(subtotal, country);
     } catch (err) {
-      setError('Failed to calculate tax');
+      setError("Failed to calculate tax");
       return null;
     }
   }, [subtotal, country, enabled, taxSettingsLoaded, isLoading, error]);

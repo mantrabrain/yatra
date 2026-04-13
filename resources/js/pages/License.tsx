@@ -755,10 +755,17 @@ const License: React.FC = () => {
                       </div>
                       <button
                         onClick={() => {
-                          const text = JSON.stringify(debugData.response, null, 2);
+                          const text = JSON.stringify(
+                            debugData.response,
+                            null,
+                            2,
+                          );
                           if (navigator?.clipboard?.writeText) {
                             navigator.clipboard.writeText(text);
-                            showToast("Response copied to clipboard!", "success");
+                            showToast(
+                              "Response copied to clipboard!",
+                              "success",
+                            );
                           } else {
                             // Fallback for older browsers
                             const textArea = document.createElement("textarea");
@@ -766,8 +773,11 @@ const License: React.FC = () => {
                             document.body.appendChild(textArea);
                             textArea.select();
                             try {
-                              document.execCommand('copy');
-                              showToast("Response copied to clipboard!", "success");
+                              document.execCommand("copy");
+                              showToast(
+                                "Response copied to clipboard!",
+                                "success",
+                              );
                             } catch (err) {
                               showToast("Failed to copy to clipboard", "error");
                             }
@@ -818,18 +828,28 @@ const License: React.FC = () => {
                             );
                             if (navigator?.clipboard?.writeText) {
                               navigator.clipboard.writeText(text);
-                              showToast("Request copied to clipboard!", "success");
+                              showToast(
+                                "Request copied to clipboard!",
+                                "success",
+                              );
                             } else {
                               // Fallback for older browsers
-                              const textArea = document.createElement("textarea");
+                              const textArea =
+                                document.createElement("textarea");
                               textArea.value = text;
                               document.body.appendChild(textArea);
                               textArea.select();
                               try {
-                                document.execCommand('copy');
-                                showToast("Request copied to clipboard!", "success");
+                                document.execCommand("copy");
+                                showToast(
+                                  "Request copied to clipboard!",
+                                  "success",
+                                );
                               } catch (err) {
-                                showToast("Failed to copy to clipboard", "error");
+                                showToast(
+                                  "Failed to copy to clipboard",
+                                  "error",
+                                );
                               }
                               document.body.removeChild(textArea);
                             }
@@ -889,15 +909,22 @@ const License: React.FC = () => {
                               );
                             } else {
                               // Fallback for older browsers
-                              const textArea = document.createElement("textarea");
+                              const textArea =
+                                document.createElement("textarea");
                               textArea.value = text;
                               document.body.appendChild(textArea);
                               textArea.select();
                               try {
-                                document.execCommand('copy');
-                                showToast("Response copied to clipboard!", "success");
+                                document.execCommand("copy");
+                                showToast(
+                                  "Response copied to clipboard!",
+                                  "success",
+                                );
                               } catch (err) {
-                                showToast("Failed to copy to clipboard", "error");
+                                showToast(
+                                  "Failed to copy to clipboard",
+                                  "error",
+                                );
                               }
                               document.body.removeChild(textArea);
                             }
@@ -944,21 +971,35 @@ const License: React.FC = () => {
                         </div>
                         <button
                           onClick={() => {
-                            const text = JSON.stringify(debugData.error, null, 2);
+                            const text = JSON.stringify(
+                              debugData.error,
+                              null,
+                              2,
+                            );
                             if (navigator?.clipboard?.writeText) {
                               navigator.clipboard.writeText(text);
-                              showToast("Error copied to clipboard!", "success");
+                              showToast(
+                                "Error copied to clipboard!",
+                                "success",
+                              );
                             } else {
                               // Fallback for older browsers
-                              const textArea = document.createElement("textarea");
+                              const textArea =
+                                document.createElement("textarea");
                               textArea.value = text;
                               document.body.appendChild(textArea);
                               textArea.select();
                               try {
-                                document.execCommand('copy');
-                                showToast("Error copied to clipboard!", "success");
+                                document.execCommand("copy");
+                                showToast(
+                                  "Error copied to clipboard!",
+                                  "success",
+                                );
                               } catch (err) {
-                                showToast("Failed to copy to clipboard", "error");
+                                showToast(
+                                  "Failed to copy to clipboard",
+                                  "error",
+                                );
                               }
                               document.body.removeChild(textArea);
                             }

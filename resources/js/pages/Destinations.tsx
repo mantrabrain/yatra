@@ -560,279 +560,291 @@ const Destinations: React.FC = () => {
               <SharedTable
                 key={`destinations-table-${JSON.stringify(visibleColumns)}`}
                 data={destinations}
-                columns={useMemo(() => [
-                  {
-                    key: "name",
-                    label: __("Destination", "yatra"),
-                    sortable: true,
-                    visible: visibleColumns.name,
-                    render: (destination: Destination) => (
-                      <div className="flex items-center gap-3">
-                        {/* Icon/Image */}
-                        <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                          {destination.icon ? (
-                            destination.icon.type === "image" ? (
-                              <img
-                                src={destination.icon.value}
-                                alt={destination.name}
-                                className="w-full h-full object-cover rounded-lg"
-                              />
+                columns={useMemo(
+                  () => [
+                    {
+                      key: "name",
+                      label: __("Destination", "yatra"),
+                      sortable: true,
+                      visible: visibleColumns.name,
+                      render: (destination: Destination) => (
+                        <div className="flex items-center gap-3">
+                          {/* Icon/Image */}
+                          <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                            {destination.icon ? (
+                              destination.icon.type === "image" ? (
+                                <img
+                                  src={destination.icon.value}
+                                  alt={destination.name}
+                                  className="w-full h-full object-cover rounded-lg"
+                                />
+                              ) : (
+                                <IconSelector
+                                  iconName={destination.icon.value}
+                                  className="w-5 h-5 text-blue-600 dark:text-blue-400"
+                                />
+                              )
                             ) : (
-                              <IconSelector
-                                iconName={destination.icon.value}
-                                className="w-5 h-5 text-blue-600 dark:text-blue-400"
-                              />
-                            )
-                          ) : (
-                            <div className="w-5 h-5 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-semibold">
-                              {destination.name.charAt(0).toUpperCase()}
+                              <div className="w-5 h-5 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-semibold">
+                                {destination.name.charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                          </div>
+                          {/* Text */}
+                          <div>
+                            <div className="flex items-center gap-1">
+                              <a
+                                href={`${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=edit&id=${destination.id}`}
+                                className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
+                              >
+                                {destination.name}
+                              </a>
+                              {can("yatra_view_trips") &&
+                                destination.status !== "trash" && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleView(destination);
+                                    }}
+                                    className="ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
+                                    title={__(
+                                      "View destination in new tab",
+                                      "yatra",
+                                    )}
+                                  >
+                                    <ExternalLink className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
                             </div>
-                          )}
-                        </div>
-                        {/* Text */}
-                        <div>
-                          <div className="flex items-center gap-1">
-                            <a
-                              href={`${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=edit&id=${destination.id}`}
-                              className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
-                            >
-                              {destination.name}
-                            </a>
-                            {can("yatra_view_trips") &&
-                              destination.status !== "trash" && (
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleView(destination);
-                                  }}
-                                  className="ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
-                                  title={__(
-                                    "View destination in new tab",
-                                    "yatra",
-                                  )}
-                                >
-                                  <ExternalLink className="w-3.5 h-3.5" />
-                                </button>
-                              )}
-                          </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                            <span>{destination.slug}</span>
-                            <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                              ({__("ID:", "yatra")} {destination.id})
-                            </span>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                              <span>{destination.slug}</span>
+                              <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                                ({__("ID:", "yatra")} {destination.id})
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ),
-                  },
-                  {
-                    key: "trips",
-                    label: __("Trips", "yatra"),
-                    sortable: false,
-                    visible: visibleColumns.trips,
-                    render: (destination: Destination) => (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                        {typeof destination.trip_count === "number"
-                          ? destination.trip_count
-                          : 0}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "description",
-                    label: __("Description", "yatra"),
-                    visible: visibleColumns.description,
-                    render: (destination: Destination) => (
-                      <span
-                        className={`block max-w-[300px] truncate ${
-                          destination.status === "trash" ||
+                      ),
+                    },
+                    {
+                      key: "trips",
+                      label: __("Trips", "yatra"),
+                      sortable: false,
+                      visible: visibleColumns.trips,
+                      render: (destination: Destination) => (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                          {typeof destination.trip_count === "number"
+                            ? destination.trip_count
+                            : 0}
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "description",
+                      label: __("Description", "yatra"),
+                      visible: visibleColumns.description,
+                      render: (destination: Destination) => (
+                        <span
+                          className={`block max-w-[300px] truncate ${
+                            destination.status === "trash" ||
+                            statusFilter === "trash"
+                              ? "text-gray-400 dark:text-gray-600"
+                              : "text-gray-600 dark:text-gray-400"
+                          }`}
+                          title={destination.description || ""}
+                        >
+                          {destination.description ||
+                            __("No description", "yatra")}
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "seo_title",
+                      label: __("SEO Title", "yatra"),
+                      visible: visibleColumns.seo_title,
+                      render: (destination: Destination) => (
+                        <span
+                          className={
+                            destination.status === "trash" ||
+                            statusFilter === "trash"
+                              ? "text-gray-400 dark:text-gray-600"
+                              : "text-gray-600 dark:text-gray-400"
+                          }
+                        >
+                          {destination.metadata?.seo_title ||
+                            __("Not set", "yatra")}
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "seo_description",
+                      label: __("SEO Description", "yatra"),
+                      visible: visibleColumns.seo_description,
+                      render: (destination: Destination) => (
+                        <span
+                          className={
+                            destination.status === "trash" ||
+                            statusFilter === "trash"
+                              ? "text-gray-400 dark:text-gray-600"
+                              : "text-gray-600 dark:text-gray-400"
+                          }
+                          title={destination.metadata?.seo_description || ""}
+                        >
+                          {destination.metadata?.seo_description
+                            ? destination.metadata.seo_description.length > 50
+                              ? destination.metadata.seo_description.substring(
+                                  0,
+                                  50,
+                                ) + "..."
+                              : destination.metadata.seo_description
+                            : __("Not set", "yatra")}
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "seo_keywords",
+                      label: __("SEO Keywords", "yatra"),
+                      visible: visibleColumns.seo_keywords,
+                      render: (destination: Destination) => (
+                        <span
+                          className={
+                            destination.status === "trash" ||
+                            statusFilter === "trash"
+                              ? "text-gray-400 dark:text-gray-600"
+                              : "text-gray-600 dark:text-gray-400"
+                          }
+                          title={destination.metadata?.seo_keywords || ""}
+                        >
+                          {destination.metadata?.seo_keywords
+                            ? destination.metadata.seo_keywords.length > 30
+                              ? destination.metadata.seo_keywords.substring(
+                                  0,
+                                  30,
+                                ) + "..."
+                              : destination.metadata.seo_keywords
+                            : __("Not set", "yatra")}
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "status",
+                      label: __("Status", "yatra"),
+                      sortable: true,
+                      visible: visibleColumns.status,
+                      render: (destination: Destination) => (
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            destination.status === "trash" ||
+                            statusFilter === "trash"
+                              ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                              : destination.status === "publish"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                                : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                          }`}
+                        >
+                          {destination.status === "trash" ||
                           statusFilter === "trash"
-                            ? "text-gray-400 dark:text-gray-600"
-                            : "text-gray-600 dark:text-gray-400"
-                        }`}
-                        title={destination.description || ""}
-                      >
-                        {destination.description ||
-                          __("No description", "yatra")}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "seo_title",
-                    label: __("SEO Title", "yatra"),
-                    visible: visibleColumns.seo_title,
-                    render: (destination: Destination) => (
-                      <span
-                        className={
-                          destination.status === "trash" ||
-                          statusFilter === "trash"
-                            ? "text-gray-400 dark:text-gray-600"
-                            : "text-gray-600 dark:text-gray-400"
-                        }
-                      >
-                        {destination.metadata?.seo_title || __("Not set", "yatra")}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "seo_description",
-                    label: __("SEO Description", "yatra"),
-                    visible: visibleColumns.seo_description,
-                    render: (destination: Destination) => (
-                      <span
-                        className={
-                          destination.status === "trash" ||
-                          statusFilter === "trash"
-                            ? "text-gray-400 dark:text-gray-600"
-                            : "text-gray-600 dark:text-gray-400"
-                        }
-                        title={destination.metadata?.seo_description || ""}
-                      >
-                        {destination.metadata?.seo_description 
-                          ? (destination.metadata.seo_description.length > 50 
-                              ? destination.metadata.seo_description.substring(0, 50) + "..."
-                              : destination.metadata.seo_description)
-                          : __("Not set", "yatra")}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "seo_keywords",
-                    label: __("SEO Keywords", "yatra"),
-                    visible: visibleColumns.seo_keywords,
-                    render: (destination: Destination) => (
-                      <span
-                        className={
-                          destination.status === "trash" ||
-                          statusFilter === "trash"
-                            ? "text-gray-400 dark:text-gray-600"
-                            : "text-gray-600 dark:text-gray-400"
-                        }
-                        title={destination.metadata?.seo_keywords || ""}
-                      >
-                        {destination.metadata?.seo_keywords 
-                          ? (destination.metadata.seo_keywords.length > 30 
-                              ? destination.metadata.seo_keywords.substring(0, 30) + "..."
-                              : destination.metadata.seo_keywords)
-                          : __("Not set", "yatra")}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "status",
-                    label: __("Status", "yatra"),
-                    sortable: true,
-                    visible: visibleColumns.status,
-                    render: (destination: Destination) => (
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          destination.status === "trash" ||
-                          statusFilter === "trash"
-                            ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                            ? __("Trash", "yatra")
                             : destination.status === "publish"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-                        }`}
-                      >
-                        {destination.status === "trash" ||
-                        statusFilter === "trash"
-                          ? __("Trash", "yatra")
-                          : destination.status === "publish"
-                            ? __("Published", "yatra")
-                            : __("Draft", "yatra")}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "created_at",
-                    label: __("Created Date", "yatra"),
-                    sortable: true,
-                    visible: visibleColumns.created_at,
-                    render: (destination: Destination) => (
-                      <span
-                        className={
-                          destination.status === "trash" ||
-                          statusFilter === "trash"
-                            ? "text-gray-400 dark:text-gray-600"
-                            : "text-gray-600 dark:text-gray-400"
-                        }
-                      >
-                        {new Date(destination.created_at).toLocaleDateString(
-                          "en-US",
-                          {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          },
-                        )}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "updated_at",
-                    label: __("Updated Date", "yatra"),
-                    sortable: true,
-                    visible: visibleColumns.updated_at,
-                    render: (destination: Destination) => (
-                      <span
-                        className={
-                          destination.status === "trash" ||
-                          statusFilter === "trash"
-                            ? "text-gray-400 dark:text-gray-600"
-                            : "text-gray-600 dark:text-gray-400"
-                        }
-                      >
-                        {new Date(destination.updated_at).toLocaleDateString(
-                          "en-US",
-                          {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          },
-                        )}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "created_by_name",
-                    label: __("Created By", "yatra"),
-                    visible: visibleColumns.created_by_name,
-                    render: (destination: Destination) => (
-                      <span
-                        className={
-                          destination.status === "trash" ||
-                          statusFilter === "trash"
-                            ? "text-gray-400 dark:text-gray-600"
-                            : "text-gray-600 dark:text-gray-400"
-                        }
-                      >
-                        {destination.created_by_name || __("Unknown", "yatra")}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "updated_by_name",
-                    label: __("Updated By", "yatra"),
-                    visible: visibleColumns.updated_by_name,
-                    render: (destination: Destination) => (
-                      <span
-                        className={
-                          destination.status === "trash" ||
-                          statusFilter === "trash"
-                            ? "text-gray-400 dark:text-gray-600"
-                            : "text-gray-600 dark:text-gray-400"
-                        }
-                      >
-                        {destination.updated_by_name || __("Unknown", "yatra")}
-                      </span>
-                    ),
-                  },
-                ], [visibleColumns])}
+                              ? __("Published", "yatra")
+                              : __("Draft", "yatra")}
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "created_at",
+                      label: __("Created Date", "yatra"),
+                      sortable: true,
+                      visible: visibleColumns.created_at,
+                      render: (destination: Destination) => (
+                        <span
+                          className={
+                            destination.status === "trash" ||
+                            statusFilter === "trash"
+                              ? "text-gray-400 dark:text-gray-600"
+                              : "text-gray-600 dark:text-gray-400"
+                          }
+                        >
+                          {new Date(destination.created_at).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            },
+                          )}
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "updated_at",
+                      label: __("Updated Date", "yatra"),
+                      sortable: true,
+                      visible: visibleColumns.updated_at,
+                      render: (destination: Destination) => (
+                        <span
+                          className={
+                            destination.status === "trash" ||
+                            statusFilter === "trash"
+                              ? "text-gray-400 dark:text-gray-600"
+                              : "text-gray-600 dark:text-gray-400"
+                          }
+                        >
+                          {new Date(destination.updated_at).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            },
+                          )}
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "created_by_name",
+                      label: __("Created By", "yatra"),
+                      visible: visibleColumns.created_by_name,
+                      render: (destination: Destination) => (
+                        <span
+                          className={
+                            destination.status === "trash" ||
+                            statusFilter === "trash"
+                              ? "text-gray-400 dark:text-gray-600"
+                              : "text-gray-600 dark:text-gray-400"
+                          }
+                        >
+                          {destination.created_by_name ||
+                            __("Unknown", "yatra")}
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "updated_by_name",
+                      label: __("Updated By", "yatra"),
+                      visible: visibleColumns.updated_by_name,
+                      render: (destination: Destination) => (
+                        <span
+                          className={
+                            destination.status === "trash" ||
+                            statusFilter === "trash"
+                              ? "text-gray-400 dark:text-gray-600"
+                              : "text-gray-600 dark:text-gray-400"
+                          }
+                        >
+                          {destination.updated_by_name ||
+                            __("Unknown", "yatra")}
+                        </span>
+                      ),
+                    },
+                  ],
+                  [visibleColumns],
+                )}
                 actions={[
                   {
                     key: "view",

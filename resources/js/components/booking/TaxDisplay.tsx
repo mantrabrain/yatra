@@ -1,14 +1,14 @@
 /**
  * Tax Display Component
- * 
+ *
  * Shows tax breakdown for booking forms and details
- * 
+ *
  * @package Yatra.Components.Booking
  * @since 3.0.0
  */
 
-import React from 'react';
-import { taxService } from '../../services/TaxService';
+import React from "react";
+import { taxService } from "../../services/TaxService";
 
 interface TaxDisplayProps {
   subtotal: number;
@@ -20,7 +20,7 @@ interface TaxDisplayProps {
 const TaxDisplay: React.FC<TaxDisplayProps> = ({
   subtotal,
   country,
-  className = '',
+  className = "",
   showBreakdown = true,
 }) => {
   // Calculate tax
@@ -37,9 +37,7 @@ const TaxDisplay: React.FC<TaxDisplayProps> = ({
     <div className={`space-y-2 ${className}`}>
       {/* Subtotal */}
       <div className="flex justify-between text-sm">
-        <span className="text-gray-600 dark:text-gray-400">
-          Subtotal
-        </span>
+        <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
         <span className="font-medium text-gray-900 dark:text-gray-100">
           {taxService.formatPrice(taxCalculation.subtotal)}
         </span>

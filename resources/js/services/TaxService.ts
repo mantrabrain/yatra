@@ -1,8 +1,8 @@
 /**
  * Frontend Tax Service
- * 
+ *
  * Handles tax calculations for booking forms and displays
- * 
+ *
  * @package Yatra.Services
  * @since 3.0.0
  */
@@ -54,11 +54,11 @@ class TaxService {
    */
   async loadTaxSettings(): Promise<void> {
     try {
-      const response = await fetch('/wp-json/yatra/v1/settings');
+      const response = await fetch("/wp-json/yatra/v1/settings");
       const settings = await response.json();
       this.taxSettings = settings;
     } catch (error) {
-      console.error('Failed to load tax settings:', error);
+      console.error("Failed to load tax settings:", error);
     }
   }
 
@@ -90,7 +90,8 @@ class TaxService {
     }
 
     const taxInclusive = this.taxSettings?.tax_inclusive === true;
-    const multipleTaxesEnabled = this.taxSettings?.multiple_taxes_enabled === true;
+    const multipleTaxesEnabled =
+      this.taxSettings?.multiple_taxes_enabled === true;
 
     if (multipleTaxesEnabled) {
       return this.calculateMultipleTaxes(amount, country, taxInclusive);
@@ -102,19 +103,28 @@ class TaxService {
   /**
    * Calculate single tax (backward compatibility)
    */
-  private calculateSingleTax(amount: number, country?: string, taxInclusive: boolean = false): TaxDetails {
+  private calculateSingleTax(
+    amount: number,
+    country?: string,
+    taxInclusive: boolean = false,
+  ): TaxDetails {
     let taxRate = this.taxSettings?.tax_rate || 0;
-    const taxName = this.taxSettings?.tax_name || this.taxSettings?.tax_label || 'Tax';
+    const taxName =
+      this.taxSettings?.tax_name || this.taxSettings?.tax_label || "Tax";
 
     // Check for country-specific tax
-    if (this.taxSettings?.tax_by_country === true && country && this.taxSettings?.tax_rates?.[country]) {
+    if (
+      this.taxSettings?.tax_by_country === true &&
+      country &&
+      this.taxSettings?.tax_rates?.[country]
+    ) {
       taxRate = this.taxSettings.tax_rates[country];
     }
 
     let taxAmount: number;
     if (taxInclusive) {
       // Tax is included in the price
-      taxAmount = amount - (amount / (1 + (taxRate / 100)));
+      taxAmount = amount - amount / (1 + taxRate / 100);
     } else {
       // Tax is added to the price
       taxAmount = amount * (taxRate / 100);
@@ -124,18 +134,24 @@ class TaxService {
       tax_amount: Math.round(taxAmount * 100) / 100,
       tax_rate: taxRate,
       tax_inclusive: taxInclusive,
-      taxes: [{
-        name: taxName,
-        rate: taxRate,
-        amount: Math.round(taxAmount * 100) / 100,
-      }],
+      taxes: [
+        {
+          name: taxName,
+          rate: taxRate,
+          amount: Math.round(taxAmount * 100) / 100,
+        },
+      ],
     };
   }
 
   /**
    * Calculate multiple taxes
    */
-  private calculateMultipleTaxes(amount: number, country?: string, taxInclusive: boolean = false): TaxDetails {
+  private calculateMultipleTaxes(
+    amount: number,
+    country?: string,
+    taxInclusive: boolean = false,
+  ): TaxDetails {
     let taxes = this.taxSettings?.multiple_taxes || [];
 
     // Check for country-specific taxes
@@ -143,12 +159,16 @@ class TaxService {
       taxes = this.taxSettings.multiple_taxes_by_country[country];
     }
 
-    const calculatedTaxes: Array<{ name: string; rate: number; amount: number }> = [];
+    const calculatedTaxes: Array<{
+      name: string;
+      rate: number;
+      amount: number;
+    }> = [];
     let totalTaxAmount = 0;
 
     for (const tax of taxes) {
       const taxRate = tax.rate || 0;
-      const taxName = tax.name || 'Tax';
+      const taxName = tax.name || "Tax";
 
       let taxAmount: number;
       if (taxInclusive) {
@@ -172,7 +192,10 @@ class TaxService {
 
     return {
       tax_amount: Math.round(totalTaxAmount * 100) / 100,
-      tax_rate: taxes.reduce((sum: number, tax: any) => sum + (tax.rate || 0), 0),
+      tax_rate: taxes.reduce(
+        (sum: number, tax: any) => sum + (tax.rate || 0),
+        0,
+      ),
       tax_inclusive: taxInclusive,
       taxes: calculatedTaxes,
     };
@@ -181,7 +204,10 @@ class TaxService {
   /**
    * Calculate complete booking tax breakdown
    */
-  calculateBookingTax(subtotal: number, country?: string): BookingTaxCalculation {
+  calculateBookingTax(
+    subtotal: number,
+    country?: string,
+  ): BookingTaxCalculation {
     const taxDetails = this.calculateTax(subtotal, country);
 
     let finalSubtotal: number;
@@ -197,15 +223,17 @@ class TaxService {
       finalTotal = subtotal + taxDetails.tax_amount;
     }
 
-    const formattedTaxes = taxDetails.taxes.map(tax => ({
+    const formattedTaxes = taxDetails.taxes.map((tax) => ({
       ...tax,
       formatted_amount: this.formatPrice(tax.amount),
       formatted_rate: `${tax.rate.toFixed(2)}%`,
     }));
 
     const taxBreakdown = formattedTaxes
-      .map(tax => `${tax.name} (${tax.formatted_rate}): ${tax.formatted_amount}`)
-      .join('\n');
+      .map(
+        (tax) => `${tax.name} (${tax.formatted_rate}): ${tax.formatted_amount}`,
+      )
+      .join("\n");
 
     return {
       subtotal: Math.round(finalSubtotal * 100) / 100,
@@ -222,9 +250,9 @@ class TaxService {
    * Format price display
    */
   formatPrice(amount: number): string {
-    const currency = this.taxSettings?.currency || 'USD';
+    const currency = this.taxSettings?.currency || "USD";
     const currencySymbol = this.getCurrencySymbol(currency);
-    
+
     return `${currencySymbol}${amount.toFixed(2)}`;
   }
 
@@ -233,15 +261,15 @@ class TaxService {
    */
   getCurrencySymbol(currency: string): string {
     const symbols: { [key: string]: string } = {
-      'USD': '$',
-      'EUR': '€',
-      'GBP': '£',
-      'JPY': '¥',
-      'AUD': 'A$',
-      'CAD': 'C$',
-      'CHF': 'CHF',
-      'CNY': '¥',
-      'INR': '₹',
+      USD: "$",
+      EUR: "€",
+      GBP: "£",
+      JPY: "¥",
+      AUD: "A$",
+      CAD: "C$",
+      CHF: "CHF",
+      CNY: "¥",
+      INR: "₹",
     };
 
     return symbols[currency] || currency;
@@ -258,7 +286,7 @@ class TaxService {
     formatted_rate: string;
     formatted_line: string;
   }> {
-    return taxDetails.taxes.map(tax => ({
+    return taxDetails.taxes.map((tax) => ({
       name: tax.name,
       rate: tax.rate,
       amount: tax.amount,
@@ -273,7 +301,7 @@ class TaxService {
    */
   formatTaxDisplay(taxDetails: TaxDetails): string {
     const breakdown = this.getTaxBreakdown(taxDetails);
-    return breakdown.map(tax => tax.formatted_line).join('\n');
+    return breakdown.map((tax) => tax.formatted_line).join("\n");
   }
 
   /**
@@ -286,24 +314,25 @@ class TaxService {
       return { valid: true, errors: [] };
     }
 
-    const multipleTaxesEnabled = this.taxSettings?.multiple_taxes_enabled === true;
+    const multipleTaxesEnabled =
+      this.taxSettings?.multiple_taxes_enabled === true;
 
     if (multipleTaxesEnabled) {
       const multipleTaxes = this.taxSettings?.multiple_taxes || [];
-      
+
       if (multipleTaxes.length === 0) {
-        errors.push('At least one tax must be configured');
+        errors.push("At least one tax must be configured");
       }
 
       let totalRate = 0;
       for (let i = 0; i < multipleTaxes.length; i++) {
         const tax = multipleTaxes[i];
-        
-        if (!tax.name || tax.name.trim() === '') {
+
+        if (!tax.name || tax.name.trim() === "") {
           errors.push(`Tax ${i + 1}: Name is required`);
         }
-        
-        if (typeof tax.rate !== 'number' || tax.rate < 0 || tax.rate > 100) {
+
+        if (typeof tax.rate !== "number" || tax.rate < 0 || tax.rate > 100) {
           errors.push(`Tax ${i + 1}: Rate must be between 0 and 100`);
         } else {
           totalRate += tax.rate;
@@ -311,18 +340,18 @@ class TaxService {
       }
 
       if (totalRate > 100) {
-        errors.push('Total tax rate cannot exceed 100%');
+        errors.push("Total tax rate cannot exceed 100%");
       }
     } else {
       const taxRate = this.taxSettings?.tax_rate || 0;
-      const taxName = this.taxSettings?.tax_name || '';
+      const taxName = this.taxSettings?.tax_name || "";
 
-      if (typeof taxRate !== 'number' || taxRate < 0 || taxRate > 100) {
-        errors.push('Tax rate must be between 0 and 100');
+      if (typeof taxRate !== "number" || taxRate < 0 || taxRate > 100) {
+        errors.push("Tax rate must be between 0 and 100");
       }
 
-      if (!taxName || taxName.trim() === '') {
-        errors.push('Tax name is required');
+      if (!taxName || taxName.trim() === "") {
+        errors.push("Tax name is required");
       }
     }
 
@@ -338,13 +367,27 @@ class TaxService {
   getTaxSummary(bookings: any[]): {
     total_tax_collected: number;
     total_bookings_with_tax: number;
-    tax_breakdown: { [key: string]: { name: string; total_amount: number; count: number; average_rate: number } };
+    tax_breakdown: {
+      [key: string]: {
+        name: string;
+        total_amount: number;
+        count: number;
+        average_rate: number;
+      };
+    };
     average_tax_rate: number;
   } {
     const summary = {
       total_tax_collected: 0,
       total_bookings_with_tax: 0,
-      tax_breakdown: {} as { [key: string]: { name: string; total_amount: number; count: number; average_rate: number } },
+      tax_breakdown: {} as {
+        [key: string]: {
+          name: string;
+          total_amount: number;
+          count: number;
+          average_rate: number;
+        };
+      },
       average_tax_rate: 0,
     };
 

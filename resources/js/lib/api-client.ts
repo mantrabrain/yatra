@@ -104,9 +104,7 @@ class ApiClient {
     }
     const w = window as YatraWindowGlobals;
     const raw =
-      w.yatraAccountPage?.apiUrl ||
-      w.yatraAdmin?.apiUrl ||
-      "/wp-json/yatra/v1";
+      w.yatraAccountPage?.apiUrl || w.yatraAdmin?.apiUrl || "/wp-json/yatra/v1";
     return raw.endsWith("/") ? raw.slice(0, -1) : raw;
   }
 
@@ -601,21 +599,46 @@ export const apiService = {
   getModules: () => apiClient.get(API_ENDPOINTS.MODULES),
 
   // Facebook Pixel
-  getFacebookPixelSettings: () => apiClient.get(API_ENDPOINTS.FACEBOOK_PIXEL_SETTINGS),
-  testFacebookPixel: (pixelId: string) => apiClient.post(API_ENDPOINTS.FACEBOOK_PIXEL_TEST, { pixel_id: pixelId }),
-  testFacebookPixelToken: (accessToken: string) => apiClient.post(API_ENDPOINTS.FACEBOOK_PIXEL_TEST_TOKEN, { access_token: accessToken }),
-  getFacebookPixelEvents: () => apiClient.get(API_ENDPOINTS.FACEBOOK_PIXEL_EVENTS),
-  getFacebookPixelEventLogs: () => apiClient.get(API_ENDPOINTS.FACEBOOK_PIXEL_EVENT_LOGS),
-  clearFacebookPixelEventLogs: () => apiClient.delete(API_ENDPOINTS.FACEBOOK_PIXEL_EVENT_LOGS),
+  getFacebookPixelSettings: () =>
+    apiClient.get(API_ENDPOINTS.FACEBOOK_PIXEL_SETTINGS),
+  testFacebookPixel: (pixelId: string) =>
+    apiClient.post(API_ENDPOINTS.FACEBOOK_PIXEL_TEST, { pixel_id: pixelId }),
+  testFacebookPixelToken: (accessToken: string) =>
+    apiClient.post(API_ENDPOINTS.FACEBOOK_PIXEL_TEST_TOKEN, {
+      access_token: accessToken,
+    }),
+  getFacebookPixelEvents: () =>
+    apiClient.get(API_ENDPOINTS.FACEBOOK_PIXEL_EVENTS),
+  getFacebookPixelEventLogs: () =>
+    apiClient.get(API_ENDPOINTS.FACEBOOK_PIXEL_EVENT_LOGS),
+  clearFacebookPixelEventLogs: () =>
+    apiClient.delete(API_ENDPOINTS.FACEBOOK_PIXEL_EVENT_LOGS),
 
   // Google Analytics 4
-  getGoogleAnalyticsSettings: () => apiClient.get(API_ENDPOINTS.GOOGLE_ANALYTICS_SETTINGS),
-  testGoogleAnalytics: (measurementId: string) => apiClient.post(API_ENDPOINTS.GOOGLE_ANALYTICS_TEST, { measurement_id: measurementId }),
-  validateGoogleAnalyticsMeasurementId: (measurementId: string) => apiClient.post(API_ENDPOINTS.GOOGLE_ANALYTICS_VALIDATE_MEASUREMENT_ID, { measurement_id: measurementId }),
-  validateGoogleAnalyticsApiSecret: (measurementId: string, apiSecret: string) => apiClient.post(API_ENDPOINTS.GOOGLE_ANALYTICS_VALIDATE_API_SECRET, { measurement_id: measurementId, api_secret: apiSecret }),
-  getGoogleAnalyticsEvents: () => apiClient.get(API_ENDPOINTS.GOOGLE_ANALYTICS_EVENTS),
-  getGoogleAnalyticsEventLogs: () => apiClient.get(API_ENDPOINTS.GOOGLE_ANALYTICS_EVENT_LOGS),
-  clearGoogleAnalyticsEventLogs: () => apiClient.delete(API_ENDPOINTS.GOOGLE_ANALYTICS_EVENT_LOGS),
+  getGoogleAnalyticsSettings: () =>
+    apiClient.get(API_ENDPOINTS.GOOGLE_ANALYTICS_SETTINGS),
+  testGoogleAnalytics: (measurementId: string) =>
+    apiClient.post(API_ENDPOINTS.GOOGLE_ANALYTICS_TEST, {
+      measurement_id: measurementId,
+    }),
+  validateGoogleAnalyticsMeasurementId: (measurementId: string) =>
+    apiClient.post(API_ENDPOINTS.GOOGLE_ANALYTICS_VALIDATE_MEASUREMENT_ID, {
+      measurement_id: measurementId,
+    }),
+  validateGoogleAnalyticsApiSecret: (
+    measurementId: string,
+    apiSecret: string,
+  ) =>
+    apiClient.post(API_ENDPOINTS.GOOGLE_ANALYTICS_VALIDATE_API_SECRET, {
+      measurement_id: measurementId,
+      api_secret: apiSecret,
+    }),
+  getGoogleAnalyticsEvents: () =>
+    apiClient.get(API_ENDPOINTS.GOOGLE_ANALYTICS_EVENTS),
+  getGoogleAnalyticsEventLogs: () =>
+    apiClient.get(API_ENDPOINTS.GOOGLE_ANALYTICS_EVENT_LOGS),
+  clearGoogleAnalyticsEventLogs: () =>
+    apiClient.delete(API_ENDPOINTS.GOOGLE_ANALYTICS_EVENT_LOGS),
 
   // Payment Gateways
   getPaymentGateways: () => apiClient.get(API_ENDPOINTS.PAYMENT_GATEWAYS),
@@ -727,8 +750,7 @@ export const apiService = {
   cancelMigration: () => apiClient.post(API_ENDPOINTS.MIGRATION_CANCEL),
 
   // Sample Data
-  importSampleData: (data: any) =>
-    apiClient.post("/sample-data/import", data),
+  importSampleData: (data: any) => apiClient.post("/sample-data/import", data),
   getSampleDataStatus: () => apiClient.get("/sample-data/status"),
   cleanupSampleData: () => apiClient.delete("/sample-data/cleanup"),
 

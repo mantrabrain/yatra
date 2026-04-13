@@ -689,9 +689,12 @@ const DynamicPricingPage: React.FC = () => {
                         ),
                         onConfirm: async () => {
                           try {
-                            await apiClient.put(`/dynamic-pricing/rules/${rule.id}`, {
-                              status: "active",
-                            });
+                            await apiClient.put(
+                              `/dynamic-pricing/rules/${rule.id}`,
+                              {
+                                status: "active",
+                              },
+                            );
                             showToast(
                               __("Pricing rule marked as active successfully"),
                               "success",
@@ -735,11 +738,16 @@ const DynamicPricingPage: React.FC = () => {
                         ),
                         onConfirm: async () => {
                           try {
-                            await apiClient.put(`/dynamic-pricing/rules/${rule.id}`, {
-                              status: "inactive",
-                            });
+                            await apiClient.put(
+                              `/dynamic-pricing/rules/${rule.id}`,
+                              {
+                                status: "inactive",
+                              },
+                            );
                             showToast(
-                              __("Pricing rule marked as inactive successfully"),
+                              __(
+                                "Pricing rule marked as inactive successfully",
+                              ),
                               "success",
                             );
                             queryClient.invalidateQueries({
@@ -780,9 +788,12 @@ const DynamicPricingPage: React.FC = () => {
                         ),
                         onConfirm: async () => {
                           try {
-                            await apiClient.put(`/dynamic-pricing/rules/${rule.id}`, {
-                              status: "active",
-                            });
+                            await apiClient.put(
+                              `/dynamic-pricing/rules/${rule.id}`,
+                              {
+                                status: "active",
+                              },
+                            );
                             showToast(
                               __("Pricing rule restored successfully"),
                               "success",

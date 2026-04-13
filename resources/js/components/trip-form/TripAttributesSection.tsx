@@ -325,7 +325,11 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
           );
         }
         return (
-          <div className="mt-2 space-y-2" role="radiogroup" aria-label={attribute.name}>
+          <div
+            className="mt-2 space-y-2"
+            role="radiogroup"
+            aria-label={attribute.name}
+          >
             {options.map((option, index) => (
               <label
                 key={`${option.value}-${index}`}
@@ -377,7 +381,9 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
                 <input
                   type="checkbox"
                   checked={selected.includes(String(option.value))}
-                  onChange={(e) => toggle(String(option.value), e.target.checked)}
+                  onChange={(e) =>
+                    toggle(String(option.value), e.target.checked)
+                  }
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span>{option.label || option.value}</span>

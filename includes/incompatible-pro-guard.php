@@ -211,10 +211,7 @@ function yatra_admin_notice_incompatible_pro_deactivated(): void
             printf(
                 /* translators: 1: minimum Yatra Pro version, 2: HTML link to MantraBrain store account */
                 wp_kses_post(
-                    __(
-                        'Please download and install <strong>Yatra Pro %1$s or newer</strong> from your MantraBrain store account: %2$s to use Pro features with this version of Yatra.',
-                        'yatra'
-                    )
+                    __('Please download and install <strong>Yatra Pro %1$s or newer</strong> from your MantraBrain store account: %2$s to use Pro features with this version of Yatra.', 'yatra')
                 ),
                 esc_html($min_v),
                 sprintf(

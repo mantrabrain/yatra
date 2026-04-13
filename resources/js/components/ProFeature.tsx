@@ -79,14 +79,13 @@ export const ProFeature: React.FC<ProFeatureProps> = ({
               {__("Please activate", "yatra")} {moduleName}
             </h4>
             <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-              {__(
-                "You have Yatra Pro installed. Enable the",
-                "yatra",
-              )} {moduleName} {__("module to access", "yatra")} {description.toLowerCase()} {__("features.", "yatra")}
+              {__("You have Yatra Pro installed. Enable the", "yatra")}{" "}
+              {moduleName} {__("module to access", "yatra")}{" "}
+              {description.toLowerCase()} {__("features.", "yatra")}
             </p>
             <Button
               type="button"
-              onClick={() => window.open(modulesPageUrl, '_blank')}
+              onClick={() => window.open(modulesPageUrl, "_blank")}
               className="mt-3 bg-amber-600 hover:bg-amber-700 text-white"
             >
               {__("Activate Module", "yatra")}

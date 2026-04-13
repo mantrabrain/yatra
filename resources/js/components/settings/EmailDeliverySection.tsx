@@ -148,10 +148,7 @@ export const EmailDeliverySection: React.FC<EmailDeliverySectionProps> = ({
           className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
         />
         <div className="flex-1">
-          <Label
-            htmlFor="smtp_enabled"
-            className="font-medium cursor-pointer"
-          >
+          <Label htmlFor="smtp_enabled" className="font-medium cursor-pointer">
             {__("Enable SMTP", "yatra")}
           </Label>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -183,10 +180,7 @@ export const EmailDeliverySection: React.FC<EmailDeliverySectionProps> = ({
             <Field
               id="smtp_port"
               label={__("SMTP Port", "yatra")}
-              description={__(
-                "SMTP server port (usually 587 or 465)",
-                "yatra",
-              )}
+              description={__("SMTP server port (usually 587 or 465)", "yatra")}
             >
               <Input
                 id="smtp_port"

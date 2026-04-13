@@ -113,8 +113,7 @@ export const useToggleModule = () => {
           (m) => m.slug === "dynamic_form_field",
         );
         window.yatraAdmin.showGoogleCalendarSettingsUI = enabledModules.some(
-          (m) =>
-            m.slug === "google_calendar" || m.slug === "google-calendar",
+          (m) => m.slug === "google_calendar" || m.slug === "google-calendar",
         );
         window.yatraAdmin.advancedDiscountEnabled = enabledModules.some(
           (m) =>
@@ -218,8 +217,7 @@ export const useBulkToggleModules = () => {
           (m) => m.slug === "dynamic_form_field",
         );
         window.yatraAdmin.showGoogleCalendarSettingsUI = enabledModules.some(
-          (m) =>
-            m.slug === "google_calendar" || m.slug === "google-calendar",
+          (m) => m.slug === "google_calendar" || m.slug === "google-calendar",
         );
         window.yatraAdmin.advancedDiscountEnabled = enabledModules.some(
           (m) =>

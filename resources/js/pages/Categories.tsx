@@ -175,7 +175,7 @@ export const Categories: React.FC = () => {
       ...visibleColumns,
       [columnKey]: !visibleColumns[columnKey],
     };
-    
+
     setVisibleColumns(newVisibleColumns);
     localStorage.setItem(
       "yatra_categories_columns_v2",
@@ -584,173 +584,182 @@ export const Categories: React.FC = () => {
     sortOrder !== "asc";
 
   // Define columns for the shared table
-  const columns = useMemo(() => [
-    {
-      key: "name",
-      label: __("Name", "yatra"),
-      sortable: true,
-      visible: visibleColumns.name,
-      render: (category: Category) => {
-        const editUrl = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories&action=edit&id=${category.id}`;
-        return (
-          <div className="flex items-start gap-2">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1">
-                <a
-                  href={editUrl}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleEdit(category);
-                  }}
-                  className="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline-offset-2 hover:underline truncate"
-                >
-                  {category.name}
-                </a>
-                {can("yatra_view_trips") && category.status !== "trash" && (
-                  <button
-                    type="button"
+  const columns = useMemo(
+    () => [
+      {
+        key: "name",
+        label: __("Name", "yatra"),
+        sortable: true,
+        visible: visibleColumns.name,
+        render: (category: Category) => {
+          const editUrl = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories&action=edit&id=${category.id}`;
+          return (
+            <div className="flex items-start gap-2">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1">
+                  <a
+                    href={editUrl}
                     onClick={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
-                      handleView(category);
+                      handleEdit(category);
                     }}
-                    className="ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
-                    title={__("View category in new tab", "yatra")}
+                    className="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline-offset-2 hover:underline truncate"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
-                {category.slug}
-                <span className="ml-1 text-[11px] text-gray-400 dark:text-gray-500">
-                  (ID: {category.id})
-                </span>
+                    {category.name}
+                  </a>
+                  {can("yatra_view_trips") && category.status !== "trash" && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleView(category);
+                      }}
+                      className="ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
+                      title={__("View category in new tab", "yatra")}
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                  {category.slug}
+                  <span className="ml-1 text-[11px] text-gray-400 dark:text-gray-500">
+                    (ID: {category.id})
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        );
+          );
+        },
       },
-    },
-    {
-      key: "trips",
-      label: __("Trips", "yatra"),
-      visible: visibleColumns.trips,
-      render: (category: Category) => (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-          {typeof category.trip_count === "number" ? category.trip_count : 0}
-        </span>
-      ),
-    },
-    {
-      key: "description",
-      label: __("Description", "yatra"),
-      visible: visibleColumns.description,
-      render: (category: Category) => (
-        <span
-          className={`block max-w-[300px] truncate ${
-            category.status === "trash" || statusFilter === "trash"
-              ? "text-gray-400 dark:text-gray-600"
-              : "text-gray-600 dark:text-gray-400"
-          }`}
-          title={category.description || ""}
-        >
-          {category.description || __("No description", "yatra")}
-        </span>
-      ),
-    },
-    {
-      key: "seo_title",
-      label: __("SEO Title", "yatra"),
-      visible: visibleColumns.seo_title,
-      render: (category: Category) => {
-        return (
-          <span
-            className={
-              category.status === "trash"
-                ? "text-gray-400 dark:text-gray-600"
-                : "text-gray-600 dark:text-gray-400"
-            }
-          >
-            {category.metadata?.seo_title || __("Not set", "yatra")}
+      {
+        key: "trips",
+        label: __("Trips", "yatra"),
+        visible: visibleColumns.trips,
+        render: (category: Category) => (
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+            {typeof category.trip_count === "number" ? category.trip_count : 0}
           </span>
-        );
+        ),
       },
-    },
-    {
-      key: "seo_description",
-      label: __("SEO Description", "yatra"),
-      visible: visibleColumns.seo_description,
-      render: (category: Category) => {
-        return (
+      {
+        key: "description",
+        label: __("Description", "yatra"),
+        visible: visibleColumns.description,
+        render: (category: Category) => (
           <span
-            className={
-              category.status === "trash"
+            className={`block max-w-[300px] truncate ${
+              category.status === "trash" || statusFilter === "trash"
                 ? "text-gray-400 dark:text-gray-600"
                 : "text-gray-600 dark:text-gray-400"
-            }
-            title={category.metadata?.seo_description || ""}
+            }`}
+            title={category.description || ""}
           >
-            {category.metadata?.seo_description 
-              ? (category.metadata.seo_description.length > 50 
+            {category.description || __("No description", "yatra")}
+          </span>
+        ),
+      },
+      {
+        key: "seo_title",
+        label: __("SEO Title", "yatra"),
+        visible: visibleColumns.seo_title,
+        render: (category: Category) => {
+          return (
+            <span
+              className={
+                category.status === "trash"
+                  ? "text-gray-400 dark:text-gray-600"
+                  : "text-gray-600 dark:text-gray-400"
+              }
+            >
+              {category.metadata?.seo_title || __("Not set", "yatra")}
+            </span>
+          );
+        },
+      },
+      {
+        key: "seo_description",
+        label: __("SEO Description", "yatra"),
+        visible: visibleColumns.seo_description,
+        render: (category: Category) => {
+          return (
+            <span
+              className={
+                category.status === "trash"
+                  ? "text-gray-400 dark:text-gray-600"
+                  : "text-gray-600 dark:text-gray-400"
+              }
+              title={category.metadata?.seo_description || ""}
+            >
+              {category.metadata?.seo_description
+                ? category.metadata.seo_description.length > 50
                   ? category.metadata.seo_description.substring(0, 50) + "..."
-                  : category.metadata.seo_description)
-              : __("Not set", "yatra")}
-          </span>
-        );
+                  : category.metadata.seo_description
+                : __("Not set", "yatra")}
+            </span>
+          );
+        },
       },
-    },
-    {
-      key: "seo_keywords",
-      label: __("SEO Keywords", "yatra"),
-      visible: visibleColumns.seo_keywords,
-      render: (category: Category) => {
-        return (
-          <span
-            className={
-              category.status === "trash"
-                ? "text-gray-400 dark:text-gray-600"
-                : "text-gray-600 dark:text-gray-400"
-            }
-            title={category.metadata?.seo_keywords || ""}
-          >
-            {category.metadata?.seo_keywords 
-              ? (category.metadata.seo_keywords.length > 30 
+      {
+        key: "seo_keywords",
+        label: __("SEO Keywords", "yatra"),
+        visible: visibleColumns.seo_keywords,
+        render: (category: Category) => {
+          return (
+            <span
+              className={
+                category.status === "trash"
+                  ? "text-gray-400 dark:text-gray-600"
+                  : "text-gray-600 dark:text-gray-400"
+              }
+              title={category.metadata?.seo_keywords || ""}
+            >
+              {category.metadata?.seo_keywords
+                ? category.metadata.seo_keywords.length > 30
                   ? category.metadata.seo_keywords.substring(0, 30) + "..."
-                  : category.metadata.seo_keywords)
-              : __("Not set", "yatra")}
-          </span>
-        );
+                  : category.metadata.seo_keywords
+                : __("Not set", "yatra")}
+            </span>
+          );
+        },
       },
-    },
-    {
-      key: "status",
-      label: __("Status", "yatra"),
-      sortable: true,
-      visible: visibleColumns.status,
-      render: (category: Category) => {
-        return (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            category.status === 'publish' 
-              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-              : category.status === 'draft'
-              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
-              : 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
-          }`}>
-            {category.status === 'publish' ? __('Published', 'yatra') : 
-             category.status === 'draft' ? __('Draft', 'yatra') : 
-             category.status === 'trash' ? __('Trash', 'yatra') : category.status}
-          </span>
-        );
+      {
+        key: "status",
+        label: __("Status", "yatra"),
+        sortable: true,
+        visible: visibleColumns.status,
+        render: (category: Category) => {
+          return (
+            <span
+              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                category.status === "publish"
+                  ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                  : category.status === "draft"
+                    ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
+                    : "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300"
+              }`}
+            >
+              {category.status === "publish"
+                ? __("Published", "yatra")
+                : category.status === "draft"
+                  ? __("Draft", "yatra")
+                  : category.status === "trash"
+                    ? __("Trash", "yatra")
+                    : category.status}
+            </span>
+          );
+        },
       },
-    },
-    {
-      key: "created_at",
-      label: __("Created", "yatra"),
-      sortable: true,
-      visible: visibleColumns.created_at,
-    },
-  ], [visibleColumns]);
+      {
+        key: "created_at",
+        label: __("Created", "yatra"),
+        sortable: true,
+        visible: visibleColumns.created_at,
+      },
+    ],
+    [visibleColumns],
+  );
 
   // Status mutation for individual actions
   const statusMutation = useMutation({
@@ -859,12 +868,12 @@ export const Categories: React.FC = () => {
     isChild = false,
   ): React.ReactNode[] => {
     // Get visible columns and render their content
-    const visibleColumns = columns.filter(col => col.visible !== false);
-    
-    return visibleColumns.map(column => {
+    const visibleColumns = columns.filter((col) => col.visible !== false);
+
+    return visibleColumns.map((column) => {
       // Handle each column based on its key
       switch (column.key) {
-        case 'name':
+        case "name":
           return (
             <div className="flex items-center gap-2">
               {renderIcon(category.icon)}
@@ -905,40 +914,44 @@ export const Categories: React.FC = () => {
               </div>
             </div>
           );
-        
-        case 'trips':
+
+        case "trips":
           return (
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-              {typeof category.trip_count === "number" ? category.trip_count : 0}
+              {typeof category.trip_count === "number"
+                ? category.trip_count
+                : 0}
             </span>
           );
-        
-        case 'description':
+
+        case "description":
           return (
             <div className="max-w-xs truncate text-sm text-gray-600 dark:text-gray-400">
               {category.description || "—"}
             </div>
           );
-        
-        case 'status':
+
+        case "status":
           return getStatusBadge(category.status);
-        
-        case 'created_at':
+
+        case "created_at":
           return (
             <span className="text-sm text-gray-600 dark:text-gray-400">
               {formatDate(category.created_at)}
             </span>
           );
-        
+
         // SEO columns - use their render functions
-        case 'seo_title':
-        case 'seo_description':
-        case 'seo_keywords':
+        case "seo_title":
+        case "seo_description":
+        case "seo_keywords":
           return column.render ? column.render(category) : null;
-        
+
         default:
           // Fallback for any other columns
-          return column.render ? column.render(category) : (category as any)[column.key];
+          return column.render
+            ? column.render(category)
+            : (category as any)[column.key];
       }
     });
   };
@@ -1134,7 +1147,7 @@ export const Categories: React.FC = () => {
       <Card>
         <CardContent className="p-0">
           {null}
-          
+
           <SharedTable
             key={`categories-table-${JSON.stringify(visibleColumns)}`}
             data={processedCategories}

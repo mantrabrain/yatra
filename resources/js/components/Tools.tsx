@@ -175,12 +175,12 @@ const Tools: React.FC = () => {
   const [showMigrationConfirm, setShowMigrationConfirm] = useState(false);
   const [showMigrationCompleteNotice, setShowMigrationCompleteNotice] =
     useState(true);
-  
+
   // Sample Data states
   const [isImportingSampleData, setIsImportingSampleData] = useState(false);
   const [sampleDataStatus, setSampleDataStatus] = useState<any>(null);
   const [sampleDataJob, setSampleDataJob] = useState<any>(null);
-  
+
   const { showToast } = useToast();
 
   // Deep-link from WP admin notice: admin.php?page=yatra&subpage=tools&tools_tab=migration
@@ -453,9 +453,7 @@ const Tools: React.FC = () => {
   // Handle data type selection for export
   const handleExportDataToggle = (dataType: string) => {
     if (dataType === "all") {
-      setSelectedExportData((prev) =>
-        prev.includes("all") ? [] : ["all"],
-      );
+      setSelectedExportData((prev) => (prev.includes("all") ? [] : ["all"]));
       return;
     }
     setSelectedExportData((prev) => {
@@ -486,9 +484,7 @@ const Tools: React.FC = () => {
   // Handle data type selection for import
   const handleImportDataToggle = (dataType: string) => {
     if (dataType === "all") {
-      setSelectedImportData((prev) =>
-        prev.includes("all") ? [] : ["all"],
-      );
+      setSelectedImportData((prev) => (prev.includes("all") ? [] : ["all"]));
       return;
     }
     setSelectedImportData((prev) => {
@@ -826,13 +822,13 @@ const Tools: React.FC = () => {
 
       if (response.success) {
         setSampleDataJob({ ...response.data, progress: 100 });
-        
+
         // Show detailed success message with counts
         const data = response.data || {};
         const message = `Successfully imported: ${data.trips || 0} trips, ${data.classifications || 0} classifications, ${data.items || 0} items, ${data.trip_classifications || 0} trip assignments, ${data.discounts || 0} discounts, ${data.availability_dates || 0} availability dates, ${data.availability_rules || 0} rules, ${data.itinerary_days || 0} itinerary days, ${data.itinerary_entries || 0} itinerary entries`;
-        
+
         showToast(message, "success");
-        
+
         // Refresh sample data status
         const statusResponse = await apiService.getSampleDataStatus();
         setSampleDataStatus(statusResponse);
@@ -841,7 +837,10 @@ const Tools: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Sample data import error:", error);
-      showToast(error.message || __("Failed to import sample data. Please try again."), "error");
+      showToast(
+        error.message || __("Failed to import sample data. Please try again."),
+        "error",
+      );
     } finally {
       setIsImportingSampleData(false);
       setTimeout(() => setSampleDataJob(null), 3000);
@@ -1640,7 +1639,9 @@ const Tools: React.FC = () => {
                 </div>
               </div>
               <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-                Quickly populate your Yatra site with sample trips, categories, destinations, and more. Perfect for testing and demonstration purposes.
+                Quickly populate your Yatra site with sample trips, categories,
+                destinations, and more. Perfect for testing and demonstration
+                purposes.
               </p>
 
               {/* What Will Be Imported */}
@@ -2225,7 +2226,7 @@ const Tools: React.FC = () => {
                   </p>
                 </div>
               </div>
-              
+
               {/* Action Buttons */}
               {migrationStatus?.has_old_data && (
                 <div className="flex items-center gap-2">
@@ -2243,12 +2244,17 @@ const Tools: React.FC = () => {
                       loadMigrationStatus();
                       if (isMigrating) loadMigrationProgress();
                     }}
-                    disabled={(isMigrating || isStartingMigration) && !migrationProgress?.all_complete}
+                    disabled={
+                      (isMigrating || isStartingMigration) &&
+                      !migrationProgress?.all_complete
+                    }
                   >
-                    <RefreshCw className={`w-4 h-4 mr-2 ${isMigrating && !migrationProgress?.all_complete ? "animate-spin" : ""}`} />
+                    <RefreshCw
+                      className={`w-4 h-4 mr-2 ${isMigrating && !migrationProgress?.all_complete ? "animate-spin" : ""}`}
+                    />
                     Refresh
                   </Button>
-                  
+
                   {isMigrating && !migrationProgress?.all_complete && (
                     <Button
                       variant="destructive"
@@ -2259,7 +2265,7 @@ const Tools: React.FC = () => {
                       Cancel
                     </Button>
                   )}
-                  
+
                   {!isMigrating && (
                     <Button
                       onClick={() => setShowMigrationConfirm(true)}
@@ -2268,7 +2274,10 @@ const Tools: React.FC = () => {
                       disabled={isStartingMigration}
                     >
                       <Database className="w-4 h-4 mr-2" />
-                      {migrationProgress?.all_complete && migrationProgress?.started_at ? 'Migrate Again' : 'Start Migration'}
+                      {migrationProgress?.all_complete &&
+                      migrationProgress?.started_at
+                        ? "Migrate Again"
+                        : "Start Migration"}
                     </Button>
                   )}
                 </div>
@@ -2337,30 +2346,32 @@ const Tools: React.FC = () => {
             ) : migrationStatus?.has_old_data ? (
               <div className="space-y-6">
                 {/* Migration Completion Notice */}
-                {migrationProgress?.all_complete && migrationProgress?.started_at && Object.keys(migrationProgress.progress || {}).length > 0 && (
-                  <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
-                      <div className="flex-1">
-                        <h4 className="font-medium text-green-900 dark:text-green-300">
-                          Migration Completed Successfully!
-                        </h4>
-                        <p className="text-sm text-green-700 dark:text-green-400 mt-1">
-                          All data has been migrated from Yatra 2.x to 3.0
-                        </p>
+                {migrationProgress?.all_complete &&
+                  migrationProgress?.started_at &&
+                  Object.keys(migrationProgress.progress || {}).length > 0 && (
+                    <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
+                        <div className="flex-1">
+                          <h4 className="font-medium text-green-900 dark:text-green-300">
+                            Migration Completed Successfully!
+                          </h4>
+                          <p className="text-sm text-green-700 dark:text-green-400 mt-1">
+                            All data has been migrated from Yatra 2.x to 3.0
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setIsMigrating(false);
+                            setMigrationProgress(null);
+                          }}
+                          className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
                       </div>
-                      <button
-                        onClick={() => {
-                          setIsMigrating(false);
-                          setMigrationProgress(null);
-                        }}
-                        className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {/* Advanced Progress Bar (only show during migration) */}
                 {(isMigrating || isStartingMigration) &&
@@ -2383,247 +2394,299 @@ const Tools: React.FC = () => {
                     </div>
                   )}
 
-                {migrationProgress && !migrationProgress.all_complete && migrationProgress.started_at && Object.keys(migrationProgress.progress || {}).length > 0 && (
-                  <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <RefreshCw className="w-5 h-5 text-blue-600 dark:text-blue-400 animate-spin" />
-                        <span className="font-medium text-blue-900 dark:text-blue-300">
-                          Migration in Progress
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setIsMigrating(false);
-                          setMigrationProgress(null);
-                        }}
-                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                    
-                    {/* Overall Progress Bar */}
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between text-sm mb-2">
-                        <span className="text-gray-700 dark:text-gray-300">Overall Progress</span>
-                        <span className="font-medium text-gray-900 dark:text-white">
-                          {(() => {
-                            const total = Object.values(migrationProgress.progress || {}).reduce(
-                              (sum: number, p: any) => sum + (p.total || 0),
-                              0
-                            );
-                            const processed = Object.values(migrationProgress.progress || {}).reduce(
-                              (sum: number, p: any) =>
-                                sum + (p.migrated || 0) + (p.skipped || 0) + (p.failed || 0),
-                              0
-                            );
-                            return total > 0 ? Math.round((processed / total) * 100) : 0;
-                          })()}%
-                        </span>
-                      </div>
-                      <div className="w-full bg-blue-200 dark:bg-blue-800 rounded-full h-3 overflow-hidden">
-                        <div
-                          className="h-full bg-blue-600 dark:bg-blue-400 transition-all duration-500"
-                          style={{
-                            width: `${
-                              (() => {
-                                const total = Object.values(migrationProgress.progress || {}).reduce(
-                                  (sum: number, p: any) => sum + (p.total || 0),
-                                  0
-                                );
-                                const processed = Object.values(migrationProgress.progress || {}).reduce(
-                                  (sum: number, p: any) =>
-                                    sum + (p.migrated || 0) + (p.skipped || 0) + (p.failed || 0),
-                                  0
-                                );
-                                return total > 0 ? Math.round((processed / total) * 100) : 0;
-                              })()
-                            }%`
+                {migrationProgress &&
+                  !migrationProgress.all_complete &&
+                  migrationProgress.started_at &&
+                  Object.keys(migrationProgress.progress || {}).length > 0 && (
+                    <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <RefreshCw className="w-5 h-5 text-blue-600 dark:text-blue-400 animate-spin" />
+                          <span className="font-medium text-blue-900 dark:text-blue-300">
+                            Migration in Progress
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setIsMigrating(false);
+                            setMigrationProgress(null);
                           }}
-                        />
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      {/* Overall Progress Bar */}
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between text-sm mb-2">
+                          <span className="text-gray-700 dark:text-gray-300">
+                            Overall Progress
+                          </span>
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            {(() => {
+                              const total = Object.values(
+                                migrationProgress.progress || {},
+                              ).reduce(
+                                (sum: number, p: any) => sum + (p.total || 0),
+                                0,
+                              );
+                              const processed = Object.values(
+                                migrationProgress.progress || {},
+                              ).reduce(
+                                (sum: number, p: any) =>
+                                  sum +
+                                  (p.migrated || 0) +
+                                  (p.skipped || 0) +
+                                  (p.failed || 0),
+                                0,
+                              );
+                              return total > 0
+                                ? Math.round((processed / total) * 100)
+                                : 0;
+                            })()}
+                            %
+                          </span>
+                        </div>
+                        <div className="w-full bg-blue-200 dark:bg-blue-800 rounded-full h-3 overflow-hidden">
+                          <div
+                            className="h-full bg-blue-600 dark:bg-blue-400 transition-all duration-500"
+                            style={{
+                              width: `${(() => {
+                                const total = Object.values(
+                                  migrationProgress.progress || {},
+                                ).reduce(
+                                  (sum: number, p: any) => sum + (p.total || 0),
+                                  0,
+                                );
+                                const processed = Object.values(
+                                  migrationProgress.progress || {},
+                                ).reduce(
+                                  (sum: number, p: any) =>
+                                    sum +
+                                    (p.migrated || 0) +
+                                    (p.skipped || 0) +
+                                    (p.failed || 0),
+                                  0,
+                                );
+                                return total > 0
+                                  ? Math.round((processed / total) * 100)
+                                  : 0;
+                              })()}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Detailed Breakdown by Data Type */}
+                      <div className="space-y-3">
+                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Progress by Data Type
+                        </h5>
+                        {Object.entries(migrationProgress.progress || {}).map(
+                          ([key, progress]: [string, any]) => {
+                            const dataInfo = migrationStatus?.old_data?.[key];
+                            if (!dataInfo || progress.total === 0) return null;
+
+                            const percentage =
+                              progress.total > 0
+                                ? Math.round(
+                                    (((progress.migrated || 0) +
+                                      (progress.skipped || 0) +
+                                      (progress.failed || 0)) /
+                                      progress.total) *
+                                      100,
+                                  )
+                                : 0;
+
+                            return (
+                              <div
+                                key={key}
+                                className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700"
+                              >
+                                <div className="flex items-center justify-between mb-2">
+                                  <div className="flex items-center gap-2">
+                                    {progress.status === "running" ? (
+                                      <RefreshCw className="w-4 h-4 text-blue-600 dark:text-blue-400 animate-spin" />
+                                    ) : progress.status === "completed" ? (
+                                      <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                                    ) : (
+                                      <div className="w-4 h-4 rounded-full border-2 border-gray-300 dark:border-gray-600" />
+                                    )}
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                      {dataInfo.label}
+                                    </span>
+                                  </div>
+                                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                                    {(progress.migrated || 0) +
+                                      (progress.skipped || 0) +
+                                      (progress.failed || 0)}
+                                    /{progress.total}
+                                  </span>
+                                </div>
+
+                                {/* Individual Progress Bar */}
+                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden mb-2">
+                                  <div
+                                    className={`h-full transition-all duration-300 ${
+                                      progress.status === "completed"
+                                        ? "bg-green-500"
+                                        : progress.status === "running"
+                                          ? "bg-blue-500"
+                                          : "bg-gray-400"
+                                    }`}
+                                    style={{ width: `${percentage}%` }}
+                                  />
+                                </div>
+
+                                {/* Stats */}
+                                {(progress.migrated || 0) +
+                                  (progress.skipped || 0) +
+                                  (progress.failed || 0) >
+                                  0 && (
+                                  <div className="flex items-center gap-3 text-xs">
+                                    {progress.migrated > 0 && (
+                                      <span className="text-green-600 dark:text-green-400">
+                                        ✓ {progress.migrated} migrated
+                                      </span>
+                                    )}
+                                    {progress.skipped > 0 && (
+                                      <span className="text-yellow-600 dark:text-yellow-400">
+                                        ⊘ {progress.skipped} skipped
+                                      </span>
+                                    )}
+                                    {progress.failed > 0 && (
+                                      <span className="text-red-600 dark:text-red-400">
+                                        ✗ {progress.failed} failed
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          },
+                        )}
                       </div>
                     </div>
-
-                    {/* Detailed Breakdown by Data Type */}
-                    <div className="space-y-3">
-                      <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Progress by Data Type
-                      </h5>
-                      {Object.entries(migrationProgress.progress || {}).map(([key, progress]: [string, any]) => {
-                        const dataInfo = migrationStatus?.old_data?.[key];
-                        if (!dataInfo || progress.total === 0) return null;
-                        
-                        const percentage = progress.total > 0
-                          ? Math.round(
-                              (((progress.migrated || 0) + (progress.skipped || 0) + (progress.failed || 0)) /
-                                progress.total) *
-                                100
-                            )
-                          : 0;
-                        
-                        return (
-                          <div key={key} className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center gap-2">
-                                {progress.status === 'running' ? (
-                                  <RefreshCw className="w-4 h-4 text-blue-600 dark:text-blue-400 animate-spin" />
-                                ) : progress.status === 'completed' ? (
-                                  <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
-                                ) : (
-                                  <div className="w-4 h-4 rounded-full border-2 border-gray-300 dark:border-gray-600" />
-                                )}
-                                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                                  {dataInfo.label}
-                                </span>
-                              </div>
-                              <span className="text-sm text-gray-600 dark:text-gray-400">
-                                {(progress.migrated || 0) + (progress.skipped || 0) + (progress.failed || 0)}/{progress.total}
-                              </span>
-                            </div>
-                            
-                            {/* Individual Progress Bar */}
-                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden mb-2">
-                              <div
-                                className={`h-full transition-all duration-300 ${
-                                  progress.status === 'completed'
-                                    ? 'bg-green-500'
-                                    : progress.status === 'running'
-                                      ? 'bg-blue-500'
-                                      : 'bg-gray-400'
-                                }`}
-                                style={{ width: `${percentage}%` }}
-                              />
-                            </div>
-                            
-                            {/* Stats */}
-                            {((progress.migrated || 0) + (progress.skipped || 0) + (progress.failed || 0)) > 0 && (
-                              <div className="flex items-center gap-3 text-xs">
-                                {progress.migrated > 0 && (
-                                  <span className="text-green-600 dark:text-green-400">
-                                    ✓ {progress.migrated} migrated
-                                  </span>
-                                )}
-                                {progress.skipped > 0 && (
-                                  <span className="text-yellow-600 dark:text-yellow-400">
-                                    ⊘ {progress.skipped} skipped
-                                  </span>
-                                )}
-                                {progress.failed > 0 && (
-                                  <span className="text-red-600 dark:text-red-400">
-                                    ✗ {progress.failed} failed
-                                  </span>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+                  )}
 
                 {/* Migration Summary (show after completion) */}
-                {migrationProgress?.all_complete && migrationProgress?.started_at && Object.keys(migrationProgress.progress || {}).length > 0 && (() => {
-                  const totalMigrated = Object.values(migrationProgress.progress || {}).reduce(
-                    (sum: number, p: any) => sum + (p.migrated || 0),
-                    0
-                  );
-                  const totalSkipped = Object.values(migrationProgress.progress || {}).reduce(
-                    (sum: number, p: any) => sum + (p.skipped || 0),
-                    0
-                  );
-                  const totalFailed = Object.values(migrationProgress.progress || {}).reduce(
-                    (sum: number, p: any) => sum + (p.failed || 0),
-                    0
-                  );
-                  
-                  return (
-                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="font-medium text-gray-900 dark:text-white">
-                          Migration Summary
-                        </h4>
-                        <div className="flex items-center gap-3 text-sm">
-                          <span className="text-green-600 dark:text-green-400">
-                            ✓ {totalMigrated} migrated
-                          </span>
-                          {totalSkipped > 0 && (
-                            <span className="text-yellow-600 dark:text-yellow-400">
-                              ⊘ {totalSkipped} skipped
+                {migrationProgress?.all_complete &&
+                  migrationProgress?.started_at &&
+                  Object.keys(migrationProgress.progress || {}).length > 0 &&
+                  (() => {
+                    const totalMigrated = Object.values(
+                      migrationProgress.progress || {},
+                    ).reduce(
+                      (sum: number, p: any) => sum + (p.migrated || 0),
+                      0,
+                    );
+                    const totalSkipped = Object.values(
+                      migrationProgress.progress || {},
+                    ).reduce(
+                      (sum: number, p: any) => sum + (p.skipped || 0),
+                      0,
+                    );
+                    const totalFailed = Object.values(
+                      migrationProgress.progress || {},
+                    ).reduce((sum: number, p: any) => sum + (p.failed || 0), 0);
+
+                    return (
+                      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="font-medium text-gray-900 dark:text-white">
+                            Migration Summary
+                          </h4>
+                          <div className="flex items-center gap-3 text-sm">
+                            <span className="text-green-600 dark:text-green-400">
+                              ✓ {totalMigrated} migrated
                             </span>
-                          )}
-                          {totalFailed > 0 && (
-                            <span className="text-red-600 dark:text-red-400">
-                              ✗ {totalFailed} failed
-                            </span>
+                            {totalSkipped > 0 && (
+                              <span className="text-yellow-600 dark:text-yellow-400">
+                                ⊘ {totalSkipped} skipped
+                              </span>
+                            )}
+                            {totalFailed > 0 && (
+                              <span className="text-red-600 dark:text-red-400">
+                                ✗ {totalFailed} failed
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          {Object.entries(migrationProgress.progress || {}).map(
+                            ([key, progress]: [string, any]) => {
+                              const dataInfo = migrationStatus?.old_data?.[key];
+
+                              if (!dataInfo) return null;
+
+                              const totalProcessed =
+                                (progress.migrated || 0) +
+                                (progress.skipped || 0) +
+                                (progress.failed || 0);
+                              if (totalProcessed === 0) return null;
+
+                              return (
+                                <div
+                                  key={key}
+                                  className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                                >
+                                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                                    {dataInfo.label}
+                                  </span>
+                                  <div className="flex items-center gap-3 text-xs">
+                                    {progress.migrated > 0 && (
+                                      <span className="text-green-600 dark:text-green-400">
+                                        ✓ {progress.migrated}
+                                      </span>
+                                    )}
+                                    {progress.skipped > 0 && (
+                                      <span className="text-yellow-600 dark:text-yellow-400">
+                                        ⊘ {progress.skipped}
+                                      </span>
+                                    )}
+                                    {progress.failed > 0 && (
+                                      <span className="text-red-600 dark:text-red-400">
+                                        ✗ {progress.failed}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            },
                           )}
                         </div>
                       </div>
-                      <div className="space-y-2">
-                        {Object.entries(migrationProgress.progress || {}).map(([key, progress]: [string, any]) => {
-                          const dataInfo = migrationStatus?.old_data?.[key];
-                          
-                          if (!dataInfo) return null;
-                          
-                          const totalProcessed = (progress.migrated || 0) + (progress.skipped || 0) + (progress.failed || 0);
-                          if (totalProcessed === 0) return null;
-                          
-                          return (
-                            <div key={key} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
-                              <span className="text-sm text-gray-700 dark:text-gray-300">
-                                {dataInfo.label}
-                              </span>
-                              <div className="flex items-center gap-3 text-xs">
-                                {progress.migrated > 0 && (
-                                  <span className="text-green-600 dark:text-green-400">
-                                    ✓ {progress.migrated}
-                                  </span>
-                                )}
-                                {progress.skipped > 0 && (
-                                  <span className="text-yellow-600 dark:text-yellow-400">
-                                    ⊘ {progress.skipped}
-                                  </span>
-                                )}
-                                {progress.failed > 0 && (
-                                  <span className="text-red-600 dark:text-red-400">
-                                    ✗ {progress.failed}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })()}
+                    );
+                  })()}
 
                 {/* Data Type Cards - Simple Display */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {Object.entries(migrationStatus.old_data || {}).map(([key, data]: [string, any]) => (
-                    <div
-                      key={key}
-                      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-900 dark:text-white">
-                            {data.label}
-                          </h4>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            {data.description}
-                          </p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                            {data.table}
-                          </p>
+                  {Object.entries(migrationStatus.old_data || {}).map(
+                    ([key, data]: [string, any]) => (
+                      <div
+                        key={key}
+                        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-gray-900 dark:text-white">
+                              {data.label}
+                            </h4>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              {data.description}
+                            </p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                              {data.table}
+                            </p>
+                          </div>
+                          <Badge className="bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400">
+                            {data.count}
+                          </Badge>
                         </div>
-                        <Badge className="bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400">
-                          {data.count}
-                        </Badge>
                       </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               </div>
             ) : (

@@ -217,10 +217,7 @@ const AttributeForm: React.FC = () => {
   const addOptionRow = () => {
     setFormData((prev) => ({
       ...prev,
-      field_option_rows: [
-        ...prev.field_option_rows,
-        { label: "", value: "" },
-      ],
+      field_option_rows: [...prev.field_option_rows, { label: "", value: "" }],
     }));
   };
 
@@ -298,8 +295,7 @@ const AttributeForm: React.FC = () => {
       const built = formData.field_option_rows
         .map((r) => {
           const label = r.label.trim();
-          const value =
-            r.value.trim() || (label ? generateSlug(label) : "");
+          const value = r.value.trim() || (label ? generateSlug(label) : "");
           return { label, value };
         })
         .filter((r) => r.label !== "" && r.value !== "");
@@ -892,13 +888,14 @@ const AttributeForm: React.FC = () => {
                                       ],
                                     }));
                                   } else {
-                                    updateOptionRow(index, "label", e.target.value);
+                                    updateOptionRow(
+                                      index,
+                                      "label",
+                                      e.target.value,
+                                    );
                                   }
                                 }}
-                                placeholder={__(
-                                  "Display name",
-                                  "yatra",
-                                )}
+                                placeholder={__("Display name", "yatra")}
                               />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -919,7 +916,11 @@ const AttributeForm: React.FC = () => {
                                       ],
                                     }));
                                   } else {
-                                    updateOptionRow(index, "value", e.target.value);
+                                    updateOptionRow(
+                                      index,
+                                      "value",
+                                      e.target.value,
+                                    );
                                   }
                                 }}
                                 placeholder={__(

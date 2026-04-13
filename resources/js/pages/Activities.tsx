@@ -116,101 +116,106 @@ const Activities: React.FC = () => {
   const { showToast } = useToast();
 
   // Define columns for the shared table
-  const columns = useMemo(() => [
-    {
-      Header: __("Name", "yatra"),
-      accessor: "name",
-      Cell: ({ row }: any) => (
-        <div className="flex items-center">
-          <div className="text-sm font-medium text-gray-900">
-            {row.original.name}
+  const columns = useMemo(
+    () => [
+      {
+        Header: __("Name", "yatra"),
+        accessor: "name",
+        Cell: ({ row }: any) => (
+          <div className="flex items-center">
+            <div className="text-sm font-medium text-gray-900">
+              {row.original.name}
+            </div>
           </div>
-        </div>
-      ),
-    },
-    {
-      Header: __("Description", "yatra"),
-      accessor: "description",
-      Cell: ({ row }: any) => (
-        <div className="text-sm text-gray-500">{row.original.description}</div>
-      ),
-    },
-    {
-      Header: __("Trips", "yatra"),
-      accessor: "trip_count",
-      Cell: ({ row }: any) => (
-        <div className="text-sm text-gray-500">
-          {row.original.trip_count || 0}
-        </div>
-      ),
-    },
-    {
-      Header: __("Status", "yatra"),
-      accessor: "status",
-      Cell: ({ row }: any) => (
-        <div className="text-sm text-gray-500">{row.original.status}</div>
-      ),
-    },
-    {
-      Header: __("SEO Title", "yatra"),
-      accessor: "metadata.seo_title",
-      Cell: ({ row }: any) => (
-        <div className="text-sm text-gray-500">
-          {row.original.metadata?.seo_title || ""}
-        </div>
-      ),
-    },
-    {
-      Header: __("SEO Description", "yatra"),
-      accessor: "metadata.seo_description",
-      Cell: ({ row }: any) => (
-        <div className="text-sm text-gray-500">
-          {row.original.metadata?.seo_description || ""}
-        </div>
-      ),
-    },
-    {
-      Header: __("SEO Keywords", "yatra"),
-      accessor: "metadata.seo_keywords",
-      Cell: ({ row }: any) => (
-        <div className="text-sm text-gray-500">
-          {row.original.metadata?.seo_keywords || ""}
-        </div>
-      ),
-    },
-    {
-      Header: __("Created At", "yatra"),
-      accessor: "created_at",
-      Cell: ({ row }: any) => (
-        <div className="text-sm text-gray-500">{row.original.created_at}</div>
-      ),
-    },
-    {
-      Header: __("Updated At", "yatra"),
-      accessor: "updated_at",
-      Cell: ({ row }: any) => (
-        <div className="text-sm text-gray-500">{row.original.updated_at}</div>
-      ),
-    },
-    {
-      Header: __("Created By", "yatra"),
-      accessor: "created_by_name",
-      Cell: ({ row }: any) => (
-        <div className="text-sm text-gray-500">
-          {row.original.created_by_name || ""}
-        </div>
-      ),
-    },
-    {
-      Header: __("Updated By", "yatra"),
-      accessor: "updated_by_name",
-      Cell: ({ row }: any) => (
-        <div className="text-sm text-gray-500">
-          {row.original.updated_by_name || ""}
-        </div>
-      ),
-    },
-  ], [visibleColumns]);
+        ),
+      },
+      {
+        Header: __("Description", "yatra"),
+        accessor: "description",
+        Cell: ({ row }: any) => (
+          <div className="text-sm text-gray-500">
+            {row.original.description}
+          </div>
+        ),
+      },
+      {
+        Header: __("Trips", "yatra"),
+        accessor: "trip_count",
+        Cell: ({ row }: any) => (
+          <div className="text-sm text-gray-500">
+            {row.original.trip_count || 0}
+          </div>
+        ),
+      },
+      {
+        Header: __("Status", "yatra"),
+        accessor: "status",
+        Cell: ({ row }: any) => (
+          <div className="text-sm text-gray-500">{row.original.status}</div>
+        ),
+      },
+      {
+        Header: __("SEO Title", "yatra"),
+        accessor: "metadata.seo_title",
+        Cell: ({ row }: any) => (
+          <div className="text-sm text-gray-500">
+            {row.original.metadata?.seo_title || ""}
+          </div>
+        ),
+      },
+      {
+        Header: __("SEO Description", "yatra"),
+        accessor: "metadata.seo_description",
+        Cell: ({ row }: any) => (
+          <div className="text-sm text-gray-500">
+            {row.original.metadata?.seo_description || ""}
+          </div>
+        ),
+      },
+      {
+        Header: __("SEO Keywords", "yatra"),
+        accessor: "metadata.seo_keywords",
+        Cell: ({ row }: any) => (
+          <div className="text-sm text-gray-500">
+            {row.original.metadata?.seo_keywords || ""}
+          </div>
+        ),
+      },
+      {
+        Header: __("Created At", "yatra"),
+        accessor: "created_at",
+        Cell: ({ row }: any) => (
+          <div className="text-sm text-gray-500">{row.original.created_at}</div>
+        ),
+      },
+      {
+        Header: __("Updated At", "yatra"),
+        accessor: "updated_at",
+        Cell: ({ row }: any) => (
+          <div className="text-sm text-gray-500">{row.original.updated_at}</div>
+        ),
+      },
+      {
+        Header: __("Created By", "yatra"),
+        accessor: "created_by_name",
+        Cell: ({ row }: any) => (
+          <div className="text-sm text-gray-500">
+            {row.original.created_by_name || ""}
+          </div>
+        ),
+      },
+      {
+        Header: __("Updated By", "yatra"),
+        accessor: "updated_by_name",
+        Cell: ({ row }: any) => (
+          <div className="text-sm text-gray-500">
+            {row.original.updated_by_name || ""}
+          </div>
+        ),
+      },
+    ],
+    [visibleColumns],
+  );
 
   // Toggle column visibility
   const toggleColumn = (columnKey: string) => {
@@ -863,10 +868,13 @@ const Activities: React.FC = () => {
                         }
                         title={activity.metadata?.seo_description || ""}
                       >
-                        {activity.metadata?.seo_description 
-                          ? (activity.metadata.seo_description.length > 50 
-                              ? activity.metadata.seo_description.substring(0, 50) + "..."
-                              : activity.metadata.seo_description)
+                        {activity.metadata?.seo_description
+                          ? activity.metadata.seo_description.length > 50
+                            ? activity.metadata.seo_description.substring(
+                                0,
+                                50,
+                              ) + "..."
+                            : activity.metadata.seo_description
                           : __("Not set", "yatra")}
                       </span>
                     ),
@@ -885,10 +893,11 @@ const Activities: React.FC = () => {
                         }
                         title={activity.metadata?.seo_keywords || ""}
                       >
-                        {activity.metadata?.seo_keywords 
-                          ? (activity.metadata.seo_keywords.length > 30 
-                              ? activity.metadata.seo_keywords.substring(0, 30) + "..."
-                              : activity.metadata.seo_keywords)
+                        {activity.metadata?.seo_keywords
+                          ? activity.metadata.seo_keywords.length > 30
+                            ? activity.metadata.seo_keywords.substring(0, 30) +
+                              "..."
+                            : activity.metadata.seo_keywords
                           : __("Not set", "yatra")}
                       </span>
                     ),

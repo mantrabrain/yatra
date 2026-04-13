@@ -774,7 +774,6 @@ const ViewBooking: React.FC = () => {
                     {__("Payment Summary", "yatra")}
                   </h4>
                   <div className="space-y-2">
-                                        
                     {/* Gross Total */}
                     <div className="flex justify-between text-sm">
                       <span className="font-bold text-gray-900 dark:text-white">
@@ -791,22 +790,27 @@ const ViewBooking: React.FC = () => {
                     {/* Itinerary Costs */}
                     {(() => {
                       const itineraryCosts = (booking as any).itinerary_costs;
-                      const itineraryCostsTotal = parseFloat((booking as any).itinerary_costs_total || 0);
-                      
+                      const itineraryCostsTotal = parseFloat(
+                        (booking as any).itinerary_costs_total || 0,
+                      );
+
                       if (itineraryCostsTotal > 0) {
                         let costs = [];
-                        
+
                         // Try to parse itinerary_costs if it's a string
-                        if (typeof itineraryCosts === 'string') {
+                        if (typeof itineraryCosts === "string") {
                           try {
                             costs = JSON.parse(itineraryCosts);
                           } catch (e) {
-                            console.error('Failed to parse itinerary_costs:', e);
+                            console.error(
+                              "Failed to parse itinerary_costs:",
+                              e,
+                            );
                           }
                         } else if (Array.isArray(itineraryCosts)) {
                           costs = itineraryCosts;
                         }
-                        
+
                         if (costs.length > 0) {
                           return (
                             <>
@@ -816,12 +820,22 @@ const ViewBooking: React.FC = () => {
                                 </span>
                               </div>
                               {costs.map((cost: any, index: number) => (
-                                <div key={index} className="flex justify-between text-sm ml-4">
+                                <div
+                                  key={index}
+                                  className="flex justify-between text-sm ml-4"
+                                >
                                   <span className="text-gray-600 dark:text-gray-400">
-                                    {cost.name} ({cost.price_per === 'person' ? 'per person' : 'per group'})
+                                    {cost.name} (
+                                    {cost.price_per === "person"
+                                      ? "per person"
+                                      : "per group"}
+                                    )
                                   </span>
                                   <span className="text-gray-900 dark:text-white">
-                                    {formatPrice(cost.total_cost, booking.currency)}
+                                    {formatPrice(
+                                      cost.total_cost,
+                                      booking.currency,
+                                    )}
                                   </span>
                                 </div>
                               ))}
@@ -830,7 +844,10 @@ const ViewBooking: React.FC = () => {
                                   {__("Itinerary Costs Total", "yatra")}
                                 </span>
                                 <span className="text-gray-900 dark:text-white">
-                                  {formatPrice(itineraryCostsTotal, booking.currency)}
+                                  {formatPrice(
+                                    itineraryCostsTotal,
+                                    booking.currency,
+                                  )}
                                 </span>
                               </div>
                             </>
@@ -843,28 +860,33 @@ const ViewBooking: React.FC = () => {
                                 {__("Itinerary Costs", "yatra")}
                               </span>
                               <span className="text-gray-900 dark:text-white">
-                                {formatPrice(itineraryCostsTotal, booking.currency)}
+                                {formatPrice(
+                                  itineraryCostsTotal,
+                                  booking.currency,
+                                )}
                               </span>
                             </div>
                           );
                         }
                       }
-                      
+
                       return null;
                     })()}
 
                     {/* Taxable Amount (SubTotal) - Displayed after all costs are added */}
-                    {((booking as any).tax_amount > 0 || ((booking as any).tax_breakdown?.length > 0)) && (
+                    {((booking as any).tax_amount > 0 ||
+                      (booking as any).tax_breakdown?.length > 0) && (
                       <div className="flex justify-between text-sm font-medium border-t border-gray-200 dark:border-gray-700 pt-2">
                         <span className="font-bold text-gray-900 dark:text-white">
                           {__("Subtotal (Taxable Amount)", "yatra")}
                         </span>
                         <span className="text-gray-900 dark:text-white">
                           {formatPrice(
-                            (booking as any).taxable_amount > 0 
-                              ? (booking as any).taxable_amount 
-                              : ((booking as any).subtotal || booking.total_amount),
-                            booking.currency
+                            (booking as any).taxable_amount > 0
+                              ? (booking as any).taxable_amount
+                              : (booking as any).subtotal ||
+                                  booking.total_amount,
+                            booking.currency,
                           )}
                         </span>
                       </div>
@@ -877,62 +899,83 @@ const ViewBooking: React.FC = () => {
                           {__("Discount", "yatra")}
                         </span>
                         <span className="text-green-600 dark:text-green-400">
-                          -{formatPrice(booking.discount_amount, booking.currency)}
+                          -
+                          {formatPrice(
+                            booking.discount_amount,
+                            booking.currency,
+                          )}
                         </span>
                       </div>
                     )}
 
                     {/* Tax Breakdown */}
-                    {(parseFloat((booking as any).tax_amount) > 0 || (booking as any).tax_breakdown?.length > 0) && (
+                    {(parseFloat((booking as any).tax_amount) > 0 ||
+                      (booking as any).tax_breakdown?.length > 0) && (
                       <>
                         {(() => {
                           // Use tax_breakdown if available (already parsed by backend)
                           const taxBreakdown = (booking as any).tax_breakdown;
-                          
-                          if (Array.isArray(taxBreakdown) && taxBreakdown.length > 0) {
-                            return taxBreakdown.map((tax: any, index: number) => (
-                              <div key={index} className="flex justify-between text-sm">
-                                <span className="text-gray-600 dark:text-gray-400">
-                                  {tax.name} ({tax.rate}%)
-                                </span>
-                                <span className="text-gray-900 dark:text-white">
-                                  {formatPrice(tax.amount, booking.currency)}
-                                </span>
-                              </div>
-                            ));
+
+                          if (
+                            Array.isArray(taxBreakdown) &&
+                            taxBreakdown.length > 0
+                          ) {
+                            return taxBreakdown.map(
+                              (tax: any, index: number) => (
+                                <div
+                                  key={index}
+                                  className="flex justify-between text-sm"
+                                >
+                                  <span className="text-gray-600 dark:text-gray-400">
+                                    {tax.name} ({tax.rate}%)
+                                  </span>
+                                  <span className="text-gray-900 dark:text-white">
+                                    {formatPrice(tax.amount, booking.currency)}
+                                  </span>
+                                </div>
+                              ),
+                            );
                           }
-                          
+
                           // Fallback: try parsing tax_details JSON string
                           const taxDetails = (booking as any).tax_details;
                           if (taxDetails) {
                             try {
-                              const taxes = typeof taxDetails === 'string' 
-                                ? JSON.parse(taxDetails) 
-                                : taxDetails;
-                              
+                              const taxes =
+                                typeof taxDetails === "string"
+                                  ? JSON.parse(taxDetails)
+                                  : taxDetails;
+
                               if (Array.isArray(taxes) && taxes.length > 0) {
                                 return taxes.map((tax: any, index: number) => (
-                                  <div key={index} className="flex justify-between text-sm">
+                                  <div
+                                    key={index}
+                                    className="flex justify-between text-sm"
+                                  >
                                     <span className="text-gray-600 dark:text-gray-400">
                                       {tax.name} ({tax.rate}%)
                                     </span>
                                     <span className="text-gray-900 dark:text-white">
-                                      {formatPrice(tax.amount, booking.currency)}
+                                      {formatPrice(
+                                        tax.amount,
+                                        booking.currency,
+                                      )}
                                     </span>
                                   </div>
                                 ));
                               }
                             } catch (e) {
-                              console.error('Failed to parse tax_details:', e);
+                              console.error("Failed to parse tax_details:", e);
                             }
                           }
-                          
+
                           // Final fallback: show single tax line
                           if ((booking as any).tax_amount > 0) {
                             return (
                               <div className="flex justify-between text-sm">
                                 <span className="text-gray-600 dark:text-gray-400">
-                                  {__("Tax", "yatra")} ({(booking as any).tax_rate}%)
+                                  {__("Tax", "yatra")} (
+                                  {(booking as any).tax_rate}%)
                                 </span>
                                 <span className="text-gray-900 dark:text-white">
                                   {formatPrice(
@@ -943,7 +986,7 @@ const ViewBooking: React.FC = () => {
                               </div>
                             );
                           }
-                          
+
                           return null;
                         })()}
                       </>
@@ -955,7 +998,10 @@ const ViewBooking: React.FC = () => {
                         {__("Net Amount", "yatra")}
                       </span>
                       <span className="text-gray-900 dark:text-white">
-                        {formatPrice(booking.total_amount || 0, booking.currency)}
+                        {formatPrice(
+                          booking.total_amount || 0,
+                          booking.currency,
+                        )}
                       </span>
                     </div>
                   </div>
@@ -1335,7 +1381,8 @@ const ViewBooking: React.FC = () => {
                   </div>
                   <div className="text-sm text-gray-900 dark:text-white">
                     {(() => {
-                      const subtotal = (booking as any).subtotal || booking.total_amount;
+                      const subtotal =
+                        (booking as any).subtotal || booking.total_amount;
                       const travelers = booking.travelers || 1;
                       const pricePerPerson = subtotal / travelers;
                       return formatPrice(pricePerPerson, booking.currency);

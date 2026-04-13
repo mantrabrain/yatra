@@ -53,8 +53,11 @@ const AccountPage: React.FC = () => {
   const accountNavigation = React.useMemo(() => {
     const wl =
       typeof window !== "undefined" &&
-      !!(window as unknown as { yatraAccountPage?: { wishlistEnabled?: boolean } })
-        .yatraAccountPage?.wishlistEnabled;
+      !!(
+        window as unknown as {
+          yatraAccountPage?: { wishlistEnabled?: boolean };
+        }
+      ).yatraAccountPage?.wishlistEnabled;
     return navigation.filter((n) => n.id !== "saved-trips" || wl);
   }, []);
 
@@ -87,8 +90,11 @@ const AccountPage: React.FC = () => {
   // Get section from URL parameter, localStorage, or default to 'dashboard'
   const getSectionFromUrl = (): Section => {
     if (typeof window !== "undefined") {
-      const wl = !!(window as unknown as { yatraAccountPage?: { wishlistEnabled?: boolean } })
-        .yatraAccountPage?.wishlistEnabled;
+      const wl = !!(
+        window as unknown as {
+          yatraAccountPage?: { wishlistEnabled?: boolean };
+        }
+      ).yatraAccountPage?.wishlistEnabled;
       const params = new URLSearchParams(window.location.search);
       const tab = params.get("tab");
       if (tab === "saved-trips" && !wl) {
@@ -109,8 +115,11 @@ const AccountPage: React.FC = () => {
       }
       // Fallback to localStorage
       const saved = localStorage.getItem("yatra-account-active-section");
-      const wlSaved = !!(window as unknown as { yatraAccountPage?: { wishlistEnabled?: boolean } })
-        .yatraAccountPage?.wishlistEnabled;
+      const wlSaved = !!(
+        window as unknown as {
+          yatraAccountPage?: { wishlistEnabled?: boolean };
+        }
+      ).yatraAccountPage?.wishlistEnabled;
       if (saved === "saved-trips" && !wlSaved) {
         return "dashboard";
       }
@@ -217,9 +226,7 @@ const AccountPage: React.FC = () => {
           if (
             !raw ||
             typeof raw !== "object" ||
-            (!("id" in raw) &&
-              !("user_id" in raw) &&
-              !("email" in raw))
+            (!("id" in raw) && !("user_id" in raw) && !("email" in raw))
           ) {
             return null;
           }
@@ -238,8 +245,7 @@ const AccountPage: React.FC = () => {
           return {
             ...row,
             name,
-            registered_at:
-              row.registered_at || row.created_at || "",
+            registered_at: row.registered_at || row.created_at || "",
           } as CustomerProfile;
         } catch (error) {
           console.error("Error fetching profile:", error);
@@ -308,8 +314,9 @@ const AccountPage: React.FC = () => {
   // Fetch saved trips
   const wishlistEnabled =
     typeof window !== "undefined" &&
-    !!(window as unknown as { yatraAccountPage?: { wishlistEnabled?: boolean } })
-      .yatraAccountPage?.wishlistEnabled;
+    !!(
+      window as unknown as { yatraAccountPage?: { wishlistEnabled?: boolean } }
+    ).yatraAccountPage?.wishlistEnabled;
 
   const { data: savedTripsData, isLoading: isLoadingSavedTrips } =
     useQuery<any>({
@@ -567,8 +574,7 @@ const AccountPage: React.FC = () => {
                 {__("Need help right away?", "yatra")}
               </p>
               <p className="font-semibold text-lg text-white">
-                {accountShell.companyName ||
-                  __("Concierge Desk", "yatra")}
+                {accountShell.companyName || __("Concierge Desk", "yatra")}
               </p>
               {accountShell.companyPhone ? (
                 <a

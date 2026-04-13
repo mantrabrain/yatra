@@ -324,7 +324,6 @@ const DiscountForm: React.FC = () => {
   };
 
   const handleGroupDiscountToggle = (checked: boolean) => {
-  
     handleFieldChange("is_group_discount", checked);
   };
 

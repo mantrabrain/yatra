@@ -98,7 +98,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
       >
         <div
           onClick={() => !disabled && setIsOpen(!isOpen)}
-          className={`flex-1 flex items-center justify-between text-left ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+          className={`flex-1 flex items-center justify-between text-left ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
         >
           <span
             className={

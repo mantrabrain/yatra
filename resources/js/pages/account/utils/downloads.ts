@@ -17,9 +17,7 @@ function buildBookingDocumentUrl(
 ): string {
   const suffix = `/bookings/${bookingId}/${kind}`;
   const origin =
-    typeof window !== "undefined"
-      ? window.location.origin
-      : "http://localhost";
+    typeof window !== "undefined" ? window.location.origin : "http://localhost";
 
   let u: URL;
   try {

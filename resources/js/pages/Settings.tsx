@@ -99,7 +99,11 @@ const MultipleTaxesEditor = React.memo(
       onChange(taxes.filter((_, i) => i !== index));
     };
 
-    const updateTax = (index: number, field: "name" | "rate", value: string | number) => {
+    const updateTax = (
+      index: number,
+      field: "name" | "rate",
+      value: string | number,
+    ) => {
       const updated = [...taxes];
       if (field === "rate") {
         updated[index].rate = parseFloat(value as string) || 0;
@@ -113,49 +117,58 @@ const MultipleTaxesEditor = React.memo(
       <div className="space-y-4">
         {/* Tax Cards */}
         <div className="space-y-3">
-          {taxes.filter((tax) => tax.name && tax.name.trim() !== '').map((tax, index) => (
-            <div key={index} className="relative p-4 border rounded-lg bg-gray-50 dark:bg-gray-800 w-full">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => removeTax(index)}
-                className="absolute top-3 right-3 text-red-600 hover:text-red-700 p-2"
+          {taxes
+            .filter((tax) => tax.name && tax.name.trim() !== "")
+            .map((tax, index) => (
+              <div
+                key={index}
+                className="relative p-4 border rounded-lg bg-gray-50 dark:bg-gray-800 w-full"
               >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-              
-              <div className="flex items-center gap-3 pr-12">
-                <div className="flex-1">
-                  <Input
-                    value={tax.name}
-                    onChange={(e) => updateTax(index, "name", e.target.value)}
-                    placeholder={__("Tax name (e.g., VAT, GST)", "yatra")}
-                    className="w-full"
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => removeTax(index)}
+                  className="absolute top-3 right-3 text-red-600 hover:text-red-700 p-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+
+                <div className="flex items-center gap-3 pr-12">
+                  <div className="flex-1">
                     <Input
-                      type="number"
-                      value={tax.rate}
-                      onChange={(e) => updateTax(index, "rate", e.target.value)}
-                      min="0"
-                      max="100"
-                      step="0.01"
-                      placeholder={__("Rate", "yatra")}
+                      value={tax.name}
+                      onChange={(e) => updateTax(index, "name", e.target.value)}
+                      placeholder={__("Tax name (e.g., VAT, GST)", "yatra")}
                       className="w-full"
                     />
-                    <span className="text-sm text-gray-500 dark:text-gray-400">%</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-1">
+                      <Input
+                        type="number"
+                        value={tax.rate}
+                        onChange={(e) =>
+                          updateTax(index, "rate", e.target.value)
+                        }
+                        min="0"
+                        max="100"
+                        step="0.01"
+                        placeholder={__("Rate", "yatra")}
+                        className="w-full"
+                      />
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        %
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     );
-  }
+  },
 );
 
 // Helper component for form field with description - MUST be outside component to prevent remounts
@@ -717,7 +730,6 @@ interface SettingsData {
   timezone: string;
   date_format: string;
   time_format: string;
-  
 
   // Google Calendar Settings
   google_calendar_client_id?: string;
@@ -816,7 +828,10 @@ interface SettingsData {
   tax_rates: Record<string, number>;
   multiple_taxes_enabled: boolean;
   multiple_taxes: Array<{ name: string; rate: number }>;
-  multiple_taxes_by_country: Record<string, Array<{ name: string; rate: number }>>;
+  multiple_taxes_by_country: Record<
+    string,
+    Array<{ name: string; rate: number }>
+  >;
 
   // Currency Settings
   default_currency: string;
@@ -825,7 +840,6 @@ interface SettingsData {
   currency_decimals: number;
   thousand_separator: string;
   decimal_separator: string;
-
 
   // Notification Settings (SMS; booking emails use Email → Templates)
   sms_notifications: boolean;
@@ -1260,7 +1274,10 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
     <div className="space-y-6">
       <ProFeature
         title={__("Dynamic Form Field", "yatra")}
-        description={__("customize your booking forms with drag-and-drop field builder", "yatra")}
+        description={__(
+          "customize your booking forms with drag-and-drop field builder",
+          "yatra",
+        )}
         moduleName="Dynamic Form Field"
         pricingUrl="https://wpyatra.com/pricing?module=dynamic-form-field"
         isProActive={(window as any).yatraAdmin?.isPro}
@@ -1293,715 +1310,732 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-          <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-            <input
-              type="checkbox"
-              id="form_section_enabled"
-              checked={currentConfig.enabled !== false}
-              onChange={(e) => updateFormConfig({ enabled: e.target.checked })}
-              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <Label
-              htmlFor="form_section_enabled"
-              className="font-medium cursor-pointer"
-            >
-              {__("Enable this form section", "yatra")}
-            </Label>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="form_title">{__("Section Title", "yatra")}</Label>
-              <Input
-                id="form_title"
-                value={currentConfig.title || ""}
-                onChange={(e) => updateFormConfig({ title: e.target.value })}
-                placeholder="Enter section title"
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="form_description">
-                {__("Section Description", "yatra")}
-              </Label>
-              <Input
-                id="form_description"
-                value={currentConfig.description || ""}
+            <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+              <input
+                type="checkbox"
+                id="form_section_enabled"
+                checked={currentConfig.enabled !== false}
                 onChange={(e) =>
-                  updateFormConfig({ description: e.target.value })
+                  updateFormConfig({ enabled: e.target.checked })
                 }
-                placeholder="Enter description"
-                className="mt-1"
+                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
+              <Label
+                htmlFor="form_section_enabled"
+                className="font-medium cursor-pointer"
+              >
+                {__("Enable this form section", "yatra")}
+              </Label>
             </div>
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* Form Fields */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-base">
-            {__("Form Fields", "yatra")}
-          </CardTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowAddField(!showAddField)}
-            className="flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            {__("Add Field", "yatra")}
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {/* Add New Field Form */}
-          {showAddField && (
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 mb-4">
-              <h4 className="font-medium text-sm mb-3">
-                {__("Add New Field", "yatra")}
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-                <div>
-                  <Label className="text-xs">{__("Field Type", "yatra")}</Label>
-                  <Select
-                    value={newField.type || "text"}
-                    onChange={(e) =>
-                      setNewField((prev) => ({
-                        ...prev,
-                        type: e.target.value as FormFieldConfig["type"],
-                      }))
-                    }
-                    className="mt-1"
-                  >
-                    {fieldTypes.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.label}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-                <div>
-                  <Label className="text-xs">{__("Label", "yatra")} *</Label>
-                  <Input
-                    value={newField.label || ""}
-                    onChange={(e) => handleNewFieldLabelChange(e.target.value)}
-                    placeholder="Field label"
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">{__("Field ID", "yatra")} *</Label>
-                  <Input
-                    value={newField.id || ""}
-                    onChange={(e) =>
-                      setNewField((prev) => ({
-                        ...prev,
-                        id: sanitizeId(e.target.value),
-                      }))
-                    }
-                    placeholder="field_id"
-                    className="mt-1 font-mono text-xs"
-                  />
-                  <p className="text-[10px] text-gray-400 mt-0.5">
-                    {__("Lowercase, no spaces", "yatra")}
-                  </p>
-                </div>
-                <div>
-                  <Label className="text-xs">
-                    {__("Placeholder", "yatra")}
-                  </Label>
-                  <Input
-                    value={newField.placeholder || ""}
-                    onChange={(e) =>
-                      setNewField((prev) => ({
-                        ...prev,
-                        placeholder: e.target.value,
-                      }))
-                    }
-                    placeholder="Placeholder text"
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">{__("Width", "yatra")}</Label>
-                  <Select
-                    value={newField.width || "full"}
-                    onChange={(e) =>
-                      setNewField((prev) => ({
-                        ...prev,
-                        width: e.target.value as FormFieldConfig["width"],
-                      }))
-                    }
-                    className="mt-1"
-                  >
-                    {widthOptions.map((w) => (
-                      <option key={w.value} value={w.value}>
-                        {w.label}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="form_title">
+                  {__("Section Title", "yatra")}
+                </Label>
+                <Input
+                  id="form_title"
+                  value={currentConfig.title || ""}
+                  onChange={(e) => updateFormConfig({ title: e.target.value })}
+                  placeholder="Enter section title"
+                  className="mt-1"
+                />
               </div>
-              {/* Options editor for select fields */}
-              {newField.type === "select" && (
-                <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-100 dark:border-blue-900">
-                  <div className="flex items-center justify-between mb-2">
-                    <Label className="text-xs font-medium">
-                      {__("Dropdown Options", "yatra")}
+              <div>
+                <Label htmlFor="form_description">
+                  {__("Section Description", "yatra")}
+                </Label>
+                <Input
+                  id="form_description"
+                  value={currentConfig.description || ""}
+                  onChange={(e) =>
+                    updateFormConfig({ description: e.target.value })
+                  }
+                  placeholder="Enter description"
+                  className="mt-1"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Form Fields */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-base">
+              {__("Form Fields", "yatra")}
+            </CardTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAddField(!showAddField)}
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              {__("Add Field", "yatra")}
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {/* Add New Field Form */}
+            {showAddField && (
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 mb-4">
+                <h4 className="font-medium text-sm mb-3">
+                  {__("Add New Field", "yatra")}
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+                  <div>
+                    <Label className="text-xs">
+                      {__("Field Type", "yatra")}
                     </Label>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        const currentOptions = newField.options || [];
+                    <Select
+                      value={newField.type || "text"}
+                      onChange={(e) =>
                         setNewField((prev) => ({
                           ...prev,
-                          options: [
-                            ...currentOptions,
-                            { value: "", label: "" },
-                          ],
-                        }));
-                      }}
-                      className="h-6 text-xs"
+                          type: e.target.value as FormFieldConfig["type"],
+                        }))
+                      }
+                      className="mt-1"
                     >
-                      <Plus className="w-3 h-3 mr-1" />
-                      {__("Add Option", "yatra")}
-                    </Button>
+                      {fieldTypes.map((type) => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
+                    </Select>
                   </div>
-                  <div className="space-y-2">
-                    {(newField.options || []).map((option, optIndex) => (
-                      <div key={optIndex} className="flex items-center gap-2">
-                        <Input
-                          value={option.value}
-                          onChange={(e) => {
-                            const newOptions = [...(newField.options || [])];
-                            newOptions[optIndex] = {
-                              ...newOptions[optIndex],
-                              value: e.target.value,
-                            };
-                            setNewField((prev) => ({
-                              ...prev,
-                              options: newOptions,
-                            }));
-                          }}
-                          placeholder="Value (e.g., option1)"
-                          className="text-xs flex-1"
-                        />
-                        <Input
-                          value={option.label}
-                          onChange={(e) => {
-                            const newOptions = [...(newField.options || [])];
-                            newOptions[optIndex] = {
-                              ...newOptions[optIndex],
-                              label: e.target.value,
-                            };
-                            setNewField((prev) => ({
-                              ...prev,
-                              options: newOptions,
-                            }));
-                          }}
-                          placeholder="Label (e.g., Option 1)"
-                          className="text-xs flex-1"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newOptions = (newField.options || []).filter(
-                              (_, i) => i !== optIndex,
-                            );
-                            setNewField((prev) => ({
-                              ...prev,
-                              options: newOptions,
-                            }));
-                          }}
-                          className="p-1 text-gray-400 hover:text-red-500"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
-                    {(!newField.options || newField.options.length === 0) && (
-                      <p className="text-xs text-gray-400 italic">
-                        {__(
-                          'Click "Add Option" to add dropdown choices.',
-                          "yatra",
-                        )}
-                      </p>
-                    )}
+                  <div>
+                    <Label className="text-xs">{__("Label", "yatra")} *</Label>
+                    <Input
+                      value={newField.label || ""}
+                      onChange={(e) =>
+                        handleNewFieldLabelChange(e.target.value)
+                      }
+                      placeholder="Field label"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">
+                      {__("Field ID", "yatra")} *
+                    </Label>
+                    <Input
+                      value={newField.id || ""}
+                      onChange={(e) =>
+                        setNewField((prev) => ({
+                          ...prev,
+                          id: sanitizeId(e.target.value),
+                        }))
+                      }
+                      placeholder="field_id"
+                      className="mt-1 font-mono text-xs"
+                    />
+                    <p className="text-[10px] text-gray-400 mt-0.5">
+                      {__("Lowercase, no spaces", "yatra")}
+                    </p>
+                  </div>
+                  <div>
+                    <Label className="text-xs">
+                      {__("Placeholder", "yatra")}
+                    </Label>
+                    <Input
+                      value={newField.placeholder || ""}
+                      onChange={(e) =>
+                        setNewField((prev) => ({
+                          ...prev,
+                          placeholder: e.target.value,
+                        }))
+                      }
+                      placeholder="Placeholder text"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">{__("Width", "yatra")}</Label>
+                    <Select
+                      value={newField.width || "full"}
+                      onChange={(e) =>
+                        setNewField((prev) => ({
+                          ...prev,
+                          width: e.target.value as FormFieldConfig["width"],
+                        }))
+                      }
+                      className="mt-1"
+                    >
+                      {widthOptions.map((w) => (
+                        <option key={w.value} value={w.value}>
+                          {w.label}
+                        </option>
+                      ))}
+                    </Select>
                   </div>
                 </div>
-              )}
-
-              <div className="flex items-center gap-4 mt-3">
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={newField.required || false}
-                    onChange={(e) =>
-                      setNewField((prev) => ({
-                        ...prev,
-                        required: e.target.checked,
-                      }))
-                    }
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600"
-                  />
-                  {__("Required", "yatra")}
-                </label>
-                <div className="flex-1"></div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowAddField(false)}
-                >
-                  {__("Cancel", "yatra")}
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={addNewField}
-                  disabled={!newField.label || !newField.id}
-                >
-                  {__("Add Field", "yatra")}
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Field List */}
-          {currentConfig.fields?.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <p>
-                {__(
-                  'No fields configured. Click "Add Field" to get started.',
-                  "yatra",
-                )}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {currentConfig.fields?.map((field, index) => (
-                <div
-                  key={field.id}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, field.id)}
-                  onDragOver={(e) => handleDragOver(e, field.id)}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) => handleDrop(e, field.id)}
-                  onDragEnd={handleDragEnd}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-grab active:cursor-grabbing ${
-                    draggedFieldId === field.id
-                      ? "opacity-50 border-dashed"
-                      : ""
-                  } ${
-                    dragOverFieldId === field.id
-                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                      : ""
-                  } ${
-                    field.enabled
-                      ? "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-                      : "bg-gray-50 dark:bg-gray-900 border-gray-100 dark:border-gray-800 opacity-60"
-                  }`}
-                >
-                  {/* Drag Handle & Order */}
-                  <div className="flex items-center gap-1">
-                    <GripVertical className="w-4 h-4 text-gray-400" />
-                    <div className="flex flex-col gap-0.5">
-                      <button
+                {/* Options editor for select fields */}
+                {newField.type === "select" && (
+                  <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-100 dark:border-blue-900">
+                    <div className="flex items-center justify-between mb-2">
+                      <Label className="text-xs font-medium">
+                        {__("Dropdown Options", "yatra")}
+                      </Label>
+                      <Button
                         type="button"
-                        onClick={() => moveField(field.id, "up")}
-                        disabled={index === 0}
-                        className="p-0.5 text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const currentOptions = newField.options || [];
+                          setNewField((prev) => ({
+                            ...prev,
+                            options: [
+                              ...currentOptions,
+                              { value: "", label: "" },
+                            ],
+                          }));
+                        }}
+                        className="h-6 text-xs"
                       >
-                        <ArrowUp className="w-3 h-3" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => moveField(field.id, "down")}
-                        disabled={index === currentConfig.fields.length - 1}
-                        className="p-0.5 text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
-                      >
-                        <ArrowDown className="w-3 h-3" />
-                      </button>
+                        <Plus className="w-3 h-3 mr-1" />
+                        {__("Add Option", "yatra")}
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      {(newField.options || []).map((option, optIndex) => (
+                        <div key={optIndex} className="flex items-center gap-2">
+                          <Input
+                            value={option.value}
+                            onChange={(e) => {
+                              const newOptions = [...(newField.options || [])];
+                              newOptions[optIndex] = {
+                                ...newOptions[optIndex],
+                                value: e.target.value,
+                              };
+                              setNewField((prev) => ({
+                                ...prev,
+                                options: newOptions,
+                              }));
+                            }}
+                            placeholder="Value (e.g., option1)"
+                            className="text-xs flex-1"
+                          />
+                          <Input
+                            value={option.label}
+                            onChange={(e) => {
+                              const newOptions = [...(newField.options || [])];
+                              newOptions[optIndex] = {
+                                ...newOptions[optIndex],
+                                label: e.target.value,
+                              };
+                              setNewField((prev) => ({
+                                ...prev,
+                                options: newOptions,
+                              }));
+                            }}
+                            placeholder="Label (e.g., Option 1)"
+                            className="text-xs flex-1"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newOptions = (
+                                newField.options || []
+                              ).filter((_, i) => i !== optIndex);
+                              setNewField((prev) => ({
+                                ...prev,
+                                options: newOptions,
+                              }));
+                            }}
+                            className="p-1 text-gray-400 hover:text-red-500"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                      {(!newField.options || newField.options.length === 0) && (
+                        <p className="text-xs text-gray-400 italic">
+                          {__(
+                            'Click "Add Option" to add dropdown choices.',
+                            "yatra",
+                          )}
+                        </p>
+                      )}
                     </div>
                   </div>
+                )}
 
-                  {/* Field Info */}
-                  <div className="flex-1 min-w-0">
-                    {editingField === field.id ? (
-                      <div className="space-y-3">
-                        <div className="grid grid-cols-4 gap-2">
-                          <Input
-                            value={field.label}
-                            onChange={(e) =>
-                              updateField(field.id, { label: e.target.value })
-                            }
-                            placeholder="Label"
-                            className="text-sm"
-                          />
-                          <Input
-                            value={field.placeholder}
-                            onChange={(e) =>
-                              updateField(field.id, {
-                                placeholder: e.target.value,
-                              })
-                            }
-                            placeholder="Placeholder"
-                            className="text-sm"
-                          />
-                          <Select
-                            value={field.type}
-                            onChange={(e) =>
-                              updateField(field.id, {
-                                type: e.target.value as FormFieldConfig["type"],
-                              })
-                            }
-                            className="text-sm"
-                          >
-                            {fieldTypes.map((type) => (
-                              <option key={type.value} value={type.value}>
-                                {type.label}
-                              </option>
-                            ))}
-                          </Select>
-                          <Select
-                            value={field.width}
-                            onChange={(e) =>
-                              updateField(field.id, {
-                                width: e.target
-                                  .value as FormFieldConfig["width"],
-                              })
-                            }
-                            className="text-sm"
-                          >
-                            {widthOptions.map((w) => (
-                              <option key={w.value} value={w.value}>
-                                {w.label}
-                              </option>
-                            ))}
-                          </Select>
-                        </div>
+                <div className="flex items-center gap-4 mt-3">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={newField.required || false}
+                      onChange={(e) =>
+                        setNewField((prev) => ({
+                          ...prev,
+                          required: e.target.checked,
+                        }))
+                      }
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600"
+                    />
+                    {__("Required", "yatra")}
+                  </label>
+                  <div className="flex-1"></div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowAddField(false)}
+                  >
+                    {__("Cancel", "yatra")}
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={addNewField}
+                    disabled={!newField.label || !newField.id}
+                  >
+                    {__("Add Field", "yatra")}
+                  </Button>
+                </div>
+              </div>
+            )}
 
-                        {/* Field ID - Below other fields */}
-                        <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded">
-                          <Label className="text-xs text-gray-500 whitespace-nowrap">
-                            {__("Field ID:", "yatra")}
-                          </Label>
-                          <Input
-                            value={field.id}
-                            onChange={(e) => {
-                              if (!field.locked) {
-                                updateField(field.id, {
-                                  id: sanitizeId(e.target.value),
-                                });
+            {/* Field List */}
+            {currentConfig.fields?.length === 0 ? (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <p>
+                  {__(
+                    'No fields configured. Click "Add Field" to get started.',
+                    "yatra",
+                  )}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {currentConfig.fields?.map((field, index) => (
+                  <div
+                    key={field.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, field.id)}
+                    onDragOver={(e) => handleDragOver(e, field.id)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, field.id)}
+                    onDragEnd={handleDragEnd}
+                    className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-grab active:cursor-grabbing ${
+                      draggedFieldId === field.id
+                        ? "opacity-50 border-dashed"
+                        : ""
+                    } ${
+                      dragOverFieldId === field.id
+                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                        : ""
+                    } ${
+                      field.enabled
+                        ? "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                        : "bg-gray-50 dark:bg-gray-900 border-gray-100 dark:border-gray-800 opacity-60"
+                    }`}
+                  >
+                    {/* Drag Handle & Order */}
+                    <div className="flex items-center gap-1">
+                      <GripVertical className="w-4 h-4 text-gray-400" />
+                      <div className="flex flex-col gap-0.5">
+                        <button
+                          type="button"
+                          onClick={() => moveField(field.id, "up")}
+                          disabled={index === 0}
+                          className="p-0.5 text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
+                          <ArrowUp className="w-3 h-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveField(field.id, "down")}
+                          disabled={index === currentConfig.fields.length - 1}
+                          className="p-0.5 text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
+                          <ArrowDown className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Field Info */}
+                    <div className="flex-1 min-w-0">
+                      {editingField === field.id ? (
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-4 gap-2">
+                            <Input
+                              value={field.label}
+                              onChange={(e) =>
+                                updateField(field.id, { label: e.target.value })
                               }
-                            }}
-                            placeholder="field_id"
-                            className="text-sm font-mono flex-1 max-w-xs"
-                            disabled={field.locked}
-                            title={
-                              field.locked
-                                ? "Locked fields cannot change ID"
-                                : "Field ID (lowercase, no spaces)"
-                            }
-                          />
+                              placeholder="Label"
+                              className="text-sm"
+                            />
+                            <Input
+                              value={field.placeholder}
+                              onChange={(e) =>
+                                updateField(field.id, {
+                                  placeholder: e.target.value,
+                                })
+                              }
+                              placeholder="Placeholder"
+                              className="text-sm"
+                            />
+                            <Select
+                              value={field.type}
+                              onChange={(e) =>
+                                updateField(field.id, {
+                                  type: e.target
+                                    .value as FormFieldConfig["type"],
+                                })
+                              }
+                              className="text-sm"
+                            >
+                              {fieldTypes.map((type) => (
+                                <option key={type.value} value={type.value}>
+                                  {type.label}
+                                </option>
+                              ))}
+                            </Select>
+                            <Select
+                              value={field.width}
+                              onChange={(e) =>
+                                updateField(field.id, {
+                                  width: e.target
+                                    .value as FormFieldConfig["width"],
+                                })
+                              }
+                              className="text-sm"
+                            >
+                              {widthOptions.map((w) => (
+                                <option key={w.value} value={w.value}>
+                                  {w.label}
+                                </option>
+                              ))}
+                            </Select>
+                          </div>
+
+                          {/* Field ID - Below other fields */}
+                          <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded">
+                            <Label className="text-xs text-gray-500 whitespace-nowrap">
+                              {__("Field ID:", "yatra")}
+                            </Label>
+                            <Input
+                              value={field.id}
+                              onChange={(e) => {
+                                if (!field.locked) {
+                                  updateField(field.id, {
+                                    id: sanitizeId(e.target.value),
+                                  });
+                                }
+                              }}
+                              placeholder="field_id"
+                              className="text-sm font-mono flex-1 max-w-xs"
+                              disabled={field.locked}
+                              title={
+                                field.locked
+                                  ? "Locked fields cannot change ID"
+                                  : "Field ID (lowercase, no spaces)"
+                              }
+                            />
+                            {field.locked && (
+                              <span className="text-xs text-amber-600">
+                                {__("(locked)", "yatra")}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Dropdown Options Editor */}
+                          {field.type === "select" && (
+                            <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                              <div className="flex items-center justify-between mb-2">
+                                <Label className="text-xs font-medium">
+                                  {__("Dropdown Options", "yatra")}
+                                </Label>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    const newOptions = [
+                                      ...(field.options || []),
+                                      { value: "", label: "" },
+                                    ];
+                                    updateField(field.id, {
+                                      options: newOptions,
+                                    });
+                                  }}
+                                  className="h-6 text-xs"
+                                >
+                                  <Plus className="w-3 h-3 mr-1" />
+                                  {__("Add Option", "yatra")}
+                                </Button>
+                              </div>
+                              <div className="space-y-2">
+                                {(field.options || []).map(
+                                  (option, optIndex) => (
+                                    <div
+                                      key={optIndex}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Input
+                                        value={option.value}
+                                        onChange={(e) => {
+                                          const newOptions = [
+                                            ...(field.options || []),
+                                          ];
+                                          newOptions[optIndex] = {
+                                            ...newOptions[optIndex],
+                                            value: e.target.value,
+                                          };
+                                          updateField(field.id, {
+                                            options: newOptions,
+                                          });
+                                        }}
+                                        placeholder="Value (e.g., spouse)"
+                                        className="text-xs flex-1"
+                                      />
+                                      <Input
+                                        value={option.label}
+                                        onChange={(e) => {
+                                          const newOptions = [
+                                            ...(field.options || []),
+                                          ];
+                                          newOptions[optIndex] = {
+                                            ...newOptions[optIndex],
+                                            label: e.target.value,
+                                          };
+                                          updateField(field.id, {
+                                            options: newOptions,
+                                          });
+                                        }}
+                                        placeholder="Label (e.g., Spouse/Partner)"
+                                        className="text-xs flex-1"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const newOptions = (
+                                            field.options || []
+                                          ).filter((_, i) => i !== optIndex);
+                                          updateField(field.id, {
+                                            options: newOptions,
+                                          });
+                                        }}
+                                        className="p-1 text-gray-400 hover:text-red-500"
+                                      >
+                                        <Trash2 className="w-3 h-3" />
+                                      </button>
+                                    </div>
+                                  ),
+                                )}
+                                {(!field.options ||
+                                  field.options.length === 0) && (
+                                  <p className="text-xs text-gray-400 italic">
+                                    {__(
+                                      'No options. Click "Add Option" to add dropdown choices.',
+                                      "yatra",
+                                    )}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <span className="font-medium text-sm">
+                            {field.label}
+                          </span>
+                          <code className="text-xs text-gray-500 dark:text-gray-400 px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded font-mono">
+                            {field.id}
+                          </code>
+                          <span className="text-xs text-gray-400 dark:text-gray-500 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded">
+                            {fieldTypes.find((t) => t.value === field.type)
+                              ?.label || field.type}
+                          </span>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
+                            {widthOptions.find((w) => w.value === field.width)
+                              ?.label || "Full"}
+                          </span>
+                          {field.type === "select" &&
+                            field.options &&
+                            field.options.length > 0 && (
+                              <span className="text-xs text-blue-500 dark:text-blue-400">
+                                ({field.options.length}{" "}
+                                {field.options.length === 1
+                                  ? "option"
+                                  : "options"}
+                                )
+                              </span>
+                            )}
+                          {field.required && (
+                            <span className="text-xs text-red-500 font-medium">
+                              {__("Required", "yatra")}
+                            </span>
+                          )}
                           {field.locked && (
-                            <span className="text-xs text-amber-600">
-                              {__("(locked)", "yatra")}
+                            <span
+                              className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 px-1.5 py-0.5 bg-amber-50 dark:bg-amber-900/20 rounded"
+                              title="This field is protected and cannot be deleted"
+                            >
+                              <Lock className="w-3 h-3" />
+                              Locked
                             </span>
                           )}
                         </div>
+                      )}
+                    </div>
 
-                        {/* Dropdown Options Editor */}
-                        {field.type === "select" && (
-                          <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center justify-between mb-2">
-                              <Label className="text-xs font-medium">
-                                {__("Dropdown Options", "yatra")}
-                              </Label>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  const newOptions = [
-                                    ...(field.options || []),
-                                    { value: "", label: "" },
-                                  ];
-                                  updateField(field.id, {
-                                    options: newOptions,
-                                  });
-                                }}
-                                className="h-6 text-xs"
-                              >
-                                <Plus className="w-3 h-3 mr-1" />
-                                {__("Add Option", "yatra")}
-                              </Button>
-                            </div>
-                            <div className="space-y-2">
-                              {(field.options || []).map((option, optIndex) => (
-                                <div
-                                  key={optIndex}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Input
-                                    value={option.value}
-                                    onChange={(e) => {
-                                      const newOptions = [
-                                        ...(field.options || []),
-                                      ];
-                                      newOptions[optIndex] = {
-                                        ...newOptions[optIndex],
-                                        value: e.target.value,
-                                      };
-                                      updateField(field.id, {
-                                        options: newOptions,
-                                      });
-                                    }}
-                                    placeholder="Value (e.g., spouse)"
-                                    className="text-xs flex-1"
-                                  />
-                                  <Input
-                                    value={option.label}
-                                    onChange={(e) => {
-                                      const newOptions = [
-                                        ...(field.options || []),
-                                      ];
-                                      newOptions[optIndex] = {
-                                        ...newOptions[optIndex],
-                                        label: e.target.value,
-                                      };
-                                      updateField(field.id, {
-                                        options: newOptions,
-                                      });
-                                    }}
-                                    placeholder="Label (e.g., Spouse/Partner)"
-                                    className="text-xs flex-1"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const newOptions = (
-                                        field.options || []
-                                      ).filter((_, i) => i !== optIndex);
-                                      updateField(field.id, {
-                                        options: newOptions,
-                                      });
-                                    }}
-                                    className="p-1 text-gray-400 hover:text-red-500"
-                                  >
-                                    <Trash2 className="w-3 h-3" />
-                                  </button>
-                                </div>
-                              ))}
-                              {(!field.options ||
-                                field.options.length === 0) && (
-                                <p className="text-xs text-gray-400 italic">
-                                  {__(
-                                    'No options. Click "Add Option" to add dropdown choices.',
-                                    "yatra",
-                                  )}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <span className="font-medium text-sm">
-                          {field.label}
-                        </span>
-                        <code className="text-xs text-gray-500 dark:text-gray-400 px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded font-mono">
-                          {field.id}
-                        </code>
-                        <span className="text-xs text-gray-400 dark:text-gray-500 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded">
-                          {fieldTypes.find((t) => t.value === field.type)
-                            ?.label || field.type}
-                        </span>
-                        <span className="text-xs text-gray-400 dark:text-gray-500">
-                          {widthOptions.find((w) => w.value === field.width)
-                            ?.label || "Full"}
-                        </span>
-                        {field.type === "select" &&
-                          field.options &&
-                          field.options.length > 0 && (
-                            <span className="text-xs text-blue-500 dark:text-blue-400">
-                              ({field.options.length}{" "}
-                              {field.options.length === 1
-                                ? "option"
-                                : "options"}
-                              )
-                            </span>
-                          )}
-                        {field.required && (
-                          <span className="text-xs text-red-500 font-medium">
-                            {__("Required", "yatra")}
-                          </span>
-                        )}
-                        {field.locked && (
-                          <span
-                            className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 px-1.5 py-0.5 bg-amber-50 dark:bg-amber-900/20 rounded"
-                            title="This field is protected and cannot be deleted"
-                          >
-                            <Lock className="w-3 h-3" />
-                            Locked
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        !field.locked && toggleFieldRequired(field.id)
-                      }
-                      disabled={field.locked}
-                      className={`p-1.5 rounded ${field.locked ? "cursor-not-allowed opacity-50" : ""} ${field.required ? "text-red-500 bg-red-50 dark:bg-red-900/20" : "text-gray-400 hover:text-gray-600"}`}
-                      title={
-                        field.locked
-                          ? "This field is required and cannot be changed"
-                          : field.required
-                            ? "Make optional"
-                            : "Make required"
-                      }
-                    >
-                      <Star
-                        className="w-4 h-4"
-                        fill={field.required ? "currentColor" : "none"}
-                      />
-                    </button>
-                    {/* Show enable/disable toggle only for non-locked fields */}
-                    {!field.locked && (
-                      <button
-                        type="button"
-                        onClick={() => toggleFieldEnabled(field.id)}
-                        className={`p-1.5 rounded ${field.enabled ? "text-green-500" : "text-gray-400"}`}
-                        title={field.enabled ? "Disable field" : "Enable field"}
-                      >
-                        {field.enabled ? (
-                          <Eye className="w-4 h-4" />
-                        ) : (
-                          <EyeOff className="w-4 h-4" />
-                        )}
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setEditingField(
-                          editingField === field.id ? null : field.id,
-                        )
-                      }
-                      className="p-1.5 rounded text-gray-400 hover:text-blue-500"
-                      title="Edit field"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    {/* Show delete button only for non-locked fields */}
-                    {!field.locked && (
+                    {/* Actions */}
+                    <div className="flex items-center gap-1">
                       <button
                         type="button"
                         onClick={() =>
-                          setDeleteConfirm({
-                            isOpen: true,
-                            fieldId: field.id,
-                            fieldLabel: field.label,
-                          })
+                          !field.locked && toggleFieldRequired(field.id)
                         }
-                        className="p-1.5 rounded text-gray-400 hover:text-red-500"
-                        title="Delete field"
+                        disabled={field.locked}
+                        className={`p-1.5 rounded ${field.locked ? "cursor-not-allowed opacity-50" : ""} ${field.required ? "text-red-500 bg-red-50 dark:bg-red-900/20" : "text-gray-400 hover:text-gray-600"}`}
+                        title={
+                          field.locked
+                            ? "This field is required and cannot be changed"
+                            : field.required
+                              ? "Make optional"
+                              : "Make required"
+                        }
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Star
+                          className="w-4 h-4"
+                          fill={field.required ? "currentColor" : "none"}
+                        />
                       </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Delete Confirmation Dialog */}
-      <ConfirmationDialog
-        isOpen={deleteConfirm.isOpen}
-        onClose={() =>
-          setDeleteConfirm({ isOpen: false, fieldId: null, fieldLabel: "" })
-        }
-        onConfirm={() => {
-          if (deleteConfirm.fieldId) {
-            deleteField(deleteConfirm.fieldId);
-          }
-        }}
-        title={__("Delete Field", "yatra")}
-        message={`Are you sure you want to delete the field "${deleteConfirm.fieldLabel}"? This action cannot be undone.`}
-        confirmText={__("Delete", "yatra")}
-        cancelText={__("Cancel", "yatra")}
-        variant="danger"
-      />
-
-      {/* Preview */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{__("Preview", "yatra")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <h3 className="font-semibold text-lg mb-1">
-              {currentConfig.title || "Form Section"}
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              {currentConfig.description}
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              {currentConfig.fields
-                ?.filter((f) => f.enabled)
-                .map((field) => (
-                  <div
-                    key={field.id}
-                    className={
-                      field.width === "full"
-                        ? "col-span-2"
-                        : field.width === "third"
-                          ? "col-span-1"
-                          : "col-span-1"
-                    }
-                  >
-                    <Label className="text-sm">
-                      {field.label}
-                      {field.required && (
-                        <span className="text-red-500 ml-1">*</span>
+                      {/* Show enable/disable toggle only for non-locked fields */}
+                      {!field.locked && (
+                        <button
+                          type="button"
+                          onClick={() => toggleFieldEnabled(field.id)}
+                          className={`p-1.5 rounded ${field.enabled ? "text-green-500" : "text-gray-400"}`}
+                          title={
+                            field.enabled ? "Disable field" : "Enable field"
+                          }
+                        >
+                          {field.enabled ? (
+                            <Eye className="w-4 h-4" />
+                          ) : (
+                            <EyeOff className="w-4 h-4" />
+                          )}
+                        </button>
                       )}
-                    </Label>
-                    {field.type === "select" || field.type === "country" ? (
-                      <Select disabled className="mt-1 w-full">
-                        <option>{field.placeholder || "Select..."}</option>
-                      </Select>
-                    ) : field.type === "textarea" ? (
-                      <textarea
-                        disabled
-                        placeholder={field.placeholder}
-                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-gray-700 text-sm"
-                        rows={2}
-                      />
-                    ) : (
-                      <Input
-                        disabled
-                        type={field.type}
-                        placeholder={field.placeholder}
-                        className="mt-1"
-                      />
-                    )}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setEditingField(
+                            editingField === field.id ? null : field.id,
+                          )
+                        }
+                        className="p-1.5 rounded text-gray-400 hover:text-blue-500"
+                        title="Edit field"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      {/* Show delete button only for non-locked fields */}
+                      {!field.locked && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setDeleteConfirm({
+                              isOpen: true,
+                              fieldId: field.id,
+                              fieldLabel: field.label,
+                            })
+                          }
+                          className="p-1.5 rounded text-gray-400 hover:text-red-500"
+                          title="Delete field"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Delete Confirmation Dialog */}
+        <ConfirmationDialog
+          isOpen={deleteConfirm.isOpen}
+          onClose={() =>
+            setDeleteConfirm({ isOpen: false, fieldId: null, fieldLabel: "" })
+          }
+          onConfirm={() => {
+            if (deleteConfirm.fieldId) {
+              deleteField(deleteConfirm.fieldId);
+            }
+          }}
+          title={__("Delete Field", "yatra")}
+          message={`Are you sure you want to delete the field "${deleteConfirm.fieldLabel}"? This action cannot be undone.`}
+          confirmText={__("Delete", "yatra")}
+          cancelText={__("Cancel", "yatra")}
+          variant="danger"
+        />
+
+        {/* Preview */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">
+              {__("Preview", "yatra")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <h3 className="font-semibold text-lg mb-1">
+                {currentConfig.title || "Form Section"}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                {currentConfig.description}
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                {currentConfig.fields
+                  ?.filter((f) => f.enabled)
+                  .map((field) => (
+                    <div
+                      key={field.id}
+                      className={
+                        field.width === "full"
+                          ? "col-span-2"
+                          : field.width === "third"
+                            ? "col-span-1"
+                            : "col-span-1"
+                      }
+                    >
+                      <Label className="text-sm">
+                        {field.label}
+                        {field.required && (
+                          <span className="text-red-500 ml-1">*</span>
+                        )}
+                      </Label>
+                      {field.type === "select" || field.type === "country" ? (
+                        <Select disabled className="mt-1 w-full">
+                          <option>{field.placeholder || "Select..."}</option>
+                        </Select>
+                      ) : field.type === "textarea" ? (
+                        <textarea
+                          disabled
+                          placeholder={field.placeholder}
+                          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-gray-700 text-sm"
+                          rows={2}
+                        />
+                      ) : (
+                        <Input
+                          disabled
+                          type={field.type}
+                          placeholder={field.placeholder}
+                          className="mt-1"
+                        />
+                      )}
+                    </div>
+                  ))}
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
       </ProFeature>
     </div>
   );
@@ -2068,13 +2102,17 @@ const Settings: React.FC = () => {
   }, [activeSection]);
 
   // Fetch settings
-  const { data: settings, isLoading, error } = useQuery({
+  const {
+    data: settings,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
       try {
         return await fetchSettings();
       } catch (error: any) {
-        console.error('Error fetching settings:', error);
+        console.error("Error fetching settings:", error);
         showToast(
           error?.message || __("Failed to load settings", "yatra"),
           "error",
@@ -2280,7 +2318,7 @@ const Settings: React.FC = () => {
       email_tpl_admin_payment_body: "",
       email_tpl_admin_cancellation_subject: "",
       email_tpl_admin_cancellation_body: "",
-            customer_registration: true,
+      customer_registration: true,
       customer_fields: ["name", "email", "phone", "address"],
       require_email_verification: false,
       customer_account_page: "/my-account",
@@ -2574,29 +2612,34 @@ const Settings: React.FC = () => {
     connected: boolean;
     error?: string;
   } | null>(null);
-  const [mailchimpLists, setMailchimpLists] = useState<Array<{
-    id: string;
-    name: string;
-  }>>([]);
-  const [mailchimpMergeFields, setMailchimpMergeFields] = useState<Array<{
-    tag: string;
-    name: string;
-    type: string;
-    required: boolean;
-  }>>([]);
+  const [mailchimpLists, setMailchimpLists] = useState<
+    Array<{
+      id: string;
+      name: string;
+    }>
+  >([]);
+  const [mailchimpMergeFields, setMailchimpMergeFields] = useState<
+    Array<{
+      tag: string;
+      name: string;
+      type: string;
+      required: boolean;
+    }>
+  >([]);
   const [showApiKey, setShowApiKey] = useState(false);
   const [validatingApiKey, setValidatingApiKey] = useState(false);
   const [showFacebookToken, setShowFacebookToken] = useState(false);
-  const [seoImageUrl, setSeoImageUrl] = useState<string>('');
+  const [seoImageUrl, setSeoImageUrl] = useState<string>("");
   const [seoImageLoading, setSeoImageLoading] = useState<boolean>(false);
-  const [seoImageError, setSeoImageError] = useState<string>('');
+  const [seoImageError, setSeoImageError] = useState<string>("");
 
   const [newTaxName, setNewTaxName] = useState("");
   const [newTaxRate, setNewTaxRate] = useState("");
-  
+
   // Premium upgrade dialog state
   const [showPremiumDialog, setShowPremiumDialog] = useState(false);
-  const [selectedPremiumGateway, setSelectedPremiumGateway] = useState<string>('');
+  const [selectedPremiumGateway, setSelectedPremiumGateway] =
+    useState<string>("");
 
   // Facebook Pixel validation state
   const [validatingPixel, setValidatingPixel] = useState(false);
@@ -2609,57 +2652,57 @@ const Settings: React.FC = () => {
   // Mailchimp functions
   const validateMailchimpApiKey = async () => {
     if (!formData?.mailchimp_api_key) return;
-    
+
     setValidatingApiKey(true);
     try {
       const response = await apiClient.post("/mailchimp/test", {
-        api_key: formData.mailchimp_api_key
+        api_key: formData.mailchimp_api_key,
       });
-      
+
       if (response.success) {
         // Update the yatraAdmin object with new connection status
         const updatedMailchimpData = {
-          ...(window as any).yatraAdmin?.mailchimp || {},
+          ...((window as any).yatraAdmin?.mailchimp || {}),
           connectionStatus: {
             connected: true,
-            error: null
-          }
+            error: null,
+          },
         };
-        
+
         // Update the global yatraAdmin object
         if ((window as any).yatraAdmin) {
           (window as any).yatraAdmin.mailchimp = updatedMailchimpData;
         }
-        
+
         // Update local connection status
         setMailchimpConnectionStatus({
           connected: true,
-          error: null
+          error: null,
         });
-        
+
         // Load lists after successful validation
         await loadMailchimpLists();
       }
     } catch (error: any) {
       // Update connection status with error
       const updatedMailchimpData = {
-        ...(window as any).yatraAdmin?.mailchimp || {},
+        ...((window as any).yatraAdmin?.mailchimp || {}),
         connectionStatus: {
           connected: false,
-          error: error.message || __("Invalid API key", "yatra")
-        }
+          error: error.message || __("Invalid API key", "yatra"),
+        },
       };
-      
+
       if ((window as any).yatraAdmin) {
         (window as any).yatraAdmin.mailchimp = updatedMailchimpData;
       }
-      
+
       // Update local connection status
       setMailchimpConnectionStatus({
         connected: false,
-        error: error.message || __("Invalid API key", "yatra")
+        error: error.message || __("Invalid API key", "yatra"),
       });
-      
+
       console.error("API key validation failed:", error);
     } finally {
       setValidatingApiKey(false);
@@ -2669,16 +2712,16 @@ const Settings: React.FC = () => {
   const loadMailchimpLists = async () => {
     try {
       const response = await apiClient.get("/mailchimp/lists");
-      
+
       if (response.success && response.data) {
         setMailchimpLists(response.data);
-        
+
         // Update the yatraAdmin object with available lists
         const updatedMailchimpData = {
-          ...(window as any).yatraAdmin?.mailchimp || {},
-          availableLists: response.data
+          ...((window as any).yatraAdmin?.mailchimp || {}),
+          availableLists: response.data,
         };
-        
+
         if ((window as any).yatraAdmin) {
           (window as any).yatraAdmin.mailchimp = updatedMailchimpData;
         }
@@ -2694,19 +2737,21 @@ const Settings: React.FC = () => {
       setMailchimpMergeFields([]);
       return;
     }
-    
+
     try {
-      const response = await apiClient.get(`/mailchimp/lists/${listId}/merge-fields`);
-      
+      const response = await apiClient.get(
+        `/mailchimp/lists/${listId}/merge-fields`,
+      );
+
       if (response.success && response.data) {
         setMailchimpMergeFields(response.data);
-        
+
         // Update the yatraAdmin object with merge fields
         const updatedMailchimpData = {
-          ...(window as any).yatraAdmin?.mailchimp || {},
-          mergeFields: response.data
+          ...((window as any).yatraAdmin?.mailchimp || {}),
+          mergeFields: response.data,
         };
-        
+
         if ((window as any).yatraAdmin) {
           (window as any).yatraAdmin.mailchimp = updatedMailchimpData;
         }
@@ -2727,25 +2772,38 @@ const Settings: React.FC = () => {
   // Initialize local connection status from global state
   React.useEffect(() => {
     if ((window as any).yatraAdmin?.mailchimp?.connectionStatus) {
-      setMailchimpConnectionStatus((window as any).yatraAdmin.mailchimp.connectionStatus);
+      setMailchimpConnectionStatus(
+        (window as any).yatraAdmin.mailchimp.connectionStatus,
+      );
     }
   }, []);
 
   // Google Analytics validation functions
   const validateMeasurementId = async () => {
     if (!formData?.ga4_measurement_id) return;
-    
+
     setValidatingMeasurementId(true);
     try {
-      const response = await apiService.validateGoogleAnalyticsMeasurementId(formData.ga4_measurement_id);
-      
+      const response = await apiService.validateGoogleAnalyticsMeasurementId(
+        formData.ga4_measurement_id,
+      );
+
       if (response.success) {
-        showToast(__('Measurement ID validated successfully!', 'yatra'), 'success');
+        showToast(
+          __("Measurement ID validated successfully!", "yatra"),
+          "success",
+        );
       } else {
-        showToast(response.message || __('Measurement ID validation failed.', 'yatra'), 'error');
+        showToast(
+          response.message || __("Measurement ID validation failed.", "yatra"),
+          "error",
+        );
       }
     } catch (error: any) {
-      showToast(error.message || __('Failed to validate Measurement ID.', 'yatra'), 'error');
+      showToast(
+        error.message || __("Failed to validate Measurement ID.", "yatra"),
+        "error",
+      );
     } finally {
       setValidatingMeasurementId(false);
     }
@@ -2753,21 +2811,27 @@ const Settings: React.FC = () => {
 
   const validateApiSecret = async () => {
     if (!formData?.ga4_measurement_id || !formData?.ga4_api_secret) return;
-    
+
     setValidatingApiSecret(true);
     try {
       const response = await apiService.validateGoogleAnalyticsApiSecret(
         formData.ga4_measurement_id,
-        formData.ga4_api_secret
+        formData.ga4_api_secret,
       );
-      
+
       if (response.success) {
-        showToast(__('API Secret validated successfully!', 'yatra'), 'success');
+        showToast(__("API Secret validated successfully!", "yatra"), "success");
       } else {
-        showToast(response.message || __('API Secret validation failed.', 'yatra'), 'error');
+        showToast(
+          response.message || __("API Secret validation failed.", "yatra"),
+          "error",
+        );
       }
     } catch (error: any) {
-      showToast(error.message || __('Failed to validate API Secret.', 'yatra'), 'error');
+      showToast(
+        error.message || __("Failed to validate API Secret.", "yatra"),
+        "error",
+      );
     } finally {
       setValidatingApiSecret(false);
     }
@@ -2776,24 +2840,25 @@ const Settings: React.FC = () => {
   // Facebook Pixel validation functions
   const validateFacebookPixel = async () => {
     if (!formData?.facebook_pixel_id) return;
-    
+
     setValidatingPixel(true);
     try {
       const response = await apiClient.post("/facebook-pixel/test", {
-        pixel_id: formData.facebook_pixel_id
+        pixel_id: formData.facebook_pixel_id,
       });
-      
+
       if (response.success) {
         // Update the yatraAdmin object with new connection status
         const updatedFacebookPixelData = {
-          ...(window as any).yatraAdmin?.facebookPixel || {},
+          ...((window as any).yatraAdmin?.facebookPixel || {}),
           connectionStatus: {
-            ...(window as any).yatraAdmin?.facebookPixel?.connectionStatus || {},
+            ...((window as any).yatraAdmin?.facebookPixel?.connectionStatus ||
+              {}),
             pixelConnected: true,
-            pixelError: null
-          }
+            pixelError: null,
+          },
         };
-        
+
         if ((window as any).yatraAdmin) {
           (window as any).yatraAdmin.facebookPixel = updatedFacebookPixelData;
         }
@@ -2801,18 +2866,19 @@ const Settings: React.FC = () => {
     } catch (error: any) {
       // Update connection status with error
       const updatedFacebookPixelData = {
-        ...(window as any).yatraAdmin?.facebookPixel || {},
+        ...((window as any).yatraAdmin?.facebookPixel || {}),
         connectionStatus: {
-          ...(window as any).yatraAdmin?.facebookPixel?.connectionStatus || {},
+          ...((window as any).yatraAdmin?.facebookPixel?.connectionStatus ||
+            {}),
           pixelConnected: false,
-          pixelError: error.message || __("Invalid Pixel ID", "yatra")
-        }
+          pixelError: error.message || __("Invalid Pixel ID", "yatra"),
+        },
       };
-      
+
       if ((window as any).yatraAdmin) {
         (window as any).yatraAdmin.facebookPixel = updatedFacebookPixelData;
       }
-      
+
       console.error("Pixel validation failed:", error);
     } finally {
       setValidatingPixel(false);
@@ -2821,24 +2887,25 @@ const Settings: React.FC = () => {
 
   const validateFacebookToken = async () => {
     if (!formData?.facebook_access_token) return;
-    
+
     setValidatingToken(true);
     try {
       const response = await apiClient.post("/facebook-pixel/test-token", {
-        access_token: formData.facebook_access_token
+        access_token: formData.facebook_access_token,
       });
-      
+
       if (response.success) {
         // Update the yatraAdmin object with new connection status
         const updatedFacebookPixelData = {
-          ...(window as any).yatraAdmin?.facebookPixel || {},
+          ...((window as any).yatraAdmin?.facebookPixel || {}),
           connectionStatus: {
-            ...(window as any).yatraAdmin?.facebookPixel?.connectionStatus || {},
+            ...((window as any).yatraAdmin?.facebookPixel?.connectionStatus ||
+              {}),
             tokenConnected: true,
-            tokenError: null
-          }
+            tokenError: null,
+          },
         };
-        
+
         if ((window as any).yatraAdmin) {
           (window as any).yatraAdmin.facebookPixel = updatedFacebookPixelData;
         }
@@ -2846,18 +2913,19 @@ const Settings: React.FC = () => {
     } catch (error: any) {
       // Update connection status with error
       const updatedFacebookPixelData = {
-        ...(window as any).yatraAdmin?.facebookPixel || {},
+        ...((window as any).yatraAdmin?.facebookPixel || {}),
         connectionStatus: {
-          ...(window as any).yatraAdmin?.facebookPixel?.connectionStatus || {},
+          ...((window as any).yatraAdmin?.facebookPixel?.connectionStatus ||
+            {}),
           tokenConnected: false,
-          tokenError: error.message || __("Invalid access token", "yatra")
-        }
+          tokenError: error.message || __("Invalid access token", "yatra"),
+        },
       };
-      
+
       if ((window as any).yatraAdmin) {
         (window as any).yatraAdmin.facebookPixel = updatedFacebookPixelData;
       }
-      
+
       console.error("Access token validation failed:", error);
     } finally {
       setValidatingToken(false);
@@ -2895,55 +2963,57 @@ const Settings: React.FC = () => {
 
     const fetchSeoImageUrl = async () => {
       const imageId = formData?.seo_trip_meta_image;
-      
+
       if (!imageId || imageId <= 0) {
         if (isMounted) {
-          setSeoImageUrl('');
+          setSeoImageUrl("");
           setSeoImageLoading(false);
-          setSeoImageError('');
+          setSeoImageError("");
         }
         return;
       }
 
       if (isMounted) {
         setSeoImageLoading(true);
-        setSeoImageError('');
+        setSeoImageError("");
       }
 
       try {
-        const siteUrl = window.yatraAdmin?.siteUrl || '';
+        const siteUrl = window.yatraAdmin?.siteUrl || "";
         const response = await fetch(
           `${siteUrl}/wp-json/wp/v2/media/${imageId}`,
-          { 
+          {
             signal: controller.signal,
             headers: {
-              'Accept': 'application/json',
-            }
-          }
+              Accept: "application/json",
+            },
+          },
         );
-        
+
         if (!isMounted) return;
 
         if (response.ok) {
           const mediaData = await response.json();
           const imageUrl = mediaData?.source_url;
-          
-          if (imageUrl && typeof imageUrl === 'string') {
+
+          if (imageUrl && typeof imageUrl === "string") {
             setSeoImageUrl(imageUrl);
-            setSeoImageError('');
+            setSeoImageError("");
           } else {
-            setSeoImageUrl('');
-            setSeoImageError('Image not found');
+            setSeoImageUrl("");
+            setSeoImageError("Image not found");
           }
         } else {
-          setSeoImageUrl('');
+          setSeoImageUrl("");
           setSeoImageError(`Failed to load image (${response.status})`);
         }
       } catch (error) {
         if (isMounted) {
-          console.error('Error fetching SEO image:', error);
-          setSeoImageUrl('');
-          setSeoImageError(error instanceof Error ? error.message : 'Unknown error');
+          console.error("Error fetching SEO image:", error);
+          setSeoImageUrl("");
+          setSeoImageError(
+            error instanceof Error ? error.message : "Unknown error",
+          );
         }
       } finally {
         if (isMounted) {
@@ -3674,11 +3744,16 @@ const Settings: React.FC = () => {
 
                 <ProFeature
                   title={__("Flexible Payments", "yatra")}
-                  description={__("offer deposit and partial payment options to your customers", "yatra")}
+                  description={__(
+                    "offer deposit and partial payment options to your customers",
+                    "yatra",
+                  )}
                   moduleName="Flexible Payments"
                   pricingUrl="https://wpyatra.com/pricing?module=flexible-payments"
                   isProActive={(window as any).yatraAdmin?.isPro}
-                  isModuleEnabled={(window as any).yatraAdmin?.flexiblePaymentsEnabled}
+                  isModuleEnabled={
+                    (window as any).yatraAdmin?.flexiblePaymentsEnabled
+                  }
                 >
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
@@ -3867,7 +3942,7 @@ const Settings: React.FC = () => {
                       const isDragging = draggedGateway === gatewayId;
 
                       const isPremium = gateway.requires_pro || false;
-                      
+
                       return (
                         <Card
                           key={gatewayId}
@@ -3879,7 +3954,9 @@ const Settings: React.FC = () => {
                                 : "border-gray-200 dark:border-gray-700"
                           }`}
                           draggable={!isPremium}
-                          onDragStart={(e) => !isPremium && handleDragStart(e, gatewayId)}
+                          onDragStart={(e) =>
+                            !isPremium && handleDragStart(e, gatewayId)
+                          }
                           onDragOver={!isPremium ? handleDragOver : undefined}
                           onDrop={(e) => !isPremium && handleDrop(e, gatewayId)}
                           onDragEnd={!isPremium ? handleDragEnd : undefined}
@@ -3920,10 +3997,16 @@ const Settings: React.FC = () => {
                                   checked={config.enabled || false}
                                   onChange={(e) => {
                                     // Show Pro popup if trying to enable a premium gateway
-                                    if (gateway.requires_pro && e.target.checked) {
+                                    if (
+                                      gateway.requires_pro &&
+                                      e.target.checked
+                                    ) {
                                       e.preventDefault();
-                                      const pricingUrl = (window as any).yatraAdmin?.pricingUrl || 'https://wpyatra.com/pricing';
-                                      window.open(pricingUrl, '_blank');
+                                      const pricingUrl =
+                                        (window as any).yatraAdmin
+                                          ?.pricingUrl ||
+                                        "https://wpyatra.com/pricing";
+                                      window.open(pricingUrl, "_blank");
                                       return;
                                     }
                                     handleGatewayConfigChange(
@@ -3978,7 +4061,9 @@ const Settings: React.FC = () => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => toggleGatewayExpanded(gatewayId)}
+                                  onClick={() =>
+                                    toggleGatewayExpanded(gatewayId)
+                                  }
                                   className="h-8"
                                   disabled={!gateway.fields?.length}
                                 >
@@ -4489,7 +4574,7 @@ const Settings: React.FC = () => {
                           )}
                           {/* Clean overlay for premium gateways */}
                           {isPremium && (
-                            <div 
+                            <div
                               className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5 dark:from-purple-500/10 dark:to-blue-500/10 rounded-lg cursor-pointer hover:from-purple-500/10 hover:to-blue-500/10 dark:hover:from-purple-500/15 dark:hover:to-blue-500/15 transition-all duration-200"
                               onClick={() => {
                                 setSelectedPremiumGateway(gateway.title);
@@ -5102,13 +5187,16 @@ const Settings: React.FC = () => {
                   <FormField
                     id="multiple_taxes"
                     label={__("Taxes", "yatra")}
-                    description={__("Configure taxes to apply to bookings", "yatra")}
+                    description={__(
+                      "Configure taxes to apply to bookings",
+                      "yatra",
+                    )}
                   >
                     <MultipleTaxesEditor
                       taxes={formData.multiple_taxes || []}
                       onChange={(taxes) => {
                         setFormData((prev) =>
-                          prev ? { ...prev, multiple_taxes: taxes } : prev
+                          prev ? { ...prev, multiple_taxes: taxes } : prev,
                         );
                       }}
                     />
@@ -5120,7 +5208,10 @@ const Settings: React.FC = () => {
                           <Input
                             value={newTaxName}
                             onChange={(e) => setNewTaxName(e.target.value)}
-                            placeholder={__("Tax name (e.g., VAT, GST)", "yatra")}
+                            placeholder={__(
+                              "Tax name (e.g., VAT, GST)",
+                              "yatra",
+                            )}
                             className="w-full"
                           />
                         </div>
@@ -5136,24 +5227,41 @@ const Settings: React.FC = () => {
                               placeholder={__("Rate", "yatra")}
                               className="w-full"
                             />
-                            <span className="text-sm text-gray-500 dark:text-gray-400">%</span>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                              %
+                            </span>
                           </div>
                         </div>
                         <Button
                           type="button"
                           onClick={() => {
-                            if (newTaxName && newTaxRate && parseFloat(newTaxRate) >= 0 && parseFloat(newTaxRate) <= 100) {
+                            if (
+                              newTaxName &&
+                              newTaxRate &&
+                              parseFloat(newTaxRate) >= 0 &&
+                              parseFloat(newTaxRate) <= 100
+                            ) {
                               setFormData((prev) => {
                                 const currentTaxes = prev?.multiple_taxes || [];
-                                const newTax = { name: newTaxName, rate: parseFloat(newTaxRate) };
+                                const newTax = {
+                                  name: newTaxName,
+                                  rate: parseFloat(newTaxRate),
+                                };
                                 const updatedTaxes = [...currentTaxes, newTax];
-                                return prev ? { ...prev, multiple_taxes: updatedTaxes } : prev;
+                                return prev
+                                  ? { ...prev, multiple_taxes: updatedTaxes }
+                                  : prev;
                               });
-                              setNewTaxName('');
-                              setNewTaxRate('');
+                              setNewTaxName("");
+                              setNewTaxRate("");
                             }
                           }}
-                          disabled={!newTaxName || !newTaxRate || parseFloat(newTaxRate) < 0 || parseFloat(newTaxRate) > 100}
+                          disabled={
+                            !newTaxName ||
+                            !newTaxRate ||
+                            parseFloat(newTaxRate) < 0 ||
+                            parseFloat(newTaxRate) > 100
+                          }
                           className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white"
                         >
                           <Plus className="w-4 h-4 mr-2" />
@@ -5166,13 +5274,16 @@ const Settings: React.FC = () => {
                     {(formData.multiple_taxes || []).length > 0 && (
                       <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 mt-4">
                         <div className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                          {__("Total Tax Rate:", "yatra")} {(formData.multiple_taxes || []).reduce((sum, tax) => sum + tax.rate, 0).toFixed(2)}%
+                          {__("Total Tax Rate:", "yatra")}{" "}
+                          {(formData.multiple_taxes || [])
+                            .reduce((sum, tax) => sum + tax.rate, 0)
+                            .toFixed(2)}
+                          %
                         </div>
                       </div>
                     )}
                   </FormField>
 
-                  
                   <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
                     <input
                       type="checkbox"
@@ -5223,7 +5334,7 @@ const Settings: React.FC = () => {
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
               {__("Currency Settings", "yatra")}
             </h3>
-            
+
             {/* Two Column Layout for All Currency Settings */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Left Column */}
@@ -5268,7 +5379,9 @@ const Settings: React.FC = () => {
                     <option value="left">$100 (Left)</option>
                     <option value="right">100$ (Right)</option>
                     <option value="left_space">$ 100 (Left with Space)</option>
-                    <option value="right_space">100 $ (Right with Space)</option>
+                    <option value="right_space">
+                      100 $ (Right with Space)
+                    </option>
                   </Select>
                 </FormField>
 
@@ -5360,7 +5473,8 @@ const Settings: React.FC = () => {
                   {__("Mailchimp", "yatra")}
                   <ProBadge isProActive={(window as any).yatraAdmin?.isPro} />
                 </CardTitle>
-                {(window as any).yatraAdmin?.mailchimp?.connectionStatus?.connected ? (
+                {(window as any).yatraAdmin?.mailchimp?.connectionStatus
+                  ?.connected ? (
                   <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
                     <CheckCircle className="w-4 h-4" />
                     {__("Connected", "yatra")}
@@ -5386,7 +5500,9 @@ const Settings: React.FC = () => {
                   moduleName="Mailchimp"
                   pricingUrl="https://wpyatra.com/pricing?module=mailchimp"
                   isProActive={(window as any).yatraAdmin?.isPro}
-                  isModuleEnabled={(window as any).yatraAdmin?.showMailchimpSettingsUI}
+                  isModuleEnabled={
+                    (window as any).yatraAdmin?.showMailchimpSettingsUI
+                  }
                 >
                   <div className="space-y-4">
                     <FormField
@@ -5435,7 +5551,9 @@ const Settings: React.FC = () => {
                           variant="outline"
                           size="sm"
                           onClick={validateMailchimpApiKey}
-                          disabled={!formData.mailchimp_api_key || validatingApiKey}
+                          disabled={
+                            !formData.mailchimp_api_key || validatingApiKey
+                          }
                           className="whitespace-nowrap"
                         >
                           {validatingApiKey ? (
@@ -5452,21 +5570,31 @@ const Settings: React.FC = () => {
                         </Button>
                       </div>
                       {formData.mailchimp_api_key && (
-                        <div className={`mt-2 text-sm ${(window as any).yatraAdmin?.mailchimp?.connectionStatus?.connected ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}`}>
-                          {(window as any).yatraAdmin?.mailchimp?.connectionStatus?.connected ? (
+                        <div
+                          className={`mt-2 text-sm ${(window as any).yatraAdmin?.mailchimp?.connectionStatus?.connected ? "text-green-600 dark:text-green-400" : "text-orange-600 dark:text-orange-400"}`}
+                        >
+                          {(window as any).yatraAdmin?.mailchimp
+                            ?.connectionStatus?.connected ? (
                             <>
                               <CheckCircle className="h-4 w-4 inline mr-1" />
                               {__("Connected successfully!", "yatra")}
                             </>
-                          ) : (window as any).yatraAdmin?.mailchimp?.connectionStatus?.error ? (
+                          ) : (window as any).yatraAdmin?.mailchimp
+                              ?.connectionStatus?.error ? (
                             <>
                               <XCircle className="h-4 w-4 inline mr-1" />
-                              {(window as any).yatraAdmin?.mailchimp?.connectionStatus?.error}
+                              {
+                                (window as any).yatraAdmin?.mailchimp
+                                  ?.connectionStatus?.error
+                              }
                             </>
                           ) : (
                             <>
                               <AlertCircle className="h-4 w-4 inline mr-1" />
-                              {__("API key entered. Click 'Validate' to test connection.", "yatra")}
+                              {__(
+                                "API key entered. Click 'Validate' to test connection.",
+                                "yatra",
+                              )}
                             </>
                           )}
                         </div>
@@ -5486,18 +5614,26 @@ const Settings: React.FC = () => {
                         value={formData.mailchimp_list_id || ""}
                         name="mailchimp_list_id"
                         onChange={handleFieldChange}
-                        disabled={!(window as any).yatraAdmin?.mailchimp?.connectionStatus?.connected}
+                        disabled={
+                          !(window as any).yatraAdmin?.mailchimp
+                            ?.connectionStatus?.connected
+                        }
                       >
                         <option value="">
-                          {!(window as any).yatraAdmin?.mailchimp?.connectionStatus?.connected
+                          {!(window as any).yatraAdmin?.mailchimp
+                            ?.connectionStatus?.connected
                             ? __("Please validate API key first", "yatra")
                             : __("Select an audience", "yatra")}
                         </option>
-                        {(window as any).yatraAdmin?.mailchimp?.availableLists?.map((list: any) => (
-                          <option key={list.id} value={list.id}>
-                            {list.name}
-                          </option>
-                        ))}
+                        {(
+                          window as any
+                        ).yatraAdmin?.mailchimp?.availableLists?.map(
+                          (list: any) => (
+                            <option key={list.id} value={list.id}>
+                              {list.name}
+                            </option>
+                          ),
+                        )}
                       </Select>
                     </FormField>
 
@@ -5567,53 +5703,81 @@ const Settings: React.FC = () => {
                           </p>
 
                           <div className="space-y-3">
-                            {(window as any).yatraAdmin?.mailchimp?.mergeFields?.length > 0 ? (
-                              (window as any).yatraAdmin?.mailchimp?.mergeFields.map((field: any) => {
-                                const currentMapping = (formData as any).mailchimp_field_mapping || {};
-                                const yatraFields = (window as any).yatraAdmin?.mailchimp?.yatraFields || {};
-                                const yatraFieldOptions = yatraFields[field.type] || yatraFields['text'] || [];
-                                
-                                return (
-                                  <div key={field.tag} className="grid grid-cols-2 gap-3 items-center">
-                                    <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
-                                      <div className="flex items-center gap-2">
-                                        <span>{field.name}</span>
-                                        {field.required && (
-                                          <span className="text-xs text-red-500">*</span>
-                                        )}
-                                        <span className="text-xs text-gray-400">({field.tag})</span>
-                                      </div>
-                                    </div>
-                                    <Select
-                                      value={currentMapping[field.tag] || ""}
-                                      onChange={(e) => {
-                                        const newMapping = { ...(formData as any).mailchimp_field_mapping || {} };
-                                        if (e.target.value) {
-                                          newMapping[field.tag] = e.target.value;
-                                        } else {
-                                          delete newMapping[field.tag];
-                                        }
-                                        setFormData((prev: any) => ({
-                                          ...prev,
-                                          mailchimp_field_mapping: newMapping,
-                                        }));
-                                      }}
+                            {(window as any).yatraAdmin?.mailchimp?.mergeFields
+                              ?.length > 0 ? (
+                              (
+                                window as any
+                              ).yatraAdmin?.mailchimp?.mergeFields.map(
+                                (field: any) => {
+                                  const currentMapping =
+                                    (formData as any).mailchimp_field_mapping ||
+                                    {};
+                                  const yatraFields =
+                                    (window as any).yatraAdmin?.mailchimp
+                                      ?.yatraFields || {};
+                                  const yatraFieldOptions =
+                                    yatraFields[field.type] ||
+                                    yatraFields["text"] ||
+                                    [];
+
+                                  return (
+                                    <div
+                                      key={field.tag}
+                                      className="grid grid-cols-2 gap-3 items-center"
                                     >
-                                      <option value="">
-                                        {__("Do not sync", "yatra")}
-                                      </option>
-                                      {Object.entries(yatraFieldOptions).map(([value, label]) => (
-                                        <option key={value} value={value}>
-                                          {label}
+                                      <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
+                                        <div className="flex items-center gap-2">
+                                          <span>{field.name}</span>
+                                          {field.required && (
+                                            <span className="text-xs text-red-500">
+                                              *
+                                            </span>
+                                          )}
+                                          <span className="text-xs text-gray-400">
+                                            ({field.tag})
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <Select
+                                        value={currentMapping[field.tag] || ""}
+                                        onChange={(e) => {
+                                          const newMapping = {
+                                            ...((formData as any)
+                                              .mailchimp_field_mapping || {}),
+                                          };
+                                          if (e.target.value) {
+                                            newMapping[field.tag] =
+                                              e.target.value;
+                                          } else {
+                                            delete newMapping[field.tag];
+                                          }
+                                          setFormData((prev: any) => ({
+                                            ...prev,
+                                            mailchimp_field_mapping: newMapping,
+                                          }));
+                                        }}
+                                      >
+                                        <option value="">
+                                          {__("Do not sync", "yatra")}
                                         </option>
-                                      ))}
-                                    </Select>
-                                  </div>
-                                );
-                              })
+                                        {Object.entries(yatraFieldOptions).map(
+                                          ([value, label]) => (
+                                            <option key={value} value={value}>
+                                              {label}
+                                            </option>
+                                          ),
+                                        )}
+                                      </Select>
+                                    </div>
+                                  );
+                                },
+                              )
                             ) : (
                               <div className="text-center py-4 text-sm text-gray-500 dark:text-gray-400">
-                                {__("No merge fields available. Please select a list first.", "yatra")}
+                                {__(
+                                  "No merge fields available. Please select a list first.",
+                                  "yatra",
+                                )}
                               </div>
                             )}
                           </div>
@@ -5696,7 +5860,8 @@ const Settings: React.FC = () => {
                   {__("Facebook Pixel", "yatra")}
                   <ProBadge isProActive={(window as any).yatraAdmin?.isPro} />
                 </CardTitle>
-                {(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.pixelConnected ? (
+                {(window as any).yatraAdmin?.facebookPixel?.connectionStatus
+                  ?.pixelConnected ? (
                   <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
                     <CheckCircle className="w-4 h-4" />
                     {__("Connected", "yatra")}
@@ -5718,11 +5883,16 @@ const Settings: React.FC = () => {
 
                 <ProFeature
                   title={__("Facebook Pixel", "yatra")}
-                  description={__("access advanced conversion tracking features", "yatra")}
+                  description={__(
+                    "access advanced conversion tracking features",
+                    "yatra",
+                  )}
                   moduleName="Facebook Pixel"
                   pricingUrl="https://wpyatra.com/pricing?module=facebook-pixel"
                   isProActive={(window as any).yatraAdmin?.isPro}
-                  isModuleEnabled={(window as any).yatraAdmin?.showFacebookPixelSettingsUI}
+                  isModuleEnabled={
+                    (window as any).yatraAdmin?.showFacebookPixelSettingsUI
+                  }
                 >
                   <div className="space-y-4">
                     <FormField
@@ -5730,20 +5900,57 @@ const Settings: React.FC = () => {
                       label={__("Pixel ID", "yatra")}
                       description={
                         <div className="space-y-2">
-                          <p>{__("Your Facebook Pixel ID (e.g., 123456789012345).", "yatra")}</p>
+                          <p>
+                            {__(
+                              "Your Facebook Pixel ID (e.g., 123456789012345).",
+                              "yatra",
+                            )}
+                          </p>
                           <details className="text-sm">
                             <summary className="cursor-pointer text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium">
                               {__("How to get your Pixel ID:", "yatra")}
                             </summary>
                             <ol className="mt-2 ml-4 list-decimal space-y-1 text-gray-600 dark:text-gray-400">
-                              <li>{__("Go to Facebook Business Manager: business.facebook.com", "yatra")}</li>
-                              <li>{__("Select your Business Account", "yatra")}</li>
-                              <li>{__("Click 'All tools' and select 'Pixels'", "yatra")}</li>
-                              <li>{__("Click 'Add Pixel' if you don't have one", "yatra")}</li>
-                              <li>{__("Enter a Pixel name and enter your website URL", "yatra")}</li>
+                              <li>
+                                {__(
+                                  "Go to Facebook Business Manager: business.facebook.com",
+                                  "yatra",
+                                )}
+                              </li>
+                              <li>
+                                {__("Select your Business Account", "yatra")}
+                              </li>
+                              <li>
+                                {__(
+                                  "Click 'All tools' and select 'Pixels'",
+                                  "yatra",
+                                )}
+                              </li>
+                              <li>
+                                {__(
+                                  "Click 'Add Pixel' if you don't have one",
+                                  "yatra",
+                                )}
+                              </li>
+                              <li>
+                                {__(
+                                  "Enter a Pixel name and enter your website URL",
+                                  "yatra",
+                                )}
+                              </li>
                               <li>{__("Click 'Create Pixel'", "yatra")}</li>
-                              <li>{__("Your Pixel ID will be displayed (e.g., 123456789012345)", "yatra")}</li>
-                              <li>{__("Copy this Pixel ID and paste it in the field above", "yatra")}</li>
+                              <li>
+                                {__(
+                                  "Your Pixel ID will be displayed (e.g., 123456789012345)",
+                                  "yatra",
+                                )}
+                              </li>
+                              <li>
+                                {__(
+                                  "Copy this Pixel ID and paste it in the field above",
+                                  "yatra",
+                                )}
+                              </li>
                             </ol>
                           </details>
                           <div className="mt-2">
@@ -5772,7 +5979,9 @@ const Settings: React.FC = () => {
                         <Button
                           type="button"
                           onClick={validateFacebookPixel}
-                          disabled={!formData.facebook_pixel_id || validatingPixel}
+                          disabled={
+                            !formData.facebook_pixel_id || validatingPixel
+                          }
                           variant="outline"
                           size="sm"
                           className="whitespace-nowrap"
@@ -5791,21 +6000,31 @@ const Settings: React.FC = () => {
                         </Button>
                       </div>
                       {formData.facebook_pixel_id && (
-                        <div className={`mt-2 text-sm ${(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.pixelConnected ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}`}>
-                          {(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.pixelConnected ? (
+                        <div
+                          className={`mt-2 text-sm ${(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.pixelConnected ? "text-green-600 dark:text-green-400" : "text-orange-600 dark:text-orange-400"}`}
+                        >
+                          {(window as any).yatraAdmin?.facebookPixel
+                            ?.connectionStatus?.pixelConnected ? (
                             <>
                               <CheckCircle className="h-4 w-4 inline mr-1" />
                               {__("Pixel ID is valid!", "yatra")}
                             </>
-                          ) : (window as any).yatraAdmin?.facebookPixel?.connectionStatus?.pixelError ? (
+                          ) : (window as any).yatraAdmin?.facebookPixel
+                              ?.connectionStatus?.pixelError ? (
                             <>
                               <XCircle className="h-4 w-4 inline mr-1" />
-                              {(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.pixelError}
+                              {
+                                (window as any).yatraAdmin?.facebookPixel
+                                  ?.connectionStatus?.pixelError
+                              }
                             </>
                           ) : (
                             <>
                               <AlertCircle className="h-4 w-4 inline mr-1" />
-                              {__("Click 'Validate' to test Pixel ID.", "yatra")}
+                              {__(
+                                "Click 'Validate' to test Pixel ID.",
+                                "yatra",
+                              )}
                             </>
                           )}
                         </div>
@@ -5888,33 +6107,91 @@ const Settings: React.FC = () => {
                         label={__("Access Token", "yatra")}
                         description={
                           <div className="space-y-2">
-                            <p>{__("Required for Conversions API. Enables server-side tracking for better accuracy.", "yatra")}</p>
+                            <p>
+                              {__(
+                                "Required for Conversions API. Enables server-side tracking for better accuracy.",
+                                "yatra",
+                              )}
+                            </p>
                             <details className="text-sm">
                               <summary className="cursor-pointer text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium">
                                 {__("How to get Access Token:", "yatra")}
                               </summary>
                               <ol className="mt-2 ml-4 list-decimal space-y-1 text-gray-600 dark:text-gray-400">
-                                <li>{__("Go to Facebook Business Manager: business.facebook.com", "yatra")}</li>
-                                <li>{__("Select your Business Account", "yatra")}</li>
-                                <li>{__("Click 'All tools' and select 'Events Manager'", "yatra")}</li>
-                                <li>{__("Find your Pixel ID in the data sources list (it should match the Pixel ID you entered above)", "yatra")}</li>
-                                <li>{__("Click on your Pixel name to open its settings", "yatra")}</li>
-                                <li>{__("Click 'Settings' (gear icon ⚙️) in the top right", "yatra")}</li>
-                                <li>{__("Scroll down to 'Conversions API' section", "yatra")}</li>
-                                <li>{__("Click 'Generate access token'", "yatra")}</li>
-                                <li>{__("Choose permissions: 'ads_management' and 'business_management'", "yatra")}</li>
+                                <li>
+                                  {__(
+                                    "Go to Facebook Business Manager: business.facebook.com",
+                                    "yatra",
+                                  )}
+                                </li>
+                                <li>
+                                  {__("Select your Business Account", "yatra")}
+                                </li>
+                                <li>
+                                  {__(
+                                    "Click 'All tools' and select 'Events Manager'",
+                                    "yatra",
+                                  )}
+                                </li>
+                                <li>
+                                  {__(
+                                    "Find your Pixel ID in the data sources list (it should match the Pixel ID you entered above)",
+                                    "yatra",
+                                  )}
+                                </li>
+                                <li>
+                                  {__(
+                                    "Click on your Pixel name to open its settings",
+                                    "yatra",
+                                  )}
+                                </li>
+                                <li>
+                                  {__(
+                                    "Click 'Settings' (gear icon ⚙️) in the top right",
+                                    "yatra",
+                                  )}
+                                </li>
+                                <li>
+                                  {__(
+                                    "Scroll down to 'Conversions API' section",
+                                    "yatra",
+                                  )}
+                                </li>
+                                <li>
+                                  {__("Click 'Generate access token'", "yatra")}
+                                </li>
+                                <li>
+                                  {__(
+                                    "Choose permissions: 'ads_management' and 'business_management'",
+                                    "yatra",
+                                  )}
+                                </li>
                                 <li>{__("Click 'Generate token'", "yatra")}</li>
-                                <li>{__("Copy the generated access token", "yatra")}</li>
-                                <li>{__("Paste it in the field above", "yatra")}</li>
+                                <li>
+                                  {__(
+                                    "Copy the generated access token",
+                                    "yatra",
+                                  )}
+                                </li>
+                                <li>
+                                  {__("Paste it in the field above", "yatra")}
+                                </li>
                               </ol>
                               <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
                                 <p className="text-xs text-blue-800 dark:text-blue-300">
-                                  <strong>{__("💡 Tip:", "yatra")}</strong> {__("If you have multiple Pixels, look for the one that matches the Pixel ID you entered above. The Pixel ID is displayed next to each Pixel name in the list.", "yatra")}
+                                  <strong>{__("💡 Tip:", "yatra")}</strong>{" "}
+                                  {__(
+                                    "If you have multiple Pixels, look for the one that matches the Pixel ID you entered above. The Pixel ID is displayed next to each Pixel name in the list.",
+                                    "yatra",
+                                  )}
                                 </p>
                               </div>
                               <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
                                 <p className="text-xs text-yellow-800 dark:text-yellow-300">
-                                  {__("⚠️ Keep your access token secure and never share it publicly.", "yatra")}
+                                  {__(
+                                    "⚠️ Keep your access token secure and never share it publicly.",
+                                    "yatra",
+                                  )}
                                 </p>
                               </div>
                             </details>
@@ -5945,7 +6222,9 @@ const Settings: React.FC = () => {
                               />
                               <button
                                 type="button"
-                                onClick={() => setShowFacebookToken(!showFacebookToken)}
+                                onClick={() =>
+                                  setShowFacebookToken(!showFacebookToken)
+                                }
                                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
                                 tabIndex={-1}
                               >
@@ -5959,7 +6238,10 @@ const Settings: React.FC = () => {
                             <Button
                               type="button"
                               onClick={validateFacebookToken}
-                              disabled={!formData.facebook_access_token || validatingToken}
+                              disabled={
+                                !formData.facebook_access_token ||
+                                validatingToken
+                              }
                               variant="outline"
                               size="sm"
                               className="whitespace-nowrap"
@@ -5978,21 +6260,31 @@ const Settings: React.FC = () => {
                             </Button>
                           </div>
                           {formData.facebook_access_token && (
-                            <div className={`text-sm ${(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.tokenConnected ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}`}>
-                              {(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.tokenConnected ? (
+                            <div
+                              className={`text-sm ${(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.tokenConnected ? "text-green-600 dark:text-green-400" : "text-orange-600 dark:text-orange-400"}`}
+                            >
+                              {(window as any).yatraAdmin?.facebookPixel
+                                ?.connectionStatus?.tokenConnected ? (
                                 <>
                                   <CheckCircle className="h-4 w-4 inline mr-1" />
                                   {__("Access token is valid!", "yatra")}
                                 </>
-                              ) : (window as any).yatraAdmin?.facebookPixel?.connectionStatus?.tokenError ? (
+                              ) : (window as any).yatraAdmin?.facebookPixel
+                                  ?.connectionStatus?.tokenError ? (
                                 <>
                                   <XCircle className="h-4 w-4 inline mr-1" />
-                                  {(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.tokenError}
+                                  {
+                                    (window as any).yatraAdmin?.facebookPixel
+                                      ?.connectionStatus?.tokenError
+                                  }
                                 </>
                               ) : (
                                 <>
                                   <AlertCircle className="h-4 w-4 inline mr-1" />
-                                  {__("Click 'Validate' to test access token.", "yatra")}
+                                  {__(
+                                    "Click 'Validate' to test access token.",
+                                    "yatra",
+                                  )}
                                 </>
                               )}
                             </div>
@@ -6006,15 +6298,30 @@ const Settings: React.FC = () => {
                 {(window as any).yatraAdmin?.facebookPixel?.pixelId && (
                   <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                     <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <svg
+                        className="w-4 h-4 text-blue-600 dark:text-blue-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
                       <div className="text-sm">
-                        <span className="text-blue-800 dark:text-blue-300 font-medium">{__("Facebook Pixel Monitoring:", "yatra")}</span>
+                        <span className="text-blue-800 dark:text-blue-300 font-medium">
+                          {__("Facebook Pixel Monitoring:", "yatra")}
+                        </span>
                         <span className="text-blue-700 dark:text-blue-400 ml-1">
-                          {__("View event statistics and activity in the ", "yatra")}
-                          <a 
-                            href={`${(window as any).yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=reports`}
+                          {__(
+                            "View event statistics and activity in the ",
+                            "yatra",
+                          )}
+                          <a
+                            href={`${(window as any).yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=reports`}
                             className="underline hover:text-blue-600 dark:hover:text-blue-300 font-medium"
                           >
                             {__("Reports page", "yatra")}
@@ -6025,7 +6332,6 @@ const Settings: React.FC = () => {
                     </div>
                   </div>
                 )}
-                
               </CardContent>
             </Card>
 
@@ -6068,11 +6374,16 @@ const Settings: React.FC = () => {
 
                 <ProFeature
                   title={__("Google Analytics 4 Enhanced", "yatra")}
-                  description={__("access enhanced e-commerce tracking features", "yatra")}
+                  description={__(
+                    "access enhanced e-commerce tracking features",
+                    "yatra",
+                  )}
                   moduleName="Google Analytics"
                   pricingUrl="https://wpyatra.com/pricing?module=google-analytics"
                   isProActive={(window as any).yatraAdmin?.isPro}
-                  isModuleEnabled={(window as any).yatraAdmin?.showGoogleAnalyticsSettingsUI}
+                  isModuleEnabled={
+                    (window as any).yatraAdmin?.showGoogleAnalyticsSettingsUI
+                  }
                 >
                   <div className="space-y-4">
                     <FormField
@@ -6098,21 +6409,49 @@ const Settings: React.FC = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => validateMeasurementId()}
-                          disabled={!formData.ga4_measurement_id || validatingMeasurementId}
+                          disabled={
+                            !formData.ga4_measurement_id ||
+                            validatingMeasurementId
+                          }
                           className="shrink-0"
                         >
                           {validatingMeasurementId ? (
                             <>
-                              <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              <svg
+                                className="animate-spin -ml-1 mr-2 h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                ></circle>
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
                               </svg>
                               {__("Validating...", "yatra")}
                             </>
                           ) : (
                             <>
-                              <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              <svg
+                                className="-ml-1 mr-2 h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
                               </svg>
                               {__("Validate", "yatra")}
                             </>
@@ -6202,9 +6541,7 @@ const Settings: React.FC = () => {
                       <input
                         type="checkbox"
                         id="ga4_use_measurement_protocol"
-                        checked={
-                          formData.ga4_use_measurement_protocol ?? false
-                        }
+                        checked={formData.ga4_use_measurement_protocol ?? false}
                         name="ga4_use_measurement_protocol"
                         onChange={handleFieldChange}
                         className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
@@ -6263,20 +6600,35 @@ const Settings: React.FC = () => {
                     )}
                   </div>
                 </ProFeature>
-                
+
                 {/* Google Analytics Monitoring Notice */}
                 {(window as any).yatraAdmin?.googleAnalytics?.measurementId && (
                   <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                     <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <svg
+                        className="w-4 h-4 text-blue-600 dark:text-blue-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
                       <div className="text-sm">
-                        <span className="text-blue-800 dark:text-blue-300 font-medium">{__("Google Analytics Monitoring:", "yatra")}</span>
+                        <span className="text-blue-800 dark:text-blue-300 font-medium">
+                          {__("Google Analytics Monitoring:", "yatra")}
+                        </span>
                         <span className="text-blue-700 dark:text-blue-400 ml-1">
-                          {__("View event statistics and activity in the ", "yatra")}
-                          <a 
-                            href={`${(window as any).yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=reports`}
+                          {__(
+                            "View event statistics and activity in the ",
+                            "yatra",
+                          )}
+                          <a
+                            href={`${(window as any).yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=reports`}
                             className="underline hover:text-blue-600 dark:hover:text-blue-300 font-medium"
                           >
                             {__("Reports page", "yatra")}
@@ -6297,7 +6649,12 @@ const Settings: React.FC = () => {
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 text-blue-600 dark:text-blue-400 mt-0.5">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                      />
                     </svg>
                   </div>
                   <div className="flex-1">
@@ -6305,7 +6662,10 @@ const Settings: React.FC = () => {
                       {__("OpenStreetMap Integration", "yatra")}
                     </h4>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      {__("Maps are powered by OpenStreetMap - a free, open-source mapping service. No API key required! Maps will automatically display trip starting locations with custom markers.", "yatra")}
+                      {__(
+                        "Maps are powered by OpenStreetMap - a free, open-source mapping service. No API key required! Maps will automatically display trip starting locations with custom markers.",
+                        "yatra",
+                      )}
                     </p>
                   </div>
                 </div>
@@ -6499,9 +6859,7 @@ const Settings: React.FC = () => {
                       </code>
                     </span>
                     <a
-                      href={listingHref(
-                        formData.activity_base || "activity",
-                      )}
+                      href={listingHref(formData.activity_base || "activity")}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline shrink-0"
@@ -6777,13 +7135,19 @@ const Settings: React.FC = () => {
                 {__("Trip Archive SEO Settings", "yatra")}
               </h3>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                {__("Configure SEO meta tags for the trip archive page (/trip/). These meta tags will be used for the main trip listing page.", "yatra")}
+                {__(
+                  "Configure SEO meta tags for the trip archive page (/trip/). These meta tags will be used for the main trip listing page.",
+                  "yatra",
+                )}
               </p>
               <div className="space-y-4">
                 <FormField
                   id="seo_trip_meta_title"
                   label={__("Trip Archive Meta Title", "yatra")}
-                  description={__("Meta title for the trip archive page. This will appear in search engine results for /trip/ page.", "yatra")}
+                  description={__(
+                    "Meta title for the trip archive page. This will appear in search engine results for /trip/ page.",
+                    "yatra",
+                  )}
                 >
                   <Input
                     id="seo_trip_meta_title"
@@ -6791,10 +7155,15 @@ const Settings: React.FC = () => {
                     value={formData.seo_trip_meta_title}
                     onChange={(e) =>
                       setFormData((prev) =>
-                        prev ? { ...prev, seo_trip_meta_title: e.target.value } : null
+                        prev
+                          ? { ...prev, seo_trip_meta_title: e.target.value }
+                          : null,
                       )
                     }
-                    placeholder={__("e.g., Browse All Trips - Find Your Perfect Adventure | Your Travel Agency", "yatra")}
+                    placeholder={__(
+                      "e.g., Browse All Trips - Find Your Perfect Adventure | Your Travel Agency",
+                      "yatra",
+                    )}
                     className="w-full"
                   />
                 </FormField>
@@ -6802,17 +7171,28 @@ const Settings: React.FC = () => {
                 <FormField
                   id="seo_trip_meta_description"
                   label={__("Trip Archive Meta Description", "yatra")}
-                  description={__("Meta description for the trip archive page. Should be 150-160 characters for best SEO results.", "yatra")}
+                  description={__(
+                    "Meta description for the trip archive page. Should be 150-160 characters for best SEO results.",
+                    "yatra",
+                  )}
                 >
                   <textarea
                     id="seo_trip_meta_description"
                     value={formData.seo_trip_meta_description}
                     onChange={(e) =>
                       setFormData((prev) =>
-                        prev ? { ...prev, seo_trip_meta_description: e.target.value } : null
+                        prev
+                          ? {
+                              ...prev,
+                              seo_trip_meta_description: e.target.value,
+                            }
+                          : null,
                       )
                     }
-                    placeholder={__("e.g., Explore our complete collection of amazing trips and adventures. Find and book your perfect journey with us.", "yatra")}
+                    placeholder={__(
+                      "e.g., Explore our complete collection of amazing trips and adventures. Find and book your perfect journey with us.",
+                      "yatra",
+                    )}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                   />
@@ -6821,7 +7201,10 @@ const Settings: React.FC = () => {
                 <FormField
                   id="seo_trip_meta_keywords"
                   label={__("Trip Archive Meta Keywords", "yatra")}
-                  description={__("Comma-separated keywords for the trip archive page. Include relevant travel and booking keywords.", "yatra")}
+                  description={__(
+                    "Comma-separated keywords for the trip archive page. Include relevant travel and booking keywords.",
+                    "yatra",
+                  )}
                 >
                   <Input
                     id="seo_trip_meta_keywords"
@@ -6829,10 +7212,15 @@ const Settings: React.FC = () => {
                     value={formData.seo_trip_meta_keywords}
                     onChange={(e) =>
                       setFormData((prev) =>
-                        prev ? { ...prev, seo_trip_meta_keywords: e.target.value } : null
+                        prev
+                          ? { ...prev, seo_trip_meta_keywords: e.target.value }
+                          : null,
                       )
                     }
-                    placeholder={__("e.g., travel, trips, adventure, booking, tours, destinations, holidays", "yatra")}
+                    placeholder={__(
+                      "e.g., travel, trips, adventure, booking, tours, destinations, holidays",
+                      "yatra",
+                    )}
                     className="w-full"
                   />
                 </FormField>
@@ -6840,10 +7228,14 @@ const Settings: React.FC = () => {
                 <FormField
                   id="seo_trip_meta_image"
                   label={__("Trip Archive SEO Image", "yatra")}
-                  description={__("Image for social media sharing and SEO. Recommended size: 1200x630 pixels. This image will appear when the trip archive page is shared on Facebook, Twitter, and other platforms.", "yatra")}
+                  description={__(
+                    "Image for social media sharing and SEO. Recommended size: 1200x630 pixels. This image will appear when the trip archive page is shared on Facebook, Twitter, and other platforms.",
+                    "yatra",
+                  )}
                 >
                   <div className="space-y-4">
-                    {formData.seo_trip_meta_image && formData.seo_trip_meta_image > 0 ? (
+                    {formData.seo_trip_meta_image &&
+                    formData.seo_trip_meta_image > 0 ? (
                       <div className="relative group">
                         <div className="flex items-start gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800/50">
                           {seoImageLoading ? (
@@ -6862,15 +7254,19 @@ const Settings: React.FC = () => {
                           ) : seoImageError ? (
                             <div className="w-24 h-24 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
                               <X className="w-6 h-6 text-red-400 mb-1" />
-                              <span className="text-xs text-red-500 dark:text-red-400 text-center px-1">{seoImageError}</span>
+                              <span className="text-xs text-red-500 dark:text-red-400 text-center px-1">
+                                {seoImageError}
+                              </span>
                             </div>
                           ) : (
                             <div className="w-24 h-24 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
                               <Image className="w-6 h-6 text-gray-400 mb-1" />
-                              <span className="text-xs text-gray-500 dark:text-gray-400">No image</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                No image
+                              </span>
                             </div>
                           )}
-                          
+
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-2">
                               <h4 className="text-sm font-medium text-gray-900 dark:text-white">
@@ -6881,7 +7277,9 @@ const Settings: React.FC = () => {
                                   type="button"
                                   onClick={() => {
                                     setFormData((prev) =>
-                                      prev ? { ...prev, seo_trip_meta_image: 0 } : null
+                                      prev
+                                        ? { ...prev, seo_trip_meta_image: 0 }
+                                        : null,
                                     );
                                   }}
                                   className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
@@ -6892,7 +7290,10 @@ const Settings: React.FC = () => {
                               )}
                             </div>
                             <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                              {__("Recommended size: 1200x630 pixels for optimal social media display.", "yatra")}
+                              {__(
+                                "Recommended size: 1200x630 pixels for optimal social media display.",
+                                "yatra",
+                              )}
                             </p>
                             <Button
                               type="button"
@@ -6901,18 +7302,29 @@ const Settings: React.FC = () => {
                                 if (window.wp && window.wp.media) {
                                   const mediaUploader = window.wp.media({
                                     title: __("Select SEO Image", "yatra"),
-                                    button: { text: __("Use this image", "yatra") },
+                                    button: {
+                                      text: __("Use this image", "yatra"),
+                                    },
                                     multiple: false,
                                     library: { type: "image" },
                                   });
-                                  
+
                                   mediaUploader.on("select", () => {
-                                    const attachment = mediaUploader.state().get("selection").first().toJSON();
+                                    const attachment = mediaUploader
+                                      .state()
+                                      .get("selection")
+                                      .first()
+                                      .toJSON();
                                     setFormData((prev) =>
-                                      prev ? { ...prev, seo_trip_meta_image: attachment.id } : null
+                                      prev
+                                        ? {
+                                            ...prev,
+                                            seo_trip_meta_image: attachment.id,
+                                          }
+                                        : null,
                                     );
                                   });
-                                  
+
                                   prepareWordPressMediaFrameOpen();
                                   mediaUploader.open();
                                 }
@@ -6934,7 +7346,10 @@ const Settings: React.FC = () => {
                           {__("Add SEO Image", "yatra")}
                         </h4>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 max-w-sm mx-auto">
-                          {__("Upload an image that will appear when your trip archive page is shared on social media. Recommended size: 1200x630 pixels.", "yatra")}
+                          {__(
+                            "Upload an image that will appear when your trip archive page is shared on social media. Recommended size: 1200x630 pixels.",
+                            "yatra",
+                          )}
                         </p>
                         <Button
                           type="button"
@@ -6947,14 +7362,23 @@ const Settings: React.FC = () => {
                                 multiple: false,
                                 library: { type: "image" },
                               });
-                              
+
                               mediaUploader.on("select", () => {
-                                const attachment = mediaUploader.state().get("selection").first().toJSON();
+                                const attachment = mediaUploader
+                                  .state()
+                                  .get("selection")
+                                  .first()
+                                  .toJSON();
                                 setFormData((prev) =>
-                                  prev ? { ...prev, seo_trip_meta_image: attachment.id } : null
+                                  prev
+                                    ? {
+                                        ...prev,
+                                        seo_trip_meta_image: attachment.id,
+                                      }
+                                    : null,
                                 );
                               });
-                              
+
                               prepareWordPressMediaFrameOpen();
                               mediaUploader.open();
                             }
@@ -7120,11 +7544,12 @@ const Settings: React.FC = () => {
                             e.target.checked,
                           );
                           setUsageStatus((prev) =>
-                            prev
-                              ? { ...prev, enabled: r.enabled }
-                              : prev,
+                            prev ? { ...prev, enabled: r.enabled } : prev,
                           );
-                          showToast(__("Preference saved.", "yatra"), "success");
+                          showToast(
+                            __("Preference saved.", "yatra"),
+                            "success",
+                          );
                         } catch (err: any) {
                           showToast(
                             err?.message ||
@@ -7176,7 +7601,10 @@ const Settings: React.FC = () => {
                           });
                           const s = await fetchUsageTrackingStatus();
                           setUsageStatus(s);
-                          showToast(__("Sent successfully.", "yatra"), "success");
+                          showToast(
+                            __("Sent successfully.", "yatra"),
+                            "success",
+                          );
                         } catch (err: any) {
                           showToast(
                             err?.message || __("Send failed.", "yatra"),
@@ -7193,7 +7621,6 @@ const Settings: React.FC = () => {
                   </div>
                 </div>
               )}
-
             </div>
           </div>
         );
@@ -7377,14 +7804,17 @@ const Settings: React.FC = () => {
           </div>
         </div>
       </ConditionalRender>
-      
+
       {/* Premium Upgrade Dialog for Payment Gateways */}
       <PremiumUpgradeDialog
         open={showPremiumDialog}
         onClose={() => setShowPremiumDialog(false)}
         moduleName={selectedPremiumGateway}
         moduleDescription={`Unlock ${selectedPremiumGateway} payment gateway to accept payments from your customers. This premium gateway provides secure payment processing with advanced features.`}
-        purchaseUrl={(window as any).yatraAdmin?.pricingUrl || 'https://wpyatra.com/pricing'}
+        purchaseUrl={
+          (window as any).yatraAdmin?.pricingUrl ||
+          "https://wpyatra.com/pricing"
+        }
       />
     </div>
   );

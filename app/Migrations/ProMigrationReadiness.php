@@ -116,24 +116,15 @@ final class ProMigrationReadiness
                 $list = implode(', ', array_map(static fn (array $p): string => $p['file'], $plugins));
                 $warning = sprintf(
                     /* translators: %s: comma-separated list of plugin paths */
-                    __(
-                        'More than one Yatra Pro plugin is active (%s). Deactivate duplicates so only Yatra Pro 3.0 or newer remains. Pro-specific migration will not run correctly with multiple copies.',
-                        'yatra'
-                    ),
+                    __('More than one Yatra Pro plugin is active (%s). Deactivate duplicates so only Yatra Pro 3.0 or newer remains. Pro-specific migration will not run correctly with multiple copies.', 'yatra'),
                     $list
                 );
             } elseif ($count === 0) {
-                $warning = __(
-                    'No Yatra Pro plugin is active. If you used Yatra Pro before, install and activate Yatra Pro 3.0 or newer first — Pro-related migration steps (additional services, some payment settings, Pro tables) will be skipped or incomplete.',
-                    'yatra'
-                );
+                $warning = __('No Yatra Pro plugin is active. If you used Yatra Pro before, install and activate Yatra Pro 3.0 or newer first — Pro-related migration steps (additional services, some payment settings, Pro tables) will be skipped or incomplete.', 'yatra');
             } else {
                 $warning = sprintf(
                     /* translators: %1$s: detected Yatra Pro version, %2$s: minimum required version */
-                    __(
-                        'Your active Yatra Pro version is %1$s. Update to Yatra Pro %2$s or newer before migrating. Pro-specific migration steps will not succeed on older versions.',
-                        'yatra'
-                    ),
+                    __('Your active Yatra Pro version is %1$s. Update to Yatra Pro %2$s or newer before migrating. Pro-specific migration steps will not succeed on older versions.', 'yatra'),
                     $version !== null ? $version : __('unknown', 'yatra'),
                     '3.0'
                 );

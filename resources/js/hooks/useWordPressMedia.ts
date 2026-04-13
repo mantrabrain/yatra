@@ -104,7 +104,6 @@ export const useWordPressMedia = (
 
         // Method 4: Use eval to access in global scope (last resort)
         try {
-          // eslint-disable-next-line no-eval
           const wpMedia = eval(
             '(typeof wp !== "undefined" && typeof wp.media === "function") ? wp.media : null',
           );

@@ -497,8 +497,7 @@ const EmailAutomationModulePrompt: React.FC = () => (
         variant="outline"
         className="shrink-0 border-amber-300 bg-white hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950 dark:hover:bg-amber-900"
         onClick={() => {
-          window.location.href =
-            "admin.php?page=yatra&subpage=modules";
+          window.location.href = "admin.php?page=yatra&subpage=modules";
         }}
       >
         {__("Open Modules", "yatra")}
@@ -511,10 +510,7 @@ const EmailAutomation: React.FC = () => {
   const emailMgr = useEmailSettingsManager();
   const [activeTab, setActiveTab] = useState<EmailHubTab>(() => {
     const t = getInitialEmailHubTab();
-    if (
-      !isProPluginActive() &&
-      (t === "sequences" || t === "logs")
-    ) {
+    if (!isProPluginActive() && (t === "sequences" || t === "logs")) {
       return "delivery";
     }
     return t;

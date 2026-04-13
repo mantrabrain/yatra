@@ -520,12 +520,20 @@ const ActivityForm: React.FC = () => {
                       id="seo_title"
                       type="text"
                       value={formData.seo_title}
-                      onChange={(e) => handleFieldChange("seo_title", e.target.value)}
-                      placeholder={__("e.g., {name} Activities | Your Travel Agency", "yatra")}
+                      onChange={(e) =>
+                        handleFieldChange("seo_title", e.target.value)
+                      }
+                      placeholder={__(
+                        "e.g., {name} Activities | Your Travel Agency",
+                        "yatra",
+                      )}
                       className="w-full"
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {__("Custom title for search engines. Use {name} as placeholder.", "yatra")}
+                      {__(
+                        "Custom title for search engines. Use {name} as placeholder.",
+                        "yatra",
+                      )}
                     </p>
                   </div>
 
@@ -539,13 +547,21 @@ const ActivityForm: React.FC = () => {
                     <textarea
                       id="seo_description"
                       value={formData.seo_description}
-                      onChange={(e) => handleFieldChange("seo_description", e.target.value)}
-                      placeholder={__("e.g., Discover amazing {name} activities and experiences. Book your adventure today!", "yatra")}
+                      onChange={(e) =>
+                        handleFieldChange("seo_description", e.target.value)
+                      }
+                      placeholder={__(
+                        "e.g., Discover amazing {name} activities and experiences. Book your adventure today!",
+                        "yatra",
+                      )}
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {__("Description for search engines (150-160 characters). Use {name} as placeholder.", "yatra")}
+                      {__(
+                        "Description for search engines (150-160 characters). Use {name} as placeholder.",
+                        "yatra",
+                      )}
                     </p>
                   </div>
 
@@ -560,12 +576,20 @@ const ActivityForm: React.FC = () => {
                       id="seo_keywords"
                       type="text"
                       value={formData.seo_keywords}
-                      onChange={(e) => handleFieldChange("seo_keywords", e.target.value)}
-                      placeholder={__("e.g., activities, adventure, {name}, travel, experiences", "yatra")}
+                      onChange={(e) =>
+                        handleFieldChange("seo_keywords", e.target.value)
+                      }
+                      placeholder={__(
+                        "e.g., activities, adventure, {name}, travel, experiences",
+                        "yatra",
+                      )}
                       className="w-full"
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {__("Comma-separated keywords. Use {name} as placeholder.", "yatra")}
+                      {__(
+                        "Comma-separated keywords. Use {name} as placeholder.",
+                        "yatra",
+                      )}
                     </p>
                   </div>
                 </CardContent>

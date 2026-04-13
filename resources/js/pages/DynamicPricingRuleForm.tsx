@@ -260,7 +260,7 @@ const DynamicPricingRuleForm: React.FC = () => {
         "success",
       );
       queryClient.invalidateQueries({ queryKey: ["dynamic-pricing-rules"] });
-      
+
       if (!isEdit && response?.data?.id) {
         // For new rules, redirect to edit page
         const baseUrl = window.location.href.split("&action=")[0];
@@ -868,8 +868,13 @@ const DynamicPricingRuleForm: React.FC = () => {
                           <Label>{__("Apply Pricing On")}</Label>
                           <div className="grid grid-cols-2 gap-2 mt-2">
                             {[
-                              "monday", "tuesday", "wednesday", "thursday", 
-                              "friday", "saturday", "sunday"
+                              "monday",
+                              "tuesday",
+                              "wednesday",
+                              "thursday",
+                              "friday",
+                              "saturday",
+                              "sunday",
                             ].map((day) => (
                               <div
                                 key={day}
@@ -912,7 +917,9 @@ const DynamicPricingRuleForm: React.FC = () => {
                         </div>
 
                         <div>
-                          <Label htmlFor="start_date">{__("Start Date (Optional)")}</Label>
+                          <Label htmlFor="start_date">
+                            {__("Start Date (Optional)")}
+                          </Label>
                           <DatePicker
                             value={formData.start_date}
                             onChange={(value) =>
@@ -926,7 +933,9 @@ const DynamicPricingRuleForm: React.FC = () => {
                         </div>
 
                         <div>
-                          <Label htmlFor="end_date">{__("End Date (Optional)")}</Label>
+                          <Label htmlFor="end_date">
+                            {__("End Date (Optional)")}
+                          </Label>
                           <DatePicker
                             value={formData.end_date}
                             onChange={(value) =>

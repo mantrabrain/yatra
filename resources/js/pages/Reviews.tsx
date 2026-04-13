@@ -323,7 +323,6 @@ const Reviews: React.FC = () => {
 
         queryClient.invalidateQueries({ queryKey: ["reviews"] });
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error("Bulk review action error", error);
       } finally {
         setSelectedIds([]);

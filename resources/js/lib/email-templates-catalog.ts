@@ -40,8 +40,7 @@ export function isCoreTemplateSlug(
   slug: string | null | undefined,
 ): slug is CoreFreeTemplateKey {
   return (
-    !!slug &&
-    (CORE_FREE_TEMPLATE_KEYS as readonly string[]).includes(slug)
+    !!slug && (CORE_FREE_TEMPLATE_KEYS as readonly string[]).includes(slug)
   );
 }
 
@@ -340,7 +339,9 @@ export function buildLocalTemplateRows(
         : false;
 
     return {
-      id: locked ? `locked:${entry.template_key}` : `core:${entry.template_key}`,
+      id: locked
+        ? `locked:${entry.template_key}`
+        : `core:${entry.template_key}`,
       template_key: entry.template_key,
       event_key: entry.event_key,
       name: entry.name,

@@ -3,7 +3,13 @@
  * Manage trip departures (manual and recurring-generated)
  */
 
-import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Plus,
@@ -566,13 +572,7 @@ const Departures: React.FC = () => {
 
   // Delete departure mutation (per-row trip id supports "All trips" list)
   const deleteMutation = useMutation({
-    mutationFn: async ({
-      id,
-      tripId: tid,
-    }: {
-      id: number;
-      tripId: number;
-    }) => {
+    mutationFn: async ({ id, tripId: tid }: { id: number; tripId: number }) => {
       await apiClient.delete(`/trips/${tid}/departures/${id}`);
     },
     onSuccess: () => {
@@ -592,10 +592,7 @@ const Departures: React.FC = () => {
     const tid = tripIdForDeparture(departure);
     if (!tid) {
       showToast(
-        __(
-          "Cannot delete: missing trip id for this departure.",
-          "yatra",
-        ),
+        __("Cannot delete: missing trip id for this departure.", "yatra"),
         "error",
       );
       return;
@@ -840,7 +837,10 @@ const Departures: React.FC = () => {
     const tid = tripIdForDeparture(departure);
     if (!tid) {
       showToast(
-        __("Cannot move to trash: missing trip id for this departure.", "yatra"),
+        __(
+          "Cannot move to trash: missing trip id for this departure.",
+          "yatra",
+        ),
         "error",
       );
       return;

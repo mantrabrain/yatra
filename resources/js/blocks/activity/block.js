@@ -52,8 +52,7 @@
             value: attributes.per_page,
             onChange: function (value) {
               setAttributes({
-                per_page:
-                  value !== undefined && value !== null ? value : 10,
+                per_page: value !== undefined && value !== null ? value : 10,
               });
             },
             min: 1,

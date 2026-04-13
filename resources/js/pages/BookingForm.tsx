@@ -375,7 +375,9 @@ const BookingForm: React.FC = () => {
           travel_date: normalizeDateInput(booking.travel_date ?? ""),
           travelers: String(booking.travelers || "1"),
           travelers_data: travelers, // Add the correctly parsed travelers data
-          subtotal: String((booking as any).subtotal || booking.total_amount || ""),
+          subtotal: String(
+            (booking as any).subtotal || booking.total_amount || "",
+          ),
           tax_amount: String((booking as any).tax_amount || "0"),
           total_amount: String(booking.total_amount || ""),
           currency: booking.currency || "USD",
@@ -403,13 +405,22 @@ const BookingForm: React.FC = () => {
         customer_name: bookingData.customer_name || "",
         customer_email: bookingData.customer_email || "",
         customer_phone: bookingData.customer_phone || "",
-        customer_country: (bookingData as any).contact_country || (bookingData as any).customer_country || "",
+        customer_country:
+          (bookingData as any).contact_country ||
+          (bookingData as any).customer_country ||
+          "",
         trip_id: String(bookingData.trip_id || ""),
         booking_date:
           bookingData.booking_date || new Date().toISOString().split("T")[0],
         travel_date: bookingData.travel_date || "",
-        travelers: String((bookingData as any).travelers_count || bookingData.travelers_data?.length || "1"),
-        subtotal: String((bookingData as any).subtotal || bookingData.total_amount || ""),
+        travelers: String(
+          (bookingData as any).travelers_count ||
+            bookingData.travelers_data?.length ||
+            "1",
+        ),
+        subtotal: String(
+          (bookingData as any).subtotal || bookingData.total_amount || "",
+        ),
         tax_amount: String((bookingData as any).tax_amount || "0"),
         total_amount: String(bookingData.total_amount || ""),
         currency: bookingData.currency || "USD",
@@ -420,7 +431,11 @@ const BookingForm: React.FC = () => {
       });
 
       // Set travelers data - use the correctly parsed travelers_data
-      if (bookingData.travelers_data && Array.isArray(bookingData.travelers_data) && bookingData.travelers_data.length > 0) {
+      if (
+        bookingData.travelers_data &&
+        Array.isArray(bookingData.travelers_data) &&
+        bookingData.travelers_data.length > 0
+      ) {
         setTravelersData(bookingData.travelers_data);
         // Expand first traveler by default
         setExpandedTravelers([0]);
@@ -450,13 +465,13 @@ const BookingForm: React.FC = () => {
       );
       if (selectedTrip) {
         const subtotal = selectedTrip.price * parseInt(formData.travelers);
-        
+
         // Calculate tax
         const taxCalculation = taxService.calculateBookingTax(
           subtotal,
-          formData.customer_country
+          formData.customer_country,
         );
-        
+
         setFormData((prev) => ({
           ...prev,
           subtotal: taxCalculation.subtotal.toString(),
@@ -1144,17 +1159,24 @@ const BookingForm: React.FC = () => {
                                 {__("Subtotal", "yatra")}
                               </span>
                               <span className="font-medium text-gray-900 dark:text-white">
-                                {currencySymbol}{parseFloat(formData.subtotal).toFixed(2)}
+                                {currencySymbol}
+                                {parseFloat(formData.subtotal).toFixed(2)}
                               </span>
                             </div>
                             {/* Itinerary Costs */}
-                            {(bookingData as any)?.itinerary_costs_total > 0 && (
+                            {(bookingData as any)?.itinerary_costs_total >
+                              0 && (
                               <div className="flex justify-between">
                                 <span className="text-gray-600 dark:text-gray-400">
                                   {__("Itinerary Costs", "yatra")}
                                 </span>
                                 <span className="font-medium text-gray-900 dark:text-white">
-                                  {getCurrencySymbol(formData.currency || globalCurrency)}{(bookingData as any).itinerary_costs_total.toFixed(2)}
+                                  {getCurrencySymbol(
+                                    formData.currency || globalCurrency,
+                                  )}
+                                  {(
+                                    bookingData as any
+                                  ).itinerary_costs_total.toFixed(2)}
                                 </span>
                               </div>
                             )}
@@ -1164,7 +1186,8 @@ const BookingForm: React.FC = () => {
                                   {__("Tax", "yatra")}
                                 </span>
                                 <span className="font-medium text-gray-900 dark:text-white">
-                                  {currencySymbol}{parseFloat(formData.tax_amount).toFixed(2)}
+                                  {currencySymbol}
+                                  {parseFloat(formData.tax_amount).toFixed(2)}
                                 </span>
                               </div>
                             )}
@@ -1173,13 +1196,19 @@ const BookingForm: React.FC = () => {
                                 {__("Total", "yatra")}
                               </span>
                               <span className="text-gray-900 dark:text-white">
-                                {getCurrencySymbol(formData.currency || globalCurrency)}{formData.total_amount}
+                                {getCurrencySymbol(
+                                  formData.currency || globalCurrency,
+                                )}
+                                {formData.total_amount}
                               </span>
                             </div>
                           </>
                         ) : (
                           <div className="text-center text-gray-500 dark:text-gray-400 py-2">
-                            {__("Select a trip and number of travelers to see pricing", "yatra")}
+                            {__(
+                              "Select a trip and number of travelers to see pricing",
+                              "yatra",
+                            )}
                           </div>
                         )}
                       </div>
@@ -1191,12 +1220,15 @@ const BookingForm: React.FC = () => {
                         htmlFor="total_amount"
                         className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
                       >
-                        {__("Total Amount", "yatra")} ({formData.currency || globalCurrency}){" "}
+                        {__("Total Amount", "yatra")} (
+                        {formData.currency || globalCurrency}){" "}
                         <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                          {getCurrencySymbol(formData.currency || globalCurrency)}
+                          {getCurrencySymbol(
+                            formData.currency || globalCurrency,
+                          )}
                         </span>
                         <Input
                           id="total_amount"
@@ -1354,9 +1386,7 @@ const BookingForm: React.FC = () => {
                                     )
                                   }
                                 />
-                                <span>
-                                  {field.placeholder || field.label}
-                                </span>
+                                <span>{field.placeholder || field.label}</span>
                               </label>
                             ) : (
                               <Input

@@ -13,11 +13,7 @@ import { Input } from "../ui/input";
 import { Select } from "../ui/select";
 import { ConfirmationDialog } from "../ui/confirmation-dialog";
 import { Switch } from "../ui/switch";
-import {
-  Table as SharedTable,
-  BulkActionToolbar,
-  Pagination,
-} from "../shared";
+import { Table as SharedTable, BulkActionToolbar, Pagination } from "../shared";
 import {
   Mail,
   Edit,
@@ -294,9 +290,7 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
         );
       }
 
-      await Promise.all(
-        customTemplateIds.map((id) => deleteEmailTemplate(id)),
-      );
+      await Promise.all(customTemplateIds.map((id) => deleteEmailTemplate(id)));
       return {
         deleted: customTemplateIds.length,
         skipped: ids.length - customTemplateIds.length,
@@ -697,7 +691,9 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
       icon: <Copy className="w-4 h-4" />,
       onClick: handleDuplicate,
       condition: (template: UnifiedEmailTemplate) =>
-        automationModuleActive && isApiTemplate(template) && !template.is_system,
+        automationModuleActive &&
+        isApiTemplate(template) &&
+        !template.is_system,
     },
     {
       key: "delete",
@@ -705,7 +701,9 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
       icon: <Trash2 className="w-4 h-4" />,
       onClick: handleDelete,
       condition: (template: UnifiedEmailTemplate) =>
-        automationModuleActive && isApiTemplate(template) && !template.is_system,
+        automationModuleActive &&
+        isApiTemplate(template) &&
+        !template.is_system,
       variant: "destructive" as const,
     },
   ];

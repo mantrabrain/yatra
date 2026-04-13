@@ -17,12 +17,7 @@ import {
   Bell,
 } from "lucide-react";
 import { __ } from "../../lib/i18n";
-import {
-  formatDate,
-  getBadge,
-  currency,
-  phoneToTelHref,
-} from "./utils";
+import { formatDate, getBadge, currency, phoneToTelHref } from "./utils";
 import type { Booking, Payment, CustomerProfile } from "./types";
 
 interface DashboardProps {

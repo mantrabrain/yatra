@@ -56,8 +56,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             value={attributes.columns}
             onChange={(value) =>
               setAttributes({
-                columns:
-                  value !== undefined && value !== null ? value : 3,
+                columns: value !== undefined && value !== null ? value : 3,
               })
             }
             min={1}
