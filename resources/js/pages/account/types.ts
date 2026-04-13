@@ -49,6 +49,8 @@ export interface TravelDocument {
   // Optional metadata for Pro downloads
   trip_id?: number;
   booking_id?: number;
+  /** Payment row id for invoice PDFs (REST /payment/{id}/invoice). */
+  payment_id?: number;
   access?: "public" | "logged_in" | "booked_only" | "paid_only";
   access_label?: string;
   locked?: boolean;

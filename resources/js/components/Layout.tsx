@@ -615,6 +615,31 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             })}
           </nav>
 
+          {!isProPluginActive() && (
+            <div className="shrink-0 px-4 pb-3">
+              <a
+                href="https://wpyatra.com/pricing/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col gap-0.5 rounded-lg border border-amber-200/90 dark:border-amber-800/40 bg-amber-50/60 dark:bg-amber-950/25 px-3 py-2.5 text-left transition-colors hover:bg-amber-50 dark:hover:bg-amber-950/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-800"
+              >
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-900 dark:text-amber-200">
+                  <Crown
+                    className="w-3.5 h-3.5 shrink-0 text-amber-600 dark:text-amber-400"
+                    aria-hidden
+                  />
+                  {__("Upgrade to Pro", "yatra")}
+                </span>
+                <span className="text-[11px] leading-snug text-amber-800/75 dark:text-amber-300/70">
+                  {__(
+                    "Premium features & integrations — view plans.",
+                    "yatra",
+                  )}
+                </span>
+              </a>
+            </div>
+          )}
+
           {/* Sticky bottom back link */}
           <div className="border-t border-gray-200 dark:border-gray-700 p-4">
             <a

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { __ } from "../../lib/i18n";
 import { formatDate } from "./utils";
-import { downloadDocument } from "./utils/downloads";
+import { downloadDocument, previewTravelDocument } from "./utils/downloads";
 import type { TravelDocument } from "./types";
 
 interface DocumentsProps {
@@ -220,12 +220,28 @@ const Documents: React.FC<DocumentsProps> = ({ documents }) => {
                         </div>
                       ) : (
                         <button
-                          onClick={() =>
-                            downloadDocument({
-                              documentType: doc.category as any,
-                              fallbackUrl: doc.url,
-                            })
-                          }
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              await downloadDocument({
+                                bookingId: doc.booking_id,
+                                paymentId: doc.payment_id,
+                                documentType: doc.category as
+                                  | "voucher"
+                                  | "invoice"
+                                  | "itinerary"
+                                  | "all"
+                                  | "downloads",
+                                fallbackUrl: doc.url,
+                              });
+                            } catch (err) {
+                              alert(
+                                err instanceof Error
+                                  ? err.message
+                                  : __("Download failed.", "yatra"),
+                              );
+                            }
+                          }}
                           className="yatra-document-action yatra-document-action-download inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium"
                         >
                           {__("Download", "yatra")}
@@ -233,14 +249,23 @@ const Documents: React.FC<DocumentsProps> = ({ documents }) => {
                       )}
 
                       {doc.url ? (
-                        <a
-                          href={doc.url}
-                          target="_blank"
-                          rel="noreferrer"
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              await previewTravelDocument(doc);
+                            } catch (err) {
+                              alert(
+                                err instanceof Error
+                                  ? err.message
+                                  : __("Preview failed.", "yatra"),
+                              );
+                            }
+                          }}
                           className="yatra-document-action yatra-document-action-preview inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
                         >
                           {__("Preview", "yatra")}
-                        </a>
+                        </button>
                       ) : (
                         <div className="inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-500 text-sm font-medium cursor-not-allowed">
                           {__("Preview", "yatra")}

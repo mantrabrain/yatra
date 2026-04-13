@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { __ } from "../../lib/i18n";
 import { formatDate, getBadge, currency } from "./utils";
-import { downloadInvoice } from "./utils/downloads";
+import { downloadInvoice, previewPaymentInvoice } from "./utils/downloads";
 import type { Payment } from "./types";
 
 interface PaymentsProps {
@@ -316,7 +316,18 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                     {/* Download Invoice - show for paid/completed payments */}
                     {isPaid && (
                       <button
-                        onClick={() => downloadInvoice(payment.id)}
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            await downloadInvoice(payment.id);
+                          } catch (err) {
+                            alert(
+                              err instanceof Error
+                                ? err.message
+                                : __("Download failed.", "yatra"),
+                            );
+                          }
+                        }}
                         className="yatra-payment-action yatra-payment-action-invoice inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
                         style={{ backgroundColor: "#059669", color: "#ffffff" }}
                       >
@@ -325,16 +336,25 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                       </button>
                     )}
                     {isPaid && (
-                      <a
-                        href={`${(window as any).yatraAdmin?.siteUrl || ""}/?yatra_invoice=${payment.id}&_wpnonce=${(window as any).yatraAdmin?.nonce || ""}&view=1`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            await previewPaymentInvoice(payment.id);
+                          } catch (err) {
+                            alert(
+                              err instanceof Error
+                                ? err.message
+                                : __("Could not open receipt.", "yatra"),
+                            );
+                          }
+                        }}
                         className="yatra-payment-action yatra-payment-action-receipt inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
                         style={{ backgroundColor: "#2563eb", color: "#ffffff" }}
                       >
                         <FileTextIcon className="w-4 h-4" />
                         {__("View Receipt", "yatra")}
-                      </a>
+                      </button>
                     )}
                     {isPending && !canPayRemaining && (
                       <button

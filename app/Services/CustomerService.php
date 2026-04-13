@@ -612,6 +612,8 @@ class CustomerService
                     'category' => 'invoice',
                     'updated_at' => $payment->created_at ?? $createdAt ?: date('Y-m-d H:i:s'),
                     'url' => $invoiceUrl,
+                    'booking_id' => $bookingId,
+                    'payment_id' => $paymentId,
                 ];
             }
 
@@ -629,6 +631,7 @@ class CustomerService
                     'category' => 'voucher',
                     'updated_at' => $createdAt ?: date('Y-m-d H:i:s'),
                     'url' => $voucherUrl,
+                    'booking_id' => $bookingId,
                 ];
 
                 // Itinerary per booking
@@ -642,6 +645,7 @@ class CustomerService
                     'category' => 'itinerary',
                     'updated_at' => $createdAt ?: date('Y-m-d H:i:s'),
                     'url' => $itineraryUrl,
+                    'booking_id' => $bookingId,
                 ];
             }
         }
