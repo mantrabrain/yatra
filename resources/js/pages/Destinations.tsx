@@ -304,10 +304,7 @@ const Destinations: React.FC = () => {
       ...visibleColumns,
       [columnKey]: !visibleColumns[columnKey as keyof typeof visibleColumns],
     };
-    
-    // DEBUG: Log column visibility changes
-    console.log('YATRA DEBUG: Destinations Column toggle -', columnKey, 'from', visibleColumns[columnKey], 'to', newVisibleColumns[columnKey]);
-    
+
     setVisibleColumns(newVisibleColumns);
     localStorage.setItem(
       "yatra_destinations_visible_columns_v2",

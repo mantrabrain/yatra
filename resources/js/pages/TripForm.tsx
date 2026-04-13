@@ -2604,16 +2604,6 @@ const TripForm: React.FC = () => {
   };
 
   const handleFieldChange = (field: keyof TripFormData, value: any) => {
-    // Debug: Log when attributes field changes
-    if (field === "attributes") {
-      console.log("TripForm: handleFieldChange for attributes", {
-        field,
-        value,
-        valueType: typeof value,
-        isObject: typeof value === 'object',
-        keys: typeof value === 'object' ? Object.keys(value) : null
-      });
-    }
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
@@ -3325,16 +3315,6 @@ const TripForm: React.FC = () => {
           }))
           .filter((item) => item.title);
       }
-
-      // Debug: Log attributes and time slots data being sent
-      console.log("Saving trip with attributes and time slots:", {
-        tripId,
-        attributes: payload.attributes,
-        has_default_time_slots: payload.has_default_time_slots,
-        default_time_slots: payload.default_time_slots,
-        departure_time: payload.departure_time,
-        fullPayloadKeys: Object.keys(payload)
-      });
 
       if (isEditMode && tripId) {
         const response = await apiClient.put(`/trips/${tripId}`, payload);

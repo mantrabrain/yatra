@@ -2907,6 +2907,124 @@
       }
     }
 
+    /**
+     * Single source of truth for availability "Book Now" (Pro: yatraBeforeBooking / additional services popup).
+     * Previously attachBookNowHandlers() used a legacy session POST and skipped the hook — inconsistent by date after AJAX refresh.
+     */
+    handleAvailabilityBookNowClick(btn) {
+      const self = this;
+
+      const tripId = btn.getAttribute('data-trip-id') || window.yatraTripData?.tripId;
+      const date = btn.getAttribute('data-date');
+      const itemIndex = btn.getAttribute('data-item');
+      const availabilityId = btn.getAttribute('data-availability-id') || itemIndex;
+
+      const card = btn.closest('.yatra-availability-card');
+
+      let departureTime = '';
+      if (card) {
+        const timeElement = card.querySelector('.yatra-card-header-date');
+        if (timeElement) {
+          const timeText = timeElement.textContent?.trim();
+          if (timeText && /^\d{1,2}:\d{2}\s*(AM|PM)?$/i.test(timeText)) {
+            departureTime = timeText;
+          }
+        }
+      }
+
+      let travelers = 0;
+      const travelerCounts = {};
+
+      const categoryInputs = card?.querySelectorAll('.yatra-availability-category[data-item="' + itemIndex + '"]');
+      if (categoryInputs && categoryInputs.length > 0) {
+        categoryInputs.forEach((input) => {
+          const categoryId = input.getAttribute('data-category');
+          const count = parseInt(input.value) || 0;
+          if (categoryId && count > 0) {
+            travelerCounts[categoryId] = count;
+            travelers += count;
+          }
+        });
+      } else {
+        const simpleInput = card?.querySelector('.yatra-availability-num-travelers[data-item="' + itemIndex + '"]');
+        if (simpleInput) {
+          travelers = parseInt(simpleInput.value) || 1;
+        } else {
+          const adults = this.getTravelerCount(itemIndex, 'adults');
+          const children = this.getTravelerCount(itemIndex, 'children');
+          travelers = parseInt(adults) + parseInt(children);
+        }
+      }
+
+      if (travelers < 1) {
+        this.showBookingError(btn, 'Please select at least 1 traveler to continue.');
+        return;
+      }
+
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<svg class="animate-spin" width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Processing...';
+      btn.disabled = true;
+
+      if (!tripId || isNaN(parseInt(tripId)) || parseInt(tripId) <= 0) {
+        console.error('Invalid trip ID:', tripId);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        this.showBookingError(btn, 'Unable to process booking. Invalid trip data.');
+        return;
+      }
+
+      const pricingType = btn.getAttribute('data-pricing-type') || 'regular';
+      const isDayTrip = btn.getAttribute('data-is-day-trip') === '1';
+      let priceTypesJson = btn.getAttribute('data-price-types') || '';
+      let priceTypes = [];
+      try {
+        if (priceTypesJson) {
+          priceTypes = JSON.parse(priceTypesJson);
+        }
+      } catch (e) {
+        console.error('Error parsing price types:', e);
+      }
+
+      const btnDepartureTime = btn.getAttribute('data-departure-time') || '';
+      if (btnDepartureTime) {
+        departureTime = btnDepartureTime;
+      }
+
+      const sessionPayload = {
+        trip_id: parseInt(tripId, 10),
+        travelers: travelers,
+        travel_date: date || '',
+        departure_time: departureTime,
+        availability_id: availabilityId,
+        pricing_type: pricingType,
+        price_types: priceTypes,
+        is_day_trip: isDayTrip,
+      };
+
+      if (Object.keys(travelerCounts).length > 0) {
+        sessionPayload.traveler_counts = travelerCounts;
+      }
+
+      if (typeof window.yatraBeforeBooking === 'function') {
+        Promise.resolve(window.yatraBeforeBooking({
+          btn: btn,
+          originalText: originalText,
+          sessionPayload: sessionPayload,
+          proceedToBooking: () => self.proceedToBooking(btn, originalText, sessionPayload)
+        })).then(handled => {
+          if (!handled) {
+            self.proceedToBooking(btn, originalText, sessionPayload);
+          }
+        }).catch(error => {
+          console.error('Error in yatraBeforeBooking hook:', error);
+          self.proceedToBooking(btn, originalText, sessionPayload);
+        });
+        return;
+      }
+
+      this.proceedToBooking(btn, originalText, sessionPayload);
+    }
+
     attachEventListeners() {
       const filterBar = this.section.querySelector('.yatra-availability-filters');
 
@@ -2961,138 +3079,7 @@
       bookButtons.forEach((btn) => {
         btn.addEventListener('click', (e) => {
           e.preventDefault();
-
-          // Store reference to this for use in callbacks
-          const self = this;
-
-          // Get booking details
-          const tripId = btn.getAttribute('data-trip-id') || window.yatraTripData?.tripId;
-          const date = btn.getAttribute('data-date');
-          const itemIndex = btn.getAttribute('data-item');
-          const availabilityId = btn.getAttribute('data-availability-id') || itemIndex;
-
-          // Get the availability card to extract more info
-          const card = btn.closest('.yatra-availability-card');
-
-          // Get departure time from the card if available (single-day trips)
-          let departureTime = '';
-          if (card) {
-            const timeElement = card.querySelector('.yatra-card-header-date');
-            if (timeElement) {
-              const timeText = timeElement.textContent?.trim();
-              // Check if it's a time format (e.g., "9:00 AM")
-              if (timeText && /^\d{1,2}:\d{2}\s*(AM|PM)?$/i.test(timeText)) {
-                departureTime = timeText;
-              }
-            }
-          }
-
-          // Get traveler counts - support both category-based and simple counting
-          let travelers = 0;
-          const travelerCounts = {};
-
-          // Check for category-based traveler inputs
-          const categoryInputs = card?.querySelectorAll('.yatra-availability-category[data-item="' + itemIndex + '"]');
-          if (categoryInputs && categoryInputs.length > 0) {
-            categoryInputs.forEach((input) => {
-              const categoryId = input.getAttribute('data-category');
-              const count = parseInt(input.value) || 0;
-              if (categoryId && count > 0) {
-                travelerCounts[categoryId] = count;
-                travelers += count;
-              }
-            });
-          } else {
-            // Fallback to simple traveler input
-            const simpleInput = card?.querySelector('.yatra-availability-num-travelers[data-item="' + itemIndex + '"]');
-            if (simpleInput) {
-              travelers = parseInt(simpleInput.value) || 1;
-            } else {
-              // Legacy: adults + children
-              const adults = this.getTravelerCount(itemIndex, 'adults');
-              const children = this.getTravelerCount(itemIndex, 'children');
-              travelers = parseInt(adults) + parseInt(children);
-            }
-          }
-
-          if (travelers < 1) {
-            this.showBookingError(btn, 'Please select at least 1 traveler to continue.');
-            return;
-          }
-
-          // Show loading state
-          const originalText = btn.innerHTML;
-          btn.innerHTML = '<svg class="animate-spin" width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Processing...';
-          btn.disabled = true;
-
-          // Validate trip ID before making request
-          if (!tripId || isNaN(parseInt(tripId)) || parseInt(tripId) <= 0) {
-            console.error('Invalid trip ID:', tripId);
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-            this.showBookingError(btn, 'Unable to process booking. Invalid trip data.');
-            return;
-          }
-
-          // Get pricing data from button attributes
-          const pricingType = btn.getAttribute('data-pricing-type') || 'regular';
-          const isDayTrip = btn.getAttribute('data-is-day-trip') === '1';
-          let priceTypesJson = btn.getAttribute('data-price-types') || '';
-          let priceTypes = [];
-          try {
-            if (priceTypesJson) {
-              priceTypes = JSON.parse(priceTypesJson);
-            }
-          } catch (e) {
-            console.error('Error parsing price types:', e);
-          }
-
-          // Get departure time from button data attribute
-          const btnDepartureTime = btn.getAttribute('data-departure-time') || '';
-          if (btnDepartureTime) {
-            departureTime = btnDepartureTime;
-          }
-
-          // Build session payload
-          const sessionPayload = {
-            trip_id: parseInt(tripId),
-            travelers: travelers,
-            travel_date: date || '',
-            departure_time: departureTime,
-            availability_id: availabilityId,
-            pricing_type: pricingType,
-            price_types: priceTypes,
-            is_day_trip: isDayTrip,
-          };
-
-          // Add traveler_counts if using category-based pricing
-          if (Object.keys(travelerCounts).length > 0) {
-            sessionPayload.traveler_counts = travelerCounts;
-          }
-
-          // Hook: Allow Pro plugins to intercept booking flow (e.g., show additional services popup)
-          // If handler returns true (or Promise resolving to true), Pro handled the flow
-          if (typeof window.yatraBeforeBooking === 'function') {
-            const self = this;
-            Promise.resolve(window.yatraBeforeBooking({
-              btn: btn,
-              originalText: originalText,
-              sessionPayload: sessionPayload,
-              proceedToBooking: () => self.proceedToBooking(btn, originalText, sessionPayload)
-            })).then(handled => {
-              if (!handled) {
-                // Pro plugin didn't handle it, proceed normally
-                self.proceedToBooking(btn, originalText, sessionPayload);
-              }
-            }).catch(error => {
-              console.error('Error in yatraBeforeBooking hook:', error);
-              self.proceedToBooking(btn, originalText, sessionPayload);
-            });
-            return; // Wait for promise to resolve
-          }
-
-          // Proceed with normal booking flow
-          this.proceedToBooking(btn, originalText, sessionPayload);
+          this.handleAvailabilityBookNowClick(btn);
         });
       });
 
@@ -3880,87 +3867,13 @@
     }
 
     attachBookNowHandlers() {
-      // Re-attach book now button handlers for newly visible cards
       const bookButtons = this.section.querySelectorAll('.yatra-card-book-btn');
       bookButtons.forEach((btn) => {
-        // Remove existing listener by cloning
         const newBtn = btn.cloneNode(true);
         btn.parentNode.replaceChild(newBtn, btn);
-
         newBtn.addEventListener('click', (e) => {
           e.preventDefault();
-
-          // Get booking details
-          const tripId = newBtn.getAttribute('data-trip-id') || window.yatraTripData?.tripId;
-          const date = newBtn.getAttribute('data-date');
-          const itemIndex = newBtn.getAttribute('data-item');
-          const adults = this.getTravelerCount(itemIndex, 'adults');
-          const children = this.getTravelerCount(itemIndex, 'children');
-          const travelers = parseInt(adults) + parseInt(children);
-
-          if (!travelers || travelers < 1) {
-            this.showBookingError(newBtn, 'Please select at least 1 traveler to continue.');
-            return;
-          }
-
-          // Show loading state
-          const originalText = newBtn.innerHTML;
-          newBtn.innerHTML = '<svg class="animate-spin" width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Processing...';
-          newBtn.disabled = true;
-
-          // Validate trip ID before making request
-          if (!tripId || isNaN(parseInt(tripId)) || parseInt(tripId) <= 0) {
-            console.error('Invalid trip ID:', tripId);
-            newBtn.innerHTML = originalText;
-            newBtn.disabled = false;
-            this.showBookingError(newBtn, 'Unable to process booking. Invalid trip data.');
-            return;
-          }
-
-          // Build minimal session payload for legacy book-now flow
-          const sessionPayload = {
-            trip_id: parseInt(tripId),
-            travel_date: date || '',
-            travelers: travelers,
-            availability_id: itemIndex
-          };
-
-          // Set booking session via REST API
-          const { base: baseUrl, isPlain } = getRestBase();
-          let sessionUrl;
-          if (isPlain && !baseUrl.includes('/yatra/v1')) {
-            sessionUrl = `${baseUrl}/?rest_route=/yatra/v1/booking/session`;
-          } else if (baseUrl.includes('/yatra/v1')) {
-            sessionUrl = `${baseUrl}/booking/session`;
-          } else {
-            sessionUrl = `${baseUrl}/yatra/v1/booking/session`;
-          }
-
-          fetch(sessionUrl, {
-            method: 'POST',
-            credentials: 'same-origin', // needs PHP session cookie
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(sessionPayload)
-          })
-              .then(response => response.json())
-              .then(data => {
-                if (data.success && data.redirect_url) {
-                  window.location.href = data.redirect_url;
-                } else {
-                  console.error('Booking session error:', data);
-                  newBtn.innerHTML = originalText;
-                  newBtn.disabled = false;
-                  this.showBookingError(newBtn, data.message || 'Unable to process booking. Please try again.');
-                }
-              })
-              .catch(error => {
-                console.error('Error setting booking session:', error);
-                newBtn.innerHTML = originalText;
-                newBtn.disabled = false;
-                this.showBookingError(newBtn, 'Unable to process booking. Please try again.');
-              });
+          this.handleAvailabilityBookNowClick(newBtn);
         });
       });
     }

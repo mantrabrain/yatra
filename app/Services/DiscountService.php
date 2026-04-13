@@ -584,7 +584,7 @@ class DiscountService extends BaseService
         }
 
         if (!empty($args['status']) && $args['status'] !== 'all') {
-            $allowed_statuses = ['draft', 'publish', 'trash'];
+            $allowed_statuses = ['draft', 'publish', 'trash', 'expired'];
             $status = in_array($args['status'], $allowed_statuses, true) ? $args['status'] : null;
             if ($status) {
                 $args['where']['status'] = $status;
@@ -611,7 +611,7 @@ class DiscountService extends BaseService
         }
 
         if (!empty($args['status']) && $args['status'] !== 'all') {
-            $allowed_statuses = ['draft', 'publish', 'trash'];
+            $allowed_statuses = ['draft', 'publish', 'trash', 'expired'];
             $status = in_array($args['status'], $allowed_statuses, true) ? $args['status'] : null;
             if ($status) {
                 $args['where']['status'] = $status;
@@ -627,6 +627,16 @@ class DiscountService extends BaseService
         }
 
         return $this->repository->count($args);
+    }
+
+    /**
+     * Admin toolbar: counts per discount status (stable, unfiltered).
+     *
+     * @return array{all: int, publish: int, draft: int, trash: int, expired: int}
+     */
+    public function getAdminStatusCounts(): array
+    {
+        return $this->repository->getAdminStatusCounts();
     }
 
     /**

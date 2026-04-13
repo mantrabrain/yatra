@@ -1,6 +1,8 @@
 <?php
 
-namespace Yatra\App\Ajax;
+declare(strict_types=1);
+
+namespace Yatra\Ajax;
 
 use Yatra\Repositories\AttributeRepository;
 
@@ -14,6 +16,7 @@ class DirectAttributeQuery
     public function __construct()
     {
         $this->attributeRepository = new AttributeRepository();
+        add_action('wp_ajax_yatra_get_attribute_direct', [$this, 'handle']);
     }
 
     /**
@@ -82,13 +85,5 @@ class DirectAttributeQuery
         } catch (\Exception $e) {
             wp_send_json_error('Database query failed: ' . $e->getMessage());
         }
-    }
-
-    /**
-     * Register AJAX action
-     */
-    public function register(): void
-    {
-        add_action('wp_ajax_yatra_get_attribute_direct', [$this, 'handle']);
     }
 }

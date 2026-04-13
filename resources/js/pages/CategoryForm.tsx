@@ -251,9 +251,6 @@ const CategoryForm: React.FC = () => {
         seo_keywords: data.seo_keywords.trim(),
       };
 
-      // DEBUG: Log the payload being sent
-      console.log('YATRA DEBUG: CategoryForm sending payload:', payload);
-
       if (isEditMode && isSlugEditable) {
         payload.preserve_slug = true;
       }

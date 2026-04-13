@@ -39,6 +39,14 @@ class PaymentController extends BaseController
      */
     public function register_routes(): void
     {
+        register_rest_route($this->namespace, '/payments/stats', [
+            [
+                'methods' => 'GET',
+                'callback' => [$this, 'getPaymentStats'],
+                'permission_callback' => [$this, 'checkAdminPermission'],
+            ],
+        ]);
+
         // List all payments
         register_rest_route($this->namespace, '/payments', [
             [
@@ -74,11 +82,25 @@ class PaymentController extends BaseController
     }
 
     /**
-     * Check admin permission
+     * Check admin permission (align with bookings list — shop managers may only have yatra caps).
      */
     public function checkAdminPermission(): bool
     {
+        if (current_user_can('yatra_view_bookings')) {
+            return true;
+        }
+
         return current_user_can('manage_options');
+    }
+
+    /**
+     * GET /payments/stats - Counts per status for admin toolbar
+     */
+    public function getPaymentStats(WP_REST_Request $request): WP_REST_Response
+    {
+        $counts = $this->paymentService->getAdminStatusCounts();
+
+        return new WP_REST_Response($counts, 200);
     }
 
     /**

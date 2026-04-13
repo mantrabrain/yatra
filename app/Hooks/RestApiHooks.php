@@ -29,6 +29,14 @@ class RestApiHooks
     }
 
     /**
+     * Only administrators can probe REST availability (avoids public version/timestamp disclosure).
+     */
+    public static function canAccessTestEndpoint(): bool
+    {
+        return current_user_can('manage_options');
+    }
+
+    /**
      * Register test endpoint for REST API verification
      */
     public static function registerTestEndpoint(): void
@@ -36,7 +44,7 @@ class RestApiHooks
         register_rest_route('yatra/v1', '/test', [
             'methods' => 'GET',
             'callback' => [self::class, 'handleTestEndpoint'],
-            'permission_callback' => '__return_true'
+            'permission_callback' => [self::class, 'canAccessTestEndpoint'],
         ]);
     }
 

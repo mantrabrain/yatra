@@ -321,6 +321,16 @@ class MigrationProgress
                 default:
                     throw new \Exception("Unknown data type: {$dataType}");
             }
+
+            // Taxonomy → trip links must work when migrations run out of order (e.g. trips before destinations).
+            if ($dataType === 'destinations') {
+                $this->repairTripDestinationsForAllLegacyTours();
+            } elseif ($dataType === 'activities') {
+                $this->repairTripActivitiesForAllLegacyTours();
+            } elseif ($dataType === 'trips') {
+                $this->repairTripDestinationsForAllLegacyTours();
+                $this->repairTripActivitiesForAllLegacyTours();
+            }
             
             $duration = microtime(true) - $startTime;
             
@@ -865,6 +875,18 @@ class MigrationProgress
     }
 
     /**
+     * Latest term meta value when duplicate keys exist (imports / re-saves).
+     */
+    public function getRawTermMetaLatest(int $termId, string $metaKey): ?string
+    {
+        return $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT meta_value FROM {$this->wpdb->termmeta} WHERE term_id = %d AND meta_key = %s ORDER BY meta_id DESC LIMIT 1",
+            $termId,
+            $metaKey
+        ));
+    }
+
+    /**
      * Set/update a term meta value using raw SQL.
      */
     public function setRawTermMeta(int $termId, string $metaKey, string $metaValue): void
@@ -1175,6 +1197,128 @@ class MigrationProgress
 
         return compact('migrated', 'skipped', 'failed');
     }
+
+    /**
+     * Re-run destination linking for every legacy tour that already has a migrated trip row.
+     * Needed when "trips" migrated before "destinations" (term meta did not exist yet).
+     */
+    public function repairTripDestinationsForAllLegacyTours(): void
+    {
+        $ids = $this->wpdb->get_col(
+            "SELECT ID FROM {$this->wpdb->posts} WHERE post_type = 'tour' AND post_status != 'auto-draft'"
+        );
+        $n = 0;
+        foreach ($ids as $oldId) {
+            $oldId = (int) $oldId;
+            $newTripId = $this->getMigratedTripId($oldId);
+            if (!$newTripId) {
+                continue;
+            }
+            $this->migrateTripDestinations($oldId, $newTripId);
+            $n++;
+        }
+        if ($n > 0) {
+            Logger::info("Trip–destination link pass: checked {$n} legacy tour(s) with a migrated trip id.", [
+                'source' => 'migration',
+            ]);
+        }
+    }
+
+    /**
+     * Re-run activity linking for every legacy tour that already has a migrated trip row.
+     */
+    public function repairTripActivitiesForAllLegacyTours(): void
+    {
+        $ids = $this->wpdb->get_col(
+            "SELECT ID FROM {$this->wpdb->posts} WHERE post_type = 'tour' AND post_status != 'auto-draft'"
+        );
+        $n = 0;
+        foreach ($ids as $oldId) {
+            $oldId = (int) $oldId;
+            $newTripId = $this->getMigratedTripId($oldId);
+            if (!$newTripId) {
+                continue;
+            }
+            $this->migrateTripActivities($oldId, $newTripId);
+            $n++;
+        }
+        if ($n > 0) {
+            Logger::info("Trip–activity link pass: checked {$n} legacy tour(s) with a migrated trip id.", [
+                'source' => 'migration',
+            ]);
+        }
+    }
+
+    /**
+     * Map a legacy taxonomy term to ClassificationsTable.id after taxonomy migration.
+     *
+     * Prefer term meta from DestinationMigration/ActivityMigration (handles slug de-duplication e.g. paris vs paris-1).
+     */
+    private function resolveLegacyTermToClassificationId(
+        int $termId,
+        string $termSlug,
+        string $termName,
+        string $legacyTaxonomy,
+        string $classificationType
+    ): ?int {
+        $classificationsTable = ClassificationsTable::getTableName();
+        $metaKey = '_yatra_migrated_' . $legacyTaxonomy . '_id';
+
+        $mapped = $this->getRawTermMetaLatest($termId, $metaKey);
+        if ($mapped !== null && $mapped !== '') {
+            $id = (int) trim((string) $mapped);
+            if ($id > 0) {
+                $ok = $this->wpdb->get_var($this->wpdb->prepare(
+                    "SELECT id FROM {$classificationsTable} WHERE id = %d AND type = %s",
+                    $id,
+                    $classificationType
+                ));
+                if ($ok) {
+                    return (int) $ok;
+                }
+            }
+        }
+
+        $slug = trim((string) $termSlug);
+        if ($slug !== '') {
+            $bySlug = $this->wpdb->get_var($this->wpdb->prepare(
+                "SELECT id FROM {$classificationsTable} WHERE slug = %s AND type = %s",
+                $slug,
+                $classificationType
+            ));
+            if ($bySlug) {
+                return (int) $bySlug;
+            }
+        }
+
+        $name = trim((string) $termName);
+        if ($name !== '' && function_exists('sanitize_title')) {
+            $fromName = sanitize_title($name);
+            if ($fromName !== '' && $fromName !== $slug) {
+                $byNameSlug = $this->wpdb->get_var($this->wpdb->prepare(
+                    "SELECT id FROM {$classificationsTable} WHERE slug = %s AND type = %s",
+                    $fromName,
+                    $classificationType
+                ));
+                if ($byNameSlug) {
+                    return (int) $byNameSlug;
+                }
+            }
+        }
+
+        if ($name !== '') {
+            $byName = $this->wpdb->get_var($this->wpdb->prepare(
+                "SELECT id FROM {$classificationsTable} WHERE type = %s AND name = %s LIMIT 1",
+                $classificationType,
+                $name
+            ));
+            if ($byName) {
+                return (int) $byName;
+            }
+        }
+
+        return null;
+    }
     
     /**
      * Migrate trip destinations relationship.
@@ -1200,49 +1344,59 @@ class MigrationProgress
             return;
         }
 
-        $classificationsTable = ClassificationsTable::getTableName();
         $tripClassificationsTable = TripClassificationsTable::getTableName();
 
         foreach ($destinations as $index => $destination) {
-            // Find the migrated destination in the unified ClassificationsTable
-            $newDestinationId = $this->wpdb->get_var($this->wpdb->prepare(
-                "SELECT id FROM {$classificationsTable} WHERE slug = %s AND type = %s",
-                $destination->slug,
+            $termId = (int) $destination->term_id;
+            $newDestinationId = $this->resolveLegacyTermToClassificationId(
+                $termId,
+                (string) ($destination->slug ?? ''),
+                (string) ($destination->name ?? ''),
+                'destination',
+                ClassificationTypes::DESTINATION
+            );
+
+            if (!$newDestinationId) {
+                Logger::warning('Could not map legacy destination term to a classification row; skipping trip link.', [
+                    'source' => 'migration',
+                    'old_trip_id' => $oldTripId,
+                    'new_trip_id' => $newTripId,
+                    'term_id' => $termId,
+                    'term_slug' => $destination->slug ?? '',
+                    'term_name' => $destination->name ?? '',
+                ]);
+                continue;
+            }
+
+            $exists = $this->wpdb->get_var($this->wpdb->prepare(
+                "SELECT id FROM {$tripClassificationsTable}
+                 WHERE trip_id = %d AND classification_id = %d AND classification_type = %s",
+                $newTripId,
+                $newDestinationId,
                 ClassificationTypes::DESTINATION
             ));
 
-            if (!$newDestinationId) {
-                // Also try looking up by term meta mapping
-                $mappedId = $this->getRawTermMeta((int) $destination->term_id, '_yatra_migrated_destination_id');
-                if ($mappedId) {
-                    $newDestinationId = (int) $mappedId;
-                }
-            }
-
-            if ($newDestinationId) {
-                // Check if relationship already exists
-                $exists = $this->wpdb->get_var($this->wpdb->prepare(
-                    "SELECT id FROM {$tripClassificationsTable}
-                     WHERE trip_id = %d AND classification_id = %d AND classification_type = %s",
-                    $newTripId,
-                    $newDestinationId,
-                    ClassificationTypes::DESTINATION
-                ));
-
-                if (!$exists) {
-                    $this->wpdb->insert(
-                        $tripClassificationsTable,
-                        [
-                            'trip_id' => $newTripId,
-                            'classification_id' => $newDestinationId,
-                            'classification_type' => ClassificationTypes::DESTINATION,
-                            'relationship_type' => ($index === 0) ? 'primary' : 'secondary',
-                            'sort_order' => $index,
-                            'is_active' => 1,
-                            'created_at' => current_time('mysql'),
-                            'updated_at' => current_time('mysql'),
-                        ]
-                    );
+            if (!$exists) {
+                $inserted = $this->wpdb->insert(
+                    $tripClassificationsTable,
+                    [
+                        'trip_id' => $newTripId,
+                        'classification_id' => $newDestinationId,
+                        'classification_type' => ClassificationTypes::DESTINATION,
+                        'relationship_type' => ($index === 0) ? 'primary' : 'secondary',
+                        'sort_order' => $index,
+                        'is_featured' => ($index === 0) ? 1 : 0,
+                        'is_active' => 1,
+                        'created_at' => current_time('mysql'),
+                        'updated_at' => current_time('mysql'),
+                    ]
+                );
+                if ($inserted === false) {
+                    Logger::error('Failed to insert trip–destination classification row: ' . $this->wpdb->last_error, [
+                        'source' => 'migration',
+                        'new_trip_id' => $newTripId,
+                        'classification_id' => $newDestinationId,
+                    ]);
                 }
             }
         }
@@ -1272,49 +1426,59 @@ class MigrationProgress
             return;
         }
 
-        $classificationsTable = ClassificationsTable::getTableName();
         $tripClassificationsTable = TripClassificationsTable::getTableName();
 
         foreach ($activities as $index => $activity) {
-            // Find the migrated activity in the unified ClassificationsTable
-            $newActivityId = $this->wpdb->get_var($this->wpdb->prepare(
-                "SELECT id FROM {$classificationsTable} WHERE slug = %s AND type = %s",
-                $activity->slug,
+            $termId = (int) $activity->term_id;
+            $newActivityId = $this->resolveLegacyTermToClassificationId(
+                $termId,
+                (string) ($activity->slug ?? ''),
+                (string) ($activity->name ?? ''),
+                'activity',
+                ClassificationTypes::ACTIVITY
+            );
+
+            if (!$newActivityId) {
+                Logger::warning('Could not map legacy activity term to a classification row; skipping trip link.', [
+                    'source' => 'migration',
+                    'old_trip_id' => $oldTripId,
+                    'new_trip_id' => $newTripId,
+                    'term_id' => $termId,
+                    'term_slug' => $activity->slug ?? '',
+                    'term_name' => $activity->name ?? '',
+                ]);
+                continue;
+            }
+
+            $exists = $this->wpdb->get_var($this->wpdb->prepare(
+                "SELECT id FROM {$tripClassificationsTable}
+                 WHERE trip_id = %d AND classification_id = %d AND classification_type = %s",
+                $newTripId,
+                $newActivityId,
                 ClassificationTypes::ACTIVITY
             ));
 
-            if (!$newActivityId) {
-                // Also try looking up by term meta mapping
-                $mappedId = $this->getRawTermMeta((int) $activity->term_id, '_yatra_migrated_activity_id');
-                if ($mappedId) {
-                    $newActivityId = (int) $mappedId;
-                }
-            }
-
-            if ($newActivityId) {
-                // Check if relationship already exists
-                $exists = $this->wpdb->get_var($this->wpdb->prepare(
-                    "SELECT id FROM {$tripClassificationsTable}
-                     WHERE trip_id = %d AND classification_id = %d AND classification_type = %s",
-                    $newTripId,
-                    $newActivityId,
-                    ClassificationTypes::ACTIVITY
-                ));
-
-                if (!$exists) {
-                    $this->wpdb->insert(
-                        $tripClassificationsTable,
-                        [
-                            'trip_id' => $newTripId,
-                            'classification_id' => $newActivityId,
-                            'classification_type' => ClassificationTypes::ACTIVITY,
-                            'relationship_type' => 'primary',
-                            'sort_order' => $index,
-                            'is_active' => 1,
-                            'created_at' => current_time('mysql'),
-                            'updated_at' => current_time('mysql'),
-                        ]
-                    );
+            if (!$exists) {
+                $inserted = $this->wpdb->insert(
+                    $tripClassificationsTable,
+                    [
+                        'trip_id' => $newTripId,
+                        'classification_id' => $newActivityId,
+                        'classification_type' => ClassificationTypes::ACTIVITY,
+                        'relationship_type' => ($index === 0) ? 'primary' : 'secondary',
+                        'sort_order' => $index,
+                        'is_featured' => ($index === 0) ? 1 : 0,
+                        'is_active' => 1,
+                        'created_at' => current_time('mysql'),
+                        'updated_at' => current_time('mysql'),
+                    ]
+                );
+                if ($inserted === false) {
+                    Logger::error('Failed to insert trip–activity classification row: ' . $this->wpdb->last_error, [
+                        'source' => 'migration',
+                        'new_trip_id' => $newTripId,
+                        'classification_id' => $newActivityId,
+                    ]);
                 }
             }
         }

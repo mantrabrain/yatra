@@ -112,10 +112,12 @@ const Bookings: React.FC = () => {
   const __ = (text: string) => translations[text] || text;
 
   // Build query params
+  const BOOKINGS_PER_PAGE = 10;
+
   const queryParams = useMemo(() => {
     const params: Record<string, any> = {
       page,
-      per_page: 10,
+      per_page: BOOKINGS_PER_PAGE,
       orderby: sortBy,
       order: sortOrder,
     };
@@ -183,7 +185,7 @@ const Bookings: React.FC = () => {
     enabled: statsEnabled,
   });
   const statsData: any = statsRaw ?? {};
-  const totalBookings = statsData?.all ?? statsData?.all ?? 0;
+  const totalBookings = statsData?.all ?? 0;
   const confirmedCount = statsData?.confirmed ?? 0;
   const pendingCount = statsData?.pending ?? 0;
   const cancelledCount = statsData?.cancelled ?? 0;
@@ -196,6 +198,7 @@ const Bookings: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["bookings-stats"] });
       showToast(__("Booking deleted successfully"), "success");
     },
     onError: (error: any) => {
@@ -204,8 +207,16 @@ const Bookings: React.FC = () => {
   });
 
   const bookings: Booking[] = data?.data || [];
-  const total = data?.total || 0;
-  const totalPages = Math.ceil(total / 10);
+  const listMeta = data?.meta ?? {};
+  const total = Number(listMeta.total ?? data?.total ?? 0);
+  const perPage =
+    Number(listMeta.per_page ?? data?.per_page ?? BOOKINGS_PER_PAGE) ||
+    BOOKINGS_PER_PAGE;
+  const totalPages = Math.max(
+    1,
+    Number(listMeta.total_pages) ||
+      (total > 0 ? Math.ceil(total / perPage) : 1),
+  );
 
   // Enhanced error handling
   const errorContext = getErrorContext(error);
@@ -433,6 +444,7 @@ const Bookings: React.FC = () => {
       }
 
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["bookings-stats"] });
       setSelectedIds([]);
       setBulkAction("");
     } catch (error: any) {
@@ -683,6 +695,7 @@ const Bookings: React.FC = () => {
         try {
           await updateStatusForIds([booking.id], "confirmed");
           queryClient.invalidateQueries({ queryKey: ["bookings"] });
+          queryClient.invalidateQueries({ queryKey: ["bookings-stats"] });
           showToast(__("Booking status updated"), "success");
         } catch (error: any) {
           showToast(
@@ -705,6 +718,7 @@ const Bookings: React.FC = () => {
         try {
           await updateStatusForIds([booking.id], "pending");
           queryClient.invalidateQueries({ queryKey: ["bookings"] });
+          queryClient.invalidateQueries({ queryKey: ["bookings-stats"] });
           showToast(__("Booking status updated"), "success");
         } catch (error: any) {
           showToast(
@@ -727,6 +741,7 @@ const Bookings: React.FC = () => {
         try {
           await updateStatusForIds([booking.id], "cancelled");
           queryClient.invalidateQueries({ queryKey: ["bookings"] });
+          queryClient.invalidateQueries({ queryKey: ["bookings-stats"] });
           showToast(__("Booking status updated"), "success");
         } catch (error: any) {
           showToast(
@@ -749,6 +764,7 @@ const Bookings: React.FC = () => {
         try {
           await updateStatusForIds([booking.id], "completed");
           queryClient.invalidateQueries({ queryKey: ["bookings"] });
+          queryClient.invalidateQueries({ queryKey: ["bookings-stats"] });
           showToast(__("Booking status updated"), "success");
         } catch (error: any) {
           showToast(
@@ -967,7 +983,7 @@ const Bookings: React.FC = () => {
                 currentPage={page}
                 totalPages={totalPages}
                 totalItems={total}
-                itemsPerPage={10}
+                itemsPerPage={perPage}
                 onPageChange={(newPage) => setPage(newPage)}
                 itemName={__("bookings")}
               />

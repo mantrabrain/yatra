@@ -578,6 +578,7 @@ export const apiService = {
     apiClient.delete(API_ENDPOINTS.PAYMENT_DELETE(id)),
   getPayments: (params?: Record<string, any>) =>
     apiClient.get(API_ENDPOINTS.PAYMENTS, { params }),
+  getPaymentsStats: () => apiClient.get(API_ENDPOINTS.PAYMENTS_STATS),
   createPayment: (data: any) => apiClient.post(API_ENDPOINTS.PAYMENTS, data),
   updatePayment: (id: string | number, data: any) =>
     apiClient.put(API_ENDPOINTS.PAYMENT_GET(id), data),

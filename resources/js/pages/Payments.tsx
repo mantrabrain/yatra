@@ -112,10 +112,12 @@ const Payments: React.FC = () => {
 
   // Fetch payments from API
 
+  const PAYMENTS_PER_PAGE = 10;
+
   const queryParams = useMemo(() => {
     const params: Record<string, any> = {
       page,
-      per_page: 10,
+      per_page: PAYMENTS_PER_PAGE,
       orderby: sortBy,
       order: sortOrder,
     };
@@ -139,31 +141,28 @@ const Payments: React.FC = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["payments", queryParams],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      params.append("page", String(queryParams.page));
-      params.append("per_page", String(queryParams.per_page));
-
-      if (queryParams.search) {
-        params.append("search", queryParams.search);
-      }
-      if (queryParams.payment_status) {
-        params.append("status", queryParams.payment_status);
-      }
-      if (queryParams.payment_method) {
-        params.append("gateway", queryParams.payment_method);
-      }
-
       const paramsObj: Record<string, any> = {
         page: queryParams.page,
         per_page: queryParams.per_page,
       };
-      if (queryParams.search) paramsObj.search = queryParams.search;
-      if (queryParams.status) paramsObj.status = queryParams.status;
-      if (queryParams.payment_method)
+      if (queryParams.search) {
+        paramsObj.search = queryParams.search;
+      }
+      if (queryParams.payment_status) {
+        paramsObj.status = queryParams.payment_status;
+      }
+      if (queryParams.payment_method) {
         paramsObj.gateway = queryParams.payment_method;
+      }
 
       return await apiService.getPayments(paramsObj);
     },
+    enabled: can("yatra_view_bookings"),
+  });
+
+  const { data: paymentStatsRaw } = useQuery({
+    queryKey: ["payments-stats"],
+    queryFn: () => apiService.getPaymentsStats(),
     enabled: can("yatra_view_bookings"),
   });
 
@@ -174,6 +173,7 @@ const Payments: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["payments-stats"] });
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
       showToast(__("Payment deleted successfully", "yatra"), "success");
       setDeleteConfirm({ isOpen: false, payment: null });
@@ -187,8 +187,21 @@ const Payments: React.FC = () => {
   });
 
   const payments: Payment[] = data?.data || [];
-  const total = data?.total || 0;
-  const totalPages = Math.ceil(total / 10);
+  const listMeta = (data as any)?.meta;
+  const total = Number(
+    listMeta?.total ?? (data as any)?.total ?? 0,
+  );
+  const perPage =
+    Number(listMeta?.per_page ?? (data as any)?.per_page ?? PAYMENTS_PER_PAGE) ||
+    PAYMENTS_PER_PAGE;
+  const totalPages = Math.max(
+    1,
+    Number(listMeta?.total_pages ?? (data as any)?.total_pages) ||
+      (total > 0 ? Math.ceil(total / perPage) : 1),
+  );
+
+  const payCounts = (paymentStatsRaw ?? {}) as Record<string, number>;
+  const countFor = (key: string) => Number(payCounts[key] ?? 0);
   const errorContext = getErrorContext(error);
 
   const formatDate = (dateString: string) => {
@@ -379,6 +392,7 @@ const Payments: React.FC = () => {
       }
 
       queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["payments-stats"] });
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
       setSelectedIds([]);
       setBulkAction("");
@@ -437,6 +451,7 @@ const Payments: React.FC = () => {
   const statusOptions = [
     { value: "all", label: __("All Status", "yatra") },
     { value: "completed", label: __("Completed", "yatra") },
+    { value: "pending", label: __("Pending", "yatra") },
     { value: "partial", label: __("Partial", "yatra") },
     { value: "failed", label: __("Failed", "yatra") },
     { value: "refunded", label: __("Refunded", "yatra") },
@@ -609,6 +624,7 @@ const Payments: React.FC = () => {
         try {
           await updateStatusForIds([payment.id], "completed");
           queryClient.invalidateQueries({ queryKey: ["payments"] });
+          queryClient.invalidateQueries({ queryKey: ["payments-stats"] });
           queryClient.invalidateQueries({ queryKey: ["bookings"] });
           showToast(__("Payment status updated", "yatra"), "success");
         } catch (error: any) {
@@ -632,6 +648,7 @@ const Payments: React.FC = () => {
         try {
           await updateStatusForIds([payment.id], "failed");
           queryClient.invalidateQueries({ queryKey: ["payments"] });
+          queryClient.invalidateQueries({ queryKey: ["payments-stats"] });
           queryClient.invalidateQueries({ queryKey: ["bookings"] });
           showToast(__("Payment status updated", "yatra"), "success");
         } catch (error: any) {
@@ -655,6 +672,7 @@ const Payments: React.FC = () => {
         try {
           await updateStatusForIds([payment.id], "refunded");
           queryClient.invalidateQueries({ queryKey: ["payments"] });
+          queryClient.invalidateQueries({ queryKey: ["payments-stats"] });
           queryClient.invalidateQueries({ queryKey: ["bookings"] });
           showToast(__("Payment status updated", "yatra"), "success");
         } catch (error: any) {
@@ -678,6 +696,7 @@ const Payments: React.FC = () => {
         try {
           await updateStatusForIds([payment.id], "cancelled");
           queryClient.invalidateQueries({ queryKey: ["payments"] });
+          queryClient.invalidateQueries({ queryKey: ["payments-stats"] });
           queryClient.invalidateQueries({ queryKey: ["bookings"] });
           showToast(__("Payment status updated", "yatra"), "success");
         } catch (error: any) {
@@ -809,13 +828,37 @@ const Payments: React.FC = () => {
                 setPage(1);
               }}
               statusOptions={[
-                { key: "all", label: __("All", "yatra"), count: 0 },
-                { key: "completed", label: __("Completed", "yatra"), count: 0 },
-                { key: "pending", label: __("Pending", "yatra"), count: 0 },
-                { key: "partial", label: __("Partial", "yatra"), count: 0 },
-                { key: "failed", label: __("Failed", "yatra"), count: 0 },
-                { key: "refunded", label: __("Refunded", "yatra"), count: 0 },
-                { key: "cancelled", label: __("Cancelled", "yatra"), count: 0 },
+                { key: "all", label: __("All", "yatra"), count: countFor("all") },
+                {
+                  key: "completed",
+                  label: __("Completed", "yatra"),
+                  count: countFor("completed"),
+                },
+                {
+                  key: "pending",
+                  label: __("Pending", "yatra"),
+                  count: countFor("pending"),
+                },
+                {
+                  key: "partial",
+                  label: __("Partial", "yatra"),
+                  count: countFor("partial"),
+                },
+                {
+                  key: "failed",
+                  label: __("Failed", "yatra"),
+                  count: countFor("failed"),
+                },
+                {
+                  key: "refunded",
+                  label: __("Refunded", "yatra"),
+                  count: countFor("refunded"),
+                },
+                {
+                  key: "cancelled",
+                  label: __("Cancelled", "yatra"),
+                  count: countFor("cancelled"),
+                },
               ]}
               showColumnsDropdown={showColumnsDropdown}
               setShowColumnsDropdown={setShowColumnsDropdown}
@@ -840,9 +883,12 @@ const Payments: React.FC = () => {
                   "We couldn’t connect to the payments service. Please refresh or try again in a moment.",
                   "We couldn’t connect to the payments service. Please refresh or try again in a moment.",
                 )}
-                onRetry={() =>
-                  queryClient.invalidateQueries({ queryKey: ["payments"] })
-                }
+                onRetry={() => {
+                  queryClient.invalidateQueries({ queryKey: ["payments"] });
+                  queryClient.invalidateQueries({
+                    queryKey: ["payments-stats"],
+                  });
+                }}
                 errorDetails={errorContext.details}
                 errorRequestInfo={errorContext.requestInfo}
                 emptyText={__("No payments found", "yatra")}
@@ -879,7 +925,7 @@ const Payments: React.FC = () => {
                 currentPage={page}
                 totalPages={totalPages}
                 totalItems={total}
-                itemsPerPage={10}
+                itemsPerPage={perPage}
                 onPageChange={(newPage) => setPage(newPage)}
                 itemName={__("payments", "yatra")}
               />

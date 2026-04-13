@@ -74,6 +74,7 @@ export const API_ENDPOINTS = {
 
   // Payments
   PAYMENTS: "/payments",
+  PAYMENTS_STATS: "/payments/stats",
   PAYMENT_GET: (id: string | number) => `/payments/${id}`,
   PAYMENT_DELETE: (id: string | number) => `/payments/${id}`,
 

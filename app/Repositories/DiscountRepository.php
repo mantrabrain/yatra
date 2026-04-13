@@ -118,5 +118,42 @@ class DiscountRepository extends BaseRepository
         
         return (int) ($count ?? 0);
     }
+
+    /**
+     * Status counts for admin toolbar (matches wp_yatra_new_discounts.status values).
+     *
+     * @return array{all: int, publish: int, draft: int, trash: int, expired: int}
+     */
+    public function getAdminStatusCounts(): array
+    {
+        $table = esc_sql($this->table);
+        $all = (int) $this->wpdb->get_var("SELECT COUNT(*) FROM `{$table}`");
+
+        $rows = $this->wpdb->get_results(
+            "SELECT `status`, COUNT(*) AS c FROM `{$table}` GROUP BY `status`"
+        ) ?: [];
+
+        $map = [
+            'publish' => 0,
+            'draft' => 0,
+            'trash' => 0,
+            'expired' => 0,
+        ];
+
+        foreach ($rows as $row) {
+            $st = (string) ($row->status ?? '');
+            if (isset($map[$st])) {
+                $map[$st] = (int) $row->c;
+            }
+        }
+
+        return [
+            'all' => $all,
+            'publish' => $map['publish'],
+            'draft' => $map['draft'],
+            'trash' => $map['trash'],
+            'expired' => $map['expired'],
+        ];
+    }
 }
 

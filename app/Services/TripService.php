@@ -823,6 +823,15 @@ class TripService extends BaseService
     }
 
     /**
+     * Admin trip list/grid: read rows directly from the repository (bypasses BaseService::getAll() list cache).
+     * Count queries do not use that cache; a stale cached empty list made /trips/stats correct while the grid stayed empty.
+     */
+    public function getAllForAdminList(array $args = []): array
+    {
+        return $this->repository->all($args);
+    }
+
+    /**
      * Count items
      */
     public function count(array $args = []): int

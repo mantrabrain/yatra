@@ -254,9 +254,15 @@ const Trips: React.FC = () => {
     },
   });
 
-  const trips = (data as any)?.data || [];
-  const total = (data as any)?.total || 0;
-  const itemsPerPage = (data as any)?.per_page || 10;
+  // List endpoint returns { data: Trip[], total, per_page }; meta.total / meta.per_page used by some collections.
+  const r = data as Record<string, any> | undefined;
+  const trips: Trip[] = Array.isArray(r?.data)
+    ? r.data
+    : Array.isArray(r?.data?.data)
+      ? r.data.data
+      : [];
+  const total = Number(r?.meta?.total ?? r?.total ?? 0);
+  const itemsPerPage = Number(r?.meta?.per_page ?? r?.per_page ?? 10) || 10;
   const totalPages = Math.ceil(total / itemsPerPage);
   const errorContext = getErrorContext(error);
 

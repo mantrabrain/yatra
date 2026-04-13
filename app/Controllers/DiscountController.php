@@ -42,6 +42,14 @@ class DiscountController extends BaseController
             ]
         ));
 
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/stats', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_stats'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+
         // Group discount discoverability endpoint
         register_rest_route($this->namespace, '/' . $this->rest_base . '/group-discounts', [
             [
@@ -223,6 +231,18 @@ class DiscountController extends BaseController
                 return current_user_can('yatra_edit_bookings');
             default:
                 return current_user_can('manage_options');
+        }
+    }
+
+    /**
+     * GET /discounts/stats — counts per status for admin toolbar tabs
+     */
+    public function get_stats(WP_REST_Request $request)
+    {
+        try {
+            return $this->success_response($this->service->getAdminStatusCounts());
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
         }
     }
 

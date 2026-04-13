@@ -48,7 +48,8 @@ class ShortcodeServiceProvider extends \Yatra\Core\ServiceProvider
             'DestinationShortcodeAjax',
             'DiscountShortcodeAjax',
             'LoginAjax',
-            'GeocodingAjax'
+            'GeocodingAjax',
+            'DirectAttributeQuery',
         ];
 
         foreach ($ajax_handlers as $handler_class) {

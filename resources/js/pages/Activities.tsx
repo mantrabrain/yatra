@@ -218,10 +218,7 @@ const Activities: React.FC = () => {
       ...visibleColumns,
       [columnKey]: !visibleColumns[columnKey],
     };
-    
-    // DEBUG: Log column visibility changes
-    console.log('YATRA DEBUG: Activities Column toggle -', columnKey, 'from', visibleColumns[columnKey], 'to', newVisibleColumns[columnKey]);
-    
+
     setVisibleColumns(newVisibleColumns);
     localStorage.setItem(
       "yatra-activities-columns-v2",

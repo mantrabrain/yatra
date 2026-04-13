@@ -204,9 +204,6 @@ const ActivityForm: React.FC = () => {
         seo_keywords: data.seo_keywords.trim(),
       };
 
-      // DEBUG: Log the payload being sent
-      console.log('YATRA DEBUG: ActivityForm sending payload:', payload);
-
       // If slug was manually edited, add flag to preserve it
       if (isEditMode && isSlugEditable) {
         payload.preserve_slug = true;

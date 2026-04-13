@@ -116,6 +116,10 @@ phpmd.xml.dist
 *.log
 .DS_Store
 Thumbs.db
+# Source maps & Vite metadata (optional for support; omit from distribution zip)
+*.map
+assets/.vite/
+scripts/
 build.sh
 copy.sh
 EOF

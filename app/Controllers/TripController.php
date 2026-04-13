@@ -175,24 +175,23 @@ class TripController extends BaseController
             ],
         ]);
 
-        // Trip attributes endpoints
-        // Test endpoint to verify routing works
+        // Trip attributes endpoints (admin only — never expose unauthenticated read/write)
         register_rest_route($namespace, '/' . $base . '/test', [
             'methods' => \WP_REST_Server::READABLE,
             'callback' => [$this, 'test_endpoint'],
-            'permission_callback' => '__return_true', // Temporarily bypass auth for testing
+            'permission_callback' => [$this, 'check_permission'],
         ]);
 
         register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/attributes', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_trip_attributes'],
-                'permission_callback' => '__return_true', // Temporarily bypass auth for testing
+                'permission_callback' => [$this, 'check_read_permission'],
             ],
             [
                 'methods' => \WP_REST_Server::CREATABLE,
                 'callback' => [$this, 'update_trip_attributes'],
-                'permission_callback' => '__return_true', // Temporarily bypass auth for testing
+                'permission_callback' => [$this, 'check_permission'],
             ],
         ]);
 
@@ -253,10 +252,16 @@ class TripController extends BaseController
         try {
             // For admin listing, show more items by default to see all trips
             $default_limit = 20; // Increased from 10 to show all trips
+            $orderbyRaw = $request->get_param('orderby') ?: 'id';
+            // UI sends "price"; the trips table has sale_price (no "price" column).
+            if ($orderbyRaw === 'price') {
+                $orderbyRaw = 'sale_price';
+            }
+
             $args = [
                 'limit' => (int) ($request->get_param('per_page') ?: $default_limit),
                 'offset' => ((int) ($request->get_param('page') ?: 1) - 1) * (int) ($request->get_param('per_page') ?: $default_limit),
-                'order_by' => $request->get_param('orderby') ?: 'id',
+                'order_by' => $orderbyRaw,
                 'order' => strtoupper($request->get_param('order') ?: 'DESC'),
             ];
 
@@ -275,16 +280,10 @@ class TripController extends BaseController
                 $total = count($items);
           
             } else {
-                // DEBUG: Use TripService to get trip counts
-            
-                    $direct_count = $this->service->count();
-                    $publish_count = $this->service->countByStatus('publish');
-                    $trash_count = $this->service->countByStatus('trash');
-            
-                
                 // For admin listing, include all trips regardless of status or soft delete
                 $args['include_deleted'] = true;
-                $items = $this->service->getAll($args);
+                // Must not use BaseService::getAll() — it caches list results while count() does not, which broke the admin grid.
+                $items = $this->service->getAllForAdminList($args);
                 $total = $this->service->count($args);
           
             }
@@ -610,11 +609,15 @@ class TripController extends BaseController
                 $data['testimonial_review_ids'] = is_string($data['testimonial_review_ids']) ? $data['testimonial_review_ids'] : wp_json_encode($data['testimonial_review_ids']);
             }
             if (isset($data['default_time_slots'])) {
-                error_log('YATRA DEBUG: default_time_slots received: ' . print_r($data['default_time_slots'], true));
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('Yatra DEBUG: default_time_slots received: ' . print_r($data['default_time_slots'], true));
+                }
                 $data['default_time_slots'] = is_string($data['default_time_slots']) ? $data['default_time_slots'] : wp_json_encode($data['default_time_slots']);
-                error_log('YATRA DEBUG: default_time_slots after encoding: ' . $data['default_time_slots']);
-            } else {
-                error_log('YATRA DEBUG: default_time_slots NOT in request data');
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('Yatra DEBUG: default_time_slots after encoding: ' . $data['default_time_slots']);
+                }
+            } elseif (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('Yatra DEBUG: default_time_slots NOT in request data');
             }
             
             // Handle featured_priority field (already in $data for update)
@@ -1433,10 +1436,11 @@ class TripController extends BaseController
             $toDate = date('Y-m-d', strtotime('+12 months'));
             
             $availability_dates = $resolutionService->getAllAvailabilityDates($id, $fromDate, $toDate);
-            
-            // Log for debugging
-            error_log('Yatra Availability Debug: Trip ID ' . $id . ' has ' . count($availability_dates) . ' availability dates from centralized service');
-            
+
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('Yatra Availability Debug: Trip ID ' . $id . ' has ' . count($availability_dates) . ' availability dates from centralized service');
+            }
+
             // Determine if this is a day trip
             $is_single_day = ($trip->duration_days ?? 1) <= 1;
             
@@ -2351,7 +2355,6 @@ class TripController extends BaseController
      */
     public function update_trip_attributes(WP_REST_Request $request)
     {
-        // Add immediate log to verify method is called
         try {
             $trip_id = (int) $request->get_param('id');
             $attributes = $request->get_param('attributes') ?? [];

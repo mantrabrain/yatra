@@ -214,6 +214,14 @@ class PaymentService
     }
 
     /**
+     * Admin toolbar: counts per payment status.
+     */
+    public function getAdminStatusCounts(): array
+    {
+        return $this->paymentRepository->getAdminStatusCounts();
+    }
+
+    /**
      * Process refund
      * 
      * @param int    $paymentId Payment ID to refund
@@ -280,10 +288,20 @@ class PaymentService
             ? trim($payment->contact_first_name . ' ' . ($payment->contact_last_name ?? ''))
             : null;
 
+        $status = (string) ($payment->status ?? 'pending');
+        $gateway = (string) ($payment->gateway ?? '');
+        $bookingRef = $payment->booking_reference ?? null;
+        $processedAt = $payment->processed_at ?? null;
+        $createdAt = $payment->created_at ?? null;
+        $paymentDate = ($processedAt !== null && $processedAt !== '') ? $processedAt : ($createdAt ?? '');
+
         return [
             'id' => (int) $payment->id,
             'booking_id' => (int) $payment->booking_id,
-            'booking_reference' => $payment->booking_reference ?? null,
+            'booking_reference' => $bookingRef,
+            'booking_number' => ($bookingRef !== null && $bookingRef !== '')
+                ? (string) $bookingRef
+                : '#' . (int) ($payment->booking_id ?? 0),
             'contact_email' => $payment->contact_email ?? null,
             'contact_name' => $contactName,
             'customer_name' => $contactName,
@@ -291,13 +309,17 @@ class PaymentService
             'trip_title' => $payment->trip_title ?? null,
             'transaction_id' => $payment->transaction_id,
             'gateway' => $payment->gateway,
+            'payment_method' => $gateway,
             'amount' => (float) $payment->amount,
             'currency' => $payment->currency,
             'status' => $payment->status,
+            'payment_status' => $status,
             'payment_type' => $payment->payment_type,
             'notes' => $payment->notes,
             'processed_at' => $payment->processed_at,
             'created_at' => $payment->created_at,
+            'payment_date' => $paymentDate,
+            'payment_number' => sprintf('PAY-%06d', (int) $payment->id),
         ];
     }
 }

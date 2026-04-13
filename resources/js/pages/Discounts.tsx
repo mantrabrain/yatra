@@ -135,6 +135,11 @@ const Discounts: React.FC = () => {
   const { can } = usePermissions();
   const { showToast } = useToast();
 
+  const invalidateDiscountQueries = () => {
+    queryClient.invalidateQueries({ queryKey: ["discounts"] });
+    queryClient.invalidateQueries({ queryKey: ["discounts-stats"] });
+  };
+
   const baseAdminUrl = (window as any).yatraAdmin?.adminUrl || "";
 
   // Build query params
@@ -181,13 +186,76 @@ const Discounts: React.FC = () => {
     enabled: can("yatra_view_bookings"),
   });
 
+  const { data: discountStats } = useQuery({
+    queryKey: ["discounts-stats"],
+    queryFn: async () => {
+      try {
+        return await apiClient.get("/discounts/stats");
+      } catch {
+        return {
+          all: 0,
+          publish: 0,
+          draft: 0,
+          trash: 0,
+          expired: 0,
+        };
+      }
+    },
+    enabled: can("yatra_view_bookings"),
+  });
+
+  const discountStatusCounts = useMemo(() => {
+    const d = discountStats as Record<string, unknown> | null | undefined;
+    if (!d) {
+      return { all: 0, publish: 0, draft: 0, trash: 0, expired: 0 };
+    }
+    return {
+      all: Number(d.all ?? 0),
+      publish: Number(d.publish ?? 0),
+      draft: Number(d.draft ?? 0),
+      trash: Number(d.trash ?? 0),
+      expired: Number(d.expired ?? 0),
+    };
+  }, [discountStats]);
+
+  const bulkToolbarStatusOptions = useMemo(
+    () => [
+      {
+        key: "all",
+        label: __("All", "yatra"),
+        count: discountStatusCounts.all,
+      },
+      {
+        key: "publish",
+        label: __("Publish", "yatra"),
+        count: discountStatusCounts.publish,
+      },
+      {
+        key: "draft",
+        label: __("Draft", "yatra"),
+        count: discountStatusCounts.draft,
+      },
+      {
+        key: "trash",
+        label: __("Trash", "yatra"),
+        count: discountStatusCounts.trash,
+      },
+      {
+        key: "expired",
+        label: __("Expired", "yatra"),
+        count: discountStatusCounts.expired,
+      },
+    ],
+    [discountStatusCounts],
+  );
+
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       return await apiClient.delete(`/discounts/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["discounts"] });
+      invalidateDiscountQueries();
       showToast(__("Discount deleted successfully", "yatra"), "success");
       setDeleteConfirm({ isOpen: false, discount: null });
     },
@@ -298,13 +366,6 @@ const Discounts: React.FC = () => {
   // Check if Advanced Discount module is enabled (Pro plugin sets this flag via yatraAdmin)
   const isAdvancedDiscountEnabled = !!(window as any).yatraAdmin
     ?.advancedDiscountEnabled;
-  
-  // Debug: Log the flag value
-  console.log('Yatra Debug - Advanced Discount Enabled:', {
-    yatraAdmin: (window as any).yatraAdmin,
-    advancedDiscountEnabled: (window as any).yatraAdmin?.advancedDiscountEnabled,
-    isAdvancedDiscountEnabled
-  });
 
   const handleSelectDiscountType = (type: "promo" | "group" | "both") => {
     // Block group and both options if Advanced Discount module is not enabled - show premium dialog
@@ -448,7 +509,7 @@ const Discounts: React.FC = () => {
         showToast(__("Bulk status updated successfully", "yatra"), "success");
       }
 
-      queryClient.invalidateQueries({ queryKey: ["discounts"] });
+      invalidateDiscountQueries();
       setSelectedIds([]);
       setBulkAction("");
     } catch (error: any) {
@@ -796,7 +857,7 @@ const Discounts: React.FC = () => {
         setIsBulkPending(true);
         try {
           await updateStatusForIds([discount.id], "publish");
-          queryClient.invalidateQueries({ queryKey: ["discounts"] });
+          invalidateDiscountQueries();
           showToast(__("Discount status updated", "yatra"), "success");
         } catch (error: any) {
           showToast(
@@ -817,7 +878,7 @@ const Discounts: React.FC = () => {
         setIsBulkPending(true);
         try {
           await updateStatusForIds([discount.id], "draft");
-          queryClient.invalidateQueries({ queryKey: ["discounts"] });
+          invalidateDiscountQueries();
           showToast(__("Discount status updated", "yatra"), "success");
         } catch (error: any) {
           showToast(
@@ -838,7 +899,7 @@ const Discounts: React.FC = () => {
         setIsBulkPending(true);
         try {
           await updateStatusForIds([discount.id], "trash");
-          queryClient.invalidateQueries({ queryKey: ["discounts"] });
+          invalidateDiscountQueries();
           showToast(__("Discount moved to trash", "yatra"), "success");
         } catch (error: any) {
           showToast(
@@ -859,7 +920,7 @@ const Discounts: React.FC = () => {
         setIsBulkPending(true);
         try {
           await updateStatusForIds([discount.id], "expired");
-          queryClient.invalidateQueries({ queryKey: ["discounts"] });
+          invalidateDiscountQueries();
           showToast(__("Discount status updated", "yatra"), "success");
         } catch (error: any) {
           showToast(
@@ -1103,33 +1164,7 @@ const Discounts: React.FC = () => {
               setStatusFilter(value);
               setPage(1);
             }}
-            statusOptions={[
-              {
-                key: "all",
-                label: __("All", "yatra"),
-                count: 0,
-              },
-              {
-                key: "publish",
-                label: __("Publish", "yatra"),
-                count: 0,
-              },
-              {
-                key: "draft",
-                label: __("Draft", "yatra"),
-                count: 0,
-              },
-              {
-                key: "trash",
-                label: __("Trash", "yatra"),
-                count: 0,
-              },
-              {
-                key: "expired",
-                label: __("Expired", "yatra"),
-                count: 0,
-              },
-            ]}
+            statusOptions={bulkToolbarStatusOptions}
             showColumnsDropdown={showColumnsDropdown}
             setShowColumnsDropdown={setShowColumnsDropdown}
             columnOptions={columnOptions}

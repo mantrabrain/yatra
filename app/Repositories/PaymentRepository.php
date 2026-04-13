@@ -388,6 +388,41 @@ class PaymentRepository extends BaseRepository
     }
 
     /**
+     * Flat counts for admin list toolbar (matches payment status filter keys).
+     *
+     * @return array{all:int,completed:int,pending:int,partial:int,failed:int,refunded:int,cancelled:int}
+     */
+    public function getAdminStatusCounts(): array
+    {
+        $table = $this->getTableName();
+        $rows = $this->wpdb->get_results(
+            "SELECT status, COUNT(*) AS c FROM {$table} GROUP BY status",
+            ARRAY_A
+        ) ?: [];
+
+        $out = [
+            'all' => 0,
+            'completed' => 0,
+            'pending' => 0,
+            'partial' => 0,
+            'failed' => 0,
+            'refunded' => 0,
+            'cancelled' => 0,
+        ];
+
+        foreach ($rows as $row) {
+            $status = isset($row['status']) ? (string) $row['status'] : '';
+            $c = isset($row['c']) ? (int) $row['c'] : 0;
+            $out['all'] += $c;
+            if ($status !== '' && array_key_exists($status, $out)) {
+                $out[$status] = $c;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
      * Prepare payment data for insert/update
      * 
      * @param array $data Raw data
