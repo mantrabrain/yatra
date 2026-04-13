@@ -114,7 +114,7 @@ class AdminServiceProvider extends ServiceProvider
         $org_plugin_page = 'https://wordpress.org/plugins/yatra/';
         $support_url = 'https://wordpress.org/support/plugin/yatra/reviews/?filter=5';
         $contact_url = 'https://mantrabrain.com/contact';
-        $rate_url = 'https://wordpress.org/support/plugin/yatra/reviews/#new-post';
+        $rate_url = 'https://wordpress.org/support/plugin/yatra/reviews/?filter=5';
 
         $row = [];
 
