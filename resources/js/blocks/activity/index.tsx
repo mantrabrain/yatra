@@ -21,4 +21,4 @@ registerBlockType(metadata.name, {
   ...metadata,
   edit: Edit,
   save: () => null,
-} as BlockConfiguration);
+} as unknown as BlockConfiguration);

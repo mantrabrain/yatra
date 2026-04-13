@@ -424,7 +424,7 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
       case "time":
         return (
           <TimePicker
-            value={value}
+            value={Array.isArray(value) ? value[0] ?? "" : value}
             onChange={(newValue) =>
               handleAttributeValueChange(attribute.id, newValue)
             }

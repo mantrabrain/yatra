@@ -186,7 +186,7 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
 
   const apiTemplates: UnifiedEmailTemplate[] = useMemo(() => {
     const raw = Array.isArray(templatesData) ? templatesData : [];
-    return raw.map((t: UnifiedEmailTemplate) => ({
+    return (raw as UnifiedEmailTemplate[]).map((t) => ({
       ...t,
       is_locked: false,
     }));

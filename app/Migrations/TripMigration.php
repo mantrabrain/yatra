@@ -1096,6 +1096,10 @@ class TripMigration extends BaseMigration
                 'status' => 'available',
                 'from_location' => null,
                 'to_location' => null,
+                'from_latitude' => null,
+                'from_longitude' => null,
+                'to_latitude' => null,
+                'to_longitude' => null,
                 'special_notes' => null,
                 'cutoff_date' => null,
                 'cutoff_hours' => 24,
@@ -1106,7 +1110,10 @@ class TripMigration extends BaseMigration
             $inserted = $wpdb->insert(
                 $table,
                 $availabilityEntry,
-                ['%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%s', '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s']
+                [
+                    '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d',
+                    '%s', '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s',
+                ]
             );
             
             if ($inserted) {

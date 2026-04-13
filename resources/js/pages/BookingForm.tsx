@@ -1377,7 +1377,7 @@ const BookingForm: React.FC = () => {
                                   className="rounded border-gray-300"
                                   checked={
                                     emergencyContactData[field.id] === "1" ||
-                                    emergencyContactData[field.id] === true
+                                    emergencyContactData[field.id] === "true"
                                   }
                                   onChange={(e) =>
                                     handleEmergencyContactChange(
@@ -1638,7 +1638,7 @@ const BookingForm: React.FC = () => {
                                           className="rounded border-gray-300"
                                           checked={
                                             traveler[field.id] === "1" ||
-                                            traveler[field.id] === true
+                                            traveler[field.id] === "true"
                                           }
                                           onChange={(e) =>
                                             handleTravelerChange(

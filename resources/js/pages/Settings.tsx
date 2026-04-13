@@ -2677,7 +2677,7 @@ const Settings: React.FC = () => {
         // Update local connection status
         setMailchimpConnectionStatus({
           connected: true,
-          error: null,
+          error: undefined,
         });
 
         // Load lists after successful validation
@@ -3190,7 +3190,7 @@ const Settings: React.FC = () => {
   const saveMutation = useMutation({
     mutationFn: async (data: SettingsData) => {
       try {
-        await saveSettings(data as Record<string, unknown>);
+        await saveSettings(data as unknown as Record<string, unknown>);
         return data;
       } catch (error: any) {
         showToast(
@@ -5763,7 +5763,7 @@ const Settings: React.FC = () => {
                                         {Object.entries(yatraFieldOptions).map(
                                           ([value, label]) => (
                                             <option key={value} value={value}>
-                                              {label}
+                                              {String(label)}
                                             </option>
                                           ),
                                         )}

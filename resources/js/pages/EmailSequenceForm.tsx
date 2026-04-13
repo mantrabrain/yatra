@@ -136,7 +136,7 @@ const EmailSequenceForm: React.FC = () => {
   });
 
   const templates: EmailTemplate[] = Array.isArray(templatesData)
-    ? templatesData
+    ? (templatesData as EmailTemplate[])
     : [];
 
   // Get all trigger events from Schema (passed via window.yatraAdmin.emailEvents)
@@ -159,20 +159,22 @@ const EmailSequenceForm: React.FC = () => {
 
   // Populate form when editing
   useEffect(() => {
-    if (sequenceData) {
-      setFormData({
-        name: sequenceData.name || "",
-        description: sequenceData.description || "",
-        trigger_type: sequenceData.trigger_type || "booking.created",
-        trigger_config: sequenceData.trigger_config || {},
-        status: sequenceData.status || "draft",
-        applicable_to: sequenceData.applicable_to || "all",
-        trip_ids: sequenceData.trip_ids || [],
-      });
+    if (!sequenceData || typeof sequenceData !== "object") {
+      return;
+    }
+    const loaded = sequenceData as SequenceData;
+    setFormData({
+      name: loaded.name || "",
+      description: loaded.description || "",
+      trigger_type: loaded.trigger_type || "booking.created",
+      trigger_config: loaded.trigger_config || {},
+      status: loaded.status || "draft",
+      applicable_to: loaded.applicable_to || "all",
+      trip_ids: loaded.trip_ids || [],
+    });
 
-      if (sequenceData.steps && sequenceData.steps.length > 0) {
-        setSteps(sequenceData.steps);
-      }
+    if (loaded.steps && loaded.steps.length > 0) {
+      setSteps(loaded.steps);
     }
   }, [sequenceData]);
 

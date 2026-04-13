@@ -34,6 +34,7 @@ import { useNavigate } from "../../hooks/useNavigate";
 
 interface AvailabilityDate {
   id: string;
+  trip_id?: number;
   departure_date: string;
   departure_time?: string;
   arrival_date: string;

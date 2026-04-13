@@ -14,6 +14,21 @@ use Yatra\Database\Tables\TripAvailabilityDatesTable;
 class AvailabilityRepository extends BaseRepository
 {
     /**
+     * Normalize optional latitude/longitude for storage (null if empty/invalid).
+     */
+    private function sanitizeCoordinate(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (is_numeric($value)) {
+            return (string) $value;
+        }
+
+        return null;
+    }
+
+    /**
      * Get table name
      */
     protected function getTableName(): string
@@ -293,6 +308,10 @@ class AvailabilityRepository extends BaseRepository
             'status' => sanitize_text_field($data['status'] ?? 'available'),
             'from_location' => !empty($data['from_location']) ? sanitize_text_field($data['from_location']) : null,
             'to_location' => !empty($data['to_location']) ? sanitize_text_field($data['to_location']) : null,
+            'from_latitude' => $this->sanitizeCoordinate($data['from_latitude'] ?? null),
+            'from_longitude' => $this->sanitizeCoordinate($data['from_longitude'] ?? null),
+            'to_latitude' => $this->sanitizeCoordinate($data['to_latitude'] ?? null),
+            'to_longitude' => $this->sanitizeCoordinate($data['to_longitude'] ?? null),
             'special_notes' => !empty($data['special_notes']) ? sanitize_textarea_field($data['special_notes']) : null,
             'cutoff_date' => !empty($data['cutoff_date']) ? sanitize_text_field($data['cutoff_date']) : null,
             'cutoff_hours' => (int) ($data['cutoff_hours'] ?? 24),
@@ -305,7 +324,7 @@ class AvailabilityRepository extends BaseRepository
         
         $this->wpdb->insert($table, $insertData, [
             '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d',
-            '%s', '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%d'
+            '%s', '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d',
         ]);
         
         return $this->wpdb->insert_id;
@@ -338,6 +357,18 @@ class AvailabilityRepository extends BaseRepository
         if (isset($data['status'])) $updateData['status'] = sanitize_text_field($data['status']);
         if (isset($data['from_location'])) $updateData['from_location'] = !empty($data['from_location']) ? sanitize_text_field($data['from_location']) : null;
         if (isset($data['to_location'])) $updateData['to_location'] = !empty($data['to_location']) ? sanitize_text_field($data['to_location']) : null;
+        if (array_key_exists('from_latitude', $data)) {
+            $updateData['from_latitude'] = $this->sanitizeCoordinate($data['from_latitude']);
+        }
+        if (array_key_exists('from_longitude', $data)) {
+            $updateData['from_longitude'] = $this->sanitizeCoordinate($data['from_longitude']);
+        }
+        if (array_key_exists('to_latitude', $data)) {
+            $updateData['to_latitude'] = $this->sanitizeCoordinate($data['to_latitude']);
+        }
+        if (array_key_exists('to_longitude', $data)) {
+            $updateData['to_longitude'] = $this->sanitizeCoordinate($data['to_longitude']);
+        }
         if (isset($data['special_notes'])) $updateData['special_notes'] = !empty($data['special_notes']) ? sanitize_textarea_field($data['special_notes']) : null;
         if (isset($data['cutoff_date'])) $updateData['cutoff_date'] = !empty($data['cutoff_date']) ? sanitize_text_field($data['cutoff_date']) : null;
         if (isset($data['cutoff_hours'])) $updateData['cutoff_hours'] = (int) $data['cutoff_hours'];

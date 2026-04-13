@@ -64,6 +64,10 @@ export interface AvailabilityDate {
   status: "available" | "sold_out" | "limited" | "closed";
   from_location?: string;
   to_location?: string;
+  from_latitude?: string;
+  from_longitude?: string;
+  to_latitude?: string;
+  to_longitude?: string;
 }
 
 export interface ItineraryEntry {

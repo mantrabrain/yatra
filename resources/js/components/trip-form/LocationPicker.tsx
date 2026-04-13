@@ -18,6 +18,22 @@ const defaultTranslate = (key: string) => {
     "Search for a location...": "Search for a location...",
     "Click on the map to set the location, or search for a place above.":
       "Click on the map to set the location, or search for a place above.",
+    "GPS Coordinates": "GPS Coordinates",
+    "Manual override": "Manual override",
+    "Latitude": "Latitude",
+    "Longitude": "Longitude",
+    "e.g. -8.3405": "e.g. -8.3405",
+    "e.g. 115.0920": "e.g. 115.0920",
+    "Use Current Location": "Use Current Location",
+    "Geolocation is not supported by your browser":
+      "Geolocation is not supported by your browser",
+    "Unable to get your location": "Unable to get your location",
+    "Location access requires HTTPS. This feature will work on your live HTTPS site.":
+      "Location access requires HTTPS. This feature will work on your live HTTPS site.",
+    "Manual coordinate entry. These will be auto-filled when you select a location from the map above.":
+      "Manual coordinate entry. These will be auto-filled when you select a location from the map above.",
+    "Click on the map to set the location, or drag the marker to adjust coordinates.":
+      "Click on the map to set the location, or drag the marker to adjust coordinates.",
   };
   return translations[key] || key;
 };
@@ -65,6 +81,9 @@ interface LocationPickerProps {
   // Validation
   validateCoordinates?: (lat: string, lng: string) => boolean;
   errorMessage?: string;
+
+  /** Show editable latitude/longitude fields (same idea as trip form manual GPS section). */
+  showManualCoordinateFields?: boolean;
 }
 
 export const LocationPicker: React.FC<LocationPickerProps> = ({
@@ -85,6 +104,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   onLocationSelect,
   onLocationClear,
   onMapToggle,
+  showManualCoordinateFields = false,
 }) => {
   const [showMap, setShowMap] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -508,16 +528,17 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         )}
       </div>
 
-      {/* Coordinates Display */}
-      {(value.latitude || value.longitude) && (
-        <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <Globe className="w-4 h-4 text-gray-500" />
-          <span className="text-xs text-gray-600 dark:text-gray-400">
-            {translate("Coordinates:")} {value.latitude || "0"},{" "}
-            {value.longitude || "0"}
-          </span>
-        </div>
-      )}
+      {/* Coordinates Display (compact) — hidden when manual fields are shown below */}
+      {!showManualCoordinateFields &&
+        (value.latitude || value.longitude) && (
+          <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <Globe className="w-4 h-4 text-gray-500" />
+            <span className="text-xs text-gray-600 dark:text-gray-400">
+              {translate("Coordinates:")} {value.latitude || "0"},{" "}
+              {value.longitude || "0"}
+            </span>
+          </div>
+        )}
 
       {/* Map Interface */}
       {showMap && (
@@ -542,6 +563,88 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
               "Click on the map to set the location, or drag the marker to adjust coordinates.",
             )}
           </div>
+        </div>
+      )}
+
+      {showManualCoordinateFields && (
+        <div className="space-y-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {translate("GPS Coordinates")}
+              <span className="text-xs font-normal text-gray-500 dark:text-gray-400 ml-1">
+                ({translate("Manual override")})
+              </span>
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                if (!navigator.geolocation) {
+                  alert(translate("Geolocation is not supported by your browser"));
+                  return;
+                }
+                navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                    onChange({
+                      ...value,
+                      latitude: position.coords.latitude.toString(),
+                      longitude: position.coords.longitude.toString(),
+                    });
+                  },
+                  (error) => {
+                    let message = translate(
+                      "Unable to get your location",
+                    );
+                    if (error.code === 1 && error.message.includes("secure origins")) {
+                      message = translate(
+                        "Location access requires HTTPS. This feature will work on your live HTTPS site.",
+                      );
+                    }
+                    alert(message);
+                  },
+                );
+              }}
+              className="text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 px-3 py-1.5 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
+            >
+              {translate("Use Current Location")}
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                {translate("Latitude")}
+              </label>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={value.latitude}
+                onChange={(e) =>
+                  onChange({ ...value, latitude: e.target.value })
+                }
+                placeholder={translate("e.g. -8.3405")}
+                className={`w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${inputClassName}`}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                {translate("Longitude")}
+              </label>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={value.longitude}
+                onChange={(e) =>
+                  onChange({ ...value, longitude: e.target.value })
+                }
+                placeholder={translate("e.g. 115.0920")}
+                className={`w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${inputClassName}`}
+              />
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {translate(
+              "Manual coordinate entry. These will be auto-filled when you select a location from the map above.",
+            )}
+          </p>
         </div>
       )}
 

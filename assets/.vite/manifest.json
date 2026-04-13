@@ -3,11 +3,11 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-0VU9RtlD.js": {
-    "file": "dist/js/index-0VU9RtlD.js",
+  "_index-D6ftZoh-.js": {
+    "file": "dist/js/index-D6ftZoh-.js",
     "name": "index",
     "imports": [
-      "_react-vendor-BHHBpqb5.js"
+      "_react-vendor-LtfLP-AK.js"
     ],
     "css": [
       "admin/dist/css/index.css"
@@ -17,8 +17,8 @@
     "file": "admin/dist/css/react-vendor.css",
     "src": "_react-vendor-!~{001}~.js"
   },
-  "_react-vendor-BHHBpqb5.js": {
-    "file": "dist/js/react-vendor-BHHBpqb5.js",
+  "_react-vendor-LtfLP-AK.js": {
+    "file": "dist/js/react-vendor-LtfLP-AK.js",
     "name": "react-vendor",
     "css": [
       "admin/dist/css/react-vendor.css"
@@ -30,8 +30,8 @@
     "src": "resources/js/account-page.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-BHHBpqb5.js",
-      "_index-0VU9RtlD.js"
+      "_react-vendor-LtfLP-AK.js",
+      "_index-D6ftZoh-.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -40,8 +40,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-BHHBpqb5.js",
-      "_index-0VU9RtlD.js"
+      "_react-vendor-LtfLP-AK.js",
+      "_index-D6ftZoh-.js"
     ]
   }
 }

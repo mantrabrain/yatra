@@ -12,6 +12,18 @@ use Yatra\Database\Tables\TripAvailabilityRulesTable;
  */
 class RecurringAvailabilityRepository extends BaseRepository
 {
+    private function sanitizeCoordinate(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (is_numeric($value)) {
+            return (string) $value;
+        }
+
+        return null;
+    }
+
     /**
      * Get table name
      */
@@ -245,6 +257,7 @@ class RecurringAvailabilityRepository extends BaseRepository
             'end_date', 'excluded_dates', 'months', 'time_slots', 'original_price',
             'sale_price', 'traveler_pricing', 'seats_total', 'alert_threshold',
             'departure_time', 'arrival_time', 'from_location', 'to_location',
+            'from_latitude', 'from_longitude', 'to_latitude', 'to_longitude',
             'cutoff_hours', 'advance_booking_days', 'day_overrides', 'status', 'priority',
         ];
 
@@ -272,6 +285,10 @@ class RecurringAvailabilityRepository extends BaseRepository
                     if (in_array($field, ['end_date', 'interval_start_date', 'departure_time', 'arrival_time', 'advance_booking_days'], true)) {
                         $value = null;
                     }
+                }
+
+                if (in_array($field, ['from_latitude', 'from_longitude', 'to_latitude', 'to_longitude'], true)) {
+                    $value = $this->sanitizeCoordinate($value);
                 }
 
                 $prepared[$field] = $value;

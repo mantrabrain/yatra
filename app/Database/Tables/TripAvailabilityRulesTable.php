@@ -64,6 +64,10 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     -- Location Settings
     `from_location` varchar(255) DEFAULT NULL COMMENT 'Default pickup location',
     `to_location` varchar(255) DEFAULT NULL COMMENT 'Default destination location',
+    `from_latitude` decimal(10,8) DEFAULT NULL COMMENT 'From location latitude',
+    `from_longitude` decimal(11,8) DEFAULT NULL COMMENT 'From location longitude',
+    `to_latitude` decimal(10,8) DEFAULT NULL COMMENT 'To location latitude',
+    `to_longitude` decimal(11,8) DEFAULT NULL COMMENT 'To location longitude',
     `pickup_location` varchar(255) DEFAULT NULL COMMENT 'Specific pickup point',
     `dropoff_location` varchar(255) DEFAULT NULL COMMENT 'Specific dropoff point',
     

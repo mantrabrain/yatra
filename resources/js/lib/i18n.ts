@@ -8,6 +8,9 @@ declare global {
     yatraAdmin?: {
       apiUrl?: string;
       nonce?: string;
+      brandLogoUrl?: string;
+      pluginUrl?: string;
+      currentUserAvatar?: string;
       currentUser?: number;
       siteUrl?: string;
       permissions?: string[];

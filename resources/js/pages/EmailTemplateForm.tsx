@@ -173,9 +173,13 @@ const EmailTemplateForm: React.FC = () => {
     mutationFn: async (data: typeof formData) => {
       if (isCreateMode) {
         const response = await createEmailTemplate(data);
-        // Check if the response indicates failure
-        if (response && response.success === false) {
-          throw new Error(response.message || __("Failed to create template"));
+        const r = response as {
+          success?: boolean;
+          message?: string;
+          data?: { id?: string | number };
+        };
+        if (r && r.success === false) {
+          throw new Error(r.message || __("Failed to create template"));
         }
         return response;
       }
@@ -186,7 +190,8 @@ const EmailTemplateForm: React.FC = () => {
       if (isCreateMode) {
         showToast(__("Template created successfully"), "success");
         // Redirect to edit page after creation - response.data contains the template
-        const newId = response?.data?.id;
+        const newId = (response as { data?: { id?: string | number } })?.data
+          ?.id;
         if (newId) {
           window.location.href = `admin.php?page=yatra&subpage=email-automation&tab=template&action=edit&id=${newId}`;
         } else {

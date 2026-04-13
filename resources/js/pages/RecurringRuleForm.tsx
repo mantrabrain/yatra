@@ -15,6 +15,8 @@ import {
   X,
   AlertCircle,
   Eye,
+  MapPin,
+  CheckCircle2,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { Button } from "../components/ui/button";
@@ -37,6 +39,12 @@ import { useNavigate } from "../hooks/useNavigate";
 import { apiClient } from "../lib/api-client";
 import { useToast } from "../components/ui/toast";
 import { RecurringRuleFormSkeleton } from "../components/availability/RecurringRuleFormSkeleton";
+import { LocationPicker } from "../components/trip-form/LocationPicker";
+
+function coordFromApi(v: unknown): string {
+  if (v == null || v === "") return "";
+  return String(v);
+}
 
 interface Trip {
   id: number;
@@ -45,6 +53,10 @@ interface Trip {
   duration_days?: number;
   starting_location?: string;
   ending_location?: string;
+  starting_latitude?: string | number;
+  starting_longitude?: string | number;
+  ending_latitude?: string | number;
+  ending_longitude?: string | number;
   pricing_type?: "regular" | "traveler_based";
 }
 
@@ -98,6 +110,10 @@ interface RecurringRule {
   arrival_time?: string;
   from_location?: string;
   to_location?: string;
+  from_latitude?: string;
+  from_longitude?: string;
+  to_latitude?: string;
+  to_longitude?: string;
   cutoff_hours: number;
   alert_threshold: number;
   status: "active" | "inactive";
@@ -155,6 +171,10 @@ const RecurringRuleForm: React.FC = () => {
     arrival_time: "",
     from_location: "",
     to_location: "",
+    from_latitude: "",
+    from_longitude: "",
+    to_latitude: "",
+    to_longitude: "",
     cutoff_hours: 24,
     alert_threshold: 5,
     status: "active",
@@ -203,6 +223,15 @@ const RecurringRuleForm: React.FC = () => {
 
   // Get selected trip details
   const selectedTrip = tripsData?.trips.find((t) => t.id === formData.trip_id);
+  const { data: tripForLocations } = useQuery({
+    queryKey: ["trip", formData.trip_id, "recurring-rule-locations"],
+    queryFn: async () => {
+      const response = await apiClient.get(`/trips/${formData.trip_id}`);
+      return response?.data || response || null;
+    },
+    enabled: formData.trip_id > 0,
+    staleTime: 5 * 60 * 1000,
+  });
   const { data: fallbackTripData } = useQuery({
     queryKey: ["trip", formData.trip_id, "recurring-rule-form"],
     queryFn: async () => {
@@ -306,6 +335,10 @@ const RecurringRuleForm: React.FC = () => {
         arrival_time: existingRule.arrival_time || "",
         from_location: existingRule.from_location || "",
         to_location: existingRule.to_location || "",
+        from_latitude: coordFromApi(existingRule.from_latitude),
+        from_longitude: coordFromApi(existingRule.from_longitude),
+        to_latitude: coordFromApi(existingRule.to_latitude),
+        to_longitude: coordFromApi(existingRule.to_longitude),
         cutoff_hours: existingRule.cutoff_hours || 24,
         alert_threshold: existingRule.alert_threshold || 5,
         status: existingRule.status || "active",
@@ -315,18 +348,49 @@ const RecurringRuleForm: React.FC = () => {
 
   // Set pricing type based on selected trip when not editing
   useEffect(() => {
-    if (!isEditing && selectedTrip && !existingRule) {
+    if (!isEditing && !existingRule) {
       setFormData((prev) => ({
         ...prev,
-        pricing_type: (selectedTrip.pricing_type || "regular") as
-          | "regular"
-          | "traveler_based",
-        from_location:
-          prev.from_location || selectedTrip.starting_location || "",
-        to_location: prev.to_location || selectedTrip.ending_location || "",
+        ...(selectedTrip || tripForLocations
+          ? {
+              pricing_type: ((
+                selectedTrip?.pricing_type ||
+                (tripForLocations as Trip)?.pricing_type ||
+                "regular"
+              ) || "regular") as "regular" | "traveler_based",
+            }
+          : {}),
+        ...(tripForLocations
+          ? {
+              from_location:
+                prev.from_location ||
+                (tripForLocations as Trip).starting_location ||
+                "",
+              to_location:
+                prev.to_location ||
+                (tripForLocations as Trip).ending_location ||
+                "",
+              from_latitude:
+                prev.from_latitude ||
+                coordFromApi(
+                  (tripForLocations as Trip).starting_latitude,
+                ),
+              from_longitude:
+                prev.from_longitude ||
+                coordFromApi(
+                  (tripForLocations as Trip).starting_longitude,
+                ),
+              to_latitude:
+                prev.to_latitude ||
+                coordFromApi((tripForLocations as Trip).ending_latitude),
+              to_longitude:
+                prev.to_longitude ||
+                coordFromApi((tripForLocations as Trip).ending_longitude),
+            }
+          : {}),
       }));
     }
-  }, [isEditing, selectedTrip, existingRule]);
+  }, [isEditing, selectedTrip, tripForLocations, existingRule]);
 
   // Create mutation
   const createMutation = useMutation({
@@ -2135,52 +2199,172 @@ const RecurringRuleForm: React.FC = () => {
                 {/* Location & Cutoff - always shown when trip selected */}
                 {formData.trip_id > 0 && (
                   <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          {__("From Location", "yatra")}
-                        </label>
-                        <Input
-                          type="text"
-                          value={
-                            formData.from_location ||
-                            selectedTrip?.starting_location ||
-                            ""
-                          }
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              from_location: e.target.value,
-                            }))
-                          }
-                          placeholder={
-                            selectedTrip?.starting_location ||
-                            __("e.g., Airport", "yatra")
-                          }
-                        />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <MapPin className="w-5 h-5 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-base font-semibold text-blue-900 dark:text-blue-100">
+                              {__("Starting Point", "yatra")}
+                            </h4>
+                            <p className="text-xs text-blue-700 dark:text-blue-300">
+                              {__("Where the journey begins", "yatra")}
+                            </p>
+                          </div>
+                          {formData.from_latitude && formData.from_longitude && (
+                            <div
+                              className="w-2 h-2 bg-blue-500 rounded-full"
+                              title={__("Coordinates set", "yatra")}
+                            />
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {__("From location (departure)", "yatra")}
+                          </label>
+                          <LocationPicker
+                            value={{
+                              name: formData.from_location || "",
+                              latitude: formData.from_latitude || "",
+                              longitude: formData.from_longitude || "",
+                            }}
+                            onChange={(loc) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                from_location: loc.name,
+                                from_latitude: loc.latitude,
+                                from_longitude: loc.longitude,
+                              }))
+                            }
+                            label=""
+                            placeholder={__(
+                              "Search for starting location...",
+                              "yatra",
+                            )}
+                            helpText=""
+                            required={false}
+                            defaultMapCenter={
+                              formData.from_latitude &&
+                              formData.from_longitude
+                                ? [
+                                    parseFloat(formData.from_latitude),
+                                    parseFloat(formData.from_longitude),
+                                  ]
+                                : tripForLocations?.starting_latitude &&
+                                    tripForLocations?.starting_longitude
+                                  ? [
+                                      parseFloat(
+                                        String(tripForLocations.starting_latitude),
+                                      ),
+                                      parseFloat(
+                                        String(
+                                          tripForLocations.starting_longitude,
+                                        ),
+                                      ),
+                                    ]
+                                  : [-8.3405, 115.092]
+                            }
+                            defaultZoom={13}
+                            mapHeight="300px"
+                            showMapButton={false}
+                            searchLimit={8}
+                            __={__}
+                            className=""
+                            mapClassName="rounded-lg"
+                            showManualCoordinateFields
+                          />
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {__(
+                              "Default: trip starting location. Set per rule to override.",
+                              "yatra",
+                            )}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          {__("To Location", "yatra")}
-                        </label>
-                        <Input
-                          type="text"
-                          value={
-                            formData.to_location ||
-                            selectedTrip?.ending_location ||
-                            ""
-                          }
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              to_location: e.target.value,
-                            }))
-                          }
-                          placeholder={
-                            selectedTrip?.ending_location ||
-                            __("e.g., Hotel", "yatra")
-                          }
-                        />
+
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl border border-green-200 dark:border-green-800">
+                          <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <CheckCircle2 className="w-5 h-5 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-base font-semibold text-green-900 dark:text-green-100">
+                              {__("Ending Point", "yatra")}
+                            </h4>
+                            <p className="text-xs text-green-700 dark:text-green-300">
+                              {__("Where the journey concludes", "yatra")}
+                            </p>
+                          </div>
+                          {formData.to_latitude && formData.to_longitude && (
+                            <div
+                              className="w-2 h-2 bg-green-500 rounded-full"
+                              title={__("Coordinates set", "yatra")}
+                            />
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {__("To location (destination)", "yatra")}
+                          </label>
+                          <LocationPicker
+                            value={{
+                              name: formData.to_location || "",
+                              latitude: formData.to_latitude || "",
+                              longitude: formData.to_longitude || "",
+                            }}
+                            onChange={(loc) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                to_location: loc.name,
+                                to_latitude: loc.latitude,
+                                to_longitude: loc.longitude,
+                              }))
+                            }
+                            label=""
+                            placeholder={__(
+                              "Search for ending location...",
+                              "yatra",
+                            )}
+                            helpText=""
+                            required={false}
+                            defaultMapCenter={
+                              formData.to_latitude && formData.to_longitude
+                                ? [
+                                    parseFloat(formData.to_latitude),
+                                    parseFloat(formData.to_longitude),
+                                  ]
+                                : tripForLocations?.ending_latitude &&
+                                    tripForLocations?.ending_longitude
+                                  ? [
+                                      parseFloat(
+                                        String(tripForLocations.ending_latitude),
+                                      ),
+                                      parseFloat(
+                                        String(
+                                          tripForLocations.ending_longitude,
+                                        ),
+                                      ),
+                                    ]
+                                  : [-8.5069, 115.2625]
+                            }
+                            defaultZoom={13}
+                            mapHeight="300px"
+                            showMapButton={false}
+                            searchLimit={8}
+                            __={__}
+                            className=""
+                            mapClassName="rounded-lg"
+                            showManualCoordinateFields
+                          />
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {__(
+                              "Default: trip ending location. Set per rule to override.",
+                              "yatra",
+                            )}
+                          </p>
+                        </div>
                       </div>
                     </div>
                     <div>

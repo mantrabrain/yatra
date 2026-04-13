@@ -78,17 +78,20 @@ const PaymentForm: React.FC = () => {
       }
 
       const data = result.data;
+      const processedAt = data.processed_at;
+      const processedDate =
+        typeof processedAt === "string" && processedAt.includes(" ")
+          ? processedAt.split(" ")[0]
+          : new Date().toISOString().split("T")[0];
       return {
         id: data.id,
         booking_id: data.booking_id,
         amount: data.amount,
         payment_method: data.gateway,
         payment_status: data.status,
-        payment_date: data.processed_at
-          ? data.processed_at.split(" ")[0]
-          : new Date().toISOString().split("T")[0],
-        transaction_id: data.transaction_id || "",
-        notes: data.notes || "",
+        payment_date: processedDate,
+        transaction_id: data.transaction_id ?? "",
+        notes: data.notes ?? "",
       };
     },
     enabled: isEditMode && can("yatra_view_bookings"),
@@ -98,15 +101,17 @@ const PaymentForm: React.FC = () => {
   useEffect(() => {
     if (paymentData && isEditMode) {
       setFormData({
-        booking_id: paymentData.booking_id?.toString() || "",
-        amount: paymentData.amount?.toString() || "",
-        payment_method: paymentData.payment_method || "Credit Card",
-        payment_status: (paymentData.payment_status ||
+        booking_id: String(paymentData.booking_id ?? ""),
+        amount: String(paymentData.amount ?? ""),
+        payment_method: String(paymentData.payment_method || "Credit Card"),
+        payment_status: (String(paymentData.payment_status || "pending") ||
           "pending") as PaymentFormData["payment_status"],
-        payment_date:
-          paymentData.payment_date || new Date().toISOString().split("T")[0],
-        transaction_id: paymentData.transaction_id || "",
-        notes: paymentData.notes || "",
+        payment_date: String(
+          paymentData.payment_date ||
+            new Date().toISOString().split("T")[0],
+        ),
+        transaction_id: String(paymentData.transaction_id ?? ""),
+        notes: String(paymentData.notes ?? ""),
       });
     }
   }, [paymentData, isEditMode]);

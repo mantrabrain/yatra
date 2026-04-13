@@ -70,6 +70,7 @@ import {
   History,
   Home,
   Car,
+  Lightbulb,
 } from "lucide-react";
 import { RichTextEditor } from "../components/ui/rich-text-editor";
 import { IconPicker, IconPickerValue } from "../components/ui/icon-picker";
@@ -102,10 +103,7 @@ import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
 import { useToast } from "../components/ui/toast";
 import { MultiSelect } from "../components/ui/multi-select";
 import { TestimonialsSelector } from "../components/trip-form/TestimonialsSelector";
-import {
-  LocationPicker,
-  LocationData,
-} from "../components/trip-form/LocationPicker";
+import { LocationPicker } from "../components/trip-form/LocationPicker";
 import { getErrorContext } from "../lib/errors";
 import {
   buildYatraSinglePublicUrls,
@@ -430,6 +428,8 @@ interface FrontendTab {
 
 interface AvailabilityDate {
   id: string;
+  /** Present when availability row is tied to a specific trip */
+  trip_id?: number;
   departure_date: string;
   arrival_date: string;
   seats_remaining: string;
@@ -439,6 +439,10 @@ interface AvailabilityDate {
   status: "available" | "sold_out" | "limited" | "closed";
   from_location?: string;
   to_location?: string;
+  from_latitude?: string;
+  from_longitude?: string;
+  to_latitude?: string;
+  to_longitude?: string;
 }
 
 interface ItineraryEntry {
@@ -681,6 +685,9 @@ const TripForm: React.FC = () => {
         "Visa on arrival available for most nationalities. Valid passport required with at least 6 months validity.",
       vaccination_requirements:
         "No mandatory vaccinations. Recommended: Hepatitis A, Typhoid, and routine vaccinations.",
+      has_default_time_slots: false,
+      default_time_slots: [],
+      departure_time: "",
       included_items: [
         {
           title: "Accommodation",
@@ -929,6 +936,9 @@ const TripForm: React.FC = () => {
         "Tourist visa required for Nepal. Can be obtained on arrival at airport or in advance. Valid passport required.",
       vaccination_requirements:
         "Recommended: Hepatitis A, Typhoid, Japanese Encephalitis, and routine vaccinations. Consult with travel health clinic.",
+      has_default_time_slots: false,
+      default_time_slots: [],
+      departure_time: "",
       included_items: [
         {
           title: "Accommodation",
@@ -1188,6 +1198,9 @@ const TripForm: React.FC = () => {
         "Schengen visa required for most non-EU nationals. Apply well in advance as processing can take several weeks.",
       vaccination_requirements:
         "No mandatory vaccinations. Routine vaccinations recommended.",
+      has_default_time_slots: false,
+      default_time_slots: [],
+      departure_time: "",
       included_items: [
         {
           title: "Accommodation",
@@ -1627,8 +1640,14 @@ const TripForm: React.FC = () => {
   });
 
   // Get global currency from settings, default to USD
+  const cur = settingsData?.currency;
+  const defCur = settingsData?.default_currency;
   const globalCurrency =
-    settingsData?.currency || settingsData?.default_currency || "USD";
+    typeof cur === "string" && cur.length > 0
+      ? cur
+      : typeof defCur === "string" && defCur.length > 0
+        ? defCur
+        : "USD";
 
   // Fetch activities from API - LAZY LOAD: only when categorization section is visited
   const { data: activitiesData } = useQuery({
@@ -3301,6 +3320,10 @@ const TripForm: React.FC = () => {
           status: avail.status || "available",
           from_location: avail.from_location || null,
           to_location: avail.to_location || null,
+          from_latitude: avail.from_latitude || null,
+          from_longitude: avail.from_longitude || null,
+          to_latitude: avail.to_latitude || null,
+          to_longitude: avail.to_longitude || null,
         })),
         status: data.status === "publish" ? "publish" : "draft",
         scheduled_publish_date: data.scheduled_publish_date || null,

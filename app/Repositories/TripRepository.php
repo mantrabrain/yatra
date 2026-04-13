@@ -2001,13 +2001,17 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
                         'discounted_price' => isset($date['discounted_price']) ? (float) $date['discounted_price'] : null,
                         'from_location' => isset($date['from_location']) ? sanitize_text_field($date['from_location']) : null,
                         'to_location' => isset($date['to_location']) ? sanitize_text_field($date['to_location']) : null,
+                        'from_latitude' => isset($date['from_latitude']) && is_numeric($date['from_latitude']) ? (string) $date['from_latitude'] : null,
+                        'from_longitude' => isset($date['from_longitude']) && is_numeric($date['from_longitude']) ? (string) $date['from_longitude'] : null,
+                        'to_latitude' => isset($date['to_latitude']) && is_numeric($date['to_latitude']) ? (string) $date['to_latitude'] : null,
+                        'to_longitude' => isset($date['to_longitude']) && is_numeric($date['to_longitude']) ? (string) $date['to_longitude'] : null,
                         'status' => isset($date['is_blackout']) && $date['is_blackout'] ? 'blocked' : (isset($date['status']) ? sanitize_text_field($date['status']) : 'available'),
                     ];
                     
                     $wpdb->insert(
                         $table,
                         $insertData,
-                        ['%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%f', '%f', '%s', '%s', '%s']
+                        ['%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%f', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%s']
                     );
                 }
             }

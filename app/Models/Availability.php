@@ -29,6 +29,10 @@ class Availability
     public string $status = 'available';
     public ?string $from_location = null;
     public ?string $to_location = null;
+    public ?string $from_latitude = null;
+    public ?string $from_longitude = null;
+    public ?string $to_latitude = null;
+    public ?string $to_longitude = null;
     public ?string $special_notes = null;
     public ?string $cutoff_date = null;
     public int $cutoff_hours = 24;
@@ -106,6 +110,10 @@ class Availability
             'status' => $this->status,
             'from_location' => $this->from_location,
             'to_location' => $this->to_location,
+            'from_latitude' => $this->from_latitude,
+            'from_longitude' => $this->from_longitude,
+            'to_latitude' => $this->to_latitude,
+            'to_longitude' => $this->to_longitude,
             'special_notes' => $this->special_notes,
             'cutoff_date' => $this->cutoff_date,
             'cutoff_hours' => $this->cutoff_hours,

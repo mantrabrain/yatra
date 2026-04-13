@@ -98,7 +98,8 @@ const EmailSequencesList: React.FC = () => {
     },
   });
 
-  const sequences = sequencesData || [];
+  const sequences = (Array.isArray(sequencesData) ? sequencesData : []) as
+    EmailSequence[];
 
   const navigateToCreate = () => {
     window.location.href =
@@ -227,7 +228,7 @@ const EmailSequencesList: React.FC = () => {
         </Card>
       ) : (
         <div className="space-y-4">
-          {sequences.map((sequence: EmailSequence) => (
+          {sequences.map((sequence) => (
             <Card key={sequence.id}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -327,7 +328,7 @@ const EmailLogsList: React.FC = () => {
     enabled: isEmailAutomationModuleEnabled(),
   });
 
-  const logs = logsData?.items ?? [];
+  const logs = (logsData?.items ?? []) as EmailLog[];
   const totalItems = logsData?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
 
@@ -403,7 +404,7 @@ const EmailLogsList: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {logs.map((log: EmailLog) => (
+                {logs.map((log) => (
                   <tr
                     key={log.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-800/50"

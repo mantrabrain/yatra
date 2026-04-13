@@ -36,6 +36,10 @@ class RecurringRule
     public ?float $duration_hours = null;
     public ?string $from_location = null;
     public ?string $to_location = null;
+    public ?string $from_latitude = null;
+    public ?string $from_longitude = null;
+    public ?string $to_latitude = null;
+    public ?string $to_longitude = null;
     public ?array $exceptions = null;
     public string $exception_type = 'exclude';
     public string $capacity_type = 'fixed';

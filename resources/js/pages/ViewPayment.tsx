@@ -29,6 +29,37 @@ import { ConditionalRender } from "../components/ui/conditional-render";
 import { Skeleton } from "../components/ui/skeleton";
 import { getCurrencySymbol, getCurrency } from "../data/currencies";
 
+function paymentStr(v: unknown, fallback = ""): string {
+  if (v == null || v === "") return fallback;
+  return String(v);
+}
+
+function paymentNum(v: unknown): number {
+  if (typeof v === "number" && !Number.isNaN(v)) return v;
+  const n = typeof v === "string" ? parseFloat(v) : NaN;
+  return Number.isNaN(n) ? 0 : n;
+}
+
+interface ViewPaymentRow {
+  id: number;
+  payment_number: string;
+  booking_id: number;
+  booking_number: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  trip_id: number;
+  trip_title: string;
+  amount: number;
+  payment_method: string;
+  payment_status: string;
+  transaction_id: string;
+  payment_date: string;
+  notes: string;
+  created_at: string;
+  updated_at: string;
+}
+
 const ViewPayment: React.FC = () => {
   const { can } = usePermissions();
 
@@ -59,25 +90,29 @@ const ViewPayment: React.FC = () => {
       }
 
       const data = result.data;
-      return {
-        id: data.id,
-        payment_number: `PAY-${data.id.toString().padStart(6, "0")}`,
-        booking_id: data.booking_id,
-        booking_number: data.booking_reference || `#${data.booking_id}`,
-        customer_name: data.customer_name || "N/A",
-        customer_email: data.customer_email || "",
-        customer_phone: data.customer_phone || "",
-        trip_id: data.trip_id,
-        trip_title: data.trip_title || "",
-        amount: data.amount,
-        payment_method: data.gateway,
-        payment_status: data.status,
-        transaction_id: data.transaction_id,
-        payment_date: data.processed_at || data.created_at,
-        notes: data.notes,
-        created_at: data.created_at,
-        updated_at: data.updated_at,
+      const idNum = paymentNum(data.id);
+      const bookingId = paymentNum(data.booking_id);
+      const ref = paymentStr(data.booking_reference);
+      const row: ViewPaymentRow = {
+        id: idNum,
+        payment_number: `PAY-${String(idNum).padStart(6, "0")}`,
+        booking_id: bookingId,
+        booking_number: ref || `#${bookingId}`,
+        customer_name: paymentStr(data.customer_name, "N/A"),
+        customer_email: paymentStr(data.customer_email),
+        customer_phone: paymentStr(data.customer_phone),
+        trip_id: paymentNum(data.trip_id),
+        trip_title: paymentStr(data.trip_title),
+        amount: paymentNum(data.amount),
+        payment_method: paymentStr(data.gateway),
+        payment_status: paymentStr(data.status, "pending"),
+        transaction_id: paymentStr(data.transaction_id),
+        payment_date: paymentStr(data.processed_at || data.created_at),
+        notes: paymentStr(data.notes),
+        created_at: paymentStr(data.created_at),
+        updated_at: paymentStr(data.updated_at),
       };
+      return row;
     },
     enabled: !!paymentId && can("yatra_view_bookings"),
   });
