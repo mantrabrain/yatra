@@ -28,16 +28,16 @@ $company_phone = SettingsService::get('company_phone', '');
         <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
             <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label" for="company_name"><?php esc_html_e('Business / brand name', 'yatra'); ?> <span class="wizard-req">*</span></label>
-                <input type="text" id="company_name" name="company_name" value="<?php echo esc_attr($company_name); ?>" class="form-control" required autocomplete="organization">
+                <input type="text" id="company_name" name="company_name" value="<?php echo esc_attr($company_name); ?>" class="form-control" required autocomplete="organization" placeholder="<?php esc_attr_e('e.g. Mountain View Tours', 'yatra'); ?>">
             </div>
             <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label" for="company_email"><?php esc_html_e('Public contact email', 'yatra'); ?> <span class="wizard-req">*</span></label>
-                <input type="email" id="company_email" name="company_email" value="<?php echo esc_attr($company_email); ?>" class="form-control" required autocomplete="email">
+                <input type="email" id="company_email" name="company_email" value="<?php echo esc_attr($company_email); ?>" class="form-control" required autocomplete="email" placeholder="<?php esc_attr_e('e.g. hello@yourbusiness.com', 'yatra'); ?>">
             </div>
         </div>
         <div class="form-group">
             <label class="form-label" for="company_phone"><?php esc_html_e('Phone', 'yatra'); ?> <span class="wizard-req">*</span></label>
-            <input type="tel" id="company_phone" name="company_phone" value="<?php echo esc_attr($company_phone); ?>" class="form-control" required autocomplete="tel">
+            <input type="tel" id="company_phone" name="company_phone" value="<?php echo esc_attr($company_phone); ?>" class="form-control" required autocomplete="tel" placeholder="<?php esc_attr_e('e.g. +1 555 123 4567', 'yatra'); ?>">
         </div>
     </div>
 

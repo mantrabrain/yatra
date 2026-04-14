@@ -213,15 +213,12 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 📷 **Screenshots** (as shown on WordPress.org)
 
 1. Yatra dashboard inside WordPress — bookings, revenue, and quick access to daily tasks
-2. Trip editor — content, pricing, media, and settings in one workspace
-3. Bookings list — search, filters, and status at a glance
-4. Single trip on the front end — hero, itinerary, and book flow
-5. Availability and departures — dates, capacity, and recurring rules
-6. Payment settings — PayPal and Pay Later (free); Pro adds premium gateways
-7. Traveler account — bookings, payments, and documents
-8. Reports — booking and payment trends for planning
-9. Mobile-friendly trip and checkout layouts
-10. Itinerary builder — structured day-by-day plans
+2. Trip Creation Process — content, pricing, media, and settings in one workspace
+3. Trip list & All listing page — search, filters, and status at a glance
+4. Trip Booking Process — hero, itinerary, and book flow
+5. Global Settings - Payment Gateways etc.
+6. Traveler account — bookings, payments, and documents
+ 
 
 == Changelog ==
 

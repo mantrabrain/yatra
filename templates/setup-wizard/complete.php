@@ -95,7 +95,7 @@ defined('ABSPATH') || exit;
 
         <div class="action-buttons" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 32px; max-width: 700px; margin-left: auto; margin-right: auto;">
             <!-- Create First Trip -->
-            <a href="<?php echo esc_url(admin_url('post-new.php?post_type=tour')); ?>" class="action-card" style="display: flex; flex-direction: column; align-items: center; padding: 24px; background: #fff; border: 2px solid #e5e7eb; border-radius: 12px; text-decoration: none; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#4f46e5'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)';" onmouseout="this.style.borderColor='#e5e7eb'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+            <a href="<?php echo esc_url(admin_url('admin.php?page=yatra&subpage=trips')); ?>" class="action-card" style="display: flex; flex-direction: column; align-items: center; padding: 24px; background: #fff; border: 2px solid #e5e7eb; border-radius: 12px; text-decoration: none; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#4f46e5'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)';" onmouseout="this.style.borderColor='#e5e7eb'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
                 <div style="width: 48px; height: 48px; background: #eff6ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2">
                         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
@@ -144,10 +144,6 @@ defined('ABSPATH') || exit;
                 <div class="premium-feature">
                     <h4><?php esc_html_e('Advanced Reports', 'yatra'); ?></h4>
                     <p><?php esc_html_e('Revenue & analytics', 'yatra'); ?></p>
-                </div>
-                <div class="premium-feature">
-                    <h4><?php esc_html_e('Multi-Currency', 'yatra'); ?></h4>
-                    <p><?php esc_html_e('Accept global payments', 'yatra'); ?></p>
                 </div>
             </div>
 
