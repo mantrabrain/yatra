@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'yatra/yatra-plugin',
-        'pretty_version' => '3.0.0.x-dev',
-        'version' => '3.0.0.9999999-dev',
-        'reference' => '4d33de842013d2f782b2e50eedc8e96c82c8d037',
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'reference' => '525b19c88095aa24b951b291638e291c4775d648',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -65,9 +65,9 @@
             'dev_requirement' => false,
         ),
         'yatra/yatra-plugin' => array(
-            'pretty_version' => '3.0.0.x-dev',
-            'version' => '3.0.0.9999999-dev',
-            'reference' => '4d33de842013d2f782b2e50eedc8e96c82c8d037',
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => '525b19c88095aa24b951b291638e291c4775d648',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

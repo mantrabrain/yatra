@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import {
   LayoutDashboard,
   MapPin,
@@ -76,6 +76,7 @@ import {
   type ModuleDefinition,
 } from "../hooks/useModules";
 import { isProPluginActive, isModuleActive } from "../lib/plugin-utils";
+import { navigateMenu } from "../hooks/useNavigate";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -130,6 +131,28 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   // Track URL changes to update menu state
   const [urlKey, setUrlKey] = useState(0);
   const [navRefreshKey, setNavRefreshKey] = useState(0);
+
+  /** SPA: avoid full reload — keeps PHP boot splash from showing on every sidebar click */
+  const handleMenuNavClick = useCallback(
+    (
+      e: React.MouseEvent<HTMLAnchorElement>,
+      subpage: string,
+      tab?: string,
+    ) => {
+      if (
+        e.metaKey ||
+        e.ctrlKey ||
+        e.altKey ||
+        e.shiftKey ||
+        e.button !== 0
+      ) {
+        return;
+      }
+      e.preventDefault();
+      navigateMenu(subpage, tab);
+    },
+    [],
+  );
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -302,8 +325,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       ? `${window.yatraAdmin.siteUrl}/wp-admin/admin.php?page=yatra`
       : "/wp-admin/admin.php?page=yatra";
   }, []);
-
-  const modulesPageUrl = useMemo(() => `${baseUrl}&subpage=modules`, [baseUrl]);
 
   const menuItems = useMemo(
     () => [
@@ -533,6 +554,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                               <a
                                 key={subItem.tab}
                                 href={getUrl(item.subpage, subItem.tab)}
+                                onClick={(e) =>
+                                  handleMenuNavClick(
+                                    e,
+                                    item.subpage,
+                                    subItem.tab,
+                                  )
+                                }
                                 className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors relative ${
                                   subActive
                                     ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium"
@@ -567,6 +595,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   ) : (
                     <a
                       href={getUrl(item.subpage)}
+                      onClick={(e) =>
+                        handleMenuNavClick(e, item.subpage)
+                      }
                       className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors relative ${
                         active
                           ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium"
@@ -707,9 +738,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <Button
                     variant={currentSubpage === "tools" ? "default" : "outline"}
                     onClick={() => {
-                      const admin = (window as any)?.yatraAdmin;
-                      const baseUrl = admin?.adminUrl || "";
-                      window.location.href = `${baseUrl}?page=yatra&subpage=tools`;
+                      navigateMenu("tools");
                     }}
                     className={`flex items-center gap-2 ${
                       currentSubpage === "tools"
@@ -754,7 +783,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 variant="ghost"
                                 onClick={() => {
                                   setIsModulesPanelOpen(false);
-                                  window.location.href = modulesPageUrl;
+                                  navigateMenu("modules");
                                 }}
                               >
                                 {__("Open", "yatra")}
@@ -841,7 +870,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 className="w-full"
                                 onClick={() => {
                                   setIsModulesPanelOpen(false);
-                                  window.location.href = modulesPageUrl;
+                                  navigateMenu("modules");
                                 }}
                               >
                                 {__("Manage all modules", "yatra")}
@@ -1030,6 +1059,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </div>
                     <a
                       href={getUrl("license")}
+                      onClick={(e) => handleMenuNavClick(e, "license")}
                       className="flex-shrink-0 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors"
                     >
                       {licenseStatus === "expired"

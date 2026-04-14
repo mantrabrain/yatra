@@ -297,6 +297,13 @@ class AdminAssetsProvider
 
                 // Localize script data
                 wp_localize_script('yatra-admin', 'yatraAdmin', $localized_data);
+
+                // Start fetching the ES module as early as possible (helps shorten white/splash time before React runs)
+                $app_js_url = YATRA_PLUGIN_URL . 'assets/admin/dist/js/app.js';
+                add_action('admin_head', static function () use ($app_js_url, $jsVersion): void {
+                    $href = esc_url(add_query_arg('ver', rawurlencode((string) $jsVersion), $app_js_url));
+                    echo '<link rel="modulepreload" href="' . $href . '" />' . "\n";
+                }, 0);
             }
         }
     }

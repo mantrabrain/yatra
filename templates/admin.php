@@ -1,7 +1,9 @@
 <?php
 /**
- * Admin Template
- * Wrapper for React admin app
+ * Admin Template — React app mount point.
+ *
+ * Fullscreen shell CSS runs from AdminServiceProvider::printYatraReactAdminCriticalCss() on admin_print_styles
+ * (priority 0) so it is output in the document head before the wp-admin menu markup — avoids FOUC.
  */
 
 if (!defined('ABSPATH')) {
@@ -13,85 +15,13 @@ $app_js = YATRA_PLUGIN_PATH . 'assets/admin/dist/js/app.js';
 $app_css = YATRA_PLUGIN_PATH . 'assets/admin/dist/css/app.css';
 $has_build = file_exists($app_js);
 ?>
-<script>
-  // Apply dark mode immediately to prevent flash
-  (function() {
-    const darkMode = localStorage.getItem('yatra-dark-mode');
-    if (darkMode === 'true') {
-      document.documentElement.classList.add('dark');
-    }
-  })();
-</script>
-<style>
-    /* Hide WordPress admin elements for fullscreen UI */
-    #wpadminbar,
-    #adminmenumain,
-    #adminmenuback,
-    #wpfooter {
-        display: none !important;
-    }
-    
-    #wpcontent {
-        margin-left: 0 !important;
-        padding: 0 !important;
-    }
-    
-    .wrap {
-        margin: 0 !important;
-        padding: 0 !important;
-        max-width: 100% !important;
-    }
-    
-    html, body {
-        margin: 0 !important;
-        padding: 0 !important;
-        height: 100% !important;
-        <?php if (!$has_build): ?>
-        overflow: auto !important;
-        <?php else: ?>
-        overflow: hidden !important;
-        <?php endif; ?>
-    }
-    
-    #yatra-app-root {
-        width: 100vw;
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 9999;
-        background: #fff;
-    }
-    
-    .yatra-build-message {
-        padding: 40px;
-        text-align: center;
-        max-width: 800px;
-        margin: 50px auto;
-        background: #fff;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .yatra-build-message h1 {
-        margin-bottom: 20px;
-        color: #333;
-    }
-    
-    .yatra-build-message code {
-        display: block;
-        background: #f5f5f5;
-        padding: 15px;
-        margin: 15px 0;
-        border-radius: 4px;
-        text-align: left;
-        border-left: 4px solid #0073aa;
-    }
-</style>
-
 <div id="yatra-app-root">
-    <?php if (!$has_build): ?>
+    <?php if ($has_build) : ?>
+    <div class="yatra-admin-boot-splash" role="status" aria-live="polite" aria-busy="true">
+        <div class="yatra-admin-boot-spinner" aria-hidden="true"></div>
+        <p class="yatra-admin-boot-text"><?php esc_html_e('Loading Yatra…', 'yatra'); ?></p>
+    </div>
+    <?php else : ?>
     <div class="yatra-build-message">
         <h1><?php esc_html_e('🚀 Yatra Admin UI Setup Required', 'yatra'); ?></h1>
         <p style="font-size: 16px; margin-bottom: 30px; color: #666;">

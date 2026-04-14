@@ -4,7 +4,7 @@ Tags: travel, booking, tour, travel agency, tour booking
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.0.2.2
+Stable tag: 3.0.2.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -223,6 +223,12 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 
 == Changelog ==
 
+= 3.0.2.3 =
+* **Admin (React):** moved fullscreen shell CSS into the document **head** to reduce wp-admin chrome flicker; added HTML/CSS **boot splash** and **`modulepreload`** for the admin bundle; primary **sidebar navigation** uses client-side URL updates so the PHP loading state does not repeat on every screen change.
+* **REST:** registered **License** routes in the API registry so **`GET /yatra/v1/license`** works on the free plugin (License screen and scripts that probe it).
+* **Admin UI:** hardened **Departures** and **Availability** trip dropdowns against **TanStack Query** cache shapes and `/trips` list payloads (fixes `map` / `find` errors when navigating without a full reload).
+* Safe to update from 3.0.2.2.
+
 = 3.0.2.2 =
 * Maintenance / patch release. Safe to update from 3.0.2.1.
 
@@ -247,6 +253,9 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 * For 2.x changelog entries, see the plugin’s GitHub releases or historical notes on the vendor site.
 
 == Upgrade Notice ==
+
+= 3.0.2.3 =
+Maintenance update (admin UX, REST license route, trip list stability in Departures/Availability). Safe to update from 3.0.2.2.
 
 = 3.0.2.2 =
 Patch release. Safe to update from 3.0.2.1.

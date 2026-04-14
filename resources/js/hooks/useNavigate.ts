@@ -1,4 +1,29 @@
 /**
+ * Primary sidebar navigation: replaces the query string with a clean Yatra URL (drops action, id, etc.)
+ * so it matches {@link getUrl} in Layout and avoids full page reloads.
+ */
+export function navigateMenu(subpage: string, tab?: string): void {
+  const pathname = window.location.pathname;
+  const page =
+    new URLSearchParams(window.location.search).get("page") || "yatra";
+  const sp = new URLSearchParams();
+  sp.set("page", page);
+
+  if (subpage === "dashboard") {
+    // Match Layout getUrl("dashboard"): only ?page=yatra
+  } else {
+    sp.set("subpage", subpage);
+    if (tab !== undefined && tab !== null && tab !== "") {
+      sp.set("tab", tab);
+    }
+  }
+
+  const newUrl = `${pathname}?${sp.toString()}`;
+  window.history.pushState({}, "", newUrl);
+  window.dispatchEvent(new PopStateEvent("popstate"));
+}
+
+/**
  * Navigation hook for updating URL parameters
  */
 export const useNavigate = () => {
@@ -41,5 +66,5 @@ export const useNavigate = () => {
     window.dispatchEvent(new PopStateEvent("popstate"));
   };
 
-  return { navigate };
+  return { navigate, navigateMenu };
 };

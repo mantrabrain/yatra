@@ -94,6 +94,50 @@ interface AvailabilityDate {
   updated_at?: string;
 }
 
+function mapApiRowToTrip(trip: Record<string, unknown>): Trip {
+  return {
+    id: Number(trip.id),
+    title: String(trip.title ?? ""),
+    slug: String(trip.slug ?? ""),
+    currency: String(trip.currency || "USD"),
+    starting_location: trip.starting_location as string | undefined,
+    ending_location: trip.ending_location as string | undefined,
+    trip_type: (trip.trip_type as Trip["trip_type"]) || "multi_day",
+  };
+}
+
+/**
+ * Normalize /trips payloads and stale TanStack Query cache (client nav can reuse envelopes without `trips`).
+ */
+function tripsFromAvailabilityQueryCached(raw: unknown): Trip[] {
+  if (raw == null) {
+    return [];
+  }
+  if (Array.isArray(raw)) {
+    return raw as Trip[];
+  }
+  if (typeof raw === "object") {
+    const o = raw as Record<string, unknown>;
+    if (Array.isArray(o.trips)) {
+      return o.trips as Trip[];
+    }
+    let rows: unknown[] = [];
+    if (Array.isArray(o.data)) {
+      rows = o.data as unknown[];
+    } else if (
+      o.data &&
+      typeof o.data === "object" &&
+      Array.isArray((o.data as Record<string, unknown>).data)
+    ) {
+      rows = (o.data as Record<string, unknown>).data as unknown[];
+    }
+    return rows.map((t) =>
+      mapApiRowToTrip(t as Record<string, unknown>),
+    );
+  }
+  return [];
+}
+
 const Availability: React.FC = () => {
   const { navigate } = useNavigate();
   const queryClient = useQueryClient();
@@ -216,26 +260,21 @@ const Availability: React.FC = () => {
     }));
   };
 
-  // Fetch all trips for dropdown
+  // Fetch all trips for dropdown — store as Trip[]; normalize stale cache via tripsList
   const { data: tripsData } = useQuery({
-    queryKey: ["trips", "all"],
+    queryKey: ["trips", "availability-dropdown", "v2"],
     queryFn: async () => {
       const response = await apiClient.get("/trips", {
         params: { per_page: 100, status: "publish" },
       });
-      return {
-        trips: (response?.data || []).map((trip: any) => ({
-          id: trip.id,
-          title: trip.title,
-          slug: trip.slug,
-          currency: trip.currency || "USD",
-          starting_location: trip.starting_location,
-          ending_location: trip.ending_location,
-          trip_type: trip.trip_type || "multi_day",
-        })) as Trip[],
-      };
+      return tripsFromAvailabilityQueryCached(response);
     },
   });
+
+  const tripsList = useMemo(
+    () => tripsFromAvailabilityQueryCached(tripsData),
+    [tripsData],
+  );
 
   // Fetch availability dates for selected trip
   const {
@@ -441,7 +480,7 @@ const Availability: React.FC = () => {
     }
   };
 
-  const selectedTrip = tripsData?.trips.find((t) => t.id === selectedTripId);
+  const selectedTrip = tripsList.find((t) => t.id === selectedTripId);
   const availabilityErrorContext = availabilityError
     ? getErrorContext(availabilityError)
     : null;
@@ -1081,10 +1120,10 @@ const Availability: React.FC = () => {
               }}
               options={[
                 { value: "", label: __("-- Select a Trip --", "yatra") },
-                ...(tripsData?.trips.map((trip) => ({
+                ...tripsList.map((trip) => ({
                   value: trip.id.toString(),
                   label: `${trip.title}${trip.trip_type === "single_day" ? " (Single Day)" : trip.trip_type === "multi_day" ? " (Multi-Day)" : ""}`,
-                })) || []),
+                })),
               ]}
               placeholder={__("Search or select a trip...", "yatra")}
               searchPlaceholder={__("Search by trip name or ID...", "yatra")}

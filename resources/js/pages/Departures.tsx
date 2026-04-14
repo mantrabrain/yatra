@@ -120,6 +120,30 @@ const formatCurrency = (value?: number | null) => {
   }
 };
 
+/**
+ * Normalize /trips list payloads and any stale React Query cache (SPA navigation can reuse bad shapes).
+ */
+function normalizeTripsForDropdown(raw: unknown): Trip[] {
+  if (Array.isArray(raw)) {
+    return raw as Trip[];
+  }
+  if (raw && typeof raw === "object") {
+    const r = raw as Record<string, unknown>;
+    if (Array.isArray(r.data)) {
+      return r.data as Trip[];
+    }
+    const inner = r.data;
+    if (
+      inner &&
+      typeof inner === "object" &&
+      Array.isArray((inner as Record<string, unknown>).data)
+    ) {
+      return (inner as Record<string, unknown>).data as Trip[];
+    }
+  }
+  return [];
+}
+
 const Departures: React.FC = () => {
   // Load selected trip from localStorage on initial render
   const [selectedTripId, setSelectedTripId] = useState<number | null>(() => {
@@ -234,16 +258,21 @@ const Departures: React.FC = () => {
     }
   }, [selectedTripId]);
 
-  // Fetch trips for dropdown
+  // Fetch trips for dropdown (same response shapes as Trips.tsx: data[] or data.data[])
   const { data: tripsData } = useQuery({
-    queryKey: ["trips", "all"],
+    queryKey: ["trips", "departures-dropdown", "v1"],
     queryFn: async () => {
       const response = await apiClient.get("/trips", {
         params: { per_page: 1000 },
       });
-      return response?.data || [];
+      return normalizeTripsForDropdown(response);
     },
   });
+
+  const tripsList = useMemo(
+    () => normalizeTripsForDropdown(tripsData),
+    [tripsData],
+  );
 
   // Note: We pass filter values directly to the API call instead of building queryParams
 
@@ -999,10 +1028,10 @@ const Departures: React.FC = () => {
                 }}
                 options={[
                   { value: "", label: __("-- Select a Trip --", "yatra") },
-                  ...(tripsData?.map((trip: Trip) => ({
+                  ...tripsList.map((trip: Trip) => ({
                     value: trip.id.toString(),
                     label: `${trip.title}${trip.trip_type === "single_day" ? " (Single Day)" : trip.trip_type === "multi_day" ? " (Multi-Day)" : ""}`,
-                  })) || []),
+                  })),
                 ]}
                 placeholder={__("Search or select a trip...", "yatra")}
                 searchPlaceholder={__("Search by trip name or ID...", "yatra")}
@@ -1013,7 +1042,7 @@ const Departures: React.FC = () => {
 
             {selectedTripId &&
               (() => {
-                const selectedTripData = tripsData?.find(
+                const selectedTripData = tripsList.find(
                   (trip: Trip) => trip.id === selectedTripId,
                 );
                 return selectedTripData ? (

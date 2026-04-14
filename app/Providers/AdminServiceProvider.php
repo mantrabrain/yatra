@@ -38,10 +38,196 @@ class AdminServiceProvider extends ServiceProvider
         // Remove admin wrapper for our page
         add_action('admin_init', [$this, 'removeAdminWrapper']);
 
+        add_action('admin_print_styles', [$this, 'printYatraReactAdminCriticalCss'], 0);
+        add_filter('admin_body_class', [$this, 'filterYatraReactAdminBodyClass']);
         add_action('admin_head', [$this, 'printUpgradeProAdminStyles']);
         add_action('admin_head', [$this, 'printYatraAdminMenuIconStyles']);
         add_action('admin_head', [$this, 'printHideYatraSetupWizardSubmenu']);
         add_action('admin_footer', [$this, 'upgradeProSubmenuOpenInNewTab']);
+    }
+
+    /**
+     * Whether the current request is the main Yatra React admin screen (admin.php?page=yatra).
+     */
+    private function isYatraMainReactAdminScreen(): bool
+    {
+        if (!is_admin()) {
+            return false;
+        }
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- screen detection only
+        if (isset($_GET['page']) && $_GET['page'] === 'yatra') {
+            return true;
+        }
+
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+
+        return $screen && $screen->id === 'toplevel_page_yatra';
+    }
+
+    /**
+     * Critical CSS + dark-mode init in &lt;head&gt; (before body) to prevent FOUC / flicker of native wp-admin chrome.
+     *
+     * Previously this lived in templates/admin.php (body), so the menu painted before hide rules applied.
+     */
+    public function printYatraReactAdminCriticalCss(): void
+    {
+        if (!$this->isYatraMainReactAdminScreen()) {
+            return;
+        }
+
+        $app_js = YATRA_PLUGIN_PATH . 'assets/admin/dist/js/app.js';
+        $has_build = file_exists($app_js);
+
+        ?>
+<script id="yatra-admin-dark-init">
+(function(){var d=localStorage.getItem('yatra-dark-mode');if(d==='true'){document.documentElement.classList.add('dark');}})();
+</script>
+<style id="yatra-react-admin-critical">
+    #wpadminbar,
+    #adminmenumain,
+    #adminmenuback,
+    #adminmenuwrap,
+    #wpfooter,
+    #screen-meta,
+    #screen-meta-links {
+        display: none !important;
+    }
+
+    #wpcontent {
+        margin-left: 0 !important;
+        padding: 0 !important;
+    }
+
+    #wpbody,
+    #wpbody-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        padding-top: 0 !important;
+    }
+
+    .wrap {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+    }
+
+    html,
+    body.wp-admin {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: 100% !important;
+        overflow: <?php echo $has_build ? 'hidden' : 'auto'; ?> !important;
+    }
+
+    /* Match React Layout shell (gray-50 / gray-900) so the pre-JS phase is not a flat white flash */
+    body.yatra-react-admin-shell {
+        background: #f9fafb !important;
+    }
+
+    html.dark body.yatra-react-admin-shell {
+        background: #111827 !important;
+    }
+
+    #yatra-app-root {
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 99999;
+        background: #f9fafb;
+    }
+
+    html.dark #yatra-app-root {
+        background: #111827;
+    }
+
+    /* HTML/CSS-only boot UI (no JS); React replaces #yatra-app-root contents on mount */
+    .yatra-admin-boot-splash {
+        box-sizing: border-box;
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 1rem;
+        z-index: 1;
+    }
+
+    .yatra-admin-boot-spinner {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 3px solid rgba(79, 70, 229, 0.2);
+        border-top-color: #4f46e5;
+        animation: yatra-boot-spin 0.7s linear infinite;
+    }
+
+    html.dark .yatra-admin-boot-spinner {
+        border-color: rgba(129, 140, 248, 0.25);
+        border-top-color: #a5b4fc;
+    }
+
+    .yatra-admin-boot-text {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    html.dark .yatra-admin-boot-text {
+        color: #9ca3af;
+    }
+
+    @keyframes yatra-boot-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .yatra-build-message {
+        padding: 40px;
+        text-align: center;
+        max-width: 800px;
+        margin: 50px auto;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .yatra-build-message h1 {
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .yatra-build-message code {
+        display: block;
+        background: #f5f5f5;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 4px;
+        text-align: left;
+        border-left: 4px solid #0073aa;
+    }
+</style>
+        <?php
+    }
+
+    /**
+     * Marker class for the React shell (optional hooks / debugging).
+     *
+     * @param string $classes Space-separated classes.
+     */
+    public function filterYatraReactAdminBodyClass(string $classes): string
+    {
+        if ($this->isYatraMainReactAdminScreen()) {
+            $classes .= ' yatra-react-admin-shell';
+        }
+
+        return $classes;
     }
 
     /**
