@@ -27,6 +27,3 @@ yarn-error.log*
 .env
 .env.local
 
-# Build / tooling artifacts
-dist/
-

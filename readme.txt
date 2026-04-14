@@ -4,7 +4,7 @@ Tags: travel, booking, tour, travel agency, tour booking
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.0.2.1
+Stable tag: 3.0.2.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -223,6 +223,9 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 
 == Changelog ==
 
+= 3.0.2.2 =
+* Maintenance / patch release. Safe to update from 3.0.2.1.
+
 = 3.0.2.1 =
 * **Readme (WordPress.org):** linked **Pro** gateways, modules, traveler features, and related mentions to **[wpyatra.com/pricing](https://wpyatra.com/pricing/)** throughout the long description, FAQ, and quick links.
 * Patch release; safe to update from 3.0.2.
@@ -244,6 +247,9 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 * For 2.x changelog entries, see the plugin’s GitHub releases or historical notes on the vendor site.
 
 == Upgrade Notice ==
+
+= 3.0.2.2 =
+Patch release. Safe to update from 3.0.2.1.
 
 = 3.0.2.1 =
 Readme update (Pro feature links to pricing). Safe to update from 3.0.2.
