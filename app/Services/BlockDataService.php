@@ -193,8 +193,8 @@ class BlockDataService
      */
     private static function enqueueTripAssets(): void
     {
-        wp_enqueue_style('yatra-trip-shortcode', \YATRA_PLUGIN_URL . 'assets/css/shortcodes/trip-shortcode.css', array(), '3.0.2.3');
-        wp_enqueue_script('yatra-trip-shortcode', \YATRA_PLUGIN_URL . 'assets/js/trip-shortcode.js', array('jquery'), '3.0.2.3', true);
+        wp_enqueue_style('yatra-trip-shortcode', \YATRA_PLUGIN_URL . 'assets/css/shortcodes/trip-shortcode.css', array(), '3.0.2.4');
+        wp_enqueue_script('yatra-trip-shortcode', \YATRA_PLUGIN_URL . 'assets/js/trip-shortcode.js', array('jquery'), '3.0.2.4', true);
         
         // Localize script for AJAX
         wp_localize_script('yatra-trip-shortcode', 'yatraTripShortcode', [
