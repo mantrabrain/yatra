@@ -197,7 +197,6 @@ class FrontendAssetsProvider
      */
     private function enqueueTripListingAssets(): void
     {
-        // Additional assets for trip listing can be added here
         $this->enqueueListingFiltersJs();
     }
 
