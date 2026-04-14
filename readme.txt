@@ -4,11 +4,11 @@ Tags: travel, booking, tour, travel agency, tour booking
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.0.0
+Stable tag: 3.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Tours & activities on WordPress: trips, departures, PayPal & Pay Later, guest accounts, emails, reports. Yatra Pro adds card gateways, deposits, and modules.
+Tours & activities on WordPress: trips, departures, PayPal & Pay Later, guests, emails, reports. Yatra Pro adds cards, deposits, modules.
 
 == Description ==
 
@@ -19,6 +19,7 @@ Tours & activities on WordPress: trips, departures, PayPal & Pay Later, guest ac
 = 🎬 See Yatra in action =
 
 🎥 **[Watch the Yatra 3.0 walkthrough on YouTube](https://youtu.be/cHmC-x7y0TQ)** — trips, bookings, checkout, and traveler accounts in a few minutes. For release highlights and upgrade notes, see **[Yatra 3.0 on wpyatra.com](https://wpyatra.com/yatra-3-0/)**. More tutorials: **[MantraBrain on YouTube](https://www.youtube.com/@MantraBrain)**.
+	[youtube https://youtu.be/cHmC-x7y0TQ]
 
 = ✈️ Why teams pick Yatra =
 
@@ -222,6 +223,11 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 
 == Changelog ==
 
+= 3.0.1 =
+* Maintenance release: updated WordPress.org **banner** and directory **assets** (including screenshots) for the 3.x listing.
+* **Readme:** shortened the plugin short description to meet WordPress.org’s **150-character** limit so imports are no longer truncated.
+* Minor fixes and polish; see [wpyatra.com](https://wpyatra.com/) for release notes.
+
 = 3.0.0 =
 * Major 3.0 release: redesigned admin experience, streamlined booking and traveler account flows, expanded gateway and module architecture for Pro, and ongoing hardening for production travel sites.
 * See the plugin’s release notes and [wpyatra.com](https://wpyatra.com/yatra-3-0/) for highlights. **Always back up** before upgrading from 2.x; follow migration guidance in documentation.
@@ -230,6 +236,9 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 * For 2.x changelog entries, see the plugin’s GitHub releases or historical notes on the vendor site.
 
 == Upgrade Notice ==
+
+= 3.0.1 =
+Maintenance update (banner, WordPress.org readme/assets, and small fixes). Safe to update from 3.0.0.
 
 = 3.0.0 =
 Major release. Back up your site and database before upgrading from 2.x. Update free Yatra from WordPress.org first; then align Yatra Pro with a version compatible with 3.0.
