@@ -18,7 +18,7 @@ Tours & activities on WordPress: trips, departures, PayPal & Pay Later, guests, 
 
 = 🎬 See Yatra in action =
 
-🎥 **[Watch the Yatra 3.0 walkthrough on YouTube](https://youtu.be/cHmC-x7y0TQ)** — trips, bookings, checkout, and traveler accounts in a few minutes. For release highlights and upgrade notes, see **[Yatra 3.0 on wpyatra.com](https://wpyatra.com/yatra-3-0/)**. More tutorials: **[MantraBrain on YouTube](https://www.youtube.com/@MantraBrain)**.
+🎥   Watch the Yatra 3.0 walkthrough on YouTube — trips, bookings, checkout, and traveler accounts in a few minutes. For release highlights and upgrade notes, see **[Yatra 3.0 on wpyatra.com](https://wpyatra.com/yatra-3-0/)**. More tutorials: **[MantraBrain on YouTube](https://www.youtube.com/@MantraBrain)**.
 	[youtube https://www.youtube.com/watch?v=cHmC-x7y0TQ]
 
 = ✈️ Why teams pick Yatra =
