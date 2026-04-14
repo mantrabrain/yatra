@@ -8,11 +8,11 @@ Stable tag: 3.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Tours & activities on WordPress: trips, departures, PayPal & Pay Later, guests, emails, reports. Yatra Pro adds cards, deposits, modules.
+Tours & activities: trips, departures, PayPal, Pay Later, guests, email, reports. [Yatra Pro](https://wpyatra.com/pricing/): cards, deposits, modules.
 
 == Description ==
 
-**✈️ Yatra** is a WordPress plugin built for **tour operators, activity providers, and travel brands** that need real trip inventory—not a generic shop. The free version includes a full booking office: trips, availability, checkout, customer records, and essential emails. **[Yatra Pro](https://wpyatra.com/pricing/)** unlocks premium payment methods and a suite of Pro modules you can turn on as your business grows.
+**✈️ Yatra** is a WordPress plugin built for **tour operators, activity providers, and travel brands** that need real trip inventory—not a generic shop. The free version includes a full booking office: trips, availability, checkout, customer records, and essential emails. **[Yatra Pro](https://wpyatra.com/pricing/)** unlocks [premium payment methods](https://wpyatra.com/pricing/) and a suite of [Pro modules](https://wpyatra.com/pricing/) you can turn on as your business grows.
 
 **Official site:** 🌐 [wpyatra.com](https://wpyatra.com/) · 📖 [docs.wpyatra.com](https://docs.wpyatra.com) · 💬 [WordPress.org forum](https://wordpress.org/support/plugin/yatra/)
 
@@ -25,7 +25,7 @@ Tours & activities on WordPress: trips, departures, PayPal & Pay Later, guests, 
 
 * 🗺️ **Travel-first data model** — Departures, capacity, traveler types, and itineraries match how tours are actually sold.
 * 🧭 **One admin workspace** — Modern Yatra dashboard inside wp-admin; less tab-hopping than bolting travel onto a generic commerce stack.
-* ⚖️ **Honest Free vs Pro** — Core booking, CRM-style records, reviews, and PayPal / Pay Later are in the free plugin. Card gateways and advanced modules are in Pro—no surprise paywalls on basics like “save a trip” (saved trips / wishlist are a **Pro** feature when enabled in settings).
+* ⚖️ **Honest Free vs [Pro](https://wpyatra.com/pricing/)** — Core booking, CRM-style records, reviews, and PayPal / Pay Later are in the free plugin. Card gateways and advanced modules are in [Pro](https://wpyatra.com/pricing/)—no surprise paywalls on basics like “save a trip” (saved trips / wishlist are a **[Pro](https://wpyatra.com/pricing/)** feature when enabled in settings).
 * 🔒 **Your site, your data** — Bookings and customer data stay in your WordPress database; payments go through the gateways you configure.
 
 = 🎁 Free plugin — what you get =
@@ -78,32 +78,32 @@ Tours & activities on WordPress: trips, departures, PayPal & Pay Later, guests, 
 
 = 💎 Yatra Pro — when you are ready to scale =
 
-**[Compare plans and buy Yatra Pro](https://wpyatra.com/pricing/)** — same Pro software on every tier; plans differ by **site activations** and **support level**.
+**[Compare plans and buy Yatra Pro](https://wpyatra.com/pricing/)** — same [Pro](https://wpyatra.com/pricing/) software on every tier; plans differ by **site activations** and **support level**.
 
 **Premium gateways (examples)**
 
-* Stripe, Razorpay, Mollie, Paystack, Square, Authorize.Net, bank transfer (region and account dependent)
+* [Stripe](https://wpyatra.com/pricing/), [Razorpay](https://wpyatra.com/pricing/), [Mollie](https://wpyatra.com/pricing/), [Paystack](https://wpyatra.com/pricing/), [Square](https://wpyatra.com/pricing/), [Authorize.Net](https://wpyatra.com/pricing/), [bank transfer](https://wpyatra.com/pricing/) (region and account dependent)
 
-**Pro modules (enable under Yatra → Modules)**
+**[Pro modules](https://wpyatra.com/pricing/)** (enable under Yatra → Modules)
 
-* Flexible Payments — deposits and partial payments
-* Dynamic Pricing — rules for seasonality, demand, early bird, last minute
-* Advanced Discount — group-style discounts alongside coupons
-* Google Calendar sync
-* Additional Services — sell extras with the trip
-* Trip Consent — digital waivers and signatures
-* Email Automation — extended templates, sequences, logs
-* Custom booking questions — drag-and-drop extra fields
-* Mailchimp, Facebook Pixel, Google Analytics 4 Enhanced
-* Abandoned Booking Recovery
+* [Flexible Payments](https://wpyatra.com/pricing/) — deposits and partial payments
+* [Dynamic Pricing](https://wpyatra.com/pricing/) — rules for seasonality, demand, early bird, last minute
+* [Advanced Discount](https://wpyatra.com/pricing/) — group-style discounts alongside coupons
+* [Google Calendar sync](https://wpyatra.com/pricing/)
+* [Additional Services](https://wpyatra.com/pricing/) — sell extras with the trip
+* [Trip Consent](https://wpyatra.com/pricing/) — digital waivers and signatures
+* [Email Automation](https://wpyatra.com/pricing/) — extended templates, sequences, logs
+* [Custom booking questions](https://wpyatra.com/pricing/) — drag-and-drop extra fields
+* [Mailchimp](https://wpyatra.com/pricing/), [Facebook Pixel](https://wpyatra.com/pricing/), [Google Analytics 4 Enhanced](https://wpyatra.com/pricing/)
+* [Abandoned Booking Recovery](https://wpyatra.com/pricing/)
 
 **Traveler experience**
 
-* Saved trips / wishlist when Pro is active and wishlist is enabled in settings
+* [Saved trips / wishlist](https://wpyatra.com/pricing/) when [Yatra Pro](https://wpyatra.com/pricing/) is active and wishlist is enabled in settings
 
 **Support**
 
-* Premium or priority support depending on plan; see [wpyatra.com](https://wpyatra.com/) for current terms and **money-back window** for paid licenses.
+* [Premium or priority support](https://wpyatra.com/pricing/) depending on plan; see [wpyatra.com](https://wpyatra.com/) for current terms and **money-back window** for paid licenses.
 
 = 🧩 Blocks and shortcodes =
 
@@ -138,7 +138,7 @@ Yatra works with most well-coded block themes, classic themes, and major page bu
 = 🔗 Quick links =
 
 * 📖 **[Documentation](https://docs.wpyatra.com/)** — installation, blocks, shortcodes, and operations
-* ✨ **[All features](https://wpyatra.com/features/)** — full capability list with Free vs Pro labels (use this instead of a separate “extensions” catalog; Pro modules are summarized there and on 💳 **[Pricing](https://wpyatra.com/pricing/)**)
+* ✨ **[All features](https://wpyatra.com/features/)** — full capability list with Free vs [Pro](https://wpyatra.com/pricing/) labels (use this instead of a separate “extensions” catalog; [Pro modules](https://wpyatra.com/pricing/) are summarized there and on 💳 **[Pricing](https://wpyatra.com/pricing/)**)
 * 🎯 **[Live demo](https://demo.wpyatra.com/)** — see Yatra on a real WordPress demo
 * 🆘 **[Support portal / contact](https://mantrabrain.com/contact)** — help and commercial support routing
 
@@ -160,14 +160,14 @@ Yatra works with most well-coded block themes, classic themes, and major page bu
 1. Install and activate **Yatra** from this screen or upload the ZIP under Plugins → Add New → Upload.
 2. Complete the setup wizard (currency, basics, permalinks as prompted).
 3. Add destinations and activities, then create your first trip under **Yatra → Trips**.
-4. Configure **PayPal** and/or **Pay Later** under Yatra payment settings (free). Add **Yatra Pro** when you need card gateways or Pro modules.
+4. Configure **PayPal** and/or **Pay Later** under Yatra payment settings (free). Add **[Yatra Pro](https://wpyatra.com/pricing/)** when you need card gateways or [Pro modules](https://wpyatra.com/pricing/).
 5. Place the booking experience on your site using Yatra templates, **blocks**, or **shortcodes** (see **🧩 Blocks and shortcodes** in the description above and [docs.wpyatra.com](https://docs.wpyatra.com)).
 
 == Frequently Asked Questions ==
 
 = Is Yatra free? =
 
-Yes. The plugin on WordPress.org is free and includes the core booking stack for many operators. **Yatra Pro** is a paid upgrade for premium gateways and Pro modules.
+Yes. The plugin on WordPress.org is free and includes the core booking stack for many operators. **[Yatra Pro](https://wpyatra.com/pricing/)** is a paid upgrade for [premium gateways](https://wpyatra.com/pricing/) and [Pro modules](https://wpyatra.com/pricing/).
 
 = Do I need code skills? =
 
@@ -175,7 +175,7 @@ No for day-to-day operation. Developers can override templates and use hooks for
 
 = Which payments are free vs Pro? =
 
-**Free:** PayPal and Pay Later. **Pro:** Stripe, Razorpay, Mollie, Paystack, Square, Authorize.Net, bank transfer (as supported for your account and region).
+**Free:** PayPal and Pay Later. **[Pro](https://wpyatra.com/pricing/):** [Stripe](https://wpyatra.com/pricing/), [Razorpay](https://wpyatra.com/pricing/), [Mollie](https://wpyatra.com/pricing/), [Paystack](https://wpyatra.com/pricing/), [Square](https://wpyatra.com/pricing/), [Authorize.Net](https://wpyatra.com/pricing/), [bank transfer](https://wpyatra.com/pricing/) (as supported for your account and region).
 
 = Can I take bookings without charging a card immediately? =
 
@@ -187,11 +187,11 @@ It works with most modern WordPress themes. Yatra ships front-end templates; you
 
 = Are invoices and vouchers only in Pro? =
 
-Travelers can access invoices, vouchers, and itineraries from the account area on the free plugin when your site is configured for it. Pro expands payment choices and business modules—it does not remove core documents by default.
+Travelers can access invoices, vouchers, and itineraries from the account area on the free plugin when your site is configured for it. [Pro](https://wpyatra.com/pricing/) expands payment choices and business modules—it does not remove core documents by default.
 
 = How do saved trips / wishlist work? =
 
-Saved trips appear when **Yatra Pro** is active and **wishlist** is enabled in Yatra settings.
+Saved trips appear when **[Yatra Pro](https://wpyatra.com/pricing/)** is active and **wishlist** is enabled in Yatra settings.
 
 = Is Yatra GDPR-friendly? =
 
@@ -199,7 +199,7 @@ Use WordPress privacy tools together with Yatra: export or delete user-related d
 
 = Where is documentation? =
 
-See **[docs.wpyatra.com](https://docs.wpyatra.com)** and **[wpyatra.com](https://wpyatra.com/)** for features, Pro, and updates.
+See **[docs.wpyatra.com](https://docs.wpyatra.com)** and **[wpyatra.com](https://wpyatra.com/)** for features, **[Pro](https://wpyatra.com/pricing/)**, and updates.
 
 = Where are shortcodes and blocks documented? =
 
@@ -248,7 +248,7 @@ Readme / documentation listing update only. Safe to update from 3.0.1.
 Maintenance update (banner, WordPress.org readme/assets, and small fixes). Safe to update from 3.0.0.
 
 = 3.0.0 =
-Major release. Back up your site and database before upgrading from 2.x. Update free Yatra from WordPress.org first; then align Yatra Pro with a version compatible with 3.0.
+Major release. Back up your site and database before upgrading from 2.x. Update free Yatra from WordPress.org first; then align **[Yatra Pro](https://wpyatra.com/pricing/)** with a version compatible with 3.0.
 
 == Additional Information ==
 
@@ -264,4 +264,4 @@ Yatra is developed by **MantraBrain**. Third-party libraries include components 
 
 Issues and contributions: [GitHub — Yatra](https://github.com/MantraBrain/yatra)
 
-If Yatra helps your business, a ⭐ **five-star review** on WordPress.org and considering **💎 Yatra Pro** when you need paid features both help sustain development. Thank you for using Yatra.
+If Yatra helps your business, a ⭐ **five-star review** on WordPress.org and considering **💎 [Yatra Pro](https://wpyatra.com/pricing/)** when you need paid features both help sustain development. Thank you for using Yatra.
