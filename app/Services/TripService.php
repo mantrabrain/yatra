@@ -794,6 +794,18 @@ class TripService extends BaseService
     }
 
     /**
+     * Permanently remove a trip (hard delete). Used from trash / permanent-delete REST.
+     */
+    public function permanentDelete(int $id): bool
+    {
+        if ($this->repository->find($id, true) === null) {
+            return false;
+        }
+
+        return $this->delete($id);
+    }
+
+    /**
      * Publish trip
      */
     public function publish(int $id): bool

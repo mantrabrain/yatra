@@ -910,41 +910,9 @@ const Trips: React.FC = () => {
     ];
   }, [statusFilter]);
 
-  // Bulk apply handler
+  // Bulk apply handler (confirmation UI: BulkActionToolbar → ConfirmationDialog)
   const handleBulkApply = async () => {
     if (!bulkAction || selectedIds.length === 0) return;
-
-    const confirmMessages: Record<string, string> = {
-      delete: __(
-        "Are you sure you want to permanently delete {count} trip(s)? This cannot be undone.",
-        "yatra",
-      ).replace("{count}", selectedIds.length.toString()),
-      mark_published: __("Mark {count} trip(s) as Published?", "yatra").replace(
-        "{count}",
-        selectedIds.length.toString(),
-      ),
-      mark_draft:
-        statusFilter === "trash"
-          ? __("Restore {count} trip(s) to Draft?", "yatra").replace(
-              "{count}",
-              selectedIds.length.toString(),
-            )
-          : __("Mark {count} trip(s) as Draft?", "yatra").replace(
-              "{count}",
-              selectedIds.length.toString(),
-            ),
-      mark_archived: __("Archive {count} trip(s)?", "yatra").replace(
-        "{count}",
-        selectedIds.length.toString(),
-      ),
-      mark_trash: __("Move {count} trip(s) to Trash?", "yatra").replace(
-        "{count}",
-        selectedIds.length.toString(),
-      ),
-    };
-
-    const message = confirmMessages[bulkAction];
-    if (message && !window.confirm(message)) return;
 
     try {
       if (bulkAction === "delete") {

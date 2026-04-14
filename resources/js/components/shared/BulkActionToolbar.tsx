@@ -255,12 +255,17 @@ export const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
           switch (confirmDialog.action) {
             case "delete":
               return __("Delete Permanently", "yatra");
+            case "mark_trash":
             case "trash":
               return __("Move to Trash", "yatra");
+            case "mark_publish":
             case "publish":
               return __("Publish Items", "yatra");
+            case "mark_draft":
             case "draft":
               return __("Make Draft", "yatra");
+            case "mark_archived":
+              return __("Archive Items", "yatra");
             case "restore":
               return __("Restore Items", "yatra");
             default:
@@ -275,19 +280,27 @@ export const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                 "Are you sure you want to permanently delete {count} item(s)? This action cannot be undone.",
                 "yatra",
               ).replace("{count}", count.toString());
+            case "mark_trash":
             case "trash":
               return __(
                 "Are you sure you want to move {count} item(s) to trash?",
                 "yatra",
               ).replace("{count}", count.toString());
+            case "mark_publish":
             case "publish":
               return __(
                 "Are you sure you want to publish {count} item(s)?",
                 "yatra",
               ).replace("{count}", count.toString());
+            case "mark_draft":
             case "draft":
               return __(
                 "Are you sure you want to make {count} item(s) draft?",
+                "yatra",
+              ).replace("{count}", count.toString());
+            case "mark_archived":
+              return __(
+                "Are you sure you want to archive {count} item(s)?",
                 "yatra",
               ).replace("{count}", count.toString());
             case "restore":
@@ -306,12 +319,17 @@ export const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
           switch (confirmDialog.action) {
             case "delete":
               return __("Delete Permanently", "yatra");
+            case "mark_trash":
             case "trash":
               return __("Move to Trash", "yatra");
+            case "mark_publish":
             case "publish":
               return __("Publish", "yatra");
+            case "mark_draft":
             case "draft":
               return __("Make Draft", "yatra");
+            case "mark_archived":
+              return __("Archive", "yatra");
             case "restore":
               return __("Restore", "yatra");
             default:
