@@ -7,13 +7,11 @@
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: MantraBrain
- * Author URI: https://wpyatra.com/
+ * Author URI: https://mantrabrain.com/
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: yatra
  * Domain Path: /i18n/languages
- * Network: false
- * Update URI: https://updates.yatra.com
  */
 
 declare(strict_types=1);
