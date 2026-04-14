@@ -1,59 +1,86 @@
 <?php
 /**
- * Plugin Name:       Yatra - Best Travel & Tour Booking Plugin
- * Plugin URI:        https://wpyatra.com/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg
- * Description:       Yatra is a free travel & tour booking WordPress plugin to create travel and tour packages for tour operators and travel agencies.
- * Version:           2.3.4
- * Author:            MantraBrain
- * Author URI:        https://mantrabrain.com/
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       yatra
- * Domain Path:       /languages
+ * Plugin Name: Yatra - Travel Booking & Management
+ * Plugin URI: https://wpyatra.com/
+ * Description: Tours and activities on WordPress — trips, bookings, PayPal and Pay Later, guest accounts, emails, reports. Yatra Pro adds premium gateways and modules.
+ * Version: 3.0.0
+ * Requires at least: 6.0
+ * Requires PHP: 7.4
+ * Author: MantraBrain
+ * Author URI: https://wpyatra.com/
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: yatra
+ * Domain Path: /i18n/languages
+ * Network: false
+ * Update URI: https://updates.yatra.com
  */
 
+declare(strict_types=1);
+
+// Prevent direct access
 if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly.
-}
-// Define YATRA_PLUGIN_FILE.
-if (!defined('YATRA_FILE')) {
-    define('YATRA_FILE', __FILE__);
+    exit;
 }
 
-// Define YATRA_VERSION.
-if (!defined('YATRA_VERSION')) {
-    define('YATRA_VERSION',  '2.3.4');
+require_once __DIR__ . '/includes/php-compat.php';
+
+// Define plugin constants
+define('YATRA_PLUGIN_FILE', __FILE__);
+define('YATRA_PLUGIN_PATH', plugin_dir_path(__FILE__));
+define('YATRA_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('YATRA_PLUGIN_BASENAME', plugin_basename(__FILE__));
+define('YATRA_ABSPATH', plugin_dir_path(__FILE__));
+define('YATRA_PLUGIN_URI', plugin_dir_url(__FILE__));
+define('YATRA_VERSION', '3.0.0');
+define('YATRA_MIN_PHP_VERSION', '7.4');
+define('YATRA_MIN_WP_VERSION', '6.0');
+
+// Deactivate incompatible Yatra Pro (&lt; 3.0) and normalize plugin load order before Composer (prevents fatals from old Pro extending removed classes).
+require_once YATRA_PLUGIN_PATH . 'includes/incompatible-pro-guard.php';
+yatra_run_incompatible_pro_guard();
+
+// Load Composer autoloader
+$autoloader = YATRA_PLUGIN_PATH . 'vendor/autoload.php';
+if (!file_exists($autoloader)) {
+    wp_die(
+        'Yatra plugin requires Composer dependencies. From the plugin directory run: composer install --no-dev --optimize-autoloader (or: composer run install:prod).',
+        'Yatra Plugin Error',
+        ['back_link' => true]
+    );
+}
+require_once $autoloader;
+
+// Check minimum requirements
+if (!\Yatra\Core\Requirements::check()) {
+    return;
 }
 
-// Define YATRA_PLUGIN_URI.
-if (!defined('YATRA_PLUGIN_URI')) {
-    define('YATRA_PLUGIN_URI', plugins_url('', YATRA_FILE));
+// Bootstrap the plugin
+try {
+    if (!class_exists('Yatra\Bootstrap')) {
+        throw new \Exception('Bootstrap class not found. Run composer install --no-dev --optimize-autoloader (or composer run install:prod) in the plugin directory.');
+    }
+
+    $yatra = new \Yatra\Bootstrap();
+    $yatra->init();
+
+} catch (Throwable $e) {
+    // Use plain strings instead of translation functions to avoid early loading
+    wp_die(
+        sprintf(
+            'Yatra plugin failed to initialize: %s',
+            esc_html($e->getMessage())
+        ),
+        'Yatra Plugin Error',
+        ['back_link' => true]
+    );
 }
 
-// Define YATRA_PLUGIN_DIR.
-if (!defined('YATRA_PLUGIN_DIR')) {
-    define('YATRA_PLUGIN_DIR', plugin_dir_path(YATRA_FILE));
-}
-
-
-// Include the main Yatra class.
-if (!class_exists('Yatra')) {
-    include_once dirname(__FILE__) . '/includes/class-yatra.php';
-}
-
-
-/**
- * Main instance of Yatra.
- *
- * Returns the main instance of Yatra to prevent the need to use globals.
- *
- * @return Yatra
- * @since  1.0.0
- */
-function yatra()
-{
-    return Yatra::instance();
-}
-
-// Global for backwards compatibility.
-$GLOBALS['yatra-instance'] = yatra();
+register_activation_hook(YATRA_PLUGIN_FILE, static function (): void {
+    if (!function_exists('yatra_normalize_yatra_plugins_active_order')) {
+        require_once YATRA_PLUGIN_PATH . 'includes/incompatible-pro-guard.php';
+    }
+    yatra_normalize_yatra_plugins_active_order();
+    yatra_deactivate_incompatible_old_pro();
+});

@@ -1,26 +1,33 @@
-# Editors
-project.xml
-project.properties
-/nbproject/private/
-.buildpath
-.project
-.settings*
-.idea
-/svn-repository/
+# Dependencies
 /vendor/
-assets/lib/fullcalendar/examples/
-
-# Grunt
 /node_modules/
-/assets/admin/src/node_modules/
-package-lock.json
-# Sass
-.sass-cache/
 
-# OS X metadata
+# Build outputs
+# Release zips from ./build.sh (do not commit)
+build/
+*.zip
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
 .DS_Store
-
-# Windows junk
 Thumbs.db
-yatra.zip
-yatra.tar
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+
+# Build / tooling artifacts
+dist/
+

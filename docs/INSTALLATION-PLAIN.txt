@@ -1,0 +1,122 @@
+YATRA PLUGIN INSTALLATION GUIDE
+================================
+
+SYSTEM REQUIREMENTS
+-------------------
+• WordPress 5.0 or higher
+• PHP 7.4 or higher
+• MySQL 5.7 or higher
+• Memory: 64MB or higher recommended
+• Web Server: Apache or Nginx with mod_rewrite enabled
+
+
+INSTALLATION METHODS
+====================
+
+
+METHOD 1: AUTOMATIC INSTALLATION (RECOMMENDED)
+----------------------------------------------
+
+1. Log in to WordPress Admin dashboard
+2. Navigate to Plugins → Add New
+3. Search for "Yatra" in the search field
+4. Click "Install Now" on the Yatra plugin
+5. Click "Activate" after installation completes
+6. Configure basic settings in Yatra → Settings
+
+
+METHOD 2: MANUAL INSTALLATION (FTP/SFTP)
+----------------------------------------
+
+1. Download the Yatra plugin zip file
+2. Extract the zip file to your computer
+3. Connect to your website via FTP/SFTP
+4. Upload the extracted yatra folder to:
+   /wp-content/plugins/
+5. Set correct file permissions:
+   • Folders: 755
+   • Files: 644
+6. Log in to WordPress Admin
+7. Navigate to Plugins
+8. Find Yatra in the list and click "Activate"
+9. Configure basic settings in Yatra → Settings
+
+
+METHOD 3: MANUAL INSTALLATION (WORDPRESS ADMIN)
+-----------------------------------------------
+
+1. Download the Yatra plugin zip file
+2. Log in to WordPress Admin dashboard
+3. Navigate to Plugins → Add New
+4. Click "Upload Plugin" button at top
+5. Choose the yatra.zip file from your computer
+6. Click "Install Now"
+7. Click "Activate Plugin" after installation
+8. Configure basic settings in Yatra → Settings
+
+
+POST-INSTALLATION CONFIGURATION
+===============================
+
+BASIC CONFIGURATION
+-------------------
+Configure in Yatra → Settings:
+
+• Site URL and Currency
+• Permalink Structure (Critical for API)
+• Email Settings for notifications
+• Payment Gateways
+
+
+VERIFY INSTALLATION
+-------------------
+
+FRONTEND TESTING:
+• Trip pages load correctly
+• Availability checking works
+• Booking forms submit properly
+• Mobile responsive design
+
+BACKEND TESTING:
+Test REST API endpoints:
+
+curl -X GET "http://yoursite.com/wp-json/yatra/v1/trips"
+
+
+COMMON ISSUES
+=============
+
+"Plugin has no valid header" Error
+----------------------------------
+• Cause: Missing plugin header information
+• Solution: Ensure all plugin files are in correct yatra folder structure
+
+
+PERFORMANCE OPTIMIZATION
+------------------------
+• Enable object caching
+• Optimize database queries
+• Implement lazy loading
+
+
+SERVER REQUIREMENTS
+===================
+
+APACHE CONFIGURATION
+--------------------
+<IfModule mod_rewrite.c>
+RewriteEngine On
+</IfModule>
+
+
+PHP CONFIGURATION
+-----------------
+memory_limit = 256M
+max_execution_time = 300
+upload_max_filesize = 64M
+
+
+================================
+Follow these steps for successful Yatra installation and configuration.
+
+Last updated: April 2026

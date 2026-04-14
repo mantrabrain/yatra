@@ -1,0 +1,102 @@
+YATRA PLUGIN SETTINGS GUIDE
+============================
+
+Location: WordPress Admin → Yatra → Settings
+
+
+GENERAL SETTINGS
+================
+
+Site Configuration
+------------------
+• Site URL: Base URL for all plugin operations
+• Currency: USD, EUR, GBP, JPY with symbol position
+• Date/Time Format: Display format for dates and times
+• Timezone: Site timezone for date calculations
+
+
+Permalink Structure
+-------------------
+Critical Setting: Affects REST API routing and URL generation
+
+PRETTY PERMALINKS (RECOMMENDED)
+- SEO-friendly URLs for better search engine optimization
+
+PLAIN PERMALINKS (COMPATIBILITY)
+- Use with certain server configurations
+
+
+Email Configuration
+-------------------
+• Admin Email: Receive booking notifications
+• Email Templates: Customizable HTML templates
+• SMTP Configuration: TLS or SSL recommended
+
+
+Payment Settings
+----------------
+• WooCommerce Integration: Map trips to products
+• Custom Payment Gateways: Configure external processors
+• Test Mode: Enable sandbox testing
+
+
+Display Settings
+----------------
+• Theme Integration: Select WordPress theme mode
+• Custom CSS: Add custom stylesheets
+• Mobile Optimization: Responsive design settings
+• Booking Form Settings: Customize form fields and validation
+
+
+Advanced Settings
+-----------------
+• API Configuration: REST API version and rate limiting
+• Security Settings: Data sanitization and CAPTCHA
+• Integration Settings: Third-party APIs and webhooks
+
+
+RECOMMENDED CONFIGURATIONS
+===========================
+
+Small Sites (Less than 1000 monthly visitors)
+---------------------------------------------
+• Aggressive caching enabled
+• High compression and lazy loading
+• Shared hosting with optimized queries
+
+
+Medium Sites (1000-10,000 monthly visitors)
+-------------------------------------------
+• Moderate caching with smart invalidation
+• VPS hosting recommended
+• Balanced quality and performance
+
+
+Large Sites (More than 10,000 monthly visitors)
+-----------------------------------------------
+• Strategic caching with database optimization
+• Dedicated server recommended
+• Load balancing and CDN essential
+
+
+CONFIGURATION API
+=================
+
+Get Settings Programmatically
+-----------------------------
+$settings = get_option('yatra_settings', []);
+$currency = $settings['currency'] ?? 'USD';
+$debug_mode = $settings['debug_mode'] ?? false;
+
+
+Update Settings Programmatically
+--------------------------------
+$settings = get_option('yatra_settings', []);
+$settings['new_setting'] = 'new_value';
+update_option('yatra_settings', $settings);
+
+
+================================
+Configure your Yatra settings for optimal performance and user experience.
+
+Last updated: April 2026

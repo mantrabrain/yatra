@@ -1,0 +1,366 @@
+/**
+ * Stripe Elements Styling
+ */
+
+.yatra-stripe-container {
+    margin: 18px 0 0;
+    display: none; /* Hidden by default, shown when Stripe is selected */
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+}
+
+.yatra-method-switcher {
+    margin-bottom: 18px;
+}
+
+.yatra-method-switcher__header {
+    margin-bottom: 16px;
+}
+
+.yatra-label-eyebrow {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #2563eb;
+    margin: 0 0 6px;
+}
+
+.yatra-method-switcher__title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.yatra-method-switcher__helper {
+    margin: 4px 0 0;
+    color: #475569;
+    font-size: 0.92rem;
+}
+
+.yatra-method-switcher__buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.yatra-method-button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    background: #f8fafc;
+    color: #0f172a;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    font-weight: 500;
+}
+
+.yatra-method-button .method-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e1b4b;
+    flex-shrink: 0;
+}
+
+.method-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* JS uses method-icon--google_pay / method-icon--apple_pay (match stripe.js) */
+.method-icon--google {
+    background: linear-gradient(135deg, #0f9d58, #1a73e8);
+    color: #fff;
+}
+
+.method-icon--google_pay {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: inherit;
+}
+
+.method-icon--google_pay svg {
+    width: 28px;
+    height: 28px;
+    max-width: none;
+}
+
+.method-icon--apple {
+    background: #0f172a;
+    color: #fff;
+}
+
+.method-icon--apple_pay {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: #000;
+}
+
+.method-icon--apple_pay svg {
+    width: 26px;
+    height: 26px;
+    max-width: none;
+}
+
+.yatra-method-button .method-content {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.yatra-method-button .method-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.yatra-method-button .method-description {
+    font-size: 0.8rem;
+    color: #475569;
+}
+
+.method-tooltip {
+    position: relative;
+    z-index: 2;
+    margin-left: auto;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #2563eb;
+    transition: background 0.15s ease;
+    flex-shrink: 0;
+    pointer-events: auto;
+}
+
+.method-tooltip svg {
+    width: 16px;
+    height: 16px;
+}
+
+.yatra-method-button.is-disabled .method-tooltip,
+.yatra-method-button.is-pending .method-tooltip {
+    pointer-events: auto;
+}
+
+.method-tooltip:hover,
+.method-tooltip:focus-visible {
+    background: #e0ecff;
+}
+
+.method-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    transform: translate(-50%, -8px);
+    left: 50%;
+    bottom: 100%;
+    background: #0f172a;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    max-width: min(280px, 86vw);
+    width: max-content;
+    white-space: normal;
+    text-align: left;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 50;
+}
+
+.method-tooltip:hover::after,
+.method-tooltip:focus-visible::after {
+    opacity: 1;
+    transform: translate(-50%, -14px);
+}
+
+.yatra-method-button.is-active {
+    border-color: #2563eb;
+    box-shadow: 0 10px 26px rgba(37, 99, 235, 0.2);
+    transform: translateY(-3px);
+}
+
+.yatra-method-button.is-disabled {
+    cursor: not-allowed;
+    background: #eef2f6;
+    border-color: #cbd5e1;
+    color: #64748b;
+}
+
+.yatra-method-button.is-disabled .method-label {
+    color: #64748b;
+}
+
+.yatra-method-button.is-disabled .method-icon {
+    opacity: 0.85;
+}
+
+.yatra-method-button.is-pending {
+    border-style: dashed;
+    border-color: #94a3b8;
+}
+
+.yatra-stripe-card-wrapper,
+.yatra-stripe-payment-request-wrapper {
+    background: #fff;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 18px;
+    padding: 22px;
+    margin-top: 14px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 10px 25px rgba(15, 23, 42, 0.08);
+}
+
+.yatra-wallet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.yatra-wallet-eyebrow {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #2563eb;
+    margin: 0;
+}
+
+.yatra-wallet-title {
+    font-size: 1.25rem;
+    margin: 0;
+    color: #0f172a;
+}
+
+.yatra-wallet-badges {
+    display: flex;
+    gap: 6px;
+}
+
+.wallet-badge {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #0f172a;
+    background: #eef2ff;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.wallet-badge--apple {
+    background: #0f172a;
+    color: #fff;
+}
+
+.wallet-badge--google {
+    background: linear-gradient(135deg, #1a73e8, #34a853);
+    color: #fff;
+}
+
+.yatra-wallet-desc {
+    margin: 10px 0 14px;
+    color: #475569;
+    font-size: 0.9rem;
+}
+
+.yatra-wallet-status {
+    margin-top: 18px;
+    font-size: 0.88rem;
+    color: #475569;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #edf2ff;
+}
+
+.yatra-wallet-status.is-success {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.yatra-wallet-status.is-warning {
+    background: #fff7ed;
+    color: #9a3412;
+}
+
+.yatra-wallet-status.is-error {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.wallet-placeholder {
+    border: 1px dashed #cbd5f5;
+    border-radius: 14px;
+    padding: 16px;
+    color: #64748b;
+    text-align: center;
+    background: rgba(248, 250, 255, 0.8);
+}
+
+.yatra-stripe-card-element {
+    padding: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.6);
+    border-radius: 14px;
+    background: #fff;
+    margin-bottom: 12px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.yatra-stripe-card-element--focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.6);
+}
+
+.yatra-stripe-card-element--invalid {
+    border-color: #ef4444;
+}
+
+.yatra-stripe-errors {
+    color: #ef4444;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    margin-top: 0.5rem;
+    display: none;
+}
+
+.yatra-stripe-errors.visible {
+    display: block;
+}
+
+/* Loading spinner */
+.yatra-spinner {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: yatra-spin 1s ease-in-out infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes yatra-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .yatra-stripe-card-element {
+        padding: 10px;
+    }
+}

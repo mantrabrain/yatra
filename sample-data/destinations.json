@@ -1,0 +1,122 @@
+[
+  {
+    "type": "destination",
+    "name": "Swiss Alps",
+    "slug": "swiss-alps",
+    "description": "Majestic mountain ranges and pristine alpine landscapes",
+    "metadata": {
+      "country": "Switzerland",
+      "latitude": 46.5197,
+      "longitude": 8.2543
+    },
+    "status": "publish"
+  },
+  {
+    "type": "destination",
+    "name": "Maldives",
+    "slug": "maldives",
+    "description": "Tropical paradise islands with crystal-clear waters",
+    "metadata": {
+      "country": "Maldives",
+      "latitude": 3.2028,
+      "longitude": 73.2207
+    },
+    "status": "publish"
+  },
+  {
+    "type": "destination",
+    "name": "Kyoto, Japan",
+    "slug": "kyoto-japan",
+    "description": "Ancient temples and traditional Japanese culture",
+    "metadata": {
+      "country": "Japan",
+      "latitude": 35.0116,
+      "longitude": 135.7681
+    },
+    "status": "publish"
+  },
+  {
+    "type": "destination",
+    "name": "Serengeti, Tanzania",
+    "slug": "serengeti-tanzania",
+    "description": "Wildlife safari paradise with vast savannas",
+    "metadata": {
+      "country": "Tanzania",
+      "latitude": -2.3333,
+      "longitude": 34.8333
+    },
+    "status": "publish"
+  },
+  {
+    "type": "destination",
+    "name": "Paris, France",
+    "slug": "paris-france",
+    "description": "City of lights and romance",
+    "metadata": {
+      "country": "France",
+      "latitude": 48.8566,
+      "longitude": 2.3522
+    },
+    "status": "publish"
+  },
+  {
+    "type": "destination",
+    "name": "Bali, Indonesia",
+    "slug": "bali-indonesia",
+    "description": "Island of gods with beaches and temples",
+    "metadata": {
+      "country": "Indonesia",
+      "latitude": -8.3405,
+      "longitude": 115.092
+    },
+    "status": "publish"
+  },
+  {
+    "type": "destination",
+    "name": "Iceland",
+    "slug": "iceland",
+    "description": "Land of fire and ice with glaciers and volcanoes",
+    "metadata": {
+      "country": "Iceland",
+      "latitude": 64.9631,
+      "longitude": -19.0208
+    },
+    "status": "publish"
+  },
+  {
+    "type": "destination",
+    "name": "New Zealand",
+    "slug": "new-zealand",
+    "description": "Adventure capital with stunning landscapes",
+    "metadata": {
+      "country": "New Zealand",
+      "latitude": -40.9006,
+      "longitude": 174.886
+    },
+    "status": "publish"
+  },
+  {
+    "type": "destination",
+    "name": "Peru",
+    "slug": "peru",
+    "description": "Machu Picchu and ancient Inca civilization",
+    "metadata": {
+      "country": "Peru",
+      "latitude": -9.19,
+      "longitude": -75.0152
+    },
+    "status": "publish"
+  },
+  {
+    "type": "destination",
+    "name": "Norway",
+    "slug": "norway",
+    "description": "Fjords and northern lights",
+    "metadata": {
+      "country": "Norway",
+      "latitude": 60.472,
+      "longitude": 8.4689
+    },
+    "status": "publish"
+  }
+]

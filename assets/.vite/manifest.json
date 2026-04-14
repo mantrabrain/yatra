@@ -1,0 +1,47 @@
+{
+  "_index-!~{002}~.js": {
+    "file": "admin/dist/css/index.css",
+    "src": "_index-!~{002}~.js"
+  },
+  "_index-D6ftZoh-.js": {
+    "file": "dist/js/index-D6ftZoh-.js",
+    "name": "index",
+    "imports": [
+      "_react-vendor-LtfLP-AK.js"
+    ],
+    "css": [
+      "admin/dist/css/index.css"
+    ]
+  },
+  "_react-vendor-!~{001}~.js": {
+    "file": "admin/dist/css/react-vendor.css",
+    "src": "_react-vendor-!~{001}~.js"
+  },
+  "_react-vendor-LtfLP-AK.js": {
+    "file": "dist/js/react-vendor-LtfLP-AK.js",
+    "name": "react-vendor",
+    "css": [
+      "admin/dist/css/react-vendor.css"
+    ]
+  },
+  "resources/js/account-page.tsx": {
+    "file": "dist/js/account-page.js",
+    "name": "account-page",
+    "src": "resources/js/account-page.tsx",
+    "isEntry": true,
+    "imports": [
+      "_react-vendor-LtfLP-AK.js",
+      "_index-D6ftZoh-.js"
+    ]
+  },
+  "resources/js/main.tsx": {
+    "file": "admin/dist/js/app.js",
+    "name": "app",
+    "src": "resources/js/main.tsx",
+    "isEntry": true,
+    "imports": [
+      "_react-vendor-LtfLP-AK.js",
+      "_index-D6ftZoh-.js"
+    ]
+  }
+}

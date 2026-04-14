@@ -1,0 +1,936 @@
+name: Yatra CI
+
+on:
+  push:
+    branches: [ main, develop, development, 3.0.0 ]
+  pull_request:
+    branches: [ main, develop, development, 3.0.0 ]
+
+jobs:
+  # Code Quality and Standards Compliance
+  quality-check:
+    name: Code Quality (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
+        
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, mbstring, xml, ctype, iconv, pdo, pdo_mysql, gd, zip, curl, json
+          coverage: none
+          
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-${{ matrix.php }}-
+            ${{ runner.os }}-composer-
+            
+      # PHPCS installed_paths (WordPress + PHPCompatibility) come from Composer's phpcodesniffer-composer-installer.
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --optimize-autoloader
+
+      - name: Validate Composer
+        run: composer validate --strict
+        
+      - name: PHP Lint (Syntax Check)
+        id: php-lint
+        run: |
+          echo "Running PHP syntax check..."
+          
+          # Debug: Check PHP environment
+          echo "=== DEBUG: PHP Environment ===" >&2
+          echo "PHP Version:" >&2
+          php -v >&2
+          echo "PHP Configuration:" >&2
+          php -i | grep -E "(error_reporting|display_errors|log_errors)" >&2
+          echo "Current Directory:" >&2
+          pwd >&2
+          echo "Available PHP Files:" >&2
+          find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" | wc -l >&2
+          echo "=== END DEBUG ===" >&2
+          
+          # Create temporary file to store errors
+          ERROR_FILE=$(mktemp)
+          SYNTAX_ERRORS=0
+          
+          # Temporarily disable strict error handling
+          set +e
+          
+          # Find PHP files and check syntax
+          find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" | while read -r file; do
+            if [ -f "$file" ] && [ -r "$file" ]; then
+              OUTPUT=$(php -l "$file" 2>&1)
+              PHP_EXIT_CODE=$?
+              
+              # Debug: Show first few files being checked
+              if [ "$SYNTAX_ERRORS" -lt 3 ]; then
+                echo "DEBUG: Checking $file (exit code: $PHP_EXIT_CODE)" >&2
+              fi
+              
+              # Handle PHP crash (exit code 255) or other failures
+              if [ $PHP_EXIT_CODE -eq 255 ]; then
+                echo "❌ PHP crashed while checking $file - likely PHP version incompatibility" | tee -a "$ERROR_FILE"
+                echo "This usually indicates PHP 8.0+ syntax (union types, match expressions, etc.)" | tee -a "$ERROR_FILE"
+                echo "DEBUG: PHP crashed on $file" >&2
+                SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
+                continue
+              fi
+              
+              # Handle regular syntax errors
+              if [ $PHP_EXIT_CODE -ne 0 ]; then
+                echo "❌ $file:" | tee -a "$ERROR_FILE"
+                echo "$OUTPUT" | tee -a "$ERROR_FILE"
+                echo "DEBUG: Syntax error in $file: $OUTPUT" >&2
+                echo "DEBUG: File with syntax error: $file" >&2
+                echo "DEBUG: Error details: $OUTPUT" >&2
+                echo "DEBUG: PHP exit code: $PHP_EXIT_CODE" >&2
+                echo "DEBUG: Error file contents:" >&2
+                cat "$ERROR_FILE" >&2
+                SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
+              fi
+            fi
+          done
+          
+          # Re-enable strict error handling
+          set -e
+          
+          # Debug: Show what specific file is still causing issues
+          echo "DEBUG: Total syntax errors found: $SYNTAX_ERRORS" >&2
+          echo "DEBUG: Error count variable: $SYNTAX_ERRORS" >&2
+          echo "DEBUG: Error file contents before final check:" >&2
+          cat "$ERROR_FILE" 2>/dev/null || echo "DEBUG: No error file contents" >&2
+          
+          # Debug: Check for files with BOM that might cause issues
+          echo "DEBUG: Checking for BOM issues..." >&2
+          find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" -exec sh -c 'if [ "$(head -c 3 "$0" | od -tx1 -N1 | cut -d' ' -f1)" = 'efbbbf' ]; then echo "BOM found in $0"; fi' {} \; 2>/dev/null || echo "DEBUG: BOM check completed" >&2
+          
+          # SYNTAX_ERRORS already contains the correct count
+          
+          echo "DEBUG: Final error count: $SYNTAX_ERRORS" >&2
+          
+          if [ $SYNTAX_ERRORS -gt 0 ]; then
+            echo "DEBUG: Writing errors to files..." >&2
+            cat "$ERROR_FILE" > php-lint-errors.txt
+            echo "=== SYNTAX ERRORS FOUND ===" >&2
+            cat "$ERROR_FILE" >&2
+            echo "=== END SYNTAX ERRORS ===" >&2
+            echo "has_errors=true" >> $GITHUB_OUTPUT
+            rm -f "$ERROR_FILE"
+            echo "DEBUG: Exiting with code 1 due to $SYNTAX_ERRORS syntax errors" >&2
+            exit 1
+          fi
+          echo "No PHP syntax errors found" > php-lint-errors.txt
+          echo "has_errors=false" >> $GITHUB_OUTPUT
+          rm -f "$ERROR_FILE"
+          echo "DEBUG: All checks passed, exiting with code 0" >&2
+          
+      - name: Run PHP_CodeSniffer (WordPress Standards)
+        id: phpcs
+        if: always() && steps.php-lint.outcome != 'failure'
+        run: |
+          echo "Running WordPress coding standards check..."
+          vendor/bin/phpcs \
+            -d memory_limit=512M \
+            --standard=phpcs.xml \
+            --report=full \
+            --report-file=phpcs-report.txt \
+            --report-json=phpcs-report.json \
+            --report-gitblame=phpcs-gitblame.txt \
+            -q || true
+          
+          # Parse PHPCS report using bash script
+          bash .github/scripts/parse-phpcs-report.sh
+                
+                
+      - name: Composer Audit (Security Check)
+        id: composer-audit
+        if: always()
+        run: |
+          composer audit 2>&1 | tee composer-audit.txt || true
+          
+      - name: Check for disallowed functions
+        id: disallowed
+        if: always()
+        run: |
+          echo "Checking for disallowed functions..."
+          FOUND=""
+          # Word-boundary style patterns (avoid curl_exec, collect_system(), etc.)
+          patterns=(
+            '(?<![A-Za-z0-9_])eval\s*\('
+            '(?<![A-Za-z0-9_])exec\s*\('
+            '(?<![A-Za-z0-9_])shell_exec\s*\('
+            '(?<![A-Za-z0-9_])system\s*\('
+            '(?<![A-Za-z0-9_])passthru\s*\('
+          )
+          
+          for pat in "${patterns[@]}"; do
+            RAW=$(grep -rPn "$pat" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null || true)
+            MATCHES=""
+            while IFS= read -r line; do
+              [ -z "$line" ] && continue
+              # Strip path:lineno: — ignore matches on single-line // # or * comment lines (e.g. "system (…)" in prose)
+              content="${line#*:*:}"
+              trimmed=$(echo "$content" | sed 's/^[[:space:]]*//')
+              if [[ "$trimmed" =~ ^// ]] || [[ "$trimmed" =~ ^# ]] || [[ "$trimmed" =~ ^\* ]]; then
+                continue
+              fi
+              MATCHES="${MATCHES}${line}"$'\n'
+            done <<< "$RAW"
+            if [ -n "$MATCHES" ]; then
+              FOUND="${FOUND}Disallowed pattern '${pat}' found:\n${MATCHES}\n\n"
+            fi
+          done
+          
+          if [ -n "$FOUND" ]; then
+            echo -e "$FOUND" | tee disallowed-functions.txt
+            exit 1
+          fi
+          echo "No disallowed functions found" > disallowed-functions.txt
+
+      - name: Upload All Error Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-errors-php${{ matrix.php }}
+          path: |
+            php-lint-errors.txt
+            phpcs-report.txt
+            phpcs-report.json
+            phpcs-gitblame.txt
+            phpcs-errors-readable.txt
+            composer-audit.txt
+            disallowed-functions.txt
+          if-no-files-found: ignore
+
+  # Security Scanning
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: dom, mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, gd, zip, curl
+          
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-security-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-security-
+            
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress
+        
+      - name: Run Composer Security Audit
+        id: security-audit
+        run: composer audit 2>&1 | tee security-audit.txt || true
+        
+      - name: Check for hardcoded secrets
+        id: secrets-check
+        run: |
+          echo "Checking for potential secrets..." > secrets-check.txt
+          FOUND=$(grep -rn -i "password\s*=\s*['\"][^'\"]\+['\"]" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null || true)
+          if [ -n "$FOUND" ]; then
+            echo "Potential hardcoded passwords found:" >> secrets-check.txt
+            echo "$FOUND" >> secrets-check.txt
+            cat secrets-check.txt
+            exit 1
+          fi
+          echo "No obvious secrets found" >> secrets-check.txt
+
+      - name: Upload Security Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-errors
+          path: |
+            security-audit.txt
+            secrets-check.txt
+          if-no-files-found: ignore
+
+  # Plugin Structure Validation
+  structure-check:
+    name: Plugin Structure Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Check plugin structure
+        run: |
+          ERRORS="" 
+          
+          if [ ! -f "yatra.php" ]; then
+            ERRORS="${ERRORS}Main plugin file yatra.php not found\n"
+          fi
+          
+          required_dirs=("app" "assets" "templates" "includes")
+          for dir in "${required_dirs[@]}"; do
+            if [ ! -d "$dir" ]; then
+              ERRORS="${ERRORS}Required directory $dir not found\n"
+            fi
+          done
+          
+          if ! grep -q "Plugin Name:" yatra.php 2>/dev/null; then
+            ERRORS="${ERRORS}Plugin header not found in yatra.php\n"
+          fi
+          
+          if [ ! -f "composer.json" ]; then
+            ERRORS="${ERRORS}composer.json not found\n"
+          fi
+          
+          executable_files=$(find . -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" -executable 2>/dev/null || true)
+          if [ -n "$executable_files" ]; then
+            ERRORS="${ERRORS}Executable PHP files found (security risk):\n${executable_files}\n"
+          fi
+          
+          if [ -n "$ERRORS" ]; then
+            echo -e "$ERRORS" | tee structure-errors.txt
+            exit 1
+          fi
+          echo "Plugin structure is valid" > structure-errors.txt
+          
+      - name: Upload Structure Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: structure-errors
+          path: structure-errors.txt
+          if-no-files-found: ignore
+
+  # PHP Compatibility Matrix Testing
+  php-compatibility:
+    name: PHP ${{ matrix.php }} Compatibility
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, mbstring, xml, ctype, iconv, pdo, pdo_mysql, gd, zip, curl, json
+          
+      - name: Debug PHP Setup
+        run: |
+          echo "DEBUG: PHP setup completed for ${{ matrix.php }}"
+          echo "DEBUG: PHP version:"
+          php -v
+          echo "DEBUG: Current directory:"
+          pwd
+          echo "DEBUG: Available files:"
+          ls -la
+          echo "DEBUG: Starting compatibility check..."
+          
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-php${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-php${{ matrix.php }}-
+            
+      # PHPCS installed_paths (WordPress + PHPCompatibility) come from Composer's phpcodesniffer-composer-installer.
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --ignore-platform-reqs
+
+      - name: PHP Syntax Check (Lint)
+        run: |
+          echo "Checking PHP syntax for PHP ${{ matrix.php }}..." >&2
+          
+          # Debug: Check PHP version
+          echo "PHP version:" >&2
+          php -v >&2
+          
+          # Debug: Check if PHP files exist
+          echo "PHP files found:" >&2
+          find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" | wc -l >&2
+          
+          # Initialize error counter
+          SYNTAX_ERRORS=0
+          
+          # Get list of PHP files and check each one
+          find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" > php_files_list.txt 2>/dev/null || {
+            echo "❌ No PHP files found to check" | tee -a php${{ matrix.php }}-compat.txt
+            exit 1
+          }
+          
+          echo "Starting syntax check..." >&2
+          
+          while IFS= read -r file; do
+            if [ -f "$file" ] && [ -r "$file" ]; then
+              echo "Checking: $file" >&2
+              OUTPUT=$(php -l "$file" 2>&1) || {
+                # Handle PHP crash (exit code 255) or other failures
+                echo "❌ PHP crashed while checking $file - likely PHP ${{ matrix.php }} incompatibility" | tee -a php${{ matrix.php }}-compat.txt
+                echo "This usually indicates PHP 8.0+ syntax (union types, match expressions, etc.)" | tee -a php${{ matrix.php }}-compat.txt
+                echo "❌ PHP crashed while checking $file - likely PHP ${{ matrix.php }} incompatibility" >> php${{ matrix.php }}-lint.txt
+                echo "This usually indicates PHP 8.0+ syntax (union types, match expressions, etc.)" >> php${{ matrix.php }}-lint.txt
+                SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
+                continue
+              }
+              PHP_EXIT_CODE=$?
+              
+              # Only capture actual errors, not "No syntax errors detected"
+              if [ $PHP_EXIT_CODE -ne 0 ]; then
+                echo "$OUTPUT" >> php${{ matrix.php }}-lint.txt
+                echo "❌ Syntax error in $file:" | tee -a php${{ matrix.php }}-compat.txt
+                echo "$OUTPUT" | tee -a php${{ matrix.php }}-compat.txt
+                SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
+              fi
+            fi
+          done < php_files_list.txt
+          
+          # Clean up
+          rm -f php_files_list.txt
+          
+          # SYNTAX_ERRORS already contains the correct count
+          
+          echo "Syntax check completed. Errors found: $SYNTAX_ERRORS" >&2
+          
+          if [ $SYNTAX_ERRORS -gt 0 ]; then
+            echo "❌ PHP ${{ matrix.php }}: Found $SYNTAX_ERRORS files with syntax errors" | tee -a php${{ matrix.php }}-compat.txt
+            echo "DEBUG: Syntax check failed but continuing to upload artifacts" | tee -a php${{ matrix.php }}-compat.txt
+            # Don't exit here - let artifact upload happen
+          else
+            echo "✅ PHP ${{ matrix.php }} syntax check passed - All files valid" | tee -a php${{ matrix.php }}-compat.txt
+          fi
+          
+          # Debug: Show what files exist before upload
+          echo "DEBUG: Files to upload:" | tee -a php${{ matrix.php }}-compat.txt
+          ls -la php${{ matrix.php }}*.txt 2>/dev/null | tee -a php${{ matrix.php }}-compat.txt || echo "No txt files found" | tee -a php${{ matrix.php }}-compat.txt
+          
+      - name: Check Deprecated Functions (PHP ${{ matrix.php }})
+        run: |
+          echo "Checking for deprecated functions in PHP ${{ matrix.php }}..." >&2
+          echo "Checking for deprecated functions in PHP ${{ matrix.php }}..." | tee -a php${{ matrix.php }}-compat.txt
+          
+          # Legacy PHP API usage (matrix includes 7.4 and 8.x)
+          if [ "${{ matrix.php }}" = "7.4" ] || [ "${{ matrix.php }}" = "8.0" ] || [ "${{ matrix.php }}" = "8.1" ] || [ "${{ matrix.php }}" = "8.2" ] || [ "${{ matrix.php }}" = "8.3" ] || [ "${{ matrix.php }}" = "8.4" ]; then
+            DEPRECATED=$(grep -rn "create_function\(\|each(\|money_format(\|ezmlm_hash(" app includes templates --include="*.php" 2>/dev/null || true)
+            if [ -n "$DEPRECATED" ]; then
+              echo "⚠️ Deprecated PHP APIs found:" | tee -a php${{ matrix.php }}-compat.txt
+              echo "$DEPRECATED" | tee -a php${{ matrix.php }}-compat.txt
+            fi
+          fi
+          
+          # PHP 8.0+ deprecations
+          if [ "${{ matrix.php }}" = "8.0" ] || [ "${{ matrix.php }}" = "8.1" ] || [ "${{ matrix.php }}" = "8.2" ] || [ "${{ matrix.php }}" = "8.3" ] || [ "${{ matrix.php }}" = "8.4" ]; then
+            DEPRECATED_80=$(grep -rn "get_magic_quotes_gpc(\|get_magic_quotes_runtime(" app includes templates --include="*.php" 2>/dev/null || true)
+            if [ -n "$DEPRECATED_80" ]; then
+              echo "⚠️ PHP 8.0+ deprecated functions found:" | tee -a php${{ matrix.php }}-compat.txt
+              echo "$DEPRECATED_80" | tee -a php${{ matrix.php }}-compat.txt
+            fi
+          fi
+          
+          # PHP 8.1+ deprecations
+          if [ "${{ matrix.php }}" = "8.1" ] || [ "${{ matrix.php }}" = "8.2" ] || [ "${{ matrix.php }}" = "8.3" ] || [ "${{ matrix.php }}" = "8.4" ]; then
+            DEPRECATED_81=$(grep -rn "utf8_encode(\|utf8_decode(" app includes templates --include="*.php" 2>/dev/null || true)
+            if [ -n "$DEPRECATED_81" ]; then
+              echo "⚠️ PHP 8.1+ deprecated functions found:" | tee -a php${{ matrix.php }}-compat.txt
+              echo "$DEPRECATED_81" | tee -a php${{ matrix.php }}-compat.txt
+            fi
+          fi
+          
+          echo "Deprecated function check completed" | tee -a php${{ matrix.php }}-compat.txt
+          
+      - name: PHPCS Coding Standards (PHP ${{ matrix.php }})
+        run: |
+          echo "Running PHPCS coding standards for PHP ${{ matrix.php }}..." >&2
+          if [ -f "vendor/bin/phpcs" ]; then
+            vendor/bin/phpcs \
+              -d memory_limit=512M \
+              --standard=phpcs.xml \
+              --report=full \
+              --report-json=phpcs-report.json \
+              -q > phpcs-output.txt 2>&1 || true
+            
+            # Show raw PHPCS output for detailed analysis
+            if [ -f "phpcs-output.txt" ]; then
+              echo "=== RAW PHPCS REPORT FOR PHP ${{ matrix.php }} ===" | tee -a php${{ matrix.php }}-compat.txt
+              cat phpcs-output.txt | tee -a php${{ matrix.php }}-compat.txt
+              echo "=== END PHPCS REPORT ===" | tee -a php${{ matrix.php }}-compat.txt
+              echo "PHPCS analysis completed for PHP ${{ matrix.php }}" | tee -a php${{ matrix.php }}-compat.txt
+            else
+              echo "PHPCS not available for PHP ${{ matrix.php }}" | tee -a php${{ matrix.php }}-compat.txt
+            fi
+          else
+            echo "PHPCS binary not found for PHP ${{ matrix.php }}" | tee -a php${{ matrix.php }}-compat.txt
+          fi
+          
+      - name: Upload PHP ${{ matrix.php }} Compatibility Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: php${{ matrix.php }}-compatibility
+          path: |
+            php${{ matrix.php }}-compat.txt
+            php${{ matrix.php }}-lint.txt
+            phpcs-output.txt
+            phpcs-report.json
+          if-no-files-found: ignore
+          
+      - name: Upload Fallback Report (if job failed)
+        if: failure()
+        run: |
+          echo "Creating fallback report for PHP ${{ matrix.php }}..." >&2
+          echo "❌ PHP ${{ matrix.php }} job failed during execution" > php${{ matrix.php }}-fallback.txt
+          echo "This indicates a critical issue with PHP ${{ matrix.php }} compatibility." >> php${{ matrix.php }}-fallback.txt
+          echo "Possible causes:" >> php${{ matrix.php }}-fallback.txt
+          echo "- PHP setup failure" >> php${{ matrix.php }}-fallback.txt
+          echo "- Composer installation failure" >> php${{ matrix.php }}-fallback.txt
+          echo "- Critical syntax errors preventing job completion" >> php${{ matrix.php }}-fallback.txt
+          echo "- CI environment issues" >> php${{ matrix.php }}-fallback.txt
+          echo "" >> php${{ matrix.php }}-fallback.txt
+          echo "Debug information:" >> php${{ matrix.php }}-fallback.txt
+          echo "PHP version: $(php -v 2>&1 || echo 'PHP not available')" >> php${{ matrix.php }}-fallback.txt
+          echo "Current directory: $(pwd)" >> php${{ matrix.php }}-fallback.txt
+          echo "Available files: $(ls -la 2>/dev/null || echo 'Cannot list files')" >> php${{ matrix.php }}-fallback.txt
+          
+      - name: Upload Fallback Artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: php${{ matrix.php }}-compatibility
+          path: php${{ matrix.php }}-fallback.txt
+          if-no-files-found: ignore
+
+  # WordPress Compatibility Check
+  wordpress-compatibility:
+    name: WordPress Compatibility
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: dom, mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, gd, zip, curl
+          
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-wp-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-wp-
+            
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress
+        
+      - name: Check WordPress compatibility
+        run: |
+          ERRORS=""
+          
+          # Check for custom function definitions with wp_ prefix
+          WP_FUNCS=$(grep -rn "^[[:space:]]*\(public \|private \|protected \|static \)*function wp_" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null || true)
+          if [ -n "$WP_FUNCS" ]; then
+            ERRORS="${ERRORS}Custom functions with wp_ prefix found (should use unique prefix):\n${WP_FUNCS}\n\n"
+          fi
+          
+          # Check for proper text domain usage (plain __() only — not esc_html__, esc_attr__, etc.)
+          TEXT_DOMAIN_ISSUES=$(grep -rPn '(?<![A-Za-z0-9_])__\(' . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null | grep -v "'yatra'" | grep -v '"yatra"' | head -50 || true)
+          if [ -n "$TEXT_DOMAIN_ISSUES" ]; then
+            ERRORS="${ERRORS}Translation functions possibly missing 'yatra' text domain:\n${TEXT_DOMAIN_ISSUES}\n\n"
+          fi
+          
+          if [ -n "$ERRORS" ]; then
+            echo -e "$ERRORS" | tee wp-compat-errors.txt
+            exit 1
+          fi
+          echo "WordPress compatibility checks passed" > wp-compat-errors.txt
+
+      - name: Upload WP Compatibility Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wp-compat-errors
+          path: wp-compat-errors.txt
+          if-no-files-found: ignore
+
+  # TypeScript/React Code Quality
+  typescript-quality:
+    name: TypeScript/React Quality
+    runs-on: ubuntu-latest
+    # GitHub/org NODE_ENV=production skips devDependencies on npm ci (no eslint, prettier, typescript).
+    env:
+      NODE_ENV: development
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: TypeScript Type Check
+        id: typecheck
+        run: |
+          echo "Running TypeScript type checking..."
+          npm run type-check > typescript-errors.txt 2>&1 || {
+            echo "TypeScript type checking failed:"
+            cat typescript-errors.txt
+            exit 1
+          }
+          echo "No TypeScript errors found" > typescript-errors.txt
+          
+      - name: ESLint Check
+        id: eslint
+        if: always()
+        run: |
+          echo "Running ESLint..."
+          npm run lint > eslint-errors.txt 2>&1 || {
+            echo "ESLint check failed:"
+            cat eslint-errors.txt
+            exit 1
+          }
+          echo "No ESLint errors found" > eslint-errors.txt
+          
+      - name: Prettier Check
+        id: prettier
+        if: always()
+        run: |
+          echo "Running Prettier format check..."
+          npm run format:check > prettier-errors.txt 2>&1 || {
+            echo "Prettier format check failed:"
+            cat prettier-errors.txt
+            exit 1
+          }
+          echo "No Prettier errors found" > prettier-errors.txt
+          
+      - name: Check for console.log statements
+        id: consolelog
+        if: always()
+        run: |
+          FOUND=$(grep -rn "console\.log" resources/js/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" 2>/dev/null | grep -v "//.*console\.log" || true)
+          if [ -n "$FOUND" ]; then
+            echo "console.log statements found in production code:" > consolelog-errors.txt
+            echo "$FOUND" >> consolelog-errors.txt
+            cat consolelog-errors.txt
+            exit 1
+          fi
+          echo "No console.log statements found" > consolelog-errors.txt
+
+      - name: Upload All TS/React Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: typescript-errors
+          path: |
+            typescript-errors.txt
+            eslint-errors.txt
+            prettier-errors.txt
+            consolelog-errors.txt
+          if-no-files-found: ignore
+
+  # Build Summary - Downloads all artifacts and compiles one comprehensive report
+  build-summary:
+    name: Build Summary
+    runs-on: ubuntu-latest
+    needs: [quality-check, security-scan, structure-check, php-compatibility, wordpress-compatibility, typescript-quality]
+    if: always()
+    
+    steps:
+      - name: Download all error artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: error-reports
+          
+      - name: Compile Comprehensive AI Error Report
+        run: |
+          echo "## 🚀 Yatra CI Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Job Status Overview
+          if [ "${{ needs.quality-check.result }}" == "success" ]; then
+            echo "✅ **Code Quality**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Code Quality**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ needs.security-scan.result }}" == "success" ]; then
+            echo "✅ **Security Scan**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Security Scan**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ needs.structure-check.result }}" == "success" ]; then
+            echo "✅ **Plugin Structure**: Valid" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Plugin Structure**: Invalid" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ needs.wordpress-compatibility.result }}" == "success" ]; then
+            echo "✅ **WordPress Compatibility**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **WordPress Compatibility**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ needs.typescript-quality.result }}" == "success" ]; then
+            echo "✅ **TypeScript/React Quality**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **TypeScript/React Quality**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # ============================================================
+          # COMPREHENSIVE AI-READY ERROR REPORT
+          # ============================================================
+          echo "## 📋 COMPLETE ERROR REPORT — Copy everything below this line to AI" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "I need help fixing the following CI errors in my WordPress plugin called **Yatra** (a travel booking plugin). The plugin targets PHP 7.4+ (CI also runs 8.x), plus TypeScript, React, TailwindCSS, and Vite. Please provide specific code fixes for each error below." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # List all downloaded artifacts for debugging
+          echo "### Downloaded artifacts:" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          ls -R error-reports/ 2>/dev/null >> $GITHUB_STEP_SUMMARY || echo "No artifacts downloaded" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # --- PHP LINT ERRORS ---
+          HAS_PHP_LINT_ERRORS=false
+          for f in error-reports/quality-errors-php*/php-lint-errors.txt; do
+            if [ -f "$f" ] && [ -s "$f" ]; then
+              if [ "$HAS_PHP_LINT_ERRORS" = "false" ]; then
+                echo "### 1. PHP Syntax Errors" >> $GITHUB_STEP_SUMMARY
+                echo '```' >> $GITHUB_STEP_SUMMARY
+                HAS_PHP_LINT_ERRORS=true
+              fi
+              echo "--- $(basename $(dirname $f)) ---" >> $GITHUB_STEP_SUMMARY
+              cat "$f" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          if [ "$HAS_PHP_LINT_ERRORS" = "true" ]; then
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # --- PHPCS ERRORS ---
+          HAS_PHPCS_ERRORS=false
+          for f in error-reports/quality-errors-php*/phpcs-errors-readable.txt; do
+            if [ -f "$f" ] && [ -s "$f" ]; then
+              if [ "$HAS_PHPCS_ERRORS" = "false" ]; then
+                echo "### 2. PHP_CodeSniffer — WordPress Coding Standards Violations" >> $GITHUB_STEP_SUMMARY
+                echo '```' >> $GITHUB_STEP_SUMMARY
+                HAS_PHPCS_ERRORS=true
+              fi
+              echo "--- $(basename $(dirname $f)) ---" >> $GITHUB_STEP_SUMMARY
+              cat "$f" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          if [ "$HAS_PHPCS_ERRORS" = "true" ]; then
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # --- COMPOSER AUDIT ---
+          echo "### 3. Composer Security Audit" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          for f in error-reports/quality-errors-php*/composer-audit.txt error-reports/security-errors/security-audit.txt; do
+            if [ -f "$f" ]; then
+              cat "$f" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              break
+            fi
+          done
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # --- DISALLOWED FUNCTIONS ---
+          echo "### 5. Disallowed Functions" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          for f in error-reports/quality-errors-php*/disallowed-functions.txt; do
+            if [ -f "$f" ]; then
+              cat "$f" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              break
+            fi
+          done
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # --- SECURITY SECRETS ---
+          echo "### 6. Hardcoded Secrets Check" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          if [ -f "error-reports/security-errors/secrets-check.txt" ]; then
+            cat "error-reports/security-errors/secrets-check.txt" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No secrets check report available" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # --- STRUCTURE ERRORS ---
+          echo "### 7. Plugin Structure Validation" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          if [ -f "error-reports/structure-errors/structure-errors.txt" ]; then
+            cat "error-reports/structure-errors/structure-errors.txt" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No structure report available" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # --- PHP COMPATIBILITY ---
+          HAS_PHP_COMPAT_ERRORS=false
+          echo "### 8. PHP Version Compatibility (7.4, 8.0, 8.1, 8.2, 8.3, 8.4)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          HAS_PHP_COMPAT_ERRORS=true
+          
+          for version in 7.4 8.0 8.1 8.2 8.3 8.4; do
+            HAS_VERSION_ERRORS=false
+            if [ -d "error-reports/php${version}-compatibility" ]; then
+              # Check if any files have content
+              if [ -f "error-reports/php${version}-compatibility/php${version}-compat.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-compat.txt" ]; then
+                HAS_VERSION_ERRORS=true
+              fi
+              if [ -f "error-reports/php${version}-compatibility/php${version}-lint.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-lint.txt" ]; then
+                # Check if file contains actual errors (not just success messages)
+                if grep -q "Parse error\|syntax error\|Fatal error\|❌\|Failed to check" "error-reports/php${version}-compatibility/php${version}-lint.txt"; then
+                  HAS_VERSION_ERRORS=true
+                fi
+              fi
+              if [ -f "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" ] && [ -s "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" ]; then
+                HAS_VERSION_ERRORS=true
+              fi
+            fi
+                            
+            echo "=== PHP ${version} ===" >> $GITHUB_STEP_SUMMARY
+                
+              if [ ! -d "error-reports/php${version}-compatibility" ]; then
+                echo "❌ PHP ${version} compatibility check did not run or failed to upload results" >> $GITHUB_STEP_SUMMARY
+                echo "This may indicate a job failure or CI configuration issue." >> $GITHUB_STEP_SUMMARY
+              else
+                # Show compatibility errors
+                if [ -f "error-reports/php${version}-compatibility/php${version}-compat.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-compat.txt" ]; then
+                  cat "error-reports/php${version}-compatibility/php${version}-compat.txt" >> $GITHUB_STEP_SUMMARY
+                fi
+                
+                # Show lint errors
+                if [ -f "error-reports/php${version}-compatibility/php${version}-lint.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-lint.txt" ]; then
+                  # Only show if file contains actual errors
+                  if grep -q "Parse error\|syntax error\|Fatal error\|❌\|Failed to check" "error-reports/php${version}-compatibility/php${version}-lint.txt"; then
+                    echo "Syntax errors:" >> $GITHUB_STEP_SUMMARY
+                    cat "error-reports/php${version}-compatibility/php${version}-lint.txt" >> $GITHUB_STEP_SUMMARY
+                  fi
+                fi
+                
+                # Show PHPCS errors
+                if [ -f "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" ] && [ -s "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" ]; then
+                  echo "Coding standards errors:" >> $GITHUB_STEP_SUMMARY
+                  cat "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" >> $GITHUB_STEP_SUMMARY
+                fi
+                
+                # Show status if no errors found
+                if [ "$HAS_VERSION_ERRORS" = "false" ]; then
+                  echo "✅ All checks passed" >> $GITHUB_STEP_SUMMARY
+                fi
+              fi
+                
+                echo "" >> $GITHUB_STEP_SUMMARY
+          done
+          if [ "$HAS_PHP_COMPAT_ERRORS" = "true" ]; then
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # --- WP COMPATIBILITY ---
+          if [ -f "error-reports/wp-compat-errors/wp-compat-errors.txt" ] && [ -s "error-reports/wp-compat-errors/wp-compat-errors.txt" ]; then
+            echo "### 9. WordPress Compatibility Issues" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat "error-reports/wp-compat-errors/wp-compat-errors.txt" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # --- TYPESCRIPT ERRORS ---
+          if [ -f "error-reports/typescript-errors/typescript-errors.txt" ] && [ -s "error-reports/typescript-errors/typescript-errors.txt" ]; then
+            echo "### 10. TypeScript Compilation Errors" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat "error-reports/typescript-errors/typescript-errors.txt" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # --- ESLINT ERRORS ---
+          if [ -f "error-reports/typescript-errors/eslint-errors.txt" ] && [ -s "error-reports/typescript-errors/eslint-errors.txt" ]; then
+            echo "### 11. ESLint Violations" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat "error-reports/typescript-errors/eslint-errors.txt" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # --- PRETTIER ERRORS ---
+          if [ -f "error-reports/typescript-errors/prettier-errors.txt" ] && [ -s "error-reports/typescript-errors/prettier-errors.txt" ]; then
+            echo "### 12. Prettier Formatting Issues" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat "error-reports/typescript-errors/prettier-errors.txt" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # --- CONSOLE.LOG ---
+          if [ -f "error-reports/typescript-errors/consolelog-errors.txt" ] && [ -s "error-reports/typescript-errors/consolelog-errors.txt" ]; then
+            echo "### 13. Console.log Statements in Production Code" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat "error-reports/typescript-errors/consolelog-errors.txt" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "End of error report. Please provide specific fixes for each error above." >> $GITHUB_STEP_SUMMARY

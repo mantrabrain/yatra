@@ -1,0 +1,198 @@
+[
+  {
+    "type": "attribute",
+    "name": "Group Size",
+    "slug": "group-size",
+    "description": "Maximum group size for the trip",
+    "metadata": {
+      "field_type": "number",
+      "placeholder": "e.g. 12",
+      "default_value": "",
+      "required": false,
+      "show_on_frontend": true,
+      "show_in_filters": true,
+      "filter_type": "range",
+      "searchable": false,
+      "display_order": 10,
+      "validation_rules": ""
+    },
+    "status": "publish"
+  },
+  {
+    "type": "attribute",
+    "name": "Age Restriction",
+    "slug": "age-restriction",
+    "description": "Minimum age requirement (years)",
+    "metadata": {
+      "field_type": "number",
+      "placeholder": "e.g. 8",
+      "default_value": "",
+      "required": false,
+      "show_on_frontend": true,
+      "show_in_filters": true,
+      "filter_type": "range",
+      "searchable": false,
+      "display_order": 20,
+      "validation_rules": ""
+    },
+    "status": "publish"
+  },
+  {
+    "type": "attribute",
+    "name": "Fitness Level",
+    "slug": "fitness-level",
+    "description": "Required fitness level for participants",
+    "metadata": {
+      "field_type": "select",
+      "field_options": [
+        { "label": "Low", "value": "low" },
+        { "label": "Moderate", "value": "moderate" },
+        { "label": "High", "value": "high" },
+        { "label": "Very High", "value": "very-high" }
+      ],
+      "placeholder": "",
+      "default_value": "",
+      "required": false,
+      "show_on_frontend": true,
+      "show_in_filters": true,
+      "filter_type": "dropdown",
+      "searchable": true,
+      "display_order": 30,
+      "validation_rules": ""
+    },
+    "status": "publish"
+  },
+  {
+    "type": "attribute",
+    "name": "Accommodation Type",
+    "slug": "accommodation-type",
+    "description": "Type of accommodation provided",
+    "metadata": {
+      "field_type": "select",
+      "field_options": [
+        { "label": "Hotel", "value": "hotel" },
+        { "label": "Resort", "value": "resort" },
+        { "label": "Guesthouse", "value": "guesthouse" },
+        { "label": "Camping", "value": "camping" },
+        { "label": "Lodge", "value": "lodge" },
+        { "label": "Hostel", "value": "hostel" }
+      ],
+      "placeholder": "",
+      "default_value": "",
+      "required": false,
+      "show_on_frontend": true,
+      "show_in_filters": true,
+      "filter_type": "dropdown",
+      "searchable": true,
+      "display_order": 40,
+      "validation_rules": ""
+    },
+    "status": "publish"
+  },
+  {
+    "type": "attribute",
+    "name": "Meal Plan",
+    "slug": "meal-plan",
+    "description": "Meals included in the trip",
+    "metadata": {
+      "field_type": "select",
+      "field_options": [
+        { "label": "Breakfast Only", "value": "breakfast-only" },
+        { "label": "Half Board", "value": "half-board" },
+        { "label": "Full Board", "value": "full-board" },
+        { "label": "All Inclusive", "value": "all-inclusive" }
+      ],
+      "placeholder": "",
+      "default_value": "",
+      "required": false,
+      "show_on_frontend": true,
+      "show_in_filters": true,
+      "filter_type": "dropdown",
+      "searchable": false,
+      "display_order": 50,
+      "validation_rules": ""
+    },
+    "status": "publish"
+  },
+  {
+    "type": "attribute",
+    "name": "Transportation",
+    "slug": "transportation",
+    "description": "Primary mode of transportation",
+    "metadata": {
+      "field_type": "select",
+      "field_options": [
+        { "label": "Bus", "value": "bus" },
+        { "label": "Private Vehicle", "value": "private-vehicle" },
+        { "label": "Train", "value": "train" },
+        { "label": "Flight", "value": "flight" },
+        { "label": "Boat", "value": "boat" },
+        { "label": "Walking", "value": "walking" }
+      ],
+      "placeholder": "",
+      "default_value": "",
+      "required": false,
+      "show_on_frontend": true,
+      "show_in_filters": true,
+      "filter_type": "dropdown",
+      "searchable": false,
+      "display_order": 60,
+      "validation_rules": ""
+    },
+    "status": "publish"
+  },
+  {
+    "type": "attribute",
+    "name": "Guide Language",
+    "slug": "guide-language",
+    "description": "Languages available with guides",
+    "metadata": {
+      "field_type": "checkbox",
+      "field_options": [
+        { "label": "English", "value": "english" },
+        { "label": "Spanish", "value": "spanish" },
+        { "label": "French", "value": "french" },
+        { "label": "German", "value": "german" },
+        { "label": "Italian", "value": "italian" },
+        { "label": "Japanese", "value": "japanese" },
+        { "label": "Chinese", "value": "chinese" }
+      ],
+      "placeholder": "",
+      "default_value": "",
+      "required": false,
+      "show_on_frontend": true,
+      "show_in_filters": true,
+      "filter_type": "dropdown",
+      "searchable": true,
+      "display_order": 70,
+      "validation_rules": ""
+    },
+    "status": "publish"
+  },
+  {
+    "type": "attribute",
+    "name": "Season",
+    "slug": "season",
+    "description": "Best season for this trip",
+    "metadata": {
+      "field_type": "select",
+      "field_options": [
+        { "label": "Spring", "value": "spring" },
+        { "label": "Summer", "value": "summer" },
+        { "label": "Fall", "value": "fall" },
+        { "label": "Winter", "value": "winter" },
+        { "label": "Year-round", "value": "year-round" }
+      ],
+      "placeholder": "",
+      "default_value": "",
+      "required": false,
+      "show_on_frontend": true,
+      "show_in_filters": true,
+      "filter_type": "dropdown",
+      "searchable": true,
+      "display_order": 80,
+      "validation_rules": ""
+    },
+    "status": "publish"
+  }
+]
