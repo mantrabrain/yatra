@@ -13,7 +13,6 @@
 
 # Node / Composer dev metadata — vendor is not deployed to WordPress.org (built in release workflow)
 node_modules
-vendor
 package.json
 package-lock.json
 yarn.lock
