@@ -11,8 +11,9 @@
 # WordPress.org repo assets (banner, screenshots) — action uploads these separately
 .wordpress-org
 
-# Node / Composer dev metadata (vendor is produced by release workflow / composer install)
+# Node / Composer dev metadata — vendor is not deployed to WordPress.org (built in release workflow)
 node_modules
+vendor
 package.json
 package-lock.json
 yarn.lock
