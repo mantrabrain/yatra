@@ -4,7 +4,7 @@ Tags: travel, booking, tour, travel agency, tour booking
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.0.1
+Stable tag: 3.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,6 +76,35 @@ Tours & activities on WordPress: trips, departures, PayPal & Pay Later, guests, 
 * Hooks and filters for customization; template overrides in your theme
 * REST-oriented flows for booking and account experiences in 3.x
 
+= 💎 Yatra Pro — when you are ready to scale =
+
+**[Compare plans and buy Yatra Pro](https://wpyatra.com/pricing/)** — same Pro software on every tier; plans differ by **site activations** and **support level**.
+
+**Premium gateways (examples)**
+
+* Stripe, Razorpay, Mollie, Paystack, Square, Authorize.Net, bank transfer (region and account dependent)
+
+**Pro modules (enable under Yatra → Modules)**
+
+* Flexible Payments — deposits and partial payments
+* Dynamic Pricing — rules for seasonality, demand, early bird, last minute
+* Advanced Discount — group-style discounts alongside coupons
+* Google Calendar sync
+* Additional Services — sell extras with the trip
+* Trip Consent — digital waivers and signatures
+* Email Automation — extended templates, sequences, logs
+* Custom booking questions — drag-and-drop extra fields
+* Mailchimp, Facebook Pixel, Google Analytics 4 Enhanced
+* Abandoned Booking Recovery
+
+**Traveler experience**
+
+* Saved trips / wishlist when Pro is active and wishlist is enabled in settings
+
+**Support**
+
+* Premium or priority support depending on plan; see [wpyatra.com](https://wpyatra.com/) for current terms and **money-back window** for paid licenses.
+
 = 🧩 Blocks and shortcodes =
 
 Use the **block editor** or **classic shortcodes** to drop catalog widgets, search, and account UI into any page.
@@ -123,35 +152,6 @@ Yatra works with most well-coded block themes, classic themes, and major page bu
 = 🚀 Try Yatra risk-free =
 
 * 🧪 **[Create a free demo site (WordPress Playground)](https://try.new/plugins/yatra)** — spin up a temporary WordPress with Yatra pre-installed; no local setup required
-
-= 💎 Yatra Pro — when you are ready to scale =
-
-**[Compare plans and buy Yatra Pro](https://wpyatra.com/pricing/)** — same Pro software on every tier; plans differ by **site activations** and **support level**.
-
-**Premium gateways (examples)**
-
-* Stripe, Razorpay, Mollie, Paystack, Square, Authorize.Net, bank transfer (region and account dependent)
-
-**Pro modules (enable under Yatra → Modules)**
-
-* Flexible Payments — deposits and partial payments
-* Dynamic Pricing — rules for seasonality, demand, early bird, last minute
-* Advanced Discount — group-style discounts alongside coupons
-* Google Calendar sync
-* Additional Services — sell extras with the trip
-* Trip Consent — digital waivers and signatures
-* Email Automation — extended templates, sequences, logs
-* Custom booking questions — drag-and-drop extra fields
-* Mailchimp, Facebook Pixel, Google Analytics 4 Enhanced
-* Abandoned Booking Recovery
-
-**Traveler experience**
-
-* Saved trips / wishlist when Pro is active and wishlist is enabled in settings
-
-**Support**
-
-* Premium or priority support depending on plan; see [wpyatra.com](https://wpyatra.com/) for current terms and **money-back window** for paid licenses.
 
 == Installation ==
 
@@ -223,6 +223,10 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 
 == Changelog ==
 
+= 3.0.2 =
+* **Readme (WordPress.org):** reorganized the long description — the **Yatra Pro** section now appears **before** **Blocks and shortcodes** for a clearer Free → Pro → integration flow.
+* Documentation-only release for the plugin directory listing; no code changes required for existing 3.0.x sites.
+
 = 3.0.1 =
 * Maintenance release: updated WordPress.org **banner** and directory **assets** (including screenshots) for the 3.x listing.
 * **Readme:** shortened the plugin short description to meet WordPress.org’s **150-character** limit so imports are no longer truncated.
@@ -236,6 +240,9 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 * For 2.x changelog entries, see the plugin’s GitHub releases or historical notes on the vendor site.
 
 == Upgrade Notice ==
+
+= 3.0.2 =
+Readme / documentation listing update only. Safe to update from 3.0.1.
 
 = 3.0.1 =
 Maintenance update (banner, WordPress.org readme/assets, and small fixes). Safe to update from 3.0.0.
