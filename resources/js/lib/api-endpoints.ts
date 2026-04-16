@@ -219,6 +219,10 @@ export const API_ENDPOINTS = {
   EMAIL_SEQUENCES: "/email-sequences",
   EMAIL_SEQUENCE_GET: (id: string | number) => `/email-sequences/${id}`,
   EMAIL_LOGS: "/email-logs",
+
+  // Notices (Admin UI + WP notices)
+  NOTICES: "/notices",
+  NOTICE_DISMISS: (id: string) => `/notices/${id}/dismiss`,
 } as const;
 
 // Type for endpoint keys

@@ -1,11 +1,11 @@
 {
   "name": "yatra-plugin",
-  "version": "3.0.2.4",
+  "version": "3.0.2.5",
   "private": true,
   "type": "module",
   "scripts": {
     "clean": "rm -rf assets/admin/dist assets/dist",
-    "build:release": "vite build && node scripts/build-blocks.mjs",
+    "build:release": "npm run clean && vite build && node scripts/build-blocks.mjs",
     "build": "npm run build:release && npm run makepot",
     "dev": "pkill -f 'vite dev' 2>/dev/null || true && sleep 1 && vite dev",
     "preview": "vite preview",

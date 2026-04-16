@@ -329,6 +329,25 @@ class SetupWizardController
     }
 
     /**
+     * Safe redirect target passed from wizard navigation links.
+     */
+    private function get_redirect_target(string $default): string
+    {
+        $redirectTo = isset($_POST['yatra_redirect_to']) ? (string) wp_unslash($_POST['yatra_redirect_to']) : '';
+        $redirectTo = $redirectTo !== '' ? esc_url_raw($redirectTo) : '';
+
+        // Only allow admin URLs on the same host.
+        if ($redirectTo !== '') {
+            $validated = wp_validate_redirect($redirectTo, '');
+            if ($validated !== '' && strpos($validated, admin_url()) === 0) {
+                return $validated;
+            }
+        }
+
+        return $default;
+    }
+
+    /**
      * Welcome step
      */
     public function setup_welcome()
@@ -353,7 +372,7 @@ class SetupWizardController
             }
         }
 
-        wp_safe_redirect(esc_url_raw($this->get_next_step_link()));
+        wp_safe_redirect($this->get_redirect_target((string) $this->get_next_step_link()));
         exit;
     }
 
@@ -418,7 +437,7 @@ class SetupWizardController
 
         SettingsService::reload();
 
-        wp_safe_redirect(esc_url_raw($this->get_next_step_link()));
+        wp_safe_redirect($this->get_redirect_target((string) $this->get_next_step_link()));
         exit;
     }
 
@@ -456,7 +475,7 @@ class SetupWizardController
 
         SettingsService::reload();
 
-        wp_safe_redirect(esc_url_raw($this->get_next_step_link()));
+        wp_safe_redirect($this->get_redirect_target((string) $this->get_next_step_link()));
         exit;
     }
 
@@ -524,7 +543,7 @@ class SetupWizardController
 
         SettingsService::reload();
 
-        wp_safe_redirect(esc_url_raw($this->get_next_step_link()));
+        wp_safe_redirect($this->get_redirect_target((string) $this->get_next_step_link()));
         exit;
     }
 
@@ -571,7 +590,7 @@ class SetupWizardController
 
         SettingsService::reload();
 
-        wp_safe_redirect(esc_url_raw($this->get_next_step_link()));
+        wp_safe_redirect($this->get_redirect_target((string) $this->get_next_step_link()));
         exit;
     }
 
@@ -598,7 +617,7 @@ class SetupWizardController
         update_option('yatra_setup_wizard_theme_step_done', '1');
         SettingsService::reload();
 
-        wp_safe_redirect(esc_url_raw($this->get_next_step_link()));
+        wp_safe_redirect($this->get_redirect_target((string) $this->get_next_step_link()));
         exit;
     }
 

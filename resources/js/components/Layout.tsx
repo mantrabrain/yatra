@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useMutation } from "@tanstack/react-query";
 import {
   LayoutDashboard,
   MapPin,
@@ -37,6 +38,8 @@ import {
 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { Button } from "../components/ui/button";
+import { useToast } from "../components/ui/toast";
+import { postFlushRewriteRules } from "../api/settings-api";
 
 // Helper function to extract Gravatar URL from WordPress get_avatar HTML
 function extractGravatarUrl(avatarHtml: string, size: number): string {
@@ -77,6 +80,7 @@ import {
 } from "../hooks/useModules";
 import { isProPluginActive, isModuleActive } from "../lib/plugin-utils";
 import { navigateMenu } from "../hooks/useNavigate";
+import { InlineNotices } from "./notices/InlineNotices";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -110,6 +114,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [licenseStatus, setLicenseStatus] = useState<string | null>(
     (window as any).yatraAdmin?.licenseStatus || null,
   );
+
+  const { showToast } = useToast();
+  const flushRewriteRulesMutation = useMutation({
+    mutationFn: async () => postFlushRewriteRules(),
+    onSuccess: () => {
+      showToast(__("Rewrite rules flushed successfully", "yatra"), "success");
+    },
+    onError: (error: any) => {
+      showToast(
+        error?.message || __("Failed to flush rewrite rules", "yatra"),
+        "error",
+      );
+    },
+  });
   const { data: modulesData, isLoading: isLoadingModules } = useModulesQuery({
     enabled: isModulesPanelOpen,
   });
@@ -734,6 +752,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   {__("Back to WordPress", "yatra")}
                 </a>
 
+                {/* Flush Permalinks (same API as Settings → Permalink) */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => flushRewriteRulesMutation.mutate()}
+                  disabled={flushRewriteRulesMutation.isPending}
+                  className="flex items-center gap-2"
+                >
+                  <RotateCcw
+                    className={`w-4 h-4 ${flushRewriteRulesMutation.isPending ? "animate-spin" : ""}`}
+                  />
+                  {flushRewriteRulesMutation.isPending
+                    ? __("Flushing...", "yatra")
+                    : __("Flush Permalinks", "yatra")}
+                </Button>
+
                 <ConditionalRender capability="yatra_edit_trips">
                   <Button
                     variant={currentSubpage === "tools" ? "default" : "outline"}
@@ -1018,6 +1052,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </div>
             </div>
           </header>
+
+          {/* Admin notices (Review / Buy Pro, etc.) */}
+          <InlineNotices />
 
           {/* License Warning Banner */}
           {isProPluginActive() &&

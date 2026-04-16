@@ -14,6 +14,19 @@
         init: function() {
             this.bindEvents();
             this.initFormValidation();
+            this.ensureRedirectField();
+        },
+
+        /**
+         * Ensure redirect field exists so links can autosave + navigate.
+         */
+        ensureRedirectField: function() {
+            $('.yatra-setup-content form.wizard-step').each(function() {
+                var $form = $(this);
+                if ($form.find('input[name="yatra_redirect_to"]').length === 0) {
+                    $form.append('<input type="hidden" name="yatra_redirect_to" value="" />');
+                }
+            });
         },
 
         /**
@@ -45,6 +58,32 @@
                     e.preventDefault();
                     return false;
                 }
+            });
+
+            // Autosave current step when navigating via links (Back / completed steps).
+            $(document).on('click', '.yatra-setup-wrapper .yatra-setup-steps a, .yatra-setup-content a.wizard-footer-back', function(e) {
+                var $link = $(this);
+                var href = $link.attr('href');
+                if (!href) {
+                    return;
+                }
+
+                var $form = $('.yatra-setup-content form.wizard-step').first();
+                if ($form.length === 0) {
+                    return;
+                }
+
+                // Do not interfere with modifier keys / new tab.
+                if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey || e.button !== 0) {
+                    return;
+                }
+
+                e.preventDefault();
+
+                // Set redirect target and submit so PHP saves before redirecting.
+                $form.find('input[name="yatra_redirect_to"]').val(href);
+                $form.trigger('submit');
+                return false;
             });
         },
 

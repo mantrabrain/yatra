@@ -70,6 +70,11 @@ class Bootstrap
                 \Yatra\Services\SetupWizardService::init();
             }
 
+            // Centralized notices (React UI + WP admin notices)
+            if (class_exists('\Yatra\Services\NoticeService')) {
+                \Yatra\Services\NoticeService::init();
+            }
+
             if (class_exists('\Yatra\Admin\StatsUsage')) {
                 \Yatra\Admin\StatsUsage::instance()->init();
             }

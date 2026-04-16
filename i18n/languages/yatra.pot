@@ -2,65 +2,65 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Yatra - Travel Booking & Management 3.0.2.2\n"
+"Project-Id-Version: Yatra - Travel Booking & Management 3.0.2.5\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/yatra\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-14T05:25:21+00:00\n"
+"POT-Creation-Date: 2026-04-16T07:33:41+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
 
-#: assets/admin/dist/js/app.js:33409
+#: assets/admin/dist/js/app.js:33570
 msgid "Failed to load reviews. Please try again."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:33439
+#: assets/admin/dist/js/app.js:33600
 msgid "Select reviews to display as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:33441
+#: assets/admin/dist/js/app.js:33602
 msgid "Save the trip first to select testimonials from reviews"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:33446
+#: assets/admin/dist/js/app.js:33607
 msgid "Testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:33447
+#: assets/admin/dist/js/app.js:33608
 msgid "Select approved reviews to display as testimonials on the trip page"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:33453
+#: assets/admin/dist/js/app.js:33614
 msgid "Loading reviews..."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:33464
+#: assets/admin/dist/js/app.js:33625
 msgid "Retry"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:33469
+#: assets/admin/dist/js/app.js:33630
 msgid "No approved reviews yet"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:33470
+#: assets/admin/dist/js/app.js:33631
 msgid "Reviews will appear here once customers submit and they are approved"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:33475
+#: assets/admin/dist/js/app.js:33636
 msgid "Select reviews to feature as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:33484
+#: assets/admin/dist/js/app.js:33645
 #: build/yatra/templates/listing-trip.php:139
 #: templates/listing-trip.php:139
 msgid "Clear all"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:33522
+#: assets/admin/dist/js/app.js:33683
 msgid "Selected as testimonial"
 msgstr ""
 
@@ -209,7 +209,7 @@ msgid "Booking not found or error loading booking"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1125
-#: app/Providers/FrontendAssetsProvider.php:542
+#: app/Providers/FrontendAssetsProvider.php:541
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:542
 #: build/yatra/templates/pdf/voucher.php:110
 #: templates/pdf/voucher.php:110
@@ -511,7 +511,7 @@ msgid "Payment Information"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1503
-#: app/Providers/FrontendAssetsProvider.php:545
+#: app/Providers/FrontendAssetsProvider.php:544
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:545
 #: build/yatra/assets/dist/js/account-page.js:1503
 msgid "Payment Status"
@@ -655,7 +655,7 @@ msgid "Travelers"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1794
-#: app/Providers/FrontendAssetsProvider.php:544
+#: app/Providers/FrontendAssetsProvider.php:543
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:544
 #: build/yatra/templates/partials/remaining-checkout-content.php:154
 #: build/yatra/templates/pdf/voucher.php:182
@@ -1273,7 +1273,7 @@ msgid "Per person"
 msgstr ""
 
 #: assets/dist/js/account-page.js:2900
-#: app/Providers/FrontendAssetsProvider.php:546
+#: app/Providers/FrontendAssetsProvider.php:545
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:546
 #: build/yatra/templates/partials/single-trip/similar-trips.php:226
 #: build/yatra/templates/single-activity.php:226
@@ -1384,7 +1384,7 @@ msgid "Your next adventures"
 msgstr ""
 
 #: assets/dist/js/account-page.js:3254
-#: app/Providers/FrontendAssetsProvider.php:537
+#: app/Providers/FrontendAssetsProvider.php:536
 #: app/Shortcodes/LoginShortcode.php:147
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:537
 #: build/yatra/app/Shortcodes/LoginShortcode.php:147
@@ -1480,8 +1480,8 @@ msgid "Payment pending:"
 msgstr ""
 
 #: assets/dist/js/account-page.js:72
-#: app/Providers/FrontendAssetsProvider.php:516
-#: app/Providers/FrontendAssetsProvider.php:555
+#: app/Providers/FrontendAssetsProvider.php:515
+#: app/Providers/FrontendAssetsProvider.php:554
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:516
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:555
 #: build/yatra/includes/helpers.php:264
@@ -1496,7 +1496,7 @@ msgstr ""
 msgid "Contact for pricing"
 msgstr ""
 
-#: assets/dist/js/index-D6ftZoh-.js:1590
+#: assets/dist/js/index-Ar4TZ2Se.js:907
 #: build/yatra/assets/dist/js/index-0VU9RtlD.js:1581
 #: build/yatra/assets/dist/js/index-B-boFLyl.js:780
 #: build/yatra/assets/dist/js/index-B7Uoe-LV.js:720
@@ -1516,7 +1516,7 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: assets/dist/js/index-D6ftZoh-.js:519
+#: assets/dist/js/index-Ar4TZ2Se.js:519
 msgctxt "text direction"
 msgid "ltr"
 msgstr ""
@@ -2401,7 +2401,7 @@ msgid "Travel date"
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2261
-#: app/Providers/FrontendAssetsProvider.php:561
+#: app/Providers/FrontendAssetsProvider.php:560
 #: build/yatra/app/Controllers/BookingSessionController.php:2261
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:561
 #: build/yatra/templates/partials/availability-card.php:164
@@ -3225,7 +3225,7 @@ msgid "Yatra &rsaquo; Setup Wizard"
 msgstr ""
 
 #. translators: 1: current step number, 2: total steps
-#: app/Controllers/SetupWizardController.php:374
+#: app/Controllers/SetupWizardController.php:393
 #: build/yatra/app/Controllers/SetupWizardController.php:374
 #, php-format
 msgid "Step %1$d of %2$d"
@@ -3607,14 +3607,14 @@ msgid "Search keyword is required"
 msgstr ""
 
 #: app/Controllers/TripController.php:855
-#: app/Services/TripService.php:914
+#: app/Services/TripService.php:926
 #: build/yatra/app/Controllers/TripController.php:855
 #: build/yatra/app/Services/TripService.php:914
 msgid "Revision not found"
 msgstr ""
 
 #: app/Controllers/TripController.php:859
-#: app/Services/TripService.php:919
+#: app/Services/TripService.php:931
 #: build/yatra/app/Controllers/TripController.php:859
 #: build/yatra/app/Services/TripService.php:919
 msgid "Revision does not belong to this trip"
@@ -3831,7 +3831,7 @@ msgstr ""
 
 #: app/Core/Handlers/LoginPageHandler.php:134
 #: app/Core/Handlers/LoginPageHandler.php:140
-#: app/Providers/FrontendAssetsProvider.php:538
+#: app/Providers/FrontendAssetsProvider.php:537
 #: app/Shortcodes/MyAccountShortcode.php:60
 #: build/yatra/app/Core/Handlers/LoginPageHandler.php:134
 #: build/yatra/app/Core/Handlers/LoginPageHandler.php:140
@@ -4540,6 +4540,8 @@ msgstr ""
 #: app/Providers/AdminServiceProvider.php:278
 #: app/Providers/AdminServiceProvider.php:418
 #: app/Providers/AdminServiceProvider.php:421
+#: app/Services/NoticeService.php:175
+#: app/Services/NoticeService.php:485
 #: build/yatra/app/Providers/AdminServiceProvider.php:92
 #: build/yatra/app/Providers/AdminServiceProvider.php:232
 #: build/yatra/app/Providers/AdminServiceProvider.php:235
@@ -4583,7 +4585,7 @@ msgid "Plugin Homepage"
 msgstr ""
 
 #: app/Providers/AdminServiceProvider.php:342
-#: app/Providers/FrontendAssetsProvider.php:571
+#: app/Providers/FrontendAssetsProvider.php:570
 #: build/yatra/app/Providers/AdminServiceProvider.php:156
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:571
 msgid "Contact"
@@ -4608,7 +4610,7 @@ msgstr ""
 msgid "Yatra Dashboard"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:534
+#: app/Providers/FrontendAssetsProvider.php:533
 #: app/Shortcodes/LoginShortcode.php:144
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:534
 #: build/yatra/app/Shortcodes/LoginShortcode.php:144
@@ -4617,17 +4619,17 @@ msgstr ""
 msgid "My Account"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:535
+#: app/Providers/FrontendAssetsProvider.php:534
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:535
 msgid "My Bookings"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:536
+#: app/Providers/FrontendAssetsProvider.php:535
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:536
 msgid "Account Settings"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:539
+#: app/Providers/FrontendAssetsProvider.php:538
 #: app/Shortcodes/MyAccountShortcode.php:64
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:539
 #: build/yatra/app/Shortcodes/MyAccountShortcode.php:64
@@ -4636,14 +4638,14 @@ msgstr ""
 msgid "Register"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:543
+#: app/Providers/FrontendAssetsProvider.php:542
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:543
 #: build/yatra/templates/pdf/itinerary.php:186
 #: templates/pdf/itinerary.php:186
 msgid "Booking Status"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:549
+#: app/Providers/FrontendAssetsProvider.php:548
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:549
 #: build/yatra/templates/partials/single-trip/content-itinerary.php:329
 #: build/yatra/templates/partials/single-trip/gallery-modal.php:29
@@ -4652,42 +4654,42 @@ msgstr ""
 msgid "Loading..."
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:550
+#: app/Providers/FrontendAssetsProvider.php:549
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:550
 msgid "No data available"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:551
+#: app/Providers/FrontendAssetsProvider.php:550
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:551
 msgid "Error loading data"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:552
+#: app/Providers/FrontendAssetsProvider.php:551
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:552
 msgid "Please try again"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:556
+#: app/Providers/FrontendAssetsProvider.php:555
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:556
 #: includes/admin/templates/free-vs-pro.php:27
 msgid "Free"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:557
+#: app/Providers/FrontendAssetsProvider.php:556
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:557
 #: build/yatra/templates/partials/single-trip/quick-facts.php:105
 #: templates/partials/single-trip/quick-facts.php:105
 msgid "Price"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:560
+#: app/Providers/FrontendAssetsProvider.php:559
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:560
 #: build/yatra/templates/pdf/itinerary.php:144
 #: templates/pdf/itinerary.php:144
 msgid "Trip Details"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:562
+#: app/Providers/FrontendAssetsProvider.php:561
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:562
 #: build/yatra/templates/partials/single-trip/quick-facts.php:50
 #: build/yatra/templates/shortcodes/search.php:93
@@ -4698,21 +4700,21 @@ msgstr ""
 msgid "Difficulty"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:563
+#: app/Providers/FrontendAssetsProvider.php:562
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:563
 #: build/yatra/templates/partials/single-trip/quick-facts.php:84
 #: templates/partials/single-trip/quick-facts.php:84
 msgid "Group Size"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:566
+#: app/Providers/FrontendAssetsProvider.php:565
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:566
 #: build/yatra/templates/partials/single-trip/hero.php:11
 #: templates/partials/single-trip/hero.php:11
 msgid "Home"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:567
+#: app/Providers/FrontendAssetsProvider.php:566
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:567
 #: build/yatra/templates/listing-activity.php:238
 #: build/yatra/templates/listing-destination.php:245
@@ -4725,7 +4727,7 @@ msgstr ""
 msgid "Trips"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:568
+#: app/Providers/FrontendAssetsProvider.php:567
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:568
 #: build/yatra/templates/listing-trip.php:379
 #: build/yatra/templates/single-taxonomy.php:71
@@ -4734,7 +4736,7 @@ msgstr ""
 msgid "Destinations"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:569
+#: app/Providers/FrontendAssetsProvider.php:568
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:569
 #: build/yatra/templates/listing-trip.php:422
 #: build/yatra/templates/shortcodes/trip-search.php:173
@@ -4747,7 +4749,7 @@ msgstr ""
 msgid "Activities"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:570
+#: app/Providers/FrontendAssetsProvider.php:569
 #: build/yatra/app/Providers/FrontendAssetsProvider.php:570
 msgid "About Us"
 msgstr ""
@@ -5921,7 +5923,7 @@ msgstr ""
 
 #: app/Services/ItineraryService.php:56
 #: app/Services/TripService.php:593
-#: app/Services/TripService.php:908
+#: app/Services/TripService.php:920
 #: build/yatra/app/Services/ItineraryService.php:56
 #: build/yatra/app/Services/TripService.php:593
 #: build/yatra/app/Services/TripService.php:908
@@ -5931,6 +5933,72 @@ msgstr ""
 #: app/Services/ItineraryService.php:62
 #: build/yatra/app/Services/ItineraryService.php:62
 msgid "Day number must be at least 1"
+msgstr ""
+
+#: app/Services/NoticeService.php:89
+msgid "Unauthorized."
+msgstr ""
+
+#: app/Services/NoticeService.php:93
+msgid "Forbidden."
+msgstr ""
+
+#: app/Services/NoticeService.php:145
+msgid "Invalid notice."
+msgstr ""
+
+#: app/Services/NoticeService.php:188
+msgid "Limited Time"
+msgstr ""
+
+#: app/Services/NoticeService.php:194
+msgid "Upgrade to Yatra Pro - Save 30%+!"
+msgstr ""
+
+#. translators: %d: booking count
+#: app/Services/NoticeService.php:200
+#, php-format
+msgid "You’ve received <strong style=\"color: #ff9500;\">%d</strong> booking(s)! Get <strong style=\"color: #ff9500;\">30%%+ OFF</strong> on Yatra Pro. Unlock premium payment gateways, advanced modules, automation tools, and priority support."
+msgstr ""
+
+#: app/Services/NoticeService.php:207
+msgid "Special Offer:"
+msgstr ""
+
+#: app/Services/NoticeService.php:207
+msgid "Save 30%+ on your Pro upgrade with premium features and priority support!"
+msgstr ""
+
+#: app/Services/NoticeService.php:211
+msgid "Save 30%+ - Upgrade to Pro"
+msgstr ""
+
+#: app/Services/NoticeService.php:212
+msgid "Maybe later"
+msgstr ""
+
+#: app/Services/NoticeService.php:218
+msgid "Dismiss this notice."
+msgstr ""
+
+#: app/Services/NoticeService.php:455
+msgid "How’s Yatra working for you?"
+msgstr ""
+
+#: app/Services/NoticeService.php:456
+msgid "You’ve published your first trip — congratulations. If Yatra is helping your business, a quick 5‑star review would mean a lot and helps other site owners choose with confidence."
+msgstr ""
+
+#: app/Services/NoticeService.php:462
+msgid "Leave a 5‑star review"
+msgstr ""
+
+#: app/Services/NoticeService.php:478
+msgid "Upgrade to Yatra Pro — save time on every booking"
+msgstr ""
+
+#: app/Services/NoticeService.php:479
+msgid "You’re now receiving bookings. Yatra Pro helps you scale with premium payment gateways, advanced modules, and automation tools — built to reduce admin work and increase conversions."
 msgstr ""
 
 #: app/Services/NotificationService.php:101
@@ -6705,7 +6773,7 @@ msgstr ""
 msgid "Reserve Now, Pay Later"
 msgstr ""
 
-#: app/Services/TripService.php:950
+#: app/Services/TripService.php:962
 #: build/yatra/app/Services/TripService.php:950
 msgid "Invalid revision data"
 msgstr ""

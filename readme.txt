@@ -4,7 +4,7 @@ Tags: travel, booking, tour, travel agency, tour booking
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.0.2.4
+Stable tag: 3.0.2.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -223,6 +223,10 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 
 == Changelog ==
 
+= 3.0.2.5 =
+* Admin: add Review + Upgrade notices (React UI + WordPress notices) with smart dismiss scheduling.
+* Setup wizard: save step settings when navigating between steps.
+
 = 3.0.2.4 =
 * **REST:** implemented **`TripService::permanentDelete()`** so **`DELETE /yatra/v1/trips/{id}/permanent-delete`** no longer fatals (fixes permanent delete from trash and bulk actions).
 * **Admin (React):** bulk trip actions rely on **`BulkActionToolbar`** confirmation only (removed duplicate **`window.confirm`**); improved bulk dialog copy for **`mark_*`** actions.
@@ -258,6 +262,9 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 * For 2.x changelog entries, see the plugin’s GitHub releases or historical notes on the vendor site.
 
 == Upgrade Notice ==
+
+= 3.0.2.5 =
+Maintenance release (setup wizard autosave, admin notices). Safe to update from 3.0.2.4.
 
 = 3.0.2.4 =
 Bugfix release (trip permanent-delete REST endpoint, bulk trip confirmation UX). Safe to update from 3.0.2.3.

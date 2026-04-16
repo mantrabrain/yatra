@@ -570,6 +570,11 @@ export const apiService = {
       group ? API_ENDPOINTS.SETTINGS_GROUP(group) : API_ENDPOINTS.SETTINGS,
     ),
 
+  // Notices
+  getNotices: () => apiClient.get(API_ENDPOINTS.NOTICES),
+  dismissNotice: (id: string) =>
+    apiClient.post(API_ENDPOINTS.NOTICE_DISMISS(id), {}),
+
   // Payments
   getPayment: (id: string | number) => fetchPaymentNormalized(id),
   deletePayment: (id: string | number) =>
