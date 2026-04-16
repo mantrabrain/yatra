@@ -81,8 +81,10 @@ final class NoticeService
 
     /**
      * REST/AJAX: dismiss notice for current user.
+     *
+     * @return bool|\WP_Error True when dismissed/ignored; WP_Error on failure.
      */
-    public static function dismissForCurrentUser(string $noticeId): true|WP_Error
+    public static function dismissForCurrentUser(string $noticeId)
     {
         $userId = get_current_user_id();
         if ($userId <= 0) {
