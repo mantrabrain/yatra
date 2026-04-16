@@ -310,15 +310,17 @@ export const downloadDocument = async (
 
   if (options.documentType === "invoice") {
     const pid =
-      options.paymentId ??
-      parsePaymentIdFromHref(options.fallbackUrl || "");
+      options.paymentId ?? parsePaymentIdFromHref(options.fallbackUrl || "");
     if (pid) {
       await downloadPaymentInvoiceBinary(pid);
       return;
     }
   }
 
-  if (options.documentType === "voucher" || options.documentType === "itinerary") {
+  if (
+    options.documentType === "voucher" ||
+    options.documentType === "itinerary"
+  ) {
     const kind = options.documentType === "voucher" ? "voucher" : "itinerary";
     const bid =
       options.bookingId ??

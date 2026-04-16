@@ -131,9 +131,7 @@ function tripsFromAvailabilityQueryCached(raw: unknown): Trip[] {
     ) {
       rows = (o.data as Record<string, unknown>).data as unknown[];
     }
-    return rows.map((t) =>
-      mapApiRowToTrip(t as Record<string, unknown>),
-    );
+    return rows.map((t) => mapApiRowToTrip(t as Record<string, unknown>));
   }
   return [];
 }

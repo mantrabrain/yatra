@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
 import { useMutation } from "@tanstack/react-query";
 import {
   LayoutDashboard,
@@ -152,18 +158,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   /** SPA: avoid full reload — keeps PHP boot splash from showing on every sidebar click */
   const handleMenuNavClick = useCallback(
-    (
-      e: React.MouseEvent<HTMLAnchorElement>,
-      subpage: string,
-      tab?: string,
-    ) => {
-      if (
-        e.metaKey ||
-        e.ctrlKey ||
-        e.altKey ||
-        e.shiftKey ||
-        e.button !== 0
-      ) {
+    (e: React.MouseEvent<HTMLAnchorElement>, subpage: string, tab?: string) => {
+      if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey || e.button !== 0) {
         return;
       }
       e.preventDefault();
@@ -613,9 +609,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   ) : (
                     <a
                       href={getUrl(item.subpage)}
-                      onClick={(e) =>
-                        handleMenuNavClick(e, item.subpage)
-                      }
+                      onClick={(e) => handleMenuNavClick(e, item.subpage)}
                       className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors relative ${
                         active
                           ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium"
@@ -680,10 +674,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   {__("Upgrade to Pro", "yatra")}
                 </span>
                 <span className="text-[11px] leading-snug text-amber-800/75 dark:text-amber-300/70">
-                  {__(
-                    "Premium features & integrations — view plans.",
-                    "yatra",
-                  )}
+                  {__("Premium features & integrations — view plans.", "yatra")}
                 </span>
               </a>
             </div>

@@ -455,10 +455,8 @@ final class NoticeService
             'id' => self::NOTICE_REVIEW,
             'type' => 'info',
             'title' => __('How’s Yatra working for you?', 'yatra'),
-            'message' => __(
-                'You’ve published your first trip — congratulations. If Yatra is helping your business, a quick 5‑star review would mean a lot and helps other site owners choose with confidence.',
-                'yatra'
-            ),
+            // Keep text domain on the same line (CI grep expects it).
+            'message' => __('You’ve published your first trip — congratulations. If Yatra is helping your business, a quick 5‑star review would mean a lot and helps other site owners choose with confidence.', 'yatra'),
             'actions' => [
                 [
                     'label' => __('Leave a 5‑star review', 'yatra'),
@@ -478,10 +476,8 @@ final class NoticeService
             'id' => self::NOTICE_BUY_PRO,
             'type' => 'warning',
             'title' => __('Upgrade to Yatra Pro — save time on every booking', 'yatra'),
-            'message' => __(
-                'You’re now receiving bookings. Yatra Pro helps you scale with premium payment gateways, advanced modules, and automation tools — built to reduce admin work and increase conversions.',
-                'yatra'
-            ),
+            // Keep text domain on the same line (CI grep expects it).
+            'message' => __('You’re now receiving bookings. Yatra Pro helps you scale with premium payment gateways, advanced modules, and automation tools — built to reduce admin work and increase conversions.', 'yatra'),
             'actions' => [
                 [
                     'label' => __('Upgrade to Pro', 'yatra'),

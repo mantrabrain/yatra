@@ -4918,8 +4918,8 @@ const Settings: React.FC = () => {
                   />
                   {formData.customer_account_page &&
                     (() => {
-                      const siteUrl =
-                        ((window as any).yatraAdmin?.siteUrl || "") as string;
+                      const siteUrl = ((window as any).yatraAdmin?.siteUrl ||
+                        "") as string;
                       const accountUrl = buildYatraAccountViewUrl(
                         siteUrl,
                         formData.customer_account_page,

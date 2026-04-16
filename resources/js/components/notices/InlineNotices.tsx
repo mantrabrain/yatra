@@ -48,16 +48,19 @@ export const InlineNotices: React.FC = () => {
     load();
   }, [load]);
 
-  const dismiss = useCallback(async (id: string) => {
-    // Optimistic UI.
-    setNotices((prev) => prev.filter((n) => n.id !== id));
-    try {
-      await apiService.dismissNotice(id);
-    } catch {
-      // Reload if dismiss failed (permissions / nonce / etc.)
-      load();
-    }
-  }, [load]);
+  const dismiss = useCallback(
+    async (id: string) => {
+      // Optimistic UI.
+      setNotices((prev) => prev.filter((n) => n.id !== id));
+      try {
+        await apiService.dismissNotice(id);
+      } catch {
+        // Reload if dismiss failed (permissions / nonce / etc.)
+        load();
+      }
+    },
+    [load],
+  );
 
   if (notices.length === 0) {
     return null;
@@ -203,4 +206,3 @@ export const InlineNotices: React.FC = () => {
     </div>
   );
 };
-

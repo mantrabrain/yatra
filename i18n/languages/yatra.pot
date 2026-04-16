@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-16T07:33:41+00:00\n"
+"POT-Creation-Date: 2026-04-16T07:49:26+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -4540,8 +4540,8 @@ msgstr ""
 #: app/Providers/AdminServiceProvider.php:278
 #: app/Providers/AdminServiceProvider.php:418
 #: app/Providers/AdminServiceProvider.php:421
-#: app/Services/NoticeService.php:175
-#: app/Services/NoticeService.php:485
+#: app/Services/NoticeService.php:177
+#: app/Services/NoticeService.php:483
 #: build/yatra/app/Providers/AdminServiceProvider.php:92
 #: build/yatra/app/Providers/AdminServiceProvider.php:232
 #: build/yatra/app/Providers/AdminServiceProvider.php:235
@@ -5935,57 +5935,57 @@ msgstr ""
 msgid "Day number must be at least 1"
 msgstr ""
 
-#: app/Services/NoticeService.php:89
+#: app/Services/NoticeService.php:91
 msgid "Unauthorized."
 msgstr ""
 
-#: app/Services/NoticeService.php:93
+#: app/Services/NoticeService.php:95
 msgid "Forbidden."
 msgstr ""
 
-#: app/Services/NoticeService.php:145
+#: app/Services/NoticeService.php:147
 msgid "Invalid notice."
 msgstr ""
 
-#: app/Services/NoticeService.php:188
+#: app/Services/NoticeService.php:190
 msgid "Limited Time"
 msgstr ""
 
-#: app/Services/NoticeService.php:194
+#: app/Services/NoticeService.php:196
 msgid "Upgrade to Yatra Pro - Save 30%+!"
 msgstr ""
 
 #. translators: %d: booking count
-#: app/Services/NoticeService.php:200
+#: app/Services/NoticeService.php:202
 #, php-format
 msgid "You’ve received <strong style=\"color: #ff9500;\">%d</strong> booking(s)! Get <strong style=\"color: #ff9500;\">30%%+ OFF</strong> on Yatra Pro. Unlock premium payment gateways, advanced modules, automation tools, and priority support."
 msgstr ""
 
-#: app/Services/NoticeService.php:207
+#: app/Services/NoticeService.php:209
 msgid "Special Offer:"
 msgstr ""
 
-#: app/Services/NoticeService.php:207
+#: app/Services/NoticeService.php:209
 msgid "Save 30%+ on your Pro upgrade with premium features and priority support!"
 msgstr ""
 
-#: app/Services/NoticeService.php:211
+#: app/Services/NoticeService.php:213
 msgid "Save 30%+ - Upgrade to Pro"
 msgstr ""
 
-#: app/Services/NoticeService.php:212
+#: app/Services/NoticeService.php:214
 msgid "Maybe later"
 msgstr ""
 
-#: app/Services/NoticeService.php:218
+#: app/Services/NoticeService.php:220
 msgid "Dismiss this notice."
 msgstr ""
 
-#: app/Services/NoticeService.php:455
+#: app/Services/NoticeService.php:457
 msgid "How’s Yatra working for you?"
 msgstr ""
 
-#: app/Services/NoticeService.php:456
+#: app/Services/NoticeService.php:459
 msgid "You’ve published your first trip — congratulations. If Yatra is helping your business, a quick 5‑star review would mean a lot and helps other site owners choose with confidence."
 msgstr ""
 
@@ -5997,7 +5997,7 @@ msgstr ""
 msgid "Upgrade to Yatra Pro — save time on every booking"
 msgstr ""
 
-#: app/Services/NoticeService.php:479
+#: app/Services/NoticeService.php:480
 msgid "You’re now receiving bookings. Yatra Pro helps you scale with premium payment gateways, advanced modules, and automation tools — built to reduce admin work and increase conversions."
 msgstr ""
 

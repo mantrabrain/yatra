@@ -123,7 +123,7 @@ const Dashboard: React.FC = () => {
     queryFn: async () => {
       const response = await apiClient.get("/bookings/stats");
       // REST returns a flat stats object; some endpoints nest under `data` — prefer the flat body.
-      return (response?.data ?? response) ?? {};
+      return response?.data ?? response ?? {};
     },
   });
 

@@ -178,8 +178,7 @@ export function buildYatraAccountViewUrl(
 ): string {
   const raw = (customerAccountPath || "").trim().replace(/^\/+/, "");
   const parts = raw.split("/").filter((p) => p.length > 0);
-  const segment =
-    parts.length > 0 ? parts[parts.length - 1] : "my-account";
+  const segment = parts.length > 0 ? parts[parts.length - 1] : "my-account";
   const slug = (segment || "my-account").trim();
   return buildYatraListingPublicUrl(slug, siteUrl || undefined);
 }
