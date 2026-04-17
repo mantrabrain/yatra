@@ -3614,6 +3614,8 @@ button.yatra-booking-button svg path {
     cursor: pointer;
     transition: all 0.3s ease;
     color: #fff;
+    margin:0;
+    padding:0;
 }
 
 .yatra-gallery-modal-close:hover {
@@ -3639,6 +3641,8 @@ button.yatra-booking-button svg path {
     cursor: pointer;
     transition: all 0.3s ease;
     color: #fff;
+    margin:0;
+    padding:0;
 }
 
 .yatra-gallery-modal-prev {
