@@ -28,6 +28,8 @@ import { ConditionalRender } from "../components/ui/conditional-render";
 import { useToast } from "../components/ui/toast";
 import { apiClient } from "../lib/api-client";
 import { __ } from "../lib/i18n";
+import { Button } from "../components/ui/button";
+import { PageHeader } from "../components/common/PageHeader";
 import {
   Edit,
   Trash2,
@@ -35,6 +37,7 @@ import {
   CheckCircle,
   FileText,
   RotateCcw,
+  Plus,
 } from "lucide-react";
 import PremiumUpgradeCard from "./premium-pages/AdditionalServices";
 
@@ -326,6 +329,24 @@ const AdditionalServices: React.FC = () => {
 
   return (
     <div className="space-y-3">
+      <PageHeader
+        title={__("Additional Services", "yatra")}
+        description={__(
+          "Manage add-ons and extras that customers can select when booking",
+          "yatra",
+        )}
+        actionCapability="yatra_edit_trips"
+        actions={
+          <Button
+            onClick={() => navigateToForm("create")}
+            className="flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            {__("Add New Service", "yatra")}
+          </Button>
+        }
+      />
+
       {/* Permanent Delete Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={permanentDeleteConfirm.isOpen}
