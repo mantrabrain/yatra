@@ -4,7 +4,7 @@ Tags: travel, booking, tour, travel agency, tour booking
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.0.2.5
+Stable tag: 3.0.2.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -222,6 +222,12 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
  
 
 == Changelog ==
+
+= 3.0.2.6 =
+* **Fix:** Composer autoload path was declared as `includes/Admin/` (uppercase) but the directory on disk is `includes/admin/` (lowercase); caused fatal `include` warnings on Linux/cPanel servers (case-sensitive filesystems).
+* **License:** Removed stub `LicenseController` from the free plugin — all `/yatra/v1/license/*` routes are now registered exclusively by Yatra Pro's own controller, eliminating any route conflicts.
+* **Admin UI (Additional Services):** Added missing **Add New Service** button via the `PageHeader` component on the Additional Services screen.
+* Safe to update from 3.0.2.5.
 
 = 3.0.2.5 =
 * Admin: add Review + Upgrade notices (React UI + WordPress notices) with smart dismiss scheduling.

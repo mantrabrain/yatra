@@ -3,7 +3,7 @@
         'name' => 'yatra/yatra-plugin',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'e6a9d702c4d47b8ce4d63d616694053e9c7115d8',
+        'reference' => 'c6938b6c18e29aedef0ded5451bcd8747e5150ce',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -67,7 +67,7 @@
         'yatra/yatra-plugin' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'e6a9d702c4d47b8ce4d63d616694053e9c7115d8',
+            'reference' => 'c6938b6c18e29aedef0ded5451bcd8747e5150ce',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

@@ -7,7 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Yatra\\Migration\\' => array($baseDir . '/app/Migrations'),
-    'Yatra\\Admin\\' => array($baseDir . '/includes/Admin'),
+    'Yatra\\Admin\\' => array($baseDir . '/includes/admin'),
     'Yatra\\' => array($baseDir . '/app'),
     'Svg\\' => array($vendorDir . '/phenx/php-svg-lib/src/Svg'),
     'Sabberworm\\CSS\\' => array($vendorDir . '/sabberworm/php-css-parser/src'),

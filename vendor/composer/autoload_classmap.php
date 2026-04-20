@@ -206,7 +206,7 @@ return array(
     'Svg\\Tag\\Symbol' => $vendorDir . '/phenx/php-svg-lib/src/Svg/Tag/Symbol.php',
     'Svg\\Tag\\Text' => $vendorDir . '/phenx/php-svg-lib/src/Svg/Tag/Text.php',
     'Svg\\Tag\\UseTag' => $vendorDir . '/phenx/php-svg-lib/src/Svg/Tag/UseTag.php',
-    'Yatra\\Admin\\StatsUsage' => $baseDir . '/includes/Admin/StatsUsage.php',
+    'Yatra\\Admin\\StatsUsage' => $baseDir . '/includes/admin/StatsUsage.php',
     'Yatra\\Ajax\\ActivityShortcodeAjax' => $baseDir . '/app/Ajax/ActivityShortcodeAjax.php',
     'Yatra\\Ajax\\DestinationShortcodeAjax' => $baseDir . '/app/Ajax/DestinationShortcodeAjax.php',
     'Yatra\\Ajax\\DirectAttributeQuery' => $baseDir . '/app/Ajax/DirectAttributeQuery.php',

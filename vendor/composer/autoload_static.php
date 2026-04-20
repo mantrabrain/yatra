@@ -39,7 +39,7 @@ class ComposerStaticInit2644eb7ce44b7b2615237db55150e0c3
         ),
         'Yatra\\Admin\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/includes/Admin',
+            0 => __DIR__ . '/../..' . '/includes/admin',
         ),
         'Yatra\\' => 
         array (
@@ -268,7 +268,7 @@ class ComposerStaticInit2644eb7ce44b7b2615237db55150e0c3
         'Svg\\Tag\\Symbol' => __DIR__ . '/..' . '/phenx/php-svg-lib/src/Svg/Tag/Symbol.php',
         'Svg\\Tag\\Text' => __DIR__ . '/..' . '/phenx/php-svg-lib/src/Svg/Tag/Text.php',
         'Svg\\Tag\\UseTag' => __DIR__ . '/..' . '/phenx/php-svg-lib/src/Svg/Tag/UseTag.php',
-        'Yatra\\Admin\\StatsUsage' => __DIR__ . '/../..' . '/includes/Admin/StatsUsage.php',
+        'Yatra\\Admin\\StatsUsage' => __DIR__ . '/../..' . '/includes/admin/StatsUsage.php',
         'Yatra\\Ajax\\ActivityShortcodeAjax' => __DIR__ . '/../..' . '/app/Ajax/ActivityShortcodeAjax.php',
         'Yatra\\Ajax\\DestinationShortcodeAjax' => __DIR__ . '/../..' . '/app/Ajax/DestinationShortcodeAjax.php',
         'Yatra\\Ajax\\DirectAttributeQuery' => __DIR__ . '/../..' . '/app/Ajax/DirectAttributeQuery.php',

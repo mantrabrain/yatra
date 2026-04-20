@@ -18,7 +18,7 @@
         "psr-4": {
             "Yatra\\": "app/",
             "Yatra\\Migration\\": "app/Migrations/",
-            "Yatra\\Admin\\": "includes/Admin/"
+            "Yatra\\Admin\\": "includes/admin/"
         }
     },
     "autoload-dev": {
