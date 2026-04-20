@@ -82,7 +82,6 @@ $controllers = [
     // ADMIN & SETTINGS
     // =============================================
     \Yatra\Controllers\SettingsController::class,
-    \Yatra\Controllers\LicenseController::class,
     \Yatra\Controllers\ModuleController::class,
     \Yatra\Controllers\ReportsController::class,
     \Yatra\Controllers\ToolsController::class,

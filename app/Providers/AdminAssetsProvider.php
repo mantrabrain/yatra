@@ -36,7 +36,11 @@ class AdminAssetsProvider
 
         return apply_filters('yatra_admin_localized_data', [
             'apiUrl' => rest_url('yatra/v1'),
-            'licenseStatus' => 'inactive',
+            'licenseStatus' => (function () {
+                $all = get_option('yatra_license', []);
+                $status = $all['yatra-pro']['status'] ?? 'inactive';
+                return (string) $status;
+            })(),
             'restUrl' => rest_url(),
             'nonce' => wp_create_nonce('wp_rest'),
             'currentUser' => $current_user->ID,
