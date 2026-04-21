@@ -1,0 +1,78 @@
+[
+  {
+    "type": "category",
+    "name": "Adventure Tours",
+    "slug": "adventure-tours",
+    "description": "Exciting adventure travel experiences including trekking, climbing, and extreme sports",
+    "icon": "mountain",
+    "color": "#FF6B6B",
+    "status": "publish",
+    "parent_id": null,
+    "level": 0,
+    "sorting": 1,
+    "is_featured": 1
+  },
+  {
+    "type": "category",
+    "name": "Beach & Island",
+    "slug": "beach-island",
+    "description": "Relaxing beach vacations and island hopping",
+    "icon": "umbrella-beach",
+    "color": "#4ECDC4",
+    "status": "publish"
+  },
+  {
+    "type": "category",
+    "name": "Cultural Tours",
+    "slug": "cultural-tours",
+    "description": "Immersive cultural experiences and heritage tours",
+    "icon": "monument",
+    "color": "#45B7D1",
+    "status": "publish"
+  },
+  {
+    "type": "category",
+    "name": "Wildlife Safari",
+    "slug": "wildlife-safari",
+    "description": "Wildlife viewing and safari adventures",
+    "icon": "binoculars",
+    "color": "#96CEB4",
+    "status": "publish"
+  },
+  {
+    "type": "category",
+    "name": "City Tours",
+    "slug": "city-tours",
+    "description": "Urban exploration and city experiences",
+    "icon": "map",
+    "color": "#FFEAA7",
+    "status": "publish"
+  },
+  {
+    "type": "category",
+    "name": "Trekking & Hiking",
+    "slug": "trekking-hiking",
+    "description": "Mountain trekking and hiking expeditions",
+    "icon": "hiking",
+    "color": "#74B9FF",
+    "status": "publish"
+  },
+  {
+    "type": "category",
+    "name": "Cruise Tours",
+    "slug": "cruise-tours",
+    "description": "Luxury cruise and boat tours",
+    "icon": "ship",
+    "color": "#A29BFE",
+    "status": "publish"
+  },
+  {
+    "type": "category",
+    "name": "Food & Wine",
+    "slug": "food-wine",
+    "description": "Culinary tours and wine tasting experiences",
+    "icon": "utensils",
+    "color": "#FD79A8",
+    "status": "publish"
+  }
+]

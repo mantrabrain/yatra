@@ -1,0 +1,83 @@
+.yatra-destination-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.yatra-destination-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.yatra-destination-icon-wrapper,
+.yatra-destination-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.yatra-destination-icon-wrapper {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.yatra-destination-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.yatra-destination-placeholder {
+  background-color: #f3f4f6;
+}
+
+.yatra-destination-placeholder-text {
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+}
+
+/* View toggle: listing.css defines base; keep only layout tweaks if needed */
+.yatra-destination-listing .yatra-view-toggle .yatra-view-btn svg {
+  display: block;
+}
+
+/* Grid columns: listing.css (unified 1/2/3-col breakpoints). Default card layout: */
+
+/* Default card layout in grid mode: vertical card */
+.yatra-destination-grid .yatra-destination-card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* List view: cards become horizontal rows */
+.yatra-destination-grid.list-view {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.yatra-destination-grid.list-view .yatra-destination-card {
+  flex-direction: row;
+}
+
+.yatra-destination-grid.list-view .yatra-destination-image {
+  flex: 0 0 260px;
+}
+
+.yatra-destination-grid.list-view .yatra-destination-content {
+  flex: 1 1 auto;
+}
+
+/* Pagination buttons */
+.yatra-listing-pagination .yatra-pagination-btn.disabled {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+

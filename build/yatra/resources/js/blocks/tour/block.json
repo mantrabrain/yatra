@@ -1,0 +1,43 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "yatra/tour",
+  "title": "Trip",
+  "category": "yatra",
+  "icon": "palmtree",
+  "description": "Display trip listings with customizable options",
+  "keywords": ["tour", "trip", "trips", "tours", "travel", "yatra"],
+  "textdomain": "yatra",
+  "attributes": {
+    "order": {
+      "type": "string",
+      "default": "desc"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "per_page": {
+      "type": "number",
+      "default": 10
+    },
+    "columns": {
+      "type": "number",
+      "default": 3
+    },
+    "title": {
+      "type": "string",
+      "default": "Our Trips"
+    },
+    "show_pagination": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "supports": {
+    "html": false,
+    "inserter": true,
+    "align": ["wide", "full"]
+  },
+  "editorScript": "yatra-tour-block-editor"
+}
