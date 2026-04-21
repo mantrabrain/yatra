@@ -3574,7 +3574,7 @@ const TripForm: React.FC = () => {
   // Skeleton loader for edit mode
   if (isEditMode && isLoadingTrip) {
     return (
-      <div className="h-screen flex flex-col bg-white dark:bg-gray-900">
+      <div className="h-full min-h-0 flex flex-col bg-white dark:bg-gray-900">
         {/* Header Skeleton */}
         <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4 min-w-0 flex-1">
@@ -8358,7 +8358,7 @@ const TripForm: React.FC = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-white dark:bg-gray-900">
+    <div className="h-full min-h-0 flex flex-col bg-white dark:bg-gray-900">
       {/* Header */}
       <div className="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
         {/* Left Side - Title, Status, Saved Time */}

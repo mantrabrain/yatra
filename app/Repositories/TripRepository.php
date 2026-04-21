@@ -34,6 +34,64 @@ use Yatra\Constants\ClassificationTypes;
 class TripRepository extends BaseRepository
 {
     /**
+     * Get bookings count map for given trip IDs.
+     *
+     * The trips table has a `bookings_count` column but it is not reliably maintained.
+     * For list views, compute counts from the bookings table in one grouped query.
+     *
+     * @param int[] $tripIds
+     * @param string[]|null $excludeStatuses
+     * @return array<int,int> map trip_id => count
+     */
+    public function getBookingsCountMap(array $tripIds, ?array $excludeStatuses = null): array
+    {
+        $tripIds = array_values(array_filter(array_map('intval', $tripIds)));
+        if (empty($tripIds)) {
+            return [];
+        }
+
+        // Default: ignore cancelled/failed bookings in counts (can be overridden)
+        $excludeStatuses = $excludeStatuses ?? apply_filters(
+            'yatra_trip_bookings_count_exclude_statuses',
+            ['cancelled', 'failed'],
+            $tripIds
+        );
+        $excludeStatuses = is_array($excludeStatuses) ? array_values(array_filter(array_map('strval', $excludeStatuses))) : [];
+
+        $bookingsTable = BookingsTable::getTableName();
+
+        $idPlaceholders = implode(',', array_fill(0, count($tripIds), '%d'));
+        $where = "trip_id IN ({$idPlaceholders})";
+        $params = $tripIds;
+
+        if (!empty($excludeStatuses)) {
+            $stPlaceholders = implode(',', array_fill(0, count($excludeStatuses), '%s'));
+            $where .= " AND status NOT IN ({$stPlaceholders})";
+            $params = array_merge($params, $excludeStatuses);
+        }
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- uses $wpdb->prepare with placeholders
+        $sql = $this->wpdb->prepare(
+            "SELECT trip_id, COUNT(*) AS cnt
+             FROM {$bookingsTable}
+             WHERE {$where}
+             GROUP BY trip_id",
+            $params
+        );
+
+        $rows = $this->wpdb->get_results($sql);
+        $map = [];
+        foreach ((array) $rows as $row) {
+            $tId = (int) ($row->trip_id ?? 0);
+            if ($tId > 0) {
+                $map[$tId] = (int) ($row->cnt ?? 0);
+            }
+        }
+
+        return $map;
+    }
+
+    /**
      * Cache for table existence checks to avoid repeated SHOW TABLES queries
      */
     private static array $tableExistsCache = [];

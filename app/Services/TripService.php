@@ -827,6 +827,18 @@ class TripService extends BaseService
     }
 
     /**
+     * Map trip_id => bookings count for list views.
+     *
+     * @param int[] $tripIds
+     * @param string[]|null $excludeStatuses
+     * @return array<int,int>
+     */
+    public function getBookingsCountMap(array $tripIds, ?array $excludeStatuses = null): array
+    {
+        return $this->repository->getBookingsCountMap($tripIds, $excludeStatuses);
+    }
+
+    /**
      * Search trips
      */
     public function search(string $keyword, array $args = []): array

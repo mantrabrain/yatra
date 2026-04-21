@@ -276,12 +276,25 @@ class BlockDataService
                 $trip = \Yatra\Models\Trip::fromStdClass($tripData);
                 
                 // Add basic data needed for the card
-                // Note: bookings_count and reviews will be added later
-                // For now, we'll set default values to ensure basic functionality
-                $trip->bookings_count = 0;
+                // Note: reviews are loaded elsewhere; bookings_count is attached below
                 $trip->reviews = [];
                 
                 $trips[] = $trip;
+            }
+
+            // Attach bookings_count (computed from bookings table) for just these trips
+            $tripIds = array_map(static function ($t) {
+                return isset($t->id) ? (int) $t->id : 0;
+            }, $trips);
+            $tripIds = array_values(array_filter($tripIds));
+            if (!empty($tripIds)) {
+                $bookingsCountMap = $tripService->getBookingsCountMap($tripIds);
+                foreach ($trips as $t) {
+                    $tId = isset($t->id) ? (int) $t->id : 0;
+                    if ($tId > 0) {
+                        $t->bookings_count = (int) ($bookingsCountMap[$tId] ?? 0);
+                    }
+                }
             }
             
             // Calculate pagination data

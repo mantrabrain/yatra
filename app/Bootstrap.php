@@ -10,6 +10,7 @@ use Yatra\Providers\AppServiceProvider;
 use Yatra\Providers\RouteServiceProvider;
 use Yatra\Providers\AdminServiceProvider;
 use Yatra\Providers\FrontendAssetsProvider;
+use Yatra\Compatibility\Compatibility;
 use Yatra\Providers\BlockServiceProvider;
 
 /**
@@ -154,6 +155,11 @@ class Bootstrap
      */
     private function registerServiceProviders(): void
     {
+        // Register third-party compatibility hooks (Elementor, etc.)
+        if (!is_admin() && class_exists('Yatra\\Compatibility\\Compatibility')) {
+            Compatibility::register();
+        }
+
         $providerClasses = [];
 
         // Core providers — always loaded

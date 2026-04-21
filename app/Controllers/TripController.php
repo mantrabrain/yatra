@@ -334,6 +334,15 @@ class TripController extends BaseController
                 $tripIds = array_values(array_filter($tripIds));
 
                 if (!empty($tripIds)) {
+                    // Attach bookings_count computed from bookings table (trips.bookings_count is not reliably maintained)
+                    $bookingsCountMap = $this->service->getBookingsCountMap($tripIds);
+                    foreach ($items as $item) {
+                        $tId = isset($item->id) ? (int) $item->id : 0;
+                        if ($tId > 0) {
+                            $item->bookings_count = (int) ($bookingsCountMap[$tId] ?? 0);
+                        }
+                    }
+
                     // Destinations
                     $destByTrip = [];
                     foreach ($tripIds as $id) {
