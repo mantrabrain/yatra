@@ -45,6 +45,23 @@ $sel_norm = $yatra_card_date_norm($selected_date_filter ?? '');
 $card_date_norm = $yatra_card_date_norm($card['data_date'] ?? '');
 $is_selected_card = ($sel_norm !== '' && $card_date_norm !== '' && $sel_norm === $card_date_norm);
 $should_be_open = $is_selected_card || $index === 0;
+
+// Apply Yatra date format to availability header dates when the controller returns ISO.
+$yatra_format_card_date_for_display = static function ($value): string {
+    $raw = trim((string) $value);
+    if ($raw === '') {
+        return '';
+    }
+    // Only transform ISO-like values; leave already-human strings unchanged.
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}/', $raw)) {
+        return $raw;
+    }
+    return \Yatra\Helpers\FormatHelper::formatDate($raw);
+};
+
+$from_date_display = $yatra_format_card_date_for_display($card['from_date'] ?? '');
+$to_date_display = $yatra_format_card_date_for_display($card['to_date'] ?? '');
+$date_display_display = $yatra_format_card_date_for_display($card['date_display'] ?? '');
 ?>
         <div class="yatra-availability-card <?php echo $should_be_open ? 'open' : ''; ?> <?php echo $is_selected_card ? 'selected' : ''; ?> <?php echo $is_limited ? 'limited' : ''; ?> yatra-card-status-<?php echo esc_attr($card_status); ?>"
              data-availability-id="<?php echo esc_attr($item_id); ?>"
@@ -66,7 +83,7 @@ $should_be_open = $is_selected_card || $index === 0;
                 <!-- Day Trip: Show date as header -->
                 <div class="yatra-card-date-header">
                     <?php echo yatra_svg_icon('calendar', 'yatra-icon-sm'); ?>
-                    <?php echo esc_html($card['date_display']); ?>
+                    <?php echo esc_html($date_display_display); ?>
                 </div>
                 <?php endif; ?>
                 <div class="yatra-card-header-grid <?php echo !empty($card['date_display']) ? 'yatra-day-trip-grid' : ''; ?>">
@@ -74,14 +91,14 @@ $should_be_open = $is_selected_card || $index === 0;
                     <!-- Start/Departure -->
                     <div class="yatra-card-header-item">
                         <div class="yatra-card-header-label"><?php echo esc_html($card['from_label'] ?? __('Departure', 'yatra')); ?></div>
-                        <div class="yatra-card-header-date"><?php echo esc_html($card['from_date'] ?? ''); ?></div>
+                        <div class="yatra-card-header-date"><?php echo esc_html($from_date_display); ?></div>
                         <div class="yatra-card-header-location"><?php echo esc_html($card['from_location'] ?? ''); ?></div>
                     </div>
                     
                     <!-- End/Return -->
                     <div class="yatra-card-header-item">
                         <div class="yatra-card-header-label"><?php echo esc_html($card['to_label'] ?? __('Return', 'yatra')); ?></div>
-                        <div class="yatra-card-header-date"><?php echo esc_html($card['to_date'] ?? ''); ?></div>
+                        <div class="yatra-card-header-date"><?php echo esc_html($to_date_display); ?></div>
                         <div class="yatra-card-header-location"><?php echo esc_html($card['to_location'] ?? ''); ?></div>
                     </div>
                     

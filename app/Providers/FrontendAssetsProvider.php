@@ -246,6 +246,10 @@ class FrontendAssetsProvider
             'tripSlug' => $trip_slug,
             'wishlistEnabled' => \Yatra\Services\SettingsService::wishlistEnabled(),
             'isLoggedIn' => is_user_logged_in(),
+            // Regional settings
+            'timezone' => \Yatra\Services\SettingsService::getString('timezone', 'UTC'),
+            'dateFormat' => \Yatra\Services\SettingsService::getString('date_format', 'Y-m-d'),
+            'timeFormat' => \Yatra\Services\SettingsService::getString('time_format', 'H:i'),
             // Currency/settings
             'currency' => \Yatra\Services\SettingsService::getCurrency(),
             'currencyPosition' => \Yatra\Services\SettingsService::getString('currency_position', 'before'),

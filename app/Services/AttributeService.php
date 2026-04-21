@@ -586,6 +586,79 @@ class AttributeService extends BaseService
     }
 
     /**
+     * Bulk update status for multiple attributes
+     *
+     * @param array $ids     Attribute IDs
+     * @param string $status Target status (publish|draft|trash)
+     * @return array{updated: int, failed: int}
+     */
+    public function bulkUpdateStatus(array $ids, string $status): array
+    {
+        $updated = 0;
+        $failed  = 0;
+
+        foreach ($ids as $id) {
+            $id = (int) $id;
+            if ($id <= 0) {
+                $failed++;
+                continue;
+            }
+            try {
+                if ($this->attributeRepository->update($id, ['status' => $status])) {
+                    $updated++;
+                } else {
+                    $failed++;
+                }
+            } catch (\Exception $e) {
+                Logger::error("bulkUpdateStatus failed for attribute {$id}: " . $e->getMessage());
+                $failed++;
+            }
+        }
+
+        if ($updated > 0) {
+            $this->clearAttributeCache();
+        }
+
+        return ['updated' => $updated, 'failed' => $failed];
+    }
+
+    /**
+     * Permanently delete multiple attributes
+     *
+     * @param array $ids Attribute IDs
+     * @return array{deleted: int, failed: int}
+     */
+    public function bulkDelete(array $ids): array
+    {
+        $deleted = 0;
+        $failed  = 0;
+
+        foreach ($ids as $id) {
+            $id = (int) $id;
+            if ($id <= 0) {
+                $failed++;
+                continue;
+            }
+            try {
+                if ($this->attributeRepository->forceDelete($id)) {
+                    $deleted++;
+                } else {
+                    $failed++;
+                }
+            } catch (\Exception $e) {
+                Logger::error("bulkDelete failed for attribute {$id}: " . $e->getMessage());
+                $failed++;
+            }
+        }
+
+        if ($deleted > 0) {
+            $this->clearAttributeCache();
+        }
+
+        return ['deleted' => $deleted, 'failed' => $failed];
+    }
+
+    /**
      * Update attribute display orders
      */
     public function updateDisplayOrders(array $orders): bool

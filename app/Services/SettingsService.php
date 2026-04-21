@@ -34,6 +34,7 @@ class SettingsService
         'company_email' => '',
         'company_phone' => '',
         'company_address' => '',
+        'timezone' => 'UTC',
         'date_format' => 'Y-m-d',
         'time_format' => 'H:i',
         

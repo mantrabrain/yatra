@@ -33,6 +33,7 @@ export interface PriceType {
   category_id: number;
   original_price: string;
   discounted_price: string;
+  is_default?: boolean;
 }
 
 export interface FrontendTab {

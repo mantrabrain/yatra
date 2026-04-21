@@ -3937,6 +3937,12 @@ button.yatra-booking-button svg path {
     border-bottom: 1px solid #e5e7eb;
 }
 
+.yatra-booking-card .yatra-group-discount-badge-minimal {
+    margin-bottom: 10px;
+    background: #f0f9ff;
+    border-color: rgba(2, 132, 199, 0.22);
+}
+
 .yatra-booking-price-from {
     margin-bottom: 8px;
 }
@@ -3949,22 +3955,28 @@ button.yatra-booking-button svg path {
 
 .yatra-booking-price-original {
     font-size: 14px;
-    color: #6b7280;
+    color: rgba(107, 114, 128, 0.85);
     text-decoration: line-through;
     font-weight: 500;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgba(107, 114, 128, 0.65);
 }
 
 .yatra-booking-price-main {
     display: flex;
     align-items: baseline;
-    gap: 8px;
+    gap: 10px;
+    /* Keep badge inside the card: allow wrapping only when needed */
+    flex-wrap: wrap;
+    white-space: normal;
+    max-width: 100%;
 }
 
 .yatra-booking-price-amount {
     font-size: 28px;
     font-weight: 700;
     color: #ef4444;
-    line-height: 1;
+    line-height: 1.05;
     letter-spacing: -0.01em;
 }
 
@@ -3972,6 +3984,17 @@ button.yatra-booking-button svg path {
     font-size: 14px;
     color: #6b7280;
     font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+/* Allow wrapping on very small screens */
+@media (max-width: 480px) {
+    .yatra-booking-price-main {
+        flex-wrap: wrap;
+        white-space: normal;
+    }
 }
 
 /* Booking Discount Badge */
@@ -4453,14 +4476,15 @@ button.yatra-booking-button svg path {
 
 /* Flexible Booking Info */
 .yatra-flexible-booking-info {
-    background: #eff6ff;
-    border-left: 3px solid #3b82f6;
+    background: #f3f8ff;
+    border-left: 3px solid rgba(59, 130, 246, 0.65);
 }
 
 .yatra-flexible-booking-info .yatra-availability-count {
     color: #1e40af;
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
+    font-weight: 600;
 }
 
 .yatra-availability-note {
@@ -4739,12 +4763,12 @@ button.yatra-booking-button svg path {
     display: flex;
     align-items: center;
     width: 100%;
-    border: 1px solid #d1d5db;
+    border: 1px solid rgba(209, 213, 219, 0.9);
     border-radius: 8px;
     background: #fff;
     transition: all 0.3s ease;
-    min-height: 48px;
-    height: 48px;
+    min-height: 46px;
+    height: 46px;
     cursor: pointer;
 }
 
@@ -4773,7 +4797,7 @@ button.yatra-booking-button svg path {
 
 .yatra-booking-select {
     flex: 1;
-    padding: 14px 12px 14px 0;
+    padding: 12px 12px 12px 0;
     border: none;
     background: transparent;
     font-size: 15px;
@@ -4881,6 +4905,13 @@ input.yatra-datepicker,
     background: #2563eb;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.yatra-booking-button:focus-visible,
+.yatra-booking-enquiry-button:focus-visible,
+.yatra-booking-field-select:focus-within {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
 }
 
 /* Compact Availability Alert */
@@ -4997,6 +5028,7 @@ input.yatra-datepicker,
     transition: all 0.2s ease;
     z-index: 10;
     color: #6b7280;
+    padding:0;
 }
 
 .yatra-enquiry-modal-close:hover {

@@ -36,6 +36,9 @@ class AppServiceProvider extends ServiceProvider
         // Initialize ItineraryCostService for free itinerary costs feature
         \Yatra\Services\ItineraryCostService::init();
 
+        // Persist + expose selected additional services on bookings (free fallback).
+        \Yatra\Services\AdditionalServicesBookingService::init();
+
         // Ensure frontend bundles are marked as ES modules
         add_filter('script_loader_tag', [$this, 'addFrontendModuleType'], 10, 2);
 

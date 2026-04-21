@@ -300,10 +300,10 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                             <label for="travel-date"><?php esc_html_e('Travel Date', 'yatra'); ?></label>
                             <div class="yatra-summary-readonly-field">
                                 <?php if ($is_day_trip && !empty($departure_time)): ?>
-                                    <span class="yatra-date-display"><?php echo esc_html(date_i18n('d M Y', strtotime($travel_date))); ?></span>
+                                    <span class="yatra-date-display"><?php echo esc_html(\Yatra\Helpers\FormatHelper::formatDate((string) $travel_date)); ?></span>
                                     <span class="yatra-time-display"><?php echo esc_html(\Yatra\Helpers\FormatHelper::formatTimeForDisplay($departure_time)); ?></span>
                                 <?php else: ?>
-                                    <?php echo esc_html(date_i18n('d M Y', strtotime($travel_date))); ?>
+                                    <?php echo esc_html(\Yatra\Helpers\FormatHelper::formatDate((string) $travel_date)); ?>
                                 <?php endif; ?>
                             </div>
                             <input type="hidden" id="travel-date" name="travel_date" form="yatra-booking-form" value="<?php echo esc_attr($travel_date); ?>">

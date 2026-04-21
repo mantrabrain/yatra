@@ -1938,37 +1938,65 @@ function yatra_single_trip_calculate_base_price($trip) {
     $trip_price = 0;
     
     if ($has_availability) {
-        // Get the lowest price from availability dates
-        $min_price = PHP_FLOAT_MAX;
-        foreach ($trip->availability_dates as $avail) {
-            $avail_price = $avail->effective_price ?? $avail->original_price ?? 0;
-            if ($avail_price > 0 && $avail_price < $min_price) {
-                $min_price = $avail_price;
+        // Page-load pricing priority (traveler-based):
+        // - If a default category is marked at trip-level, use that as the base price.
+        // - Otherwise fall back to lowest price across availability (legacy behavior).
+        $default_trip_price = 0.0;
+        if ($has_traveler_pricing && !empty($trip->price_types) && is_array($trip->price_types)) {
+            $default_price_type = null;
+            foreach ($trip->price_types as $pt) {
+                if (is_array($pt)) {
+                    $pt = (object) $pt;
+                }
+                if (!empty($pt->is_default)) {
+                    $default_price_type = $pt;
+                    break;
+                }
+            }
+            if ($default_price_type) {
+                $default_trip_price = (float) ($default_price_type->effective_price
+                    ?? $default_price_type->discounted_price
+                    ?? $default_price_type->original_price
+                    ?? 0);
+            }
+        }
+
+        if ($default_trip_price > 0) {
+            $trip_price = $default_trip_price;
+        } else {
+            // Get the lowest price from availability dates
+            $min_price = PHP_FLOAT_MAX;
+            foreach ($trip->availability_dates as $avail) {
+                $avail_price = $avail->effective_price ?? $avail->original_price ?? 0;
+                if ($avail_price > 0 && $avail_price < $min_price) {
+                    $min_price = $avail_price;
+                }
+
+                // Also check price_types within availability if traveler-based
+                if (!empty($avail->price_types) && is_array($avail->price_types)) {
+                    foreach ($avail->price_types as $pt) {
+                        $pt = (object)$pt;
+                        $pt_price = (float)($pt->effective_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
+                        if ($pt_price > 0 && $pt_price < $min_price) {
+                            $min_price = $pt_price;
+                        }
+                    }
+                }
             }
 
-            // Also check price_types within availability if traveler-based
-            if (!empty($avail->price_types) && is_array($avail->price_types)) {
-                foreach ($avail->price_types as $pt) {
-                    $pt = (object)$pt;
+            // If no price found from availability, check traveler-based pricing
+            if ($min_price >= PHP_FLOAT_MAX && $has_traveler_pricing) {
+                foreach ($trip->price_types as $pt) {
+                    $pt = is_array($pt) ? (object) $pt : $pt;
                     $pt_price = (float)($pt->effective_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
                     if ($pt_price > 0 && $pt_price < $min_price) {
                         $min_price = $pt_price;
                     }
                 }
             }
-        }
 
-        // If no price found from availability, check traveler-based pricing
-        if ($min_price >= PHP_FLOAT_MAX && $has_traveler_pricing) {
-            foreach ($trip->price_types as $pt) {
-                $pt_price = (float)($pt->effective_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
-                if ($pt_price > 0 && $pt_price < $min_price) {
-                    $min_price = $pt_price;
-                }
-            }
+            $trip_price = ($min_price < PHP_FLOAT_MAX) ? $min_price : ($trip->sale_price ?: $trip->original_price);
         }
-
-        $trip_price = ($min_price < PHP_FLOAT_MAX) ? $min_price : ($trip->sale_price ?: $trip->original_price);
     } elseif ($has_traveler_pricing) {
         // Get default or first traveler category price
         $default_price_type = null;

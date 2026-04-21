@@ -478,6 +478,7 @@ class SingleTripController
                 'original_price'   => $original,
                 'discounted_price' => $discounted,
                 'effective_price'  => $effective,
+                'is_default'       => !empty($pt['is_default']),
                 'pricing_mode'     => $cat ? $cat->pricing_mode : ($pt['pricing_mode'] ?? 'per_person'),
                 'age_min'          => $cat ? $cat->age_min : null,
                 'age_max'          => $cat ? $cat->age_max : null,
@@ -1768,6 +1769,16 @@ class SingleTripController
         $traveler_rows = [];
         
         if ($has_traveler_pricing) {
+            // Determine which price type should be selected by default (admin-selected default; else first)
+            $default_index = 0;
+            foreach ((array) $trip->price_types as $i => $pt_candidate) {
+                $pt_candidate = is_array($pt_candidate) ? (object) $pt_candidate : $pt_candidate;
+                if (!empty($pt_candidate->is_default)) {
+                    $default_index = (int) $i;
+                    break;
+                }
+            }
+
             // Traveler-Based Pricing: Show dynamic categories
             foreach ($trip->price_types as $index => $price_type) {
                 // Normalize to object if array
@@ -1821,7 +1832,7 @@ class SingleTripController
                 $input_id = 'traveler_' . $price_type->category_id;
                 $max_travelers = is_object($trip) && method_exists($trip, 'getMaxTravelers') ? $trip->getMaxTravelers() : ($trip->max_travelers ?? 20);
                 $pt_max_qty = (int) ($price_type->max_quantity ?: $max_travelers);
-                $pt_value = ($index === 0) ? 1 : 0;
+                $pt_value = ($index === $default_index) ? 1 : 0;
 
                 $traveler_rows[] = [
                     'label' => $price_type->category_label ?: __('Traveler', 'yatra'),
@@ -1832,7 +1843,7 @@ class SingleTripController
                         'data-price' => $price_type->effective_price,
                         'data-pricing-mode' => $pricing_mode,
                     ],
-                    'minus_disabled' => ($index !== 0),
+                    'minus_disabled' => ($index !== $default_index),
                     'plus_disabled' => false,
                     'minus_attrs' => [
                         'data-target' => $input_id,
@@ -1860,7 +1871,7 @@ class SingleTripController
             $display_parts = [];
             foreach ($trip->price_types as $index => $price_type) {
                 $category_label = $price_type->category_label ?? __('Traveler', 'yatra');
-                $default_value = ($index === 0) ? 1 : 0;
+                $default_value = ($index === $default_index) ? 1 : 0;
                 
                 if ($default_value > 0) {
                     $display_parts[] = $category_label . ' x ' . $default_value;
@@ -1969,6 +1980,18 @@ class SingleTripController
             
             // Build display text from initial travelers if provided
             $display_parts = [];
+
+            // Default selection: if no initial travelers, pick admin-default category (else first)
+            $default_category_id = null;
+            foreach ($normalized_price_types as $pt_candidate) {
+                if (!is_object($pt_candidate)) {
+                    continue;
+                }
+                if (!empty($pt_candidate->is_default) && !empty($pt_candidate->category_id)) {
+                    $default_category_id = (int) $pt_candidate->category_id;
+                    break;
+                }
+            }
             
             foreach ($normalized_price_types as $pt_index => $pt) {
                 $pt_min = isset($pt->age_min) ? (int) $pt->age_min : 0;
@@ -1978,7 +2001,9 @@ class SingleTripController
                 
                 // Use initial traveler count if provided, otherwise use default
                 $pt_category_id = $pt->category_id ?? $pt_index;
-                $pt_default = isset($initial_travelers[$pt_category_id]) ? (int) $initial_travelers[$pt_category_id] : ($pt_index === 0 ? 1 : 0);
+                $pt_default = isset($initial_travelers[$pt_category_id])
+                    ? (int) $initial_travelers[$pt_category_id]
+                    : (($default_category_id !== null && (int) $pt_category_id === (int) $default_category_id) ? 1 : (($default_category_id === null && $pt_index === 0) ? 1 : 0));
                 
                 $pt_price = 0;
                 if (isset($pt->effective_price) && $pt->effective_price > 0) {
@@ -2037,7 +2062,7 @@ class SingleTripController
                         'data-price' => $pt_price,
                         'data-pricing-mode' => $pt_pricing_mode,
                     ],
-                    'minus_disabled' => ($pt_index !== 0),
+                    'minus_disabled' => ($pt_default <= 0),
                     'plus_disabled' => false,
                     'minus_attrs' => [
                         'data-target' => 'traveler_' . $pt_category_id . '_' . $item_id,

@@ -611,6 +611,14 @@ class AttributeRepository extends BaseRepository
     }
 
     /**
+     * Get trip attributes table name
+     */
+    public function getTripAttributesTableName(): string
+    {
+        return \Yatra\Database\Tables\TripClassificationsTable::getTableName();
+    }
+
+    /**
      * Get max display order
      */
     public function getMaxDisplayOrder(): int

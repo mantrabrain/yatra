@@ -190,10 +190,22 @@ if ($effective_min > 0) {
                         </div>
                         <div class="yatra-mobile-travelers-display" id="mobile-travelers-display">
                             <?php
-                            $first_label = !empty($trip->price_types[0]->category_label)
-                                ? $trip->price_types[0]->category_label
-                                : __('Traveler', 'yatra');
-                            echo esc_html($first_label . ' x 1');
+                            $default_label = null;
+                            if (!empty($trip->price_types) && is_array($trip->price_types)) {
+                                foreach ($trip->price_types as $pt) {
+                                    $pt = is_array($pt) ? (object) $pt : $pt;
+                                    if (!empty($pt->is_default)) {
+                                        $default_label = !empty($pt->category_label) ? $pt->category_label : null;
+                                        break;
+                                    }
+                                }
+                                if ($default_label === null) {
+                                    $pt0 = $trip->price_types[0];
+                                    $pt0 = is_array($pt0) ? (object) $pt0 : $pt0;
+                                    $default_label = !empty($pt0->category_label) ? $pt0->category_label : null;
+                                }
+                            }
+                            echo esc_html(($default_label ?: __('Traveler', 'yatra')) . ' x 1');
                             ?>
                         </div>
                     </div>
@@ -414,10 +426,32 @@ function initializeMobileBookingForm() {
                 });
             }
             // Initialize Flatpickr with same configuration as main date picker
+            var altFormat = (window.yatraTripData && (window.yatraTripData.flatpickrAltFormat || window.yatraTripData.altDateFormat))
+                ? (window.yatraTripData.flatpickrAltFormat || window.yatraTripData.altDateFormat)
+                : null;
+            if (!altFormat && window.yatraTripData && (window.yatraTripData.dateFormat || window.yatraTripData.date_format)) {
+                // Keep in sync with assets/js/trip.js helper (minimal mapping)
+                var php = window.yatraTripData.dateFormat || window.yatraTripData.date_format;
+                var map = { d:'d', j:'j', D:'D', l:'l', m:'m', n:'n', M:'M', F:'F', Y:'Y', y:'y' };
+                altFormat = '';
+                var esc = false;
+                for (var i = 0; i < php.length; i++) {
+                    var ch = php[i];
+                    if (esc) { altFormat += ch; esc = false; continue; }
+                    if (ch === '\\\\') { esc = true; continue; }
+                    altFormat += map[ch] || ch;
+                }
+            }
+            if (!altFormat) {
+                altFormat = 'F j, Y';
+            }
+
             if (availabilityDates.length > 0) {
                 // Availability-based booking - enable only specific dates
                 flatpickr(mobileDateInput, Object.assign({}, mobileFpCommon, {
                     dateFormat: 'Y-m-d',
+                    altInput: true,
+                    altFormat: altFormat,
                     minDate: 'today',
                     enable: availabilityDates
                 }));
@@ -425,6 +459,8 @@ function initializeMobileBookingForm() {
                 // Regular booking - flexible dates with min/max constraints
                 var config = Object.assign({}, mobileFpCommon, {
                     dateFormat: 'Y-m-d',
+                    altInput: true,
+                    altFormat: altFormat,
                     minDate: 'today'
                 });
                 var minDate = mobileDateInput.getAttribute('data-min-date');

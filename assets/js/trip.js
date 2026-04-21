@@ -7,6 +7,64 @@
 (function() {
   'use strict';
 
+  /**
+   * Convert PHP date format (WordPress/Yatra) to Flatpickr format.
+   * Covers the common tokens exposed in Yatra Settings UI.
+   *
+   * @param {string} php
+   * @returns {string}
+   */
+  const phpDateFormatToFlatpickr = (php) => {
+    if (!php || typeof php !== 'string') return 'F j, Y';
+    const map = {
+      // Day
+      d: 'd',
+      j: 'j',
+      D: 'D',
+      l: 'l',
+      // Month
+      m: 'm',
+      n: 'n',
+      M: 'M',
+      F: 'F',
+      // Year
+      Y: 'Y',
+      y: 'y',
+      // Time (for any datetime pickers)
+      H: 'H',
+      G: 'H',
+      h: 'h',
+      g: 'h',
+      i: 'i',
+      s: 'S',
+      a: 'K',
+      A: 'K'
+    };
+
+    let out = '';
+    let escaping = false;
+    for (let i = 0; i < php.length; i++) {
+      const ch = php[i];
+      if (escaping) {
+        out += ch;
+        escaping = false;
+        continue;
+      }
+      if (ch === '\\') {
+        escaping = true;
+        continue;
+      }
+      out += map[ch] || ch;
+    }
+    return out || 'F j, Y';
+  };
+
+  const getTripAltDateFormat = () => {
+    const cfg = window.yatraTripData || {};
+    const php = cfg.dateFormat || cfg.date_format || 'Y-m-d';
+    return phpDateFormatToFlatpickr(php);
+  };
+
   const getRestBase = () => {
     const siteUrl =
         (window.yatraTripData && window.yatraTripData.siteUrl) ||
@@ -1259,8 +1317,13 @@
         this.dateInput._flatpickr.destroy();
       }
 
+      const altFormat = getTripAltDateFormat();
+
       this.datepickerInstance = flatpickr(this.dateInput, {
+        // Keep backend value stable (Y-m-d), only change display
         dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat,
         minDate: today,
         defaultDate: today,
         enableTime: false,
@@ -1287,16 +1350,28 @@
       const container = this.dateInput.closest('.yatra-booking-field-select');
       if (container) {
         container.style.cursor = 'pointer';
-        container.onclick = (e) => {
-          if (e.target === this.dateInput) return;
-          e.preventDefault();
-          e.stopPropagation();
-          if (this.datepickerInstance.isOpen) {
-            this.datepickerInstance.close();
-          } else {
+        const openPicker = (e) => {
+          // Do not interfere with other actionable controls in the same row
+          if (e && e.target && e.target.closest && e.target.closest('button, a, select, textarea')) {
+            return;
+          }
+          // Prevent container clicks from triggering other toggles
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          if (this.datepickerInstance && !this.datepickerInstance.isOpen) {
             this.datepickerInstance.open();
           }
         };
+
+        // Container click (icon/arrow/background)
+        container.addEventListener('click', openPicker);
+
+        // Flatpickr altInput is the visible field when altInput:true
+        if (this.dateInput && this.dateInput._flatpickr && this.dateInput._flatpickr.altInput) {
+          this.dateInput._flatpickr.altInput.addEventListener('click', openPicker);
+        }
       }
     }
 
@@ -2318,6 +2393,8 @@
 
       this.datepickerInstance = flatpickr(this.dateInput, {
         dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: getTripAltDateFormat(),
         minDate: today,
         enableTime: false,
         clickOpens: true,
@@ -2337,16 +2414,23 @@
       const container = this.dateInput.closest('.yatra-booking-field-select');
       if (container) {
         container.style.cursor = 'pointer';
-        container.onclick = (e) => {
-          if (e.target === this.dateInput) return;
-          e.preventDefault();
-          e.stopPropagation();
-          if (this.datepickerInstance.isOpen) {
-            this.datepickerInstance.close();
-          } else {
+        const openPicker = (e) => {
+          if (e && e.target && e.target.closest && e.target.closest('button, a, select, textarea')) {
+            return;
+          }
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          if (this.datepickerInstance && !this.datepickerInstance.isOpen) {
             this.datepickerInstance.open();
           }
         };
+
+        container.addEventListener('click', openPicker);
+        if (this.dateInput && this.dateInput._flatpickr && this.dateInput._flatpickr.altInput) {
+          this.dateInput._flatpickr.altInput.addEventListener('click', openPicker);
+        }
       }
     }
 

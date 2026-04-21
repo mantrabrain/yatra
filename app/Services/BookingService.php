@@ -727,7 +727,7 @@ class BookingService
             'currency' => $booking->currency,
             'tax_amount' => (float) ($booking->tax_amount ?? 0),
             'tax_rate' => (float) ($booking->tax_rate ?? 0),
-            'tax_inclusive' => (bool) ($booking->tax_inclusive ?? false),
+            'tax_inclusive' => (int) ($booking->tax_inclusive ?? 0),
             'tax_details' => $booking->tax_details ?? null,
             'tax_breakdown' => $booking->tax_details ? json_decode($booking->tax_details, true) : [],
             'subtotal' => (float) ($booking->subtotal ?? $booking->total_amount ?? 0),

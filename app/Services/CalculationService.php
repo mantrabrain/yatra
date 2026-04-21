@@ -559,8 +559,12 @@ class CalculationService
         if (!is_array($multiple_taxes)) {
             $multiple_taxes = [];
         }
-        
-        if (count($multiple_taxes) > 1) {
+
+        // If tax is enabled and taxes are configured, honor them even if the boolean
+        // "multiple_taxes_enabled" setting wasn't toggled in the UI (common case).
+        if ($enable_tax && !empty($multiple_taxes)) {
+            $multiple_taxes_enabled = true;
+        } elseif (count($multiple_taxes) > 1) {
             $multiple_taxes_enabled = true;
         }
         

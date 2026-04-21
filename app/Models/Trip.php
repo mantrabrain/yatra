@@ -870,9 +870,12 @@ class Trip
         $original_price_raw = 0;
         
         if ($is_traveler_based) {
-            // For traveler-based pricing, find minimum price from all categories
+            // For traveler-based pricing, prefer admin-selected default category if present;
+            // otherwise fall back to minimum across categories (legacy behavior).
+            $default_price = 0.0;
+            $default_original_price = 0.0;
             $min_price = PHP_FLOAT_MAX;
-            $min_original_price = 0;
+            $min_original_price = 0.0;
             
             // Check multiple possible data structures for price categories
             $price_categories = [];
@@ -893,16 +896,26 @@ class Trip
                         $regular_price = (float) ($category->original_price ?? $category->price ?? 0);
                         // Priority: discounted_price > sale_price (legacy) > discount_price (legacy)
                         $discounted_price = (float) ($category->discounted_price ?? $category->sale_price ?? $category->discount_price ?? 0);
+                        $is_default = !empty($category->is_default);
                     } elseif (is_array($category)) {
                         $regular_price = (float) ($category['original_price'] ?? $category['price'] ?? 0);
                         // Priority: discounted_price > sale_price (legacy) > discount_price (legacy)
                         $discounted_price = (float) ($category['discounted_price'] ?? $category['sale_price'] ?? $category['discount_price'] ?? 0);
+                        $is_default = !empty($category['is_default']);
                     } else {
                         continue;
                     }
                     
                     // Use discounted price if available, otherwise regular price
                     $category_price = ($discounted_price > 0 && $discounted_price < $regular_price) ? $discounted_price : $regular_price;
+
+                    // Capture default category price (first valid default only)
+                    if ($is_default && $default_price <= 0 && $category_price > 0) {
+                        $default_price = $category_price;
+                        if ($discounted_price > 0 && $discounted_price < $regular_price) {
+                            $default_original_price = $regular_price;
+                        }
+                    }
                     
                     if ($category_price > 0 && $category_price < $min_price) {
                         $min_price = $category_price;
@@ -930,14 +943,23 @@ class Trip
                 }
             }
             
-            if ($min_price !== PHP_FLOAT_MAX && $min_price > 0) {
-                $current_price_raw = $min_price;
+            $chosen_price = $default_price > 0 ? $default_price : $min_price;
+            $chosen_original = $default_price > 0 ? $default_original_price : $min_original_price;
+            $chosen_has_discount = $default_price > 0
+                ? ($default_original_price > 0 && $default_original_price > $default_price)
+                : $has_discount;
+
+            if ($chosen_price !== PHP_FLOAT_MAX && $chosen_price > 0) {
+                $current_price_raw = $chosen_price;
                 $current_price = yatra_format_price($current_price_raw);
                 $price_prefix = __('From ', 'yatra'); // Always show "From" for traveler-based
                 
-                if ($has_discount && $min_original_price > 0) {
-                    $original_price_raw = $min_original_price;
+                if ($chosen_has_discount && $chosen_original > 0) {
+                    $original_price_raw = $chosen_original;
                     $original_price = yatra_format_price($original_price_raw);
+                    $has_discount = true;
+                } else {
+                    $has_discount = false;
                 }
             }
         } else {
@@ -1184,7 +1206,8 @@ class Trip
     public function getEffectivePrice(): float
     {
         if ($this->pricing_type === 'traveler_based') {
-            return $this->min_category_original_price ?? 0.0;
+            // Use centralized logic (default category if set, else minimum).
+            return (float) \Yatra\Services\TripPricingService::getEffectivePrice((object) $this);
         }
 
         // Use discounted price if available and valid
@@ -1503,6 +1526,10 @@ class Trip
      */
     public function getOriginalPrice(): float
     {
+        if ($this->pricing_type === 'traveler_based') {
+            $pricing = \Yatra\Services\TripPricingService::resolveDisplayPricing((object) $this);
+            return (float) ($pricing['min_category_original_price'] ?? 0);
+        }
         return (float) ($this->original_price ?? 0);
     }
 
@@ -1511,6 +1538,10 @@ class Trip
      */
     public function getSalePrice(): float
     {
+        if ($this->pricing_type === 'traveler_based') {
+            $pricing = \Yatra\Services\TripPricingService::resolveDisplayPricing((object) $this);
+            return (float) ($pricing['effective_price_min'] ?? 0);
+        }
         return (float) ($this->sale_price ?? 0);
     }
 

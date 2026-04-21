@@ -1881,18 +1881,22 @@ class TripController extends BaseController
                 $departure_time = !empty($avail->departure_time) ? $avail->departure_time : null;
                 $arrival_time = !empty($avail->arrival_time) ? $avail->arrival_time : null;
                 
-                // Format display strings based on trip type
+                // Format display strings based on trip type (respect Yatra Settings date/time formats)
+                $yatra_date_format = \Yatra\Services\SettingsService::getString('date_format', 'Y-m-d');
+                $yatra_time_format = \Yatra\Services\SettingsService::getString('time_format', 'H:i');
+
                 if ($is_single_day && $departure_time) {
                     // Day trip: Show time as main value, date as sub-label
-                    $from_display = date_i18n('g:i A', strtotime($departure_time)); // e.g., "9:00 AM"
-                    $to_display = $arrival_time ? date_i18n('g:i A', strtotime($arrival_time)) : ''; // e.g., "5:00 PM"
-                    $date_display = date_i18n('l, j M Y', $departure_date); // e.g., "Saturday, 30 Nov 2025"
+                    $from_display = date_i18n($yatra_time_format, strtotime($departure_time)); // e.g., "14:30" or "2:30 PM"
+                    $to_display = $arrival_time ? date_i18n($yatra_time_format, strtotime($arrival_time)) : '';
+                    // Show day-trip header date using configured format
+                    $date_display = date_i18n($yatra_date_format, $departure_date);
                     $from_label = __('Start', 'yatra');
                     $to_label = __('End', 'yatra');
                 } else {
                     // Multi-day trip: Show dates
-                    $from_display = date_i18n('j M Y', $departure_date);
-                    $to_display = date_i18n('j M Y', $return_date);
+                    $from_display = date_i18n($yatra_date_format, $departure_date);
+                    $to_display = date_i18n($yatra_date_format, $return_date);
                     $date_display = ''; // Not needed for multi-day
                     $from_label = __('Departure', 'yatra');
                     $to_label = __('Return', 'yatra');

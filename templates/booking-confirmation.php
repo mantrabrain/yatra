@@ -28,8 +28,8 @@ if (function_exists('yatra_clear_booking_session')) {
 }
 
 // Format dates
-$travel_date_formatted = date_i18n(get_option('date_format'), strtotime($booking->travel_date));
-$booking_date_formatted = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($booking->created_at));
+$travel_date_formatted = \Yatra\Helpers\FormatHelper::formatDate((string) ($booking->travel_date ?? ''));
+$booking_date_formatted = \Yatra\Helpers\FormatHelper::formatDateTime((string) ($booking->created_at ?? ''));
 
 // Get status color
 $status_colors = [
@@ -290,7 +290,7 @@ do_action('yatra_booking_confirmation_header', $booking);
                                     </span>
                                     <?php if (!empty($traveler['date_of_birth'])) : ?>
                                     <span class="yatra-traveler-dob">
-                                        <?php echo esc_html(date_i18n(get_option('date_format'), strtotime($traveler['date_of_birth']))); ?>
+                                        <?php echo esc_html(\Yatra\Helpers\FormatHelper::formatDate((string) $traveler['date_of_birth'])); ?>
                                     </span>
                                     <?php endif; ?>
                                 </div>
@@ -319,42 +319,121 @@ do_action('yatra_booking_confirmation_header', $booking);
                         </h3>
                         
                         <div class="yatra-payment-rows">
-                            <?php 
-                            // Get subtotal (gross amount before tax)
-                            $subtotal = !empty($booking->subtotal) ? (float) $booking->subtotal : (float) $booking->total_amount;
-                            $tax_amount = !empty($booking->tax_amount) ? (float) $booking->tax_amount : 0;
-                            $tax_inclusive = !empty($booking->tax_inclusive);
-                            
-                            // If tax is inclusive, subtotal should be total_amount, otherwise calculate it
-                            if (!$tax_inclusive && $tax_amount > 0) {
-                                $subtotal = $booking->total_amount - $tax_amount;
-                            }
-                            ?>
-                            
-                            <!-- Gross Total (base trip cost before services/discounts/taxes) -->
-                            <div class="yatra-payment-row">
-                                <span><strong><?php esc_html_e('Gross Total', 'yatra'); ?></strong></span>
-                                <span><strong><?php echo esc_html(yatra_format_price($subtotal, $booking->currency)); ?></strong></span>
-                            </div>
-                            
-                            <?php if (!empty($booking->discount_amount) && $booking->discount_amount > 0) : ?>
-                            <!-- Discount -->
-                            <div class="yatra-payment-row yatra-discount-row">
-                                <span><?php esc_html_e('Discount', 'yatra'); ?></span>
-                                <span style="color: #059669; font-weight: 500;">-<?php echo esc_html(yatra_format_price($booking->discount_amount, $booking->currency)); ?></span>
-                            </div>
-                            <?php endif; ?>
-                            
-                            <!-- Itinerary Costs -->
                             <?php
+                            // ── Raw figures from DB ───────────────────────────────────
+                            $db_subtotal           = (float) ($booking->subtotal ?? $booking->total_amount);
+                            $discount_amount       = (float) ($booking->discount_amount ?? 0);
+                            $itinerary_costs_total = (float) ($booking->itinerary_costs_total ?? 0);
+                            $tax_amount            = (float) ($booking->tax_amount ?? 0);
+                            $tax_inclusive         = !empty($booking->tax_inclusive);
+                            $total_amount          = (float) $booking->total_amount;
+                            $amount_paid           = (float) ($booking->amount_paid ?? 0);
+                            $amount_due            = (float) ($booking->amount_due ?? 0);
+
+                            // ── Tax breakdown (built first so it can gate later rows) ─
+                            $tax_breakdown = [];
+                            if (!empty($booking->tax_details)) {
+                                $taxes = json_decode($booking->tax_details, true) ?: [];
+                                foreach ($taxes as $tax) {
+                                    $tax_breakdown[] = [
+                                        'name'   => $tax['name'] ?? __('Tax', 'yatra'),
+                                        'rate'   => (float) ($tax['rate'] ?? 0),
+                                        'amount' => (float) ($tax['amount'] ?? 0),
+                                    ];
+                                }
+                            } elseif ($tax_amount > 0) {
+                                $tax_breakdown[] = [
+                                    'name'   => __('Tax', 'yatra'),
+                                    'rate'   => (float) ($booking->tax_rate ?? 0),
+                                    'amount' => $tax_amount,
+                                ];
+                            }
+
+                            // ── Itinerary costs ───────────────────────────────────────
                             $itinerary_costs = [];
                             if (!empty($booking->itinerary_costs)) {
                                 $itinerary_costs = json_decode($booking->itinerary_costs, true) ?: [];
                             }
-                            
-                            if (!empty($itinerary_costs)):
+
+                            // ── Additional services ───────────────────────────────────
+                            $raw_services = apply_filters('yatra_booking_get_services', [], (int) ($booking->id ?? 0));
+                            $selected_services = [];
+                            if (!empty($raw_services) && is_array($raw_services)) {
+                                foreach ($raw_services as $s) {
+                                    $arr = is_array($s) ? $s : (array) $s;
+                                    if (!isset($arr['selected']) || !empty($arr['selected'])) {
+                                        $selected_services[] = $arr;
+                                    }
+                                }
+                            }
+                            $services_total = 0.0;
+                            foreach ($selected_services as $s) {
+                                $services_total += (float) ($s['total_price'] ?? $s['calculated_price'] ?? $s['total_cost'] ?? $s['amount'] ?? $s['unit_price'] ?? $s['price'] ?? 0);
+                            }
+
+                            // ── Derived amounts ───────────────────────────────────────
+                            // base_trip_cost: the trip price without services (services are embedded in db_subtotal by Pro)
+                            $base_trip_cost = $db_subtotal - $services_total;
+                            // taxable_amount: what tax is calculated on
+                            $taxable_amount = max(0.0, $db_subtotal - $discount_amount) + $itinerary_costs_total;
+
+                            $has_services    = !empty($selected_services);
+                            $has_discount    = $discount_amount > 0;
+                            $has_itinerary   = !empty($itinerary_costs) && $itinerary_costs_total > 0;
+                            $has_tax         = !empty($tax_breakdown);
+                            $show_taxable_row = $has_tax && ($has_discount || $has_itinerary);
                             ?>
+
+                            <!-- Trip Base Price (always the first line) -->
                             <div class="yatra-payment-row">
+                                <span>
+                                    <?php esc_html_e('Trip Base Price', 'yatra'); ?>
+                                    <?php if ($tax_inclusive): ?>
+                                        <span style="display:inline-flex;align-items:center;padding:1px 6px;border-radius:4px;font-size:0.72em;font-weight:600;background:#eff6ff;color:#1d4ed8;margin-left:5px;letter-spacing:0;">
+                                            <?php esc_html_e('Tax Incl.', 'yatra'); ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </span>
+                                <span><?php echo esc_html(yatra_format_price($base_trip_cost, $booking->currency)); ?></span>
+                            </div>
+
+                            <?php if ($has_services): ?>
+                            <!-- Additional Services section header -->
+                            <div class="yatra-payment-row" style="margin-top: 4px;">
+                                <span style="font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;">
+                                    + <?php esc_html_e('Additional Services', 'yatra'); ?>
+                                </span>
+                                <span></span>
+                            </div>
+                            <!-- Service line items -->
+                            <?php foreach ($selected_services as $svc): ?>
+                                <?php
+                                $svc_name   = $svc['service_name'] ?? $svc['name'] ?? $svc['title'] ?? $svc['label'] ?? __('Service', 'yatra');
+                                $svc_amount = (float) ($svc['total_price'] ?? $svc['calculated_price'] ?? $svc['total_cost'] ?? $svc['amount'] ?? $svc['unit_price'] ?? $svc['price'] ?? 0);
+                                ?>
+                                <div class="yatra-payment-row" style="margin-left: 16px;">
+                                    <span><?php echo esc_html($svc_name); ?></span>
+                                    <span><?php echo esc_html(yatra_format_price($svc_amount, $booking->currency, false)); ?></span>
+                                </div>
+                            <?php endforeach; ?>
+                            <!-- Gross Total = Trip Base Price + Services -->
+                            <div class="yatra-payment-row" style="border-top: 1px solid #e5e7eb; margin-top: 6px; padding-top: 6px;">
+                                <span><strong><?php esc_html_e('Gross Total', 'yatra'); ?></strong></span>
+                                <span><strong><?php echo esc_html(yatra_format_price($db_subtotal, $booking->currency)); ?></strong></span>
+                            </div>
+                            <?php endif; ?>
+
+                            <?php if ($has_discount): ?>
+                            <!-- Discount -->
+                            <div class="yatra-payment-row">
+                                <span><?php esc_html_e('Discount', 'yatra'); ?></span>
+                                <span style="color: #059669; font-weight: 500;">-<?php echo esc_html(yatra_format_price($discount_amount, $booking->currency)); ?></span>
+                            </div>
+                            <?php endif; ?>
+
+                            <?php if ($has_itinerary): ?>
+                            <!-- Itinerary costs header -->
+                            <div class="yatra-payment-row" style="margin-top: 4px;">
                                 <span><strong><?php esc_html_e('Itinerary Costs', 'yatra'); ?></strong></span>
                                 <span></span>
                             </div>
@@ -362,17 +441,17 @@ do_action('yatra_booking_confirmation_header', $booking);
                             <div class="yatra-payment-row" style="margin-left: 20px;">
                                 <span>
                                     <?php echo esc_html($cost['name']); ?>
-                                    <?php if (!empty($cost['price_per'])) : ?>
-                                        <small style="opacity: 0.7;">
-                                            <?php 
-                                            if ($cost['price_per'] === 'person') {
-                                                esc_html_e('(per person)', 'yatra');
-                                            } elseif ($cost['price_per'] === 'group') {
-                                                esc_html_e('(per booking)', 'yatra');
-                                            } else {
-                                                esc_html_e('(flat rate)', 'yatra');
-                                            }
-                                            ?>
+                                    <?php if (!empty($cost['price_per'])): ?>
+                                        <small style="opacity: 0.65;">
+                                        <?php
+                                        if ($cost['price_per'] === 'person') {
+                                            esc_html_e('(per person)', 'yatra');
+                                        } elseif ($cost['price_per'] === 'group') {
+                                            esc_html_e('(per booking)', 'yatra');
+                                        } else {
+                                            esc_html_e('(flat rate)', 'yatra');
+                                        }
+                                        ?>
                                         </small>
                                     <?php endif; ?>
                                 </span>
@@ -380,74 +459,73 @@ do_action('yatra_booking_confirmation_header', $booking);
                             </div>
                             <?php endforeach; ?>
                             <?php endif; ?>
-                            
-                            <!-- Taxable Amount (SubTotal - amount that tax is calculated on) -->
-                            <?php 
-                            $taxable_amount = 0;
-                            if (!empty($booking->itinerary_costs_total)) {
-                                // Calculate taxable amount: discounted subtotal + itinerary costs
-                                $discounted_subtotal = $subtotal - ($booking->discount_amount ?? 0);
-                                $taxable_amount = $discounted_subtotal + (float) $booking->itinerary_costs_total;
-                            }
-                            
-                            if ($taxable_amount > 0 && !empty($tax_breakdown)): 
-                            ?>
+
+                            <?php if (!$tax_inclusive && $show_taxable_row): ?>
+                            <!-- Taxable Amount (only for exclusive tax when there are deductions above it) -->
                             <div class="yatra-payment-row" style="border-top: 1px dashed #e5e7eb; margin-top: 8px; padding-top: 8px;">
-                                <span><strong><?php esc_html_e('Subtotal (Taxable Amount)', 'yatra'); ?></strong></span>
+                                <span><strong><?php esc_html_e('Taxable Amount', 'yatra'); ?></strong></span>
                                 <span><strong><?php echo esc_html(yatra_format_price($taxable_amount, $booking->currency)); ?></strong></span>
                             </div>
                             <?php endif; ?>
-                            
-                            <!-- Tax Breakdown -->
-                            <?php
-                            $tax_breakdown = [];
-                            if (!empty($booking->tax_details)) {
-                                $taxes = json_decode($booking->tax_details, true) ?: [];
-                                foreach ($taxes as $tax) {
-                                    $tax_breakdown[] = [
-                                        'name' => $tax['name'] ?? 'Tax',
-                                        'rate' => $tax['rate'] ?? 0,
-                                        'amount' => $tax['amount'] ?? 0
-                                    ];
-                                }
-                            } elseif (!empty($booking->tax_amount) && $booking->tax_amount > 0) {
-                                // Fallback for single tax
-                                $tax_breakdown[] = [
-                                    'name' => __('Tax', 'yatra'),
-                                    'rate' => (float) ($booking->tax_rate ?? 0),
-                                    'amount' => (float) $booking->tax_amount
-                                ];
-                            }
-                            
-                            if (!empty($tax_breakdown)):
-                            ?>
+
+                            <?php if ($has_tax && !$tax_inclusive): ?>
+                            <!-- Exclusive tax: shown as an addition before Net Amount -->
+                            <div class="yatra-payment-row" style="margin-top: 4px;">
+                                <span style="font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;">
+                                    + <?php esc_html_e('Tax', 'yatra'); ?>
+                                </span>
+                                <span></span>
+                            </div>
                             <?php foreach ($tax_breakdown as $tax): ?>
-                            <div class="yatra-payment-row">
-                                <span><?php echo esc_html($tax['name']); ?> (<?php echo esc_html($tax['rate']); ?>%)</span>
-                                <span><?php echo esc_html(yatra_format_price($tax['amount'], $booking->currency)); ?></span>
+                            <div class="yatra-payment-row" style="margin-left: 16px;">
+                                <span>
+                                    <?php echo esc_html($tax['name']); ?>
+                                    <?php if ($tax['rate'] > 0): ?>
+                                        (<?php echo esc_html($tax['rate']); ?>%)
+                                    <?php endif; ?>
+                                </span>
+                                <span>+<?php echo esc_html(yatra_format_price($tax['amount'], $booking->currency)); ?></span>
                             </div>
                             <?php endforeach; ?>
                             <?php endif; ?>
-                            
+
                             <!-- Net Amount -->
-                            <div class="yatra-payment-row">
-                                <span><strong><?php esc_html_e('Net Amount', 'yatra'); ?></strong></span>
-                                <span><strong><?php echo esc_html(yatra_format_price($booking->total_amount, $booking->currency)); ?></strong></span>
+                            <div class="yatra-payment-row" style="border-top: 2px solid #111827; margin-top: 10px; padding-top: 10px;">
+                                <span style="font-size: 1.05em;"><strong><?php esc_html_e('Net Amount', 'yatra'); ?></strong></span>
+                                <span style="font-size: 1.05em;"><strong><?php echo esc_html(yatra_format_price($total_amount, $booking->currency)); ?></strong></span>
                             </div>
-                            
-                            <?php if (($booking->amount_paid ?? 0) > 0) : ?>
-                            <!-- Amount Paid -->
-                            <div class="yatra-payment-row">
+
+                            <?php if ($has_tax && $tax_inclusive): ?>
+                            <!-- Inclusive tax: shown as an informational footnote after Net Amount -->
+                            <?php foreach ($tax_breakdown as $tax): ?>
+                            <div class="yatra-payment-row" style="margin-top: 4px; opacity: 0.7;">
+                                <span style="font-size: 0.85em; font-style: italic;">
+                                    <?php
+                                    printf(
+                                        /* translators: %1$s = tax name, %2$s = rate, %3$s = amount */
+                                        esc_html__('Incl. %1$s%2$s: %3$s', 'yatra'),
+                                        esc_html($tax['name']),
+                                        $tax['rate'] > 0 ? ' (' . esc_html($tax['rate']) . '%)' : '',
+                                        esc_html(yatra_format_price($tax['amount'], $booking->currency))
+                                    );
+                                    ?>
+                                </span>
+                                <span></span>
+                            </div>
+                            <?php endforeach; ?>
+                            <?php endif; ?>
+
+                            <?php if ($amount_paid > 0): ?>
+                            <div class="yatra-payment-row" style="margin-top: 6px;">
                                 <span><?php esc_html_e('Amount Paid', 'yatra'); ?></span>
-                                <span><?php echo esc_html(yatra_format_price($booking->amount_paid, $booking->currency)); ?></span>
+                                <span style="color: #059669;"><?php echo esc_html(yatra_format_price($amount_paid, $booking->currency)); ?></span>
                             </div>
                             <?php endif; ?>
-                            
-                            <?php if ($booking->amount_due > 0) : ?>
-                            <!-- Due Now -->
+
+                            <?php if ($amount_due > 0): ?>
                             <div class="yatra-payment-row yatra-due-row">
-                                <span><?php esc_html_e('Due Now', 'yatra'); ?></span>
-                                <span><?php echo esc_html(yatra_format_price($booking->amount_due, $booking->currency)); ?></span>
+                                <span><strong><?php esc_html_e('Due Now', 'yatra'); ?></strong></span>
+                                <span><strong><?php echo esc_html(yatra_format_price($amount_due, $booking->currency)); ?></strong></span>
                             </div>
                             <?php endif; ?>
                         </div>

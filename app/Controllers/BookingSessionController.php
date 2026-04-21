@@ -1301,6 +1301,16 @@ class BookingSessionController extends BaseController
          * @param int $duration_days Trip duration in days
          * @since 3.0.0
          */
+        // Normalise: Pro module reads $data['selected_services'], frontend sends $data['additional_services']
+        if (!isset($data['selected_services'])) {
+            $data['selected_services'] = $data['additional_services']
+                ?? $session['additional_services']
+                ?? [];
+        }
+        if (!is_array($data['selected_services'])) {
+            $data['selected_services'] = [];
+        }
+        $data['selected_services'] = array_map('intval', $data['selected_services']);
         do_action('yatra_booking_save_services', $booking_id, $trip_id, $data, $travelers_count, (int) ($trip->duration_days ?? 1));
 
         // ========================================

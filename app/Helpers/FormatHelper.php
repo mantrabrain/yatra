@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yatra\Helpers;
 
+use Yatra\Services\SettingsService;
+
 /**
  * Format Helper
  * 
@@ -111,14 +113,14 @@ class FormatHelper
             return '';
         }
 
-        $format = $format ?: get_option('date_format', 'F j, Y');
+        $format = $format ?: SettingsService::getString('date_format', (string) get_option('date_format', 'F j, Y'));
         
         $timestamp = strtotime($date);
         if ($timestamp === false) {
             return $date;
         }
 
-        return date_i18n($format, $timestamp);
+        return self::formatTimestampWithTz($timestamp, $format);
     }
 
     /**
@@ -134,8 +136,8 @@ class FormatHelper
             return '';
         }
 
-        $dateFormat = get_option('date_format', 'F j, Y');
-        $timeFormat = get_option('time_format', 'g:i a');
+        $dateFormat = SettingsService::getString('date_format', (string) get_option('date_format', 'F j, Y'));
+        $timeFormat = SettingsService::getString('time_format', (string) get_option('time_format', 'g:i a'));
         $format = $format ?: $dateFormat . ' ' . $timeFormat;
         
         $timestamp = strtotime($datetime);
@@ -143,32 +145,22 @@ class FormatHelper
             return $datetime;
         }
 
-        return date_i18n($format, $timestamp);
+        return self::formatTimestampWithTz($timestamp, $format);
     }
 
     /**
-     * Format time for display (24h to 12h) with uppercase AM/PM
+     * Format time for display
      * 
      * @param string $time Time string (e.g., "14:30")
      * @return string Formatted time (e.g., "2:30 PM")
      */
     public static function formatTime(string $time): string
     {
-        if (empty($time)) {
-            return '';
-        }
-
-        $timestamp = strtotime($time);
-        if ($timestamp === false) {
-            return $time;
-        }
-
-        // Always use uppercase AM/PM format (g:i A)
-        return date_i18n('g:i A', $timestamp);
+        return self::formatTimeForDisplay($time);
     }
 
     /**
-     * Format time for display with uppercase AM/PM
+     * Format time for display using plugin settings (fallback to WordPress settings)
      * 
      * @param string $time Time string (e.g., "14:30")
      * @return string Formatted time (e.g., "2:30 PM")
@@ -184,8 +176,43 @@ class FormatHelper
             return $time;
         }
         
-        // Always use uppercase AM/PM format (g:i A)
-        return date_i18n('g:i A', $timestamp);
+        $format = SettingsService::getString('time_format', (string) get_option('time_format', 'g:i a'));
+        return self::formatTimestampWithTz($timestamp, $format);
+    }
+
+    /**
+     * Format a timestamp using Yatra timezone when set.
+     *
+     * @param int $timestamp Unix timestamp
+     * @param string $format PHP date format
+     * @return string
+     */
+    private static function formatTimestampWithTz(int $timestamp, string $format): string
+    {
+        $tz = trim((string) SettingsService::getString('timezone', ''));
+        if ($tz === '') {
+            // WP site timezone fallback
+            return function_exists('wp_date')
+                ? wp_date($format, $timestamp)
+                : date_i18n($format, $timestamp);
+        }
+
+        try {
+            $dtz = new \DateTimeZone($tz);
+        } catch (\Exception $e) {
+            return function_exists('wp_date')
+                ? wp_date($format, $timestamp)
+                : date_i18n($format, $timestamp);
+        }
+
+        if (function_exists('wp_date')) {
+            return wp_date($format, $timestamp, $dtz);
+        }
+
+        // Older WP fallback: shift timestamp into requested timezone via DateTime.
+        $d = new \DateTime('@' . $timestamp);
+        $d->setTimezone($dtz);
+        return $d->format($format);
     }
 
     /**

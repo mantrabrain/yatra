@@ -2164,6 +2164,7 @@ const TripForm: React.FC = () => {
             category_id: Number(pt.category_id) || 0,
             original_price: pt.original_price?.toString() || "",
             discounted_price: pt.discounted_price?.toString() || "",
+            is_default: Boolean(pt.is_default),
           }))
         : [],
       deposit_amount: tripData.deposit_amount?.toString() || "",
@@ -2903,7 +2904,12 @@ const TripForm: React.FC = () => {
       ...prev,
       price_types: [
         ...prev.price_types,
-        { category_id: categoryId, original_price: "", discounted_price: "" },
+        {
+          category_id: categoryId,
+          original_price: "",
+          discounted_price: "",
+          is_default: false,
+        },
       ],
     }));
   };
@@ -2929,6 +2935,19 @@ const TripForm: React.FC = () => {
           ? { ...pt, [field]: value }
           : pt,
       ),
+    }));
+  };
+
+  const handlePriceTypeDefaultChange = (categoryId: number, isDefault: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      price_types: prev.price_types.map((pt) => {
+        if (Number(pt.category_id) === Number(categoryId)) {
+          return { ...pt, is_default: isDefault };
+        }
+        // Only allow one default at a time.
+        return isDefault ? { ...pt, is_default: false } : pt;
+      }),
     }));
   };
 
@@ -3251,6 +3270,7 @@ const TripForm: React.FC = () => {
           data.pricing_type === "traveler_based"
             ? data.price_types.map((pt) => ({
                 category_id: pt.category_id,
+                is_default: Boolean((pt as any).is_default),
                 original_price: pt.original_price
                   ? parseFloat(pt.original_price)
                   : 0,
@@ -7436,6 +7456,26 @@ const TripForm: React.FC = () => {
                                       </p>
                                     )}
                                   </div>
+                                </div>
+
+                                <div className="mt-3 flex items-center justify-between">
+                                  <label className="inline-flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300">
+                                    <input
+                                      type="checkbox"
+                                      checked={Boolean(priceType.is_default)}
+                                      onChange={(e) =>
+                                        handlePriceTypeDefaultChange(
+                                          category.id,
+                                          e.target.checked,
+                                        )
+                                      }
+                                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600"
+                                    />
+                                    {__("Default price (used on page load)", "yatra")}
+                                  </label>
+                                  <span className="text-[11px] text-gray-500 dark:text-gray-400">
+                                    {__("Traveler-based pricing only", "yatra")}
+                                  </span>
                                 </div>
                               </div>
                             );

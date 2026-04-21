@@ -70,7 +70,11 @@ class TripPricingService
         ];
 
         if ($has_traveler_pricing) {
-            // Traveler-based: find minimum effective price across all categories
+            // Traveler-based:
+            // - If a default category is marked, use that for initial display (listings + single trip page-load).
+            // - Otherwise fall back to minimum effective price across categories (current behavior).
+            $default_price = 0.0;
+            $default_original = 0.0;
             $min_price = PHP_FLOAT_MAX;
             $min_original = 0.0;
             $max_discount = 0;
@@ -79,6 +83,11 @@ class TripPricingService
                 $pt = (array) $pt;
                 $original = (float) ($pt['original_price'] ?? 0);
                 $discounted = self::resolveCategoryEffectivePrice($pt);
+
+                if (!empty($pt['is_default']) && $default_price <= 0 && $discounted > 0) {
+                    $default_price = $discounted;
+                    $default_original = $original;
+                }
 
                 if ($discounted > 0 && $discounted < $min_price) {
                     $min_price = $discounted;
@@ -94,12 +103,15 @@ class TripPricingService
                 }
             }
 
-            if ($min_price < PHP_FLOAT_MAX) {
-                $result['effective_price_min'] = $min_price;
-                $result['min_category_original_price'] = $min_original;
+            $chosen_price = $default_price > 0 ? $default_price : ($min_price < PHP_FLOAT_MAX ? $min_price : 0.0);
+            $chosen_original = $default_price > 0 ? $default_original : $min_original;
+
+            if ($chosen_price > 0) {
+                $result['effective_price_min'] = $chosen_price;
+                $result['min_category_original_price'] = $chosen_original;
                 $result['max_discount_percentage'] = $max_discount;
-                $result['current_price'] = $min_price;
-                $result['original_price'] = $min_original;
+                $result['current_price'] = $chosen_price;
+                $result['original_price'] = $chosen_original;
                 $result['has_discount'] = $max_discount > 0;
                 $result['discount_percentage'] = $max_discount;
                 $result['price_prefix'] = __('From ', 'yatra');
@@ -208,14 +220,19 @@ class TripPricingService
         $price_types = self::resolvePriceTypes($trip);
 
         if ($pricing_type === 'traveler_based' && !empty($price_types)) {
+            $default = 0.0;
             $min = PHP_FLOAT_MAX;
             foreach ($price_types as $pt) {
-                $price = self::resolveCategoryEffectivePrice((array) $pt);
+                $ptArr = (array) $pt;
+                $price = self::resolveCategoryEffectivePrice($ptArr);
+                if (!empty($ptArr['is_default']) && $default <= 0 && $price > 0) {
+                    $default = $price;
+                }
                 if ($price > 0 && $price < $min) {
                     $min = $price;
                 }
             }
-            $effective = $min < PHP_FLOAT_MAX ? $min : 0.0;
+            $effective = $default > 0 ? $default : ($min < PHP_FLOAT_MAX ? $min : 0.0);
         } else {
             $current = self::resolveRegularCurrentPrice($trip);
             $original = (float) ($trip->original_price ?? 0);

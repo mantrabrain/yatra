@@ -143,7 +143,7 @@ if (!defined('ABSPATH')) {
     $discount = [
         'has_discount'       => $displayPricing['has_discount'] && $displayPricing['max_discount_percentage'] > 0,
         'discount_text'      => $displayPricing['max_discount_percentage'] > 0
-            ? sprintf(__('Up to %d%%', 'yatra'), $displayPricing['max_discount_percentage']) : '',
+            ? sprintf(__('Save up to %d%%', 'yatra'), $displayPricing['max_discount_percentage']) : '',
         'discount_percentage' => $displayPricing['max_discount_percentage'],
     ];
     ?>
@@ -212,7 +212,7 @@ if (!defined('ABSPATH')) {
         <div class="yatra-booking-price">
             <?php if ($discount['has_discount']): ?>
                 <div class="yatra-booking-discount-badge">
-                    <?php echo esc_html($discount['discount_text']); ?> <?php echo esc_html__('OFF', 'yatra'); ?>
+                    <?php echo esc_html($discount['discount_text']); ?>
                 </div>
             <?php endif; ?>
             <div class="yatra-booking-price-main">

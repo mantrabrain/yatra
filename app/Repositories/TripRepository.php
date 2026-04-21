@@ -1136,6 +1136,7 @@ class TripRepository extends BaseRepository
                 'sale_price'       => isset($pt['sale_price']) ? (float) $pt['sale_price'] : null,
                 'label'            => $pt['label'] ?? ($pt['title'] ?? null),
                 'pricing_mode'     => $pt['pricing_mode'] ?? 'per_person',
+                'is_default'       => !empty($pt['is_default']),
             ];
             if (isset($pt['category_label'])) {
                 $normalized['category_label'] = $pt['category_label'];
@@ -1610,6 +1611,22 @@ class TripRepository extends BaseRepository
         if (empty($priceTypes)) {
             return;
         }
+
+        // Ensure at most one default category is set (keep the first truthy one).
+        $defaultFound = false;
+        foreach ($priceTypes as &$pt) {
+            if (!is_array($pt)) {
+                continue;
+            }
+            $isDefault = !empty($pt['is_default']);
+            if ($isDefault && !$defaultFound) {
+                $defaultFound = true;
+                $pt['is_default'] = true;
+            } else {
+                $pt['is_default'] = false;
+            }
+        }
+        unset($pt);
 
         // Compute minimal pricing values from provided price types
         $minOriginal   = PHP_FLOAT_MAX;

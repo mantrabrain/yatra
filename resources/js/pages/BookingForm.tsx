@@ -19,7 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
-import { formatDate as formatDateUtil } from "../lib/dateFormat";
+import { formatDate as formatDateUtil, formatDateForInput } from "../lib/dateFormat";
 import { apiService } from "../lib/api-client";
 import { usePermissions } from "../hooks/usePermissions";
 import { getCurrencySymbol } from "../data/currencies";
@@ -125,8 +125,8 @@ const countryList = [
 // Normalize ISO/date-like string to formatted date using shared date library
 const normalizeDateInput = (value?: string | null) => {
   if (!value) return "";
-  const formatted = formatDateUtil(value);
-  return formatted || value;
+  // DatePicker strictly requires YYYY-MM-DD; use formatDateForInput to ensure correct format
+  return formatDateForInput(value) || value;
 };
 
 const BookingForm: React.FC = () => {

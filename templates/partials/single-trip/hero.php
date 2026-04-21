@@ -135,7 +135,7 @@ if (!defined('ABSPATH')) {
         <div class="yatra-hero-main-image" itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
             <?php if (isset($trip->discount_percentage) && $trip->discount_percentage > 0): ?>
                 <div class="yatra-hero-discount-tag" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-                    <?php echo esc_html__('SAVE', 'yatra'); ?> <?php echo esc_html($trip->discount_percentage); ?>%
+                    <?php echo esc_html__('SAVE UP TO', 'yatra'); ?> <?php echo esc_html($trip->discount_percentage); ?>%
                     <meta itemprop="discount" content="<?php echo esc_attr($trip->discount_percentage); ?>">
                     <meta itemprop="discountCurrency" content="<?php echo esc_attr(\Yatra\Services\SettingsService::getCurrency()); ?>">
                 </div>

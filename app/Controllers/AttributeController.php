@@ -105,6 +105,13 @@ class AttributeController extends BaseController
             ],
         ]);
 
+        // Bulk operations
+        register_rest_route($this->namespace, "/{$this->rest_base}/bulk", [
+            'methods'             => \WP_REST_Server::CREATABLE,
+            'callback'            => [$this, 'bulkAction'],
+            'permission_callback' => [$this, 'check_permission'],
+        ]);
+
         register_rest_route($this->namespace, "/{$this->rest_base}/orders", [
             'methods' => 'POST',
             'callback' => [$this, 'update_display_orders'],
@@ -498,6 +505,50 @@ class AttributeController extends BaseController
             
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 400);
+        }
+    }
+
+    /**
+     * Handle bulk operations
+     */
+    public function bulkAction(WP_REST_Request $request): WP_REST_Response
+    {
+        try {
+            $action = sanitize_text_field((string) $request->get_param('action'));
+            $ids    = $request->get_param('ids');
+
+            if (empty($action)) {
+                return $this->error_response(__('Action is required', 'yatra'), 400);
+            }
+
+            if (empty($ids) || !is_array($ids)) {
+                return $this->error_response(__('No attributes selected', 'yatra'), 400);
+            }
+
+            switch ($action) {
+                case 'trash':
+                    $result = $this->attributeService->bulkUpdateStatus($ids, 'trash');
+                    break;
+                case 'publish':
+                case 'restore':
+                    $result = $this->attributeService->bulkUpdateStatus($ids, 'publish');
+                    break;
+                case 'draft':
+                    $result = $this->attributeService->bulkUpdateStatus($ids, 'draft');
+                    break;
+                case 'delete':
+                    $result = $this->attributeService->bulkDelete($ids);
+                    break;
+                default:
+                    return $this->error_response(__('Invalid action', 'yatra'), 400);
+            }
+
+            return $this->success_response($result);
+
+        } catch (\InvalidArgumentException $e) {
+            return $this->error_response($e->getMessage(), 400);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
         }
     }
 
