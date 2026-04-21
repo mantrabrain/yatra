@@ -14,7 +14,9 @@ import {
   Trash2,
   Eye,
   CreditCard,
+  Download,
 } from "lucide-react";
+import { downloadAdminInvoice } from "../lib/invoice-download";
 import {
   Pagination,
   SearchFilterToolbar,
@@ -613,6 +615,25 @@ const Payments: React.FC = () => {
       label: __("Edit", "yatra"),
       icon: <Edit className="w-4 h-4" />,
       onClick: (payment: Payment) => handleEdit(payment),
+    },
+    {
+      key: "download_invoice",
+      label: __("Download Invoice", "yatra"),
+      icon: <Download className="w-4 h-4" />,
+      onClick: async (payment: Payment) => {
+        try {
+          await downloadAdminInvoice(payment.id);
+        } catch (error: any) {
+          showToast(
+            error?.message || __("Failed to download invoice", "yatra"),
+            "error",
+          );
+        }
+      },
+      condition: (payment: Payment) =>
+        ["completed", "paid"].includes(
+          String(payment.payment_status).toLowerCase(),
+        ),
     },
     {
       key: "mark_completed",

@@ -710,6 +710,8 @@ class PaymentGatewayController extends BaseController
         $paymentId = (int) $request->get_param('payment_id');
         $isPreview = $request->get_param('preview') === '1';
         $isDownload = $request->get_param('download') === '1';
+        $bookingToken = sanitize_text_field((string) ($request->get_param('booking_token') ?? ''));
+        $invoiceToken = sanitize_text_field((string) ($request->get_param('invoice_token') ?? ''));
 
         if ($paymentId <= 0) {
             return new WP_Error('invalid_payment', __('Invalid payment ID.', 'yatra'), ['status' => 400]);
@@ -722,18 +724,42 @@ class PaymentGatewayController extends BaseController
             return new WP_Error('payment_not_found', __('Payment not found.', 'yatra'), ['status' => 404]);
         }
 
-        // Verify user is logged in and owns this payment (or is admin)
-        $currentUserId = get_current_user_id();
+        // Authorisation:
+        //  1. Administrators can always access (no further checks).
+        //  2. Logged-in owner of the booking can access.
+        //  3. Anyone with a valid signed `invoice_token` (HMAC) can access — used on the
+        //     booking-confirmation page so guest checkouts and post-session views work.
+        //  4. Legacy guest path: `booking_token` (active checkout transient) — kept for BC.
+        $currentUserId = (int) get_current_user_id();
         $bookingUserId = (int) ($payment->booking_user_id ?? $payment->user_id ?? 0);
-        
-        // Must be logged in
-        if (!$currentUserId) {
-            return new WP_Error('unauthorized', __('You must be logged in to download invoices.', 'yatra'), ['status' => 401]);
+        $paymentBookingId = (int) ($payment->booking_id ?? 0);
+        $isAdmin = current_user_can('manage_options');
+        $authorised = false;
+
+        if ($isAdmin) {
+            $authorised = true;
+        } elseif ($currentUserId && $bookingUserId && $currentUserId === $bookingUserId) {
+            $authorised = true;
+        } elseif ($invoiceToken !== '' && self::verifyInvoiceToken($invoiceToken, (int) $payment->id, $paymentBookingId)) {
+            $authorised = true;
+        } elseif ($bookingToken !== '') {
+            $guestEnabled = (bool) SettingsService::get('allow_guest_checkout', true);
+            if ($guestEnabled) {
+                $session = get_transient($bookingToken);
+                if (is_array($session)) {
+                    $sessionBookingId = (int) ($session['booking_id'] ?? 0);
+                    if ($sessionBookingId > 0 && $paymentBookingId > 0 && $sessionBookingId === $paymentBookingId) {
+                        $authorised = true;
+                    }
+                }
+            }
         }
-        
-        // Must own the booking or be admin
-        if ($bookingUserId && $currentUserId !== $bookingUserId && !current_user_can('manage_options')) {
-            return new WP_Error('forbidden', __('You do not have permission to access this invoice.', 'yatra'), ['status' => 403]);
+
+        if (!$authorised) {
+            if ($currentUserId) {
+                return new WP_Error('forbidden', __('You do not have permission to access this invoice.', 'yatra'), ['status' => 403]);
+            }
+            return new WP_Error('unauthorized', __('You must be logged in to download invoices.', 'yatra'), ['status' => 401]);
         }
 
         // Get trip details if available
@@ -1083,5 +1109,33 @@ class PaymentGatewayController extends BaseController
             $pdfService->outputPdfDownload($pdfBinary, $filename);
             exit;
         }
+    }
+
+    /**
+     * Issue a stateless, signed token that grants access to a single payment's invoice.
+     *
+     * The token is bound to the payment id + booking id and signed with the WP auth salt,
+     * so it cannot be forged without the site secret. It is safe to embed in the
+     * confirmation page link so guests (or users who logged out after checkout) can still
+     * download their invoice without a session.
+     */
+    public static function issueInvoiceToken(int $paymentId, int $bookingId): string
+    {
+        if ($paymentId <= 0 || $bookingId <= 0) {
+            return '';
+        }
+        return hash_hmac('sha256', $paymentId . '|' . $bookingId, wp_salt('auth') . '|yatra_invoice');
+    }
+
+    /**
+     * Verify a token previously issued by self::issueInvoiceToken().
+     */
+    public static function verifyInvoiceToken(string $token, int $paymentId, int $bookingId): bool
+    {
+        if ($token === '' || $paymentId <= 0 || $bookingId <= 0) {
+            return false;
+        }
+        $expected = self::issueInvoiceToken($paymentId, $bookingId);
+        return $expected !== '' && hash_equals($expected, $token);
     }
 }

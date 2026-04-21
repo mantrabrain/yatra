@@ -648,13 +648,29 @@ do_action('yatra_booking_confirmation_header', $booking);
                 </a>
                 
                 <?php 
-                // Get latest payment for this booking to enable invoice download
+                // Get latest payment for this booking to enable invoice download.
+                // The invoice endpoint authorises via: admin → owner → signed invoice_token → guest booking_token.
+                // We always issue a signed invoice_token here so the link works for guests
+                // (no session required) AND for logged-in users who don't own the booking
+                // (e.g. site admins viewing the page) — without re-checking login on the client.
                 $paymentRepository = new \Yatra\Repositories\PaymentRepository();
                 $latestPayment = $paymentRepository->findLatestByBookingId((int) $booking->id);
-                if ($latestPayment && in_array($latestPayment->status, ['completed', 'paid'], true)) : 
+                if ($latestPayment && in_array($latestPayment->status, ['completed', 'paid'], true)) :
+                    $invoiceToken = \Yatra\Controllers\PaymentGatewayController::issueInvoiceToken(
+                        (int) $latestPayment->id,
+                        (int) ($latestPayment->booking_id ?? $booking->id)
+                    );
+                    $invoiceUrl = add_query_arg(
+                        [
+                            'download' => '1',
+                            'invoice_token' => $invoiceToken,
+                        ],
+                        rest_url('yatra/v1/payment/' . (int) $latestPayment->id . '/invoice')
+                    );
                 ?>
-                <a href="<?php echo esc_url(rest_url('yatra/v1/payment/' . $latestPayment->id . '/invoice')); ?>" 
+                <a href="<?php echo esc_url($invoiceUrl); ?>" 
                    target="_blank" 
+                   rel="noopener"
                    class="yatra-btn yatra-btn-primary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -665,7 +681,7 @@ do_action('yatra_booking_confirmation_header', $booking);
                 </a>
                 <?php endif; ?>
                 
-                <button onclick="window.print();" class="yatra-btn yatra-btn-outline">
+                <button type="button" data-yatra-print="confirmation" class="yatra-btn yatra-btn-outline">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="6 9 6 2 18 2 18 9"></polyline>
                         <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
@@ -1071,17 +1087,93 @@ do_action('yatra_booking_confirmation_header', $booking);
     color: #3b82f6;
 }
 
-/* Print Styles */
+/* Print Styles — print only the confirmation card, not the surrounding theme chrome */
 @media print {
-    .yatra-confirmation-actions {
-        display: none;
+    body.yatra-printing-confirmation {
+        background: #fff !important;
     }
-    
-    .yatra-confirmation-wrapper {
+    body.yatra-printing-confirmation > *:not(.yatra-print-root) {
+        display: none !important;
+    }
+    body.yatra-printing-confirmation .yatra-print-root,
+    body.yatra-printing-confirmation .yatra-print-root * {
+        visibility: visible;
+    }
+    body.yatra-printing-confirmation .yatra-print-root {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
         padding: 0;
+    }
+    body.yatra-printing-confirmation .yatra-confirmation-wrapper {
+        padding: 0 !important;
+        max-width: none !important;
+    }
+    body.yatra-printing-confirmation .yatra-confirmation-actions,
+    body.yatra-printing-confirmation .yatra-no-print {
+        display: none !important;
     }
 }
 </style>
+
+<script>
+(function () {
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-yatra-print="confirmation"]');
+        if (!btn) {
+            return;
+        }
+        e.preventDefault();
+
+        var card = document.querySelector('.yatra-confirmation-container');
+        if (!card) {
+            window.print();
+            return;
+        }
+
+        // Wrap (or reuse) a print-only root so the @media print rules can target a single
+        // direct child of <body>. Reused on the account page if the same data attribute
+        // and CSS rules are added there.
+        var root = document.querySelector('.yatra-print-root');
+        var addedWrapper = false;
+        if (!root) {
+            root = document.createElement('div');
+            root.className = 'yatra-print-root';
+            document.body.appendChild(root);
+            addedWrapper = true;
+        }
+        var clone = card.cloneNode(true);
+        // Drop the action buttons from the clone so they don't appear on paper.
+        clone.querySelectorAll('.yatra-confirmation-actions').forEach(function (n) { n.remove(); });
+        root.innerHTML = '';
+        root.appendChild(clone);
+
+        document.body.classList.add('yatra-printing-confirmation');
+
+        var cleanup = function () {
+            document.body.classList.remove('yatra-printing-confirmation');
+            if (addedWrapper && root && root.parentNode) {
+                root.parentNode.removeChild(root);
+            } else if (root) {
+                root.innerHTML = '';
+            }
+            window.removeEventListener('afterprint', cleanup);
+        };
+
+        window.addEventListener('afterprint', cleanup);
+        // Safety net for browsers that don't fire afterprint reliably.
+        window.setTimeout(function () {
+            if (document.body.classList.contains('yatra-printing-confirmation')) {
+                cleanup();
+            }
+        }, 5000);
+
+        window.print();
+    });
+})();
+</script>
 
 <?php yatra_get_footer(); ?>
 

@@ -13,9 +13,12 @@ import {
   CreditCard,
   Edit,
   ExternalLink,
+  Download,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { apiService } from "../lib/api-client";
+import { downloadAdminInvoice } from "../lib/invoice-download";
+import { useToast } from "../components/ui/toast";
 import { usePermissions } from "../hooks/usePermissions";
 import { Button } from "../components/ui/button";
 import { PageHeader } from "../components/common/PageHeader";
@@ -62,6 +65,8 @@ interface ViewPaymentRow {
 
 const ViewPayment: React.FC = () => {
   const { can } = usePermissions();
+  const { showToast } = useToast();
+  const [isDownloadingInvoice, setIsDownloadingInvoice] = React.useState(false);
 
   // Get payment id from URL
   const paymentId = useMemo(() => {
@@ -195,6 +200,27 @@ const ViewPayment: React.FC = () => {
     }
   };
 
+  const handleDownloadInvoice = async () => {
+    if (!paymentId) return;
+    setIsDownloadingInvoice(true);
+    try {
+      await downloadAdminInvoice(paymentId);
+    } catch (e: any) {
+      showToast(
+        e?.message || __("Failed to download invoice", "yatra"),
+        "error",
+      );
+    } finally {
+      setIsDownloadingInvoice(false);
+    }
+  };
+
+  const canDownloadInvoice =
+    !!payment &&
+    ["completed", "paid"].includes(
+      String(payment.payment_status).toLowerCase(),
+    );
+
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -298,6 +324,19 @@ const ViewPayment: React.FC = () => {
               <ArrowLeft className="w-4 h-4" />
               {__("Back", "yatra")}
             </Button>
+            {canDownloadInvoice && (
+              <Button
+                variant="outline"
+                onClick={handleDownloadInvoice}
+                disabled={isDownloadingInvoice}
+                className="flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                {isDownloadingInvoice
+                  ? __("Downloading…", "yatra")
+                  : __("Download Invoice", "yatra")}
+              </Button>
+            )}
             <ConditionalRender capability="yatra_edit_bookings">
               <Button onClick={handleEdit} className="flex items-center gap-2">
                 <Edit className="w-4 h-4" />

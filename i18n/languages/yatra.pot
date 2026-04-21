@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Yatra - Travel Booking & Management 3.0.2.7\n"
+"Project-Id-Version: Yatra - Travel Booking & Management 3.0.2.8\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/yatra\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-21T12:10:51+00:00\n"
+"POT-Creation-Date: 2026-04-21T12:55:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -2771,27 +2771,36 @@ msgstr ""
 msgid "Valid booking is required to download this file."
 msgstr ""
 
-#: app/Controllers/UsageTrackingController.php:112
+#: app/Controllers/UsageTrackingController.php:83
+#: app/Controllers/UsageTrackingController.php:114
+#: app/Controllers/UsageTrackingController.php:136
+#: app/Controllers/UsageTrackingController.php:187
+#: app/Controllers/UsageTrackingController.php:207
+#: app/Controllers/UsageTrackingController.php:224
+msgid "Usage tracking is unavailable because StatsUsage could not be loaded. Please ensure Yatra is deployed with app/Services/StatsUsage.php and vendor/autoload.php."
+msgstr ""
+
+#: app/Controllers/UsageTrackingController.php:126
 msgid "Preference saved."
 msgstr ""
 
-#: app/Controllers/UsageTrackingController.php:127
+#: app/Controllers/UsageTrackingController.php:147
 msgid "Sharing is turned off. Enable it above, or use “Send now” for a one-time test send."
 msgstr ""
 
-#: app/Controllers/UsageTrackingController.php:136
+#: app/Controllers/UsageTrackingController.php:156
 msgid "Sent successfully."
 msgstr ""
 
-#: app/Controllers/UsageTrackingController.php:137
+#: app/Controllers/UsageTrackingController.php:157
 msgid "Send failed; will retry with backoff."
 msgstr ""
 
-#: app/Controllers/UsageTrackingController.php:182
+#: app/Controllers/UsageTrackingController.php:214
 msgid "Local telemetry cache cleared."
 msgstr ""
 
-#: app/Controllers/UsageTrackingController.php:193
+#: app/Controllers/UsageTrackingController.php:231
 msgid "Local snapshots removed."
 msgstr ""
 
@@ -2825,7 +2834,6 @@ msgid "Error"
 msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:44
-#: includes/admin/templates/free-vs-pro.php:247
 msgid "Google Calendar Integration"
 msgstr ""
 
@@ -3367,7 +3375,6 @@ msgstr ""
 #: core/Premium.php:232
 #: core/Premium.php:427
 #: core/Premium.php:618
-#: includes/admin/templates/free-vs-pro.php:335
 #: templates/setup-wizard/complete-old.php:149
 msgid "Upgrade to Pro"
 msgstr ""
@@ -3460,7 +3467,6 @@ msgid "Please try again"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:559
-#: includes/admin/templates/free-vs-pro.php:27
 msgid "Free"
 msgstr ""
 
@@ -5030,7 +5036,6 @@ msgid "Recommended"
 msgstr ""
 
 #: app/Services/TripListingPageContextFactory.php:275
-#: includes/admin/templates/free-vs-pro.php:42
 #: templates/listing-activity.php:99
 #: templates/listing-destination.php:99
 #: templates/listing-trip-category.php:99
@@ -5449,7 +5454,6 @@ msgstr ""
 #: core/Premium.php:155
 #: core/Premium.php:156
 #: core/Premium.php:405
-#: includes/admin/templates/free-vs-pro.php:208
 msgid "Availability Conditions"
 msgstr ""
 
@@ -5469,7 +5473,6 @@ msgstr ""
 #: core/Premium.php:241
 #: core/Premium.php:345
 #: core/Premium.php:625
-#: includes/admin/templates/free-vs-pro.php:337
 msgid "7-day money-back guarantee"
 msgstr ""
 
@@ -5535,7 +5538,6 @@ msgid "Premium Features"
 msgstr ""
 
 #: core/Premium.php:413
-#: includes/admin/templates/free-vs-pro.php:195
 #: templates/partials/remaining-checkout-content.php:93
 msgid "Partial Payment"
 msgstr ""
@@ -5545,7 +5547,6 @@ msgid "Reviews & Ratings"
 msgstr ""
 
 #: core/Premium.php:421
-#: includes/admin/templates/free-vs-pro.php:121
 msgid "Payment Gateways"
 msgstr ""
 
@@ -5788,238 +5789,6 @@ msgstr ""
 
 #: core/ProCompatibility.php:715
 msgid "Yatra Pro has been successfully activated! The page will reload shortly."
-msgstr ""
-
-#: includes/admin/class-yatra-promotional-notice.php:161
-msgid "🔥 Yatra Pro Price Increase Alert!"
-msgstr ""
-
-#: includes/admin/class-yatra-promotional-notice.php:163
-msgid "Important Notice:"
-msgstr ""
-
-#: includes/admin/class-yatra-promotional-notice.php:164
-msgid "Yatra Pro pricing will be increasing by 20% soon. Lock in current pricing before the increase!"
-msgstr ""
-
-#: includes/admin/class-yatra-promotional-notice.php:167
-msgid "Get Yatra Pro now at the current price and enjoy all premium features including advanced booking management, priority updates, and premium customer support."
-msgstr ""
-
-#: includes/admin/class-yatra-promotional-notice.php:173
-msgid "Get Yatra Pro Now"
-msgstr ""
-
-#: includes/admin/class-yatra-promotional-notice.php:178
-msgid "View Pricing"
-msgstr ""
-
-#: includes/admin/class-yatra-promotional-notice.php:296
-msgid "You do not have sufficient permissions to perform this action."
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:16
-msgid "Free vs Pro Comparison"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:17
-msgid "Compare the features available in Yatra Free vs Yatra Pro to make the best choice for your travel business."
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:23
-msgid "Features"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:30
-msgid "Forever"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:36
-msgid "Pro"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:39
-msgid "/year"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:51
-msgid "Core Features"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:55
-msgid "Tour Management"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:56
-msgid "Create and manage unlimited tour packages with detailed information"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:68
-msgid "Booking System"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:69
-msgid "Complete booking management with availability calendar"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:81
-msgid "Customer Management"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:82
-msgid "Manage customer accounts and booking history"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:94
-msgid "Basic Email Notifications"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:95
-msgid "Automated email notifications for bookings"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:107
-msgid "PayPal Integration"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:108
-msgid "Accept PayPal payments for tour bookings"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:125
-msgid "Stripe Payment Gateway"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:126
-msgid "Accept credit card payments securely"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:138
-msgid "Authorize.Net Gateway"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:139
-msgid "Enterprise-level payment processing"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:151
-msgid "Razorpay Gateway"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:152
-msgid "Indian payment gateway integration"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:164
-msgid "2Checkout Gateway"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:165
-msgid "Global payment processing solution"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:177
-msgid "Square Payment Gateway"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:178
-msgid "Point-of-sale payment integration"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:191
-msgid "Advanced Features"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:196
-msgid "Allow customers to pay in installments"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:209
-msgid "Set custom rules for tour availability"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:221
-msgid "Services Management"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:222
-msgid "Add extra services to tour packages"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:234
-msgid "Downloads Management"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:235
-msgid "Add downloaded items on the tour package"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:248
-msgid "Sync bookings with Google Calendar"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:260
-msgid "Review & Rating System"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:261
-msgid "Collect and display customer reviews"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:274
-msgid "Support & License"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:278
-msgid "Community Support"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:279
-msgid "Get help from the WordPress community"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:291
-msgid "Priority Support"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:292
-msgid "Fast-track support from our expert team"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:306
-msgid "All Future Add-ons"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:307
-msgid "Access to all upcoming premium features"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:323
-msgid "Continue with Free"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:329
-msgid "Current Plan"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:339
-msgid "Learn More"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:348
-msgid "Still have questions?"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:349
-msgid "Our team is here to help you choose the right plan for your business."
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:352
-msgid "View Documentation"
-msgstr ""
-
-#: includes/admin/templates/free-vs-pro.php:355
-msgid "Contact Support"
 msgstr ""
 
 #: includes/helpers.php:204
