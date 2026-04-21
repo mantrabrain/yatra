@@ -2101,6 +2101,7 @@ const Settings: React.FC = () => {
   );
   const [usageBusy, setUsageBusy] = useState(false);
   const [usageLoading, setUsageLoading] = useState(false);
+  const [usageError, setUsageError] = useState<string>("");
 
   // Initialize viewingSection from activeSection on mount
   useEffect(() => {
@@ -2158,15 +2159,23 @@ const Settings: React.FC = () => {
     }
     let cancelled = false;
     setUsageLoading(true);
+    setUsageError("");
     (async () => {
       try {
         const s = await fetchUsageTrackingStatus();
         if (!cancelled) {
           setUsageStatus(s);
         }
-      } catch {
+      } catch (e: any) {
         if (!cancelled) {
           setUsageStatus(null);
+          const status =
+            e?.response?.status != null ? ` (HTTP ${e.response.status})` : "";
+          const msg =
+            (typeof e?.message === "string" && e.message.trim() !== ""
+              ? e.message
+              : __("Failed to load usage tracking status", "yatra")) + status;
+          setUsageError(msg);
         }
       } finally {
         // Always clear loading — otherwise a strict-mode remount / dependency churn can leave the spinner stuck.
@@ -7620,12 +7629,19 @@ const Settings: React.FC = () => {
               )}
 
               {!usageLoading && !usageStatus && (
-                <p className="text-sm text-amber-600">
-                  {__(
-                    "Could not load this section. You may need permission to manage Yatra.",
-                    "yatra",
+                <div className="space-y-1">
+                  <p className="text-sm text-amber-600">
+                    {__(
+                      "Could not load this section. You may need permission to manage Yatra.",
+                      "yatra",
+                    )}
+                  </p>
+                  {usageError && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {usageError}
+                    </p>
                   )}
-                </p>
+                </div>
               )}
 
               {!usageLoading && usageStatus && (

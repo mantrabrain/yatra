@@ -2391,9 +2391,9 @@ if (!function_exists('yatra_usage_track_event')) {
      */
     function yatra_usage_track_event(string $event, int $delta = 1): void
     {
-        if (!class_exists(\Yatra\Admin\StatsUsage::class)) {
+        if (!class_exists(\Yatra\Services\StatsUsage::class)) {
             return;
         }
-        \Yatra\Admin\StatsUsage::instance()->record_event($event, $delta);
+        \Yatra\Services\StatsUsage::instance()->record_event($event, $delta);
     }
 }

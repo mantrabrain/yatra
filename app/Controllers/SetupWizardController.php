@@ -9,7 +9,7 @@
 
 namespace Yatra\Controllers;
 
-use Yatra\Admin\StatsUsage;
+use Yatra\Services\StatsUsage;
 use Yatra\Helpers\CurrencyHelper;
 use Yatra\Services\SettingsService;
 

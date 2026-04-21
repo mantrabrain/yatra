@@ -2,12 +2,12 @@
 /**
  * Yatra usage telemetry (opt-in, privacy-safe).
  *
- * @package Yatra\Admin
+ * @package Yatra\Services
  */
 
 declare(strict_types=1);
 
-namespace Yatra\Admin;
+namespace Yatra\Services;
 
 use Yatra\Core\Modules\ModuleManager;
 use Yatra\Database\Tables\BookingsTable;

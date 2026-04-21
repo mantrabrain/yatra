@@ -76,8 +76,8 @@ class Bootstrap
                 \Yatra\Services\NoticeService::init();
             }
 
-            if (class_exists('\Yatra\Admin\StatsUsage')) {
-                \Yatra\Admin\StatsUsage::instance()->init();
+            if (class_exists('\Yatra\Services\StatsUsage')) {
+                \Yatra\Services\StatsUsage::instance()->init();
             }
 
             // Initialize Dynamic Pricing Service

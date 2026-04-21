@@ -10,7 +10,6 @@ class ComposerStaticInit2644eb7ce44b7b2615237db55150e0c3
         'Y' => 
         array (
             'Yatra\\Migration\\' => 16,
-            'Yatra\\Admin\\' => 12,
             'Yatra\\' => 6,
         ),
         'S' => 
@@ -36,10 +35,6 @@ class ComposerStaticInit2644eb7ce44b7b2615237db55150e0c3
         'Yatra\\Migration\\' => 
         array (
             0 => __DIR__ . '/../..' . '/app/Migrations',
-        ),
-        'Yatra\\Admin\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/includes/admin',
         ),
         'Yatra\\' => 
         array (
@@ -268,7 +263,6 @@ class ComposerStaticInit2644eb7ce44b7b2615237db55150e0c3
         'Svg\\Tag\\Symbol' => __DIR__ . '/..' . '/phenx/php-svg-lib/src/Svg/Tag/Symbol.php',
         'Svg\\Tag\\Text' => __DIR__ . '/..' . '/phenx/php-svg-lib/src/Svg/Tag/Text.php',
         'Svg\\Tag\\UseTag' => __DIR__ . '/..' . '/phenx/php-svg-lib/src/Svg/Tag/UseTag.php',
-        'Yatra\\Admin\\StatsUsage' => __DIR__ . '/../..' . '/includes/admin/StatsUsage.php',
         'Yatra\\Ajax\\ActivityShortcodeAjax' => __DIR__ . '/../..' . '/app/Ajax/ActivityShortcodeAjax.php',
         'Yatra\\Ajax\\DestinationShortcodeAjax' => __DIR__ . '/../..' . '/app/Ajax/DestinationShortcodeAjax.php',
         'Yatra\\Ajax\\DirectAttributeQuery' => __DIR__ . '/../..' . '/app/Ajax/DirectAttributeQuery.php',
@@ -537,6 +531,7 @@ class ComposerStaticInit2644eb7ce44b7b2615237db55150e0c3
         'Yatra\\Services\\SettingsService' => __DIR__ . '/../..' . '/app/Services/SettingsService.php',
         'Yatra\\Services\\SetupService' => __DIR__ . '/../..' . '/app/Services/SetupService.php',
         'Yatra\\Services\\SetupWizardService' => __DIR__ . '/../..' . '/app/Services/SetupWizardService.php',
+        'Yatra\\Services\\StatsUsage' => __DIR__ . '/../..' . '/app/Services/StatsUsage.php',
         'Yatra\\Services\\TaxService' => __DIR__ . '/../..' . '/app/Services/TaxService.php',
         'Yatra\\Services\\TaxValidationService' => __DIR__ . '/../..' . '/app/Services/TaxValidationService.php',
         'Yatra\\Services\\TransactionalEmailTemplateService' => __DIR__ . '/../..' . '/app/Services/TransactionalEmailTemplateService.php',

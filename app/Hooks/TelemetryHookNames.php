@@ -7,7 +7,7 @@ namespace Yatra\Hooks;
 /**
  * Action hook names used for usage telemetry and related lifecycle signals.
  *
- * Emitters call {@see do_action()} with these constants. {@see \Yatra\Admin\StatsUsage}
+ * Emitters call {@see do_action()} with these constants. {@see \Yatra\Services\StatsUsage}
  * registers listeners against the same values — keep them in sync only here.
  *
  * @see \Yatra\Services\BookingService::createBooking() BOOKING_CREATED

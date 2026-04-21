@@ -7,7 +7,6 @@ namespace Yatra\Controllers;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
-use Yatra\Admin\StatsUsage;
 
 /**
  * REST endpoints for opt-in usage telemetry (admin only).
@@ -77,16 +76,25 @@ class UsageTrackingController extends BaseController
     public function get_status(WP_REST_Request $request): WP_REST_Response
     {
         unset($request);
-        $u = StatsUsage::instance();
+        // Never fatal if telemetry files were not packaged correctly.
+        if (!class_exists('\\Yatra\\Services\\StatsUsage')) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Usage tracking is unavailable because StatsUsage could not be loaded. Please ensure Yatra is deployed with app/Services/StatsUsage.php and vendor/autoload.php.', 'yatra'),
+            ], 500);
+        }
+
+        /** @var \Yatra\Services\StatsUsage $u */
+        $u = \Yatra\Services\StatsUsage::instance();
 
         return new WP_REST_Response([
             'success' => true,
             'data' => [
                 'enabled' => $u->is_enabled(),
-                'last_sync' => (int) get_option(StatsUsage::OPT_LAST_SYNC, 0),
+                'last_sync' => (int) get_option(\Yatra\Services\StatsUsage::OPT_LAST_SYNC, 0),
                 'next_scheduled' => $u->get_next_scheduled(),
-                'retry_count' => (int) get_option(StatsUsage::OPT_RETRY_COUNT, 0),
-                'next_retry' => (int) get_option(StatsUsage::OPT_NEXT_RETRY, 0),
+                'retry_count' => (int) get_option(\Yatra\Services\StatsUsage::OPT_RETRY_COUNT, 0),
+                'next_retry' => (int) get_option(\Yatra\Services\StatsUsage::OPT_NEXT_RETRY, 0),
                 'instance_id' => $u->ensure_instance_id(),
                 'last_send_error' => $u->get_last_send_error(),
             ],
@@ -100,7 +108,13 @@ class UsageTrackingController extends BaseController
             $body = [];
         }
         $enabled = !empty($body['enabled']);
-        $u = StatsUsage::instance();
+        if (!class_exists('\\Yatra\\Services\\StatsUsage')) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Usage tracking is unavailable because StatsUsage could not be loaded. Please ensure Yatra is deployed with app/Services/StatsUsage.php and vendor/autoload.php.', 'yatra'),
+            ], 500);
+        }
+        $u = \Yatra\Services\StatsUsage::instance();
         if ($enabled) {
             $u->enable(true);
         } else {
@@ -116,7 +130,13 @@ class UsageTrackingController extends BaseController
 
     public function send_now(WP_REST_Request $request): WP_REST_Response
     {
-        $u = StatsUsage::instance();
+        if (!class_exists('\\Yatra\\Services\\StatsUsage')) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Usage tracking is unavailable because StatsUsage could not be loaded. Please ensure Yatra is deployed with app/Services/StatsUsage.php and vendor/autoload.php.', 'yatra'),
+            ], 500);
+        }
+        $u = \Yatra\Services\StatsUsage::instance();
         $body = $request->get_json_params();
         $body = is_array($body) ? $body : [];
         $force = !empty($body['force']);
@@ -161,7 +181,13 @@ class UsageTrackingController extends BaseController
     public function preview_payload(WP_REST_Request $request): WP_REST_Response
     {
         unset($request);
-        $u = StatsUsage::instance();
+        if (!class_exists('\\Yatra\\Services\\StatsUsage')) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Usage tracking is unavailable because StatsUsage could not be loaded. Please ensure Yatra is deployed with app/Services/StatsUsage.php and vendor/autoload.php.', 'yatra'),
+            ], 500);
+        }
+        $u = \Yatra\Services\StatsUsage::instance();
         $payload = $u->build_payload();
 
         return new WP_REST_Response([
@@ -175,7 +201,13 @@ class UsageTrackingController extends BaseController
     public function clear_cache(WP_REST_Request $request): WP_REST_Response
     {
         unset($request);
-        StatsUsage::instance()->clear_local_cache();
+        if (!class_exists('\\Yatra\\Services\\StatsUsage')) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Usage tracking is unavailable because StatsUsage could not be loaded. Please ensure Yatra is deployed with app/Services/StatsUsage.php and vendor/autoload.php.', 'yatra'),
+            ], 500);
+        }
+        \Yatra\Services\StatsUsage::instance()->clear_local_cache();
 
         return new WP_REST_Response([
             'success' => true,
@@ -186,7 +218,13 @@ class UsageTrackingController extends BaseController
     public function delete_snapshots(WP_REST_Request $request): WP_REST_Response
     {
         unset($request);
-        StatsUsage::instance()->delete_snapshots();
+        if (!class_exists('\\Yatra\\Services\\StatsUsage')) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Usage tracking is unavailable because StatsUsage could not be loaded. Please ensure Yatra is deployed with app/Services/StatsUsage.php and vendor/autoload.php.', 'yatra'),
+            ], 500);
+        }
+        \Yatra\Services\StatsUsage::instance()->delete_snapshots();
 
         return new WP_REST_Response([
             'success' => true,

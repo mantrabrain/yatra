@@ -7,7 +7,7 @@
 
 defined('ABSPATH') || exit;
 
-use Yatra\Admin\StatsUsage;
+use Yatra\Services\StatsUsage;
 
 $usage_stored = get_option(StatsUsage::OPT_CONSENT, null);
 /** First visit: default checked; after save, reflect stored preference. */
