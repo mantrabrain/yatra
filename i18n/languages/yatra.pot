@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-21T12:55:39+00:00\n"
+"POT-Creation-Date: 2026-04-21T13:48:28+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -266,7 +266,7 @@ msgid "per booking"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1315
-#: app/Controllers/PaymentGatewayController.php:794
+#: app/Controllers/PaymentGatewayController.php:820
 #: app/Controllers/SettingsController.php:121
 #: app/Services/BookingTaxService.php:128
 #: app/Services/BookingTaxService.php:214
@@ -565,7 +565,7 @@ msgid "Welcome back,"
 msgstr ""
 
 #: assets/dist/js/account-page.js:2093
-#: templates/booking-confirmation.php:664
+#: templates/booking-confirmation.php:680
 msgid "Download Invoice"
 msgstr ""
 
@@ -1408,9 +1408,9 @@ msgid "Status is required."
 msgstr ""
 
 #: app/Controllers/BookingsController.php:524
-#: app/Controllers/PaymentGatewayController.php:722
-#: app/Controllers/PaymentGatewayController.php:868
-#: app/Controllers/PaymentGatewayController.php:985
+#: app/Controllers/PaymentGatewayController.php:724
+#: app/Controllers/PaymentGatewayController.php:894
+#: app/Controllers/PaymentGatewayController.php:1011
 #: app/Services/PaymentService.php:118
 #: app/Services/PaymentService.php:155
 #: app/Services/PaymentService.php:185
@@ -1452,38 +1452,38 @@ msgid "Booking not found."
 msgstr ""
 
 #: app/Controllers/BookingsController.php:747
-#: app/Controllers/PaymentGatewayController.php:877
+#: app/Controllers/PaymentGatewayController.php:903
 msgid "You must be logged in to download vouchers."
 msgstr ""
 
 #: app/Controllers/BookingsController.php:752
-#: app/Controllers/PaymentGatewayController.php:882
+#: app/Controllers/PaymentGatewayController.php:908
 msgid "You do not have permission to access this voucher."
 msgstr ""
 
 #: app/Controllers/BookingsController.php:767
 #: app/Controllers/BookingsController.php:828
-#: app/Controllers/PaymentGatewayController.php:715
-#: app/Controllers/PaymentGatewayController.php:861
-#: app/Controllers/PaymentGatewayController.php:978
+#: app/Controllers/PaymentGatewayController.php:717
+#: app/Controllers/PaymentGatewayController.php:887
+#: app/Controllers/PaymentGatewayController.php:1004
 msgid "Invalid payment ID."
 msgstr ""
 
 #: app/Controllers/BookingsController.php:808
-#: app/Controllers/PaymentGatewayController.php:994
+#: app/Controllers/PaymentGatewayController.php:1020
 msgid "You must be logged in to download itineraries."
 msgstr ""
 
 #: app/Controllers/BookingsController.php:813
-#: app/Controllers/PaymentGatewayController.php:999
+#: app/Controllers/PaymentGatewayController.php:1025
 msgid "You do not have permission to access this itinerary."
 msgstr ""
 
 #: app/Controllers/BookingsController.php:881
 #: app/Controllers/BookingsController.php:974
-#: app/Controllers/PaymentGatewayController.php:811
-#: app/Controllers/PaymentGatewayController.php:927
-#: app/Controllers/PaymentGatewayController.php:1043
+#: app/Controllers/PaymentGatewayController.php:837
+#: app/Controllers/PaymentGatewayController.php:953
+#: app/Controllers/PaymentGatewayController.php:1069
 #: app/Services/EmailTemplateDefaults.php:178
 #: app/Services/EmailTemplateDefaults.php:211
 #: app/Services/EmailTemplateDefaults.php:303
@@ -1494,22 +1494,22 @@ msgstr ""
 
 #: app/Controllers/BookingsController.php:895
 #: app/Controllers/BookingsController.php:999
-#: app/Controllers/PaymentGatewayController.php:817
-#: app/Controllers/PaymentGatewayController.php:934
-#: app/Controllers/PaymentGatewayController.php:1050
+#: app/Controllers/PaymentGatewayController.php:843
+#: app/Controllers/PaymentGatewayController.php:960
+#: app/Controllers/PaymentGatewayController.php:1076
 msgid "Trip Booking"
 msgstr ""
 
 #: app/Controllers/BookingsController.php:896
 #: app/Controllers/BookingsController.php:1001
-#: app/Controllers/PaymentGatewayController.php:935
-#: app/Controllers/PaymentGatewayController.php:1052
+#: app/Controllers/PaymentGatewayController.php:961
+#: app/Controllers/PaymentGatewayController.php:1078
 #, php-format
 msgid "%d days"
 msgstr ""
 
 #: app/Controllers/BookingsController.php:913
-#: app/Controllers/PaymentGatewayController.php:917
+#: app/Controllers/PaymentGatewayController.php:943
 msgid "Voucher PDF generator is not installed. Please run composer install to install dompdf/dompdf."
 msgstr ""
 
@@ -2174,15 +2174,15 @@ msgstr ""
 msgid "Payment not found"
 msgstr ""
 
-#: app/Controllers/PaymentGatewayController.php:731
-msgid "You must be logged in to download invoices."
-msgstr ""
-
-#: app/Controllers/PaymentGatewayController.php:736
+#: app/Controllers/PaymentGatewayController.php:760
 msgid "You do not have permission to access this invoice."
 msgstr ""
 
-#: app/Controllers/PaymentGatewayController.php:766
+#: app/Controllers/PaymentGatewayController.php:762
+msgid "You must be logged in to download invoices."
+msgstr ""
+
+#: app/Controllers/PaymentGatewayController.php:792
 msgid "Invoice PDF generator is not installed. Please run composer install to install dompdf/dompdf."
 msgstr ""
 
@@ -6052,7 +6052,7 @@ msgstr ""
 msgid "Return to Home"
 msgstr ""
 
-#: templates/booking-confirmation.php:674
+#: templates/booking-confirmation.php:690
 msgid "Print Confirmation"
 msgstr ""
 

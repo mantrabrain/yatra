@@ -1087,11 +1087,44 @@ do_action('yatra_booking_confirmation_header', $booking);
     color: #3b82f6;
 }
 
-/* Print Styles — print only the confirmation card, not the surrounding theme chrome */
+/* =====================================================================
+   Print Styles — produce a clean, single-page-friendly receipt.
+   Triggered by the print button (adds .yatra-printing-confirmation
+   to <body> + clones the confirmation card into .yatra-print-root).
+   ===================================================================== */
 @media print {
+    @page {
+        size: A4;
+        margin: 9mm 10mm;
+    }
+
+    /* Force browsers to print our colors / borders */
+    body.yatra-printing-confirmation,
+    body.yatra-printing-confirmation * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
+    /* Reset body, kill animations & transitions */
     body.yatra-printing-confirmation {
         background: #fff !important;
+        color: #111827 !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            Helvetica, Arial, sans-serif !important;
+        font-size: 10pt !important;
+        line-height: 1.45 !important;
     }
+    body.yatra-printing-confirmation *,
+    body.yatra-printing-confirmation *::before,
+    body.yatra-printing-confirmation *::after {
+        animation: none !important;
+        transition: none !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    /* Hide everything except our cloned print root */
     body.yatra-printing-confirmation > *:not(.yatra-print-root) {
         display: none !important;
     }
@@ -1100,20 +1133,303 @@ do_action('yatra_booking_confirmation_header', $booking);
         visibility: visible;
     }
     body.yatra-printing-confirmation .yatra-print-root {
-        position: absolute;
-        left: 0;
-        top: 0;
+        position: static !important;
+        left: auto;
+        top: auto;
         width: 100%;
         margin: 0;
         padding: 0;
     }
-    body.yatra-printing-confirmation .yatra-confirmation-wrapper {
-        padding: 0 !important;
+
+    /* Wrappers — remove screen padding/widths */
+    body.yatra-printing-confirmation .yatra-confirmation-wrapper,
+    body.yatra-printing-confirmation .yatra-confirmation-container {
         max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
+
+    /* Hide things that don't belong on paper */
     body.yatra-printing-confirmation .yatra-confirmation-actions,
-    body.yatra-printing-confirmation .yatra-no-print {
+    body.yatra-printing-confirmation .yatra-no-print,
+    body.yatra-printing-confirmation .yatra-whats-next,
+    body.yatra-printing-confirmation .yatra-trip-rating {
         display: none !important;
+    }
+
+    /* Confirmation header — compact, two-column with status icon left & ref right */
+    body.yatra-printing-confirmation .yatra-confirmation-header {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 16pt !important;
+        text-align: left !important;
+        margin: 0 0 8pt !important;
+        padding: 0 0 6pt !important;
+        border-bottom: 1pt solid #111827 !important;
+    }
+    body.yatra-printing-confirmation .yatra-confirmation-icon {
+        width: 28pt !important;
+        height: 28pt !important;
+        margin: 0 !important;
+        background: #16a34a !important;
+        flex-shrink: 0 !important;
+    }
+    body.yatra-printing-confirmation .yatra-confirmation-icon svg {
+        width: 16pt !important;
+        height: 16pt !important;
+    }
+    body.yatra-printing-confirmation .yatra-confirmation-title {
+        font-size: 14pt !important;
+        font-weight: 700 !important;
+        margin: 0 !important;
+        flex: 1 !important;
+        color: #111827 !important;
+    }
+    body.yatra-printing-confirmation .yatra-confirmation-subtitle {
+        display: none !important;
+    }
+    body.yatra-printing-confirmation .yatra-confirmation-reference {
+        display: inline-flex !important;
+        flex-direction: column !important;
+        align-items: flex-end !important;
+        gap: 2pt !important;
+        background: transparent !important;
+        padding: 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
+    }
+    body.yatra-printing-confirmation .yatra-ref-label {
+        font-size: 8pt !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.4pt !important;
+        color: #6b7280 !important;
+    }
+    body.yatra-printing-confirmation .yatra-ref-code {
+        font-size: 11pt !important;
+        font-weight: 700 !important;
+        color: #111827 !important;
+        letter-spacing: 0.6pt !important;
+    }
+
+    /* Cards — flat, thin border, never split across pages */
+    body.yatra-printing-confirmation .yatra-confirmation-card {
+        background: #fff !important;
+        border: 0.75pt solid #d1d5db !important;
+        border-radius: 3pt !important;
+        padding: 8pt 10pt !important;
+        margin: 0 0 6pt !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+    body.yatra-printing-confirmation .yatra-trip-summary-card {
+        background: #f9fafb !important;
+        border-color: #d1d5db !important;
+    }
+    body.yatra-printing-confirmation .yatra-card-title {
+        font-size: 10.5pt !important;
+        font-weight: 700 !important;
+        gap: 6pt !important;
+        margin: 0 0 8pt !important;
+        padding: 0 0 5pt !important;
+        border-bottom: 0.5pt solid #e5e7eb !important;
+        color: #111827 !important;
+    }
+    body.yatra-printing-confirmation .yatra-card-title svg {
+        width: 12pt !important;
+        height: 12pt !important;
+        color: #111827 !important;
+    }
+
+    /* Trip summary — small image, tight spacing */
+    body.yatra-printing-confirmation .yatra-trip-summary {
+        gap: 10pt !important;
+        align-items: flex-start !important;
+    }
+    /* Images often render as empty placeholders in print preview; hide for a cleaner receipt. */
+    body.yatra-printing-confirmation .yatra-trip-image {
+        display: none !important;
+    }
+    body.yatra-printing-confirmation .yatra-trip-name {
+        font-size: 12pt !important;
+        font-weight: 700 !important;
+        margin: 0 0 4pt !important;
+        color: #111827 !important;
+    }
+    body.yatra-printing-confirmation .yatra-trip-meta {
+        font-size: 9pt !important;
+        gap: 10pt !important;
+        margin-bottom: 4pt !important;
+        color: #374151 !important;
+    }
+    body.yatra-printing-confirmation .yatra-trip-meta svg,
+    body.yatra-printing-confirmation .yatra-trip-location svg {
+        width: 9pt !important;
+        height: 9pt !important;
+    }
+    body.yatra-printing-confirmation .yatra-trip-location {
+        font-size: 9pt !important;
+        margin: 0 0 4pt !important;
+        color: #374151 !important;
+    }
+
+    /* Tags — outline pills, no fills */
+    body.yatra-printing-confirmation .yatra-trip-tags {
+        font-size: 9pt !important;
+        margin-top: 4pt !important;
+    }
+    body.yatra-printing-confirmation .yatra-tag-label {
+        font-weight: 700 !important;
+        color: #374151 !important;
+        margin-right: 4pt !important;
+    }
+    body.yatra-printing-confirmation .yatra-tag-item {
+        display: inline-block !important;
+        background: #fff !important;
+        border: 0.5pt solid #d1d5db !important;
+        padding: 1pt 5pt !important;
+        border-radius: 2pt !important;
+        font-size: 8.5pt !important;
+        color: #374151 !important;
+        margin: 1pt 2pt 1pt 0 !important;
+    }
+
+    /* Two-column grid stays two columns on paper */
+    body.yatra-printing-confirmation .yatra-confirmation-grid {
+        display: grid !important;
+        grid-template-columns: 1.15fr 0.85fr !important;
+        gap: 6pt !important;
+        align-items: start !important;
+    }
+    body.yatra-printing-confirmation .yatra-confirmation-column {
+        min-width: 0 !important;
+    }
+
+    /* Booking info grid */
+    body.yatra-printing-confirmation .yatra-info-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 5pt 9pt !important;
+    }
+    body.yatra-printing-confirmation .yatra-info-item {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1pt !important;
+    }
+    body.yatra-printing-confirmation .yatra-info-label {
+        font-size: 7.5pt !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.3pt !important;
+        color: #6b7280 !important;
+    }
+    body.yatra-printing-confirmation .yatra-info-value {
+        font-size: 10pt !important;
+        font-weight: 600 !important;
+        color: #111827 !important;
+    }
+    body.yatra-printing-confirmation .yatra-status-badge {
+        display: inline-block !important;
+        padding: 1pt 6pt !important;
+        border: 0.75pt solid currentColor !important;
+        border-radius: 2pt !important;
+        font-size: 8.5pt !important;
+        font-weight: 700 !important;
+    }
+
+    /* Travelers */
+    body.yatra-printing-confirmation .yatra-travelers-list {
+        margin: 0 !important;
+    }
+    body.yatra-printing-confirmation .yatra-traveler-item {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8pt !important;
+        padding: 4pt 0 !important;
+        border-bottom: 0.5pt solid #e5e7eb !important;
+    }
+    body.yatra-printing-confirmation .yatra-traveler-item:last-child {
+        border-bottom: none !important;
+    }
+    body.yatra-printing-confirmation .yatra-traveler-number {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 16pt !important;
+        height: 16pt !important;
+        background: #111827 !important;
+        color: #fff !important;
+        border-radius: 50% !important;
+        font-size: 8.5pt !important;
+        font-weight: 700 !important;
+        flex-shrink: 0 !important;
+    }
+    body.yatra-printing-confirmation .yatra-traveler-name {
+        font-size: 10pt !important;
+        font-weight: 600 !important;
+        color: #111827 !important;
+    }
+    body.yatra-printing-confirmation .yatra-traveler-dob {
+        font-size: 8.5pt !important;
+        color: #6b7280 !important;
+    }
+
+    /* Payment summary rows */
+    body.yatra-printing-confirmation .yatra-payment-rows {
+        margin: 0 !important;
+    }
+    body.yatra-printing-confirmation .yatra-payment-row {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: baseline !important;
+        gap: 12pt !important;
+        font-size: 9.25pt !important;
+        padding: 1.5pt 0 !important;
+        color: #111827 !important;
+    }
+    body.yatra-printing-confirmation .yatra-due-row {
+        background: #fef3c7 !important;
+        padding: 4pt 6pt !important;
+        margin-top: 5pt !important;
+        border-radius: 2pt !important;
+        border: 0.5pt solid #fbbf24 !important;
+    }
+    body.yatra-printing-confirmation .yatra-payment-method {
+        margin-top: 6pt !important;
+        padding-top: 5pt !important;
+        font-size: 9pt !important;
+        border-top: 0.5pt solid #e5e7eb !important;
+        color: #374151 !important;
+    }
+
+    /* Contact info */
+    body.yatra-printing-confirmation .yatra-contact-info {
+        margin: 0 !important;
+    }
+    body.yatra-printing-confirmation .yatra-contact-item {
+        font-size: 9.5pt !important;
+        margin: 0 0 3pt !important;
+        color: #111827 !important;
+    }
+    body.yatra-printing-confirmation .yatra-contact-item strong {
+        color: #6b7280 !important;
+        font-weight: 600 !important;
+        margin-right: 4pt !important;
+    }
+
+    /* Links — print as plain text, no underline (URL is still in browser footer) */
+    body.yatra-printing-confirmation a,
+    body.yatra-printing-confirmation a:visited {
+        color: inherit !important;
+        text-decoration: none !important;
+    }
+
+    /* Avoid orphan headings */
+    body.yatra-printing-confirmation h1,
+    body.yatra-printing-confirmation h2,
+    body.yatra-printing-confirmation h3,
+    body.yatra-printing-confirmation h4 {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
     }
 }
 </style>
