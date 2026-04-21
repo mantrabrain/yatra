@@ -163,6 +163,44 @@
   }
 
   /**
+   * Resolve the real image URL from an <img> element.
+   *
+   * Caching / performance plugins (LiteSpeed Cache, WP Rocket, W3 Total Cache,
+   * Autoptimize, etc.) replace the `src` attribute with a tiny base64
+   * placeholder and store the real URL in a data-* attribute.  We check our
+   * own `data-yatra-src` first (added in PHP templates and never touched by
+   * any third-party plugin), then fall back to the most common lazy-load
+   * attribute names, and finally fall back to `img.src` while filtering out
+   * obvious placeholders so we never pass a base64 GIF to the modal.
+   */
+  function getImageSrc(img) {
+    // 1. Our own reliable attribute – always present on Yatra gallery images.
+    const yatra = img.getAttribute('data-yatra-src');
+    if (yatra) return yatra;
+
+    // 2. Common lazy-load attributes used by popular caching plugins.
+    const lazyAttrs = [
+      'data-src',            // LiteSpeed Cache, WP Rocket, Smush, BJ Lazy Load
+      'data-lazyload',       // LiteSpeed Cache (older attribute)
+      'data-lazy-src',       // WordPress core lazy-load
+      'data-original',       // jQuery.lazyLoad plugin
+      'data-pagespeed-lazy-src', // Google PageSpeed / mod_pagespeed
+      'data-lazy',           // Jetpack
+      'data-full-size',      // Yatra itinerary images
+    ];
+    for (const attr of lazyAttrs) {
+      const val = img.getAttribute(attr);
+      if (val && !val.startsWith('data:')) return val;
+    }
+
+    // 3. Native src – only use if it is not a placeholder.
+    const src = img.src || '';
+    if (src && !src.startsWith('data:')) return src;
+
+    return '';
+  }
+
+  /**
    * Gallery Modal Class
    * Handles image gallery modal functionality
    */
@@ -207,53 +245,49 @@
     collectImages() {
       this.images = [];
 
-      // Collect from hero slides
-      const heroSlides = document.querySelectorAll('.yatra-trip-hero-slide img');
-      console.log('Hero slides found:', heroSlides.length);
-      heroSlides.forEach((img, index) => {
-        this.images.push({
-          src: img.src,
-          alt: img.alt || `Gallery Image ${index + 1}`
-        });
-      });
-
-      // Collect from gallery section (hero gallery only, NOT itinerary)
-      const galleryItems = document.querySelectorAll('.yatra-trip-gallery .yatra-gallery-item img');
-      console.log('Gallery items found:', galleryItems.length);
-      galleryItems.forEach((img) => {
-        const exists = this.images.some(i => i.src === img.src);
-        if (!exists) {
-          this.images.push({
-            src: img.src,
-            alt: img.alt || 'Gallery Image'
-          });
+      // Helper: deduplicate by resolved URL.
+      const add = (img, fallbackAlt) => {
+        const src = getImageSrc(img);
+        if (!src) return;
+        if (!this.images.some(i => i.src === src)) {
+          this.images.push({ src, alt: img.alt || fallbackAlt });
         }
-      });
+      };
 
-      // Collect from hero main image
-      const heroMainImg = document.querySelector('.yatra-hero-main-img');
-      console.log('Hero main image found:', !!heroMainImg);
-      if (heroMainImg && !this.images.some(i => i.src === heroMainImg.src)) {
-        this.images.push({
-          src: heroMainImg.src,
-          alt: heroMainImg.alt || 'Main Image'
-        });
+      // 1. Prefer the JSON media-data blob (never touched by caching plugins).
+      const mediaScript = document.getElementById('yatra-hero-media-data');
+      if (mediaScript) {
+        try {
+          const mediaData = JSON.parse(mediaScript.textContent || '{}');
+          const imageUrls = Array.isArray(mediaData.images) ? mediaData.images : [];
+          imageUrls.forEach((url, index) => {
+            if (url && typeof url === 'string' && !this.images.some(i => i.src === url)) {
+              this.images.push({ src: url, alt: `Gallery Image ${index + 1}` });
+            }
+          });
+        } catch (e) {
+          // JSON parse error – fall through to DOM-based collection.
+        }
       }
 
-      // Collect from side images
-      const sideImages = document.querySelectorAll('.yatra-side-image-item img');
-      console.log('Side images found:', sideImages.length);
-      sideImages.forEach((img) => {
-        const exists = this.images.some(i => i.src === img.src);
-        if (!exists) {
-          this.images.push({
-            src: img.src,
-            alt: img.alt || 'Side Image'
-          });
-        }
+      // 2. Collect from hero slides (covers any images not in the JSON blob).
+      document.querySelectorAll('.yatra-trip-hero-slide img').forEach((img, index) => {
+        add(img, `Gallery Image ${index + 1}`);
       });
 
-      console.log('Total gallery images collected:', this.images.length);
+      // 3. Collect from gallery section (hero gallery only, NOT itinerary).
+      document.querySelectorAll('.yatra-trip-gallery .yatra-gallery-item img').forEach((img) => {
+        add(img, 'Gallery Image');
+      });
+
+      // 4. Collect from hero main image.
+      const heroMainImg = document.querySelector('.yatra-hero-main-img');
+      if (heroMainImg) add(heroMainImg, 'Main Image');
+
+      // 5. Collect from side images.
+      document.querySelectorAll('.yatra-side-image-item img').forEach((img) => {
+        add(img, 'Side Image');
+      });
     }
 
     createThumbnails() {
@@ -407,7 +441,8 @@
         item.addEventListener('click', () => {
           const img = item.querySelector('img');
           if (img) {
-            const imageIndex = this.images.findIndex(i => i.src === img.src);
+            const src = getImageSrc(img);
+            const imageIndex = this.images.findIndex(i => i.src === src);
             this.open(imageIndex >= 0 ? imageIndex : index);
           }
         });
@@ -422,7 +457,8 @@
           }
           const img = item.querySelector('img');
           if (img) {
-            const imageIndex = this.images.findIndex(i => i.src === img.src);
+            const src = getImageSrc(img);
+            const imageIndex = this.images.findIndex(i => i.src === src);
             this.open(imageIndex >= 0 ? imageIndex : 0);
           }
         });
@@ -481,40 +517,27 @@
     collectImages() {
       this.images = [];
 
+      const add = (img, fallbackAlt) => {
+        const src = img.getAttribute('data-full-size') || getImageSrc(img);
+        if (!src) return;
+        if (!this.images.some(i => i.src === src)) {
+          this.images.push({ src, alt: img.alt || fallbackAlt });
+        }
+      };
+
       // Collect from itinerary gallery section (hidden gallery)
-      const galleryItems = document.querySelectorAll('.yatra-itinerary-trip-gallery .yatra-gallery-item img');
-      galleryItems.forEach((img) => {
-        const fullSizeUrl = img.getAttribute('data-full-size') || img.src;
-        this.images.push({
-          src: fullSizeUrl,
-          alt: img.alt || `Itinerary Image ${this.images.length + 1}`
-        });
+      document.querySelectorAll('.yatra-itinerary-trip-gallery .yatra-gallery-item img').forEach((img) => {
+        add(img, `Itinerary Image ${this.images.length + 1}`);
       });
 
       // Collect from visible itinerary gallery items
-      const itineraryGalleryItems = document.querySelectorAll('.yatra-entry-gallery .yatra-media-card img');
-      itineraryGalleryItems.forEach((img) => {
-        const fullSizeUrl = img.getAttribute('data-full-size') || img.src;
-        const exists = this.images.some(i => i.src === fullSizeUrl);
-        if (!exists) {
-          this.images.push({
-            src: fullSizeUrl,
-            alt: img.alt || `Itinerary Gallery Image ${this.images.length + 1}`
-          });
-        }
+      document.querySelectorAll('.yatra-entry-gallery .yatra-media-card img').forEach((img) => {
+        add(img, `Itinerary Gallery Image ${this.images.length + 1}`);
       });
 
       // Collect from itinerary video items
-      const itineraryVideoItems = document.querySelectorAll('.yatra-entry-video .yatra-media-card img, .yatra-entry-gallery .yatra-itinerary-video-link img');
-      itineraryVideoItems.forEach((img) => {
-        const fullSizeUrl = img.getAttribute('data-full-size') || img.src;
-        const exists = this.images.some(i => i.src === fullSizeUrl);
-        if (!exists) {
-          this.images.push({
-            src: fullSizeUrl,
-            alt: img.alt || `Itinerary Video Image ${this.images.length + 1}`
-          });
-        }
+      document.querySelectorAll('.yatra-entry-video .yatra-media-card img, .yatra-entry-gallery .yatra-itinerary-video-link img').forEach((img) => {
+        add(img, `Itinerary Video Image ${this.images.length + 1}`);
       });
     }
 
@@ -658,7 +681,8 @@
         item.addEventListener('click', () => {
           const img = item.querySelector('img');
           if (img) {
-            const imageIndex = this.images.findIndex(i => i.src === img.src);
+            const src = img.getAttribute('data-full-size') || getImageSrc(img);
+            const imageIndex = this.images.findIndex(i => i.src === src);
             this.open(imageIndex >= 0 ? imageIndex : index);
           }
         });

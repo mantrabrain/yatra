@@ -188,10 +188,12 @@ if (!defined('ABSPATH')) {
             
             <?php if (!empty($main_image_url)): ?>
                 <a href="#" class="yatra-hero-main-img-link" data-gallery="hero-gallery" data-image-index="0">
-                    <img src="<?php echo esc_url($main_image_url); ?>" 
+                    <img src="<?php echo esc_url($main_image_url); ?>"
                          alt="<?php echo esc_attr(sprintf(__('Main image for %s', 'yatra'), $trip->getTitle())); ?>"
                          title="<?php echo esc_attr($trip->getTitle()); ?>"
                          itemprop="url" content="<?php echo esc_url($main_image_url); ?>"
+                         data-yatra-src="<?php echo esc_url($main_image_url); ?>"
+                         data-no-lazy="1"
                          class="yatra-hero-main-img">
                 </a>
                 <meta itemprop="contentUrl" content="<?php echo esc_url($main_image_url); ?>">
@@ -268,7 +270,9 @@ if (!defined('ABSPATH')) {
                 <?php foreach ($side_images as $index => $img_url): ?>
                     <div class="yatra-side-image-item">
                         <img src="<?php echo esc_url($img_url); ?>"
-                             alt="<?php echo esc_attr__('Gallery Image', 'yatra'); ?>">
+                             alt="<?php echo esc_attr__('Gallery Image', 'yatra'); ?>"
+                             data-yatra-src="<?php echo esc_url($img_url); ?>"
+                             data-no-lazy="1">
                         <?php if ($index === 0 && function_exists('yatra_wishlist_enabled') && yatra_wishlist_enabled() && !empty($trip->id)) : ?>
                             <button type="button" class="yatra-favorite-btn"
                                     data-trip-id="<?php echo esc_attr((string) $trip->id); ?>"

@@ -3,7 +3,7 @@
  * Plugin Name: Yatra - Travel Booking & Management
  * Plugin URI: https://wpyatra.com/
  * Description: Tours and activities on WordPress — trips, bookings, PayPal and Pay Later, guest accounts, emails, reports. Yatra Pro adds premium gateways and modules.
- * Version: 3.0.2.6
+ * Version: 3.0.2.7
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: MantraBrain
@@ -30,7 +30,7 @@ define('YATRA_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('YATRA_PLUGIN_BASENAME', plugin_basename(__FILE__));
 define('YATRA_ABSPATH', plugin_dir_path(__FILE__));
 define('YATRA_PLUGIN_URI', plugin_dir_url(__FILE__));
-define('YATRA_VERSION', '3.0.2.6');
+define('YATRA_VERSION', '3.0.2.7');
 define('YATRA_MIN_PHP_VERSION', '7.4');
 define('YATRA_MIN_WP_VERSION', '6.0');
 

@@ -23,7 +23,9 @@ if (!defined('ABSPATH')) {
                     <img src="<?php echo esc_url($image); ?>"
                          alt="<?php echo esc_attr(sprintf(__('Photo %d of %s trip gallery', 'yatra'), $index + 1, $trip->getTitle())); ?>"
                          title="<?php echo esc_attr(sprintf(__('Photo %d - %s', 'yatra'), $index + 1, $trip->getTitle())); ?>"
-                         itemprop="url" content="<?php echo esc_url($image); ?>">
+                         itemprop="url" content="<?php echo esc_url($image); ?>"
+                         data-yatra-src="<?php echo esc_url($image); ?>"
+                         data-no-lazy="1">
                     <meta itemprop="contentUrl" content="<?php echo esc_url($image); ?>">
                     <meta itemprop="name" content="<?php echo esc_attr(sprintf(__('Photo %d - %s', 'yatra'), $index + 1, $trip->getTitle())); ?>">
                     <meta itemprop="description" content="<?php echo esc_attr(sprintf(__('Photo %d from the %s trip gallery', 'yatra'), $index + 1, $trip->getTitle())); ?>">

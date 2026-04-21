@@ -221,6 +221,7 @@ return array(
     'Yatra\\Bootstrap' => $baseDir . '/app/Bootstrap.php',
     'Yatra\\Compatibility\\Compatibility' => $baseDir . '/app/Compatibility/Compatibility.php',
     'Yatra\\Compatibility\\Elementor\\Assets' => $baseDir . '/app/Compatibility/Elementor/Assets.php',
+    'Yatra\\Compatibility\\LiteSpeed\\Assets' => $baseDir . '/app/Compatibility/LiteSpeed/Assets.php',
     'Yatra\\Constants\\ClassificationTypes' => $baseDir . '/app/Constants/ClassificationTypes.php',
     'Yatra\\Contracts\\RepositoryInterface' => $baseDir . '/app/Contracts/RepositoryInterface.php',
     'Yatra\\Contracts\\ServiceInterface' => $baseDir . '/app/Contracts/ServiceInterface.php',

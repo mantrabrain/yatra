@@ -65,8 +65,12 @@ final class Compatibility
 
         return [
             [
-                'file' => $base . 'Elementor/Assets.php',
+                'file'  => $base . 'Elementor/Assets.php',
                 'class' => 'Yatra\\Compatibility\\Elementor\\Assets',
+            ],
+            [
+                'file'  => $base . 'LiteSpeed/Assets.php',
+                'class' => 'Yatra\\Compatibility\\LiteSpeed\\Assets',
             ],
         ];
     }

@@ -1,0 +1,845 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"X-Generator: babel-plugin-makepot\n"
+
+#: assets/admin/dist/js/app.js:33570
+msgid "Failed to load reviews. Please try again."
+msgstr ""
+
+#: assets/admin/dist/js/app.js:33600
+msgid "Select reviews to display as testimonials"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:33602
+msgid "Save the trip first to select testimonials from reviews"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:33607
+msgid "Testimonials"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:33608
+msgid "Select approved reviews to display as testimonials on the trip page"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:33614
+msgid "Loading reviews..."
+msgstr ""
+
+#: assets/admin/dist/js/app.js:33625
+msgid "Retry"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:33630
+msgid "No approved reviews yet"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:33631
+msgid "Reviews will appear here once customers submit and they are approved"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:33636
+msgid "Select reviews to feature as testimonials"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:33645
+msgid "Clear all"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:33683
+msgid "Selected as testimonial"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:14
+#: assets/dist/blocks/destination.js:21
+#: assets/dist/blocks/tour.js:14
+msgid "Order"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:17
+#: assets/dist/blocks/destination.js:24
+#: assets/dist/blocks/tour.js:18
+msgid "Ascending"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:18
+#: assets/dist/blocks/destination.js:25
+#: assets/dist/blocks/tour.js:17
+msgid "Descending"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:25
+msgid "Number of Activities"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:36
+#: assets/dist/blocks/destination.js:45
+#: assets/dist/blocks/tour.js:34
+msgid "Columns"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:4
+msgid "Activity Settings"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:47
+#: assets/dist/blocks/destination.js:57
+#: assets/dist/blocks/tour.js:52
+msgid "Show pagination"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:7
+#: assets/dist/blocks/destination.js:13
+#: assets/dist/blocks/tour.js:7
+msgid "Title"
+msgstr ""
+
+#: assets/dist/blocks/destination.js:33
+msgid "Number of Destinations"
+msgstr ""
+
+#: assets/dist/blocks/destination.js:7
+msgid "Destination Settings"
+msgstr ""
+
+#: assets/dist/blocks/tour.js:25
+msgid "Number of Tours"
+msgstr ""
+
+#: assets/dist/blocks/tour.js:4
+msgid "Trip Settings"
+msgstr ""
+
+#: assets/dist/blocks/tour.js:45
+msgid "Show only featured tours"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1101
+msgid "Booking not found or error loading booking"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1125
+msgid "Booking Details"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1126
+msgid "Complete booking information"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1137
+msgid "Back to Bookings"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1146
+msgid "Booking Overview"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1160
+msgid "Booking Number"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1164
+msgid "Trip"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1173
+msgid "View Trip"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1181
+msgid "Booking Date"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1195
+msgid "Number of Travelers"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1205
+msgid "Payment Summary"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1208
+msgid "Gross Total"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1215
+msgid "Subtotal (Taxable Amount)"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1222
+msgid "Discount"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1232
+msgid "Itinerary Costs"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1242
+msgid "per person"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1247
+msgid "per booking"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1315
+msgid "Tax"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1329
+msgid "Net Amount"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1339
+msgid "Customer Information"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1357
+msgid "Travelers Information"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1362
+msgid "traveler"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1362
+msgid "travelers"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1396
+msgid "Traveler"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1396
+msgid "Lead Traveler"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1403
+msgid "Primary Contact"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1442
+msgid "Emergency Contact"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1457
+msgid "Special Requests"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1500
+msgid "Payment Information"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1503
+msgid "Payment Status"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1524
+msgid "Amount Paid"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1531
+msgid "Amount Due"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1540
+msgid "Timeline"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1543
+msgid "Created"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1547
+msgid "Last Updated"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1612
+msgid "Could not start payment. Please try again."
+msgstr ""
+
+#: assets/dist/js/account-page.js:1616
+msgid "Could not start payment."
+msgstr ""
+
+#: assets/dist/js/account-page.js:1671
+msgid "Manage and view all your travel bookings"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1677
+msgid "Search bookings..."
+msgstr ""
+
+#: assets/dist/js/account-page.js:1692
+msgid "All Bookings"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1711
+msgid "Upcoming"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1725
+msgid "Completed"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1740
+msgid "No bookings found"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1741
+msgid "Try adjusting your filters or check back later."
+msgstr ""
+
+#: assets/dist/js/account-page.js:1775
+msgid "Multiple destinations"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1786
+msgid "Travel Date"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1790
+msgid "Travelers"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1794
+msgid "Total Amount"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1798
+msgid "Paid / Due"
+msgstr ""
+
+#: assets/dist/js/account-page.js:18
+msgid "Invalid date"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1802
+msgid "Due:"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1809
+msgid "Booked On"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1831
+msgid "Download Voucher"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1841
+msgid "Payment"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1874
+msgid "Pay Remaining Balance"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1883
+msgid "Call us"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1890
+msgid "Email us"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1959
+msgid "Payments & Invoices"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1961
+msgid ""
+"Track deposits, balances, and installment schedules with secure payment "
+"links."
+msgstr ""
+
+#: assets/dist/js/account-page.js:1969
+msgid "Total Payments"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1976
+msgid "Paid"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1984
+msgid "Pending"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1991
+msgid "Outstanding"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1999
+msgid "No payments found"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2000
+msgid "Payment history will appear here once you make a booking."
+msgstr ""
+
+#: assets/dist/js/account-page.js:2037
+msgid "Booking"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2056
+msgid "Amount"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2063
+msgid "Payment Method"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2070
+msgid "Payment Date"
+msgstr ""
+
+#: assets/dist/js/account-page.js:208
+msgid "Welcome back,"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2093
+msgid "Download Invoice"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2106
+msgid "Could not open receipt."
+msgstr ""
+
+#: assets/dist/js/account-page.js:2114
+msgid "View Receipt"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2125
+msgid "Pending approval"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2137
+msgid "View Booking Details"
+msgstr ""
+
+#: assets/dist/js/account-page.js:216
+msgid "You have"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2177
+msgid "Travel Documents"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2178
+msgid "Download itineraries, vouchers, invoices, and other documents for each trip."
+msgstr ""
+
+#: assets/dist/js/account-page.js:2188
+msgid "Search documents..."
+msgstr ""
+
+#: assets/dist/js/account-page.js:220
+msgid "upcoming adventure"
+msgstr ""
+
+#: assets/dist/js/account-page.js:220
+msgid "upcoming adventures"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2203
+msgid "All Documents"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2204
+msgid "Itineraries"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2205
+msgid "Vouchers"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2206
+msgid "Invoices"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2215
+msgid "Itinerary"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2219
+msgid "Voucher"
+msgstr ""
+
+#: assets/dist/js/account-page.js:222
+msgid "coming up"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2223
+msgid "Invoice"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2227
+msgid "Downloads"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2233
+msgid "No documents found"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2234
+msgid "No documents are available yet. Please check back later."
+msgstr ""
+
+#: assets/dist/js/account-page.js:2248
+msgid "Updated"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2253
+msgid "Access"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2274
+msgid "Not available"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2275
+msgid "Not Available"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2291
+msgid "Download failed."
+msgstr ""
+
+#: assets/dist/js/account-page.js:2296
+msgid "Download"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2308
+msgid "Preview failed."
+msgstr ""
+
+#: assets/dist/js/account-page.js:2315
+msgid "Preview"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2381
+msgid "Update your contact details, address, and communication preferences."
+msgstr ""
+
+#: assets/dist/js/account-page.js:239
+msgid "View Calendar"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2396
+msgid "Edit Profile"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2405
+msgid "Full Name"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2416
+msgid "Enter your full name"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2422
+msgid "Email Address"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2433
+msgid "Enter your email address"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2438
+msgid "Phone Number"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2446
+msgid "Enter your phone number"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2451
+msgid "City"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2459
+msgid "Enter your city"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2464
+msgid "Address"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2472
+msgid "Enter your address"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2477
+msgid "Country"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2485
+msgid "Enter your country"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2487
+msgid "Not set"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2499
+msgid "Save Changes"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2525
+msgid "Update your password to keep your account secure."
+msgstr ""
+
+#: assets/dist/js/account-page.js:2536
+msgid "Change Password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2544
+msgid "Current Password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2558
+msgid "Enter your current password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2564
+msgid "New Password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2578
+msgid "Enter new password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2584
+msgid "Confirm New Password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2598
+msgid "Confirm your new password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2601
+msgid "Passwords do not match"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2623
+msgid "Update Password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2643
+msgid "Cancel"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2654
+msgid "Communication Preferences"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2666
+msgid "Booking reminders"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2677
+msgid "Payment notifications"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2687
+msgid "Promotional offers"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2698
+msgid "Trip updates"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2717
+msgid "From"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2736
+msgid "Failed to remove trip from wishlist."
+msgstr ""
+
+#: assets/dist/js/account-page.js:2742
+msgid "Your wishlist of favorite trips"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2760
+msgid "No saved trips yet"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2761
+msgid "Start exploring and save your favorite trips to your wishlist!"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2772
+msgid "Browse Trips"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2799
+msgid "OFF"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2805
+msgid "Remove from favorites"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2836
+msgid "Flexible"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2884
+msgid "reviews"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2891
+msgid "Starting from"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2893
+msgid "Per person"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2900
+msgid "View Details"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2913
+msgid "Dashboard"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2914
+msgid "Bookings"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2915
+msgid "Payments"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2916
+msgid "Documents"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2917
+msgid "Saved Trips"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2918
+msgid "Profile"
+msgstr ""
+
+#: assets/dist/js/account-page.js:3140
+msgid "Total Bookings"
+msgstr ""
+
+#: assets/dist/js/account-page.js:3146
+msgid "Upcoming Trips"
+msgstr ""
+
+#: assets/dist/js/account-page.js:3151
+msgid "Outstanding Balance"
+msgstr ""
+
+#: assets/dist/js/account-page.js:3156
+msgid "Total Spent"
+msgstr ""
+
+#: assets/dist/js/account-page.js:3221
+msgid "Hello,"
+msgstr ""
+
+#: assets/dist/js/account-page.js:3223
+msgid "Guest"
+msgstr ""
+
+#: assets/dist/js/account-page.js:3225
+msgid ""
+"Manage bookings, payments, and documents – everything for your adventures "
+"in one place."
+msgstr ""
+
+#: assets/dist/js/account-page.js:324
+msgid "Your next adventures"
+msgstr ""
+
+#: assets/dist/js/account-page.js:3254
+msgid "Logout"
+msgstr ""
+
+#: assets/dist/js/account-page.js:3285
+msgid "Need help right away?"
+msgstr ""
+
+#: assets/dist/js/account-page.js:3286
+msgid "Concierge Desk"
+msgstr ""
+
+#: assets/dist/js/account-page.js:335
+msgid "View all"
+msgstr ""
+
+#: assets/dist/js/account-page.js:375
+msgid "No upcoming trips"
+msgstr ""
+
+#: assets/dist/js/account-page.js:376
+msgid "Start planning your next adventure!"
+msgstr ""
+
+#: assets/dist/js/account-page.js:383
+msgid "Quick Actions"
+msgstr ""
+
+#: assets/dist/js/account-page.js:396
+msgid "View Bookings"
+msgstr ""
+
+#: assets/dist/js/account-page.js:412
+msgid "Make Payment"
+msgstr ""
+
+#: assets/dist/js/account-page.js:428
+msgid "My Documents"
+msgstr ""
+
+#: assets/dist/js/account-page.js:467
+msgid "Notifications"
+msgstr ""
+
+#: assets/dist/js/account-page.js:468
+msgid "Updates & reminders"
+msgstr ""
+
+#: assets/dist/js/account-page.js:486
+msgid "No new notifications"
+msgstr ""
+
+#: assets/dist/js/account-page.js:495
+msgid "Recent Activity"
+msgstr ""
+
+#: assets/dist/js/account-page.js:496
+msgid "Your latest updates"
+msgstr ""
+
+#: assets/dist/js/account-page.js:5
+msgid "N/A"
+msgstr ""
+
+#: assets/dist/js/account-page.js:508
+msgid "Booking confirmed:"
+msgstr ""
+
+#: assets/dist/js/account-page.js:527
+msgid "Payment pending:"
+msgstr ""
+
+#: assets/dist/js/account-page.js:72
+msgid "Contact for pricing"
+msgstr ""
+
+#: assets/dist/js/index-Ar4TZ2Se.js:907
+msgid "Close"
+msgstr ""
+
+#: assets/dist/js/index-Ar4TZ2Se.js:519
+msgctxt "text direction"
+msgid "ltr"
+msgstr ""

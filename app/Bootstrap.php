@@ -156,8 +156,12 @@ class Bootstrap
     private function registerServiceProviders(): void
     {
         // Register third-party compatibility hooks (Elementor, etc.)
+        // Must run on `plugins_loaded` so that other plugins (Elementor, etc.) are
+        // guaranteed to have loaded their classes before we check class_exists().
+        // Calling Compatibility::register() directly here runs before plugins_loaded
+        // and class_exists('\Elementor\Plugin') will always be false at that point.
         if (!is_admin() && class_exists('Yatra\\Compatibility\\Compatibility')) {
-            Compatibility::register();
+            add_action('plugins_loaded', ['Yatra\\Compatibility\\Compatibility', 'register'], 20);
         }
 
         $providerClasses = [];
