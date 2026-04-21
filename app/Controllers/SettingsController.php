@@ -160,6 +160,10 @@ class SettingsController extends BaseController
         // Booking Page Settings
         'use_booking_page' => false,
         'booking_page_id' => 0,
+
+        // Legal Pages (Booking UI)
+        'terms_page_id' => 0,
+        'privacy_policy_page_id' => 0,
         
         // SEO Settings
         'seo_trip_meta_title' => '',

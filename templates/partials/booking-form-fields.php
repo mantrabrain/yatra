@@ -796,6 +796,24 @@ if (!is_user_logged_in() && !$is_remaining_payment) :
 <!-- Terms & Conditions -->
 <div class="yatra-booking-section">
     <div class="yatra-terms-container">
+        <?php
+        $termsPageId = 0;
+        $privacyPageId = 0;
+        if (class_exists('\\Yatra\\Services\\SettingsService')) {
+            $termsPageId = \Yatra\Services\SettingsService::getInt('terms_page_id', 0);
+            $privacyPageId = \Yatra\Services\SettingsService::getInt('privacy_policy_page_id', 0);
+        } else {
+            $termsPageId = (int) get_option('yatra_terms_page_id', 0);
+            $privacyPageId = (int) get_option('yatra_privacy_policy_page_id', 0);
+        }
+
+        $termsUrl = $termsPageId > 0 ? get_permalink($termsPageId) : '';
+        $privacyUrl = $privacyPageId > 0 ? get_permalink($privacyPageId) : '';
+        if ($privacyUrl === '' && function_exists('get_privacy_policy_url')) {
+            $privacyUrl = (string) get_privacy_policy_url();
+        }
+        ?>
+
         <label class="yatra-checkbox-label">
             <input type="checkbox" name="accept_terms" id="accept-terms" required>
             <span>
@@ -803,7 +821,9 @@ if (!is_user_logged_in() && !$is_remaining_payment) :
                 printf(
                     /* translators: %s: Terms and Conditions link */
                     esc_html__('I have read and agree to the %s', 'yatra'),
-                    '<a href="#" target="_blank">' . esc_html__('Terms and Conditions', 'yatra') . '</a>'
+                    $termsUrl
+                        ? '<a href="' . esc_url($termsUrl) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Terms and Conditions', 'yatra') . '</a>'
+                        : '<span>' . esc_html__('Terms and Conditions', 'yatra') . '</span>'
                 ); 
                 ?>
                 <span class="required">*</span>
@@ -817,7 +837,9 @@ if (!is_user_logged_in() && !$is_remaining_payment) :
                 printf(
                     /* translators: %s: Privacy Policy link */
                     esc_html__('I agree to the %s and consent to my data being processed', 'yatra'),
-                    '<a href="#" target="_blank">' . esc_html__('Privacy Policy', 'yatra') . '</a>'
+                    $privacyUrl
+                        ? '<a href="' . esc_url($privacyUrl) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Privacy Policy', 'yatra') . '</a>'
+                        : '<span>' . esc_html__('Privacy Policy', 'yatra') . '</span>'
                 ); 
                 ?>
                 <span class="required">*</span>

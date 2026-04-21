@@ -912,6 +912,8 @@ interface SettingsData {
   // Booking Page Settings
   use_booking_page: boolean;
   booking_page_id: number;
+  terms_page_id: number;
+  privacy_policy_page_id: number;
 
   // Advanced Settings
   debug_mode: boolean;
@@ -2367,6 +2369,8 @@ const Settings: React.FC = () => {
       enable_wishlist: false,
       use_booking_page: false,
       booking_page_id: 0,
+      terms_page_id: 0,
+      privacy_policy_page_id: 0,
       debug_mode: false,
       enable_logging: false,
       cache_enabled: true,
@@ -3247,7 +3251,9 @@ const Settings: React.FC = () => {
         url: string;
       }>;
     },
-    enabled: can("manage_yatra") && viewingSection === "permalink",
+    // Used by multiple sections (Booking page, Legal pages, etc.), so keep it available
+    // whenever the user can manage Yatra settings.
+    enabled: can("manage_yatra"),
   });
 
   // Check shortcode on-demand when user selects a page
@@ -7509,6 +7515,66 @@ const Settings: React.FC = () => {
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     {__(
                       "Stores frequently used data for faster loads. Stays off while WP_DEBUG or Debug mode (above) is on.",
+                      "yatra",
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                {__("Legal pages (Booking UI)", "yatra")}
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                {__(
+                  "Select the pages that will be linked from the booking Terms and Privacy consent checkboxes.",
+                  "yatra",
+                )}
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="terms_page_id">
+                    {__("Terms & Conditions page", "yatra")}
+                  </Label>
+                  <select
+                    id="terms_page_id"
+                    name="terms_page_id"
+                    value={formData.terms_page_id || 0}
+                    onChange={handleFieldChange}
+                    className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900"
+                  >
+                    <option value={0}>{__("— Select —", "yatra")}</option>
+                    {pagesData?.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <Label htmlFor="privacy_policy_page_id">
+                    {__("Privacy Policy page", "yatra")}
+                  </Label>
+                  <select
+                    id="privacy_policy_page_id"
+                    name="privacy_policy_page_id"
+                    value={formData.privacy_policy_page_id || 0}
+                    onChange={handleFieldChange}
+                    className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900"
+                  >
+                    <option value={0}>{__("— Select —", "yatra")}</option>
+                    {pagesData?.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.title}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-[11px] text-gray-500 dark:text-gray-400">
+                    {__(
+                      "If not set here, WordPress Settings → Privacy will be used when available.",
                       "yatra",
                     )}
                   </p>

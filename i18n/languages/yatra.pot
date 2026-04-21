@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-21T11:58:55+00:00\n"
+"POT-Creation-Date: 2026-04-21T12:10:51+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -2290,7 +2290,7 @@ msgstr ""
 msgid "Cleanup failed. Please try again."
 msgstr ""
 
-#: app/Controllers/SettingsController.php:262
+#: app/Controllers/SettingsController.php:266
 msgid "Invalid request body."
 msgstr ""
 
@@ -6974,7 +6974,8 @@ msgid "Terms of Service"
 msgstr ""
 
 #: templates/partials/booking-auth.php:212
-#: templates/partials/booking-form-fields.php:820
+#: templates/partials/booking-form-fields.php:841
+#: templates/partials/booking-form-fields.php:842
 msgid "Privacy Policy"
 msgstr ""
 
@@ -7242,22 +7243,23 @@ msgid "Log out"
 msgstr ""
 
 #. translators: %s: Terms and Conditions link
-#: templates/partials/booking-form-fields.php:805
+#: templates/partials/booking-form-fields.php:823
 #, php-format
 msgid "I have read and agree to the %s"
 msgstr ""
 
-#: templates/partials/booking-form-fields.php:806
+#: templates/partials/booking-form-fields.php:825
+#: templates/partials/booking-form-fields.php:826
 msgid "Terms and Conditions"
 msgstr ""
 
 #. translators: %s: Privacy Policy link
-#: templates/partials/booking-form-fields.php:819
+#: templates/partials/booking-form-fields.php:839
 #, php-format
 msgid "I agree to the %s and consent to my data being processed"
 msgstr ""
 
-#: templates/partials/booking-form-fields.php:829
+#: templates/partials/booking-form-fields.php:851
 msgid "Subscribe to our newsletter for travel tips and exclusive offers"
 msgstr ""
 

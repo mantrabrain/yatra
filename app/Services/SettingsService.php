@@ -42,6 +42,8 @@ class SettingsService
         'booking_base' => 'book',
         'use_booking_page' => false,
         'booking_page_id' => 0,
+        'terms_page_id' => 0,
+        'privacy_policy_page_id' => 0,
         'enable_guest_booking' => true,
         'booking_confirmation' => true,
         'auto_confirm_bookings' => false,
