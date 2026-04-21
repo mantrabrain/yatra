@@ -1103,7 +1103,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <main
             className={`flex-1 ${isTripFormPage ? "p-0 overflow-hidden flex flex-col" : "p-6 overflow-y-auto"}`}
           >
-            <div className={isTripFormPage ? "flex-1 min-h-0 overflow-hidden flex flex-col" : currentSubpage === "tools" ? "" : "space-y-6"}>
+            <div
+              className={
+                isTripFormPage
+                  ? "flex-1 min-h-0 overflow-hidden flex flex-col"
+                  : currentSubpage === "tools"
+                    ? ""
+                    : "space-y-6"
+              }
+            >
               {children}
             </div>
           </main>

@@ -155,7 +155,9 @@ const ViewBooking: React.FC = () => {
           trip_id: data.trip_id,
           trip_title: data.trip_title || `Trip #${data.trip_id}`,
           trip_image: data.trip_image,
-          trip_price: (parseFloat(data.subtotal) || data.total_amount || 0) / (data.travelers_count || 1),
+          trip_price:
+            (parseFloat(data.subtotal) || data.total_amount || 0) /
+            (data.travelers_count || 1),
           booking_date: data.created_at,
           travel_date: data.travel_date,
           travelers: data.travelers_count,
@@ -778,32 +780,56 @@ const ViewBooking: React.FC = () => {
                   </h4>
                   {(() => {
                     // ── Raw figures ──────────────────────────────────────────
-                    const dbSubtotal         = parseFloat((booking as any).subtotal) || booking.total_amount || 0;
-                    const discountAmount     = booking.discount_amount || 0;
-                    const itineraryCostsTotal = parseFloat((booking as any).itinerary_costs_total) || 0;
-                    const taxAmount          = parseFloat((booking as any).tax_amount) || 0;
+                    const dbSubtotal =
+                      parseFloat((booking as any).subtotal) ||
+                      booking.total_amount ||
+                      0;
+                    const discountAmount = booking.discount_amount || 0;
+                    const itineraryCostsTotal =
+                      parseFloat((booking as any).itinerary_costs_total) || 0;
+                    const taxAmount =
+                      parseFloat((booking as any).tax_amount) || 0;
                     // Handle both PHP bool (true/false) and int/string (1/0/"1"/"0")
                     const taxInclusiveRaw = (booking as any).tax_inclusive;
-                    const taxInclusive = taxInclusiveRaw === true || parseInt(String(taxInclusiveRaw), 10) === 1;
-                    const totalAmount        = booking.total_amount || 0;
-                    const amountPaid         = booking.amount_paid || 0;
-                    const amountDue          = booking.amount_due || 0;
+                    const taxInclusive =
+                      taxInclusiveRaw === true ||
+                      parseInt(String(taxInclusiveRaw), 10) === 1;
+                    const totalAmount = booking.total_amount || 0;
+                    const amountPaid = booking.amount_paid || 0;
+                    const amountDue = booking.amount_due || 0;
 
                     // ── Tax breakdown ────────────────────────────────────────
-                    let taxLines: { name: string; rate: number; amount: number }[] = [];
+                    let taxLines: {
+                      name: string;
+                      rate: number;
+                      amount: number;
+                    }[] = [];
                     const taxBreakdownRaw = (booking as any).tax_breakdown;
-                    if (Array.isArray(taxBreakdownRaw) && taxBreakdownRaw.length > 0) {
+                    if (
+                      Array.isArray(taxBreakdownRaw) &&
+                      taxBreakdownRaw.length > 0
+                    ) {
                       taxLines = taxBreakdownRaw;
                     } else {
                       const taxDetailsRaw = (booking as any).tax_details;
                       if (taxDetailsRaw) {
                         try {
-                          const parsed = typeof taxDetailsRaw === "string" ? JSON.parse(taxDetailsRaw) : taxDetailsRaw;
-                          if (Array.isArray(parsed) && parsed.length > 0) taxLines = parsed;
+                          const parsed =
+                            typeof taxDetailsRaw === "string"
+                              ? JSON.parse(taxDetailsRaw)
+                              : taxDetailsRaw;
+                          if (Array.isArray(parsed) && parsed.length > 0)
+                            taxLines = parsed;
                         } catch (_) {}
                       }
                       if (taxLines.length === 0 && taxAmount > 0) {
-                        taxLines = [{ name: __("Tax", "yatra"), rate: parseFloat((booking as any).tax_rate) || 0, amount: taxAmount }];
+                        taxLines = [
+                          {
+                            name: __("Tax", "yatra"),
+                            rate: parseFloat((booking as any).tax_rate) || 0,
+                            amount: taxAmount,
+                          },
+                        ];
                       }
                     }
 
@@ -811,7 +837,9 @@ const ViewBooking: React.FC = () => {
                     let itineraryCosts: any[] = [];
                     const itineraryCostsRaw = (booking as any).itinerary_costs;
                     if (typeof itineraryCostsRaw === "string") {
-                      try { itineraryCosts = JSON.parse(itineraryCostsRaw); } catch (_) {}
+                      try {
+                        itineraryCosts = JSON.parse(itineraryCostsRaw);
+                      } catch (_) {}
                     } else if (Array.isArray(itineraryCostsRaw)) {
                       itineraryCosts = itineraryCostsRaw;
                     }
@@ -822,23 +850,64 @@ const ViewBooking: React.FC = () => {
                       ? rawServices.filter((s: any) => s?.selected !== false)
                       : [];
                     const getServiceAmt = (s: any) =>
-                      parseFloat(s?.total_price ?? s?.calculated_price ?? s?.total_cost ?? s?.amount ?? s?.unit_price ?? s?.price ?? 0);
-                    const servicesTotal = selectedServices.reduce((sum, s) => sum + getServiceAmt(s), 0);
+                      parseFloat(
+                        s?.total_price ??
+                          s?.calculated_price ??
+                          s?.total_cost ??
+                          s?.amount ??
+                          s?.unit_price ??
+                          s?.price ??
+                          0,
+                      );
+                    const servicesTotal = selectedServices.reduce(
+                      (sum, s) => sum + getServiceAmt(s),
+                      0,
+                    );
                     const baseTripCost = dbSubtotal - servicesTotal;
 
                     // ── Derived amounts ──────────────────────────────────────
-                    const taxableAmount = Math.max(0, dbSubtotal - discountAmount) + itineraryCostsTotal;
+                    const taxableAmount =
+                      Math.max(0, dbSubtotal - discountAmount) +
+                      itineraryCostsTotal;
 
-                    const hasServices    = selectedServices.length > 0;
-                    const hasDiscount    = discountAmount > 0;
-                    const hasItinerary   = itineraryCosts.length > 0 && itineraryCostsTotal > 0;
-                    const hasTax         = taxLines.length > 0;
-                    const showTaxableRow = hasTax && (hasDiscount || hasItinerary);
+                    const hasServices = selectedServices.length > 0;
+                    const hasDiscount = discountAmount > 0;
+                    const hasItinerary =
+                      itineraryCosts.length > 0 && itineraryCostsTotal > 0;
+                    const hasTax = taxLines.length > 0;
+                    const showTaxableRow =
+                      hasTax && (hasDiscount || hasItinerary);
 
-                    const Row = ({ label, value, sub = false, green = false, bold = false }: any) => (
-                      <div className={`flex justify-between text-sm${sub ? " ml-4" : ""}`}>
-                        <span className={bold ? "font-semibold text-gray-900 dark:text-white" : "text-gray-600 dark:text-gray-400"}>{label}</span>
-                        <span className={bold ? "font-semibold text-gray-900 dark:text-white" : green ? "text-green-600 dark:text-green-400" : "text-gray-900 dark:text-white"}>{value}</span>
+                    const Row = ({
+                      label,
+                      value,
+                      sub = false,
+                      green = false,
+                      bold = false,
+                    }: any) => (
+                      <div
+                        className={`flex justify-between text-sm${sub ? " ml-4" : ""}`}
+                      >
+                        <span
+                          className={
+                            bold
+                              ? "font-semibold text-gray-900 dark:text-white"
+                              : "text-gray-600 dark:text-gray-400"
+                          }
+                        >
+                          {label}
+                        </span>
+                        <span
+                          className={
+                            bold
+                              ? "font-semibold text-gray-900 dark:text-white"
+                              : green
+                                ? "text-green-600 dark:text-green-400"
+                                : "text-gray-900 dark:text-white"
+                          }
+                        >
+                          {value}
+                        </span>
                       </div>
                     );
 
@@ -854,28 +923,45 @@ const ViewBooking: React.FC = () => {
                               </span>
                             )}
                           </span>
-                          <span className="text-gray-900 dark:text-white">{formatPrice(baseTripCost, booking.currency)}</span>
+                          <span className="text-gray-900 dark:text-white">
+                            {formatPrice(baseTripCost, booking.currency)}
+                          </span>
                         </div>
 
                         {/* Additional Services section — only when services exist */}
                         {hasServices && (
                           <>
                             <div className="flex justify-between text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mt-1">
-                              <span>+ {__("Additional Services", "yatra")}</span>
+                              <span>
+                                + {__("Additional Services", "yatra")}
+                              </span>
                               <span></span>
                             </div>
                             {selectedServices.map((s: any, i: number) => (
                               <Row
                                 key={i}
                                 sub
-                                label={s?.service_name || s?.name || s?.title || s?.label || __("Service", "yatra")}
-                                value={formatPrice(getServiceAmt(s), booking.currency)}
+                                label={
+                                  s?.service_name ||
+                                  s?.name ||
+                                  s?.title ||
+                                  s?.label ||
+                                  __("Service", "yatra")
+                                }
+                                value={formatPrice(
+                                  getServiceAmt(s),
+                                  booking.currency,
+                                )}
                               />
                             ))}
                             {/* Gross Total = Trip Base Price + Services */}
                             <div className="flex justify-between text-sm font-semibold border-t border-gray-200 dark:border-gray-600 pt-1.5 mt-0.5">
-                              <span className="text-gray-900 dark:text-white">{__("Gross Total", "yatra")}</span>
-                              <span className="text-gray-900 dark:text-white">{formatPrice(dbSubtotal, booking.currency)}</span>
+                              <span className="text-gray-900 dark:text-white">
+                                {__("Gross Total", "yatra")}
+                              </span>
+                              <span className="text-gray-900 dark:text-white">
+                                {formatPrice(dbSubtotal, booking.currency)}
+                              </span>
                             </div>
                           </>
                         )}
@@ -901,7 +987,10 @@ const ViewBooking: React.FC = () => {
                                 key={i}
                                 sub
                                 label={`${cost.name} ${cost.price_per === "person" ? __("(per person)", "yatra") : cost.price_per === "group" ? __("(per booking)", "yatra") : __("(flat rate)", "yatra")}`}
-                                value={formatPrice(cost.total_cost ?? cost.price, booking.currency)}
+                                value={formatPrice(
+                                  cost.total_cost ?? cost.price,
+                                  booking.currency,
+                                )}
                               />
                             ))}
                           </>
@@ -910,8 +999,12 @@ const ViewBooking: React.FC = () => {
                         {/* Taxable Amount — only for exclusive tax when discount/itinerary exist above it */}
                         {!taxInclusive && showTaxableRow && (
                           <div className="flex justify-between text-sm font-semibold border-t border-dashed border-gray-300 dark:border-gray-600 pt-1.5 mt-0.5">
-                            <span className="text-gray-700 dark:text-gray-300">{__("Taxable Amount", "yatra")}</span>
-                            <span className="text-gray-900 dark:text-white">{formatPrice(taxableAmount, booking.currency)}</span>
+                            <span className="text-gray-700 dark:text-gray-300">
+                              {__("Taxable Amount", "yatra")}
+                            </span>
+                            <span className="text-gray-900 dark:text-white">
+                              {formatPrice(taxableAmount, booking.currency)}
+                            </span>
                           </div>
                         )}
 
@@ -923,12 +1016,20 @@ const ViewBooking: React.FC = () => {
                               <span></span>
                             </div>
                             {taxLines.map((tax: any, i: number) => (
-                              <div key={i} className="flex justify-between text-sm ml-4">
+                              <div
+                                key={i}
+                                className="flex justify-between text-sm ml-4"
+                              >
                                 <span className="text-gray-600 dark:text-gray-400">
-                                  {tax.name}{tax.rate > 0 ? ` (${tax.rate}%)` : ""}
+                                  {tax.name}
+                                  {tax.rate > 0 ? ` (${tax.rate}%)` : ""}
                                 </span>
                                 <span className="text-gray-900 dark:text-white">
-                                  +{formatPrice(parseFloat(tax.amount) || 0, booking.currency)}
+                                  +
+                                  {formatPrice(
+                                    parseFloat(tax.amount) || 0,
+                                    booking.currency,
+                                  )}
                                 </span>
                               </div>
                             ))}
@@ -937,17 +1038,28 @@ const ViewBooking: React.FC = () => {
 
                         {/* Net Amount */}
                         <div className="flex justify-between text-base font-bold border-t-2 border-gray-800 dark:border-gray-300 pt-2 mt-1">
-                          <span className="text-gray-900 dark:text-white">{__("Net Amount", "yatra")}</span>
-                          <span className="text-gray-900 dark:text-white">{formatPrice(totalAmount, booking.currency)}</span>
+                          <span className="text-gray-900 dark:text-white">
+                            {__("Net Amount", "yatra")}
+                          </span>
+                          <span className="text-gray-900 dark:text-white">
+                            {formatPrice(totalAmount, booking.currency)}
+                          </span>
                         </div>
 
                         {/* Inclusive tax — informational footnote after Net Amount */}
                         {hasTax && taxInclusive && (
                           <div className="mt-1 space-y-0.5">
                             {taxLines.map((tax: any, i: number) => (
-                              <div key={i} className="text-xs text-gray-400 dark:text-gray-500 italic">
-                                {__("Incl.", "yatra")} {tax.name}{tax.rate > 0 ? ` (${tax.rate}%)` : ""}:{" "}
-                                {formatPrice(parseFloat(tax.amount) || 0, booking.currency)}
+                              <div
+                                key={i}
+                                className="text-xs text-gray-400 dark:text-gray-500 italic"
+                              >
+                                {__("Incl.", "yatra")} {tax.name}
+                                {tax.rate > 0 ? ` (${tax.rate}%)` : ""}:{" "}
+                                {formatPrice(
+                                  parseFloat(tax.amount) || 0,
+                                  booking.currency,
+                                )}
                               </div>
                             ))}
                           </div>
@@ -955,14 +1067,22 @@ const ViewBooking: React.FC = () => {
 
                         {/* Amount Paid */}
                         {amountPaid > 0 && (
-                          <Row label={__("Amount Paid", "yatra")} value={formatPrice(amountPaid, booking.currency)} green />
+                          <Row
+                            label={__("Amount Paid", "yatra")}
+                            value={formatPrice(amountPaid, booking.currency)}
+                            green
+                          />
                         )}
 
                         {/* Due Now */}
                         {amountDue > 0 && (
                           <div className="flex justify-between text-sm font-semibold">
-                            <span className="text-orange-600 dark:text-orange-400">{__("Due Now", "yatra")}</span>
-                            <span className="text-orange-600 dark:text-orange-400">{formatPrice(amountDue, booking.currency)}</span>
+                            <span className="text-orange-600 dark:text-orange-400">
+                              {__("Due Now", "yatra")}
+                            </span>
+                            <span className="text-orange-600 dark:text-orange-400">
+                              {formatPrice(amountDue, booking.currency)}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -1341,7 +1461,9 @@ const ViewBooking: React.FC = () => {
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                     {__("Trip Price per Person", "yatra")}
-                    {(((v) => v === true || parseInt(String(v), 10) === 1))((booking as any).tax_inclusive) && (
+                    {((v) => v === true || parseInt(String(v), 10) === 1)(
+                      (booking as any).tax_inclusive,
+                    ) && (
                       <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 normal-case tracking-normal">
                         {__("Tax Incl.", "yatra")}
                       </span>
@@ -1351,7 +1473,10 @@ const ViewBooking: React.FC = () => {
                     {(() => {
                       // subtotal (DB) = base trip cost + services when Pro is active.
                       // Subtract services total to get the pure trip base cost.
-                      const subtotal = parseFloat((booking as any).subtotal) || booking.total_amount || 0;
+                      const subtotal =
+                        parseFloat((booking as any).subtotal) ||
+                        booking.total_amount ||
+                        0;
                       const travelers = booking.travelers || 1;
 
                       const rawServices = (booking as any).additional_services;
@@ -1375,14 +1500,19 @@ const ViewBooking: React.FC = () => {
                         : 0;
 
                       const baseTripCost = subtotal - servicesTotal;
-                      return formatPrice(baseTripCost / travelers, booking.currency);
+                      return formatPrice(
+                        baseTripCost / travelers,
+                        booking.currency,
+                      );
                     })()}
                   </div>
                 </div>
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                     {__("Total Amount", "yatra")}
-                    {(((v) => v === true || parseInt(String(v), 10) === 1))((booking as any).tax_inclusive) && (
+                    {((v) => v === true || parseInt(String(v), 10) === 1)(
+                      (booking as any).tax_inclusive,
+                    ) && (
                       <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 normal-case tracking-normal">
                         {__("Tax Incl.", "yatra")}
                       </span>

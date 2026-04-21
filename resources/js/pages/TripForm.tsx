@@ -156,6 +156,7 @@ interface PriceType {
   category_id: number;
   original_price: string;
   discounted_price: string;
+  is_default?: boolean;
 }
 
 interface TripCategoryOption {
@@ -2938,7 +2939,10 @@ const TripForm: React.FC = () => {
     }));
   };
 
-  const handlePriceTypeDefaultChange = (categoryId: number, isDefault: boolean) => {
+  const handlePriceTypeDefaultChange = (
+    categoryId: number,
+    isDefault: boolean,
+  ) => {
     setFormData((prev) => ({
       ...prev,
       price_types: prev.price_types.map((pt) => {
@@ -7471,7 +7475,10 @@ const TripForm: React.FC = () => {
                                       }
                                       className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600"
                                     />
-                                    {__("Default price (used on page load)", "yatra")}
+                                    {__(
+                                      "Default price (used on page load)",
+                                      "yatra",
+                                    )}
                                   </label>
                                   <span className="text-[11px] text-gray-500 dark:text-gray-400">
                                     {__("Traveler-based pricing only", "yatra")}

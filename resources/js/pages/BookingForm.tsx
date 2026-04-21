@@ -19,7 +19,10 @@ import {
   X,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
-import { formatDate as formatDateUtil, formatDateForInput } from "../lib/dateFormat";
+import {
+  formatDate as formatDateUtil,
+  formatDateForInput,
+} from "../lib/dateFormat";
 import { apiService } from "../lib/api-client";
 import { usePermissions } from "../hooks/usePermissions";
 import { getCurrencySymbol } from "../data/currencies";
