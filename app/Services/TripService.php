@@ -1252,7 +1252,48 @@ class TripService extends BaseService
      */
     public function getTripPriceRange(int $tripId): array
     {
-        $tripPriceTypeRepository = new \Yatra\Repositories\TripPriceTypeRepository();
-        return $tripPriceTypeRepository->getPriceRangeByTripId($tripId);
+        // Traveler-based pricing stores per-category prices in `trips.price_types` JSON.
+        // The old implementation referenced a repository that may not exist in all builds;
+        // compute the range directly from the persisted JSON so list endpoints can't fatal.
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $priceTypes = $tripRepository->getPriceTypes($tripId);
+
+        $min = PHP_FLOAT_MAX;
+        $max = 0.0;
+
+        foreach ($priceTypes as $pt) {
+            if (!is_array($pt)) {
+                continue;
+            }
+
+            $discounted = isset($pt['discounted_price']) ? (float) $pt['discounted_price'] : 0.0;
+            $sale = isset($pt['sale_price']) ? (float) $pt['sale_price'] : 0.0;
+            $original = isset($pt['original_price']) ? (float) $pt['original_price'] : 0.0;
+            $legacyPrice = isset($pt['price']) ? (float) $pt['price'] : 0.0;
+
+            $effective = 0.0;
+            if ($discounted > 0) {
+                $effective = $discounted;
+            } elseif ($sale > 0) {
+                $effective = $sale;
+            } elseif ($original > 0) {
+                $effective = $original;
+            } elseif ($legacyPrice > 0) {
+                $effective = $legacyPrice;
+            }
+
+            if ($effective <= 0) {
+                continue;
+            }
+
+            $min = min($min, $effective);
+            $max = max($max, $effective);
+        }
+
+        if ($min === PHP_FLOAT_MAX) {
+            return ['min_price' => 0.0, 'max_price' => 0.0];
+        }
+
+        return ['min_price' => (float) $min, 'max_price' => (float) $max];
     }
 }
