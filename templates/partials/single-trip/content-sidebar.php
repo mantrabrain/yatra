@@ -125,6 +125,9 @@ if (!defined('ABSPATH')) {
         }
     }
 
+    // Pro: check whether this trip has booking disabled (enquiry-only mode)
+    $booking_disabled = method_exists($trip, 'isBookingDisabled') && $trip->isBookingDisabled();
+
     // Pricing — resolved via centralized TripPricingService (single source of truth)
     // SingleTripController pre-computes effective_price_min, min_category_original_price, max_discount_percentage
     $displayPricing = \Yatra\Services\TripPricingService::resolveDisplayPricing($trip);
@@ -147,6 +150,46 @@ if (!defined('ABSPATH')) {
         'discount_percentage' => $displayPricing['max_discount_percentage'],
     ];
     ?>
+    <?php if ($booking_disabled): ?>
+    <div class="yatra-booking-card yatra-enquiry-only-card">
+        <!-- Price Display -->
+        <div class="yatra-booking-price">
+            <?php if ($discount['has_discount']): ?>
+                <div class="yatra-booking-discount-badge">
+                    <?php echo esc_html($discount['discount_text']); ?>
+                </div>
+            <?php endif; ?>
+            <div class="yatra-booking-price-main">
+                <?php if ($pricing['has_price']): ?>
+                    <span class="yatra-booking-price-label-top"><?php echo esc_html__('From', 'yatra'); ?></span>
+                    <?php if ($pricing['has_discount'] && !empty($pricing['original_price'])): ?>
+                        <span class="yatra-booking-price-original"><?php echo esc_html($pricing['original_price']); ?></span>
+                    <?php endif; ?>
+                    <span class="yatra-booking-price-amount" id="display-price"><?php echo esc_html($pricing['current_price']); ?></span>
+                    <span class="yatra-booking-price-label"><?php echo esc_html__('per person', 'yatra'); ?></span>
+                <?php else: ?>
+                    <span class="yatra-booking-price-amount yatra-contact-pricing" id="display-price"><?php echo esc_html__('Contact for pricing', 'yatra'); ?></span>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Enquiry-only notice -->
+        <div class="yatra-enquiry-notice" style="margin:12px 0 4px;padding:10px 12px;background:#f0f7ff;border:1px solid #cce0ff;border-radius:6px;font-size:0.85rem;color:#1a5fa8;display:flex;align-items:flex-start;gap:8px;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span><?php esc_html_e('This trip is available for enquiry only. Please contact us to discuss dates and availability.', 'yatra'); ?></span>
+        </div>
+
+        <!-- Enquiry button -->
+        <button type="button" class="yatra-booking-button" style="margin-top:12px;" id="open-enquiry-modal" onclick="window.YatraEnquiry?.open?.(); return false;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+            </svg>
+            <?php echo esc_html__('Send Enquiry', 'yatra'); ?>
+        </button>
+    </div>
+    <?php else: ?>
     <div class="yatra-booking-card"
          data-has-availability="<?php echo $has_availability ? 'true' : 'false'; ?>"
          data-is-multi-day="<?php echo $is_multi_day ? 'true' : 'false'; ?>"
@@ -459,4 +502,5 @@ if (!defined('ABSPATH')) {
                 </div>
             </form>
     </div>
+    <?php endif; // end else (booking not disabled) ?>
 </aside>

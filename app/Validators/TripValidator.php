@@ -476,6 +476,14 @@ class TripValidator
             $sanitized['excludes'] = is_array($data['excludes']) ? json_encode($data['excludes']) : $data['excludes'];
         }
 
+        // custom_fields is a JSON column — pass the array through so TripService can
+        // merge it with the existing stored data before serialising.
+        if (isset($data['custom_fields'])) {
+            $sanitized['custom_fields'] = is_array($data['custom_fields'])
+                ? $data['custom_fields']
+                : (array) $data['custom_fields'];
+        }
+
         return apply_filters('yatra_trip_sanitize_data', $sanitized, $data);
     }
 }

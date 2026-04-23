@@ -278,6 +278,7 @@ class ComposerStaticInit2644eb7ce44b7b2615237db55150e0c3
         'Yatra\\Compatibility\\Compatibility' => __DIR__ . '/../..' . '/app/Compatibility/Compatibility.php',
         'Yatra\\Compatibility\\Elementor\\Assets' => __DIR__ . '/../..' . '/app/Compatibility/Elementor/Assets.php',
         'Yatra\\Compatibility\\LiteSpeed\\Assets' => __DIR__ . '/../..' . '/app/Compatibility/LiteSpeed/Assets.php',
+        'Yatra\\Compatibility\\Wanderland\\Header' => __DIR__ . '/../..' . '/app/Compatibility/Wanderland/Header.php',
         'Yatra\\Constants\\ClassificationTypes' => __DIR__ . '/../..' . '/app/Constants/ClassificationTypes.php',
         'Yatra\\Contracts\\RepositoryInterface' => __DIR__ . '/../..' . '/app/Contracts/RepositoryInterface.php',
         'Yatra\\Contracts\\ServiceInterface' => __DIR__ . '/../..' . '/app/Contracts/ServiceInterface.php',

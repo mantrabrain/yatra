@@ -72,6 +72,10 @@ final class Compatibility
                 'file'  => $base . 'LiteSpeed/Assets.php',
                 'class' => 'Yatra\\Compatibility\\LiteSpeed\\Assets',
             ],
+            [
+                'file'  => $base . 'Wanderland/Header.php',
+                'class' => 'Yatra\\Compatibility\\Wanderland\\Header',
+            ],
         ];
     }
 }

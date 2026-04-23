@@ -104,6 +104,7 @@ import { useToast } from "../components/ui/toast";
 import { MultiSelect } from "../components/ui/multi-select";
 import { TestimonialsSelector } from "../components/trip-form/TestimonialsSelector";
 import { LocationPicker } from "../components/trip-form/LocationPicker";
+import { ProFeature, ProBadge } from "../components/ProFeature";
 import { getErrorContext } from "../lib/errors";
 import {
   buildYatraSinglePublicUrls,
@@ -342,6 +343,7 @@ interface TripFormData {
   physical_requirements: string;
   visa_requirements: string;
   vaccination_requirements: string;
+  disable_booking: boolean; // Pro: enquiry-only mode (stored in custom_fields)
 
   // Fallback Settings (for trips without availability dates/rules)
   has_default_time_slots: boolean; // For day tours: enable multiple time slots
@@ -486,7 +488,7 @@ interface ItineraryDay {
 
 const TripForm: React.FC = () => {
   const queryClient = useQueryClient();
-  const { can } = usePermissions();
+  const { can, isPro } = usePermissions();
   const { showToast } = useToast();
   // Downloads is now a FREE feature - always show the UI
   const showDownloadsUI = true;
@@ -1426,6 +1428,7 @@ const TripForm: React.FC = () => {
     physical_requirements: "Moderate",
     visa_requirements: "Schengen visa",
     vaccination_requirements: "COVID-19 vaccination",
+    disable_booking: false,
     has_default_time_slots: false,
     default_time_slots: [],
     departure_time: "09:00",
@@ -2180,6 +2183,7 @@ const TripForm: React.FC = () => {
       physical_requirements: tripData.physical_requirements || "",
       visa_requirements: tripData.visa_requirements || "",
       vaccination_requirements: tripData.vaccination_requirements || "",
+      disable_booking: Boolean(tripData.custom_fields?.disable_booking),
       has_default_time_slots: tripData.has_default_time_slots || false,
       default_time_slots: Array.isArray(tripData.default_time_slots)
         ? tripData.default_time_slots
@@ -3294,6 +3298,7 @@ const TripForm: React.FC = () => {
         min_travelers: data.min_travelers ? parseInt(data.min_travelers) : null,
         booking_deadline_hours: data.booking_deadline_hours || null,
         cancellation_policy: data.cancellation_policy || "",
+        custom_fields: { disable_booking: data.disable_booking },
         age_min: data.age_min ? parseInt(data.age_min) : null,
         age_max: data.age_max ? parseInt(data.age_max) : null,
         physical_requirements: data.physical_requirements.trim(),
@@ -5898,6 +5903,50 @@ const TripForm: React.FC = () => {
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* SECTION 3b: Disable Booking (Pro) */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-blue-500" />
+                  {__("Booking Availability", "yatra")}
+                  <ProBadge isProActive={isPro} />
+                </h3>
+                <ProFeature
+                  description={__("disable the booking calendar and make trips enquiry-only", "yatra")}
+                  moduleName={__("Enquiry Only Mode", "yatra")}
+                  pricingUrl="https://wpyatra.com/pricing"
+                  isProActive={isPro}
+                  isModuleEnabled={isPro}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex items-center h-5 mt-0.5">
+                      <input
+                        id="disable_booking"
+                        type="checkbox"
+                        checked={formData.disable_booking}
+                        onChange={(e) =>
+                          handleFieldChange("disable_booking", e.target.checked)
+                        }
+                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 cursor-pointer"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="disable_booking"
+                        className="block text-sm font-medium text-gray-900 dark:text-white cursor-pointer"
+                      >
+                        {__("Disable Booking Calendar", "yatra")}
+                      </label>
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        {__(
+                          "When enabled, the booking form and date picker will be hidden. Visitors can only send an enquiry for this trip.",
+                          "yatra",
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </ProFeature>
               </div>
 
               {/* SECTION 4: Accommodation */}

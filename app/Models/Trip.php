@@ -655,6 +655,19 @@ class Trip
     }
 
     /**
+     * Returns true when the trip is set to enquiry-only (booking calendar disabled).
+     * Stored as custom_fields['disable_booking'] = true. Requires Pro to be active.
+     */
+    public function isBookingDisabled(): bool
+    {
+        if (!apply_filters('yatra_is_pro_active', false)) {
+            return false;
+        }
+
+        return !empty($this->custom_fields['disable_booking']);
+    }
+
+    /**
      * Parse JSON field from database
      */
     private static function parseJsonField(?string $value, array $default = []): array

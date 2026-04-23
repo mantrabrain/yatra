@@ -357,6 +357,11 @@ class TripService extends BaseService
         // Set updated_by
         $data['updated_by'] = get_current_user_id();
 
+        // Merge custom_fields: keep existing keys that the incoming payload doesn't touch
+        if (isset($data['custom_fields']) && is_array($data['custom_fields'])) {
+            $data['custom_fields'] = $this->mergeCustomFields($id, $data['custom_fields']);
+        }
+
         // Process JSON fields
         $data = $this->processJsonFields($data);
         
@@ -366,6 +371,30 @@ class TripService extends BaseService
         }
 
         return $data;
+    }
+
+    /**
+     * Merge incoming custom_fields with what is already stored in the DB for a trip.
+     * Only keys present in the incoming array are changed; all other existing keys are
+     * kept intact.  This is the "append, never override" contract the UI depends on.
+     */
+    private function mergeCustomFields(int $id, array $incoming): array
+    {
+        $existing = $this->repository->find($id);
+        if (!$existing || empty($existing->custom_fields)) {
+            return $incoming;
+        }
+
+        $storedRaw = $existing->custom_fields;
+        if (is_string($storedRaw)) {
+            $decoded = maybe_unserialize($storedRaw);
+            if (!is_array($decoded)) {
+                $decoded = json_decode($storedRaw, true);
+            }
+            $storedRaw = is_array($decoded) ? $decoded : [];
+        }
+
+        return array_merge($storedRaw, $incoming);
     }
 
     /**

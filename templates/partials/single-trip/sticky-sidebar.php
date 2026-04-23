@@ -134,7 +134,26 @@ if ($effective_min > 0) {
         }
     }
 }
+// Pro: check whether this trip has booking disabled (enquiry-only mode)
+$booking_disabled = method_exists($trip, 'isBookingDisabled') && $trip->isBookingDisabled();
 ?>
+<?php if ($booking_disabled): ?>
+<div class="yatra-mobile-sticky-sidebar yatra-enquiry-only-sticky" id="yatra-mobile-sticky-sidebar">
+    <div class="yatra-mobile-sticky-content">
+        <div class="yatra-mobile-row-1" style="justify-content:space-between;align-items:center;">
+            <div style="font-size:0.82rem;color:#1a5fa8;padding:0 4px;">
+                <?php esc_html_e('Enquiry only — no direct booking', 'yatra'); ?>
+            </div>
+            <button type="button"
+                    class="yatra-mobile-book-btn"
+                    style="background:var(--yatra-primary,#3b82f6);"
+                    onclick="window.YatraEnquiry?.open?.(); return false;">
+                <?php esc_html_e('Send Enquiry', 'yatra'); ?>
+            </button>
+        </div>
+    </div>
+</div>
+<?php else: ?>
 <div class="yatra-mobile-sticky-sidebar" id="yatra-mobile-sticky-sidebar"
      data-has-availability="<?php echo $has_availability ? 'true' : 'false'; ?>"
      data-booking-mode="<?php echo esc_attr($booking_mode); ?>"
@@ -267,6 +286,7 @@ if ($effective_min > 0) {
             </div>
     
     </div>
+<?php endif; // end else (booking not disabled) ?>
 
 <!-- JavaScript for mobile sidebar interactions -->
 <script>
@@ -573,7 +593,7 @@ function formatCurrency(amount) {
     return '$' + amount.toFixed(2);
 }
 
-// Auto-hide on scroll down, show on scroll up
+// Auto-hide on scroll down, show on scroll up (also works for enquiry-only sticky)
 let lastScrollTop = 0;
 const mobileSidebar = document.getElementById('yatra-mobile-sticky-sidebar');
 const scrollThreshold = 100;
