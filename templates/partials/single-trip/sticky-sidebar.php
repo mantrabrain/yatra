@@ -168,7 +168,10 @@ $booking_disabled = method_exists($trip, 'isBookingDisabled') && $trip->isBookin
         <div class="yatra-mobile-row-1">
 
             <div class="yatra-mobile-date-section">
-                <button type="button" class="yatra-mobile-field-btn yatra-mobile-date-btn" aria-label="<?php echo esc_attr__('Select date', 'yatra'); ?>">
+                <div class="yatra-mobile-field-btn yatra-mobile-date-btn"
+                     role="button"
+                     tabindex="0"
+                     aria-label="<?php echo esc_attr__('Select date', 'yatra'); ?>">
                     <span class="yatra-mobile-field-icon" aria-hidden="true">
                         <?php echo yatra_svg_icon('calendar', 'yatra-mobile-icon'); ?>
                     </span>
@@ -184,37 +187,51 @@ $booking_disabled = method_exists($trip, 'isBookingDisabled') && $trip->isBookin
                     <svg class="yatra-mobile-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
-                </button>
+                </div>
             </div>
 
             <div class="yatra-mobile-travelers-section">
                 <?php if ($has_traveler_pricing): ?>
-                    <!-- Traveler-Based Pricing -->
-                    <div class="yatra-mobile-booking-field">
-                        <div class="yatra-mobile-field-icon">
-                            <?php echo yatra_svg_icon('users', 'yatra-mobile-icon'); ?>
-                        </div>
-                        <div class="yatra-mobile-travelers-display" id="mobile-travelers-display">
-                            <?php
-                            $default_label = null;
-                            if (!empty($trip->price_types) && is_array($trip->price_types)) {
-                                foreach ($trip->price_types as $pt) {
-                                    $pt = is_array($pt) ? (object) $pt : $pt;
-                                    if (!empty($pt->is_default)) {
-                                        $default_label = !empty($pt->category_label) ? $pt->category_label : null;
-                                        break;
-                                    }
-                                }
-                                if ($default_label === null) {
-                                    $pt0 = $trip->price_types[0];
-                                    $pt0 = is_array($pt0) ? (object) $pt0 : $pt0;
-                                    $default_label = !empty($pt0->category_label) ? $pt0->category_label : null;
-                                }
-                            }
-                            echo esc_html(($default_label ?: __('Traveler', 'yatra')) . ' x 1');
-                            ?>
-                        </div>
-                    </div>
+                    <?php
+                    // Reuse the same traveler selector component as desktop, but with mobile-specific IDs
+                    $traveler_data = \Yatra\Controllers\SingleTripController::prepareTravelerSelectorData($trip, 'sidebar');
+                    $rows = $traveler_data['traveler_rows'] ?? [];
+
+                    // Prefix IDs so they don't collide with the desktop sidebar.
+                    foreach ($rows as &$row) {
+                        if (!empty($row['minus_attrs']['data-target'])) {
+                            $row['minus_attrs']['data-target'] = 'mobile_' . $row['minus_attrs']['data-target'];
+                        }
+                        if (!empty($row['plus_attrs']['data-target'])) {
+                            $row['plus_attrs']['data-target'] = 'mobile_' . $row['plus_attrs']['data-target'];
+                        }
+                        if (!empty($row['input_attrs']['id'])) {
+                            $row['input_attrs']['id'] = 'mobile_' . $row['input_attrs']['id'];
+                        }
+                        if (!empty($row['input_attrs']['name'])) {
+                            $row['input_attrs']['name'] = 'mobile_' . $row['input_attrs']['name'];
+                        }
+                    }
+                    unset($row);
+
+                    // Setup variables for traveler-selector.php
+                    $root_id = 'mobile-participants';
+                    $root_class = 'yatra-booking-field-select yatra-participants-select yatra-mobile-participants';
+                    $container_attrs = [];
+
+                    $display_id = 'mobile-participants-display';
+                    $display_class = 'yatra-participants-display yatra-mobile-participants-display';
+                    $display_attrs = [];
+
+                    $dropdown_id = 'mobile-quantity-selector';
+                    $dropdown_class = 'yatra-booking-quantity-selector yatra-mobile-quantity-selector';
+                    $dropdown_attrs = [];
+
+                    $display_text = $traveler_data['traveler_display_text'] ?? __('Select travelers', 'yatra');
+                    $icon_html = yatra_svg_icon('users', 'yatra-mobile-icon');
+
+                    include YATRA_PLUGIN_PATH . 'templates/partials/traveler-selector.php';
+                    ?>
                 <?php else: ?>
                     <!-- Regular Pricing -->
                     <div class="yatra-mobile-booking-field">
@@ -253,7 +270,7 @@ $booking_disabled = method_exists($trip, 'isBookingDisabled') && $trip->isBookin
                     class="yatra-mobile-close-btn"
                     aria-label="<?php echo esc_attr__('Close', 'yatra'); ?>"
                     onclick="yatraCloseMobileSidebar()">
-                <?php echo yatra_svg_icon('x', 'yatra-mobile-close-icon'); ?>
+                    <span class="yatra-mobile-close-fallback" aria-hidden="true">&times;</span>
             </button>
         </div>
 
@@ -434,6 +451,14 @@ function initializeMobileBookingForm() {
                     e.stopPropagation();
                     fp.open();
                 });
+                target.addEventListener('keydown', function(e) {
+                    var key = e.key || e.code;
+                    if (key === 'Enter' || key === ' ' || key === 'Spacebar') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        fp.open();
+                    }
+                });
             }
             // Initialize Flatpickr with same configuration as main date picker
             var altFormat = (window.yatraTripData && (window.yatraTripData.flatpickrAltFormat || window.yatraTripData.altDateFormat))
@@ -492,29 +517,7 @@ function initializeMobileBookingForm() {
         }
     }
 
-    // Travelers: on traveler-based pricing, tap should open desktop selector (same behavior).
-    const mobileSidebar = document.getElementById('yatra-mobile-sticky-sidebar');
-    const pricingType = mobileSidebar ? mobileSidebar.getAttribute('data-pricing-type') : '';
-    if (pricingType === 'traveler_based') {
-        const mobilePeopleField = document.querySelector('.yatra-mobile-travelers-section .yatra-mobile-booking-field');
-        if (mobilePeopleField) {
-            mobilePeopleField.style.cursor = 'pointer';
-            mobilePeopleField.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                // Scroll to desktop sidebar and open the participants selector dropdown.
-                const sidebar = document.querySelector('.yatra-trip-sidebar');
-                if (sidebar) {
-                    sidebar.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-                const participantsDisplay = document.getElementById('participants-display') ||
-                    document.querySelector('.yatra-participants-display');
-                if (participantsDisplay) {
-                    participantsDisplay.click();
-                }
-            });
-        }
-    }
+    // Travelers selector is rendered in the sticky bar using the same component as desktop.
     
     // Mobile check availability button
     const mobileCheckBtn = document.getElementById('mobile-check-availability-btn');
@@ -549,6 +552,18 @@ function syncMobileToMainForm() {
     const mainTravelers = document.getElementById('num_travelers');
     if (mobileTravelers && mainTravelers) {
         mainTravelers.value = mobileTravelers.value;
+    }
+
+    // Sync traveler-based pricing (mobile selector -> desktop selector)
+    const mobileTravelerInputs = document.querySelectorAll('#mobile-quantity-selector input[id^="mobile_traveler_"]');
+    if (mobileTravelerInputs && mobileTravelerInputs.length > 0) {
+        mobileTravelerInputs.forEach((input) => {
+            const desktopId = input.id.replace(/^mobile_/, '');
+            const desktopInput = document.getElementById(desktopId);
+            if (desktopInput) {
+                desktopInput.value = input.value;
+            }
+        });
     }
 }
 

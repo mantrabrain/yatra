@@ -1519,7 +1519,7 @@
       if (!display || !selector) return;
 
       // Get all traveler category inputs dynamically
-      const travelerInputs = selector.querySelectorAll('input[id^="traveler_"]');
+      const travelerInputs = selector.querySelectorAll('input[id^="traveler_"], input[id^="mobile_traveler_"]');
 
       if (travelerInputs.length === 0) return;
 
@@ -1569,7 +1569,17 @@
         e.stopPropagation();
 
         const targetId = btn.getAttribute('data-target');
-        const input = document.getElementById(targetId);
+        let input = null;
+        if (targetId) {
+          try {
+            input = selector.querySelector('#' + CSS.escape(targetId));
+          } catch (_) {
+            // ignore
+          }
+          if (!input) {
+            input = document.getElementById(targetId);
+          }
+        }
         if (!input) return;
 
         const current = parseInt(input.value || 0);
@@ -1609,7 +1619,7 @@
         if (!availabilitySection) return;
 
         inputs.forEach((input) => {
-          const categoryId = input.id.replace('traveler_', '');
+          const categoryId = input.id.replace(/^mobile_/, '').replace('traveler_', '');
           const value = parseInt(input.value) || 0;
 
           // Find all matching inputs in availability cards
