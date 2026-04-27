@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 ?>
 <section class="yatra-trip-section" id="location" itemscope itemtype="https://schema.org/Place">
     <h2 class="yatra-trip-section-title">
-        <?php yatra_render_tab_icon($tab->icon ?? null, 'map-pin', 'yatra-trip-section-title-icon', $tab->label ?? 'Location'); ?>
+        <?php yatra_render_tab_icon($tab->icon ?? null, 'map-pin', 'yatra-trip-section-title-icon', $tab->label ?? __('Location', 'yatra')); ?>
         <?php echo esc_html(isset($tab->label) ? $tab->label : __('Location', 'yatra')); ?>
     </h2>
 
@@ -75,11 +75,28 @@ if (!defined('ABSPATH')) {
                                 var endLng = parseFloat('<?php echo esc_js($trip->ending_longitude ?? '0'); ?>');
                                 var startingLocation = '<?php echo esc_js($trip->getStartingLocation() ?? ''); ?>';
                                 var endingLocation = '<?php echo esc_js($trip->ending_location ?? ''); ?>';
+                                var yatraMapI18n = {
+                                    mapLocationNotAvailable: '<?php echo esc_js(__('Map location not available', 'yatra')); ?>',
+                                    mapFailedToLoad: '<?php echo esc_js(__('Map failed to load. Please refresh the page.', 'yatra')); ?>',
+                                    tripStartingPoint: '<?php echo esc_js(__('Trip Starting Point', 'yatra')); ?>',
+                                    tripStart: '<?php echo esc_js(__('Trip Start', 'yatra')); ?>',
+                                    tripEndingPoint: '<?php echo esc_js(__('Trip Ending Point', 'yatra')); ?>',
+                                    tripEnd: '<?php echo esc_js(__('Trip End', 'yatra')); ?>',
+                                    startingPoint: '<?php echo esc_js(__('Starting Point', 'yatra')); ?>',
+                                    endingPoint: '<?php echo esc_js(__('Ending Point', 'yatra')); ?>',
+                                    labelLocation: '<?php echo esc_js(__('Location:', 'yatra')); ?>',
+                                    labelCoordinates: '<?php echo esc_js(__('Coordinates:', 'yatra')); ?>',
+                                    labelMap: '<?php echo esc_js(__('Map:', 'yatra')); ?>',
+                                    labelTime: '<?php echo esc_js(__('Time:', 'yatra')); ?>',
+                                    labelDescription: '<?php echo esc_js(__('Description', 'yatra')); ?>',
+                                    day: '<?php echo esc_js(__('Day', 'yatra')); ?>',
+                                    viewOnOpenStreetMap: '<?php echo esc_js(__('View on OpenStreetMap ↗', 'yatra')); ?>'
+                                };
                                 
                                 // Validate coordinates
                                 if (isNaN(startLat) || isNaN(startLng) || startLat === 0 || startLng === 0) {
                                     console.warn('[Yatra Map] Invalid starting coordinates');
-                                    mapContainer.innerHTML = '<div style="padding: 40px; text-align: center; color: #64748b;">Map location not available</div>';
+                                    mapContainer.innerHTML = '<div style="padding: 40px; text-align: center; color: #64748b;">' + yatraMapI18n.mapLocationNotAvailable + '</div>';
                                     return;
                                 }
                         
@@ -133,7 +150,7 @@ if (!defined('ABSPATH')) {
                         
                                 // Add OpenStreetMap tiles with error handling
                                 var tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                                    attribution: <?php echo wp_json_encode(sprintf(__('© %s contributors', 'yatra'), '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>')); ?>,
                                     maxZoom: 19,
                                     minZoom: 2,
                                     errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
@@ -197,23 +214,23 @@ if (!defined('ABSPATH')) {
                                         '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>' +
                                     '</div>' +
                                     '<div class="yatra-popup-title-section">' +
-                                        '<h4 class="yatra-popup-title">' + (startingLocation || 'Trip Starting Point') + '</h4>' +
-                                        '<span class="yatra-popup-badge yatra-badge-start">Starting Point</span>' +
+                                        '<h4 class="yatra-popup-title">' + (startingLocation || yatraMapI18n.tripStartingPoint) + '</h4>' +
+                                        '<span class="yatra-popup-badge yatra-badge-start">' + yatraMapI18n.startingPoint + '</span>' +
                                     '</div>' +
                                 '</div>' +
                                 '<div class="yatra-popup-body">' +
                                     '<div class="yatra-popup-info">' +
                                         '<div class="yatra-popup-info-item">' +
-                                            '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Location:</span>' +
-                                            '<span class="yatra-popup-value">' + (startingLocation || 'Trip Start') + '</span>' +
+                                            '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' + yatraMapI18n.labelLocation + '</span>' +
+                                            '<span class="yatra-popup-value">' + (startingLocation || yatraMapI18n.tripStart) + '</span>' +
                                         '</div>' +
                                         '<div class="yatra-popup-info-item">' +
-                                            '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Coordinates:</span>' +
+                                            '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' + yatraMapI18n.labelCoordinates + '</span>' +
                                             '<span class="yatra-popup-value">' + startLat.toFixed(6) + ', ' + startLng.toFixed(6) + '</span>' +
                                         '</div>' +
                                         '<div class="yatra-popup-info-item">' +
-                                            '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><polygon points="1 6 1 22 8 18 16 22 16 6"/><polyline points="8 18 8 12 16 12"/></svg>Map:</span>' +
-                                            '<a href="https://www.openstreetmap.org/?mlat=' + startLat + '&mlon=' + startLng + '#map=15/' + startLat + '/' + startLng + '" target="_blank" class="yatra-popup-link">View on OpenStreetMap ↗</a>' +
+                                            '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><polygon points="1 6 1 22 8 18 16 22 16 6"/><polyline points="8 18 8 12 16 12"/></svg>' + yatraMapI18n.labelMap + '</span>' +
+                                            '<a href="https://www.openstreetmap.org/?mlat=' + startLat + '&mlon=' + startLng + '#map=15/' + startLat + '/' + startLng + '" target="_blank" class="yatra-popup-link">' + yatraMapI18n.viewOnOpenStreetMap + '</a>' +
                                         '</div>' +
                                     '</div>' +
                                 '</div>' +
@@ -224,7 +241,7 @@ if (!defined('ABSPATH')) {
                             });
                             
                             // Add tooltip that shows on hover
-                            var startTooltip = startingLocation ? startingLocation : 'Trip Starting Point';
+                            var startTooltip = startingLocation ? startingLocation : yatraMapI18n.tripStartingPoint;
                             startMarker.bindTooltip(startTooltip, {
                                 permanent: false,
                                 direction: 'top',
@@ -255,7 +272,7 @@ if (!defined('ABSPATH')) {
                                         '<div class="yatra-popup-title-section">' +
                                             '<h4 class="yatra-popup-title">' + activity.title + '</h4>' +
                                             '<div class="yatra-popup-badges">' +
-                                                '<span class="yatra-popup-badge yatra-badge-activity">Day ' + activity.day + '</span>' +
+                                                '<span class="yatra-popup-badge yatra-badge-activity">' + yatraMapI18n.day + ' ' + activity.day + '</span>' +
                                                 (activity.day_title ? '<span class="yatra-popup-day-title">' + activity.day_title + '</span>' : '') +
                                             '</div>' +
                                         '</div>' +
@@ -263,24 +280,24 @@ if (!defined('ABSPATH')) {
                                     '<div class="yatra-popup-body">' +
                                         '<div class="yatra-popup-info">' +
                                             (activity.location ? '<div class="yatra-popup-info-item">' +
-                                                '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Location:</span>' +
+                                                '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' + yatraMapI18n.labelLocation + '</span>' +
                                                 '<span class="yatra-popup-value">' + activity.location + '</span>' +
                                             '</div>' : '') +
                                             (activity.start_time && activity.end_time ? '<div class="yatra-popup-info-item">' +
-                                                '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Time:</span>' +
+                                                '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' + yatraMapI18n.labelTime + '</span>' +
                                                 '<span class="yatra-popup-value">' + activity.start_time + ' - ' + activity.end_time + '</span>' +
                                             '</div>' : '') +
                                             '<div class="yatra-popup-info-item">' +
-                                                '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Coordinates:</span>' +
+                                                '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' + yatraMapI18n.labelCoordinates + '</span>' +
                                                 '<span class="yatra-popup-value">' + activity.lat.toFixed(6) + ', ' + activity.lng.toFixed(6) + '</span>' +
                                             '</div>' +
                                             '<div class="yatra-popup-info-item">' +
-                                                '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><polygon points="1 6 1 22 8 18 16 22 16 6"/><polyline points="8 18 8 12 16 12"/></svg>Map:</span>' +
-                                                '<a href="https://www.openstreetmap.org/?mlat=' + activity.lat + '&mlon=' + activity.lng + '#map=15/' + activity.lat + '/' + activity.lng + '" target="_blank" class="yatra-popup-link">View on OpenStreetMap ↗</a>' +
+                                                '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><polygon points="1 6 1 22 8 18 16 22 16 6"/><polyline points="8 18 8 12 16 12"/></svg>' + yatraMapI18n.labelMap + '</span>' +
+                                                '<a href="https://www.openstreetmap.org/?mlat=' + activity.lat + '&mlon=' + activity.lng + '#map=15/' + activity.lat + '/' + activity.lng + '" target="_blank" class="yatra-popup-link">' + yatraMapI18n.viewOnOpenStreetMap + '</a>' +
                                             '</div>' +
                                         '</div>' +
                                         (activity.description ? '<div class="yatra-popup-description">' +
-                                            '<div class="yatra-popup-desc-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Description</div>' +
+                                            '<div class="yatra-popup-desc-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>' + yatraMapI18n.labelDescription + '</div>' +
                                             '<div class="yatra-popup-desc-text">' + 
                                                 (activity.description.length > 150 ? activity.description.substring(0, 150) + '...' : activity.description) +
                                             '</div>' +
@@ -319,23 +336,23 @@ if (!defined('ABSPATH')) {
                                         '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>' +
                                     '</div>' +
                                     '<div class="yatra-popup-title-section">' +
-                                        '<h4 class="yatra-popup-title">' + (endingLocation || 'Trip Ending Point') + '</h4>' +
-                                        '<span class="yatra-popup-badge yatra-badge-end">Ending Point</span>' +
+                                        '<h4 class="yatra-popup-title">' + (endingLocation || yatraMapI18n.tripEndingPoint) + '</h4>' +
+                                        '<span class="yatra-popup-badge yatra-badge-end">' + yatraMapI18n.endingPoint + '</span>' +
                                     '</div>' +
                                 '</div>' +
                                 '<div class="yatra-popup-body">' +
                                     '<div class="yatra-popup-info">' +
                                         '<div class="yatra-popup-info-item">' +
-                                            '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Location:</span>' +
-                                            '<span class="yatra-popup-value">' + (endingLocation || 'Trip End') + '</span>' +
+                                            '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' + yatraMapI18n.labelLocation + '</span>' +
+                                            '<span class="yatra-popup-value">' + (endingLocation || yatraMapI18n.tripEnd) + '</span>' +
                                         '</div>' +
                                         '<div class="yatra-popup-info-item">' +
-                                            '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Coordinates:</span>' +
+                                            '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' + yatraMapI18n.labelCoordinates + '</span>' +
                                             '<span class="yatra-popup-value">' + endLat.toFixed(6) + ', ' + endLng.toFixed(6) + '</span>' +
                                         '</div>' +
                                         '<div class="yatra-popup-info-item">' +
-                                            '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><polygon points="1 6 1 22 8 18 16 22 16 6"/><polyline points="8 18 8 12 16 12"/></svg>Map:</span>' +
-                                            '<a href="https://www.openstreetmap.org/?mlat=' + endLat + '&mlon=' + endLng + '#map=15/' + endLat + '/' + endLng + '" target="_blank" class="yatra-popup-link">View on OpenStreetMap ↗</a>' +
+                                            '<span class="yatra-popup-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><polygon points="1 6 1 22 8 18 16 22 16 6"/><polyline points="8 18 8 12 16 12"/></svg>' + yatraMapI18n.labelMap + '</span>' +
+                                            '<a href="https://www.openstreetmap.org/?mlat=' + endLat + '&mlon=' + endLng + '#map=15/' + endLat + '/' + endLng + '" target="_blank" class="yatra-popup-link">' + yatraMapI18n.viewOnOpenStreetMap + '</a>' +
                                         '</div>' +
                                     '</div>' +
                                 '</div>' +
@@ -346,7 +363,7 @@ if (!defined('ABSPATH')) {
                             });
                             
                             // Add tooltip that shows on hover
-                            var endTooltip = endingLocation ? endingLocation : 'Trip Ending Point';
+                            var endTooltip = endingLocation ? endingLocation : yatraMapI18n.tripEndingPoint;
                             endMarker.bindTooltip(endTooltip, {
                                 permanent: false,
                                 direction: 'top',
@@ -476,7 +493,7 @@ if (!defined('ABSPATH')) {
                             } catch (error) {
                                 console.error('[Yatra Map] Initialization error:', error);
                                 if (mapContainer) {
-                                    mapContainer.innerHTML = '<div style="padding: 40px; text-align: center; color: #ef4444;">Map failed to load. Please refresh the page.</div>';
+                                    mapContainer.innerHTML = '<div style="padding: 40px; text-align: center; color: #ef4444;">' + yatraMapI18n.mapFailedToLoad + '</div>';
                                 }
                             }
                         });

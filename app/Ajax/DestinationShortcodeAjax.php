@@ -23,9 +23,7 @@ class DestinationShortcodeAjax
         
         // Verify nonce
         if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_destination_shortcode_nonce')) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra Destination AJAX - Security check failed');
-            }
+
             wp_die(esc_html__('Security check failed', 'yatra'), '', ['response' => 403]);
         }
 
@@ -78,11 +76,7 @@ class DestinationShortcodeAjax
             ]);
 
         } catch (\Exception $e) {
-            // Log error for debugging
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra DestinationShortcode AJAX Error: ' . $e->getMessage());
-                error_log('Yatra DestinationShortcode AJAX Trace: ' . $e->getTraceAsString());
-            }
+
             
             wp_send_json_error([
                 'message' => (defined('WP_DEBUG') && WP_DEBUG)

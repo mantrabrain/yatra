@@ -509,7 +509,6 @@ class TripDownloadController extends BaseController
         }
         
         if ($attachmentId <= 0) {
-            error_log("ensureProtectedFile: No attachment_id found for download " . ($download->id ?? 'unknown'));
             return '';
         }
 

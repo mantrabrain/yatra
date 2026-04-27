@@ -292,7 +292,6 @@ class SampleDataService
             ];
             
         } catch (\Exception $e) {
-            error_log('Yatra Sample Data Import Error: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
             return [
                 'success' => false,
                 'message' => sprintf(__('Error importing sample data: %s', 'yatra'), $e->getMessage()),

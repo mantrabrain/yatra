@@ -401,6 +401,21 @@ class CustomerRepository extends BaseRepository
     }
 
     /**
+     * Delete a customer record
+     *
+     * CustomerService calls this method when deleting customers via the REST API.
+     * BaseRepository already implements delete(int $id), so this is a thin wrapper
+     * for backward/semantic compatibility.
+     *
+     * @param int $customerId
+     * @return bool
+     */
+    public function deleteCustomer(int $customerId): bool
+    {
+        return $this->delete($customerId);
+    }
+
+    /**
      * Get gateway customer ID for a customer
      * 
      * @param int $customerId

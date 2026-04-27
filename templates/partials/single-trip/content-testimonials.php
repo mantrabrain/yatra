@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
 ?>
 <section class="yatra-trip-section" id="<?php echo esc_attr($tab->id); ?>">
     <h2 class="yatra-trip-section-title">
-        <?php yatra_render_tab_icon($tab->icon ?? null, 'message-circle', 'yatra-trip-section-title-icon', $tab->label ?? 'Testimonials'); ?>
+        <?php yatra_render_tab_icon($tab->icon ?? null, 'message-circle', 'yatra-trip-section-title-icon', $tab->label ?? __('Testimonials', 'yatra')); ?>
         <?php echo esc_html($tab->label); ?>
     </h2>
     
@@ -41,7 +41,7 @@ if (!defined('ABSPATH')) {
                             <div class="yatra-testimonial-avatar">
                                 <?php 
                                 // Use default avatar or initials
-                                $author_name = !empty($testimonial->author_name) ? $testimonial->author_name : 'Anonymous';
+                                $author_name = !empty($testimonial->author_name) ? $testimonial->author_name : __('Anonymous', 'yatra');
                                 $initials = implode('', array_map(function($word) { return strtoupper(substr($word, 0, 1)); }, explode(' ', $author_name)));
                                 echo esc_html(substr($initials, 0, 2));
                                 ?>

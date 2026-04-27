@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$listing_url = $listing_url ?? home_url('/trip/');
+$listing_url = $listing_url ?? home_url('/' . \Yatra\Services\SettingsService::getTripBase() . '/');
 $duration_bounds = is_array($duration_bounds ?? null) ? $duration_bounds : ['min' => 1, 'max' => 30];
 $budget_presets = is_array($budget_presets ?? null) ? $budget_presets : [];
 

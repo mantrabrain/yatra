@@ -194,7 +194,6 @@ class SampleDataController
                 ];
             }
         } catch (\Exception $e) {
-            error_log('Yatra Sample Data Import Error: ' . $e->getMessage());
             return [
                 'success' => false,
                 'message' => __('An error occurred during import. Please check the error logs.', 'yatra')
@@ -229,7 +228,6 @@ class SampleDataController
                 ];
             }
         } catch (\Exception $e) {
-            error_log('Yatra Sample Data Cleanup Error: ' . $e->getMessage());
             return [
                 'success' => false,
                 'message' => __('An error occurred during cleanup. Please check the error logs.', 'yatra')

@@ -190,8 +190,12 @@ class DepartureRepository extends BaseRepository
         
         if (!empty($filters['date_from']) && trim($filters['date_from']) !== '') {
             if ($hasStartDate) {
-                $where[] = '(start_date >= %s OR ((start_date IS NULL OR start_date = "") AND date >= %s))';
+                // NOTE: start_date is a DATE column in some installs; comparing to "" can trigger
+                // "Incorrect DATE value: ''" under strict SQL modes. Treat "0000-00-00" as empty.
+                $where[] = '((start_date IS NOT NULL AND start_date <> %s AND start_date >= %s) OR ((start_date IS NULL OR start_date = %s) AND date >= %s))';
+                $params[] = '0000-00-00';
                 $params[] = $filters['date_from'];
+                $params[] = '0000-00-00';
                 $params[] = $filters['date_from'];
             } else {
                 $where[] = 'date >= %s';
@@ -201,8 +205,11 @@ class DepartureRepository extends BaseRepository
         
         if (!empty($filters['date_to']) && trim($filters['date_to']) !== '') {
             if ($hasStartDate) {
-                $where[] = '(start_date <= %s OR ((start_date IS NULL OR start_date = "") AND date <= %s))';
+                // See note above re strict DATE comparisons and empty string.
+                $where[] = '((start_date IS NOT NULL AND start_date <> %s AND start_date <= %s) OR ((start_date IS NULL OR start_date = %s) AND date <= %s))';
+                $params[] = '0000-00-00';
                 $params[] = $filters['date_to'];
+                $params[] = '0000-00-00';
                 $params[] = $filters['date_to'];
             } else {
                 $where[] = 'date <= %s';

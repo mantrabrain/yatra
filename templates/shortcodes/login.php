@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
 
 // Get and validate variables
 $atts = get_query_var('yatra_login_atts', []);
-$redirect_url = get_query_var('yatra_redirect_url', home_url('/my-account'));
+$redirect_url = get_query_var('yatra_redirect_url', home_url('/' . \Yatra\Services\SettingsService::getAccountBase()));
 
 // Generate unique form ID for this instance
 $form_id = 'yatra-login-form-' . uniqid();
@@ -48,7 +48,7 @@ $login_nonce = wp_create_nonce('yatra_login_nonce');
                         required
                         autocomplete="username"
                         maxlength="60"
-                        pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|[a-zA-Z0-9._-]{3,20}"
+                        pattern="([a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,})|([a-zA-Z0-9._\\-]{3,20})"
                         title="<?php esc_attr_e('Enter a valid email address or username', 'yatra'); ?>"
                     >
                 </div>
@@ -67,8 +67,7 @@ $login_nonce = wp_create_nonce('yatra_login_nonce');
                             required
                             autocomplete="current-password"
                             maxlength="72"
-                            minlength="8"
-                            title="<?php esc_attr_e('Password must be at least 8 characters long', 'yatra'); ?>"
+                        title="<?php esc_attr_e('Enter your password', 'yatra'); ?>"
                         >
                         <button type="button" class="yatra-password-toggle" aria-label="<?php esc_attr_e('Toggle password visibility', 'yatra'); ?>" data-target="<?php echo esc_attr($form_id); ?>-password">
                             <?php echo yatra_svg_icon('eye', 'yatra-eye-icon'); ?>

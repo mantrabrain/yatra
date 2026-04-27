@@ -154,7 +154,6 @@ class AddTaxFieldsToBookingsMigration
                 }
             } catch (\Exception $e) {
                 // Log error but continue with other bookings
-                error_log('[Yatra] Tax migration error for booking ' . $booking->id . ': ' . $e->getMessage());
             }
         }
         

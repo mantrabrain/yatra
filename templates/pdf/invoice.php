@@ -29,7 +29,7 @@ $amountDue = (string) ($amount_due ?? '0.00');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice - <?php echo htmlspecialchars($paymentRef, ENT_QUOTES, 'UTF-8'); ?></title>
+    <title><?php echo esc_html__('Invoice', 'yatra'); ?> - <?php echo htmlspecialchars($paymentRef, ENT_QUOTES, 'UTF-8'); ?></title>
     <style>
         @page { size: A4 portrait; margin: 0mm; }
         * { margin: 0; padding: 0; box-sizing: border-box; }

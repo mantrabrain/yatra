@@ -163,27 +163,15 @@ $booking_disabled = method_exists($trip, 'isBookingDisabled') && $trip->isBookin
      data-group-discounts='<?php echo esc_attr(json_encode($sidebar_group_discounts_data)); ?>'>
     <!-- Two-Row Layout -->
     <div class="yatra-mobile-sticky-content">
-        
-        <!-- Row 1: Date, Travelers, and Actions -->
-        <div class="yatra-mobile-row-1">
-            <!-- Group Discount Badge -->
-            <?php if ($sidebar_has_group_discounts): ?>
-            <div class="yatra-mobile-group-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-            </div>
-            <?php endif; ?>
 
-            <!-- Date Picker - Compact Mobile Version -->
+        <!-- Row 1: Compact fields + close (clean grid layout) -->
+        <div class="yatra-mobile-row-1">
+
             <div class="yatra-mobile-date-section">
-                <div class="yatra-mobile-compact-datepicker">
-                    <div class="yatra-mobile-field-icon">
+                <button type="button" class="yatra-mobile-field-btn yatra-mobile-date-btn" aria-label="<?php echo esc_attr__('Select date', 'yatra'); ?>">
+                    <span class="yatra-mobile-field-icon" aria-hidden="true">
                         <?php echo yatra_svg_icon('calendar', 'yatra-mobile-icon'); ?>
-                    </div>
+                    </span>
                     <input type="text"
                            id="mobile_travel_date"
                            name="travel_date"
@@ -193,13 +181,12 @@ $booking_disabled = method_exists($trip, 'isBookingDisabled') && $trip->isBookin
                            data-max-date="<?php echo esc_attr($trip->getAvailableTo() ?: ''); ?>"
                            readonly
                            required>
-                    <svg class="yatra-mobile-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="yatra-mobile-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
-                </div>
+                </button>
             </div>
 
-            <!-- Travelers Selection -->
             <div class="yatra-mobile-travelers-section">
                 <?php if ($has_traveler_pricing): ?>
                     <!-- Traveler-Based Pricing -->
@@ -258,29 +245,32 @@ $booking_disabled = method_exists($trip, 'isBookingDisabled') && $trip->isBookin
                     </div>
                 <?php endif; ?>
             </div>
-            
-            <!-- Action Buttons -->
-            <div class="yatra-mobile-action-section">
-                <button type="button" class="yatra-mobile-check-btn" id="mobile-check-availability-btn" data-trip-id="<?php echo esc_attr($trip->getId()); ?>">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    <span><?php echo esc_html__('Check', 'yatra'); ?></span>
-                </button>
-                <button type="button" class="yatra-mobile-enquire-btn" id="mobile-open-enquiry-modal" onclick="if (window.enquiryModal) { window.enquiryModal.open(); } else if (window.YatraEnquiry) { window.YatraEnquiry.open(); } return false;">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
-                    </svg>
-                    <span><?php echo esc_html__('Enquire', 'yatra'); ?></span>
-                </button>
-            </div>
+        </div>
 
-            <!-- Close Button -->
-            <div class="yatra-mobile-action-buttons">
-                <button type="button" class="yatra-mobile-close-btn" onclick="yatraCloseMobileSidebar()">
-                    <?php echo yatra_svg_icon('x', 'yatra-mobile-close-icon'); ?>
-                </button>
-            </div>
+        <!-- Close Button (fixed in top-right of sticky container) -->
+        <div class="yatra-mobile-action-buttons">
+            <button type="button"
+                    class="yatra-mobile-close-btn"
+                    aria-label="<?php echo esc_attr__('Close', 'yatra'); ?>"
+                    onclick="yatraCloseMobileSidebar()">
+                <?php echo yatra_svg_icon('x', 'yatra-mobile-close-icon'); ?>
+            </button>
+        </div>
+
+        <!-- Row 2: Primary Actions -->
+        <div class="yatra-mobile-row-2">
+            <button type="button" class="yatra-mobile-check-btn" id="mobile-check-availability-btn" data-trip-id="<?php echo esc_attr($trip->getId()); ?>">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span><?php echo esc_html__('Check', 'yatra'); ?></span>
+            </button>
+            <button type="button" class="yatra-mobile-enquire-btn" id="mobile-open-enquiry-modal" onclick="if (window.enquiryModal) { window.enquiryModal.open(); } else if (window.YatraEnquiry) { window.YatraEnquiry.open(); } return false;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                </svg>
+                <span><?php echo esc_html__('Enquire', 'yatra'); ?></span>
+            </button>
         </div>
 
             </div>
@@ -312,10 +302,8 @@ function yatraScrollToContact() {
 
 
 function yatraCloseMobileSidebar() {
-    console.log('Close button clicked');
     const sidebar = document.getElementById('yatra-mobile-sticky-sidebar');
     if (sidebar) {
-        console.log('Sidebar found, closing...');
         sidebar.classList.add('user-closed');
         
         // Save closed state in sessionStorage (persists until page reload)
@@ -326,29 +314,20 @@ function yatraCloseMobileSidebar() {
             sidebar.style.transform = 'translateY(100%)';
             sidebar.style.opacity = '0';
         }, 100);
-    } else {
-        console.log('Sidebar not found');
     }
 }
 
 // Auto-show on page load (reset closed state)
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, checking mobile sidebar...');
     const sidebar = document.getElementById('yatra-mobile-sticky-sidebar');
     
     if (sidebar) {
-        console.log('Mobile sidebar element found');
-        
         // Clear any previous closed state on page load
         sessionStorage.removeItem('yatra-mobile-sidebar-closed');
         
         // Ensure sidebar is visible on page load (CSS will handle responsive)
         sidebar.classList.remove('user-closed');
         sidebar.classList.remove('hidden');
-        
-        console.log('CSS-based responsive behavior initialized');
-    } else {
-        console.log('Mobile sidebar element NOT found');
     }
     
     // Initialize mobile booking form functionality
@@ -393,11 +372,19 @@ function initializeMobileBookingForm() {
     // Mobile date picker - Initialize exactly like main date picker
     const mobileDateInput = document.getElementById('mobile_travel_date');
     if (mobileDateInput) {
-        console.log('Initializing mobile date picker...');
+        // Default value: today (desktop behavior). If availability mode doesn't allow today,
+        // we will swap to the first enabled date after Flatpickr initializes.
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayStr = today.getFullYear() + '-' +
+            String(today.getMonth() + 1).padStart(2, '0') + '-' +
+            String(today.getDate()).padStart(2, '0');
+        if (!mobileDateInput.value) {
+            mobileDateInput.value = todayStr;
+        }
         
         // Check if Flatpickr is available
         if (typeof flatpickr === 'undefined') {
-            console.log('Flatpickr not loaded, falling back to basic date input');
             // Make it a regular date input as fallback
             mobileDateInput.type = 'date';
             mobileDateInput.removeAttribute('readonly');
@@ -409,7 +396,6 @@ function initializeMobileBookingForm() {
                     availabilityDates = window.yatraTripData.availabilityDates;
                 }
             } catch (e) {
-                console.log('Error accessing yatraTripData:', e);
             }
             
             var mobileFpCommon = {
@@ -419,6 +405,12 @@ function initializeMobileBookingForm() {
                 onReady: function(selectedDates, dateStr, instance) {
                     if (instance.calendarContainer) {
                         instance.calendarContainer.style.zIndex = '100050';
+                    }
+
+                    // Ensure we have a selected date (desktop behavior).
+                    // If current value is empty, use today.
+                    if (!instance.selectedDates || instance.selectedDates.length === 0) {
+                        instance.setDate(mobileDateInput.value || todayStr, true);
                     }
                 },
                 onChange: function(selectedDates, dateStr, instance) {
@@ -434,15 +426,13 @@ function initializeMobileBookingForm() {
                     return;
                 }
                 var fp = inputEl._flatpickr;
-                var wrap = inputEl.closest('.yatra-mobile-compact-datepicker');
-                if (!wrap) {
-                    return;
-                }
-                wrap.addEventListener('click', function(e) {
+                var btn = document.querySelector('.yatra-mobile-date-btn');
+                var fallbackWrap = inputEl.closest('.yatra-mobile-date-section');
+                var target = btn || fallbackWrap;
+                if (!target) return;
+                target.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    if (!fp.isOpen) {
-                        fp.open();
-                    }
+                    fp.open();
                 });
             }
             // Initialize Flatpickr with same configuration as main date picker
@@ -473,7 +463,8 @@ function initializeMobileBookingForm() {
                     altInput: true,
                     altFormat: altFormat,
                     minDate: 'today',
-                    enable: availabilityDates
+                    enable: availabilityDates,
+                    defaultDate: availabilityDates[0] || todayStr,
                 }));
             } else {
                 // Regular booking - flexible dates with min/max constraints
@@ -481,12 +472,16 @@ function initializeMobileBookingForm() {
                     dateFormat: 'Y-m-d',
                     altInput: true,
                     altFormat: altFormat,
-                    minDate: 'today'
+                    minDate: 'today',
+                    defaultDate: mobileDateInput.value || todayStr,
                 });
                 var minDate = mobileDateInput.getAttribute('data-min-date');
                 var maxDate = mobileDateInput.getAttribute('data-max-date');
                 if (minDate) {
                     config.minDate = minDate;
+                    if (!mobileDateInput.value) {
+                        config.defaultDate = minDate;
+                    }
                 }
                 if (maxDate) {
                     config.maxDate = maxDate;
@@ -495,30 +490,44 @@ function initializeMobileBookingForm() {
             }
             yatraBindMobileDatepickerTouch(mobileDateInput);
         }
-        
-        console.log('Mobile date picker initialized successfully');
-    } else {
-        console.log('Mobile date input not found');
+    }
+
+    // Travelers: on traveler-based pricing, tap should open desktop selector (same behavior).
+    const mobileSidebar = document.getElementById('yatra-mobile-sticky-sidebar');
+    const pricingType = mobileSidebar ? mobileSidebar.getAttribute('data-pricing-type') : '';
+    if (pricingType === 'traveler_based') {
+        const mobilePeopleField = document.querySelector('.yatra-mobile-travelers-section .yatra-mobile-booking-field');
+        if (mobilePeopleField) {
+            mobilePeopleField.style.cursor = 'pointer';
+            mobilePeopleField.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                // Scroll to desktop sidebar and open the participants selector dropdown.
+                const sidebar = document.querySelector('.yatra-trip-sidebar');
+                if (sidebar) {
+                    sidebar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                const participantsDisplay = document.getElementById('participants-display') ||
+                    document.querySelector('.yatra-participants-display');
+                if (participantsDisplay) {
+                    participantsDisplay.click();
+                }
+            });
+        }
     }
     
     // Mobile check availability button
     const mobileCheckBtn = document.getElementById('mobile-check-availability-btn');
     if (mobileCheckBtn) {
         mobileCheckBtn.addEventListener('click', function() {
-            console.log('Mobile Check button clicked');
             // Sync mobile form data with main form
             syncMobileToMainForm();
             // Trigger main check availability
             const mainCheckBtn = document.getElementById('check-availability-btn');
             if (mainCheckBtn) {
-                console.log('Triggering main Check button');
                 mainCheckBtn.click();
-            } else {
-                console.log('Main Check button not found');
             }
         });
-    } else {
-        console.log('Mobile Check button not found');
     }
 }
 

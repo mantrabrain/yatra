@@ -127,7 +127,7 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
             case 'select':
                 ?>
                 <select id="<?php echo $field_id; ?>" name="<?php echo $field_name; ?>" <?php echo $required_attr; ?>>
-                    <option value=""><?php echo esc_html($field['placeholder'] ?? 'Select...'); ?></option>
+                    <option value=""><?php echo esc_html($field['placeholder'] ?? __('Select...', 'yatra')); ?></option>
                     <?php if (!empty($field['options'])) : ?>
                         <?php foreach ($field['options'] as $option) : ?>
                             <option value="<?php echo esc_attr($option['value']); ?>" <?php echo selected($prefill_value, (string) ($option['value'] ?? ''), false); ?>>
@@ -142,7 +142,7 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
             case 'country':
                 ?>
                 <select id="<?php echo $field_id; ?>" name="<?php echo $field_name; ?>" <?php echo $required_attr; ?>>
-                    <option value=""><?php echo esc_html($field['placeholder'] ?? 'Select Country'); ?></option>
+                    <option value=""><?php echo esc_html($field['placeholder'] ?? __('Select Country', 'yatra')); ?></option>
                     <?php foreach ($countries as $code => $name) : ?>
                         <option value="<?php echo esc_attr($code); ?>" <?php echo selected($prefill_value, (string) $code, false); ?>>
                             <?php echo esc_html($name); ?>

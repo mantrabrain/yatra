@@ -121,7 +121,13 @@ if (!defined('ABSPATH')) {
                                 
                                 <?php if ($discount['has_discount']): ?>
                                 <div class="yatra-similar-discount-badge">
-                                    <?php echo esc_html($discount['discount_text']); ?> OFF
+                                    <?php
+                                    printf(
+                                        /* translators: %s: discount text (e.g. "10%") */
+                                        esc_html__('%s OFF', 'yatra'),
+                                        esc_html($discount['discount_text'])
+                                    );
+                                    ?>
                                 </div>
                                 <?php endif; ?>
                                 

@@ -36,11 +36,7 @@ class InstallerService
         if (class_exists('\Yatra\Core\Database')) {
             \Yatra\Core\Database::createTables();
         }
-        
-        // Log table creation (for debugging)
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra Installer: Created all database tables');
-        }
+
     }
     
     /**
@@ -196,10 +192,7 @@ class InstallerService
         update_option('yatra_installation_date', current_time('mysql'));
         update_option('yatra_version', defined('YATRA_VERSION') ? YATRA_VERSION : '3.0.2.4');
         
-        // Log the installation (for debugging)
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra Installer: Set all default options with pay_later as only gateway');
-        }
+
     }
     
     /**

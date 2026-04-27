@@ -8,6 +8,8 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 use Yatra\Services\DiscountService;
+use Yatra\Repositories\DiscountRepository;
+use Yatra\Models\Discount;
 
 /**
  * Discount REST API Controller
@@ -121,26 +123,53 @@ class DiscountController extends BaseController
         if (!apply_filters('yatra_advanced_discount_enabled', false)) {
             return [];
         }
-        
-        $discounts = \Yatra\Models\Discount::where('is_group_discount', true)
-            ->where('status', 'publish')
-            ->where(function($query) {
-                $query->whereNull('valid_from')
-                      ->orWhere('valid_from', '<=', date('Y-m-d'));
-            })
-            ->where(function($query) {
-                $query->whereNull('expiry_date')
-                      ->orWhere('expiry_date', '>=', date('Y-m-d'));
-            })
-            ->where(function($query) use ($tripId) {
-                $query->where('applicable_to', 'all')
-                      ->orWhere(function($subQuery) use ($tripId) {
-                          $subQuery->where('applicable_to', 'specific_trips')
-                                   ->whereJsonContains('trip_ids', $tripId);
-                      });
-            })
-            ->orderBy('min_group_size', 'asc')
-            ->get();
+        // Discount is a simple DTO model (not Eloquent), so use repository + PHP filtering.
+        $repo = new DiscountRepository();
+        $rows = $repo->getActiveGroupDiscounts();
+
+        $today = date('Y-m-d');
+
+        $discounts = array_values(array_filter(array_map(function ($row) use ($today, $tripId) {
+            $arr = (array) $row;
+            $discount = Discount::fromArray($arr);
+
+            if (empty($discount->is_group_discount)) {
+                return null;
+            }
+
+            // Repository already filters status='publish', but keep this defensive.
+            if (($arr['status'] ?? null) !== 'publish' && ($discount->status ?? null) !== 'publish') {
+                return null;
+            }
+
+            $validFrom = is_string($discount->valid_from) ? trim($discount->valid_from) : '';
+            if ($validFrom !== '' && $validFrom !== '0000-00-00' && $validFrom > $today) {
+                return null;
+            }
+
+            $expiry = is_string($discount->expiry_date) ? trim($discount->expiry_date) : '';
+            if ($expiry !== '' && $expiry !== '0000-00-00' && $expiry < $today) {
+                return null;
+            }
+
+            $applicableTo = (string) ($discount->applicable_to ?? 'all');
+            if ($applicableTo === 'all') {
+                return $discount;
+            }
+
+            if ($applicableTo === 'specific_trips') {
+                $tripIds = $discount->trip_ids ?? [];
+                if (is_array($tripIds) && in_array($tripId, array_map('absint', $tripIds), true)) {
+                    return $discount;
+                }
+            }
+
+            return null;
+        }, $rows)));
+
+        usort($discounts, function (Discount $a, Discount $b) {
+            return (int) ($a->min_group_size ?? 0) <=> (int) ($b->min_group_size ?? 0);
+        });
 
         $result = [];
         foreach ($discounts as $discount) {
@@ -176,11 +205,13 @@ class DiscountController extends BaseController
         $uniqueRanges = array_unique($ranges);
 
         if (count($uniqueRanges) === 1) {
-            return "Up to {$discounts[0]['discount_label']} for {$uniqueRanges[0]}";
-        } else {
-            $firstDiscount = $discounts[0];
-            return "Up to {$firstDiscount['discount_label']} for groups starting at {$firstDiscount['min_group_size']} people";
+            /* translators: 1: discount label, 2: range label */
+            return sprintf(__('Up to %1$s for %2$s', 'yatra'), $discounts[0]['discount_label'], $uniqueRanges[0]);
         }
+
+        $firstDiscount = $discounts[0];
+        /* translators: 1: discount label, 2: minimum group size */
+        return sprintf(__('Up to %1$s for groups starting at %2$d people', 'yatra'), $firstDiscount['discount_label'], (int) $firstDiscount['min_group_size']);
     }
 
     /**
@@ -189,10 +220,12 @@ class DiscountController extends BaseController
     private function formatGroupSizeRange($discount): string
     {
         if ($discount->max_group_size) {
-            return "{$discount->min_group_size}-{$discount->max_group_size} people";
-        } else {
-            return "{$discount->min_group_size}+ people";
+            /* translators: 1: min group size, 2: max group size */
+            return sprintf(__('%1$d-%2$d people', 'yatra'), (int) $discount->min_group_size, (int) $discount->max_group_size);
         }
+
+        /* translators: %d: minimum group size */
+        return sprintf(__('%d+ people', 'yatra'), (int) $discount->min_group_size);
     }
 
     /**
@@ -201,10 +234,12 @@ class DiscountController extends BaseController
     private function formatDiscountLabel($discount): string
     {
         if ($discount->group_discount_type === 'percentage') {
-            return "{$discount->group_discount_amount}% off";
-        } else {
-            return "$" . number_format($discount->group_discount_amount, 2) . " off";
+            /* translators: %s: discount percentage */
+            return sprintf(__('%s%% off', 'yatra'), (string) $discount->group_discount_amount);
         }
+
+        /* translators: %s: discount amount */
+        return sprintf(__('%s off', 'yatra'), '$' . number_format((float) $discount->group_discount_amount, 2));
     }
 
     public function check_permission(?WP_REST_Request $request = null): bool

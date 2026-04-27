@@ -555,19 +555,24 @@ button.yatra-booking-button svg path {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 6px 10px;
-    border-radius: 20px;
+    background: rgba(17, 24, 39, 0.55);
+    color: rgba(255, 255, 255, 0.95);
+    padding: 4px 8px;
+    border-radius: 999px;
     font-size: 12px;
     font-weight: 500;
-    backdrop-filter: blur(4px);
-    transition: all 0.3s ease;
+    letter-spacing: 0.2px;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    transition: none;
+    cursor: default;
+    user-select: none;
+    pointer-events: none;
 }
 
 .yatra-media-badge:hover {
-    background: rgba(0, 0, 0, 0.85);
-    transform: translateY(-1px);
+    background: rgba(17, 24, 39, 0.55);
 }
 
 .yatra-media-badge-icon {
@@ -965,7 +970,8 @@ button.yatra-booking-button svg path {
     position: absolute;
     bottom: 20px;
     right: 20px;
-    z-index: 10;
+    z-index: 25;
+    pointer-events: auto;
 }
 
 .yatra-hero-book-now-btn {
@@ -1000,6 +1006,22 @@ button.yatra-booking-button svg path {
         padding: 10px 16px;
         font-size: 13px;
     }
+}
+
+@media (max-width: 480px) {
+    /* Avoid overlap with the full-width media switcher */
+    .yatra-hero-book-now-container {
+        bottom: 56px;
+        right: 10px;
+        z-index: 30;
+    }
+}
+
+.yatra-hero-book-now-btn.is-disabled,
+.yatra-hero-book-now-btn[aria-disabled="true"] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 /* Video Player and Tour Viewer modules are loaded separately */
@@ -2232,18 +2254,20 @@ button.yatra-booking-button svg path {
     gap: 8px;
     background: #ffffff;
     min-height: auto;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    position: relative;
+    padding-top: 14px;
+    padding-right: 56px; /* space for close button */
 }
 
 /* Row 1: Price and Date */
 .yatra-mobile-row-1 {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none; /* Hide scrollbar for Firefox */
-    -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
+    gap: 10px;
+    width: 100%;
+    overflow: visible;
 }
 
 .yatra-mobile-row-1::-webkit-scrollbar {
@@ -2252,12 +2276,11 @@ button.yatra-booking-button svg path {
 
 /* Row 2: Total Price Only */
 .yatra-mobile-row-2 {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     align-items: center;
-    justify-content: center;
     gap: 8px;
-    flex-wrap: nowrap;
-    padding: 8px 0;
+    padding-top: 8px;
     border-top: 1px solid #e5e7eb;
 }
 
@@ -2271,10 +2294,6 @@ button.yatra-booking-button svg path {
 }
 
 /* Ensure correct order of elements */
-.yatra-mobile-group-badge {
-    order: 1;
-}
-
 .yatra-mobile-price-section {
     order: 2;
 }
@@ -2283,17 +2302,14 @@ button.yatra-booking-button svg path {
     order: 3;
     display: flex;
     align-items: center;
-    flex: 0 1 auto;
-    flex-shrink: 1;
     min-width: 0;
-    /* Keep compact so Check / Enquire stay visible (do not stretch like flex: 1) */
-    max-width: min(112px, 30vw);
-    width: auto;
+    width: 100%;
     touch-action: manipulation;
 }
 
 .yatra-mobile-travelers-section {
     order: 4;
+    min-width: 0;
 }
 
 
@@ -2307,6 +2323,10 @@ button.yatra-booking-button svg path {
 
 .yatra-mobile-action-buttons {
     order: 8;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 6;
 }
 
 /* Mobile Booking Fields */
@@ -2320,11 +2340,54 @@ button.yatra-booking-button svg path {
     padding: 0 8px;
     box-sizing: border-box;
     min-width: 0;
-    min-height: 36px;
-    height: 36px;
-    max-height: 36px;
+    min-height: 44px;
+    height: 44px;
+    max-height: 44px;
     flex-shrink: 0;
     touch-action: manipulation;
+}
+
+/* New: unified mobile field wrapper (used by date button wrapper) */
+.yatra-mobile-field-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    min-height: 44px;
+    height: 44px;
+    padding: 0 10px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.yatra-mobile-field-btn:active {
+    transform: translateY(0.5px);
+}
+
+.yatra-mobile-field-btn input {
+    pointer-events: none; /* wrapper opens picker */
+}
+
+.yatra-mobile-field-btn .yatra-mobile-datepicker-input {
+    width: 100% !important;
+    flex: 1 1 auto !important;
+}
+
+.yatra-mobile-field-btn .yatra-mobile-field-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.yatra-mobile-field-btn .yatra-mobile-arrow {
+    flex-shrink: 0;
+}
+
+.yatra-mobile-field-btn .yatra-mobile-arrow {
+    margin-left: auto;
 }
 
 /* Compact Mobile Date Picker — same vertical footprint as Adult / Check / Enquire */
@@ -2340,9 +2403,9 @@ button.yatra-booking-button svg path {
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    min-height: 36px;
-    height: 36px;
-    max-height: 36px;
+    min-height: 44px;
+    height: 44px;
+    max-height: 44px;
     flex-shrink: 1;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -2372,7 +2435,7 @@ button.yatra-booking-button svg path {
 .yatra-mobile-datepicker-input {
     border: none;
     background: transparent;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.2;
     color: #374151;
     outline: none;
@@ -2507,9 +2570,19 @@ button.yatra-booking-button svg path {
 }
 
 .yatra-mobile-icon {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     color: #6b7280;
+}
+
+/* Ensure SVG icons inside mobile field icon render consistently */
+.yatra-mobile-field-icon svg,
+.yatra-mobile-close-icon svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+    stroke: currentColor;
+    fill: none;
 }
 
 .yatra-mobile-datepicker,
@@ -2542,8 +2615,8 @@ button.yatra-booking-button svg path {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 34px;
+    height: 34px;
     background: #f3f4f6;
     border: 1px solid #d1d5db;
     border-radius: 6px;
@@ -2567,7 +2640,7 @@ button.yatra-booking-button svg path {
     text-align: center;
     border: none;
     background: transparent;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: #374151;
     outline: none;
@@ -2809,14 +2882,58 @@ button.yatra-booking-button svg path {
     border: 1px solid #d1d5db;
     padding: 0 10px;
     box-sizing: border-box;
-    min-height: 36px;
-    height: 36px;
-    max-height: 36px;
-    font-size: 12px;
+    min-height: 44px;
+    height: 44px;
+    max-height: 44px;
+    font-size: 14px;
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
     touch-action: manipulation;
+}
+
+/* When Enquire is placed in the mobile sticky row-2 grid */
+.yatra-mobile-row-2 .yatra-mobile-check-btn,
+.yatra-mobile-row-2 .yatra-mobile-enquire-btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+    height: 44px;
+    font-size: 14px;
+}
+
+@media (max-width: 480px) {
+    /* Avoid cramped horizontal overflow; use clean two-row layout */
+    .yatra-mobile-row-1 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 44px;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        overflow-x: visible;
+    }
+
+    /* If group badge exists, let it sit above fields */
+    .yatra-mobile-group-badge {
+        grid-column: 1 / -1;
+        justify-content: center;
+    }
+
+    .yatra-mobile-date-section {
+        max-width: none;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .yatra-mobile-travelers-section {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .yatra-mobile-action-buttons {
+        width: 44px;
+        justify-content: flex-end;
+    }
 }
 
 .yatra-mobile-enquire-btn:hover {
@@ -2844,8 +2961,8 @@ button.yatra-booking-button svg path {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     background: #f3f4f6;
     border: 1px solid #d1d5db;
     border-radius: 8px;
@@ -2865,8 +2982,8 @@ button.yatra-booking-button svg path {
 }
 
 .yatra-mobile-close-icon {
-    width: 14px;
-    height: 14px;
+    width: 18px;
+    height: 18px;
     color: #6b7280;
 }
 

@@ -307,9 +307,12 @@ class BookingSessionController extends BaseController
             }
             
             // Recalculate taxes for partial updates
-            $trip_price = $existing_session['trip_price'];
-            $travelers_count = $existing_session['travelers'];
+            $trip_id = (int) ($existing_session['trip_id'] ?? 0);
+            $trip_price = (float) ($existing_session['trip_price'] ?? $existing_session['base_price'] ?? 0);
+            $travelers_count = (int) ($existing_session['travelers'] ?? 1);
             $additional_services = $existing_session['additional_services'] ?? [];
+            $travel_date = (string) ($existing_session['travel_date'] ?? '');
+            $departure_time = (string) ($existing_session['departure_time'] ?? '');
             
             // Calculate base amount - handle traveler-based pricing
             $base_amount = 0;
@@ -341,24 +344,10 @@ class BookingSessionController extends BaseController
                 $base_amount = $trip_price * $travelers_count;
             }
             
-            // Calculate additional services cost
-            $services_cost = 0;
-            if (!empty($additional_services)) {
-                foreach ($additional_services as $service_id) {
-                    $service = $wpdb->get_row($wpdb->prepare(
-                        "SELECT price FROM {$wpdb->prefix}yatra_additional_services WHERE id = %d",
-                        $service_id
-                    ));
-                    if ($service && $service->price) {
-                        $services_cost += (float) $service->price;
-                    }
-                }
-            }
-            
             // Use CalculationService for pricing (fetches trip data from database)
             $calculationService = new CalculationService();
             $pricing = $calculationService->calculatePricing([
-                'trip_id'           => (int) $trip->id,
+                'trip_id'           => $trip_id,
                 'travelers_count'   => $travelers_count,
                 'traveler_counts'   => $traveler_counts,
                 'travel_date'       => $travel_date,
@@ -367,10 +356,10 @@ class BookingSessionController extends BaseController
                 'coupon_code'       => '',
                 'payment_method'    => 'full',
             ]);
-            $subtotal = $pricing['subtotal'];
-            $total_with_tax = $pricing['final_total'];
-            $tax_calculation = $pricing['tax_calculation'];
-            $services_cost = $pricing['services_cost'];
+            $subtotal = (float) ($pricing['subtotal'] ?? $base_amount);
+            $total_with_tax = (float) ($pricing['final_total'] ?? $subtotal);
+            $tax_calculation = (array) ($pricing['tax_calculation'] ?? []);
+            $services_cost = (float) ($pricing['services_cost'] ?? $pricing['services_total'] ?? 0);
             
             // Note: Pricing is calculated on-demand via CalculationService, not stored in session
             
@@ -430,7 +419,6 @@ class BookingSessionController extends BaseController
                     $data['seats_total'] = $availability->seats_total;
                 }
             } catch (\Exception $e) {
-                error_log('Yatra Booking: Error resolving availability - ' . $e->getMessage());
                 $availability = null;
             }
         }
@@ -2405,9 +2393,7 @@ class BookingSessionController extends BaseController
         
         $discount_amount = $coupon_result['calculated_amount'];
         
-        error_log('apply_coupon - Coupon result: ' . print_r($coupon_result, true));
-        error_log('apply_coupon - Original code: ' . $code);
-        
+
         // Store coupon in session (use the original $code variable, not from result)
         $session['coupon'] = [
             'code' => $code,  // Use the actual code that was validated
@@ -2420,8 +2406,7 @@ class BookingSessionController extends BaseController
         
         yatra_set_booking_session($session);
         
-        error_log('apply_coupon - Session coupon stored: ' . print_r($session['coupon'], true));
-        
+
         return new WP_REST_Response([
             'success' => true,
             'message' => __('Coupon applied successfully!', 'yatra'),
@@ -2445,12 +2430,7 @@ class BookingSessionController extends BaseController
         yatra_start_session();
         $session = yatra_get_booking_session();
         $data = $request->get_json_params();
-        
-        error_log('=== calculate_summary CALLED ===');
-        error_log('Request data: ' . print_r($data, true));
-        error_log('Session traveler_counts: ' . print_r($session['traveler_counts'] ?? 'NOT SET', true));
-        error_log('Session travelers: ' . ($session['travelers'] ?? 'NOT SET'));
-        
+
         // Get trip_id from session (required)
         $trip_id = (int) ($session['trip_id'] ?? 0);
         
@@ -2471,9 +2451,7 @@ class BookingSessionController extends BaseController
         // IMPORTANT: Always read coupon from SESSION (not request) to maintain applied discount
         $coupon_code = isset($session['coupon']['code']) ? sanitize_text_field($session['coupon']['code']) : '';
         
-        error_log('calculate_summary - Final traveler_counts: ' . print_r($traveler_counts, true));
-        error_log('calculate_summary - Coupon from session: ' . $coupon_code);
-        
+
         if (empty($trip_id)) {
             return new WP_REST_Response([
                 'success' => false,
@@ -2665,7 +2643,6 @@ class BookingSessionController extends BaseController
             $price_per_person = $base_trip_price;
             $subtotal = $price_per_person * $total_travelers;
             
-            error_log('calculate_summary - Regular pricing: total_travelers=' . $total_travelers . ', subtotal=' . $subtotal);
         }
         
         // Calculate group discount
@@ -3117,7 +3094,6 @@ class BookingSessionController extends BaseController
             
             return (float) $total;
         } catch (\Throwable $e) {
-            error_log('calculateSessionTotal - ERROR: ' . $e->getMessage());
             return 0.0;
         }
     }

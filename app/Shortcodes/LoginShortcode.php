@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yatra\Shortcodes;
 
+use Yatra\Services\SettingsService;
+
 /**
  * Login Shortcode
  *
@@ -100,11 +102,9 @@ class LoginShortcode extends BaseShortcode
         try {
             include $template_path;
             $content = ob_get_clean();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             ob_end_clean();
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra Login Shortcode Error: ' . $e->getMessage());
-            }
+
             $content = $this->renderFallbackError();
         }
         
@@ -121,7 +121,7 @@ class LoginShortcode extends BaseShortcode
     private function renderLoggedInMessage(array $atts): string
     {
         $user = wp_get_current_user();
-        $account_url = home_url('/my-account');
+        $account_url = home_url('/' . SettingsService::getAccountBase());
         
         ob_start();
         ?>
@@ -186,8 +186,9 @@ class LoginShortcode extends BaseShortcode
             }
         }
         
-        // Fallback to safe defaults
-        return wp_get_referer() ?: home_url('/my-account');
+        // Default: always send users to the account area after login.
+        // Avoid wp_get_referer() here to prevent redirect loops back to the login form.
+        return home_url('/' . SettingsService::getAccountBase());
     }
 
     /**

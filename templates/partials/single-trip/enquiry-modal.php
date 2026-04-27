@@ -34,12 +34,12 @@ if (!defined('ABSPATH')) {
 
                 <div class="yatra-enquiry-field">
                     <label for="enquiry-email" class="yatra-enquiry-label"><?php esc_html_e('Email Address', 'yatra'); ?> <span class="yatra-enquiry-required">*</span></label>
-                    <input type="email" id="enquiry-email" name="email" class="yatra-enquiry-input" placeholder="your.email@example.com" required>
+                    <input type="email" id="enquiry-email" name="email" class="yatra-enquiry-input" placeholder="<?php esc_attr_e('your.email@example.com', 'yatra'); ?>" required>
                 </div>
 
                 <div class="yatra-enquiry-field">
                     <label for="enquiry-phone" class="yatra-enquiry-label"><?php esc_html_e('Phone Number', 'yatra'); ?></label>
-                    <input type="tel" id="enquiry-phone" name="phone" class="yatra-enquiry-input" placeholder="+1 (234) 567-8900">
+                    <input type="tel" id="enquiry-phone" name="phone" class="yatra-enquiry-input" placeholder="<?php esc_attr_e('+1 (234) 567-8900', 'yatra'); ?>">
                 </div>
             </div>
 

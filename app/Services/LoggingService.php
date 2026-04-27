@@ -40,12 +40,7 @@ class LoggingService
         $timestamp = current_time('Y-m-d H:i:s');
         $context_str = !empty($context) ? ' | Context: ' . wp_json_encode($context) : '';
         $log_entry = sprintf('[%s] [%s] %s%s', $timestamp, strtoupper($level), $message, $context_str);
-        
-        // Write to WordPress debug log if WP_DEBUG_LOG is enabled
-        if (defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
-            error_log('Yatra: ' . $log_entry);
-        }
-        
+
         // Store in database for admin viewing
         self::storeLog($message, $level, $context);
     }

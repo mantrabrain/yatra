@@ -74,7 +74,6 @@ class EmailService
         
         // Validate required settings
         if (empty($smtp_host) || empty($smtp_username) || empty($smtp_password)) {
-            error_log('Yatra SMTP: Missing required SMTP configuration');
             return false;
         }
         
@@ -132,7 +131,6 @@ class EmailService
             return true;
             
         } catch (Exception $e) {
-            error_log('Yatra SMTP Error: ' . $mail->ErrorInfo);
             return false;
         }
     }

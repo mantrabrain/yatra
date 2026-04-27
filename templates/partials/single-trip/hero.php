@@ -2,10 +2,11 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+$booking_disabled = isset($trip) && method_exists($trip, 'isBookingDisabled') && $trip->isBookingDisabled();
 ?>
 <div class="yatra-trip-hero-new" itemscope itemtype="https://schema.org/TouristTrip">
     <div class="yatra-hero-header">
-        <nav class="yatra-hero-breadcrumb" aria-label="Breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
+        <nav class="yatra-hero-breadcrumb" aria-label="<?php echo esc_attr__('Breadcrumb', 'yatra'); ?>" itemscope itemtype="https://schema.org/BreadcrumbList">
             <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
                 <a href="<?php echo esc_url(home_url('/')); ?>" itemprop="item">
                     <span itemprop="name"><?php echo esc_html__('Home', 'yatra'); ?></span>
@@ -214,30 +215,30 @@ if (!defined('ABSPATH')) {
             <div class="yatra-hero-media-switcher">
                 <button type="button" class="yatra-media-switcher-btn yatra-media-switcher-active" data-media="images">
                     <?php echo yatra_svg_icon('camera', 'yatra-media-switcher-icon'); ?>
-                    <span>Images</span>
+                    <span><?php echo esc_html__('Images', 'yatra'); ?></span>
                 </button>
                 <?php if ($video_count > 0): ?>
                     <button type="button" class="yatra-media-switcher-btn" data-media="videos">
                         <?php echo yatra_svg_icon('play', 'yatra-media-switcher-icon'); ?>
-                        <span>Videos</span>
+                        <span><?php echo esc_html__('Videos', 'yatra'); ?></span>
                     </button>
                 <?php endif; ?>
                 <?php if ($youtube_count > 0): ?>
                     <button type="button" class="yatra-media-switcher-btn" data-media="youtube">
                         <?php echo yatra_svg_icon('video', 'yatra-media-switcher-icon'); ?>
-                    <span>Video</span>
+                    <span><?php echo esc_html__('Video', 'yatra'); ?></span>
                     </button>
                 <?php endif; ?>
                 <?php if ($tour_count > 0): ?>
                     <button type="button" class="yatra-media-switcher-btn" data-media="tours">
                         <?php echo yatra_svg_icon('globe', 'yatra-media-switcher-icon'); ?>
-                    <span>360°</span>
+                    <span><?php echo esc_html__('360°', 'yatra'); ?></span>
                     </button>
                 <?php endif; ?>
                 <?php if ($doc_count > 0): ?>
                     <button type="button" class="yatra-media-switcher-btn" data-media="documents">
                         <?php echo yatra_svg_icon('file-text', 'yatra-media-switcher-icon'); ?>
-                        <span>Documents</span>
+                        <span><?php echo esc_html__('Documents', 'yatra'); ?></span>
                     </button>
                 <?php endif; ?>
             </div>
@@ -253,17 +254,19 @@ if (!defined('ABSPATH')) {
                 ]); ?>
             </script>
             
-            <!-- Book Now Button on Right Side of Main Image -->
-            <div class="yatra-hero-book-now-container">
-                <a href="#yatra-booking-widget" class="yatra-hero-book-now-btn">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    <?php echo esc_html__('Book Now', 'yatra'); ?>
-                    - <?php echo esc_html(yatra_format_price($base_price)); ?>
-                </a>
-            </div>
+            <?php if (!$booking_disabled): ?>
+                <!-- Book Now Button on Right Side of Main Image -->
+                <div class="yatra-hero-book-now-container">
+                    <a href="#booking" id="yatra-hero-book-now-btn" class="yatra-hero-book-now-btn">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <?php echo esc_html__('Book Now', 'yatra'); ?>
+                        - <?php echo esc_html(yatra_format_price($base_price)); ?>
+                    </a>
+                </div>
+            <?php endif; ?>
         </div>
         <div class="yatra-hero-side-images">
             <?php if (!empty($side_images)): ?>

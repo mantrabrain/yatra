@@ -43,7 +43,13 @@ $column_class = 'yatra-discount-grid-' . min(max($columns, 1), 4);
                     <!-- Discount Badge Overlay -->
                     <?php if ($trip->has_discount && !empty($trip->best_discount)): ?>
                         <div class="yatra-discount-badge">
-                            <?php echo esc_html($trip->best_discount['value']); ?>% OFF
+                            <?php
+                            printf(
+                                /* translators: %s: discount percentage */
+                                esc_html__('%s%% OFF', 'yatra'),
+                                esc_html($trip->best_discount['value'])
+                            );
+                            ?>
                         </div>
                     <?php endif; ?>
                 </div>

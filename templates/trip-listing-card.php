@@ -161,7 +161,13 @@ try {
         <?php endif; ?>
         <?php if ($discount['has_discount']): ?>
         <div class="yatra-discount-badge">
-            <?php echo esc_html($discount['discount_text']); ?> OFF
+            <?php
+            printf(
+                /* translators: %s: discount text (e.g. "10%") */
+                esc_html__('%s OFF', 'yatra'),
+                esc_html($discount['discount_text'])
+            );
+            ?>
         </div>
         <?php endif; ?>
         <?php if ($has_group_discounts): ?>

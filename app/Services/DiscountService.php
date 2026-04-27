@@ -891,31 +891,11 @@ class DiscountService extends BaseService
                 $priceByCategory[$categoryId] = (float) ($pt->effective_price ?? $pt->sale_price ?? $pt->original_price ?? 0);
             }
         }
-        
-        // Debug: Log traveler counts and total
-        if (WP_DEBUG && WP_DEBUG_LOG) {
-            error_log('Yatra Debug - Group Discount Calculation: ' . print_r([
-                'total_travelers' => $totalTravelers,
-                'traveler_counts' => $travelerCounts,
-                'price_by_category' => $priceByCategory
-            ], true));
-        }
+
 
         foreach ($groupDiscounts as $discount) {
             $discountMode = $discount->discount_mode ?? 'total';
-            
-            // Debug: Log discount details
-            if (WP_DEBUG && WP_DEBUG_LOG) {
-                error_log('Yatra Debug - Processing discount: ' . print_r([
-                    'discount_code' => $discount->code ?? 'unknown',
-                    'discount_mode' => $discountMode,
-                    'discount_amount' => $discount->amount ?? $discount->discount_amount ?? 'not_set',
-                    'discount_type' => $discount->type ?? $discount->discount_type ?? 'not_set',
-                    'category_discounts' => !empty($discount->category_discounts),
-                    'group_discount_ranges' => !empty($discount->group_discount_ranges)
-                ], true));
-            }
-            
+
             // Category-based discounts: check each category's count and apply to that category's subtotal
             if ($discountMode === 'category_based' && !empty($discount->category_discounts)) {
                 $totalDiscountAmount = 0;
@@ -1041,18 +1021,7 @@ class DiscountService extends BaseService
                 $discountType = $discount->type ?? $discount->discount_type ?? 'percentage';
                 $discountValue = (float) ($discount->amount ?? $discount->discount_amount ?? 0);
                 
-                // Debug: Log legacy format processing
-                if (WP_DEBUG && WP_DEBUG_LOG) {
-                    error_log('Yatra Debug - Legacy format processing: ' . print_r([
-                        'min_size' => $minSize,
-                        'max_size' => $maxSize,
-                        'total_travelers' => $totalTravelers,
-                        'discount_type' => $discountType,
-                        'discount_value' => $discountValue,
-                        'meets_criteria' => $totalTravelers >= $minSize && $totalTravelers <= $maxSize
-                    ], true));
-                }
-                
+
                 if ($totalTravelers >= $minSize && $totalTravelers <= $maxSize) {
                     
                     // Calculate total subtotal from all categories

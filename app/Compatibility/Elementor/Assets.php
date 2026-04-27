@@ -96,7 +96,6 @@ final class Assets
             'yatra_booking_confirmation',
             'yatra_remaining_checkout',
             'yatra_verify_email',
-            'yatra_login_page',
             'yatra_destination_slug',
             'yatra_activity_slug',
             'yatra_category_slug',

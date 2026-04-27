@@ -214,35 +214,26 @@
                 
                 // Reset previous errors
                 $('.yatra-form-error').remove();
-                
-                // Validate username
-                if (!$username.val().trim()) {
-                    showFieldError($username, 'Please enter your email or username.');
-                    isValid = false;
-                }
-                
-                // Validate password
-                if (!$password.val().trim()) {
-                    showFieldError($password, 'Please enter your password.');
-                    isValid = false;
-                }
-                
-                if (!isValid) {
-                    return false;
-                }
+                // Field-level validation is already handled by validateLoginForm()
                 
                 // Show loading state immediately to prevent flicker
                 $submitBtn.prop('disabled', true);
-                const originalText = $submitBtn.text();
-                $submitBtn.html('<span class="yatra-spinner"></span> ' + (yatra_ajax?.strings?.loading || 'Loading...'));
+                // Preserve the original markup once, then toggle the built-in loading spans.
+                if (!$submitBtn.data('yatraOriginalHtml')) {
+                    $submitBtn.data('yatraOriginalHtml', $submitBtn.html());
+                }
+                $submitBtn.addClass('yatra-is-loading');
+                $submitBtn.find('.yatra-btn-text').hide();
+                $submitBtn.find('.yatra-btn-loading').show();
                 
                 // Prepare AJAX request data
                 const formData = {
                     action: 'yatra_ajax_login',
                     username: $username.val().trim(),
                     password: $password.val().trim(),
-                    remember: $form.find('[name="rememberme"]').is(':checked') ? 'forever' : '',
-                    security: $form.find('[name="yatra-login-nonce"]').val(),
+                    rememberme: $form.find('[name="rememberme"]').is(':checked') ? 'forever' : '',
+                    yatra_login_nonce: $form.find('[name="yatra_login_nonce"]').val(),
+                    redirect_to: $form.find('[name="redirect_to"]').val() || '',
                     ajax: true
                 };
                 
@@ -259,8 +250,8 @@
                 ajaxRequest.done(function(response) {
                     if (response.success) {
                         // Success: Redirect or show success message
-                        if (response.data.redirect) {
-                            window.location.href = response.data.redirect;
+                        if (response.data && (response.data.redirect_url || response.data.redirect)) {
+                            window.location.href = response.data.redirect_url || response.data.redirect;
                         } else {
                             showFormSuccess($form, response.data.message || 'Login successful!');
                             setTimeout(() => {
@@ -289,7 +280,15 @@
                 // Always restore button state
                 ajaxRequest.always(function() {
                     $submitBtn.prop('disabled', false);
-                    $submitBtn.text(originalText);
+                    $submitBtn.removeClass('yatra-is-loading');
+                    $submitBtn.find('.yatra-btn-loading').hide();
+                    $submitBtn.find('.yatra-btn-text').show();
+
+                    // If some other code replaced the markup, restore it.
+                    const originalHtml = $submitBtn.data('yatraOriginalHtml');
+                    if (originalHtml && $submitBtn.find('.yatra-btn-text').length === 0) {
+                        $submitBtn.html(originalHtml);
+                    }
                 });
                 
                 return false;

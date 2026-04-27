@@ -30,7 +30,6 @@ class SEOManager
                 add_filter('document_title', [self::class, 'filterDocumentTitle'], 10);
             }
         } catch (\Exception $e) {
-            error_log('Yatra SEO Manager init Error: ' . $e->getMessage());
         }
     }
 
@@ -49,8 +48,7 @@ class SEOManager
                 $seoService->generateMetaTags();
             }
         } catch (\Exception $e) {
-            error_log('Yatra SEO Manager outputSEOMetaTags Error: ' . $e->getMessage());
-            
+
             // Fail silently to avoid breaking page rendering
         }
     }
@@ -94,8 +92,7 @@ class SEOManager
 
             return $title;
         } catch (\Exception $e) {
-            error_log('Yatra SEO Manager filterDocumentTitle Error: ' . $e->getMessage());
-            
+
             // Return original title on error
             return $title;
         }
@@ -142,7 +139,6 @@ class SEOManager
 
             return '';
         } catch (\Exception $e) {
-            error_log('Yatra SEO Manager getCurrentPageType Error: ' . $e->getMessage());
             return '';
         }
     }
@@ -169,7 +165,6 @@ class SEOManager
 
             return null;
         } catch (\Exception $e) {
-            error_log('Yatra SEO Manager getCurrentPageObject Error: ' . $e->getMessage());
             return null;
         }
     }
@@ -199,7 +194,6 @@ class SEOManager
             
             return $isArchivePage && !self::isSingleTripPage();
         } catch (\Exception $e) {
-            error_log('Yatra SEO Manager isTripArchivePage Error: ' . $e->getMessage());
             return false;
         }
     }
@@ -229,7 +223,6 @@ class SEOManager
                 return SEOService::PAGE_TYPE_CATEGORY_LISTING;
             }
         } catch (\Exception $e) {
-            error_log('Yatra SEOManager getTaxonomyListingPageType Error: ' . $e->getMessage());
         }
 
         return '';

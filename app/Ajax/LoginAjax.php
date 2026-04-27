@@ -111,21 +111,36 @@ class LoginAjax
     private function checkRateLimit(): void
     {
         $ip = $this->getClientIp();
-        $transient_key = 'yatra_login_limit_' . md5($ip);
-        $attempts = get_transient($transient_key) ?: 0;
+        $enabled = (bool) apply_filters('yatra_login_rate_limit_enabled', true, $ip);
+        if (!$enabled) {
+            return;
+        }
+
+        // Defaults: 10 attempts per 1 minute (can be overridden via filters).
+        $maxAttempts = (int) apply_filters('yatra_login_rate_limit_max_attempts', 10, $ip);
+        $windowSeconds = (int) apply_filters('yatra_login_rate_limit_window_seconds', MINUTE_IN_SECONDS, $ip);
+        $transient_key = (string) apply_filters('yatra_login_rate_limit_transient_key', 'yatra_login_limit_' . md5($ip), $ip);
+
+        $attempts = (int) (get_transient($transient_key) ?: 0);
         
-        // Allow 5 attempts per 15 minutes
-        if ($attempts >= 5) {
+        // Allow N attempts per window
+        if ($maxAttempts > 0 && $attempts >= $maxAttempts) {
             $this->logSecurityEvent('rate_limit_exceeded', ['ip' => $ip]);
+            $minutes = (int) max(1, ceil(max(1, $windowSeconds) / 60));
             wp_send_json_error([
                 'success' => false,
                 'code' => 'rate_limit_exceeded',
-                'message' => __('Too many login attempts. Please try again in 15 minutes.', 'yatra')
+                'message' => sprintf(
+                    /* translators: %d = minutes to wait */
+                    __('Too many login attempts. Please try again in %d minute(s).', 'yatra'),
+                    $minutes
+                ),
             ]);
         }
         
         // Increment counter
-        set_transient($transient_key, $attempts + 1, 15 * MINUTE_IN_SECONDS);
+        $ttl = $windowSeconds > 0 ? $windowSeconds : MINUTE_IN_SECONDS;
+        set_transient($transient_key, $attempts + 1, $ttl);
     }
 
     /**
@@ -208,7 +223,7 @@ class LoginAjax
         if (in_array($error_code, ['invalid_username', 'incorrect_password'], true)) {
             $error_message = __('Invalid username or password. Please try again.', 'yatra');
         } elseif ($error_code === 'email_not_verified') {
-            $error_message = $error_message; // Use the specific message
+            // Keep the specific message from the error
         } else {
             $error_message = __('Login failed. Please try again.', 'yatra');
         }
@@ -262,14 +277,14 @@ class LoginAjax
     private function validateRedirectUrl(string $redirect_url): string
     {
         if (empty($redirect_url)) {
-            return home_url('/my-account');
+            return home_url('/' . \Yatra\Services\SettingsService::getAccountBase());
         }
 
         $redirect_url = sanitize_url($redirect_url);
         
         // Validate URL is safe
         if (!wp_http_validate_url($redirect_url)) {
-            return home_url('/my-account');
+            return home_url('/' . \Yatra\Services\SettingsService::getAccountBase());
         }
 
         // Only allow redirects to same host
@@ -277,7 +292,7 @@ class LoginAjax
         $site_host = parse_url(home_url(), PHP_URL_HOST);
         
         if ($redirect_host !== $site_host) {
-            return home_url('/my-account');
+            return home_url('/' . \Yatra\Services\SettingsService::getAccountBase());
         }
 
         return $redirect_url;
@@ -341,7 +356,6 @@ class LoginAjax
             'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? ''
         ], $data);
 
-        error_log('Yatra Login Security: ' . json_encode($log_data));
     }
 
     /**
@@ -353,6 +367,5 @@ class LoginAjax
             return;
         }
 
-        error_log('Yatra Login Attempt: ' . $username . ' from IP: ' . $this->getClientIp());
     }
 }

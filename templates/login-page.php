@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 $current_user = wp_get_current_user();
 if ($current_user->ID > 0) {
     // Use safe redirect with nonce verification
-    $redirect_url = apply_filters('yatra_login_redirect_url', home_url('/my-account'), $current_user);
+    $redirect_url = apply_filters('yatra_login_redirect_url', home_url('/' . \Yatra\Services\SettingsService::getAccountBase()), $current_user);
     wp_safe_redirect($redirect_url);
     exit;
 }

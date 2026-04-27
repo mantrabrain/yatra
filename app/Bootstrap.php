@@ -114,8 +114,6 @@ class Bootstrap
             $this->loadTextDomain();
 
         } catch (\Throwable $e) {
-            error_log('Yatra plugin initialization error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
-
             // Show admin notice if in admin area
             if (is_admin()) {
                 add_action('admin_notices', function() use ($e) {
@@ -207,7 +205,6 @@ class Bootstrap
                 }
                 $instances[$class] = $instance;
             } catch (\Throwable $e) {
-                error_log("Yatra: Failed to register provider {$class}: " . $e->getMessage());
                 continue;
             }
         }
@@ -219,7 +216,6 @@ class Bootstrap
                     $instance->boot();
                 }
             } catch (\Throwable $e) {
-                error_log("Yatra: Failed to boot provider {$class}: " . $e->getMessage());
                 continue;
             }
         }
@@ -290,12 +286,7 @@ class Bootstrap
                 $migrationService = new \Yatra\Migration\MigrationProgress();
                 $result = $migrationService->processMigration($dataType, (bool) $force);
                 
-                // Log result for debugging
-                if (isset($result['success']) && $result['success']) {
-                    error_log("Yatra Migration completed for {$dataType}: migrated={$result['migrated']}, skipped={$result['skipped']}, failed={$result['failed']}");
-                } else {
-                    error_log("Yatra Migration failed for {$dataType}: " . ($result['error'] ?? 'Unknown error'));
-                }
+
             }
         }, 10, 2);
 

@@ -131,9 +131,7 @@ class TripShortcode extends BaseShortcode
             ];
             
         } catch (\Exception $e) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra TripShortcode Error: ' . $e->getMessage());
-            }
+
             
             return [
                 'trips' => [],

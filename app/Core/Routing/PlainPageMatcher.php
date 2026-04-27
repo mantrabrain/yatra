@@ -67,14 +67,6 @@ final class PlainPageMatcher
         }
 
         if ($raw === '') {
-            if (!empty($_GET['yatra_login_page'])) {
-                return [
-                    'type' => 'login',
-                    'page' => 'main',
-                    'base' => 'login',
-                ];
-            }
-
             $checkoutToken = isset($_GET['yatra_remaining_checkout']) ? (string) wp_unslash($_GET['yatra_remaining_checkout']) : '';
             $checkoutToken = preg_replace('/[^a-zA-Z0-9_-]/', '', $checkoutToken) ?? '';
             if ($checkoutToken !== '') {

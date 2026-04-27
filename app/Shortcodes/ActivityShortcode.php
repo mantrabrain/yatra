@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yatra\Shortcodes;
 
+use Yatra\Services\SettingsService;
+
 /**
  * Activity Shortcode
  *
@@ -126,10 +128,7 @@ class ActivityShortcode extends BaseShortcode
             $activities = [];
 
             foreach ($result as $activityData) {
-                // Debug: Log each activity being processed
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('Yatra ActivityShortcode Processing activity: ' . $activityData->name . ' (ID: ' . $activityData->id . ')');
-                }
+
                 
                 // Get real trip data for this activity using classification tables
                 global $wpdb;
@@ -186,18 +185,12 @@ class ActivityShortcode extends BaseShortcode
                          AND status = 'approved'",
                         ...$trip_ids
                     ));
-                    
-                    if (defined('WP_DEBUG') && WP_DEBUG) {
-                        error_log('ACTIVITY REVIEWS QUERY: ' . print_r($reviews, true));
-                    }
+
                     
                     foreach ($reviews as $review) {
                         $total_rating_sum += $review->rating * $review->review_count;
                         $total_review_count += $review->review_count;
-                        
-                        if (defined('WP_DEBUG') && WP_DEBUG) {
-                            error_log('ACTIVITY RATING CALCULATION: Added ' . $review->rating . ' * ' . $review->review_count . ' = ' . ($review->rating * $review->review_count));
-                        }
+
                     }
                 }
                 
@@ -281,9 +274,7 @@ class ActivityShortcode extends BaseShortcode
             ];
             
         } catch (\Exception $e) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra ActivityShortcode Error: ' . $e->getMessage());
-            }
+
             return [];
         }
     }
@@ -348,10 +339,7 @@ class ActivityShortcode extends BaseShortcode
         // Fallback to placeholder
         $fallback_url = YATRA_PLUGIN_URL . 'assets/images/placeholder.png';
         
-        // Debug: Log the image URL being used
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra ActivityShortcode Using fallback image: ' . $fallback_url);
-        }
+
         
         return $fallback_url;
     }
@@ -361,9 +349,14 @@ class ActivityShortcode extends BaseShortcode
      */
     private function getActivityLink($activity): string
     {
-        // Try to get permalink from activity service or construct it
         if (isset($activity->slug)) {
-            return home_url("/activity/{$activity->slug}/");
+            // Use permalink helper so global base + plain permalinks are respected
+            if (function_exists('yatra_get_activity_permalink')) {
+                return yatra_get_activity_permalink($activity);
+            }
+
+            $base = SettingsService::getString('activity_base', 'activity');
+            return home_url('/' . $base . '/' . $activity->slug . '/');
         }
         
         return '#'; // Fallback

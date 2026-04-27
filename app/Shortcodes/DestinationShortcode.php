@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yatra\Shortcodes;
 
+use Yatra\Services\SettingsService;
+
 /**
  * Destination Shortcode
  *
@@ -95,13 +97,9 @@ class DestinationShortcode extends BaseShortcode
             $per_page = 10; // Default fallback
             if (!empty($atts['per_page'])) {
                 $per_page = (int) $atts['per_page'];
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('Yatra DestinationShortcode: Using per_page = ' . $per_page);
-                }
+              
             } else {
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('Yatra DestinationShortcode: Using default per_page = ' . $per_page);
-                }
+             
             }
             
             // Validate per_page to prevent issues
@@ -130,30 +128,7 @@ class DestinationShortcode extends BaseShortcode
             // Try using the base repository method to bypass status filtering
             $result = $destinationService->getAll($args);
             
-            // Debug: Log the results with enhanced pagination info
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('=== YATRA DESTINATION PAGINATION DEBUG ===');
-                error_log('Yatra DestinationShortcode Args: ' . print_r($args, true));
-                error_log('Yatra DestinationShortcode Results count: ' . count($result));
-                error_log('Yatra DestinationShortcode Total destinations: ' . $total_destinations);
-                error_log('Yatra DestinationShortcode Pagination Info:');
-                error_log('  - Current Page: ' . $current_page);
-                error_log('  - Per Page: ' . $per_page);
-                error_log('  - Offset: ' . $offset);
-                error_log('  - Max Pages: ' . ($per_page > 0 ? ceil($total_destinations / $per_page) : 1));
-                error_log('  - Expected items on this page: ' . min($per_page, max(0, $total_destinations - $offset)));
-                error_log('  - SQL LIMIT clause should be: LIMIT ' . $offset . ', ' . $per_page);
-                
-                // Log each destination being returned
-                if (!empty($result)) {
-                    error_log('Destinations returned on page ' . $current_page . ':');
-                    foreach ($result as $index => $destination) {
-                        error_log('  ' . ($index + 1) . '. ' . ($destination->name ?? 'NO NAME') . ' (ID: ' . $destination->id . ')');
-                    }
-                }
-                error_log('=== END PAGINATION DEBUG ===');
-            }
-            
+                       
             $destinations = [];
 
             foreach ($result as $destinationData) {
@@ -213,17 +188,13 @@ class DestinationShortcode extends BaseShortcode
                         ...$trip_ids
                     ));
                     
-                    if (defined('WP_DEBUG') && WP_DEBUG) {
-                        error_log('DESTINATION REVIEWS QUERY: ' . print_r($reviews, true));
-                    }
+                
                     
                     foreach ($reviews as $review) {
                         $total_rating_sum += $review->rating * $review->review_count;
                         $total_review_count += $review->review_count;
                         
-                        if (defined('WP_DEBUG') && WP_DEBUG) {
-                            error_log('DESTINATION RATING CALCULATION: Added ' . $review->rating . ' * ' . $review->review_count . ' = ' . ($review->rating * $review->review_count));
-                        }
+                  
                     }
                 }
                 
@@ -233,19 +204,7 @@ class DestinationShortcode extends BaseShortcode
                 
                 foreach ($trips as $trip) {
                     // Debug: Log all trip data to see what fields exist
-                    if (defined('WP_DEBUG') && WP_DEBUG) {
-                        error_log('DESTINATION TRIP DATA: ' . print_r([
-                            'trip_id' => $trip->id ?? 'NO ID',
-                            'trip_title' => $trip->title ?? 'NO TITLE',
-                            'original_price' => $trip->original_price ?? 'NO ORIGINAL_PRICE',
-                            'discounted_price' => $trip->discounted_price ?? 'NO DISCOUNTED_PRICE',
-                            'sale_price' => $trip->sale_price ?? 'NO SALE_PRICE',
-                            'base_price' => $trip->base_price ?? 'NO BASE_PRICE',
-                            'price' => $trip->price ?? 'NO PRICE',
-                            'all_fields' => array_keys(get_object_vars($trip))
-                        ], true));
-                    }
-                    
+
                     // Get pricing via centralized TripPricingService
                     $effective = \Yatra\Services\TripPricingService::getEffectivePrice($trip);
                     if ($effective > 0) {
@@ -280,13 +239,13 @@ class DestinationShortcode extends BaseShortcode
                 $best_season = !empty($best_seasons) ? $this->getMostCommonSeason($best_seasons) : 'Summer';
                 
                 if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('FINAL DESTINATION RATING CALCULATION:');
-                    error_log('Destination: ' . ($destinationData->name ?? 'NO NAME'));
-                    error_log('Total rating sum: ' . $total_rating_sum);
-                    error_log('Total review count: ' . $total_review_count);
-                    error_log('Number of trips: ' . $trip_count);
-                    error_log('Logic: Only trips with reviews are included in average');
-                    error_log('Final avg_rating: ' . $final_avg_rating);
+                     
+                     
+                     
+                     
+                     
+                     
+                     
                 }
                 
                 $destinations[] = [
@@ -336,7 +295,7 @@ class DestinationShortcode extends BaseShortcode
             
         } catch (\Exception $e) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra DestinationShortcode Error: ' . $e->getMessage());
+                 
             }
             return [];
         }
@@ -494,7 +453,7 @@ class DestinationShortcode extends BaseShortcode
         $fallback_url = YATRA_PLUGIN_URL . 'assets/images/placeholder.png';
 
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra DestinationShortcode Using fallback image: ' . $fallback_url);
+             
         }
 
         return $fallback_url;
@@ -505,9 +464,14 @@ class DestinationShortcode extends BaseShortcode
      */
     private function getDestinationLink($destination): string
     {
-        // Try to get permalink from destination service or construct it
         if (isset($destination->slug)) {
-            return home_url("/destination/{$destination->slug}/");
+            // Use permalink helper so global base + plain permalinks are respected
+            if (function_exists('yatra_get_destination_permalink')) {
+                return yatra_get_destination_permalink($destination);
+            }
+
+            $base = SettingsService::getString('destination_base', 'destination');
+            return home_url('/' . $base . '/' . $destination->slug . '/');
         }
         
         return '#'; // Fallback

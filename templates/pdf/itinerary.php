@@ -38,7 +38,7 @@ $destination = (string) ($destination ?? '');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Travel Itinerary - <?php echo htmlspecialchars($bookingRef, ENT_QUOTES, 'UTF-8'); ?></title>
+    <title><?php echo esc_html__('Travel Itinerary', 'yatra'); ?> - <?php echo htmlspecialchars($bookingRef, ENT_QUOTES, 'UTF-8'); ?></title>
     <style>
         @page { size: A4 portrait; margin: 0mm; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -106,14 +106,14 @@ $destination = (string) ($destination ?? '');
             <tr>
                 <td style="width: 60%;">
                     <div class="brand">
-                        <h1><?php echo htmlspecialchars($companyName ?: 'Travel Company', ENT_QUOTES, 'UTF-8'); ?></h1>
+                        <h1><?php echo htmlspecialchars($companyName ?: __('Travel Company', 'yatra'), ENT_QUOTES, 'UTF-8'); ?></h1>
                         <p><?php esc_html_e('Travel Itinerary Document', 'yatra'); ?></p>
                     </div>
                 </td>
                 <td style="width: 40%;">
                     <div class="brand" style="background: #374151; text-align: right;">
                         <p style="font-size: 10px; margin-bottom: 2px;"><?php esc_html_e('Booking Reference', 'yatra'); ?></p>
-                        <p style="font-size: 14px; font-weight: 700;"><?php echo htmlspecialchars($bookingRef ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></p>
+                        <p style="font-size: 14px; font-weight: 700;"><?php echo htmlspecialchars($bookingRef ?: __('N/A', 'yatra'), ENT_QUOTES, 'UTF-8'); ?></p>
                     </div>
                 </td>
             </tr>
@@ -149,11 +149,11 @@ $destination = (string) ($destination ?? '');
                             </tr>
                             <tr>
                                 <th class="label"><?php esc_html_e('Duration', 'yatra'); ?></th>
-                                <td><?php echo htmlspecialchars($tripDuration ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($tripDuration ?: __('N/A', 'yatra'), ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                             <tr>
                                 <th class="label"><?php esc_html_e('Difficulty Level', 'yatra'); ?></th>
-                                <td><?php echo htmlspecialchars($tripDifficulty ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($tripDifficulty ?: __('N/A', 'yatra'), ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                             <tr>
                                 <th class="label"><?php esc_html_e('Number of Travelers', 'yatra'); ?></th>
@@ -166,15 +166,15 @@ $destination = (string) ($destination ?? '');
                         <table class="trip-details">
                             <tr>
                                 <th class="label"><?php esc_html_e('Departure Location', 'yatra'); ?></th>
-                                <td><?php echo htmlspecialchars($departureLocation ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($departureLocation ?: __('N/A', 'yatra'), ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                             <tr>
                                 <th class="label"><?php esc_html_e('Destination', 'yatra'); ?></th>
-                                <td><?php echo htmlspecialchars($destination ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($destination ?: __('N/A', 'yatra'), ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                             <tr>
                                 <th class="label"><?php esc_html_e('Travel Date', 'yatra'); ?></th>
-                                <td><?php echo htmlspecialchars($travelDate ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($travelDate ?: __('N/A', 'yatra'), ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                             <?php if (!empty($returnDate)): ?>
                             <tr>
@@ -258,13 +258,13 @@ $destination = (string) ($destination ?? '');
             <div class="section-title"><?php esc_html_e('Travel Timeline', 'yatra'); ?></div>
             <div class="timeline">
                 <div class="timeline-item">
-                    <div class="timeline-date"><?php echo htmlspecialchars($travelDate ?: 'TBD', ENT_QUOTES, 'UTF-8'); ?></div>
+                    <div class="timeline-date"><?php echo htmlspecialchars($travelDate ?: __('TBD', 'yatra'), ENT_QUOTES, 'UTF-8'); ?></div>
                     <div class="timeline-title"><?php esc_html_e('Departure', 'yatra'); ?></div>
                     <div class="timeline-desc"><?php echo esc_html(sprintf(__('Departure from %s. Please arrive at least 30 minutes before departure time.', 'yatra'), htmlspecialchars($departureLocation ?: __('meeting point', 'yatra'), ENT_QUOTES, 'UTF-8'))); ?></div>
                 </div>
                 
                 <div class="timeline-item">
-                    <div class="timeline-date"><?php echo htmlspecialchars($travelDate ?: 'TBD', ENT_QUOTES, 'UTF-8'); ?></div>
+                    <div class="timeline-date"><?php echo htmlspecialchars($travelDate ?: __('TBD', 'yatra'), ENT_QUOTES, 'UTF-8'); ?></div>
                     <div class="timeline-title"><?php esc_html_e('Arrival at Destination', 'yatra'); ?></div>
                     <div class="timeline-desc"><?php echo esc_html(sprintf(__('Arrival at %s. Check-in and accommodation briefing.', 'yatra'), htmlspecialchars($destination ?: __('destination', 'yatra'), ENT_QUOTES, 'UTF-8'))); ?></div>
                 </div>
@@ -298,15 +298,15 @@ $destination = (string) ($destination ?? '');
             <table class="trip-details">
                 <tr>
                     <th class="label"><?php esc_html_e('What to Bring', 'yatra'); ?></th>
-                    <td>Comfortable clothing, walking shoes, sunscreen, hat, camera, personal medications, and any required travel documents.</td>
+                    <td><?php esc_html_e('Comfortable clothing, walking shoes, sunscreen, hat, camera, personal medications, and any required travel documents.', 'yatra'); ?></td>
                 </tr>
                 <tr>
                     <th class="label"><?php esc_html_e('Weather Conditions', 'yatra'); ?></th>
-                    <td>Please check weather forecast before departure and pack accordingly. Weather conditions may vary by destination.</td>
+                    <td><?php esc_html_e('Please check weather forecast before departure and pack accordingly. Weather conditions may vary by destination.', 'yatra'); ?></td>
                 </tr>
                 <tr>
                     <th class="label"><?php esc_html_e('Emergency Contact', 'yatra'); ?></th>
-                    <td><?php echo htmlspecialchars($companyPhone ?: 'Contact your travel agent', ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td><?php echo htmlspecialchars($companyPhone ?: __('Contact your travel agent', 'yatra'), ENT_QUOTES, 'UTF-8'); ?></td>
                 </tr>
             </table>
         </div>
@@ -355,13 +355,26 @@ $destination = (string) ($destination ?? '');
         <table class="footer">
             <tr>
                 <td style="width: 60%;">
-                    <p><strong><?php echo htmlspecialchars($companyName ?: 'Travel Company', ENT_QUOTES, 'UTF-8'); ?></strong></p>
+                    <p><strong><?php echo htmlspecialchars($companyName ?: __('Travel Company', 'yatra'), ENT_QUOTES, 'UTF-8'); ?></strong></p>
                     <p><?php echo htmlspecialchars($companyAddress, ENT_QUOTES, 'UTF-8'); ?></p>
-                    <p>Email: <?php echo htmlspecialchars($companyEmail, ENT_QUOTES, 'UTF-8'); ?> | Phone: <?php echo htmlspecialchars($companyPhone, ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p>
+                        <?php
+                        echo esc_html(
+                            sprintf(
+                                /* translators: 1: label "Email", 2: company email, 3: label "Phone", 4: company phone */
+                                __('%1$s: %2$s | %3$s: %4$s', 'yatra'),
+                                __('Email', 'yatra'),
+                                $companyEmail,
+                                __('Phone', 'yatra'),
+                                $companyPhone
+                            )
+                        );
+                        ?>
+                    </p>
                 </td>
                 <td style="width: 40%; text-align: right;">
-                    <p>This is a computer-generated document.</p>
-                    <p>No signature required.</p>
+                    <p><?php esc_html_e('This is a computer-generated document.', 'yatra'); ?></p>
+                    <p><?php esc_html_e('No signature required.', 'yatra'); ?></p>
                 </td>
             </tr>
         </table>

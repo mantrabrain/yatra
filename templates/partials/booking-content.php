@@ -173,7 +173,7 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                             <span id="pay-button-text"><?php esc_html_e('Complete Booking', 'yatra'); ?></span>
                             <span id="pay-amount"><?php echo esc_html(yatra_format_price((float) ($summary_due_amount ?? 0), null, false)); ?></span>
                         </button>
-                        <a href="<?php echo esc_url(home_url('/trip/' . $trip->slug)); ?>" class="yatra-booking-cancel-btn">
+                        <a href="<?php echo esc_url(yatra_get_trip_permalink($trip)); ?>" class="yatra-booking-cancel-btn">
                             <?php esc_html_e('Cancel', 'yatra'); ?>
                         </a>
                     </div>

@@ -1269,6 +1269,7 @@
     constructor() {
       this.checkAvailabilityBtn = null;
       this.makeEnquiryBtn = null;
+      this.heroBookNowBtn = null;
       this.dateInput = null;
       this.participantsSelect = null;
       this.datepickerInstance = null;
@@ -1286,6 +1287,7 @@
     setup() {
       this.checkAvailabilityBtn = document.getElementById('check-availability-btn');
       this.makeEnquiryBtn = document.getElementById('open-enquiry-modal');
+      this.heroBookNowBtn = document.getElementById('yatra-hero-book-now-btn');
       this.dateInput = document.getElementById('travel_date');
       this.participantsSelect = document.querySelector('.yatra-participants-select');
 
@@ -1304,6 +1306,27 @@
         this.checkAvailabilityBtn.addEventListener('click', (e) => {
           e.preventDefault();
           this.handleCheckAvailability();
+        });
+      }
+
+      // Hero "Book Now" (should behave like Check Availability)
+      if (this.heroBookNowBtn) {
+        this.heroBookNowBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const disabled =
+              this.heroBookNowBtn.classList.contains('is-disabled') ||
+              this.heroBookNowBtn.getAttribute('aria-disabled') === 'true';
+          if (disabled) return;
+
+          const bookingSidebar = document.getElementById('booking') || document.querySelector('.yatra-trip-sidebar');
+          if (bookingSidebar && bookingSidebar.scrollIntoView) {
+            bookingSidebar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+
+          // Trigger the same availability flow
+          if (this.checkAvailabilityBtn) {
+            this.handleCheckAvailability();
+          }
         });
       }
 

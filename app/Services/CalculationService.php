@@ -510,12 +510,7 @@ class CalculationService
                             'price' => $pt->effective_price ?? $pt->sale_price ?? $pt->original_price ?? 0
                         ];
                     }
-                    error_log('Yatra Debug - Group Discount Calculation Result: ' . print_r([
-                        'trip_id' => $trip_id,
-                        'traveler_counts' => $traveler_counts,
-                        'price_types' => $priceTypesDebug,
-                        'discount_result' => $discountResult
-                    ], true));
+
                 }
                 
                 if ($discountResult && !empty($discountResult['amount'])) {
@@ -526,10 +521,7 @@ class CalculationService
                     ];
                 }
             } catch (\Exception $e) {
-                // Debug: Log the exception
-                if (WP_DEBUG && WP_DEBUG_LOG) {
-                    error_log('Yatra Debug - Group Discount Calculation Exception: ' . $e->getMessage());
-                }
+
             }
         }
         

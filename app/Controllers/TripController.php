@@ -618,15 +618,8 @@ class TripController extends BaseController
                 $data['testimonial_review_ids'] = is_string($data['testimonial_review_ids']) ? $data['testimonial_review_ids'] : wp_json_encode($data['testimonial_review_ids']);
             }
             if (isset($data['default_time_slots'])) {
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('Yatra DEBUG: default_time_slots received: ' . print_r($data['default_time_slots'], true));
-                }
                 $data['default_time_slots'] = is_string($data['default_time_slots']) ? $data['default_time_slots'] : wp_json_encode($data['default_time_slots']);
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('Yatra DEBUG: default_time_slots after encoding: ' . $data['default_time_slots']);
-                }
-            } elseif (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra DEBUG: default_time_slots NOT in request data');
+
             }
             
             // Handle featured_priority field (already in $data for update)
@@ -1446,10 +1439,6 @@ class TripController extends BaseController
             
             $availability_dates = $resolutionService->getAllAvailabilityDates($id, $fromDate, $toDate);
 
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra Availability Debug: Trip ID ' . $id . ' has ' . count($availability_dates) . ' availability dates from centralized service');
-            }
-
             // Determine if this is a day trip
             $is_single_day = ($trip->duration_days ?? 1) <= 1;
             
@@ -1930,15 +1919,7 @@ class TripController extends BaseController
                     if (!empty($card_traveler_pricing)) {
                         $card_traveler_pricing = $enrich_price_types($card_traveler_pricing);
                     }
-                    
-                    // Debug logging
-                    if (defined('WP_DEBUG') && WP_DEBUG) {
-                        error_log('Yatra Card traveler_pricing count: ' . count($card_traveler_pricing));
-                        if (!empty($card_traveler_pricing[0])) {
-                            $first = is_array($card_traveler_pricing[0]) ? $card_traveler_pricing[0] : (array) $card_traveler_pricing[0];
-                            error_log('Yatra Card first category: ' . print_r($first, true));
-                        }
-                    }
+
                 }
                 
                 $availability_cards[] = [

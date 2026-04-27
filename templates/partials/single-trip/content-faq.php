@@ -37,7 +37,7 @@ if (!defined('ABSPATH')) {
     </script>
     <div class="faq-header">
         <h2 class="yatra-trip-section-title">
-            <?php yatra_render_tab_icon($tab->icon ?? null, 'help-circle', 'yatra-trip-section-title-icon', $tab->label ?? 'FAQ'); ?>
+            <?php yatra_render_tab_icon($tab->icon ?? null, 'help-circle', 'yatra-trip-section-title-icon', $tab->label ?? __('FAQ', 'yatra')); ?>
             <?php echo esc_html(isset($tab->label) ? $tab->label : __('Frequently Asked Questions', 'yatra')); ?>
         </h2>
         <div class="faq-controls">
@@ -48,7 +48,7 @@ if (!defined('ABSPATH')) {
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="toggle-icon collapse-icon" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25"/>
                 </svg>
-                <span class="toggle-text">Expand All</span>
+                <span class="toggle-text"><?php echo esc_html__('Expand All', 'yatra'); ?></span>
             </button>
         </div>
     </div>
@@ -93,6 +93,10 @@ if (!defined('ABSPATH')) {
 <script>
 (function () {
     let faqIsAllExpanded = false;
+    const yatraFaqI18n = {
+        expandAll: <?php echo wp_json_encode(__('Expand All', 'yatra')); ?>,
+        collapseAll: <?php echo wp_json_encode(__('Collapse All', 'yatra')); ?>
+    };
 
     function toggleFAQ(button) {
         var item = button.closest('.faq-item');
@@ -121,7 +125,7 @@ if (!defined('ABSPATH')) {
                 if (q) q.setAttribute('aria-expanded', 'false');
             });
             toggleBtn.classList.remove('is-all-expanded');
-            if (toggleText) toggleText.textContent = 'Expand All';
+            if (toggleText) toggleText.textContent = yatraFaqI18n.expandAll;
         } else {
             items.forEach(function (item) {
                 item.classList.add('active');
@@ -129,7 +133,7 @@ if (!defined('ABSPATH')) {
                 if (q) q.setAttribute('aria-expanded', 'true');
             });
             toggleBtn.classList.add('is-all-expanded');
-            if (toggleText) toggleText.textContent = 'Collapse All';
+            if (toggleText) toggleText.textContent = yatraFaqI18n.collapseAll;
         }
         faqIsAllExpanded = !faqIsAllExpanded;
     }

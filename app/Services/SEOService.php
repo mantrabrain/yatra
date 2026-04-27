@@ -141,8 +141,7 @@ class SEOService
             
         } catch (\Exception $e) {
             // Log error and fail gracefully
-            error_log('Yatra SEO Service Error: ' . $e->getMessage());
-            
+
             // Output basic fallback meta tags
             $this->outputFallbackMetaTags();
         }
@@ -165,7 +164,6 @@ class SEOService
             
             return '';
         } catch (\Exception $e) {
-            error_log('Yatra SEO Service getTitle Error: ' . $e->getMessage());
             return '';
         }
     }
@@ -281,8 +279,7 @@ class SEOService
                     throw new \InvalidArgumentException("Unsupported page type: {$this->pageType}");
             }
         } catch (\Exception $e) {
-            error_log('Yatra SEO Service collectSEOData Error: ' . $e->getMessage());
-            
+
             // Set default values on error
             $this->setDefaultSEOData();
         }
@@ -345,7 +342,6 @@ class SEOService
             $this->seoData['publisher'] = $this->sanitizeText(get_bloginfo('name'));
             
         } catch (\Exception $e) {
-            error_log('Yatra SEO Service collectTripArchiveData Error: ' . $e->getMessage());
             $this->setDefaultSEOData();
         }
     }

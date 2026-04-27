@@ -12,7 +12,6 @@ use Yatra\Core\Handlers\TaxonomyPageHandler;
 use Yatra\Core\Handlers\BookingPageHandler;
 use Yatra\Core\Handlers\BookingConfirmationPageHandler;
 use Yatra\Core\Handlers\CheckoutPageHandler;
-use Yatra\Core\Handlers\LoginPageHandler;
 use Yatra\Core\Routing\PlainPageMatcher;
 use Yatra\Core\Routing\PrettyRouteMatcher;
 
@@ -50,7 +49,6 @@ class Router
             'booking' => function() { return new BookingPageHandler(); },
             'booking_confirmation' => function() { return new BookingConfirmationPageHandler(); },
             'checkout' => function() { return new CheckoutPageHandler(); },
-            'login' => function() { return new LoginPageHandler(); },
         ];
     }
 
@@ -138,10 +136,7 @@ class Router
             
             return $handler;
         } catch (\Throwable $e) {
-            // Log error for debugging
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra Router: Failed to load handler "' . $route_type . '": ' . $e->getMessage());
-            }
+
             
             return null;
         }

@@ -38,7 +38,16 @@ if (!defined('ABSPATH')) {
                                     <?php foreach ($discount['category_discounts'] as $category => $details): ?>
                                         <div class="yatra-category-item">
                                             <span class="yatra-category-name"><?php echo esc_html(ucfirst($category)); ?>:</span>
-                                            <span class="yatra-category-saving"><?php echo esc_html($details['discount_rate']); ?><?php echo $details['discount_type'] === 'percentage' ? '%' : ''; ?> off</span>
+                                            <span class="yatra-category-saving">
+                                                <?php
+                                                printf(
+                                                    /* translators: 1: discount amount, 2: percent symbol or empty */
+                                                    esc_html__('%1$s%2$s off', 'yatra'),
+                                                    esc_html($details['discount_rate']),
+                                                    $details['discount_type'] === 'percentage' ? '%' : ''
+                                                );
+                                                ?>
+                                            </span>
                                         </div>
                                     <?php endforeach; ?>
                                 </div>

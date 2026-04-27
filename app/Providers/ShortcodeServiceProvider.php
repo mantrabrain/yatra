@@ -59,16 +59,10 @@ class ShortcodeServiceProvider extends \Yatra\Core\ServiceProvider
                 if (class_exists($full_class_name)) {
                     new $full_class_name();
                 } else {
-                    // Log error for debugging
-                    if (defined('WP_DEBUG') && WP_DEBUG) {
-                        error_log("Yatra ShortcodeServiceProvider: AJAX handler class {$full_class_name} not found");
-                    }
+
                 }
             } catch (Exception $e) {
-                // Log error for debugging
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log("Yatra ShortcodeServiceProvider: Failed to register AJAX handler {$handler_class}: " . $e->getMessage());
-                }
+
             }
         }
     }
@@ -97,23 +91,14 @@ class ShortcodeServiceProvider extends \Yatra\Core\ServiceProvider
                     if (method_exists($shortcode, 'register')) {
                         $shortcode->register();
                     } else {
-                        // Log error for debugging
-                        if (defined('WP_DEBUG') && WP_DEBUG) {
-                            error_log("Yatra ShortcodeServiceProvider: Shortcode class {$class} missing register method");
-                        }
+
                     }
                 } else {
-                    // Log error for debugging
-                    if (defined('WP_DEBUG') && WP_DEBUG) {
-                        error_log("Yatra ShortcodeServiceProvider: Shortcode class {$class} not found");
-                    }
+
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 // Log error for debugging
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log("Yatra ShortcodeServiceProvider: Failed to register shortcode {$tag}: " . $e->getMessage());
-                }
-                
+
                 // Continue with other shortcodes even if one fails
                 continue;
             }

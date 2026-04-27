@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 <section class="yatra-trip-section" id="itinerary" itemscope itemtype="https://schema.org/TouristTrip">
     <div class="yatra-section-header-with-actions">
         <h2 class="yatra-trip-section-title">
-            <?php yatra_render_tab_icon($tab->icon ?? null, 'calendar', 'yatra-trip-section-title-icon', $tab->label ?? 'Itinerary'); ?>
+            <?php yatra_render_tab_icon($tab->icon ?? null, 'calendar', 'yatra-trip-section-title-icon', $tab->label ?? __('Itinerary', 'yatra')); ?>
             <?php echo esc_html(isset($tab->label) ? $tab->label : __('Itinerary', 'yatra')); ?>
         </h2>
         <div class="yatra-itinerary-actions">
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="toggle-icon collapse-icon" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25"/>
                 </svg>
-                <span class="toggle-text">Expand All</span>
+                <span class="toggle-text"><?php echo esc_html__('Expand All', 'yatra'); ?></span>
             </button>
         </div>
     </div>

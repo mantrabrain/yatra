@@ -11,7 +11,7 @@ namespace Yatra\Core\Modules;
 class ModuleManager
 {
     private const OPTION_KEY = 'yatra_modules';
-    private const DEFAULT_VIDEO_URL = 'https://www.youtube.com/embed/2g811Eo7K8U';
+    private const DEFAULT_VIDEO_URL = 'https://youtu.be/cHmC-x7y0TQ';
 
     /**
      * Ensure option exists with defaults

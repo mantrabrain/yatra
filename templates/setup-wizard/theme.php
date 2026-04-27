@@ -115,9 +115,20 @@ if (typeof ajaxurl === 'undefined') {
 function installAndActivateTheme(themeSlug) {
     const button = event.target;
     const originalContent = button.innerHTML;
+    const yatraThemeWizardI18n = {
+        installing: <?php echo wp_json_encode(__('Installing...', 'yatra')); ?>,
+        activating: <?php echo wp_json_encode(__('Activating...', 'yatra')); ?>,
+        installationFailedInvalidResponse: <?php echo wp_json_encode(__('Installation failed: Invalid response format', 'yatra')); ?>,
+        activationFailedPrefix: <?php echo wp_json_encode(__('Activation failed:', 'yatra')); ?>,
+        installationFailedPrefix: <?php echo wp_json_encode(__('Installation failed:', 'yatra')); ?>,
+        activationRequestFailed: <?php echo wp_json_encode(__('Activation request failed. Please try again.', 'yatra')); ?>,
+        installationRequestFailed: <?php echo wp_json_encode(__('Installation request failed. Please try again.', 'yatra')); ?>,
+        unknownActivationError: <?php echo wp_json_encode(__('Unknown activation error', 'yatra')); ?>,
+        unknownInstallationError: <?php echo wp_json_encode(__('Unknown installation error', 'yatra')); ?>
+    };
     
     // Show loading state with spinner
-    button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"></circle><path d="M12 2v10l4 2" fill="none" stroke="currentColor" stroke-width="2"></path></svg> Installing...';
+    button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"></circle><path d="M12 2v10l4 2" fill="none" stroke="currentColor" stroke-width="2"></path></svg> ' + yatraThemeWizardI18n.installing;
     button.disabled = true;
     button.style.cursor = 'not-allowed';
     button.style.opacity = '0.7';
@@ -155,14 +166,14 @@ function installAndActivateTheme(themeSlug) {
                 } catch (e) {
                     console.error('Failed to parse JSON:', e);
                     resetButtonState(button, originalContent);
-                    alert('Installation failed: Invalid response format');
+                    alert(yatraThemeWizardI18n.installationFailedInvalidResponse);
                     return;
                 }
             }
             
             if (jsonResponse && jsonResponse.success) {
                 // Theme installed successfully, now activate it
-                button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"></circle><path d="M12 2v10l4 2" fill="none" stroke="currentColor" stroke-width="2"></path></svg> Activating...';
+                button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"></circle><path d="M12 2v10l4 2" fill="none" stroke="currentColor" stroke-width="2"></path></svg> ' + yatraThemeWizardI18n.activating;
                 
                 jQuery.ajax({
                     url: ajaxurl,
@@ -179,26 +190,26 @@ function installAndActivateTheme(themeSlug) {
                             updateThemeCardToActivated();
                         } else {
                             resetButtonState(button, originalContent);
-                            const errorMsg = activateResponse && activateResponse.data ? activateResponse.data : 'Unknown activation error';
-                            alert('Activation failed: ' + errorMsg);
+                            const errorMsg = activateResponse && activateResponse.data ? activateResponse.data : yatraThemeWizardI18n.unknownActivationError;
+                            alert(yatraThemeWizardI18n.activationFailedPrefix + ' ' + errorMsg);
                         }
                     },
                     error: function(xhr, status, error) {
                         console.log('Activation AJAX error:', {xhr: xhr, status: status, error: error}); // Debug log
                         resetButtonState(button, originalContent);
-                        alert('Activation request failed. Please try again.');
+                        alert(yatraThemeWizardI18n.activationRequestFailed);
                     }
                 });
             } else {
                 resetButtonState(button, originalContent);
-                const errorMsg = jsonResponse && jsonResponse.data ? jsonResponse.data : 'Unknown installation error';
-                alert('Installation failed: ' + errorMsg);
+                const errorMsg = jsonResponse && jsonResponse.data ? jsonResponse.data : yatraThemeWizardI18n.unknownInstallationError;
+                alert(yatraThemeWizardI18n.installationFailedPrefix + ' ' + errorMsg);
             }
         },
         error: function() {
             button.innerHTML = originalContent;
             button.disabled = false;
-            alert('Installation request failed. Please try again.');
+            alert(yatraThemeWizardI18n.installationRequestFailed);
         }
     });
 }
@@ -206,9 +217,15 @@ function installAndActivateTheme(themeSlug) {
 function activateTheme(themeSlug) {
     const button = event.target;
     const originalContent = button.innerHTML;
+    const yatraThemeWizardI18n = {
+        activating: <?php echo wp_json_encode(__('Activating...', 'yatra')); ?>,
+        activationFailedPrefix: <?php echo wp_json_encode(__('Activation failed:', 'yatra')); ?>,
+        activationRequestFailed: <?php echo wp_json_encode(__('Activation request failed. Please try again.', 'yatra')); ?>,
+        unknownActivationError: <?php echo wp_json_encode(__('Unknown activation error', 'yatra')); ?>
+    };
     
     // Show loading state with spinner
-    button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"></circle><path d="M12 2v10l4 2" fill="none" stroke="currentColor" stroke-width="2"></path></svg> Activating...';
+    button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"></circle><path d="M12 2v10l4 2" fill="none" stroke="currentColor" stroke-width="2"></path></svg> ' + yatraThemeWizardI18n.activating;
     button.disabled = true;
     button.style.cursor = 'not-allowed';
     button.style.opacity = '0.7';
@@ -237,14 +254,14 @@ function activateTheme(themeSlug) {
                 updateThemeCardToActivated();
             } else {
                 resetButtonState(button, originalContent);
-                const errorMsg = response && response.data ? response.data : 'Unknown activation error';
-                alert('Activation failed: ' + errorMsg);
+                const errorMsg = response && response.data ? response.data : yatraThemeWizardI18n.unknownActivationError;
+                alert(yatraThemeWizardI18n.activationFailedPrefix + ' ' + errorMsg);
             }
         },
         error: function(xhr, status, error) {
             console.log('Activation AJAX error:', {xhr: xhr, status: status, error: error}); // Debug log
             resetButtonState(button, originalContent);
-            alert('Activation request failed. Please try again.');
+            alert(yatraThemeWizardI18n.activationRequestFailed);
         }
     });
 }

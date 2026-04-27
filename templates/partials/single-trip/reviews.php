@@ -124,7 +124,7 @@ if (!defined('ABSPATH')) {
                             $review_rating = is_object($review) ? ($review->rating ?? 5) : ($review['rating'] ?? 5);
                             $review_title = is_object($review) ? ($review->title ?? '') : ($review['title'] ?? '');
                             $review_content = is_object($review) ? ($review->content ?? '') : ($review['content'] ?? '');
-                            $review_author = is_object($review) ? ($review->author_name ?? 'Anonymous') : ($review['author_name'] ?? 'Anonymous');
+                            $review_author = is_object($review) ? ($review->author_name ?? __('Anonymous', 'yatra')) : ($review['author_name'] ?? __('Anonymous', 'yatra'));
                             $review_location = is_object($review) ? ($review->author_location ?? '') : ($review['author_location'] ?? '');
                             $review_date = is_object($review) ? ($review->created_at ?? '') : ($review['created_at'] ?? '');
                             $review_user_id = is_object($review) ? ($review->user_id ?? 0) : ($review['user_id'] ?? 0);

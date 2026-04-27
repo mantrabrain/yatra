@@ -92,12 +92,11 @@ class ItineraryCostService
                 ];
             }
             
-            // error_log('ItineraryCostService - Found ' . count($itineraryCosts) . ' itinerary costs for trip ' . $tripId);
+            //  
             
             return $itineraryCosts;
             
         } catch (\Exception $e) {
-            error_log('ItineraryCostService - Error: ' . $e->getMessage());
             return [];
         }
     }
@@ -129,10 +128,9 @@ class ItineraryCostService
             $bookingDetails['itinerary_costs'] = $itineraryCosts;
             $bookingDetails['itinerary_costs_total'] = $itineraryCostsTotal;
             
-            // error_log('ItineraryCostService - Added ' . count($itineraryCosts) . ' itinerary costs to booking details for booking ' . $bookingId);
+            //  
             
         } catch (\Exception $e) {
-            error_log('ItineraryCostService - Error adding to booking details: ' . $e->getMessage());
         }
         
         return $bookingDetails;
@@ -196,10 +194,9 @@ class ItineraryCostService
                 ];
             }
             
-            // error_log('ItineraryCostService - Added ' . count($itineraryCosts) . ' itinerary costs as services for booking ' . $bookingId);
+            //  
             
         } catch (\Exception $e) {
-            error_log('ItineraryCostService - Error getting services: ' . $e->getMessage());
         }
         
         return $services;

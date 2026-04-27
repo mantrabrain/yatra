@@ -152,27 +152,14 @@ class BlockDataService
 
             // Load template
             $result = self::loadTemplate('shortcodes/trip.php', $data);
-            
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra BlockDataService: Render successful, result length: ' . strlen($result));
-            }
+
             
             return $result;
         } catch (\Exception $e) {
-            // Return error message for debugging
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra BlockDataService Exception: ' . $e->getMessage());
-                error_log('Yatra BlockDataService Exception Trace: ' . $e->getTraceAsString());
-                return '<div class="yatra-error">Trip rendering error: ' . esc_html($e->getMessage()) . ' in ' . esc_html($e->getFile()) . ':' . esc_html($e->getLine()) . '</div>';
-            }
+
             return '<div class="yatra-error">Trip rendering failed</div>';
         } catch (\Error $e) {
-            // Catch fatal errors too
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra BlockDataService Error: ' . $e->getMessage());
-                error_log('Yatra BlockDataService Error Trace: ' . $e->getTraceAsString());
-                return '<div class="yatra-error">Trip rendering error: ' . esc_html($e->getMessage()) . ' in ' . esc_html($e->getFile()) . ':' . esc_html($e->getLine()) . '</div>';
-            }
+
             return '<div class="yatra-error">Trip rendering failed</div>';
         }
     }
@@ -312,9 +299,7 @@ class BlockDataService
             ];
             
         } catch (\Exception $e) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra BlockDataService Trip Error: ' . $e->getMessage());
-            }
+
             
             return [
                 'trips' => [],

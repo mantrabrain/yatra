@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) {
 ?>
 <section class="yatra-trip-section" id="trip-story">
     <h2 class="yatra-trip-section-title">
-        <?php yatra_render_tab_icon($tab->icon ?? null, 'book', 'yatra-trip-section-title-icon', $tab->label ?? 'Trip Story'); ?>
+        <?php yatra_render_tab_icon($tab->icon ?? null, 'book', 'yatra-trip-section-title-icon', $tab->label ?? __('Trip Story', 'yatra')); ?>
         <?php echo esc_html(isset($tab->label) ? $tab->label : __('Trip Story', 'yatra')); ?>
     </h2>
     <div class="yatra-trip-story-container">

@@ -34,7 +34,7 @@ class LoginPageHandler extends BasePageHandler
         // Security: Check if user is already logged in and redirect securely
         if (is_user_logged_in()) {
             $current_user = wp_get_current_user();
-            $redirect_url = apply_filters('yatra_login_redirect_url', home_url('/my-account'), $current_user);
+            $redirect_url = apply_filters('yatra_login_redirect_url', home_url('/' . \Yatra\Services\SettingsService::getAccountBase()), $current_user);
             
             // Use safe redirect to prevent open redirects
             wp_safe_redirect($redirect_url, 302);
@@ -51,10 +51,7 @@ class LoginPageHandler extends BasePageHandler
         $template_path = YATRA_PLUGIN_PATH . 'templates/login-page.php';
         
         if (!file_exists($template_path)) {
-            // Log error for debugging
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra Login Page Handler: Template not found at ' . $template_path);
-            }
+
             
             // Fallback to shortcode if template is missing
             return $this->handleFallback();
@@ -71,12 +68,8 @@ class LoginPageHandler extends BasePageHandler
             include $template_path;
             exit;
             
-        } catch (Exception $e) {
-            // Log error for debugging
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra Login Page Handler Error: ' . $e->getMessage());
-            }
-            
+        } catch (\Exception $e) {
+
             return $this->handleFallback();
         }
     }

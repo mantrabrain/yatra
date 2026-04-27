@@ -510,14 +510,7 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 				// A possible reason for an exception would include a scenario where the same action is deleted by a
 				// concurrent request.
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-				error_log(
-					sprintf(
-						/* translators: 1: action ID 2: exception message. */
-						__( 'Action Scheduler was unable to delete action %1$d. Reason: %2$s', 'action-scheduler' ),
-						$id,
-						$e->getMessage()
-					)
-				);
+				 
 			}
 		}
 	}

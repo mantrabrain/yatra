@@ -381,19 +381,6 @@ class SingleTripController
             // Calculate if limited availability
             $avail->is_limited = ($avail->seats_available <= 5 && $avail->seats_available > 0);
             $avail->is_sold_out = ($avail->seats_available <= 0 || $avail->status === 'sold_out');
-            
-            // Debug logging
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log(sprintf(
-                    'Yatra Availability [%s]: Date=%s, PricingType=%s, HasPriceTypes=%s, EffectivePrice=%s, Seats=%d',
-                    $avail->source,
-                    $avail->departure_date,
-                    $avail->pricing_type,
-                    !empty($avail->price_types) ? 'YES(' . count($avail->price_types) . ')' : 'NO',
-                    $avail->effective_price ?? 'null',
-                    $avail->seats_available
-                ));
-            }
         }
         
         return $availability;

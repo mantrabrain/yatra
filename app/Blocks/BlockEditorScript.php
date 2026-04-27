@@ -129,16 +129,7 @@ final class BlockEditorScript
             }
         }
         if ($bundle === null) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-                error_log(
-                    sprintf(
-                        '[Yatra] Block editor script not found for slug "%s" (handle "%s"). Run npm run build in the plugin directory.',
-                        $slug,
-                        $handle
-                    )
-                );
-            }
+
 
             return false;
         }

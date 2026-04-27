@@ -23,7 +23,7 @@ function yatra_get_seo_title(): string {
         
         return \Yatra\Managers\SEOManager::filterDocumentTitle('');
     } catch (\Exception $e) {
-        error_log('Yatra SEO Helper get_seo_title Error: ' . $e->getMessage());
+         
         return '';
     }
 }
@@ -43,7 +43,6 @@ function yatra_output_seo_meta_tags(): void {
         
         \Yatra\Managers\SEOManager::outputSEOMetaTags();
     } catch (\Exception $e) {
-        error_log('Yatra SEO Helper output_seo_meta_tags Error: ' . $e->getMessage());
         // Fail silently to avoid breaking page rendering
     }
 }
@@ -81,7 +80,7 @@ function yatra_get_seo_service(string $pageType, $pageObject = null): \Yatra\Ser
         
         return \Yatra\Services\SEOService::forPage($pageType, $pageObject);
     } catch (\Exception $e) {
-        error_log('Yatra SEO Helper get_seo_service Error: ' . $e->getMessage());
+         
         throw $e;
     }
 }

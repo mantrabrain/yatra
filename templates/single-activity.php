@@ -146,14 +146,20 @@ yatra_get_header();
                     <div class="yatra-trip-card">
                         <div class="yatra-trip-image">
                             <?php if (!empty($trip->featured_image_url)): ?>
-                                <img src="<?php echo esc_url($trip->featured_image_url); ?>" alt="<?php echo esc_attr($trip->title ?? $trip->name ?? 'Trip'); ?>">
+                                <img src="<?php echo esc_url($trip->featured_image_url); ?>" alt="<?php echo esc_attr($trip->title ?? $trip->name ?? __('Trip', 'yatra')); ?>">
                             <?php else: ?>
-                                <img src="<?php echo esc_url(plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE)); ?>" alt="<?php echo esc_attr($trip->title ?? $trip->name ?? 'Trip'); ?>">
+                                <img src="<?php echo esc_url(plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE)); ?>" alt="<?php echo esc_attr($trip->title ?? $trip->name ?? __('Trip', 'yatra')); ?>">
                             <?php endif; ?>
                             
                             <?php if (!empty($trip->discount_percentage) && $trip->discount_percentage > 0): ?>
                                 <div class="yatra-discount-badge">
-                                    <?php echo esc_html($trip->discount_percentage); ?>% OFF
+                                    <?php
+                                    printf(
+                                        /* translators: %s: discount percentage */
+                                        esc_html__('%s%% OFF', 'yatra'),
+                                        esc_html($trip->discount_percentage)
+                                    );
+                                    ?>
                                 </div>
                             <?php endif; ?>
                             
@@ -181,7 +187,7 @@ yatra_get_header();
                             
                             <h3 class="yatra-trip-title">
                                 <a href="<?php echo esc_url($trip->permalink ?? ''); ?>">
-                                    <?php echo esc_html($trip->title ?? $trip->name ?? 'Untitled Trip'); ?>
+                                    <?php echo esc_html($trip->title ?? $trip->name ?? __('Untitled Trip', 'yatra')); ?>
                                 </a>
                             </h3>
                             
@@ -235,7 +241,7 @@ yatra_get_header();
                 <p style="color: #6b7280; margin: 0 0 16px 0;">
                     <?php esc_html_e('No trips are currently available with this activity.', 'yatra'); ?>
                 </p>
-                <a href="<?php echo esc_url(home_url('/trip/')); ?>" 
+                <a href="<?php echo esc_url(home_url('/' . \Yatra\Services\SettingsService::getTripBase() . '/')); ?>" 
                    style="color: #2563eb; text-decoration: none; font-weight: 500;">
                     <?php esc_html_e('Browse all trips', 'yatra'); ?>
                 </a>
@@ -243,7 +249,7 @@ yatra_get_header();
         <?php endif; ?>
         
         <div style="text-align: center;">
-            <a href="<?php echo esc_url(home_url('/trip/?activity=' . urlencode($activity->slug))); ?>" 
+            <a href="<?php echo esc_url(add_query_arg(['activity' => urlencode($activity->slug)], home_url('/' . \Yatra\Services\SettingsService::getTripBase() . '/'))); ?>" 
                class="yatra-btn" 
                style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: #059669; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; transition: background-color 0.2s;">
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -256,7 +262,7 @@ yatra_get_header();
 
     <!-- Back to Activities -->
     <div style="text-align: center; margin-top: 60px; padding-top: 40px; border-top: 1px solid #e5e7eb;">
-        <a href="<?php echo esc_url(home_url('/activity/')); ?>" 
+        <a href="<?php echo esc_url(home_url('/' . \Yatra\Services\SettingsService::getString('activity_base', 'activity') . '/')); ?>" 
            style="color: #6b7280; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>

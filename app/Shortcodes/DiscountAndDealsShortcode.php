@@ -109,11 +109,7 @@ class DiscountAndDealsShortcode extends BaseShortcode
                      (sale_price > 0)
                  )";
         
-        // Debug: Log the query
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('DISCOUNT QUERY: ' . $query);
-            error_log('DISCOUNT ATTRS: ' . print_r($atts, true));
-        }
+    
         
         // Add category filter if specified
         if (!empty($atts['category'])) {
@@ -158,16 +154,10 @@ class DiscountAndDealsShortcode extends BaseShortcode
         
         // Debug: Log the results
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('DISCOUNT RESULTS COUNT: ' . count($trips));
+             
             if (!empty($trips)) {
                 foreach ($trips as $trip) {
-                    error_log('DISCOUNT TRIP: ' . print_r([
-                        'id' => $trip->id,
-                        'title' => $trip->title,
-                        'original_price' => $trip->original_price,
-                        'discounted_price' => $trip->discounted_price,
-                        'sale_price' => $trip->sale_price
-                    ], true));
+                     
                 }
             }
         }
@@ -183,15 +173,10 @@ class DiscountAndDealsShortcode extends BaseShortcode
         
         // Debug: Log processed trips
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('PROCESSED DISCOUNT TRIPS COUNT: ' . count($processed_trips));
+             
             if (!empty($processed_trips)) {
                 foreach ($processed_trips as $trip) {
-                    error_log('PROCESSED TRIP: ' . print_r([
-                        'id' => $trip->id,
-                        'title' => $trip->title,
-                        'has_discount' => $trip->has_discount,
-                        'best_discount' => $trip->best_discount
-                    ], true));
+                     
                 }
             }
         }

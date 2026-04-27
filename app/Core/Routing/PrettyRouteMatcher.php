@@ -27,23 +27,14 @@ final class PrettyRouteMatcher
             ];
         }
 
-        // 2. Dedicated login slug (rewrite: ^login/?$)
-        if ($path === 'login') {
-            return [
-                'type' => 'login',
-                'page' => 'main',
-                'base' => 'login',
-            ];
-        }
-
-        // 3. Account page
+        // 2. Account page
         $account_base = SettingsService::getAccountBase();
         $account_route = self::matchAccountRoute($path, $account_base);
         if ($account_route !== null) {
             return $account_route;
         }
 
-        // 4. Trip archive pagination: {trip_base}/page/{n}
+        // 3. Trip archive pagination: {trip_base}/page/{n}
         $trip_base = SettingsService::getTripBase();
         if (preg_match('/^' . preg_quote($trip_base, '/') . '\/page\/(\d+)\/?$/', $path, $matches)) {
             return [

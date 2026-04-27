@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) {
 ?>
 <section class="yatra-trip-section" id="overview" itemscope itemtype="https://schema.org/TouristTrip">
     <h2 class="yatra-trip-section-title">
-        <?php yatra_render_tab_icon($tab->icon ?? null, 'book', 'yatra-trip-section-title-icon', $tab->label ?? 'Overview'); ?>
+        <?php yatra_render_tab_icon($tab->icon ?? null, 'book', 'yatra-trip-section-title-icon', $tab->label ?? __('Overview', 'yatra')); ?>
         <?php echo esc_html(isset($tab->label) ? $tab->label : __('Overview', 'yatra')); ?>
     </h2>
     

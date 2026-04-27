@@ -128,10 +128,6 @@ final class PermalinkCanonical
             }
         }
 
-        if (!empty($_GET['yatra_login_page'])) {
-            return true;
-        }
-
         if (!empty($_GET['reference']) && is_string($_GET['reference']) && trim(wp_unslash($_GET['reference'])) !== '') {
             return true;
         }
@@ -186,10 +182,6 @@ final class PermalinkCanonical
             if ($t !== '') {
                 return trailingslashit(home_url('/yatra-verify-email/' . $t . '/'));
             }
-        }
-
-        if (!empty($_GET['yatra_login_page'])) {
-            return trailingslashit(home_url('/login/'));
         }
 
         $trip_base = SettingsService::getTripBase();
@@ -424,7 +416,6 @@ final class PermalinkCanonical
             'yatra_booking_confirmation',
             'yatra_remaining_checkout',
             'yatra_verify_email',
-            'yatra_login_page',
             'reference',
             'trip',
             'paged',

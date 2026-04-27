@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 ?>
 <section class="yatra-trip-section" id="downloads">
     <h2 class="yatra-trip-section-title">
-        <?php yatra_render_tab_icon($tab->icon ?? null, 'download', 'yatra-trip-section-title-icon', $tab->label ?? 'Downloads'); ?>
+        <?php yatra_render_tab_icon($tab->icon ?? null, 'download', 'yatra-trip-section-title-icon', $tab->label ?? __('Downloads', 'yatra')); ?>
         <?php echo esc_html(isset($tab->label) ? $tab->label : __('Downloads', 'yatra')); ?>
     </h2>
     

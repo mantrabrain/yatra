@@ -246,6 +246,11 @@ class DestinationService extends BaseService
                     $existing_metadata = maybe_unserialize($existing->metadata);
                 }
             }
+
+            // `metadata` can be stored as serialized string or other scalar; ensure array before offset access.
+            if (!is_array($existing_metadata)) {
+                $existing_metadata = [];
+            }
             
             // Add/update SEO fields in metadata
             if (isset($data['seo_title'])) {

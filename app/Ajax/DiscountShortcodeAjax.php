@@ -21,16 +21,11 @@ class DiscountShortcodeAjax
      */
     public function loadTrips(): void
     {
-        // Debug: Log AJAX request
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra Discount AJAX - Request received: ' . print_r($_POST, true));
-        }
+
         
         // Verify nonce
         if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_trip_shortcode_nonce')) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra Discount AJAX - Security check failed');
-            }
+
             wp_die(esc_html__('Security check failed', 'yatra'), '', ['response' => 403]);
         }
 
@@ -76,10 +71,7 @@ class DiscountShortcodeAjax
             ]);
 
         } catch (\Exception $e) {
-            // Debug: Log error
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra Discount AJAX Error: ' . $e->getMessage());
-            }
+
             
             wp_send_json_error([
                 'message' => (defined('WP_DEBUG') && WP_DEBUG)

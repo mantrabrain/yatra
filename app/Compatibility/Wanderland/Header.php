@@ -202,7 +202,6 @@ final class Header
             'yatra_booking_confirmation',
             'yatra_remaining_checkout',
             'yatra_verify_email',
-            'yatra_login_page',
         ];
 
         foreach ($yatraQueryVars as $var) {

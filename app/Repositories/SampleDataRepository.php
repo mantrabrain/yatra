@@ -76,7 +76,6 @@ class SampleDataRepository
         $file_path = $this->get_sample_data_dir() . $filename;
         
         if (!file_exists($file_path)) {
-            error_log('Yatra Sample Data: File not found: ' . $file_path);
             return [];
         }
         
@@ -84,7 +83,6 @@ class SampleDataRepository
         $data = json_decode($json_content, true);
         
         if (json_last_error() !== JSON_ERROR_NONE) {
-            error_log('Yatra Sample Data: JSON decode error in ' . $filename . ': ' . json_last_error_msg());
             return [];
         }
         
@@ -164,7 +162,6 @@ class SampleDataRepository
                     $this->slug_to_id[$slug] = $id;
                 }
             } else {
-                error_log('Yatra Sample Data: Failed to insert classification: ' . $slug . ' - ' . $this->wpdb->last_error);
             }
         }
         
@@ -193,7 +190,6 @@ class SampleDataRepository
             } else {
                 $item['parent_id'] = null;
                 if ($parent_slug) {
-                    error_log('Yatra Sample Data: Item type not found for item parent_slug: ' . $parent_slug);
                 }
             }
             
@@ -265,7 +261,6 @@ class SampleDataRepository
                     if ($existing) {
                         $this->classification_ids[$composite_key] = (int) $existing;
                     } else {
-                        error_log('Yatra Sample Data: Classification not found: ' . $composite_key);
                         continue;
                     }
                 }
@@ -437,7 +432,6 @@ class SampleDataRepository
             if ($result && $this->wpdb->insert_id) {
                 $trip_ids[$trip_slug] = $this->wpdb->insert_id;
             } else {
-                error_log('Yatra Sample Data: Failed to insert trip: ' . $trip_slug . ' - ' . $this->wpdb->last_error);
             }
         }
         
@@ -604,7 +598,6 @@ class SampleDataRepository
             if ($result) {
                 $inserted++;
             } else {
-                error_log('Yatra Sample Data: Failed to insert itinerary entry: ' . ($item['title'] ?? 'unknown') . ' - ' . $this->wpdb->last_error);
             }
         }
         
