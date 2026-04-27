@@ -4,7 +4,7 @@ Tags: travel, booking, tour, travel agency, tour booking
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.0.2.8
+Stable tag: 3.0.2.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -222,6 +222,11 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
  
 
 == Changelog ==
+
+= 3.0.2.9 =
+* **Mobile booking bar:** Improved sticky booking UI on small screens (date + travelers layout, full-width travelers dropdown opening upward, and reliable click targets).
+* **Admin caching:** Fixed service cache invalidation so updates (including SEO fields) reflect immediately when cache is enabled.
+* Safe to update from 3.0.2.8.
 
 = 3.0.2.8 =
 * **Booking UI:** Added Advanced settings to select **Terms & Conditions** and **Privacy Policy** pages; booking form now links to these pages (Privacy falls back to WordPress Settings → Privacy when unset).
