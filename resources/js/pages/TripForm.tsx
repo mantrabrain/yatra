@@ -688,6 +688,7 @@ const TripForm: React.FC = () => {
         "Visa on arrival available for most nationalities. Valid passport required with at least 6 months validity.",
       vaccination_requirements:
         "No mandatory vaccinations. Recommended: Hepatitis A, Typhoid, and routine vaccinations.",
+      disable_booking: false,
       has_default_time_slots: false,
       default_time_slots: [],
       departure_time: "",
@@ -939,6 +940,7 @@ const TripForm: React.FC = () => {
         "Tourist visa required for Nepal. Can be obtained on arrival at airport or in advance. Valid passport required.",
       vaccination_requirements:
         "Recommended: Hepatitis A, Typhoid, Japanese Encephalitis, and routine vaccinations. Consult with travel health clinic.",
+      disable_booking: false,
       has_default_time_slots: false,
       default_time_slots: [],
       departure_time: "",
@@ -1201,6 +1203,7 @@ const TripForm: React.FC = () => {
         "Schengen visa required for most non-EU nationals. Apply well in advance as processing can take several weeks.",
       vaccination_requirements:
         "No mandatory vaccinations. Routine vaccinations recommended.",
+      disable_booking: false,
       has_default_time_slots: false,
       default_time_slots: [],
       departure_time: "",
@@ -5913,7 +5916,10 @@ const TripForm: React.FC = () => {
                   <ProBadge isProActive={isPro} />
                 </h3>
                 <ProFeature
-                  description={__("disable the booking calendar and make trips enquiry-only", "yatra")}
+                  description={__(
+                    "disable the booking calendar and make trips enquiry-only",
+                    "yatra",
+                  )}
                   moduleName={__("Enquiry Only Mode", "yatra")}
                   pricingUrl="https://wpyatra.com/pricing"
                   isProActive={isPro}
