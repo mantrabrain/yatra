@@ -786,7 +786,10 @@ const TravelerCategories: React.FC = () => {
             }
             bulkMutationPending={bulkMutation.isPending}
             totalItems={categories.length}
-            bulkActionOptions={getDefaultBulkStatusOptions(statusFilter)}
+            bulkActionOptions={getDefaultBulkStatusOptions(statusFilter).filter(
+              (opt) =>
+                opt.value !== "delete" || can("yatra_delete_trips"),
+            )}
           />
         )}
 

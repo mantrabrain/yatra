@@ -7207,7 +7207,7 @@ const TripForm: React.FC = () => {
                         variant="outline"
                         onClick={() =>
                           (window.location.href =
-                            "?subpage=traveler-categories&action=create")
+                            "?page=yatra&subpage=traveler-categories&action=create")
                         }
                         className="flex items-center gap-2 mx-auto"
                       >

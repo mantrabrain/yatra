@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Table as UITable,
   TableBody,
@@ -146,6 +147,76 @@ export const Table: React.FC<TableProps> = ({
       return () => document.removeEventListener("click", handleClickOutside);
     }
   }, [openDropdownId]);
+
+  const getVisibleActions = (item: any) =>
+    actions.filter((a) => !a.condition || a.condition(item));
+
+  const openActionsMenu = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    item: any,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const itemId = getItemId(item);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const visibleActions = getVisibleActions(item);
+    const dropdownHeight = visibleActions.length * 40 + 16;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const shouldPositionAbove =
+      spaceBelow < dropdownHeight && spaceAbove > dropdownHeight;
+
+    // position:fixed uses viewport coordinates; getBoundingClientRect is viewport-relative
+    setDropdownPosition({
+      top: shouldPositionAbove
+        ? Math.max(8, rect.top - dropdownHeight)
+        : rect.bottom,
+      right: window.innerWidth - rect.right,
+    });
+    setOpenDropdownId(openDropdownId === itemId ? null : itemId);
+  };
+
+  const renderActionsDropdown = (item: any) => {
+    const itemId = getItemId(item);
+    if (openDropdownId !== itemId || !dropdownPosition) return null;
+
+    return createPortal(
+      <div
+        className="fixed min-w-[180px] w-max bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-2xl py-1"
+        style={{
+          top: `${dropdownPosition.top}px`,
+          right: `${dropdownPosition.right}px`,
+          zIndex: 999999,
+        }}
+        data-dropdown-content
+        onClick={(e) => e.stopPropagation()}
+      >
+        {getVisibleActions(item).map((action) => (
+          <button
+            key={action.key}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              action.onClick(item);
+              setOpenDropdownId(null);
+            }}
+            className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap ${
+              action.variant === "destructive"
+                ? "text-red-600 dark:text-red-400"
+                : action.variant === "outline"
+                  ? "text-blue-600 dark:text-blue-400"
+                  : "text-gray-700 dark:text-gray-300"
+            }`}
+          >
+            {action.icon}
+            {action.label}
+          </button>
+        ))}
+      </div>,
+      document.body,
+    );
+  };
 
   // Render skeleton loading state
   const renderSkeleton = () => (
@@ -499,82 +570,14 @@ export const Table: React.FC<TableProps> = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const button = e.currentTarget;
-                    const rect = button.getBoundingClientRect();
-
-                    // Calculate dropdown height (estimate based on number of actions)
-                    const dropdownHeight =
-                      actions.filter((a) => !a.condition || a.condition(item))
-                        .length *
-                        40 +
-                      16;
-                    const spaceBelow = window.innerHeight - rect.bottom;
-                    const spaceAbove = rect.top;
-
-                    // Position dropdown above if not enough space below
-                    const shouldPositionAbove =
-                      spaceBelow < dropdownHeight &&
-                      spaceAbove > dropdownHeight;
-
-                    setDropdownPosition({
-                      top: shouldPositionAbove
-                        ? rect.top + window.scrollY - dropdownHeight
-                        : rect.bottom + window.scrollY,
-                      right: window.innerWidth - rect.right + window.scrollX,
-                    });
-                    setOpenDropdownId(
-                      openDropdownId === itemId ? null : itemId,
-                    );
-                  }}
+                  onClick={(e) => openActionsMenu(e, item)}
                   className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700"
                   aria-label={__("More actions", "yatra")}
                   data-dropdown-trigger
                 >
                   <MoreVertical className="w-4 h-4" />
                 </Button>
-
-                {openDropdownId === itemId && dropdownPosition && (
-                  <div
-                    className="fixed min-w-[180px] w-max bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-2xl py-1"
-                    style={{
-                      top: `${dropdownPosition.top}px`,
-                      right: `${dropdownPosition.right}px`,
-                      zIndex: 999999,
-                    }}
-                    data-dropdown-content
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {actions
-                      .filter(
-                        (action) => !action.condition || action.condition(item),
-                      )
-                      .map((action) => (
-                        <button
-                          key={action.key}
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            action.onClick(item);
-                            setOpenDropdownId(null);
-                          }}
-                          className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap ${
-                            action.variant === "destructive"
-                              ? "text-red-600 dark:text-red-400"
-                              : action.variant === "outline"
-                                ? "text-blue-600 dark:text-blue-400"
-                                : "text-gray-700 dark:text-gray-300"
-                          }`}
-                        >
-                          {action.icon}
-                          {action.label}
-                        </button>
-                      ))}
-                  </div>
-                )}
+                {renderActionsDropdown(item)}
               </div>
             </TableCell>
           )}
@@ -632,79 +635,14 @@ export const Table: React.FC<TableProps> = ({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const button = e.currentTarget;
-                  const rect = button.getBoundingClientRect();
-
-                  // Calculate dropdown height (estimate based on number of actions)
-                  const dropdownHeight =
-                    actions.filter((a) => !a.condition || a.condition(item))
-                      .length *
-                      40 +
-                    16;
-                  const spaceBelow = window.innerHeight - rect.bottom;
-                  const spaceAbove = rect.top;
-
-                  // Position dropdown above if not enough space below
-                  const shouldPositionAbove =
-                    spaceBelow < dropdownHeight && spaceAbove > dropdownHeight;
-
-                  setDropdownPosition({
-                    top: shouldPositionAbove
-                      ? rect.top + window.scrollY - dropdownHeight
-                      : rect.bottom + window.scrollY,
-                    right: window.innerWidth - rect.right + window.scrollX,
-                  });
-                  setOpenDropdownId(openDropdownId === itemId ? null : itemId);
-                }}
+                onClick={(e) => openActionsMenu(e, item)}
                 className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700"
                 aria-label={__("More actions", "yatra")}
                 data-dropdown-trigger
               >
                 <MoreVertical className="w-4 h-4" />
               </Button>
-
-              {openDropdownId === itemId && dropdownPosition && (
-                <div
-                  className="fixed min-w-[180px] w-max bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-2xl py-1"
-                  style={{
-                    top: `${dropdownPosition.top}px`,
-                    right: `${dropdownPosition.right}px`,
-                    zIndex: 999999,
-                  }}
-                  data-dropdown-content
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {actions
-                    .filter(
-                      (action) => !action.condition || action.condition(item),
-                    )
-                    .map((action) => (
-                      <button
-                        key={action.key}
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          action.onClick(item);
-                          setOpenDropdownId(null);
-                        }}
-                        className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap ${
-                          action.variant === "destructive"
-                            ? "text-red-600 dark:text-red-400"
-                            : action.variant === "outline"
-                              ? "text-blue-600 dark:text-blue-400"
-                              : "text-gray-700 dark:text-gray-300"
-                        }`}
-                      >
-                        {action.icon}
-                        {action.label}
-                      </button>
-                    ))}
-                </div>
-              )}
+              {renderActionsDropdown(item)}
             </div>
           </TableCell>
         )}

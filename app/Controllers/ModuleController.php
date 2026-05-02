@@ -82,10 +82,44 @@ class ModuleController extends BaseController
         }
 
         $modules = ModuleManager::getModules();
-        $exists = array_filter($modules, static fn ($module) => $module['slug'] === $slug);
+        $module_exists = false;
+        $target_module = null;
 
-        if (empty($exists)) {
+        foreach ($modules as $module) {
+            if ($module['slug'] === $slug) {
+                $module_exists = true;
+                $target_module = $module;
+                break;
+            }
+        }
+
+        if (!$module_exists || !$target_module) {
             return $this->error_response(__('Module not found.', 'yatra'), 404);
+        }
+
+        // Check if trying to enable a premium module without Pro
+        if ($enabled && !empty($target_module['is_premium']) && !$target_module['is_available']) {
+            return $this->error_response(
+                sprintf(
+                    __('%s is a premium module. Yatra Pro is required to enable this module.', 'yatra'),
+                    $target_module['name']
+                ),
+                403
+            );
+        }
+
+        // Check if trying to enable a module that requires Pro but Pro is not active
+        if ($enabled && !empty($target_module['requires_pro'])) {
+            $pro_active = apply_filters('yatra_is_pro_active', false);
+            if (!$pro_active) {
+                return $this->error_response(
+                    sprintf(
+                        __('%s requires Yatra Pro. Please install and activate Yatra Pro to enable this module.', 'yatra'),
+                        $target_module['name']
+                    ),
+                    403
+                );
+            }
         }
 
         $updated = ModuleManager::setModuleStatus($slug, (bool) $enabled);
@@ -102,21 +136,75 @@ class ModuleController extends BaseController
             return $this->error_response(__('No module changes supplied.', 'yatra'), 400);
         }
 
+        $modules = ModuleManager::getModules();
+        $module_map = [];
+        foreach ($modules as $module) {
+            $module_map[$module['slug']] = $module;
+        }
+
         $sanitized = [];
+        $blocked_modules = [];
+
         foreach ($items as $item) {
             if (empty($item['slug'])) {
                 continue;
             }
 
+            $slug = sanitize_key($item['slug']);
             $enabled = filter_var($item['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
             if ($enabled === null) {
                 continue;
             }
 
+            // Check if module exists
+            if (!isset($module_map[$slug])) {
+                continue;
+            }
+
+            $target_module = $module_map[$slug];
+
+            // Check if trying to enable a premium module without Pro
+            if ($enabled && !empty($target_module['is_premium']) && !$target_module['is_available']) {
+                $blocked_modules[] = $target_module['name'];
+                continue;
+            }
+
+            // Check if trying to enable a module that requires Pro but Pro is not active
+            if ($enabled && !empty($target_module['requires_pro'])) {
+                $pro_active = apply_filters('yatra_is_pro_active', false);
+                if (!$pro_active) {
+                    $blocked_modules[] = $target_module['name'];
+                    continue;
+                }
+            }
+
             $sanitized[] = [
-                'slug' => sanitize_key($item['slug']),
+                'slug' => $slug,
                 'enabled' => (bool) $enabled,
             ];
+        }
+
+        if (empty($sanitized) && !empty($blocked_modules)) {
+            return $this->error_response(
+                sprintf(
+                    __('The following modules require Yatra Pro: %s', 'yatra'),
+                    implode(', ', $blocked_modules)
+                ),
+                403
+            );
+        }
+
+        if (!empty($blocked_modules)) {
+            // Partial success - some modules processed, some blocked
+            $updated = ModuleManager::setMultipleStatuses($sanitized);
+            
+            return $this->success_response([
+                'data' => $updated,
+                'message' => sprintf(
+                    __('Some modules were skipped because they require Yatra Pro: %s', 'yatra'),
+                    implode(', ', $blocked_modules)
+                ),
+            ]);
         }
 
         if (empty($sanitized)) {

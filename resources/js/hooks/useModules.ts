@@ -182,8 +182,15 @@ export const useBulkToggleModules = () => {
       );
       return Array.isArray(response?.data) ? response.data : [];
     },
-    onSuccess: (data, variables = []) => {
+    onSuccess: (data, variables = [], context) => {
       queryClient.setQueryData(["modules"], data);
+
+      // Check if there's a partial success message (some modules blocked)
+      const response = context as any;
+      if (response?.message) {
+        // Show partial success message with warning
+        showToast(response.message, "warning");
+      }
 
       // Update global admin variables for navigation
       if (window.yatraAdmin && data) {
@@ -251,14 +258,15 @@ export const useBulkToggleModules = () => {
         window.dispatchEvent(new CustomEvent("yatra-force-nav-refresh"));
       }
 
-      if (variables.length > 0) {
+      // Only show success message if there wasn't a partial success message
+      if (!response?.message && variables.length > 0) {
         const names = variables.map((item) => item.name || item.slug);
         const summary = formatNamesList(names);
         const message = variables[0].enabled
           ? __("Enabled: {modules}", "yatra").replace("{modules}", summary)
           : __("Disabled: {modules}", "yatra").replace("{modules}", summary);
         showToast(message, "success");
-      } else {
+      } else if (!response?.message) {
         showToast(__("Modules updated successfully.", "yatra"), "success");
       }
     },
