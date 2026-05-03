@@ -12,9 +12,12 @@ use Yatra\Utils\Cache;
  */
 final class GeocodingRepository
 {
-    public function cacheKeySearch(string $query, int $limit): string
+    /**
+     * @param string $schema Bump when search API parameters change (busts stale cache).
+     */
+    public function cacheKeySearch(string $query, int $limit, string $schema = 'v4'): string
     {
-        return 'yatra_geo_search_' . md5($query . '|' . $limit);
+        return 'yatra_geo_search_' . md5($query . '|' . $limit . '|' . $schema);
     }
 
     public function cacheKeyReverse(float $lat, float $lng): string

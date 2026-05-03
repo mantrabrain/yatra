@@ -84,8 +84,8 @@ const Profile: React.FC<ProfileProps> = ({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-3">
-              <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
-                <User className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+              <div className="p-2 bg-yatra-soft dark:bg-yatra-surface-dark-muted rounded-lg">
+                <User className="w-6 h-6 text-yatra-primary dark:text-yatra-on-dark" />
               </div>
               {__("Profile", "yatra")}
             </h2>
@@ -101,7 +101,7 @@ const Profile: React.FC<ProfileProps> = ({
               role="button"
               tabIndex={0}
               onClick={() => setIsEditing(true)}
-              className="yatra-profile-edit-btn inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer"
+              className="yatra-profile-edit-btn inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium cursor-pointer"
             >
               <PenSquare className="w-4 h-4" /> {__("Edit Profile", "yatra")}
             </div>
@@ -123,7 +123,7 @@ const Profile: React.FC<ProfileProps> = ({
                   type="text"
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
                   placeholder={__("Enter your full name", "yatra")}
                 />
               ) : (
@@ -143,7 +143,7 @@ const Profile: React.FC<ProfileProps> = ({
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
                   placeholder={__("Enter your email address", "yatra")}
                 />
               ) : (
@@ -162,7 +162,7 @@ const Profile: React.FC<ProfileProps> = ({
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => handleInputChange("phone", e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
                   placeholder={__("Enter your phone number", "yatra")}
                 />
               ) : (
@@ -181,7 +181,7 @@ const Profile: React.FC<ProfileProps> = ({
                   type="text"
                   value={formData.city}
                   onChange={(e) => handleInputChange("city", e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
                   placeholder={__("Enter your city", "yatra")}
                 />
               ) : (
@@ -200,7 +200,7 @@ const Profile: React.FC<ProfileProps> = ({
                   value={formData.address}
                   onChange={(e) => handleInputChange("address", e.target.value)}
                   rows={3}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
                   placeholder={__("Enter your address", "yatra")}
                 />
               ) : (
@@ -219,7 +219,7 @@ const Profile: React.FC<ProfileProps> = ({
                   type="text"
                   value={formData.country}
                   onChange={(e) => handleInputChange("country", e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
                   placeholder={__("Enter your country", "yatra")}
                 />
               ) : (
@@ -235,7 +235,7 @@ const Profile: React.FC<ProfileProps> = ({
               <button
                 type="button"
                 onClick={handleSave}
-                className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium"
+                className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium"
               >
                 <CheckCircle className="w-4 h-4" />
                 {__("Save Changes", "yatra")}
@@ -259,7 +259,7 @@ const Profile: React.FC<ProfileProps> = ({
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <ShieldCheck className="w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" />
               {__("Change Password", "yatra")}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -271,7 +271,7 @@ const Profile: React.FC<ProfileProps> = ({
               role="button"
               tabIndex={0}
               onClick={() => setIsChangingPassword(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4" />
               {__("Change Password", "yatra")}
@@ -295,7 +295,7 @@ const Profile: React.FC<ProfileProps> = ({
                     currentPassword: e.target.value,
                   }))
                 }
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
                 placeholder={__("Enter your current password", "yatra")}
               />
             </div>
@@ -314,7 +314,7 @@ const Profile: React.FC<ProfileProps> = ({
                     newPassword: e.target.value,
                   }))
                 }
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
                 placeholder={__("Enter new password", "yatra")}
               />
             </div>
@@ -333,7 +333,7 @@ const Profile: React.FC<ProfileProps> = ({
                     confirmPassword: e.target.value,
                   }))
                 }
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
                 placeholder={__("Confirm your new password", "yatra")}
               />
               {passwordData.newPassword &&
@@ -368,7 +368,7 @@ const Profile: React.FC<ProfileProps> = ({
                   !passwordData.confirmPassword ||
                   passwordData.newPassword !== passwordData.confirmPassword
                 }
-                className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <CheckCircle className="w-4 h-4" />
                 {__("Update Password", "yatra")}
@@ -398,7 +398,7 @@ const Profile: React.FC<ProfileProps> = ({
       <div className="yatra-profile-sections grid gap-6 lg:grid-cols-2">
         <div className="yatra-profile-communication bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
           <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <Mail className="w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" />
             {__("Communication Preferences", "yatra")}
           </h3>
           <div className="yatra-profile-preferences space-y-3 text-sm">
@@ -406,7 +406,7 @@ const Profile: React.FC<ProfileProps> = ({
               <input
                 type="checkbox"
                 defaultChecked
-                className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                className="w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
               />
               <span className="text-gray-700 dark:text-gray-300">
                 {__("Booking reminders", "yatra")}
@@ -416,7 +416,7 @@ const Profile: React.FC<ProfileProps> = ({
               <input
                 type="checkbox"
                 defaultChecked
-                className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                className="w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
               />
               <span className="text-gray-700 dark:text-gray-300">
                 {__("Payment notifications", "yatra")}
@@ -425,7 +425,7 @@ const Profile: React.FC<ProfileProps> = ({
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
-                className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                className="w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
               />
               <span className="text-gray-700 dark:text-gray-300">
                 {__("Promotional offers", "yatra")}
@@ -435,7 +435,7 @@ const Profile: React.FC<ProfileProps> = ({
               <input
                 type="checkbox"
                 defaultChecked
-                className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                className="w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
               />
               <span className="text-gray-700 dark:text-gray-300">
                 {__("Trip updates", "yatra")}

@@ -146,6 +146,10 @@ class DiscountController extends BaseController
      */
     private function getTripGroupDiscounts(int $tripId): array
     {
+        if (!apply_filters('yatra_advanced_discount_enabled', false)) {
+            return [];
+        }
+
         // Discoverability is read-only: list published group tiers for the trip page. Booking/calculation
         // still gates on {@see apply_filters('yatra_advanced_discount_enabled')} inside DiscountService.
         // Discount is a simple DTO model (not Eloquent), so use repository + PHP filtering.

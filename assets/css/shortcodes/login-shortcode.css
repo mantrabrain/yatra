@@ -8,9 +8,9 @@
 
 /* CSS Custom Properties for better maintainability */
 :root {
-    --yatra-login-primary: #3b82f6;
-    --yatra-login-primary-hover: #2563eb;
-    --yatra-login-primary-light: rgba(59, 130, 246, 0.1);
+    --yatra-login-primary: var(--yatra-primary, #3b82f6);
+    --yatra-login-primary-hover: var(--yatra-primary-dark, #2563eb);
+    --yatra-login-primary-light: color-mix(in srgb, var(--yatra-primary, #3b82f6) 12%, transparent);
     --yatra-login-text: #1f2937;
     --yatra-login-text-muted: #6b7280;
     --yatra-login-border: #d1d5db;
@@ -22,7 +22,7 @@
     --yatra-login-error-border: #fecaca;
     --yatra-login-success: #10b981;
     --yatra-login-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    --yatra-login-shadow-hover: 0 2px 8px rgba(59, 130, 246, 0.3);
+    --yatra-login-shadow-hover: 0 2px 8px color-mix(in srgb, var(--yatra-primary, #3b82f6) 28%, transparent);
     --yatra-login-border-radius: 12px;
     --yatra-login-border-radius-sm: 8px;
     --yatra-login-border-radius-xs: 6px;
@@ -341,14 +341,14 @@
 }
 
 .yatra-link {
-    color: #3b82f6;
+    color: var(--yatra-primary, #3b82f6);
     text-decoration: none;
     font-size: 0.875rem;
     transition: color 0.3s ease;
 }
 
 .yatra-link:hover {
-    color: #2563eb;
+    color: var(--yatra-primary-dark, #2563eb);
 }
 
 .yatra-link-bold {

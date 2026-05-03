@@ -10,8 +10,8 @@
    Scope: high specificity (body + block class). box-sizing for predictable layout.
    ------------------------------------------------------------------------- */
 body .yatra-trip-search-shortcode {
-    --yatra-ts-accent: #2563eb;
-    --yatra-ts-accent-hover: #1d4ed8;
+    --yatra-ts-accent: var(--yatra-primary-dark, #2563eb);
+    --yatra-ts-accent-hover: var(--yatra-primary-darker, #1d4ed8);
     --yatra-ts-surface: #ffffff;
     --yatra-ts-text: #0f172a;
     --yatra-ts-muted: #64748b;
@@ -384,7 +384,7 @@ body .yatra-trip-search-shortcode .yatra-dropdown-filter-input::placeholder {
 
 body .yatra-trip-search-shortcode .yatra-dropdown-filter-input:focus {
     outline: none !important;
-    border-color: #3b82f6 !important;
+    border-color: var(--yatra-primary, #3b82f6) !important;
     background: #ffffff !important;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
 }
@@ -469,7 +469,7 @@ body .yatra-trip-search-shortcode .yatra-dropdown-option:hover {
 
 body .yatra-trip-search-shortcode .yatra-dropdown-option.selected {
     background: #eff6ff !important;
-    color: #1d4ed8 !important;
+    color: var(--yatra-primary-darker, #1d4ed8) !important;
     font-weight: 600 !important;
     padding-right: 26px !important;
 }
@@ -538,7 +538,7 @@ body .yatra-trip-search-shortcode .yatra-duration-badge {
     color: #1f2937 !important;
     padding: 4px 8px !important;
     background: #ffffff !important;
-    border: 1px solid #3b82f6 !important;
+    border: 1px solid var(--yatra-primary, #3b82f6) !important;
     border-radius: 4px !important;
 }
 
@@ -571,7 +571,7 @@ body .yatra-trip-search-shortcode .yatra-slider-range {
     height: 6px !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
-    background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%) !important;
+    background: linear-gradient(90deg, var(--yatra-primary, #3b82f6) 0%, var(--yatra-primary-dark, #2563eb) 100%) !important;
     border-radius: 3px !important;
     box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3) !important;
 }
@@ -596,7 +596,7 @@ body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range']::
     height: 20px !important;
     border-radius: 50% !important;
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
-    border: 3px solid #3b82f6 !important;
+    border: 3px solid var(--yatra-primary, #3b82f6) !important;
     cursor: pointer !important;
     pointer-events: all !important;
     z-index: 3 !important;
@@ -608,7 +608,7 @@ body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range']::
     height: 20px !important;
     border-radius: 50% !important;
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
-    border: 3px solid #3b82f6 !important;
+    border: 3px solid var(--yatra-primary, #3b82f6) !important;
     cursor: pointer !important;
     pointer-events: all !important;
     z-index: 3 !important;

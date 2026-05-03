@@ -1,5 +1,5 @@
 import { j as jsxRuntimeExports, i as Calendar, h as FileText, l as Plane, ak as ArrowRight, M as MapPin, U as User, v as ChevronRight, b2 as Sparkles, P as Package, k as CreditCard, bS as LifeBuoy, bB as Bell, b5 as AlertCircle, bh as CheckCircle2, ai as Clock, av as ExternalLink, ah as Users, o as Mail, bj as Phone, aI as Download, r as reactExports, u as useQuery, am as CheckCircle, aj as DollarSign, w as React, aZ as Eye, ax as PenSquare, b6 as XCircle, bT as ShieldCheck, aJ as Heart, L as LayoutDashboard, bU as LogOut, bP as QueryClient, bQ as client, bR as QueryClientProvider } from "./react-vendor-lSVLenth.js";
-import { g as getCurrencySymbol, c as getCurrency, _ as __, s as sprintf, a as apiClient, A as API_ENDPOINTS, u as useToast, T as ToastProvider } from "./index-BUTTH9Ac.js";
+import { f as formatYatraMoney, _ as __, h as applyCurrencyPosition, s as sprintf, a as apiClient, A as API_ENDPOINTS, u as useToast, T as ToastProvider } from "./index-D9-qO82a.js";
 const formatDate = (value) => {
   if (!value) {
     return __("N/A", "yatra");
@@ -58,7 +58,7 @@ const getBadge = (status) => {
     case "cancelled":
       return `${base} bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300`;
     default:
-      return `${base} bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300`;
+      return `${base} bg-yatra-chip-bg text-yatra-primary-darker dark:bg-yatra-surface-dark dark:text-yatra-primary-light`;
   }
 };
 function readPriceConfig() {
@@ -76,7 +76,7 @@ function readPriceConfig() {
   const p = w.yatraAccountPage || {};
   return {
     globalCurrency: a.currency || p.currency || "USD",
-    currencyPosition: a.currencyPosition || p.currencyPosition || "before",
+    currencyPosition: a.currencyPosition || a.currency_position || p.currencyPosition || p.currency_position || "before",
     decimalPlaces: Number(a.decimalPlaces ?? p.decimalPlaces ?? 2) || 2,
     thousandSeparator: a.thousandSeparator || p.thousandSeparator || ",",
     decimalSeparator: a.decimalSeparator || p.decimalSeparator || "."
@@ -101,10 +101,11 @@ const formatPrice = (price) => {
     style: "currency",
     currency: globalCurrency
   }).format(0).replace(/[\d\s.,]/g, "").trim();
-  if (currencyPosition === "right" || currencyPosition === "after") {
-    return `${formattedAmount}${currencySymbol}`;
-  }
-  return `${currencySymbol}${formattedAmount}`;
+  return applyCurrencyPosition(
+    formattedAmount,
+    currencySymbol,
+    currencyPosition
+  );
 };
 const formatPriceForBooking = (price, currency2) => {
   const cfg = readPriceConfig();
@@ -125,21 +126,13 @@ const formatPriceForBooking = (price, currency2) => {
     style: "currency",
     currency: currencyToUse
   }).format(0).replace(/[\d\s.,]/g, "").trim();
-  if (currencyPosition === "right" || currencyPosition === "after") {
-    return `${formattedAmount}${currencySymbol}`;
-  }
-  return `${currencySymbol}${formattedAmount}`;
+  return applyCurrencyPosition(
+    formattedAmount,
+    currencySymbol,
+    currencyPosition
+  );
 };
-const currency = (value, currencyCode = "USD") => {
-  const symbol = getCurrencySymbol(currencyCode);
-  const currencyData = getCurrency(currencyCode);
-  const decimals = (currencyData == null ? void 0 : currencyData.decimalDigits) ?? 2;
-  const formatted = new Intl.NumberFormat(void 0, {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
-  }).format(value);
-  return `${symbol}${formatted}`;
-};
+const currency = (value, currencyCode = "USD") => formatYatraMoney(Number(value) || 0, currencyCode, { zeroAsUnknown: false });
 function getYatraAccountPageGlobals() {
   if (typeof window === "undefined") {
     return {
@@ -186,9 +179,9 @@ const Dashboard = ({
   const enhancedStats = [
     {
       ...stats[0],
-      gradient: "from-blue-500 to-blue-600",
-      bgColor: "bg-blue-50 dark:bg-blue-900/20",
-      iconColor: "text-blue-600 dark:text-blue-400"
+      gradient: "from-yatra-primary to-yatra-primary-dark",
+      bgColor: "bg-yatra-soft dark:bg-yatra-surface-dark-muted",
+      iconColor: "text-yatra-primary dark:text-yatra-on-dark"
     },
     {
       ...stats[1],
@@ -215,7 +208,7 @@ const Dashboard = ({
       {
         className: "yatra-dashboard-welcome relative overflow-hidden rounded-2xl p-8 shadow-xl",
         style: {
-          background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #4f46e5 100%)",
+          background: "linear-gradient(135deg, var(--yatra-primary, #3b82f6) 0%, var(--yatra-primary-dark, #2563eb) 45%, var(--yatra-primary-darker, #1e40af) 100%)",
           color: "#ffffff"
         },
         children: [
@@ -234,7 +227,7 @@ const Dashboard = ({
                   ]
                 }
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm mb-4", style: { color: "#e0e7ff" }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm mb-4 text-white/90", children: [
                 __("You have", "yatra"),
                 " ",
                 upcomingBookings.length,
@@ -319,7 +312,7 @@ const Dashboard = ({
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between mb-4", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `p-3 rounded-lg ${stat.bgColor}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(stat.icon, { className: `w-6 h-6 ${stat.iconColor}` }) }),
-              stat.badge && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200 font-medium", children: stat.badge })
+              stat.badge && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex text-xs px-2 py-1 rounded-full bg-yatra-chip-bg text-yatra-primary-dark dark:bg-yatra-surface-dark dark:text-yatra-primary-light font-medium", children: stat.badge })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mb-1", children: stat.label }),
@@ -352,7 +345,7 @@ const Dashboard = ({
               role: "button",
               tabIndex: 0,
               onClick: () => onSectionChange("bookings"),
-              className: "text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium flex items-center gap-1 transition-colors cursor-pointer",
+              className: "text-sm text-yatra-primary dark:text-yatra-on-dark hover:text-yatra-primary-dark dark:hover:text-yatra-primary-light font-medium flex items-center gap-1 transition-colors cursor-pointer",
               children: [
                 __("View all", "yatra"),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { className: "w-4 h-4" })
@@ -363,12 +356,12 @@ const Dashboard = ({
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6", children: upcomingBookings.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: upcomingBookings.map((booking) => /* @__PURE__ */ jsxRuntimeExports.jsx(
           "div",
           {
-            className: "yatra-booking-card yatra-booking-card-upcoming group relative border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all cursor-pointer bg-gradient-to-r from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-800/50",
+            className: "yatra-booking-card yatra-booking-card-upcoming group relative border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:shadow-md transition-all cursor-pointer bg-gradient-to-r from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-800/50",
             children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-6 h-6 text-white" }) }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-12 h-12 bg-gradient-to-br from-yatra-primary to-yatra-primary-darker rounded-lg flex items-center justify-center shadow-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-6 h-6 text-white" }) }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-2 mb-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors", children: booking.trip_title }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark transition-colors", children: booking.trip_title }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.booking_status), children: __(booking.booking_status, booking.booking_status) })
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2", children: [
@@ -391,7 +384,7 @@ const Dashboard = ({
                   ] })
                 ] })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors flex-shrink-0" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark transition-colors flex-shrink-0" })
             ] })
           },
           booking.id
@@ -414,13 +407,13 @@ const Dashboard = ({
                 role: "button",
                 tabIndex: 0,
                 onClick: () => onSectionChange("bookings"),
-                className: "w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm",
+                className: "w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:bg-yatra-hover-soft dark:hover:bg-yatra-hover-soft-dark transition-all group cursor-pointer text-sm",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Package, { className: "w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400", children: __("View Bookings", "yatra") })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Package, { className: "w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-700 dark:text-gray-300 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark", children: __("View Bookings", "yatra") })
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" })
                 ]
               }
             ),
@@ -430,13 +423,13 @@ const Dashboard = ({
                 role: "button",
                 tabIndex: 0,
                 onClick: () => onSectionChange("payments"),
-                className: "w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm",
+                className: "w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:bg-yatra-hover-soft dark:hover:bg-yatra-hover-soft-dark transition-all group cursor-pointer text-sm",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(CreditCard, { className: "w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400", children: __("Make Payment", "yatra") })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(CreditCard, { className: "w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-700 dark:text-gray-300 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark", children: __("Make Payment", "yatra") })
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" })
                 ]
               }
             ),
@@ -446,13 +439,13 @@ const Dashboard = ({
                 role: "button",
                 tabIndex: 0,
                 onClick: () => onSectionChange("documents"),
-                className: "w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm",
+                className: "w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:bg-yatra-hover-soft dark:hover:bg-yatra-hover-soft-dark transition-all group cursor-pointer text-sm",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400", children: __("My Documents", "yatra") })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-700 dark:text-gray-300 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark", children: __("My Documents", "yatra") })
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" })
                 ]
               }
             ),
@@ -460,26 +453,26 @@ const Dashboard = ({
               "a",
               {
                 href: conciergeTel,
-                className: "w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm no-underline text-inherit",
+                className: "w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:bg-yatra-hover-soft dark:hover:bg-yatra-hover-soft-dark transition-all group cursor-pointer text-sm no-underline text-inherit",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(LifeBuoy, { className: "w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400", children: __("Call us", "yatra") })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(LifeBuoy, { className: "w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-700 dark:text-gray-300 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark", children: __("Call us", "yatra") })
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" })
                 ]
               }
             ) : conciergeMail ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "a",
               {
                 href: `mailto:${encodeURIComponent(conciergeMail)}`,
-                className: "w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm no-underline text-inherit",
+                className: "w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:bg-yatra-hover-soft dark:hover:bg-yatra-hover-soft-dark transition-all group cursor-pointer text-sm no-underline text-inherit",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(LifeBuoy, { className: "w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400", children: __("Email us", "yatra") })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(LifeBuoy, { className: "w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-700 dark:text-gray-300 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark", children: __("Email us", "yatra") })
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" })
                 ]
               }
             ) : null
@@ -496,9 +489,9 @@ const Dashboard = ({
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6 space-y-3", children: displayNotifications.length > 0 ? displayNotifications.map((notif) => /* @__PURE__ */ jsxRuntimeExports.jsx(
             "div",
             {
-              className: `p-4 rounded-lg border ${notif.type === "warning" ? "bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800" : "bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800"}`,
+              className: `p-4 rounded-lg border ${notif.type === "warning" ? "bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800" : "bg-yatra-soft dark:bg-yatra-hover-soft-dark border-yatra-border-subtle dark:border-yatra-border-dark"}`,
               children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-                notif.type === "warning" ? /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle2, { className: "w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" }),
+                notif.type === "warning" ? /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle2, { className: "w-5 h-5 text-yatra-primary dark:text-yatra-on-dark flex-shrink-0 mt-0.5" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-semibold text-sm text-gray-900 dark:text-white mb-1", children: notif.title }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 dark:text-gray-400 leading-relaxed", children: notif.message })
@@ -515,7 +508,7 @@ const Dashboard = ({
     ] }),
     (recentBookings.length > 0 || pendingPayments.length > 0) && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-dashboard-recent-activity bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "yatra-dashboard-recent-activity-header p-6 border-b border-gray-100 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-5 h-5 text-indigo-600 dark:text-indigo-400" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-yatra-soft dark:bg-yatra-surface-dark-muted rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-gray-900 dark:text-white", children: __("Recent Activity", "yatra") }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("Your latest updates", "yatra") })
@@ -527,7 +520,7 @@ const Dashboard = ({
           {
             className: "flex items-center gap-4 pb-4 border-b border-gray-100 dark:border-gray-700 last:border-0 last:pb-0",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle2, { className: "w-5 h-5 text-blue-600 dark:text-blue-400" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 bg-yatra-chip-bg dark:bg-yatra-surface-dark rounded-full flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle2, { className: "w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm font-medium text-gray-900 dark:text-white", children: [
                   __("Booking confirmed:", "yatra"),
@@ -1024,7 +1017,7 @@ const BookingDetails = ({
                 "a",
                 {
                   href: booking.trip_url,
-                  className: "mt-2 inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline",
+                  className: "mt-2 inline-flex items-center gap-2 text-sm text-yatra-primary dark:text-yatra-on-dark hover:underline",
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-4 h-4" }),
                     __("View Trip", "yatra")
@@ -1249,7 +1242,7 @@ const BookingDetails = ({
             return /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "div",
               {
-                className: `p-4 rounded-lg ${index === 0 ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800" : "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"}`,
+                className: `p-4 rounded-lg ${index === 0 ? "bg-yatra-soft dark:bg-yatra-surface-dark-muted border border-yatra-border-subtle dark:border-yatra-border-dark" : "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"}`,
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: [
@@ -1260,7 +1253,7 @@ const BookingDetails = ({
                         [firstName, lastName].filter(Boolean).join(" ")
                       ] })
                     ] }),
-                    index === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded", children: __("Primary Contact", "yatra") })
+                    index === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-yatra-chip-bg text-yatra-primary-dark dark:bg-yatra-surface-dark dark:text-yatra-primary-light px-2 py-0.5 rounded", children: __("Primary Contact", "yatra") })
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 md:grid-cols-3 gap-3", children: travelerEntries.map(([fieldId, fieldValue]) => {
                     if (fieldId === "first_name" || fieldId === "last_name")
@@ -1342,7 +1335,7 @@ const BookingDetails = ({
                     href: d.url,
                     target: "_blank",
                     rel: "noreferrer",
-                    className: "inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium",
+                    className: "inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium",
                     children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-4 h-4" }),
                       __("Download", "yatra")
@@ -1537,7 +1530,7 @@ const Bookings = ({
             placeholder: __("Search bookings...", "yatra"),
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "w-full lg:w-64 pl-4 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className: "w-full lg:w-64 pl-4 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
           }
         ) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -1547,7 +1540,7 @@ const Bookings = ({
             onChange: (e) => setBookingFilter(
               e.target.value
             ),
-            className: "appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 pr-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer",
+            className: "appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 pr-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-yatra-primary focus:border-transparent cursor-pointer",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Bookings", "yatra") }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "upcoming", children: __("Upcoming", "yatra") }),
@@ -1564,7 +1557,7 @@ const Bookings = ({
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Total Bookings", "yatra") }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl font-bold text-gray-900 dark:text-white", children: bookingStats.total })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Package, { className: "w-5 h-5 text-blue-600 dark:text-blue-400" }) })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-yatra-soft dark:bg-yatra-surface-dark-muted rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Package, { className: "w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" }) })
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 min-w-0 flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -1680,7 +1673,7 @@ const Bookings = ({
                   role: "button",
                   tabIndex: 0,
                   onClick: () => handleBookingSelect(bookingId),
-                  className: "yatra-booking-action yatra-booking-action-view inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer",
+                  className: "yatra-booking-action yatra-booking-action-view inline-flex items-center px-4 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium cursor-pointer",
                   children: __("View Details", "yatra")
                 }
               ),
@@ -1844,7 +1837,7 @@ const Payments = ({ payments, onSectionChange }) => {
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Total Payments", "yatra") }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl font-bold text-gray-900 dark:text-white", children: paymentStats.total })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CreditCard, { className: "w-5 h-5 text-blue-600 dark:text-blue-400" }) })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-yatra-soft dark:bg-yatra-surface-dark-muted rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CreditCard, { className: "w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" }) })
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "yatra-payment-stat-card bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -1921,7 +1914,7 @@ const Payments = ({ payments, onSectionChange }) => {
               ] }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-2 items-start", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(payment.status), children: __(payment.status, payment.status) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-3 py-1 rounded-lg text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 capitalize", children: paymentTypeLabel(payment.type) })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-3 py-1 rounded-lg text-xs font-medium bg-yatra-soft dark:bg-yatra-surface-dark-muted text-yatra-primary-dark dark:text-yatra-primary-light capitalize", children: paymentTypeLabel(payment.type) })
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-payment-details grid grid-cols-2 md:grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg mb-4", children: [
@@ -1983,7 +1976,10 @@ const Payments = ({ payments, onSectionChange }) => {
                     }
                   },
                   className: "yatra-payment-action yatra-payment-action-receipt inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium",
-                  style: { backgroundColor: "#2563eb", color: "#ffffff" },
+                  style: {
+                    backgroundColor: "var(--yatra-primary-dark, #2563eb)",
+                    color: "#ffffff"
+                  },
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-4 h-4" }),
                     __("View Receipt", "yatra")
@@ -2102,7 +2098,7 @@ const Documents = ({ documents }) => {
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-documents-stats flex flex-nowrap gap-6 overflow-x-auto", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0 yatra-document-stat-card bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-6 min-w-0 flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Itinerary", "yatra") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl font-bold text-blue-600 dark:text-blue-400", children: documentsByCategory.itinerary.length })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl font-bold text-yatra-primary dark:text-yatra-on-dark", children: documentsByCategory.itinerary.length })
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0 yatra-document-stat-card bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-6 min-w-0 flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Voucher", "yatra") }),
@@ -2181,7 +2177,7 @@ const Documents = ({ documents }) => {
                     );
                   }
                 },
-                className: "yatra-document-action yatra-document-action-download inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium",
+                className: "yatra-document-action yatra-document-action-download inline-flex items-center px-4 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium",
                 children: __("Download", "yatra")
               }
             ),
@@ -2264,7 +2260,7 @@ const Profile = ({
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "yatra-profile-header bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-lg font-bold text-gray-900 dark:text-white flex items-center gap-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-6 h-6 text-indigo-600 dark:text-indigo-400" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-yatra-soft dark:bg-yatra-surface-dark-muted rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-6 h-6 text-yatra-primary dark:text-yatra-on-dark" }) }),
           __("Profile", "yatra")
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-2", children: __(
@@ -2278,7 +2274,7 @@ const Profile = ({
           role: "button",
           tabIndex: 0,
           onClick: () => setIsEditing(true),
-          className: "yatra-profile-edit-btn inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer",
+          className: "yatra-profile-edit-btn inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium cursor-pointer",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
             " ",
@@ -2301,7 +2297,7 @@ const Profile = ({
               type: "text",
               value: formData.name,
               onChange: (e) => handleInputChange("name", e.target.value),
-              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent",
               placeholder: __("Enter your full name", "yatra")
             }
           ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.name || __("Not set", "yatra") })
@@ -2318,7 +2314,7 @@ const Profile = ({
               type: "email",
               value: formData.email,
               onChange: (e) => handleInputChange("email", e.target.value),
-              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent",
               placeholder: __("Enter your email address", "yatra")
             }
           ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.email || __("Not set", "yatra") })
@@ -2331,7 +2327,7 @@ const Profile = ({
               type: "tel",
               value: formData.phone,
               onChange: (e) => handleInputChange("phone", e.target.value),
-              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent",
               placeholder: __("Enter your phone number", "yatra")
             }
           ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.phone || __("Not set", "yatra") })
@@ -2344,7 +2340,7 @@ const Profile = ({
               type: "text",
               value: formData.city,
               onChange: (e) => handleInputChange("city", e.target.value),
-              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent",
               placeholder: __("Enter your city", "yatra")
             }
           ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.city || __("Not set", "yatra") })
@@ -2357,7 +2353,7 @@ const Profile = ({
               value: formData.address,
               onChange: (e) => handleInputChange("address", e.target.value),
               rows: 3,
-              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent",
               placeholder: __("Enter your address", "yatra")
             }
           ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.address || __("Not set", "yatra") })
@@ -2370,7 +2366,7 @@ const Profile = ({
               type: "text",
               value: formData.country,
               onChange: (e) => handleInputChange("country", e.target.value),
-              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent",
               placeholder: __("Enter your country", "yatra")
             }
           ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.country || __("Not set", "yatra") })
@@ -2382,7 +2378,7 @@ const Profile = ({
           {
             type: "button",
             onClick: handleSave,
-            className: "inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium",
+            className: "inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4" }),
               __("Save Changes", "yatra")
@@ -2408,7 +2404,7 @@ const Profile = ({
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-6", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ShieldCheck, { className: "w-5 h-5 text-blue-600 dark:text-blue-400" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ShieldCheck, { className: "w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" }),
             __("Change Password", "yatra")
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: __("Update your password to keep your account secure.", "yatra") })
@@ -2419,7 +2415,7 @@ const Profile = ({
             role: "button",
             tabIndex: 0,
             onClick: () => setIsChangingPassword(true),
-            className: "inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer",
+            className: "inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium cursor-pointer",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ShieldCheck, { className: "w-4 h-4" }),
               __("Change Password", "yatra")
@@ -2443,7 +2439,7 @@ const Profile = ({
                 ...prev,
                 currentPassword: e.target.value
               })),
-              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent",
               placeholder: __("Enter your current password", "yatra")
             }
           )
@@ -2463,7 +2459,7 @@ const Profile = ({
                 ...prev,
                 newPassword: e.target.value
               })),
-              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent",
               placeholder: __("Enter new password", "yatra")
             }
           )
@@ -2483,7 +2479,7 @@ const Profile = ({
                 ...prev,
                 confirmPassword: e.target.value
               })),
-              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent",
               placeholder: __("Confirm your new password", "yatra")
             }
           ),
@@ -2506,7 +2502,7 @@ const Profile = ({
                 });
               },
               disabled: !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword || passwordData.newPassword !== passwordData.confirmPassword,
-              className: "inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed",
+              className: "inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed",
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4" }),
                 __("Update Password", "yatra")
@@ -2539,7 +2535,7 @@ const Profile = ({
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-sections grid gap-6 lg:grid-cols-2", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-communication bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-5 h-5 text-blue-600 dark:text-blue-400" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" }),
           __("Communication Preferences", "yatra")
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-preferences space-y-3 text-sm", children: [
@@ -2549,7 +2545,7 @@ const Profile = ({
               {
                 type: "checkbox",
                 defaultChecked: true,
-                className: "w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                className: "w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-700 dark:text-gray-300", children: __("Booking reminders", "yatra") })
@@ -2560,7 +2556,7 @@ const Profile = ({
               {
                 type: "checkbox",
                 defaultChecked: true,
-                className: "w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                className: "w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-700 dark:text-gray-300", children: __("Payment notifications", "yatra") })
@@ -2570,7 +2566,7 @@ const Profile = ({
               "input",
               {
                 type: "checkbox",
-                className: "w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                className: "w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-700 dark:text-gray-300", children: __("Promotional offers", "yatra") })
@@ -2581,7 +2577,7 @@ const Profile = ({
               {
                 type: "checkbox",
                 defaultChecked: true,
-                className: "w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                className: "w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-700 dark:text-gray-300", children: __("Trip updates", "yatra") })
@@ -2655,7 +2651,7 @@ const SavedTrips = ({ savedTrips, isLoading }) => {
         "a",
         {
           href: "/trip/",
-          className: "inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors",
+          className: "inline-flex items-center gap-2 px-4 py-2 bg-yatra-primary text-white rounded-lg hover:bg-yatra-primary-dark transition-colors",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-4 h-4" }),
             __("Browse Trips", "yatra")
@@ -2732,7 +2728,7 @@ const SavedTrips = ({ savedTrips, isLoading }) => {
                 "a",
                 {
                   href: tripUrl,
-                  className: "text-blue-700 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300 focus-visible:outline focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm",
+                  className: "text-yatra-primary-dark hover:text-yatra-primary-darker hover:underline dark:text-yatra-on-dark dark:hover:text-yatra-primary-light focus-visible:outline focus-visible:ring-2 focus-visible:ring-yatra-primary focus-visible:ring-offset-2 rounded-sm",
                   children: trip.trip_title
                 }
               ) }),
@@ -2778,14 +2774,14 @@ const SavedTrips = ({ savedTrips, isLoading }) => {
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-trip-price flex min-w-0 flex-col items-start gap-1 text-left", children: [
                   hasDiscount && originalPrice && originalPrice > displayPrice && !trip.is_traveler_based && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "yatra-original-price text-sm text-gray-500 line-through", children: formatPrice(originalPrice) }),
                   trip.is_traveler_based ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "yatra-starting-from text-xs font-normal leading-tight text-gray-500 dark:text-gray-400", children: __("Starting from", "yatra") }) : null,
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "yatra-current-price text-xl font-bold leading-none text-blue-600 tabular-nums dark:text-blue-400", children: formatPrice(displayPrice) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "yatra-current-price text-xl font-bold leading-none text-yatra-primary tabular-nums dark:text-yatra-on-dark", children: formatPrice(displayPrice) }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "yatra-price-note text-xs leading-tight text-gray-400 dark:text-gray-500", children: __("Per person", "yatra") })
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   "a",
                   {
                     href: tripUrl,
-                    className: "yatra-card-view-btn inline-flex shrink-0 items-center justify-center self-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white no-underline transition-colors hover:bg-blue-700",
+                    className: "yatra-card-view-btn inline-flex shrink-0 items-center justify-center self-center rounded-lg bg-yatra-primary px-4 py-2 text-sm font-medium text-white no-underline transition-colors hover:bg-yatra-primary-dark",
                     children: __("View Details", "yatra")
                   }
                 )
@@ -3098,7 +3094,7 @@ const AccountPage = () => {
         return null;
     }
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "min-h-screen bg-gray-50 dark:bg-gray-900 py-10 pb-16 px-4 sm:px-6 lg:px-8", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-7xl mx-auto space-y-6 pb-8", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "min-h-screen bg-gray-50 dark:bg-gray-900 py-10 pb-16 px-4 sm:px-6 lg:px-8", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full max-w-[var(--yatra-container-max-width,80rem)] mx-auto space-y-6 pb-8", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-800 rounded-xl shadow-sm p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: (displayProfile == null ? void 0 : displayProfile.registered_at) ? formatDate(displayProfile.registered_at) : "" }),
@@ -3149,7 +3145,7 @@ const AccountPage = () => {
             role: "button",
             tabIndex: 0,
             onClick: () => handleSectionChange(item.id),
-            className: `yatra-nav-item yatra-nav-item-${item.id} w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition cursor-pointer ${section === item.id ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200" : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900/40"}`,
+            className: `yatra-nav-item yatra-nav-item-${item.id} w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition cursor-pointer ${section === item.id ? "bg-yatra-soft text-yatra-primary-dark dark:bg-yatra-surface-dark dark:text-yatra-primary-light" : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900/40"}`,
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(item.icon, { className: "w-4 h-4" }),
               item.label
@@ -3160,10 +3156,9 @@ const AccountPage = () => {
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "div",
           {
-            className: "bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl p-6 text-white space-y-2 shadow-xl",
+            className: "rounded-xl p-6 text-white space-y-2 shadow-xl",
             style: {
-              backgroundColor: "#2563eb",
-              backgroundImage: "linear-gradient(to bottom right, #2563eb, #4f46e5)"
+              backgroundImage: "linear-gradient(to bottom right, var(--yatra-primary-dark, #2563eb), var(--yatra-primary-darker, #1e40af))"
             },
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ShieldCheck, { className: "w-6 h-6 text-white" }),

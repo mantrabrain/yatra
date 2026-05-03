@@ -272,20 +272,24 @@ class CurrencyHelper
      */
     public static function format(float $amount, string $code = 'USD', bool $showCode = false): string
     {
-        $code = strtoupper($code);
-        $currency = self::CURRENCIES[$code] ?? null;
-        
-        if (!$currency) {
-            return number_format($amount, 2) . ' ' . $code;
+        if (function_exists('yatra_format_price')) {
+            $result = yatra_format_price($amount, $code, false);
+        } else {
+            $code = strtoupper($code);
+            $currency = self::CURRENCIES[$code] ?? null;
+
+            if (!$currency) {
+                return number_format($amount, 2) . ' ' . $code;
+            }
+
+            $formatted = number_format($amount, $currency['decimal_digits']);
+            $result = $currency['symbol'] . $formatted;
         }
-        
-        $formatted = number_format($amount, $currency['decimal_digits']);
-        $result = $currency['symbol'] . $formatted;
-        
+
         if ($showCode) {
-            $result .= ' ' . $code;
+            $result .= ' ' . strtoupper($code);
         }
-        
+
         return $result;
     }
 

@@ -37,6 +37,11 @@
     --yatra-primary: #3b82f6;
     --yatra-primary-dark: #2563eb;
     --yatra-primary-light: #60a5fa;
+    --yatra-primary-darker: #1e40af;
+    --yatra-primary-color: var(--yatra-primary);
+    --yatra-primary-light-soft: #eff6ff;
+    --yatra-primary-color-dark: #60a5fa;
+    --yatra-primary-light-dark: #1e3a8a;
     
     --yatra-success: #10b981;
     --yatra-warning: #f59e0b;
@@ -483,5 +488,79 @@
     .yatra-sticky-nav-price-amount {
         font-size: 16px;
     }
+}
+
+/* ============================================
+   SHORTCODES & BLOCK FRONTEND — content width
+   (--yatra-container-max-width from :root; theme.json / $content_width via PHP when set)
+   ============================================ */
+.yatra-tour-shortcode,
+.yatra-destination-shortcode,
+.yatra-activity-shortcode,
+.yatra-discount-shortcode,
+.yatra-search-shortcode,
+.yatra-login-shortcode,
+.yatra-my-account-login {
+    width: 100%;
+    max-width: var(--yatra-container-max-width, 1300px);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--yatra-container-padding);
+    padding-right: var(--yatra-container-padding);
+    box-sizing: border-box;
+}
+
+/* React account (standalone route + [yatra_my_account]): inner grid uses horizontal padding; width only here */
+.yatra-account-react-root {
+    width: 100%;
+    max-width: var(--yatra-container-max-width, 1300px);
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
+/* ============================================
+   LEGACY ARCHIVE — .yatra-page-wrapper pagination
+   ============================================ */
+.yatra-page-wrapper .pagination a.page-numbers,
+.yatra-page-wrapper .pagination span.page-numbers {
+    border-color: var(--yatra-border-color, #e5e7eb);
+    color: var(--yatra-text-primary, #374151);
+    text-decoration: none;
+}
+
+.yatra-page-wrapper .pagination a.page-numbers:hover,
+.yatra-page-wrapper .pagination span.page-numbers.current {
+    border-color: var(--yatra-primary, #3b82f6);
+    background: var(--yatra-primary, #3b82f6);
+    color: #fff;
+}
+
+.yatra-page-wrapper .pagination a.page-numbers:hover {
+    background: var(--yatra-primary-dark, #2563eb);
+    border-color: var(--yatra-primary-dark, #2563eb);
+}
+
+/* Paginate links (templates/parts/pagination.php — nav.yatra-pagination) */
+.yatra-pagination-wrap nav .page-numbers,
+nav.yatra-pagination .page-numbers {
+    border-color: var(--yatra-border-color, #e5e7eb);
+    color: var(--yatra-text-primary, #374151);
+    text-decoration: none;
+}
+
+.yatra-pagination-wrap nav a.page-numbers:hover,
+nav.yatra-pagination a.page-numbers:hover,
+.yatra-pagination-wrap nav span.page-numbers.current,
+nav.yatra-pagination span.page-numbers.current {
+    border-color: var(--yatra-primary, #3b82f6);
+    background: var(--yatra-primary, #3b82f6);
+    color: #fff;
+}
+
+.yatra-pagination-wrap nav a.page-numbers:hover,
+nav.yatra-pagination a.page-numbers:hover {
+    background: var(--yatra-primary-dark, #2563eb);
+    border-color: var(--yatra-primary-dark, #2563eb);
 }
 

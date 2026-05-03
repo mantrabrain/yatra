@@ -918,7 +918,7 @@ class DiscountService extends BaseService
                 $totalDiscountAmount = 0;
                 $appliedCategories = [];
                 
-                $categoryDiscounts = is_array($discount->category_discounts) ? $discount->category_discounts : unserialize($discount->category_discounts);
+                $categoryDiscounts = $this->decodeStoredList($discount->category_discounts ?? null);
                 foreach ($categoryDiscounts as $catDiscount) {
                     $catDiscount = (object) $catDiscount;
                     $categoryId = $catDiscount->traveler_category_id ?? null;
@@ -930,7 +930,7 @@ class DiscountService extends BaseService
                     
                     // Check if this category's count falls within any range
                     if (!empty($catDiscount->ranges)) {
-                        $ranges = is_array($catDiscount->ranges) ? $catDiscount->ranges : unserialize($catDiscount->ranges);
+                        $ranges = $this->decodeStoredList($catDiscount->ranges ?? null);
                         foreach ($ranges as $range) {
                             $range = (object) $range;
                             $minSize = (int) ($range->min_group_size ?? 0);
@@ -990,7 +990,7 @@ class DiscountService extends BaseService
             }
             // Total-based discounts: check total travelers and apply to total
             elseif (!empty($discount->group_discount_ranges)) {
-                $groupDiscountRanges = is_array($discount->group_discount_ranges) ? $discount->group_discount_ranges : unserialize($discount->group_discount_ranges);
+                $groupDiscountRanges = $this->decodeStoredList($discount->group_discount_ranges ?? null);
                 foreach ($groupDiscountRanges as $range) {
                     $range = (object) $range;
                     $minSize = (int) ($range->min_group_size ?? 0);
@@ -1140,6 +1140,44 @@ class DiscountService extends BaseService
         ];
     }
     
+    /**
+     * Decode list-shaped discount DB fields: JSON (current storage), array, or legacy PHP serialized.
+     *
+     * @param mixed $raw
+     * @return array<int|string, mixed>
+     */
+    private function decodeStoredList($raw): array
+    {
+        if ($raw === null || $raw === '') {
+            return [];
+        }
+        if (is_array($raw)) {
+            return $raw;
+        }
+        if (is_object($raw)) {
+            $asArray = json_decode(wp_json_encode($raw), true);
+
+            return is_array($asArray) ? $asArray : [];
+        }
+        if (!is_string($raw)) {
+            return [];
+        }
+        $trimmed = trim($raw);
+        if ($trimmed === '') {
+            return [];
+        }
+        $first = $trimmed[0];
+        if ($first === '[' || $first === '{') {
+            $decoded = json_decode($trimmed, true);
+
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        $maybe = maybe_unserialize($trimmed);
+
+        return is_array($maybe) ? $maybe : [];
+    }
+
     /**
      * Validate coupon for booking
      * 

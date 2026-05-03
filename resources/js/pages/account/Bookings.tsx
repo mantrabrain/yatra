@@ -215,7 +215,7 @@ const Bookings: React.FC<BookingsProps> = ({
                 placeholder={__("Search bookings...", "yatra")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full lg:w-64 pl-4 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full lg:w-64 pl-4 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
               />
             </div>
             {/* Filter Dropdown */}
@@ -231,7 +231,7 @@ const Bookings: React.FC<BookingsProps> = ({
                       | "completed",
                   )
                 }
-                className="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 pr-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+                className="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 pr-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-yatra-primary focus:border-transparent cursor-pointer"
               >
                 <option value="all">{__("All Bookings", "yatra")}</option>
                 <option value="upcoming">{__("Upcoming", "yatra")}</option>
@@ -255,8 +255,8 @@ const Bookings: React.FC<BookingsProps> = ({
                 {bookingStats.total}
               </p>
             </div>
-            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 bg-yatra-soft dark:bg-yatra-surface-dark-muted rounded-lg">
+              <Package className="w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" />
             </div>
           </div>
         </div>
@@ -464,7 +464,7 @@ const Bookings: React.FC<BookingsProps> = ({
                       role="button"
                       tabIndex={0}
                       onClick={() => handleBookingSelect(bookingId)}
-                      className="yatra-booking-action yatra-booking-action-view inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer"
+                      className="yatra-booking-action yatra-booking-action-view inline-flex items-center px-4 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium cursor-pointer"
                     >
                       {__("View Details", "yatra")}
                     </div>

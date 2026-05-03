@@ -14,13 +14,9 @@ if (!defined('ABSPATH')) {
 
 // Expected variables: $trip, $has_availability, $has_traveler_pricing, $base_price, $pricing_type
 
-// Determine if this is a multi-day trip
-$is_multi_day = ($trip->getDurationDays() ?? 1) > 1;
-
-// Group discounts: same REST-backed payload as desktop booking card (for pricing JS + popover)
+// Group discounts: same REST-backed payload as desktop booking card (popover)
 $sidebar_has_group_discounts = false;
 $sidebar_group_discount_cards = [];
-$sidebar_group_discounts_for_js = [];
 if (function_exists('yatra_single_trip_get_group_discounts')) {
     $gd = yatra_single_trip_get_group_discounts((int) $trip->getId());
     $sidebar_has_group_discounts = !empty($gd['has_group_discounts']);
@@ -28,33 +24,8 @@ if (function_exists('yatra_single_trip_get_group_discounts')) {
         ? $gd['group_discounts_data']
         : [];
 }
-$sidebar_group_discounts_for_js = apply_filters('yatra_advanced_discount_enabled', false)
-    ? $sidebar_group_discount_cards
-    : [];
 
-// Prepare availability data for JavaScript
-$availability_json = [];
 $booking_mode = $trip->getBookingMode();
-if ($has_availability) {
-    foreach ($trip->getAvailabilityDates() as $avail) {
-        $availability_json[] = [
-            'id' => (int) $avail->id,
-            'date' => $avail->departure_date,
-            'departure_date' => $avail->departure_date,
-            'return_date' => (isset($avail->return_date) && $avail->return_date !== '')
-                ? $avail->return_date
-                : (isset($avail->arrival_date) ? $avail->arrival_date : null),
-            'price' => $avail->effective_price ?? $avail->original_price,
-            'original_price' => $avail->original_price,
-            'discounted_price' => $avail->discounted_price,
-            'seats_available' => $avail->seats_available,
-            'seats_total' => $avail->seats_total,
-            'status' => $avail->status,
-            'is_limited' => $avail->is_limited ?? false,
-            'is_sold_out' => $avail->is_sold_out ?? false,
-        ];
-    }
-}
 
 // Calculate pricing - use pre-computed values from SingleTripController
 $pricing = [
@@ -153,12 +124,7 @@ $booking_disabled = method_exists($trip, 'isBookingDisabled') && $trip->isBookin
 </div>
 <?php else: ?>
 <div class="yatra-mobile-sticky-sidebar" id="yatra-mobile-sticky-sidebar"
-     data-has-availability="<?php echo $has_availability ? 'true' : 'false'; ?>"
-     data-booking-mode="<?php echo esc_attr($booking_mode); ?>"
-     data-is-multi-day="<?php echo $is_multi_day ? 'true' : 'false'; ?>"
-     data-pricing-type="<?php echo esc_attr($pricing_type); ?>"
-     data-availability='<?php echo esc_attr(json_encode($availability_json)); ?>'
-     data-group-discounts='<?php echo esc_attr(wp_json_encode($sidebar_group_discounts_for_js)); ?>'>
+     data-booking-mode="<?php echo esc_attr($booking_mode); ?>">
     <!-- Two-Row Layout -->
     <div class="yatra-mobile-sticky-content">
 
@@ -580,7 +546,7 @@ function updateMobileTotal() {
     const sidebar = document.getElementById('yatra-mobile-sticky-sidebar');
     if (!sidebar) return;
     
-    const pricingType = sidebar.getAttribute('data-pricing-type');
+    const pricingType = (window.yatraTripData && window.yatraTripData.pricingType) ? window.yatraTripData.pricingType : 'regular';
     const mobileTotal = document.getElementById('mobile-total-amount');
     if (!mobileTotal) return;
     

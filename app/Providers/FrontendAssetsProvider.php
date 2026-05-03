@@ -92,6 +92,52 @@ class FrontendAssetsProvider
                 );
             }
         }
+
+        $this->enqueueFrontendThemeVariables();
+        $this->enqueueFrontendLayoutVariables();
+    }
+
+    /**
+     * Override design tokens from Settings (single primary color → related shades).
+     */
+    private function enqueueFrontendThemeVariables(): void
+    {
+        if (!wp_style_is('yatra-common', 'enqueued')) {
+            return;
+        }
+        $primary = \Yatra\Services\SettingsService::getString(
+            'frontend_primary_color',
+            \Yatra\Utils\FrontendThemeCss::DEFAULT_PRIMARY
+        );
+        $primary = \Yatra\Utils\FrontendThemeCss::sanitizePrimaryColor($primary);
+        if (strtolower($primary) === strtolower(\Yatra\Utils\FrontendThemeCss::DEFAULT_PRIMARY)) {
+            return;
+        }
+        $css = \Yatra\Utils\FrontendThemeCss::buildInlineRootCss($primary);
+        if ($css !== '') {
+            wp_add_inline_style('yatra-common', $css);
+        }
+    }
+
+    /**
+     * Align --yatra-container-max-width with the active theme (theme.json wide/content size or $content_width).
+     */
+    private function enqueueFrontendLayoutVariables(): void
+    {
+        if (!wp_style_is('yatra-common', 'enqueued')) {
+            return;
+        }
+        $fromSetting = \Yatra\Utils\FrontendThemeCss::sanitizeContainerMaxWidthSetting(
+            \Yatra\Services\SettingsService::getString('frontend_container_max_width', '')
+        );
+        $max = $fromSetting !== ''
+            ? $fromSetting
+            : \Yatra\Utils\FrontendThemeCss::resolveThemeContainerMaxWidth();
+        if ($max === null || $max === '') {
+            return;
+        }
+        $maxEsc = esc_attr($max);
+        wp_add_inline_style('yatra-common', ':root{--yatra-container-max-width:' . $maxEsc . ';}');
     }
 
     /**
@@ -252,7 +298,8 @@ class FrontendAssetsProvider
             'timeFormat' => \Yatra\Services\SettingsService::getString('time_format', 'H:i'),
             // Currency/settings
             'currency' => \Yatra\Services\SettingsService::getCurrency(),
-            'currencyPosition' => \Yatra\Services\SettingsService::getString('currency_position', 'before'),
+            'currencyPosition' => \Yatra\Services\SettingsService::getString('currency_position', 'left'),
+            'currency_position' => \Yatra\Services\SettingsService::getString('currency_position', 'left'),
             'decimalPlaces' => (int) \Yatra\Services\SettingsService::getString('currency_decimals', '2'),
             'thousandSeparator' => \Yatra\Services\SettingsService::getString('thousand_separator', ','),
             'decimalSeparator' => \Yatra\Services\SettingsService::getString('decimal_separator', '.'),
@@ -262,6 +309,14 @@ class FrontendAssetsProvider
                 : '$',
             'availabilityDates' => [],
             'groupDiscountsUrl' => rest_url('yatra/v1/discounts/group-discounts'),
+            'dynamicPricingDisplay' => apply_filters('yatra_get_dynamic_pricing_display_settings', [
+                'show_original_price' => true,
+                'show_savings_badge' => true,
+                'show_urgency_messages' => false,
+            ]),
+            'pricingType' => 'regular',
+            'sidebarAvailability' => [],
+            'sidebarGroupDiscounts' => [],
         ];
 
         if ($has_trip) {
@@ -280,6 +335,12 @@ class FrontendAssetsProvider
 
                     return null;
                 }, $trip->getAvailabilityDates())));
+            }
+            if (function_exists('yatra_single_trip_get_client_booking_payload')) {
+                $bookingPayload = yatra_single_trip_get_client_booking_payload($trip);
+                $tripData['pricingType'] = $bookingPayload['pricingType'];
+                $tripData['sidebarAvailability'] = $bookingPayload['sidebarAvailability'];
+                $tripData['sidebarGroupDiscounts'] = $bookingPayload['sidebarGroupDiscounts'];
             }
         }
 
@@ -403,7 +464,8 @@ class FrontendAssetsProvider
             'permalinkStructure' => $is_plain ? 'plain' : $permalink_structure,
             'nonce' => wp_create_nonce('wp_rest'),
             'currency' => \Yatra\Services\SettingsService::getCurrency(),
-            'currencyPosition' => \Yatra\Services\SettingsService::getString('currency_position', 'before'),
+            'currencyPosition' => \Yatra\Services\SettingsService::getString('currency_position', 'left'),
+            'currency_position' => \Yatra\Services\SettingsService::getString('currency_position', 'left'),
             'decimalPlaces' => (int) \Yatra\Services\SettingsService::getString('currency_decimals', '2'),
             'thousandSeparator' => \Yatra\Services\SettingsService::getString('thousand_separator', ','),
             'decimalSeparator' => \Yatra\Services\SettingsService::getString('decimal_separator', '.'),
@@ -486,7 +548,8 @@ class FrontendAssetsProvider
             'companyName' => \Yatra\Services\SettingsService::getString('company_name', ''),
             'companyEmail' => \Yatra\Services\SettingsService::getString('company_email', ''),
             'currency' => \Yatra\Services\SettingsService::getCurrency(),
-            'currencyPosition' => \Yatra\Services\SettingsService::getString('currency_position', 'before'),
+            'currencyPosition' => \Yatra\Services\SettingsService::getString('currency_position', 'left'),
+            'currency_position' => \Yatra\Services\SettingsService::getString('currency_position', 'left'),
             'decimalPlaces' => (int) \Yatra\Services\SettingsService::getString('currency_decimals', '2'),
             'thousandSeparator' => \Yatra\Services\SettingsService::getString('thousand_separator', ','),
             'decimalSeparator' => \Yatra\Services\SettingsService::getString('decimal_separator', '.'),

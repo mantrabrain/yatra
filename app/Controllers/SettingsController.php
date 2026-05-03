@@ -45,7 +45,9 @@ class SettingsController extends BaseController
         'timezone' => 'UTC',
         'date_format' => 'Y-m-d',
         'time_format' => 'H:i',
-         
+        'frontend_primary_color' => '#3b82f6',
+        'frontend_container_max_width' => '',
+
         // Booking Settings
         'booking_confirmation' => true,
         'auto_confirm_bookings' => false,
@@ -659,6 +661,25 @@ class SettingsController extends BaseController
 
         // Handle strings
         if (is_string($default)) {
+            if ($key === 'timezone') {
+                $tz = is_string($value) ? trim($value) : '';
+                if ($tz === '') {
+                    return is_string($default) ? $default : 'UTC';
+                }
+                try {
+                    new \DateTimeZone($tz);
+
+                    return $tz;
+                } catch (\Exception $e) {
+                    return is_string($default) ? $default : 'UTC';
+                }
+            }
+            if ($key === 'currency_position') {
+                $allowed = ['left', 'right', 'left_space', 'right_space', 'before', 'after'];
+                $v = is_string($value) ? strtolower(trim($value)) : '';
+
+                return in_array($v, $allowed, true) ? $v : (is_string($default) ? $default : 'left');
+            }
             // Special handling for specific fields
             if ($key === 'company_email' || $key === 'admin_email' || $key === 'from_email' || $key === 'smtp_username') {
                 return sanitize_email($value);
@@ -680,6 +701,14 @@ class SettingsController extends BaseController
             if ($key === 'seo_trip_meta_keywords') {
                 // Allow keywords, strip HTML and sanitize
                 return sanitize_text_field($value);
+            }
+            if ($key === 'frontend_primary_color') {
+                return \Yatra\Utils\FrontendThemeCss::sanitizePrimaryColor(is_string($value) ? $value : '');
+            }
+            if ($key === 'frontend_container_max_width') {
+                return \Yatra\Utils\FrontendThemeCss::sanitizeContainerMaxWidthSetting(
+                    is_string($value) ? $value : ''
+                );
             }
             if (is_string($key) && strpos($key, 'email_tpl_') === 0 && substr($key, -5) === '_body') {
                 return wp_kses_post((string) $value);

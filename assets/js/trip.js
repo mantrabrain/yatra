@@ -138,7 +138,11 @@
           ? cfg.currencySymbol
           : (typeof cfg.currency === 'string' ? cfg.currency : '$');
 
-      const position = (cfg.currencyPosition || 'before').toString();
+      const position = (
+        cfg.currencyPosition ||
+        cfg.currency_position ||
+        'before'
+      ).toString().toLowerCase().trim();
       const decimals = Number.isFinite(Number(cfg.decimalPlaces)) ? Number(cfg.decimalPlaces) : 2;
       const thousandSep = (typeof cfg.thousandSeparator === 'string') ? cfg.thousandSeparator : ',';
       const decimalSep = (typeof cfg.decimalSeparator === 'string') ? cfg.decimalSeparator : '.';
@@ -154,11 +158,22 @@
           .replace(/TEMP_THOUSAND/g, thousandSep)
           .replace(/TEMP_DECIMAL/g, decimalSep);
 
-      // Accept common variants: before/left vs after/right
-      if (position === 'after' || position === 'right') {
-        return `${formatted} ${symbol}`;
+      var pos = position;
+      if (pos === 'before') {
+        pos = 'left_space';
+      } else if (pos === 'after') {
+        pos = 'right_space';
       }
-      return `${symbol}${formatted}`;
+      if (pos === 'right') {
+        return formatted + symbol;
+      }
+      if (pos === 'right_space') {
+        return formatted + ' ' + symbol;
+      }
+      if (pos === 'left') {
+        return symbol + formatted;
+      }
+      return symbol + ' ' + formatted;
     };
   }
 
@@ -1660,6 +1675,9 @@
             }
           });
         });
+        if (window.availabilitySection && typeof window.availabilitySection.updateAllCardTotals === 'function') {
+          window.availabilitySection.updateAllCardTotals();
+        }
       };
 
       // Close dropdown when clicking outside
@@ -2259,6 +2277,11 @@
      * Update availability card total price
      */
     updateAvailabilityCardTotals(itemId) {
+      if (window.availabilitySection && typeof window.availabilitySection.updateTotalPrice === 'function') {
+        window.availabilitySection.updateTotalPrice(itemId);
+        return;
+      }
+
       const totalAmountEl = document.querySelector('.yatra-card-total-amount[data-item="' + itemId + '"]');
       const totalNoteEl = document.querySelector('.yatra-card-total-note[data-item="' + itemId + '"]');
       if (!totalAmountEl) return;
@@ -3689,6 +3712,22 @@
         totalAmountElement.textContent = String(finalPrice.toFixed(2));
       }
 
+      // Header "per person" must match chargable average (row totals + group discount), not static PHP.
+      const cardRoot = this.section.querySelector('.yatra-availability-card[data-item="' + itemIndex + '"]');
+      const headerSaleEl = cardRoot ? cardRoot.querySelector('.yatra-card-header-price .yatra-sale-price') : null;
+      if (headerSaleEl) {
+        let perPerson = 0;
+        if (totalTravelers > 0) {
+          perPerson = finalPrice / totalTravelers;
+        } else if (totalPrice > 0) {
+          perPerson = totalPrice;
+        }
+        if (perPerson > 0) {
+          headerSaleEl.textContent =
+            typeof yatra_format_price_js === 'function' ? yatra_format_price_js(perPerson) : String(perPerson.toFixed(2));
+        }
+      }
+
       // Update the note text
       const noteElement = this.section.querySelector(
           `.yatra-card-total-note[data-item="${itemIndex}"]`
@@ -3724,21 +3763,7 @@
         discountType: null
       };
 
-      // Get group discounts from the booking card data attribute
-      const bookingCard = document.querySelector('.yatra-booking-card');
-      if (!bookingCard) return result;
-
-      const groupDiscountsData = bookingCard.getAttribute('data-group-discounts');
-      if (!groupDiscountsData) return result;
-
-      let groupDiscounts;
-      try {
-        groupDiscounts = JSON.parse(groupDiscountsData);
-      } catch (e) {
-        console.error('Failed to parse group discounts:', e);
-        return result;
-      }
-
+      const groupDiscounts = window.yatraTripData && window.yatraTripData.sidebarGroupDiscounts;
       if (!Array.isArray(groupDiscounts) || groupDiscounts.length === 0) return result;
 
       // Find the applicable discount based on total travelers
@@ -3792,6 +3817,21 @@
       }
 
       return result;
+    }
+
+    /**
+     * Recompute footer + header pricing for every availability card (e.g. after sidebar traveler sync).
+     */
+    updateAllCardTotals() {
+      if (!this.section) return;
+      const seen = new Set();
+      this.section.querySelectorAll('.yatra-availability-card[data-item]').forEach((card) => {
+        const id = card.getAttribute('data-item');
+        if (id && !seen.has(id)) {
+          seen.add(id);
+          this.updateTotalPrice(id);
+        }
+      });
     }
 
     /**

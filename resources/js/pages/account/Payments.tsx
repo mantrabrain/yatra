@@ -140,8 +140,8 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                 {paymentStats.total}
               </p>
             </div>
-            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 bg-yatra-soft dark:bg-yatra-surface-dark-muted rounded-lg">
+              <CreditCard className="w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" />
             </div>
           </div>
         </div>
@@ -287,7 +287,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                       <span className={getBadge(payment.status)}>
                         {__(payment.status, payment.status)}
                       </span>
-                      <span className="px-3 py-1 rounded-lg text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 capitalize">
+                      <span className="px-3 py-1 rounded-lg text-xs font-medium bg-yatra-soft dark:bg-yatra-surface-dark-muted text-yatra-primary-dark dark:text-yatra-primary-light capitalize">
                         {paymentTypeLabel(payment.type)}
                       </span>
                     </div>
@@ -363,7 +363,10 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                           }
                         }}
                         className="yatra-payment-action yatra-payment-action-receipt inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
-                        style={{ backgroundColor: "#2563eb", color: "#ffffff" }}
+                        style={{
+                          backgroundColor: "var(--yatra-primary-dark, #2563eb)",
+                          color: "#ffffff",
+                        }}
                       >
                         <FileTextIcon className="w-4 h-4" />
                         {__("View Receipt", "yatra")}

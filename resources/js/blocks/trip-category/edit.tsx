@@ -135,9 +135,9 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             onChange={(value: boolean) => setAttributes({ hide_empty: value })}
           />
           <ToggleControl
-            label={__("Featured only", "yatra")}
+            label={__("Featured only (filter list)", "yatra")}
             help={__(
-              "When enabled, only categories marked featured are shown (same as featured_only=yes on the shortcode).",
+              "When on, only categories with “Featured category” enabled in Yatra → Trips → Categories are listed. The red “Featured” badge on each card is controlled per category there—not by this toggle.",
               "yatra",
             )}
             checked={featured_only}

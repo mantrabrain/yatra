@@ -42,7 +42,7 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { Skeleton } from "../components/ui/skeleton";
-import { getCurrencySymbol, getCurrency } from "../data/currencies";
+import { formatYatraMoney } from "../lib/currency-display";
 
 interface Customer {
   id: number;
@@ -162,16 +162,8 @@ const ViewCustomer: React.FC = () => {
     return formatDateUtil(dateString);
   };
 
-  const formatPrice = (price: number, currencyCode: string = "USD") => {
-    const symbol = getCurrencySymbol(currencyCode);
-    const currencyData = getCurrency(currencyCode);
-    const decimals = currencyData?.decimalDigits ?? 2;
-
-    return `${symbol}${new Intl.NumberFormat(undefined, {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
-    }).format(price)}`;
-  };
+  const formatPrice = (price: number, currencyCode: string = "USD") =>
+    formatYatraMoney(Number(price) || 0, currencyCode, { zeroAsUnknown: false });
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {

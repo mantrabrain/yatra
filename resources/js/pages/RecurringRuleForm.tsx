@@ -2261,9 +2261,16 @@ const RecurringRuleForm: React.FC = () => {
                                         ),
                                       ),
                                     ]
-                                  : [-8.3405, 115.092]
+                                  : [20, 0]
                             }
-                            defaultZoom={13}
+                            defaultZoom={
+                              formData.from_latitude && formData.from_longitude
+                                ? 13
+                                : tripForLocations?.starting_latitude &&
+                                    tripForLocations?.starting_longitude
+                                  ? 13
+                                  : 2
+                            }
                             mapHeight="300px"
                             showMapButton={false}
                             searchLimit={8}
@@ -2346,9 +2353,42 @@ const RecurringRuleForm: React.FC = () => {
                                         ),
                                       ),
                                     ]
-                                  : [-8.5069, 115.2625]
+                                  : formData.from_latitude &&
+                                      formData.from_longitude
+                                    ? [
+                                        parseFloat(formData.from_latitude),
+                                        parseFloat(formData.from_longitude),
+                                      ]
+                                    : tripForLocations?.starting_latitude &&
+                                        tripForLocations?.starting_longitude
+                                      ? [
+                                          parseFloat(
+                                            String(
+                                              tripForLocations.starting_latitude,
+                                            ),
+                                          ),
+                                          parseFloat(
+                                            String(
+                                              tripForLocations.starting_longitude,
+                                            ),
+                                          ),
+                                        ]
+                                      : [20, 0]
                             }
-                            defaultZoom={13}
+                            defaultZoom={
+                              formData.to_latitude && formData.to_longitude
+                                ? 13
+                                : tripForLocations?.ending_latitude &&
+                                    tripForLocations?.ending_longitude
+                                  ? 13
+                                  : formData.from_latitude &&
+                                      formData.from_longitude
+                                    ? 13
+                                    : tripForLocations?.starting_latitude &&
+                                        tripForLocations?.starting_longitude
+                                      ? 13
+                                      : 2
+                            }
                             mapHeight="300px"
                             showMapButton={false}
                             searchLimit={8}

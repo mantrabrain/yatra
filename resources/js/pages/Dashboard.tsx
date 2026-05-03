@@ -37,7 +37,10 @@ import { UpcomingDepartures } from "../components/dashboard/UpcomingDepartures";
 import { PendingPayments } from "../components/dashboard/PendingPayments";
 import { RecentBookings } from "../components/dashboard/RecentBookings";
 import { apiClient } from "../lib/api-client";
-import { getCurrencySymbol } from "../data/currencies";
+import {
+  formatYatraMoney,
+  readYatraCurrencyPositionFromWindow,
+} from "../lib/currency-display";
 
 // Skeleton components
 const SkeletonStatCard = () => (
@@ -72,50 +75,21 @@ const Dashboard: React.FC = () => {
     (window as any)?.yatraBookingData?.currency ||
     "USD";
 
-  const currencyPosition =
-    (window as any)?.yatraAdmin?.currency_position ||
-    (window as any)?.yatraBookingData?.currency_position ||
-    "left";
+  const currencyPosition = readYatraCurrencyPositionFromWindow();
 
   const currencyDecimalsRaw =
-    (window as any)?.yatraAdmin?.currency_decimals ||
+    (window as any)?.yatraAdmin?.decimalPlaces ??
+    (window as any)?.yatraAdmin?.currency_decimals ??
+    (window as any)?.yatraBookingData?.decimalPlaces ??
     (window as any)?.yatraBookingData?.currency_decimals;
   const currencyDecimals = Number.isFinite(Number(currencyDecimalsRaw))
     ? Number(currencyDecimalsRaw)
     : 2;
 
-  // Get additional currency settings
-  const thousandSeparator =
-    (window as any)?.yatraAdmin?.thousandSeparator || ",";
-  const decimalSeparator = (window as any)?.yatraAdmin?.decimalSeparator || ".";
-
-  // Comprehensive currency formatting function
-  const formatCurrencyAmount = (amount: number) => {
-    if (!amount || amount === 0)
-      return getCurrencySymbol(defaultCurrency) + "0";
-
-    const numPrice = Number(amount) || 0;
-
-    // Format the number with proper separators
-    const formattedAmount = new Intl.NumberFormat(undefined, {
-      minimumFractionDigits: currencyDecimals,
-      maximumFractionDigits: currencyDecimals,
-    })
-      .format(numPrice)
-      .replace(/,/g, "TEMP_THOUSAND")
-      .replace(/\./g, decimalSeparator)
-      .replace(/TEMP_THOUSAND/g, thousandSeparator);
-
-    // Get currency symbol
-    const currencySymbol = getCurrencySymbol(defaultCurrency);
-
-    // Apply currency position
-    if (currencyPosition === "after" || currencyPosition === "right") {
-      return `${formattedAmount} ${currencySymbol}`;
-    } else {
-      return `${currencySymbol}${formattedAmount}`;
-    }
-  };
+  const formatCurrencyAmount = (amount: number) =>
+    formatYatraMoney(Number(amount) || 0, defaultCurrency, {
+      zeroAsUnknown: false,
+    });
 
   // Fetch booking statistics (totals, revenue, status breakdown, upcoming)
   const { data: bookingStats, isLoading } = useQuery({

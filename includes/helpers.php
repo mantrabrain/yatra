@@ -249,6 +249,71 @@ function yatra_get_booking_url(string $trip_slug, array $params = []): string
 }
 
 /**
+ * Normalized Dynamic Pricing display toggles (listing, trip page, availability).
+ *
+ * @return array{show_original_price: bool, show_savings_badge: bool, show_urgency_messages: bool}
+ */
+if (!function_exists('yatra_get_dynamic_pricing_display_flags')) {
+    function yatra_get_dynamic_pricing_display_flags(): array
+    {
+        $s = apply_filters('yatra_get_dynamic_pricing_display_settings', [
+            'show_original_price' => true,
+            'show_savings_badge' => true,
+            'show_urgency_messages' => false,
+        ]);
+
+        return [
+            'show_original_price' => filter_var($s['show_original_price'] ?? true, FILTER_VALIDATE_BOOLEAN),
+            'show_savings_badge' => filter_var($s['show_savings_badge'] ?? true, FILTER_VALIDATE_BOOLEAN),
+            'show_urgency_messages' => filter_var($s['show_urgency_messages'] ?? false, FILTER_VALIDATE_BOOLEAN),
+        ];
+    }
+}
+
+/**
+ * Urgency lines for a trip surface (listing card, sidebar, similar trips). Pro fills via yatra_trip_card_dynamic_pricing_meta.
+ *
+ * @param array<string, mixed> $context base_sale_price, base_original_price, departure_date, spots_remaining, …
+ * @return array<int, string>
+ */
+if (!function_exists('yatra_trip_card_dynamic_pricing_urgency_lines')) {
+    function yatra_trip_card_dynamic_pricing_urgency_lines(int $trip_id, array $context = []): array
+    {
+        if ($trip_id <= 0) {
+            return [];
+        }
+
+        $flags = yatra_get_dynamic_pricing_display_flags();
+        if (!$flags['show_urgency_messages']) {
+            return [];
+        }
+
+        $meta = apply_filters(
+            'yatra_trip_card_dynamic_pricing_meta',
+            ['urgency_messages' => []],
+            array_merge($context, [
+                'trip_id' => $trip_id,
+                'display' => $flags,
+            ])
+        );
+
+        if (!is_array($meta) || empty($meta['urgency_messages']) || !is_array($meta['urgency_messages'])) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($meta['urgency_messages'] as $line) {
+            $line = sanitize_text_field((string) $line);
+            if ($line !== '') {
+                $out[] = $line;
+            }
+        }
+
+        return array_values(array_unique($out));
+    }
+}
+
+/**
  * Format price with currency
  * 
  * @param float       $amount   The amount to format
@@ -282,12 +347,31 @@ if (!function_exists('yatra_format_price')) {
         
         // Get currency symbol
         $currency_symbol = yatra_get_currency_symbol($currency);
-        
-        // Position currency based on settings
-        if ($currency_position === 'right' || $currency_position === 'after') {
+
+        // Placement: Settings UI uses left, right, left_space, right_space; legacy uses before/after.
+        $raw = strtolower(trim((string) $currency_position));
+        if ($raw === 'before') {
+            $pos = 'left_space';
+        } elseif ($raw === 'after') {
+            $pos = 'right_space';
+        } else {
+            $pos = $raw;
+        }
+        $allowed = ['left', 'right', 'left_space', 'right_space'];
+        if (!in_array($pos, $allowed, true)) {
+            $pos = 'left_space';
+        }
+
+        if ($pos === 'right') {
+            return $formatted_amount . $currency_symbol;
+        }
+        if ($pos === 'right_space') {
             return $formatted_amount . ' ' . $currency_symbol;
         }
-        
+        if ($pos === 'left') {
+            return $currency_symbol . $formatted_amount;
+        }
+
         return $currency_symbol . ' ' . $formatted_amount;
     }
 }
@@ -1964,7 +2048,7 @@ function yatra_enqueue_single_trip_scripts(): void
     wp_enqueue_script(
         'yatra-single-trip',
         YATRA_PLUGIN_URL . 'assets/js/single-trip.js',
-        ['jquery'],
+        ['jquery', 'yatra-trip'],
         YATRA_VERSION,
         true
     );
@@ -2222,6 +2306,94 @@ function yatra_single_trip_parse_group_discounts_payload($data, int $trip_id): ?
     $row = $data[$trip_id] ?? $data[$keyStr] ?? null;
 
     return is_array($row) ? $row : null;
+}
+
+/**
+ * Payload for single-trip booking UI JS (sidebar date/traveler pricing + group tiers).
+ * Kept in yatraTripData instead of large HTML data-* attributes on .yatra-booking-card.
+ *
+ * @param object $trip Trip model
+ * @return array{pricingType: string, sidebarAvailability: array<int, array<string, mixed>>, sidebarGroupDiscounts: array<int, array<string, mixed>>}
+ */
+function yatra_single_trip_get_client_booking_payload($trip): array {
+    $empty = [
+        'pricingType' => 'regular',
+        'sidebarAvailability' => [],
+        'sidebarGroupDiscounts' => [],
+    ];
+
+    if (!is_object($trip) || empty($trip->id)) {
+        return $empty;
+    }
+
+    $pricing_data = function_exists('yatra_single_trip_calculate_base_price')
+        ? yatra_single_trip_calculate_base_price($trip)
+        : ['has_availability' => false, 'pricing_type' => $trip->pricing_type ?? 'regular'];
+
+    $pricing_type = (string) ($pricing_data['pricing_type'] ?? ($trip->pricing_type ?? 'regular'));
+    $has_availability = !empty($pricing_data['has_availability']);
+
+    $availability = [];
+    if ($has_availability && method_exists($trip, 'getAvailabilityDates')) {
+        foreach ($trip->getAvailabilityDates() as $avail) {
+            if (!is_object($avail)) {
+                continue;
+            }
+            $price_types_raw = !empty($avail->price_types) && is_array($avail->price_types) ? $avail->price_types : [];
+            $price_types = [];
+            foreach ($price_types_raw as $pt) {
+                if (is_object($pt)) {
+                    $decoded = json_decode(wp_json_encode($pt), true);
+                    $price_types[] = is_array($decoded) ? $decoded : [];
+                } elseif (is_array($pt)) {
+                    $price_types[] = $pt;
+                }
+            }
+
+            $availability[] = [
+                'id' => (int) ($avail->id ?? 0),
+                'date' => $avail->departure_date ?? '',
+                'departure_date' => $avail->departure_date ?? '',
+                'return_date' => (isset($avail->return_date) && $avail->return_date !== '')
+                    ? $avail->return_date
+                    : (isset($avail->arrival_date) ? $avail->arrival_date : null),
+                'price' => $avail->effective_price ?? $avail->original_price ?? 0,
+                'original_price' => $avail->original_price ?? 0,
+                'discounted_price' => $avail->discounted_price ?? null,
+                'seats_available' => $avail->seats_available ?? 0,
+                'seats_total' => $avail->seats_total ?? 0,
+                'status' => $avail->status ?? '',
+                'is_limited' => (bool) ($avail->is_limited ?? false),
+                'is_sold_out' => (bool) ($avail->is_sold_out ?? false),
+                'pricing_type' => $price_types !== [] ? 'traveler_based' : $pricing_type,
+                'price_types' => $price_types,
+            ];
+        }
+    }
+
+    $sidebar_group_discounts = [];
+    if (function_exists('yatra_single_trip_get_group_discounts')) {
+        $gd = yatra_single_trip_get_group_discounts((int) $trip->id);
+        $cards = isset($gd['group_discounts_data']) && is_array($gd['group_discounts_data'])
+            ? $gd['group_discounts_data']
+            : [];
+        $sidebar_group_discounts = apply_filters('yatra_advanced_discount_enabled', false) ? $cards : [];
+        $sidebar_group_discounts = array_values(array_map(static function ($row) {
+            if (is_object($row)) {
+                $decoded = json_decode(wp_json_encode($row), true);
+
+                return is_array($decoded) ? $decoded : [];
+            }
+
+            return $row;
+        }, $sidebar_group_discounts));
+    }
+
+    return [
+        'pricingType' => $pricing_type,
+        'sidebarAvailability' => $availability,
+        'sidebarGroupDiscounts' => $sidebar_group_discounts,
+    ];
 }
 
 // Hook into WordPress enqueue system

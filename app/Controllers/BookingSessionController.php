@@ -2574,11 +2574,14 @@ class BookingSessionController extends BaseController
                     continue;
                 }
                 $price_before = $pt->effective_price;
+                $pt_orig = (float) ($pt->original_price ?? 0);
                 $pt->effective_price = apply_filters('yatra_trip_display_price', (float) $pt->effective_price, $trip_id, [
                     'departure_date' => $travel_date ?: null,
                     'spots_remaining' => $spots_remaining,
                     'availability_id' => $availability_id,
                     'price_type_id' => $pt->id ?? ($pt->price_type_id ?? null),
+                    'original_price' => $pt_orig > 0 ? $pt_orig : (float) $price_before,
+                    'discounted_price' => (float) $price_before,
                 ]);
                 }
         }
@@ -2601,10 +2604,20 @@ class BookingSessionController extends BaseController
 
         // Apply dynamic pricing filter (Pro DynamicPricingModule hooks here)
         if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
+            $list_for_dp = (float) ($trip->original_price ?? 0);
+            if ($availability) {
+                $ao = (float) ($availability->original_price ?? 0);
+                if ($ao > 0) {
+                    $list_for_dp = $ao;
+                }
+            }
+            $pre_dp_effective = (float) $base_trip_price;
             $base_trip_price = apply_filters('yatra_booking_trip_price', $base_trip_price, $trip_id, [
                 'departure_date' => $travel_date,
                 'spots_remaining' => $availability ? (int) ($availability->spots_remaining ?? null) : null,
                 'availability_id' => $availability_id,
+                'original_price' => $list_for_dp > 0 ? $list_for_dp : $pre_dp_effective,
+                'discounted_price' => $pre_dp_effective,
             ]);
         }
         

@@ -141,6 +141,13 @@ yatra_get_header();
         </h2>
         
         <?php if (!empty($destination->trips) && is_array($destination->trips)): ?>
+            <?php
+            $yatra_dp_flags_destination = function_exists('yatra_get_dynamic_pricing_display_flags') ? yatra_get_dynamic_pricing_display_flags() : [
+                'show_original_price' => true,
+                'show_savings_badge' => true,
+                'show_urgency_messages' => false,
+            ];
+            ?>
             <div class="yatra-trip-grid">
                 <?php foreach ($destination->trips as $trip): ?>
                     <div class="yatra-trip-card">
@@ -151,7 +158,7 @@ yatra_get_header();
                                 <img src="<?php echo esc_url(plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE)); ?>" alt="<?php echo esc_attr($trip->title ?? $trip->name ?? __('Trip', 'yatra')); ?>">
                             <?php endif; ?>
                             
-                            <?php if (!empty($trip->discount_percentage) && $trip->discount_percentage > 0): ?>
+                            <?php if (!empty($trip->discount_percentage) && $trip->discount_percentage > 0 && !empty($yatra_dp_flags_destination['show_savings_badge'])): ?>
                                 <div class="yatra-discount-badge">
                                     <?php
                                     printf(
@@ -213,25 +220,35 @@ yatra_get_header();
                                 <div class="yatra-trip-price">
                                     <?php 
                                     // Apply dynamic pricing if module is enabled
-                                    $display_original_price = $trip->original_price ?? 0;
-                                    $display_effective_price = $trip->effective_price_min ?? $trip->original_price ?? 0;
+                                    $raw_orig_dest = (float) ($trip->original_price ?? 0);
+                                    $raw_eff_dest = (float) ($trip->effective_price_min ?? $trip->original_price ?? 0);
+                                    $display_original_price = $raw_orig_dest;
+                                    $display_effective_price = $raw_eff_dest;
                                     
                                     if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
-                                        if (!empty($display_original_price)) {
-                                            $display_original_price = apply_filters('yatra_trip_display_price', $display_original_price, $trip->id ?? 0, [
-                                                'departure_date' => null,
-                                                'spots_remaining' => null,
-                                            ]);
-                                        }
                                         if (!empty($display_effective_price)) {
                                             $display_effective_price = apply_filters('yatra_trip_display_price', $display_effective_price, $trip->id ?? 0, [
                                                 'departure_date' => null,
                                                 'spots_remaining' => null,
+                                                'original_price' => $raw_orig_dest > 0 ? $raw_orig_dest : (float) $display_effective_price,
+                                                'discounted_price' => $raw_eff_dest > 0 ? $raw_eff_dest : (float) $display_effective_price,
                                             ]);
                                         }
                                     }
+                                    $yatra_dest_urgency = function_exists('yatra_trip_card_dynamic_pricing_urgency_lines')
+                                        ? yatra_trip_card_dynamic_pricing_urgency_lines((int) ($trip->id ?? 0), [
+                                            'base_sale_price' => $raw_eff_dest,
+                                            'base_original_price' => $raw_orig_dest,
+                                            'sale_price' => (float) $display_effective_price,
+                                            'original_price' => (float) $display_original_price,
+                                            'departure_date' => null,
+                                            'spots_remaining' => null,
+                                            'availability_id' => null,
+                                            'surface' => 'destination_card',
+                                        ])
+                                        : [];
                                     ?>
-                                    <?php if (!empty($display_original_price) && !empty($display_effective_price) && $display_original_price > $display_effective_price): ?>
+                                    <?php if (!empty($yatra_dp_flags_destination['show_original_price']) && !empty($display_original_price) && !empty($display_effective_price) && $display_original_price > $display_effective_price): ?>
                                         <div class="yatra-original-price"><?php echo esc_html(yatra_format_price($display_original_price)); ?></div>
                                     <?php endif; ?>
                                     <div class="yatra-current-price">
@@ -244,6 +261,13 @@ yatra_get_header();
                                         ?>
                                     </div>
                                     <div class="yatra-price-note"><?php esc_html_e('per person', 'yatra'); ?></div>
+                                    <?php if (!empty($yatra_dest_urgency)) : ?>
+                                        <?php foreach ($yatra_dest_urgency as $yatra_d_urg) : ?>
+                                            <div style="margin-top:6px;font-size:11px;line-height:1.35;color:#92400e;background:#fef3c7;padding:4px 6px;border-radius:4px;">
+                                                <?php echo esc_html((string) $yatra_d_urg); ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
                                 </div>
                                 <a href="<?php echo esc_url($trip->permalink ?? ''); ?>" class="yatra-btn yatra-btn-primary yatra-archive-card-cta yatra-card-view-btn">
                                     <?php echo yatra_svg_icon('file-text', 'yatra-btn-icon'); ?>

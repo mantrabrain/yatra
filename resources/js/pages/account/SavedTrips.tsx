@@ -71,7 +71,7 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
           </p>
           <a
             href="/trip/"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-yatra-primary text-white rounded-lg hover:bg-yatra-primary-dark transition-colors"
           >
             <MapPinIcon className="w-4 h-4" />
             {__("Browse Trips", "yatra")}
@@ -186,7 +186,7 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
                   <h3 className="yatra-trip-title mb-2 text-lg font-semibold leading-snug text-gray-900 dark:text-white">
                     <a
                       href={tripUrl}
-                      className="text-blue-700 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300 focus-visible:outline focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm"
+                      className="text-yatra-primary-dark hover:text-yatra-primary-darker hover:underline dark:text-yatra-on-dark dark:hover:text-yatra-primary-light focus-visible:outline focus-visible:ring-2 focus-visible:ring-yatra-primary focus-visible:ring-offset-2 rounded-sm"
                     >
                       {trip.trip_title}
                     </a>
@@ -260,7 +260,7 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
                           {__("Starting from", "yatra")}
                         </span>
                       ) : null}
-                      <div className="yatra-current-price text-xl font-bold leading-none text-blue-600 tabular-nums dark:text-blue-400">
+                      <div className="yatra-current-price text-xl font-bold leading-none text-yatra-primary tabular-nums dark:text-yatra-on-dark">
                         {formatPrice(displayPrice)}
                       </div>
                       <div className="yatra-price-note text-xs leading-tight text-gray-400 dark:text-gray-500">
@@ -269,7 +269,7 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
                     </div>
                     <a
                       href={tripUrl}
-                      className="yatra-card-view-btn inline-flex shrink-0 items-center justify-center self-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white no-underline transition-colors hover:bg-blue-700"
+                      className="yatra-card-view-btn inline-flex shrink-0 items-center justify-center self-center rounded-lg bg-yatra-primary px-4 py-2 text-sm font-medium text-white no-underline transition-colors hover:bg-yatra-primary-dark"
                     >
                       {__("View Details", "yatra")}
                     </a>

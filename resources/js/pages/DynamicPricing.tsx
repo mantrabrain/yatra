@@ -29,7 +29,7 @@ import { Table as SharedTable } from "../components/shared/Table";
 import { SearchFilterToolbar, BulkActionToolbar } from "../components/shared";
 import { apiClient } from "../lib/api-client";
 import { __ } from "../lib/i18n";
-import { getCurrencySymbol } from "../data/currencies";
+import { formatYatraMoney } from "../lib/currency-display";
 import PremiumUpgradeCard from "./premium-pages/DynamicPricing";
 import {
   ResponsiveContainer,
@@ -75,6 +75,8 @@ const DynamicPricingPage: React.FC = () => {
     show_original_price: true,
     show_savings_badge: true,
     show_urgency_messages: false,
+    /** discounted = rules use sale/effective price; regular = rules use list price when known */
+    calculation_base: "discounted" as "discounted" | "regular",
   });
   const { showToast } = useToast();
   const queryClient = useQueryClient();
@@ -129,14 +131,23 @@ const DynamicPricingPage: React.FC = () => {
     queryKey: ["dynamic-pricing-settings"],
     queryFn: async () => {
       const response = await apiClient.get("/dynamic-pricing/settings");
-      return response.data || response;
+      const body = (response as any)?.data ?? response;
+      const payload = (body as any)?.data ?? body;
+      return payload && typeof payload === "object" ? payload : {};
     },
   });
 
   // Update settings state when data is loaded
   React.useEffect(() => {
-    if (settingsData) {
-      setSettings(settingsData);
+    if (settingsData && typeof settingsData === "object") {
+      setSettings((prev) => ({
+        ...prev,
+        ...settingsData,
+        calculation_base:
+          (settingsData as any).calculation_base === "regular"
+            ? "regular"
+            : "discounted",
+      }));
     }
   }, [settingsData]);
 
@@ -175,36 +186,10 @@ const DynamicPricingPage: React.FC = () => {
   const stats = statsPayload || {};
 
   const globalCurrency = (window as any)?.yatraAdmin?.currency || "USD";
-  const currencyPosition =
-    (window as any)?.yatraAdmin?.currencyPosition ||
-    (window as any)?.yatraAdmin?.currency_position ||
-    "before";
-  const decimalPlaces = Number(
-    (window as any)?.yatraAdmin?.decimalPlaces ||
-      (window as any)?.yatraAdmin?.currency_decimals ||
-      2,
-  );
-  const thousandSeparator =
-    (window as any)?.yatraAdmin?.thousandSeparator || ",";
-  const decimalSeparator = (window as any)?.yatraAdmin?.decimalSeparator || ".";
-
-  const formatCurrencyAmount = (amount: number) => {
-    const numPrice = Number(amount) || 0;
-    const formattedAmount = new Intl.NumberFormat(undefined, {
-      minimumFractionDigits: decimalPlaces,
-      maximumFractionDigits: decimalPlaces,
-    })
-      .format(numPrice)
-      .replace(/,/g, "TEMP_THOUSAND")
-      .replace(/\./g, decimalSeparator)
-      .replace(/TEMP_THOUSAND/g, thousandSeparator);
-
-    const currencySymbol = getCurrencySymbol(globalCurrency);
-    if (currencyPosition === "after" || currencyPosition === "right") {
-      return `${formattedAmount} ${currencySymbol}`;
-    }
-    return `${currencySymbol}${formattedAmount}`;
-  };
+  const formatCurrencyAmount = (amount: number) =>
+    formatYatraMoney(Number(amount) || 0, globalCurrency, {
+      zeroAsUnknown: false,
+    });
 
   const trendData = Array.isArray(
     (stats as any)?.pricing_history_trend_last_30_days,
@@ -613,7 +598,11 @@ const DynamicPricingPage: React.FC = () => {
                       <span className="font-medium text-gray-900 dark:text-white">
                         {rule.adjustment_type === "percentage"
                           ? `${rule.adjustment_value > 0 ? "+" : ""}${rule.adjustment_value}%`
-                          : `$${rule.adjustment_value}`}
+                          : formatYatraMoney(
+                              Number(rule.adjustment_value) || 0,
+                              globalCurrency,
+                              { zeroAsUnknown: false },
+                            )}
                       </span>
                     ),
                   },
@@ -1166,12 +1155,29 @@ const DynamicPricingPage: React.FC = () => {
                     ))
                   ) : (
                     <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                      <p>{__("No pricing rules created yet")}</p>
-                      <p className="text-sm mt-2">
-                        {__(
-                          "Create your first rule to see performance metrics",
-                        )}
-                      </p>
+                      {rules.length > 0 ? (
+                        <>
+                          <p>
+                            {__(
+                              "No rule-level impact recorded in the last 30 days",
+                            )}
+                          </p>
+                          <p className="text-sm mt-2 max-w-lg mx-auto">
+                            {__(
+                              "Charts use dynamic pricing history when a booking applies an adjusted price. Complete a checkout (or recalculate pricing) after rules are active to populate metrics.",
+                            )}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p>{__("No pricing rules created yet")}</p>
+                          <p className="text-sm mt-2">
+                            {__(
+                              "Create your first rule to see performance metrics",
+                            )}
+                          </p>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1300,10 +1306,23 @@ const DynamicPricingPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="h-40 flex items-center justify-center border border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
-                  <div className="text-center">
+                  <div className="text-center px-4">
                     <p className="text-gray-500 dark:text-gray-400">
-                      {__("No pricing history in the last 30 days")}
+                      {Number(stats.pricing_history_total) > 0 &&
+                      Number(stats.pricing_history_last_30_days) === 0
+                        ? __(
+                            "No pricing events in the last 30 days (older history exists).",
+                          )
+                        : __("No pricing history in the last 30 days")}
                     </p>
+                    {rules.length > 0 &&
+                    Number(stats.pricing_history_total) === 0 ? (
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-md mx-auto">
+                        {__(
+                          "Revenue impact is recorded when a booking uses a trip price adjusted by your rules. Place a test booking to see this chart fill in.",
+                        )}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
               )}
@@ -1335,6 +1354,38 @@ const DynamicPricingPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      {__("Rule calculation base")}
+                    </label>
+                    <select
+                      value={settings.calculation_base || "discounted"}
+                      onChange={(e) =>
+                        handleSettingChange(
+                          "calculation_base",
+                          e.target.value === "regular" ? "regular" : "discounted",
+                        )
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="discounted">
+                        {__(
+                          "Promotional / sale price (stack dynamic pricing on the price customers already see after trip discounts)",
+                        )}
+                      </option>
+                      <option value="regular">
+                        {__(
+                          "Regular list price (compute adjustments from catalog price; requires original price in context)",
+                        )}
+                      </option>
+                    </select>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {__(
+                        "Choose whether percentage and fixed rules use the discounted trip price or the regular list price as their starting point. Bookings and availability pass both values when possible.",
+                      )}
+                    </p>
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       {__("Rule Priority Mode")}

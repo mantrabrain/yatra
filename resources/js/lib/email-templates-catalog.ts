@@ -9,6 +9,10 @@
 import { __ } from "./i18n";
 import type { EmailSettingsValues } from "../components/settings/email-settings-types";
 
+/** Rich booking merge tags (gateway, schedule, travelers, booking meta, special requests). */
+const BOOKING_RICH_MERGE_TAGS =
+  "{{payment_gateway}}, {{payment_gateway_label}}, {{payment_schedule}}, {{payment_schedule_label}}, {{travelers_list}}, {{travelers_list_html}}, {{traveler_custom_fields_html}}, {{booking_custom_fields_html}}, {{special_requests}}, {{special_requests_html}}";
+
 export type EmailCatalogEntry = {
   template_key: string;
   event_key: string;
@@ -79,7 +83,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_booking_subject",
     settingsBody: "email_tpl_booking_body",
     mergeTags:
-      "{{site_name}}, {{customer_name}}, {{customer_first_name}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{travel_date}}, {{travelers_count}}, {{total_amount_formatted}}, {{amount_due_formatted}}, {{currency}}, {{intro_paragraph}}, {{details_html}}, {{footer_note}}",
+      "{{site_name}}, {{customer_name}}, {{customer_first_name}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{travel_date}}, {{travelers_count}}, {{total_amount_formatted}}, {{amount_due_formatted}}, {{currency}}, {{intro_paragraph}}, {{details_html}}, {{footer_note}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
   {
     template_key: "payment_received",
@@ -94,7 +99,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_payment_subject",
     settingsBody: "email_tpl_payment_body",
     mergeTags:
-      "{{site_name}}, {{customer_name}}, {{customer_first_name}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{payment_amount_formatted}}, {{payment_method}}, {{transaction_id}}, {{total_amount_formatted}}, {{currency}}",
+      "{{site_name}}, {{customer_name}}, {{customer_first_name}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{payment_amount_formatted}}, {{payment_method}}, {{transaction_id}}, {{total_amount_formatted}}, {{currency}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
   {
     template_key: "booking_cancelled",
@@ -109,7 +115,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_cancellation_subject",
     settingsBody: "email_tpl_cancellation_body",
     mergeTags:
-      "{{site_name}}, {{customer_name}}, {{customer_first_name}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{travelers_count}}",
+      "{{site_name}}, {{customer_name}}, {{customer_first_name}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{travelers_count}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
   {
     template_key: "trip_reminder",
@@ -127,7 +134,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_reminder_subject",
     settingsBody: "email_tpl_reminder_body",
     mergeTags:
-      "{{site_name}}, {{customer_name}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{travelers_count}}, {{reminder_days}}, {{days_until_trip}}, {{amount_due_formatted}}, {{reminder_extra_html}}",
+      "{{site_name}}, {{customer_name}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{travelers_count}}, {{reminder_days}}, {{days_until_trip}}, {{amount_due_formatted}}, {{reminder_extra_html}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
   {
     template_key: "trip_consent_request",
@@ -182,7 +190,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_admin_booking_subject",
     settingsBody: "email_tpl_admin_booking_body",
     mergeTags:
-      "{{site_name}}, {{site_url}}, {{admin_url}}, {{booking_reference}}, {{booking_id}}, {{customer_name}}, {{customer_email}}, {{customer_phone}}, {{trip_name}}, {{travel_date}}, {{travelers_count}}, {{total_amount_formatted}}, {{currency}}, {{booking_status}}, {{payment_status}}",
+      "{{site_name}}, {{site_url}}, {{admin_url}}, {{booking_reference}}, {{booking_id}}, {{customer_name}}, {{customer_email}}, {{customer_phone}}, {{trip_name}}, {{travel_date}}, {{travelers_count}}, {{total_amount_formatted}}, {{currency}}, {{booking_status}}, {{payment_status}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
   {
     template_key: "admin_payment_received",
@@ -200,7 +209,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_admin_payment_subject",
     settingsBody: "email_tpl_admin_payment_body",
     mergeTags:
-      "{{site_name}}, {{admin_url}}, {{booking_reference}}, {{booking_id}}, {{customer_name}}, {{payment_amount_formatted}}, {{payment_method}}, {{transaction_id}}",
+      "{{site_name}}, {{admin_url}}, {{booking_reference}}, {{booking_id}}, {{customer_name}}, {{payment_amount_formatted}}, {{payment_method}}, {{transaction_id}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
   {
     template_key: "admin_booking_cancelled",
@@ -218,7 +228,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_admin_cancellation_subject",
     settingsBody: "email_tpl_admin_cancellation_body",
     mergeTags:
-      "{{site_name}}, {{admin_url}}, {{booking_reference}}, {{booking_id}}, {{customer_name}}, {{trip_name}}, {{travel_date}}",
+      "{{site_name}}, {{admin_url}}, {{booking_reference}}, {{booking_id}}, {{customer_name}}, {{trip_name}}, {{travel_date}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
   {
     template_key: "new_booking",
@@ -275,7 +286,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_booking_completed_subject",
     settingsBody: "email_tpl_booking_completed_body",
     mergeTags:
-      "{{site_name}}, {{customer_name}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{travel_date}}, {{trip_url}}",
+      "{{site_name}}, {{customer_name}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{travel_date}}, {{trip_url}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
   {
     template_key: "booking_expired_customer",
@@ -293,7 +305,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_booking_expired_customer_subject",
     settingsBody: "email_tpl_booking_expired_customer_body",
     mergeTags:
-      "{{site_name}}, {{customer_name}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{trip_url}}, {{expiry_policy_note}}",
+      "{{site_name}}, {{customer_name}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{trip_url}}, {{expiry_policy_note}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
   {
     template_key: "admin_booking_expired",
@@ -311,7 +324,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_admin_booking_expired_subject",
     settingsBody: "email_tpl_admin_booking_expired_body",
     mergeTags:
-      "{{site_name}}, {{admin_url}}, {{booking_reference}}, {{booking_id}}, {{customer_name}}, {{customer_email}}, {{trip_name}}",
+      "{{site_name}}, {{admin_url}}, {{booking_reference}}, {{booking_id}}, {{customer_name}}, {{customer_email}}, {{trip_name}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
   {
     template_key: "scheduled_payment_reminder",
@@ -330,7 +344,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_scheduled_payment_reminder_subject",
     settingsBody: "email_tpl_scheduled_payment_reminder_body",
     mergeTags:
-      "{{site_name}}, {{customer_first_name}}, {{customer_name}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{trip_url}}, {{scheduled_amount_formatted}}, {{scheduled_date_formatted}}, {{payment_type_label}}, {{scheduled_payment_id}}, {{currency}}",
+      "{{site_name}}, {{customer_first_name}}, {{customer_name}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{trip_url}}, {{scheduled_amount_formatted}}, {{scheduled_date_formatted}}, {{payment_type_label}}, {{scheduled_payment_id}}, {{currency}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
   {
     template_key: "scheduled_payment_succeeded",
@@ -346,7 +361,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_scheduled_payment_succeeded_subject",
     settingsBody: "email_tpl_scheduled_payment_succeeded_body",
     mergeTags:
-      "{{site_name}}, {{customer_first_name}}, {{customer_name}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{scheduled_amount_formatted}}, {{payment_type_label}}, {{balance_after_formatted}}, {{scheduled_payment_id}}, {{currency}}",
+      "{{site_name}}, {{customer_first_name}}, {{customer_name}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{scheduled_amount_formatted}}, {{payment_type_label}}, {{balance_after_formatted}}, {{scheduled_payment_id}}, {{currency}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
   {
     template_key: "scheduled_payment_failed",
@@ -365,7 +381,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_scheduled_payment_failed_subject",
     settingsBody: "email_tpl_scheduled_payment_failed_body",
     mergeTags:
-      "{{site_name}}, {{customer_first_name}}, {{customer_name}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{scheduled_amount_formatted}}, {{scheduled_payment_id}}, {{failure_reason}}, {{failure_intro_html}}, {{failure_followup_html}}",
+      "{{site_name}}, {{customer_first_name}}, {{customer_name}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{scheduled_amount_formatted}}, {{scheduled_payment_id}}, {{failure_reason}}, {{failure_intro_html}}, {{failure_followup_html}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
   {
     template_key: "admin_scheduled_payment_failed",
@@ -384,7 +401,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_admin_scheduled_payment_failed_subject",
     settingsBody: "email_tpl_admin_scheduled_payment_failed_body",
     mergeTags:
-      "{{site_name}}, {{admin_url}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{customer_name}}, {{customer_email}}, {{scheduled_amount_formatted}}, {{scheduled_payment_id}}, {{failure_reason}}",
+      "{{site_name}}, {{admin_url}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{customer_name}}, {{customer_email}}, {{scheduled_amount_formatted}}, {{scheduled_payment_id}}, {{failure_reason}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
   {
     template_key: "payment_reminder",
@@ -460,7 +478,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_review_request_subject",
     settingsBody: "email_tpl_review_request_body",
     mergeTags:
-      "{{site_name}}, {{customer_name}}, {{trip_name}}, {{review_url}}, {{booking_reference}}",
+      "{{site_name}}, {{customer_name}}, {{trip_name}}, {{review_url}}, {{booking_reference}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
   {
     template_key: "abandoned_booking_recovery",
@@ -479,7 +498,8 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsSubject: "email_tpl_abandoned_booking_recovery_subject",
     settingsBody: "email_tpl_abandoned_booking_recovery_body",
     mergeTags:
-      "{{site_name}}, {{customer_name}}, {{trip_name}}, {{recovery_link}}, {{booking_reference}}, {{recovery_reminder_label}}, {{recovery_intro_html}}",
+      "{{site_name}}, {{customer_name}}, {{trip_name}}, {{recovery_link}}, {{booking_reference}}, {{recovery_reminder_label}}, {{recovery_intro_html}}, " +
+      BOOKING_RICH_MERGE_TAGS,
   },
 ];
 

@@ -36,7 +36,7 @@ import {
 import { useToast } from "../components/ui/toast";
 import { __ } from "../lib/i18n";
 import { apiService } from "../lib/api-client";
-import { getCurrencySymbol, getCurrency } from "../data/currencies";
+import { formatYatraMoney } from "../lib/currency-display";
 import PremiumUpgradeCard from "./premium-pages/AbandonedRecovery";
 import {
   TrendingUp,
@@ -92,12 +92,7 @@ const isModuleAvailable = (): boolean => {
 const formatPrice = (price: number, currencyCode?: string): string => {
   const globalCurrency = (window as any)?.yatraAdmin?.currency || "USD";
   const currency = currencyCode || globalCurrency;
-
-  const symbol = getCurrencySymbol(currency);
-  const currencyData = getCurrency(currency);
-  const decimals = currencyData?.decimalDigits ?? 2;
-
-  return `${symbol}${Number(price).toFixed(decimals)}`;
+  return formatYatraMoney(Number(price) || 0, currency, { zeroAsUnknown: false });
 };
 
 // Main Component

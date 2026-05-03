@@ -43,7 +43,7 @@ import {
 } from "../lib/frontend-permalink-urls";
 import { useToast } from "../components/ui/toast";
 import { generateSlug } from "../lib/slug";
-import { getCurrencySymbol, getCurrency } from "../data/currencies";
+import { formatYatraMoney } from "../lib/currency-display";
 import { Pagination } from "../components/shared/Pagination";
 import { Table as SharedTable } from "../components/shared/Table";
 import { BulkActionToolbar } from "../components/shared/BulkActionToolbar";
@@ -389,15 +389,6 @@ const Trips: React.FC = () => {
 
   const formatPrice = (trip: Trip) => {
     const currencyCode = defaultCurrency;
-    const symbol = getCurrencySymbol(currencyCode);
-    const currencyData = getCurrency(currencyCode);
-    const decimals = currencyData?.decimalDigits ?? 2;
-
-    const formatNumber = (value: number) =>
-      new Intl.NumberFormat(undefined, {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals,
-      }).format(value);
 
     // Traveler-based pricing: show min - max range
     if (trip.pricing_type === "traveler_based") {
@@ -434,9 +425,9 @@ const Trips: React.FC = () => {
 
       if (minPrice !== null && maxPrice !== null) {
         if (minPrice === maxPrice) {
-          return `${symbol}${formatNumber(minPrice)} \n`;
+          return `${formatYatraMoney(minPrice, currencyCode, { zeroAsUnknown: false })} \n`;
         }
-        return `${symbol}${formatNumber(minPrice)} - ${symbol}${formatNumber(maxPrice)}`;
+        return `${formatYatraMoney(minPrice, currencyCode, { zeroAsUnknown: false })} - ${formatYatraMoney(maxPrice, currencyCode, { zeroAsUnknown: false })}`;
       }
     }
 
@@ -448,7 +439,9 @@ const Trips: React.FC = () => {
       return "-";
     }
 
-    return `${symbol}${formatNumber(price)}`;
+    return formatYatraMoney(Number(price), currencyCode, {
+      zeroAsUnknown: false,
+    });
   };
 
   const getStatusBadge = (status: string) => {

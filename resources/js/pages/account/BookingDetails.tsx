@@ -246,7 +246,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                 {booking.trip_url ? (
                   <a
                     href={booking.trip_url}
-                    className="mt-2 inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                    className="mt-2 inline-flex items-center gap-2 text-sm text-yatra-primary dark:text-yatra-on-dark hover:underline"
                   >
                     <ExternalLink className="w-4 h-4" />
                     {__("View Trip", "yatra")}
@@ -562,7 +562,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                   return (
                     <div
                       key={index}
-                      className={`p-4 rounded-lg ${index === 0 ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800" : "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"}`}
+                      className={`p-4 rounded-lg ${index === 0 ? "bg-yatra-soft dark:bg-yatra-surface-dark-muted border border-yatra-border-subtle dark:border-yatra-border-dark" : "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"}`}
                     >
                       <div className="flex items-center justify-between mb-3">
                         <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -577,7 +577,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                           )}
                         </h4>
                         {index === 0 && (
-                          <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded">
+                          <span className="text-xs bg-yatra-chip-bg text-yatra-primary-dark dark:bg-yatra-surface-dark dark:text-yatra-primary-light px-2 py-0.5 rounded">
                             {__("Primary Contact", "yatra")}
                           </span>
                         )}
@@ -721,7 +721,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                           href={d.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium"
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium"
                         >
                           <Download className="w-4 h-4" />
                           {__("Download", "yatra")}

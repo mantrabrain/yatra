@@ -1,5 +1,8 @@
 import { __, sprintf } from "../../lib/i18n";
-import { getCurrencySymbol, getCurrency } from "../../data/currencies";
+import {
+  applyCurrencyPosition,
+  formatYatraMoney,
+} from "../../lib/currency-display";
 
 export const formatDate = (value: string | undefined | null) => {
   if (!value) {
@@ -77,7 +80,7 @@ export const getBadge = (status: string | undefined | null) => {
     case "cancelled":
       return `${base} bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300`;
     default:
-      return `${base} bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300`;
+      return `${base} bg-yatra-chip-bg text-yatra-primary-darker dark:bg-yatra-surface-dark dark:text-yatra-primary-light`;
   }
 };
 
@@ -102,7 +105,9 @@ function readPriceConfig() {
   return {
     globalCurrency: (a.currency || p.currency || "USD") as string,
     currencyPosition: (a.currencyPosition ||
+      a.currency_position ||
       p.currencyPosition ||
+      p.currency_position ||
       "before") as string,
     decimalPlaces: Number(a.decimalPlaces ?? p.decimalPlaces ?? 2) || 2,
     thousandSeparator: (a.thousandSeparator ||
@@ -144,11 +149,11 @@ export const formatPrice = (price: number) => {
     .replace(/[\d\s.,]/g, "")
     .trim();
 
-  if (currencyPosition === "right" || currencyPosition === "after") {
-    return `${formattedAmount}${currencySymbol}`;
-  }
-
-  return `${currencySymbol}${formattedAmount}`;
+  return applyCurrencyPosition(
+    formattedAmount,
+    currencySymbol,
+    currencyPosition,
+  );
 };
 
 export const formatPriceForBooking = (price: number, currency?: string) => {
@@ -183,25 +188,15 @@ export const formatPriceForBooking = (price: number, currency?: string) => {
     .replace(/[\d\s.,]/g, "")
     .trim();
 
-  if (currencyPosition === "right" || currencyPosition === "after") {
-    return `${formattedAmount}${currencySymbol}`;
-  }
-
-  return `${currencySymbol}${formattedAmount}`;
+  return applyCurrencyPosition(
+    formattedAmount,
+    currencySymbol,
+    currencyPosition,
+  );
 };
 
-export const currency = (value: number, currencyCode: string = "USD") => {
-  const symbol = getCurrencySymbol(currencyCode);
-  const currencyData = getCurrency(currencyCode);
-  const decimals = currencyData?.decimalDigits ?? 2;
-
-  const formatted = new Intl.NumberFormat(undefined, {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  }).format(value);
-
-  return `${symbol}${formatted}`;
-};
+export const currency = (value: number, currencyCode: string = "USD") =>
+  formatYatraMoney(Number(value) || 0, currencyCode, { zeroAsUnknown: false });
 
 /** Values from `wp_localize_script(…, 'yatraAccountPage', …)` on the account page. */
 export function getYatraAccountPageGlobals(): {

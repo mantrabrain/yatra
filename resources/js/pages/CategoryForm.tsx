@@ -27,6 +27,21 @@ import { ConditionalRender } from "../components/ui/conditional-render";
 import { IconPicker, IconPickerValue } from "../components/ui/icon-picker";
 import { RichTextEditor } from "../components/ui/rich-text-editor";
 
+/** DB / REST may send 0|1 as number or string; never use Boolean() on string "0". */
+function parseTripCategoryIsFeatured(raw: unknown): boolean {
+  if (raw === true || raw === 1) {
+    return true;
+  }
+  if (raw === false || raw === 0 || raw === null || raw === undefined) {
+    return false;
+  }
+  if (typeof raw === "string") {
+    const t = raw.trim();
+    return t === "1" || t.toLowerCase() === "true";
+  }
+  return Number(raw) === 1;
+}
+
 interface CategoryFormData {
   name: string;
   slug: string;
@@ -34,6 +49,8 @@ interface CategoryFormData {
   icon: IconPickerValue | null;
   parent_id: number | "";
   status: string;
+  /** Trip category card "Featured" badge on shortcode / Trip Category block */
+  is_featured: boolean;
   seo_title: string;
   seo_description: string;
   seo_keywords: string;
@@ -56,6 +73,7 @@ const CategoryForm: React.FC = () => {
     icon: null,
     parent_id: "",
     status: "publish",
+    is_featured: false,
     seo_title: "",
     seo_description: "",
     seo_keywords: "",
@@ -161,6 +179,9 @@ const CategoryForm: React.FC = () => {
         icon: (categoryData.icon as IconPickerValue) || null,
         parent_id: categoryData.parent_id ?? "",
         status: categoryData.status || "publish",
+        is_featured: parseTripCategoryIsFeatured(
+          (categoryData as { is_featured?: unknown }).is_featured,
+        ),
         seo_title: categoryData.metadata?.seo_title || "",
         seo_description: categoryData.metadata?.seo_description || "",
         seo_keywords: categoryData.metadata?.seo_keywords || "",
@@ -246,6 +267,7 @@ const CategoryForm: React.FC = () => {
         icon: data.icon,
         parent_id: data.parent_id === "" ? null : Number(data.parent_id),
         status: data.status,
+        is_featured: data.is_featured ? 1 : 0,
         seo_title: data.seo_title.trim(),
         seo_description: data.seo_description.trim(),
         seo_keywords: data.seo_keywords.trim(),
@@ -591,6 +613,37 @@ const CategoryForm: React.FC = () => {
                     <option value="publish">{__("Publish", "yatra")}</option>
                     <option value="trash">{__("Trash", "yatra")}</option>
                   </Select>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">
+                    {__("Visibility", "yatra")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      checked={formData.is_featured}
+                      onChange={(e) =>
+                        handleFieldChange("is_featured", e.target.checked)
+                      }
+                    />
+                    <span>
+                      <span className="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                        {__("Featured category", "yatra")}
+                      </span>
+                      <span className="block text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        {__(
+                          "Shows a “Featured” badge on Trip Category blocks and the [yatra_trip_category] shortcode cards.",
+                          "yatra",
+                        )}
+                      </span>
+                    </span>
+                  </label>
                 </CardContent>
               </Card>
 

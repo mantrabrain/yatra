@@ -557,7 +557,7 @@ class ComposerStaticInit2644eb7ce44b7b2615237db55150e0c3
         'Yatra\\Upgrades\\Contracts\\UpgradeStepInterface' => __DIR__ . '/../..' . '/app/Upgrades/Contracts/UpgradeStepInterface.php',
         'Yatra\\Upgrades\\FreeUpgradeRegistry' => __DIR__ . '/../..' . '/app/Upgrades/FreeUpgradeRegistry.php',
         'Yatra\\Upgrades\\FreeUpgradeRunner' => __DIR__ . '/../..' . '/app/Upgrades/FreeUpgradeRunner.php',
-        'Yatra\\Upgrades\\Versions\\Upgrade_3_0_1' => __DIR__ . '/../..' . '/app/Upgrades/Versions/Upgrade_3_0_1.php',
+        'Yatra\\Upgrades\\Versions\\Upgrade_3_0_3' => __DIR__ . '/../..' . '/app/Upgrades/Versions/Upgrade_3_0_3.php',
         'Yatra\\Utils\\Cache' => __DIR__ . '/../..' . '/app/Utils/Cache.php',
         'Yatra\\Utils\\Logger' => __DIR__ . '/../..' . '/app/Utils/Logger.php',
         'Yatra\\Utils\\QueryCache' => __DIR__ . '/../..' . '/app/Utils/QueryCache.php',

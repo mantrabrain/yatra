@@ -5,48 +5,15 @@ if (!defined('ABSPATH')) {
 ?>
 <aside class="yatra-trip-sidebar" id="booking">
     <?php
-    // Determine if this is a multi-day trip
-    $is_multi_day = ($trip->getDurationDays() ?? 1) > 1;
-
     // Group discounts (Advanced Discount / Pro): same payload as the public REST discoverability endpoint
     $sidebar_has_group_discounts = false;
     $sidebar_group_discount_cards = [];
-    $sidebar_group_discounts_for_js = [];
     if (function_exists('yatra_single_trip_get_group_discounts')) {
         $gd = yatra_single_trip_get_group_discounts((int) $trip->getId());
         $sidebar_has_group_discounts = !empty($gd['has_group_discounts']);
         $sidebar_group_discount_cards = isset($gd['group_discounts_data']) && is_array($gd['group_discounts_data'])
             ? $gd['group_discounts_data']
             : [];
-    }
-    // Only pass tiers into booking JS when Advanced Discount applies them server-side (avoid misleading prices).
-    $sidebar_group_discounts_for_js = apply_filters('yatra_advanced_discount_enabled', false)
-        ? $sidebar_group_discount_cards
-        : [];
-
-    // Prepare availability data for JavaScript
-    $availability_json = [];
-    if ($has_availability) {
-        foreach ($trip->getAvailabilityDates() as $avail) {
-            $availability_json[] = [
-                'id' => (int) $avail->id,
-                'date' => $avail->departure_date,
-                'departure_date' => $avail->departure_date,
-                'return_date' => (isset($avail->return_date) && $avail->return_date !== '')
-                    ? $avail->return_date
-                    : (isset($avail->arrival_date) ? $avail->arrival_date : null),
-                'price' => $avail->effective_price ?? $avail->original_price,
-                'original_price' => $avail->original_price,
-                'discounted_price' => $avail->discounted_price,
-                'seats_available' => $avail->seats_available,
-                'seats_total' => $avail->seats_total,
-                'status' => $avail->status,
-                'is_limited' => $avail->is_limited ?? false,
-                'is_sold_out' => $avail->is_sold_out ?? false,
-                'pricing_type' => (!empty($avail->price_types) && is_array($avail->price_types)) ? 'traveler_based' : $pricing_type,
-                'price_types' => !empty($avail->price_types) ? $avail->price_types : [],
-            ];
-        }
     }
 
     // Pro: check whether this trip has booking disabled (enquiry-only mode)
@@ -73,12 +40,32 @@ if (!defined('ABSPATH')) {
             ? sprintf(__('Save up to %d%%', 'yatra'), $displayPricing['max_discount_percentage']) : '',
         'discount_percentage' => $displayPricing['max_discount_percentage'],
     ];
+
+    $dp_display_sidebar = apply_filters('yatra_get_dynamic_pricing_display_settings', [
+        'show_original_price' => true,
+        'show_savings_badge' => true,
+        'show_urgency_messages' => false,
+    ]);
+    $dp_show_savings_sidebar = filter_var($dp_display_sidebar['show_savings_badge'] ?? true, FILTER_VALIDATE_BOOLEAN);
+    $show_strike_original_sidebar = filter_var($dp_display_sidebar['show_original_price'] ?? true, FILTER_VALIDATE_BOOLEAN);
+    $yatra_sidebar_urgency = function_exists('yatra_trip_card_dynamic_pricing_urgency_lines')
+        ? yatra_trip_card_dynamic_pricing_urgency_lines((int) $trip->getId(), [
+            'base_sale_price' => (float) ($displayPricing['effective_price_min'] ?? 0),
+            'base_original_price' => (float) ($displayPricing['min_category_original_price'] ?? 0),
+            'sale_price' => (float) ($displayPricing['effective_price_min'] ?? 0),
+            'original_price' => (float) ($displayPricing['min_category_original_price'] ?? 0),
+            'departure_date' => null,
+            'spots_remaining' => null,
+            'availability_id' => null,
+            'surface' => 'single_sidebar',
+        ])
+        : [];
     ?>
     <?php if ($booking_disabled): ?>
     <div class="yatra-booking-card yatra-enquiry-only-card">
         <!-- Price Display -->
         <div class="yatra-booking-price">
-            <?php if ($discount['has_discount']): ?>
+            <?php if ($discount['has_discount'] && $dp_show_savings_sidebar): ?>
                 <div class="yatra-booking-discount-badge">
                     <?php echo esc_html($discount['discount_text']); ?>
                 </div>
@@ -86,11 +73,18 @@ if (!defined('ABSPATH')) {
             <div class="yatra-booking-price-main">
                 <?php if ($pricing['has_price']): ?>
                     <span class="yatra-booking-price-label-top"><?php echo esc_html__('From', 'yatra'); ?></span>
-                    <?php if ($pricing['has_discount'] && !empty($pricing['original_price'])): ?>
+                    <?php if ($pricing['has_discount'] && !empty($pricing['original_price']) && $show_strike_original_sidebar): ?>
                         <span class="yatra-booking-price-original"><?php echo esc_html($pricing['original_price']); ?></span>
                     <?php endif; ?>
                     <span class="yatra-booking-price-amount" id="display-price"><?php echo esc_html($pricing['current_price']); ?></span>
                     <span class="yatra-booking-price-label"><?php echo esc_html__('per person', 'yatra'); ?></span>
+                    <?php if (!empty($yatra_sidebar_urgency)) : ?>
+                        <?php foreach ($yatra_sidebar_urgency as $yatra_sb_urg) : ?>
+                            <div class="yatra-booking-dp-urgency" style="background-color:#fef3c7;color:#92400e;padding:6px 8px;border-radius:6px;margin-top:8px;font-size:12px;line-height:1.35;">
+                                <?php echo esc_html((string) $yatra_sb_urg); ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 <?php else: ?>
                     <span class="yatra-booking-price-amount yatra-contact-pricing" id="display-price"><?php echo esc_html__('Contact for pricing', 'yatra'); ?></span>
                 <?php endif; ?>
@@ -114,12 +108,7 @@ if (!defined('ABSPATH')) {
         </button>
     </div>
     <?php else: ?>
-    <div class="yatra-booking-card"
-         data-has-availability="<?php echo $has_availability ? 'true' : 'false'; ?>"
-         data-is-multi-day="<?php echo $is_multi_day ? 'true' : 'false'; ?>"
-         data-pricing-type="<?php echo esc_attr($pricing_type); ?>"
-         data-availability='<?php echo esc_attr(json_encode($availability_json)); ?>'
-         data-group-discounts='<?php echo esc_attr(wp_json_encode($sidebar_group_discounts_for_js)); ?>'>
+    <div class="yatra-booking-card">
 
         <?php if ($sidebar_has_group_discounts && !empty($sidebar_group_discount_cards)): ?>
             <?php
@@ -132,7 +121,7 @@ if (!defined('ABSPATH')) {
 
         <!-- Price Display -->
         <div class="yatra-booking-price">
-            <?php if ($discount['has_discount']): ?>
+            <?php if ($discount['has_discount'] && $dp_show_savings_sidebar): ?>
                 <div class="yatra-booking-discount-badge">
                     <?php echo esc_html($discount['discount_text']); ?>
                 </div>
@@ -142,11 +131,18 @@ if (!defined('ABSPATH')) {
                     <?php if ($has_availability || $has_traveler_pricing): ?>
                         <span class="yatra-booking-price-label-top"><?php echo esc_html__('From', 'yatra'); ?></span>
                     <?php endif; ?>
-                    <?php if ($pricing['has_discount'] && !empty($pricing['original_price'])): ?>
+                    <?php if ($pricing['has_discount'] && !empty($pricing['original_price']) && $show_strike_original_sidebar): ?>
                         <span class="yatra-booking-price-original"><?php echo esc_html($pricing['original_price']); ?></span>
                     <?php endif; ?>
                     <span class="yatra-booking-price-amount" id="display-price"><?php echo esc_html($pricing['current_price']); ?></span>
                     <span class="yatra-booking-price-label"><?php echo esc_html__('per person', 'yatra'); ?></span>
+                    <?php if (!empty($yatra_sidebar_urgency)) : ?>
+                        <?php foreach ($yatra_sidebar_urgency as $yatra_sb_urg) : ?>
+                            <div class="yatra-booking-dp-urgency" style="background-color:#fef3c7;color:#92400e;padding:6px 8px;border-radius:6px;margin-top:8px;font-size:12px;line-height:1.35;">
+                                <?php echo esc_html((string) $yatra_sb_urg); ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 <?php else: ?>
                     <span class="yatra-booking-price-amount yatra-contact-pricing" id="display-price"><?php echo esc_html__('Contact for pricing', 'yatra'); ?></span>
                     <span class="yatra-booking-price-label"><?php echo esc_html__('per person', 'yatra'); ?></span>

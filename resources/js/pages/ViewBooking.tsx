@@ -34,7 +34,7 @@ import {
 } from "../components/ui/card";
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { Skeleton } from "../components/ui/skeleton";
-import { getCurrencySymbol, getCurrency } from "../data/currencies";
+import { formatYatraMoney } from "../lib/currency-display";
 
 interface GoogleCalendarSyncInfo {
   synced: boolean;
@@ -228,20 +228,8 @@ const ViewBooking: React.FC = () => {
     return formatDateUtil(dateString);
   };
 
-  const formatPrice = (price: number, currencyCode: string = "USD") => {
-    // Always format the price, even if 0 - don't show "Contact for pricing" for bookings
-    const numPrice = Number(price) || 0;
-    const symbol = getCurrencySymbol(currencyCode);
-    const currencyData = getCurrency(currencyCode);
-    const decimals = currencyData?.decimalDigits ?? 2;
-
-    const formatted = new Intl.NumberFormat(undefined, {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
-    }).format(numPrice);
-
-    return `${symbol}${formatted}`;
-  };
+  const formatPrice = (price: number, currencyCode: string = "USD") =>
+    formatYatraMoney(Number(price) || 0, currencyCode, { zeroAsUnknown: false });
 
   // Country code to name mapping
   const COUNTRY_NAMES: Record<string, string> = {

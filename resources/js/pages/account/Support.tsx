@@ -45,7 +45,7 @@ const Support: React.FC<SupportProps> = ({ tickets }) => {
         );
       case "open":
         return (
-          <AlertTriangle className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          <AlertTriangle className="w-4 h-4 text-yatra-primary dark:text-yatra-on-dark" />
         );
       default:
         return (
@@ -61,8 +61,8 @@ const Support: React.FC<SupportProps> = ({ tickets }) => {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-3">
-              <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <LifeBuoy className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              <div className="p-2 bg-yatra-soft dark:bg-yatra-surface-dark-muted rounded-lg">
+                <LifeBuoy className="w-6 h-6 text-yatra-primary dark:text-yatra-on-dark" />
               </div>
               {__("Support & Help Center", "yatra")}
             </h2>
@@ -88,8 +88,8 @@ const Support: React.FC<SupportProps> = ({ tickets }) => {
                 {displayTickets.length}
               </p>
             </div>
-            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <LifeBuoy className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 bg-yatra-soft dark:bg-yatra-surface-dark-muted rounded-lg">
+              <LifeBuoy className="w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" />
             </div>
           </div>
         </div>
@@ -99,7 +99,7 @@ const Support: React.FC<SupportProps> = ({ tickets }) => {
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                 {__("Open", "yatra")}
               </p>
-              <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
+              <p className="text-xl font-bold text-yatra-primary dark:text-yatra-on-dark">
                 {
                   displayTickets.filter(
                     (t) =>
@@ -108,8 +108,8 @@ const Support: React.FC<SupportProps> = ({ tickets }) => {
                 }
               </p>
             </div>
-            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <AlertTriangle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 bg-yatra-soft dark:bg-yatra-surface-dark-muted rounded-lg">
+              <AlertTriangle className="w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" />
             </div>
           </div>
         </div>
@@ -133,8 +133,8 @@ const Support: React.FC<SupportProps> = ({ tickets }) => {
       {/* Create New Ticket */}
       <div className="yatra-support-form-card bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
         <div className="yatra-support-form-header flex items-center gap-3 mb-6">
-          <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <LifeBuoy className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+          <div className="p-2 bg-yatra-soft dark:bg-yatra-surface-dark-muted rounded-lg">
+            <LifeBuoy className="w-6 h-6 text-yatra-primary dark:text-yatra-on-dark" />
           </div>
           <div>
             <h3 className="text-base font-semibold text-gray-900 dark:text-white">
@@ -162,7 +162,7 @@ const Support: React.FC<SupportProps> = ({ tickets }) => {
               onChange={(e) => setTicketSubject(e.target.value)}
               placeholder={__("Enter ticket subject", "yatra")}
               required
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
             />
           </div>
           <div>
@@ -175,12 +175,12 @@ const Support: React.FC<SupportProps> = ({ tickets }) => {
               placeholder={__("How can we help?", "yatra")}
               required
               rows={6}
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
             />
           </div>
           <button
             type="submit"
-            className="yatra-support-submit-btn inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium"
+            className="yatra-support-submit-btn inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium"
           >
             <LifeBuoy className="w-4 h-4" /> {__("Submit Ticket", "yatra")}
           </button>
@@ -225,7 +225,7 @@ const Support: React.FC<SupportProps> = ({ tickets }) => {
                               ? "bg-emerald-50 dark:bg-emerald-900/20"
                               : isAwaiting
                                 ? "bg-amber-50 dark:bg-amber-900/20"
-                                : "bg-blue-50 dark:bg-blue-900/20"
+                                : "bg-yatra-soft dark:bg-yatra-surface-dark-muted"
                           }`}
                         >
                           {getStatusIcon(ticket.status)}
@@ -268,8 +268,8 @@ const Support: React.FC<SupportProps> = ({ tickets }) => {
       <div
         className="yatra-support-contact rounded-xl p-6 text-white shadow-xl"
         style={{
-          backgroundColor: "#2563eb",
-          backgroundImage: "linear-gradient(to bottom right, #2563eb, #4f46e5)",
+          backgroundImage:
+            "linear-gradient(to bottom right, var(--yatra-primary-dark, #2563eb), var(--yatra-primary-darker, #1e40af))",
         }}
       >
         <div className="flex items-start gap-4">

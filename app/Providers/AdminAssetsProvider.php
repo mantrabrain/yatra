@@ -35,6 +35,11 @@ class AdminAssetsProvider
         }
 
         return apply_filters('yatra_admin_localized_data', [
+            'timeZoneIdentifiers' => self::buildTimezoneIdentifierList(),
+            'wordPressTimezone' => function_exists('wp_timezone_string')
+                ? (string) wp_timezone_string()
+                : 'UTC',
+            'timezone' => \Yatra\Services\SettingsService::getString('timezone', 'UTC'),
             'apiUrl' => rest_url('yatra/v1'),
             'licenseStatus' => (function () {
                 $all = get_option('yatra_license', []);
@@ -63,11 +68,41 @@ class AdminAssetsProvider
 
             'locale' => get_locale(),
             'currency' => \Yatra\Services\SettingsService::getCurrency(),
+            'currencyPosition' => \Yatra\Services\SettingsService::getString('currency_position', 'left'),
+            'currency_position' => \Yatra\Services\SettingsService::getString('currency_position', 'left'),
+            'decimalPlaces' => (int) \Yatra\Services\SettingsService::getString('currency_decimals', '2'),
+            'thousandSeparator' => \Yatra\Services\SettingsService::getString('thousand_separator', ','),
+            'decimalSeparator' => \Yatra\Services\SettingsService::getString('decimal_separator', '.'),
             'date_format' => \Yatra\Services\SettingsService::get('date_format', 'Y-m-d'),
             'time_format' => \Yatra\Services\SettingsService::get('time_format', 'H:i'),
             'geocodingNonce' => wp_create_nonce('yatra_geocoding_nonce'),
             'ajaxUrl' => admin_url('admin-ajax.php'),
         ]);
+    }
+
+    /**
+     * Sorted IANA identifiers for the admin timezone control (matches PHP {@see DateTimeZone}).
+     *
+     * @return list<string>
+     */
+    private static function buildTimezoneIdentifierList(): array
+    {
+        if (!function_exists('timezone_identifiers_list')) {
+            return ['UTC'];
+        }
+
+        $ids = timezone_identifiers_list();
+        if (!is_array($ids) || $ids === []) {
+            return ['UTC'];
+        }
+
+        $ids = array_values(array_filter($ids, static function ($id): bool {
+            return is_string($id) && $id !== '';
+        }));
+
+        sort($ids, SORT_STRING);
+
+        return $ids;
     }
 
     /**

@@ -14,6 +14,10 @@ if (!defined('ABSPATH')) {
 
 $columns = (int) $atts['columns'];
 $column_class = 'yatra-discount-grid-' . min(max($columns, 1), 4);
+$yatra_deals_dp_overlay = true;
+if (function_exists('yatra_get_dynamic_pricing_display_flags')) {
+    $yatra_deals_dp_overlay = !empty(yatra_get_dynamic_pricing_display_flags()['show_savings_badge']);
+}
 ?>
 
 <div class="yatra-discount-shortcode">
@@ -41,7 +45,7 @@ $column_class = 'yatra-discount-grid-' . min(max($columns, 1), 4);
                     ?>
                     
                     <!-- Discount Badge Overlay -->
-                    <?php if ($trip->has_discount && !empty($trip->best_discount)): ?>
+                    <?php if ($yatra_deals_dp_overlay && $trip->has_discount && !empty($trip->best_discount)): ?>
                         <div class="yatra-discount-badge">
                             <?php
                             printf(

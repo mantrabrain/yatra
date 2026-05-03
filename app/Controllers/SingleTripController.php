@@ -1784,13 +1784,22 @@ class SingleTripController
                     }
                 }
 
-                $display_price_type = $price_type->effective_price ?? \Yatra\Services\TripPricingService::resolveCategoryEffectivePrice((array) $price_type);
+                $pt_arr = (array) $price_type;
+                $eff_before_dp = (float) ($price_type->effective_price ?? \Yatra\Services\TripPricingService::resolveCategoryEffectivePrice($pt_arr));
+                $display_price_type = $eff_before_dp;
                 if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
                     $trip_id = is_object($trip) && method_exists($trip, 'getId') ? $trip->getId() : ($trip->id ?? 0);
-                    $display_price_type = apply_filters('yatra_trip_display_price', $display_price_type, $trip_id, [
+                    $pt_orig_dp = (float) ($price_type->original_price ?? 0);
+                    $pt_disc_dp = (float) ($price_type->discounted_price ?? $price_type->sale_price ?? 0);
+                    if ($pt_disc_dp <= 0) {
+                        $pt_disc_dp = $eff_before_dp;
+                    }
+                    $display_price_type = apply_filters('yatra_trip_display_price', $eff_before_dp, $trip_id, [
                         'departure_date' => null,
                         'spots_remaining' => null,
                         'price_type_id' => $price_type->id ?? null,
+                        'original_price' => $pt_orig_dp > 0 ? $pt_orig_dp : $eff_before_dp,
+                        'discounted_price' => $pt_disc_dp > 0 ? $pt_disc_dp : $eff_before_dp,
                     ]);
                 }
 
@@ -2003,11 +2012,18 @@ class SingleTripController
                     
                 // Apply dynamic pricing to traveler category prices
                 if ($dp_enabled && $pt_price > 0) {
+                    $pt_orig_dp = (float) ($pt->original_price ?? 0);
+                    $pt_disc_dp = (float) ($pt->discounted_price ?? $pt->sale_price ?? $pt->effective_price ?? 0);
+                    if ($pt_disc_dp <= 0) {
+                        $pt_disc_dp = $pt_price;
+                    }
                     $pt_price = apply_filters('yatra_availability_price', $pt_price, $trip_id, [
                         'departure_date' => $card['date'] ?? null,
                         'spots_remaining' => $card['spots_remaining'] ?? null,
                         'availability_id' => $item_id,
                         'price_type_id' => $pt->id ?? ($pt->price_type_id ?? null),
+                        'original_price' => $pt_orig_dp > 0 ? $pt_orig_dp : $pt_price,
+                        'discounted_price' => $pt_disc_dp > 0 ? $pt_disc_dp : $pt_price,
                     ]);
                 }
 

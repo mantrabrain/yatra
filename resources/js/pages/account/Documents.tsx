@@ -127,7 +127,7 @@ const Documents: React.FC<DocumentsProps> = ({ documents }) => {
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
               {__("Itinerary", "yatra")}
             </p>
-            <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
+            <p className="text-xl font-bold text-yatra-primary dark:text-yatra-on-dark">
               {documentsByCategory.itinerary.length}
             </p>
           </div>
@@ -259,7 +259,7 @@ const Documents: React.FC<DocumentsProps> = ({ documents }) => {
                               );
                             }
                           }}
-                          className="yatra-document-action yatra-document-action-download inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium"
+                          className="yatra-document-action yatra-document-action-download inline-flex items-center px-4 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium"
                         >
                           {__("Download", "yatra")}
                         </button>

@@ -28,6 +28,7 @@ import { apiClient } from "../../lib/api-client";
 import { useToast } from "../ui/toast";
 import { BulkActionToolbar, Table as SharedTable } from "../shared";
 import { ConfirmationDialog } from "../ui/confirmation-dialog";
+import { formatYatraMoney } from "../../lib/currency-display";
 
 interface RecurringRule {
   id: number;
@@ -92,6 +93,11 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
   const isTravelerBased = pricingType === "traveler_based";
   const queryClient = useQueryClient();
   const { showToast } = useToast();
+  const adminCurrency =
+    (typeof window !== "undefined" &&
+      (window as unknown as { yatraAdmin?: { currency?: string } })
+        .yatraAdmin?.currency) ||
+    "USD";
 
   // State management
   const [searchTerm, setSearchTerm] = useState("");
@@ -457,10 +463,16 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
         render: (rule: RecurringRule) => (
           <div className="text-sm font-semibold text-gray-900 dark:text-white">
             {rule.sale_price
-              ? `$${rule.sale_price}`
+              ? formatYatraMoney(Number(rule.sale_price) || 0, adminCurrency, {
+                  zeroAsUnknown: false,
+                })
               : rule.original_price
-                ? `$${rule.original_price}`
-                : "$0"}
+                ? formatYatraMoney(
+                    Number(rule.original_price) || 0,
+                    adminCurrency,
+                    { zeroAsUnknown: false },
+                  )
+                : formatYatraMoney(0, adminCurrency, { zeroAsUnknown: false })}
           </div>
         ),
       });
@@ -476,7 +488,13 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     }
 
     return cols;
-  }, [visibleColumns, formatRulePattern, formatDate, getStatusBadge]);
+  }, [
+    visibleColumns,
+    formatRulePattern,
+    formatDate,
+    getStatusBadge,
+    adminCurrency,
+  ]);
 
   // Status toggle mutation
   const toggleStatusMutation = useMutation({

@@ -6,6 +6,7 @@
 
 import React from "react";
 import { __ } from "../../lib/i18n";
+import { formatYatraMoney } from "../../lib/currency-display";
 import { ConditionalRender } from "../ui/conditional-render";
 import {
   Table,
@@ -55,9 +56,18 @@ export const TripsTable: React.FC<TripsTableProps> = ({
     return new Date(dateString).toLocaleDateString();
   };
 
-  const formatPrice = (price: number) => {
-    return `$${price.toFixed(2)}`;
-  };
+  const defaultCurrency =
+    (typeof window !== "undefined" &&
+      ((window as unknown as { yatraAdmin?: { currency?: string } })
+        .yatraAdmin?.currency ||
+        (window as unknown as { yatraBookingData?: { currency?: string } })
+          .yatraBookingData?.currency)) ||
+    "USD";
+
+  const formatPrice = (price: number) =>
+    formatYatraMoney(Number(price) || 0, defaultCurrency, {
+      zeroAsUnknown: false,
+    });
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<

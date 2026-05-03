@@ -86,7 +86,17 @@ class FormatHelper
      */
     public static function formatPrice(float $amount, string $currency = 'USD', bool $showCode = false): string
     {
-        return CurrencyHelper::format($amount, $currency, $showCode);
+        if (function_exists('yatra_format_price')) {
+            $main = yatra_format_price($amount, $currency, false);
+        } else {
+            $main = CurrencyHelper::format($amount, $currency, false);
+        }
+
+        if ($showCode) {
+            return $main . ' ' . strtoupper($currency);
+        }
+
+        return $main;
     }
 
     /**

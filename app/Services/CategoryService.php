@@ -42,6 +42,8 @@ class CategoryService extends BaseService
      */
     protected function processBeforeCreate(array $data): array
     {
+        unset($data['preserve_slug']);
+
         // Set the type to 'category' for the ClassificationsTable
         $data['type'] = 'category';
 
@@ -76,6 +78,10 @@ class CategoryService extends BaseService
                 : 'draft';
         } else {
             $data['status'] = 'draft';
+        }
+
+        if (array_key_exists('is_featured', $data)) {
+            $data['is_featured'] = !empty($data['is_featured']) ? 1 : 0;
         }
 
         // Set created_by and updated_by to current user
@@ -148,7 +154,8 @@ class CategoryService extends BaseService
      */
     protected function processBeforeUpdate(int $id, array $data): array
     {
-        
+        unset($data['preserve_slug']);
+
         // Ensure the type remains 'category' for the ClassificationsTable
         $data['type'] = 'category';
 
@@ -182,6 +189,10 @@ class CategoryService extends BaseService
             $data['status'] = in_array($data['status'], $allowed_statuses, true) 
                 ? $data['status'] 
                 : 'draft';
+        }
+
+        if (array_key_exists('is_featured', $data)) {
+            $data['is_featured'] = !empty($data['is_featured']) ? 1 : 0;
         }
 
         // Set updated_by to current user

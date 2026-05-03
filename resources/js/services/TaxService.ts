@@ -7,6 +7,8 @@
  * @since 3.0.0
  */
 
+import { formatYatraMoney } from "../lib/currency-display";
+
 interface TaxDetails {
   tax_amount: number;
   tax_rate: number;
@@ -251,9 +253,9 @@ class TaxService {
    */
   formatPrice(amount: number): string {
     const currency = this.taxSettings?.currency || "USD";
-    const currencySymbol = this.getCurrencySymbol(currency);
-
-    return `${currencySymbol}${amount.toFixed(2)}`;
+    return formatYatraMoney(Number(amount) || 0, currency, {
+      zeroAsUnknown: false,
+    });
   }
 
   /**

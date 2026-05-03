@@ -23,7 +23,7 @@
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: #2563eb;
+    color: var(--yatra-primary-dark, #2563eb);
     margin: 0 0 6px;
 }
 
@@ -139,7 +139,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #2563eb;
+    color: var(--yatra-primary-dark, #2563eb);
     transition: background 0.15s ease;
     flex-shrink: 0;
     pointer-events: auto;
@@ -190,7 +190,7 @@
 }
 
 .yatra-method-button.is-active {
-    border-color: #2563eb;
+    border-color: var(--yatra-primary-dark, #2563eb);
     box-shadow: 0 10px 26px rgba(37, 99, 235, 0.2);
     transform: translateY(-3px);
 }
@@ -237,7 +237,7 @@
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: #2563eb;
+    color: var(--yatra-primary-dark, #2563eb);
     margin: 0;
 }
 
@@ -321,7 +321,7 @@
 }
 
 .yatra-stripe-card-element--focus {
-    border-color: #2563eb;
+    border-color: var(--yatra-primary-dark, #2563eb);
     box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.6);
 }
 

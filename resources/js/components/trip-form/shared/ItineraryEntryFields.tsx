@@ -385,9 +385,11 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                     parseFloat(entry.location_latitude),
                     parseFloat(entry.location_longitude),
                   ]
-                : [-8.3405, 115.092]
+                : [20, 0]
             }
-            defaultZoom={13}
+            defaultZoom={
+              entry.location_latitude && entry.location_longitude ? 13 : 2
+            }
             mapHeight="300px"
             showMapButton={false}
             searchLimit={8}

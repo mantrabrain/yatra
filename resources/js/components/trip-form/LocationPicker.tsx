@@ -93,8 +93,9 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   helpText,
   required = false,
   showMapButton = true,
-  defaultMapCenter = [25.2048, 55.2708], // Dubai coordinates
-  defaultZoom = 13,
+  /** Neutral world view when no coordinates (avoid implying a random region). */
+  defaultMapCenter = [20, 0],
+  defaultZoom = 2,
   mapHeight = "300px",
   searchLimit = 5,
   className = "",
@@ -115,6 +116,41 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
+  const valueRef = useRef(value);
+  const defaultMapCenterRef = useRef(defaultMapCenter);
+  const defaultZoomRef = useRef(defaultZoom);
+  const pendingSelectionRef = useRef<{
+    lat: number;
+    lng: number;
+    zoom: number;
+    name?: string;
+  } | null>(null);
+
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
+
+  useEffect(() => {
+    defaultMapCenterRef.current = defaultMapCenter;
+  }, [defaultMapCenter]);
+
+  useEffect(() => {
+    defaultZoomRef.current = defaultZoom;
+  }, [defaultZoom]);
+
+  useEffect(() => {
+    return () => {
+      if (mapInstanceRef.current) {
+        try {
+          mapInstanceRef.current.remove();
+        } catch {
+          /* ignore */
+        }
+        mapInstanceRef.current = null;
+        markerRef.current = null;
+      }
+    };
+  }, []);
 
   // Update marker when coordinates change and map is already initialized
   useEffect(() => {
@@ -164,7 +200,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         }, 150);
       }
     }
-  }, [mapReady]);
+  }, [mapReady, value.latitude, value.longitude, defaultZoom]);
 
   const loadMap = async () => {
     setMapLoading(true);
@@ -189,7 +225,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         leafletJS.crossOrigin = "";
         document.head.appendChild(leafletJS);
 
-        leafletJS.onload = initializeMap;
+        leafletJS.onload = () => initializeMap();
       } else {
         initializeMap();
       }
@@ -203,16 +239,19 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     if (!mapRef.current || !window.L) return;
 
     const L = window.L;
+    const v = valueRef.current;
+    const center = defaultMapCenterRef.current;
+    const zoomCfg = defaultZoomRef.current;
 
-    // Initialize map with default view or current coordinates
-    const lat = value.latitude
-      ? parseFloat(value.latitude)
-      : defaultMapCenter[0];
-    const lng = value.longitude
-      ? parseFloat(value.longitude)
-      : defaultMapCenter[1];
+    // Initialize map with default view or current coordinates (always read latest refs — avoids stale closure when Leaflet loads async)
+    const lat = v.latitude?.trim()
+      ? parseFloat(v.latitude)
+      : center[0];
+    const lng = v.longitude?.trim()
+      ? parseFloat(v.longitude)
+      : center[1];
 
-    const map = L.map(mapRef.current).setView([lat, lng], defaultZoom);
+    const map = L.map(mapRef.current).setView([lat, lng], zoomCfg);
 
     // Add OpenStreetMap tiles
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -221,8 +260,17 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
       maxZoom: 19,
     }).addTo(map);
 
-    // Add marker if coordinates exist
-    if (value.latitude && value.longitude) {
+    const pending = pendingSelectionRef.current;
+    if (pending) {
+      pendingSelectionRef.current = null;
+      map.setView([pending.lat, pending.lng], pending.zoom);
+      addMarker(
+        map,
+        pending.lat,
+        pending.lng,
+        pending.name ? { name: pending.name } : undefined,
+      );
+    } else if (v.latitude?.trim() && v.longitude?.trim()) {
       addMarker(map, lat, lng);
     }
 
@@ -240,7 +288,12 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     setMapReady(true);
   };
 
-  const addMarker = (map: any, lat: number, lng: number) => {
+  const addMarker = (
+    map: any,
+    lat: number,
+    lng: number,
+    extra?: Partial<LocationData>,
+  ) => {
     const L = window.L;
 
     // Remove existing marker
@@ -270,23 +323,26 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
 
       // Update form values
       const newLocation = {
-        ...value,
+        ...valueRef.current,
         latitude: newLat.toString(),
         longitude: newLng.toString(),
       };
       onChange(newLocation);
+      valueRef.current = newLocation;
 
       // Reverse geocode to get updated location name
       reverseGeocode(newLat, newLng);
     });
 
-    // Update form values
+    // Update form values (merge extra e.g. display_name from search — avoids stale `value` wiping the label)
     const newLocation = {
-      ...value,
+      ...valueRef.current,
+      ...extra,
       latitude: lat.toString(),
       longitude: lng.toString(),
     };
     onChange(newLocation);
+    valueRef.current = newLocation;
   };
 
   const reverseGeocode = async (lat: number, lng: number) => {
@@ -316,12 +372,13 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
           const locationName =
             data.display_name || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
           const newLocation = {
-            ...value,
+            ...valueRef.current,
             name: locationName,
             latitude: lat.toString(),
             longitude: lng.toString(),
           };
           onChange(newLocation);
+          valueRef.current = newLocation;
           return;
         }
       }
@@ -332,12 +389,13 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     // Fallback: always update with coordinates if reverse geocoding fails
     const locationName = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
     const newLocation = {
-      ...value,
+      ...valueRef.current,
       name: locationName,
       latitude: lat.toString(),
       longitude: lng.toString(),
     };
     onChange(newLocation);
+    valueRef.current = newLocation;
   };
 
   // Debounced search for better performance
@@ -404,20 +462,30 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   const selectLocation = (location: any) => {
     const lat = parseFloat(location.lat);
     const lng = parseFloat(location.lon);
+    const displayName = (location.display_name as string) || "";
 
     const newLocation = {
-      name: location.display_name,
+      name: displayName,
       latitude: lat.toString(),
       longitude: lng.toString(),
     };
 
     onChange(newLocation);
+    valueRef.current = newLocation;
     onLocationSelect?.(newLocation);
 
-    // Update map if it's open
+    const detailZoom = 14;
+
     if (mapInstanceRef.current) {
-      mapInstanceRef.current.setView([lat, lng], 15);
-      addMarker(mapInstanceRef.current, lat, lng);
+      mapInstanceRef.current.setView([lat, lng], detailZoom);
+      addMarker(mapInstanceRef.current, lat, lng, { name: displayName });
+    } else {
+      pendingSelectionRef.current = {
+        lat,
+        lng,
+        zoom: detailZoom,
+        name: displayName,
+      };
     }
 
     // Reset search
@@ -426,8 +494,10 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   };
 
   const clearLocation = () => {
+    pendingSelectionRef.current = null;
     const emptyLocation = { name: "", latitude: "", longitude: "" };
     onChange(emptyLocation);
+    valueRef.current = emptyLocation;
     onLocationClear?.();
 
     if (markerRef.current && mapInstanceRef.current) {

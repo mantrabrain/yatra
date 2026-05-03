@@ -877,9 +877,16 @@ const AvailabilityForm: React.FC = () => {
                               parseFloat(String(tripData.starting_latitude)),
                               parseFloat(String(tripData.starting_longitude)),
                             ]
-                          : [-8.3405, 115.092]
+                          : [20, 0]
                     }
-                    defaultZoom={13}
+                    defaultZoom={
+                      formData.from_latitude && formData.from_longitude
+                        ? 13
+                        : tripData?.starting_latitude &&
+                            tripData?.starting_longitude
+                          ? 13
+                          : 2
+                    }
                     mapHeight="300px"
                     showMapButton={false}
                     searchLimit={8}
@@ -951,9 +958,32 @@ const AvailabilityForm: React.FC = () => {
                               parseFloat(String(tripData.ending_latitude)),
                               parseFloat(String(tripData.ending_longitude)),
                             ]
-                          : [-8.5069, 115.2625]
+                          : formData.from_latitude && formData.from_longitude
+                            ? [
+                                parseFloat(formData.from_latitude),
+                                parseFloat(formData.from_longitude),
+                              ]
+                            : tripData?.starting_latitude &&
+                                tripData?.starting_longitude
+                              ? [
+                                  parseFloat(String(tripData.starting_latitude)),
+                                  parseFloat(String(tripData.starting_longitude)),
+                                ]
+                              : [20, 0]
                     }
-                    defaultZoom={13}
+                    defaultZoom={
+                      formData.to_latitude && formData.to_longitude
+                        ? 13
+                        : tripData?.ending_latitude &&
+                            tripData?.ending_longitude
+                          ? 13
+                          : formData.from_latitude && formData.from_longitude
+                            ? 13
+                            : tripData?.starting_latitude &&
+                                tripData?.starting_longitude
+                              ? 13
+                              : 2
+                    }
                     mapHeight="300px"
                     showMapButton={false}
                     searchLimit={8}

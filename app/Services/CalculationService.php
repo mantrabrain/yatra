@@ -92,6 +92,23 @@ class CalculationService
         
         $pricing_type = $this->resolvePricingType($trip, $availability);
         $price_types  = $this->resolvePriceTypes($trip, $availability);
+
+        // Context for Pro dynamic pricing (inventory rules, etc.): prefer departure row seats, not trip max only.
+        $spots_for_dp = null;
+        if ($availability !== null) {
+            if (isset($availability->seats_available)) {
+                $spots_for_dp = (int) $availability->seats_available;
+            } elseif (isset($availability->spots_remaining)) {
+                $spots_for_dp = (int) $availability->spots_remaining;
+            }
+        }
+        if ($spots_for_dp === null && isset($trip->max_travelers)) {
+            $spots_for_dp = (int) $trip->max_travelers;
+        }
+        $availability_id_for_dp = $availability_id;
+        if ($availability_id_for_dp === null && $availability !== null && isset($availability->id)) {
+            $availability_id_for_dp = (int) $availability->id;
+        }
         
         // ── Resolve per-unit price (Regular pricing) ────────────────────
         // Priority: discounted_price → sale_price → original_price
@@ -102,7 +119,8 @@ class CalculationService
         // Apply Dynamic Pricing filter (Pro DynamicPricingModule hooks here)
         $unit_price = (float) apply_filters('yatra_booking_trip_price', $unit_price, $trip_id, [
             'departure_date'   => $travel_date,
-            'spots_remaining'  => $trip->max_travelers ?? null,
+            'spots_remaining'  => $spots_for_dp,
+            'availability_id'  => $availability_id_for_dp,
             'original_price'   => $original_price,
             'discounted_price' => $discounted_price,
         ]);
@@ -115,7 +133,9 @@ class CalculationService
             $pricing_type,
             $price_types,
             $trip_id,
-            $travel_date
+            $travel_date,
+            $spots_for_dp,
+            $availability_id_for_dp
         );
         
         $base_amount = (float) apply_filters('yatra_calculate_base_amount', $base_amount, [
@@ -437,7 +457,9 @@ class CalculationService
         string $pricing_type,
         array $price_types,
         int $trip_id,
-        string $travel_date = ''
+        string $travel_date = '',
+        ?int $spots_remaining = null,
+        ?int $availability_id_for_dp = null
     ): float {
         if ($pricing_type === 'traveler_based' && !empty($price_types)) {
             $base_amount = 0.0;
@@ -453,6 +475,8 @@ class CalculationService
                 $category_price = (float) apply_filters('yatra_booking_trip_price', $category_price, $trip_id, [
                     'departure_date'   => $travel_date,
                     'category_id'      => $category_id,
+                    'spots_remaining'  => $spots_remaining,
+                    'availability_id'  => $availability_id_for_dp,
                     'original_price'   => (float) ($pt['original_price'] ?? 0),
                     'discounted_price' => (float) ($pt['discounted_price'] ?? $pt['sale_price'] ?? 0),
                 ]);

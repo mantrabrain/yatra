@@ -297,6 +297,10 @@ class TripCategoryController extends BaseController
             $prepared['updated_by_name'] = $user ? esc_html($user->display_name) : null;
         }
 
+        if (array_key_exists('is_featured', $prepared)) {
+            $prepared['is_featured'] = !empty($prepared['is_featured']) ? 1 : 0;
+        }
+
         return $prepared;
     }
 }

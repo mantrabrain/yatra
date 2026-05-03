@@ -103,7 +103,11 @@ if (!defined('ABSPATH')) {
         $qf_original = (float) ($trip->getOriginalPrice() ?? 0);
     }
     if ($qf_current > 0 || $qf_original > 0):
-        $show_strike = $qf_original > 0 && $qf_current > 0 && $qf_current < $qf_original;
+        $yatra_qf_dp = function_exists('yatra_get_dynamic_pricing_display_flags') ? yatra_get_dynamic_pricing_display_flags() : [
+            'show_original_price' => true,
+            'show_urgency_messages' => false,
+        ];
+        $show_strike = !empty($yatra_qf_dp['show_original_price']) && $qf_original > 0 && $qf_current > 0 && $qf_current < $qf_original;
     ?>
         <div class="yatra-quick-fact">
             <div class="yatra-quick-fact-icon">
@@ -117,6 +121,23 @@ if (!defined('ABSPATH')) {
                         <?php if ($show_strike): ?>
                             <span class="yatra-price-original"><?php echo esc_html(yatra_format_price($qf_original)); ?></span>
                         <?php endif; ?>
+                        <?php
+                        if (!empty($yatra_qf_dp['show_urgency_messages']) && function_exists('yatra_trip_card_dynamic_pricing_urgency_lines')) {
+                            $yatra_qf_urg = yatra_trip_card_dynamic_pricing_urgency_lines((int) $trip->getId(), [
+                                'base_sale_price' => $qf_current,
+                                'base_original_price' => $qf_original,
+                                'sale_price' => $qf_current,
+                                'original_price' => $qf_original,
+                                'departure_date' => null,
+                                'spots_remaining' => null,
+                                'availability_id' => null,
+                                'surface' => 'quick_facts',
+                            ]);
+                            foreach ($yatra_qf_urg as $yatra_qf_line) {
+                                echo '<div class="yatra-quick-fact-dp-urgency" style="margin-top:6px;font-size:11px;line-height:1.35;color:#92400e;background:#fef3c7;padding:4px 6px;border-radius:4px;">' . esc_html($yatra_qf_line) . '</div>';
+                            }
+                        }
+                        ?>
                     <?php else: ?>
                         <span class="yatra-price-current"><?php echo esc_html(yatra_format_price($qf_original)); ?></span>
                     <?php endif; ?>

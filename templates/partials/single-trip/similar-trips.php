@@ -34,6 +34,12 @@ if (!defined('ABSPATH')) {
                 
                 // Only show real trips from database - no dummy data
 
+                $yatra_similar_dp_flags = function_exists('yatra_get_dynamic_pricing_display_flags') ? yatra_get_dynamic_pricing_display_flags() : [
+                    'show_original_price' => true,
+                    'show_savings_badge' => true,
+                    'show_urgency_messages' => false,
+                ];
+
                 foreach ($similar_trips_data as $similar_trip) {
                     // Prepare trip data directly from object properties
                     $title = $similar_trip->title ?? '';
@@ -80,6 +86,20 @@ if (!defined('ABSPATH')) {
                         'has_discount' => $has_discount,
                         'discount_text' => $has_discount ? $discount_pct . '%' : ''
                     ];
+
+                    $yatra_similar_urgency = [];
+                    if (!empty($yatra_similar_dp_flags['show_urgency_messages']) && function_exists('yatra_trip_card_dynamic_pricing_urgency_lines')) {
+                        $yatra_similar_urgency = yatra_trip_card_dynamic_pricing_urgency_lines((int) ($similar_trip->id ?? 0), [
+                            'base_sale_price' => $current_price,
+                            'base_original_price' => $original_price,
+                            'sale_price' => $current_price,
+                            'original_price' => $original_price,
+                            'departure_date' => null,
+                            'spots_remaining' => null,
+                            'availability_id' => null,
+                            'surface' => 'similar',
+                        ]);
+                    }
                     
                     // Image
                     $image_url = $similar_trip->featured_image_url ?? '';
@@ -121,7 +141,7 @@ if (!defined('ABSPATH')) {
                                     <img src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>">
                                 <?php endif; ?>
                                 
-                                <?php if ($discount['has_discount']): ?>
+                                <?php if ($discount['has_discount'] && !empty($yatra_similar_dp_flags['show_savings_badge'])): ?>
                                 <div class="yatra-similar-discount-badge">
                                     <?php
                                     printf(
@@ -222,10 +242,17 @@ if (!defined('ABSPATH')) {
                                             <div class="yatra-similar-trip-price">
                                                 <span class="yatra-similar-price-label"><?php esc_html_e('From', 'yatra'); ?></span>
                                                 <span class="yatra-similar-price-amount"><?php echo esc_html($pricing['current_price']); ?></span>
-                                                <?php if ($pricing['has_discount'] && !empty($pricing['original_price'])): ?>
+                                                <?php if (!empty($yatra_similar_dp_flags['show_original_price']) && $pricing['has_discount'] && !empty($pricing['original_price'])): ?>
                                                     <span class="yatra-similar-original-price"><?php echo esc_html($pricing['original_price']); ?></span>
                                                 <?php endif; ?>
                                             </div>
+                                            <?php if (!empty($yatra_similar_urgency)) : ?>
+                                                <?php foreach ($yatra_similar_urgency as $yatra_sim_urg) : ?>
+                                                    <div style="background-color:#fef3c7;color:#92400e;padding:4px 6px;border-radius:4px;font-size:11px;line-height:1.3;margin-top:6px;">
+                                                        <?php echo esc_html((string) $yatra_sim_urg); ?>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
                                         <?php else: ?>
                                             <span class="yatra-similar-trip-price yatra-similar-price-contact"><?php esc_html_e('Contact for pricing', 'yatra'); ?></span>
                                         <?php endif; ?>

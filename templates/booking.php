@@ -98,13 +98,13 @@ if (!empty($booking->error)) {
             transition: all 0.2s ease;
         }
         .yatra-error-btn-primary {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            background: linear-gradient(135deg, var(--yatra-primary, #3b82f6) 0%, var(--yatra-primary-dark, #2563eb) 100%);
             color: #ffffff;
-            box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.4);
+            box-shadow: 0 4px 14px 0 color-mix(in srgb, var(--yatra-primary, #3b82f6) 40%, transparent);
         }
         .yatra-error-btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px 0 rgba(59, 130, 246, 0.5);
+            box-shadow: 0 6px 20px 0 color-mix(in srgb, var(--yatra-primary, #3b82f6) 50%, transparent);
             color: #ffffff;
         }
         .yatra-error-btn-secondary {

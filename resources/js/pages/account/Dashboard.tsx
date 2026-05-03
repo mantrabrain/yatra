@@ -75,9 +75,9 @@ const Dashboard: React.FC<DashboardProps> = ({
   const enhancedStats = [
     {
       ...stats[0],
-      gradient: "from-blue-500 to-blue-600",
-      bgColor: "bg-blue-50 dark:bg-blue-900/20",
-      iconColor: "text-blue-600 dark:text-blue-400",
+      gradient: "from-yatra-primary to-yatra-primary-dark",
+      bgColor: "bg-yatra-soft dark:bg-yatra-surface-dark-muted",
+      iconColor: "text-yatra-primary dark:text-yatra-on-dark",
     },
     {
       ...stats[1],
@@ -106,7 +106,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         className="yatra-dashboard-welcome relative overflow-hidden rounded-2xl p-8 shadow-xl"
         style={{
           background:
-            "linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #4f46e5 100%)",
+            "linear-gradient(135deg, var(--yatra-primary, #3b82f6) 0%, var(--yatra-primary-dark, #2563eb) 45%, var(--yatra-primary-darker, #1e40af) 100%)",
           color: "#ffffff",
         }}
       >
@@ -121,7 +121,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 {displayProfile?.name?.split(" ")[0] || __("Traveler", "yatra")}
                 ! 👋
               </h2>
-              <p className="text-sm mb-4" style={{ color: "#e0e7ff" }}>
+              <p className="text-sm mb-4 text-white/90">
                 {__("You have", "yatra")} {upcomingBookings.length}{" "}
                 {upcomingBookings.length === 1
                   ? __("upcoming adventure", "yatra")
@@ -195,7 +195,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <stat.icon className={`w-6 h-6 ${stat.iconColor}`} />
                 </div>
                 {stat.badge && (
-                  <span className="inline-flex text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200 font-medium">
+                  <span className="inline-flex text-xs px-2 py-1 rounded-full bg-yatra-chip-bg text-yatra-primary-dark dark:bg-yatra-surface-dark dark:text-yatra-primary-light font-medium">
                     {stat.badge}
                   </span>
                 )}
@@ -240,7 +240,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   role="button"
                   tabIndex={0}
                   onClick={() => onSectionChange("bookings")}
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium flex items-center gap-1 transition-colors cursor-pointer"
+                  className="text-sm text-yatra-primary dark:text-yatra-on-dark hover:text-yatra-primary-dark dark:hover:text-yatra-primary-light font-medium flex items-center gap-1 transition-colors cursor-pointer"
                 >
                   {__("View all", "yatra")}
                   <ArrowRight className="w-4 h-4" />
@@ -254,17 +254,17 @@ const Dashboard: React.FC<DashboardProps> = ({
                 {upcomingBookings.map((booking) => (
                   <div
                     key={booking.id}
-                    className="yatra-booking-card yatra-booking-card-upcoming group relative border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all cursor-pointer bg-gradient-to-r from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-800/50"
+                    className="yatra-booking-card yatra-booking-card-upcoming group relative border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:shadow-md transition-all cursor-pointer bg-gradient-to-r from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-800/50"
                   >
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-sm">
+                        <div className="w-12 h-12 bg-gradient-to-br from-yatra-primary to-yatra-primary-darker rounded-lg flex items-center justify-center shadow-sm">
                           <MapPin className="w-6 h-6 text-white" />
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-2">
-                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark transition-colors">
                             {booking.trip_title}
                           </h4>
                           <span className={getBadge(booking.booking_status)}>
@@ -293,7 +293,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           </span>
                         </div>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors flex-shrink-0" />
+                      <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark transition-colors flex-shrink-0" />
                     </div>
                   </div>
                 ))}
@@ -333,69 +333,69 @@ const Dashboard: React.FC<DashboardProps> = ({
                 role="button"
                 tabIndex={0}
                 onClick={() => onSectionChange("bookings")}
-                className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm"
+                className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:bg-yatra-hover-soft dark:hover:bg-yatra-hover-soft-dark transition-all group cursor-pointer text-sm"
               >
                 <div className="flex items-center gap-3">
-                  <Package className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
-                  <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                  <Package className="w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" />
+                  <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark">
                     {__("View Bookings", "yatra")}
                   </span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" />
               </div>
               <div
                 role="button"
                 tabIndex={0}
                 onClick={() => onSectionChange("payments")}
-                className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm"
+                className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:bg-yatra-hover-soft dark:hover:bg-yatra-hover-soft-dark transition-all group cursor-pointer text-sm"
               >
                 <div className="flex items-center gap-3">
-                  <CreditCard className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
-                  <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                  <CreditCard className="w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" />
+                  <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark">
                     {__("Make Payment", "yatra")}
                   </span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" />
               </div>
               <div
                 role="button"
                 tabIndex={0}
                 onClick={() => onSectionChange("documents")}
-                className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm"
+                className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:bg-yatra-hover-soft dark:hover:bg-yatra-hover-soft-dark transition-all group cursor-pointer text-sm"
               >
                 <div className="flex items-center gap-3">
-                  <FileText className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
-                  <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                  <FileText className="w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" />
+                  <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark">
                     {__("My Documents", "yatra")}
                   </span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" />
               </div>
               {conciergeTel ? (
                 <a
                   href={conciergeTel}
-                  className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm no-underline text-inherit"
+                  className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:bg-yatra-hover-soft dark:hover:bg-yatra-hover-soft-dark transition-all group cursor-pointer text-sm no-underline text-inherit"
                 >
                   <div className="flex items-center gap-3">
-                    <LifeBuoy className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
-                    <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                    <LifeBuoy className="w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" />
+                    <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark">
                       {__("Call us", "yatra")}
                     </span>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                  <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" />
                 </a>
               ) : conciergeMail ? (
                 <a
                   href={`mailto:${encodeURIComponent(conciergeMail)}`}
-                  className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm no-underline text-inherit"
+                  className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:bg-yatra-hover-soft dark:hover:bg-yatra-hover-soft-dark transition-all group cursor-pointer text-sm no-underline text-inherit"
                 >
                   <div className="flex items-center gap-3">
-                    <LifeBuoy className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
-                    <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                    <LifeBuoy className="w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" />
+                    <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark">
                       {__("Email us", "yatra")}
                     </span>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                  <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark" />
                 </a>
               ) : null}
             </div>
@@ -426,14 +426,14 @@ const Dashboard: React.FC<DashboardProps> = ({
                     className={`p-4 rounded-lg border ${
                       notif.type === "warning"
                         ? "bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800"
-                        : "bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800"
+                        : "bg-yatra-soft dark:bg-yatra-hover-soft-dark border-yatra-border-subtle dark:border-yatra-border-dark"
                     }`}
                   >
                     <div className="flex items-start gap-3">
                       {notif.type === "warning" ? (
                         <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
                       ) : (
-                        <CheckCircle2 className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-5 h-5 text-yatra-primary dark:text-yatra-on-dark flex-shrink-0 mt-0.5" />
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm text-gray-900 dark:text-white mb-1">
@@ -464,8 +464,8 @@ const Dashboard: React.FC<DashboardProps> = ({
         <div className="yatra-dashboard-recent-activity bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden">
           <div className="yatra-dashboard-recent-activity-header p-6 border-b border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
-                <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <div className="p-2 bg-yatra-soft dark:bg-yatra-surface-dark-muted rounded-lg">
+                <Clock className="w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" />
               </div>
               <div>
                 <h3 className="text-base font-semibold text-gray-900 dark:text-white">
@@ -484,8 +484,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                   key={booking.id}
                   className="flex items-center gap-4 pb-4 border-b border-gray-100 dark:border-gray-700 last:border-0 last:pb-0"
                 >
-                  <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <CheckCircle2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <div className="w-10 h-10 bg-yatra-chip-bg dark:bg-yatra-surface-dark rounded-full flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 dark:text-white">

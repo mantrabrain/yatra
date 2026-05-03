@@ -70,6 +70,27 @@ if (function_exists('yatra_trip_listing_card_rating_data')) {
 
 $pricing = $trip->getPricing();
 $discount = $trip->getDiscount();
+$yatra_dp_flags = function_exists('yatra_get_dynamic_pricing_display_flags') ? yatra_get_dynamic_pricing_display_flags() : [
+    'show_original_price' => true,
+    'show_savings_badge' => true,
+    'show_urgency_messages' => false,
+];
+$yatra_listing_urgency = [];
+if (!empty($yatra_dp_flags['show_urgency_messages'])) {
+    $yatra_tid = (int) ($trip->id ?? 0);
+    $yatra_listing_urgency = function_exists('yatra_trip_card_dynamic_pricing_urgency_lines')
+        ? yatra_trip_card_dynamic_pricing_urgency_lines($yatra_tid, [
+            'base_sale_price' => (float) ($pricing['raw_current_price'] ?? 0),
+            'base_original_price' => (float) ($pricing['raw_original_price'] ?? 0),
+            'sale_price' => (float) ($pricing['raw_current_price'] ?? 0),
+            'original_price' => (float) ($pricing['raw_original_price'] ?? 0),
+            'departure_date' => null,
+            'spots_remaining' => null,
+            'availability_id' => null,
+            'surface' => 'listing',
+        ])
+        : [];
+}
 $image = $trip->getImage();
 $permalink = $trip->getPermalink();
 $destinations = $trip->getDestinations();
@@ -159,7 +180,7 @@ try {
         <?php else: ?>
             <img src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>">
         <?php endif; ?>
-        <?php if ($discount['has_discount']): ?>
+        <?php if ($discount['has_discount'] && !empty($yatra_dp_flags['show_savings_badge'])): ?>
         <div class="yatra-discount-badge">
             <?php
             printf(
@@ -399,7 +420,7 @@ try {
                 <span class="yatra-trip-price">
                     <?php if ($pricing['has_price']): ?>
                         <?php echo esc_html($pricing['price_prefix'] . $pricing['current_price']); ?>
-                        <?php if ($pricing['has_discount'] && !empty($pricing['original_price'])): ?>
+                        <?php if (!empty($yatra_dp_flags['show_original_price']) && $pricing['has_discount'] && !empty($pricing['original_price'])): ?>
                             <span class="yatra-original-price"><?php echo esc_html($pricing['original_price']); ?></span>
                         <?php endif; ?>
                     <?php else: ?>
@@ -412,6 +433,15 @@ try {
                     <?php echo function_exists('yatra_archive_listing_cta_icon_markup') ? yatra_archive_listing_cta_icon_markup($yatra_view_details_icon_slug, 'file-text') : yatra_svg_icon('file-text', 'yatra-btn-icon'); ?>
                     <span><?php esc_html_e('View Details', 'yatra'); ?></span>
                 </a>
+            <?php endif; ?>
+            <?php if (!empty($yatra_listing_urgency)) : ?>
+                <div class="yatra-trip-listing-dp-urgency" style="width:100%;margin-top:8px;">
+                    <?php foreach ($yatra_listing_urgency as $yatra_urg_line) : ?>
+                        <div style="background-color:#fef3c7;color:#92400e;padding:6px 8px;border-radius:6px;font-size:12px;line-height:1.35;margin-top:4px;">
+                            <?php echo esc_html((string) $yatra_urg_line); ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             <?php endif; ?>
         </div>
     </div>

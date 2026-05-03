@@ -238,7 +238,11 @@ if (!isset($checkout) || !($checkout instanceof \Yatra\Models\Checkout)) {
 <?php endforeach; ?>
 <?php endif; ?>
 
-<?php if (!empty($dynamic_pricing) && !empty($dynamic_pricing['rules'])) : ?>
+<?php if (!empty($dynamic_pricing) && !empty($dynamic_pricing['rules'])) :
+    $dp_show_original = filter_var($dynamic_pricing['show_original_price'] ?? false, FILTER_VALIDATE_BOOLEAN);
+    $dp_show_savings = filter_var($dynamic_pricing['show_savings_badge'] ?? false, FILTER_VALIDATE_BOOLEAN);
+    $dp_show_urgency = filter_var($dynamic_pricing['show_urgency_messages'] ?? false, FILTER_VALIDATE_BOOLEAN);
+    ?>
 <!-- Dynamic Pricing Information -->
 <div class="yatra-price-section yatra-dynamic-pricing-section">
     <div class="yatra-price-section-title">
@@ -249,7 +253,7 @@ if (!isset($checkout) || !($checkout instanceof \Yatra\Models\Checkout)) {
         <?php echo esc_html($dynamic_pricing['label']); ?>
     </div>
     
-    <?php if (!empty($dynamic_pricing['show_original_price']) && $dynamic_pricing['original_price'] > 0 && $dynamic_pricing['original_price'] != $dynamic_pricing['final_price']) : ?>
+    <?php if ($dp_show_original && $dynamic_pricing['original_price'] > 0 && $dynamic_pricing['original_price'] != $dynamic_pricing['final_price']) : ?>
     <div class="yatra-price-row yatra-original-price">
         <span><?php esc_html_e('Original Price', 'yatra'); ?></span>
         <span class="yatra-original-price-amount" style="text-decoration: line-through; color: #6b7280;">
@@ -258,7 +262,7 @@ if (!isset($checkout) || !($checkout instanceof \Yatra\Models\Checkout)) {
     </div>
     <?php endif; ?>
     
-    <?php if (!empty($dynamic_pricing['show_savings_badge']) && $dynamic_pricing['savings'] > 0) : ?>
+    <?php if ($dp_show_savings && $dynamic_pricing['savings'] > 0) : ?>
     <div class="yatra-price-row yatra-savings-badge" style="background-color: #dcfce7; color: #166534; padding: 8px 12px; border-radius: 6px; margin: 8px 0;">
         <span style="font-weight: 600;">
             <?php 
@@ -275,7 +279,7 @@ if (!isset($checkout) || !($checkout instanceof \Yatra\Models\Checkout)) {
     </div>
     <?php endif; ?>
     
-    <?php if (!empty($dynamic_pricing['show_urgency_messages']) && !empty($dynamic_pricing['rules'])) : ?>
+    <?php if ($dp_show_urgency && !empty($dynamic_pricing['rules'])) : ?>
     <div class="yatra-price-row yatra-urgency-message" style="background-color: #fef3c7; color: #92400e; padding: 8px 12px; border-radius: 6px; margin: 8px 0; font-size: 14px;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
             <circle cx="12" cy="12" r="10"></circle>

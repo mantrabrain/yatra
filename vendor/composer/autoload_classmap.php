@@ -500,7 +500,7 @@ return array(
     'Yatra\\Upgrades\\Contracts\\UpgradeStepInterface' => $baseDir . '/app/Upgrades/Contracts/UpgradeStepInterface.php',
     'Yatra\\Upgrades\\FreeUpgradeRegistry' => $baseDir . '/app/Upgrades/FreeUpgradeRegistry.php',
     'Yatra\\Upgrades\\FreeUpgradeRunner' => $baseDir . '/app/Upgrades/FreeUpgradeRunner.php',
-    'Yatra\\Upgrades\\Versions\\Upgrade_3_0_1' => $baseDir . '/app/Upgrades/Versions/Upgrade_3_0_1.php',
+    'Yatra\\Upgrades\\Versions\\Upgrade_3_0_3' => $baseDir . '/app/Upgrades/Versions/Upgrade_3_0_3.php',
     'Yatra\\Utils\\Cache' => $baseDir . '/app/Utils/Cache.php',
     'Yatra\\Utils\\Logger' => $baseDir . '/app/Utils/Logger.php',
     'Yatra\\Utils\\QueryCache' => $baseDir . '/app/Utils/QueryCache.php',

@@ -9,6 +9,7 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
+import { normalizeCurrencyPosition } from "../../lib/currency-display";
 
 export interface BookingsOverviewPoint {
   label: string;
@@ -55,8 +56,9 @@ const BookingsOverviewChart: React.FC<BookingsOverviewChartProps> = ({
 
     const useK = compact;
     const core = formatCore(v, useK);
+    const mode = normalizeCurrencyPosition(currencyPosition);
 
-    switch (currencyPosition) {
+    switch (mode) {
       case "right":
         return `${core}${symbol}`;
       case "left_space":

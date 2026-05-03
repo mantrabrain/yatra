@@ -28,6 +28,7 @@ import { ConditionalRender } from "../components/ui/conditional-render";
 import { useToast } from "../components/ui/toast";
 import { apiClient } from "../lib/api-client";
 import { __ } from "../lib/i18n";
+import { formatYatraMoney } from "../lib/currency-display";
 import { Button } from "../components/ui/button";
 import { PageHeader } from "../components/common/PageHeader";
 import {
@@ -237,14 +238,13 @@ const AdditionalServices: React.FC = () => {
     pricePer: string,
   ) => {
     const currency = (window as any)?.yatraAdmin?.currency || "USD";
-    const symbol = currency === "USD" ? "$" : currency;
     const numPrice = Number(price) || 0;
     if (priceType === "percentage") return `${numPrice}%`;
     const perLabel =
       { person: __("/person"), booking: __("/booking"), day: __("/day") }[
         pricePer
       ] || "";
-    return `${symbol}${numPrice.toFixed(2)}${perLabel}`;
+    return `${formatYatraMoney(numPrice, currency, { zeroAsUnknown: false })}${perLabel}`;
   };
 
   const handleEdit = (service: AdditionalService) => {

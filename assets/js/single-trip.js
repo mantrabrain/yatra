@@ -166,59 +166,47 @@ document.addEventListener('DOMContentLoaded', function () {
         
         return discountAmount;
     }
+
+    function getSidebarAvailabilities() {
+        const raw = window.yatraTripData && window.yatraTripData.sidebarAvailability;
+        return Array.isArray(raw) ? raw : [];
+    }
     
     // Update pricing when date changes
     if (dateInput) {
         dateInput.addEventListener('change', function() {
             const selectedDate = this.value;
-            const bookingCard = document.querySelector('.yatra-booking-card');
-            
-            if (bookingCard) {
-                const availabilityData = bookingCard.getAttribute('data-availability');
-                if (availabilityData) {
-                    try {
-                        const availabilities = JSON.parse(availabilityData);
-                        selectedAvailability = availabilities.find(a => a.departure_date === selectedDate);
-                        
-                        // Update traveler input prices if traveler-based pricing
-                        if (selectedAvailability && selectedAvailability.pricing_type === 'traveler_based' && selectedAvailability.price_types) {
-                            selectedAvailability.price_types.forEach((pt, index) => {
-                                const input = document.querySelector(`input[name="travelers[${pt.category_id}]"]`);
-                                if (input) {
-                                    const price = pt.discounted_price || pt.original_price || 0;
-                                    input.setAttribute('data-price', price);
-                                }
-                            });
+            const availabilities = getSidebarAvailabilities();
+            if (availabilities.length > 0) {
+                selectedAvailability = availabilities.find(a => a.departure_date === selectedDate);
+
+                if (selectedAvailability && selectedAvailability.pricing_type === 'traveler_based' && selectedAvailability.price_types) {
+                    selectedAvailability.price_types.forEach((pt) => {
+                        const input = document.querySelector(`input[name="travelers[${pt.category_id}]"]`);
+                        if (input) {
+                            const price = pt.discounted_price || pt.original_price || 0;
+                            input.setAttribute('data-price', price);
                         }
-                        
-                        // Recalculate total
-                        updatePricing();
-                    } catch (e) {
-                        console.error('Error parsing availability data:', e);
-                    }
+                    });
                 }
+            } else {
+                selectedAvailability = null;
             }
+
+            updatePricing();
         });
         
         // Set today's date by default if available, otherwise use trip fallback pricing
         const today = new Date().toISOString().split('T')[0];
-        const bookingCard = document.querySelector('.yatra-booking-card');
-        if (bookingCard && !dateInput.value) {
-            const availabilityData = bookingCard.getAttribute('data-availability');
-            if (availabilityData) {
-                try {
-                    const availabilities = JSON.parse(availabilityData);
-                    const todayAvailability = availabilities.find(a => a.departure_date === today);
-                    if (todayAvailability) {
-                        dateInput.value = today;
-                        dateInput.dispatchEvent(new Event('change'));
-                    } else {
-                        // No availability for today - use trip's default pricing (already set in HTML)
-                        // Just trigger initial calculation with trip prices
-                        updatePricing();
-                    }
-                } catch (e) {
-                    console.error('Error setting default date:', e);
+        if (!dateInput.value) {
+            const availabilities = getSidebarAvailabilities();
+            if (availabilities.length > 0) {
+                const todayAvailability = availabilities.find(a => a.departure_date === today);
+                if (todayAvailability) {
+                    dateInput.value = today;
+                    dateInput.dispatchEvent(new Event('change'));
+                } else {
+                    updatePricing();
                 }
             }
         }

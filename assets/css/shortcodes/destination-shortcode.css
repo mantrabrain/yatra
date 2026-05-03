@@ -78,7 +78,7 @@
 }
 
 .yatra-category-card-title-link:hover {
-    color: #60a5fa;
+    color: var(--yatra-primary-light, #60a5fa);
 }
 
 .yatra-category-card-stats {
@@ -109,7 +109,7 @@
 }
 
 .category-stat.trips .category-stat-icon {
-    color: #60a5fa; /* Blue for consistency */
+    color: var(--yatra-primary-light, #60a5fa);
 }
 
 .category-stat.price .category-stat-icon {
@@ -980,24 +980,24 @@
 
 .yatra-pagination-link:hover {
     background: #f9fafb;
-    border-color: #9ca3af;
-    color: #111827;
+    border-color: color-mix(in srgb, var(--yatra-primary, #3b82f6) 35%, #d1d5db);
+    color: var(--yatra-primary, #3b82f6);
 }
 
 .yatra-pagination-current {
-    background: #0073aa;
-    border-color: #0073aa;
+    background: var(--yatra-primary, #3b82f6);
+    border-color: var(--yatra-primary, #3b82f6);
     color: #ffffff;
     font-weight: 600;
     transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0, 115, 170, 0.3);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--yatra-primary, #3b82f6) 35%, transparent);
 }
 
 .yatra-pagination-current:hover {
-    background: #005a87;
-    border-color: #005a87;
+    background: var(--yatra-primary-dark, #2563eb);
+    border-color: var(--yatra-primary-dark, #2563eb);
     transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0, 90, 135, 0.4);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--yatra-primary-dark, #2563eb) 40%, transparent);
 }
 
 .yatra-pagination-ellipsis {

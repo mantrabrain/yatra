@@ -30,7 +30,7 @@ import {
 } from "../components/ui/card";
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { Skeleton } from "../components/ui/skeleton";
-import { getCurrencySymbol, getCurrency } from "../data/currencies";
+import { formatYatraMoney } from "../lib/currency-display";
 
 function paymentStr(v: unknown, fallback = ""): string {
   if (v == null || v === "") return fallback;
@@ -131,16 +131,8 @@ const ViewPayment: React.FC = () => {
     });
   };
 
-  const formatPrice = (price: number, currencyCode: string = "USD") => {
-    const symbol = getCurrencySymbol(currencyCode);
-    const currencyData = getCurrency(currencyCode);
-    const decimals = currencyData?.decimalDigits ?? 2;
-
-    return `${symbol}${new Intl.NumberFormat(undefined, {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
-    }).format(price)}`;
-  };
+  const formatPrice = (price: number, currencyCode: string = "USD") =>
+    formatYatraMoney(Number(price) || 0, currencyCode, { zeroAsUnknown: false });
 
   const getPaymentStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {

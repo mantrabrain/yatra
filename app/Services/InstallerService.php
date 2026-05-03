@@ -197,7 +197,7 @@ class InstallerService
         
         // Set installation tracking (not in SettingsService but needed for tracking)
         update_option('yatra_installation_date', current_time('mysql'));
-        update_option('yatra_version', defined('YATRA_VERSION') ? YATRA_VERSION : '3.0.2.4');
+        update_option('yatra_version', defined('YATRA_VERSION') ? YATRA_VERSION : '3.0.3');
         
 
     }

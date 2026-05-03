@@ -68,14 +68,23 @@ class GeocodingAjax
             return;
         }
 
-        $url = add_query_arg([
+        $limit = min(max($limit, 1), 50);
+
+        // Forward geocode: global results by default. Optional filter
+        // `yatra_nominatim_search_query_args` may add `countrycodes` etc. if a site must
+        // restrict to specific ISO regions.
+        $baseArgs = [
             'format' => 'json',
             'q' => $query,
             'limit' => $limit,
             'addressdetails' => 1,
-            'accept-language' => 'en-US,en;q=0.9',
-            'countrycodes' => 'id,np,us,gb,fr,de,it,es,au,nz',
-        ], 'https://nominatim.openstreetmap.org/search');
+            'dedupe' => 1,
+            'accept-language' => $this->nominatimAcceptLanguage(),
+        ];
+
+        $args = apply_filters('yatra_nominatim_search_query_args', $baseArgs, $query, $limit);
+
+        $url = add_query_arg($args, 'https://nominatim.openstreetmap.org/search');
 
         $response = wp_remote_get($url, [
             'timeout' => 10,
@@ -96,6 +105,8 @@ class GeocodingAjax
             wp_send_json_success(['results' => []]);
             return;
         }
+
+        $data = self::sortNominatimSearchResults($data);
 
         $this->geocodingRepository->setPayload($resultCacheKey, $data, 300);
 
@@ -134,7 +145,7 @@ class GeocodingAjax
             'lon' => $lng,
             'zoom' => 18,
             'addressdetails' => 1,
-            'accept-language' => 'en-US,en;q=0.9',
+            'accept-language' => $this->nominatimAcceptLanguage(),
         ], 'https://nominatim.openstreetmap.org/reverse');
 
         $response = wp_remote_get($url, [
@@ -160,5 +171,52 @@ class GeocodingAjax
         $this->geocodingRepository->setPayload($resultCacheKey, $data, 600);
 
         wp_send_json_success(['result' => $data]);
+    }
+
+    /**
+     * Prefer the site / user locale for Nominatim labels.
+     * English regions like en-US can skew free-text search ordering toward US places;
+     * use a neutral "en" first, then the full tag, so global queries (e.g. "Japan") stay global.
+     */
+    private function nominatimAcceptLanguage(): string
+    {
+        $locale = function_exists('get_user_locale') ? (string) get_user_locale() : '';
+        if ($locale === '') {
+            $locale = (string) get_locale();
+        }
+        $primary = str_replace('_', '-', $locale);
+        if ($primary === '' || $primary === 'C') {
+            return 'en';
+        }
+
+        if (preg_match('/^en-/i', $primary)) {
+            return 'en,' . $primary . ';q=0.88,*;q=0.5';
+        }
+
+        return $primary . ',en;q=0.8';
+    }
+
+    /**
+     * Nominatim relevance order is not always ideal for short queries; re-rank by importance
+     * (countries/cities rank higher than homonymous hamlets). No country filter — full planet.
+     *
+     * @param list<array<string, mixed>> $rows
+     * @return list<array<string, mixed>>
+     */
+    private static function sortNominatimSearchResults(array $rows): array
+    {
+        usort($rows, static function (array $a, array $b): int {
+            $ia = isset($a['importance']) ? (float) $a['importance'] : 0.0;
+            $ib = isset($b['importance']) ? (float) $b['importance'] : 0.0;
+            if ($ia !== $ib) {
+                return $ib <=> $ia;
+            }
+            $rankA = isset($a['place_rank']) ? (int) $a['place_rank'] : 0;
+            $rankB = isset($b['place_rank']) ? (int) $b['place_rank'] : 0;
+
+            return $rankB <=> $rankA;
+        });
+
+        return $rows;
     }
 }

@@ -1,10 +1,10 @@
 === Yatra - Travel Booking & Tour Management ===
 Contributors: MantraBrain
-Tags: travel, booking, tour, travel agency, tour booking
+Tags: tour-booking, tour-operator, travel, travel-booking, travel-agency
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.0.2.9
+Stable tag: 3.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -225,6 +225,12 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 
 == Changelog ==
 
+= 3.0.3 =
+* **Upgrades:** version-gated Free upgrade runner; legacy payment tokens table dropped when applicable (see `Upgrade_3_0_3`).
+* **Discounts:** REST and repository hardening (writable column whitelist; safer updates).
+* **Single trip:** group discount discoverability in the sidebar; **Similar trips** links respect plain permalinks via `yatra_get_trip_permalink()`.
+* Safe to update from 3.0.2.x.
+
 = 3.0.2.9 =
 * **Mobile booking bar:** Improved sticky booking UI on small screens (date + travelers layout, full-width travelers dropdown opening upward, and reliable click targets).
 * **Admin caching:** Fixed service cache invalidation so updates (including SEO fields) reflect immediately when cache is enabled.
@@ -286,6 +292,9 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 * For 2.x changelog entries, see the plugin’s GitHub releases or historical notes on the vendor site.
 
 == Upgrade Notice ==
+
+= 3.0.3 =
+Release **3.0.3** (versioned upgrades, discounts, single-trip polish). Safe to update from 3.0.2.x.
 
 = 3.0.2.5 =
 Maintenance release (setup wizard autosave, admin notices). Safe to update from 3.0.2.4.

@@ -125,9 +125,9 @@
       /* @__PURE__ */ element.createElement(
         components.ToggleControl,
         {
-          label: i18n.__("Featured only", "yatra"),
+          label: i18n.__("Featured only (filter list)", "yatra"),
           help: i18n.__(
-            "When enabled, only categories marked featured are shown (same as featured_only=yes on the shortcode).",
+            "When on, only categories with “Featured category” enabled in Yatra → Trips → Categories are listed. The red “Featured” badge on each card is controlled per category there—not by this toggle.",
             "yatra"
           ),
           checked: featured_only,

@@ -132,12 +132,14 @@ class TripMigration extends BaseMigration
                     }
                 }
 
+                $mainBodyHtml = $this->resolveLegacyTourMainBodyHtml($oldTrip, $meta);
+
                 $tripData = [
                     'title' => $oldTrip->post_title,
                     'slug' => $slug,
-                    'description' => $oldTrip->post_content,
+                    'description' => $mainBodyHtml,
                     'short_description' => $oldTrip->post_excerpt,
-                    'trip_details' => $oldTrip->post_content,
+                    'trip_details' => $mainBodyHtml,
                     'trip_type' => $tripType,
                     'duration_days' => $durationDays,
                     'duration_nights' => $durationNights,
@@ -1124,5 +1126,64 @@ class TripMigration extends BaseMigration
         
         if ($created > 0) {
             }
+    }
+
+    /**
+     * Resolve main trip HTML for description / trip_details.
+     *
+     * Legacy Yatra 2.x rendered the “Overview” tab from the `overview_description` post meta field
+     * (see `Yatra_Frontend_Tour_Tabs::overview()` in Yatra 2.3.x),
+     * while the block editor / post_content was often left empty. Migration previously copied only
+     * post_content, which dropped that body. We prefer meta when present and merge with post_content
+     * when both differ so unique content in either place is kept.
+     */
+    private function resolveLegacyTourMainBodyHtml(object $oldTrip, array $meta): string
+    {
+        $overviewKeys = [
+            'overview_description',
+            'yatra_tour_meta_overview_description',
+            'yatra_overview_description',
+        ];
+
+        $fromMeta = '';
+        foreach ($overviewKeys as $key) {
+            $fromMeta = $this->legacyMetaTrimmedString($meta, $key);
+            if ($fromMeta !== '') {
+                break;
+            }
+        }
+
+        $fromPost = isset($oldTrip->post_content) ? trim((string) $oldTrip->post_content) : '';
+
+        if ($fromMeta !== '' && $fromPost !== '' && $fromMeta !== $fromPost) {
+            return $fromMeta . "\n\n" . $fromPost;
+        }
+
+        if ($fromMeta !== '') {
+            return $fromMeta;
+        }
+
+        return $fromPost;
+    }
+
+    /**
+     * @param array<string, mixed> $meta
+     */
+    private function legacyMetaTrimmedString(array $meta, string $key): string
+    {
+        if (!array_key_exists($key, $meta) || $meta[$key] === null || $meta[$key] === '') {
+            return '';
+        }
+
+        $value = $meta[$key];
+        if (is_string($value)) {
+            $value = maybe_unserialize($value);
+        }
+
+        if (!is_string($value)) {
+            return '';
+        }
+
+        return trim($value);
     }
 }

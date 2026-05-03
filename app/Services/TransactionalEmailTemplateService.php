@@ -538,6 +538,16 @@ class TransactionalEmailTemplateService
 
     /**
      * Build variables from a booking row (admin / cron).
+     *
+     * Includes rich tags from {@see BookingEmailRichMergeTags::forBooking()}:
+     * `payment_gateway`, `payment_gateway_label`, `payment_schedule`, `payment_schedule_label`,
+     * `travelers_list`, `travelers_list_html`, `traveler_custom_fields_html`, `booking_custom_fields_html`,
+     * `special_requests`, `special_requests_html`.
+     *
+     * Note: `{{payment_method}}` on payment emails is the instrument label (e.g. Card) merged by callers;
+     * gateway/slug labels use `payment_gateway` / `payment_gateway_label`. Deposit vs full uses `payment_schedule*`.
+     *
+     * @return array<string, string> Filter: `yatra_booking_email_variables`.
      */
     public static function variablesFromBooking(object $booking): array
     {
@@ -546,7 +556,7 @@ class TransactionalEmailTemplateService
             ? date_i18n(get_option('date_format'), strtotime((string) $booking->travel_date))
             : '';
 
-        return [
+        $base = [
             'customer_name' => trim((string) (($booking->contact_first_name ?? '') . ' ' . ($booking->contact_last_name ?? ''))),
             'customer_first_name' => (string) ($booking->contact_first_name ?? ''),
             'customer_last_name' => (string) ($booking->contact_last_name ?? ''),
@@ -567,6 +577,13 @@ class TransactionalEmailTemplateService
             'payment_status' => (string) ($booking->payment_status ?? ''),
             'admin_url' => admin_url('admin.php?page=yatra'),
         ];
+
+        $rich = BookingEmailRichMergeTags::forBooking($booking);
+
+        /** @var array<string, string> $merged */
+        $merged = array_merge($base, $rich);
+
+        return apply_filters('yatra_booking_email_variables', $merged, $booking);
     }
 
     /**

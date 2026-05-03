@@ -3,6 +3,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 $booking_disabled = isset($trip) && method_exists($trip, 'isBookingDisabled') && $trip->isBookingDisabled();
+$yatra_hero_dp_flags = function_exists('yatra_get_dynamic_pricing_display_flags') ? yatra_get_dynamic_pricing_display_flags() : [
+    'show_savings_badge' => true,
+];
 ?>
 <div class="yatra-trip-hero-new" itemscope itemtype="https://schema.org/TouristTrip">
     <div class="yatra-hero-header">
@@ -134,7 +137,7 @@ $booking_disabled = isset($trip) && method_exists($trip, 'isBookingDisabled') &&
     ?>
     <div class="yatra-hero-images">
         <div class="yatra-hero-main-image" itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
-            <?php if (isset($trip->discount_percentage) && $trip->discount_percentage > 0): ?>
+            <?php if (isset($trip->discount_percentage) && $trip->discount_percentage > 0 && !empty($yatra_hero_dp_flags['show_savings_badge'])): ?>
                 <div class="yatra-hero-discount-tag" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
                     <?php echo esc_html__('SAVE UP TO', 'yatra'); ?> <?php echo esc_html($trip->discount_percentage); ?>%
                     <meta itemprop="discount" content="<?php echo esc_attr($trip->discount_percentage); ?>">

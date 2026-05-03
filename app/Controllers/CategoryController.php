@@ -197,7 +197,7 @@ class CategoryController extends BaseController
             'image_id' => $item->image_id,
             'metadata' => isset($item->metadata) && is_string($item->metadata) ? maybe_unserialize($item->metadata) : $item->metadata,
             'sorting' => $item->sorting,
-            'is_featured' => $item->is_featured,
+            'is_featured' => !empty($item->is_featured) ? 1 : 0,
             'status' => $item->status,
             'created_at' => $item->created_at,
             'updated_at' => $item->updated_at,

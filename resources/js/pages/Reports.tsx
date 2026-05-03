@@ -20,7 +20,7 @@ import { Button } from "../components/ui/button";
 import { Select } from "../components/ui/select";
 import BookingsOverviewChart from "../components/charts/BookingsOverviewChart";
 import BookingStatusChart from "../components/charts/BookingStatusChart";
-import { getCurrencySymbol } from "../data/currencies";
+import { formatYatraMoney } from "../lib/currency-display";
 
 // Skeleton Loading Components
 const SkeletonCard = () => (
@@ -273,46 +273,11 @@ const DetailedBreakdownChart: React.FC<{
   selectedCategory: string;
   reportData?: any;
 }> = ({ viewType, dateRange, selectedCategory, reportData }) => {
-  // Get global currency settings for chart
   const globalCurrency = (window as any)?.yatraAdmin?.currency || "USD";
-  const currencyPosition =
-    (window as any)?.yatraAdmin?.currencyPosition ||
-    (window as any)?.yatraAdmin?.currency_position ||
-    "before";
-  const decimalPlaces = Number(
-    (window as any)?.yatraAdmin?.decimalPlaces ||
-      (window as any)?.yatraAdmin?.currency_decimals ||
-      2,
-  );
-  const thousandSeparator =
-    (window as any)?.yatraAdmin?.thousandSeparator || ",";
-  const decimalSeparator = (window as any)?.yatraAdmin?.decimalSeparator || ".";
-
-  const formatCurrencyAmount = (amount: number) => {
-    if (!amount || amount === 0) return getCurrencySymbol(globalCurrency) + "0";
-
-    const numPrice = Number(amount) || 0;
-
-    // Format the number with proper separators
-    const formattedAmount = new Intl.NumberFormat(undefined, {
-      minimumFractionDigits: decimalPlaces,
-      maximumFractionDigits: decimalPlaces,
-    })
-      .format(numPrice)
-      .replace(/,/g, "TEMP_THOUSAND")
-      .replace(/\./g, decimalSeparator)
-      .replace(/TEMP_THOUSAND/g, thousandSeparator);
-
-    // Get currency symbol
-    const currencySymbol = getCurrencySymbol(globalCurrency);
-
-    // Apply currency position
-    if (currencyPosition === "after" || currencyPosition === "right") {
-      return `${formattedAmount} ${currencySymbol}`;
-    } else {
-      return `${currencySymbol}${formattedAmount}`;
-    }
-  };
+  const formatCurrencyAmount = (amount: number) =>
+    formatYatraMoney(Number(amount) || 0, globalCurrency, {
+      zeroAsUnknown: false,
+    });
 
   // Generate chart data based on view type using real API data
   const generateChartData = () => {
@@ -726,46 +691,11 @@ const DetailedBreakdownTable: React.FC<{
 
   const breakdownData = generateBreakdownData();
 
-  // Get global currency settings - using all available Yatra currency settings
   const globalCurrency = (window as any)?.yatraAdmin?.currency || "USD";
-  const currencyPosition =
-    (window as any)?.yatraAdmin?.currencyPosition ||
-    (window as any)?.yatraAdmin?.currency_position ||
-    "before";
-  const decimalPlaces = Number(
-    (window as any)?.yatraAdmin?.decimalPlaces ||
-      (window as any)?.yatraAdmin?.currency_decimals ||
-      2,
-  );
-  const thousandSeparator =
-    (window as any)?.yatraAdmin?.thousandSeparator || ",";
-  const decimalSeparator = (window as any)?.yatraAdmin?.decimalSeparator || ".";
-
-  const formatCurrencyAmount = (amount: number) => {
-    if (!amount || amount === 0) return getCurrencySymbol(globalCurrency) + "0";
-
-    const numPrice = Number(amount) || 0;
-
-    // Format the number with proper separators
-    const formattedAmount = new Intl.NumberFormat(undefined, {
-      minimumFractionDigits: decimalPlaces,
-      maximumFractionDigits: decimalPlaces,
-    })
-      .format(numPrice)
-      .replace(/,/g, "TEMP_THOUSAND")
-      .replace(/\./g, decimalSeparator)
-      .replace(/TEMP_THOUSAND/g, thousandSeparator);
-
-    // Get currency symbol
-    const currencySymbol = getCurrencySymbol(globalCurrency);
-
-    // Apply currency position
-    if (currencyPosition === "after" || currencyPosition === "right") {
-      return `${formattedAmount} ${currencySymbol}`;
-    } else {
-      return `${currencySymbol}${formattedAmount}`;
-    }
-  };
+  const formatCurrencyAmount = (amount: number) =>
+    formatYatraMoney(Number(amount) || 0, globalCurrency, {
+      zeroAsUnknown: false,
+    });
 
   // Render different table headers and columns based on category
   const renderTableHeaders = () => {
@@ -2333,46 +2263,11 @@ const TravelBookingReports: React.FC = () => {
     };
   }, [reportData]);
 
-  // Get global currency settings - using all available Yatra currency settings
   const globalCurrency = (window as any)?.yatraAdmin?.currency || "USD";
-  const currencyPosition =
-    (window as any)?.yatraAdmin?.currencyPosition ||
-    (window as any)?.yatraAdmin?.currency_position ||
-    "before";
-  const decimalPlaces = Number(
-    (window as any)?.yatraAdmin?.decimalPlaces ||
-      (window as any)?.yatraAdmin?.currency_decimals ||
-      2,
-  );
-  const thousandSeparator =
-    (window as any)?.yatraAdmin?.thousandSeparator || ",";
-  const decimalSeparator = (window as any)?.yatraAdmin?.decimalSeparator || ".";
-
-  const formatCurrencyAmount = (amount: number) => {
-    if (!amount || amount === 0) return getCurrencySymbol(globalCurrency) + "0";
-
-    const numPrice = Number(amount) || 0;
-
-    // Format the number with proper separators
-    const formattedAmount = new Intl.NumberFormat(undefined, {
-      minimumFractionDigits: decimalPlaces,
-      maximumFractionDigits: decimalPlaces,
-    })
-      .format(numPrice)
-      .replace(/,/g, "TEMP_THOUSAND")
-      .replace(/\./g, decimalSeparator)
-      .replace(/TEMP_THOUSAND/g, thousandSeparator);
-
-    // Get currency symbol
-    const currencySymbol = getCurrencySymbol(globalCurrency);
-
-    // Apply currency position
-    if (currencyPosition === "after" || currencyPosition === "right") {
-      return `${formattedAmount} ${currencySymbol}`;
-    } else {
-      return `${currencySymbol}${formattedAmount}`;
-    }
-  };
+  const formatCurrencyAmount = (amount: number) =>
+    formatYatraMoney(Number(amount) || 0, globalCurrency, {
+      zeroAsUnknown: false,
+    });
 
   return (
     <div className="space-y-6">

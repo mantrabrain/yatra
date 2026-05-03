@@ -1803,10 +1803,16 @@ class TripController extends BaseController
         if (!empty($trip_data->price_types)) {
             $trip_data->price_types = $enrich_price_types($trip_data->price_types);
         }
+
+        $dp_display_settings = apply_filters('yatra_get_dynamic_pricing_display_settings', [
+            'show_original_price' => true,
+            'show_savings_badge' => true,
+            'show_urgency_messages' => false,
+        ]);
         
         if ($has_availability) {
             $current_time = time();
-            
+
             foreach ($trip_data->availability_dates as $avail) {
                 if (empty($avail->departure_date)) {
                     // Skip entries without a valid departure date
@@ -1843,30 +1849,47 @@ class TripController extends BaseController
                 $base_original_price = $original_price;
                 $base_sale_price = $sale_price;
                 
-                // Apply dynamic pricing if enabled (Pro DynamicPricingModule hooks here)
+                // Apply dynamic pricing if enabled (Pro DynamicPricingModule hooks here).
+                // Single pass on the effective sale price; list/original stays for strikethrough. Context supplies both for "regular vs discounted" rule base.
                 if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
                     $dp_context = [
                         'departure_date' => $avail->departure_date ?? null,
                         'spots_remaining' => $seats,
                         'availability_id' => $avail->id ?? null,
+                        'original_price' => $base_original_price,
+                        'discounted_price' => $base_sale_price,
                     ];
-                    $original_price = apply_filters('yatra_availability_price', $original_price, $trip_data->id, $dp_context);
-                    $sale_price = apply_filters('yatra_availability_price', $sale_price, $trip_data->id, $dp_context);
+                    $sale_price = apply_filters('yatra_availability_price', $base_sale_price, $trip_data->id, $dp_context);
                 }
                 
-                // Calculate discount/surge pricing badge
-                $discount_percent = $cardPricing['discount_percentage'];
-                $discount_text = '';
-                
-                if ($discount_percent > 0) {
-                    $discount_text = sprintf(__('%d%% OFF', 'yatra'), $discount_percent);
+                // Savings badge: surge vs pre-DP sale first when DP raises price; else total % off vs list
+                // (covers regular + traveler-based + date-level pricing; DP stacked on sale is reflected in final vs list).
+                $discount_text = $this->computeAvailabilitySavingsBadgeText(
+                    $base_original_price,
+                    $base_sale_price,
+                    $sale_price,
+                    (bool) apply_filters('yatra_dynamic_pricing_enabled', false)
+                );
+
+                // Dynamic Pricing → Display: hide savings / surge % badge on card when disabled.
+                if (is_array($dp_display_settings) && !filter_var($dp_display_settings['show_savings_badge'] ?? true, FILTER_VALIDATE_BOOLEAN)) {
+                    $discount_text = '';
                 }
-                // Check if dynamic pricing increased the price (surge)
-                elseif ($base_sale_price > 0 && $sale_price > $base_sale_price) {
-                    $surge_percent = round((($sale_price - $base_sale_price) / $base_sale_price) * 100);
-                    $discount_text = $surge_percent > 0 ? sprintf(__('+%d%%', 'yatra'), $surge_percent) : '';
-                }
-                
+
+                $dp_card_fields = $this->buildAvailabilityDynamicPricingCardFields(
+                    $dp_display_settings,
+                    (int) $trip_data->id,
+                    [
+                        'departure_date' => $avail->departure_date ?? null,
+                        'spots_remaining' => $seats,
+                        'availability_id' => $avail->id ?? null,
+                        'base_sale_price' => $base_sale_price,
+                        'base_original_price' => $base_original_price,
+                        'sale_price' => $sale_price,
+                        'original_price' => $original_price,
+                    ]
+                );
+
                 // Use month-based filters for both day trips and multi-day trips for better navigation
                 // This prevents overwhelming users with too many individual date filters
                 $month_key = strtolower(date('M-Y', $departure_date));
@@ -1947,7 +1970,7 @@ class TripController extends BaseController
                     'traveler_pricing' => $card_traveler_pricing,
                     'is_recurring' => !empty($avail->is_recurring),
                     'rule_id' => $avail->rule_id ?? null,
-                ];
+                ] + $dp_card_fields;
             }
         }
         
@@ -1962,30 +1985,41 @@ class TripController extends BaseController
             $base_sample_original = $sample_original;
             $base_sample_sale = $sample_sale;
             
-            // Apply dynamic pricing to sample card
+            // Apply dynamic pricing to sample card (sale line only; list price unchanged for display)
             if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
-                $sample_original = apply_filters('yatra_availability_price', $sample_original, $trip_data->id, [
+                $sample_sale = apply_filters('yatra_availability_price', $base_sample_sale, $trip_data->id, [
                     'departure_date' => $sample_date,
                     'spots_remaining' => $sample_seats,
                     'availability_id' => 'sample-1',
-                ]);
-                $sample_sale = apply_filters('yatra_availability_price', $sample_sale, $trip_data->id, [
-                    'departure_date' => $sample_date,
-                    'spots_remaining' => $sample_seats,
-                    'availability_id' => 'sample-1',
+                    'original_price' => $base_sample_original,
+                    'discounted_price' => $base_sample_sale,
                 ]);
             }
             
-            // Calculate discount/surge pricing badge for sample card
-            $sample_discount_text = '';
-            if ($base_sample_original > 0 && $base_sample_sale < $base_sample_original) {
-                $discount_percent = round((($base_sample_original - $base_sample_sale) / $base_sample_original) * 100);
-                $sample_discount_text = $discount_percent > 0 ? sprintf(__('%d%% OFF', 'yatra'), $discount_percent) : '';
+            $sample_discount_text = $this->computeAvailabilitySavingsBadgeText(
+                $base_sample_original,
+                $base_sample_sale,
+                $sample_sale,
+                (bool) apply_filters('yatra_dynamic_pricing_enabled', false)
+            );
+
+            if (is_array($dp_display_settings) && !filter_var($dp_display_settings['show_savings_badge'] ?? true, FILTER_VALIDATE_BOOLEAN)) {
+                $sample_discount_text = '';
             }
-            elseif ($base_sample_sale > 0 && $sample_sale > $base_sample_sale) {
-                $surge_percent = round((($sample_sale - $base_sample_sale) / $base_sample_sale) * 100);
-                $sample_discount_text = $surge_percent > 0 ? sprintf(__('+%d%%', 'yatra'), $surge_percent) : '';
-            }
+
+            $sample_dp_fields = $this->buildAvailabilityDynamicPricingCardFields(
+                $dp_display_settings,
+                (int) $trip_data->id,
+                [
+                    'departure_date' => $sample_date,
+                    'spots_remaining' => $sample_seats,
+                    'availability_id' => 'sample-1',
+                    'base_sale_price' => $base_sample_sale,
+                    'base_original_price' => $base_sample_original,
+                    'sale_price' => $sample_sale,
+                    'original_price' => $sample_original,
+                ]
+            );
             
             $availability_cards = [
                 [
@@ -2016,7 +2050,7 @@ class TripController extends BaseController
                     'traveler_pricing' => $trip_data->price_types ?? [],
                     'is_recurring' => false,
                     'rule_id' => null,
-                ],
+                ] + $sample_dp_fields,
             ];
             $month_filters[strtolower(date('M-Y', strtotime('+7 days')))] = date('M Y', strtotime('+7 days'));
         }
@@ -2071,6 +2105,91 @@ class TripController extends BaseController
         }
 
         return $slice;
+    }
+
+    /**
+     * "% OFF" / "+%" badge for availability cards after dynamic pricing is applied to the sale line.
+     *
+     * - If dynamic pricing is on and the final price is above the pre-DP sale, show surge vs that sale (priority).
+     * - Otherwise, if list/original on the card is above the final price, show total % off vs list (trip/date
+     *   discount + any extra DP discount in one number — never understates vs showing only the old catalog %).
+     * - If there is no list price but DP reduced the promo-only anchor, show % off vs that anchor.
+     *
+     * Works for regular, traveler-based (uses same header O/B/F from {@see TripPricingService::resolveCardPricing}),
+     * and availability date pricing (already in O/B from the card resolver).
+     */
+    private function computeAvailabilitySavingsBadgeText(
+        float $base_original_price,
+        float $base_sale_price,
+        float $final_sale_price,
+        bool $dynamic_pricing_enabled
+    ): string {
+        $O = max(0.0, $base_original_price);
+        $B = max(0.0, $base_sale_price);
+        $F = max(0.0, $final_sale_price);
+        $eps = 0.005;
+
+        if ($dynamic_pricing_enabled && $B > $eps && $F > $B + $eps) {
+            $p = (int) round((($F - $B) / $B) * 100);
+
+            return $p > 0 ? sprintf(__('+%d%%', 'yatra'), $p) : '';
+        }
+
+        if ($O > $eps && $F < $O - $eps) {
+            $p = (int) round((($O - $F) / $O) * 100);
+
+            return $p > 0 ? sprintf(__('%d%% OFF', 'yatra'), $p) : '';
+        }
+
+        if ($O <= $eps && $B > $eps && $F < $B - $eps) {
+            $p = (int) round((($B - $F) / $B) * 100);
+
+            return $p > 0 ? sprintf(__('%d%% OFF', 'yatra'), $p) : '';
+        }
+
+        return '';
+    }
+
+    /**
+     * Per-departure-card dynamic pricing display flags + urgency lines (Pro fills via filter).
+     *
+     * @param array<string, mixed> $display_settings From yatra_get_dynamic_pricing_display_settings
+     * @param array<string, mixed> $context        departure_date, spots_remaining, prices, availability_id, …
+     * @return array{dynamic_pricing_display: array<string, bool>, dynamic_pricing_urgency_messages: array<int, string>}
+     */
+    private function buildAvailabilityDynamicPricingCardFields(array $display_settings, int $trip_id, array $context): array
+    {
+        $display = [
+            'show_original_price' => filter_var($display_settings['show_original_price'] ?? true, FILTER_VALIDATE_BOOLEAN),
+            'show_savings_badge' => filter_var($display_settings['show_savings_badge'] ?? true, FILTER_VALIDATE_BOOLEAN),
+            'show_urgency_messages' => filter_var($display_settings['show_urgency_messages'] ?? false, FILTER_VALIDATE_BOOLEAN),
+        ];
+
+        $meta = apply_filters(
+            'yatra_availability_card_dynamic_pricing_meta',
+            ['urgency_messages' => []],
+            array_merge($context, [
+                'trip_id' => $trip_id,
+                'display' => $display,
+                'dp_display_settings' => $display_settings,
+            ])
+        );
+
+        $urgency = [];
+        if (is_array($meta) && !empty($meta['urgency_messages']) && is_array($meta['urgency_messages'])) {
+            foreach ($meta['urgency_messages'] as $m) {
+                $line = sanitize_text_field((string) $m);
+                if ($line !== '') {
+                    $urgency[] = $line;
+                }
+            }
+            $urgency = array_values(array_unique($urgency));
+        }
+
+        return [
+            'dynamic_pricing_display' => $display,
+            'dynamic_pricing_urgency_messages' => $urgency,
+        ];
     }
 
     private function sortAvailabilityCards(array $cards, string $sort_key): array
@@ -2197,9 +2316,16 @@ class TripController extends BaseController
                     
                     // Apply dynamic pricing
                     if ($dp_enabled && $price > 0) {
+                        $pt_orig = (float) ($pt->original_price ?? 0);
+                        $pt_disc = (float) ($pt->sale_price ?? $pt->discounted_price ?? $pt->effective_price ?? $price);
+                        if ($pt_disc <= 0) {
+                            $pt_disc = $price;
+                        }
                         $price = apply_filters('yatra_availability_price', $price, $trip_id, [
                             'departure_date' => $date,
                             'price_type_id' => $pt->id ?? null,
+                            'original_price' => $pt_orig > 0 ? $pt_orig : $price,
+                            'discounted_price' => $pt_disc > 0 ? $pt_disc : $price,
                         ]);
                     }
                     

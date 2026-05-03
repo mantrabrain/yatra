@@ -44,6 +44,7 @@ import {
   X,
   TrendingUp,
   BarChart3,
+  Palette,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { prepareWordPressMediaFrameOpen } from "../lib/wp-media-open";
@@ -627,6 +628,7 @@ const GoogleCalendarIntegrationSection: React.FC<{
 
 type SettingsSection =
   | "general"
+  | "design"
   | "booking"
   | "booking_form"
   | "payment"
@@ -734,6 +736,10 @@ interface SettingsData {
   timezone: string;
   date_format: string;
   time_format: string;
+  /** Hex brand color for public trip/booking/listing UI (buttons, links, accents) */
+  frontend_primary_color: string;
+  /** CSS max width for Yatra containers; empty = follow theme / theme.json */
+  frontend_container_max_width: string;
 
   // Google Calendar Settings
   google_calendar_client_id?: string;
@@ -2111,6 +2117,7 @@ const Settings: React.FC = () => {
         saved &&
         [
           "general",
+          "design",
           "booking",
           "booking_form",
           "payment",
@@ -2251,6 +2258,8 @@ const Settings: React.FC = () => {
       timezone: "Asia/Kathmandu",
       date_format: "Y-m-d",
       time_format: "H:i",
+      frontend_primary_color: "#3b82f6",
+      frontend_container_max_width: "",
       booking_confirmation: true,
       auto_confirm_bookings: false,
       require_login: false,
@@ -3195,6 +3204,46 @@ const Settings: React.FC = () => {
     [],
   );
 
+  const timeZoneSelectOptions = useMemo(() => {
+    const ya = (window as any).yatraAdmin || {};
+    const raw = ya.timeZoneIdentifiers;
+    let ids: string[] = [];
+    if (
+      Array.isArray(raw) &&
+      raw.length > 0 &&
+      raw.every((x: unknown) => typeof x === "string")
+    ) {
+      ids = raw as string[];
+    } else {
+      ids = [
+        "UTC",
+        "America/New_York",
+        "America/Los_Angeles",
+        "Europe/London",
+        "Europe/Paris",
+        "Asia/Dubai",
+        "Asia/Kolkata",
+        "Asia/Kathmandu",
+        "Australia/Sydney",
+      ];
+    }
+    const set = new Set(ids);
+    const wpTz =
+      typeof ya.wordPressTimezone === "string"
+        ? ya.wordPressTimezone.trim()
+        : "";
+    if (wpTz) {
+      set.add(wpTz);
+    }
+    const current = formData?.timezone?.trim();
+    if (current) {
+      set.add(current);
+    }
+    return Array.from(set)
+      .sort((a, b) => a.localeCompare(b))
+      .map((z) => ({ value: z, label: z }));
+  }, [formData?.timezone]);
+
   const handleGatewayConfigChange = React.useCallback(
     (gateway: string, field: keyof PaymentGatewayConfig, value: any) => {
       setFormData((prev) => {
@@ -3492,6 +3541,11 @@ const Settings: React.FC = () => {
       icon: Building2,
     },
     {
+      id: "design" as SettingsSection,
+      label: __("Design", "yatra"),
+      icon: Palette,
+    },
+    {
       id: "booking" as SettingsSection,
       label: __("Booking", "yatra"),
       icon: Calendar,
@@ -3706,27 +3760,59 @@ const Settings: React.FC = () => {
                 <FormField
                   id="timezone"
                   label={__("Timezone", "yatra")}
-                  description={__("Select your local timezone", "yatra")}
+                  description={__(
+                    "Used for booking logic, emails, and date display. Search the full IANA list (same identifiers PHP uses).",
+                    "yatra",
+                  )}
                 >
-                  <Select
-                    id="timezone"
-                    value={formData.timezone}
-                    name="timezone"
-                    onChange={handleFieldChange}
-                  >
-                    <option value="UTC">{__("UTC", "yatra")}</option>
-                    <option value="America/New_York">
-                      {__("America/New_York", "yatra")}
-                    </option>
-                    <option value="Europe/London">
-                      {__("Europe/London", "yatra")}
-                    </option>
-                    <option value="Asia/Kathmandu">
-                      {__("Asia/Kathmandu", "yatra")}
-                    </option>
-                    <option value="Asia/Dubai">Asia/Dubai</option>
-                    <option value="Asia/Kolkata">Asia/Kolkata</option>
-                  </Select>
+                  <div className="space-y-2">
+                    {(window as any).yatraAdmin?.wordPressTimezone ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="w-full sm:w-auto"
+                        onClick={() =>
+                          handleFieldChange({
+                            target: {
+                              name: "timezone",
+                              id: "timezone",
+                              value: String(
+                                (window as any).yatraAdmin.wordPressTimezone,
+                              ),
+                              type: "select-one",
+                            },
+                          } as React.ChangeEvent<HTMLSelectElement>)
+                        }
+                      >
+                        {__("Use WordPress site timezone", "yatra")}
+                        {": "}
+                        <span className="font-mono text-xs">
+                          {(window as any).yatraAdmin.wordPressTimezone}
+                        </span>
+                      </Button>
+                    ) : null}
+                    <SearchableSelect
+                      value={formData.timezone}
+                      onChange={(val) =>
+                        handleFieldChange({
+                          target: {
+                            name: "timezone",
+                            id: "timezone",
+                            value: val,
+                            type: "select-one",
+                          },
+                        } as React.ChangeEvent<HTMLSelectElement>)
+                      }
+                      options={timeZoneSelectOptions}
+                      searchPlaceholder={__(
+                        "Search by city, region, or code…",
+                        "yatra",
+                      )}
+                      placeholder={__("Select timezone…", "yatra")}
+                      showValueId={false}
+                    />
+                  </div>
                 </FormField>
 
                 <FormField
@@ -3832,6 +3918,100 @@ const Settings: React.FC = () => {
                   </Select>
                 </FormField>
               </div>
+            </div>
+          </div>
+        );
+
+      case "design":
+        return (
+          <div className="space-y-6">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {__(
+                "Control how Yatra looks on the public site (trip pages, booking, listings, and shortcodes). These options complement your WordPress theme.",
+                "yatra",
+              )}
+            </p>
+            <div className="space-y-4">
+              <FormField
+                id="frontend_primary_color"
+                label={__("Primary brand color", "yatra")}
+                description={__(
+                  "Buttons, links, and highlights. Default is the standard Yatra blue; choose a hex color that matches your brand or theme accent.",
+                  "yatra",
+                )}
+              >
+                <div className="flex flex-wrap items-center gap-3">
+                  <input
+                    type="color"
+                    id="frontend_primary_color_picker"
+                    aria-label={__("Pick primary color", "yatra")}
+                    className="h-10 w-14 cursor-pointer rounded border border-gray-300 bg-white p-0.5 dark:border-gray-600"
+                    value={
+                      /^#[0-9A-Fa-f]{6}$/.test(
+                        (formData.frontend_primary_color || "").trim(),
+                      )
+                        ? (formData.frontend_primary_color || "").trim()
+                        : "#3b82f6"
+                    }
+                    onChange={(e) =>
+                      handleFieldChange({
+                        target: {
+                          name: "frontend_primary_color",
+                          id: "frontend_primary_color",
+                          value: e.target.value,
+                          type: "text",
+                        },
+                      } as React.ChangeEvent<HTMLInputElement>)
+                    }
+                  />
+                  <Input
+                    id="frontend_primary_color"
+                    name="frontend_primary_color"
+                    className="max-w-[10rem] font-mono text-sm"
+                    value={formData.frontend_primary_color || ""}
+                    onChange={handleFieldChange}
+                    placeholder="#3b82f6"
+                    spellCheck={false}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      handleFieldChange({
+                        target: {
+                          name: "frontend_primary_color",
+                          id: "frontend_primary_color",
+                          value: "#3b82f6",
+                          type: "text",
+                        },
+                      } as React.ChangeEvent<HTMLInputElement>)
+                    }
+                  >
+                    {__("Reset to default", "yatra")}
+                  </Button>
+                </div>
+              </FormField>
+
+              <FormField
+                id="frontend_container_max_width"
+                label={__("Container max width", "yatra")}
+                description={__(
+                  "Optional. CSS width for trip listings, booking flow, and shortcode layouts (e.g. 1200px, 72rem, min(100%,80rem)). Leave empty to use your block theme layout (theme.json) or theme content width.",
+                  "yatra",
+                )}
+              >
+                <Input
+                  id="frontend_container_max_width"
+                  name="frontend_container_max_width"
+                  className="max-w-md font-mono text-sm"
+                  value={formData.frontend_container_max_width || ""}
+                  onChange={handleFieldChange}
+                  placeholder="1200px"
+                  spellCheck={false}
+                  autoComplete="off"
+                />
+              </FormField>
             </div>
           </div>
         );

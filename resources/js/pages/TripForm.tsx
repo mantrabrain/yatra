@@ -4822,9 +4822,14 @@ const TripForm: React.FC = () => {
                                   parseFloat(formData.starting_latitude),
                                   parseFloat(formData.starting_longitude),
                                 ]
-                              : [-8.3405, 115.092]
+                              : [20, 0]
                           }
-                          defaultZoom={13}
+                          defaultZoom={
+                            formData.starting_latitude &&
+                            formData.starting_longitude
+                              ? 13
+                              : 2
+                          }
                           mapHeight="300px"
                           showMapButton={false}
                           searchLimit={8}
@@ -5078,9 +5083,23 @@ const TripForm: React.FC = () => {
                                   parseFloat(formData.ending_latitude),
                                   parseFloat(formData.ending_longitude),
                                 ]
-                              : [-8.5069, 115.2625]
+                              : formData.starting_latitude &&
+                                  formData.starting_longitude
+                                ? [
+                                    parseFloat(formData.starting_latitude),
+                                    parseFloat(formData.starting_longitude),
+                                  ]
+                                : [20, 0]
                           }
-                          defaultZoom={13}
+                          defaultZoom={
+                            formData.ending_latitude &&
+                            formData.ending_longitude
+                              ? 13
+                              : formData.starting_latitude &&
+                                  formData.starting_longitude
+                                ? 13
+                                : 2
+                          }
                           mapHeight="300px"
                           showMapButton={false}
                           searchLimit={8}

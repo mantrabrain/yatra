@@ -66,6 +66,7 @@ final class EmailTemplateSampleData
     {
         $currency = SettingsService::getCurrency();
         $travelSample = date_i18n(get_option('date_format'), strtotime('+14 days'));
+        $specialSample = __('Late check-in after 10pm if possible.', 'yatra');
 
         return [
             'customer_name' => __('Alex Traveler', 'yatra'),
@@ -119,6 +120,26 @@ final class EmailTemplateSampleData
                 . '</p>',
             'recovery_reminder_label' => __('48 hours left at this price', 'yatra'),
             'recovery_link' => home_url('/book/preview-recovery/'),
+            'payment_gateway' => 'stripe',
+            'payment_gateway_label' => 'Stripe',
+            'payment_schedule' => 'deposit',
+            'payment_schedule_label' => __('Deposit (balance due later)', 'yatra'),
+            'travelers_list' => "1. Alex Traveler (" . __('Lead', 'yatra') . ")\n2. Sam Guest",
+            'travelers_list_html' => '<ul style="margin:8px 0;padding-left:20px;">'
+                . '<li style="margin:4px 0;">Alex Traveler <span style="color:#64748b;font-size:12px;">(' . esc_html__('Lead', 'yatra') . ')</span></li>'
+                . '<li style="margin:4px 0;">Sam Guest</li></ul>',
+            'traveler_custom_fields_html' => '<div style="margin:12px 0 0;">'
+                . '<p style="margin:0 0 6px;font-weight:600;">' . esc_html__('Traveler 1 — Alex Traveler', 'yatra') . '</p>'
+                . '<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">'
+                . '<tr><td style="padding:4px 12px 4px 0;vertical-align:top;color:#64748b;width:40%;">' . esc_html__('Dietary Requirements', 'yatra') . '</td>'
+                . '<td style="padding:4px 0;vertical-align:top;">' . esc_html__('Vegetarian', 'yatra') . '</td></tr></table></div>',
+            'booking_custom_fields_html' => '<div style="margin:12px 0 0;">'
+                . '<p style="margin:0 0 6px;font-weight:600;">' . esc_html__('Additional services', 'yatra') . '</p>'
+                . '<ul style="margin:0;padding-left:20px;">'
+                . '<li style="margin:4px 0;">' . esc_html__('Airport transfer', 'yatra') . ' — ' . esc_html(yatra_format_price(45.0, $currency)) . '</li>'
+                . '</ul></div>',
+            'special_requests' => $specialSample,
+            'special_requests_html' => nl2br(esc_html($specialSample)),
         ];
     }
 

@@ -486,7 +486,7 @@ const AccountPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10 pb-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto space-y-6 pb-8">
+      <div className="w-full max-w-[var(--yatra-container-max-width,80rem)] mx-auto space-y-6 pb-8">
         <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-800 rounded-xl shadow-sm p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -545,7 +545,7 @@ const AccountPage: React.FC = () => {
                     onClick={() => handleSectionChange(item.id)}
                     className={`yatra-nav-item yatra-nav-item-${item.id} w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition cursor-pointer ${
                       section === item.id
-                        ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200"
+                        ? "bg-yatra-soft text-yatra-primary-dark dark:bg-yatra-surface-dark dark:text-yatra-primary-light"
                         : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900/40"
                     }`}
                   >
@@ -557,11 +557,10 @@ const AccountPage: React.FC = () => {
             </nav>
 
             <div
-              className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl p-6 text-white space-y-2 shadow-xl"
+              className="rounded-xl p-6 text-white space-y-2 shadow-xl"
               style={{
-                backgroundColor: "#2563eb",
                 backgroundImage:
-                  "linear-gradient(to bottom right, #2563eb, #4f46e5)",
+                  "linear-gradient(to bottom right, var(--yatra-primary-dark, #2563eb), var(--yatra-primary-darker, #1e40af))",
               }}
             >
               <ShieldCheck className="w-6 h-6 text-white" />

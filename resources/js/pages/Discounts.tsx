@@ -38,6 +38,7 @@ import { ConditionalRender } from "../components/ui/conditional-render";
 import { Badge } from "../components/ui/badge";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
 import { Modal } from "../components/ui/modal";
+import { formatYatraMoney } from "../lib/currency-display";
 
 interface GroupDiscountRange {
   id: string;
@@ -141,6 +142,7 @@ const Discounts: React.FC = () => {
   };
 
   const baseAdminUrl = (window as any).yatraAdmin?.adminUrl || "";
+  const adminCurrency = (window as any)?.yatraAdmin?.currency || "USD";
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -722,7 +724,9 @@ const Discounts: React.FC = () => {
               <span className="font-medium text-gray-900 dark:text-white">
                 {discount.type === "percentage"
                   ? `${discount.amount}%`
-                  : `$${discount.amount}`}
+                  : formatYatraMoney(Number(discount.amount) || 0, adminCurrency, {
+                      zeroAsUnknown: false,
+                    })}
               </span>
               <span className="text-xs text-gray-500">
                 {__("off", "yatra")}
@@ -754,7 +758,11 @@ const Discounts: React.FC = () => {
                                 :
                                 {range.discount_type === "percentage"
                                   ? `${range.discount_amount}%`
-                                  : `$${range.discount_amount}`}
+                                  : formatYatraMoney(
+                                      Number(range.discount_amount) || 0,
+                                      adminCurrency,
+                                      { zeroAsUnknown: false },
+                                    )}
                               </span>
                             ))
                           : "-"}
@@ -780,7 +788,11 @@ const Discounts: React.FC = () => {
                         {__("pax", "yatra")}:
                         {range.discount_type === "percentage"
                           ? ` ${range.discount_amount}%`
-                          : ` $${range.discount_amount}`}{" "}
+                          : ` ${formatYatraMoney(
+                              Number(range.discount_amount) || 0,
+                              adminCurrency,
+                              { zeroAsUnknown: false },
+                            )}`}{" "}
                         {__("off", "yatra")}
                       </span>
                     </div>
@@ -791,7 +803,7 @@ const Discounts: React.FC = () => {
                 <div className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
                   <Users className="w-3 h-3" />
                   {discount.min_group_size
-                    ? `${discount.min_group_size}+ ${__("travelers", "yatra")}: ${discount.group_discount_type === "percentage" ? `${discount.group_discount_amount}%` : `$${discount.group_discount_amount}`}`
+                    ? `${discount.min_group_size}+ ${__("travelers", "yatra")}: ${discount.group_discount_type === "percentage" ? `${discount.group_discount_amount}%` : formatYatraMoney(Number(discount.group_discount_amount) || 0, adminCurrency, { zeroAsUnknown: false })}`
                     : __("Group pricing", "yatra")}
                 </div>
               )}

@@ -37,7 +37,11 @@ class SettingsService
         'timezone' => 'UTC',
         'date_format' => 'Y-m-d',
         'time_format' => 'H:i',
-        
+        /** Primary brand color (hex) for trip/booking/listing frontend — see FrontendThemeCss */
+        'frontend_primary_color' => '#3b82f6',
+        /** Max width for Yatra trip/booking/listing containers (CSS length). Empty = theme.json / content width / filter. */
+        'frontend_container_max_width' => '',
+
         // Booking
         'booking_base' => 'book',
         'use_booking_page' => false,
