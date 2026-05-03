@@ -38,9 +38,6 @@ $has_availability = $pricing_data['has_availability'];
 $has_traveler_pricing = $pricing_data['has_traveler_pricing'];
 $pricing_type = $pricing_data['pricing_type'];
 
-// Get group discounts data
-$group_discounts = yatra_single_trip_get_group_discounts($trip->id);
-
 // Prepare variables for templates
 $destinations = isset($trip->destinations) ? $trip->destinations : [];
 $activities = isset($trip->activities) ? $trip->activities : [];
@@ -168,11 +165,6 @@ if (!empty($downloads)):
         <!-- Sidebar - Booking Card -->
         <?php yatra_get_template('partials/single-trip/content-sidebar', ['trip' => $trip, 'has_availability' => $has_availability, 'has_traveler_pricing' => $has_traveler_pricing, 'base_price' => $base_price, 'pricing_type' => $pricing_type]); ?>
     </div>
-
-    <!-- Group Discount Section -->
-    <?php if ($group_discounts['has_group_discounts'] && !empty($group_discounts['group_discounts_data'])): ?>
-        <?php yatra_get_template('partials/single-trip/group-discounts', ['trip' => $trip, 'group_discounts_data' => $group_discounts['group_discounts_data']]); ?>
-    <?php endif; ?>
 
     <!-- Reviews Section - Full Width (before similar trips for social proof) -->
     <?php if (yatra_reviews_enabled()): ?>

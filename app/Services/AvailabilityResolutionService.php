@@ -292,9 +292,13 @@ class AvailabilityResolutionService
     {
         $avail = new \stdClass();
         
-        // Get trip's pricing configuration (used as fallback for all sources)
-        $trip_pricing_type = $trip->pricing_type ?? 'regular';
-        $trip_price_types = $this->getTripPriceTypes((int) $trip->id);
+        // Get trip's pricing configuration (used as fallback for all sources).
+        // Use {@see TripPricingService::resolvePricingType} so "regular" trips do not inherit stale
+        // JSON category rows into availability objects (keeps effective_price aligned with trip row).
+        $trip_pricing_type = TripPricingService::resolvePricingType($trip);
+        $trip_price_types = $trip_pricing_type === 'traveler_based'
+            ? $this->getTripPriceTypes((int) $trip->id)
+            : [];
         $trip_original_price = isset($trip->original_price) ? (float) $trip->original_price : null;
         $trip_discounted_price = isset($trip->discounted_price) && (float) $trip->discounted_price > 0
             ? (float) $trip->discounted_price

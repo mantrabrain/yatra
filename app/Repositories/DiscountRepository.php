@@ -82,9 +82,10 @@ class DiscountRepository extends BaseRepository
 
         // Query for active group discounts applicable to this trip
         // Check both is_group_discount=1 OR discount_mode IN ('group', 'both') for backward compatibility
+        // Status: admin UI uses "publish"; legacy rows may use "active" as live (see DiscountService::isLive).
         $query = "SELECT * FROM `{$table}` 
             WHERE (is_group_discount = 1 OR discount_mode IN ('group', 'both'))
-            AND status = 'publish'";
+            AND status IN ('publish', 'active')";
         
         return $wpdb->get_results($query) ?: [];
     }

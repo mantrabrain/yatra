@@ -422,6 +422,8 @@ class CustomerService
             'created_at' => $booking->created_at ?? null,
             'updated_at' => $booking->updated_at ?? null,
             'travel_date' => $booking->travel_date ?? null,
+            'start_date' => $booking->start_date ?? $booking->travel_date ?? null,
+            'end_date' => $booking->end_date ?? null,
             'travelers_count' => (int) ($booking->travelers_count ?? 0),
             'total_amount' => (float) ($booking->total_amount ?? 0),
             'amount_paid' => (float) ($booking->amount_paid ?? 0),

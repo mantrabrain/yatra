@@ -48,46 +48,34 @@ class ReviewReminderService
     public static function sendReminder(int $bookingId): void
     {
         $bookingRepository = new \Yatra\Repositories\BookingRepository();
-        $booking = $bookingRepository->find($bookingId);
-        
-        if (!$booking || empty($booking->email)) {
+        $booking = $bookingRepository->findWithTrip($bookingId);
+
+        if (!$booking || empty($booking->contact_email)) {
             return;
         }
-        
+
         // Check if customer has already reviewed
-        if (self::hasCustomerReviewed($bookingId, $booking->customer_id)) {
+        if (self::hasCustomerReviewed($bookingId, (int) ($booking->customer_id ?? 0))) {
             return;
         }
-        
+
         // Get trip details
         $tripRepository = new \Yatra\Repositories\TripRepository();
-        $trip = $tripRepository->find($booking->trip_id);
-        
+        $trip = $tripRepository->find((int) ($booking->trip_id ?? 0));
+
         if (!$trip) {
             return;
         }
-        
+
         $review_url = get_permalink($trip->id) . '#reviews';
-        $customerName = trim((string) (($booking->first_name ?? '') . ' ' . ($booking->last_name ?? '')));
-        if ($customerName === '') {
-            $customerName = __('there', 'yatra');
-        }
-        $tripName = (string) ($trip->title ?? '');
+        $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
+        $vars['review_url'] = esc_url($review_url);
 
-        $subject = sprintf(
-            /* translators: 1: site name, 2: trip title */
-            __('⭐ [%1$s] How was %2$s?', 'yatra'),
-            get_bloginfo('name'),
-            $tripName !== '' ? $tripName : __('your trip', 'yatra')
+        TransactionalEmailTemplateService::sendIfEnabled(
+            TransactionalEmailTemplateService::TYPE_REVIEW_REQUEST,
+            (string) $booking->contact_email,
+            $vars
         );
-
-        $body = EmailTemplateDefaults::renderCoreReviewReminderHtml(
-            $customerName,
-            $tripName !== '' ? $tripName : __('your trip', 'yatra'),
-            $review_url
-        );
-
-        EmailService::send($booking->email, $subject, $body, ['Content-Type: text/html; charset=UTF-8']);
     }
     
     /**

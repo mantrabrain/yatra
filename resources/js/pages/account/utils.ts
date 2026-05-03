@@ -1,4 +1,4 @@
-import { __ } from "../../lib/i18n";
+import { __, sprintf } from "../../lib/i18n";
 import { getCurrencySymbol, getCurrency } from "../../data/currencies";
 
 export const formatDate = (value: string | undefined | null) => {
@@ -22,6 +22,38 @@ export const formatDate = (value: string | undefined | null) => {
   } catch (error) {
     return __("Invalid date", "yatra");
   }
+};
+
+/** Leading Y-m-d from API datetime strings for stable range comparison. */
+function extractYmd(value: string | undefined | null): string | null {
+  if (!value) {
+    return null;
+  }
+  const m = String(value).trim().match(/^(\d{4}-\d{2}-\d{2})/);
+  return m ? m[1] : null;
+}
+
+/**
+ * Format trip window for the account UI: one localized date, or start–end when different.
+ * translators: %1$s: trip start date, %2$s: trip end date (localized).
+ */
+export const formatTravelDateRange = (
+  travelDate?: string | null,
+  endDate?: string | null,
+): string => {
+  const startKey = extractYmd(travelDate);
+  const endKey = extractYmd(endDate);
+  if (!startKey) {
+    return formatDate(travelDate);
+  }
+  if (!endKey || endKey === startKey) {
+    return formatDate(travelDate);
+  }
+  return sprintf(
+    __("%1$s – %2$s", "yatra"),
+    formatDate(travelDate),
+    formatDate(endDate),
+  );
 };
 
 export const getBadge = (status: string | undefined | null) => {

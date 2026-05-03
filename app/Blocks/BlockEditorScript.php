@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Blocks;
 
 /**
- * Resolves the Gutenberg editor script URL for yatra/tour, yatra/activity, yatra/destination.
+ * Resolves the Gutenberg editor script URL for yatra/tour, yatra/activity, yatra/destination, yatra/trip-category.
  *
  * Prefer Vite output under assets/dist/blocks/ (present after npm run build). Fall back to
  * legacy IIFE scripts under resources/js/blocks/{slug}/block.js (dev or when dist is missing).
@@ -84,7 +84,10 @@ final class BlockEditorScript
 
     public static function blockJsonPath(string $slug): string
     {
-        $slug = preg_replace('/[^a-z]/', '', strtolower($slug));
+        // Keep hyphens for on-disk paths (e.g. trip-category/block.json). Editor bundles still use
+        // letters-only slugs in resolveEditorBundle() (e.g. tripcategory.js).
+        $slug = strtolower((string) $slug);
+        $slug = preg_replace('/[^a-z0-9_-]/', '', $slug);
 
         return YATRA_PLUGIN_PATH . 'resources/js/blocks/' . $slug . '/block.json';
     }

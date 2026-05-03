@@ -258,7 +258,9 @@ class BookingSessionController extends BaseController
                 $total_amount = (float) $booking->total_amount;
                 
                 if ($total_paid >= $total_amount) {
+                    $prevStatus = (string) ($booking->status ?? 'pending');
                     $bookingRepository->update($booking_id, ['status' => 'confirmed', 'payment_status' => 'paid']);
+                    \yatra_trigger_booking_confirmed((int) $booking_id, $prevStatus);
                 } else {
                     $bookingRepository->update($booking_id, ['payment_status' => 'partial']);
                 }
@@ -1507,6 +1509,8 @@ class BookingSessionController extends BaseController
             if (!apply_filters('yatra_skip_checkout_autoconfirm_status_changed_event', true, (int) $booking_id, 'pending', 'confirmed')) {
                 do_action('yatra_booking_status_changed', (int) $booking_id, 'pending', 'confirmed');
             }
+            // Trip Consent / Google Calendar listen on `yatra_booking_confirmed` (not fired by status_changed skip above).
+            \yatra_trigger_booking_confirmed((int) $booking_id, 'pending');
         }
 
         // ========================================

@@ -206,53 +206,38 @@ class BookingCronService
     private static function sendExpiryEmail(object $booking, ?object $trip): void
     {
         $customer_email = $booking->contact_email;
-        $customer_name = trim($booking->contact_first_name . ' ' . $booking->contact_last_name);
-        
+
         if (empty($customer_email)) {
             return;
         }
 
         $expiry_hours = (int) SettingsService::get('booking_expiry_hours', 24);
+        $full = self::getBookingRepository()->findWithTrip((int) $booking->id) ?: $booking;
 
-        $subject = sprintf(
-            __('[%s] Booking Expired - %s', 'yatra'),
-            get_bloginfo('name'),
-            $booking->reference
-        );
-
-        $body = sprintf(__("Dear %s,\n\n", 'yatra'), $customer_name ?: 'Customer');
-        $body .= __("We regret to inform you that your booking has been automatically cancelled due to non-payment.\n\n", 'yatra');
-        
-        $body .= "═══════════════════════════════════════\n";
-        $body .= sprintf(__("Booking Reference: %s\n", 'yatra'), $booking->reference);
-        $body .= sprintf(__("Trip: %s\n", 'yatra'), $trip ? $trip->title : 'N/A');
-        $body .= "═══════════════════════════════════════\n\n";
-        
-        $body .= sprintf(
-            __("Bookings that are not paid within %d hours are automatically cancelled to maintain availability for other travelers.\n\n", 'yatra'),
+        $vars = TransactionalEmailTemplateService::variablesFromBooking($full);
+        if ($trip && !empty($trip->title)) {
+            $vars['trip_name'] = (string) $trip->title;
+        }
+        $vars['expiry_policy_note'] = sprintf(
+            /* translators: %d: hours until unpaid booking expires */
+            __('Unpaid bookings are released after %d hours.', 'yatra'),
             $expiry_hours
         );
 
-        $body .= __("If you still wish to book this trip, please visit our website to create a new booking.\n\n", 'yatra');
-        $body .= __("If you believe this is an error or have already made a payment, please contact us immediately.\n\n", 'yatra');
-        
-        $body .= sprintf(__("Best regards,\n%s Team\n", 'yatra'), get_bloginfo('name'));
-        $body .= home_url() . "\n";
+        TransactionalEmailTemplateService::sendIfEnabled(
+            TransactionalEmailTemplateService::TYPE_BOOKING_EXPIRED_CUSTOMER,
+            (string) $customer_email,
+            $vars
+        );
 
-        $headers = ['Content-Type: text/plain; charset=UTF-8'];
-
-        EmailService::send($customer_email, $subject, $body, $headers);
-
-        // Also notify admin
-        $admin_email = get_option('admin_email');
-        $admin_subject = sprintf(__('[%s] Booking Expired - %s', 'yatra'), get_bloginfo('name'), $booking->reference);
-        
-        $admin_body = sprintf(__("Booking %s has been automatically cancelled due to non-payment.\n\n", 'yatra'), $booking->reference);
-        $admin_body .= sprintf(__("Customer: %s (%s)\n", 'yatra'), $customer_name, $customer_email);
-        $admin_body .= sprintf(__("Trip: %s\n", 'yatra'), $trip ? $trip->title : 'N/A');
-        $admin_body .= sprintf(__("View: %s\n", 'yatra'), admin_url('admin.php?page=yatra&subpage=bookings&action=view&id=' . $booking->id));
-
-        EmailService::send($admin_email, $admin_subject, $admin_body, $headers);
+        $admin_email = sanitize_email((string) SettingsService::getString('admin_email', (string) get_option('admin_email', '')));
+        if ($admin_email !== '' && is_email($admin_email)) {
+            TransactionalEmailTemplateService::sendIfEnabled(
+                TransactionalEmailTemplateService::TYPE_ADMIN_BOOKING_EXPIRED,
+                $admin_email,
+                $vars
+            );
+        }
     }
 }
 

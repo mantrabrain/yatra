@@ -103,7 +103,11 @@ declare global {
  * Handles translations for UI text
  */
 
-import { __ as wpI18n__, _x as wpI18n_x } from "@wordpress/i18n";
+import {
+  __ as wpI18n__,
+  _x as wpI18n_x,
+  sprintf as wpSprintf,
+} from "@wordpress/i18n";
 
 function __(key: string): string;
 function __(key: string, textDomain: string): string;
@@ -127,7 +131,17 @@ function _x(key: string, context: string, textDomain?: string): string {
   return wpI18n_x(key, context, textDomain || "yatra");
 }
 
-export { __, _x };
+function sprintf(format: string, ...args: (string | number)[]): string {
+  if (typeof window !== "undefined" && (window as any).wp?.i18n?.sprintf) {
+    return (window as any).wp.i18n.sprintf(format, ...args);
+  }
+  return (wpSprintf as (fmt: string, ...a: (string | number)[]) => string)(
+    format,
+    ...args,
+  );
+}
+
+export { __, _x, sprintf };
 
 /**
  * Get translated string with number

@@ -3,8 +3,8 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-Ar4TZ2Se.js": {
-    "file": "dist/js/index-Ar4TZ2Se.js",
+  "_index-BUTTH9Ac.js": {
+    "file": "dist/js/index-BUTTH9Ac.js",
     "name": "index",
     "imports": [
       "_react-vendor-lSVLenth.js"
@@ -31,7 +31,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-lSVLenth.js",
-      "_index-Ar4TZ2Se.js"
+      "_index-BUTTH9Ac.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -41,7 +41,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-lSVLenth.js",
-      "_index-Ar4TZ2Se.js"
+      "_index-BUTTH9Ac.js"
     ]
   }
 }

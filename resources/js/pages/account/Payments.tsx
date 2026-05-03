@@ -19,6 +19,19 @@ interface PaymentsProps {
   onSectionChange: (section: string) => void;
 }
 
+function paymentTypeLabel(type: Payment["type"] | string): string {
+  switch (type) {
+    case "deposit":
+      return __("Deposit", "yatra");
+    case "balance":
+      return __("Balance", "yatra");
+    case "installment":
+      return __("Installment", "yatra");
+    default:
+      return type;
+  }
+}
+
 const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
   const displayPayments = payments;
 
@@ -275,7 +288,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                         {__(payment.status, payment.status)}
                       </span>
                       <span className="px-3 py-1 rounded-lg text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 capitalize">
-                        {payment.type}
+                        {paymentTypeLabel(payment.type)}
                       </span>
                     </div>
                   </div>

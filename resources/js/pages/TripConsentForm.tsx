@@ -870,7 +870,7 @@ const TripConsentForm: React.FC = () => {
                 type="button"
                 variant="outline"
                 onClick={generateSimpleForm}
-                className="border-purple-300 text-purple-600 hover:bg-purple-50 dark:border-purple-700 dark:hover:bg-purple-900/20"
+                className="border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-700 dark:hover:bg-blue-900/20"
               >
                 <Sparkles className="w-4 h-4 mr-2" />
                 {__("Generate Simple Form")}
@@ -879,7 +879,7 @@ const TripConsentForm: React.FC = () => {
             <Button
               onClick={handleSubmit}
               disabled={saveMutation.isPending}
-              className="bg-purple-600 hover:bg-purple-700"
+              className="bg-blue-600 hover:bg-blue-700"
             >
               {saveMutation.isPending ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -905,7 +905,7 @@ const TripConsentForm: React.FC = () => {
                 onClick={() => setActiveTab(tab)}
                 className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === tab
-                    ? "border-purple-600 text-purple-600"
+                    ? "border-blue-600 text-blue-600"
                     : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                 }`}
               >
@@ -1116,9 +1116,9 @@ const TripConsentForm: React.FC = () => {
                           onDragEnd={handleDragEnd}
                           className={`border rounded-lg transition-all ${
                             isDragging
-                              ? "opacity-50 border-purple-400 bg-purple-50 dark:bg-purple-900/20"
+                              ? "opacity-50 border-blue-400 bg-blue-50 dark:bg-blue-900/20"
                               : isDragOver
-                                ? "border-purple-500 border-2 bg-purple-50 dark:bg-purple-900/10"
+                                ? "border-blue-500 border-2 bg-blue-50 dark:bg-blue-900/10"
                                 : "border-gray-200 dark:border-gray-700"
                           }`}
                         >
@@ -1129,7 +1129,7 @@ const TripConsentForm: React.FC = () => {
                             }
                           >
                             <GripVertical className="w-4 h-4 text-gray-400 cursor-grab active:cursor-grabbing" />
-                            <FieldIcon className="w-4 h-4 text-purple-600" />
+                            <FieldIcon className="w-4 h-4 text-blue-600" />
                             <span className="flex-1 text-sm font-medium">
                               {field.label || __("Untitled Field")}
                             </span>
@@ -1381,7 +1381,7 @@ const TripConsentForm: React.FC = () => {
                         className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
                       >
                         <div className="flex items-center justify-between mb-3">
-                          <span className="text-sm font-medium text-purple-600 capitalize">
+                          <span className="text-sm font-medium text-blue-600 capitalize">
                             {block.type}
                           </span>
                           <Button
@@ -1778,8 +1778,8 @@ const PreviewForm: React.FC<PreviewFormProps> = ({
       <div className="max-w-3xl mx-auto">
         <Card className="overflow-hidden">
           <CardContent className="p-12 text-center">
-            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckSquare className="w-10 h-10 text-green-600" />
+            <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckSquare className="w-10 h-10 text-blue-600" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
               {__("Consent Form Saved!")}
@@ -1790,7 +1790,7 @@ const PreviewForm: React.FC<PreviewFormProps> = ({
               )}
             </p>
             {savedConsentId && (
-              <p className="text-sm text-purple-600 dark:text-purple-400 mb-6">
+              <p className="text-sm text-blue-600 dark:text-blue-400 mb-6">
                 {__("Consent ID")}: #{savedConsentId}
               </p>
             )}
@@ -1858,12 +1858,12 @@ const PreviewForm: React.FC<PreviewFormProps> = ({
   return (
     <div className="max-w-3xl mx-auto">
       <Card className="overflow-hidden">
-        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-white">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
           <h2 className="text-2xl font-bold">
             {formData.name || __("Consent Form")}
           </h2>
           {formData.description && (
-            <p className="mt-2 text-purple-100">{formData.description}</p>
+            <p className="mt-2 text-blue-100">{formData.description}</p>
           )}
         </div>
 
@@ -1912,7 +1912,7 @@ const PreviewForm: React.FC<PreviewFormProps> = ({
                     {block.type === "terms" && (
                       <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                         <h4 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
-                          <CheckSquare className="w-5 h-5 text-purple-600" />
+                          <CheckSquare className="w-5 h-5 text-blue-600" />
                           {block.title}
                         </h4>
                         <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
@@ -1957,7 +1957,7 @@ const PreviewForm: React.FC<PreviewFormProps> = ({
                             })
                           }
                           rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                       ) : field.type === "checkbox" ? (
                         <label className="flex items-start gap-3 cursor-pointer">
@@ -1970,7 +1970,7 @@ const PreviewForm: React.FC<PreviewFormProps> = ({
                                 [field.id]: e.target.checked,
                               })
                             }
-                            className="mt-1 w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                            className="mt-1 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                           />
                           <span className="text-sm text-gray-600 dark:text-gray-400">
                             {field.label}
@@ -1985,7 +1985,7 @@ const PreviewForm: React.FC<PreviewFormProps> = ({
                               [field.id]: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         >
                           <option value="">
                             {field.placeholder || __("Select an option")}
@@ -2007,7 +2007,7 @@ const PreviewForm: React.FC<PreviewFormProps> = ({
                               [field.id]: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                       )}
                     </div>
@@ -2062,7 +2062,7 @@ const PreviewForm: React.FC<PreviewFormProps> = ({
               type="button"
               onClick={handlePreviewSubmit}
               disabled={isSubmitting}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
             >
               {isSubmitting ? (
                 <>

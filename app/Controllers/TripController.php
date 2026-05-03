@@ -1903,23 +1903,13 @@ class TripController extends BaseController
                 // Use month-based keys for filtering for both day trips and multi-day trips
                 $filter_key = strtolower(date('M-Y', $departure_date));
                 
-                // pricing_type MODEL comes from trip level (regular vs traveler_based)
-                // Note: $avail->pricing_type enum is about price state, not pricing model
-                $card_pricing_type = $trip_data->pricing_type ?? 'regular';
-                if (!empty($avail->price_types) && is_array($avail->price_types) && count($avail->price_types) > 0) {
-                    $card_pricing_type = 'traveler_based';
-                }
-                
-                // price_types come from centralized service (already resolved with priority: Rules → Dates → Trip)
+                // Must match {@see TripPricingService::resolveCardPricing}: trip-level mode wins; do not
+                // treat inherited stale price_types on a date as traveler-based when the trip is regular.
+                $card_pricing_type = $cardPricing['pricing_type'];
                 $card_traveler_pricing = [];
-                if (!empty($avail->price_types)) {
-                    $card_traveler_pricing = is_array($avail->price_types) ? $avail->price_types : [];
-                    
-                    // Enrich with category labels if needed
-                    if (!empty($card_traveler_pricing)) {
-                        $card_traveler_pricing = $enrich_price_types($card_traveler_pricing);
-                    }
-
+                $pts_for_card = $cardPricing['price_types'] ?? [];
+                if (!empty($pts_for_card) && is_array($pts_for_card)) {
+                    $card_traveler_pricing = $enrich_price_types($pts_for_card);
                 }
                 
                 $availability_cards[] = [

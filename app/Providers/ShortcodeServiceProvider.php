@@ -8,12 +8,14 @@ use Yatra\Shortcodes\MyAccountShortcode;
 use Yatra\Shortcodes\TripShortcode;
 use Yatra\Shortcodes\ActivityShortcode;
 use Yatra\Shortcodes\DestinationShortcode;
+use Yatra\Shortcodes\TripCategoryShortcode;
 use Yatra\Shortcodes\DiscountAndDealsShortcode;
 use Yatra\Shortcodes\SearchShortcode;
 use Yatra\Shortcodes\LoginShortcode;
 use Yatra\Ajax\TripShortcodeAjax;
 use Yatra\Ajax\ActivityShortcodeAjax;
 use Yatra\Ajax\DestinationShortcodeAjax;
+use Yatra\Ajax\TripCategoryShortcodeAjax;
 use Yatra\Ajax\DiscountShortcodeAjax;
 use Yatra\Ajax\LoginAjax;
 use Yatra\Ajax\GeocodingAjax;
@@ -46,6 +48,7 @@ class ShortcodeServiceProvider extends \Yatra\Core\ServiceProvider
             'TripShortcodeAjax',
             'ActivityShortcodeAjax', 
             'DestinationShortcodeAjax',
+            'TripCategoryShortcodeAjax',
             'DiscountShortcodeAjax',
             'LoginAjax',
             'GeocodingAjax',
@@ -77,6 +80,7 @@ class ShortcodeServiceProvider extends \Yatra\Core\ServiceProvider
             'yatra_trip' => TripShortcode::class,
             'yatra_activity' => ActivityShortcode::class,
             'yatra_destination' => DestinationShortcode::class,
+            'yatra_trip_category' => TripCategoryShortcode::class,
             'yatra_discount_and_deals' => DiscountAndDealsShortcode::class,
             'yatra_search' => SearchShortcode::class,
             'yatra_login' => LoginShortcode::class,

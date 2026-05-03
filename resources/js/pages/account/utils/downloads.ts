@@ -1,3 +1,5 @@
+import { __ } from "../../../lib/i18n";
+
 /**
  * Account PDFs use Yatra REST routes with cookie auth + X-WP-Nonce.
  * Plain-permalink sites use index.php?rest_route=/yatra/v1 — query params must
@@ -152,7 +154,7 @@ function buildPaymentInvoiceUrl(
 }
 
 async function readFetchErrorMessage(res: Response): Promise<string> {
-  let msg = res.statusText || "Request failed";
+  let msg = res.statusText || __("Request failed", "yatra");
   try {
     const j = await res.json();
     if (j?.message) {
@@ -170,7 +172,9 @@ async function readFetchErrorMessage(res: Response): Promise<string> {
 async function fetchPreviewPdf(url: string): Promise<Blob> {
   const { nonce } = getAccountRestConfig();
   if (!nonce) {
-    throw new Error("Missing REST nonce; reload the account page.");
+    throw new Error(
+      __("Missing security token. Reload the account page and try again.", "yatra"),
+    );
   }
   const res = await fetch(url, {
     method: "GET",
@@ -188,7 +192,9 @@ async function fetchPreviewPdf(url: string): Promise<Blob> {
     filename?: string;
   };
   if (!data?.pdf_data || typeof data.pdf_data !== "string") {
-    throw new Error("Invalid preview response from server.");
+    throw new Error(
+      __("Invalid preview response from the server.", "yatra"),
+    );
   }
   const binary = atob(data.pdf_data);
   const bytes = new Uint8Array(binary.length);
@@ -204,7 +210,10 @@ function openPdfInNewTab(blob: Blob): void {
   if (!win) {
     URL.revokeObjectURL(objectUrl);
     throw new Error(
-      "Popup blocked. Allow popups for this site to preview the PDF.",
+      __(
+        "Popup blocked. Allow popups for this site to preview the PDF.",
+        "yatra",
+      ),
     );
   }
   window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
@@ -216,7 +225,9 @@ async function downloadBookingBinary(
 ): Promise<void> {
   const { base, nonce } = getAccountRestConfig();
   if (!nonce) {
-    throw new Error("Missing REST nonce; reload the account page.");
+    throw new Error(
+      __("Missing security token. Reload the account page and try again.", "yatra"),
+    );
   }
   const url = buildBookingDocumentUrl(base, bookingId, kind, "download");
   const res = await fetch(url, {
@@ -256,7 +267,9 @@ async function downloadBookingBinary(
 async function downloadPaymentInvoiceBinary(paymentId: number): Promise<void> {
   const { base, nonce } = getAccountRestConfig();
   if (!nonce) {
-    throw new Error("Missing REST nonce; reload the account page.");
+    throw new Error(
+      __("Missing security token. Reload the account page and try again.", "yatra"),
+    );
   }
   const url = buildPaymentInvoiceUrl(base, paymentId, "download");
   const res = await fetch(url, {
@@ -354,7 +367,9 @@ export const previewPaymentInvoice = async (
 ): Promise<void> => {
   const { base, nonce } = getAccountRestConfig();
   if (!nonce) {
-    throw new Error("Missing REST nonce; reload the account page.");
+    throw new Error(
+      __("Missing security token. Reload the account page and try again.", "yatra"),
+    );
   }
   const url = buildPaymentInvoiceUrl(base, paymentId, "preview");
   const blob = await fetchPreviewPdf(url);
@@ -369,13 +384,17 @@ export async function previewTravelDocument(doc: {
 }): Promise<void> {
   const { base, nonce } = getAccountRestConfig();
   if (!nonce) {
-    throw new Error("Missing REST nonce; reload the account page.");
+    throw new Error(
+      __("Missing security token. Reload the account page and try again.", "yatra"),
+    );
   }
 
   if (doc.category === "invoice") {
     const pid = doc.payment_id ?? parsePaymentIdFromHref(doc.url);
     if (!pid) {
-      throw new Error("Could not resolve invoice link.");
+      throw new Error(
+        __("Could not resolve invoice link.", "yatra"),
+      );
     }
     const url = buildPaymentInvoiceUrl(base, pid, "preview");
     const blob = await fetchPreviewPdf(url);
@@ -387,7 +406,9 @@ export async function previewTravelDocument(doc: {
     const kind = doc.category === "voucher" ? "voucher" : "itinerary";
     const bid = doc.booking_id ?? parseBookingDocFromHref(doc.url, kind);
     if (!bid) {
-      throw new Error("Could not resolve document link.");
+      throw new Error(
+        __("Could not resolve document link.", "yatra"),
+      );
     }
     const url = buildBookingDocumentUrl(base, bid, kind, "preview");
     const blob = await fetchPreviewPdf(url);

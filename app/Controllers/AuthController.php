@@ -484,9 +484,24 @@ class AuthController
      */
     public static function handleEmailVerification(): void
     {
-        $secure_token = get_query_var('yatra_verify_email');
-        
-        if (empty($secure_token)) {
+        $secure_token = (string) get_query_var('yatra_verify_email');
+        if ($secure_token === '' && isset($_GET['yatra_verify_email'])) {
+            $raw = wp_unslash($_GET['yatra_verify_email']);
+            $secure_token = is_string($raw) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $raw) ?? '' : '';
+        }
+
+        if ($secure_token === '') {
+            self::showVerificationError(__('Invalid verification link.', 'yatra'));
+
+            return;
+        }
+
+        $previewToken = defined('YATRA_EMAIL_VERIFICATION_PREVIEW_TOKEN')
+            ? (string) YATRA_EMAIL_VERIFICATION_PREVIEW_TOKEN
+            : 'preview-verify-token';
+        if ($secure_token === $previewToken) {
+            self::showEmailVerificationPreviewNotice();
+
             return;
         }
 
@@ -539,26 +554,49 @@ class AuthController
     /**
      * Send verification email
      */
-    private static function sendVerificationEmail(int $user_id, string $email, string $first_name, string $secure_token, bool $isResend = false): void
+    private static function sendVerificationEmail(int $_user_id, string $email, string $first_name, string $secure_token, bool $isResend = false): void
     {
-        $verification_url = home_url('/yatra-verify-email/' . $secure_token . '/');
-        $site_name = get_bloginfo('name');
-        $subject = sprintf(__('[%s] Please verify your email address', 'yatra'), $site_name);
-        
-        $intro = $isResend 
-            ? __("You requested a new verification link for your account at %s.", 'yatra')
-            : __("Thank you for registering at %s.", 'yatra');
-        
-        $message = sprintf(
-            __("Hello %s,\n\n" . $intro . "\n\nPlease click the link below to verify your email address:\n\n%s\n\nThis link will expire in 24 hours.\n\nIf you did not " . ($isResend ? "request this" : "create this account") . ", please ignore this email.\n\nBest regards,\n%s", 'yatra'),
-            $first_name,
-            $site_name,
-            $verification_url,
-            $site_name
+        $verificationUrl = function_exists('yatra_get_email_verification_url')
+            ? yatra_get_email_verification_url($secure_token)
+            : home_url('/yatra-verify-email/' . rawurlencode($secure_token) . '/');
+
+        $siteName = get_bloginfo('name');
+        $introParagraph = $isResend
+            ? sprintf(
+                /* translators: %s: site name */
+                __('You requested a new verification link for your account at %s. Click the button below to verify your email address.', 'yatra'),
+                $siteName
+            )
+            : sprintf(
+                /* translators: %s: site name */
+                __('Thank you for registering at %s. Please verify your email address to activate your account.', 'yatra'),
+                $siteName
+            );
+
+        $footerNote = $isResend
+            ? __('If you did not request this email, you can ignore it.', 'yatra')
+            : __('If you did not create this account, you can ignore this email.', 'yatra');
+
+        $expiryNoticeHtml = esc_html(
+            sprintf(
+                /* translators: %d: hours until expiry */
+                __('This verification link expires in %d hours for your security.', 'yatra'),
+                24
+            )
         );
 
-        $headers = ['Content-Type: text/plain; charset=UTF-8'];
-        wp_mail($email, $subject, $message, $headers);
+        \Yatra\Services\TransactionalEmailTemplateService::sendIfEnabled(
+            \Yatra\Services\TransactionalEmailTemplateService::TYPE_CUSTOMER_EMAIL_VERIFICATION,
+            $email,
+            [
+                'customer_first_name' => $first_name,
+                'customer_name' => $first_name,
+                'verification_link' => $verificationUrl,
+                'intro_paragraph' => $introParagraph,
+                'footer_note' => $footerNote,
+                'expiry_notice_html' => $expiryNoticeHtml,
+            ]
+        );
     }
 
     /**
@@ -574,6 +612,27 @@ class AuthController
             </div>',
             __('Verification Failed', 'yatra'),
             ['response' => 400]
+        );
+    }
+
+    /**
+     * Inform users that the link is only for email template previews.
+     */
+    private static function showEmailVerificationPreviewNotice(): void
+    {
+        $body = '<div style="text-align: center; padding: 50px; max-width: 520px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif;">
+                <h1 style="color: #1e40af; margin-bottom: 16px;">' . esc_html__('Sample verification link', 'yatra') . '</h1>
+                <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">' . esc_html__(
+                    'This URL is used only in email previews and test messages. It does not verify an account. Use the link from your real verification email to activate your account.',
+                    'yatra'
+                ) . '</p>
+                <a href="' . esc_url(home_url()) . '" style="display: inline-block; background: #3b82f6; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">' . esc_html__('Go to homepage', 'yatra') . '</a>
+            </div>';
+
+        wp_die(
+            $body,
+            __('Email verification (preview)', 'yatra'),
+            ['response' => 200]
         );
     }
 }

@@ -79,6 +79,10 @@ final class WaitlistPromotionService
             do_action('yatra_booking_status_changed', $bookingId, 'waitlist', $newStatus);
             do_action('yatra_waitlist_booking_promoted', $bookingId, $tripId, $availabilityId, $newStatus);
 
+            if ($newStatus === 'confirmed') {
+                \yatra_trigger_booking_confirmed($bookingId, 'waitlist');
+            }
+
             if (SettingsService::isEnabled('booking_confirmation')) {
                 $bs = new BookingService();
                 $bs->sendNewBookingTransactionalConfirmation($bookingId);

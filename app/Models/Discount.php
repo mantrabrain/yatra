@@ -58,7 +58,22 @@ class Discount
         $discount->expiry_date = $data['expiry_date'] ?? null;
         $discount->status = $data['status'] ?? 'active';
         $discount->applicable_to = $data['applicable_to'] ?? 'all';
-        $discount->trip_ids = isset($data['trip_ids']) ? (is_array($data['trip_ids']) ? $data['trip_ids'] : maybe_unserialize($data['trip_ids'])) : null;
+        if (!isset($data['trip_ids']) || $data['trip_ids'] === '' || $data['trip_ids'] === null) {
+            $discount->trip_ids = null;
+        } elseif (is_array($data['trip_ids'])) {
+            $discount->trip_ids = $data['trip_ids'];
+        } elseif (is_string($data['trip_ids'])) {
+            $raw = trim($data['trip_ids']);
+            if ($raw !== '' && ($raw[0] === '[' || $raw[0] === '{')) {
+                $decoded = json_decode($raw, true);
+                $discount->trip_ids = is_array($decoded) ? $decoded : null;
+            } else {
+                $unser = maybe_unserialize($data['trip_ids']);
+                $discount->trip_ids = is_array($unser) ? $unser : array_values(array_filter(array_map('trim', explode(',', $raw))));
+            }
+        } else {
+            $discount->trip_ids = null;
+        }
         $discount->min_amount = isset($data['min_amount']) ? (float) $data['min_amount'] : null;
         $discount->first_time_customer_only = (bool) ($data['first_time_customer_only'] ?? false);
         $discount->is_group_discount = (bool) ($data['is_group_discount'] ?? false);

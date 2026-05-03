@@ -7,6 +7,7 @@ namespace Yatra\Providers;
 use Yatra\Blocks\TourBlock;
 use Yatra\Blocks\ActivityBlock;
 use Yatra\Blocks\DestinationBlock;
+use Yatra\Blocks\TripCategoryBlock;
 use Yatra\Core\Container;
 use Yatra\Core\ServiceProvider;
 
@@ -51,6 +52,7 @@ class BlockServiceProvider extends ServiceProvider
         new TourBlock();
         new ActivityBlock();
         new DestinationBlock();
+        new TripCategoryBlock();
     }
     
     /**

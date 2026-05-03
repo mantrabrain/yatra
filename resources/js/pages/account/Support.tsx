@@ -10,7 +10,7 @@ import {
   Mail,
 } from "lucide-react";
 import { __ } from "../../lib/i18n";
-import { formatDate, getBadge } from "./utils";
+import { formatDate, getBadge, phoneToTelHref, getYatraAccountPageGlobals } from "./utils";
 import type { SupportTicket } from "./types";
 
 interface SupportProps {
@@ -20,6 +20,9 @@ interface SupportProps {
 const Support: React.FC<SupportProps> = ({ tickets }) => {
   const [ticketSubject, setTicketSubject] = useState("");
   const [ticketMessage, setTicketMessage] = useState("");
+  const accountShell = getYatraAccountPageGlobals();
+  const supportTel = phoneToTelHref(accountShell.companyPhone);
+  const supportMail = String(accountShell.companyEmail || "").trim();
 
   const displayTickets = tickets;
 
@@ -284,24 +287,36 @@ const Support: React.FC<SupportProps> = ({ tickets }) => {
               )}
             </p>
             <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2">
-                <PhoneIcon className="w-4 h-4 text-white flex-shrink-0" />
-                <a
-                  href="tel:+18005550199"
-                  className="text-sm font-medium text-white hover:underline"
-                >
-                  +1-800-555-0199
-                </a>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-white flex-shrink-0" />
-                <a
-                  href="mailto:support@yatra.com"
-                  className="text-sm font-medium text-white hover:underline"
-                >
-                  support@yatra.com
-                </a>
-              </div>
+              {supportTel ? (
+                <div className="flex items-center gap-2">
+                  <PhoneIcon className="w-4 h-4 text-white flex-shrink-0" />
+                  <a
+                    href={supportTel}
+                    className="text-sm font-medium text-white hover:underline"
+                  >
+                    {accountShell.companyPhone}
+                  </a>
+                </div>
+              ) : null}
+              {supportMail ? (
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-white flex-shrink-0" />
+                  <a
+                    href={`mailto:${encodeURIComponent(supportMail)}`}
+                    className="text-sm font-medium text-white hover:underline break-all"
+                  >
+                    {supportMail}
+                  </a>
+                </div>
+              ) : null}
+              {!supportTel && !supportMail ? (
+                <p className="text-sm text-white/80">
+                  {__(
+                    "Contact details are not configured. Please reach out through your booking confirmation email.",
+                    "yatra",
+                  )}
+                </p>
+              ) : null}
             </div>
           </div>
         </div>

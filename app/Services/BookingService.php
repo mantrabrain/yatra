@@ -560,6 +560,10 @@ class BookingService
          */
         do_action('yatra_booking_status_changed', $id, $oldStatus, $status);
 
+        if ($status === 'confirmed' && $oldStatus !== 'confirmed') {
+            \yatra_trigger_booking_confirmed($id, $oldStatus);
+        }
+
         return [
             'success' => true,
             'message' => sprintf(__('Booking status updated to %s.', 'yatra'), $status),
@@ -716,6 +720,8 @@ class BookingService
             'contact_phone' => $customerPhone,
             'contact_country' => $booking->contact_country ?? null,
             'travel_date' => $booking->travel_date,
+            'start_date' => $booking->start_date ?? $booking->travel_date ?? null,
+            'end_date' => $booking->end_date ?? null,
             // travelers_count stored; also fallback to total_travelers/travelers if present
             'travelers_count' => (int) ($booking->travelers_count ?? $booking->total_travelers ?? $booking->travelers ?? 0),
             'travelers' => (int) ($booking->travelers_count ?? $booking->total_travelers ?? $booking->travelers ?? 0),
@@ -921,67 +927,21 @@ class BookingService
         if ($newStatus === 'completed') {
             $handled = apply_filters('yatra_send_booking_status_email_html', null, $bookingId, $oldStatus, $newStatus, $booking);
             if ($handled !== null) {
+                ReviewReminderService::scheduleReminder($bookingId);
+
                 return;
             }
+
+            TransactionalEmailTemplateService::sendIfEnabled(
+                TransactionalEmailTemplateService::TYPE_BOOKING_COMPLETED,
+                $booking->contact_email,
+                TransactionalEmailTemplateService::variablesFromBooking($booking)
+            );
+
+            ReviewReminderService::scheduleReminder($bookingId);
+
+            return;
         }
-
-        $subject = sprintf(
-            __('[%s] Booking Status Update - %s', 'yatra'),
-            get_bloginfo('name'),
-            $booking->reference
-        );
-        $message = $this->getStatusChangeEmailContent($booking, $newStatus);
-
-        EmailService::send(
-            $booking->contact_email,
-            $subject,
-            $message,
-            ['Content-Type: text/html; charset=UTF-8']
-        );
-    }
-
-    /**
-     * Get status change email content
-     * 
-     * @param object $booking   Booking data
-     * @param string $newStatus New status
-     * @return string HTML email content
-     */
-    private function getStatusChangeEmailContent(object $booking, string $newStatus): string
-    {
-        $statusMessages = [
-            'confirmed' => __('Your booking has been confirmed!', 'yatra'),
-            'cancelled' => __('Your booking has been cancelled.', 'yatra'),
-            'completed' => __('Your trip has been completed. Thank you for traveling with us!', 'yatra'),
-        ];
-
-        $message = $statusMessages[$newStatus] ?? sprintf(__('Your booking status has been updated to: %s', 'yatra'), $newStatus);
-
-        ob_start();
-        ?>
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-        </head>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #2563eb;"><?php esc_html_e('Booking Update', 'yatra'); ?></h1>
-            
-            <p><?php echo esc_html($message); ?></p>
-            
-            <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <p><strong><?php esc_html_e('Reference:', 'yatra'); ?></strong> <?php echo esc_html($booking->reference); ?></p>
-                <p><strong><?php esc_html_e('Trip:', 'yatra'); ?></strong> <?php echo esc_html($booking->trip_title); ?></p>
-                <p><strong><?php esc_html_e('Travel Date:', 'yatra'); ?></strong> <?php echo esc_html(date_i18n(get_option('date_format'), strtotime($booking->travel_date))); ?></p>
-            </div>
-            
-            <p style="margin-top: 30px; color: #666; font-size: 14px;">
-                <?php echo esc_html(get_bloginfo('name')); ?>
-            </p>
-        </body>
-        </html>
-        <?php
-        return ob_get_clean();
     }
 
     /**

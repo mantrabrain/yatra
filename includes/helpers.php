@@ -365,12 +365,17 @@ if (!function_exists('yatra_get_currency_symbol')) {
 if (!function_exists('yatra_format_duration')) {
     function yatra_format_duration(int $days, ?int $nights = null): string
     {
-        if ($days && $nights) {
-            return $days . ' Days / ' . $nights . ' Nights';
-        } elseif ($days) {
-            return $days . ' Day' . ($days > 1 ? 's' : '');
+        if ($days > 0 && $nights !== null && $nights > 0) {
+            /* translators: 1: days count, 2: nights count */
+            return sprintf(__('%1$d days / %2$d nights', 'yatra'), $days, $nights);
         }
-        return 'Flexible';
+        if ($days > 0) {
+            return sprintf(
+                _n('%d day', '%d days', $days, 'yatra'),
+                $days
+            );
+        }
+        return __('Flexible', 'yatra');
     }
 }
 
@@ -829,6 +834,38 @@ function yatra_has_booking_session(): bool
 }
 
 /**
+ * Fire {@see 'yatra_booking_confirmed'} when a booking reaches `confirmed` from a non-confirmed status.
+ *
+ * Core always fired `yatra_booking_status_changed`; Pro modules (Trip Consent, Google Calendar) listen
+ * on this dedicated action. Call this after any code path that sets a booking to `confirmed` without
+ * going through {@see \Yatra\Services\BookingService::updateStatus()}.
+ *
+ * @param int    $bookingId       Booking ID.
+ * @param string $previousStatus  Booking status in the database immediately before confirming.
+ */
+function yatra_trigger_booking_confirmed(int $bookingId, string $previousStatus): void
+{
+    if ($bookingId < 1 || $previousStatus === 'confirmed') {
+        return;
+    }
+
+    $repo = new \Yatra\Repositories\BookingRepository();
+    $booking = $repo->findWithTrip($bookingId);
+
+    if (!$booking || ($booking->status ?? '') !== 'confirmed') {
+        return;
+    }
+
+    /**
+     * Booking reached confirmed status (was not confirmed before this transition).
+     *
+     * @param int    $bookingId Booking ID.
+     * @param object $booking   Row from {@see \Yatra\Repositories\BookingRepository::findWithTrip()}.
+     */
+    do_action('yatra_booking_confirmed', $bookingId, $booking);
+}
+
+/**
  * ============================================
  * REMAINING PAYMENT SESSION MANAGEMENT
  * ============================================
@@ -1036,6 +1073,39 @@ function yatra_get_booking_confirmation_url(string $reference = ''): string
      * @param string $reference Booking reference (may be empty).
      */
     return (string) apply_filters('yatra_booking_confirmation_url', $url, $reference);
+}
+
+/**
+ * Front-end URL to verify a customer email (checkout registration / account).
+ *
+ * Pretty permalinks: /yatra-verify-email/{token}/ (rewrite + query var).
+ * Plain permalinks: ?yatra_verify_email={token} on the home URL (same as {@see \Yatra\Core\Routing\PermalinkCanonical}).
+ *
+ * @param string $secure_token URL-safe token (base64-derived; only [A-Za-z0-9_-] used in the path/query).
+ */
+function yatra_get_email_verification_url(string $secure_token): string
+{
+    $t = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $secure_token) ?? '';
+    if ($t === '') {
+        return home_url('/');
+    }
+
+    $permalink_structure = get_option('permalink_structure');
+    $is_plain = empty($permalink_structure);
+
+    if ($is_plain) {
+        $url = add_query_arg('yatra_verify_email', $t, home_url('/'));
+    } else {
+        $url = trailingslashit(home_url('/yatra-verify-email/' . $t . '/'));
+    }
+
+    /**
+     * Filter the customer email verification URL.
+     *
+     * @param string $url   Full verification URL.
+     * @param string $token Sanitized token segment.
+     */
+    return (string) apply_filters('yatra_email_verification_url', $url, $t);
 }
 
 /**
@@ -2068,36 +2138,78 @@ function yatra_single_trip_calculate_base_price($trip) {
 function yatra_single_trip_get_group_discounts($trip_id) {
     $has_group_discounts = false;
     $group_discounts_data = [];
-    
-    try {
-        // Call the group discount API to get detailed discount information
-        $api_url = rest_url('yatra/v1/discounts/group-discounts');
-        $response = wp_remote_post($api_url, [
-            'method' => 'GET',
-            'body' => [
-                'trip_ids' => [$trip_id]
-            ],
-            'headers' => [
-                'Content-Type' => 'application/json',
-            ],
-        ]);
+    $trip_id = (int) $trip_id;
 
-        if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
-            $data = json_decode(wp_remote_retrieve_body($response), true);
-            if (isset($data[$trip_id]) && $data[$trip_id]['has_group_discounts']) {
-                $has_group_discounts = true;
-                $group_discounts_data = $data[$trip_id]['discounts'];
+    if ($trip_id <= 0) {
+        return [
+            'has_group_discounts' => false,
+            'group_discounts_data' => [],
+        ];
+    }
+
+    try {
+        $row = null;
+
+        // Prefer internal REST dispatch — wp_remote_get() to the same site often fails (loopback
+        // blocked, TLS, auth) and leaves the sidebar without group discount discoverability.
+        if (class_exists('\WP_REST_Request') && function_exists('rest_do_request')) {
+            $request = new \WP_REST_Request('GET', '/yatra/v1/discounts/group-discounts');
+            $request->set_param('trip_ids', [$trip_id]);
+            $rest_response = rest_do_request($request);
+            if ($rest_response instanceof \WP_REST_Response && $rest_response->get_status() === 200) {
+                $row = yatra_single_trip_parse_group_discounts_payload($rest_response->get_data(), $trip_id);
             }
         }
+
+        if (!is_array($row)) {
+            $api_url = add_query_arg(
+                ['trip_ids' => [$trip_id]],
+                rest_url('yatra/v1/discounts/group-discounts')
+            );
+            $response = wp_remote_get($api_url, [
+                'timeout' => 6,
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+            ]);
+
+            if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
+                $data = json_decode(wp_remote_retrieve_body($response), true);
+                $row = yatra_single_trip_parse_group_discounts_payload($data, $trip_id);
+            }
+        }
+
+        if (is_array($row) && !empty($row['has_group_discounts']) && !empty($row['discounts']) && is_array($row['discounts'])) {
+            $has_group_discounts = true;
+            $group_discounts_data = $row['discounts'];
+        }
     } catch (Exception $e) {
-        // Silently fail if API call fails - don't break the page
         $has_group_discounts = false;
     }
-    
+
     return [
         'has_group_discounts' => $has_group_discounts,
-        'group_discounts_data' => $group_discounts_data
+        'group_discounts_data' => $group_discounts_data,
     ];
+}
+
+/**
+ * Extract the per-trip object from a group-discounts REST payload (handles optional wrappers).
+ *
+ * @param mixed $data
+ * @return array<string, mixed>|null
+ */
+function yatra_single_trip_parse_group_discounts_payload($data, int $trip_id): ?array {
+    if (!is_array($data)) {
+        return null;
+    }
+    if (isset($data['data']) && is_array($data['data'])) {
+        $data = $data['data'];
+    }
+    $keyStr = (string) $trip_id;
+    $row = $data[$trip_id] ?? $data[$keyStr] ?? null;
+
+    return is_array($row) ? $row : null;
 }
 
 // Hook into WordPress enqueue system

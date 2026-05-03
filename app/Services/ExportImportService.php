@@ -45,8 +45,6 @@ class ExportImportService
         'trip_classifications' => 'yatra_new_trip_classifications',
         'trip_content' => 'yatra_new_trip_content',
         'trip_revisions' => 'yatra_new_trip_revisions',
-        'scheduled_payments' => 'yatra_new_scheduled_payments',
-        'payment_tokens' => 'yatra_new_payment_tokens',
     ];
 
     /**
@@ -943,10 +941,6 @@ class ExportImportService
                 return 'bookings';
             case 'payments':
                 return 'payments';
-            case 'payment_tokens':
-                return 'payment_tokens';
-            case 'scheduled_payments':
-                return 'scheduled_payments';
             case 'availability':
                 return 'availability';
             case 'departures':
@@ -1013,12 +1007,8 @@ class ExportImportService
                 return empty($row['traveller_id'] ?? null);
             case 'booking_additional_services':
                 return empty($row['booking_id'] ?? null) || empty($row['service_id'] ?? null);
-            case 'payment_tokens':
-                return empty($row['customer_id'] ?? null);
             case 'bookings':
                 return empty($row['trip_id'] ?? null);
-            case 'scheduled_payments':
-                return empty($row['booking_id'] ?? null);
             case 'reviews':
                 return empty($row['trip_id'] ?? null);
             default:
@@ -1067,11 +1057,6 @@ class ExportImportService
                     $row['service_id'] = $m->map('services', $row['service_id']);
                 }
                 break;
-            case 'payment_tokens':
-                if (isset($row['customer_id'])) {
-                    $row['customer_id'] = $m->map('customers', $row['customer_id']);
-                }
-                break;
             case 'bookings':
                 if (isset($row['trip_id'])) {
                     $row['trip_id'] = $m->map('trips', $row['trip_id']);
@@ -1115,17 +1100,6 @@ class ExportImportService
                 }
                 if (array_key_exists('customer_id', $row)) {
                     $row['customer_id'] = $m->mapFkNullable('customers', $row['customer_id']);
-                }
-                break;
-            case 'scheduled_payments':
-                if (isset($row['booking_id'])) {
-                    $row['booking_id'] = $m->map('bookings', $row['booking_id']);
-                }
-                if (array_key_exists('customer_id', $row)) {
-                    $row['customer_id'] = $m->mapFkNullable('customers', $row['customer_id']);
-                }
-                if (array_key_exists('payment_token_id', $row)) {
-                    $row['payment_token_id'] = $m->mapFkNullable('payment_tokens', $row['payment_token_id']);
                 }
                 break;
             case 'google_calendar_events':
@@ -1418,14 +1392,6 @@ class ExportImportService
         if (in_array('availability', $out, true) && !in_array('availability_rules', $out, true)) {
             $out[] = 'availability_rules';
         }
-        if (in_array('payments', $out, true)) {
-            foreach (['scheduled_payments', 'payment_tokens'] as $extra) {
-                if (!in_array($extra, $out, true)) {
-                    $out[] = $extra;
-                }
-            }
-        }
-
         return apply_filters('yatra_export_import_expand_types', $out, $dataTypes);
     }
 
@@ -1462,7 +1428,6 @@ class ExportImportService
             'pricing_history',
             'departures',
             'customers',
-            'payment_tokens',
             'bookings',
             'booking_departures',
             'booking_additional_services',
@@ -1476,7 +1441,6 @@ class ExportImportService
             'travelers',
             'traveler_meta',
             'payments',
-            'scheduled_payments',
             'google_calendar_events',
             'reviews',
             'enquiries',

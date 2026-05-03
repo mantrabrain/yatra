@@ -1,5 +1,71 @@
-import { r as reactExports, j as jsxRuntimeExports, as as X, al as Info, at as AlertTriangle, b5 as AlertCircle, bh as CheckCircle2 } from "./react-vendor-lSVLenth.js";
-var sprintf = {};
+import { I as getDefaultExportFromCjs, r as reactExports, j as jsxRuntimeExports, as as X, al as Info, at as AlertTriangle, b5 as AlertCircle, bh as CheckCircle2 } from "./react-vendor-lSVLenth.js";
+function memize(fn, options) {
+  var size = 0;
+  var head;
+  var tail;
+  options = options || {};
+  function memoized() {
+    var node = head, len = arguments.length, args, i;
+    searchCache: while (node) {
+      if (node.args.length !== arguments.length) {
+        node = node.next;
+        continue;
+      }
+      for (i = 0; i < len; i++) {
+        if (node.args[i] !== arguments[i]) {
+          node = node.next;
+          continue searchCache;
+        }
+      }
+      if (node !== head) {
+        if (node === tail) {
+          tail = node.prev;
+        }
+        node.prev.next = node.next;
+        if (node.next) {
+          node.next.prev = node.prev;
+        }
+        node.next = head;
+        node.prev = null;
+        head.prev = node;
+        head = node;
+      }
+      return node.val;
+    }
+    args = new Array(len);
+    for (i = 0; i < len; i++) {
+      args[i] = arguments[i];
+    }
+    node = {
+      args,
+      // Generate the result from original function
+      val: fn.apply(null, args)
+    };
+    if (head) {
+      head.prev = node;
+      node.next = head;
+    } else {
+      tail = node;
+    }
+    if (size === /** @type {MemizeOptions} */
+    options.maxSize) {
+      tail = /** @type {MemizeCacheNode} */
+      tail.prev;
+      tail.next = null;
+    } else {
+      size++;
+    }
+    head = node;
+    return node.val;
+  }
+  memoized.clear = function() {
+    head = null;
+    tail = null;
+    size = 0;
+  };
+  return memoized;
+}
+var sprintf$2 = {};
 (function(exports$1) {
   !function() {
     var re = {
@@ -186,7 +252,19 @@ var sprintf = {};
       window["vsprintf"] = vsprintf;
     }
   }();
-})(sprintf);
+})(sprintf$2);
+const sprintfjs = /* @__PURE__ */ getDefaultExportFromCjs(sprintf$2);
+const logErrorOnce = memize(console.error);
+function sprintf$1(format, ...args) {
+  try {
+    return sprintfjs.sprintf(format, ...args);
+  } catch (error) {
+    if (error instanceof Error) {
+      logErrorOnce("sprintf error: \n\n" + error.toString());
+    }
+    return format;
+  }
+}
 var PRECEDENCE, OPENERS, TERMINATORS, PATTERN;
 PRECEDENCE = {
   "(": 9,
@@ -805,6 +883,16 @@ function __(key, textDomain) {
     return window.wp.i18n.__(key, textDomain || "yatra");
   }
   return __$1(key, textDomain || "yatra");
+}
+function sprintf(format, ...args) {
+  var _a, _b;
+  if (typeof window !== "undefined" && ((_b = (_a = window.wp) == null ? void 0 : _a.i18n) == null ? void 0 : _b.sprintf)) {
+    return window.wp.i18n.sprintf(format, ...args);
+  }
+  return sprintf$1(
+    format,
+    ...args
+  );
 }
 const ToastContext = reactExports.createContext(void 0);
 const useToast = () => {
@@ -2000,7 +2088,8 @@ export {
   getCurrencyOptions as e,
   ajaxService as f,
   getCurrencySymbol as g,
+  sprintf as s,
   useToast as u,
   wpService as w
 };
-//# sourceMappingURL=index-Ar4TZ2Se.js.map
+//# sourceMappingURL=index-BUTTH9Ac.js.map

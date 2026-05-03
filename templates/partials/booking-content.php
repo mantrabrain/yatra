@@ -143,19 +143,22 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                         <?php 
                         // Pass pricing type info to form fields partial
                         // Prefer booking pricing data, fallback to trip definition
+                        $trip_pricing_mode = \Yatra\Services\TripPricingService::resolvePricingType($trip);
                         $pricing_type = !empty($booking->pricing_type) ? $booking->pricing_type : ($trip->pricing_type ?? 'regular');
                         $price_types = !empty($booking->price_types) ? $booking->price_types : ($trip->price_types ?? []);
+                        if ($trip_pricing_mode === 'regular' && empty($booking->price_types)) {
+                            $pricing_type = 'regular';
+                            $price_types = [];
+                        }
                         if (empty($pricing_type) && !empty($price_types)) {
                             $pricing_type = 'traveler_based';
                         }
-                        if ($pricing_type === 'regular' && !empty($price_types)) {
-                            // Infer traveler-based if price types are present but flag not set
-                            $pricing_type = 'traveler_based';
-                        }
-                        // Ensure price_types is always the trip's price_types if booking lacks it
-                        if (empty($price_types) && !empty($trip->price_types)) {
+                        // Do not override explicit regular trip pricing with orphan trip_price_types rows
+                        if (empty($price_types) && !empty($trip->price_types) && $trip_pricing_mode === 'traveler_based') {
                             $price_types = $trip->price_types;
-                            $pricing_type = 'traveler_based';
+                            if (empty($pricing_type) || $pricing_type === 'regular') {
+                                $pricing_type = 'traveler_based';
+                            }
                         }
                         $traveler_counts = $booking->traveler_counts ?? [];
 
@@ -312,7 +315,7 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                             <?php endif; ?>
                         </div>
                         
-                        <?php if (!empty($trip->price_types) || (!empty($price_types) && $pricing_type === 'traveler_based')): ?>
+                        <?php if ($pricing_type === 'traveler_based' && !empty($price_types)): ?>
                         <!-- Traveler-based pricing: use shared traveler selector partial -->
                         <div class="yatra-summary-form-group yatra-traveler-categories">
                             <label><?php esc_html_e('Travelers', 'yatra'); ?></label>

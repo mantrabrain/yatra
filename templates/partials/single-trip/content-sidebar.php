@@ -8,97 +8,21 @@ if (!defined('ABSPATH')) {
     // Determine if this is a multi-day trip
     $is_multi_day = ($trip->getDurationDays() ?? 1) > 1;
 
-    // Check for group discounts availability early for the badge (premium feature)
+    // Group discounts (Advanced Discount / Pro): same payload as the public REST discoverability endpoint
     $sidebar_has_group_discounts = false;
-    $sidebar_group_discounts_data = [];
-    $sidebar_group_discount_summary = '';
-    try {
-        // Check if group discounts method exists (premium feature)
-        if (class_exists('\Yatra\Services\DiscountService') &&
-            method_exists('\Yatra\Services\DiscountService', 'getGroupDiscountsForTrip')) {
-            $discountService = new \Yatra\Services\DiscountService();
-            $groupDiscountsResult = $discountService->getGroupDiscountsForTrip((int) $trip->getId());
-            
-                        
-            if (!empty($groupDiscountsResult)) {
-                $sidebar_has_group_discounts = true;
-                $all_ranges = [];
-                
-                // Process ALL group discount rules
-                foreach ($groupDiscountsResult as $discount) {
-                    $ranges = [];
-                    
-                    // Try different field names where ranges might be stored
-                    $possible_fields = ['group_discount_ranges', 'ranges', 'discount_ranges'];
-                    foreach ($possible_fields as $field) {
-                        if (!empty($discount->$field)) {
-                            if (is_string($discount->$field)) {
-                                $ranges = json_decode($discount->$field, true);
-                            } elseif (is_array($discount->$field)) {
-                                $ranges = $discount->$field;
-                            }
-                            break;
-                        }
-                    }
-                    
-                    // If no ranges found, create a basic structure from other fields
-                    if (empty($ranges)) {
-                        $ranges = [];
-                        // Check if it's a simple discount with min/max fields
-                        $min_size = !empty($discount->min_group_size) ? (int) $discount->min_group_size : 0;
-                        $max_size = !empty($discount->max_group_size) ? (int) $discount->max_group_size : null;
-                        
-                        // Handle different field names for discount value and type
-                        $discount_value = 0;
-                        $discount_type = 'percentage';
-                        
-                        if (!empty($discount->amount)) {
-                            $discount_value = (float) $discount->amount;
-                        } elseif (!empty($discount->discount_amount)) {
-                            $discount_value = (float) $discount->discount_amount;
-                        }
-                        
-                        if (!empty($discount->type)) {
-                            $discount_type = $discount->type;
-                        } elseif (!empty($discount->discount_type)) {
-                            $discount_type = $discount->discount_type;
-                        }
-                        
-                        // If no min_size is set, assume it's a general group discount starting from 2 people
-                        if ($min_size === 0) {
-                            $min_size = 2;
-                        }
-                        
-                        if ($min_size > 0 && $discount_value > 0) {
-                            $ranges[] = [
-                                'min_group_size' => $min_size,
-                                'max_group_size' => $max_size,
-                                'discount_amount' => $discount_value,
-                                'discount_type' => $discount_type,
-                                'discount_percentage' => $discount_type === 'percentage' ? $discount_value : null,
-                                'discount_code' => $discount->code ?? ''
-                            ];
-                        }
-                    } else {
-                        // Add discount code to existing ranges if available
-                        foreach ($ranges as &$range) {
-                            if (!isset($range['discount_code'])) {
-                                $range['discount_code'] = $discount->code ?? '';
-                            }
-                        }
-                    }
-                    
-                    // Merge ranges from this discount rule
-                    $all_ranges = array_merge($all_ranges, $ranges);
-                }
-                
-                $sidebar_group_discounts_data = $all_ranges;
-            }
-        }
-    } catch (\Exception $e) {
-        // Silently fail if premium features are not available
-        $sidebar_has_group_discounts = false;
+    $sidebar_group_discount_cards = [];
+    $sidebar_group_discounts_for_js = [];
+    if (function_exists('yatra_single_trip_get_group_discounts')) {
+        $gd = yatra_single_trip_get_group_discounts((int) $trip->getId());
+        $sidebar_has_group_discounts = !empty($gd['has_group_discounts']);
+        $sidebar_group_discount_cards = isset($gd['group_discounts_data']) && is_array($gd['group_discounts_data'])
+            ? $gd['group_discounts_data']
+            : [];
     }
+    // Only pass tiers into booking JS when Advanced Discount applies them server-side (avoid misleading prices).
+    $sidebar_group_discounts_for_js = apply_filters('yatra_advanced_discount_enabled', false)
+        ? $sidebar_group_discount_cards
+        : [];
 
     // Prepare availability data for JavaScript
     $availability_json = [];
@@ -195,60 +119,15 @@ if (!defined('ABSPATH')) {
          data-is-multi-day="<?php echo $is_multi_day ? 'true' : 'false'; ?>"
          data-pricing-type="<?php echo esc_attr($pricing_type); ?>"
          data-availability='<?php echo esc_attr(json_encode($availability_json)); ?>'
-         data-group-discounts='<?php echo esc_attr(json_encode($sidebar_group_discounts_data)); ?>'>
+         data-group-discounts='<?php echo esc_attr(wp_json_encode($sidebar_group_discounts_for_js)); ?>'>
 
-        <?php if ($sidebar_has_group_discounts): ?>
-            <!-- Group Discount Badge - Minimal with Tooltip -->
-            <div class="yatra-group-discount-badge-minimal yatra-has-tooltip">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-                <span><?php echo esc_html__('Group discount available', 'yatra'); ?></span>
-                <svg class="yatra-info-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
-                <div class="yatra-tooltip">
-                    <div class="yatra-tooltip-header">
-                        <strong><?php echo esc_html__('Group Discount Tiers', 'yatra'); ?></strong>
-                    </div>
-                    <div class="yatra-tooltip-content">
-                        <?php if (!empty($sidebar_group_discounts_data) && is_array($sidebar_group_discounts_data)): ?>
-                            <?php foreach ($sidebar_group_discounts_data as $range): ?>
-                                <div class="yatra-discount-tier">
-                                    <span class="yatra-tier-size">
-                                        <?php 
-                                        $min = (int) ($range['min_group_size'] ?? 0);
-                                        $max = isset($range['max_group_size']) && $range['max_group_size'] > 0 ? (int) $range['max_group_size'] : null;
-                                        if ($max) {
-                                            echo sprintf(esc_html__('%d-%d travelers', 'yatra'), $min, $max);
-                                        } else {
-                                            echo sprintf(esc_html__('%d+ travelers', 'yatra'), $min);
-                                        }
-                                        ?>
-                                    </span>
-                                    <span class="yatra-tier-discount">
-                                        <?php 
-                                        $discount_type = $range['discount_type'] ?? 'percentage';
-                                        $discount_value = (float) ($range['discount_amount'] ?? $range['discount_percentage'] ?? 0);
-                                        
-                                        if ($discount_type === 'percentage') {
-                                            echo esc_html(sprintf(__('%s%% OFF', 'yatra'), number_format($discount_value, 1)));
-                                        } else {
-                                            echo esc_html(sprintf(__('%s OFF', 'yatra'), yatra_format_price($discount_value)));
-                                        }
-                                        ?>
-                                    </span>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
+        <?php if ($sidebar_has_group_discounts && !empty($sidebar_group_discount_cards)): ?>
+            <?php
+            $group_discount_cards = $sidebar_group_discount_cards;
+            $popover_context = 'booking';
+            $popover_uid = 'sb-' . (int) $trip->getId();
+            yatra_get_template('partials/single-trip/group-discount-booking-popover', compact('group_discount_cards', 'popover_context', 'popover_uid'));
+            ?>
         <?php endif; ?>
 
         <!-- Price Display -->

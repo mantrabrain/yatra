@@ -1,7 +1,9 @@
 /**
  * Canonical list of system email templates (aligned with Yatra Pro seeds).
- * When Email Automation is off, the four isCoreFree rows are editable via site settings;
- * all other rows appear locked until the module is enabled.
+ * When Email Automation is off, settings-backed templates stay editable in the free plugin;
+ * Pro-only catalog rows stay visible but locked until Pro + Email Automation is on.
+ * Module-gated templates (e.g. trip consent, abandoned recovery) stay listed with real
+ * on/off + content from site settings while the module is off — view-only until the module is active.
  */
 
 import { __ } from "./i18n";
@@ -17,6 +19,8 @@ export type EmailCatalogEntry = {
   to_email: string;
   /** When true, subject/body/active map to EmailSettingsValues keys. */
   isCoreFree: boolean;
+  /** If set, subject/body cannot be edited until Pro + this module slug is active (row still listed). */
+  requiresModule?: string;
   settingsFlag?: keyof EmailSettingsValues;
   settingsSubject?: keyof EmailSettingsValues;
   settingsBody?: keyof EmailSettingsValues;
@@ -29,6 +33,20 @@ export const CORE_FREE_TEMPLATE_KEYS = [
   "payment_received",
   "booking_cancelled",
   "trip_reminder",
+  "trip_consent_request",
+  "customer_email_verification",
+  "booking_completed",
+  "booking_expired_customer",
+  "admin_booking_expired",
+  "scheduled_payment_reminder",
+  "scheduled_payment_succeeded",
+  "scheduled_payment_failed",
+  "admin_scheduled_payment_failed",
+  "enquiry_received",
+  "enquiry_admin",
+  "enquiry_response",
+  "review_request",
+  "abandoned_booking_recovery",
   "admin_new_booking",
   "admin_payment_received",
   "admin_booking_cancelled",
@@ -112,6 +130,43 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
       "{{site_name}}, {{customer_name}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{travelers_count}}, {{reminder_days}}, {{days_until_trip}}, {{amount_due_formatted}}, {{reminder_extra_html}}",
   },
   {
+    template_key: "trip_consent_request",
+    event_key: "consent.requested",
+    name: __("Trip consent request", "yatra"),
+    description: __(
+      "Sent when a traveler must sign a trip consent form (Trip Consent module).",
+      "yatra",
+    ),
+    category: "booking",
+    recipient_type: "customer",
+    to_email: "{customer_email}",
+    isCoreFree: true,
+    requiresModule: "trip_consent",
+    settingsFlag: "email_template_trip_consent",
+    settingsSubject: "email_tpl_trip_consent_subject",
+    settingsBody: "email_tpl_trip_consent_body",
+    mergeTags:
+      "{{site_name}}, {{recipient_name}}, {{form_name}}, {{consent_link}}, {{trip_name}}, {{travel_date}}, {{booking_reference}}, {{expiry_notice_html}}, {{consent_test_notice_html}}",
+  },
+  {
+    template_key: "customer_email_verification",
+    event_key: "account.email_verification",
+    name: __("Customer email verification", "yatra"),
+    description: __(
+      "Sent when a customer registers (e.g. from checkout) and must verify their email before logging in.",
+      "yatra",
+    ),
+    category: "account",
+    recipient_type: "customer",
+    to_email: "{customer_email}",
+    isCoreFree: true,
+    settingsFlag: "email_template_customer_verification",
+    settingsSubject: "email_tpl_customer_verification_subject",
+    settingsBody: "email_tpl_customer_verification_body",
+    mergeTags:
+      "{{site_name}}, {{site_url}}, {{customer_first_name}}, {{customer_name}}, {{verification_link}}, {{intro_paragraph}}, {{expiry_notice_html}}, {{footer_note}}",
+  },
+  {
     template_key: "admin_new_booking",
     event_key: "booking.created",
     name: __("Admin: New Booking", "yatra"),
@@ -167,7 +222,7 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
   },
   {
     template_key: "new_booking",
-    event_key: "new_booking",
+    event_key: "booking.created",
     name: __("New Booking Confirmation", "yatra"),
     description: __(
       "Pro automation template. Enable Email Automation to edit and send.",
@@ -180,7 +235,7 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
   },
   {
     template_key: "booking_payment",
-    event_key: "booking_payment",
+    event_key: "payment.received",
     name: __("Booking payment notice", "yatra"),
     description: __(
       "Pro automation template. Enable Email Automation to edit and send.",
@@ -207,15 +262,129 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
   {
     template_key: "booking_completed",
     event_key: "booking.completed",
-    name: __("Trip Completed", "yatra"),
+    name: __("Trip completed", "yatra"),
     description: __(
-      "Pro automation template. Enable Email Automation to edit and send.",
+      "Sent when a booking is marked completed (after travel).",
       "yatra",
     ),
     category: "booking",
     recipient_type: "customer",
     to_email: "{customer_email}",
-    isCoreFree: false,
+    isCoreFree: true,
+    settingsFlag: "email_template_booking_completed",
+    settingsSubject: "email_tpl_booking_completed_subject",
+    settingsBody: "email_tpl_booking_completed_body",
+    mergeTags:
+      "{{site_name}}, {{customer_name}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{travel_date}}, {{trip_url}}",
+  },
+  {
+    template_key: "booking_expired_customer",
+    event_key: "booking.expired",
+    name: __("Booking expired (customer)", "yatra"),
+    description: __(
+      "Sent when a pending booking is auto-cancelled for non-payment.",
+      "yatra",
+    ),
+    category: "booking",
+    recipient_type: "customer",
+    to_email: "{customer_email}",
+    isCoreFree: true,
+    settingsFlag: "email_template_booking_expired_customer",
+    settingsSubject: "email_tpl_booking_expired_customer_subject",
+    settingsBody: "email_tpl_booking_expired_customer_body",
+    mergeTags:
+      "{{site_name}}, {{customer_name}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{trip_url}}, {{expiry_policy_note}}",
+  },
+  {
+    template_key: "admin_booking_expired",
+    event_key: "booking.expired",
+    name: __("Admin: Booking expired", "yatra"),
+    description: __(
+      "Admin notice when a booking is auto-cancelled for non-payment.",
+      "yatra",
+    ),
+    category: "booking",
+    recipient_type: "admin",
+    to_email: "{{admin_email}}",
+    isCoreFree: true,
+    settingsFlag: "email_template_admin_booking_expired",
+    settingsSubject: "email_tpl_admin_booking_expired_subject",
+    settingsBody: "email_tpl_admin_booking_expired_body",
+    mergeTags:
+      "{{site_name}}, {{admin_url}}, {{booking_reference}}, {{booking_id}}, {{customer_name}}, {{customer_email}}, {{trip_name}}",
+  },
+  {
+    template_key: "scheduled_payment_reminder",
+    event_key: "scheduled.payment.reminder",
+    name: __("Scheduled payment reminder", "yatra"),
+    description: __(
+      "Sent before an installment or gateway-scheduled charge when Scheduled payments is enabled in settings.",
+      "yatra",
+    ),
+    category: "payment",
+    recipient_type: "customer",
+    to_email: "{customer_email}",
+    isCoreFree: true,
+    requiresModule: "scheduled_payments",
+    settingsFlag: "email_template_scheduled_payment_reminder",
+    settingsSubject: "email_tpl_scheduled_payment_reminder_subject",
+    settingsBody: "email_tpl_scheduled_payment_reminder_body",
+    mergeTags:
+      "{{site_name}}, {{customer_first_name}}, {{customer_name}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{trip_url}}, {{scheduled_amount_formatted}}, {{scheduled_date_formatted}}, {{payment_type_label}}, {{scheduled_payment_id}}, {{currency}}",
+  },
+  {
+    template_key: "scheduled_payment_succeeded",
+    event_key: "scheduled.payment.succeeded",
+    name: __("Scheduled payment succeeded", "yatra"),
+    description: __("Sent after a scheduled / installment charge succeeds.", "yatra"),
+    category: "payment",
+    recipient_type: "customer",
+    to_email: "{customer_email}",
+    isCoreFree: true,
+    requiresModule: "scheduled_payments",
+    settingsFlag: "email_template_scheduled_payment_succeeded",
+    settingsSubject: "email_tpl_scheduled_payment_succeeded_subject",
+    settingsBody: "email_tpl_scheduled_payment_succeeded_body",
+    mergeTags:
+      "{{site_name}}, {{customer_first_name}}, {{customer_name}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{scheduled_amount_formatted}}, {{payment_type_label}}, {{balance_after_formatted}}, {{scheduled_payment_id}}, {{currency}}",
+  },
+  {
+    template_key: "scheduled_payment_failed",
+    event_key: "scheduled.payment.failed",
+    name: __("Scheduled payment failed", "yatra"),
+    description: __(
+      "Sent when a scheduled charge fails (temporary or final).",
+      "yatra",
+    ),
+    category: "payment",
+    recipient_type: "customer",
+    to_email: "{customer_email}",
+    isCoreFree: true,
+    requiresModule: "scheduled_payments",
+    settingsFlag: "email_template_scheduled_payment_failed",
+    settingsSubject: "email_tpl_scheduled_payment_failed_subject",
+    settingsBody: "email_tpl_scheduled_payment_failed_body",
+    mergeTags:
+      "{{site_name}}, {{customer_first_name}}, {{customer_name}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{scheduled_amount_formatted}}, {{scheduled_payment_id}}, {{failure_reason}}, {{failure_intro_html}}, {{failure_followup_html}}",
+  },
+  {
+    template_key: "admin_scheduled_payment_failed",
+    event_key: "scheduled.payment.failed",
+    name: __("Admin: Scheduled payment failed", "yatra"),
+    description: __(
+      "Admin notice when a scheduled payment permanently fails.",
+      "yatra",
+    ),
+    category: "payment",
+    recipient_type: "admin",
+    to_email: "{{admin_email}}",
+    isCoreFree: true,
+    requiresModule: "scheduled_payments",
+    settingsFlag: "email_template_admin_scheduled_payment_failed",
+    settingsSubject: "email_tpl_admin_scheduled_payment_failed_subject",
+    settingsBody: "email_tpl_admin_scheduled_payment_failed_body",
+    mergeTags:
+      "{{site_name}}, {{admin_url}}, {{booking_reference}}, {{booking_id}}, {{trip_name}}, {{customer_name}}, {{customer_email}}, {{scheduled_amount_formatted}}, {{scheduled_payment_id}}, {{failure_reason}}",
   },
   {
     template_key: "payment_reminder",
@@ -234,53 +403,83 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     template_key: "enquiry_received",
     event_key: "enquiry.created",
     name: __("Enquiry Received", "yatra"),
-    description: __(
-      "Pro automation template. Enable Email Automation to edit and send.",
-      "yatra",
-    ),
+    description: __("Confirmation sent to the customer after they submit an enquiry.", "yatra"),
     category: "enquiry",
     recipient_type: "customer",
     to_email: "{customer_email}",
-    isCoreFree: false,
+    isCoreFree: true,
+    settingsFlag: "email_template_enquiry_received",
+    settingsSubject: "email_tpl_enquiry_received_subject",
+    settingsBody: "email_tpl_enquiry_received_body",
+    mergeTags:
+      "{{site_name}}, {{customer_name}}, {{customer_email}}, {{customer_phone}}, {{trip_name}}, {{trip_url}}, {{message}}",
   },
   {
     template_key: "enquiry_admin",
     event_key: "enquiry.created",
     name: __("Admin: New Enquiry", "yatra"),
-    description: __(
-      "Pro automation template. Enable Email Automation to edit and send.",
-      "yatra",
-    ),
+    description: __("Sent to your admin email when a new enquiry is submitted.", "yatra"),
     category: "enquiry",
     recipient_type: "admin",
-    to_email: "",
-    isCoreFree: false,
+    to_email: "{{admin_email}}",
+    isCoreFree: true,
+    settingsFlag: "email_template_enquiry_admin",
+    settingsSubject: "email_tpl_enquiry_admin_subject",
+    settingsBody: "email_tpl_enquiry_admin_body",
+    mergeTags:
+      "{{site_name}}, {{admin_url}}, {{customer_name}}, {{customer_email}}, {{customer_phone}}, {{trip_name}}, {{message}}",
   },
   {
     template_key: "enquiry_response",
     event_key: "enquiry.responded",
     name: __("Enquiry Response", "yatra"),
-    description: __(
-      "Pro automation template. Enable Email Automation to edit and send.",
-      "yatra",
-    ),
+    description: __("Sent to the customer when you reply to their enquiry.", "yatra"),
     category: "enquiry",
     recipient_type: "customer",
     to_email: "{customer_email}",
-    isCoreFree: false,
+    isCoreFree: true,
+    settingsFlag: "email_template_enquiry_response",
+    settingsSubject: "email_tpl_enquiry_response_subject",
+    settingsBody: "email_tpl_enquiry_response_body",
+    mergeTags:
+      "{{site_name}}, {{customer_name}}, {{customer_email}}, {{trip_name}}, {{trip_url}}, {{response}}, {{response_message}}, {{original_message}}",
   },
   {
     template_key: "review_request",
     event_key: "marketing.review_request",
     name: __("Review Request", "yatra"),
     description: __(
-      "Pro automation template. Enable Email Automation to edit and send.",
+      "Queued when a booking is marked completed, then sent after the delay in Review settings (if reviews are enabled).",
       "yatra",
     ),
     category: "marketing",
     recipient_type: "customer",
     to_email: "{customer_email}",
-    isCoreFree: false,
+    isCoreFree: true,
+    settingsFlag: "email_template_review_request",
+    settingsSubject: "email_tpl_review_request_subject",
+    settingsBody: "email_tpl_review_request_body",
+    mergeTags:
+      "{{site_name}}, {{customer_name}}, {{trip_name}}, {{review_url}}, {{booking_reference}}",
+  },
+  {
+    template_key: "abandoned_booking_recovery",
+    event_key: "booking.abandoned_recovery",
+    name: __("Abandoned booking recovery", "yatra"),
+    description: __(
+      "Used by Yatra Pro abandoned checkout recovery (merge tags include module copy in {{recovery_intro_html}}).",
+      "yatra",
+    ),
+    category: "booking",
+    recipient_type: "customer",
+    to_email: "{customer_email}",
+    isCoreFree: true,
+    requiresModule: "abandoned_booking_recovery",
+    settingsFlag: "email_template_abandoned_booking_recovery",
+    settingsSubject: "email_tpl_abandoned_booking_recovery_subject",
+    settingsBody: "email_tpl_abandoned_booking_recovery_body",
+    mergeTags:
+      "{{site_name}}, {{customer_name}}, {{trip_name}}, {{recovery_link}}, {{booking_reference}}, {{recovery_reminder_label}}, {{recovery_intro_html}}",
   },
 ];
 
@@ -320,28 +519,50 @@ export type UnifiedEmailTemplate = {
   updated_at?: string;
 };
 
+export type BuildLocalTemplateRowsOptions = {
+  isProPluginActive: boolean;
+  isModuleActive: (slug: string) => boolean;
+};
+
 export function buildLocalTemplateRows(
   values: EmailSettingsValues,
+  options?: BuildLocalTemplateRowsOptions,
 ): UnifiedEmailTemplate[] {
+  const pro = options?.isProPluginActive ?? false;
+  const moduleOk = (slug: string) =>
+    options?.isModuleActive ? options.isModuleActive(slug) : false;
+
   return EMAIL_TEMPLATES_CATALOG.map((entry) => {
-    const locked = !entry.isCoreFree;
-    const subject =
-      entry.settingsSubject && !locked
-        ? String(values[entry.settingsSubject] ?? "")
-        : "";
-    const body =
-      entry.settingsBody && !locked
-        ? String(values[entry.settingsBody] ?? "")
-        : "";
-    const isActive =
-      entry.settingsFlag && !locked
-        ? Boolean(values[entry.settingsFlag])
-        : false;
+    const moduleGateOk =
+      !entry.requiresModule || (pro && moduleOk(entry.requiresModule));
+
+    const proCatalogLocked = !entry.isCoreFree;
+    const moduleContentLocked =
+      Boolean(entry.requiresModule) && !moduleGateOk;
+
+    const is_locked = proCatalogLocked || moduleContentLocked;
+
+    const hasSettingsKeys = Boolean(
+      entry.settingsFlag && entry.settingsSubject && entry.settingsBody,
+    );
+
+    const subject = entry.settingsSubject
+      ? String(values[entry.settingsSubject] ?? "")
+      : "";
+    const body = entry.settingsBody
+      ? String(values[entry.settingsBody] ?? "")
+      : "";
+    const isActive = entry.settingsFlag
+      ? Boolean(values[entry.settingsFlag])
+      : false;
+
+    const id =
+      entry.isCoreFree || hasSettingsKeys
+        ? `core:${entry.template_key}`
+        : `locked:${entry.template_key}`;
 
     return {
-      id: locked
-        ? `locked:${entry.template_key}`
-        : `core:${entry.template_key}`,
+      id,
       template_key: entry.template_key,
       event_key: entry.event_key,
       name: entry.name,
@@ -351,9 +572,9 @@ export function buildLocalTemplateRows(
       category: entry.category,
       recipient_type: entry.recipient_type,
       to_email: entry.to_email,
-      is_active: locked ? false : isActive,
+      is_active: hasSettingsKeys ? isActive : false,
       is_system: true,
-      is_locked: locked,
+      is_locked,
       variables: [],
     };
   });

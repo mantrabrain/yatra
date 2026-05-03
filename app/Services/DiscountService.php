@@ -41,7 +41,7 @@ class DiscountService extends BaseService
         $query = $wpdb->prepare(
             "SELECT * FROM `{$table}` 
             WHERE (is_group_discount = 1 OR discount_mode IN ('group', 'both'))
-            AND status = 'publish'
+            AND status IN ('publish', 'active')
             AND (valid_from IS NULL OR valid_from <= %s)
             AND (expiry_date IS NULL OR expiry_date >= %s)
             ORDER BY created_at DESC",
@@ -54,15 +54,32 @@ class DiscountService extends BaseService
         // Filter by trip_ids in PHP since it's stored as serialized array
         $filtered = [];
         foreach ($results as $discount) {
-            // If applicable_to is 'all', include it
-            if (empty($discount->trip_ids) || $discount->applicable_to === 'all') {
+            $applicable = (string) ($discount->applicable_to ?? 'all');
+            if ($applicable === '' || $applicable === 'all') {
                 $filtered[] = $discount;
                 continue;
             }
-            
-            // If applicable_to is 'specific_trips', check if trip is in the list
-            $trip_ids = maybe_unserialize($discount->trip_ids);
-            if (is_array($trip_ids) && in_array($tripId, array_map('intval', $trip_ids), true)) {
+            if ($applicable !== 'specific_trips') {
+                continue;
+            }
+
+            // specific_trips: include only when this trip is in the configured list
+            $rawIds = $discount->trip_ids;
+            $trip_ids = [];
+            if (is_string($rawIds) && $rawIds !== '') {
+                $t = trim($rawIds);
+                if ($t !== '' && ($t[0] === '[' || $t[0] === '{')) {
+                    $decoded = json_decode($t, true);
+                    $trip_ids = is_array($decoded) ? $decoded : [];
+                } else {
+                    $unser = maybe_unserialize($rawIds);
+                    $trip_ids = is_array($unser) ? $unser : array_map('trim', explode(',', $t));
+                }
+            } elseif (is_array($rawIds)) {
+                $trip_ids = $rawIds;
+            }
+            $trip_ids = array_values(array_unique(array_map('absint', $trip_ids)));
+            if (in_array($tripId, $trip_ids, true)) {
                 $filtered[] = $discount;
             }
         }
@@ -87,7 +104,7 @@ class DiscountService extends BaseService
             throw new \InvalidArgumentException('Invalid discount type. Must be one of: ' . implode(', ', $allowed_types));
         }
 
-        $allowed_statuses = ['draft', 'publish', 'trash'];
+        $allowed_statuses = ['draft', 'publish', 'trash', 'expired'];
         if (isset($data['status']) && !in_array($data['status'], $allowed_statuses, true)) {
             throw new \InvalidArgumentException('Invalid status. Must be one of: ' . implode(', ', $allowed_statuses));
         }
@@ -154,7 +171,7 @@ class DiscountService extends BaseService
         }
 
         if (isset($data['status'])) {
-            $allowed_statuses = ['draft', 'publish', 'trash'];
+            $allowed_statuses = ['draft', 'publish', 'trash', 'expired'];
             $data['status'] = in_array($data['status'], $allowed_statuses, true) ? $data['status'] : 'draft';
         } else {
             $data['status'] = 'draft';
@@ -405,7 +422,7 @@ class DiscountService extends BaseService
         }
 
         if (isset($data['status'])) {
-            $allowed_statuses = ['draft', 'publish', 'trash'];
+            $allowed_statuses = ['draft', 'publish', 'trash', 'expired'];
             $data['status'] = in_array($data['status'], $allowed_statuses, true) ? $data['status'] : 'draft';
         }
 

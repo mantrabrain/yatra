@@ -79,14 +79,6 @@ class SettingsService
         'gateway_configs' => [],
         'gateway_order' => [],
         
-        // Scheduled/Recurring Payments - Pro feature
-        // These defaults are overridden by Pro's FlexiblePaymentsModule when active
-        'enable_scheduled_payments' => false,
-        'scheduled_payment_type' => 'single',
-        'scheduled_payment_days' => 15,
-        'scheduled_payment_installments' => 1,
-        'scheduled_payment_interval' => 30,
-        'scheduled_payment_reminder_days' => 3,
         'allow_save_payment_methods' => false,
         
         // Email
@@ -318,6 +310,16 @@ class SettingsService
             self::load();
         }
 
+        if (self::isScheduledPaymentSetting($key)) {
+            $scheduledDefaults = self::scheduledPaymentDefaults();
+
+            return apply_filters(
+                'yatra_scheduled_payment_setting',
+                $default ?? ($scheduledDefaults[$key] ?? null),
+                $key
+            );
+        }
+
         // Support dot notation for nested access (future use)
         if (strpos($key, '.') !== false) {
             $keys = explode('.', $key);
@@ -383,6 +385,14 @@ class SettingsService
             $value = apply_filters('yatra_flexible_payment_setting', false, $key);
             return filter_var($value, FILTER_VALIDATE_BOOLEAN);
         }
+
+        if (self::isScheduledPaymentSetting($key)) {
+            $defaults = self::scheduledPaymentDefaults();
+            $base = $defaults[$key] ?? false;
+            $value = apply_filters('yatra_scheduled_payment_setting', $base, $key);
+
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        }
         
         $value = self::get($key, false);
         return filter_var($value, FILTER_VALIDATE_BOOLEAN);
@@ -400,6 +410,13 @@ class SettingsService
         // Flexible payment settings require Pro module
         if (self::isFlexiblePaymentSetting($key)) {
             return (int) apply_filters('yatra_flexible_payment_setting', $default, $key);
+        }
+
+        if (self::isScheduledPaymentSetting($key)) {
+            $defaults = self::scheduledPaymentDefaults();
+            $base = $defaults[$key] ?? $default;
+
+            return (int) apply_filters('yatra_scheduled_payment_setting', $base, $key);
         }
         
         return (int) self::get($key, $default);
@@ -677,16 +694,32 @@ class SettingsService
             'partial_payment',
             'partial_payment_percentage',
             'enable_deposit',
-            'enable_scheduled_payments',
-            'scheduled_payment_type',
-            'scheduled_payment_days',
-            'scheduled_payment_installments',
-            'scheduled_payment_interval',
-            'scheduled_payment_reminder_days',
             'allow_save_payment_methods',
         ];
         
         return in_array($key, $flexiblePaymentSettings, true);
+    }
+
+    /**
+     * Settings owned by Yatra Pro "Scheduled Payments" module (not core options).
+     *
+     * @return array<string, mixed>
+     */
+    private static function scheduledPaymentDefaults(): array
+    {
+        return [
+            'enable_scheduled_payments' => false,
+            'scheduled_payment_type' => 'single',
+            'scheduled_payment_days' => 15,
+            'scheduled_payment_installments' => 1,
+            'scheduled_payment_interval' => 30,
+            'scheduled_payment_reminder_days' => 3,
+        ];
+    }
+
+    private static function isScheduledPaymentSetting(string $key): bool
+    {
+        return array_key_exists($key, self::scheduledPaymentDefaults());
     }
 
     /**

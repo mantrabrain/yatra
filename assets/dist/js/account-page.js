@@ -1,5 +1,5 @@
 import { j as jsxRuntimeExports, i as Calendar, h as FileText, l as Plane, ak as ArrowRight, M as MapPin, U as User, v as ChevronRight, b2 as Sparkles, P as Package, k as CreditCard, bS as LifeBuoy, bB as Bell, b5 as AlertCircle, bh as CheckCircle2, ai as Clock, av as ExternalLink, ah as Users, o as Mail, bj as Phone, aI as Download, r as reactExports, u as useQuery, am as CheckCircle, aj as DollarSign, w as React, aZ as Eye, ax as PenSquare, b6 as XCircle, bT as ShieldCheck, aJ as Heart, L as LayoutDashboard, bU as LogOut, bP as QueryClient, bQ as client, bR as QueryClientProvider } from "./react-vendor-lSVLenth.js";
-import { _ as __, g as getCurrencySymbol, c as getCurrency, a as apiClient, A as API_ENDPOINTS, u as useToast, T as ToastProvider } from "./index-Ar4TZ2Se.js";
+import { g as getCurrencySymbol, c as getCurrency, _ as __, s as sprintf, a as apiClient, A as API_ENDPOINTS, u as useToast, T as ToastProvider } from "./index-BUTTH9Ac.js";
 const formatDate = (value) => {
   if (!value) {
     return __("N/A", "yatra");
@@ -17,6 +17,28 @@ const formatDate = (value) => {
   } catch (error) {
     return __("Invalid date", "yatra");
   }
+};
+function extractYmd(value) {
+  if (!value) {
+    return null;
+  }
+  const m = String(value).trim().match(/^(\d{4}-\d{2}-\d{2})/);
+  return m ? m[1] : null;
+}
+const formatTravelDateRange = (travelDate, endDate) => {
+  const startKey = extractYmd(travelDate);
+  const endKey = extractYmd(endDate);
+  if (!startKey) {
+    return formatDate(travelDate);
+  }
+  if (!endKey || endKey === startKey) {
+    return formatDate(travelDate);
+  }
+  return sprintf(
+    __("%1$s – %2$s", "yatra"),
+    formatDate(travelDate),
+    formatDate(endDate)
+  );
 };
 const getBadge = (status) => {
   const base = "px-2.5 py-0.5 rounded-full text-xs font-medium";
@@ -356,7 +378,10 @@ const Dashboard = ({
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { className: "w-3.5 h-3.5" }),
-                    formatDate(booking.travel_date)
+                    formatTravelDateRange(
+                      booking.travel_date,
+                      booking.end_date
+                    )
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-3.5 h-3.5" }),
@@ -651,7 +676,7 @@ function buildPaymentInvoiceUrl(baseRaw, paymentId, mode) {
   return u.toString();
 }
 async function readFetchErrorMessage(res) {
-  let msg = res.statusText || "Request failed";
+  let msg = res.statusText || __("Request failed", "yatra");
   try {
     const j = await res.json();
     if (j == null ? void 0 : j.message) {
@@ -668,7 +693,9 @@ async function readFetchErrorMessage(res) {
 async function fetchPreviewPdf(url) {
   const { nonce } = getAccountRestConfig();
   if (!nonce) {
-    throw new Error("Missing REST nonce; reload the account page.");
+    throw new Error(
+      __("Missing security token. Reload the account page and try again.", "yatra")
+    );
   }
   const res = await fetch(url, {
     method: "GET",
@@ -683,7 +710,9 @@ async function fetchPreviewPdf(url) {
   }
   const data = await res.json();
   if (!(data == null ? void 0 : data.pdf_data) || typeof data.pdf_data !== "string") {
-    throw new Error("Invalid preview response from server.");
+    throw new Error(
+      __("Invalid preview response from the server.", "yatra")
+    );
   }
   const binary = atob(data.pdf_data);
   const bytes = new Uint8Array(binary.length);
@@ -698,7 +727,10 @@ function openPdfInNewTab(blob) {
   if (!win) {
     URL.revokeObjectURL(objectUrl);
     throw new Error(
-      "Popup blocked. Allow popups for this site to preview the PDF."
+      __(
+        "Popup blocked. Allow popups for this site to preview the PDF.",
+        "yatra"
+      )
     );
   }
   window.setTimeout(() => URL.revokeObjectURL(objectUrl), 6e4);
@@ -706,7 +738,9 @@ function openPdfInNewTab(blob) {
 async function downloadBookingBinary(bookingId, kind) {
   const { base, nonce } = getAccountRestConfig();
   if (!nonce) {
-    throw new Error("Missing REST nonce; reload the account page.");
+    throw new Error(
+      __("Missing security token. Reload the account page and try again.", "yatra")
+    );
   }
   const url = buildBookingDocumentUrl(base, bookingId, kind, "download");
   const res = await fetch(url, {
@@ -745,7 +779,9 @@ async function downloadBookingBinary(bookingId, kind) {
 async function downloadPaymentInvoiceBinary(paymentId) {
   const { base, nonce } = getAccountRestConfig();
   if (!nonce) {
-    throw new Error("Missing REST nonce; reload the account page.");
+    throw new Error(
+      __("Missing security token. Reload the account page and try again.", "yatra")
+    );
   }
   const url = buildPaymentInvoiceUrl(base, paymentId, "download");
   const res = await fetch(url, {
@@ -812,7 +848,9 @@ const downloadInvoice = (paymentId) => downloadPaymentInvoiceBinary(paymentId);
 const previewPaymentInvoice = async (paymentId) => {
   const { base, nonce } = getAccountRestConfig();
   if (!nonce) {
-    throw new Error("Missing REST nonce; reload the account page.");
+    throw new Error(
+      __("Missing security token. Reload the account page and try again.", "yatra")
+    );
   }
   const url = buildPaymentInvoiceUrl(base, paymentId, "preview");
   const blob = await fetchPreviewPdf(url);
@@ -821,12 +859,16 @@ const previewPaymentInvoice = async (paymentId) => {
 async function previewTravelDocument(doc) {
   const { base, nonce } = getAccountRestConfig();
   if (!nonce) {
-    throw new Error("Missing REST nonce; reload the account page.");
+    throw new Error(
+      __("Missing security token. Reload the account page and try again.", "yatra")
+    );
   }
   if (doc.category === "invoice") {
     const pid = doc.payment_id ?? parsePaymentIdFromHref(doc.url);
     if (!pid) {
-      throw new Error("Could not resolve invoice link.");
+      throw new Error(
+        __("Could not resolve invoice link.", "yatra")
+      );
     }
     const url = buildPaymentInvoiceUrl(base, pid, "preview");
     const blob = await fetchPreviewPdf(url);
@@ -837,7 +879,9 @@ async function previewTravelDocument(doc) {
     const kind = doc.category === "voucher" ? "voucher" : "itinerary";
     const bid = doc.booking_id ?? parseBookingDocFromHref(doc.url, kind);
     if (!bid) {
-      throw new Error("Could not resolve document link.");
+      throw new Error(
+        __("Could not resolve document link.", "yatra")
+      );
     }
     const url = buildBookingDocumentUrl(base, bid, kind, "preview");
     const blob = await fetchPreviewPdf(url);
@@ -846,208 +890,21 @@ async function previewTravelDocument(doc) {
   }
   window.open(doc.url, "_blank", "noopener,noreferrer");
 }
-const COUNTRY_NAMES = {
-  AF: "Afghanistan",
-  AL: "Albania",
-  DZ: "Algeria",
-  AD: "Andorra",
-  AO: "Angola",
-  AG: "Antigua and Barbuda",
-  AR: "Argentina",
-  AM: "Armenia",
-  AU: "Australia",
-  AT: "Austria",
-  AZ: "Azerbaijan",
-  BS: "Bahamas",
-  BH: "Bahrain",
-  BD: "Bangladesh",
-  BB: "Barbados",
-  BY: "Belarus",
-  BE: "Belgium",
-  BZ: "Belize",
-  BJ: "Benin",
-  BT: "Bhutan",
-  BO: "Bolivia",
-  BA: "Bosnia and Herzegovina",
-  BW: "Botswana",
-  BR: "Brazil",
-  BN: "Brunei",
-  BG: "Bulgaria",
-  BF: "Burkina Faso",
-  BI: "Burundi",
-  KH: "Cambodia",
-  CM: "Cameroon",
-  CA: "Canada",
-  CV: "Cape Verde",
-  CF: "Central African Republic",
-  TD: "Chad",
-  CL: "Chile",
-  CN: "China",
-  CO: "Colombia",
-  KM: "Comoros",
-  CG: "Congo",
-  CD: "DR Congo",
-  CR: "Costa Rica",
-  CI: "Ivory Coast",
-  HR: "Croatia",
-  CU: "Cuba",
-  CY: "Cyprus",
-  CZ: "Czech Republic",
-  DK: "Denmark",
-  DJ: "Djibouti",
-  DM: "Dominica",
-  DO: "Dominican Republic",
-  EC: "Ecuador",
-  EG: "Egypt",
-  SV: "El Salvador",
-  GQ: "Equatorial Guinea",
-  ER: "Eritrea",
-  EE: "Estonia",
-  SZ: "Eswatini",
-  ET: "Ethiopia",
-  FJ: "Fiji",
-  FI: "Finland",
-  FR: "France",
-  GA: "Gabon",
-  GM: "Gambia",
-  GE: "Georgia",
-  DE: "Germany",
-  GH: "Ghana",
-  GR: "Greece",
-  GD: "Grenada",
-  GT: "Guatemala",
-  GN: "Guinea",
-  GW: "Guinea-Bissau",
-  GY: "Guyana",
-  HT: "Haiti",
-  HN: "Honduras",
-  HU: "Hungary",
-  IS: "Iceland",
-  IN: "India",
-  ID: "Indonesia",
-  IR: "Iran",
-  IQ: "Iraq",
-  IE: "Ireland",
-  IL: "Israel",
-  IT: "Italy",
-  JM: "Jamaica",
-  JP: "Japan",
-  JO: "Jordan",
-  KZ: "Kazakhstan",
-  KE: "Kenya",
-  KI: "Kiribati",
-  KP: "North Korea",
-  KR: "South Korea",
-  KW: "Kuwait",
-  KG: "Kyrgyzstan",
-  LA: "Laos",
-  LV: "Latvia",
-  LB: "Lebanon",
-  LS: "Lesotho",
-  LR: "Liberia",
-  LY: "Libya",
-  LI: "Liechtenstein",
-  LT: "Lithuania",
-  LU: "Luxembourg",
-  MG: "Madagascar",
-  MW: "Malawi",
-  MY: "Malaysia",
-  MV: "Maldives",
-  ML: "Mali",
-  MT: "Malta",
-  MH: "Marshall Islands",
-  MR: "Mauritania",
-  MU: "Mauritius",
-  MX: "Mexico",
-  FM: "Micronesia",
-  MD: "Moldova",
-  MC: "Monaco",
-  MN: "Mongolia",
-  ME: "Montenegro",
-  MA: "Morocco",
-  MZ: "Mozambique",
-  MM: "Myanmar",
-  NA: "Namibia",
-  NR: "Nauru",
-  NP: "Nepal",
-  NL: "Netherlands",
-  NZ: "New Zealand",
-  NI: "Nicaragua",
-  NE: "Niger",
-  NG: "Nigeria",
-  MK: "North Macedonia",
-  NO: "Norway",
-  OM: "Oman",
-  PK: "Pakistan",
-  PW: "Palau",
-  PS: "Palestine",
-  PA: "Panama",
-  PG: "Papua New Guinea",
-  PY: "Paraguay",
-  PE: "Peru",
-  PH: "Philippines",
-  PL: "Poland",
-  PT: "Portugal",
-  QA: "Qatar",
-  RO: "Romania",
-  RU: "Russia",
-  RW: "Rwanda",
-  KN: "Saint Kitts and Nevis",
-  LC: "Saint Lucia",
-  VC: "Saint Vincent and the Grenadines",
-  WS: "Samoa",
-  SM: "San Marino",
-  ST: "Sao Tome and Principe",
-  SA: "Saudi Arabia",
-  SN: "Senegal",
-  RS: "Serbia",
-  SC: "Seychelles",
-  SL: "Sierra Leone",
-  SG: "Singapore",
-  SK: "Slovakia",
-  SI: "Slovenia",
-  SB: "Solomon Islands",
-  SO: "Somalia",
-  ZA: "South Africa",
-  SS: "South Sudan",
-  ES: "Spain",
-  LK: "Sri Lanka",
-  SD: "Sudan",
-  SR: "Suriname",
-  SE: "Sweden",
-  CH: "Switzerland",
-  SY: "Syria",
-  TW: "Taiwan",
-  TJ: "Tajikistan",
-  TZ: "Tanzania",
-  TH: "Thailand",
-  TL: "Timor-Leste",
-  TG: "Togo",
-  TO: "Tonga",
-  TT: "Trinidad and Tobago",
-  TN: "Tunisia",
-  TR: "Turkey",
-  TM: "Turkmenistan",
-  TV: "Tuvalu",
-  UG: "Uganda",
-  UA: "Ukraine",
-  AE: "United Arab Emirates",
-  GB: "United Kingdom",
-  US: "United States",
-  UY: "Uruguay",
-  UZ: "Uzbekistan",
-  VU: "Vanuatu",
-  VA: "Vatican City",
-  VE: "Venezuela",
-  VN: "Vietnam",
-  YE: "Yemen",
-  ZM: "Zambia",
-  ZW: "Zimbabwe"
-};
 const getCountryName = (code) => {
-  if (!code) return "";
-  const upperCode = code.toUpperCase();
-  return COUNTRY_NAMES[upperCode] || code;
+  if (!code || typeof code !== "string") {
+    return "";
+  }
+  const upperCode = code.trim().toUpperCase();
+  if (upperCode.length !== 2) {
+    return code;
+  }
+  try {
+    const display = new Intl.DisplayNames(void 0, { type: "region" });
+    const name = display.of(upperCode);
+    return name && name !== upperCode ? name : code;
+  } catch {
+    return code;
+  }
 };
 const BookingDetails = ({
   booking,
@@ -1187,7 +1044,10 @@ const BookingDetails = ({
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { className: "w-3 h-3" }),
                 __("Travel Date", "yatra")
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate(booking.travel_date) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatTravelDateRange(
+                booking.travel_date,
+                booking.end_date
+              ) })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1", children: [
@@ -1784,7 +1644,10 @@ const Bookings = ({
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-booking-details grid grid-cols-2 md:grid-cols-5 gap-4 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg mb-4", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Travel Date", "yatra") }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: formatDate(booking.travel_date) })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: formatTravelDateRange(
+                  booking.travel_date,
+                  booking.end_date
+                ) })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Travelers", "yatra") }),
@@ -1898,6 +1761,18 @@ const Bookings = ({
     }) })
   ] });
 };
+function paymentTypeLabel(type) {
+  switch (type) {
+    case "deposit":
+      return __("Deposit", "yatra");
+    case "balance":
+      return __("Balance", "yatra");
+    case "installment":
+      return __("Installment", "yatra");
+    default:
+      return type;
+  }
+}
 const Payments = ({ payments, onSectionChange }) => {
   const displayPayments = payments;
   const bookingSummaries = React.useMemo(() => {
@@ -2046,7 +1921,7 @@ const Payments = ({ payments, onSectionChange }) => {
               ] }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-2 items-start", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(payment.status), children: __(payment.status, payment.status) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-3 py-1 rounded-lg text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 capitalize", children: payment.type })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-3 py-1 rounded-lg text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 capitalize", children: paymentTypeLabel(payment.type) })
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-payment-details grid grid-cols-2 md:grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg mb-4", children: [
@@ -2146,6 +2021,20 @@ const Payments = ({ payments, onSectionChange }) => {
     }) })
   ] });
 };
+function documentCategoryLabel(category) {
+  switch (category) {
+    case "itinerary":
+      return __("Itinerary", "yatra");
+    case "voucher":
+      return __("Voucher", "yatra");
+    case "invoice":
+      return __("Invoice", "yatra");
+    case "downloads":
+      return __("Downloads", "yatra");
+    default:
+      return category;
+  }
+}
 const Documents = ({ documents }) => {
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [selectedCategory, setSelectedCategory] = reactExports.useState("all");
@@ -2263,7 +2152,7 @@ const Documents = ({ documents }) => {
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-shrink-0", children: [
               doc.category === "downloads" && doc.access_label && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-3 py-1 rounded-lg text-xs font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800", children: doc.access_label }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-3 py-1 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 capitalize", children: doc.category })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-3 py-1 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 capitalize", children: documentCategoryLabel(doc.category) })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-document-actions flex flex-wrap gap-3 mt-4", children: [
@@ -3124,10 +3013,6 @@ const AccountPage = () => {
     }
   });
   const savedTrips = Array.isArray(savedTripsData) ? savedTripsData : [];
-  const currency2 = (value) => new Intl.NumberFormat(void 0, {
-    style: "currency",
-    currency: "USD"
-  }).format(value);
   const stats = reactExports.useMemo(() => {
     const outstanding = payments.filter((p) => p.status === "pending").reduce((sum, payment) => sum + payment.amount, 0);
     const upcoming = bookings.filter(
@@ -3149,12 +3034,12 @@ const AccountPage = () => {
       },
       {
         label: __("Outstanding Balance", "yatra"),
-        value: currency2(outstanding),
+        value: currency(outstanding),
         icon: DollarSign
       },
       {
         label: __("Total Spent", "yatra"),
-        value: currency2(totalSpent),
+        value: currency(totalSpent),
         icon: ShieldCheck
       }
     ];
@@ -3354,7 +3239,18 @@ if (rootElement) {
     );
   } catch (error) {
     console.error("Error rendering account page:", error);
-    rootElement.innerHTML = '<div style="padding: 40px; text-align: center;"><h2>Error loading account page</h2><p>Please refresh the page or contact support.</p></div>';
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "padding: 40px; text-align: center;";
+    const h2 = document.createElement("h2");
+    h2.textContent = __("Error loading account page", "yatra");
+    const p = document.createElement("p");
+    p.textContent = __(
+      "Please refresh the page or contact support if the problem continues.",
+      "yatra"
+    );
+    wrap.appendChild(h2);
+    wrap.appendChild(p);
+    rootElement.replaceChildren(wrap);
   }
 }
 //# sourceMappingURL=account-page.js.map

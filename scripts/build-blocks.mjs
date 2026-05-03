@@ -1,5 +1,5 @@
 /**
- * Build yatra/tour, yatra/activity, yatra/destination as single-file IIFE bundles.
+ * Build yatra/tour, yatra/activity, yatra/destination, yatra/trip-category as single-file IIFE bundles.
  *
  * CRITICAL: @wordpress/* packages MUST NOT be bundled. A bundled @wordpress/blocks uses a
  * separate block registry from the editor's wp.blocks — registerBlockType would succeed in
@@ -14,7 +14,7 @@ import { build } from 'vite';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
 
-const blocks = ['tour', 'activity', 'destination'];
+const blocks = ['tour', 'activity', 'destination', 'trip-category'];
 
 /**
  * Map @wordpress/package-name to the global WordPress exposes (wp.blockEditor, wp.apiFetch, …).
@@ -68,6 +68,9 @@ function globalForExternal(id) {
 }
 
 for (const slug of blocks) {
+  // Must match {@see \Yatra\Blocks\BlockEditorScript::resolveEditorBundle} (letters only) for the dist filename.
+  const slugKey = slug.replace(/[^a-z]/gi, '').toLowerCase();
+
   await build({
     root,
     base: './',
@@ -94,15 +97,15 @@ for (const slug of blocks) {
         external: isExternal,
         output: {
           format: 'iife',
-          name: `yatraBlock_${slug}`,
+          name: `yatraBlock_${slugKey}`,
           inlineDynamicImports: true,
-          entryFileNames: `dist/blocks/${slug}.js`,
+          entryFileNames: `dist/blocks/${slugKey}.js`,
           globals: globalForExternal,
         },
       },
     },
   });
-  console.log(`✓ Built IIFE block (externals): ${slug}`);
+  console.log(`✓ Built IIFE block (externals): ${slug} → dist/blocks/${slugKey}.js`);
 }
 
 console.log('✅ All Yatra Gutenberg block bundles built (IIFE + WordPress externals).');

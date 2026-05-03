@@ -26,6 +26,33 @@ final class EmailTemplateSampleData
             $vars = self::mergeTripContext($tripId, $vars);
         }
 
+        if ($templateKey === 'trip_consent_request') {
+            $vars['recipient_name'] = $vars['customer_name'] ?? __('Alex Traveler', 'yatra');
+            $vars['form_name'] = __('Trip liability & release', 'yatra');
+            $vars['consent_link'] = home_url('/trip-consent/preview-token/');
+            $vars['expiry_notice_html'] = '<strong>' . esc_html__('This link expires soon.', 'yatra') . '</strong> '
+                . esc_html__('Request a new email from the operator if needed.', 'yatra');
+            $vars['consent_test_notice_html'] = '';
+        }
+
+        if ($templateKey === 'customer_email_verification') {
+            $previewTok = defined('YATRA_EMAIL_VERIFICATION_PREVIEW_TOKEN')
+                ? (string) YATRA_EMAIL_VERIFICATION_PREVIEW_TOKEN
+                : 'preview-verify-token';
+            $vars['verification_link'] = function_exists('yatra_get_email_verification_url')
+                ? yatra_get_email_verification_url($previewTok)
+                : home_url('/?yatra_verify_email=' . rawurlencode($previewTok));
+            $vars['intro_paragraph'] = __('Thank you for registering. Click the button below to verify your email and activate your account.', 'yatra');
+            $vars['footer_note'] = __('If you did not create an account, you can ignore this email.', 'yatra');
+            $vars['expiry_notice_html'] = esc_html(
+                sprintf(
+                    /* translators: %d: hours */
+                    __('This verification link expires in %d hours for your security.', 'yatra'),
+                    24
+                )
+            );
+        }
+
         /** @var array<string, string> $filtered */
         $filtered = apply_filters('yatra_email_template_preview_variables', $vars, $templateKey, $tripId);
 
@@ -73,6 +100,25 @@ final class EmailTemplateSampleData
             'message' => __('Could you confirm whether airport pickup is included on day one?', 'yatra'),
             'response' => __('Hi Alex, yes — pickup is included for all guests. Safe travels!', 'yatra'),
             'original_message' => __('Interested in the April departure dates.', 'yatra'),
+            'expiry_policy_note' => __('Unpaid bookings are released after the deadline.', 'yatra'),
+            'scheduled_amount_formatted' => yatra_format_price(750.0, $currency),
+            'scheduled_date_formatted' => date_i18n(get_option('date_format'), strtotime('+5 days')),
+            'payment_type_label' => __('Installment', 'yatra'),
+            'scheduled_payment_id' => '9',
+            'balance_after_formatted' => yatra_format_price(1749.0, $currency),
+            'failure_reason' => __('Card declined (insufficient funds).', 'yatra'),
+            'failure_intro_html' => '<p style="margin:0;">'
+                . esc_html__('We could not process your scheduled payment.', 'yatra')
+                . '</p>',
+            'failure_followup_html' => esc_html__(
+                'Please update your payment method or contact us so we can retry before your booking is affected.',
+                'yatra'
+            ),
+            'recovery_intro_html' => '<p style="margin:0;">'
+                . esc_html__('You left items in your cart — your trip is still available to book.', 'yatra')
+                . '</p>',
+            'recovery_reminder_label' => __('48 hours left at this price', 'yatra'),
+            'recovery_link' => home_url('/book/preview-recovery/'),
         ];
     }
 

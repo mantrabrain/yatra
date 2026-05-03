@@ -10,7 +10,6 @@ use WP_Error;
 use Yatra\PaymentGateways\PaymentGatewayRegistry;
 use Yatra\Repositories\BookingRepository;
 use Yatra\Repositories\PaymentRepository;
-use Yatra\Repositories\ScheduledPaymentRepository;
 use Yatra\Repositories\TripRepository;
 use Yatra\Helpers\FormatHelper;
 use Yatra\Services\PdfService;
@@ -26,7 +25,6 @@ class PaymentGatewayController extends BaseController
     private PaymentGatewayRegistry $registry;
     private BookingRepository $bookingRepository;
     private PaymentRepository $paymentRepository;
-    private ScheduledPaymentRepository $scheduledPaymentRepository;
     private TripRepository $tripRepository;
 
     public function __construct()
@@ -34,7 +32,6 @@ class PaymentGatewayController extends BaseController
         $this->registry = PaymentGatewayRegistry::getInstance();
         $this->bookingRepository = new BookingRepository();
         $this->paymentRepository = new PaymentRepository();
-        $this->scheduledPaymentRepository = new ScheduledPaymentRepository();
         $this->tripRepository = new TripRepository();
     }
 
@@ -429,14 +426,21 @@ class PaymentGatewayController extends BaseController
             $customerId = $result['customer_id'] ?? null;
             $paymentMethodId = $result['payment_method_id'] ?? $result['token_id'] ?? $result['vault_id'] ?? null;
 
+            $passForSchedule = (bool) apply_filters(
+                'yatra_pass_gateway_ids_for_scheduled_payments',
+                $saveCard,
+                $result,
+                $bookingId
+            );
+
             $this->handle_successful_payment(
                 $bookingId, 
                 $gatewayId, 
                 $transactionId, 
                 $result['amount'] ?? null, 
                 $result['currency'] ?? null,
-                $saveCard ? $customerId : null,
-                $saveCard ? $paymentMethodId : null
+                ($saveCard || $passForSchedule) ? $customerId : null,
+                ($saveCard || $passForSchedule) ? $paymentMethodId : null
             );
         }
 
@@ -574,6 +578,8 @@ class PaymentGatewayController extends BaseController
             $payment_status = 'partial';
         }
 
+        $previousBookingStatus = (string) ($booking->status ?? 'pending');
+
         // Update booking
         $this->bookingRepository->update($bookingId, [
             'amount_paid' => $new_amount_paid,
@@ -582,17 +588,7 @@ class PaymentGatewayController extends BaseController
             'status' => 'confirmed',
         ]);
 
-        // Handle scheduled payments for remaining balance
-        if ($new_amount_due > 0 && $customerId && $paymentMethodId) {
-            $this->createScheduledPaymentsForBooking(
-                $bookingId,
-                $gateway,
-                $customerId,
-                $paymentMethodId,
-                $new_amount_due,
-                $payment_currency
-            );
-        }
+        \yatra_trigger_booking_confirmed($bookingId, $previousBookingStatus);
 
         // Clear remaining payment session if this was a remaining payment
         if (function_exists('yatra_has_remaining_session') && yatra_has_remaining_session()) {
@@ -605,101 +601,6 @@ class PaymentGatewayController extends BaseController
             'customer_id' => $customerId,
             'payment_method_id' => $paymentMethodId,
         ]);
-    }
-
-    /**
-     * Create scheduled payments for remaining balance
-     */
-    private function createScheduledPaymentsForBooking(
-        int $bookingId,
-        string $gateway,
-        string $customerId,
-        string $paymentMethodId,
-        float $remainingAmount,
-        string $currency
-    ): void {
-        // Get scheduled payment settings
-        $settings = \Yatra\Services\SettingsService::getAll();
-        
-        // Check if auto-scheduled payments is enabled
-        if (empty($settings['enable_scheduled_payments'])) {
-            return;
-        }
-
-        // Save the payment token first
-        $tokenId = $this->savePaymentToken($bookingId, $gateway, $customerId, $paymentMethodId);
-        
-        if (!$tokenId) {
-            return;
-        }
-
-        // Get schedule configuration from settings
-        $schedule = [
-            'type' => $settings['scheduled_payment_type'] ?? 'single', // single, installments
-            'days_until' => (int) ($settings['scheduled_payment_days'] ?? 15),
-            'installments' => (int) ($settings['scheduled_payment_installments'] ?? 1),
-            'interval_days' => (int) ($settings['scheduled_payment_interval'] ?? 30),
-        ];
-
-        // Create scheduled payments
-        \Yatra\Services\ScheduledPaymentService::createScheduledPayments(
-            $bookingId,
-            $gateway,
-            $customerId,
-            $tokenId,
-            $remainingAmount,
-            $currency,
-            $schedule
-        );
-    }
-
-    /**
-     * Save payment token for future charges
-     */
-    private function savePaymentToken(
-        int $bookingId,
-        string $gateway,
-        string $customerId,
-        string $paymentMethodId
-    ): ?int {
-        // Get booking for customer info
-        $booking = $this->bookingRepository->find($bookingId);
-
-        if (!$booking) {
-            return null;
-        }
-
-        $userId = get_current_user_id() ?: 0;
-
-        // Get payment method details from gateway
-        $gatewayInstance = $this->registry->get($gateway);
-        $cardInfo = [];
-
-        if ($gatewayInstance) {
-            $methods = $gatewayInstance->getPaymentMethods($customerId);
-            foreach ($methods as $method) {
-                if ($method['id'] === $paymentMethodId) {
-                    $cardInfo = $method;
-                    break;
-                }
-            }
-        }
-
-        // Create token via repository
-        $tokenId = $this->scheduledPaymentRepository->createPaymentToken([
-            'customer_id' => $userId,
-            'user_id' => $userId,
-            'gateway' => $gateway,
-            'token' => $paymentMethodId,
-            'payment_method_id' => $paymentMethodId,
-            'card_brand' => $cardInfo['brand'] ?? null,
-            'card_last4' => $cardInfo['last4'] ?? null,
-            'card_exp_month' => $cardInfo['exp_month'] ?? null,
-            'card_exp_year' => $cardInfo['exp_year'] ?? null,
-            'is_default' => 1,
-        ]);
-
-        return $tokenId ?: null;
     }
 
     /**

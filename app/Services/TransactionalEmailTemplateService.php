@@ -24,6 +24,37 @@ class TransactionalEmailTemplateService
 
     public const TYPE_ADMIN_BOOKING_CANCELLED = 'admin_booking_cancelled_notice';
 
+    /** Trip consent request (Yatra Pro Trip Consent module). */
+    public const TYPE_TRIP_CONSENT_REQUEST = 'trip_consent_request';
+
+    /** Customer account email verification (e.g. checkout registration). */
+    public const TYPE_CUSTOMER_EMAIL_VERIFICATION = 'customer_email_verification';
+
+    public const TYPE_BOOKING_COMPLETED = 'booking_completed';
+
+    public const TYPE_BOOKING_EXPIRED_CUSTOMER = 'booking_expired_customer';
+
+    public const TYPE_ADMIN_BOOKING_EXPIRED = 'admin_booking_expired';
+
+    public const TYPE_SCHEDULED_PAYMENT_REMINDER = 'scheduled_payment_reminder';
+
+    public const TYPE_SCHEDULED_PAYMENT_SUCCEEDED = 'scheduled_payment_succeeded';
+
+    public const TYPE_SCHEDULED_PAYMENT_FAILED = 'scheduled_payment_failed';
+
+    public const TYPE_ADMIN_SCHEDULED_PAYMENT_FAILED = 'admin_scheduled_payment_failed';
+
+    public const TYPE_ENQUIRY_ADMIN = 'enquiry_admin';
+
+    public const TYPE_ENQUIRY_CUSTOMER_RECEIVED = 'enquiry_received';
+
+    public const TYPE_ENQUIRY_CUSTOMER_RESPONSE = 'enquiry_response';
+
+    public const TYPE_REVIEW_REQUEST = 'review_request';
+
+    /** Abandoned checkout recovery (Yatra Pro); merge tags include {{recovery_reminder_label}}. */
+    public const TYPE_ABANDONED_BOOKING_RECOVERY = 'abandoned_booking_recovery';
+
     /**
      * Map catalog / settings UI keys to internal render types.
      */
@@ -37,6 +68,20 @@ class TransactionalEmailTemplateService
             'admin_new_booking' => self::TYPE_ADMIN_NEW_BOOKING,
             'admin_payment_received' => self::TYPE_ADMIN_PAYMENT_RECEIVED,
             'admin_booking_cancelled' => self::TYPE_ADMIN_BOOKING_CANCELLED,
+            'trip_consent_request' => self::TYPE_TRIP_CONSENT_REQUEST,
+            'customer_email_verification' => self::TYPE_CUSTOMER_EMAIL_VERIFICATION,
+            'booking_completed' => self::TYPE_BOOKING_COMPLETED,
+            'booking_expired_customer' => self::TYPE_BOOKING_EXPIRED_CUSTOMER,
+            'admin_booking_expired' => self::TYPE_ADMIN_BOOKING_EXPIRED,
+            'scheduled_payment_reminder' => self::TYPE_SCHEDULED_PAYMENT_REMINDER,
+            'scheduled_payment_succeeded' => self::TYPE_SCHEDULED_PAYMENT_SUCCEEDED,
+            'scheduled_payment_failed' => self::TYPE_SCHEDULED_PAYMENT_FAILED,
+            'admin_scheduled_payment_failed' => self::TYPE_ADMIN_SCHEDULED_PAYMENT_FAILED,
+            'enquiry_admin' => self::TYPE_ENQUIRY_ADMIN,
+            'enquiry_received' => self::TYPE_ENQUIRY_CUSTOMER_RECEIVED,
+            'enquiry_response' => self::TYPE_ENQUIRY_CUSTOMER_RESPONSE,
+            'review_request' => self::TYPE_REVIEW_REQUEST,
+            'abandoned_booking_recovery' => self::TYPE_ABANDONED_BOOKING_RECOVERY,
         ];
 
         return $map[$templateKey] ?? null;
@@ -145,6 +190,76 @@ class TransactionalEmailTemplateService
                 'flag' => 'email_template_admin_cancellation',
                 'subject' => 'email_tpl_admin_cancellation_subject',
                 'body' => 'email_tpl_admin_cancellation_body',
+            ],
+            self::TYPE_TRIP_CONSENT_REQUEST => [
+                'flag' => 'email_template_trip_consent',
+                'subject' => 'email_tpl_trip_consent_subject',
+                'body' => 'email_tpl_trip_consent_body',
+            ],
+            self::TYPE_CUSTOMER_EMAIL_VERIFICATION => [
+                'flag' => 'email_template_customer_verification',
+                'subject' => 'email_tpl_customer_verification_subject',
+                'body' => 'email_tpl_customer_verification_body',
+            ],
+            self::TYPE_BOOKING_COMPLETED => [
+                'flag' => 'email_template_booking_completed',
+                'subject' => 'email_tpl_booking_completed_subject',
+                'body' => 'email_tpl_booking_completed_body',
+            ],
+            self::TYPE_BOOKING_EXPIRED_CUSTOMER => [
+                'flag' => 'email_template_booking_expired_customer',
+                'subject' => 'email_tpl_booking_expired_customer_subject',
+                'body' => 'email_tpl_booking_expired_customer_body',
+            ],
+            self::TYPE_ADMIN_BOOKING_EXPIRED => [
+                'flag' => 'email_template_admin_booking_expired',
+                'subject' => 'email_tpl_admin_booking_expired_subject',
+                'body' => 'email_tpl_admin_booking_expired_body',
+            ],
+            self::TYPE_SCHEDULED_PAYMENT_REMINDER => [
+                'flag' => 'email_template_scheduled_payment_reminder',
+                'subject' => 'email_tpl_scheduled_payment_reminder_subject',
+                'body' => 'email_tpl_scheduled_payment_reminder_body',
+            ],
+            self::TYPE_SCHEDULED_PAYMENT_SUCCEEDED => [
+                'flag' => 'email_template_scheduled_payment_succeeded',
+                'subject' => 'email_tpl_scheduled_payment_succeeded_subject',
+                'body' => 'email_tpl_scheduled_payment_succeeded_body',
+            ],
+            self::TYPE_SCHEDULED_PAYMENT_FAILED => [
+                'flag' => 'email_template_scheduled_payment_failed',
+                'subject' => 'email_tpl_scheduled_payment_failed_subject',
+                'body' => 'email_tpl_scheduled_payment_failed_body',
+            ],
+            self::TYPE_ADMIN_SCHEDULED_PAYMENT_FAILED => [
+                'flag' => 'email_template_admin_scheduled_payment_failed',
+                'subject' => 'email_tpl_admin_scheduled_payment_failed_subject',
+                'body' => 'email_tpl_admin_scheduled_payment_failed_body',
+            ],
+            self::TYPE_ENQUIRY_ADMIN => [
+                'flag' => 'email_template_enquiry_admin',
+                'subject' => 'email_tpl_enquiry_admin_subject',
+                'body' => 'email_tpl_enquiry_admin_body',
+            ],
+            self::TYPE_ENQUIRY_CUSTOMER_RECEIVED => [
+                'flag' => 'email_template_enquiry_received',
+                'subject' => 'email_tpl_enquiry_received_subject',
+                'body' => 'email_tpl_enquiry_received_body',
+            ],
+            self::TYPE_ENQUIRY_CUSTOMER_RESPONSE => [
+                'flag' => 'email_template_enquiry_response',
+                'subject' => 'email_tpl_enquiry_response_subject',
+                'body' => 'email_tpl_enquiry_response_body',
+            ],
+            self::TYPE_REVIEW_REQUEST => [
+                'flag' => 'email_template_review_request',
+                'subject' => 'email_tpl_review_request_subject',
+                'body' => 'email_tpl_review_request_body',
+            ],
+            self::TYPE_ABANDONED_BOOKING_RECOVERY => [
+                'flag' => 'email_template_abandoned_booking_recovery',
+                'subject' => 'email_tpl_abandoned_booking_recovery_subject',
+                'body' => 'email_tpl_abandoned_booking_recovery_body',
             ],
         ];
     }
@@ -289,6 +404,54 @@ class TransactionalEmailTemplateService
             case self::TYPE_ADMIN_BOOKING_CANCELLED:
                 return sprintf(__('📋 [%s] Booking cancelled · %s (#%s)', 'yatra'), $site, $ref, $v['booking_id'] ?? '');
 
+            case self::TYPE_TRIP_CONSENT_REQUEST:
+                $formName = $v['form_name'] ?? __('consent form', 'yatra');
+
+                return sprintf(__('📝 [%s] Action required · %s', 'yatra'), $site, $formName);
+
+            case self::TYPE_CUSTOMER_EMAIL_VERIFICATION:
+                return sprintf(__('✉️ [%s] Verify your email address', 'yatra'), $site);
+
+            case self::TYPE_BOOKING_COMPLETED:
+                return sprintf(__('🌟 [%s] Trip complete · %s', 'yatra'), $site, $ref);
+
+            case self::TYPE_BOOKING_EXPIRED_CUSTOMER:
+                return sprintf(__('⏱️ [%s] Booking expired · %s', 'yatra'), $site, $ref);
+
+            case self::TYPE_ADMIN_BOOKING_EXPIRED:
+                return sprintf(__('⏱️ [%s] Booking expired · %s (#%s)', 'yatra'), $site, $ref, $v['booking_id'] ?? '');
+
+            case self::TYPE_SCHEDULED_PAYMENT_REMINDER:
+                return sprintf(__('💳 [%s] Upcoming payment · %s', 'yatra'), $site, $ref);
+
+            case self::TYPE_SCHEDULED_PAYMENT_SUCCEEDED:
+                return sprintf(__('✅ [%s] Scheduled payment received · %s', 'yatra'), $site, $ref);
+
+            case self::TYPE_SCHEDULED_PAYMENT_FAILED:
+                return sprintf(__('⚠️ [%s] Payment issue · %s', 'yatra'), $site, $ref);
+
+            case self::TYPE_ADMIN_SCHEDULED_PAYMENT_FAILED:
+                return sprintf(__('⚠️ [%s] Scheduled payment failed · %s', 'yatra'), $site, $ref);
+
+            case self::TYPE_ENQUIRY_ADMIN:
+                $who = $v['customer_name'] ?? __('Customer', 'yatra');
+
+                return sprintf(__('💬 [%s] New enquiry · %s', 'yatra'), $site, $who);
+
+            case self::TYPE_ENQUIRY_CUSTOMER_RECEIVED:
+                return sprintf(__('✉️ [%s] We received your message', 'yatra'), $site);
+
+            case self::TYPE_ENQUIRY_CUSTOMER_RESPONSE:
+                return sprintf(__('💬 [%s] Re: your enquiry', 'yatra'), $site);
+
+            case self::TYPE_REVIEW_REQUEST:
+                $trip = $v['trip_name'] ?? __('your trip', 'yatra');
+
+                return sprintf(__('⭐ [%s] How was %s?', 'yatra'), $site, $trip);
+
+            case self::TYPE_ABANDONED_BOOKING_RECOVERY:
+                return sprintf(__('🛒 [%s] Complete your booking', 'yatra'), $site);
+
             default:
                 return sprintf(__('✉️ [%s] Notification', 'yatra'), $site);
         }
@@ -320,6 +483,48 @@ class TransactionalEmailTemplateService
 
             case self::TYPE_ADMIN_BOOKING_CANCELLED:
                 return EmailTemplateDefaults::fallbackAdminBookingCancelled($v);
+
+            case self::TYPE_TRIP_CONSENT_REQUEST:
+                return EmailTemplateDefaults::fallbackTransactionalTripConsent($v);
+
+            case self::TYPE_CUSTOMER_EMAIL_VERIFICATION:
+                return EmailTemplateDefaults::fallbackTransactionalCustomerEmailVerification($v);
+
+            case self::TYPE_BOOKING_COMPLETED:
+                return EmailTemplateDefaults::fallbackTransactionalBookingCompleted($v);
+
+            case self::TYPE_BOOKING_EXPIRED_CUSTOMER:
+                return EmailTemplateDefaults::fallbackTransactionalBookingExpiredCustomer($v);
+
+            case self::TYPE_ADMIN_BOOKING_EXPIRED:
+                return EmailTemplateDefaults::fallbackAdminBookingExpired($v);
+
+            case self::TYPE_SCHEDULED_PAYMENT_REMINDER:
+                return EmailTemplateDefaults::fallbackTransactionalScheduledPaymentReminder($v);
+
+            case self::TYPE_SCHEDULED_PAYMENT_SUCCEEDED:
+                return EmailTemplateDefaults::fallbackTransactionalScheduledPaymentSucceeded($v);
+
+            case self::TYPE_SCHEDULED_PAYMENT_FAILED:
+                return EmailTemplateDefaults::fallbackTransactionalScheduledPaymentFailed($v);
+
+            case self::TYPE_ADMIN_SCHEDULED_PAYMENT_FAILED:
+                return EmailTemplateDefaults::fallbackAdminScheduledPaymentFailed($v);
+
+            case self::TYPE_ENQUIRY_ADMIN:
+                return EmailTemplateDefaults::fallbackTransactionalEnquiryAdmin($v);
+
+            case self::TYPE_ENQUIRY_CUSTOMER_RECEIVED:
+                return EmailTemplateDefaults::fallbackTransactionalEnquiryReceived($v);
+
+            case self::TYPE_ENQUIRY_CUSTOMER_RESPONSE:
+                return EmailTemplateDefaults::fallbackTransactionalEnquiryResponse($v);
+
+            case self::TYPE_REVIEW_REQUEST:
+                return EmailTemplateDefaults::fallbackTransactionalReviewRequest($v);
+
+            case self::TYPE_ABANDONED_BOOKING_RECOVERY:
+                return EmailTemplateDefaults::fallbackTransactionalAbandonedBookingRecovery($v);
 
             default:
                 return EmailTemplateLayout::customer(
@@ -362,5 +567,64 @@ class TransactionalEmailTemplateService
             'payment_status' => (string) ($booking->payment_status ?? ''),
             'admin_url' => admin_url('admin.php?page=yatra'),
         ];
+    }
+
+    /**
+     * Merge tags for enquiry emails (row from EnquiryRepository::findWithTrip()).
+     *
+     * @param object $enquiry Row with name, email, phone, message, trip_title, etc.
+     * @return array<string, string>
+     */
+    public static function variablesFromEnquiry(object $enquiry, string $responsePlain = ''): array
+    {
+        $trip = trim((string) ($enquiry->trip_title ?? ''));
+        $tripSlug = (string) ($enquiry->trip_slug ?? '');
+        $tripUrl = $tripSlug !== ''
+            ? home_url('/' . SettingsService::getTripBase() . '/' . rawurlencode($tripSlug) . '/')
+            : home_url('/');
+
+        return [
+            'customer_name' => (string) ($enquiry->name ?? ''),
+            'customer_email' => (string) ($enquiry->email ?? ''),
+            'customer_phone' => (string) ($enquiry->phone ?? ''),
+            'trip_name' => $trip !== '' ? $trip : __('General enquiry', 'yatra'),
+            'trip_url' => $tripUrl,
+            'message' => nl2br(esc_html((string) ($enquiry->message ?? ''))),
+            'response' => $responsePlain !== '' ? nl2br(esc_html($responsePlain)) : '',
+            'response_message' => $responsePlain !== '' ? nl2br(esc_html($responsePlain)) : '',
+        ];
+    }
+
+    /**
+     * @param object $booking Booking row (contact_*, reference, …)
+     * @param array<string, string> $extra e.g. expiry_hours, expiry_notice_html
+     * @return array<string, string>
+     */
+    public static function variablesFromBookingWithExtras(object $booking, array $extra = []): array
+    {
+        return array_merge(self::variablesFromBooking($booking), $extra);
+    }
+
+    /**
+     * @param object $booking      Booking row
+     * @param object $scheduledRow Scheduled payment row (amount, currency, scheduled_date, payment_type, …)
+     * @param array<string, string> $extra failure_reason, balance_after_formatted, permanent_failure, …
+     * @return array<string, string>
+     */
+    public static function variablesFromScheduledPayment(object $booking, object $scheduledRow, array $extra = []): array
+    {
+        $currency = (string) ($scheduledRow->currency ?? $booking->currency ?? SettingsService::getCurrency());
+        $amount = (float) ($scheduledRow->amount ?? 0);
+        $schedDate = !empty($scheduledRow->scheduled_date)
+            ? date_i18n(get_option('date_format'), strtotime((string) $scheduledRow->scheduled_date))
+            : '';
+
+        $base = self::variablesFromBooking($booking);
+        $base['scheduled_amount_formatted'] = yatra_format_price($amount, $currency);
+        $base['scheduled_date_formatted'] = $schedDate;
+        $base['payment_type_label'] = (string) ($scheduledRow->payment_type ?? '');
+        $base['scheduled_payment_id'] = (string) (int) ($scheduledRow->id ?? 0);
+
+        return array_merge($base, $extra);
     }
 }

@@ -484,8 +484,8 @@ const ConsentFormsList: React.FC = () => {
                       visible: visibleColumns.name,
                       render: (form: ConsentForm) => (
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
-                            <FileSignature className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                          <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                            <FileSignature className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                           </div>
                           <div>
                             <a
@@ -494,7 +494,7 @@ const ConsentFormsList: React.FC = () => {
                                 e.preventDefault();
                                 handleEdit(form);
                               }}
-                              className="font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:underline transition-colors cursor-pointer"
+                              className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
                             >
                               {form.name}
                             </a>
@@ -515,7 +515,7 @@ const ConsentFormsList: React.FC = () => {
                       render: (form: ConsentForm) => {
                         const statusColors: Record<string, string> = {
                           publish:
-                            "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+                            "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
                           draft:
                             "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
                           archived:
@@ -555,7 +555,7 @@ const ConsentFormsList: React.FC = () => {
 
                         return (
                           <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
+                            <div className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400">
                               <CheckCircle className="w-4 h-4" />
                               <span>{signedCount}</span>
                             </div>
@@ -847,9 +847,9 @@ const SignedConsentsList: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleView(consent)}
-                    className="flex items-center gap-3 w-full text-left group focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded-lg"
+                    className="flex items-center gap-3 w-full text-left group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg"
                   >
-                    <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-300 font-semibold">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-300 font-semibold">
                       {consent.signer_name?.charAt(0)?.toUpperCase() || "?"}
                     </div>
                     <div className="flex flex-col">
@@ -860,7 +860,7 @@ const SignedConsentsList: React.FC = () => {
                         <Mail className="w-3 h-3" />
                         {consent.signer_email}
                       </div>
-                      <span className="text-xs text-purple-600 dark:text-purple-300 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="text-xs text-blue-600 dark:text-blue-300 opacity-0 group-hover:opacity-100 transition-opacity">
                         {__("View details")}
                       </span>
                     </div>
@@ -1237,7 +1237,7 @@ const TripConsent: React.FC = () => {
                 );
                 window.dispatchEvent(new PopStateEvent("popstate"));
               }}
-              className="bg-purple-600 hover:bg-purple-700"
+              className="bg-blue-600 hover:bg-blue-700"
             >
               <Plus className="w-4 h-4 mr-2" />
               {__("Create Form")}
@@ -1253,7 +1253,7 @@ const TripConsent: React.FC = () => {
             onClick={() => handleTabChange("forms")}
             className={`py-3 px-1 border-b-2 font-medium text-sm ${
               activeTab === "forms"
-                ? "border-purple-500 text-purple-600 dark:text-purple-400"
+                ? "border-blue-500 text-blue-600 dark:text-blue-400"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
             }`}
           >
@@ -1263,7 +1263,7 @@ const TripConsent: React.FC = () => {
             onClick={() => handleTabChange("signed")}
             className={`py-3 px-1 border-b-2 font-medium text-sm ${
               activeTab === "signed"
-                ? "border-purple-500 text-purple-600 dark:text-purple-400"
+                ? "border-blue-500 text-blue-600 dark:text-blue-400"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
             }`}
           >

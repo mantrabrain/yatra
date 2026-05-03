@@ -16,7 +16,7 @@ class PayPalGateway extends AbstractPaymentGateway
     protected string $description = 'Accept PayPal and credit card payments';
     protected string $icon = 'paypal.svg';
     protected string $sandboxUrl = 'https://developer.paypal.com/tools/sandbox/';
-    protected array $supports = ['paypal', 'credit_card', 'refunds', 'recurring', 'tokenization', 'scheduled_payments'];
+    protected array $supports = ['paypal', 'credit_card', 'refunds', 'recurring', 'tokenization'];
 
     public function getConfigFields(): array
     {
@@ -715,7 +715,8 @@ class PayPalGateway extends AbstractPaymentGateway
         
         $bookingId = (int) $booking->id;
         $amountDue = (float) ($booking->amount_due ?? ($booking->total_amount - $booking->amount_paid));
-        
+        $previousBookingStatus = (string) ($booking->status ?? 'pending');
+
         // Update booking payment status
         $bookings_table = BookingsTable::getTableName();
         $wpdb->update(
@@ -753,7 +754,9 @@ class PayPalGateway extends AbstractPaymentGateway
             'transaction_id' => $transactionId,
             'amount' => $amountDue,
         ]);
-        
+
+        \yatra_trigger_booking_confirmed($bookingId, $previousBookingStatus);
+
         // Fire action for other plugins/services
         do_action('yatra_payment_completed', [
             'booking_id' => $bookingId,

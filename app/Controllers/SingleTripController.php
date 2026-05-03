@@ -217,11 +217,9 @@ class SingleTripController
         // Get price types from database table (for traveler-based pricing)
         $trip->price_types = $this->getPriceTypes((int) $trip->id);
         
-        // Determine pricing type - use database value, fallback to 'regular'
-        // If pricing_type is set to 'traveler_based' in DB, use that
-        // If pricing_type is empty but price_types exist, infer 'traveler_based'
-        if (empty($trip->pricing_type)) {
-            $trip->pricing_type = !empty($trip->price_types) ? 'traveler_based' : 'regular';
+        // Normalize pricing_type with the same rules as {@see TripPricingService::resolvePricingType}
+        if ($trip->pricing_type === null || $trip->pricing_type === '') {
+            $trip->pricing_type = \Yatra\Services\TripPricingService::resolvePricingType($trip);
         }
         
         // Load itinerary from new database tables (preferred) or fallback to JSON field

@@ -399,21 +399,16 @@ class EnquiryService
             return;
         }
 
-        $adminEmail = get_option('admin_email');
+        $adminEmail = sanitize_email((string) SettingsService::getString('admin_email', (string) get_option('admin_email', '')));
         if ($adminEmail === '' || !is_email($adminEmail)) {
             return;
         }
 
-        $subject = sprintf(
-            /* translators: 1: site name, 2: customer name */
-            __('💬 [%1$s] New enquiry · %2$s', 'yatra'),
-            get_bloginfo('name'),
-            $enquiry->name
+        TransactionalEmailTemplateService::sendIfEnabled(
+            TransactionalEmailTemplateService::TYPE_ENQUIRY_ADMIN,
+            $adminEmail,
+            TransactionalEmailTemplateService::variablesFromEnquiry($enquiry, '')
         );
-
-        $body = EmailTemplateDefaults::renderCoreEnquiryAdminNotificationHtml($enquiry);
-
-        EmailService::send($adminEmail, $subject, $body, ['Content-Type: text/html; charset=UTF-8']);
     }
 
     /**
@@ -429,14 +424,11 @@ class EnquiryService
             return;
         }
 
-        $subject = sprintf(
-            __('✉️ [%s] We received your message', 'yatra'),
-            get_bloginfo('name')
+        TransactionalEmailTemplateService::sendIfEnabled(
+            TransactionalEmailTemplateService::TYPE_ENQUIRY_CUSTOMER_RECEIVED,
+            (string) $enquiry->email,
+            TransactionalEmailTemplateService::variablesFromEnquiry($enquiry, '')
         );
-
-        $body = EmailTemplateDefaults::renderCoreEnquiryCustomerConfirmationHtml($enquiry);
-
-        EmailService::send($enquiry->email, $subject, $body, ['Content-Type: text/html; charset=UTF-8']);
     }
 
     /**
@@ -451,14 +443,11 @@ class EnquiryService
             return;
         }
 
-        $subject = sprintf(
-            __('💬 [%s] Re: your enquiry', 'yatra'),
-            get_bloginfo('name')
+        TransactionalEmailTemplateService::sendIfEnabled(
+            TransactionalEmailTemplateService::TYPE_ENQUIRY_CUSTOMER_RESPONSE,
+            (string) $enquiry->email,
+            TransactionalEmailTemplateService::variablesFromEnquiry($enquiry, $response)
         );
-
-        $body = EmailTemplateDefaults::renderCoreEnquiryResponseHtml($enquiry, $response);
-
-        EmailService::send($enquiry->email, $subject, $body, ['Content-Type: text/html; charset=UTF-8']);
     }
 }
 

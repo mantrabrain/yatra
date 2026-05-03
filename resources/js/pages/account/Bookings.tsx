@@ -8,7 +8,13 @@ import {
   MapPin,
 } from "lucide-react";
 import { __ } from "../../lib/i18n";
-import { formatDate, getBadge, currency, phoneToTelHref } from "./utils";
+import {
+  formatDate,
+  formatTravelDateRange,
+  getBadge,
+  currency,
+  phoneToTelHref,
+} from "./utils";
 import { downloadVoucher } from "./utils/downloads";
 import type { Booking } from "./types";
 import BookingDetails from "./BookingDetails";
@@ -407,7 +413,10 @@ const Bookings: React.FC<BookingsProps> = ({
                         {__("Travel Date", "yatra")}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {formatDate(booking.travel_date)}
+                        {formatTravelDateRange(
+                          booking.travel_date,
+                          booking.end_date,
+                        )}
                       </p>
                     </div>
                     <div>

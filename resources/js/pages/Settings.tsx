@@ -767,6 +767,12 @@ interface SettingsData {
   deposit_required: boolean;
   deposit_percentage: number;
   auto_confirm_pay_later: boolean;
+  enable_scheduled_payments: boolean;
+  scheduled_payment_type: string;
+  scheduled_payment_days: number;
+  scheduled_payment_installments: number;
+  scheduled_payment_interval: number;
+  scheduled_payment_reminder_days: number;
   gateway_configs: Record<string, PaymentGatewayConfig>;
   gateway_order?: string[];
 
@@ -781,6 +787,20 @@ interface SettingsData {
   email_template_admin_new_booking: boolean;
   email_template_admin_payment: boolean;
   email_template_admin_cancellation: boolean;
+  email_template_trip_consent: boolean;
+  email_template_customer_verification: boolean;
+  email_template_booking_completed: boolean;
+  email_template_booking_expired_customer: boolean;
+  email_template_admin_booking_expired: boolean;
+  email_template_scheduled_payment_reminder: boolean;
+  email_template_scheduled_payment_succeeded: boolean;
+  email_template_scheduled_payment_failed: boolean;
+  email_template_admin_scheduled_payment_failed: boolean;
+  email_template_enquiry_received: boolean;
+  email_template_enquiry_admin: boolean;
+  email_template_enquiry_response: boolean;
+  email_template_review_request: boolean;
+  email_template_abandoned_booking_recovery: boolean;
   smtp_enabled: boolean;
   smtp_host: string;
   smtp_port: number;
@@ -802,6 +822,34 @@ interface SettingsData {
   email_tpl_admin_payment_body: string;
   email_tpl_admin_cancellation_subject: string;
   email_tpl_admin_cancellation_body: string;
+  email_tpl_trip_consent_subject: string;
+  email_tpl_trip_consent_body: string;
+  email_tpl_customer_verification_subject: string;
+  email_tpl_customer_verification_body: string;
+  email_tpl_booking_completed_subject: string;
+  email_tpl_booking_completed_body: string;
+  email_tpl_booking_expired_customer_subject: string;
+  email_tpl_booking_expired_customer_body: string;
+  email_tpl_admin_booking_expired_subject: string;
+  email_tpl_admin_booking_expired_body: string;
+  email_tpl_scheduled_payment_reminder_subject: string;
+  email_tpl_scheduled_payment_reminder_body: string;
+  email_tpl_scheduled_payment_succeeded_subject: string;
+  email_tpl_scheduled_payment_succeeded_body: string;
+  email_tpl_scheduled_payment_failed_subject: string;
+  email_tpl_scheduled_payment_failed_body: string;
+  email_tpl_admin_scheduled_payment_failed_subject: string;
+  email_tpl_admin_scheduled_payment_failed_body: string;
+  email_tpl_enquiry_received_subject: string;
+  email_tpl_enquiry_received_body: string;
+  email_tpl_enquiry_admin_subject: string;
+  email_tpl_enquiry_admin_body: string;
+  email_tpl_enquiry_response_subject: string;
+  email_tpl_enquiry_response_body: string;
+  email_tpl_review_request_subject: string;
+  email_tpl_review_request_body: string;
+  email_tpl_abandoned_booking_recovery_subject: string;
+  email_tpl_abandoned_booking_recovery_body: string;
 
   // Customer Settings
   customer_registration: boolean;
@@ -2224,6 +2272,12 @@ const Settings: React.FC = () => {
       deposit_required: true,
       deposit_percentage: 20,
       auto_confirm_pay_later: true,
+      enable_scheduled_payments: false,
+      scheduled_payment_type: "single",
+      scheduled_payment_days: 15,
+      scheduled_payment_installments: 1,
+      scheduled_payment_interval: 30,
+      scheduled_payment_reminder_days: 3,
       gateway_configs: {
         stripe: {
           enabled: true,
@@ -2313,6 +2367,20 @@ const Settings: React.FC = () => {
       email_template_admin_new_booking: true,
       email_template_admin_payment: true,
       email_template_admin_cancellation: true,
+      email_template_trip_consent: true,
+      email_template_customer_verification: true,
+      email_template_booking_completed: true,
+      email_template_booking_expired_customer: true,
+      email_template_admin_booking_expired: true,
+      email_template_scheduled_payment_reminder: true,
+      email_template_scheduled_payment_succeeded: true,
+      email_template_scheduled_payment_failed: true,
+      email_template_admin_scheduled_payment_failed: true,
+      email_template_enquiry_received: true,
+      email_template_enquiry_admin: true,
+      email_template_enquiry_response: true,
+      email_template_review_request: true,
+      email_template_abandoned_booking_recovery: true,
       smtp_enabled: false,
       smtp_host: "smtp.gmail.com",
       smtp_port: 587,
@@ -2333,6 +2401,34 @@ const Settings: React.FC = () => {
       email_tpl_admin_payment_body: "",
       email_tpl_admin_cancellation_subject: "",
       email_tpl_admin_cancellation_body: "",
+      email_tpl_trip_consent_subject: "",
+      email_tpl_trip_consent_body: "",
+      email_tpl_customer_verification_subject: "",
+      email_tpl_customer_verification_body: "",
+      email_tpl_booking_completed_subject: "",
+      email_tpl_booking_completed_body: "",
+      email_tpl_booking_expired_customer_subject: "",
+      email_tpl_booking_expired_customer_body: "",
+      email_tpl_admin_booking_expired_subject: "",
+      email_tpl_admin_booking_expired_body: "",
+      email_tpl_scheduled_payment_reminder_subject: "",
+      email_tpl_scheduled_payment_reminder_body: "",
+      email_tpl_scheduled_payment_succeeded_subject: "",
+      email_tpl_scheduled_payment_succeeded_body: "",
+      email_tpl_scheduled_payment_failed_subject: "",
+      email_tpl_scheduled_payment_failed_body: "",
+      email_tpl_admin_scheduled_payment_failed_subject: "",
+      email_tpl_admin_scheduled_payment_failed_body: "",
+      email_tpl_enquiry_received_subject: "",
+      email_tpl_enquiry_received_body: "",
+      email_tpl_enquiry_admin_subject: "",
+      email_tpl_enquiry_admin_body: "",
+      email_tpl_enquiry_response_subject: "",
+      email_tpl_enquiry_response_body: "",
+      email_tpl_review_request_subject: "",
+      email_tpl_review_request_body: "",
+      email_tpl_abandoned_booking_recovery_subject: "",
+      email_tpl_abandoned_booking_recovery_body: "",
       customer_registration: true,
       customer_fields: ["name", "email", "phone", "address"],
       require_email_verification: false,
@@ -3874,6 +3970,169 @@ const Settings: React.FC = () => {
                           </span>
                         </div>
                       </FormField>
+                    )}
+                  </div>
+                </ProFeature>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+                  {__("Scheduled balance payments", "yatra")}
+                  <ProBadge isProActive={(window as any).yatraAdmin?.isPro} />
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                  {__(
+                    "After a deposit or partial payment, automatically schedule the remaining balance with your gateway (Stripe invoices or subscription schedules). Requires a gateway customer and payment method from checkout.",
+                    "yatra",
+                  )}
+                </p>
+                <ProFeature
+                  title={__("Scheduled Payments", "yatra")}
+                  description={__(
+                    "schedule the remaining balance after partial or deposit payments",
+                    "yatra",
+                  )}
+                  moduleName="Scheduled Payments"
+                  pricingUrl="https://wpyatra.com/pricing?module=scheduled-payments"
+                  isProActive={(window as any).yatraAdmin?.isPro}
+                  isModuleEnabled={
+                    (window as any).yatraAdmin?.scheduledPaymentsEnabled
+                  }
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                      <input
+                        type="checkbox"
+                        id="enable_scheduled_payments"
+                        checked={formData.enable_scheduled_payments}
+                        name="enable_scheduled_payments"
+                        onChange={handleFieldChange}
+                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <div className="flex-1">
+                        <Label
+                          htmlFor="enable_scheduled_payments"
+                          className="font-medium cursor-pointer"
+                        >
+                          {__("Enable scheduled balance payments", "yatra")}
+                        </Label>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {__(
+                            "When a booking still has an amount due after checkout, create gateway-side schedules using the rules below.",
+                            "yatra",
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    {formData.enable_scheduled_payments && (
+                      <>
+                        <FormField
+                          id="scheduled_payment_type"
+                          label={__("Schedule type", "yatra")}
+                          description={__(
+                            "Single final charge on a date, or multiple installments.",
+                            "yatra",
+                          )}
+                        >
+                          <Select
+                            id="scheduled_payment_type"
+                            name="scheduled_payment_type"
+                            value={formData.scheduled_payment_type}
+                            onChange={handleFieldChange}
+                          >
+                            <option value="single">
+                              {__("Single balance payment", "yatra")}
+                            </option>
+                            <option value="installments">
+                              {__("Multiple installments", "yatra")}
+                            </option>
+                          </Select>
+                        </FormField>
+
+                        <FormField
+                          id="scheduled_payment_days"
+                          label={__("Days until first charge", "yatra")}
+                          description={__(
+                            "How many days after the initial payment to schedule the first balance collection.",
+                            "yatra",
+                          )}
+                        >
+                          <Input
+                            id="scheduled_payment_days"
+                            type="number"
+                            min={0}
+                            max={365}
+                            value={formData.scheduled_payment_days}
+                            name="scheduled_payment_days"
+                            onChange={handleFieldChange}
+                            className="max-w-xs"
+                          />
+                        </FormField>
+
+                        {formData.scheduled_payment_type === "installments" && (
+                          <>
+                            <FormField
+                              id="scheduled_payment_installments"
+                              label={__("Number of installments", "yatra")}
+                              description={__(
+                                "Total installments including the scheduled balance (Stripe subscription schedule).",
+                                "yatra",
+                              )}
+                            >
+                              <Input
+                                id="scheduled_payment_installments"
+                                type="number"
+                                min={2}
+                                max={24}
+                                value={formData.scheduled_payment_installments}
+                                name="scheduled_payment_installments"
+                                onChange={handleFieldChange}
+                                className="max-w-xs"
+                              />
+                            </FormField>
+                            <FormField
+                              id="scheduled_payment_interval"
+                              label={__("Days between installments", "yatra")}
+                              description={__(
+                                "Spacing between installment charges when using multiple installments.",
+                                "yatra",
+                              )}
+                            >
+                              <Input
+                                id="scheduled_payment_interval"
+                                type="number"
+                                min={1}
+                                max={365}
+                                value={formData.scheduled_payment_interval}
+                                name="scheduled_payment_interval"
+                                onChange={handleFieldChange}
+                                className="max-w-xs"
+                              />
+                            </FormField>
+                          </>
+                        )}
+
+                        <FormField
+                          id="scheduled_payment_reminder_days"
+                          label={__("Payment reminder (days before)", "yatra")}
+                          description={__(
+                            "Send the scheduled payment reminder email this many days before the due date (0 to disable reminders).",
+                            "yatra",
+                          )}
+                        >
+                          <Input
+                            id="scheduled_payment_reminder_days"
+                            type="number"
+                            min={0}
+                            max={30}
+                            value={formData.scheduled_payment_reminder_days}
+                            name="scheduled_payment_reminder_days"
+                            onChange={handleFieldChange}
+                            className="max-w-xs"
+                          />
+                        </FormField>
+                      </>
                     )}
                   </div>
                 </ProFeature>

@@ -32,6 +32,34 @@ final class EmailTemplateDefaults
             'email_tpl_admin_payment_body' => self::htmlAdminPaymentReceived(),
             'email_tpl_admin_cancellation_subject' => '📋 [{{site_name}}] Booking cancelled · {{booking_reference}} (#{{booking_id}})',
             'email_tpl_admin_cancellation_body' => self::htmlAdminBookingCancelled(),
+            'email_tpl_trip_consent_subject' => '📝 [{{site_name}}] Action required · {{form_name}}',
+            'email_tpl_trip_consent_body' => self::htmlTripConsentRequest(),
+            'email_tpl_customer_verification_subject' => '✉️ [{{site_name}}] Verify your email address',
+            'email_tpl_customer_verification_body' => self::htmlCustomerEmailVerification(),
+            'email_tpl_booking_completed_subject' => '🌟 [{{site_name}}] Thanks for traveling · {{booking_reference}}',
+            'email_tpl_booking_completed_body' => self::htmlTripCompleted(),
+            'email_tpl_booking_expired_customer_subject' => '⏱️ [{{site_name}}] Booking expired · {{booking_reference}}',
+            'email_tpl_booking_expired_customer_body' => self::htmlBookingExpiredCustomer(),
+            'email_tpl_admin_booking_expired_subject' => '⏱️ [{{site_name}}] Booking expired · {{booking_reference}} (#{{booking_id}})',
+            'email_tpl_admin_booking_expired_body' => self::htmlAdminBookingExpired(),
+            'email_tpl_scheduled_payment_reminder_subject' => '💳 [{{site_name}}] Upcoming payment · {{booking_reference}}',
+            'email_tpl_scheduled_payment_reminder_body' => self::htmlScheduledPaymentReminder(),
+            'email_tpl_scheduled_payment_succeeded_subject' => '✅ [{{site_name}}] Scheduled payment received · {{booking_reference}}',
+            'email_tpl_scheduled_payment_succeeded_body' => self::htmlScheduledPaymentSucceeded(),
+            'email_tpl_scheduled_payment_failed_subject' => '⚠️ [{{site_name}}] Payment issue · {{booking_reference}}',
+            'email_tpl_scheduled_payment_failed_body' => self::htmlScheduledPaymentFailed(),
+            'email_tpl_admin_scheduled_payment_failed_subject' => '⚠️ [{{site_name}}] Scheduled payment failed · {{booking_reference}}',
+            'email_tpl_admin_scheduled_payment_failed_body' => self::htmlAdminScheduledPaymentFailed(),
+            'email_tpl_enquiry_admin_subject' => '💬 [{{site_name}}] New enquiry · {{customer_name}}',
+            'email_tpl_enquiry_admin_body' => self::htmlEnquiryAdmin(),
+            'email_tpl_enquiry_received_subject' => '✉️ [{{site_name}}] We received your message',
+            'email_tpl_enquiry_received_body' => self::htmlEnquiryCustomer(),
+            'email_tpl_enquiry_response_subject' => '💬 [{{site_name}}] Re: your enquiry',
+            'email_tpl_enquiry_response_body' => self::htmlEnquiryResponse(),
+            'email_tpl_review_request_subject' => '⭐ [{{site_name}}] How was {{trip_name}}?',
+            'email_tpl_review_request_body' => self::htmlReviewRequest(),
+            'email_tpl_abandoned_booking_recovery_subject' => '🛒 [{{site_name}}] Complete your booking',
+            'email_tpl_abandoned_booking_recovery_body' => self::htmlAbandonedBookingRecovery(),
         ];
     }
 
@@ -98,6 +126,42 @@ final class EmailTemplateDefaults
             'review_request' => [
                 'subject' => '⭐ How was {{trip_name}}?',
                 'body' => self::htmlReviewRequest(),
+            ],
+            'trip_consent_request' => [
+                'subject' => '📝 [{{site_name}}] Action required · {{form_name}}',
+                'body' => self::htmlTripConsentRequest(),
+            ],
+            'customer_email_verification' => [
+                'subject' => '✉️ [{{site_name}}] Verify your email address',
+                'body' => self::htmlCustomerEmailVerification(),
+            ],
+            'booking_expired_customer' => [
+                'subject' => '⏱️ [{{site_name}}] Booking expired · {{booking_reference}}',
+                'body' => self::htmlBookingExpiredCustomer(),
+            ],
+            'admin_booking_expired' => [
+                'subject' => '⏱️ [{{site_name}}] Booking expired · {{booking_reference}} (#{{booking_id}})',
+                'body' => self::htmlAdminBookingExpired(),
+            ],
+            'scheduled_payment_reminder' => [
+                'subject' => '💳 [{{site_name}}] Upcoming payment · {{booking_reference}}',
+                'body' => self::htmlScheduledPaymentReminder(),
+            ],
+            'scheduled_payment_succeeded' => [
+                'subject' => '✅ [{{site_name}}] Scheduled payment received · {{booking_reference}}',
+                'body' => self::htmlScheduledPaymentSucceeded(),
+            ],
+            'scheduled_payment_failed' => [
+                'subject' => '⚠️ [{{site_name}}] Payment issue · {{booking_reference}}',
+                'body' => self::htmlScheduledPaymentFailed(),
+            ],
+            'admin_scheduled_payment_failed' => [
+                'subject' => '⚠️ [{{site_name}}] Scheduled payment failed · {{booking_reference}}',
+                'body' => self::htmlAdminScheduledPaymentFailed(),
+            ],
+            'abandoned_booking_recovery' => [
+                'subject' => '🛒 [{{site_name}}] Complete your booking',
+                'body' => self::htmlAbandonedBookingRecovery(),
             ],
         ];
 
@@ -281,6 +345,113 @@ final class EmailTemplateDefaults
             $inner,
             $site,
             __('Upcoming trip reminder', 'yatra')
+        );
+    }
+
+    /**
+     * @param array<string, string> $v
+     */
+    public static function fallbackTransactionalTripConsent(array $v): string
+    {
+        $recipient = esc_html($v['recipient_name'] ?: __('Traveler', 'yatra'));
+        $site = esc_html($v['site_name'] ?? get_bloginfo('name'));
+        $formNameRaw = (string) ($v['form_name'] ?? '');
+        $formNameEsc = esc_html($formNameRaw);
+        $link = esc_url((string) ($v['consent_link'] ?? home_url('/')));
+        $rows = array_values(array_filter([
+            ['label' => __('Form', 'yatra'), 'value' => $formNameEsc],
+            ['label' => __('Trip', 'yatra'), 'value' => esc_html($v['trip_name'] ?? '')],
+            ['label' => __('Travel date', 'yatra'), 'value' => esc_html($v['travel_date'] ?? '')],
+            ['label' => __('Booking reference', 'yatra'), 'value' => esc_html($v['booking_reference'] ?? '')],
+        ], static function (array $row): bool {
+            return $row['value'] !== '';
+        }));
+
+        $notice = !empty($v['expiry_notice_html'])
+            ? '<div style="margin:16px 0 0;padding:12px 16px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;font-size:14px;color:#9a3412;">'
+            . wp_kses_post((string) $v['expiry_notice_html'])
+            . '</div>'
+            : '';
+
+        $testBlock = !empty($v['consent_test_notice_html'])
+            ? '<div style="margin:0 0 20px;padding:12px 16px;background:#f0fdfa;border:1px solid #99f6e4;border-radius:10px;font-size:14px;color:#115e59;">'
+            . wp_kses_post((string) $v['consent_test_notice_html'])
+            . '</div>'
+            : '';
+
+        $inner = $testBlock
+            . '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">'
+            . sprintf(esc_html__('Hello %s,', 'yatra'), $recipient)
+            . '</p>'
+            . '<p style="margin:0 0 20px;color:#475569;">'
+            . sprintf(
+                /* translators: %s: consent form title */
+                esc_html__('Please complete and sign “%s” before your trip.', 'yatra'),
+                $formNameRaw !== '' ? $formNameEsc : esc_html__('your consent form', 'yatra')
+            )
+            . '</p>'
+            . EmailTemplateLayout::detailCard($rows)
+            . $notice
+            . EmailTemplateLayout::button($link, __('Sign consent form', 'yatra'))
+            . '<p style="margin:20px 0 0;font-size:13px;color:#64748b;">'
+            . esc_html__('If the button does not work, copy this link into your browser:', 'yatra')
+            . '</p>'
+            . '<p style="margin:8px 0 0;font-size:13px;word-break:break-all;"><a href="' . $link . '" style="color:#0d9488;">' . $link . '</a></p>';
+
+        return EmailTemplateLayout::customer(
+            '📝',
+            __('Consent required', 'yatra'),
+            $inner,
+            $site,
+            __('Sign your trip consent form', 'yatra')
+        );
+    }
+
+    /**
+     * @param array<string, string> $v
+     */
+    public static function fallbackTransactionalCustomerEmailVerification(array $v): string
+    {
+        $firstRaw = (string) ($v['customer_first_name'] ?? '');
+        if ($firstRaw === '') {
+            $firstRaw = (string) ($v['customer_name'] ?? '');
+        }
+        $first = esc_html($firstRaw !== '' ? $firstRaw : __('there', 'yatra'));
+        $site = esc_html($v['site_name'] ?? get_bloginfo('name'));
+        $link = esc_url((string) ($v['verification_link'] ?? home_url('/')));
+        $intro = isset($v['intro_paragraph']) ? esc_html((string) $v['intro_paragraph']) : '';
+        $footer = isset($v['footer_note']) ? esc_html((string) $v['footer_note']) : '';
+        $expiryInner = !empty($v['expiry_notice_html'])
+            ? wp_kses_post((string) $v['expiry_notice_html'])
+            : esc_html(
+                sprintf(
+                    /* translators: %d: hours until link expiry */
+                    __('This verification link expires in %d hours for your security.', 'yatra'),
+                    24
+                )
+            );
+        $expiry = '<div style="margin:20px 0 0;padding:12px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;color:#475569;">'
+            . $expiryInner
+            . '</div>';
+
+        $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">'
+            . sprintf(esc_html__('Hello %s,', 'yatra'), $first)
+            . '</p>'
+            . ($intro !== '' ? '<p style="margin:0 0 20px;color:#475569;">' . $intro . '</p>' : '')
+            . EmailTemplateLayout::button($link, __('Verify email address', 'yatra'))
+            . $expiry
+            . ($footer !== '' ? '<p style="margin:24px 0 0;font-size:14px;color:#64748b;">' . $footer . '</p>' : '')
+            . '<p style="margin:20px 0 0;font-size:13px;color:#64748b;">'
+            . esc_html__('If the button does not work, copy this link into your browser:', 'yatra')
+            . '</p>'
+            . '<p style="margin:8px 0 0;font-size:13px;word-break:break-all;"><a href="' . $link . '" style="color:#0d9488;">' . $link . '</a></p>';
+
+        return EmailTemplateLayout::customer(
+            '✉️',
+            __('Verify your email', 'yatra'),
+            $inner,
+            $site,
+            __('Account verification', 'yatra')
         );
     }
 
@@ -637,6 +808,70 @@ final class EmailTemplateDefaults
         );
     }
 
+    private static function htmlTripConsentRequest(): string
+    {
+        $cta = '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0;"><tr>'
+            . '<td style="border-radius:10px;background:#0d9488;">'
+            . '<a href="{{consent_link}}" style="display:inline-block;padding:14px 28px;font-family:\'Segoe UI\',Roboto,Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;">'
+            . esc_html__('Sign consent form', 'yatra')
+            . '</a></td></tr></table>';
+
+        $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">Hello {{recipient_name}},</p>'
+            . '<p style="margin:0 0 20px;color:#475569;">'
+            . esc_html__('Please review and sign the consent form for your upcoming trip.', 'yatra')
+            . '</p>'
+            . '{{consent_test_notice_html}}'
+            . EmailTemplateLayout::detailCard([
+                ['label' => 'Form', 'value' => '{{form_name}}'],
+                ['label' => 'Trip', 'value' => '{{trip_name}}'],
+                ['label' => 'Travel date', 'value' => '{{travel_date}}'],
+                ['label' => 'Booking reference', 'value' => '{{booking_reference}}'],
+            ])
+            . '{{expiry_notice_html}}'
+            . $cta
+            . '<p style="margin:20px 0 0;font-size:13px;color:#64748b;">'
+            . esc_html__('If the button does not work, copy this link into your browser:', 'yatra')
+            . '</p>'
+            . '<p style="margin:8px 0 0;font-size:13px;word-break:break-all;"><a href="{{consent_link}}" style="color:#0d9488;">{{consent_link}}</a></p>';
+
+        return EmailTemplateLayout::customer(
+            '📝',
+            'Consent required',
+            $inner,
+            '{{site_name}}',
+            'Trip consent'
+        );
+    }
+
+    private static function htmlCustomerEmailVerification(): string
+    {
+        $cta = '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0;"><tr>'
+            . '<td style="border-radius:10px;background:#0d9488;">'
+            . '<a href="{{verification_link}}" style="display:inline-block;padding:14px 28px;font-family:\'Segoe UI\',Roboto,Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;">'
+            . esc_html__('Verify email address', 'yatra')
+            . '</a></td></tr></table>';
+
+        $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">Hello {{customer_first_name}},</p>'
+            . '<p style="margin:0 0 20px;color:#475569;">{{intro_paragraph}}</p>'
+            . $cta
+            . '<div style="margin:20px 0 0;padding:12px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;color:#475569;">'
+            . '{{expiry_notice_html}}'
+            . '</div>'
+            . '<p style="margin:24px 0 0;font-size:14px;color:#64748b;">{{footer_note}}</p>'
+            . '<p style="margin:20px 0 0;font-size:13px;color:#64748b;">'
+            . esc_html__('If the button does not work, copy this link into your browser:', 'yatra')
+            . '</p>'
+            . '<p style="margin:8px 0 0;font-size:13px;word-break:break-all;"><a href="{{verification_link}}" style="color:#0d9488;">{{verification_link}}</a></p>';
+
+        return EmailTemplateLayout::customer(
+            '✉️',
+            __('Verify your email', 'yatra'),
+            $inner,
+            '{{site_name}}',
+            __('Account verification', 'yatra')
+        );
+    }
+
     private static function htmlPaymentReminder(): string
     {
         $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">Hello {{customer_name}},</p>'
@@ -754,6 +989,238 @@ final class EmailTemplateDefaults
         );
     }
 
+    private static function htmlBookingExpiredCustomer(): string
+    {
+        $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">Hello {{customer_name}},</p>'
+            . '<p style="margin:0 0 20px;color:#475569;">'
+            . esc_html__('Your booking was cancelled automatically because payment was not received in time.', 'yatra')
+            . '</p>'
+            . EmailTemplateLayout::detailCard([
+                ['label' => 'Reference', 'value' => '{{booking_reference}}'],
+                ['label' => 'Trip', 'value' => '{{trip_name}}'],
+                ['label' => 'Travel date', 'value' => '{{travel_date}}'],
+                ['label' => 'Policy', 'value' => '{{expiry_policy_note}}'],
+            ])
+            . '<p style="margin:24px 0 0;"><a href="{{trip_url}}" style="color:#0d9488;font-weight:600;text-decoration:none;">'
+            . esc_html__('Browse trips again →', 'yatra')
+            . '</a></p>';
+
+        return EmailTemplateLayout::customer(
+            '⏱️',
+            __('Booking expired', 'yatra'),
+            $inner,
+            '{{site_name}}',
+            __('Booking expired', 'yatra')
+        );
+    }
+
+    private static function htmlAdminBookingExpired(): string
+    {
+        $inner = '<p style="margin:0 0 20px;color:#475569;">'
+            . esc_html__('A booking was cancelled automatically due to non-payment (expiry policy).', 'yatra')
+            . '</p>'
+            . EmailTemplateLayout::detailCard([
+                ['label' => 'Reference', 'value' => '{{booking_reference}}'],
+                ['label' => 'Booking ID', 'value' => '{{booking_id}}'],
+                ['label' => 'Customer', 'value' => '{{customer_name}}'],
+                ['label' => 'Email', 'value' => '{{customer_email}}'],
+                ['label' => 'Trip', 'value' => '{{trip_name}}'],
+            ])
+            . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 0;"><tr>'
+            . '<td style="border-radius:10px;background:#2563eb;">'
+            . '<a href="{{admin_url}}" style="display:inline-block;padding:14px 24px;font-family:\'Segoe UI\',Roboto,Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;">'
+            . esc_html__('Open in Yatra admin', 'yatra')
+            . '</a></td></tr></table>';
+
+        return EmailTemplateLayout::admin(
+            '⏱️',
+            __('Booking expired', 'yatra'),
+            $inner,
+            '{{site_name}} · ' . esc_html__('Admin', 'yatra')
+        );
+    }
+
+    private static function htmlScheduledPaymentReminder(): string
+    {
+        $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">Hello {{customer_first_name}},</p>'
+            . '<p style="margin:0 0 20px;color:#475569;">'
+            . esc_html__('This is a reminder that a scheduled payment is coming up for your booking.', 'yatra')
+            . '</p>'
+            . EmailTemplateLayout::detailCard([
+                ['label' => 'Reference', 'value' => '{{booking_reference}}'],
+                ['label' => 'Amount', 'value' => '{{scheduled_amount_formatted}}'],
+                ['label' => 'Scheduled date', 'value' => '{{scheduled_date_formatted}}'],
+                ['label' => 'Type', 'value' => '{{payment_type_label}}'],
+            ])
+            . '<p style="margin:24px 0 0;font-size:14px;color:#64748b;">'
+            . esc_html__('If you need to update your payment method, contact us before the charge date.', 'yatra')
+            . '</p>';
+
+        return EmailTemplateLayout::customer(
+            '💳',
+            __('Upcoming payment', 'yatra'),
+            $inner,
+            '{{site_name}}',
+            __('Scheduled payment reminder', 'yatra')
+        );
+    }
+
+    private static function htmlScheduledPaymentSucceeded(): string
+    {
+        $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">Hello {{customer_first_name}},</p>'
+            . '<p style="margin:0 0 20px;color:#475569;">'
+            . esc_html__('Your scheduled payment was processed successfully.', 'yatra')
+            . '</p>'
+            . EmailTemplateLayout::detailCard([
+                ['label' => 'Reference', 'value' => '{{booking_reference}}'],
+                ['label' => 'Amount charged', 'value' => '{{scheduled_amount_formatted}}'],
+                ['label' => 'Type', 'value' => '{{payment_type_label}}'],
+                ['label' => 'Balance due now', 'value' => '{{balance_after_formatted}}'],
+            ]);
+
+        return EmailTemplateLayout::customer(
+            '✅',
+            __('Payment received', 'yatra'),
+            $inner,
+            '{{site_name}}',
+            __('Scheduled payment', 'yatra')
+        );
+    }
+
+    private static function htmlScheduledPaymentFailed(): string
+    {
+        $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">Hello {{customer_first_name}},</p>'
+            . '<p style="margin:0 0 20px;color:#475569;">'
+            . '{{failure_intro_html}}'
+            . '</p>'
+            . EmailTemplateLayout::detailCard([
+                ['label' => 'Reference', 'value' => '{{booking_reference}}'],
+                ['label' => 'Amount', 'value' => '{{scheduled_amount_formatted}}'],
+                ['label' => 'Details', 'value' => '{{failure_reason}}'],
+            ])
+            . '<p style="margin:24px 0 0;font-size:14px;color:#64748b;">{{failure_followup_html}}</p>';
+
+        return EmailTemplateLayout::customer(
+            '⚠️',
+            __('Payment issue', 'yatra'),
+            $inner,
+            '{{site_name}}',
+            __('Scheduled payment', 'yatra')
+        );
+    }
+
+    private static function htmlAdminScheduledPaymentFailed(): string
+    {
+        $inner = '<p style="margin:0 0 20px;color:#475569;">'
+            . esc_html__('A scheduled payment permanently failed after retries.', 'yatra')
+            . '</p>'
+            . EmailTemplateLayout::detailCard([
+                ['label' => 'Reference', 'value' => '{{booking_reference}}'],
+                ['label' => 'Customer', 'value' => '{{customer_name}}'],
+                ['label' => 'Email', 'value' => '{{customer_email}}'],
+                ['label' => 'Amount', 'value' => '{{scheduled_amount_formatted}}'],
+                ['label' => 'Error', 'value' => '{{failure_reason}}'],
+            ])
+            . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 0;"><tr>'
+            . '<td style="border-radius:10px;background:#2563eb;">'
+            . '<a href="{{admin_url}}" style="display:inline-block;padding:14px 24px;font-family:\'Segoe UI\',Roboto,Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;">'
+            . esc_html__('Open in Yatra admin', 'yatra')
+            . '</a></td></tr></table>';
+
+        return EmailTemplateLayout::admin(
+            '⚠️',
+            __('Scheduled payment failed', 'yatra'),
+            $inner,
+            '{{site_name}} · ' . esc_html__('Admin', 'yatra')
+        );
+    }
+
+    private static function htmlAbandonedBookingRecovery(): string
+    {
+        $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">Hello {{customer_name}},</p>'
+            . '<p style="margin:0 0 20px;color:#475569;">{{recovery_intro_html}}</p>'
+            . EmailTemplateLayout::detailCard([
+                ['label' => 'Trip', 'value' => '{{trip_name}}'],
+                ['label' => 'Reminder', 'value' => '{{recovery_reminder_label}}'],
+            ])
+            . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0;"><tr>'
+            . '<td style="border-radius:10px;background:#0d9488;">'
+            . '<a href="{{recovery_link}}" style="display:inline-block;padding:14px 28px;font-family:\'Segoe UI\',Roboto,Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;">'
+            . esc_html__('Continue booking', 'yatra')
+            . '</a></td></tr></table>'
+            . '<p style="margin:20px 0 0;font-size:13px;color:#64748b;">'
+            . esc_html__('If you did not start this booking, you can ignore this email.', 'yatra')
+            . '</p>';
+
+        return EmailTemplateLayout::customer(
+            '🛒',
+            __('Complete your booking', 'yatra'),
+            $inner,
+            '{{site_name}}',
+            __('Abandoned checkout', 'yatra')
+        );
+    }
+
+    public static function fallbackTransactionalBookingCompleted(array $v): string
+    {
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlTripCompleted(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
+    }
+
+    public static function fallbackTransactionalBookingExpiredCustomer(array $v): string
+    {
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlBookingExpiredCustomer(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
+    }
+
+    public static function fallbackAdminBookingExpired(array $v): string
+    {
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlAdminBookingExpired(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
+    }
+
+    public static function fallbackTransactionalScheduledPaymentReminder(array $v): string
+    {
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlScheduledPaymentReminder(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
+    }
+
+    public static function fallbackTransactionalScheduledPaymentSucceeded(array $v): string
+    {
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlScheduledPaymentSucceeded(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
+    }
+
+    public static function fallbackTransactionalScheduledPaymentFailed(array $v): string
+    {
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlScheduledPaymentFailed(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
+    }
+
+    public static function fallbackAdminScheduledPaymentFailed(array $v): string
+    {
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlAdminScheduledPaymentFailed(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
+    }
+
+    public static function fallbackTransactionalEnquiryAdmin(array $v): string
+    {
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlEnquiryAdmin(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
+    }
+
+    public static function fallbackTransactionalEnquiryReceived(array $v): string
+    {
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlEnquiryCustomer(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
+    }
+
+    public static function fallbackTransactionalEnquiryResponse(array $v): string
+    {
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlEnquiryResponse(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
+    }
+
+    public static function fallbackTransactionalReviewRequest(array $v): string
+    {
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlReviewRequest(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
+    }
+
+    public static function fallbackTransactionalAbandonedBookingRecovery(array $v): string
+    {
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlAbandonedBookingRecovery(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
+    }
+
     /**
      * Merge-tag variables for enquiry templates (core wp_mail path when Pro does not own the channel).
      *
@@ -761,17 +1228,7 @@ final class EmailTemplateDefaults
      */
     private static function enquiryVariablesForTemplates(object $enquiry, string $responsePlain): array
     {
-        $trip = trim((string) ($enquiry->trip_title ?? ''));
-
-        return [
-            'customer_name' => (string) ($enquiry->name ?? ''),
-            'customer_email' => (string) ($enquiry->email ?? ''),
-            'customer_phone' => (string) ($enquiry->phone ?? ''),
-            'trip_name' => $trip !== '' ? $trip : __('General enquiry', 'yatra'),
-            'message' => nl2br(esc_html((string) ($enquiry->message ?? ''))),
-            'response' => $responsePlain !== '' ? nl2br(esc_html($responsePlain)) : '',
-            'response_message' => $responsePlain !== '' ? nl2br(esc_html($responsePlain)) : '',
-        ];
+        return TransactionalEmailTemplateService::variablesFromEnquiry($enquiry, $responsePlain);
     }
 
     /**

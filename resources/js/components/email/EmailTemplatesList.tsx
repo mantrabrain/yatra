@@ -30,7 +30,7 @@ import {
   Lock,
   Eye,
 } from "lucide-react";
-import { isProPluginActive } from "../../lib/plugin-utils";
+import { isProPluginActive, isModuleActive } from "../../lib/plugin-utils";
 import {
   buildLocalTemplateRows,
   EMAIL_TEMPLATES_CATALOG,
@@ -79,6 +79,15 @@ export type EmailTemplatesListProps = {
     onFieldChange: EmailFieldChangeHandler;
   };
 };
+
+/** Module required by catalog but not active — template stays visible; content is view-only in free UI. */
+function isModuleGatedLocked(template: UnifiedEmailTemplate): boolean {
+  const entry = getCatalogEntryByTemplateKey(template.template_key);
+  if (!entry?.requiresModule) {
+    return false;
+  }
+  return !isProPluginActive() || !isModuleActive(entry.requiresModule);
+}
 
 const getEffectiveRecipientType = (
   template: UnifiedEmailTemplate,
@@ -194,7 +203,10 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
 
   const localTemplates = useMemo(() => {
     if (automationModuleActive || !settingsBridge) return [];
-    return buildLocalTemplateRows(settingsBridge.values);
+    return buildLocalTemplateRows(settingsBridge.values, {
+      isProPluginActive: isProPluginActive(),
+      isModuleActive,
+    });
   }, [automationModuleActive, settingsBridge]);
 
   const templates = automationModuleActive ? apiTemplates : localTemplates;
@@ -390,20 +402,24 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
   }, []);
 
   const handleEdit = (template: UnifiedEmailTemplate) => {
-    if (template.is_locked) {
-      handleLockedNavigate();
+    if (!template.is_locked) {
+      const proId = toNumericTemplateId(template.id);
+      if (automationModuleActive && proId !== null) {
+        window.location.href = `admin.php?page=yatra&subpage=email-automation&tab=templates&action=edit&id=${proId}`;
+        return;
+      }
+      window.location.href = `admin.php?page=yatra&subpage=email-automation&tab=templates&action=edit&core_template=${encodeURIComponent(template.template_key)}`;
       return;
     }
-    const proId = toNumericTemplateId(template.id);
-    if (automationModuleActive && proId !== null) {
-      window.location.href = `admin.php?page=yatra&subpage=email-automation&tab=templates&action=edit&id=${proId}`;
+    if (isModuleGatedLocked(template)) {
+      window.location.href = `admin.php?page=yatra&subpage=email-automation&tab=templates&action=edit&core_template=${encodeURIComponent(template.template_key)}`;
       return;
     }
-    window.location.href = `admin.php?page=yatra&subpage=email-automation&tab=templates&action=edit&core_template=${encodeURIComponent(template.template_key)}`;
+    handleLockedNavigate();
   };
 
   const handlePreview = (template: UnifiedEmailTemplate) => {
-    if (template.is_locked) {
+    if (template.is_locked && !isModuleGatedLocked(template)) {
       return;
     }
     const numericId = toNumericTemplateId(template.id);
@@ -511,13 +527,15 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
               {template.is_locked ? (
                 <button
                   type="button"
-                  onClick={() => handleLockedNavigate()}
+                  onClick={() => handleEdit(template)}
                   className="text-left font-medium text-gray-600 dark:text-gray-300 hover:text-amber-700 dark:hover:text-amber-400"
                 >
                   {template.name}
                   <Lock className="inline-block w-3.5 h-3.5 ml-1.5 -mt-0.5 opacity-70" />
                   <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
-                    {__("Pro", "yatra")}
+                    {isModuleGatedLocked(template)
+                      ? __("View only", "yatra")
+                      : __("Pro", "yatra")}
                   </span>
                 </button>
               ) : (
@@ -651,9 +669,12 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
       render: (template: UnifiedEmailTemplate) => (
         <Switch
           checked={template.is_active}
-          disabled={template.is_locked || toggleMutation.isPending}
+          disabled={
+            (template.is_locked && !isModuleGatedLocked(template)) ||
+            toggleMutation.isPending
+          }
           onCheckedChange={(checked) => {
-            if (template.is_locked) return;
+            if (template.is_locked && !isModuleGatedLocked(template)) return;
             const proId = toNumericTemplateId(template.id);
             if (automationModuleActive && proId !== null) {
               toggleMutation.mutate({ id: proId, is_active: checked });
@@ -677,7 +698,8 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
       label: __("Preview", "yatra"),
       icon: <Eye className="w-4 h-4" />,
       onClick: handlePreview,
-      condition: (template: UnifiedEmailTemplate) => !template.is_locked,
+      condition: (template: UnifiedEmailTemplate) =>
+        !template.is_locked || isModuleGatedLocked(template),
     },
     {
       key: "edit",
@@ -744,7 +766,7 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
       {!automationModuleActive && (
         <p className="text-sm text-gray-600 dark:text-gray-400">
           {__(
-            "Edit the four core customer emails below. Other rows are included so you see the full automation catalog; enable Email Automation (Yatra Pro) to unlock them.",
+            "Templates backed by site settings can be edited here. Rows for Yatra Pro Email Automation or optional modules stay visible with their on/off state; open a View only row to inspect content, or enable Pro or the module to edit HTML and unlock automation.",
             "yatra",
           )}
         </p>

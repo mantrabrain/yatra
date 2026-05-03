@@ -125,13 +125,6 @@ class InstallerService
         update_option('yatra_deposit_percentage', 20);
         update_option('yatra_partial_payment_percentage', 30);
         
-        // Scheduled Payment Settings - Match SettingsService defaults
-        update_option('yatra_enable_scheduled_payments', false);
-        update_option('yatra_scheduled_payment_type', 'single');
-        update_option('yatra_scheduled_payment_days', 15);
-        update_option('yatra_scheduled_payment_installments', 1);
-        update_option('yatra_scheduled_payment_interval', 30);
-        update_option('yatra_scheduled_payment_reminder_days', 3);
         update_option('yatra_allow_save_payment_methods', false);
         
         // Trip Settings - Match SettingsService defaults
@@ -183,7 +176,21 @@ class InstallerService
         update_option('yatra_email_template_admin_new_booking', true);
         update_option('yatra_email_template_admin_payment', true);
         update_option('yatra_email_template_admin_cancellation', true);
-        
+        update_option('yatra_email_template_trip_consent', true);
+        update_option('yatra_email_template_customer_verification', true);
+        update_option('yatra_email_template_booking_completed', true);
+        update_option('yatra_email_template_booking_expired_customer', true);
+        update_option('yatra_email_template_admin_booking_expired', true);
+        update_option('yatra_email_template_scheduled_payment_reminder', true);
+        update_option('yatra_email_template_scheduled_payment_succeeded', true);
+        update_option('yatra_email_template_scheduled_payment_failed', true);
+        update_option('yatra_email_template_admin_scheduled_payment_failed', true);
+        update_option('yatra_email_template_enquiry_received', true);
+        update_option('yatra_email_template_enquiry_admin', true);
+        update_option('yatra_email_template_enquiry_response', true);
+        update_option('yatra_email_template_review_request', true);
+        update_option('yatra_email_template_abandoned_booking_recovery', true);
+
         // Clear any existing Stripe/PayPal settings that might exist
         delete_option('yatra_stripe_settings');
         delete_option('yatra_paypal_settings');
@@ -207,8 +214,6 @@ class InstallerService
             \Yatra\Database\Tables\TripsTable::class,
             \Yatra\Database\Tables\BookingsTable::class,
             \Yatra\Database\Tables\BookingPaymentsTable::class,
-            \Yatra\Database\Tables\ScheduledPaymentsTable::class,
-            \Yatra\Database\Tables\PaymentTokensTable::class,
             \Yatra\Database\Tables\CustomersTable::class,
             \Yatra\Database\Tables\BookingTravellersTable::class,
             \Yatra\Database\Tables\BookingTravellerMetaTable::class,
@@ -351,6 +356,9 @@ class InstallerService
         add_option('yatra_email_template_admin_payment', 1);
         add_option('yatra_email_template_admin_cancellation', 1);
 
+        self::maybeBackfillCustomerEmailVerificationTemplate();
+        self::maybeBackfillExtendedTransactionalEmailOptionsV2();
+
         if (!get_option('yatra_email_identity_synced_v1')) {
             $from = get_option('yatra_from_email', '');
             if (($from === false || $from === '') && ($legacy = get_option('yatra_email_from_address', '')) && is_string($legacy) && $legacy !== '') {
@@ -377,5 +385,103 @@ class InstallerService
         }
 
         update_option('yatra_email_tpl_defaults_backfill_1', '1');
+    }
+
+    /**
+     * One-time: customer email verification template (Email → Templates) for existing installs.
+     */
+    private static function maybeBackfillCustomerEmailVerificationTemplate(): void
+    {
+        if (get_option('yatra_email_customer_verification_tpl_v1')) {
+            return;
+        }
+
+        add_option('yatra_email_template_customer_verification', true);
+
+        $defaults = EmailTemplateDefaults::settingsOptionDefaults();
+        foreach (['email_tpl_customer_verification_subject', 'email_tpl_customer_verification_body'] as $key) {
+            if (!isset($defaults[$key])) {
+                continue;
+            }
+            $name = 'yatra_' . $key;
+            $current = get_option($name, false);
+            $isEmpty = $current === false || $current === '' || (is_string($current) && trim($current) === '');
+            if ($isEmpty) {
+                update_option($name, $defaults[$key]);
+            }
+        }
+
+        update_option('yatra_email_customer_verification_tpl_v1', '1');
+    }
+
+    /**
+     * One-time: enable flags + default HTML for extended transactional templates (completed, expiry, scheduled, enquiry, review, abandoned).
+     * Only writes options that are still empty so existing customized HTML in the database is preserved on plugin update.
+     */
+    private static function maybeBackfillExtendedTransactionalEmailOptionsV2(): void
+    {
+        if (get_option('yatra_email_tpl_extended_v2')) {
+            return;
+        }
+
+        $boolFlags = [
+            'email_template_booking_completed',
+            'email_template_booking_expired_customer',
+            'email_template_admin_booking_expired',
+            'email_template_scheduled_payment_reminder',
+            'email_template_scheduled_payment_succeeded',
+            'email_template_scheduled_payment_failed',
+            'email_template_admin_scheduled_payment_failed',
+            'email_template_enquiry_received',
+            'email_template_enquiry_admin',
+            'email_template_enquiry_response',
+            'email_template_review_request',
+            'email_template_abandoned_booking_recovery',
+        ];
+        foreach ($boolFlags as $flag) {
+            add_option('yatra_' . $flag, true);
+        }
+
+        $extendedContentKeys = [
+            'email_tpl_booking_completed_subject',
+            'email_tpl_booking_completed_body',
+            'email_tpl_booking_expired_customer_subject',
+            'email_tpl_booking_expired_customer_body',
+            'email_tpl_admin_booking_expired_subject',
+            'email_tpl_admin_booking_expired_body',
+            'email_tpl_scheduled_payment_reminder_subject',
+            'email_tpl_scheduled_payment_reminder_body',
+            'email_tpl_scheduled_payment_succeeded_subject',
+            'email_tpl_scheduled_payment_succeeded_body',
+            'email_tpl_scheduled_payment_failed_subject',
+            'email_tpl_scheduled_payment_failed_body',
+            'email_tpl_admin_scheduled_payment_failed_subject',
+            'email_tpl_admin_scheduled_payment_failed_body',
+            'email_tpl_enquiry_admin_subject',
+            'email_tpl_enquiry_admin_body',
+            'email_tpl_enquiry_received_subject',
+            'email_tpl_enquiry_received_body',
+            'email_tpl_enquiry_response_subject',
+            'email_tpl_enquiry_response_body',
+            'email_tpl_review_request_subject',
+            'email_tpl_review_request_body',
+            'email_tpl_abandoned_booking_recovery_subject',
+            'email_tpl_abandoned_booking_recovery_body',
+        ];
+
+        $defaults = EmailTemplateDefaults::settingsOptionDefaults();
+        foreach ($extendedContentKeys as $key) {
+            if (!isset($defaults[$key])) {
+                continue;
+            }
+            $name = 'yatra_' . $key;
+            $current = get_option($name, false);
+            $isEmpty = $current === false || $current === '' || (is_string($current) && trim($current) === '');
+            if ($isEmpty) {
+                update_option($name, $defaults[$key]);
+            }
+        }
+
+        update_option('yatra_email_tpl_extended_v2', '1');
     }
 }

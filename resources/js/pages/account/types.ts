@@ -13,6 +13,9 @@ export interface Booking {
   trip_id: number;
   booking_date: string;
   travel_date: string;
+  /** Trip end (multi-day); optional on older rows. */
+  end_date?: string | null;
+  start_date?: string | null;
   travelers: number;
   total_amount: number;
   amount_paid?: number | null;

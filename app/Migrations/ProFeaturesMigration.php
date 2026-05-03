@@ -47,6 +47,7 @@ class ProFeaturesMigration extends BaseMigration
         'mailchimp',
         'facebook_pixel',
         'flexible_payments',
+        'scheduled_payments',
         'dynamic_pricing',
     ];
 

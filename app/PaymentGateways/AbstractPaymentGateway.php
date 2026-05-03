@@ -220,7 +220,7 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
      */
     public function supportsRecurring(): bool
     {
-        return in_array('recurring', $this->supports) || in_array('scheduled_payments', $this->supports);
+        return in_array('recurring', $this->supports, true);
     }
 
     /**

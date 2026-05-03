@@ -152,8 +152,8 @@ const TripConsentPremium: React.FC = () => {
 
       {/* Hero Section */}
       <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900 mb-6">
-          <FileSignature className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 mb-6">
+          <FileSignature className="w-8 h-8 text-blue-600 dark:text-blue-400" />
         </div>
         <div className="flex items-center justify-center space-x-2 mb-4">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
@@ -182,8 +182,8 @@ const TripConsentPremium: React.FC = () => {
             >
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -215,8 +215,8 @@ const TripConsentPremium: React.FC = () => {
               >
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                    <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -249,8 +249,8 @@ const TripConsentPremium: React.FC = () => {
               >
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
@@ -259,7 +259,7 @@ const TripConsentPremium: React.FC = () => {
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                         {consentType.description}
                       </p>
-                      <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300">
+                      <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
                         {consentType.required ? __("Required") : __("Optional")}
                       </div>
                     </div>
@@ -272,12 +272,12 @@ const TripConsentPremium: React.FC = () => {
       </div>
 
       {/* CTA Section */}
-      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl p-8">
+      <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-xl p-8">
         <div className="flex flex-col md:flex-row items-center justify-between">
           <div className="mb-6 md:mb-0 md:pr-8">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+              <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {__("Ensure Legal Compliance")}
@@ -290,19 +290,19 @@ const TripConsentPremium: React.FC = () => {
             </p>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
+                <CheckCircle className="w-4 h-4 text-blue-500" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {__("Digital signatures")}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
+                <CheckCircle className="w-4 h-4 text-blue-500" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {__("Legal compliance")}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
+                <CheckCircle className="w-4 h-4 text-blue-500" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {__("Automated delivery")}
                 </span>
@@ -311,7 +311,7 @@ const TripConsentPremium: React.FC = () => {
           </div>
           <div className="flex flex-col items-center">
             <Button
-              className="bg-indigo-600 text-white hover:bg-indigo-700 px-8 py-3 text-sm font-medium mb-3"
+              className="bg-blue-600 text-white hover:bg-blue-700 px-8 py-3 text-sm font-medium mb-3"
               onClick={() =>
                 window.open(
                   "https://wpyatra.com/pricing?module=trip-consent",

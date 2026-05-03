@@ -92,10 +92,18 @@ if (!defined('ABSPATH')) {
         </div>
     </div>
 
-    <!-- Price -->
-    <?php 
-    $original_price = $trip->getOriginalPrice();
-    if ($original_price > 0): 
+    <!-- Price (aligned with booking sidebar — TripPricingService, not legacy trip-level sale/original only) -->
+    <?php
+    $dp = (isset($display_pricing) && is_array($display_pricing))
+        ? $display_pricing
+        : \Yatra\Services\TripPricingService::resolveDisplayPricing($trip);
+    $qf_current = (float) ($dp['effective_price_min'] ?? 0);
+    $qf_original = (float) ($dp['min_category_original_price'] ?? 0);
+    if ($qf_original <= 0 && $qf_current > 0) {
+        $qf_original = (float) ($trip->getOriginalPrice() ?? 0);
+    }
+    if ($qf_current > 0 || $qf_original > 0):
+        $show_strike = $qf_original > 0 && $qf_current > 0 && $qf_current < $qf_original;
     ?>
         <div class="yatra-quick-fact">
             <div class="yatra-quick-fact-icon">
@@ -104,15 +112,14 @@ if (!defined('ABSPATH')) {
             <div class="yatra-quick-fact-content">
                 <div class="yatra-quick-fact-label"><?php echo esc_html__('Price', 'yatra'); ?></div>
                 <div class="yatra-quick-fact-value">
-                    <?php 
-                    $sale_price = $trip->getSalePrice();
-                    if ($sale_price > 0 && $sale_price < $original_price) {
-                        echo '<span class="yatra-price-current">' . yatra_format_price($sale_price) . '</span>';
-                        echo ' <span class="yatra-price-original">' . yatra_format_price($original_price) . '</span>';
-                    } else {
-                        echo '<span class="yatra-price-current">' . yatra_format_price($original_price) . '</span>';
-                    }
-                    ?>
+                    <?php if ($qf_current > 0): ?>
+                        <span class="yatra-price-current"><?php echo esc_html(yatra_format_price($qf_current)); ?></span>
+                        <?php if ($show_strike): ?>
+                            <span class="yatra-price-original"><?php echo esc_html(yatra_format_price($qf_original)); ?></span>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <span class="yatra-price-current"><?php echo esc_html(yatra_format_price($qf_original)); ?></span>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

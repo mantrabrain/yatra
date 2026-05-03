@@ -6,6 +6,7 @@ namespace Yatra\Services;
 
 use Yatra\Shortcodes\ActivityShortcode;
 use Yatra\Shortcodes\DestinationShortcode;
+use Yatra\Shortcodes\TripCategoryShortcode;
 
 /**
  * Block Data Service
@@ -63,6 +64,26 @@ class BlockDataService
             'per_page' => 10,
             'title' => 'Destination Showcase',
             'show_pagination' => true,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function defaultTripCategoryBlockAttributes(): array
+    {
+        return [
+            'order' => 'desc',
+            'columns' => 3,
+            'per_page' => 10,
+            'title' => 'Trip Categories',
+            'show_pagination' => true,
+            'category' => '',
+            'show_trip_count' => true,
+            'show_description' => true,
+            'show_image' => true,
+            'hide_empty' => true,
+            'featured_only' => false,
         ];
     }
 
@@ -345,6 +366,19 @@ class BlockDataService
     }
 
     /**
+     * Render trip category block (same card UI as destinations).
+     *
+     * @param array<string, mixed> $attributes
+     */
+    public static function renderTripCategoryBlock(array $attributes): string
+    {
+        $shortcode = new TripCategoryShortcode();
+        $merged = wp_parse_args(is_array($attributes) ? $attributes : [], self::defaultTripCategoryBlockAttributes());
+
+        return $shortcode->render(self::mapTripCategoryAttributes($merged));
+    }
+
+    /**
      * Map activity block attributes to shortcode format (full set for shortcode_atts merge).
      *
      * @param array<string, mixed> $attributes Merged with defaults
@@ -399,6 +433,47 @@ class BlockDataService
             'columns' => (string) $cols,
             'title' => sanitize_text_field((string) ($attributes['title'] ?? 'Destination Showcase')),
             'show_pagination' => $showPag ? 'yes' : 'no',
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     * @return array<string, string>
+     */
+    private static function mapTripCategoryAttributes(array $attributes): array
+    {
+        $order = strtolower((string) ($attributes['order'] ?? 'desc'));
+        $order = in_array($order, ['asc', 'desc'], true) ? $order : 'desc';
+
+        $perPage = (int) ($attributes['per_page'] ?? 10);
+        if ($perPage === -1) {
+            $perPage = 10;
+        }
+        $perPage = max(1, min(100, $perPage));
+
+        $cols = max(1, min(self::LISTING_COLUMNS_MAX, (int) ($attributes['columns'] ?? 3)));
+
+        $showPag = self::coerceToBool($attributes['show_pagination'] ?? true, true);
+        $showTripCount = self::coerceToBool($attributes['show_trip_count'] ?? true, true);
+        $showDescription = self::coerceToBool($attributes['show_description'] ?? true, true);
+        $showImage = self::coerceToBool($attributes['show_image'] ?? true, true);
+        $hideEmpty = self::coerceToBool($attributes['hide_empty'] ?? true, true);
+        $featuredOnly = self::coerceToBool($attributes['featured_only'] ?? false, false);
+
+        $category = isset($attributes['category']) ? sanitize_text_field((string) $attributes['category']) : '';
+
+        return [
+            'order' => $order,
+            'per_page' => (string) $perPage,
+            'columns' => (string) $cols,
+            'title' => sanitize_text_field((string) ($attributes['title'] ?? 'Trip Categories')),
+            'show_pagination' => $showPag ? 'yes' : 'no',
+            'category' => $category,
+            'show_trip_count' => $showTripCount ? 'yes' : 'no',
+            'show_description' => $showDescription ? 'yes' : 'no',
+            'show_image' => $showImage ? 'yes' : 'no',
+            'hide_empty' => $hideEmpty ? 'yes' : 'no',
+            'featured_only' => $featuredOnly ? 'yes' : 'no',
         ];
     }
 }

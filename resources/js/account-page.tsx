@@ -8,6 +8,7 @@ import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AccountPage from "./pages/AccountPage";
 import { ToastProvider } from "./components/ui/toast";
+import { __ } from "./lib/i18n";
 import "./css/index.css";
 
 // Create React Query client
@@ -39,7 +40,17 @@ if (rootElement) {
     );
   } catch (error) {
     console.error("Error rendering account page:", error);
-    rootElement.innerHTML =
-      '<div style="padding: 40px; text-align: center;"><h2>Error loading account page</h2><p>Please refresh the page or contact support.</p></div>';
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "padding: 40px; text-align: center;";
+    const h2 = document.createElement("h2");
+    h2.textContent = __("Error loading account page", "yatra");
+    const p = document.createElement("p");
+    p.textContent = __(
+      "Please refresh the page or contact support if the problem continues.",
+      "yatra",
+    );
+    wrap.appendChild(h2);
+    wrap.appendChild(p);
+    rootElement.replaceChildren(wrap);
   }
 }

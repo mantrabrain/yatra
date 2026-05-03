@@ -8,6 +8,23 @@ interface DocumentsProps {
   documents: TravelDocument[];
 }
 
+function documentCategoryLabel(
+  category: TravelDocument["category"] | string,
+): string {
+  switch (category) {
+    case "itinerary":
+      return __("Itinerary", "yatra");
+    case "voucher":
+      return __("Voucher", "yatra");
+    case "invoice":
+      return __("Invoice", "yatra");
+    case "downloads":
+      return __("Downloads", "yatra");
+    default:
+      return category;
+  }
+}
+
 const Documents: React.FC<DocumentsProps> = ({ documents }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<
@@ -204,7 +221,7 @@ const Documents: React.FC<DocumentsProps> = ({ documents }) => {
                           </span>
                         )}
                         <span className="px-3 py-1 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 capitalize">
-                          {doc.category}
+                          {documentCategoryLabel(doc.category)}
                         </span>
                       </div>
                     </div>

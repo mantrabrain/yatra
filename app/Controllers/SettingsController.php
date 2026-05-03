@@ -92,6 +92,20 @@ class SettingsController extends BaseController
         'email_template_admin_new_booking' => true,
         'email_template_admin_payment' => true,
         'email_template_admin_cancellation' => true,
+        'email_template_trip_consent' => true,
+        'email_template_customer_verification' => true,
+        'email_template_booking_completed' => true,
+        'email_template_booking_expired_customer' => true,
+        'email_template_admin_booking_expired' => true,
+        'email_template_scheduled_payment_reminder' => true,
+        'email_template_scheduled_payment_succeeded' => true,
+        'email_template_scheduled_payment_failed' => true,
+        'email_template_admin_scheduled_payment_failed' => true,
+        'email_template_enquiry_received' => true,
+        'email_template_enquiry_admin' => true,
+        'email_template_enquiry_response' => true,
+        'email_template_review_request' => true,
+        'email_template_abandoned_booking_recovery' => true,
         'smtp_enabled' => false,
         'smtp_host' => 'smtp.gmail.com',
         'smtp_port' => 587,
@@ -349,6 +363,30 @@ class SettingsController extends BaseController
                 $settings = array_merge($settings, $flexible_payment_settings);
             }
 
+            $scheduled_payment_settings = apply_filters('yatra_get_scheduled_payment_settings', []);
+            if (!empty($scheduled_payment_settings)) {
+                $settings = array_merge($settings, $scheduled_payment_settings);
+            }
+
+            // Scheduled payment keys are owned by Pro (yatra_pro_scheduled_payments), not yatra_* options.
+            foreach (
+                [
+                    'enable_scheduled_payments',
+                    'scheduled_payment_type',
+                    'scheduled_payment_days',
+                    'scheduled_payment_installments',
+                    'scheduled_payment_interval',
+                    'scheduled_payment_reminder_days',
+                ] as $sk
+            ) {
+                if (array_key_exists($sk, $this->default_settings)) {
+                    $settings[$sk] = \Yatra\Services\SettingsService::get(
+                        $sk,
+                        $this->default_settings[$sk]
+                    );
+                }
+            }
+
             $settings = $this->syncAccountRouteSettingsForResponse($settings);
 
             return $this->success_response($settings);
@@ -377,17 +415,28 @@ class SettingsController extends BaseController
             
             // Check if Flexible Payments module is enabled (Pro feature)
             $is_flexible_payments_enabled = apply_filters('yatra_flexible_payments_enabled', false);
+
+            $is_scheduled_payments_module = apply_filters('yatra_scheduled_payments_module_active', false);
             
             // Flexible payment settings keys (Pro only)
             $flexible_payment_keys = [
                 'deposit_required', 'deposit_percentage', 'partial_payment', 
-                'partial_payment_percentage', 'enable_deposit', 'enable_scheduled_payments',
-                'scheduled_payment_type', 'scheduled_payment_days', 'scheduled_payment_installments',
-                'scheduled_payment_interval', 'scheduled_payment_reminder_days', 'allow_save_payment_methods',
+                'partial_payment_percentage', 'enable_deposit', 'allow_save_payment_methods',
+            ];
+
+            $scheduled_payment_keys = [
+                'enable_scheduled_payments',
+                'scheduled_payment_type',
+                'scheduled_payment_days',
+                'scheduled_payment_installments',
+                'scheduled_payment_interval',
+                'scheduled_payment_reminder_days',
             ];
             
             // Collect flexible payment settings to delegate to Pro
             $flexible_payment_settings = [];
+
+            $scheduled_payment_settings_batch = [];
             
             // Process each setting
             foreach ($data as $key => $value) {
@@ -403,6 +452,13 @@ class SettingsController extends BaseController
                         $flexible_payment_settings[$key] = $value;
                     }
                     // Skip saving in Free plugin - Pro handles these
+                    continue;
+                }
+
+                if (in_array($key, $scheduled_payment_keys, true)) {
+                    if ($is_scheduled_payments_module) {
+                        $scheduled_payment_settings_batch[$key] = $value;
+                    }
                     continue;
                 }
 
@@ -444,6 +500,11 @@ class SettingsController extends BaseController
             if (!empty($flexible_payment_settings) && $is_flexible_payments_enabled) {
                 do_action('yatra_save_flexible_payment_settings', $flexible_payment_settings);
                 $updated = array_merge($updated, array_keys($flexible_payment_settings));
+            }
+
+            if (!empty($scheduled_payment_settings_batch) && $is_scheduled_payments_module) {
+                do_action('yatra_save_scheduled_payment_settings', $scheduled_payment_settings_batch);
+                $updated = array_merge($updated, array_keys($scheduled_payment_settings_batch));
             }
 
             // Sync currency keys: keep 'currency' and 'default_currency' in sync

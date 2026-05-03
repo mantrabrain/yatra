@@ -114,12 +114,14 @@ Use the **block editor** or **classic shortcodes** to drop catalog widgets, sear
 * **Tour** — block name `yatra/tour` (trip grid; same data options as the **`[yatra_trip]`** shortcode).
 * **Activity** — `yatra/activity`.
 * **Destination** — `yatra/destination`.
+* **Trip categories** — `yatra/trip-category` (same card layout as destinations; links use your trip category base from Settings).
 
 **Shortcodes** (attributes shown are the main filters; all accept string values as in the plugin defaults—use `yes` / `no` or `0` / `1` where noted):
 
 * **`[yatra_trip]`** — Trip listing. Alias: **`[yatra_tour]`** (same output; kept for backward compatibility). Useful attributes include `order` (asc or desc), `featured` (0 or 1), `per_page`, `category`, `destination`, `activity`, `difficulty`, `price_min`, `price_max`, `duration_min`, `duration_max`, `search`, `columns`, `show_pagination` (yes or no), `title`. Example: `[yatra_trip featured="1" per_page="6" columns="3"]`
 * **`[yatra_activity]`** — Activity archive-style listing. Attributes include `order`, `per_page`, `columns`, `activity` (slug or comma-separated slugs), `show_trip_count`, `show_description`, `show_image`, `show_pagination`, `hide_empty` (yes or no), `title`.
 * **`[yatra_destination]`** — Destination showcase. Attributes include `order`, `per_page`, `columns`, `destination` (slug or comma-separated slugs), `show_trip_count`, `show_description`, `show_image`, `show_pagination`, `hide_empty`, `featured_only` (yes or no), `title`.
+* **`[yatra_trip_category]`** — Trip category showcase (same card UI as destinations). Attributes include `order`, `per_page`, `columns`, `category` (slug or comma-separated slugs), `show_trip_count`, `show_description`, `show_image`, `show_pagination`, `hide_empty`, `featured_only` (yes or no), `title`.
 * **`[yatra_search]`** — Advanced tour search form. Toggle parts with `show_filters`, `show_categories`, `show_destinations`, `show_activities`, `show_price_range`, `show_duration`, `show_difficulty` (yes or no), plus `placeholder` and `button_text`.
 * **`[yatra_login]`** — Customer login form. Attributes include `show_register`, `show_forgot_password`, `remember_me` (yes or no), `redirect_url`, `title`, `subtitle`.
 * **`[yatra_my_account]`** — Account dashboard for logged-in users (same React experience as the virtual account URL). Legacy attributes are accepted for backward compatibility but do not change the 3.x UI.

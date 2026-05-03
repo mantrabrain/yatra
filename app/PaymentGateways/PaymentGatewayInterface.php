@@ -52,7 +52,7 @@ interface PaymentGatewayInterface
 
     /**
      * Get supported features
-     * @return array e.g., ['credit_card', 'refunds', 'recurring', 'tokenization', 'scheduled_payments']
+     * @return array e.g., ['credit_card', 'refunds', 'recurring', 'tokenization']
      */
     public function getSupports(): array;
 

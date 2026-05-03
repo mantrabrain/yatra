@@ -26,6 +26,7 @@ import {
   formatDate,
   getYatraAccountPageGlobals,
   phoneToTelHref,
+  currency as formatAccountCurrency,
 } from "./account/utils";
 import Dashboard from "./account/Dashboard";
 import Bookings from "./account/Bookings";
@@ -381,13 +382,7 @@ const AccountPage: React.FC = () => {
 
   // Booking details fetching moved to Bookings component
 
-  const currency = (value: number) =>
-    new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency: "USD",
-    }).format(value);
-
-  // formatDate imported from ./account/utils
+  // formatDate / site currency from ./account/utils
 
   const stats = useMemo(() => {
     const outstanding = payments
@@ -415,12 +410,12 @@ const AccountPage: React.FC = () => {
       },
       {
         label: __("Outstanding Balance", "yatra"),
-        value: currency(outstanding),
+        value: formatAccountCurrency(outstanding),
         icon: DollarSign,
       },
       {
         label: __("Total Spent", "yatra"),
-        value: currency(totalSpent),
+        value: formatAccountCurrency(totalSpent),
         icon: ShieldCheck,
       },
     ];

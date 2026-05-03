@@ -295,22 +295,26 @@ class CalculationService
      */
     private function resolvePricingType(object $trip, ?object $availability): string
     {
-        // The trip's pricing_type defines the pricing MODEL (regular vs traveler_based)
-        // Note: availability date's pricing_type enum ('regular','discounted','special') is
-        // about price STATE, not pricing model — do NOT use it here.
-        $pricing_type = $trip->pricing_type ?? 'regular';
-        
-        // Override to traveler_based if availability has its own price_types
+        // Authoritative model matches {@see TripPricingService::resolvePricingType}:
+        // explicit "regular" must not be overridden by inherited/stale availability price_types.
+        $trip_model = TripPricingService::resolvePricingType($trip);
+
+        if ($trip_model !== 'traveler_based') {
+            return 'regular';
+        }
+
+        // Traveler-based trip: use per-date categories when that row defines them; otherwise caller
+        // falls back to trip-level price_types via {@see self::resolvePriceTypes()}.
         if ($availability && !empty($availability->price_types)) {
             $types = is_string($availability->price_types)
                 ? json_decode($availability->price_types, true)
                 : $availability->price_types;
             if (!empty($types) && is_array($types)) {
-                $pricing_type = 'traveler_based';
+                return 'traveler_based';
             }
         }
-        
-        return $pricing_type;
+
+        return 'traveler_based';
     }
     
     /**
@@ -318,6 +322,10 @@ class CalculationService
      */
     private function resolvePriceTypes(object $trip, ?object $availability): array
     {
+        if (TripPricingService::resolvePricingType($trip) === 'regular') {
+            return [];
+        }
+
         $types = [];
         
         // Priority 1: Availability price_types
@@ -439,15 +447,7 @@ class CalculationService
                 $category_id = $pt['category_id'] ?? 0;
                 $pricing_mode = $pt['pricing_mode'] ?? 'per_person';
                 
-                // Priority: discounted_price → sale_price → original_price
-                $category_price = 0.0;
-                if (!empty($pt['discounted_price']) && (float) $pt['discounted_price'] > 0) {
-                    $category_price = (float) $pt['discounted_price'];
-                } elseif (!empty($pt['sale_price']) && (float) $pt['sale_price'] > 0) {
-                    $category_price = (float) $pt['sale_price'];
-                } elseif (!empty($pt['original_price']) && (float) $pt['original_price'] > 0) {
-                    $category_price = (float) $pt['original_price'];
-                }
+                $category_price = TripPricingService::resolveCategoryEffectivePrice($pt);
                 
                 // Apply Dynamic Pricing filter per category
                 $category_price = (float) apply_filters('yatra_booking_trip_price', $category_price, $trip_id, [

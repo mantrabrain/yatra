@@ -160,12 +160,14 @@ class TripPricingService
      */
     public static function resolveCardPricing(object $avail, object $trip): array
     {
-        $pricing_type = self::resolvePricingType($trip);
+        $trip_mode = self::resolvePricingType($trip);
         $avail_price_types = !empty($avail->price_types) && is_array($avail->price_types)
             ? $avail->price_types : [];
 
-        // Override to traveler_based if this availability has price_types
-        if (!empty($avail_price_types)) {
+        // Only treat a date as traveler-based when the trip is traveler-based. Otherwise inherited
+        // or stale price_types on an availability row must not override regular trip pricing.
+        $pricing_type = $trip_mode;
+        if ($trip_mode === 'traveler_based' && !empty($avail_price_types)) {
             $pricing_type = 'traveler_based';
         }
 
@@ -175,7 +177,7 @@ class TripPricingService
             'has_discount' => false,
             'discount_percentage' => 0,
             'pricing_type' => $pricing_type,
-            'price_types' => $avail_price_types,
+            'price_types' => $pricing_type === 'traveler_based' ? $avail_price_types : [],
         ];
 
         if ($pricing_type === 'traveler_based' && !empty($avail_price_types)) {
@@ -295,15 +297,22 @@ class TripPricingService
      */
     public static function resolvePricingType(object $trip): string
     {
-        $type = $trip->pricing_type ?? 'regular';
-
-        // Auto-detect: if pricing_type not explicitly set but price_types exist, it's traveler_based
-        if (empty($type) || $type === 'regular') {
-            $price_types = self::resolvePriceTypes($trip);
-            if (!empty($price_types)) {
-                $type = 'traveler_based';
-            }
+        $raw = $trip->pricing_type ?? null;
+        if (is_string($raw)) {
+            $raw = trim($raw);
         }
+
+        // Honor an explicit mode from the trip row. Leftover rows in trip_price_types must not
+        // override "regular" trip-level pricing (admin saves price_types as [] for regular, but
+        // legacy/orphan DB rows would otherwise force traveler_based and show min category price).
+        if ($raw !== null && $raw !== '') {
+            $type = $raw === 'traveler_based' ? 'traveler_based' : 'regular';
+            return (string) apply_filters('yatra_resolve_pricing_type', $type, $trip);
+        }
+
+        // Legacy / unmigrated trips: no pricing_type column value — infer from price_types
+        $price_types = self::resolvePriceTypes($trip);
+        $type = !empty($price_types) ? 'traveler_based' : 'regular';
 
         return (string) apply_filters('yatra_resolve_pricing_type', $type, $trip);
     }

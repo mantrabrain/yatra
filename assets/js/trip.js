@@ -4775,8 +4775,87 @@ class TripPage {
 
     // Extra page-level behaviors
     this.initHeroSmoothScroll();
+    this.initGroupDiscountPopovers();
 
     return this.instances;
+  }
+
+  /**
+   * Group discount popover in booking sidebar / mobile sticky (tap outside to close, Esc to close).
+   */
+  initGroupDiscountPopovers() {
+    const syncOpenState = (wrap, open) => {
+      const btn = wrap.querySelector('.yatra-group-discount-popover__trigger');
+      const panel = wrap.querySelector('.yatra-group-discount-popover__panel');
+      wrap.classList.toggle('is-open', open);
+      if (btn) {
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      if (panel) {
+        panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+      }
+    };
+
+    const closeAll = (exceptWrap = null) => {
+      document.querySelectorAll('[data-yatra-group-discount-popover]').forEach((w) => {
+        if (exceptWrap && w === exceptWrap) {
+          return;
+        }
+        syncOpenState(w, false);
+      });
+    };
+
+    const attach = () => {
+      document.querySelectorAll('[data-yatra-group-discount-popover]').forEach((wrap) => {
+        const btn = wrap.querySelector('.yatra-group-discount-popover__trigger');
+        if (!btn || btn.dataset.yatraGdBound === '1') {
+          return;
+        }
+        btn.dataset.yatraGdBound = '1';
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const open = !wrap.classList.contains('is-open');
+          if (open) {
+            closeAll(wrap);
+            syncOpenState(wrap, true);
+          } else {
+            syncOpenState(wrap, false);
+          }
+        });
+      });
+
+      if (document.documentElement.dataset.yatraGroupDiscountPopoverDocBound === '1') {
+        return;
+      }
+      document.documentElement.dataset.yatraGroupDiscountPopoverDocBound = '1';
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('[data-yatra-group-discount-popover]')) {
+          closeAll();
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') {
+          return;
+        }
+        const openWrap = document.querySelector('[data-yatra-group-discount-popover].is-open');
+        if (openWrap) {
+          syncOpenState(openWrap, false);
+          const btn = openWrap.querySelector('.yatra-group-discount-popover__trigger');
+          if (btn) {
+            btn.focus();
+          }
+        }
+      });
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', attach);
+    } else {
+      attach();
+    }
   }
 
   exposeGlobals() {

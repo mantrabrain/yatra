@@ -17,22 +17,20 @@ if (!defined('ABSPATH')) {
 // Determine if this is a multi-day trip
 $is_multi_day = ($trip->getDurationDays() ?? 1) > 1;
 
-// Check for group discounts availability (premium feature)
+// Group discounts: same REST-backed payload as desktop booking card (for pricing JS + popover)
 $sidebar_has_group_discounts = false;
-$sidebar_group_discounts_data = [];
-try {
-    if (class_exists('\Yatra\Services\DiscountService') &&
-        method_exists('\Yatra\Services\DiscountService', 'getGroupDiscountsForTrip')) {
-        $discountService = new \Yatra\Services\DiscountService();
-        $groupDiscountsResult = $discountService->getGroupDiscountsForTrip((int) $trip->getId());
-        if (!empty($groupDiscountsResult)) {
-            $sidebar_has_group_discounts = true;
-            $sidebar_group_discounts_data = $groupDiscountsResult;
-        }
-    }
-} catch (\Exception $e) {
-    $sidebar_has_group_discounts = false;
+$sidebar_group_discount_cards = [];
+$sidebar_group_discounts_for_js = [];
+if (function_exists('yatra_single_trip_get_group_discounts')) {
+    $gd = yatra_single_trip_get_group_discounts((int) $trip->getId());
+    $sidebar_has_group_discounts = !empty($gd['has_group_discounts']);
+    $sidebar_group_discount_cards = isset($gd['group_discounts_data']) && is_array($gd['group_discounts_data'])
+        ? $gd['group_discounts_data']
+        : [];
 }
+$sidebar_group_discounts_for_js = apply_filters('yatra_advanced_discount_enabled', false)
+    ? $sidebar_group_discount_cards
+    : [];
 
 // Prepare availability data for JavaScript
 $availability_json = [];
@@ -160,9 +158,20 @@ $booking_disabled = method_exists($trip, 'isBookingDisabled') && $trip->isBookin
      data-is-multi-day="<?php echo $is_multi_day ? 'true' : 'false'; ?>"
      data-pricing-type="<?php echo esc_attr($pricing_type); ?>"
      data-availability='<?php echo esc_attr(json_encode($availability_json)); ?>'
-     data-group-discounts='<?php echo esc_attr(json_encode($sidebar_group_discounts_data)); ?>'>
+     data-group-discounts='<?php echo esc_attr(wp_json_encode($sidebar_group_discounts_for_js)); ?>'>
     <!-- Two-Row Layout -->
     <div class="yatra-mobile-sticky-content">
+
+        <?php if ($sidebar_has_group_discounts && !empty($sidebar_group_discount_cards)): ?>
+            <div class="yatra-mobile-group-discount-popover-wrap">
+                <?php
+                $group_discount_cards = $sidebar_group_discount_cards;
+                $popover_context = 'mobile';
+                $popover_uid = 'mb-' . (int) $trip->getId();
+                yatra_get_template('partials/single-trip/group-discount-booking-popover', compact('group_discount_cards', 'popover_context', 'popover_uid'));
+                ?>
+            </div>
+        <?php endif; ?>
 
         <!-- Row 1: Compact fields + close (clean grid layout) -->
         <div class="yatra-mobile-row-1">

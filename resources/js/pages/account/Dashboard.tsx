@@ -17,7 +17,13 @@ import {
   Bell,
 } from "lucide-react";
 import { __ } from "../../lib/i18n";
-import { formatDate, getBadge, currency, phoneToTelHref } from "./utils";
+import {
+  formatDate,
+  formatTravelDateRange,
+  getBadge,
+  currency,
+  phoneToTelHref,
+} from "./utils";
 import type { Booking, Payment, CustomerProfile } from "./types";
 
 interface DashboardProps {
@@ -273,7 +279,10 @@ const Dashboard: React.FC<DashboardProps> = ({
                         <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3.5 h-3.5" />
-                            {formatDate(booking.travel_date)}
+                            {formatTravelDateRange(
+                              booking.travel_date,
+                              booking.end_date,
+                            )}
                           </span>
                           <span className="flex items-center gap-1">
                             <User className="w-3.5 h-3.5" />

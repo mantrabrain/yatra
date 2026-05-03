@@ -6,6 +6,7 @@ namespace Yatra\Core;
 
 use Yatra\Core\Routing\Router;
 use Yatra\Core\Routing\PermalinkCanonical;
+use Yatra\Core\Routing\UrlParser;
 use Yatra\Services\SettingsService;
 use Yatra\Core\Handlers\BookingConfirmationPageHandler;
 use Yatra\Repositories\BookingRepository;
@@ -205,7 +206,7 @@ class TemplateLoader
             }
         }
 
-        foreach (['yatra_trip', 'yatra_trip_slug', 'yatra_destination_slug', 'yatra_activity_slug', 'yatra_category_slug', 'yatra_booking_confirmation'] as $key) {
+        foreach (['yatra_trip', 'yatra_trip_slug', 'yatra_destination_slug', 'yatra_activity_slug', 'yatra_category_slug', 'yatra_booking_confirmation', 'yatra_verify_email'] as $key) {
             if (!isset($_GET[$key])) {
                 continue;
             }
@@ -213,6 +214,15 @@ class TemplateLoader
             if (is_string($v) && trim($v) !== '') {
                 return true;
             }
+        }
+
+        if ((string) get_query_var('yatra_verify_email') !== '') {
+            return true;
+        }
+
+        $verifyPath = trim(UrlParser::getCleanRequestPath(), '/');
+        if ($verifyPath !== '' && strpos($verifyPath, 'yatra-verify-email/') === 0) {
+            return true;
         }
 
         return (bool) apply_filters('yatra_clear_404_for_routing', false);

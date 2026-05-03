@@ -1,0 +1,67 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "yatra/trip-category",
+  "title": "Trip categories",
+  "category": "yatra",
+  "icon": "category",
+  "description": "Display trip category cards with trip counts and pricing (same layout as destinations).",
+  "keywords": ["category", "trip", "taxonomy", "yatra"],
+  "textdomain": "yatra",
+  "attributes": {
+    "align": {
+      "type": "string",
+      "default": ""
+    },
+    "order": {
+      "type": "string",
+      "default": "desc"
+    },
+    "columns": {
+      "type": "number",
+      "default": 3
+    },
+    "per_page": {
+      "type": "number",
+      "default": 10
+    },
+    "title": {
+      "type": "string",
+      "default": "Trip Categories"
+    },
+    "show_pagination": {
+      "type": "boolean",
+      "default": true
+    },
+    "category": {
+      "type": "string",
+      "default": ""
+    },
+    "show_trip_count": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_description": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_image": {
+      "type": "boolean",
+      "default": true
+    },
+    "hide_empty": {
+      "type": "boolean",
+      "default": true
+    },
+    "featured_only": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "supports": {
+    "html": false,
+    "inserter": true,
+    "align": ["wide", "full"]
+  },
+  "editorScript": "yatra-trip-category-block-editor"
+}

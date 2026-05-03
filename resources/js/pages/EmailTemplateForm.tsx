@@ -27,10 +27,15 @@ import {
 } from "lucide-react";
 import { Switch } from "../components/ui/switch";
 import {
+  getCatalogEntryByTemplateKey,
   getCoreTemplateDefinition,
   isCoreTemplateSlug,
 } from "../lib/email-templates-catalog";
-import { isEmailAutomationModuleEnabled } from "../lib/plugin-utils";
+import {
+  isEmailAutomationModuleEnabled,
+  isModuleActive,
+  isProPluginActive,
+} from "../lib/plugin-utils";
 import {
   fetchSettings,
   previewCoreEmailTemplate,
@@ -52,22 +57,53 @@ interface PreviewData {
 }
 
 const EmailTemplateForm: React.FC = () => {
-  const { id, isCreateMode, coreTemplateSlug } = useMemo(() => {
-    const params = new URLSearchParams(window.location.search);
-    const templateId = params.get("id");
-    const action = params.get("action");
-    const core = params.get("core_template") || "";
-    return {
-      id: templateId,
-      isCreateMode: action === "create",
-      coreTemplateSlug: core,
-    };
-  }, []);
+  const { id, isCreateMode, coreTemplateSlug, coreReadOnlyParam } =
+    useMemo(() => {
+      const params = new URLSearchParams(window.location.search);
+      const templateId = params.get("id");
+      const action = params.get("action");
+      const core = params.get("core_template") || "";
+      return {
+        id: templateId,
+        isCreateMode: action === "create",
+        coreTemplateSlug: core,
+        coreReadOnlyParam: params.get("readonly") === "1",
+      };
+    }, []);
 
   const isCoreSettingsEdit = isCoreTemplateSlug(coreTemplateSlug);
   const coreDef = isCoreSettingsEdit
     ? getCoreTemplateDefinition(coreTemplateSlug)
     : undefined;
+
+  const catalogEntryForCore = useMemo(
+    () =>
+      coreTemplateSlug
+        ? getCatalogEntryByTemplateKey(coreTemplateSlug)
+        : undefined,
+    [coreTemplateSlug],
+  );
+
+  /** URL ?readonly=1 — no edits at all from this screen */
+  const isCoreStrictViewOnly =
+    isCoreSettingsEdit && Boolean(coreReadOnlyParam);
+
+  /** Module required but inactive: subject/body/save locked; on/off can still be changed (site setting). */
+  const isCoreModuleBodyLocked = useMemo(() => {
+    if (!isCoreSettingsEdit || isCoreStrictViewOnly) {
+      return false;
+    }
+    const req = catalogEntryForCore?.requiresModule;
+    if (!req) {
+      return false;
+    }
+    return !isProPluginActive() || !isModuleActive(req);
+  }, [isCoreSettingsEdit, isCoreStrictViewOnly, catalogEntryForCore]);
+
+  /** Subject/body (and merge-tag insert) read-only; strict URL also locks status. */
+  const isCoreBodyReadOnly = isCoreStrictViewOnly || isCoreModuleBodyLocked;
+
+  const isCoreViewMode = isCoreStrictViewOnly || isCoreModuleBodyLocked;
 
   const goBack = () => {
     window.location.href = `admin.php?page=yatra&subpage=email-automation&tab=templates`;
@@ -216,6 +252,9 @@ const EmailTemplateForm: React.FC = () => {
 
   const saveCoreMutation = useMutation({
     mutationFn: async () => {
+      if (isCoreStrictViewOnly) {
+        throw new Error(__("This template is view-only.", "yatra"));
+      }
       if (
         !coreDef?.settingsFlag ||
         !coreDef.settingsSubject ||
@@ -227,6 +266,11 @@ const EmailTemplateForm: React.FC = () => {
         throw new Error(__("Settings not loaded", "yatra"));
       }
       const base = { ...(settings as Record<string, unknown>) };
+      if (isCoreModuleBodyLocked) {
+        base[coreDef.settingsFlag] = formData.is_active;
+        await saveSettings(base);
+        return base;
+      }
       base[coreDef.settingsSubject] = formData.subject;
       base[coreDef.settingsBody] = formData.body;
       base[coreDef.settingsFlag] = formData.is_active;
@@ -296,6 +340,9 @@ const EmailTemplateForm: React.FC = () => {
     if (e) e.preventDefault();
 
     if (isCoreSettingsEdit) {
+      if (isCoreStrictViewOnly) {
+        return;
+      }
       saveCoreMutation.mutate();
       return;
     }
@@ -319,6 +366,9 @@ const EmailTemplateForm: React.FC = () => {
   };
 
   const insertVariable = (variable: string) => {
+    if (isCoreBodyReadOnly) {
+      return;
+    }
     const textarea = document.getElementById(
       "email-body",
     ) as HTMLTextAreaElement;
@@ -455,16 +505,23 @@ const EmailTemplateForm: React.FC = () => {
               <Mail className="w-6 h-6 text-blue-500" />
               {isCreateMode
                 ? __("Create Email Template")
-                : __("Edit Email Template")}
+                : isCoreViewMode
+                  ? __("View email template", "yatra")
+                  : __("Edit Email Template")}
             </h1>
             <p className="text-gray-500 dark:text-gray-400 mt-1">
               {isCreateMode
                 ? __("Create a new custom email template")
                 : isCoreSettingsEdit
-                  ? __(
-                      "Core customer email (saved with site settings). From address is set under Email → Delivery.",
-                      "yatra",
-                    )
+                  ? isCoreViewMode
+                    ? __(
+                        "This template uses site settings. Enable Yatra Pro and the required module to edit subject and HTML body.",
+                        "yatra",
+                      )
+                    : __(
+                        "Core customer email (saved with site settings). From address is set under Email → Delivery.",
+                        "yatra",
+                      )
                   : String(templateData?.name ?? "")}
             </p>
           </div>
@@ -492,7 +549,11 @@ const EmailTemplateForm: React.FC = () => {
           )}
           <Button
             onClick={handleSubmit}
-            disabled={saveMutation.isPending || saveCoreMutation.isPending}
+            disabled={
+              saveMutation.isPending ||
+              saveCoreMutation.isPending ||
+              isCoreStrictViewOnly
+            }
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
             {saveMutation.isPending || saveCoreMutation.isPending ? (
@@ -504,6 +565,23 @@ const EmailTemplateForm: React.FC = () => {
           </Button>
         </div>
       </div>
+
+      {isCoreBodyReadOnly && (
+        <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-100">
+          <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <p>
+            {isCoreStrictViewOnly
+              ? __(
+                  "This link is view-only. Subject, body, and status cannot be changed from this screen.",
+                  "yatra",
+                )
+              : __(
+                  "Subject and HTML body are read-only until the required module is active. You can still turn this email on or off below; values reflect your site settings.",
+                  "yatra",
+                )}
+          </p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Form */}
@@ -520,6 +598,7 @@ const EmailTemplateForm: React.FC = () => {
                   </span>
                   <Switch
                     checked={formData.is_active}
+                    disabled={isCoreStrictViewOnly}
                     onCheckedChange={(checked) =>
                       setFormData({ ...formData, is_active: checked })
                     }
@@ -847,7 +926,8 @@ const EmailTemplateForm: React.FC = () => {
                     setFormData({ ...formData, subject: e.target.value })
                   }
                   placeholder={__("Email subject with {{variables}}")}
-                  className="font-mono text-sm"
+                  readOnly={isCoreBodyReadOnly}
+                  className={`font-mono text-sm ${isCoreBodyReadOnly ? "bg-gray-50 dark:bg-gray-900/40" : ""}`}
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {__("Use {{variable}} syntax to insert dynamic content")}
@@ -865,7 +945,12 @@ const EmailTemplateForm: React.FC = () => {
                     setFormData({ ...formData, body: e.target.value })
                   }
                   rows={20}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm"
+                  readOnly={isCoreBodyReadOnly}
+                  className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg font-mono text-sm ${
+                    isCoreBodyReadOnly
+                      ? "bg-gray-50 dark:bg-gray-900/40 text-gray-900 dark:text-white"
+                      : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  }`}
                   placeholder={__("HTML email content...")}
                 />
               </div>

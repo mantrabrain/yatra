@@ -34,6 +34,11 @@ define('YATRA_VERSION', '3.0.2.9');
 define('YATRA_MIN_PHP_VERSION', '7.4');
 define('YATRA_MIN_WP_VERSION', '6.0');
 
+/** Sample / preview email verification URL segment (not a real token). */
+if (!defined('YATRA_EMAIL_VERIFICATION_PREVIEW_TOKEN')) {
+    define('YATRA_EMAIL_VERIFICATION_PREVIEW_TOKEN', 'preview-verify-token');
+}
+
 // Deactivate incompatible Yatra Pro (&lt; 3.0) and normalize plugin load order before Composer (prevents fatals from old Pro extending removed classes).
 require_once YATRA_PLUGIN_PATH . 'includes/incompatible-pro-guard.php';
 yatra_run_incompatible_pro_guard();

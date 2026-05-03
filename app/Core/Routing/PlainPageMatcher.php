@@ -37,6 +37,28 @@ final class PlainPageMatcher
         $raw = $_GET['yatra_page'] ?? '';
         $raw = is_string($raw) ? trim(wp_unslash($raw)) : '';
 
+        // Plain email verification / remaining checkout: must run before trip/taxonomy heuristics
+        // so ?yatra_verify_email=… and ?yatra_remaining_checkout=… always win (same as pretty paths).
+        if ($raw === '') {
+            $checkoutToken = isset($_GET['yatra_remaining_checkout']) ? (string) wp_unslash($_GET['yatra_remaining_checkout']) : '';
+            $checkoutToken = preg_replace('/[^a-zA-Z0-9_-]/', '', $checkoutToken) ?? '';
+            if ($checkoutToken !== '') {
+                return [
+                    'type' => 'checkout',
+                    'token' => $checkoutToken,
+                ];
+            }
+
+            $verifyToken = isset($_GET['yatra_verify_email']) ? (string) wp_unslash($_GET['yatra_verify_email']) : '';
+            $verifyToken = preg_replace('/[^a-zA-Z0-9_-]/', '', $verifyToken) ?? '';
+            if ($verifyToken !== '') {
+                return [
+                    'type' => 'email_verification',
+                    'token' => $verifyToken,
+                ];
+            }
+        }
+
         // Plain single trip: ?{trip_base}=slug (legacy ?yatra_trip= / ?yatra_trip_slug=)
         $trip_slug_only = self::getTripSlugFromRequest();
         if ($trip_slug_only !== '' && $raw === '') {
@@ -67,15 +89,6 @@ final class PlainPageMatcher
         }
 
         if ($raw === '') {
-            $checkoutToken = isset($_GET['yatra_remaining_checkout']) ? (string) wp_unslash($_GET['yatra_remaining_checkout']) : '';
-            $checkoutToken = preg_replace('/[^a-zA-Z0-9_-]/', '', $checkoutToken) ?? '';
-            if ($checkoutToken !== '') {
-                return [
-                    'type' => 'checkout',
-                    'token' => $checkoutToken,
-                ];
-            }
-
             return null;
         }
 
