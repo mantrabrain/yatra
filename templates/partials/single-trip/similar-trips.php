@@ -91,9 +91,11 @@ if (!defined('ABSPATH')) {
                         'alt' => $title
                     ];
                     
-                    // Permalink
-                    $trip_base = \Yatra\Services\SettingsService::getTripBase();
-                    $permalink = home_url('/' . $trip_base . '/' . $slug . '/');
+                    // Permalink — use canonical helper (pretty + plain permalink structures).
+                    $permalink = '';
+                    if (!empty($slug) && function_exists('yatra_get_trip_permalink')) {
+                        $permalink = yatra_get_trip_permalink($similar_trip);
+                    }
                     
                     // Empty arrays for now (can be populated later if needed)
                     $destinations = [];

@@ -9,9 +9,8 @@ namespace Yatra\Database\Tables;
  * discount management data including promo codes, group discounts,
  * usage tracking, and advanced discount configurations.
  * 
- * This table follows the new simplified pattern with only two static methods:
- * - getTableName(): Returns the prefixed table name
- * - getSchema(): Returns the complete CREATE TABLE SQL statement
+ * Static API: {@see getTableName()}, {@see getWritableColumnNames()},
+ * {@see getRestRequestBodyColumnNames()}, {@see getSchema()}.
  * 
  * Usage:
  * DiscountsTable::getTableName()  // Returns 'wp_yatra_discounts'
@@ -30,12 +29,72 @@ class DiscountsTable extends BaseTable
     protected static string $table = 'yatra_new_discounts';
 
     /**
-     * Get the complete table schema as raw SQL CREATE TABLE statement
-     * 
+     * Columns that exist on {@see getSchema()} (excluding `id`) for repository mass-assignment.
+     *
+     * @return list<string>
+     */
+    public static function getWritableColumnNames(): array
+    {
+        return [
+            'code',
+            'description',
+            'type',
+            'amount',
+            'max_discount_amount',
+            'usage_limit',
+            'usage_limit_per_customer',
+            'usage_count',
+            'valid_from',
+            'expiry_date',
+            'status',
+            'applicable_to',
+            'trip_ids',
+            'min_amount',
+            'first_time_customer_only',
+            'is_group_discount',
+            'discount_mode',
+            'min_group_size',
+            'max_group_size',
+            'group_discount_type',
+            'group_discount_amount',
+            'group_discount_mode',
+            'group_discount_ranges',
+            'category_discounts',
+            'created_at',
+            'updated_at',
+            'created_by',
+            'updated_by',
+        ];
+    }
+
+    /**
+     * REST request body keys allowed through {@see \Yatra\Controllers\DiscountController}.
+     * Omits display-only keys (e.g. created_by_name) and server-controlled timestamps.
+     * Updates do not accept `created_by` from the client.
+     *
+     * @return list<string>
+     */
+    public static function getRestRequestBodyColumnNames(bool $forCreate): array
+    {
+        $base = array_values(array_diff(
+            self::getWritableColumnNames(),
+            ['created_at', 'updated_at']
+        ));
+
+        if (!$forCreate) {
+            $base = array_values(array_diff($base, ['created_by']));
+        }
+
+        return $base;
+    }
+
+    /**
+     * Get the complete table schema as raw SQL CREATE TABLE statement.
+     *
      * Returns the full SQL schema for the discounts table using heredoc syntax
      * for proper IDE syntax highlighting. Includes all columns, indexes,
      * and constraints from the original Database.php schema.
-     * 
+     *
      * @return string Complete CREATE TABLE SQL statement
      */
     public static function getSchema(): string

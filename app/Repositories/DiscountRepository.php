@@ -17,6 +17,45 @@ class DiscountRepository extends BaseRepository
         return DiscountsTable::getTableName();
     }
 
+    /**
+     * Strip unknown keys (e.g. created_by_name) before wpdb writes.
+     * Never allow updating the primary key from payloads.
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function filterToWritableDiscountColumnsForInsert(array $data): array
+    {
+        unset($data['id']);
+
+        return array_intersect_key($data, array_flip(DiscountsTable::getWritableColumnNames()));
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function filterToWritableDiscountColumnsForUpdate(array $data): array
+    {
+        unset($data['id']);
+        $allowed = array_values(array_diff(
+            DiscountsTable::getWritableColumnNames(),
+            ['created_at', 'created_by']
+        ));
+
+        return array_intersect_key($data, array_flip($allowed));
+    }
+
+    public function update(int $id, array $data): bool
+    {
+        return parent::update($id, $this->filterToWritableDiscountColumnsForUpdate($data));
+    }
+
+    public function create(array $data): int
+    {
+        return parent::create($this->filterToWritableDiscountColumnsForInsert($data));
+    }
+
     public function findByCode(string $code): ?\stdClass
     {
         $table = esc_sql($this->table);

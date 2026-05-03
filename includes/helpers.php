@@ -2148,10 +2148,22 @@ function yatra_single_trip_get_group_discounts($trip_id) {
     }
 
     try {
+        // Direct controller path avoids rest_do_request / loopback issues on single-trip templates.
+        if (class_exists(\Yatra\Controllers\DiscountController::class)) {
+            $ctrl = new \Yatra\Controllers\DiscountController();
+            $payload = $ctrl->getPublicGroupDiscountDiscoverabilityForTrip($trip_id);
+            $discounts = isset($payload['discounts']) && is_array($payload['discounts']) ? $payload['discounts'] : [];
+            if (!empty($payload['has_group_discounts']) && $discounts !== []) {
+                return [
+                    'has_group_discounts' => true,
+                    'group_discounts_data' => $discounts,
+                ];
+            }
+        }
+
         $row = null;
 
-        // Prefer internal REST dispatch — wp_remote_get() to the same site often fails (loopback
-        // blocked, TLS, auth) and leaves the sidebar without group discount discoverability.
+        // Fallback: internal REST then HTTP (e.g. if controller unavailable).
         if (class_exists('\WP_REST_Request') && function_exists('rest_do_request')) {
             $request = new \WP_REST_Request('GET', '/yatra/v1/discounts/group-discounts');
             $request->set_param('trip_ids', [$trip_id]);

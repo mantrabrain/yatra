@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yatra;
 
 use Yatra\Core\Container;
-use Yatra\Core\Database;
 use Yatra\Providers\AppServiceProvider;
 use Yatra\Providers\RouteServiceProvider;
 use Yatra\Providers\AdminServiceProvider;
@@ -250,8 +249,9 @@ class Bootstrap
         register_activation_hook(YATRA_PLUGIN_FILE, [$this, 'activate']);
         register_deactivation_hook(YATRA_PLUGIN_FILE, [$this, 'deactivate']);
         
-        // Check for plugin upgrades
-        add_action('admin_init', [$this, 'upgrade']);
+        if (class_exists(\Yatra\Upgrades\FreeUpgradeRunner::class)) {
+            \Yatra\Upgrades\FreeUpgradeRunner::register();
+        }
     }
 
     /**
@@ -319,22 +319,6 @@ class Bootstrap
         
         // Flush rewrite rules
         flush_rewrite_rules();
-    }
-
-    /**
-     * Plugin upgrade logic
-     */
-    public function upgrade(): void
-    {
-        $current_version = get_option('yatra_version', '1.0.0');
-
-        if (version_compare($current_version, YATRA_VERSION, '<')) {
-            Database::createTables();
-            update_option('yatra_version', YATRA_VERSION);
-        }
-
-        \Yatra\Services\InstallerService::maybeBackfillEmailTemplateDefaults();
-        \Yatra\Services\InstallerService::maybeNormalizeMigratedCouponDiscountStatuses();
     }
 
     /**

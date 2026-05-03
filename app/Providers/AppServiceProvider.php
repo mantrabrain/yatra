@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
         // Deactivation hook
         register_deactivation_hook(YATRA_PLUGIN_FILE, [$this, 'deactivate']);
 
-        // Database tables: created on activation (see activate()) and on version bump (Bootstrap::upgrade on admin_init).
+        // Database tables: created on activation (see activate()) and on version bump (FreeUpgradeRunner on admin_init).
 
         // Register shortcodes
         $this->registerShortcodes();

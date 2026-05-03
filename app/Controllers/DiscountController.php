@@ -10,6 +10,7 @@ use WP_Error;
 use Yatra\Services\DiscountService;
 use Yatra\Repositories\DiscountRepository;
 use Yatra\Models\Discount;
+use Yatra\Database\Tables\DiscountsTable;
 
 /**
  * Discount REST API Controller
@@ -24,39 +25,6 @@ use Yatra\Models\Discount;
 class DiscountController extends BaseController
 {
     protected string $rest_base = 'discounts';
-
-    /**
-     * DB columns only — list responses add display keys (e.g. created_by_name) that must not be sent to wpdb->update().
-     *
-     * @var list<string>
-     */
-    private const DISCOUNT_WRITABLE_FIELDS = [
-        'code',
-        'description',
-        'type',
-        'amount',
-        'max_discount_amount',
-        'usage_limit',
-        'usage_limit_per_customer',
-        'usage_count',
-        'valid_from',
-        'expiry_date',
-        'status',
-        'applicable_to',
-        'trip_ids',
-        'min_amount',
-        'first_time_customer_only',
-        'is_group_discount',
-        'discount_mode',
-        'min_group_size',
-        'max_group_size',
-        'group_discount_type',
-        'group_discount_amount',
-        'group_discount_mode',
-        'group_discount_ranges',
-        'category_discounts',
-        'updated_by',
-    ];
 
     private DiscountService $service;
 
@@ -107,6 +75,32 @@ class DiscountController extends BaseController
     {
         // Allow public access to group discount discoverability
         return true;
+    }
+
+    /**
+     * Same tier payload as GET /discounts/group-discounts for one trip — for PHP templates (sidebar)
+     * without HTTP/rest_do_request (avoids loopback failures).
+     *
+     * @return array{has_group_discounts: bool, discounts: array<int, array<string, mixed>>, summary: string}
+     */
+    public function getPublicGroupDiscountDiscoverabilityForTrip(int $tripId): array
+    {
+        $tripId = max(0, $tripId);
+        if ($tripId === 0) {
+            return [
+                'has_group_discounts' => false,
+                'discounts' => [],
+                'summary' => '',
+            ];
+        }
+
+        $discounts = $this->getTripGroupDiscounts($tripId);
+
+        return [
+            'has_group_discounts' => !empty($discounts),
+            'discounts' => $discounts,
+            'summary' => $this->generateGroupDiscountSummary($discounts),
+        ];
     }
 
     /**
@@ -178,13 +172,22 @@ class DiscountController extends BaseController
                 return null;
             }
 
+            // Compare calendar dates only (valid_from / expiry may be DATETIME).
             $validFrom = is_string($discount->valid_from) ? trim($discount->valid_from) : '';
-            if ($validFrom !== '' && $validFrom !== '0000-00-00' && $validFrom > $today) {
+            $validFromDay = $validFrom !== '' ? substr($validFrom, 0, 10) : '';
+            if ($validFromDay === '0000-00-00') {
+                $validFromDay = '';
+            }
+            if ($validFromDay !== '' && $validFromDay > $today) {
                 return null;
             }
 
             $expiry = is_string($discount->expiry_date) ? trim($discount->expiry_date) : '';
-            if ($expiry !== '' && $expiry !== '0000-00-00' && $expiry < $today) {
+            $expiryDay = $expiry !== '' ? substr($expiry, 0, 10) : '';
+            if ($expiryDay === '0000-00-00') {
+                $expiryDay = '';
+            }
+            if ($expiryDay !== '' && $expiryDay < $today) {
                 return null;
             }
 
@@ -574,10 +577,7 @@ class DiscountController extends BaseController
      */
     private function filterDiscountWritablePayload(array $data, bool $forCreate): array
     {
-        $fields = self::DISCOUNT_WRITABLE_FIELDS;
-        if ($forCreate) {
-            $fields[] = 'created_by';
-        }
+        $fields = DiscountsTable::getRestRequestBodyColumnNames($forCreate);
 
         return array_intersect_key($data, array_flip($fields));
     }
