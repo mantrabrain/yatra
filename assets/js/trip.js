@@ -65,6 +65,23 @@
     return phpDateFormatToFlatpickr(php);
   };
 
+  /**
+   * Flatpickr locale from PHP ({@see FrontendAssetsProvider::buildFlatpickrLocalePayload}).
+   * @returns {Record<string, unknown>}
+   */
+  const getFlatpickrLocale = () => {
+    const cfg = window.yatraTripData || {};
+    const l = cfg.flatpickrLocale;
+    if (!l || typeof l !== 'object') {
+      return { firstDayOfWeek: 1 };
+    }
+    const out = Object.assign({}, l);
+    if (typeof out.firstDayOfWeek !== 'number' || Number.isNaN(out.firstDayOfWeek)) {
+      out.firstDayOfWeek = 1;
+    }
+    return out;
+  };
+
   const getRestBase = () => {
     const siteUrl =
         (window.yatraTripData && window.yatraTripData.siteUrl) ||
@@ -1394,9 +1411,7 @@
         static: false,
         monthSelectorType: 'static',
         animate: true,
-        locale: {
-          firstDayOfWeek: 1
-        },
+        locale: getFlatpickrLocale(),
         onChange: (selectedDates, dateStr) => {
           this.dateInput.value = dateStr;
 
@@ -2482,9 +2497,7 @@
         static: false,
         monthSelectorType: 'static',
         animate: true,
-        locale: {
-          firstDayOfWeek: 1
-        },
+        locale: getFlatpickrLocale(),
         onChange: (selectedDates, dateStr) => {
           this.dateInput.value = dateStr;
         }

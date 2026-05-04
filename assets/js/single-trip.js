@@ -11,6 +11,20 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    function yatraGetFlatpickrLocale() {
+        var l = window.yatraTripData && window.yatraTripData.flatpickrLocale;
+        if (!l || typeof l !== 'object') {
+            return { firstDayOfWeek: 1 };
+        }
+        var out = Object.assign({}, l);
+        if (typeof out.firstDayOfWeek !== 'number' || isNaN(out.firstDayOfWeek)) {
+            out.firstDayOfWeek = 1;
+        }
+        return out;
+    }
+
+    var fpLocale = yatraGetFlatpickrLocale();
+
     // Initialize date pickers when DOM is ready
     const bookingDateInput = document.getElementById('travel_date');
     if (bookingDateInput) {
@@ -26,7 +40,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     dateFormat: 'Y-m-d',
                     minDate: 'today',
                     enable: availabilityDates,
-                    disableMobile: false
+                    disableMobile: false,
+                    locale: fpLocale
                 });
             }
         } else {
@@ -37,7 +52,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const config = {
                 dateFormat: 'Y-m-d',
                 minDate: minDate,
-                disableMobile: false
+                disableMobile: false,
+                locale: fpLocale
             };
             
             if (maxDate) {
@@ -54,7 +70,8 @@ document.addEventListener('DOMContentLoaded', function() {
         flatpickr(enquiryDateInput, {
             dateFormat: 'Y-m-d',
             minDate: 'today',
-            disableMobile: false
+            disableMobile: false,
+            locale: fpLocale
         });
     }
 });

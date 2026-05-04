@@ -1893,7 +1893,7 @@ class TripController extends BaseController
                 // Use month-based filters for both day trips and multi-day trips for better navigation
                 // This prevents overwhelming users with too many individual date filters
                 $month_key = strtolower(date('M-Y', $departure_date));
-                $month_filters[$month_key] = date('M Y', $departure_date);
+                $month_filters[$month_key] = date_i18n('M Y', $departure_date);
                 
                 $from_location = !empty($avail->from_location) ? $avail->from_location : ($trip_data->starting_location ?? '');
                 $to_location = !empty($avail->to_location) ? $avail->to_location : ($trip_data->ending_location ?? $from_location);
@@ -2052,7 +2052,7 @@ class TripController extends BaseController
                     'rule_id' => null,
                 ] + $sample_dp_fields,
             ];
-            $month_filters[strtolower(date('M-Y', strtotime('+7 days')))] = date('M Y', strtotime('+7 days'));
+            $month_filters[strtolower(date('M-Y', strtotime('+7 days')))] = date_i18n('M Y', strtotime('+7 days'));
         }
 
         $sorted_cards = $this->sortAvailabilityCards($availability_cards, $sort_key);

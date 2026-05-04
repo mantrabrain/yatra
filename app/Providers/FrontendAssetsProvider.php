@@ -385,6 +385,7 @@ class FrontendAssetsProvider
             'pricingType' => 'regular',
             'sidebarAvailability' => [],
             'sidebarGroupDiscounts' => [],
+            'flatpickrLocale' => $this->buildFlatpickrLocalePayload(),
         ];
 
         if ($has_trip) {
@@ -654,6 +655,54 @@ class FrontendAssetsProvider
                 };
             ");
         }
+    }
+
+    /**
+     * Month and weekday labels for Flatpickr from {@see \WP_Locale} (site language).
+     *
+     * @return array<string, mixed>
+     */
+    private function buildFlatpickrLocalePayload(): array
+    {
+        global $wp_locale;
+
+        $first_day = (int) get_option('start_of_week', 1);
+        $first_day = max(0, min(6, $first_day));
+
+        if (!($wp_locale instanceof \WP_Locale)) {
+            return [
+                'firstDayOfWeek' => $first_day,
+            ];
+        }
+
+        $months_long = [];
+        $months_short = [];
+        for ($m = 1; $m <= 12; ++$m) {
+            $key = sprintf('%02d', $m);
+            $months_long[] = $wp_locale->month[$key] ?? '';
+            $months_short[] = $wp_locale->month_abbrev[$key] ?? '';
+        }
+
+        $weekdays_long = [];
+        $weekdays_short = [];
+        for ($d = 0; $d <= 6; ++$d) {
+            $weekdays_long[] = $wp_locale->weekday[$d] ?? '';
+            $weekdays_short[] = $wp_locale->weekday_abbrev[$d] ?? '';
+        }
+
+        $payload = [
+            'weekdays' => [
+                'shorthand' => $weekdays_short,
+                'longhand' => $weekdays_long,
+            ],
+            'months' => [
+                'shorthand' => $months_short,
+                'longhand' => $months_long,
+            ],
+            'firstDayOfWeek' => $first_day,
+        ];
+
+        return apply_filters('yatra_flatpickr_locale', $payload);
     }
 
     /**

@@ -145,7 +145,6 @@ if (!defined('ABSPATH')) {
                     <?php endif; ?>
                 <?php else: ?>
                     <span class="yatra-booking-price-amount yatra-contact-pricing" id="display-price"><?php echo esc_html__('Contact for pricing', 'yatra'); ?></span>
-                    <span class="yatra-booking-price-label"><?php echo esc_html__('per person', 'yatra'); ?></span>
                 <?php endif; ?>
             </div>
         </div>
@@ -215,8 +214,7 @@ if (!defined('ABSPATH')) {
                     $min = $trip->getMinTravelers() ?: 1;
                     $max = $trip->getMaxTravelers() ?: 20;
                     $data_price = $base_price;
-                    $range_text = sprintf(__('Min: %d, Max: %d', 'yatra'), $min, $max);
-                    
+
                     include YATRA_PLUGIN_PATH . 'templates/partials/traveler-input-simple.php';
                     ?>
                 </div>
@@ -308,8 +306,7 @@ if (!defined('ABSPATH')) {
                         $min = $trip->getMinTravelers() ?: 1;
                         $max = $trip->getMaxTravelers() ?: 20;
                         $data_price = $base_price;
-                        $range_text = sprintf(__('Min: %d, Max: %d', 'yatra'), $min, $max);
-                        
+
                         include YATRA_PLUGIN_PATH . 'templates/partials/traveler-input-simple.php';
                         ?>
                     </div>

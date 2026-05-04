@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Simple Traveler Input for Regular Pricing (NO DROPDOWN)
-// Expected variables: $input_id, $input_name, $value, $min, $max, $range_text
+// Expected variables: $input_id, $input_name, $value, $min, $max
 ?>
 <div class="yatra-booking-travelers-simple">
     <div class="yatra-booking-field-icon">
@@ -31,7 +31,14 @@ if (!defined('ABSPATH')) {
             </svg>
         </button>
     </div>
-    <?php if (isset($range_text)): ?>
-        <span class="yatra-travelers-range"><?php echo esc_html($range_text); ?></span>
+    <?php if (isset($min, $max)): ?>
+        <span class="yatra-travelers-range"><?php
+            echo esc_html(sprintf(
+                /* translators: 1: minimum number of travelers, 2: maximum number of travelers */
+                __('Min: %1$d, Max: %2$d', 'yatra'),
+                (int) $min,
+                (int) $max
+            ));
+        ?></span>
     <?php endif; ?>
 </div>

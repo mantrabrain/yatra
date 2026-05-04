@@ -213,6 +213,18 @@ $booking_disabled = method_exists($trip, 'isBookingDisabled') && $trip->isBookin
                             </button>
                         </div>
                     </div>
+                    <?php
+                    $mobile_tr_min = (int) ($trip->getMinTravelers() ?: 1);
+                    $mobile_tr_max = (int) ($trip->getMaxTravelers() ?: 20);
+                    ?>
+                    <span class="yatra-travelers-range yatra-mobile-travelers-range"><?php
+                        echo esc_html(sprintf(
+                            /* translators: 1: minimum number of travelers, 2: maximum number of travelers */
+                            __('Min: %1$d, Max: %2$d', 'yatra'),
+                            $mobile_tr_min,
+                            $mobile_tr_max
+                        ));
+                    ?></span>
                 <?php endif; ?>
             </div>
         </div>
@@ -368,7 +380,11 @@ function initializeMobileBookingForm() {
             } catch (e) {
             }
             
+            var flatpickrLocale = (window.yatraTripData && window.yatraTripData.flatpickrLocale)
+                ? window.yatraTripData.flatpickrLocale
+                : { firstDayOfWeek: 1 };
             var mobileFpCommon = {
+                locale: flatpickrLocale,
                 clickOpens: true,
                 appendTo: document.body,
                 static: false,
