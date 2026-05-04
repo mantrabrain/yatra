@@ -504,6 +504,7 @@ const AdditionalServices: React.FC = () => {
                               ) : (
                                 <IconSelector
                                   iconName={service.icon.value}
+                                  provider={service.icon.provider ?? "yatra"}
                                   className="w-5 h-5 text-purple-600 dark:text-purple-400"
                                 />
                               )

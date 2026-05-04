@@ -74,7 +74,8 @@ import {
 } from "lucide-react";
 import { RichTextEditor } from "../components/ui/rich-text-editor";
 import { IconPicker, IconPickerValue } from "../components/ui/icon-picker";
-import { __ } from "../lib/i18n";
+import { __, sprintf } from "../lib/i18n";
+import { MEAL_PLAN_SELECT_OPTIONS } from "../lib/meal-plan-labels";
 import { usePermissions } from "../hooks/usePermissions";
 import { fetchSettings } from "../api/settings-api";
 import { apiClient } from "../lib/api-client";
@@ -4001,7 +4002,7 @@ const TripForm: React.FC = () => {
                 <HelpText
                   text={__(
                     "💡 This is automatically created from your title. You usually don't need to change it unless you want a custom web address.",
-                    "💡 This is automatically created from your title. You usually don't need to change it unless you want a custom web address.",
+                    "yatra",
                   )}
                   className="mb-2"
                 />
@@ -4637,7 +4638,11 @@ const TripForm: React.FC = () => {
                     options={destinationsData.map((destination: any) => ({
                       value: destination.id.toString(),
                       label:
-                        destination.name || `Destination #${destination.id}`,
+                        destination.name ||
+                        sprintf(
+                          __("Destination #%s", "yatra"),
+                          String(destination.id),
+                        ),
                     }))}
                     placeholder={__("Select destinations...", "yatra")}
                     searchPlaceholder={__("Search destinations...", "yatra")}
@@ -4746,14 +4751,14 @@ const TripForm: React.FC = () => {
                         {formData.starting_location && (
                           <div
                             className="w-2 h-2 bg-green-500 rounded-full animate-pulse"
-                            title="Location set"
+                            title={__("Location set", "yatra")}
                           ></div>
                         )}
                         {formData.starting_latitude &&
                           formData.starting_longitude && (
                             <div
                               className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"
-                              title="Coordinates set"
+                              title={__("Coordinates set", "yatra")}
                             ></div>
                           )}
                       </div>
@@ -5014,7 +5019,7 @@ const TripForm: React.FC = () => {
                         {formData.ending_location && (
                           <div
                             className="w-2 h-2 bg-green-500 rounded-full animate-pulse"
-                            title="Location set"
+                            title={__("Location set", "yatra")}
                           ></div>
                         )}
                       </div>
@@ -5567,7 +5572,7 @@ const TripForm: React.FC = () => {
                                       const newSlot: TimeSlot = {
                                         id: `slot-${Date.now()}`,
                                         time: "09:00",
-                                        label: "Morning Tour",
+                                        label: __("Morning Tour", "yatra"),
                                       };
                                       handleFieldChange("default_time_slots", [
                                         newSlot,
@@ -6019,25 +6024,18 @@ const TripForm: React.FC = () => {
                           handleFieldChange("meal_plan", e.target.value)
                         }
                       >
-                        <option value="">
-                          {__("Select meal plan", "yatra")}
-                        </option>
-                        <option value="breakfast">
-                          {__("Breakfast Only", "yatra")}
-                        </option>
-                        <option value="half_board">
-                          {__("Half Board (Breakfast + Dinner)", "yatra")}
-                        </option>
-                        <option value="full_board">
-                          {__("Full Board (All Meals)", "yatra")}
-                        </option>
-                        <option value="all_inclusive">
-                          {__("All Inclusive", "yatra")}
-                        </option>
-                        <option value="none">
-                          {__("No Meals Included", "yatra")}
-                        </option>
+                        {MEAL_PLAN_SELECT_OPTIONS.map(({ value, label }) => (
+                          <option key={value || "meal-plan-empty"} value={value}>
+                            {label}
+                          </option>
+                        ))}
                       </Select>
+                      <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        {__(
+                          "Tells travelers which meals are included with lodging (e.g. breakfast only vs full board).",
+                          "yatra",
+                        )}
+                      </p>
                     </div>
                   </div>
                   <div>

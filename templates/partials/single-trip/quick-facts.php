@@ -32,11 +32,13 @@ if (!defined('ABSPATH')) {
     <?php
     $difficulty = $trip->getDifficulty();
     if (!empty($difficulty['has_difficulty']) && !empty($difficulty['level'])) :
-        $difficulty_icon = !empty($difficulty['icon']) ? (string) $difficulty['icon'] : 'mountain';
         ?>
         <div class="yatra-quick-fact">
             <div class="yatra-quick-fact-icon">
-                <?php echo yatra_svg_icon($difficulty_icon, 'yatra-icon-lg'); ?>
+                <?php
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                echo yatra_stored_picker_icon_markup($difficulty['icon_picker'] ?? null, 'mountain', 'yatra-icon-lg');
+                ?>
             </div>
             <div class="yatra-quick-fact-content">
                 <div class="yatra-quick-fact-label"><?php echo esc_html__('Difficulty', 'yatra'); ?></div>

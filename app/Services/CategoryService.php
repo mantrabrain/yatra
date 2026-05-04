@@ -108,7 +108,8 @@ class CategoryService extends BaseService
                         $data['icon']['value'] = (int) $value;
                     }
                 }
-                
+
+                $data['icon'] = yatra_normalize_icon_picker_for_storage($data['icon']);
                 $data['icon'] = maybe_serialize($data['icon']);
             }
         }
@@ -217,7 +218,8 @@ class CategoryService extends BaseService
                         $data['icon']['value'] = (int) $value;
                     }
                 }
-                
+
+                $data['icon'] = yatra_normalize_icon_picker_for_storage($data['icon']);
                 $data['icon'] = maybe_serialize($data['icon']);
             }
         }

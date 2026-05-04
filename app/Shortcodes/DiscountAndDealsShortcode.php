@@ -63,12 +63,13 @@ class DiscountAndDealsShortcode extends BaseShortcode
             'per_page' => $per_page
         ];
 
-        // Enqueue same CSS and JS as regular trip shortcode
+        $tripShortcodeCssPath = YATRA_PLUGIN_PATH . 'assets/css/shortcodes/trip-shortcode.css';
+        $tripShortcodeCssVer = is_readable($tripShortcodeCssPath) ? YATRA_VERSION . '.' . filemtime($tripShortcodeCssPath) : YATRA_VERSION;
         wp_enqueue_style(
             'yatra-trip-shortcode',
             YATRA_PLUGIN_URL . 'assets/css/shortcodes/trip-shortcode.css',
-            [],
-            YATRA_VERSION
+            \Yatra\Providers\FrontendAssetsProvider::shortcodeStyleDependencies(),
+            $tripShortcodeCssVer
         );
         
         wp_enqueue_script(

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\Blocks;
 
+use Yatra\Providers\FrontendAssetsProvider;
 use Yatra\Services\BlockDataService;
 
 /**
@@ -28,7 +29,8 @@ class TourBlock
      */
     public function renderCallback(array $attributes, string $content): string
     {
-        wp_enqueue_style('yatra-trip-shortcode', \YATRA_PLUGIN_URL . 'assets/css/shortcodes/trip-shortcode.css', [], YATRA_VERSION);
+        FrontendAssetsProvider::registerCoreFrontendStylesheets();
+        wp_enqueue_style('yatra-trip-shortcode');
 
         return BlockDataService::renderTripBlock($attributes);
     }
@@ -42,6 +44,8 @@ class TourBlock
             return;
         }
 
+        FrontendAssetsProvider::registerCoreFrontendStylesheets();
+
         wp_register_style(
             'yatra-listing',
             \YATRA_PLUGIN_URL . 'assets/css/listing.css',
@@ -49,11 +53,13 @@ class TourBlock
             YATRA_VERSION
         );
 
+        $tripShortcodeCss = \YATRA_PLUGIN_PATH . 'assets/css/shortcodes/trip-shortcode.css';
+        $tripShortcodeVer = is_readable($tripShortcodeCss) ? YATRA_VERSION . '.' . filemtime($tripShortcodeCss) : YATRA_VERSION;
         wp_register_style(
             'yatra-trip-shortcode',
             \YATRA_PLUGIN_URL . 'assets/css/shortcodes/trip-shortcode.css',
-            [],
-            YATRA_VERSION
+            FrontendAssetsProvider::shortcodeStyleDependencies(),
+            $tripShortcodeVer
         );
 
         wp_register_script(

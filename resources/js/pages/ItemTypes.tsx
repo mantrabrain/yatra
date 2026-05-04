@@ -26,7 +26,10 @@ import { PageHeader } from "../components/common/PageHeader";
 import { Card, CardContent } from "../components/ui/card";
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
-import { IconSelector } from "../components/ui/icon-selector";
+import {
+  IconSelector,
+  type IconSelectorProvider,
+} from "../components/ui/icon-selector";
 import { Badge } from "../components/ui/badge";
 import { Table as SharedTable } from "../components/shared/Table";
 import { Pagination } from "../components/shared/Pagination";
@@ -267,10 +270,14 @@ const ItemTypes: React.FC = () => {
         );
       } else {
         // Icon type
+        const raw = (iconValue as { provider?: string }).provider;
+        const provider: IconSelectorProvider =
+          raw === "fa-solid" || raw === "fa-regular" ? raw : "yatra";
         return (
           <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
             <IconSelector
               iconName={iconValue.value as any}
+              provider={provider}
               className="w-5 h-5 text-gray-700 dark:text-gray-300"
             />
           </div>

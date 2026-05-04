@@ -55,12 +55,18 @@ if (!defined('ABSPATH')) {
                             : sprintf(_n('%d day', '%d days', $duration_days, 'yatra'), $duration_days)
                     ];
                     
-                    // Difficulty
-                    $difficulty = [
-                        'has_difficulty' => !empty($similar_trip->difficulty_level),
-                        'level' => $similar_trip->difficulty_level ?? '',
-                        'icon' => 'activity'
-                    ];
+                    // Difficulty — resolve classification id to label + icon (same logic as Trip::getDifficulty / quick facts)
+                    $similar_difficulty_level = isset($similar_trip->difficulty_level) && $similar_trip->difficulty_level !== ''
+                        ? (string) $similar_trip->difficulty_level
+                        : null;
+                    $similar_difficulty_name = isset($similar_trip->difficulty_name) && $similar_trip->difficulty_name !== ''
+                        ? (string) $similar_trip->difficulty_name
+                        : null;
+                    $difficulty = \Yatra\Models\Trip::resolveDifficultyDisplay(
+                        $similar_difficulty_level,
+                        $similar_difficulty_name,
+                        $similar_trip->difficulty_icon ?? null
+                    );
                     
                     // Pricing
                     $original_price = (float) ($similar_trip->original_price ?? 0);
@@ -159,9 +165,12 @@ if (!defined('ABSPATH')) {
                                 </button>
                                 <?php endif; ?>
                                 
-                                <?php if ($difficulty['has_difficulty'] && !empty($difficulty['icon'])): ?>
+                                <?php if (!empty($difficulty['has_difficulty'])) : ?>
                                     <div class="yatra-similar-difficulty-overlay">
-                                        <?php echo yatra_svg_icon($difficulty['icon'], 'similar-difficulty-icon'); ?>
+                                        <?php
+                                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                                        echo yatra_stored_picker_icon_markup($difficulty['icon_picker'] ?? null, 'mountain', 'similar-difficulty-icon');
+                                        ?>
                                         <?php echo ' ' . esc_html($difficulty['level']); ?>
                                     </div>
                                 <?php endif; ?>

@@ -4,8 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "postinstall": "npm run sync-fa",
+    "sync-icons": "node scripts/sync-lucide-icons-json.mjs",
+    "sync-fa": "node scripts/sync-fontawesome-vendor.mjs && node scripts/sync-fa-icon-names.mjs",
     "clean": "rm -rf assets/admin/dist assets/dist",
-    "build:release": "npm run clean && vite build && node scripts/build-blocks.mjs",
+    "build:release": "npm run clean && npm run sync-fa && vite build && node scripts/build-blocks.mjs",
     "build": "npm run build:release && npm run makepot",
     "dev": "pkill -f 'vite dev' 2>/dev/null || true && sleep 1 && vite dev",
     "preview": "vite preview",
@@ -19,6 +22,11 @@
     "zip": "bash ./build.sh"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-regular-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.6",
     "@tanstack/react-query": "^5.12.0",
     "@wordpress/i18n": "^4.58.0",
     "date-fns": "^4.1.0",
@@ -51,12 +59,13 @@
     "eslint": "8.57.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "lucide-static": "^0.468.0",
     "postcss": "^8.4.32",
     "prettier": "^3.1.0",
-    "yaml": "^2.8.3",
     "tailwindcss": "^3.3.6",
     "terser": "^5.44.1",
     "typescript": "^5.2.2",
-    "vite": "^5.0.8"
+    "vite": "^5.0.8",
+    "yaml": "^2.8.3"
   }
 }

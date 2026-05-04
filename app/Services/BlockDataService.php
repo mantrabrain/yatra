@@ -201,7 +201,15 @@ class BlockDataService
      */
     private static function enqueueTripAssets(): void
     {
-        wp_enqueue_style('yatra-trip-shortcode', \YATRA_PLUGIN_URL . 'assets/css/shortcodes/trip-shortcode.css', array(), \YATRA_VERSION);
+        \Yatra\Providers\FrontendAssetsProvider::registerCoreFrontendStylesheets();
+        $cssPath = \YATRA_PLUGIN_PATH . 'assets/css/shortcodes/trip-shortcode.css';
+        $cssVer = is_readable($cssPath) ? \YATRA_VERSION . '.' . filemtime($cssPath) : \YATRA_VERSION;
+        wp_enqueue_style(
+            'yatra-trip-shortcode',
+            \YATRA_PLUGIN_URL . 'assets/css/shortcodes/trip-shortcode.css',
+            \Yatra\Providers\FrontendAssetsProvider::shortcodeStyleDependencies(),
+            $cssVer
+        );
         wp_enqueue_script('yatra-trip-shortcode', \YATRA_PLUGIN_URL . 'assets/js/trip-shortcode.js', array('jquery'), \YATRA_VERSION, true);
         
         // Localize script for AJAX

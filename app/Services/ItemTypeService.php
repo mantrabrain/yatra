@@ -132,16 +132,8 @@ class ItemTypeService extends BaseService
         // Sanitize and serialize icon if it's an array
         if (isset($data['icon'])) {
             if (is_array($data['icon'])) {
-                // Sanitize icon array
-                $icon = [
-                    'type' => isset($data['icon']['type']) && in_array($data['icon']['type'], ['icon', 'image'], true)
-                        ? $data['icon']['type']
-                        : 'icon',
-                    'value' => isset($data['icon']['value']) 
-                        ? sanitize_text_field($data['icon']['value'])
-                        : '',
-                ];
-                $data['icon'] = maybe_serialize($icon);
+                $data['icon'] = yatra_normalize_icon_picker_for_storage($data['icon']);
+                $data['icon'] = maybe_serialize($data['icon']);
             } elseif (is_string($data['icon'])) {
                 // If it's already a string, sanitize it
                 $data['icon'] = sanitize_text_field($data['icon']);
@@ -215,16 +207,8 @@ class ItemTypeService extends BaseService
         // Sanitize and serialize icon if it's an array
         if (isset($data['icon'])) {
             if (is_array($data['icon'])) {
-                // Sanitize icon array
-                $icon = [
-                    'type' => isset($data['icon']['type']) && in_array($data['icon']['type'], ['icon', 'image'], true)
-                        ? $data['icon']['type']
-                        : 'icon',
-                    'value' => isset($data['icon']['value']) 
-                        ? sanitize_text_field($data['icon']['value'])
-                        : '',
-                ];
-                $data['icon'] = maybe_serialize($icon);
+                $data['icon'] = yatra_normalize_icon_picker_for_storage($data['icon']);
+                $data['icon'] = maybe_serialize($data['icon']);
             } elseif (is_string($data['icon'])) {
                 // If it's already a string, sanitize it
                 $data['icon'] = sanitize_text_field($data['icon']);

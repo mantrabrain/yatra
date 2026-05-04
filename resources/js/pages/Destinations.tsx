@@ -581,6 +581,7 @@ const Destinations: React.FC = () => {
                               ) : (
                                 <IconSelector
                                   iconName={destination.icon.value}
+                                  provider={destination.icon.provider ?? "yatra"}
                                   className="w-5 h-5 text-blue-600 dark:text-blue-400"
                                 />
                               )

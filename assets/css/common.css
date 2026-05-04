@@ -350,11 +350,29 @@
     border: 2px solid var(--yatra-border-color);
     border-top-color: var(--yatra-primary);
     border-radius: 50%;
-    animation: yatra-spinner 0.8s linear infinite;
+    animation: yatra-spin 0.8s linear infinite;
 }
 
-@keyframes yatra-spinner {
-    to { transform: rotate(360deg); }
+/**
+ * Shared rotate animation (loading dots, shortcode overlays, trip/booking/stripe spinners).
+ * Defined once here so front-end bundles do not redefine the same name.
+ */
+@keyframes yatra-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/**
+ * Skeleton / card loading sheen (shortcode listing placeholders).
+ */
+@keyframes yatra-shimmer {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
 }
 
 /* ============================================

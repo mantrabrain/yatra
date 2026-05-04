@@ -121,7 +121,7 @@ Use the **block editor** or **classic shortcodes** to drop catalog widgets, sear
 * **`[yatra_trip]`** — Trip listing. Alias: **`[yatra_tour]`** (same output; kept for backward compatibility). Useful attributes include `order` (asc or desc), `featured` (0 or 1), `per_page`, `category`, `destination`, `activity`, `difficulty`, `price_min`, `price_max`, `duration_min`, `duration_max`, `search`, `columns`, `show_pagination` (yes or no), `title`. Example: `[yatra_trip featured="1" per_page="6" columns="3"]`
 * **`[yatra_activity]`** — Activity archive-style listing. Attributes include `order`, `per_page`, `columns`, `activity` (slug or comma-separated slugs), `show_trip_count`, `show_description`, `show_image`, `show_pagination`, `hide_empty` (yes or no), `title`.
 * **`[yatra_destination]`** — Destination showcase. Attributes include `order`, `per_page`, `columns`, `destination` (slug or comma-separated slugs), `show_trip_count`, `show_description`, `show_image`, `show_pagination`, `hide_empty`, `featured_only` (yes or no), `title`.
-* **`[yatra_trip_category]`** — Trip category showcase (same card UI as destinations). Attributes include `order`, `per_page`, `columns`, `category` (slug or comma-separated slugs), `show_trip_count`, `show_description`, `show_image`, `show_pagination`, `hide_empty`, `featured_only` (yes or no), `title`.
+* **`[yatra_trip_category]`** — **Trip category showcase** (same card layout and grid behavior as **`[yatra_destination]`**). Attributes include `order`, `per_page`, `columns`, `category` (slug or comma-separated slugs — omit to list all), `show_trip_count`, `show_description`, `show_image`, `show_pagination`, `hide_empty` (yes or no), `featured_only` (yes or no), `title`. When pagination is on, page changes use the `trip_category_page` query argument. Example: `[yatra_trip_category per_page="9" columns="3" hide_empty="yes" title="Browse by style"]`
 * **`[yatra_search]`** — Advanced tour search form. Toggle parts with `show_filters`, `show_categories`, `show_destinations`, `show_activities`, `show_price_range`, `show_duration`, `show_difficulty` (yes or no), plus `placeholder` and `button_text`.
 * **`[yatra_login]`** — Customer login form. Attributes include `show_register`, `show_forgot_password`, `remember_me` (yes or no), `redirect_url`, `title`, `subtitle`.
 * **`[yatra_my_account]`** — Account dashboard for logged-in users (same React experience as the virtual account URL). Legacy attributes are accepted for backward compatibility but do not change the 3.x UI.
@@ -226,9 +226,11 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 == Changelog ==
 
 = 3.0.3 =
+* **Shortcodes:** **`[yatra_trip_category]`** — lists trip categories in the same card layout as destinations, with optional filters, pagination (`trip_category_page`), and AJAX-friendly behavior (see `TripCategoryShortcode` + `TripCategoryShortcodeAjax`).
 * **Upgrades:** version-gated Free upgrade runner; legacy payment tokens table dropped when applicable (see `Upgrade_3_0_3`).
 * **Discounts:** REST and repository hardening (writable column whitelist; safer updates).
-* **Single trip:** group discount discoverability in the sidebar; **Similar trips** links respect plain permalinks via `yatra_get_trip_permalink()`.
+* **Single trip:** group discount discoverability in the sidebar; **Similar trips** links respect plain permalinks via `yatra_get_trip_permalink()`; enquiry modal **Send Enquiry** uses `yatra-booking-button` so primary color matches **Check Availability** and global `--yatra-primary` tokens.
+* **Admin / i18n:** Trip Builder meal plan strings use shared labels; attribute icon picker preserves Font Awesome `provider` after save; front-end Important Info shows translated meal plan labels (`yatra_meal_plan_label()`).
 * Safe to update from 3.0.2.x.
 
 = 3.0.2.9 =
@@ -294,7 +296,7 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 == Upgrade Notice ==
 
 = 3.0.3 =
-Release **3.0.3** (versioned upgrades, discounts, single-trip polish). Safe to update from 3.0.2.x.
+Release **3.0.3** (`[yatra_trip_category]` shortcode, versioned upgrades, discounts, single-trip and admin polish). Safe to update from 3.0.2.x.
 
 = 3.0.2.5 =
 Maintenance release (setup wizard autosave, admin notices). Safe to update from 3.0.2.4.

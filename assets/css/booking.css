@@ -2653,12 +2653,6 @@
     gap: 8px;
 }
 
-/* Animate spin */
-@keyframes yatra-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
 .yatra-auth-form .animate-spin {
     animation: yatra-spin 1s linear infinite;
 }

@@ -14,17 +14,6 @@ if (!defined('ABSPATH')) {
 
 // Expected variables: $trip, $has_availability, $has_traveler_pricing, $base_price, $pricing_type
 
-// Group discounts: same REST-backed payload as desktop booking card (popover)
-$sidebar_has_group_discounts = false;
-$sidebar_group_discount_cards = [];
-if (function_exists('yatra_single_trip_get_group_discounts')) {
-    $gd = yatra_single_trip_get_group_discounts((int) $trip->getId());
-    $sidebar_has_group_discounts = !empty($gd['has_group_discounts']);
-    $sidebar_group_discount_cards = isset($gd['group_discounts_data']) && is_array($gd['group_discounts_data'])
-        ? $gd['group_discounts_data']
-        : [];
-}
-
 $booking_mode = $trip->getBookingMode();
 
 // Calculate pricing - use pre-computed values from SingleTripController
@@ -127,17 +116,6 @@ $booking_disabled = method_exists($trip, 'isBookingDisabled') && $trip->isBookin
      data-booking-mode="<?php echo esc_attr($booking_mode); ?>">
     <!-- Two-Row Layout -->
     <div class="yatra-mobile-sticky-content">
-
-        <?php if ($sidebar_has_group_discounts && !empty($sidebar_group_discount_cards)): ?>
-            <div class="yatra-mobile-group-discount-popover-wrap">
-                <?php
-                $group_discount_cards = $sidebar_group_discount_cards;
-                $popover_context = 'mobile';
-                $popover_uid = 'mb-' . (int) $trip->getId();
-                yatra_get_template('partials/single-trip/group-discount-booking-popover', compact('group_discount_cards', 'popover_context', 'popover_uid'));
-                ?>
-            </div>
-        <?php endif; ?>
 
         <!-- Row 1: Compact fields + close (clean grid layout) -->
         <div class="yatra-mobile-row-1">

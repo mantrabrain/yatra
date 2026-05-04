@@ -21,7 +21,10 @@ if (!defined('ABSPATH')) {
                         <?php if ($attribute['icon']['type'] === 'image'): ?>
                             <img src="<?php echo esc_url($attribute['icon']['value']); ?>" alt="<?php echo esc_attr($attribute['name']); ?>" class="yatra-attribute-icon-img">
                         <?php else: ?>
-                            <?php echo yatra_svg_icon($attribute['icon']['value'], 'yatra-icon'); ?>
+                            <?php
+                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                            echo yatra_stored_picker_icon_markup($attribute['icon'], 'info', 'yatra-icon');
+                            ?>
                         <?php endif; ?>
                     <?php else: ?>
                         <?php echo yatra_svg_icon('tag', 'yatra-icon'); ?>

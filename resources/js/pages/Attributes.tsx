@@ -24,7 +24,10 @@ import { Card, CardContent } from "../components/ui/card";
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
 import { Badge } from "../components/ui/badge";
-import { IconSelector } from "../components/ui/icon-selector";
+import {
+  IconSelector,
+  type IconSelectorProvider,
+} from "../components/ui/icon-selector";
 
 interface Attribute {
   id: number;
@@ -34,6 +37,7 @@ interface Attribute {
   icon: {
     type: "icon" | "image";
     value: string;
+    provider?: IconSelectorProvider;
   } | null;
   field_type: string;
   field_options: any;
@@ -287,6 +291,7 @@ const Attributes: React.FC = () => {
                 ) : (
                   <IconSelector
                     iconName={attribute.icon.value}
+                    provider={attribute.icon.provider ?? "yatra"}
                     size={16}
                     className="text-purple-600 dark:text-purple-400"
                   />

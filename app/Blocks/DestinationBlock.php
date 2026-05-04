@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\Blocks;
 
+use Yatra\Providers\FrontendAssetsProvider;
 use Yatra\Services\BlockDataService;
 
 /**
@@ -48,6 +49,8 @@ class DestinationBlock
             return;
         }
 
+        FrontendAssetsProvider::registerCoreFrontendStylesheets();
+
         wp_register_style(
             'yatra-listing',
             \YATRA_PLUGIN_URL . 'assets/css/listing.css',
@@ -55,11 +58,13 @@ class DestinationBlock
             YATRA_VERSION
         );
 
+        $destinationShortcodeCss = \YATRA_PLUGIN_PATH . 'assets/css/shortcodes/destination-shortcode.css';
+        $destinationShortcodeVer = is_readable($destinationShortcodeCss) ? YATRA_VERSION . '.' . filemtime($destinationShortcodeCss) : YATRA_VERSION;
         wp_register_style(
             'yatra-destination-shortcode',
             \YATRA_PLUGIN_URL . 'assets/css/shortcodes/destination-shortcode.css',
-            [],
-            YATRA_VERSION
+            FrontendAssetsProvider::shortcodeStyleDependencies(),
+            $destinationShortcodeVer
         );
 
         wp_register_script(

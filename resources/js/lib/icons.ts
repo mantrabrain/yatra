@@ -1,238 +1,68 @@
 /**
- * Centralized Icon System
- *
- * This file provides a centralized way to manage icons across both React and PHP.
- * Icons are defined in /includes/icons.json and loaded dynamically.
+ * Yatra icon library (includes/icons.json, expanded via scripts/sync-lucide-icons-json.mjs)
+ * + helpers for admin UI. Public PHP rendering uses yatra_svg_icon() / yatra_stored_picker_icon_markup().
  */
 
 import { createElement } from "react";
+import type { SVGProps } from "react";
+import yatraIconsManifest from "@yatra/icons";
 
-// Import all Lucide icons we use
-import {
-  Activity,
-  UtensilsCrossed,
-  Building2,
-  Bus,
-  Moon,
-  Package,
-  Target,
-  Camera,
-  Mountain,
-  Waves,
-  Palette,
-  Plane,
-  Car,
-  Hotel,
-  Coffee,
-  Bed,
-  MapPin,
-  Footprints,
-  Eye,
-  Clock,
-  Calendar,
-  Image as ImageIcon,
-  Music,
-  Gamepad2,
-  BookOpen,
-  ShoppingBag,
-  Heart,
-  Star,
-  Zap,
-  Flame,
-  FileText,
-  Download,
-  Users,
-  Globe,
-  HelpCircle,
-  MessageCircle,
-  Check,
-  Info,
-} from "lucide-react";
-
-// Map icon names to Lucide components
-const lucideIconMap: Record<
-  string,
-  React.ComponentType<React.SVGProps<SVGSVGElement>>
-> = {
-  activity: Activity,
-  footprints: Footprints,
-  mountain: Mountain,
-  waves: Waves,
-  camera: Camera,
-  eye: Eye,
-  target: Target,
-  zap: Zap,
-  flame: Flame,
-  utensils: UtensilsCrossed,
-  coffee: Coffee,
-  hotel: Hotel,
-  bed: Bed,
-  building: Building2,
-  bus: Bus,
-  plane: Plane,
-  car: Car,
-  "map-pin": MapPin,
-  calendar: Calendar,
-  clock: Clock,
-  moon: Moon,
-  package: Package,
-  palette: Palette,
-  image: ImageIcon,
-  music: Music,
-  gamepad: Gamepad2,
-  book: BookOpen,
-  shopping: ShoppingBag,
-  heart: Heart,
-  star: Star,
-  "file-text": FileText,
-  download: Download,
-  users: Users,
-  globe: Globe,
-  "help-circle": HelpCircle,
-  "message-circle": MessageCircle,
-  check: Check,
-  info: Info,
-};
-
-export type IconName = keyof typeof lucideIconMap;
-
-export interface IconData {
+export interface YatraManifestEntry {
   label: string;
-  category:
-    | "activity"
-    | "travel"
-    | "food"
-    | "accommodation"
-    | "transport"
-    | "general";
+  category: string;
   svg: string;
 }
 
-export interface IconOption {
-  name: IconName;
+export type IconOption = {
+  name: string;
   label: string;
-  component: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  category:
-    | "activity"
-    | "travel"
-    | "food"
-    | "accommodation"
-    | "transport"
-    | "general";
+  category: string;
+  svg: string;
+};
+
+/** @deprecated All string slugs from manifest are valid */
+export type IconName = string;
+
+export function getYatraIconManifest(): Record<string, YatraManifestEntry> {
+  return yatraIconsManifest as Record<string, YatraManifestEntry>;
 }
 
-// Cache for loaded icons
-let iconsCache: Record<string, IconData> | null = null;
-
-/**
- * Load icons from the centralized JSON file
- */
-export async function loadIcons(): Promise<Record<string, IconData>> {
-  if (iconsCache !== null) {
-    return iconsCache;
-  }
-
-  try {
-    // Load from the same JSON file that PHP uses
-    const response = await fetch(
-      "/wp-content/plugins/yatra/includes/icons.json",
-    );
-    if (!response.ok) {
-      throw new Error("Failed to load icons");
-    }
-
-    const loadedIcons = await response.json();
-    iconsCache = loadedIcons || {};
-    return iconsCache as Record<string, IconData>;
-  } catch (error) {
-    console.warn("Failed to load centralized icons, using fallback:", error);
-    iconsCache = {};
-    return iconsCache;
-  }
-}
-
-/**
- * Get all available icon options for the icon picker
- */
 export function getIconOptions(): IconOption[] {
-  return Object.entries(lucideIconMap).map(([name, component]) => ({
-    name: name as IconName,
-    label: name.charAt(0).toUpperCase() + name.slice(1).replace("-", " "),
-    component,
-    category: getCategoryForIcon(name as IconName),
+  const m = yatraIconsManifest as Record<string, YatraManifestEntry>;
+  return Object.entries(m).map(([name, meta]) => ({
+    name,
+    label: meta.label,
+    category: meta.category,
+    svg: meta.svg,
   }));
 }
 
-/**
- * Get category for an icon (fallback when JSON is not loaded)
- */
-function getCategoryForIcon(iconName: IconName): IconOption["category"] {
-  const categoryMap: Record<string, IconOption["category"]> = {
-    activity: "activity",
-    footprints: "activity",
-    mountain: "activity",
-    waves: "activity",
-    camera: "activity",
-    eye: "activity",
-    target: "activity",
-    zap: "activity",
-    flame: "activity",
-    utensils: "food",
-    coffee: "food",
-    hotel: "accommodation",
-    bed: "accommodation",
-    building: "accommodation",
-    bus: "transport",
-    plane: "transport",
-    car: "transport",
-    "map-pin": "travel",
-    calendar: "travel",
-    clock: "travel",
-    moon: "general",
-    package: "general",
-    palette: "general",
-    image: "general",
-    music: "general",
-    gamepad: "general",
-    book: "general",
-    shopping: "general",
-    heart: "general",
-    star: "general",
-    "file-text": "general",
-    download: "general",
-    users: "general",
-    globe: "general",
-    "help-circle": "general",
-    "message-circle": "general",
-    check: "general",
-    info: "general",
-  };
-
-  return categoryMap[iconName] || "general";
+export function getYatraIconSvg(slug: string): string | null {
+  const m = yatraIconsManifest as Record<string, YatraManifestEntry>;
+  return m[slug]?.svg ?? null;
 }
 
-/**
- * Get React component for an icon name
- */
-export function getIconComponent(
-  iconName: string,
-): React.ComponentType<React.SVGProps<SVGSVGElement>> | null {
-  return lucideIconMap[iconName] || null;
+/** @deprecated Prefer getYatraIconSvg + inline SVG; kept for narrow compatibility */
+export function getIconComponent(): null {
+  return null;
 }
 
-/**
- * Render an icon by name
- */
 export function renderIcon(
   iconName: string,
-  props: React.SVGProps<SVGSVGElement> = {},
-): React.ReactElement | null {
-  const IconComponent = getIconComponent(iconName);
-  if (!IconComponent) {
+  props: SVGProps<HTMLSpanElement> = {},
+): ReturnType<typeof createElement> | null {
+  const svg = getYatraIconSvg(iconName);
+  if (!svg) {
     return null;
   }
+  return createElement("span", {
+    ...props,
+    dangerouslySetInnerHTML: { __html: svg },
+  });
+}
 
-  return createElement(IconComponent, props);
+export async function loadIcons(): Promise<Record<string, YatraManifestEntry>> {
+  return getYatraIconManifest();
 }
 
 export default {
@@ -240,4 +70,6 @@ export default {
   getIconOptions,
   getIconComponent,
   renderIcon,
+  getYatraIconSvg,
+  getYatraIconManifest,
 };

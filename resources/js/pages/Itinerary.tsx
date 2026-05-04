@@ -30,10 +30,51 @@ import { SearchableSelect } from "../components/ui/searchable-select";
 import { Card, CardContent } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { ConditionalRender } from "../components/ui/conditional-render";
-import { IconSelector } from "../components/ui/icon-selector";
+import {
+  IconSelector,
+  type IconSelectorProvider,
+} from "../components/ui/icon-selector";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
 import { BulkActionToolbar } from "../components/shared/BulkActionToolbar";
 import { getErrorContext } from "../lib/errors";
+
+function parseItemTypeIcon(
+  icon: unknown,
+  defaultName = "footprints",
+): {
+  name: string;
+  provider: IconSelectorProvider;
+  isImage: boolean;
+  imageSrc?: string;
+} {
+  if (!icon) {
+    return { name: defaultName, provider: "yatra", isImage: false };
+  }
+  if (typeof icon === "string") {
+    return { name: icon, provider: "yatra", isImage: false };
+  }
+  if (typeof icon === "object" && icon !== null && "type" in icon) {
+    const o = icon as { type?: string; value?: string; provider?: string };
+    if (o.type === "image" && o.value) {
+      return {
+        name: "image",
+        provider: "yatra",
+        isImage: true,
+        imageSrc: String(o.value),
+      };
+    }
+    const prov: IconSelectorProvider =
+      o.provider === "fa-solid" || o.provider === "fa-regular"
+        ? o.provider
+        : "yatra";
+    return {
+      name: (o.value && String(o.value)) || defaultName,
+      provider: prov,
+      isImage: false,
+    };
+  }
+  return { name: defaultName, provider: "yatra", isImage: false };
+}
 
 interface ItineraryEntry {
   id: number;
@@ -44,6 +85,9 @@ interface ItineraryEntry {
   item_type: string;
   item_name: string;
   item_icon: string;
+  item_icon_provider?: IconSelectorProvider;
+  item_icon_is_image?: boolean;
+  item_icon_image_src?: string;
   item_color?: string;
   item_type_id: number | null;
   item_id: number | null;
@@ -199,15 +243,17 @@ const Itinerary: React.FC = () => {
         )
       : null;
 
-    // Extract icon and color from item type (already processed by backend)
-    const iconName = itemType?.icon || "footprints";
+    const parsed = parseItemTypeIcon(itemType?.icon, "footprints");
     const itemColor = itemType?.color || "gray";
 
     if (itemType && item) {
       return {
         item_type: itemType.name || "Activity",
         item_name: item.name || "Activity",
-        item_icon: iconName,
+        item_icon: parsed.name,
+        item_icon_provider: parsed.provider,
+        item_icon_is_image: parsed.isImage,
+        item_icon_image_src: parsed.imageSrc,
         item_color: itemColor,
       };
     }
@@ -217,7 +263,10 @@ const Itinerary: React.FC = () => {
       return {
         item_type: itemType.name || "Activity",
         item_name: itemType.name || "Activity",
-        item_icon: iconName,
+        item_icon: parsed.name,
+        item_icon_provider: parsed.provider,
+        item_icon_is_image: parsed.isImage,
+        item_icon_image_src: parsed.imageSrc,
         item_color: itemColor,
       };
     }
@@ -227,6 +276,8 @@ const Itinerary: React.FC = () => {
       item_type: "Activity",
       item_name: "Activity",
       item_icon: "footprints",
+      item_icon_provider: "yatra" as const,
+      item_icon_is_image: false,
       item_color: "gray",
     };
   };
@@ -433,6 +484,9 @@ const Itinerary: React.FC = () => {
               item_type: mapped.item_type,
               item_name: mapped.item_name,
               item_icon: mapped.item_icon,
+              item_icon_provider: mapped.item_icon_provider,
+              item_icon_is_image: mapped.item_icon_is_image,
+              item_icon_image_src: mapped.item_icon_image_src,
               item_color: mapped.item_color || "gray",
               item_type_id: entry.item_type_id || null,
               item_id: entry.item_id || null,
@@ -733,30 +787,16 @@ const Itinerary: React.FC = () => {
 
     return itemTypes
       .map((itemType: any) => {
-        // Extract icon - handle both string and object formats
-        let iconName = "footprints"; // default
-        if (itemType.icon) {
-          if (typeof itemType.icon === "string") {
-            iconName = itemType.icon;
-          } else if (typeof itemType.icon === "object" && itemType.icon.value) {
-            // If it's an image URL, we can't use IconSelector, so use a default
-            // Otherwise use the value as icon name
-            if (itemType.icon.type === "image") {
-              iconName = "image"; // Special case for images
-            } else {
-              iconName = itemType.icon.value;
-            }
-          }
-        }
-
-        // Extract color - default to blue if not set
+        const parsed = parseItemTypeIcon(itemType.icon, "footprints");
         const color = itemType.color || "blue";
 
         return {
           typeId: itemType.id,
           typeName: itemType.name || "",
-          typeIcon: iconName,
-          typeIconData: itemType.icon, // Keep full icon data for image handling
+          typeIcon: parsed.name,
+          typeIconProvider: parsed.provider,
+          typeIconImageSrc: parsed.isImage ? parsed.imageSrc : undefined,
+          typeIconData: itemType.icon,
           typeColor: color,
         };
       })
@@ -2008,12 +2048,6 @@ const Itinerary: React.FC = () => {
                             <div className="flex flex-wrap gap-2">
                               {quickAddOptions.length > 0 ? (
                                 quickAddOptions.map((option: any) => {
-                                  // Determine if icon is an image
-                                  const isImageIcon =
-                                    option.typeIconData &&
-                                    typeof option.typeIconData === "object" &&
-                                    option.typeIconData.type === "image";
-
                                   // Get color classes based on typeColor
                                   const colorClasses: Record<string, string> = {
                                     blue: "border-blue-500 text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20",
@@ -2051,16 +2085,18 @@ const Itinerary: React.FC = () => {
                                           : undefined,
                                       }}
                                     >
-                                      {isImageIcon &&
-                                      option.typeIconData.value ? (
+                                      {option.typeIconImageSrc ? (
                                         <img
-                                          src={option.typeIconData.value}
+                                          src={option.typeIconImageSrc}
                                           alt={option.typeName}
                                           className="w-4 h-4 object-contain"
                                         />
                                       ) : (
                                         <IconSelector
                                           iconName={option.typeIcon as any}
+                                          provider={
+                                            option.typeIconProvider ?? "yatra"
+                                          }
                                           className="w-4 h-4"
                                         />
                                       )}
@@ -2206,10 +2242,23 @@ const Itinerary: React.FC = () => {
                                           }}
                                         >
                                           <div className="flex items-center gap-1.5">
-                                            <IconSelector
-                                              iconName={entry.item_icon as any}
-                                              className="w-3 h-3"
-                                            />
+                                            {entry.item_icon_is_image &&
+                                            entry.item_icon_image_src ? (
+                                              <img
+                                                src={entry.item_icon_image_src}
+                                                alt=""
+                                                className="w-3 h-3 object-contain"
+                                              />
+                                            ) : (
+                                              <IconSelector
+                                                iconName={entry.item_icon as any}
+                                                provider={
+                                                  entry.item_icon_provider ??
+                                                  "yatra"
+                                                }
+                                                className="w-3 h-3"
+                                              />
+                                            )}
                                             <span>{entry.item_type}</span>
                                           </div>
                                         </Badge>

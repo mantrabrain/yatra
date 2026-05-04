@@ -729,18 +729,65 @@
 /* Additional responsive styles */
 @media (max-width: 768px) {
     .yatra-results-controls {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px 12px;
+    }
+
+    .yatra-sort-control {
+        flex: 1 1 min(100%, 320px);
+        min-width: 0;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: center;
+        gap: 8px 12px;
+    }
+
+    .yatra-sort-control label {
+        white-space: normal;
+        line-height: 1.25;
+        font-size: 13px;
+        color: #475569;
+    }
+
+    .yatra-sort-control select {
+        width: 100%;
+        min-width: 0;
+        flex: none;
+        max-width: 100%;
+    }
+
+    .yatra-view-toggle {
+        flex: 0 0 auto;
+        margin-left: 0;
+        align-self: center;
+    }
+
+    .yatra-destination-listing .yatra-results-controls .yatra-view-toggle,
+    .yatra-taxonomy-page .yatra-results-controls .yatra-view-toggle {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .yatra-results-controls {
         flex-direction: column;
         align-items: stretch;
-        gap: 12px;
     }
-    
+
     .yatra-sort-control {
-        justify-content: space-between;
+        grid-template-columns: 1fr;
+        gap: 6px;
     }
-    
-    .yatra-sort-control select {
-        min-width: auto;
-        flex: 1;
+
+    .yatra-sort-control label {
+        font-size: 12px;
+    }
+
+    .yatra-view-toggle {
+        align-self: flex-end;
     }
 }
 
@@ -1127,10 +1174,10 @@
 }
 
 .yatra-filter-section.open .yatra-filter-content {
-    animation: slideDown 0.3s ease;
+    animation: yatra-listing-filter-expand 0.3s ease;
 }
 
-@keyframes slideDown {
+@keyframes yatra-listing-filter-expand {
     from {
         opacity: 0;
         max-height: 0;
@@ -2074,6 +2121,17 @@ a.yatra-highlight-link:hover {
     height: 14px;
 }
 
+.yatra-difficulty-overlay i.difficulty-icon.fa-solid,
+.yatra-difficulty-overlay i.difficulty-icon.fa-regular {
+    width: auto;
+    height: auto;
+    font-size: 14px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Rating Section - consolidated with main rule above */
 
 .yatra-rating-stars {
@@ -2314,7 +2372,6 @@ span.yatra-pagination-btn.disabled {
 
     .yatra-results-controls {
         width: 100%;
-        justify-content: space-between;
     }
 
     .yatra-listing-layout {

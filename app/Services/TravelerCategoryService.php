@@ -230,16 +230,8 @@ class TravelerCategoryService extends BaseService
         // Sanitize and serialize icon if it's an array
         if (isset($data['icon'])) {
             if (is_array($data['icon'])) {
-                // Sanitize icon array
-                $icon = [
-                    'type' => isset($data['icon']['type']) && in_array($data['icon']['type'], ['icon', 'image'], true)
-                        ? $data['icon']['type']
-                        : 'icon',
-                    'value' => isset($data['icon']['value']) 
-                        ? sanitize_text_field($data['icon']['value'])
-                        : '',
-                ];
-                $data['icon'] = maybe_serialize($icon);
+                $data['icon'] = yatra_normalize_icon_picker_for_storage($data['icon']);
+                $data['icon'] = maybe_serialize($data['icon']);
             } elseif (is_string($data['icon'])) {
                 // If it's already a string, sanitize it
                 $data['icon'] = sanitize_text_field($data['icon']);
@@ -358,6 +350,27 @@ class TravelerCategoryService extends BaseService
 
         // Remove old field names that don't exist in ClassificationsTable
         unset($data['age_min'], $data['age_max'], $data['pricing_mode'], $data['min_pax'], $data['max_pax']);
+
+        // Sanitize and serialize icon if it's an array
+        if (isset($data['icon'])) {
+            if (is_array($data['icon'])) {
+                if ($data['icon']['type'] === 'image' && !empty($data['icon']['value'])) {
+                    $value = $data['icon']['value'];
+                    if (filter_var($value, FILTER_VALIDATE_URL)) {
+                        $attachment_id = attachment_url_to_postid($value);
+                        if ($attachment_id) {
+                            $data['icon']['value'] = $attachment_id;
+                        }
+                    } elseif (is_numeric($value)) {
+                        $data['icon']['value'] = (int) $value;
+                    }
+                }
+                $data['icon'] = yatra_normalize_icon_picker_for_storage($data['icon']);
+                $data['icon'] = maybe_serialize($data['icon']);
+            } elseif (is_string($data['icon'])) {
+                $data['icon'] = sanitize_text_field($data['icon']);
+            }
+        }
 
         // Set updated_by to current user
         $data['updated_by'] = absint(get_current_user_id());

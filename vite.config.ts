@@ -19,6 +19,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './resources/js'),
+      '@yatra/icons': path.resolve(__dirname, './includes/icons.json'),
+      '@yatra/fa-icon-names': path.resolve(__dirname, './includes/fa-free-icon-names.json'),
       // Avoid circular chunk split between block-editor barrel and inspector-controls (Rollup warning / broken load order).
       '@yatra/wp-inspector-controls': path.resolve(
         __dirname,

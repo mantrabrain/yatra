@@ -134,6 +134,7 @@ class DifficultyLevelService extends BaseService
                     }
                 }
                 
+                $data['icon'] = yatra_normalize_icon_picker_for_storage($data['icon']);
                 $data['icon'] = maybe_serialize($data['icon']);
             } elseif (is_string($data['icon'])) {
                 // If it's already a string, sanitize it
@@ -224,6 +225,7 @@ class DifficultyLevelService extends BaseService
                     }
                 }
                 
+                $data['icon'] = yatra_normalize_icon_picker_for_storage($data['icon']);
                 $data['icon'] = maybe_serialize($data['icon']);
             } elseif (is_string($data['icon'])) {
                 // If it's already a string, sanitize it

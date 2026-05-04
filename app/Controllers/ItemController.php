@@ -245,6 +245,15 @@ class ItemController extends BaseController
                     $icon_data = maybe_unserialize($type->icon);
                     if (is_array($icon_data) && isset($icon_data['value'])) {
                         $prepared['type_icon'] = $icon_data['value'];
+                        if (
+                            isset($icon_data['type'], $icon_data['provider'])
+                            && $icon_data['type'] === 'icon'
+                        ) {
+                            $p = sanitize_key((string) $icon_data['provider']);
+                            if (in_array($p, ['fa-solid', 'fa-regular'], true)) {
+                                $prepared['type_icon_provider'] = $p;
+                            }
+                        }
                     } elseif (is_string($type->icon)) {
                         $prepared['type_icon'] = $type->icon;
                     }

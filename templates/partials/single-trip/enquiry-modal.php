@@ -84,7 +84,7 @@ if (!defined('ABSPATH')) {
                     </svg>
                     <?php echo esc_html__('Cancel', 'yatra'); ?>
                 </button>
-                <button type="submit" class="yatra-enquiry-submit">
+                <button type="submit" class="yatra-booking-button yatra-enquiry-submit">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                     </svg>

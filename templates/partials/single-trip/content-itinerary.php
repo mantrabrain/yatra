@@ -92,7 +92,7 @@ if (!defined('ABSPATH')) {
                                             <?php echo $get_icon($entry['icon']); ?>
                                         </div>
                                         <div class="yatra-entry-info">
-                                            <span class="yatra-entry-type" style="color: <?php echo esc_attr($type_color); ?>"><?php echo esc_html($entry['item_type']); ?></span>
+                                            <span class="yatra-entry-type" style="color: <?php echo esc_attr($type_color); ?>"><?php echo esc_html(yatra_itinerary_item_type_label((string) $entry['item_type'])); ?></span>
                                             <h4 class="yatra-entry-title"><?php echo esc_html($entry['title']); ?></h4>
                                         </div>
                                         <?php if ($entry['start_time']): ?>

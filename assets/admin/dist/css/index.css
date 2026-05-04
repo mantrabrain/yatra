@@ -5851,6 +5851,22 @@ video {
   padding-right: 0px;
 }
 
+.\[\&\>svg\]\:h-6>svg {
+  height: 1.5rem;
+}
+
+.\[\&\>svg\]\:h-full>svg {
+  height: 100%;
+}
+
+.\[\&\>svg\]\:w-6>svg {
+  width: 1.5rem;
+}
+
+.\[\&\>svg\]\:w-full>svg {
+  width: 100%;
+}
+
 .\[\&_svg\]\:h-5 svg {
   height: 1.25rem;
 }

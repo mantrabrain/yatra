@@ -1,10 +1,8 @@
 /**
- * Icon Picker Component
- * Reusable component for selecting SVG icons or uploading custom images
- * Supports both Lucide React icons and custom image uploads
+ * Icon Picker: Yatra library (icons.json / Lucide SVG) + Font Awesome 6 Free + image upload.
  */
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import {
   Upload,
   X,
@@ -13,16 +11,21 @@ import {
   Sparkles,
   Check,
 } from "lucide-react";
-import { getIconOptions, type IconName } from "../../lib/icons";
+import { getIconOptions } from "../../lib/icons";
+import {
+  FA_FREE_SOLID_PICKER,
+  FA_FREE_REGULAR_PICKER,
+} from "../../lib/fa-free-picker-icons";
+import type { IconPickerValue, IconProvider } from "../../lib/icon-picker-types";
+
+export type { IconPickerValue, IconProvider } from "../../lib/icon-picker-types";
+
 import { __ } from "../../lib/i18n";
 import { Button } from "./button";
 import { Input } from "./input";
 import { Badge } from "./badge";
 import { Modal } from "./modal";
 import { useWordPressMedia } from "../../hooks/useWordPressMedia";
-
-// Use centralized icon system
-const iconOptions = getIconOptions();
 
 const categoryLabels: Record<string, string> = {
   activity: "Activities",
@@ -31,11 +34,7 @@ const categoryLabels: Record<string, string> = {
   accommodation: "Accommodation",
   transport: "Transportation",
   general: "General",
-};
-
-export type IconPickerValue = {
-  type: "icon" | "image";
-  value: string; // icon name for type 'icon', attachment ID for type 'image'
+  media: "Media",
 };
 
 interface IconPickerProps {
@@ -65,8 +64,11 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"icons" | "upload">("icons");
+  const [iconLibrary, setIconLibrary] = useState<IconProvider>("yatra");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
+  const yatraIconOptions = useMemo(() => getIconOptions(), []);
 
   const [imagePreview, setImagePreview] = useState<string | null>(
     value?.type === "image"
@@ -76,17 +78,14 @@ export const IconPicker: React.FC<IconPickerProps> = ({
       : null,
   );
 
-  // Update preview when value changes and fetch URL if it's an attachment ID
   useEffect(() => {
     if (value?.type === "image") {
-      // If it's already a URL, use it directly
       if (
         value.value.startsWith("http://") ||
         value.value.startsWith("https://")
       ) {
         setImagePreview(value.value);
       } else if (/^\d+$/.test(value.value) && window.yatraAdmin?.apiUrl) {
-        // It's an attachment ID, fetch the URL from WordPress REST API
         const apiUrl = window.yatraAdmin.apiUrl.replace("/yatra/v1", "");
         fetch(`${apiUrl}/wp/v2/media/${value.value}`)
           .then((res) => res.json())
@@ -95,16 +94,13 @@ export const IconPicker: React.FC<IconPickerProps> = ({
               setImagePreview(data.source_url);
             }
           })
-          .catch(() => {
-            // Keep null if fetch fails
-          });
+          .catch(() => {});
       }
     } else {
       setImagePreview(null);
     }
   }, [value]);
 
-  // WordPress media library hook
   const { openMediaLibrary } = useWordPressMedia({
     title: __("Select or Upload Image", "yatra"),
     buttonText: __("Use this image", "yatra"),
@@ -124,24 +120,45 @@ export const IconPicker: React.FC<IconPickerProps> = ({
     lg: "w-8 h-8",
   };
 
-  // Filter icons by search and category
-  const filteredIcons = iconOptions.filter((icon) => {
-    const matchesSearch =
-      icon.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      icon.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "all" || icon.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredYatraIcons = useMemo(() => {
+    const q = searchTerm.toLowerCase();
+    return yatraIconOptions.filter((icon) => {
+      const matchesSearch =
+        icon.label.toLowerCase().includes(q) ||
+        icon.name.toLowerCase().includes(q);
+      const matchesCategory =
+        selectedCategory === "all" || icon.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [yatraIconOptions, searchTerm, selectedCategory]);
 
-  // Get unique categories
-  const categories = [
-    "all",
-    ...Array.from(new Set(iconOptions.map((icon) => icon.category))),
-  ];
+  const faSourceList =
+    iconLibrary === "fa-regular" ? FA_FREE_REGULAR_PICKER : FA_FREE_SOLID_PICKER;
 
-  const handleIconSelect = (iconName: IconName) => {
-    onChange({ type: "icon", value: iconName });
+  const filteredFaIcons = useMemo(() => {
+    const q = searchTerm.toLowerCase();
+    return faSourceList.filter(
+      (row) =>
+        row.label.toLowerCase().includes(q) || row.name.toLowerCase().includes(q),
+    );
+  }, [faSourceList, searchTerm]);
+
+  const categories = useMemo(
+    () => [
+      "all",
+      ...Array.from(new Set(yatraIconOptions.map((icon) => icon.category))),
+    ],
+    [yatraIconOptions],
+  );
+
+  const selectYatraIcon = (name: string) => {
+    onChange({ type: "icon", value: name, provider: "yatra" });
+    setIsOpen(false);
+    setSearchTerm("");
+  };
+
+  const selectFaIcon = (name: string, style: "fa-solid" | "fa-regular") => {
+    onChange({ type: "icon", value: name, provider: style });
     setIsOpen(false);
     setSearchTerm("");
   };
@@ -149,9 +166,8 @@ export const IconPicker: React.FC<IconPickerProps> = ({
   const handleWordPressMediaSelect = useCallback(() => {
     openMediaLibrary((attachment) => {
       if (attachment && !Array.isArray(attachment)) {
-        // Store attachment ID instead of URL
         const attachmentId = String(attachment.id);
-        setImagePreview(attachment.url); // Use URL for preview
+        setImagePreview(attachment.url);
         onChange({ type: "image", value: attachmentId });
         setIsOpen(false);
       }
@@ -172,13 +188,50 @@ export const IconPicker: React.FC<IconPickerProps> = ({
     }
   };
 
-  const getCurrentIcon = () => {
-    if (!value || value.type !== "icon") return null;
-    const icon = iconOptions.find((opt) => opt.name === value.value);
-    return icon?.component || null;
+  const selectionSummary = (): string => {
+    if (!value) {
+      return __("Select Icon or Upload Image", "yatra");
+    }
+    if (value.type === "image") {
+      return __("Custom Image", "yatra");
+    }
+    const p = value.provider ?? "yatra";
+    if (p === "fa-solid") {
+      return `${__("Font Awesome Solid", "yatra")}: ${value.value}`;
+    }
+    if (p === "fa-regular") {
+      return `${__("Font Awesome Regular", "yatra")}: ${value.value}`;
+    }
+    const meta = yatraIconOptions.find((o) => o.name === value.value);
+    return `${__("Yatra", "yatra")}: ${meta?.label || value.value}`;
   };
 
-  const CurrentIcon = getCurrentIcon();
+  const renderIconPreview = () => {
+    if (!value || value.type !== "icon") {
+      return <ImageLucide className={`${iconSizeClasses[size]} text-gray-400`} />;
+    }
+    const p = value.provider ?? "yatra";
+    if (p === "fa-solid" || p === "fa-regular") {
+      const prefix = p === "fa-regular" ? "fa-regular" : "fa-solid";
+      return (
+        <i
+          className={`${prefix} fa-${value.value} ${iconSizeClasses[size]} text-gray-700 dark:text-gray-300 inline-flex items-center justify-center`}
+          aria-hidden="true"
+        />
+      );
+    }
+    const opt = yatraIconOptions.find((o) => o.name === value.value);
+    if (opt?.svg) {
+      return (
+        <span
+          className={`inline-flex items-center justify-center ${iconSizeClasses[size]} text-gray-700 dark:text-gray-300 [&>svg]:w-full [&>svg]:h-full`}
+          // eslint-disable-next-line react/no-danger -- bundled Yatra icons.json SVG
+          dangerouslySetInnerHTML={{ __html: opt.svg }}
+        />
+      );
+    }
+    return <ImageLucide className={`${iconSizeClasses[size]} text-gray-400`} />;
+  };
 
   return (
     <div className={`space-y-2 ${className}`}>
@@ -192,7 +245,6 @@ export const IconPicker: React.FC<IconPickerProps> = ({
         <p className="text-xs text-gray-500 dark:text-gray-400">{helpText}</p>
       )}
 
-      {/* Current Selection Display */}
       <div className="flex items-center gap-3">
         <div
           className={`${sizeClasses[size]} rounded-lg border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center bg-gray-50 dark:bg-gray-800 overflow-hidden`}
@@ -203,12 +255,8 @@ export const IconPicker: React.FC<IconPickerProps> = ({
               alt="Selected"
               className="w-full h-full object-cover"
             />
-          ) : value?.type === "icon" && CurrentIcon ? (
-            <CurrentIcon
-              className={`${iconSizeClasses[size]} text-gray-700 dark:text-gray-300`}
-            />
           ) : (
-            <ImageLucide className={`${iconSizeClasses[size]} text-gray-400`} />
+            renderIconPreview()
           )}
         </div>
 
@@ -219,11 +267,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
             onClick={() => setIsOpen(!isOpen)}
             className="w-full justify-start"
           >
-            {value?.type === "icon"
-              ? `${__("Icon", "yatra")}: ${iconOptions.find((i) => i.name === value.value)?.label || value.value}`
-              : value?.type === "image"
-                ? __("Custom Image", "yatra")
-                : __("Select Icon or Upload Image", "yatra")}
+            {selectionSummary()}
           </Button>
         </div>
 
@@ -247,7 +291,6 @@ export const IconPicker: React.FC<IconPickerProps> = ({
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
 
-      {/* Icon Picker Modal */}
       <Modal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
@@ -256,7 +299,6 @@ export const IconPicker: React.FC<IconPickerProps> = ({
         showCloseButton={true}
         customZIndex={99999}
       >
-        {/* Tabs */}
         <div className="flex border-b border-gray-200 dark:border-gray-700">
           {allowIconSelection && (
             <button
@@ -288,11 +330,33 @@ export const IconPicker: React.FC<IconPickerProps> = ({
           )}
         </div>
 
-        {/* Content */}
         <div className="p-4 max-h-[60vh] overflow-y-auto">
           {activeTab === "icons" && allowIconSelection && (
             <div className="space-y-4">
-              {/* Search */}
+              <div className="flex flex-wrap gap-2 border-b border-gray-100 dark:border-gray-800 pb-3">
+                <Badge
+                  variant={iconLibrary === "yatra" ? "info" : "outline"}
+                  className="cursor-pointer"
+                  onClick={() => setIconLibrary("yatra")}
+                >
+                  {__("Yatra library", "yatra")}
+                </Badge>
+                <Badge
+                  variant={iconLibrary === "fa-solid" ? "info" : "outline"}
+                  className="cursor-pointer"
+                  onClick={() => setIconLibrary("fa-solid")}
+                >
+                  {__("Font Awesome Solid", "yatra")}
+                </Badge>
+                <Badge
+                  variant={iconLibrary === "fa-regular" ? "info" : "outline"}
+                  className="cursor-pointer"
+                  onClick={() => setIconLibrary("fa-regular")}
+                >
+                  {__("Font Awesome Regular", "yatra")}
+                </Badge>
+              </div>
+
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
@@ -304,62 +368,119 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                 />
               </div>
 
-              {/* Category Filter */}
-              <div className="flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <Badge
-                    key={category}
-                    variant={selectedCategory === category ? "info" : "outline"}
-                    className="cursor-pointer"
-                    onClick={() => setSelectedCategory(category)}
-                  >
-                    {category === "all"
-                      ? __("All", "yatra")
-                      : categoryLabels[category] || category}
-                  </Badge>
-                ))}
-              </div>
+              {(iconLibrary === "fa-solid" || iconLibrary === "fa-regular") && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {__(
+                    "Tip: use search to filter the full Font Awesome Free library (1000+ solid, 150+ regular).",
+                    "yatra",
+                  )}
+                </p>
+              )}
 
-              {/* Icons Grid */}
-              <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-3">
-                {filteredIcons.map((icon) => {
-                  const IconComponent = icon.component;
-                  const isSelected =
-                    value?.type === "icon" && value.value === icon.name;
-                  return (
-                    <button
-                      key={icon.name}
-                      type="button"
-                      onClick={() => handleIconSelect(icon.name)}
-                      className={`relative p-3 rounded-lg border-2 transition-all hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 ${
-                        isSelected
-                          ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20"
-                          : "border-gray-200 dark:border-gray-700"
-                      }`}
-                      title={icon.label}
+              {iconLibrary === "yatra" && (
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((category) => (
+                    <Badge
+                      key={category}
+                      variant={
+                        selectedCategory === category ? "info" : "outline"
+                      }
+                      className="cursor-pointer"
+                      onClick={() => setSelectedCategory(category)}
                     >
-                      <IconComponent className="w-6 h-6 text-gray-700 dark:text-gray-300 mx-auto" />
-                      {isSelected && (
-                        <div className="absolute top-1 right-1 bg-blue-600 rounded-full p-0.5">
-                          <Check className="w-3 h-3 text-white" />
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+                      {category === "all"
+                        ? __("All", "yatra")
+                        : categoryLabels[category] || category}
+                    </Badge>
+                  ))}
+                </div>
+              )}
 
-              {filteredIcons.length === 0 && (
+              {iconLibrary === "yatra" && (
+                <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-3">
+                  {filteredYatraIcons.map((icon) => {
+                    const isSelected =
+                      value?.type === "icon" &&
+                      (value.provider ?? "yatra") === "yatra" &&
+                      value.value === icon.name;
+                    return (
+                      <button
+                        key={icon.name}
+                        type="button"
+                        onClick={() => selectYatraIcon(icon.name)}
+                        className={`relative p-3 rounded-lg border-2 transition-all hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 ${
+                          isSelected
+                            ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20"
+                            : "border-gray-200 dark:border-gray-700"
+                        }`}
+                        title={icon.label}
+                      >
+                        <span
+                          className="w-6 h-6 mx-auto text-gray-700 dark:text-gray-300 flex items-center justify-center [&>svg]:w-6 [&>svg]:h-6"
+                          // eslint-disable-next-line react/no-danger
+                          dangerouslySetInnerHTML={{ __html: icon.svg }}
+                        />
+                        {isSelected && (
+                          <div className="absolute top-1 right-1 bg-blue-600 rounded-full p-0.5">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {(iconLibrary === "fa-solid" || iconLibrary === "fa-regular") && (
+                <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-3">
+                  {filteredFaIcons.map((row) => {
+                    const isSelected =
+                      value?.type === "icon" &&
+                      value.provider === row.style &&
+                      value.value === row.name;
+                    return (
+                      <button
+                        key={`${row.style}-${row.name}`}
+                        type="button"
+                        onClick={() => selectFaIcon(row.name, row.style)}
+                        className={`relative p-3 rounded-lg border-2 transition-all hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 ${
+                          isSelected
+                            ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20"
+                            : "border-gray-200 dark:border-gray-700"
+                        }`}
+                        title={row.label}
+                      >
+                        <i
+                          className={`${row.style} fa-${row.name} w-6 h-6 mx-auto text-gray-700 dark:text-gray-300 inline-flex items-center justify-center`}
+                          aria-hidden="true"
+                        />
+                        {isSelected && (
+                          <div className="absolute top-1 right-1 bg-blue-600 rounded-full p-0.5">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {iconLibrary === "yatra" && filteredYatraIcons.length === 0 && (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                   {__("No icons found", "yatra")}
                 </div>
               )}
+              {(iconLibrary === "fa-solid" || iconLibrary === "fa-regular") &&
+                filteredFaIcons.length === 0 && (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    {__("No icons found", "yatra")}
+                  </div>
+                )}
             </div>
           )}
 
           {activeTab === "upload" && allowImageUpload && (
             <div className="space-y-6 p-2">
-              {/* Image Preview or Upload Area */}
               {imagePreview ? (
                 <div className="space-y-4">
                   <div className="relative group">
@@ -396,7 +517,6 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {/* WordPress Media Library Upload */}
                   <div
                     onClick={handleWordPressMediaSelect}
                     className="group cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 rounded-xl p-12 text-center transition-all duration-200 hover:bg-blue-50/50 dark:hover:bg-blue-900/10"
@@ -412,17 +532,10 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {__("Click to open WordPress Media Library", "yatra")}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-500">
-                          {__(
-                            "Select from library or upload new image",
-                            "yatra",
-                          )}
-                        </p>
                       </div>
                     </div>
                   </div>
 
-                  {/* Divider */}
                   <div className="relative">
                     <div className="absolute inset-0 flex items-center">
                       <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
@@ -434,7 +547,6 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                     </div>
                   </div>
 
-                  {/* Image URL Input */}
                   <div className="space-y-3">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       {__("Enter Image URL", "yatra")}
@@ -453,7 +565,6 @@ export const IconPicker: React.FC<IconPickerProps> = ({
           )}
         </div>
 
-        {/* Footer */}
         <div className="border-t border-gray-200 dark:border-gray-700 p-4 flex justify-end gap-2">
           <Button
             type="button"

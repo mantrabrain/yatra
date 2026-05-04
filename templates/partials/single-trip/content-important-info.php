@@ -122,9 +122,9 @@ if (!defined('ABSPATH')) {
                         <div class="yatra-info-detail-row">
                             <span class="yatra-info-label">
                                 <?php echo yatra_svg_icon('utensils', 'yatra-icon-tiny'); ?>
-                                <?php esc_html_e('Meals:', 'yatra'); ?>
+                                <?php esc_html_e('Meal Plan:', 'yatra'); ?>
                             </span>
-                            <span class="yatra-info-value"><?php echo esc_html(ucwords(str_replace('_', ' ', $trip->meal_plan))); ?></span>
+                            <span class="yatra-info-value"><?php echo esc_html(yatra_meal_plan_label((string) $trip->meal_plan)); ?></span>
                         </div>
                         <?php endif; ?>
                         <?php if (!empty($trip->accommodation_details)): ?>

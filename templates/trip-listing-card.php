@@ -207,9 +207,12 @@ try {
         </button>
         <?php endif; ?>
         <!-- Difficulty level overlay on bottom-right -->
-        <?php if ($difficulty['has_difficulty'] && !empty($difficulty['icon'])): ?>
+        <?php if ($difficulty['has_difficulty'] && (!empty($difficulty['icon_picker']) || !empty($difficulty['icon']))): ?>
             <div class="yatra-difficulty-overlay">
-                <?php echo yatra_svg_icon($difficulty['icon'], 'difficulty-icon'); ?>
+                <?php
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                echo yatra_stored_picker_icon_markup($difficulty['icon_picker'] ?? null, 'mountain', 'difficulty-icon');
+                ?>
                 <?php echo ' ' . esc_html($difficulty['level']); ?>
             </div>
         <?php endif; ?>
@@ -330,7 +333,7 @@ try {
                 </div>
             <?php endif; ?>
 
-            <?php if (!empty($difficulty['has_difficulty']) && empty($difficulty['icon'])) : ?>
+            <?php if (!empty($difficulty['has_difficulty']) && empty($difficulty['icon']) && empty($difficulty['icon_picker'])) : ?>
                 <div class="yatra-trip-stat">
                     <div class="yatra-stat-icon difficulty">
                         <?php echo yatra_svg_icon('mountain', ''); ?>
@@ -394,7 +397,8 @@ try {
                     if (!empty($first_category->icon)) {
                         $icon_data = maybe_unserialize($first_category->icon);
                         if (is_array($icon_data) && isset($icon_data['type']) && $icon_data['type'] === 'icon' && !empty($icon_data['value'])) {
-                            echo yatra_svg_icon($icon_data['value'], 'category-icon');
+                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                            echo yatra_stored_picker_icon_markup($icon_data, 'tag', 'category-icon');
                         } else {
                             echo '<svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" clip-rule="evenodd" /></svg>';
                         }

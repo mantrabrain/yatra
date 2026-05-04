@@ -41,6 +41,7 @@ interface Item {
   type_id: number;
   type_name?: string;
   type_icon?: string;
+  type_icon_provider?: "yatra" | "fa-solid" | "fa-regular";
   status: "draft" | "publish" | "trash";
   usage_count?: number;
   created_at: string;
@@ -516,6 +517,7 @@ const Items: React.FC = () => {
             <div className="w-8 h-8 rounded-md bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
               <IconSelector
                 iconName={item.type_icon as any}
+                provider={item.type_icon_provider ?? "yatra"}
                 className="w-4 h-4 text-gray-700 dark:text-gray-300"
               />
             </div>

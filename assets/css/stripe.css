@@ -354,10 +354,6 @@
     vertical-align: middle;
 }
 
-@keyframes yatra-spin {
-    to { transform: rotate(360deg); }
-}
-
 /* Responsive adjustments */
 @media (max-width: 480px) {
     .yatra-stripe-card-element {

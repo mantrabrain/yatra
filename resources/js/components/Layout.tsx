@@ -743,20 +743,39 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   {__("Back to WordPress", "yatra")}
                 </a>
 
-                {/* Flush Permalinks (same API as Settings → Permalink) */}
+                <a
+                  href="https://www.facebook.com/groups/yatrawordpressplugin"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  <MessageSquare className="w-4 h-4 shrink-0" aria-hidden />
+                  {__("Join Community", "yatra")}
+                </a>
+
+                {/* Flush permalink (same API as Settings → Permalink); icon + native title for tooltip */}
                 <Button
+                  type="button"
                   variant="outline"
-                  size="sm"
+                  size="icon"
                   onClick={() => flushRewriteRulesMutation.mutate()}
                   disabled={flushRewriteRulesMutation.isPending}
-                  className="flex items-center gap-2"
+                  className="h-9 w-9 shrink-0 border-gray-300 dark:border-gray-600"
+                  title={
+                    flushRewriteRulesMutation.isPending
+                      ? __("Flushing...", "yatra")
+                      : __("Flush permalink", "yatra")
+                  }
+                  aria-label={
+                    flushRewriteRulesMutation.isPending
+                      ? __("Flushing rewrite rules", "yatra")
+                      : __("Flush permalink", "yatra")
+                  }
                 >
                   <RotateCcw
-                    className={`w-4 h-4 ${flushRewriteRulesMutation.isPending ? "animate-spin" : ""}`}
+                    className={`h-4 w-4 ${flushRewriteRulesMutation.isPending ? "animate-spin" : ""}`}
+                    aria-hidden
                   />
-                  {flushRewriteRulesMutation.isPending
-                    ? __("Flushing...", "yatra")
-                    : __("Flush Permalinks", "yatra")}
                 </Button>
 
                 <ConditionalRender capability="yatra_edit_trips">

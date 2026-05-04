@@ -242,7 +242,18 @@ class AdminAssetsProvider
      */
     private function enqueueAdminReactCss(): void
     {
+        $faPath = YATRA_PLUGIN_PATH . 'assets/vendor/fontawesome/css/all.min.css';
+        if (file_exists($faPath)) {
+            wp_enqueue_style(
+                'yatra-fontawesome-6-admin',
+                YATRA_PLUGIN_URL . 'assets/vendor/fontawesome/css/all.min.css',
+                [],
+                '6.7.2.' . filemtime($faPath)
+            );
+        }
+
         $basePath = YATRA_PLUGIN_PATH . 'assets/admin/dist/css/';
+        $faHandle = file_exists($faPath) ? 'yatra-fontawesome-6-admin' : false;
 
         // React vendor CSS (contains react-draft-wysiwyg CSS)
         $reactVendorCss = $basePath . 'react-vendor.css';
@@ -251,7 +262,7 @@ class AdminAssetsProvider
             wp_enqueue_style(
                 'yatra-react-vendor',
                 YATRA_PLUGIN_URL . 'assets/admin/dist/css/react-vendor.css',
-                [],
+                $faHandle ? [$faHandle] : [],
                 $cssVersion
             );
         }

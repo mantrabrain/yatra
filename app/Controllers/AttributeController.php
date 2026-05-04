@@ -361,6 +361,8 @@ class AttributeController extends BaseController
                         $attribute->validation_rules = $metadata['validation_rules'] ?? null;
                     }
                 }
+
+                $this->attachDecodedIconToAttribute($attribute);
                 
                 return $this->success_response($attribute, 201);
             }
@@ -405,37 +407,7 @@ class AttributeController extends BaseController
                 }
             }
             
-            // Process icon field - unserialize if it's serialized
-            if (!empty($attribute->icon)) {
-                $icon_data = maybe_unserialize($attribute->icon);
-                if (is_array($icon_data)) {
-                    // Resolve image URLs for image type icons
-                    if ($icon_data['type'] === 'image' && !empty($icon_data['value'])) {
-                        $value = $icon_data['value'];
-                        $image_url = '';
-                        
-                        if (is_numeric($value)) {
-                            $maybe_url = wp_get_attachment_image_url((int) $value, 'large');
-                            if (!empty($maybe_url)) {
-                                $image_url = $maybe_url;
-                            }
-                        } elseif (is_string($value) && filter_var($value, FILTER_VALIDATE_URL)) {
-                            $image_url = $value;
-                        }
-                        
-                        $icon_data['value'] = $image_url;
-                    }
-                    $attribute->icon = $icon_data;
-                } else {
-                    // Handle legacy string format
-                    $attribute->icon = [
-                        'type' => 'icon',
-                        'value' => $attribute->icon
-                    ];
-                }
-            } else {
-                $attribute->icon = null;
-            }
+            $this->attachDecodedIconToAttribute($attribute);
             
             return $this->success_response($attribute);
             
@@ -744,15 +716,16 @@ class AttributeController extends BaseController
         if ($request->has_param('icon')) {
             $icon = $request->get_param('icon');
             if (is_array($icon)) {
-                // Sanitize icon array
-                $data['icon'] = [
-                    'type' => isset($icon['type']) && in_array($icon['type'], ['icon', 'image'], true)
-                        ? $icon['type']
-                        : 'icon',
-                    'value' => isset($icon['value']) 
-                        ? sanitize_text_field($icon['value'])
-                        : '',
-                ];
+                $data['icon'] = function_exists('yatra_normalize_icon_picker_for_storage')
+                    ? yatra_normalize_icon_picker_for_storage($icon)
+                    : [
+                        'type' => isset($icon['type']) && in_array($icon['type'], ['icon', 'image'], true)
+                            ? $icon['type']
+                            : 'icon',
+                        'value' => isset($icon['value'])
+                            ? sanitize_text_field((string) $icon['value'])
+                            : '',
+                    ];
             } elseif (is_string($icon)) {
                 // Handle legacy string format
                 $data['icon'] = sanitize_text_field($icon);
@@ -988,6 +961,43 @@ class AttributeController extends BaseController
             return $this->success_response($stats);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Replace raw DB icon (serialized array or legacy string) with REST JSON (preserves Font Awesome provider).
+     *
+     * @param object $attribute Row from AttributeService::getById()
+     */
+    private function attachDecodedIconToAttribute(object $attribute): void
+    {
+        if (!empty($attribute->icon)) {
+            $icon_data = maybe_unserialize($attribute->icon);
+            if (is_array($icon_data)) {
+                if ($icon_data['type'] === 'image' && !empty($icon_data['value'])) {
+                    $value = $icon_data['value'];
+                    $image_url = '';
+
+                    if (is_numeric($value)) {
+                        $maybe_url = wp_get_attachment_image_url((int) $value, 'large');
+                        if (!empty($maybe_url)) {
+                            $image_url = $maybe_url;
+                        }
+                    } elseif (is_string($value) && filter_var($value, FILTER_VALIDATE_URL)) {
+                        $image_url = $value;
+                    }
+
+                    $icon_data['value'] = $image_url;
+                }
+                $attribute->icon = $icon_data;
+            } else {
+                $attribute->icon = [
+                    'type' => 'icon',
+                    'value' => (string) $attribute->icon,
+                ];
+            }
+        } else {
+            $attribute->icon = null;
         }
     }
 }

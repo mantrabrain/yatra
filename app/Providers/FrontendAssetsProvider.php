@@ -25,8 +25,51 @@ class FrontendAssetsProvider
      */
     public function register(): void
     {
+        add_action('init', [self::class, 'registerCoreFrontendStylesheets'], 5);
         // Hook into WordPress to enqueue assets
         add_action('wp_enqueue_scripts', [$this, 'enqueueAssets']);
+    }
+
+    /**
+     * Register Font Awesome (optional) and common.css so block editor + shortcode styles can
+     * depend on `yatra-common` (shared @keyframes: yatra-spin, yatra-shimmer, etc.).
+     */
+    /**
+     * @return list<string>
+     */
+    public static function shortcodeStyleDependencies(): array
+    {
+        self::registerCoreFrontendStylesheets();
+
+        return wp_style_is('yatra-common', 'registered') ? ['yatra-common'] : [];
+    }
+
+    public static function registerCoreFrontendStylesheets(): void
+    {
+        $faPath = YATRA_PLUGIN_PATH . 'assets/vendor/fontawesome/css/all.min.css';
+        if (file_exists($faPath) && !wp_style_is('yatra-fontawesome-6', 'registered')) {
+            wp_register_style(
+                'yatra-fontawesome-6',
+                YATRA_PLUGIN_URL . 'assets/vendor/fontawesome/css/all.min.css',
+                [],
+                '6.7.2.' . filemtime($faPath)
+            );
+        }
+
+        if (wp_style_is('yatra-common', 'registered')) {
+            return;
+        }
+        $path = YATRA_PLUGIN_PATH . 'assets/css/common.css';
+        if (!is_readable($path)) {
+            return;
+        }
+        $commonDeps = wp_style_is('yatra-fontawesome-6', 'registered') ? ['yatra-fontawesome-6'] : [];
+        wp_register_style(
+            'yatra-common',
+            YATRA_PLUGIN_URL . 'assets/css/common.css',
+            $commonDeps,
+            YATRA_VERSION . '.' . filemtime($path)
+        );
     }
 
     /**
@@ -81,16 +124,41 @@ class FrontendAssetsProvider
             'tour-viewer' => 'tour-viewer.css',
         ];
 
+        self::registerCoreFrontendStylesheets();
+
+        if (wp_style_is('yatra-fontawesome-6', 'registered')) {
+            wp_enqueue_style('yatra-fontawesome-6');
+        }
+
         foreach ($cssFiles as $handle => $filename) {
             $filePath = YATRA_PLUGIN_PATH . "assets/css/{$filename}";
-            if (file_exists($filePath)) {
-                wp_enqueue_style(
-                    "yatra-{$handle}",
-                    YATRA_PLUGIN_URL . "assets/css/{$filename}",
-                    [],
-                    YATRA_VERSION . '.' . filemtime($filePath)
-                );
+            if (!file_exists($filePath)) {
+                continue;
             }
+            $styleHandle = 'yatra-' . $handle;
+            $ver = YATRA_VERSION . '.' . filemtime($filePath);
+
+            if ($handle === 'common') {
+                if (wp_style_is('yatra-common', 'registered')) {
+                    wp_enqueue_style('yatra-common');
+                } else {
+                    $deps = wp_style_is('yatra-fontawesome-6', 'registered') ? ['yatra-fontawesome-6'] : [];
+                    wp_enqueue_style($styleHandle, YATRA_PLUGIN_URL . "assets/css/{$filename}", $deps, $ver);
+                }
+                continue;
+            }
+
+            $deps = [];
+            if ($handle !== 'common' && wp_style_is('yatra-common', 'registered')) {
+                $deps[] = 'yatra-common';
+            }
+
+            wp_enqueue_style(
+                $styleHandle,
+                YATRA_PLUGIN_URL . "assets/css/{$filename}",
+                $deps,
+                $ver
+            );
         }
 
         $this->enqueueFrontendThemeVariables();
@@ -414,7 +482,7 @@ class FrontendAssetsProvider
             wp_enqueue_style(
                 'yatra-booking',
                 YATRA_PLUGIN_URL . 'assets/css/booking.css',
-                [],
+                ['yatra-common'],
                 YATRA_VERSION . '.' . filemtime($bookingCss)
             );
         }

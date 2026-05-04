@@ -229,6 +229,19 @@ class ActivityValidator
             $sanitized['excluded_items'] = is_array($data['excluded_items']) ? json_encode($data['excluded_items']) : $data['excluded_items'];
         }
 
+        // Icon (Yatra SVG / Font Awesome / image) — preserve full picker shape; Service layer serializes.
+        if (array_key_exists('icon', $data)) {
+            if (is_array($data['icon'])) {
+                $sanitized['icon'] = function_exists('yatra_normalize_icon_picker_for_storage')
+                    ? yatra_normalize_icon_picker_for_storage($data['icon'])
+                    : $data['icon'];
+            } elseif (is_string($data['icon'])) {
+                $sanitized['icon'] = sanitize_text_field($data['icon']);
+            } elseif ($data['icon'] === null) {
+                $sanitized['icon'] = null;
+            }
+        }
+
         return $sanitized;
     }
 }

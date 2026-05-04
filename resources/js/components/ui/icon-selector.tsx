@@ -1,162 +1,93 @@
 /**
- * Icon Selector Component
- * Maps icon names to lucide-react SVG icons
+ * Renders a stored icon in admin lists: Yatra SVG library (icons.json) or Font Awesome Free (webfont).
  */
 
 import React from "react";
-import {
-  Activity,
-  UtensilsCrossed,
-  Building2,
-  Bus,
-  Moon,
-  Package,
-  Target,
-  Camera,
-  Mountain,
-  Waves,
-  Palette,
-  Plane,
-  Car,
-  Hotel,
-  Coffee,
-  Bed,
-  MapPin,
-  Footprints,
-  Eye,
-  Clock,
-  Calendar,
-  Image,
-  Music,
-  Gamepad2,
-  BookOpen,
-  ShoppingBag,
-  Heart,
-  Star,
-  Zap,
-  Flame,
-} from "lucide-react";
+import { Package } from "lucide-react";
+import { getYatraIconSvg } from "../../lib/icons";
+import { FA_REGULAR_NAME_SET, FA_SOLID_NAME_SET } from "../../lib/fa-free-picker-icons";
+import type { IconPickerValue } from "../../lib/icon-picker-types";
 
-export type IconName =
-  | "activity"
-  | "utensils"
-  | "building"
-  | "bus"
-  | "moon"
-  | "package"
-  | "target"
-  | "camera"
-  | "mountain"
-  | "waves"
-  | "palette"
-  | "plane"
-  | "car"
-  | "hotel"
-  | "coffee"
-  | "bed"
-  | "map-pin"
-  | "footprints"
-  | "eye"
-  | "clock"
-  | "calendar"
-  | "image"
-  | "music"
-  | "gamepad"
-  | "book"
-  | "shopping"
-  | "heart"
-  | "star"
-  | "zap"
-  | "flame";
-
-const iconMap: Record<
-  IconName,
-  React.ComponentType<React.SVGProps<SVGSVGElement>>
-> = {
-  activity: Activity,
-  utensils: UtensilsCrossed,
-  building: Building2,
-  bus: Bus,
-  moon: Moon,
-  package: Package,
-  target: Target,
-  camera: Camera,
-  mountain: Mountain,
-  waves: Waves,
-  palette: Palette,
-  plane: Plane,
-  car: Car,
-  hotel: Hotel,
-  coffee: Coffee,
-  bed: Bed,
-  "map-pin": MapPin,
-  footprints: Footprints,
-  eye: Eye,
-  clock: Clock,
-  calendar: Calendar,
-  image: Image,
-  music: Music,
-  gamepad: Gamepad2,
-  book: BookOpen,
-  shopping: ShoppingBag,
-  heart: Heart,
-  star: Star,
-  zap: Zap,
-  flame: Flame,
-};
+export type IconSelectorProvider = "yatra" | "fa-solid" | "fa-regular";
 
 interface IconSelectorProps {
-  iconName: IconName | string;
+  /** Legacy: slug only (Yatra library) */
+  iconName: string;
+  provider?: IconSelectorProvider;
   className?: string;
   size?: number;
 }
 
 export const IconSelector: React.FC<IconSelectorProps> = ({
   iconName,
+  provider = "yatra",
   className = "w-5 h-5",
   size,
 }: IconSelectorProps) => {
-  const IconComponent = iconMap[iconName as IconName] || Package;
-  const sizeProps = size ? { width: size, height: size } : {};
+  const sizeStyle =
+    size !== undefined
+      ? {
+          fontSize: size,
+          width: size,
+          height: size,
+          lineHeight: 1,
+          display: "inline-flex" as const,
+          alignItems: "center" as const,
+          justifyContent: "center" as const,
+        }
+      : undefined;
 
-  return <IconComponent className={className} {...sizeProps} />;
+  if (provider === "fa-solid" || provider === "fa-regular") {
+    const ok =
+      provider === "fa-regular"
+        ? FA_REGULAR_NAME_SET.has(iconName)
+        : FA_SOLID_NAME_SET.has(iconName);
+    if (ok) {
+      const prefix = provider === "fa-regular" ? "fa-regular" : "fa-solid";
+      return (
+        <i
+          className={`${prefix} fa-${iconName} ${className}`}
+          style={sizeStyle}
+          aria-hidden="true"
+        />
+      );
+    }
+    return <Package className={className} style={sizeStyle} />;
+  }
+
+  const svg = getYatraIconSvg(iconName);
+  if (svg) {
+    return (
+      <span
+        className={`inline-flex items-center justify-center ${className}`}
+        // eslint-disable-next-line react/no-danger -- trusted Yatra-bundled SVG from icons.json
+        dangerouslySetInnerHTML={{ __html: svg }}
+        style={sizeStyle}
+      />
+    );
+  }
+
+  return <Package className={className} style={sizeStyle} />;
 };
 
+/** @deprecated Use getIconOptions() from lib/icons for the full Yatra set */
 export const availableIcons: Array<{
-  name: IconName;
+  name: string;
   label: string;
-  component: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-}> = [
-  { name: "activity", label: "Activity", component: Activity },
-  { name: "utensils", label: "Meal", component: UtensilsCrossed },
-  { name: "building", label: "Building", component: Building2 },
-  { name: "bus", label: "Bus", component: Bus },
-  { name: "plane", label: "Plane", component: Plane },
-  { name: "car", label: "Car", component: Car },
-  { name: "hotel", label: "Hotel", component: Hotel },
-  { name: "moon", label: "Rest", component: Moon },
-  { name: "bed", label: "Bed", component: Bed },
-  { name: "coffee", label: "Coffee", component: Coffee },
-  { name: "package", label: "Package", component: Package },
-  { name: "target", label: "Target", component: Target },
-  { name: "camera", label: "Camera", component: Camera },
-  { name: "mountain", label: "Mountain", component: Mountain },
-  { name: "waves", label: "Waves", component: Waves },
-  { name: "palette", label: "Palette", component: Palette },
-  { name: "map-pin", label: "Location", component: MapPin },
-  { name: "footprints", label: "Hiking", component: Footprints },
-  { name: "eye", label: "Sightseeing", component: Eye },
-  { name: "clock", label: "Time", component: Clock },
-  { name: "calendar", label: "Calendar", component: Calendar },
-  { name: "image", label: "Image", component: Image },
-  { name: "music", label: "Music", component: Music },
-  { name: "gamepad", label: "Entertainment", component: Gamepad2 },
-  { name: "book", label: "Education", component: BookOpen },
-  { name: "shopping", label: "Shopping", component: ShoppingBag },
-  { name: "heart", label: "Wellness", component: Heart },
-  { name: "star", label: "Featured", component: Star },
-  { name: "zap", label: "Energy", component: Zap },
-  { name: "flame", label: "Adventure", component: Flame },
-];
+}> = [];
+
+export function iconPickerValueToSelectorProps(
+  val: IconPickerValue | null | undefined,
+): { iconName: string; provider: IconSelectorProvider } {
+  if (!val || val.type !== "icon" || !val.value) {
+    return { iconName: "package", provider: "yatra" };
+  }
+  const p = val.provider ?? "yatra";
+  if (p === "fa-solid" || p === "fa-regular") {
+    return { iconName: val.value, provider: p };
+  }
+
+  return { iconName: val.value, provider: "yatra" };
+}
 
 export default IconSelector;

@@ -24,6 +24,7 @@ import {
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { Switch } from "../components/ui/switch";
 import { IconPicker } from "../components/ui/icon-picker";
+import type { IconPickerValue } from "../lib/icon-picker-types";
 
 type FieldOptionRow = { label: string; value: string };
 
@@ -71,6 +72,47 @@ function unwrapAttributePayload(raw: unknown): Record<string, unknown> {
   return {};
 }
 
+/** Map API / DB icon field to IconPicker state (must keep `provider` for Font Awesome). */
+function iconFromAttributeApiRaw(raw: unknown): IconPickerValue | null {
+  if (raw == null || raw === "") {
+    return null;
+  }
+  let ic: unknown = raw;
+  if (typeof ic === "string") {
+    const t = ic.trim();
+    if (t.startsWith("{")) {
+      try {
+        ic = JSON.parse(t) as unknown;
+      } catch {
+        return t ? { type: "icon", value: t, provider: "yatra" } : null;
+      }
+    } else if (t !== "") {
+      return { type: "icon", value: t, provider: "yatra" };
+    } else {
+      return null;
+    }
+  }
+  if (typeof ic !== "object" || ic === null || Array.isArray(ic)) {
+    return null;
+  }
+  const io = ic as { type?: string; value?: unknown; provider?: string };
+  const val =
+    io.value !== undefined && io.value !== null ? String(io.value) : "";
+  if (io.type === "image") {
+    if (!val) {
+      return null;
+    }
+    return { type: "image", value: val };
+  }
+  if (val === "") {
+    return null;
+  }
+  const p = io.provider;
+  const provider =
+    p === "fa-solid" || p === "fa-regular" || p === "yatra" ? p : "yatra";
+  return { type: "icon", value: val, provider };
+}
+
 type AttributeStatusUi = "publish" | "draft" | "trash";
 
 function normalizeAttributeStatusForForm(raw: unknown): AttributeStatusUi {
@@ -85,10 +127,7 @@ interface AttributeFormData {
   name: string;
   slug: string;
   description: string;
-  icon: {
-    type: "icon" | "image";
-    value: string;
-  } | null;
+  icon: IconPickerValue | null;
   field_type: string;
   field_option_rows: FieldOptionRow[];
   default_value: string;
@@ -362,17 +401,7 @@ const AttributeForm: React.FC = () => {
         name: String(finalAttribute.name ?? ""),
         slug: String(finalAttribute.slug ?? ""),
         description: String(finalAttribute.description ?? ""),
-        icon: (() => {
-          const ic = finalAttribute.icon;
-          if (!ic || typeof ic !== "object" || Array.isArray(ic)) {
-            return null;
-          }
-          const io = ic as { type?: string; value?: string };
-          return {
-            type: io.type === "image" ? "image" : "icon",
-            value: String(io.value ?? ""),
-          };
-        })(),
+        icon: iconFromAttributeApiRaw(finalAttribute.icon),
         field_type: String(finalAttribute.field_type ?? "text_field"),
         field_option_rows: (() => {
           const rows = parseFieldOptionRows(finalAttribute.field_options);

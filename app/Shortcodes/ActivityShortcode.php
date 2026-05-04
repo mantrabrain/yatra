@@ -56,12 +56,13 @@ class ActivityShortcode extends BaseShortcode
             'per_page' => $per_page
         ];
 
-        // Enqueue shortcode-specific CSS
+        $activityCssPath = YATRA_PLUGIN_PATH . 'assets/css/shortcodes/activity-shortcode.css';
+        $activityCssVer = is_readable($activityCssPath) ? YATRA_VERSION . '.' . filemtime($activityCssPath) : YATRA_VERSION;
         wp_enqueue_style(
             'yatra-activity-shortcode',
             YATRA_PLUGIN_URL . 'assets/css/shortcodes/activity-shortcode.css',
-            [],
-            YATRA_VERSION
+            \Yatra\Providers\FrontendAssetsProvider::shortcodeStyleDependencies(),
+            $activityCssVer
         );
         
         // Enqueue shortcode-specific JavaScript

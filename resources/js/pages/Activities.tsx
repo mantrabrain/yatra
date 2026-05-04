@@ -760,6 +760,7 @@ const Activities: React.FC = () => {
                             ) : (
                               <IconSelector
                                 iconName={activity.icon.value}
+                                provider={activity.icon.provider ?? "yatra"}
                                 className="w-5 h-5 text-blue-600 dark:text-blue-400"
                               />
                             )

@@ -1018,62 +1018,106 @@ class Trip
     }
 
     /**
-     * Get difficulty information
+     * Resolve difficulty label + icon for display (shared by single trip, similar trips, etc.).
+     *
+     * @param string|null $difficultyLevel Raw trip.difficulty_level (usually classification row id).
+     * @param string|null $difficultyName Optional joined name from list queries.
+     * @param mixed|null $difficultyIcon Optional serialized icon payload from list queries.
+     * @return array{level: string, icon: string, icon_picker: array<string, mixed>|null, has_difficulty: bool}
      */
-    public function getDifficulty(): array
-    {
+    public static function resolveDifficultyDisplay(
+        ?string $difficultyLevel,
+        ?string $difficultyName = null,
+        $difficultyIcon = null
+    ): array {
         $difficulty = '';
         $difficulty_icon = '';
-        
-        // Always prioritize fetching from difficulty_levels table if we have a difficulty_level ID
-        // Check if difficulty_level is set and is a valid positive integer (not 0, null, or empty)
-        if (!empty($this->difficulty_level) && is_numeric($this->difficulty_level) && (int) $this->difficulty_level > 0) {
+        /** @var array<string, mixed>|null $icon_picker */
+        $icon_picker = null;
+
+        if (!empty($difficultyLevel) && is_numeric($difficultyLevel) && (int) $difficultyLevel > 0) {
             global $wpdb;
-            
+
             $difficulty_data = $wpdb->get_row($wpdb->prepare(
-                "SELECT * FROM " . ClassificationsTable::getTableName() . " WHERE id = %d AND type = %s",
-                (int) $this->difficulty_level,
+                'SELECT * FROM ' . ClassificationsTable::getTableName() . ' WHERE id = %d AND type = %s',
+                (int) $difficultyLevel,
                 ClassificationTypes::DIFFICULTY
             ));
-            
+
             if ($difficulty_data) {
-                $difficulty = $difficulty_data->name;
+                $difficulty = (string) $difficulty_data->name;
                 if (!empty($difficulty_data->icon)) {
                     $icon_data = maybe_unserialize($difficulty_data->icon);
-                    if (is_array($icon_data) && isset($icon_data['type']) && $icon_data['type'] === 'icon' && !empty($icon_data['value'])) {
-                        $difficulty_icon = $icon_data['value'];
+                    if (is_array($icon_data) && isset($icon_data['type'])) {
+                        $icon_picker = $icon_data;
+                        if ($icon_data['type'] === 'icon' && !empty($icon_data['value'])) {
+                            $difficulty_icon = (string) $icon_data['value'];
+                        }
                     } elseif (is_string($difficulty_data->icon)) {
                         $difficulty_icon = $difficulty_data->icon;
+                        $icon_picker = [
+                            'type' => 'icon',
+                            'value' => $difficulty_icon,
+                            'provider' => 'yatra',
+                        ];
                     }
                 }
             }
         }
-        
-        // Fallback: Use pre-populated difficulty_name from main query (AppServiceProvider)
-        if (empty($difficulty) && !empty($this->difficulty_name)) {
-            $difficulty = $this->difficulty_name;
+
+        if ($difficulty === '' && !empty($difficultyName)) {
+            $difficulty = $difficultyName;
         }
-        
-        // Fallback: Use pre-populated difficulty_icon from main query (AppServiceProvider)
-        if (empty($difficulty_icon) && !empty($this->difficulty_icon)) {
-            $icon_data = maybe_unserialize($this->difficulty_icon);
-            if (is_array($icon_data) && isset($icon_data['type']) && $icon_data['type'] === 'icon' && !empty($icon_data['value'])) {
-                $difficulty_icon = $icon_data['value'];
-            } elseif (is_string($this->difficulty_icon)) {
-                $difficulty_icon = $this->difficulty_icon;
+
+        // Legacy / non-id values stored in difficulty_level (e.g. slug text).
+        if ($difficulty === '' && $difficultyLevel !== null && $difficultyLevel !== '' && !is_numeric($difficultyLevel)) {
+            $difficulty = ucfirst($difficultyLevel);
+        }
+
+        if ($icon_picker === null && $difficultyIcon !== null && $difficultyIcon !== '') {
+            $icon_data = is_string($difficultyIcon) ? maybe_unserialize($difficultyIcon) : $difficultyIcon;
+            if (is_array($icon_data) && isset($icon_data['type'])) {
+                $icon_picker = $icon_data;
+                if ($icon_data['type'] === 'icon' && !empty($icon_data['value'])) {
+                    $difficulty_icon = (string) $icon_data['value'];
+                }
+            } elseif (is_string($difficultyIcon)) {
+                $difficulty_icon = $difficultyIcon;
+                $icon_picker = [
+                    'type' => 'icon',
+                    'value' => $difficulty_icon,
+                    'provider' => 'yatra',
+                ];
             }
         }
-        
-        // If we have difficulty but no icon, provide a default icon
-        if (!empty($difficulty) && empty($difficulty_icon)) {
+
+        if ($difficulty !== '' && $icon_picker === null && $difficulty_icon === '') {
             $difficulty_icon = 'mountain';
+            $icon_picker = [
+                'type' => 'icon',
+                'value' => 'mountain',
+                'provider' => 'yatra',
+            ];
         }
-        
+
         return [
             'level' => $difficulty,
             'icon' => $difficulty_icon,
-            'has_difficulty' => !empty($difficulty)
+            'icon_picker' => $icon_picker,
+            'has_difficulty' => $difficulty !== '',
         ];
+    }
+
+    /**
+     * Get difficulty information
+     */
+    public function getDifficulty(): array
+    {
+        return self::resolveDifficultyDisplay(
+            $this->difficulty_level,
+            $this->difficulty_name,
+            $this->difficulty_icon
+        );
     }
 
     /**

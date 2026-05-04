@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\Blocks;
 
+use Yatra\Providers\FrontendAssetsProvider;
 use Yatra\Services\BlockDataService;
 
 /**
@@ -28,7 +29,8 @@ class ActivityBlock
      */
     public function renderCallback(array $attributes, string $content): string
     {
-        wp_enqueue_style('yatra-activity-shortcode', \YATRA_PLUGIN_URL . 'assets/css/shortcodes/activity-shortcode.css', [], YATRA_VERSION);
+        FrontendAssetsProvider::registerCoreFrontendStylesheets();
+        wp_enqueue_style('yatra-activity-shortcode');
 
         return BlockDataService::renderActivityBlock($attributes);
     }
@@ -42,6 +44,8 @@ class ActivityBlock
             return;
         }
 
+        FrontendAssetsProvider::registerCoreFrontendStylesheets();
+
         wp_register_style(
             'yatra-listing',
             \YATRA_PLUGIN_URL . 'assets/css/listing.css',
@@ -49,11 +53,13 @@ class ActivityBlock
             YATRA_VERSION
         );
 
+        $activityShortcodeCss = \YATRA_PLUGIN_PATH . 'assets/css/shortcodes/activity-shortcode.css';
+        $activityShortcodeVer = is_readable($activityShortcodeCss) ? YATRA_VERSION . '.' . filemtime($activityShortcodeCss) : YATRA_VERSION;
         wp_register_style(
             'yatra-activity-shortcode',
             \YATRA_PLUGIN_URL . 'assets/css/shortcodes/activity-shortcode.css',
-            [],
-            YATRA_VERSION
+            FrontendAssetsProvider::shortcodeStyleDependencies(),
+            $activityShortcodeVer
         );
 
         wp_register_script(
