@@ -187,6 +187,7 @@
     border: 1px solid #e5e7eb;
     border-radius: 12px;
     padding: 10px 12px;
+    justify-content: end;
 }
 
 .yatra-sort-control {
@@ -732,7 +733,7 @@
         flex-direction: row;
         flex-wrap: wrap;
         align-items: center;
-        justify-content: space-between;
+        justify-content: end
         gap: 10px 12px;
     }
 
