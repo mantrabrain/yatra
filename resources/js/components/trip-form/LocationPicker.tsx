@@ -244,12 +244,8 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     const zoomCfg = defaultZoomRef.current;
 
     // Initialize map with default view or current coordinates (always read latest refs — avoids stale closure when Leaflet loads async)
-    const lat = v.latitude?.trim()
-      ? parseFloat(v.latitude)
-      : center[0];
-    const lng = v.longitude?.trim()
-      ? parseFloat(v.longitude)
-      : center[1];
+    const lat = v.latitude?.trim() ? parseFloat(v.latitude) : center[0];
+    const lng = v.longitude?.trim() ? parseFloat(v.longitude) : center[1];
 
     const map = L.map(mapRef.current).setView([lat, lng], zoomCfg);
 

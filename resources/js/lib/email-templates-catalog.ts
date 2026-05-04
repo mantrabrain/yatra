@@ -351,7 +351,10 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     template_key: "scheduled_payment_succeeded",
     event_key: "scheduled.payment.succeeded",
     name: __("Scheduled payment succeeded", "yatra"),
-    description: __("Sent after a scheduled / installment charge succeeds.", "yatra"),
+    description: __(
+      "Sent after a scheduled / installment charge succeeds.",
+      "yatra",
+    ),
     category: "payment",
     recipient_type: "customer",
     to_email: "{customer_email}",
@@ -421,7 +424,10 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     template_key: "enquiry_received",
     event_key: "enquiry.created",
     name: __("Enquiry Received", "yatra"),
-    description: __("Confirmation sent to the customer after they submit an enquiry.", "yatra"),
+    description: __(
+      "Confirmation sent to the customer after they submit an enquiry.",
+      "yatra",
+    ),
     category: "enquiry",
     recipient_type: "customer",
     to_email: "{customer_email}",
@@ -436,7 +442,10 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     template_key: "enquiry_admin",
     event_key: "enquiry.created",
     name: __("Admin: New Enquiry", "yatra"),
-    description: __("Sent to your admin email when a new enquiry is submitted.", "yatra"),
+    description: __(
+      "Sent to your admin email when a new enquiry is submitted.",
+      "yatra",
+    ),
     category: "enquiry",
     recipient_type: "admin",
     to_email: "{{admin_email}}",
@@ -451,7 +460,10 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     template_key: "enquiry_response",
     event_key: "enquiry.responded",
     name: __("Enquiry Response", "yatra"),
-    description: __("Sent to the customer when you reply to their enquiry.", "yatra"),
+    description: __(
+      "Sent to the customer when you reply to their enquiry.",
+      "yatra",
+    ),
     category: "enquiry",
     recipient_type: "customer",
     to_email: "{customer_email}",
@@ -557,8 +569,7 @@ export function buildLocalTemplateRows(
       !entry.requiresModule || (pro && moduleOk(entry.requiresModule));
 
     const proCatalogLocked = !entry.isCoreFree;
-    const moduleContentLocked =
-      Boolean(entry.requiresModule) && !moduleGateOk;
+    const moduleContentLocked = Boolean(entry.requiresModule) && !moduleGateOk;
 
     const is_locked = proCatalogLocked || moduleContentLocked;
 

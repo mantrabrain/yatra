@@ -85,8 +85,7 @@ const EmailTemplateForm: React.FC = () => {
   );
 
   /** URL ?readonly=1 — no edits at all from this screen */
-  const isCoreStrictViewOnly =
-    isCoreSettingsEdit && Boolean(coreReadOnlyParam);
+  const isCoreStrictViewOnly = isCoreSettingsEdit && Boolean(coreReadOnlyParam);
 
   /** Module required but inactive: subject/body/save locked; on/off can still be changed (site setting). */
   const isCoreModuleBodyLocked = useMemo(() => {

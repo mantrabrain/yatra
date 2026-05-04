@@ -106,10 +106,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
           />
         </PanelBody>
 
-        <PanelBody
-          title={__("Display options", "yatra")}
-          initialOpen={false}
-        >
+        <PanelBody title={__("Display options", "yatra")} initialOpen={false}>
           <ToggleControl
             label={__("Show trip count", "yatra")}
             checked={show_trip_count}

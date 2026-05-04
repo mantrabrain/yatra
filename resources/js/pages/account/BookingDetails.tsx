@@ -268,10 +268,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                   {__("Travel Date", "yatra")}
                 </div>
                 <div className="text-sm text-gray-900 dark:text-white">
-                  {formatTravelDateRange(
-                    booking.travel_date,
-                    booking.end_date,
-                  )}
+                  {formatTravelDateRange(booking.travel_date, booking.end_date)}
                 </div>
               </div>
               <div>

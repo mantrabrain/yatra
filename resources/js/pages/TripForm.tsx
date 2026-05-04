@@ -6025,7 +6025,10 @@ const TripForm: React.FC = () => {
                         }
                       >
                         {MEAL_PLAN_SELECT_OPTIONS.map(({ value, label }) => (
-                          <option key={value || "meal-plan-empty"} value={value}>
+                          <option
+                            key={value || "meal-plan-empty"}
+                            value={value}
+                          >
                             {label}
                           </option>
                         ))}

@@ -24,7 +24,10 @@ function humanizeIconName(iconName: string): string {
     .join(" ");
 }
 
-function toPickerItems(names: readonly string[], style: FaPickerStyle): FaPickerItem[] {
+function toPickerItems(
+  names: readonly string[],
+  style: FaPickerStyle,
+): FaPickerItem[] {
   return names.map((name) => ({
     name,
     label: humanizeIconName(name),
@@ -33,10 +36,16 @@ function toPickerItems(names: readonly string[], style: FaPickerStyle): FaPicker
 }
 
 /** Font Awesome Free — Solid (full pack) */
-export const FA_FREE_SOLID_PICKER: FaPickerItem[] = toPickerItems(manifest.solid, "fa-solid");
+export const FA_FREE_SOLID_PICKER: FaPickerItem[] = toPickerItems(
+  manifest.solid,
+  "fa-solid",
+);
 
 /** Font Awesome Free — Regular (full pack) */
-export const FA_FREE_REGULAR_PICKER: FaPickerItem[] = toPickerItems(manifest.regular, "fa-regular");
+export const FA_FREE_REGULAR_PICKER: FaPickerItem[] = toPickerItems(
+  manifest.regular,
+  "fa-regular",
+);
 
 export const FA_FREE_ALL_PICKER: FaPickerItem[] = [
   ...FA_FREE_SOLID_PICKER,

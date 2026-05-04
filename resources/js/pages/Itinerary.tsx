@@ -2251,7 +2251,9 @@ const Itinerary: React.FC = () => {
                                               />
                                             ) : (
                                               <IconSelector
-                                                iconName={entry.item_icon as any}
+                                                iconName={
+                                                  entry.item_icon as any
+                                                }
                                                 provider={
                                                   entry.item_icon_provider ??
                                                   "yatra"

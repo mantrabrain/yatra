@@ -84,57 +84,46 @@
           onChange: (value) => setAttributes({ show_pagination: value })
         }
       )
-    ), /* @__PURE__ */ element.createElement(
-      components.PanelBody,
+    ), /* @__PURE__ */ element.createElement(components.PanelBody, { title: i18n.__("Display options", "yatra"), initialOpen: false }, /* @__PURE__ */ element.createElement(
+      components.ToggleControl,
       {
-        title: i18n.__("Display options", "yatra"),
-        initialOpen: false
-      },
-      /* @__PURE__ */ element.createElement(
-        components.ToggleControl,
-        {
-          label: i18n.__("Show trip count", "yatra"),
-          checked: show_trip_count,
-          onChange: (value) => setAttributes({ show_trip_count: value })
-        }
-      ),
-      /* @__PURE__ */ element.createElement(
-        components.ToggleControl,
-        {
-          label: i18n.__("Show description", "yatra"),
-          checked: show_description,
-          onChange: (value) => setAttributes({ show_description: value })
-        }
-      ),
-      /* @__PURE__ */ element.createElement(
-        components.ToggleControl,
-        {
-          label: i18n.__("Show image", "yatra"),
-          checked: show_image,
-          onChange: (value) => setAttributes({ show_image: value })
-        }
-      ),
-      /* @__PURE__ */ element.createElement(
-        components.ToggleControl,
-        {
-          label: i18n.__("Hide empty categories", "yatra"),
-          checked: hide_empty,
-          onChange: (value) => setAttributes({ hide_empty: value })
-        }
-      ),
-      /* @__PURE__ */ element.createElement(
-        components.ToggleControl,
-        {
-          label: i18n.__("Featured only (filter list)", "yatra"),
-          help: i18n.__(
-            "When on, only categories with “Featured category” enabled in Yatra → Trips → Categories are listed. The red “Featured” badge on each card is controlled per category there—not by this toggle.",
-            "yatra"
-          ),
-          checked: featured_only,
-          onChange: (value) => setAttributes({ featured_only: value })
-        }
-      )
-    )), /* @__PURE__ */ element.createElement("div", { className: "yatra-block-editor-preview" }, /* @__PURE__ */ element.createElement(
+        label: i18n.__("Show trip count", "yatra"),
+        checked: show_trip_count,
+        onChange: (value) => setAttributes({ show_trip_count: value })
+      }
+    ), /* @__PURE__ */ element.createElement(
+      components.ToggleControl,
+      {
+        label: i18n.__("Show description", "yatra"),
+        checked: show_description,
+        onChange: (value) => setAttributes({ show_description: value })
+      }
+    ), /* @__PURE__ */ element.createElement(
+      components.ToggleControl,
+      {
+        label: i18n.__("Show image", "yatra"),
+        checked: show_image,
+        onChange: (value) => setAttributes({ show_image: value })
+      }
+    ), /* @__PURE__ */ element.createElement(
+      components.ToggleControl,
+      {
+        label: i18n.__("Hide empty categories", "yatra"),
+        checked: hide_empty,
+        onChange: (value) => setAttributes({ hide_empty: value })
+      }
+    ), /* @__PURE__ */ element.createElement(
+      components.ToggleControl,
+      {
+        label: i18n.__("Featured only (filter list)", "yatra"),
+        help: i18n.__(
+          "When on, only categories with “Featured category” enabled in Yatra → Trips → Categories are listed. The red “Featured” badge on each card is controlled per category there—not by this toggle.",
+          "yatra"
+        ),
+        checked: featured_only,
+        onChange: (value) => setAttributes({ featured_only: value })
+      }
+    ))), /* @__PURE__ */ element.createElement("div", { className: "yatra-block-editor-preview" }, /* @__PURE__ */ element.createElement(
       ServerSideRender,
       {
         block: "yatra/trip-category",

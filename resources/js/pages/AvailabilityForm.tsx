@@ -966,8 +966,12 @@ const AvailabilityForm: React.FC = () => {
                             : tripData?.starting_latitude &&
                                 tripData?.starting_longitude
                               ? [
-                                  parseFloat(String(tripData.starting_latitude)),
-                                  parseFloat(String(tripData.starting_longitude)),
+                                  parseFloat(
+                                    String(tripData.starting_latitude),
+                                  ),
+                                  parseFloat(
+                                    String(tripData.starting_longitude),
+                                  ),
                                 ]
                               : [20, 0]
                     }

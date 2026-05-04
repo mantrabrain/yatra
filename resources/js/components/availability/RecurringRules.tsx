@@ -95,8 +95,8 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
   const { showToast } = useToast();
   const adminCurrency =
     (typeof window !== "undefined" &&
-      (window as unknown as { yatraAdmin?: { currency?: string } })
-        .yatraAdmin?.currency) ||
+      (window as unknown as { yatraAdmin?: { currency?: string } }).yatraAdmin
+        ?.currency) ||
     "USD";
 
   // State management

@@ -231,11 +231,10 @@ const Bookings: React.FC = () => {
     return formatDateUtil(dateString);
   };
 
-  const formatPrice = (
-    price: number,
-    currencyCode: string = defaultCurrency,
-  ) =>
-    formatYatraMoney(Number(price) || 0, currencyCode, { zeroAsUnknown: false });
+  const formatPrice = (price: number, currencyCode: string = defaultCurrency) =>
+    formatYatraMoney(Number(price) || 0, currencyCode, {
+      zeroAsUnknown: false,
+    });
 
   const getBookingStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {

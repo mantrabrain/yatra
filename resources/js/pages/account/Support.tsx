@@ -10,7 +10,12 @@ import {
   Mail,
 } from "lucide-react";
 import { __ } from "../../lib/i18n";
-import { formatDate, getBadge, phoneToTelHref, getYatraAccountPageGlobals } from "./utils";
+import {
+  formatDate,
+  getBadge,
+  phoneToTelHref,
+  getYatraAccountPageGlobals,
+} from "./utils";
 import type { SupportTicket } from "./types";
 
 interface SupportProps {

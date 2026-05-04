@@ -229,7 +229,9 @@ const ViewBooking: React.FC = () => {
   };
 
   const formatPrice = (price: number, currencyCode: string = "USD") =>
-    formatYatraMoney(Number(price) || 0, currencyCode, { zeroAsUnknown: false });
+    formatYatraMoney(Number(price) || 0, currencyCode, {
+      zeroAsUnknown: false,
+    });
 
   // Country code to name mapping
   const COUNTRY_NAMES: Record<string, string> = {

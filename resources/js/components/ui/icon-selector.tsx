@@ -5,7 +5,10 @@
 import React from "react";
 import { Package } from "lucide-react";
 import { getYatraIconSvg } from "../../lib/icons";
-import { FA_REGULAR_NAME_SET, FA_SOLID_NAME_SET } from "../../lib/fa-free-picker-icons";
+import {
+  FA_REGULAR_NAME_SET,
+  FA_SOLID_NAME_SET,
+} from "../../lib/fa-free-picker-icons";
 import type { IconPickerValue } from "../../lib/icon-picker-types";
 
 export type IconSelectorProvider = "yatra" | "fa-solid" | "fa-regular";
@@ -60,7 +63,6 @@ export const IconSelector: React.FC<IconSelectorProps> = ({
     return (
       <span
         className={`inline-flex items-center justify-center ${className}`}
-        // eslint-disable-next-line react/no-danger -- trusted Yatra-bundled SVG from icons.json
         dangerouslySetInnerHTML={{ __html: svg }}
         style={sizeStyle}
       />

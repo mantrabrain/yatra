@@ -92,7 +92,9 @@ const isModuleAvailable = (): boolean => {
 const formatPrice = (price: number, currencyCode?: string): string => {
   const globalCurrency = (window as any)?.yatraAdmin?.currency || "USD";
   const currency = currencyCode || globalCurrency;
-  return formatYatraMoney(Number(price) || 0, currency, { zeroAsUnknown: false });
+  return formatYatraMoney(Number(price) || 0, currency, {
+    zeroAsUnknown: false,
+  });
 };
 
 // Main Component

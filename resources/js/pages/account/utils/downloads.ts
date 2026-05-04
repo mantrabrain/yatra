@@ -173,7 +173,10 @@ async function fetchPreviewPdf(url: string): Promise<Blob> {
   const { nonce } = getAccountRestConfig();
   if (!nonce) {
     throw new Error(
-      __("Missing security token. Reload the account page and try again.", "yatra"),
+      __(
+        "Missing security token. Reload the account page and try again.",
+        "yatra",
+      ),
     );
   }
   const res = await fetch(url, {
@@ -192,9 +195,7 @@ async function fetchPreviewPdf(url: string): Promise<Blob> {
     filename?: string;
   };
   if (!data?.pdf_data || typeof data.pdf_data !== "string") {
-    throw new Error(
-      __("Invalid preview response from the server.", "yatra"),
-    );
+    throw new Error(__("Invalid preview response from the server.", "yatra"));
   }
   const binary = atob(data.pdf_data);
   const bytes = new Uint8Array(binary.length);
@@ -226,7 +227,10 @@ async function downloadBookingBinary(
   const { base, nonce } = getAccountRestConfig();
   if (!nonce) {
     throw new Error(
-      __("Missing security token. Reload the account page and try again.", "yatra"),
+      __(
+        "Missing security token. Reload the account page and try again.",
+        "yatra",
+      ),
     );
   }
   const url = buildBookingDocumentUrl(base, bookingId, kind, "download");
@@ -268,7 +272,10 @@ async function downloadPaymentInvoiceBinary(paymentId: number): Promise<void> {
   const { base, nonce } = getAccountRestConfig();
   if (!nonce) {
     throw new Error(
-      __("Missing security token. Reload the account page and try again.", "yatra"),
+      __(
+        "Missing security token. Reload the account page and try again.",
+        "yatra",
+      ),
     );
   }
   const url = buildPaymentInvoiceUrl(base, paymentId, "download");
@@ -368,7 +375,10 @@ export const previewPaymentInvoice = async (
   const { base, nonce } = getAccountRestConfig();
   if (!nonce) {
     throw new Error(
-      __("Missing security token. Reload the account page and try again.", "yatra"),
+      __(
+        "Missing security token. Reload the account page and try again.",
+        "yatra",
+      ),
     );
   }
   const url = buildPaymentInvoiceUrl(base, paymentId, "preview");
@@ -385,16 +395,17 @@ export async function previewTravelDocument(doc: {
   const { base, nonce } = getAccountRestConfig();
   if (!nonce) {
     throw new Error(
-      __("Missing security token. Reload the account page and try again.", "yatra"),
+      __(
+        "Missing security token. Reload the account page and try again.",
+        "yatra",
+      ),
     );
   }
 
   if (doc.category === "invoice") {
     const pid = doc.payment_id ?? parsePaymentIdFromHref(doc.url);
     if (!pid) {
-      throw new Error(
-        __("Could not resolve invoice link.", "yatra"),
-      );
+      throw new Error(__("Could not resolve invoice link.", "yatra"));
     }
     const url = buildPaymentInvoiceUrl(base, pid, "preview");
     const blob = await fetchPreviewPdf(url);
@@ -406,9 +417,7 @@ export async function previewTravelDocument(doc: {
     const kind = doc.category === "voucher" ? "voucher" : "itinerary";
     const bid = doc.booking_id ?? parseBookingDocFromHref(doc.url, kind);
     if (!bid) {
-      throw new Error(
-        __("Could not resolve document link.", "yatra"),
-      );
+      throw new Error(__("Could not resolve document link.", "yatra"));
     }
     const url = buildBookingDocumentUrl(base, bid, kind, "preview");
     const blob = await fetchPreviewPdf(url);

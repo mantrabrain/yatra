@@ -12,18 +12,20 @@ export type MealPlanSlug =
   | "none";
 
 /** Options for <select> (value + translated label). */
-export const MEAL_PLAN_SELECT_OPTIONS: { value: MealPlanSlug; label: string }[] =
-  [
-    { value: "", label: __("Select meal plan", "yatra") },
-    { value: "breakfast", label: __("Breakfast Only", "yatra") },
-    {
-      value: "half_board",
-      label: __("Half Board (Breakfast + Dinner)", "yatra"),
-    },
-    { value: "full_board", label: __("Full Board (All Meals)", "yatra") },
-    { value: "all_inclusive", label: __("All Inclusive", "yatra") },
-    { value: "none", label: __("No Meals Included", "yatra") },
-  ];
+export const MEAL_PLAN_SELECT_OPTIONS: {
+  value: MealPlanSlug;
+  label: string;
+}[] = [
+  { value: "", label: __("Select meal plan", "yatra") },
+  { value: "breakfast", label: __("Breakfast Only", "yatra") },
+  {
+    value: "half_board",
+    label: __("Half Board (Breakfast + Dinner)", "yatra"),
+  },
+  { value: "full_board", label: __("Full Board (All Meals)", "yatra") },
+  { value: "all_inclusive", label: __("All Inclusive", "yatra") },
+  { value: "none", label: __("No Meals Included", "yatra") },
+];
 
 /** Normalize legacy or odd casing to canonical slug key (underscore form). */
 export function normalizeMealPlanSlug(raw: string): string {

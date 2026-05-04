@@ -8,11 +8,7 @@
 import { __ } from "./i18n";
 import { getCurrency, getCurrencySymbol } from "../data/currencies";
 
-export type CurrencyPlacement =
-  | "left"
-  | "right"
-  | "left_space"
-  | "right_space";
+export type CurrencyPlacement = "left" | "right" | "left_space" | "right_space";
 
 /**
  * Normalize option / legacy values to one of the four placement modes.
@@ -27,7 +23,12 @@ export function normalizeCurrencyPosition(
   if (p === "after") {
     return "right_space";
   }
-  if (p === "right" || p === "right_space" || p === "left" || p === "left_space") {
+  if (
+    p === "right" ||
+    p === "right_space" ||
+    p === "left" ||
+    p === "left_space"
+  ) {
     return p as CurrencyPlacement;
   }
   return "left_space";

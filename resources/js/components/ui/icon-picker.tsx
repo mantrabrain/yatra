@@ -16,9 +16,15 @@ import {
   FA_FREE_SOLID_PICKER,
   FA_FREE_REGULAR_PICKER,
 } from "../../lib/fa-free-picker-icons";
-import type { IconPickerValue, IconProvider } from "../../lib/icon-picker-types";
+import type {
+  IconPickerValue,
+  IconProvider,
+} from "../../lib/icon-picker-types";
 
-export type { IconPickerValue, IconProvider } from "../../lib/icon-picker-types";
+export type {
+  IconPickerValue,
+  IconProvider,
+} from "../../lib/icon-picker-types";
 
 import { __ } from "../../lib/i18n";
 import { Button } from "./button";
@@ -133,13 +139,16 @@ export const IconPicker: React.FC<IconPickerProps> = ({
   }, [yatraIconOptions, searchTerm, selectedCategory]);
 
   const faSourceList =
-    iconLibrary === "fa-regular" ? FA_FREE_REGULAR_PICKER : FA_FREE_SOLID_PICKER;
+    iconLibrary === "fa-regular"
+      ? FA_FREE_REGULAR_PICKER
+      : FA_FREE_SOLID_PICKER;
 
   const filteredFaIcons = useMemo(() => {
     const q = searchTerm.toLowerCase();
     return faSourceList.filter(
       (row) =>
-        row.label.toLowerCase().includes(q) || row.name.toLowerCase().includes(q),
+        row.label.toLowerCase().includes(q) ||
+        row.name.toLowerCase().includes(q),
     );
   }, [faSourceList, searchTerm]);
 
@@ -208,7 +217,9 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 
   const renderIconPreview = () => {
     if (!value || value.type !== "icon") {
-      return <ImageLucide className={`${iconSizeClasses[size]} text-gray-400`} />;
+      return (
+        <ImageLucide className={`${iconSizeClasses[size]} text-gray-400`} />
+      );
     }
     const p = value.provider ?? "yatra";
     if (p === "fa-solid" || p === "fa-regular") {
@@ -225,7 +236,6 @@ export const IconPicker: React.FC<IconPickerProps> = ({
       return (
         <span
           className={`inline-flex items-center justify-center ${iconSizeClasses[size]} text-gray-700 dark:text-gray-300 [&>svg]:w-full [&>svg]:h-full`}
-          // eslint-disable-next-line react/no-danger -- bundled Yatra icons.json SVG
           dangerouslySetInnerHTML={{ __html: opt.svg }}
         />
       );
@@ -417,7 +427,6 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                       >
                         <span
                           className="w-6 h-6 mx-auto text-gray-700 dark:text-gray-300 flex items-center justify-center [&>svg]:w-6 [&>svg]:h-6"
-                          // eslint-disable-next-line react/no-danger
                           dangerouslySetInnerHTML={{ __html: icon.svg }}
                         />
                         {isSelected && (

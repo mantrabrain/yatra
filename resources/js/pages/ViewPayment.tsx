@@ -132,7 +132,9 @@ const ViewPayment: React.FC = () => {
   };
 
   const formatPrice = (price: number, currencyCode: string = "USD") =>
-    formatYatraMoney(Number(price) || 0, currencyCode, { zeroAsUnknown: false });
+    formatYatraMoney(Number(price) || 0, currencyCode, {
+      zeroAsUnknown: false,
+    });
 
   const getPaymentStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {

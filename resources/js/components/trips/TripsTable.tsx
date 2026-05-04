@@ -58,8 +58,8 @@ export const TripsTable: React.FC<TripsTableProps> = ({
 
   const defaultCurrency =
     (typeof window !== "undefined" &&
-      ((window as unknown as { yatraAdmin?: { currency?: string } })
-        .yatraAdmin?.currency ||
+      ((window as unknown as { yatraAdmin?: { currency?: string } }).yatraAdmin
+        ?.currency ||
         (window as unknown as { yatraBookingData?: { currency?: string } })
           .yatraBookingData?.currency)) ||
     "USD";

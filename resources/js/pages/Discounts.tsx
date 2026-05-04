@@ -724,9 +724,13 @@ const Discounts: React.FC = () => {
               <span className="font-medium text-gray-900 dark:text-white">
                 {discount.type === "percentage"
                   ? `${discount.amount}%`
-                  : formatYatraMoney(Number(discount.amount) || 0, adminCurrency, {
-                      zeroAsUnknown: false,
-                    })}
+                  : formatYatraMoney(
+                      Number(discount.amount) || 0,
+                      adminCurrency,
+                      {
+                        zeroAsUnknown: false,
+                      },
+                    )}
               </span>
               <span className="text-xs text-gray-500">
                 {__("off", "yatra")}
