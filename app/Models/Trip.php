@@ -1511,7 +1511,8 @@ class Trip
     }
 
     /**
-     * Get difficulty level
+     * Raw difficulty classification ID on the trip row (not a human-readable label).
+     * For display, use {@see self::getDifficulty()} which resolves the name from the classifications table.
      */
     public function getDifficultyLevel(): string
     {

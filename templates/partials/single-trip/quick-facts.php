@@ -28,27 +28,19 @@ if (!defined('ABSPATH')) {
         </div>
     </div>
 
-    <!-- Difficulty -->
-    <?php 
-    $difficulty_level = $trip->getDifficultyLevel();
-    if (!empty($difficulty_level)): 
-    ?>
+    <!-- Difficulty (use resolved name from classifications, not raw difficulty_level ID) -->
+    <?php
+    $difficulty = $trip->getDifficulty();
+    if (!empty($difficulty['has_difficulty']) && !empty($difficulty['level'])) :
+        $difficulty_icon = !empty($difficulty['icon']) ? (string) $difficulty['icon'] : 'mountain';
+        ?>
         <div class="yatra-quick-fact">
             <div class="yatra-quick-fact-icon">
-                <?php 
-                $difficulty_icons = [
-                    'easy' => 'heart',
-                    'moderate' => 'activity',
-                    'challenging' => 'zap',
-                    'difficult' => 'flame',
-                ];
-                $icon = $difficulty_icons[$difficulty_level] ?? 'mountain';
-                echo yatra_svg_icon($icon, 'yatra-icon-lg');
-                ?>
+                <?php echo yatra_svg_icon($difficulty_icon, 'yatra-icon-lg'); ?>
             </div>
             <div class="yatra-quick-fact-content">
                 <div class="yatra-quick-fact-label"><?php echo esc_html__('Difficulty', 'yatra'); ?></div>
-                <div class="yatra-quick-fact-value"><?php echo esc_html(ucfirst($difficulty_level)); ?></div>
+                <div class="yatra-quick-fact-value"><?php echo esc_html($difficulty['level']); ?></div>
             </div>
         </div>
     <?php endif; ?>
