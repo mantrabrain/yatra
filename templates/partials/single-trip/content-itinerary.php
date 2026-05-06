@@ -82,14 +82,19 @@ if (!defined('ABSPATH')) {
                     <?php endif; ?>
                     <div class="yatra-entries-timeline">
                         <?php foreach ($day['entries'] as $index => $entry):
-                            $type_color = $type_colors[$entry['item_type']] ?? '#6b7280';
+                            $rawColor = isset($entry['item_type_color']) ? (string) $entry['item_type_color'] : '';
+                            $type_color = $rawColor !== '' ? $rawColor : ($type_colors[$entry['item_type']] ?? '#6b7280');
                             ?>
                             <div class="yatra-entry-item" style="--entry-color: <?php echo esc_attr($type_color); ?>">
                                 <div class="yatra-entry-timeline-dot"></div>
                                 <div class="yatra-entry-card">
                                     <div class="yatra-entry-header">
                                         <div class="yatra-entry-icon" style="background: <?php echo esc_attr($type_color); ?>15; color: <?php echo esc_attr($type_color); ?>">
-                                            <?php echo $get_icon($entry['icon']); ?>
+                                            <?php
+                                            // Prefer icon picker data from backend (supports Font Awesome + images).
+                                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                                            echo yatra_stored_picker_icon_markup($entry['icon_picker'] ?? null, 'hiking', 'yatra-icon-sm');
+                                            ?>
                                         </div>
                                         <div class="yatra-entry-info">
                                             <span class="yatra-entry-type" style="color: <?php echo esc_attr($type_color); ?>"><?php echo esc_html(yatra_itinerary_item_type_label((string) $entry['item_type'])); ?></span>
@@ -144,16 +149,47 @@ if (!defined('ABSPATH')) {
                                         <?php endif; ?>
                                     </div>
 
-                                    <?php if (!empty($entry['included'])): ?>
-                                        <div class="yatra-entry-included">
-                                            <?php foreach ($entry['included'] as $item): ?>
-                                                <span class="yatra-included-tag">
-                                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                                </svg>
-                                                <?php echo esc_html($item); ?>
-                                            </span>
-                                            <?php endforeach; ?>
+                                    <?php if (!empty($entry['included']) || !empty($entry['excluded'])): ?>
+                                        <div class="yatra-entry-inclusions" role="group" aria-label="<?php echo esc_attr__('Included and excluded items', 'yatra'); ?>">
+                                            <div class="yatra-entry-inclusions-col is-included">
+                                                <div class="yatra-entry-inclusions-heading">
+                                                    <span class="yatra-entry-inclusions-title"><?php echo esc_html__('Included', 'yatra'); ?></span>
+                                                </div>
+                                                <div class="yatra-entry-inclusions-tags">
+                                                    <?php if (!empty($entry['included'])): ?>
+                                                        <?php foreach ($entry['included'] as $item): ?>
+                                                            <span class="yatra-included-tag">
+                                                            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                            </svg>
+                                                            <?php echo esc_html($item); ?>
+                                                        </span>
+                                                        <?php endforeach; ?>
+                                                    <?php else: ?>
+                                                        <span class="yatra-entry-inclusions-empty"><?php echo esc_html__('None', 'yatra'); ?></span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+
+                                            <div class="yatra-entry-inclusions-col is-excluded">
+                                                <div class="yatra-entry-inclusions-heading">
+                                                    <span class="yatra-entry-inclusions-title"><?php echo esc_html__('Excluded', 'yatra'); ?></span>
+                                                </div>
+                                                <div class="yatra-entry-inclusions-tags">
+                                                    <?php if (!empty($entry['excluded'])): ?>
+                                                        <?php foreach ($entry['excluded'] as $item): ?>
+                                                            <span class="yatra-excluded-tag">
+                                                            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                                            </svg>
+                                                            <?php echo esc_html($item); ?>
+                                                        </span>
+                                                        <?php endforeach; ?>
+                                                    <?php else: ?>
+                                                        <span class="yatra-entry-inclusions-empty"><?php echo esc_html__('None', 'yatra'); ?></span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
                                         </div>
                                     <?php endif; ?>
 

@@ -999,6 +999,7 @@ class TripController extends BaseController
             'international_flights_included',
             'domestic_flights_included',
             'is_featured',
+            'has_default_time_slots',
         ];
 
         foreach ($booleanFields as $field) {
@@ -1652,6 +1653,34 @@ class TripController extends BaseController
         // Build cards from real availability data or use sample data
         $availability_cards = [];
         $month_filters = [];
+
+        // Availability priority (same as the resolver):
+        // 1) manual availability dates, 2) recurring rules, 3) trip defaults.
+        // For UI counts + filters we want the list to reflect that priority (not a mixed set).
+        $availability_dates_for_render = $has_availability ? $trip_data->availability_dates : [];
+        if ($has_availability) {
+            $by_source = [
+                'availability_date' => [],
+                'recurring_rule' => [],
+                'trip_default' => [],
+            ];
+            foreach ($trip_data->availability_dates as $a) {
+                if (!is_object($a)) {
+                    continue;
+                }
+                $src = strtolower(trim((string) ($a->source ?? '')));
+                if (isset($by_source[$src])) {
+                    $by_source[$src][] = $a;
+                }
+            }
+            if (!empty($by_source['availability_date'])) {
+                $availability_dates_for_render = $by_source['availability_date'];
+            } elseif (!empty($by_source['recurring_rule'])) {
+                $availability_dates_for_render = $by_source['recurring_rule'];
+            } elseif (!empty($by_source['trip_default'])) {
+                $availability_dates_for_render = $by_source['trip_default'];
+            }
+        }
         
         // Determine if this is a day trip (duration <= 1 day)
         $is_single_day = ($trip_data->duration_days ?? 1) <= 1;
@@ -1692,7 +1721,7 @@ class TripController extends BaseController
         }
 
         if ($has_availability) {
-            foreach ($trip_data->availability_dates as $avail_for_cats) {
+            foreach ($availability_dates_for_render as $avail_for_cats) {
                 if (!empty($avail_for_cats->price_types)) {
                     $add_category_ids($avail_for_cats->price_types);
                 }
@@ -1813,7 +1842,7 @@ class TripController extends BaseController
         if ($has_availability) {
             $current_time = time();
 
-            foreach ($trip_data->availability_dates as $avail) {
+            foreach ($availability_dates_for_render as $avail) {
                 if (empty($avail->departure_date)) {
                     // Skip entries without a valid departure date
                     continue;

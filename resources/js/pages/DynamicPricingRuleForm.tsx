@@ -68,50 +68,74 @@ const RULE_TYPES = [
   {
     id: "early_bird",
     name: __("Early Bird Discount"),
-    description: __("Reward customers who book well in advance"),
+    description: __(
+      "Reward customers who book well in advance. Always behaves as a discount.",
+    ),
     icon: Calendar,
     color: "blue",
-    example: __("10% off for bookings 30+ days early"),
+    example: __(
+      "10% off when departure is at least 30 days away (set Min Days Before = 30).",
+    ),
   },
   {
     id: "last_minute",
     name: __("Last Minute Deals"),
-    description: __("Fill remaining spots close to departure"),
+    description: __(
+      "Discount close to departure to fill remaining seats. Always behaves as a discount.",
+    ),
     icon: Clock,
     color: "orange",
-    example: __("15% off for bookings within 7 days"),
+    example: __(
+      "15% off when departure is within 7 days (set Max Days Before = 7).",
+    ),
   },
   {
     id: "demand",
     name: __("Demand-Based Pricing"),
-    description: __("Adjust prices based on booking velocity"),
+    description: __(
+      "Adjusts price by booking velocity score (recomputed by cron / on each booking).",
+    ),
     icon: TrendingUp,
     color: "green",
-    example: __("Increase price for hot trips, decrease for slow"),
+    example: __(
+      "Score above 70 → markup; below 30 → discount. Magnitude scales with how far the score is outside the band.",
+    ),
   },
   {
     id: "inventory",
     name: __("Inventory-Based"),
-    description: __("Price changes based on remaining capacity"),
+    description: __(
+      "Reacts to seats remaining on the chosen departure (works with time slots too).",
+    ),
     icon: Package,
     color: "purple",
-    example: __("Higher price when few spots left"),
+    example: __(
+      "Seats ≤ 5 → +10% scarcity markup; seats ≥ 20 → 50% of magnitude as discount.",
+    ),
   },
   {
     id: "seasonal",
     name: __("Seasonal Pricing"),
-    description: __("Adjust for peak and off-peak seasons"),
+    description: __(
+      "Applies when the DEPARTURE date falls within the season window.",
+    ),
     icon: Sun,
     color: "yellow",
-    example: __("25% premium during summer months"),
+    example: __(
+      "+25% on departures between Jul 1 – Aug 31. Use a negative value for off-peak discounts.",
+    ),
   },
   {
     id: "time_based",
-    name: __("Time-Based"),
-    description: __("Different prices for specific days and date ranges"),
+    name: __("Time-Based (Weekday/Weekend)"),
+    description: __(
+      "Applies on selected weekdays of the DEPARTURE date, optionally limited to a date window.",
+    ),
     icon: Target,
     color: "indigo",
-    example: __("15% premium on weekends within specific dates"),
+    example: __(
+      "+15% premium on Saturday & Sunday departures. Add a date range to make it effective only for that period.",
+    ),
   },
 ];
 
@@ -568,7 +592,9 @@ const DynamicPricingRuleForm: React.FC = () => {
                   <CardHeader>
                     <CardTitle>{__("Rule Details")}</CardTitle>
                     <CardDescription>
-                      {__("Name and description for this pricing rule")}
+                      {__(
+                        "Internal name for this pricing rule (visible to admins only).",
+                      )}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -581,6 +607,11 @@ const DynamicPricingRuleForm: React.FC = () => {
                         placeholder={__("e.g., Summer Early Bird Discount")}
                         required
                       />
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {__(
+                          "Used in admin lists, analytics, and price-history exports. Customers never see this name.",
+                        )}
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -633,13 +664,40 @@ const DynamicPricingRuleForm: React.FC = () => {
                         required
                       />
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {formData.adjustment_type === "percentage"
-                          ? __(
-                              "Enter percentage (e.g., 10 for 10% discount, -10 for 10% increase)",
-                            )
-                          : __(
-                              "Enter fixed amount (e.g., 100 for $100 discount, -100 for $100 increase)",
-                            )}
+                        {(() => {
+                          const rt = formData.rule_type;
+                          // Early bird & last minute always behave as discounts:
+                          // enter a positive magnitude.
+                          if (rt === "early_bird" || rt === "last_minute") {
+                            return formData.adjustment_type === "percentage"
+                              ? __(
+                                  "Enter the discount magnitude as a positive number (e.g. 10 = 10% off). The rule always applies as a discount.",
+                                )
+                              : __(
+                                  "Enter the discount magnitude as a positive number (e.g. 100 = 100 off). The rule always applies as a discount.",
+                                );
+                          }
+                          // Inventory & demand auto-derive direction from
+                          // capacity / demand score; admins enter only the
+                          // magnitude.
+                          if (rt === "inventory" || rt === "demand") {
+                            return formData.adjustment_type === "percentage"
+                              ? __(
+                                  "Enter the magnitude (positive). Direction is derived automatically: scarce inventory / high demand → markup, plenty / low demand → discount.",
+                                )
+                              : __(
+                                  "Enter the magnitude (positive). Direction is derived automatically: scarce inventory / high demand → markup, plenty / low demand → discount.",
+                                );
+                          }
+                          // Seasonal & time-based use the sign as entered.
+                          return formData.adjustment_type === "percentage"
+                            ? __(
+                                "Use a positive value to increase price (e.g. 10 = +10%) and a negative value to discount (e.g. -10 = 10% off).",
+                              )
+                            : __(
+                                "Use a positive value to increase price (e.g. 100 = +100) and a negative value to discount (e.g. -100 = 100 off).",
+                              );
+                        })()}
                       </p>
                     </div>
                   </CardContent>
@@ -673,6 +731,11 @@ const DynamicPricingRuleForm: React.FC = () => {
                             }
                             min="0"
                           />
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            {__(
+                              "Apply only when the selected departure date is at least this many days away from today. Example: 30 means 30+ days before departure.",
+                            )}
+                          </p>
                         </div>
 
                         <div>
@@ -691,6 +754,19 @@ const DynamicPricingRuleForm: React.FC = () => {
                             }
                             min="0"
                           />
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            {__(
+                              "Apply only when the selected departure date is within this many days from today. Example: 7 means 0–7 days before departure.",
+                            )}
+                          </p>
+                        </div>
+
+                        <div className="p-3 bg-gray-50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-800 rounded-lg">
+                          <p className="text-xs text-gray-700 dark:text-gray-300">
+                            {__(
+                              "If you set both Minimum and Maximum, the rule applies only inside that window (Minimum ≤ days before departure ≤ Maximum).",
+                            )}
+                          </p>
                         </div>
 
                         <div>
@@ -705,7 +781,9 @@ const DynamicPricingRuleForm: React.FC = () => {
                             placeholder={__("Select start date")}
                           />
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            {__("Leave empty for no date restriction")}
+                            {__(
+                              "Optional lifetime limit. If set, this rule will run only on or after this date. Leave empty for no restriction.",
+                            )}
                           </p>
                         </div>
 
@@ -721,7 +799,9 @@ const DynamicPricingRuleForm: React.FC = () => {
                             placeholder={__("Select end date")}
                           />
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            {__("Leave empty for no date restriction")}
+                            {__(
+                              "Optional lifetime limit. If set, this rule will run only on or before this date. Leave empty for no restriction.",
+                            )}
                           </p>
                         </div>
                       </>
@@ -731,7 +811,7 @@ const DynamicPricingRuleForm: React.FC = () => {
                       <>
                         <div>
                           <Label htmlFor="min_inventory">
-                            {__("Minimum Available Seats")}
+                            {__("Low-inventory threshold (seats)")}
                           </Label>
                           <Input
                             id="min_inventory"
@@ -745,11 +825,16 @@ const DynamicPricingRuleForm: React.FC = () => {
                             }
                             min="0"
                           />
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            {__(
+                              "When seats remaining ≤ this number, the rule applies a markup (scarcity).",
+                            )}
+                          </p>
                         </div>
 
                         <div>
                           <Label htmlFor="max_inventory">
-                            {__("Maximum Available Seats")}
+                            {__("High-inventory threshold (seats)")}
                           </Label>
                           <Input
                             id="max_inventory"
@@ -763,15 +848,22 @@ const DynamicPricingRuleForm: React.FC = () => {
                             }
                             min="0"
                           />
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            {__(
+                              "When seats remaining ≥ this number, the rule applies a partial discount (50% of the magnitude).",
+                            )}
+                          </p>
                         </div>
                       </>
                     )}
 
-                    {/* Seasonal - Date range */}
+                    {/* Seasonal - Departure window */}
                     {formData.rule_type === "seasonal" && (
                       <>
                         <div>
-                          <Label htmlFor="start_date">{__("Start Date")}</Label>
+                          <Label htmlFor="start_date">
+                            {__("Season Start (Departure Date)")}
+                          </Label>
                           <DatePicker
                             value={formData.start_date}
                             onChange={(value) =>
@@ -780,12 +872,16 @@ const DynamicPricingRuleForm: React.FC = () => {
                             placeholder={__("Select start date")}
                           />
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            {__("When this seasonal pricing starts")}
+                            {__(
+                              "Earliest departure date this seasonal rule applies to.",
+                            )}
                           </p>
                         </div>
 
                         <div>
-                          <Label htmlFor="end_date">{__("End Date")}</Label>
+                          <Label htmlFor="end_date">
+                            {__("Season End (Departure Date)")}
+                          </Label>
                           <DatePicker
                             value={formData.end_date}
                             onChange={(value) =>
@@ -794,7 +890,17 @@ const DynamicPricingRuleForm: React.FC = () => {
                             placeholder={__("Select end date")}
                           />
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            {__("When this seasonal pricing ends")}
+                            {__(
+                              "Latest departure date this seasonal rule applies to. The rule matches whenever the booking's departure date falls between these two dates (inclusive).",
+                            )}
+                          </p>
+                        </div>
+
+                        <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                          <p className="text-xs text-yellow-700 dark:text-yellow-300">
+                            {__(
+                              "💡 Tip: Use a positive Adjustment Value for peak-season markup (e.g. 25% during summer) or a negative value for an off-peak discount.",
+                            )}
                           </p>
                         </div>
                       </>
@@ -911,7 +1017,7 @@ const DynamicPricingRuleForm: React.FC = () => {
                           </div>
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                             {__(
-                              "Select the days of the week when this pricing rule applies",
+                              "Selected days are matched against the booking's DEPARTURE date — e.g. tick Saturday + Sunday to apply a weekend premium to Saturday/Sunday departures, regardless of when the customer books.",
                             )}
                           </p>
                         </div>
@@ -928,7 +1034,9 @@ const DynamicPricingRuleForm: React.FC = () => {
                             placeholder={__("Select start date")}
                           />
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            {__("Leave empty for no date restriction")}
+                            {__(
+                              "Limits the rule to departures on or after this date. Leave empty for no restriction.",
+                            )}
                           </p>
                         </div>
 
@@ -944,14 +1052,16 @@ const DynamicPricingRuleForm: React.FC = () => {
                             placeholder={__("Select end date")}
                           />
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            {__("Leave empty for no date restriction")}
+                            {__(
+                              "Limits the rule to departures on or before this date. Leave empty for no restriction.",
+                            )}
                           </p>
                         </div>
 
                         <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
                           <p className="text-xs text-indigo-700 dark:text-indigo-300">
                             {__(
-                              "💡 Use positive values for premium pricing (weekends) or negative for discounts (weekdays).",
+                              "💡 Sign matters: a positive Adjustment Value adds a premium on the selected days; a negative value gives a discount.",
                             )}
                           </p>
                         </div>
@@ -1001,7 +1111,9 @@ const DynamicPricingRuleForm: React.FC = () => {
                     max="100"
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {__("Higher priority rules are applied first (1-100)")}
+                    {__(
+                      "A higher number = higher priority (1–100). When more than one rule matches, the global Rule Priority Mode in Settings decides whether the highest-priority rule wins, every rule stacks, or the customer gets the best price.",
+                    )}
                   </p>
                 </CardContent>
               </Card>

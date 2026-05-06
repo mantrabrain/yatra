@@ -1,8 +1,19 @@
 <?php
 /**
- * Dynamic Pricing Service for Yatra Plugin
+ * Dynamic Pricing — placeholder (Free plugin)
  *
- * Handles dynamic pricing calculations and filters
+ * This file used to ship a small example implementation that auto-enabled
+ * dynamic pricing and applied hard-coded `*1.15` / `*0.9` math, which double-
+ * applied or conflicted with the real engine in Yatra Pro
+ * (`YatraPro\Modules\DynamicPricing`). It is now a no-op stub kept only to
+ * preserve class-name back-compat.
+ *
+ * The Free plugin's role is purely to expose pricing filters — actual rule
+ * evaluation lives in the Pro module:
+ *   - yatra_dynamic_pricing_enabled
+ *   - yatra_availability_price
+ *   - yatra_trip_display_price
+ *   - yatra_booking_trip_price
  *
  * @package Yatra\Services
  */
@@ -12,77 +23,11 @@ namespace Yatra\Services;
 class DynamicPricingService
 {
     /**
-     * Initialize dynamic pricing hooks
+     * Intentionally a no-op. The Pro DynamicPricing module owns all rule
+     * registration, calculation, and the `yatra_dynamic_pricing_enabled` flag.
      */
     public static function init(): void
     {
-        // Enable dynamic pricing module
-        add_filter('yatra_dynamic_pricing_enabled', '__return_true');
-
-        // Register pricing filters
-        add_filter('yatra_availability_price', [self::class, 'applyDynamicPricing'], 10, 3);
-        add_filter('yatra_trip_display_price', [self::class, 'applyDisplayPricing'], 10, 3);
-        add_filter('yatra_booking_trip_price', [self::class, 'applyBookingPricing'], 10, 3);
-    }
-
-    /**
-     * Apply dynamic pricing logic
-     *
-     * @param float $price
-     * @param int $trip_id
-     * @param array $context
-     * @return float
-     */
-    public static function applyDynamicPricing(float $price, int $trip_id, array $context): float
-    {
-        // Debug logging
-        $original_price = $price;
-
-        // Apply basic dynamic pricing logic
-        $departure_date = $context['departure_date'] ?? null;
-        $spots_remaining = $context['spots_remaining'] ?? null;
-
-        // Example: Increase price if less than 5 spots remaining (high demand)
-        if ($spots_remaining !== null && $spots_remaining <= 5 && $spots_remaining > 0) {
-            $price = $price * 1.15; // 15% increase for high demand
-            }
-
-        // Example: Early bird discount (more than 30 days in advance)
-        if ($departure_date) {
-            $days_until = (strtotime($departure_date) - time()) / (60 * 60 * 24);
-            if ($days_until > 30) {
-                $price = $price * 0.9; // 10% early bird discount
-                }
-        }
-
-        return $price;
-    }
-
-    /**
-     * Apply dynamic pricing for trip display pages
-     *
-     * @param float $price
-     * @param int $trip_id
-     * @param array $context
-     * @return float
-     */
-    public static function applyDisplayPricing(float $price, int $trip_id, array $context): float
-    {
-        // Apply same logic for trip display pages
-        return apply_filters('yatra_availability_price', $price, $trip_id, $context);
-    }
-
-    /**
-     * Apply dynamic pricing for booking calculations
-     *
-     * @param float $price
-     * @param int $trip_id
-     * @param array $context
-     * @return float
-     */
-    public static function applyBookingPricing(float $price, int $trip_id, array $context): float
-    {
-        // Apply same logic for booking calculations
-        return apply_filters('yatra_availability_price', $price, $trip_id, $context);
+        // no-op
     }
 }

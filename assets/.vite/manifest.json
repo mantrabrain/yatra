@@ -3,8 +3,8 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-Chn65adw.js": {
-    "file": "dist/js/index-Chn65adw.js",
+  "_index-BoN1WlyH.js": {
+    "file": "dist/js/index-BoN1WlyH.js",
     "name": "index",
     "imports": [
       "_react-vendor-CGraIJLZ.js"
@@ -31,7 +31,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-CGraIJLZ.js",
-      "_index-Chn65adw.js"
+      "_index-BoN1WlyH.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -41,7 +41,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-CGraIJLZ.js",
-      "_index-Chn65adw.js"
+      "_index-BoN1WlyH.js"
     ]
   }
 }

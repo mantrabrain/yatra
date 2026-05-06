@@ -50,7 +50,9 @@ export const CORE_FREE_TEMPLATE_KEYS = [
   "enquiry_admin",
   "enquiry_response",
   "review_request",
-  "abandoned_booking_recovery",
+  "abandoned_booking_recovery_first",
+  "abandoned_booking_recovery_second",
+  "abandoned_booking_recovery_final",
   "admin_new_booking",
   "admin_payment_received",
   "admin_booking_cancelled",
@@ -494,11 +496,11 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
       BOOKING_RICH_MERGE_TAGS,
   },
   {
-    template_key: "abandoned_booking_recovery",
+    template_key: "abandoned_booking_recovery_first",
     event_key: "booking.abandoned_recovery",
-    name: __("Abandoned booking recovery", "yatra"),
+    name: __("Abandoned booking recovery (First)", "yatra"),
     description: __(
-      "Used by Yatra Pro abandoned checkout recovery (merge tags include module copy in {{recovery_intro_html}}).",
+      "First reminder sent by Yatra Pro abandoned checkout recovery (module copy in {{recovery_intro_html}}).",
       "yatra",
     ),
     category: "booking",
@@ -506,9 +508,49 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     to_email: "{customer_email}",
     isCoreFree: true,
     requiresModule: "abandoned_booking_recovery",
-    settingsFlag: "email_template_abandoned_booking_recovery",
-    settingsSubject: "email_tpl_abandoned_booking_recovery_subject",
-    settingsBody: "email_tpl_abandoned_booking_recovery_body",
+    settingsFlag: "email_template_abandoned_booking_recovery_first",
+    settingsSubject: "email_tpl_abandoned_booking_recovery_first_subject",
+    settingsBody: "email_tpl_abandoned_booking_recovery_first_body",
+    mergeTags:
+      "{{site_name}}, {{customer_name}}, {{trip_name}}, {{recovery_link}}, {{booking_reference}}, {{recovery_reminder_label}}, {{recovery_intro_html}}, " +
+      BOOKING_RICH_MERGE_TAGS,
+  },
+  {
+    template_key: "abandoned_booking_recovery_second",
+    event_key: "booking.abandoned_recovery",
+    name: __("Abandoned booking recovery (Second)", "yatra"),
+    description: __(
+      "Second reminder sent by Yatra Pro abandoned checkout recovery (module copy in {{recovery_intro_html}}).",
+      "yatra",
+    ),
+    category: "booking",
+    recipient_type: "customer",
+    to_email: "{customer_email}",
+    isCoreFree: true,
+    requiresModule: "abandoned_booking_recovery",
+    settingsFlag: "email_template_abandoned_booking_recovery_second",
+    settingsSubject: "email_tpl_abandoned_booking_recovery_second_subject",
+    settingsBody: "email_tpl_abandoned_booking_recovery_second_body",
+    mergeTags:
+      "{{site_name}}, {{customer_name}}, {{trip_name}}, {{recovery_link}}, {{booking_reference}}, {{recovery_reminder_label}}, {{recovery_intro_html}}, " +
+      BOOKING_RICH_MERGE_TAGS,
+  },
+  {
+    template_key: "abandoned_booking_recovery_final",
+    event_key: "booking.abandoned_recovery",
+    name: __("Abandoned booking recovery (Final)", "yatra"),
+    description: __(
+      "Final reminder sent by Yatra Pro abandoned checkout recovery (module copy in {{recovery_intro_html}}).",
+      "yatra",
+    ),
+    category: "booking",
+    recipient_type: "customer",
+    to_email: "{customer_email}",
+    isCoreFree: true,
+    requiresModule: "abandoned_booking_recovery",
+    settingsFlag: "email_template_abandoned_booking_recovery_final",
+    settingsSubject: "email_tpl_abandoned_booking_recovery_final_subject",
+    settingsBody: "email_tpl_abandoned_booking_recovery_final_body",
     mergeTags:
       "{{site_name}}, {{customer_name}}, {{trip_name}}, {{recovery_link}}, {{booking_reference}}, {{recovery_reminder_label}}, {{recovery_intro_html}}, " +
       BOOKING_RICH_MERGE_TAGS,

@@ -15,6 +15,29 @@ use Yatra\Database\Tables\BookingDeparturesTable;
 class BookingDepartureRepository extends BaseRepository
 {
     /**
+     * Check if booking_departures table exists
+     */
+    public function tableExists(): bool
+    {
+        $table = $this->getTableName();
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $exists = $this->wpdb->get_var($this->wpdb->prepare("SHOW TABLES LIKE %s", $table));
+        return $exists === $table;
+    }
+
+    /**
+     * Create booking_departures table if missing
+     */
+    private function createTable(): void
+    {
+        if (!function_exists('dbDelta')) {
+            require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        }
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        dbDelta(\Yatra\Database\Tables\BookingDeparturesTable::getSchema());
+    }
+
+    /**
      * Get table name
      */
     protected function getTableName(): string
@@ -32,6 +55,11 @@ class BookingDepartureRepository extends BaseRepository
     public function link(int $bookingId, int $departureId): bool
     {
         $table = $this->getTableName();
+
+        // Ensure table exists and detect optional columns (older installs may differ).
+        $columns = $this->wpdb->get_col("DESCRIBE {$table}") ?: [];
+        $hasTravelDate = in_array('travel_date', $columns, true);
+        $hasDepartureTime = in_array('departure_time', $columns, true);
         
         // Check if relationship already exists
         $existing = $this->wpdb->get_var($this->wpdb->prepare(
@@ -41,17 +69,94 @@ class BookingDepartureRepository extends BaseRepository
         ));
         
         if ($existing) {
-            return true; // Already linked
+            // Already linked; best-effort backfill date/time if the columns exist and are empty.
+            if ($hasTravelDate || $hasDepartureTime) {
+                $update = [];
+
+                $booking = (new BookingRepository())->find($bookingId);
+                $departure = (new DepartureRepository())->find($departureId);
+
+                $travelDate = '';
+                if (is_object($departure)) {
+                    $travelDate = (string) ($departure->start_date ?? $departure->date ?? '');
+                }
+                if ($travelDate === '' && is_object($booking)) {
+                    $travelDate = (string) ($booking->travel_date ?? $booking->start_date ?? '');
+                }
+
+                $time = '';
+                if (is_object($departure)) {
+                    $time = (string) ($departure->time ?? '');
+                }
+                if ($time !== '') {
+                    $ts = strtotime($time);
+                    $time = $ts !== false ? date('H:i:s', $ts) : $time;
+                }
+
+                if ($hasTravelDate && $travelDate !== '') {
+                    $update['travel_date'] = $travelDate;
+                }
+                if ($hasDepartureTime && $time !== '' && $time !== '00:00:00') {
+                    $update['departure_time'] = $time;
+                }
+
+                if (!empty($update)) {
+                    $this->wpdb->update($table, $update, ['id' => (int) $existing]);
+                }
+            }
+
+            return true;
+        }
+
+        $booking = (new BookingRepository())->find($bookingId);
+        $departure = (new DepartureRepository())->find($departureId);
+
+        $travelDate = '';
+        if (is_object($departure)) {
+            $travelDate = (string) ($departure->start_date ?? $departure->date ?? '');
+        }
+        if ($travelDate === '' && is_object($booking)) {
+            $travelDate = (string) ($booking->travel_date ?? $booking->start_date ?? '');
+        }
+
+        $time = '';
+        if (is_object($departure)) {
+            $time = (string) ($departure->time ?? '');
+        }
+        if ($time !== '') {
+            $ts = strtotime($time);
+            $time = $ts !== false ? date('H:i:s', $ts) : $time;
+        }
+
+        // Build insert payload compatible with both new and legacy schemas.
+        $insert = [
+            'booking_id' => $bookingId,
+            'departure_id' => $departureId,
+            'created_at' => current_time('mysql'),
+        ];
+        $formats = ['%d', '%d', '%s'];
+
+        if ($hasTravelDate) {
+            // travel_date is NOT NULL in the new schema; fail safe to booking travel_date.
+            if ($travelDate === '' && is_object($booking) && !empty($booking->travel_date)) {
+                $travelDate = (string) $booking->travel_date;
+            }
+            if ($travelDate === '') {
+                // If we can't infer a date, don't attempt insert (would violate NOT NULL in new schema).
+                return false;
+            }
+            $insert['travel_date'] = $travelDate;
+            $formats[] = '%s';
+        }
+        if ($hasDepartureTime) {
+            $insert['departure_time'] = ($time !== '' && $time !== '00:00:00') ? $time : null;
+            $formats[] = '%s';
         }
         
         $result = $this->wpdb->insert(
             $table,
-            [
-                'booking_id' => $bookingId,
-                'departure_id' => $departureId,
-                'created_at' => current_time('mysql'),
-            ],
-            ['%d', '%d', '%s']
+            $insert,
+            $formats
         );
         
         return $result !== false;

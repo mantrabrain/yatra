@@ -28,7 +28,7 @@ class DifficultyLevelRepository extends BaseRepository
      */
     public function __construct()
     {
-        parent::__construct(ClassificationsTable::getTableName());
+        parent::__construct();
     }
 
     /**
@@ -52,6 +52,30 @@ class DifficultyLevelRepository extends BaseRepository
                 $slug
             )
         );
+        return $result ?: null;
+    }
+
+    /**
+     * Find by name (case-insensitive match)
+     */
+    public function findByName(string $name): ?\stdClass
+    {
+        $name = trim($name);
+        if ($name === '') {
+            return null;
+        }
+
+        $table = esc_sql($this->table);
+        $result = $this->wpdb->get_row(
+            $this->wpdb->prepare(
+                "SELECT * FROM `{$table}` 
+                 WHERE type = %s AND LOWER(name) = LOWER(%s)
+                 LIMIT 1",
+                ClassificationTypes::DIFFICULTY,
+                $name
+            )
+        );
+
         return $result ?: null;
     }
 

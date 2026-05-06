@@ -431,11 +431,15 @@ class CalculationService
                 }
             }
             
-            // Fallback: lookup by trip + date + time (time-aware for day tours)
+            // Fallback: resolve through centralized resolver so rule-generated slots
+            // (virtual, no numeric availability_id) use the exact same data shape as the UI.
             if (!empty($travel_date)) {
-                $repo = new \Yatra\Repositories\AvailabilityRepository();
-                $availabilityService = new \Yatra\Services\AvailabilityService($repo);
-                return $availabilityService->getByTripAndDateTime($trip_id, $travel_date, $departure_time ?: null);
+                $resolver = new \Yatra\Services\AvailabilityResolutionService();
+                return $resolver->resolveAvailabilityForDate(
+                    $trip_id,
+                    $travel_date,
+                    $departure_time !== '' ? $departure_time : null
+                );
             }
         } catch (\Exception $e) {
             // Availability lookup failed, continue with trip-level pricing

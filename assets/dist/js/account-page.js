@@ -1,5 +1,5 @@
 import { j as jsxRuntimeExports, i as Calendar, h as FileText, l as Plane, ak as ArrowRight, M as MapPin, U as User, v as ChevronRight, aG as Sparkles, P as Package, k as CreditCard, bH as LifeBuoy, bo as Bell, aK as AlertCircle, a$ as CheckCircle2, ai as Clock, av as ExternalLink, ah as Users, o as Mail, b1 as Phone, aR as Download, r as reactExports, u as useQuery, am as CheckCircle, aj as DollarSign, w as React, aV as Eye, ax as PenSquare, aL as XCircle, bI as ShieldCheck, bJ as Heart, L as LayoutDashboard, bK as LogOut, bE as QueryClient, bF as client, bG as QueryClientProvider } from "./react-vendor-CGraIJLZ.js";
-import { f as formatYatraMoney, _ as __, h as applyCurrencyPosition, s as sprintf, a as apiClient, A as API_ENDPOINTS, u as useToast, T as ToastProvider } from "./index-Chn65adw.js";
+import { f as formatYatraMoney, _ as __, h as applyCurrencyPosition, s as sprintf, a as apiClient, A as API_ENDPOINTS, u as useToast, T as ToastProvider } from "./index-BoN1WlyH.js";
 const formatDate = (value) => {
   if (!value) {
     return __("N/A", "yatra");
@@ -132,7 +132,11 @@ const formatPriceForBooking = (price, currency2) => {
     currencyPosition
   );
 };
-const currency = (value, currencyCode = "USD") => formatYatraMoney(Number(value) || 0, currencyCode, { zeroAsUnknown: false });
+const currency = (value, currencyCode) => {
+  const cfg = readPriceConfig();
+  const code = cfg.globalCurrency || "USD";
+  return formatYatraMoney(Number(value) || 0, code, { zeroAsUnknown: false });
+};
 function getYatraAccountPageGlobals() {
   if (typeof window === "undefined") {
     return {

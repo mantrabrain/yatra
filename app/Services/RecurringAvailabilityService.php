@@ -81,14 +81,34 @@ class RecurringAvailabilityService
                 break;
                 
             case 'monthly':
-                if (empty($data['week_of_month'])) {
+                // week_of_month may come from the admin UI as a string (first/second/...)
+                // or from persisted data as an int (1..5). Accept both and normalize for checks.
+                $weekValue = $data['week_of_month'] ?? null;
+                if ($weekValue === null || $weekValue === '') {
                     throw new \InvalidArgumentException('Week of month is required for monthly rules');
+                }
+                if (is_string($weekValue)) {
+                    $weekValue = strtolower(trim($weekValue));
+                }
+                if (is_numeric($weekValue)) {
+                    $weekInt = (int) $weekValue;
+                    $map = [
+                        1 => 'first',
+                        2 => 'second',
+                        3 => 'third',
+                        4 => 'fourth',
+                        5 => 'last',
+                    ];
+                    if (isset($map[$weekInt])) {
+                        $weekValue = $map[$weekInt];
+                        $data['week_of_month'] = $weekValue;
+                    }
                 }
                 if (!isset($data['day_of_week']) || $data['day_of_week'] === '') {
                     throw new \InvalidArgumentException('Day of week is required for monthly rules');
                 }
                 $validWeeks = ['first', 'second', 'third', 'fourth', 'last'];
-                if (!in_array($data['week_of_month'], $validWeeks, true)) {
+                if (!is_string($weekValue) || !in_array($weekValue, $validWeeks, true)) {
                     throw new \InvalidArgumentException('Invalid week of month');
                 }
                 break;
@@ -130,12 +150,18 @@ class RecurringAvailabilityService
     public function create(array $data): int
     {
         $this->validate($data);
-        
-        // Convert days array to string if needed
-        if (isset($data['days_of_week']) && is_array($data['days_of_week'])) {
-            $data['days_of_week'] = implode(',', $data['days_of_week']);
+
+        // The `days_of_week` column is JSON. Leave the value as an array so
+        // the repository can JSON-encode it; if a caller passes a legacy CSV
+        // string, normalise it to an array of ints here so the repo always
+        // sees a single shape.
+        $data = $this->normaliseDaysOfWeek($data);
+
+        // Normalise UI strings to match DB column types.
+        if (isset($data['week_of_month']) && is_string($data['week_of_month'])) {
+            $data['week_of_month'] = strtolower(trim($data['week_of_month']));
         }
-        
+
         return $this->repository->create($data);
     }
 
@@ -145,13 +171,50 @@ class RecurringAvailabilityService
     public function update(int $id, array $data): bool
     {
         $this->validate($data, $id);
-        
-        // Convert days array to string if needed
-        if (isset($data['days_of_week']) && is_array($data['days_of_week'])) {
-            $data['days_of_week'] = implode(',', $data['days_of_week']);
+
+        $data = $this->normaliseDaysOfWeek($data);
+
+        if (isset($data['week_of_month']) && is_string($data['week_of_month'])) {
+            $data['week_of_month'] = strtolower(trim($data['week_of_month']));
         }
-        
+
         return $this->repository->update($id, $data);
+    }
+
+    /**
+     * Coerce `days_of_week` to an array of ints (0..6) regardless of how the
+     * caller passed it (array of mixed scalars, comma-separated string, JSON
+     * string). The repository is responsible for JSON-encoding it for the
+     * database column.
+     */
+    private function normaliseDaysOfWeek(array $data): array
+    {
+        if (!array_key_exists('days_of_week', $data)) {
+            return $data;
+        }
+
+        $value = $data['days_of_week'];
+
+        if (is_string($value)) {
+            $trimmed = trim($value);
+            if ($trimmed === '') {
+                $value = [];
+            } else {
+                $decoded = json_decode($trimmed, true);
+                $value = is_array($decoded) ? $decoded : explode(',', $trimmed);
+            }
+        }
+
+        if (!is_array($value)) {
+            $value = [];
+        }
+
+        $value = array_values(array_unique(array_map(static fn($d) => (int) $d, $value)));
+        $value = array_values(array_filter($value, static fn(int $d) => $d >= 0 && $d <= 6));
+
+        $data['days_of_week'] = $value;
+
+        return $data;
     }
 
     /**
@@ -354,41 +417,70 @@ class RecurringAvailabilityService
     }
 
     /**
-     * Generate interval recurring dates (every X days)
+     * Generate interval recurring dates (every X days).
+     *
+     * Hardened against malformed legacy data (rules carried over from the
+     * pre-3.x schema may land here after the legacy→new heal-step in
+     * {@see \Yatra\Services\InstallerService::maybeNormalizeAvailabilityRulesLegacyData()}):
+     *  - `interval_days` defaults to 1 when 0/NULL so we never divide by zero
+     *    or loop forever.
+     *  - `interval_start_date`/`start_date` may be NULL or unparseable; we
+     *    bail out rather than feed `false` into a chain of strtotime() calls,
+     *    which on PHP 8.1+ raises a TypeError ($baseTimestamp must be ?int).
+     *  - The previous "+N * M days" string was never a valid strtotime
+     *    expression (strtotime doesn't multiply); we now compute the skip
+     *    arithmetic in PHP and pass a single, well-formed relative format.
      */
     private function generateIntervalDates(object $rule, string $fromDate, string $toDate): array
     {
         $dates = [];
-        $intervalDays = (int) $rule->interval_days;
-        $excludedDates = $rule->excluded_dates;
+
+        $intervalDays = (int) ($rule->interval_days ?? 0);
+        if ($intervalDays <= 0) {
+            $intervalDays = 1;
+        }
+
+        $excludedDates = $rule->excluded_dates ?? [];
         $selectedMonths = !empty($rule->months) ? $rule->months : [];
-        
-        // Start from interval_start_date or rule start_date
-        $referenceDate = $rule->interval_start_date ?? $rule->start_date;
-        $reference = strtotime($referenceDate);
+
+        $referenceDate = !empty($rule->interval_start_date)
+            ? $rule->interval_start_date
+            : ($rule->start_date ?? null);
+
+        if (empty($referenceDate)) {
+            return $dates;
+        }
+
+        $reference = strtotime((string) $referenceDate);
         $from = strtotime($fromDate);
         $end = strtotime($toDate);
-        
-        // Find first occurrence on or after fromDate
-        if ($reference < $from) {
-            $daysDiff = floor(($from - $reference) / 86400);
-            $intervalsToSkip = ceil($daysDiff / $intervalDays);
-            $reference = strtotime("+{$intervalsToSkip} * {$intervalDays} days", $reference);
+
+        if ($reference === false || $from === false || $end === false) {
+            return $dates;
         }
-        
+
+        // Snap reference forward to the first occurrence on/after $from.
+        if ($reference < $from) {
+            $daysDiff = (int) floor(($from - $reference) / 86400);
+            $intervalsToSkip = (int) ceil($daysDiff / $intervalDays);
+            $skipDays = $intervalsToSkip * $intervalDays;
+            $advanced = strtotime("+{$skipDays} days", $reference);
+            if ($advanced === false) {
+                return $dates;
+            }
+            $reference = $advanced;
+        }
+
         $current = $reference;
-        
-        while ($current <= $end) {
+
+        while ($current !== false && $current <= $end) {
             if ($current >= $from) {
                 $dateStr = date('Y-m-d', $current);
                 $dayOfWeek = (int) date('w', $current);
                 $month = (int) date('n', $current); // 1-12
-                
-                // Check if month is allowed (if months filter is set)
+
                 if (empty($selectedMonths) || in_array($month, $selectedMonths, true)) {
-                    // Check if not excluded
                     if (!in_array($dateStr, $excludedDates, true)) {
-                        // Check cutoff
                         if ($this->isBookable($current, $rule)) {
                             $generatedDates = $this->createAvailabilityFromRule($rule, $dateStr, $dayOfWeek);
                             $dates = array_merge($dates, $generatedDates);
@@ -396,10 +488,10 @@ class RecurringAvailabilityService
                     }
                 }
             }
-            
+
             $current = strtotime("+{$intervalDays} days", $current);
         }
-        
+
         return $dates;
     }
 
@@ -478,7 +570,12 @@ class RecurringAvailabilityService
     {
         // Check for day-specific overrides
         $dayOverrides = $rule->day_overrides[$dayOfWeek] ?? [];
-        
+
+        // Preview flows pass a pseudo-rule that has no persisted id; fall back
+        // to the string "preview" so we still emit a deterministic synthetic
+        // availability id without triggering PHP 8 undefined-property warnings.
+        $ruleId = $rule->id ?? 'preview';
+
         // If rule has time_slots, create separate availability for each slot
         if (!empty($rule->time_slots) && is_array($rule->time_slots)) {
             $availabilities = [];
@@ -486,10 +583,10 @@ class RecurringAvailabilityService
                 $slotPrice = $slot['price'] ?? $dayOverrides['original_price'] ?? $rule->original_price;
                 $slotSeats = $slot['seats'] ?? $dayOverrides['seats_total'] ?? $rule->seats_total;
                 $slotTravelerPricing = $slot['traveler_pricing'] ?? $rule->traveler_pricing ?? [];
-                
+
                 $availabilities[] = [
-                    'id' => 'rule_' . $rule->id . '_' . $date . '_slot_' . $index,
-                    'rule_id' => $rule->id,
+                    'id' => 'rule_' . $ruleId . '_' . $date . '_slot_' . $index,
+                    'rule_id' => $ruleId,
                     'trip_id' => $rule->trip_id,
                     'departure_date' => $date,
                     'departure_time' => $slot['departure_time'] ?? null,
@@ -524,8 +621,8 @@ class RecurringAvailabilityService
         $travelerPricing = $rule->traveler_pricing ?? [];
         
         return [[
-            'id' => 'rule_' . $rule->id . '_' . $date,
-            'rule_id' => $rule->id,
+            'id' => 'rule_' . $ruleId . '_' . $date,
+            'rule_id' => $ruleId,
             'trip_id' => $rule->trip_id,
             'departure_date' => $date,
             'departure_time' => $rule->departure_time,

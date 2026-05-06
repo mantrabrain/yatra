@@ -1403,18 +1403,20 @@ const DynamicPricingPage: React.FC = () => {
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="highest">
-                        {__("Apply Highest Priority Rule Only")}
+                        {__(
+                          "Apply Largest Adjustment Only (one rule wins by magnitude)",
+                        )}
                       </option>
                       <option value="cumulative">
-                        {__("Apply All Matching Rules (Cumulative)")}
+                        {__("Apply All Matching Rules (Cumulative / Stack)")}
                       </option>
                       <option value="best">
-                        {__("Apply Best Price for Customer")}
+                        {__("Apply Best Price for Customer (Lowest Final)")}
                       </option>
                     </select>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {__(
-                        "How to handle multiple rules matching the same booking",
+                        "How to combine matching rules. Caps below still apply afterwards. Per-rule numeric Priority is used as a tie-breaker when multiple rules tie for largest / best.",
                       )}
                     </p>
                   </div>
@@ -1437,7 +1439,9 @@ const DynamicPricingPage: React.FC = () => {
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {__("Cap maximum price increase to protect customers")}
+                      {__(
+                        "Hard cap on upward adjustments (markup) across all matched rules to avoid surprising customers with sudden surges.",
+                      )}
                     </p>
                   </div>
 
@@ -1459,7 +1463,9 @@ const DynamicPricingPage: React.FC = () => {
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {__("Cap maximum discount to maintain profitability")}
+                      {__(
+                        "Hard cap on downward adjustments (discount) so dynamic pricing can never push a trip below this fraction of its base price.",
+                      )}
                     </p>
                   </div>
                 </div>

@@ -106,35 +106,49 @@ class RecurringAvailabilityRepository extends BaseRepository
     }
 
     /**
-     * Get status counts for recurring rules by trip ID
+     * Get status counts for recurring rules by trip ID.
+     *
+     * Returns zeros for every key when the trip has no rules at all so the
+     * admin status badges (All / Active / Inactive) can never report a
+     * phantom "1" while the underlying list is empty. Guarantees:
+     *   - Trip ID is required (positive integer).
+     *   - SUM() over an empty result set is normalized to 0 via COALESCE.
+     *   - $wpdb->get_row() returning null (table missing, transient errors)
+     *     also yields a fully-zero payload instead of leaking nulls upstream.
      */
     public function getStatusCounts(array $args = []): array
     {
         // Extract trip ID from args for backward compatibility
-        $tripId = $args['trip_id'] ?? null;
-        
-        if (!$tripId) {
+        $tripId = isset($args['trip_id']) ? (int) $args['trip_id'] : 0;
+
+        if ($tripId <= 0) {
             throw new \InvalidArgumentException('Trip ID is required for RecurringAvailability status counts');
         }
-        
+
         $table = esc_sql($this->table);
-        
+
         $query = $this->wpdb->prepare(
-            "SELECT 
-                COUNT(*) as all_count,
-                SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
-                SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END) as inactive
-             FROM `{$table}` 
+            "SELECT
+                COALESCE(COUNT(*), 0) AS all_count,
+                COALESCE(SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END), 0) AS active,
+                COALESCE(SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END), 0) AS inactive
+             FROM `{$table}`
              WHERE trip_id = %d",
             $tripId
         );
-        
+
         $result = $this->wpdb->get_row($query, ARRAY_A);
-        
+
+        // Defensive default: return all-zero when the row is missing or the
+        // query failed silently (no rules table yet, DB down, etc.).
+        if (!is_array($result)) {
+            return ['all' => 0, 'active' => 0, 'inactive' => 0];
+        }
+
         return [
-            'all' => (int) ($result['all_count'] ?? 0),
-            'active' => (int) ($result['active'] ?? 0),
-            'inactive' => (int) ($result['inactive'] ?? 0),
+            'all'      => max(0, (int) ($result['all_count'] ?? 0)),
+            'active'   => max(0, (int) ($result['active'] ?? 0)),
+            'inactive' => max(0, (int) ($result['inactive'] ?? 0)),
         ];
     }
 
@@ -213,14 +227,20 @@ class RecurringAvailabilityRepository extends BaseRepository
     {
         $prepared = $this->prepareData($data);
         $prepared['updated_at'] = current_time('mysql');
-        
+
         $result = $this->wpdb->update(
             $this->table,
             $prepared,
             ['id' => $id]
         );
-        
-        return $result !== false;
+
+        if ($result === false) {
+            // Bubble the wpdb error up so the controller's catch-all returns a
+            // useful 500 message instead of the opaque "Failed to update rule".
+            throw new \RuntimeException('Failed to update recurring rule: ' . $this->wpdb->last_error);
+        }
+
+        return true;
     }
 
     /**
@@ -269,14 +289,60 @@ class RecurringAvailabilityRepository extends BaseRepository
             $prepared['price_type'] = ($pt === 'percentage' || $pt === 'percent') ? 'percentage' : 'fixed';
         }
 
+        // Columns that are JSON in the schema. Anything written here MUST be a
+        // valid JSON document, otherwise MySQL rejects the row with
+        // "Invalid JSON text: The document root must not be followed by other
+        // values." (e.g. when a legacy CSV string like "0,1,2" is sent).
+        $jsonColumns = ['excluded_dates', 'months', 'time_slots', 'day_overrides', 'traveler_pricing', 'days_of_week'];
+
         foreach ($allowed as $field) {
             if (array_key_exists($field, $data)) {
                 $value = $data[$field];
 
-                // JSON encode array fields
-                if (in_array($field, ['excluded_dates', 'months', 'time_slots', 'day_overrides', 'traveler_pricing'], true)) {
+                // Normalise week_of_month (stored as smallint in schema) from the admin UI strings.
+                if ($field === 'week_of_month') {
+                    if (is_string($value)) {
+                        $map = [
+                            'first' => 1,
+                            'second' => 2,
+                            'third' => 3,
+                            'fourth' => 4,
+                            'last' => 5,
+                        ];
+                        $key = strtolower(trim($value));
+                        if (isset($map[$key])) {
+                            $value = $map[$key];
+                        }
+                    }
+                    if ($value === '' || $value === null) {
+                        $value = null;
+                    }
+                }
+
+                if (in_array($field, $jsonColumns, true)) {
                     if (is_array($value)) {
                         $value = wp_json_encode($value);
+                    } elseif (is_string($value)) {
+                        $trimmed = trim($value);
+                        // Detect a value that already looks like JSON; otherwise
+                        // treat as legacy CSV (only meaningful for days_of_week).
+                        if ($trimmed === '' || $trimmed === 'null') {
+                            $value = $field === 'days_of_week' ? wp_json_encode([]) : wp_json_encode([]);
+                        } elseif ($trimmed[0] === '[' || $trimmed[0] === '{') {
+                            $value = $trimmed;
+                        } elseif ($field === 'days_of_week') {
+                            $parts = array_values(array_filter(
+                                array_map('intval', explode(',', $trimmed)),
+                                static fn(int $d) => $d >= 0 && $d <= 6
+                            ));
+                            $value = wp_json_encode($parts);
+                        } else {
+                            $value = wp_json_encode([]);
+                        }
+                    } elseif ($value === null) {
+                        $value = wp_json_encode([]);
+                    } else {
+                        $value = wp_json_encode([$value]);
                     }
                 }
 
@@ -303,6 +369,23 @@ class RecurringAvailabilityRepository extends BaseRepository
      */
     private function hydrateRule(object $rule): object
     {
+        // Normalise week_of_month from stored int (1..5) to UI string.
+        if (isset($rule->week_of_month) && $rule->week_of_month !== null && $rule->week_of_month !== '') {
+            $w = is_numeric($rule->week_of_month) ? (int) $rule->week_of_month : null;
+            if ($w !== null) {
+                $map = [
+                    1 => 'first',
+                    2 => 'second',
+                    3 => 'third',
+                    4 => 'fourth',
+                    5 => 'last',
+                ];
+                if (isset($map[$w])) {
+                    $rule->week_of_month = $map[$w];
+                }
+            }
+        }
+
         // Decode JSON fields
         if (!empty($rule->excluded_dates)) {
             $rule->excluded_dates = json_decode($rule->excluded_dates, true) ?: [];

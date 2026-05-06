@@ -155,7 +155,86 @@ if (!defined('ABSPATH')) {
         <!-- ========================================== -->
         <div class="yatra-availability-info">
                     <span class="yatra-availability-count">
-                        <?php echo esc_html(sprintf(_n('%d departure available', '%d departures available', count($trip->getAvailabilityDates()), 'yatra'), count($trip->getAvailabilityDates()))); ?>
+                        <?php
+                        $allAvailability = $trip->getAvailabilityDates();
+                        $today = date('Y-m-d');
+
+                        // Sidebar count should reflect the same resolved availability set (priority:
+                        // manual > recurring rule > trip default). We keep it lightweight here:
+                        // count upcoming departures (date + optional time) from the resolved list.
+                        $filtered = array_filter($allAvailability, static function ($a) use ($today) {
+                            if (!is_object($a)) {
+                                return false;
+                            }
+                            $date = (string) ($a->departure_date ?? '');
+                            if ($date === '' || $date < $today) {
+                                return false;
+                            }
+                            return true;
+                        });
+
+                        // Priority: manual availability dates > recurring rules > trip default.
+                        $bySource = [
+                            'availability_date' => [],
+                            'recurring_rule' => [],
+                            'trip_default' => [],
+                            '' => [],
+                        ];
+                        foreach ($filtered as $a) {
+                            $src = strtolower(trim((string) ($a->source ?? '')));
+                            if (!isset($bySource[$src])) {
+                                $src = '';
+                            }
+                            $bySource[$src][] = $a;
+                        }
+
+                        $pick = [];
+                        if (!empty($bySource['availability_date'])) {
+                            $pick = $bySource['availability_date'];
+                        } elseif (!empty($bySource['recurring_rule'])) {
+                            $pick = $bySource['recurring_rule'];
+                        } elseif (!empty($bySource['trip_default'])) {
+                            $pick = $bySource['trip_default'];
+                        } else {
+                            $pick = $filtered;
+                        }
+
+                        // Count departures:
+                        // - if availability entries include departure_time, count unique (date + time) as departures
+                        // - otherwise count unique dates.
+                        $hasTimeSlots = false;
+                        foreach ($pick as $a) {
+                            $t = isset($a->departure_time) ? trim((string) $a->departure_time) : '';
+                            if ($t !== '' && $t !== '00:00:00') {
+                                $hasTimeSlots = true;
+                                break;
+                            }
+                        }
+
+                        $unique = [];
+                        foreach ($pick as $a) {
+                            $date = (string) ($a->departure_date ?? '');
+                            if ($date === '') {
+                                continue;
+                            }
+                            if ($hasTimeSlots) {
+                                $t = isset($a->departure_time) ? trim((string) $a->departure_time) : '';
+                                if ($t !== '' && $t !== '00:00:00') {
+                                    $date .= '|' . $t;
+                                } else {
+                                    // When some rows have time and others don't, avoid collapsing into date-only.
+                                    $date .= '|__no_time__';
+                                }
+                            }
+                            $unique[$date] = true;
+                        }
+                        $countAvailable = count($unique);
+
+                        echo esc_html(sprintf(
+                            _n('%d departure available', '%d departures available', $countAvailable, 'yatra'),
+                            $countAvailable
+                        ));
+                        ?>
                     </span>
         </div>
 

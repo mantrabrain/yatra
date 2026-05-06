@@ -25,7 +25,9 @@ export type EmailSettingsValues = {
   email_template_enquiry_admin: boolean;
   email_template_enquiry_response: boolean;
   email_template_review_request: boolean;
-  email_template_abandoned_booking_recovery: boolean;
+  email_template_abandoned_booking_recovery_first: boolean;
+  email_template_abandoned_booking_recovery_second: boolean;
+  email_template_abandoned_booking_recovery_final: boolean;
   smtp_enabled: boolean;
   smtp_host: string;
   smtp_port: number;
@@ -72,8 +74,12 @@ export type EmailSettingsValues = {
   email_tpl_enquiry_response_body: string;
   email_tpl_review_request_subject: string;
   email_tpl_review_request_body: string;
-  email_tpl_abandoned_booking_recovery_subject: string;
-  email_tpl_abandoned_booking_recovery_body: string;
+  email_tpl_abandoned_booking_recovery_first_subject: string;
+  email_tpl_abandoned_booking_recovery_first_body: string;
+  email_tpl_abandoned_booking_recovery_second_subject: string;
+  email_tpl_abandoned_booking_recovery_second_body: string;
+  email_tpl_abandoned_booking_recovery_final_subject: string;
+  email_tpl_abandoned_booking_recovery_final_body: string;
 };
 
 export type EmailFieldChangeHandler = ChangeEventHandler<

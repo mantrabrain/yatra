@@ -2188,7 +2188,13 @@ const TripForm: React.FC = () => {
       visa_requirements: tripData.visa_requirements || "",
       vaccination_requirements: tripData.vaccination_requirements || "",
       disable_booking: Boolean(tripData.custom_fields?.disable_booking),
-      has_default_time_slots: tripData.has_default_time_slots || false,
+      // tinyint(1) columns can serialize from PHP/wpdb as the string "0"/"1".
+      // JS treats "0" as truthy, so a plain `value || false` would leave the
+      // checkbox stuck on after the user un-checked + saved. Coerce explicitly.
+      has_default_time_slots:
+        tripData.has_default_time_slots === true
+        || tripData.has_default_time_slots === 1
+        || tripData.has_default_time_slots === "1",
       default_time_slots: Array.isArray(tripData.default_time_slots)
         ? tripData.default_time_slots
         : tripData.default_time_slots

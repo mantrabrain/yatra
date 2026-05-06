@@ -189,7 +189,9 @@ class InstallerService
         update_option('yatra_email_template_enquiry_admin', true);
         update_option('yatra_email_template_enquiry_response', true);
         update_option('yatra_email_template_review_request', true);
-        update_option('yatra_email_template_abandoned_booking_recovery', true);
+        update_option('yatra_email_template_abandoned_booking_recovery_first', true);
+        update_option('yatra_email_template_abandoned_booking_recovery_second', true);
+        update_option('yatra_email_template_abandoned_booking_recovery_final', true);
 
         // Clear any existing Stripe/PayPal settings that might exist
         delete_option('yatra_stripe_settings');
@@ -316,6 +318,91 @@ class InstallerService
     }
 
     /**
+     * One-time normalization of recurring availability rules created against the
+     * legacy schema (only `recurrence_type`, `capacity_value`, `interval`, etc.
+     * were written) so the new admin React UI — which reads `rule_type`,
+     * `seats_total`, `interval_days`, `interval_start_date` — can render and
+     * edit them without showing phantom "1 on All / Active" badges or empty
+     * "Every " patterns.
+     *
+     * What this fixes:
+     *  - Sample-data and pre-3.x rows landed with `rule_type` defaulted to
+     *    'weekly' regardless of the actual `recurrence_type`, and with
+     *    `seats_total` left NULL (the new capacity column). Daily and monthly
+     *    rules therefore appeared as broken weekly rows in the new UI.
+     *  - The /counts endpoint correctly reported 1 active rule, but the list
+     *    table couldn't render it cleanly, leading users to read the API
+     *    response as "ghost data".
+     *
+     * Invariants:
+     *  - Idempotent — every UPDATE filters rows whose new columns are still
+     *    unset, so re-running is a no-op once the data is healed.
+     *  - Read-only on rows already authored by the new UI (`rule_type` already
+     *    matches the recurrence intent), so user edits are never overwritten.
+     *  - No-ops cleanly when the rules table doesn't exist yet (fresh install
+     *    before {@see \Yatra\Core\Database::createTables()} has run).
+     */
+    public static function maybeNormalizeAvailabilityRulesLegacyData(): void
+    {
+        if (get_option('yatra_availability_rules_legacy_normalized_v1')) {
+            return;
+        }
+
+        if (!class_exists('Yatra\\Database\\Tables\\TripAvailabilityRulesTable')) {
+            return;
+        }
+
+        $table = \Yatra\Database\Tables\TripAvailabilityRulesTable::getTableName();
+        if (!self::databaseTableExists($table)) {
+            return;
+        }
+
+        global $wpdb;
+
+        // 1. Daily-recurrence rows whose `rule_type` defaulted to 'weekly':
+        //    map to the new "interval" rule type and copy the legacy `interval`
+        //    + `start_date` into the new columns the React form binds to.
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name from schema helper
+        $wpdb->query("UPDATE `{$table}`
+            SET `rule_type` = 'interval',
+                `interval_days` = COALESCE(`interval_days`, NULLIF(`interval`, 0), 1),
+                `interval_start_date` = COALESCE(`interval_start_date`, `start_date`)
+            WHERE `recurrence_type` = 'daily'
+              AND (`rule_type` IS NULL OR `rule_type` = '' OR `rule_type` = 'weekly')");
+
+        // 2. Monthly-recurrence rows whose `rule_type` defaulted to 'weekly':
+        //    relabel to 'monthly'. The new UI uses (week_of_month, day_of_week)
+        //    rather than `day_of_month`, so we leave those NULL for the user
+        //    to set in the form rather than guess from the legacy day_of_month.
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name from schema helper
+        $wpdb->query("UPDATE `{$table}`
+            SET `rule_type` = 'monthly'
+            WHERE `recurrence_type` = 'monthly'
+              AND (`rule_type` IS NULL OR `rule_type` = '' OR `rule_type` = 'weekly')");
+
+        // 3. Weekly-recurrence rows: ensure `rule_type` is set explicitly
+        //    (most already match the default; this catches any NULL/empty).
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name from schema helper
+        $wpdb->query("UPDATE `{$table}`
+            SET `rule_type` = 'weekly'
+            WHERE `recurrence_type` = 'weekly'
+              AND (`rule_type` IS NULL OR `rule_type` = '')");
+
+        // 4. seats_total backfill from `capacity_value` for fixed-capacity rows
+        //    so CapacityService and the React table both surface the right
+        //    seat cap without falling through hydrate-time fallbacks.
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name from schema helper
+        $wpdb->query("UPDATE `{$table}`
+            SET `seats_total` = `capacity_value`
+            WHERE `seats_total` IS NULL
+              AND `capacity_value` IS NOT NULL
+              AND `capacity_value` > 0
+              AND (`capacity_type` IS NULL OR `capacity_type` = 'fixed')");
+
+        update_option('yatra_availability_rules_legacy_normalized_v1', '1', false);
+    }
+
+    /**
      * Fill canonical + legacy email identity options when empty (upgrades, partial installs, or empty strings in DB).
      * Idempotent; safe to run on each admin load via maybeBackfillEmailTemplateDefaults().
      */
@@ -436,7 +523,9 @@ class InstallerService
             'email_template_enquiry_admin',
             'email_template_enquiry_response',
             'email_template_review_request',
-            'email_template_abandoned_booking_recovery',
+            'email_template_abandoned_booking_recovery_first',
+            'email_template_abandoned_booking_recovery_second',
+            'email_template_abandoned_booking_recovery_final',
         ];
         foreach ($boolFlags as $flag) {
             add_option('yatra_' . $flag, true);
@@ -465,8 +554,12 @@ class InstallerService
             'email_tpl_enquiry_response_body',
             'email_tpl_review_request_subject',
             'email_tpl_review_request_body',
-            'email_tpl_abandoned_booking_recovery_subject',
-            'email_tpl_abandoned_booking_recovery_body',
+            'email_tpl_abandoned_booking_recovery_first_subject',
+            'email_tpl_abandoned_booking_recovery_first_body',
+            'email_tpl_abandoned_booking_recovery_second_subject',
+            'email_tpl_abandoned_booking_recovery_second_body',
+            'email_tpl_abandoned_booking_recovery_final_subject',
+            'email_tpl_abandoned_booking_recovery_final_body',
         ];
 
         $defaults = EmailTemplateDefaults::settingsOptionDefaults();

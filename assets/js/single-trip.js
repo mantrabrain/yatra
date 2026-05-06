@@ -25,16 +25,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var fpLocale = yatraGetFlatpickrLocale();
 
-    // Initialize date pickers when DOM is ready
+    // Initialize date pickers when DOM is ready.
+    //
+    // Priority order applied here MUST mirror the server-side
+    // AvailabilityResolutionService:
+    //   1. Specific Availability Dates (per-date rows)            ← highest
+    //   2. Recurring Rules (pattern-generated dates)
+    //   3. Trip default flexible window (available_from / available_to) ← lowest
+    //
+    // Server has already merged (1) and (2) into yatraTripData.availabilityDates.
+    // When the trip is in date-specific mode (or any availability-restricted
+    // mode the template might use) we lock the date picker to that merged list.
+    // Otherwise we fall back to the flexible window encoded in data-min-date /
+    // data-max-date.
     const bookingDateInput = document.getElementById('travel_date');
     if (bookingDateInput) {
         const form = bookingDateInput.closest('.yatra-booking-form');
         const bookingMode = form ? form.getAttribute('data-booking-mode') : 'regular';
-        
-        if (bookingMode === 'availability') {
-            // Availability-based: Only specific dates
-            const availabilityDates = window.yatraTripData?.availabilityDates || [];
-            
+
+        // Accept any of the historic / current values that signal
+        // "restrict to specific availability dates". The PHP template now
+        // emits "date_specific"; older builds used "availability". Both
+        // must trigger the restricted picker so the priority chain holds.
+        const isDateSpecific = (
+            bookingMode === 'date_specific'
+            || bookingMode === 'availability'
+            || bookingMode === 'date-specific'
+        );
+
+        if (isDateSpecific) {
+            // Availability-based: only the dates resolved by the priority
+            // chain (specific dates first, then recurring rules) are pickable.
+            const availabilityDates = (window.yatraTripData && Array.isArray(window.yatraTripData.availabilityDates))
+                ? window.yatraTripData.availabilityDates
+                : [];
+
             if (availabilityDates.length > 0) {
                 flatpickr(bookingDateInput, {
                     dateFormat: 'Y-m-d',
@@ -43,23 +68,32 @@ document.addEventListener('DOMContentLoaded', function() {
                     disableMobile: false,
                     locale: fpLocale
                 });
+            } else {
+                // Edge case: template believes the trip is date-specific but
+                // the merged date list is empty (e.g. all rules expired).
+                // Disable the input rather than silently falling back to
+                // "any date", which would violate the configured priority.
+                bookingDateInput.setAttribute('disabled', 'disabled');
+                bookingDateInput.setAttribute('placeholder', bookingDateInput.getAttribute('data-empty-text') || 'No departure dates available');
             }
         } else {
-            // Flexible booking: Any future date with constraints
+            // Flexible booking: any future date inside the trip's available
+            // window (available_from / available_to are surfaced as
+            // data-min-date / data-max-date by the sidebar template).
             const minDate = bookingDateInput.getAttribute('data-min-date') || 'today';
             const maxDate = bookingDateInput.getAttribute('data-max-date');
-            
+
             const config = {
                 dateFormat: 'Y-m-d',
                 minDate: minDate,
                 disableMobile: false,
                 locale: fpLocale
             };
-            
+
             if (maxDate) {
                 config.maxDate = maxDate;
             }
-            
+
             flatpickr(bookingDateInput, config);
         }
     }

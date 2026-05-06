@@ -62,7 +62,9 @@ const EMAIL_KEYS: (keyof EmailSettingsValues)[] = [
   "email_template_enquiry_admin",
   "email_template_enquiry_response",
   "email_template_review_request",
-  "email_template_abandoned_booking_recovery",
+  "email_template_abandoned_booking_recovery_first",
+  "email_template_abandoned_booking_recovery_second",
+  "email_template_abandoned_booking_recovery_final",
   "email_tpl_booking_completed_subject",
   "email_tpl_booking_completed_body",
   "email_tpl_booking_expired_customer_subject",
@@ -85,8 +87,12 @@ const EMAIL_KEYS: (keyof EmailSettingsValues)[] = [
   "email_tpl_enquiry_response_body",
   "email_tpl_review_request_subject",
   "email_tpl_review_request_body",
-  "email_tpl_abandoned_booking_recovery_subject",
-  "email_tpl_abandoned_booking_recovery_body",
+  "email_tpl_abandoned_booking_recovery_first_subject",
+  "email_tpl_abandoned_booking_recovery_first_body",
+  "email_tpl_abandoned_booking_recovery_second_subject",
+  "email_tpl_abandoned_booking_recovery_second_body",
+  "email_tpl_abandoned_booking_recovery_final_subject",
+  "email_tpl_abandoned_booking_recovery_final_body",
 ];
 
 const BOOL_KEYS = new Set<keyof EmailSettingsValues>([
@@ -110,7 +116,9 @@ const BOOL_KEYS = new Set<keyof EmailSettingsValues>([
   "email_template_enquiry_admin",
   "email_template_enquiry_response",
   "email_template_review_request",
-  "email_template_abandoned_booking_recovery",
+  "email_template_abandoned_booking_recovery_first",
+  "email_template_abandoned_booking_recovery_second",
+  "email_template_abandoned_booking_recovery_final",
   "smtp_enabled",
 ]);
 
@@ -138,7 +146,9 @@ export const EMAIL_SETTINGS_DEFAULTS: EmailSettingsValues = {
   email_template_enquiry_admin: true,
   email_template_enquiry_response: true,
   email_template_review_request: true,
-  email_template_abandoned_booking_recovery: true,
+  email_template_abandoned_booking_recovery_first: true,
+  email_template_abandoned_booking_recovery_second: true,
+  email_template_abandoned_booking_recovery_final: true,
   smtp_enabled: false,
   smtp_host: "smtp.gmail.com",
   smtp_port: 587,
@@ -185,8 +195,12 @@ export const EMAIL_SETTINGS_DEFAULTS: EmailSettingsValues = {
   email_tpl_enquiry_response_body: "",
   email_tpl_review_request_subject: "",
   email_tpl_review_request_body: "",
-  email_tpl_abandoned_booking_recovery_subject: "",
-  email_tpl_abandoned_booking_recovery_body: "",
+  email_tpl_abandoned_booking_recovery_first_subject: "",
+  email_tpl_abandoned_booking_recovery_first_body: "",
+  email_tpl_abandoned_booking_recovery_second_subject: "",
+  email_tpl_abandoned_booking_recovery_second_body: "",
+  email_tpl_abandoned_booking_recovery_final_subject: "",
+  email_tpl_abandoned_booking_recovery_final_body: "",
 };
 
 function coerceEmailValues(

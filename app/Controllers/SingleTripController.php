@@ -1437,7 +1437,8 @@ class SingleTripController
                     "SELECT e.*, 
                             i.name as item_name,
                             it.name as item_type_name,
-                            it.icon as item_type_icon
+                            it.icon as item_type_icon,
+                            it.color as item_type_color
                      FROM {$table_entries} e
                      LEFT JOIN {$table_classifications} i ON e.item_id = i.id AND i.type = 'item'
                      LEFT JOIN {$table_classifications} it ON e.item_type_id = it.id AND it.type = 'item_type'
@@ -1449,11 +1450,30 @@ class SingleTripController
 
             $formatted_entries = [];
             foreach ($entries as $entry) {
+                $iconPicker = null;
+                if (!empty($entry->item_type_icon)) {
+                    $rawIcon = $entry->item_type_icon;
+                    // Classification `icon` column may store a serialized array from the icon picker.
+                    // Decode it into the array shape expected by yatra_stored_picker_icon_markup().
+                    $maybe = is_string($rawIcon) ? maybe_unserialize($rawIcon) : $rawIcon;
+                    if (is_array($maybe) && isset($maybe['type'])) {
+                        $iconPicker = $maybe;
+                    } elseif (is_string($rawIcon) && $rawIcon !== '') {
+                        // Backward compatibility: treat as yatra svg slug.
+                        $iconPicker = [
+                            'type' => 'icon',
+                            'value' => (string) $rawIcon,
+                            'provider' => 'yatra',
+                        ];
+                    }
+                }
+
                 $formatted_entries[] = [
                     'title' => $entry->title ?: $entry->item_name,
                     'description' => $entry->description ?: '',
                     'item_type' => $entry->item_type_name ?: 'Activity',
-                    'icon' => $entry->item_type_icon ?: 'hiking',
+                    'icon_picker' => $iconPicker,
+                    'item_type_color' => !empty($entry->item_type_color) ? (string) $entry->item_type_color : '',
                     'start_time' => $entry->start_time ?: '',
                     'end_time' => $entry->end_time ?: '',
                     'location' => $entry->location ?: '',
@@ -1461,6 +1481,7 @@ class SingleTripController
                     'cost' => !empty($entry->cost) ? (float) $entry->cost : null,
                     'cost_per_person' => !empty($entry->cost_per_person) ? true : false,
                     'included' => !empty($entry->included_items) ? json_decode($entry->included_items, true) : [],
+                    'excluded' => !empty($entry->excluded_items) ? json_decode($entry->excluded_items, true) : [],
                     'gallery' => !empty($entry->gallery) ? $this->decodeGallery($entry->gallery) : [],
                     'video_url' => $entry->video_url ?: '',
                 ];

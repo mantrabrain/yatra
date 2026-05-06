@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Yatra\Services;
 
-use Yatra\Repositories\RecurringRuleRepository;
-use Yatra\Repositories\DepartureRepository;
 use Yatra\Repositories\AvailabilityRepository;
 use Yatra\Repositories\TripRepository;
+use Yatra\Repositories\RecurringAvailabilityRepository;
+use Yatra\Repositories\BookingRepository;
 
 /**
  * Availability Resolution Service
@@ -21,18 +21,23 @@ use Yatra\Repositories\TripRepository;
  */
 class AvailabilityResolutionService
 {
-    private RecurringRuleService $recurringRuleService;
+    private RecurringAvailabilityService $recurringAvailabilityService;
     private AvailabilityRepository $availabilityRepository;
     private TripRepository $tripRepository;
+    private BookingRepository $bookingRepository;
     private CalculationService $calculationService;
 
     public function __construct()
     {
-        $recurringRuleRepository = new RecurringRuleRepository();
-        $departureRepository = new DepartureRepository();
-        $this->recurringRuleService = new RecurringRuleService($recurringRuleRepository, $departureRepository);
+        // Use the new recurring availability rules engine (wp_yatra_new_trip_availability_rules).
+        // The admin Availability Rules UI writes to this schema; the single-trip page must use
+        // the same engine to keep Preview and frontend availability consistent.
+        $this->recurringAvailabilityService = new RecurringAvailabilityService(
+            new RecurringAvailabilityRepository()
+        );
         $this->availabilityRepository = new AvailabilityRepository();
         $this->tripRepository = new TripRepository();
+        $this->bookingRepository = new BookingRepository();
         $this->calculationService = new CalculationService();
     }
 
@@ -64,9 +69,9 @@ class AvailabilityResolutionService
         }
 
         // Priority 2: Recurring rules when no explicit row exists for this date/time
-        $recurringData = $this->checkRecurringRules($tripId, $date);
-        if ($recurringData) {
-            return $this->buildAvailabilityObject($trip, $recurringData, 'recurring_rule');
+        $recurring = $this->resolveRecurringAvailabilityForDate($tripId, $date, $departureTime);
+        if ($recurring !== null) {
+            return $this->buildAvailabilityObject($trip, $recurring, 'recurring_rule');
         }
 
         // Priority 3: Trip default (flexible booking / no configured calendar)
@@ -103,9 +108,19 @@ class AvailabilityResolutionService
         }
 
         // Step 2: Generate dates from recurring rules
-        $recurringDates = $this->recurringRuleService->generateDatesForTrip($tripId, $fromDate, $toDate);
+        $recurringDates = $this->recurringAvailabilityService->generateDatesForTrip($tripId, $fromDate, $toDate);
         foreach ($recurringDates as $recurringDate) {
-            $dateKey = $recurringDate['date'];
+            $depDate = $recurringDate['departure_date'] ?? $recurringDate['date'] ?? null;
+            if (!$depDate) {
+                continue;
+            }
+            // Mirror the specific-dates composite key so manual rows can override
+            // individual rule time-slots (day tours) deterministically.
+            $dateKey = $depDate;
+            $depTime = $recurringDate['departure_time'] ?? null;
+            if (!empty($depTime)) {
+                $dateKey .= '_' . $depTime;
+            }
             
             // Only add if no specific availability date exists (specific dates override rules)
             if (!isset($dateMap[$dateKey])) {
@@ -261,26 +276,6 @@ class AvailabilityResolutionService
     }
 
     /**
-     * Check if recurring rule exists for date
-     * 
-     * @param int $tripId Trip ID
-     * @param string $date Date
-     * @return array|null Recurring rule data or null
-     */
-    private function checkRecurringRules(int $tripId, string $date): ?array
-    {
-        $rules = $this->recurringRuleService->generateDatesForTrip($tripId, $date, $date);
-        
-        foreach ($rules as $rule) {
-            if ($rule['date'] === $date) {
-                return $rule;
-            }
-        }
-        
-        return null;
-    }
-
-    /**
      * Build unified availability object from different sources
      * 
      * @param object $trip Trip data
@@ -306,38 +301,160 @@ class AvailabilityResolutionService
 
         switch ($sourceType) {
             case 'recurring_rule':
-                // From recurring rule
-                $avail->id = 'recurring_' . $source['date'] . '_' . ($source['rule_id'] ?? 0);
+                // From recurring rule (new engine uses departure_date/departure_time).
+                $depDate = is_array($source)
+                    ? ($source['departure_date'] ?? $source['date'] ?? null)
+                    : (is_object($source) ? ($source->departure_date ?? $source->date ?? null) : null);
+                $depTime = is_array($source)
+                    ? ($source['departure_time'] ?? null)
+                    : (is_object($source) ? ($source->departure_time ?? null) : null);
+                $ruleId = is_array($source)
+                    ? ($source['rule_id'] ?? null)
+                    : (is_object($source) ? ($source->rule_id ?? null) : null);
+
+                $avail->id = 'recurring_' . ($depDate ?: '') . '_' . ($ruleId ?? 0) . ($depTime ? '_' . $depTime : '');
                 $avail->trip_id = (int) $trip->id;
-                $avail->departure_date = $source['date'];
-                $ruleCap = (int) ($source['max_capacity'] ?? 0);
-                if ($ruleCap <= 0) {
-                    $ruleCap = (int) ($trip->max_travelers ?? $trip->max_travellers ?? 0);
+                $avail->departure_date = (string) ($depDate ?? '');
+                $avail->departure_time = $depTime ?: null;
+                $avail->arrival_time = is_array($source)
+                    ? ($source['arrival_time'] ?? null)
+                    : (is_object($source) ? ($source->arrival_time ?? null) : null);
+
+                $seatsTotal = null;
+                if (is_array($source)) {
+                    $seatsTotal = isset($source['seats_total']) ? (int) $source['seats_total'] : null;
+                } elseif (is_object($source)) {
+                    $seatsTotal = isset($source->seats_total) ? (int) $source->seats_total : null;
                 }
-                if ($ruleCap <= 0) {
-                    $ruleCap = 20;
+                if (!$seatsTotal || $seatsTotal <= 0) {
+                    $seatsTotal = (int) ($trip->max_travelers ?? $trip->max_travellers ?? 0);
                 }
-                $avail->seats_total = $ruleCap;
-                $avail->seats_available = $ruleCap;
-                $avail->seats_reserved = 0;
-                $avail->status = 'available';
+                if ($seatsTotal <= 0) {
+                    $seatsTotal = 20;
+                }
+
+                $avail->seats_total = $seatsTotal;
+                // Live reserved seats from bookings (virtual slots have no numeric availability_id).
+                $reserved = 0;
+                if ($avail->departure_date !== '') {
+                    /** @var array{trip_id:int, departure_date:string, departure_time:?string} $args */
+                    $args = apply_filters('yatra_virtual_availability_reserved_seats_args', [
+                        'trip_id' => (int) $trip->id,
+                        'departure_date' => (string) $avail->departure_date,
+                        'departure_time' => $avail->departure_time ?: null,
+                    ], $trip, $source);
+
+                    $tripId = (int) ($args['trip_id'] ?? (int) $trip->id);
+                    $depDate = (string) ($args['departure_date'] ?? (string) $avail->departure_date);
+                    $depTime = $args['departure_time'] ?? ($avail->departure_time ?: null);
+
+                    $reserved = $this->bookingRepository->countActiveSeatsForSlot(
+                        $tripId,
+                        $depDate,
+                        is_string($depTime) ? $depTime : null
+                    );
+                }
+                $reserved = (int) apply_filters('yatra_virtual_availability_reserved_seats_count', (int) $reserved, $avail, $trip, $source);
+
+                // Allow modules to override seats_total for rule dates (e.g. seasonal capacity).
+                $seatsTotal = (int) apply_filters('yatra_virtual_availability_seats_total', (int) $seatsTotal, $avail, $trip, $source);
+                $avail->seats_total = max(0, $seatsTotal);
+
+                // Derive seats from reserved + total.
+                $avail->seats_reserved = max(0, (int) $reserved);
+                $avail->seats_available = max(0, (int) $avail->seats_total - (int) $avail->seats_reserved);
+
+                // Let modules override final computed seats_available (e.g. channel allocations).
+                $avail->seats_available = max(0, (int) apply_filters('yatra_virtual_availability_seats_available', (int) $avail->seats_available, $avail, $trip, $source));
+                $avail->status = is_array($source)
+                    ? (($source['status'] ?? '') ?: 'available')
+                    : (is_object($source) ? (($source->status ?? '') ?: 'available') : 'available');
+                if ($avail->seats_available <= 0) {
+                    $avail->status = 'sold_out';
+                }
                 $avail->is_recurring = true;
-                $avail->rule_id = $source['rule_id'] ?? null;
+                $avail->rule_id = $ruleId;
                 $avail->source = 'recurring_rule';
+                $avail->from_location = is_array($source)
+                    ? ($source['from_location'] ?? null)
+                    : (is_object($source) ? ($source->from_location ?? null) : null);
+                $avail->to_location = is_array($source)
+                    ? ($source['to_location'] ?? null)
+                    : (is_object($source) ? ($source->to_location ?? null) : null);
+                $avail->from_latitude = is_array($source)
+                    ? ($source['from_latitude'] ?? null)
+                    : (is_object($source) ? ($source->from_latitude ?? null) : null);
+                $avail->from_longitude = is_array($source)
+                    ? ($source['from_longitude'] ?? null)
+                    : (is_object($source) ? ($source->from_longitude ?? null) : null);
+                $avail->to_latitude = is_array($source)
+                    ? ($source['to_latitude'] ?? null)
+                    : (is_object($source) ? ($source->to_latitude ?? null) : null);
+                $avail->to_longitude = is_array($source)
+                    ? ($source['to_longitude'] ?? null)
+                    : (is_object($source) ? ($source->to_longitude ?? null) : null);
+                $avail->cutoff_hours = is_array($source)
+                    ? ($source['cutoff_hours'] ?? null)
+                    : (is_object($source) ? ($source->cutoff_hours ?? null) : null);
+                $alertThreshold = is_array($source)
+                    ? (int) ($source['alert_threshold'] ?? 5)
+                    : (int) (is_object($source) ? ($source->alert_threshold ?? 5) : 5);
+                $avail->is_sold_out = ($avail->seats_available ?? 0) <= 0;
+                $avail->is_limited = ($avail->seats_available ?? 0) > 0 && ($avail->seats_available ?? 0) <= max(1, $alertThreshold);
+                $avail->is_sold_out = (bool) apply_filters('yatra_virtual_availability_is_sold_out', (bool) $avail->is_sold_out, $avail, $trip, $source);
+                $avail->is_limited = (bool) apply_filters('yatra_virtual_availability_is_limited', (bool) $avail->is_limited, $avail, $trip, $source);
                 
                 // Pricing: rule base_price → trip original_price fallback
-                $rule_price = isset($source['base_price']) && $source['base_price'] !== null
-                    ? (float) $source['base_price'] : null;
+                $rule_price = null;
+                if (is_array($source)) {
+                    $rule_price = isset($source['original_price']) && $source['original_price'] !== null
+                        ? (float) $source['original_price']
+                        : (isset($source['base_price']) && $source['base_price'] !== null ? (float) $source['base_price'] : null);
+                } elseif (is_object($source)) {
+                    $rule_price = isset($source->original_price) && $source->original_price !== null
+                        ? (float) $source->original_price
+                        : (isset($source->base_price) && $source->base_price !== null ? (float) $source->base_price : null);
+                }
                 $avail->original_price = ($rule_price !== null && $rule_price > 0)
                     ? $rule_price : $trip_original_price;
-                // Rules don't have discounted_price — inherit trip's discount
-                $avail->discounted_price = $trip_discounted_price;
+                $rule_discount = null;
+                if (is_array($source)) {
+                    $rule_discount = isset($source['discounted_price']) && $source['discounted_price'] !== null
+                        ? (float) $source['discounted_price']
+                        : null;
+                } elseif (is_object($source)) {
+                    $rule_discount = isset($source->discounted_price) && $source->discounted_price !== null
+                        ? (float) $source->discounted_price
+                        : null;
+                }
+                // Use rule slot discounted_price when present, otherwise inherit trip discount.
+                $avail->discounted_price = ($rule_discount !== null && $rule_discount > 0)
+                    ? $rule_discount
+                    : $trip_discounted_price;
+                // Convenience for frontend payloads that look for a single price number.
+                $avail->effective_price = ($avail->discounted_price !== null && (float) $avail->discounted_price > 0)
+                    ? (float) $avail->discounted_price
+                    : (float) ($avail->original_price ?? 0);
                 
                 // Inherit trip's pricing_type
                 $avail->pricing_type = $trip_pricing_type;
                 
-                // Use trip's price_types (rules don't have their own)
-                $avail->price_types = $trip_price_types;
+                // If a rule defines traveler_pricing, expose it as price_types so booking UI
+                // can render category-based pricing for rule-generated availability.
+                $travelerPricing = null;
+                if (is_array($source)) {
+                    $travelerPricing = $source['traveler_pricing'] ?? null;
+                } elseif (is_object($source)) {
+                    $travelerPricing = $source->traveler_pricing ?? null;
+                }
+                if (is_array($travelerPricing) && !empty($travelerPricing)) {
+                    $avail->price_types = TripPricingService::resolvePriceTypes(
+                        (object) ['price_types' => $travelerPricing]
+                    );
+                    $avail->pricing_type = 'traveler_based';
+                } else {
+                    $avail->price_types = $trip_price_types;
+                }
 
                 // End dates for sidebar / JSON (rules only provide departure day)
                 $durationDays = max(1, (int) ($trip->duration_days ?? 1));
@@ -370,6 +487,13 @@ class AvailabilityResolutionService
                 $avail->status = $source->status ?? 'available';
                 $avail->is_recurring = false;
                 $avail->source = 'availability_date';
+                $avail->from_location = isset($source->from_location) ? $source->from_location : null;
+                $avail->to_location = isset($source->to_location) ? $source->to_location : null;
+                $avail->from_latitude = isset($source->from_latitude) ? $source->from_latitude : null;
+                $avail->from_longitude = isset($source->from_longitude) ? $source->from_longitude : null;
+                $avail->to_latitude = isset($source->to_latitude) ? $source->to_latitude : null;
+                $avail->to_longitude = isset($source->to_longitude) ? $source->to_longitude : null;
+                $avail->cutoff_hours = isset($source->cutoff_hours) ? $source->cutoff_hours : null;
                 
                 // Pricing: availability price → trip price fallback
                 $avail_orig = isset($source->original_price) && $source->original_price !== null
@@ -396,9 +520,14 @@ class AvailabilityResolutionService
                     $avail->price_types = TripPricingService::resolvePriceTypes(
                         (object) ['price_types' => $avail_price_types]
                     );
+                    $avail->pricing_type = 'traveler_based';
                 } else {
                     $avail->price_types = $trip_price_types;
                 }
+
+                // Standard flags expected by booking UI / cards.
+                $avail->is_sold_out = ($avail->seats_available ?? 0) <= 0 || ($avail->status ?? '') === 'sold_out';
+                $avail->is_limited = ($avail->seats_available ?? 0) > 0 && ($avail->seats_available ?? 0) <= 5;
                 break;
 
             case 'trip_default':
@@ -476,6 +605,40 @@ class AvailabilityResolutionService
         }
 
         return $avail;
+    }
+
+    /**
+     * Resolve a single day's availability from recurring rules (new rules engine).
+     *
+     * @return array|null A generated availability row (array shape) or null if no rule applies
+     */
+    private function resolveRecurringAvailabilityForDate(int $tripId, string $date, ?string $departureTime = null): ?array
+    {
+        $generated = $this->recurringAvailabilityService->generateDatesForTrip($tripId, $date, $date);
+        if (empty($generated)) {
+            return null;
+        }
+
+        foreach ($generated as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $depDate = $row['departure_date'] ?? null;
+            if ($depDate !== $date) {
+                continue;
+            }
+            $depTime = $row['departure_time'] ?? null;
+            if ($departureTime !== null) {
+                if ($depTime === $departureTime) {
+                    return $row;
+                }
+                continue;
+            }
+            // No requested time; return first matching occurrence for that date.
+            return $row;
+        }
+
+        return null;
     }
 
     /**

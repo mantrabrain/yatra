@@ -148,12 +148,6 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
     first_email_delay_hours: 1,
     second_email_delay_hours: 24,
     final_email_delay_hours: 72,
-    first_email_subject: "",
-    second_email_subject: "",
-    final_email_subject: "",
-    first_email_message: "",
-    second_email_message: "",
-    final_email_message: "",
   });
   const [isSavingSettings, setIsSavingSettings] = useState(false);
 
@@ -165,45 +159,17 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
     onConfirm: () => void;
   }>({ isOpen: false, title: "", message: "", onConfirm: () => {} });
 
-  // Email preview state
-  const [emailPreview, setEmailPreview] = useState<{
-    isOpen: boolean;
-    type: "first" | "second" | "final";
-    subject: string;
-    message: string;
-  }>({ isOpen: false, type: "first", subject: "", message: "" });
+  const openGlobalAbandonedTemplate = (
+    stage: "first" | "second" | "final" = "first",
+  ) => {
+    const coreTemplate =
+      stage === "second"
+        ? "abandoned_booking_recovery_second"
+        : stage === "final"
+          ? "abandoned_booking_recovery_final"
+          : "abandoned_booking_recovery_first";
 
-  // Function to replace placeholders with sample data
-  const replaceEmailPlaceholders = (text: string): string => {
-    const placeholders: Record<string, string> = {
-      "{customer_name}": "John Doe",
-      "{trip_name}": "Everest Base Camp Trek",
-      "{trip_url}": "https://example.com/trips/everest-base-camp",
-      "{booking_amount}": "$2,500",
-      "{departure_date}": "March 15, 2025",
-      "{recovery_link}": "https://example.com/complete-booking?token=abc123",
-      "{site_name}": "Yatra Travel",
-      "{site_url}": "https://example.com",
-    };
-
-    let result = text;
-    Object.entries(placeholders).forEach(([placeholder, value]) => {
-      result = result.replace(new RegExp(placeholder, "g"), value);
-    });
-    return result;
-  };
-
-  // Function to show email preview
-  const showEmailPreview = (type: "first" | "second" | "final") => {
-    const subjectKey = `${type}_email_subject` as keyof typeof settings;
-    const messageKey = `${type}_email_message` as keyof typeof settings;
-
-    setEmailPreview({
-      isOpen: true,
-      type,
-      subject: replaceEmailPlaceholders(String(settings[subjectKey] || "")),
-      message: replaceEmailPlaceholders(String(settings[messageKey] || "")),
-    });
+    window.location.href = `admin.php?page=yatra&subpage=email-automation&tab=template&action=edit&core_template=${coreTemplate}`;
   };
 
   // Check if module is available
@@ -1359,189 +1325,54 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
             <CardHeader>
               <CardTitle>{__("Email Templates")}</CardTitle>
               <CardDescription>
-                {__("Customize recovery email subjects and messages")}
+                {__(
+                  "Abandoned Recovery uses the centralized email template system (Email → Templates).",
+                )}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* First Email */}
-              <div className="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                <h4 className="font-medium">{__("First Recovery Email")}</h4>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="first_email_subject">{__("Subject")}</Label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => showEmailPreview("first")}
-                      className="h-8 mb-2"
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      {__("Preview")}
-                    </Button>
-                  </div>
-                  <Input
-                    id="first_email_subject"
-                    value={settings.first_email_subject}
-                    onChange={(e) =>
-                      handleSettingChange("first_email_subject", e.target.value)
-                    }
-                    placeholder={__("Complete Your Booking - {trip_name}")}
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="first_email_message">{__("Message")}</Label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleResetEmailTemplate("first")}
-                      className="h-8 mb-2"
-                      title={__("Reset to default template")}
-                    >
-                      <RotateCcw className="w-4 h-4 mr-2" />
-                      {__("Reset")}
-                    </Button>
-                  </div>
-                  <textarea
-                    id="first_email_message"
-                    value={settings.first_email_message}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                      handleSettingChange("first_email_message", e.target.value)
-                    }
-                    rows={4}
-                    placeholder={__(
-                      "Hi {customer_name}, we noticed you started booking {trip_name}...",
-                    )}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-                  />
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <CardContent className="space-y-4">
+              <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-4">
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  {__(
+                    "To keep designs consistent across all emails, Abandoned Recovery uses the global template. Edit it from the centralized Templates screen.",
+                  )}
+                </p>
+                <ul className="list-disc pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                  <li>
                     {__(
-                      "Available placeholders: {customer_name}, {trip_name}, {trip_link}",
+                      "Templates: Abandoned booking recovery (First / Second / Final)",
                     )}
-                  </p>
-                </div>
+                  </li>
+                  <li>
+                    {__(
+                      "Merge tags include {{recovery_intro_html}}, {{recovery_link}}, and {{recovery_reminder_label}}.",
+                    )}
+                  </li>
+                </ul>
               </div>
 
-              {/* Second Email */}
-              <div className="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                <h4 className="font-medium">{__("Second Recovery Email")}</h4>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="second_email_subject">
-                      {__("Subject")}
-                    </Label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => showEmailPreview("second")}
-                      className="h-8 mb-2"
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      {__("Preview")}
-                    </Button>
-                  </div>
-                  <Input
-                    id="second_email_subject"
-                    value={settings.second_email_subject}
-                    onChange={(e) =>
-                      handleSettingChange(
-                        "second_email_subject",
-                        e.target.value,
-                      )
-                    }
-                    placeholder={__("Still Interested? Complete Your Booking")}
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="second_email_message">
-                      {__("Message")}
-                    </Label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleResetEmailTemplate("second")}
-                      className="h-8 mb-2"
-                      title={__("Reset to default template")}
-                    >
-                      <RotateCcw className="w-4 h-4 mr-2" />
-                      {__("Reset")}
-                    </Button>
-                  </div>
-                  <textarea
-                    id="second_email_message"
-                    value={settings.second_email_message}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                      handleSettingChange(
-                        "second_email_message",
-                        e.target.value,
-                      )
-                    }
-                    rows={4}
-                    placeholder={__("Still interested in {trip_name}?")}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-                  />
-                </div>
-              </div>
-
-              {/* Final Email */}
-              <div className="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                <h4 className="font-medium">{__("Final Recovery Email")}</h4>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="final_email_subject">{__("Subject")}</Label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => showEmailPreview("final")}
-                      className="h-8 mb-2"
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      {__("Preview")}
-                    </Button>
-                  </div>
-                  <Input
-                    id="final_email_subject"
-                    value={settings.final_email_subject}
-                    onChange={(e) =>
-                      handleSettingChange("final_email_subject", e.target.value)
-                    }
-                    placeholder={__("Last Chance - Your Booking Expires Soon")}
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="final_email_message">{__("Message")}</Label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleResetEmailTemplate("final")}
-                      className="h-8 mb-2"
-                      title={__("Reset to default template")}
-                    >
-                      <RotateCcw className="w-4 h-4 mr-2" />
-                      {__("Reset")}
-                    </Button>
-                  </div>
-                  <textarea
-                    id="final_email_message"
-                    value={settings.final_email_message}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                      handleSettingChange("final_email_message", e.target.value)
-                    }
-                    rows={4}
-                    placeholder={__(
-                      "This is your last chance to complete your booking for {trip_name}",
-                    )}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-                  />
-                </div>
+              <div className="flex flex-col sm:flex-row gap-2 justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => openGlobalAbandonedTemplate("first")}
+                >
+                  {__("Edit First email template")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => openGlobalAbandonedTemplate("second")}
+                >
+                  {__("Edit Second email template")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => openGlobalAbandonedTemplate("final")}
+                >
+                  {__("Edit Final email template")}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -1575,113 +1406,11 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
         message={confirmDialog.message}
       />
 
-      {/* Email Preview Modal */}
-      <Modal
-        isOpen={emailPreview.isOpen}
-        onClose={() => setEmailPreview({ ...emailPreview, isOpen: false })}
-        title={
-          (emailPreview.type === "first" &&
-            __("First Recovery Email Preview")) ||
-          (emailPreview.type === "second" &&
-            __("Second Recovery Email Preview")) ||
-          (emailPreview.type === "final" && __("Final Recovery Email Preview"))
-        }
-        description={__(
-          "This is how your email will look to customers. Placeholders are replaced with sample data.",
-        )}
-        size="xl"
-        showCloseButton={true}
-        footer={
-          <div className="flex justify-end">
-            <Button
-              variant="outline"
-              onClick={() =>
-                setEmailPreview({ ...emailPreview, isOpen: false })
-              }
-            >
-              {__("Close")}
-            </Button>
-          </div>
-        }
-      >
-        <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-          {/* Email Subject */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {__("Subject:")}
-            </Label>
-            <div className="mt-1 p-3 bg-gray-50 dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700">
-              <p className="text-gray-900 dark:text-white">
-                {emailPreview.subject}
-              </p>
-            </div>
-          </div>
-
-          {/* Email Message */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {__("Message:")}
-            </Label>
-            <div className="mt-1 p-4 bg-gray-50 dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700">
-              <div className="prose prose-sm max-w-none dark:prose-invert">
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: emailPreview.message.replace(/\n/g, "<br>"),
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Available Placeholders */}
-          <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-              {__("Available Placeholders:")}
-            </Label>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
-                {"{customer_name}"}
-              </code>
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
-                {"{customer_email}"}
-              </code>
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
-                {"{trip_name}"}
-              </code>
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
-                {"{trip_id}"}
-              </code>
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
-                {"{departure_date}"}
-              </code>
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
-                {"{travelers_count}"}
-              </code>
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
-                {"{total_amount}"}
-              </code>
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
-                {"{trip_link}"}
-              </code>
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
-                {"{site_name}"}
-              </code>
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
-                {"{site_url}"}
-              </code>
-            </div>
-          </div>
-
-          {/* Email Footer */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-            <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-              {__(
-                "Note: This preview uses sample data. Actual emails will contain customer-specific information.",
-              )}
-            </p>
-          </div>
+      {false && (
+        <div>
+          {/* deprecated: email preview modal removed (templates centralized) */}
         </div>
-      </Modal>
+      )}
 
       {/* View Details Modal */}
       <Modal

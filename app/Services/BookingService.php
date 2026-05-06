@@ -215,6 +215,95 @@ class BookingService
             }
             
             $data = BookingValidator::sanitize($data);
+
+            // ========================================
+            // SERVER-SIDE AVAILABILITY RESOLUTION (single source of truth)
+            // ========================================
+            // For rule-generated dates we may not have a numeric availability_id. Always re-resolve
+            // by (trip_id, travel_date, departure_time) so capacity/status/cutoff checks match what
+            // the single-trip UI showed.
+            $isWaitlist = isset($data['status']) && $data['status'] === 'waitlist';
+            $tripId = (int) ($data['trip_id'] ?? 0);
+            $travelDate = (string) ($data['travel_date'] ?? ($data['start_date'] ?? ''));
+            $departureTime = null;
+            if (!empty($data['departure_time']) && is_string($data['departure_time'])) {
+                $departureTime = trim($data['departure_time']);
+                if ($departureTime === '') {
+                    $departureTime = null;
+                }
+            }
+
+            if (!$isWaitlist && $tripId > 0 && $travelDate !== '') {
+                try {
+                    $resolver = new AvailabilityResolutionService();
+                    $resolved = $resolver->resolveAvailabilityForDate($tripId, $travelDate, $departureTime);
+
+                    $status = (string) ($resolved->status ?? 'available');
+                    if (in_array($status, ['blocked', 'closed', 'cancelled'], true)) {
+                        return [
+                            'success' => false,
+                            'message' => __('This departure is not open for booking.', 'yatra'),
+                        ];
+                    }
+
+                    $travelersCount = (int) ($data['travelers_count'] ?? 0);
+                    $seatsAvailable = isset($resolved->seats_available) ? (int) $resolved->seats_available : null;
+                    if ($status === 'sold_out' || ($seatsAvailable !== null && $seatsAvailable <= 0)) {
+                        return [
+                            'success' => false,
+                            'message' => __('This departure is sold out.', 'yatra'),
+                        ];
+                    }
+                    if ($seatsAvailable !== null && $travelersCount > 0 && $travelersCount > $seatsAvailable) {
+                        return [
+                            'success' => false,
+                            'message' => __('This departure is full.', 'yatra'),
+                        ];
+                    }
+
+                    // Cutoff enforcement (best-effort; recurring generation already filters by cutoff).
+                    $cutoffHours = isset($resolved->cutoff_hours) ? (int) $resolved->cutoff_hours : 0;
+                    if ($cutoffHours > 0 && !empty($resolved->departure_date)) {
+                        $dt = (string) $resolved->departure_date;
+                        if (!empty($resolved->departure_time)) {
+                            $dt .= ' ' . (string) $resolved->departure_time;
+                        } else {
+                            $dt .= ' 00:00';
+                        }
+                        $depTs = strtotime($dt);
+                        if ($depTs !== false) {
+                            $latest = $depTs - ($cutoffHours * 3600);
+                            if (time() > $latest) {
+                                return [
+                                    'success' => false,
+                                    'message' => __('Booking cutoff has passed for this departure.', 'yatra'),
+                                ];
+                            }
+                        }
+                    }
+
+                    // Persist a snapshot of the resolved source for auditing and downstream modules.
+                    $meta = [];
+                    if (!empty($data['meta']) && is_string($data['meta'])) {
+                        $decoded = json_decode($data['meta'], true);
+                        $meta = is_array($decoded) ? $decoded : [];
+                    } elseif (is_array($data['meta'] ?? null)) {
+                        $meta = $data['meta'];
+                    }
+                    $meta['resolved_availability'] = [
+                        'source' => $resolved->source ?? null,
+                        'rule_id' => $resolved->rule_id ?? null,
+                        'availability_id' => $resolved->id ?? null,
+                        'departure_date' => $resolved->departure_date ?? null,
+                        'departure_time' => $resolved->departure_time ?? null,
+                        'pricing_type' => $resolved->pricing_type ?? null,
+                        'price_types' => $resolved->price_types ?? [],
+                    ];
+                    $data['meta'] = wp_json_encode($meta);
+                } catch (\Throwable $e) {
+                    // If resolution fails, allow booking to proceed using legacy validations.
+                }
+            }
             
             Logger::info("After BookingValidator::sanitize", [
                 'data_keys' => array_keys($data),

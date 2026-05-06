@@ -2297,6 +2297,72 @@ button.yatra-booking-button svg path {
     color: #10b981;
 }
 
+/* Itinerary: Included / Excluded split layout */
+.yatra-entry-inclusions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 12px;
+}
+
+.yatra-entry-inclusions-col {
+    min-width: 0;
+}
+
+.yatra-entry-inclusions-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.yatra-entry-inclusions-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+
+.yatra-entry-inclusions-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.yatra-entry-inclusions-empty {
+    font-size: 12px;
+    color: #9ca3af;
+    background: #f9fafb;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.yatra-excluded-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #b91c1c;
+    background: #fef2f2;
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+.yatra-excluded-tag svg {
+    color: #ef4444;
+}
+
+@media (max-width: 640px) {
+    .yatra-entry-inclusions {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
 /* Summary Day */
 .yatra-itinerary-summary .yatra-day-badge {
     background: #8b5cf6;
@@ -8968,7 +9034,7 @@ input.yatra-datepicker,
 .yatra-card-badges-container .yatra-availability-urgency-message {
     display: inline-flex;
     align-items: center;
-    max-width: 200px;
+    
     padding: 5px 8px;
     background-color: #fef3c7;
     color: #92400e;

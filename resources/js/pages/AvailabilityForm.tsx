@@ -184,6 +184,13 @@ const AvailabilityForm: React.FC = () => {
   // Load form data when trip or availability data is available
   useEffect(() => {
     if (tripData && !isEditMode) {
+      const rawPriceTypes = tripData.price_types;
+      const hasTravelerPricing =
+        Array.isArray(rawPriceTypes) ? rawPriceTypes.length > 0 : false;
+      const effectivePricingType = hasTravelerPricing
+        ? "traveler_based"
+        : (tripData.pricing_type || "regular");
+
       setFormData((prev) => ({
         ...prev,
         from_location: tripData.starting_location || "",
@@ -193,7 +200,7 @@ const AvailabilityForm: React.FC = () => {
         to_latitude: coordFromApi(tripData.ending_latitude),
         to_longitude: coordFromApi(tripData.ending_longitude),
         // Default pricing type based on trip's pricing type
-        pricing_type: (tripData.pricing_type || "regular") as
+        pricing_type: effectivePricingType as
           | "regular"
           | "traveler_based",
       }));
@@ -212,8 +219,12 @@ const AvailabilityForm: React.FC = () => {
 
       // ALWAYS use trip's pricing type, not the old availability pricing type
       // This ensures availability dates match the current trip pricing configuration
-      const pricingType =
-        tripData?.pricing_type || availabilityData.pricing_type || "regular";
+      const rawTripPriceTypes = tripData?.price_types;
+      const tripHasTravelerPricing =
+        Array.isArray(rawTripPriceTypes) ? rawTripPriceTypes.length > 0 : false;
+      const pricingType = tripHasTravelerPricing
+        ? "traveler_based"
+        : (tripData?.pricing_type || availabilityData.pricing_type || "regular");
 
       setFormData({
         departure_date: availabilityData.departure_date || "",

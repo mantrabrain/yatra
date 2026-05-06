@@ -398,7 +398,9 @@ class BookingSessionController extends BaseController
         
         // Get availability-specific data if date provided
         $availability = null;
-        $availability_id = !empty($data['availability_id']) ? sanitize_text_field($data['availability_id']) : null;
+        // availability_id may be numeric (manual date row) or a synthetic string (rule/default).
+        // Keep it as string in session and only cast to int when it is numeric.
+        $availability_id = !empty($data['availability_id']) ? sanitize_text_field((string) $data['availability_id']) : null;
         $travel_date = !empty($data['travel_date']) ? sanitize_text_field($data['travel_date']) : '';
         $departure_time = !empty($data['departure_time']) ? sanitize_text_field($data['departure_time']) : '';
         
@@ -919,7 +921,7 @@ class BookingSessionController extends BaseController
             'travel_date'       => $travel_date,
             'departure_time'    => $departure_time,
             'selected_services' => $additional_services,
-            'availability_id'   => $availability_id ? (int) $availability_id : null,
+            'availability_id'   => (!empty($availability_id) && is_numeric($availability_id)) ? (int) $availability_id : null,
             'coupon_code'       => $coupon_code,
             'payment_method'    => $payment_method,
         ]);
@@ -2483,12 +2485,22 @@ class BookingSessionController extends BaseController
         global $wpdb;
 
         $availability = null;
-        if (!empty($availability_id) && is_numeric($availability_id)) {
-            // Only use getById if availability_id is numeric
+        if (!empty($travel_date)) {
+            // Use the same resolver as the single-trip UI so rule slots, manual dates,
+            // and flexible defaults all return a consistent object shape.
+            try {
+                $resolver = new \Yatra\Services\AvailabilityResolutionService();
+                $availability = $resolver->resolveAvailabilityForDate(
+                    $trip_id,
+                    $travel_date,
+                    $departure_time !== '' ? $departure_time : null
+                );
+            } catch (\Throwable $e) {
+                $availability = null;
+            }
+        } elseif (!empty($availability_id) && is_numeric($availability_id)) {
+            // Back-compat: allow summary by numeric availability_id only.
             $availability = $this->availabilityService->getById((int) $availability_id);
-        } elseif (!empty($travel_date)) {
-            // For string IDs or when no availability_id, use date+time lookup for day tours
-            $availability = $this->availabilityService->getByTripAndDateTime($trip_id, $travel_date, $departure_time ?: null);
         }
         
         // Resolve pricing type and price_types via centralized TripPricingService

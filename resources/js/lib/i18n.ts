@@ -112,6 +112,24 @@ import {
 function __(key: string): string;
 function __(key: string, textDomain: string): string;
 function __(key: string, textDomain?: string): string {
+  // If the frontend bootstrapped a translations map (e.g., account page),
+  // use it as the highest priority source. This allows Loco Translate / PHP
+  // string catalogs to power React UIs without requiring JS translation JSON files.
+  if (typeof window !== "undefined") {
+    const w = window as unknown as {
+      yatraAccountPage?: { translations?: Record<string, string> };
+      yatraAdmin?: { translations?: Record<string, string> };
+    };
+    const fromAccount = w.yatraAccountPage?.translations?.[key];
+    if (typeof fromAccount === "string" && fromAccount !== "") {
+      return fromAccount;
+    }
+    const fromAdmin = w.yatraAdmin?.translations?.[key];
+    if (typeof fromAdmin === "string" && fromAdmin !== "") {
+      return fromAdmin;
+    }
+  }
+
   // Use direct WordPress i18n function which is working correctly
   if (typeof window !== "undefined" && (window as any).wp?.i18n?.__) {
     return (window as any).wp.i18n.__(key, textDomain || "yatra");

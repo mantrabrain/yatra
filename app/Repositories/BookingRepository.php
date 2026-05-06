@@ -1012,7 +1012,69 @@ class BookingRepository extends BaseRepository
      */
     public static function getCapacityConsumingBookingStatuses(): array
     {
-        return ['pending', 'confirmed', 'processing', 'completed', 'on_hold'];
+        $default = ['pending', 'confirmed', 'processing', 'completed', 'on_hold'];
+        /** @var list<string> $default */
+        $filtered = apply_filters('yatra_capacity_consuming_booking_statuses', $default);
+        return is_array($filtered) && $filtered !== [] ? array_values(array_unique(array_map('strval', $filtered))) : $default;
+    }
+
+    /**
+     * Count booked travelers for a virtual (rule-generated) slot.
+     *
+     * Rule-generated dates do not have a numeric availability_id, so capacity must be
+     * computed from bookings by (trip_id, travel_date, departure_time) and the same
+     * capacity-consuming statuses used for manual availability rows.
+     */
+    public function countActiveSeatsForSlot(int $tripId, string $travelDate, ?string $departureTime = null): int
+    {
+        if ($tripId <= 0 || $travelDate === '') {
+            return 0;
+        }
+
+        $bookingsTable = esc_sql($this->getTableName());
+        $statuses = self::getCapacityConsumingBookingStatuses();
+        $stPh = implode(',', array_fill(0, count($statuses), '%s'));
+
+        // Use booking_departures when we need time-slot precision.
+        $relationTable = esc_sql(\Yatra\Database\Tables\BookingDeparturesTable::getTableName());
+
+        if ($departureTime !== null && $departureTime !== '') {
+            // Normalize to match TIME storage in MySQL (HH:MM:SS).
+            $ts = strtotime($departureTime);
+            if ($ts !== false) {
+                $departureTime = date('H:i:s', $ts);
+            }
+            $params = array_merge([$tripId, $travelDate, $departureTime], $statuses);
+
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $count = (int) $this->wpdb->get_var($this->wpdb->prepare(
+                "SELECT COALESCE(SUM(b.travelers_count), 0)
+                 FROM `{$bookingsTable}` b
+                 INNER JOIN `{$relationTable}` bd ON b.id = bd.booking_id
+                 WHERE b.trip_id = %d
+                   AND b.travel_date = %s
+                   AND bd.travel_date = %s
+                   AND bd.departure_time = %s
+                   AND b.status IN ({$stPh})",
+                array_merge([$tripId, $travelDate, $travelDate, $departureTime], $statuses)
+            ));
+            /** @var int $count */
+            $count = (int) apply_filters('yatra_virtual_availability_reserved_seats', $count, $tripId, $travelDate, $departureTime, $statuses);
+            return max(0, $count);
+        }
+
+        // No time-slot filter: sum all bookings for the trip/date.
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $count = (int) $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COALESCE(SUM(travelers_count), 0)
+             FROM `{$bookingsTable}`
+             WHERE trip_id = %d
+               AND travel_date = %s
+               AND status IN ({$stPh})",
+            array_merge([$tripId, $travelDate], $statuses)
+        ));
+        $count = (int) apply_filters('yatra_virtual_availability_reserved_seats', $count, $tripId, $travelDate, null, $statuses);
+        return max(0, $count);
     }
 
     /**

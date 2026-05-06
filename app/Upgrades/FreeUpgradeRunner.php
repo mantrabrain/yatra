@@ -72,5 +72,11 @@ final class FreeUpgradeRunner
     {
         InstallerService::maybeBackfillEmailTemplateDefaults();
         InstallerService::maybeNormalizeMigratedCouponDiscountStatuses();
+        // Heal recurring availability rules whose new-schema columns
+        // (rule_type / seats_total / interval_days / interval_start_date)
+        // were never written by sample data or pre-3.x writers. Without this
+        // the new admin UI showed phantom "1 on All & Active" badges for
+        // legacy rows that rendered as broken weekly rules.
+        InstallerService::maybeNormalizeAvailabilityRulesLegacyData();
     }
 }

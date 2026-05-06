@@ -52,8 +52,10 @@ class TransactionalEmailTemplateService
 
     public const TYPE_REVIEW_REQUEST = 'review_request';
 
-    /** Abandoned checkout recovery (Yatra Pro); merge tags include {{recovery_reminder_label}}. */
-    public const TYPE_ABANDONED_BOOKING_RECOVERY = 'abandoned_booking_recovery';
+    /** Abandoned checkout recovery (Yatra Pro); 3-stage sequence. */
+    public const TYPE_ABANDONED_BOOKING_RECOVERY_FIRST = 'abandoned_booking_recovery_first';
+    public const TYPE_ABANDONED_BOOKING_RECOVERY_SECOND = 'abandoned_booking_recovery_second';
+    public const TYPE_ABANDONED_BOOKING_RECOVERY_FINAL = 'abandoned_booking_recovery_final';
 
     /**
      * Map catalog / settings UI keys to internal render types.
@@ -81,7 +83,9 @@ class TransactionalEmailTemplateService
             'enquiry_received' => self::TYPE_ENQUIRY_CUSTOMER_RECEIVED,
             'enquiry_response' => self::TYPE_ENQUIRY_CUSTOMER_RESPONSE,
             'review_request' => self::TYPE_REVIEW_REQUEST,
-            'abandoned_booking_recovery' => self::TYPE_ABANDONED_BOOKING_RECOVERY,
+            'abandoned_booking_recovery_first' => self::TYPE_ABANDONED_BOOKING_RECOVERY_FIRST,
+            'abandoned_booking_recovery_second' => self::TYPE_ABANDONED_BOOKING_RECOVERY_SECOND,
+            'abandoned_booking_recovery_final' => self::TYPE_ABANDONED_BOOKING_RECOVERY_FINAL,
         ];
 
         return $map[$templateKey] ?? null;
@@ -127,6 +131,7 @@ class TransactionalEmailTemplateService
     public static function renderWithStringTemplates(string $type, string $subjectTpl, string $bodyTpl, array $variables): array
     {
         $variables = self::mergeDefaultVariables($variables);
+        $variables = self::normalizeVariablesForType($type, $variables);
         $map = self::typeToSettingsKeys();
         if (!isset($map[$type])) {
             return ['subject' => '', 'body' => ''];
@@ -256,10 +261,20 @@ class TransactionalEmailTemplateService
                 'subject' => 'email_tpl_review_request_subject',
                 'body' => 'email_tpl_review_request_body',
             ],
-            self::TYPE_ABANDONED_BOOKING_RECOVERY => [
-                'flag' => 'email_template_abandoned_booking_recovery',
-                'subject' => 'email_tpl_abandoned_booking_recovery_subject',
-                'body' => 'email_tpl_abandoned_booking_recovery_body',
+            self::TYPE_ABANDONED_BOOKING_RECOVERY_FIRST => [
+                'flag' => 'email_template_abandoned_booking_recovery_first',
+                'subject' => 'email_tpl_abandoned_booking_recovery_first_subject',
+                'body' => 'email_tpl_abandoned_booking_recovery_first_body',
+            ],
+            self::TYPE_ABANDONED_BOOKING_RECOVERY_SECOND => [
+                'flag' => 'email_template_abandoned_booking_recovery_second',
+                'subject' => 'email_tpl_abandoned_booking_recovery_second_subject',
+                'body' => 'email_tpl_abandoned_booking_recovery_second_body',
+            ],
+            self::TYPE_ABANDONED_BOOKING_RECOVERY_FINAL => [
+                'flag' => 'email_template_abandoned_booking_recovery_final',
+                'subject' => 'email_tpl_abandoned_booking_recovery_final_subject',
+                'body' => 'email_tpl_abandoned_booking_recovery_final_body',
             ],
         ];
     }
@@ -292,12 +307,11 @@ class TransactionalEmailTemplateService
         }
 
         $variables = self::mergeDefaultVariables($variables);
+        $variables = self::normalizeVariablesForType($type, $variables);
 
         /**
          * Allow Yatra Pro (or extensions) to send instead of core templates.
          * Return null to use core; true/false if handled.
-         *
-         * @param null|bool $handled
          */
         $handled = apply_filters('yatra_send_transactional_email', null, $type, $to, $variables);
         if ($handled !== null) {
@@ -359,19 +373,113 @@ class TransactionalEmailTemplateService
     }
 
     /**
+     * Ensure templates always have safe, meaningful defaults for commonly-used tags.
+     *
+     * This prevents "blank sections" when a caller supplies only the core booking variables
+     * (e.g. status-change emails) while the template contains richer optional sections.
+     *
+     * @param array<string, string> $variables
+     * @return array<string, string>
+     */
+    private static function normalizeVariablesForType(string $type, array $variables): array
+    {
+        // Booking confirmation is sent from multiple contexts (checkout + admin status changes).
+        // If the caller didn't include the rich "intro/details/footer" blocks, provide a minimal,
+        // data-driven fallback so the email still looks correct.
+        if ($type === self::TYPE_BOOKING_CONFIRMATION) {
+            if (!isset($variables['intro_paragraph']) || trim($variables['intro_paragraph']) === '') {
+                $variables['intro_paragraph'] = __('Thank you for your booking.', 'yatra');
+            }
+            if (!isset($variables['details_html']) || trim($variables['details_html']) === '') {
+                $variables['details_html'] = self::fallbackBookingDetailsHtml($variables);
+            }
+            if (!isset($variables['footer_note']) || trim($variables['footer_note']) === '') {
+                $variables['footer_note'] = sprintf(__('— %s', 'yatra'), get_bloginfo('name'));
+            }
+        }
+
+        // Shared defaults that are safe for most templates if included.
+        if (!isset($variables['intro_paragraph'])) {
+            $variables['intro_paragraph'] = '';
+        }
+        if (!isset($variables['footer_note'])) {
+            $variables['footer_note'] = '';
+        }
+        if (!isset($variables['details_html'])) {
+            $variables['details_html'] = '';
+        }
+
+        return $variables;
+    }
+
+    /**
+     * Minimal booking details block for confirmation emails when caller doesn't provide `details_html`.
+     *
+     * @param array<string, string> $v
+     */
+    private static function fallbackBookingDetailsHtml(array $v): string
+    {
+        $trip = $v['trip_name'] ?? '';
+        $date = $v['travel_date'] ?? '';
+        $pax = $v['travelers_count'] ?? '';
+        $total = $v['total_amount_formatted'] ?? '';
+        $due = $v['amount_due_formatted'] ?? '';
+
+        $rows = [];
+        if ($trip !== '') {
+            $rows[] = ['label' => __('Trip', 'yatra'), 'value' => esc_html($trip)];
+        }
+        if ($date !== '') {
+            $rows[] = ['label' => __('Departure', 'yatra'), 'value' => esc_html($date)];
+        }
+        if ($pax !== '') {
+            $rows[] = ['label' => __('Travelers', 'yatra'), 'value' => esc_html($pax)];
+        }
+        if ($total !== '') {
+            $rows[] = ['label' => __('Total', 'yatra'), 'value' => esc_html($total)];
+        }
+        if ($due !== '') {
+            $rows[] = ['label' => __('Amount due', 'yatra'), 'value' => esc_html($due)];
+        }
+
+        if (empty($rows)) {
+            return '';
+        }
+
+        return EmailTemplateLayout::detailCard($rows);
+    }
+
+    /**
      * @param array<string, string> $variables
      */
     private static function parseTemplate(string $template, array $variables): string
     {
-        return (string) preg_replace_callback(
+        $rendered = (string) preg_replace_callback(
             '/\{\{(\w+)\}\}/',
             static function (array $m) use ($variables): string {
                 $key = $m[1];
 
-                return $variables[$key] ?? $m[0];
+                // Never leak raw merge-tags into real emails. If a variable is
+                // missing, replace it with an empty string rather than
+                // returning the original {{tag}} token.
+                return $variables[$key] ?? '';
             },
             $template
         );
+
+        // Hard-strip any remaining merge-tags (defense-in-depth).
+        $rendered = (string) preg_replace('/\{\{\w+\}\}/', '', $rendered);
+
+        // Users sometimes paste helper text from the editor into the template.
+        // If that happens, strip common helper headings so they don't appear in
+        // production emails.
+        $rendered = (string) preg_replace(
+            '/^.*(Available Variables|Available placeholders|Available Placeholders|Merge tags).*$/mi',
+            '',
+            $rendered
+        );
+
+        return $rendered;
     }
 
     /**
@@ -449,8 +557,14 @@ class TransactionalEmailTemplateService
 
                 return sprintf(__('⭐ [%s] How was %s?', 'yatra'), $site, $trip);
 
-            case self::TYPE_ABANDONED_BOOKING_RECOVERY:
+            case self::TYPE_ABANDONED_BOOKING_RECOVERY_FIRST:
                 return sprintf(__('🛒 [%s] Complete your booking', 'yatra'), $site);
+
+            case self::TYPE_ABANDONED_BOOKING_RECOVERY_SECOND:
+                return sprintf(__('⏳ [%s] Still interested? Your booking is waiting', 'yatra'), $site);
+
+            case self::TYPE_ABANDONED_BOOKING_RECOVERY_FINAL:
+                return sprintf(__('⚠️ [%s] Final reminder: complete your booking', 'yatra'), $site);
 
             default:
                 return sprintf(__('✉️ [%s] Notification', 'yatra'), $site);
@@ -523,8 +637,14 @@ class TransactionalEmailTemplateService
             case self::TYPE_REVIEW_REQUEST:
                 return EmailTemplateDefaults::fallbackTransactionalReviewRequest($v);
 
-            case self::TYPE_ABANDONED_BOOKING_RECOVERY:
-                return EmailTemplateDefaults::fallbackTransactionalAbandonedBookingRecovery($v);
+            case self::TYPE_ABANDONED_BOOKING_RECOVERY_FIRST:
+                return EmailTemplateDefaults::fallbackTransactionalAbandonedBookingRecoveryFirst($v);
+
+            case self::TYPE_ABANDONED_BOOKING_RECOVERY_SECOND:
+                return EmailTemplateDefaults::fallbackTransactionalAbandonedBookingRecoverySecond($v);
+
+            case self::TYPE_ABANDONED_BOOKING_RECOVERY_FINAL:
+                return EmailTemplateDefaults::fallbackTransactionalAbandonedBookingRecoveryFinal($v);
 
             default:
                 return EmailTemplateLayout::customer(

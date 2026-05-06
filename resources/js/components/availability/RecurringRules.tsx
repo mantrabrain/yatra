@@ -150,9 +150,15 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     }
   };
 
-  // Fetch status counts from API endpoint
+  // Fetch status counts from API endpoint.
+  // Key is nested under ["recurring-availability", ...] so a single
+  // invalidateQueries({ queryKey: ["recurring-availability"] }) refreshes
+  // both the list AND the status badge counts (All / Active / Inactive).
+  // Otherwise, after deleting the last rule, the list correctly went to 0
+  // while the badges remained stale at 1, which looked like "no data but
+  // 1 on All and Active" for the trip.
   const { data: countsData } = useQuery({
-    queryKey: ["recurring-availability-counts", tripId],
+    queryKey: ["recurring-availability", "counts", tripId],
     queryFn: async () => {
       const response = await apiClient.get("/recurring-availability/counts", {
         params: {
@@ -219,6 +225,10 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
       return await apiClient.delete(`/recurring-availability/${id}`);
     },
     onSuccess: () => {
+      // Invalidate list AND badge counts. Both keys share the
+      // ["recurring-availability", ...] prefix so a single call refreshes
+      // both, but we keep the list key around in case a future refactor
+      // narrows the prefix.
       queryClient.invalidateQueries({ queryKey: ["recurring-availability"] });
       showToast(__("Recurring rule deleted successfully", "yatra"), "success");
       setDeleteConfirm({ isOpen: false, rule: null });
@@ -508,10 +518,9 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
       return await apiClient.put(`/recurring-availability/${id}`, { status });
     },
     onSuccess: () => {
+      // Single prefix invalidation refreshes both the rules list
+      // and the status badge counts (now keyed under the same prefix).
       queryClient.invalidateQueries({ queryKey: ["recurring-availability"] });
-      queryClient.invalidateQueries({
-        queryKey: ["recurring-availability-counts"],
-      });
       showToast(__("Rule status updated successfully", "yatra"), "success");
     },
     onError: (error: any) => {

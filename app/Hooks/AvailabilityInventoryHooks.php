@@ -58,6 +58,40 @@ class AvailabilityInventoryHooks
             $travelDate = (string) ($booking->travel_date ?? '');
 
             if ($tripId > 0 && $availabilityId <= 0 && $travelDate !== '') {
+                // Try to infer availability_id from resolved snapshot stored in booking meta.
+                // This is more reliable when a trip has multiple departure times on the same date.
+                $metaRaw = $booking->meta ?? null;
+                $meta = [];
+                if (is_string($metaRaw) && $metaRaw !== '') {
+                    $decoded = json_decode($metaRaw, true);
+                    $meta = is_array($decoded) ? $decoded : [];
+                } elseif (is_array($metaRaw)) {
+                    $meta = $metaRaw;
+                }
+
+                if (!empty($meta) && isset($meta['resolved_availability']) && is_array($meta['resolved_availability'])) {
+                    $ra = $meta['resolved_availability'];
+
+                    $metaAvailabilityId = $ra['availability_id'] ?? null;
+                    if (is_numeric($metaAvailabilityId) && (int) $metaAvailabilityId > 0) {
+                        $availabilityId = (int) $metaAvailabilityId;
+                    } else {
+                        $metaDepartureTime = isset($ra['departure_time']) ? (string) $ra['departure_time'] : '';
+                        $metaTravelDate = isset($ra['travel_date']) ? (string) $ra['travel_date'] : $travelDate;
+                        if ($metaDepartureTime !== '') {
+                            $row = (new AvailabilityRepository())->findByTripIdAndDateTime(
+                                $tripId,
+                                $metaTravelDate,
+                                self::normalizeTimeForAvailabilityMatch($metaDepartureTime),
+                                true
+                            );
+                            if ($row && !empty($row->id)) {
+                                $availabilityId = (int) $row->id;
+                            }
+                        }
+                    }
+                }
+
                 $availabilityId = self::resolveAvailabilityIdForBooking($bookingId, $tripId, $travelDate);
                 if ($availabilityId > 0) {
                     (new BookingRepository())->update($bookingId, ['availability_id' => $availabilityId]);

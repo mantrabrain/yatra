@@ -195,17 +195,29 @@ const RecurringRuleForm: React.FC = () => {
         params: { per_page: 100, status: "publish" },
       });
       return {
-        trips: (response?.data || []).map((trip: any) => ({
-          id: Number(trip.id) || 0,
-          title: trip.title,
-          trip_type:
-            trip.trip_type ||
-            (trip.duration_days <= 1 ? "single_day" : "multi_day"),
-          duration_days: trip.duration_days || 1,
-          starting_location: trip.starting_location,
-          ending_location: trip.ending_location,
-          pricing_type: trip.pricing_type || "regular",
-        })) as Trip[],
+        trips: (response?.data || []).map((trip: any) => {
+          // Some endpoints return `pricing_type` as "regular" even when the trip is
+          // effectively traveler-based (price types configured). Infer the effective
+          // pricing type from `price_types` when present so the Rules UI reflects
+          // real trip configuration.
+          const rawPriceTypes = trip.price_types;
+          const hasTravelerPricing =
+            Array.isArray(rawPriceTypes) ? rawPriceTypes.length > 0 : false;
+          const effectivePricingType =
+            hasTravelerPricing ? "traveler_based" : trip.pricing_type || "regular";
+
+          return {
+            id: Number(trip.id) || 0,
+            title: trip.title,
+            trip_type:
+              trip.trip_type ||
+              (trip.duration_days <= 1 ? "single_day" : "multi_day"),
+            duration_days: trip.duration_days || 1,
+            starting_location: trip.starting_location,
+            ending_location: trip.ending_location,
+            pricing_type: effectivePricingType,
+          };
+        }) as Trip[],
       };
     },
   });
@@ -306,6 +318,19 @@ const RecurringRuleForm: React.FC = () => {
         | "monthly"
         | "interval";
 
+      // Prefer the *trip's effective* pricing type over any stale rule.pricing_type.
+      // Trips can be traveler-based simply by having price_types configured, even if
+      // trip.pricing_type is still "regular".
+      const tripRow = tripsData.trips.find((t) => t.id === Number(existingRule.trip_id));
+      const effectivePricingType =
+        tripRow?.pricing_type ||
+        ((tripForLocations as any)?.price_types &&
+        Array.isArray((tripForLocations as any).price_types) &&
+        (tripForLocations as any).price_types.length > 0
+          ? "traveler_based"
+          : (tripForLocations as any)?.pricing_type) ||
+        "regular";
+
       setFormData({
         trip_id: existingRule.trip_id || 0,
         name: existingRule.name || "",
@@ -324,7 +349,7 @@ const RecurringRuleForm: React.FC = () => {
         time_slots: Array.isArray(existingRule.time_slots)
           ? existingRule.time_slots
           : [],
-        pricing_type: existingRule.pricing_type || "regular",
+        pricing_type: effectivePricingType as "regular" | "traveler_based",
         original_price: existingRule.original_price,
         sale_price: existingRule.sale_price,
         traveler_pricing: Array.isArray(existingRule.traveler_pricing)
@@ -344,19 +369,25 @@ const RecurringRuleForm: React.FC = () => {
         status: existingRule.status || "active",
       });
     }
-  }, [existingRule, tripsData]);
+  }, [existingRule, tripsData, tripForLocations]);
 
   // Set pricing type based on selected trip when not editing
   useEffect(() => {
     if (!isEditing && !existingRule) {
+      const inferred = (() => {
+        const priceTypes = (tripForLocations as any)?.price_types;
+        const hasTravelerPricing = Array.isArray(priceTypes) && priceTypes.length > 0;
+        return (hasTravelerPricing
+          ? "traveler_based"
+          : (selectedTrip?.pricing_type || (tripForLocations as Trip)?.pricing_type || "regular")
+        ) as "regular" | "traveler_based";
+      })();
+
       setFormData((prev) => ({
         ...prev,
         ...(selectedTrip || tripForLocations
           ? {
-              pricing_type: (selectedTrip?.pricing_type ||
-                (tripForLocations as Trip)?.pricing_type ||
-                "regular" ||
-                "regular") as "regular" | "traveler_based",
+              pricing_type: inferred,
             }
           : {}),
         ...(tripForLocations
@@ -390,9 +421,18 @@ const RecurringRuleForm: React.FC = () => {
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (data: RecurringRule) => {
+      // `days_of_week` is a JSON column on the backend; send the array as-is
+      // and let the API JSON-encode it. Sending a CSV string (e.g. "0,1,2,3")
+      // is rejected by MySQL with "Invalid JSON text".
       return await apiClient.post("/recurring-availability", {
         ...data,
-        days_of_week: data.days_of_week.join(","),
+        days_of_week: Array.isArray(data.days_of_week) ? data.days_of_week : [],
+        // Normalize month-week selector to backend contract.
+        week_of_month:
+          data.rule_type === "monthly"
+            ? ((data.week_of_month || "first") as string).toLowerCase()
+            : data.week_of_month,
+        // On create, omit empty arrays to keep payload small.
         time_slots: data.time_slots.length > 0 ? data.time_slots : undefined,
         traveler_pricing:
           data.traveler_pricing && data.traveler_pricing.length > 0
@@ -422,12 +462,17 @@ const RecurringRuleForm: React.FC = () => {
     mutationFn: async (data: RecurringRule) => {
       return await apiClient.put(`/recurring-availability/${ruleId}`, {
         ...data,
-        days_of_week: data.days_of_week.join(","),
-        time_slots: data.time_slots.length > 0 ? data.time_slots : undefined,
-        traveler_pricing:
-          data.traveler_pricing && data.traveler_pricing.length > 0
-            ? data.traveler_pricing
-            : undefined,
+        days_of_week: Array.isArray(data.days_of_week) ? data.days_of_week : [],
+        week_of_month:
+          data.rule_type === "monthly"
+            ? ((data.week_of_month || "first") as string).toLowerCase()
+            : data.week_of_month,
+        // IMPORTANT: on update, send empty arrays explicitly to clear persisted
+        // JSON columns; omitting the key leaves the old value in DB.
+        time_slots: Array.isArray(data.time_slots) ? data.time_slots : [],
+        traveler_pricing: Array.isArray(data.traveler_pricing)
+          ? data.traveler_pricing
+          : [],
       });
     },
     onSuccess: () => {
@@ -452,7 +497,11 @@ const RecurringRuleForm: React.FC = () => {
     mutationFn: async (data: RecurringRule) => {
       return await apiClient.post("/recurring-availability/preview", {
         ...data,
-        days_of_week: data.days_of_week.join(","),
+        days_of_week: Array.isArray(data.days_of_week) ? data.days_of_week : [],
+        week_of_month:
+          data.rule_type === "monthly"
+            ? ((data.week_of_month || "first") as string).toLowerCase()
+            : data.week_of_month,
         time_slots: data.time_slots.length > 0 ? data.time_slots : undefined,
         traveler_pricing:
           data.traveler_pricing && data.traveler_pricing.length > 0
@@ -1300,15 +1349,20 @@ const RecurringRuleForm: React.FC = () => {
                                           </div>
                                           <button
                                             type="button"
-                                            onClick={() =>
+                                            onClick={() => {
+                                              const categoryIdToRemove =
+                                                pricing.category_id;
                                               setFormData((prev) => ({
                                                 ...prev,
-                                                traveler_pricing:
-                                                  prev.traveler_pricing?.filter(
-                                                    (_, i) => i !== index,
-                                                  ) || [],
-                                              }))
-                                            }
+                                                traveler_pricing: (
+                                                  prev.traveler_pricing || []
+                                                ).filter(
+                                                  (tp) =>
+                                                    tp.category_id !==
+                                                    categoryIdToRemove,
+                                                ),
+                                              }));
+                                            }}
                                             className="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
                                             title={__(
                                               "Remove Pricing",
@@ -1947,31 +2001,32 @@ const RecurringRuleForm: React.FC = () => {
                                                     <button
                                                       type="button"
                                                       onClick={() => {
-                                                        const newSlots = [
-                                                          ...formData.time_slots,
-                                                        ];
-                                                        if (
-                                                          newSlots[index] &&
-                                                          newSlots[index]
-                                                            .traveler_pricing
-                                                        ) {
-                                                          newSlots[
-                                                            index
-                                                          ].traveler_pricing =
-                                                            newSlots[
-                                                              index
-                                                            ].traveler_pricing!.filter(
-                                                              (_, i) =>
-                                                                i !== tpIndex,
-                                                            );
-                                                          setFormData(
-                                                            (prev) => ({
-                                                              ...prev,
-                                                              time_slots:
-                                                                newSlots,
-                                                            }),
-                                                          );
-                                                        }
+                                                        const categoryIdToRemove =
+                                                          tp.category_id;
+                                                        setFormData((prev) => {
+                                                          const newSlots = [
+                                                            ...prev.time_slots,
+                                                          ];
+                                                          if (!newSlots[index]) {
+                                                            return prev;
+                                                          }
+                                                          newSlots[index] = {
+                                                            ...newSlots[index],
+                                                            traveler_pricing: (
+                                                              newSlots[index]
+                                                                .traveler_pricing ||
+                                                              []
+                                                            ).filter(
+                                                              (p) =>
+                                                                p.category_id !==
+                                                                categoryIdToRemove,
+                                                            ),
+                                                          };
+                                                          return {
+                                                            ...prev,
+                                                            time_slots: newSlots,
+                                                          };
+                                                        });
                                                       }}
                                                       className="p-0.5 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
                                                     >

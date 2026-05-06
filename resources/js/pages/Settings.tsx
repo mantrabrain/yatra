@@ -806,7 +806,9 @@ interface SettingsData {
   email_template_enquiry_admin: boolean;
   email_template_enquiry_response: boolean;
   email_template_review_request: boolean;
-  email_template_abandoned_booking_recovery: boolean;
+  email_template_abandoned_booking_recovery_first: boolean;
+  email_template_abandoned_booking_recovery_second: boolean;
+  email_template_abandoned_booking_recovery_final: boolean;
   smtp_enabled: boolean;
   smtp_host: string;
   smtp_port: number;
@@ -854,8 +856,12 @@ interface SettingsData {
   email_tpl_enquiry_response_body: string;
   email_tpl_review_request_subject: string;
   email_tpl_review_request_body: string;
-  email_tpl_abandoned_booking_recovery_subject: string;
-  email_tpl_abandoned_booking_recovery_body: string;
+  email_tpl_abandoned_booking_recovery_first_subject: string;
+  email_tpl_abandoned_booking_recovery_first_body: string;
+  email_tpl_abandoned_booking_recovery_second_subject: string;
+  email_tpl_abandoned_booking_recovery_second_body: string;
+  email_tpl_abandoned_booking_recovery_final_subject: string;
+  email_tpl_abandoned_booking_recovery_final_body: string;
 
   // Customer Settings
   customer_registration: boolean;
@@ -2389,7 +2395,9 @@ const Settings: React.FC = () => {
       email_template_enquiry_admin: true,
       email_template_enquiry_response: true,
       email_template_review_request: true,
-      email_template_abandoned_booking_recovery: true,
+      email_template_abandoned_booking_recovery_first: true,
+      email_template_abandoned_booking_recovery_second: true,
+      email_template_abandoned_booking_recovery_final: true,
       smtp_enabled: false,
       smtp_host: "smtp.gmail.com",
       smtp_port: 587,
@@ -2436,8 +2444,12 @@ const Settings: React.FC = () => {
       email_tpl_enquiry_response_body: "",
       email_tpl_review_request_subject: "",
       email_tpl_review_request_body: "",
-      email_tpl_abandoned_booking_recovery_subject: "",
-      email_tpl_abandoned_booking_recovery_body: "",
+      email_tpl_abandoned_booking_recovery_first_subject: "",
+      email_tpl_abandoned_booking_recovery_first_body: "",
+      email_tpl_abandoned_booking_recovery_second_subject: "",
+      email_tpl_abandoned_booking_recovery_second_body: "",
+      email_tpl_abandoned_booking_recovery_final_subject: "",
+      email_tpl_abandoned_booking_recovery_final_body: "",
       customer_registration: true,
       customer_fields: ["name", "email", "phone", "address"],
       require_email_verification: false,

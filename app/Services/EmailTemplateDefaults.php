@@ -58,8 +58,12 @@ final class EmailTemplateDefaults
             'email_tpl_enquiry_response_body' => self::htmlEnquiryResponse(),
             'email_tpl_review_request_subject' => '⭐ [{{site_name}}] How was {{trip_name}}?',
             'email_tpl_review_request_body' => self::htmlReviewRequest(),
-            'email_tpl_abandoned_booking_recovery_subject' => '🛒 [{{site_name}}] Complete your booking',
-            'email_tpl_abandoned_booking_recovery_body' => self::htmlAbandonedBookingRecovery(),
+            'email_tpl_abandoned_booking_recovery_first_subject' => '🛒 [{{site_name}}] Complete your booking',
+            'email_tpl_abandoned_booking_recovery_first_body' => self::htmlAbandonedBookingRecoveryFirst(),
+            'email_tpl_abandoned_booking_recovery_second_subject' => '⏳ [{{site_name}}] Still interested? Your booking is waiting',
+            'email_tpl_abandoned_booking_recovery_second_body' => self::htmlAbandonedBookingRecoverySecond(),
+            'email_tpl_abandoned_booking_recovery_final_subject' => '⚠️ [{{site_name}}] Final reminder: complete your booking',
+            'email_tpl_abandoned_booking_recovery_final_body' => self::htmlAbandonedBookingRecoveryFinal(),
         ];
     }
 
@@ -159,9 +163,17 @@ final class EmailTemplateDefaults
                 'subject' => '⚠️ [{{site_name}}] Scheduled payment failed · {{booking_reference}}',
                 'body' => self::htmlAdminScheduledPaymentFailed(),
             ],
-            'abandoned_booking_recovery' => [
+            'abandoned_booking_recovery_first' => [
                 'subject' => '🛒 [{{site_name}}] Complete your booking',
-                'body' => self::htmlAbandonedBookingRecovery(),
+                'body' => self::htmlAbandonedBookingRecoveryFirst(),
+            ],
+            'abandoned_booking_recovery_second' => [
+                'subject' => '⏳ [{{site_name}}] Still interested? Your booking is waiting',
+                'body' => self::htmlAbandonedBookingRecoverySecond(),
+            ],
+            'abandoned_booking_recovery_final' => [
+                'subject' => '⚠️ [{{site_name}}] Final reminder: complete your booking',
+                'body' => self::htmlAbandonedBookingRecoveryFinal(),
             ],
         ];
 
@@ -1135,7 +1147,7 @@ final class EmailTemplateDefaults
         );
     }
 
-    private static function htmlAbandonedBookingRecovery(): string
+    private static function htmlAbandonedBookingRecoveryBase(string $headline, string $subLabel): string
     {
         $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">Hello {{customer_name}},</p>'
             . '<p style="margin:0 0 20px;color:#475569;">{{recovery_intro_html}}</p>'
@@ -1154,10 +1166,34 @@ final class EmailTemplateDefaults
 
         return EmailTemplateLayout::customer(
             '🛒',
-            __('Complete your booking', 'yatra'),
+            $headline,
             $inner,
             '{{site_name}}',
-            __('Abandoned checkout', 'yatra')
+            $subLabel
+        );
+    }
+
+    private static function htmlAbandonedBookingRecoveryFirst(): string
+    {
+        return self::htmlAbandonedBookingRecoveryBase(
+            __('Complete your booking', 'yatra'),
+            __('Abandoned checkout · First reminder', 'yatra')
+        );
+    }
+
+    private static function htmlAbandonedBookingRecoverySecond(): string
+    {
+        return self::htmlAbandonedBookingRecoveryBase(
+            __('Still interested?', 'yatra'),
+            __('Abandoned checkout · Second reminder', 'yatra')
+        );
+    }
+
+    private static function htmlAbandonedBookingRecoveryFinal(): string
+    {
+        return self::htmlAbandonedBookingRecoveryBase(
+            __('Final reminder', 'yatra'),
+            __('Abandoned checkout · Final reminder', 'yatra')
         );
     }
 
@@ -1216,9 +1252,19 @@ final class EmailTemplateDefaults
         return TransactionalEmailTemplateService::parseMergeTags(self::htmlReviewRequest(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
     }
 
-    public static function fallbackTransactionalAbandonedBookingRecovery(array $v): string
+    public static function fallbackTransactionalAbandonedBookingRecoveryFirst(array $v): string
     {
-        return TransactionalEmailTemplateService::parseMergeTags(self::htmlAbandonedBookingRecovery(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlAbandonedBookingRecoveryFirst(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
+    }
+
+    public static function fallbackTransactionalAbandonedBookingRecoverySecond(array $v): string
+    {
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlAbandonedBookingRecoverySecond(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
+    }
+
+    public static function fallbackTransactionalAbandonedBookingRecoveryFinal(array $v): string
+    {
+        return TransactionalEmailTemplateService::parseMergeTags(self::htmlAbandonedBookingRecoveryFinal(), TransactionalEmailTemplateService::mergeTemplateVariables($v));
     }
 
     /**

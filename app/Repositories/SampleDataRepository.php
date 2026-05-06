@@ -468,21 +468,31 @@ class SampleDataRepository
     }
 
     /**
-     * Insert availability rules
+     * Insert availability rules.
+     *
+     * Sample JSON only knows the legacy columns (`recurrence_type`,
+     * `capacity_value`, `interval`, `day_of_month`). The new admin React UI
+     * binds to a parallel set (`rule_type`, `seats_total`, `interval_days`,
+     * `interval_start_date`). We populate both so a freshly imported sample
+     * dataset is immediately editable in the new UI without needing the
+     * idempotent {@see InstallerService::maybeNormalizeAvailabilityRulesLegacyData()}
+     * heal-step to fix it on next admin_init.
      */
     public function insert_availability_rules($data, $trip_ids)
     {
         $inserted = 0;
-        
+
         foreach ($data as $item) {
             $trip_slug = $item['trip_slug'];
             unset($item['trip_slug']);
-            
+
             if (!isset($trip_ids[$trip_slug])) {
                 continue;
             }
             $item['trip_id'] = $trip_ids[$trip_slug];
-            
+
+            $item = $this->mapLegacyAvailabilityRuleToNewSchema($item);
+
             // Convert arrays to JSON
             if (isset($item['days_of_week']) && is_array($item['days_of_week'])) {
                 $item['days_of_week'] = json_encode($item['days_of_week']);
@@ -490,14 +500,78 @@ class SampleDataRepository
             if (isset($item['recurrence_pattern']) && is_array($item['recurrence_pattern'])) {
                 $item['recurrence_pattern'] = json_encode($item['recurrence_pattern']);
             }
-            
+
             $result = $this->wpdb->insert($this->availability_rules_table, $item);
             if ($result) {
                 $inserted++;
             }
         }
-        
+
         return $inserted;
+    }
+
+    /**
+     * Map a sample-data row written against the legacy availability-rule
+     * schema onto the new-schema columns the admin UI reads.
+     *
+     * Mirrors the heal logic in
+     * {@see InstallerService::maybeNormalizeAvailabilityRulesLegacyData()}
+     * so write-time and read-time-repair stay in lock-step.
+     *
+     * @param array<string, mixed> $item
+     * @return array<string, mixed>
+     */
+    private function mapLegacyAvailabilityRuleToNewSchema(array $item): array
+    {
+        $recurrence = isset($item['recurrence_type']) ? (string) $item['recurrence_type'] : 'weekly';
+        $intervalRaw = isset($item['interval']) ? (int) $item['interval'] : 1;
+        $intervalNorm = $intervalRaw > 0 ? $intervalRaw : 1;
+
+        if (!isset($item['rule_type']) || $item['rule_type'] === '' || $item['rule_type'] === null) {
+            switch ($recurrence) {
+                case 'daily':
+                    $item['rule_type'] = 'interval';
+                    if (!isset($item['interval_days'])) {
+                        $item['interval_days'] = $intervalNorm;
+                    }
+                    if (!isset($item['interval_start_date']) && !empty($item['start_date'])) {
+                        $item['interval_start_date'] = $item['start_date'];
+                    }
+                    break;
+                case 'monthly':
+                case 'yearly':
+                    $item['rule_type'] = 'monthly';
+                    break;
+                case 'custom':
+                    $item['rule_type'] = 'interval';
+                    if (!isset($item['interval_days'])) {
+                        $item['interval_days'] = $intervalNorm;
+                    }
+                    if (!isset($item['interval_start_date']) && !empty($item['start_date'])) {
+                        $item['interval_start_date'] = $item['start_date'];
+                    }
+                    break;
+                case 'weekly':
+                default:
+                    $item['rule_type'] = 'weekly';
+                    break;
+            }
+        }
+
+        // seats_total mirrors capacity_value when capacity is fixed (the
+        // sample dataset doesn't model percentage capacity). CapacityService
+        // and the React table read seats_total directly.
+        $capacityType = $item['capacity_type'] ?? 'fixed';
+        if (
+            !isset($item['seats_total'])
+            && isset($item['capacity_value'])
+            && (int) $item['capacity_value'] > 0
+            && $capacityType === 'fixed'
+        ) {
+            $item['seats_total'] = (int) $item['capacity_value'];
+        }
+
+        return $item;
     }
 
     /**

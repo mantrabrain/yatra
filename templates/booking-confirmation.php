@@ -44,6 +44,19 @@ $status_colors = [
 
 $status_style = $status_colors[$booking->status] ?? $status_colors['pending'];
 
+// Ensure Font Awesome CSS is available for icon-picker rendered icons (fa-solid/fa-regular).
+// This template can be displayed outside normal "trip page" contexts, so we explicitly
+// register/enqueue the shared stylesheet dependencies before printing the header.
+if (class_exists(\Yatra\Providers\FrontendAssetsProvider::class)) {
+    \Yatra\Providers\FrontendAssetsProvider::registerCoreFrontendStylesheets();
+    if (wp_style_is('yatra-fontawesome-6', 'registered')) {
+        wp_enqueue_style('yatra-fontawesome-6');
+    }
+    if (wp_style_is('yatra-common', 'registered')) {
+        wp_enqueue_style('yatra-common');
+    }
+}
+
 yatra_get_header();
 
 // Hook for Pro modules to add custom scripts (Facebook Pixel, etc.)
@@ -151,16 +164,49 @@ do_action('yatra_booking_confirmation_header', $booking);
                                     <circle cx="12" cy="12" r="10"></circle>
                                     <polyline points="12 6 12 12 16 14"></polyline>
                                 </svg>
-                                <?php printf(esc_html__('%d Days / %d Nights', 'yatra'), (int) $booking->duration_days, (int) $booking->duration_nights); ?>
+                                <?php
+                                $days = (int) ($booking->duration_days ?? 0);
+                                $nights = (int) ($booking->duration_nights ?? 0);
+
+                                if ($days > 0 && $nights > 0) {
+                                    printf(
+                                        esc_html__('%d Days / %d Nights', 'yatra'),
+                                        $days,
+                                        $nights
+                                    );
+                                } elseif ($days > 0) {
+                                    printf(
+                                        /* translators: %d day count */
+                                        esc_html(_n('%d Day', '%d Days', $days, 'yatra')),
+                                        $days
+                                    );
+                                } elseif ($nights > 0) {
+                                    printf(
+                                        /* translators: %d night count */
+                                        esc_html(_n('%d Night', '%d Nights', $nights, 'yatra')),
+                                        $nights
+                                    );
+                                }
+                                ?>
                             </span>
                             <?php endif; ?>
                             
                             <?php if (!empty($booking->difficulty_level)) : ?>
                             <span class="yatra-meta-item">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                </svg>
-                                <?php echo esc_html(ucfirst($booking->difficulty_level)); ?>
+                                <?php
+                                $difficulty = \Yatra\Models\Trip::resolveDifficultyDisplay(
+                                    (string) $booking->difficulty_level
+                                );
+
+                                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                                echo yatra_stored_picker_icon_markup(
+                                    $difficulty['icon_picker'] ?? null,
+                                    '',
+                                    'yatra-icon-sm'
+                                );
+
+                                echo esc_html($difficulty['level'] ?? (string) $booking->difficulty_level);
+                                ?>
                             </span>
                             <?php endif; ?>
                         </div>
@@ -879,6 +925,11 @@ do_action('yatra_booking_confirmation_header', $booking);
         flex-direction: column;
         text-align: center;
     }
+
+    .yatra-info-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
 }
 
 .yatra-info-grid {
@@ -891,17 +942,24 @@ do_action('yatra_booking_confirmation_header', $booking);
     display: flex;
     flex-direction: column;
     gap: 4px;
+    padding: 12px 14px;
+    background: #f9fafb;
+    border: 1px solid #eef2f7;
+    border-radius: 12px;
 }
 
 .yatra-info-label {
     font-size: 13px;
     color: #6b7280;
+    line-height: 1.2;
 }
 
 .yatra-info-value {
     font-size: 15px;
     font-weight: 600;
     color: #111827;
+    line-height: 1.25;
+    text-align: left;
 }
 
 .yatra-status-badge {

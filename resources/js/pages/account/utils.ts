@@ -197,8 +197,11 @@ export const formatPriceForBooking = (price: number, currency?: string) => {
   );
 };
 
-export const currency = (value: number, currencyCode: string = "USD") =>
-  formatYatraMoney(Number(value) || 0, currencyCode, { zeroAsUnknown: false });
+export const currency = (value: number, currencyCode?: string) => {
+  const cfg = readPriceConfig();
+  const code = (currencyCode || cfg.globalCurrency || "USD") as string;
+  return formatYatraMoney(Number(value) || 0, code, { zeroAsUnknown: false });
+};
 
 /** Values from `wp_localize_script(…, 'yatraAccountPage', …)` on the account page. */
 export function getYatraAccountPageGlobals(): {
