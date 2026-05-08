@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yatra\Services;
 
+use Yatra\Helpers\TripListingFilterBuilder;
+use Yatra\Repositories\TripRepository;
 use Yatra\Shortcodes\ActivityShortcode;
 use Yatra\Shortcodes\DestinationShortcode;
 use Yatra\Shortcodes\TripCategoryShortcode;
@@ -32,11 +34,47 @@ class BlockDataService
         return [
             'order' => 'desc',
             'featured' => false,
+            'featured_priority' => '',
+            'featuredPriority' => '',
             'per_page' => 10,
             'columns' => 3,
             'title' => 'Our Trips',
             'show_pagination' => true,
+            'destinationIds' => [],
+            'activityIds' => [],
+            'categoryIds' => [],
+            'difficultyIds' => [],
+            'destination' => '',
+            'activity' => '',
+            'category' => '',
+            'destination_ids' => '',
+            'activity_ids' => '',
+            'category_ids' => '',
+            'difficulty' => '',
+            'price_min' => '',
+            'price_max' => '',
+            'duration_min' => '',
+            'duration_max' => '',
+            'search' => '',
         ];
+    }
+
+    /** Allowed values for the trip "Featured Priority" filter (matches admin TripForm). */
+    private const FEATURED_PRIORITY_VALUES = ['featured', 'new', 'limited'];
+
+    /**
+     * Trip listing for shortcodes, AJAX pagination, and programmatic use.
+     *
+     * @param array<string, mixed> $rawAtts
+     *
+     * @return array{trips: \Yatra\Models\Trip[], max_pages: int, current_page: int, total_found: int}
+     */
+    public static function getTripListingForShortcode(array $rawAtts): array
+    {
+        $atts = wp_parse_args(is_array($rawAtts) ? $rawAtts : [], self::defaultTourBlockAttributes());
+        self::normalizeTripShortcodeAttributes($atts);
+
+        return self::queryTripsForAtts($atts);
     }
 
     /**
@@ -50,6 +88,9 @@ class BlockDataService
             'per_page' => 10,
             'title' => 'Activity Listings',
             'show_pagination' => true,
+            'activityIds' => [],
+            'activity' => '',
+            'activity_ids' => '',
         ];
     }
 
@@ -64,6 +105,9 @@ class BlockDataService
             'per_page' => 10,
             'title' => 'Destination Showcase',
             'show_pagination' => true,
+            'destinationIds' => [],
+            'destination' => '',
+            'destination_ids' => '',
         ];
     }
 
@@ -84,6 +128,8 @@ class BlockDataService
             'show_image' => true,
             'hide_empty' => true,
             'featured_only' => false,
+            'categoryIds' => [],
+            'category_ids' => '',
         ];
     }
 
@@ -132,6 +178,23 @@ class BlockDataService
         $atts['title'] = sanitize_text_field((string) ($atts['title'] ?? 'Our Trips'));
 
         $atts['show_pagination'] = self::coerceToBool($atts['show_pagination'] ?? true, true) ? 'yes' : 'no';
+
+        // Featured Priority (matches admin form: featured | new | limited; "none"/empty = no filter).
+        // Accept both snake_case (shortcode) and camelCase (Gutenberg block attribute).
+        $featuredPriorityRaw = '';
+        if (isset($atts['featured_priority']) && is_string($atts['featured_priority']) && $atts['featured_priority'] !== '') {
+            $featuredPriorityRaw = $atts['featured_priority'];
+        } elseif (isset($atts['featuredPriority']) && is_string($atts['featuredPriority']) && $atts['featuredPriority'] !== '') {
+            $featuredPriorityRaw = $atts['featuredPriority'];
+        }
+        $featuredPriority = strtolower(trim((string) $featuredPriorityRaw));
+        if ($featuredPriority === 'none') {
+            $featuredPriority = '';
+        }
+        if ($featuredPriority !== '' && !in_array($featuredPriority, self::FEATURED_PRIORITY_VALUES, true)) {
+            $featuredPriority = '';
+        }
+        $atts['featured_priority'] = $featuredPriority;
     }
 
     /**
@@ -147,7 +210,7 @@ class BlockDataService
             self::normalizeTripShortcodeAttributes($atts);
 
             // Get trips using Yatra's service
-            $trips_data = self::getTrips($atts);
+            $trips_data = self::queryTripsForAtts($atts);
             
             $per_page = max(1, (int) ($atts['per_page'] ?? 10));
             $atts['per_page'] = $per_page;
@@ -247,94 +310,56 @@ class BlockDataService
     }
 
     /**
-     * Get trips data - copied from TripShortcode
+     * @param array<string, mixed> $atts
+     *
+     * @return array{trips: \Yatra\Models\Trip[], max_pages: int, current_page: int, total_found: int}
      */
-    private static function getTrips(array $atts): array
+    private static function queryTripsForAtts(array $atts): array
     {
         try {
-            $tripService = new \Yatra\Services\TripService();
-            
-            // Get current page from query string or attributes (for AJAX)
-            $current_page = isset($atts['current_page']) ? (int) $atts['current_page'] : (isset($_GET['trip_page']) ? (int) $_GET['trip_page'] : 1);
+            $tripRepository = new TripRepository();
+
+            $current_page = isset($atts['current_page'])
+                ? (int) $atts['current_page']
+                : (isset($_GET['trip_page']) ? (int) $_GET['trip_page'] : 1);
+            $current_page = max(1, $current_page);
+
             $per_page = max(1, (int) ($atts['per_page'] ?? 10));
-            $offset = ($current_page - 1) * $per_page;
 
-            $order = strtolower((string) ($atts['order'] ?? 'desc'));
+            $filters = TripListingFilterBuilder::buildFindWithFiltersArray($atts);
+            $result = $tripRepository->findWithFilters($filters, $current_page, $per_page);
 
-            // Start with very basic arguments to ensure we get trips
-            $args = [
-                'limit' => $per_page,
-                'offset' => $offset,
-                'order_by' => 'created_at',
-                'order' => $order === 'asc' ? 'ASC' : 'DESC',
-            ];
-
-            // Add featured filter if requested
-            $featured = (string) ($atts['featured'] ?? '0');
-            if ($featured === '1') {
-                $args['where']['is_featured'] = 1;
-            }
-
-            // Get total count for pagination
-            $count_args = $args;
-            unset($count_args['limit']);
-            unset($count_args['offset']);
-            $total_trips = $tripService->count($count_args);
-
-            // Get trips using the service
-            $trips_data = $tripService->getActiveTrips($args);
-            
- 
-            
             $trips = [];
-            foreach ($trips_data as $tripData) {
-                // Convert to Trip model
+            foreach (($result['trips'] ?? []) as $tripData) {
                 $trip = \Yatra\Models\Trip::fromStdClass($tripData);
-                
-                // Add basic data needed for the card
-                // Note: reviews are loaded elsewhere; bookings_count is attached below
+                if (isset($tripData->booking_count)) {
+                    $trip->bookings_count = (int) $tripData->booking_count;
+                }
+                if (isset($tripData->review_count)) {
+                    $trip->reviews_count = (int) $tripData->review_count;
+                }
+                if (isset($tripData->average_rating)) {
+                    $ar = (float) $tripData->average_rating;
+                    $trip->average_rating = $ar;
+                    $trip->avg_rating = $ar;
+                }
                 $trip->reviews = [];
-                
+
                 $trips[] = $trip;
             }
 
-            // Attach bookings_count (computed from bookings table) for just these trips
-            $tripIds = array_map(static function ($t) {
-                return isset($t->id) ? (int) $t->id : 0;
-            }, $trips);
-            $tripIds = array_values(array_filter($tripIds));
-            if (!empty($tripIds)) {
-                $bookingsCountMap = $tripService->getBookingsCountMap($tripIds);
-                foreach ($trips as $t) {
-                    $tId = isset($t->id) ? (int) $t->id : 0;
-                    if ($tId > 0) {
-                        $t->bookings_count = (int) ($bookingsCountMap[$tId] ?? 0);
-                    }
-                }
-            }
-            
-            // Calculate pagination data
-            $max_pages = $per_page > 0 ? ceil($total_trips / $per_page) : 1;
-
             return [
                 'trips' => $trips,
-                'max_pages' => $max_pages,
-                'current_page' => $current_page,
-                'total_found' => $total_trips,
-                'debug_info' => [
-                    'args_used' => $args,
-                    'raw_count' => count($trips_data)
-                ]
+                'max_pages' => max(1, (int) ($result['pages'] ?? 1)),
+                'current_page' => max(1, (int) ($result['page'] ?? $current_page)),
+                'total_found' => (int) ($result['total'] ?? 0),
             ];
-            
         } catch (\Exception $e) {
-
-            
             return [
                 'trips' => [],
                 'max_pages' => 1,
                 'current_page' => 1,
-                'total_found' => 0
+                'total_found' => 0,
             ];
         }
     }
@@ -387,6 +412,20 @@ class BlockDataService
     }
 
     /**
+     * @param array<string, mixed> $attributes
+     * @param string ...$legacyCsvKeys
+     */
+    private static function classificationIdsCsvForShortcode(
+        array $attributes,
+        string $arrayKey,
+        string ...$legacyCsvKeys
+    ): string {
+        $ids = TripListingFilterBuilder::positiveIntIdsFromAtts($attributes, $arrayKey, ...$legacyCsvKeys);
+
+        return $ids === [] ? '' : implode(',', $ids);
+    }
+
+    /**
      * Map activity block attributes to shortcode format (full set for shortcode_atts merge).
      *
      * @param array<string, mixed> $attributes Merged with defaults
@@ -413,6 +452,12 @@ class BlockDataService
             'columns' => (string) $cols,
             'title' => sanitize_text_field((string) ($attributes['title'] ?? 'Activity Listings')),
             'show_pagination' => $showPag ? 'yes' : 'no',
+            'activity' => self::classificationIdsCsvForShortcode(
+                $attributes,
+                'activityIds',
+                'activity_ids',
+                'activity'
+            ),
         ];
     }
 
@@ -441,6 +486,12 @@ class BlockDataService
             'columns' => (string) $cols,
             'title' => sanitize_text_field((string) ($attributes['title'] ?? 'Destination Showcase')),
             'show_pagination' => $showPag ? 'yes' : 'no',
+            'destination' => self::classificationIdsCsvForShortcode(
+                $attributes,
+                'destinationIds',
+                'destination_ids',
+                'destination'
+            ),
         ];
     }
 
@@ -468,15 +519,18 @@ class BlockDataService
         $hideEmpty = self::coerceToBool($attributes['hide_empty'] ?? true, true);
         $featuredOnly = self::coerceToBool($attributes['featured_only'] ?? false, false);
 
-        $category = isset($attributes['category']) ? sanitize_text_field((string) $attributes['category']) : '';
-
         return [
             'order' => $order,
             'per_page' => (string) $perPage,
             'columns' => (string) $cols,
             'title' => sanitize_text_field((string) ($attributes['title'] ?? 'Trip Categories')),
             'show_pagination' => $showPag ? 'yes' : 'no',
-            'category' => $category,
+            'category' => self::classificationIdsCsvForShortcode(
+                $attributes,
+                'categoryIds',
+                'category_ids',
+                'category'
+            ),
             'show_trip_count' => $showTripCount ? 'yes' : 'no',
             'show_description' => $showDescription ? 'yes' : 'no',
             'show_image' => $showImage ? 'yes' : 'no',

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\Shortcodes;
 
+use Yatra\Helpers\TripListingFilterBuilder;
 use Yatra\Services\SettingsService;
 
 /**
@@ -23,7 +24,7 @@ class DestinationShortcode extends BaseShortcode
             'show_description' => 'yes',
             'show_image' => 'yes',
             'show_pagination' => 'yes', // Default to show pagination like trip shortcode
-            'destination' => '', // Specific destination slug(s), comma separated
+            'destination' => '', // Classification IDs, comma-separated
             'hide_empty' => 'yes',
             'featured_only' => 'no',
             'title' => 'Destination Showcase'
@@ -115,10 +116,14 @@ class DestinationShortcode extends BaseShortcode
                 'order' => $atts['order'] === 'asc' ? 'ASC' : 'DESC'
             ];
             
-            // Filter by specific destinations if provided
-            if (!empty($atts['destination'])) {
-                $args['where']['slug'] = explode(',', $atts['destination']);
-            }
+            $args['where'] = $args['where'] ?? [];
+            TripListingFilterBuilder::applyTaxonomyWhere(
+                $args['where'],
+                $atts,
+                'destinationIds',
+                'destination_ids',
+                'destination'
+            );
 
             // Get total count for pagination
             $count_args = $args;
@@ -471,7 +476,7 @@ class DestinationShortcode extends BaseShortcode
                 return yatra_get_destination_permalink($destination);
             }
 
-            $base = SettingsService::getString('destination_base', 'destination');
+            $base = SettingsService::getDestinationBase();
             return home_url('/' . $base . '/' . $destination->slug . '/');
         }
         

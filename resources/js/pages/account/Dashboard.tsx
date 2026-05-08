@@ -16,7 +16,7 @@ import {
   AlertCircle,
   Bell,
 } from "lucide-react";
-import { __ } from "../../lib/i18n";
+import { __, sprintf } from "../../lib/i18n";
 import {
   formatDate,
   formatTravelDateRange,
@@ -117,9 +117,10 @@ const Dashboard: React.FC<DashboardProps> = ({
                 className="text-lg font-bold mb-2"
                 style={{ color: "#ffffff" }}
               >
-                {__("Welcome back,", "yatra")}{" "}
-                {displayProfile?.name?.split(" ")[0] || __("Traveler", "yatra")}
-                ! 👋
+                {sprintf(
+                  __("Welcome back, %s!", "yatra"),
+                  displayProfile?.name?.split(" ")[0] || __("Traveler", "yatra"),
+                )}
               </h2>
               <p className="text-sm mb-4 text-white/90">
                 {__("You have", "yatra")} {upcomingBookings.length}{" "}

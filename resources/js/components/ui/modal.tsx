@@ -1,6 +1,7 @@
 import React, { ReactNode, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
+import { __ } from "../../lib/i18n";
 
 type ModalSize = "sm" | "md" | "lg" | "xl" | "full";
 
@@ -112,7 +113,9 @@ export const Modal: React.FC<ModalProps> = ({
           />
         </svg>
       </div>
-      <p className="text-red-600 dark:text-red-400 font-medium mb-2">Error</p>
+      <p className="text-red-600 dark:text-red-400 font-medium mb-2">
+        {__("Error", "yatra")}
+      </p>
       <p className="text-gray-600 dark:text-gray-400 text-sm">{error}</p>
     </div>
   ) : null;
@@ -154,7 +157,7 @@ export const Modal: React.FC<ModalProps> = ({
                 onClick={onClose}
                 disabled={loading}
                 className="p-2 rounded-full text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Close modal"
+                aria-label={__("Close modal", "yatra")}
               >
                 <X className="w-5 h-5" />
               </button>

@@ -116,3 +116,8 @@ foreach ($controllers as $controllerClass) {
         continue;
     }
 }
+
+try {
+    (new \Yatra\Controllers\BlockEditorChoicesController())->register_routes();
+} catch (\Throwable $e) {
+}

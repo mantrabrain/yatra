@@ -26,6 +26,11 @@ import {
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { IconPicker, IconPickerValue } from "../components/ui/icon-picker";
 import { RichTextEditor } from "../components/ui/rich-text-editor";
+import {
+  ClassificationLandingPageField,
+  fetchPublishedPagePermalink,
+  parseLandingPageIdFromMetadata,
+} from "../components/classifications/ClassificationLandingPageField";
 
 /** DB / REST may send 0|1 as number or string; never use Boolean() on string "0". */
 function parseTripCategoryIsFeatured(raw: unknown): boolean {
@@ -54,6 +59,7 @@ interface CategoryFormData {
   seo_title: string;
   seo_description: string;
   seo_keywords: string;
+  landing_page_id: number | null;
 }
 
 interface CategoryOption {
@@ -77,6 +83,7 @@ const CategoryForm: React.FC = () => {
     seo_title: "",
     seo_description: "",
     seo_keywords: "",
+    landing_page_id: null,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -185,6 +192,9 @@ const CategoryForm: React.FC = () => {
         seo_title: categoryData.metadata?.seo_title || "",
         seo_description: categoryData.metadata?.seo_description || "",
         seo_keywords: categoryData.metadata?.seo_keywords || "",
+        landing_page_id: parseLandingPageIdFromMetadata(
+          categoryData.metadata as { landing_page_id?: unknown },
+        ),
       });
     }
   }, [categoryData, isEditMode]);
@@ -271,6 +281,7 @@ const CategoryForm: React.FC = () => {
         seo_title: data.seo_title.trim(),
         seo_description: data.seo_description.trim(),
         seo_keywords: data.seo_keywords.trim(),
+        landing_page_id: data.landing_page_id ?? null,
       };
 
       if (isEditMode && isSlugEditable) {
@@ -415,7 +426,19 @@ const CategoryForm: React.FC = () => {
             {formData.slug && (
               <Button
                 variant="outline"
-                onClick={() => {
+                onClick={async () => {
+                  if (
+                    formData.landing_page_id &&
+                    window.yatraAdmin?.customLandingPagesModuleEnabled
+                  ) {
+                    const link = await fetchPublishedPagePermalink(
+                      formData.landing_page_id,
+                    );
+                    if (link) {
+                      window.open(link, "_blank", "noopener,noreferrer");
+                      return;
+                    }
+                  }
                   const targetUrl = buildYatraSinglePreviewUrl({
                     entity: "category",
                     slug: formData.slug || "",
@@ -538,6 +561,14 @@ const CategoryForm: React.FC = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              <ClassificationLandingPageField
+                selectId="yatra-category-landing-page"
+                value={formData.landing_page_id}
+                onChange={(id) =>
+                  setFormData((prev) => ({ ...prev, landing_page_id: id }))
+                }
+              />
             </div>
 
             <div className="space-y-3">

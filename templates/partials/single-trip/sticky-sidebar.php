@@ -218,12 +218,9 @@ $booking_disabled = method_exists($trip, 'isBookingDisabled') && $trip->isBookin
                     $mobile_tr_max = (int) ($trip->getMaxTravelers() ?: 20);
                     ?>
                     <span class="yatra-travelers-range yatra-mobile-travelers-range"><?php
-                        echo esc_html(sprintf(
-                            /* translators: 1: minimum number of travelers, 2: maximum number of travelers */
-                            __('Min: %1$d, Max: %2$d', 'yatra'),
-                            $mobile_tr_min,
-                            $mobile_tr_max
-                        ));
+                        echo esc_html(
+                            __('Min', 'yatra') . ': ' . $mobile_tr_min . ', ' . __('Max', 'yatra') . ': ' . $mobile_tr_max
+                        );
                     ?></span>
                 <?php endif; ?>
             </div>

@@ -1,5 +1,16 @@
 import { j as jsxRuntimeExports, i as Calendar, h as FileText, l as Plane, ak as ArrowRight, M as MapPin, U as User, v as ChevronRight, aG as Sparkles, P as Package, k as CreditCard, bH as LifeBuoy, bo as Bell, aK as AlertCircle, a$ as CheckCircle2, ai as Clock, av as ExternalLink, ah as Users, o as Mail, b1 as Phone, aR as Download, r as reactExports, u as useQuery, am as CheckCircle, aj as DollarSign, w as React, aV as Eye, ax as PenSquare, aL as XCircle, bI as ShieldCheck, bJ as Heart, L as LayoutDashboard, bK as LogOut, bE as QueryClient, bF as client, bG as QueryClientProvider } from "./react-vendor-CGraIJLZ.js";
 import { f as formatYatraMoney, _ as __, h as applyCurrencyPosition, s as sprintf, a as apiClient, A as API_ENDPOINTS, u as useToast, T as ToastProvider } from "./index-BoN1WlyH.js";
+function toBrowserLocaleTag(locale) {
+  const raw = String(locale || "").trim();
+  if (!raw) return void 0;
+  return raw.replace(/_/g, "-");
+}
+function getAccountLocale() {
+  var _a;
+  if (typeof window === "undefined") return void 0;
+  const raw = (_a = window.yatraAccountPage) == null ? void 0 : _a.locale;
+  return toBrowserLocaleTag(raw);
+}
 const formatDate = (value) => {
   if (!value) {
     return __("N/A", "yatra");
@@ -9,7 +20,7 @@ const formatDate = (value) => {
     if (isNaN(date.getTime())) {
       return __("Invalid date", "yatra");
     }
-    return date.toLocaleDateString(void 0, {
+    return date.toLocaleDateString(getAccountLocale(), {
       year: "numeric",
       month: "long",
       day: "numeric"
@@ -93,11 +104,11 @@ const formatPrice = (price) => {
   if (!price || price === 0) {
     return __("Contact for pricing", "yatra");
   }
-  const formattedAmount = new Intl.NumberFormat(void 0, {
+  const formattedAmount = new Intl.NumberFormat(getAccountLocale(), {
     minimumFractionDigits: decimalPlaces,
     maximumFractionDigits: decimalPlaces
   }).format(price).replace(/,/g, "TEMP_THOUSAND").replace(/\./g, decimalSeparator).replace(/TEMP_THOUSAND/g, thousandSeparator);
-  const currencySymbol = new Intl.NumberFormat(void 0, {
+  const currencySymbol = new Intl.NumberFormat(getAccountLocale(), {
     style: "currency",
     currency: globalCurrency
   }).format(0).replace(/[\d\s.,]/g, "").trim();
@@ -118,11 +129,11 @@ const formatPriceForBooking = (price, currency2) => {
   } = cfg;
   const currencyToUse = globalCurrency;
   const numPrice = Number(price) || 0;
-  const formattedAmount = new Intl.NumberFormat(void 0, {
+  const formattedAmount = new Intl.NumberFormat(getAccountLocale(), {
     minimumFractionDigits: decimalPlaces,
     maximumFractionDigits: decimalPlaces
   }).format(numPrice).replace(/,/g, "TEMP_THOUSAND").replace(/\./g, decimalSeparator).replace(/TEMP_THOUSAND/g, thousandSeparator);
-  const currencySymbol = new Intl.NumberFormat(void 0, {
+  const currencySymbol = new Intl.NumberFormat(getAccountLocale(), {
     style: "currency",
     currency: currencyToUse
   }).format(0).replace(/[\d\s.,]/g, "").trim();
@@ -143,7 +154,8 @@ function getYatraAccountPageGlobals() {
       logoutUrl: "",
       companyPhone: "",
       companyName: "",
-      companyEmail: ""
+      companyEmail: "",
+      locale: ""
     };
   }
   const p = window.yatraAccountPage;
@@ -152,7 +164,8 @@ function getYatraAccountPageGlobals() {
     logoutUrl: String(raw.logoutUrl || "").trim(),
     companyPhone: String(raw.companyPhone || "").trim(),
     companyName: String(raw.companyName || "").trim(),
-    companyEmail: String(raw.companyEmail || "").trim()
+    companyEmail: String(raw.companyEmail || "").trim(),
+    locale: String(raw.locale || "").trim()
   };
 }
 function phoneToTelHref(phone) {
@@ -218,17 +231,15 @@ const Dashboard = ({
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative z-10", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "h2",
                 {
                   className: "text-lg font-bold mb-2",
                   style: { color: "#ffffff" },
-                  children: [
-                    __("Welcome back,", "yatra"),
-                    " ",
-                    ((_a = displayProfile == null ? void 0 : displayProfile.name) == null ? void 0 : _a.split(" ")[0]) || __("Traveler", "yatra"),
-                    "! 👋"
-                  ]
+                  children: sprintf(
+                    __("Welcome back, %s!", "yatra"),
+                    ((_a = displayProfile == null ? void 0 : displayProfile.name) == null ? void 0 : _a.split(" ")[0]) || __("Traveler", "yatra")
+                  )
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm mb-4 text-white/90", children: [
@@ -905,7 +916,11 @@ const getCountryName = (code) => {
     return code;
   }
   try {
-    const display = new Intl.DisplayNames(void 0, { type: "region" });
+    const locale = getYatraAccountPageGlobals().locale;
+    const tag = locale ? locale.replace(/_/g, "-") : void 0;
+    const display = new Intl.DisplayNames(tag ? [tag] : void 0, {
+      type: "region"
+    });
     const name = display.of(upperCode);
     return name && name !== upperCode ? name : code;
   } catch {
@@ -1009,12 +1024,12 @@ const BookingDetails = ({
             /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: __("Booking Overview", "yatra") }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.booking_status), children: __(
-                booking.booking_status || "pending",
-                booking.booking_status || "pending"
+                booking.booking_status || "Pending",
+                booking.booking_status || "Pending"
               ) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.payment_status), children: __(
-                booking.payment_status || "pending",
-                booking.payment_status || "pending"
+                booking.payment_status || "Pending",
+                booking.payment_status || "Pending"
               ) })
             ] })
           ] }),
@@ -1365,8 +1380,8 @@ const BookingDetails = ({
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Payment Status", "yatra") }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.payment_status), children: __(
-                booking.payment_status || "pending",
-                booking.payment_status || "pending"
+                booking.payment_status || "Pending",
+                booking.payment_status || "Pending"
               ) }) })
             ] }),
             booking.payment_method && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [

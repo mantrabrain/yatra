@@ -28,9 +28,8 @@ class EnquiryRepository extends BaseRepository
      */
     protected function getTripsTable(): string
     {
-        // Use TripRepository for trips table
-        $tripRepository = new \Yatra\Repositories\TripRepository();
-        return $tripRepository->getTableName();
+        // Avoid relying on TripRepository visibility/overrides; use the canonical table class.
+        return \Yatra\Database\Tables\TripsTable::getTableName();
     }
 
     /**

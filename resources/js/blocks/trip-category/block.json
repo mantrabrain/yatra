@@ -33,9 +33,9 @@
       "type": "boolean",
       "default": true
     },
-    "category": {
-      "type": "string",
-      "default": ""
+    "categoryIds": {
+      "type": "array",
+      "default": []
     },
     "show_trip_count": {
       "type": "boolean",

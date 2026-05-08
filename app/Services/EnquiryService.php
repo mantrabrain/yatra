@@ -65,6 +65,53 @@ class EnquiryService
      */
     public function createEnquiry(array $data): array
     {
+        // Normalize common client-side key variants (REST/JS often uses camelCase).
+        if ((!isset($data['trip_id']) || $data['trip_id'] === '' || $data['trip_id'] === null)
+            && isset($data['tripId'])
+            && $data['tripId'] !== ''
+            && $data['tripId'] !== null
+        ) {
+            $data['trip_id'] = $data['tripId'];
+        }
+
+        // If trip_id is missing, attempt to derive it from trip slug or the referring URL.
+        // This makes enquiry emails resilient even if a client drops hidden fields.
+        if (empty($data['trip_id']) || (string) $data['trip_id'] === '0') {
+            $candidateSlug = '';
+            if (!empty($data['trip_slug'])) {
+                $candidateSlug = sanitize_title((string) $data['trip_slug']);
+            } elseif (!empty($data['tripSlug'])) {
+                $candidateSlug = sanitize_title((string) $data['tripSlug']);
+            } else {
+                $ref = isset($_SERVER['HTTP_REFERER']) ? (string) $_SERVER['HTTP_REFERER'] : '';
+                if ($ref !== '') {
+                    $parts = wp_parse_url($ref);
+                    $path = isset($parts['path']) ? trim((string) $parts['path'], '/') : '';
+                    if ($path !== '') {
+                        $segments = array_values(array_filter(explode('/', $path), static fn ($s) => $s !== ''));
+                        $tripBase = trim((string) SettingsService::getTripBase(), '/');
+                        if ($tripBase !== '' && !empty($segments)) {
+                            $baseIndex = array_search($tripBase, $segments, true);
+                            if ($baseIndex !== false && isset($segments[$baseIndex + 1])) {
+                                $candidateSlug = sanitize_title((string) $segments[$baseIndex + 1]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ($candidateSlug !== '') {
+                try {
+                    $trip = $this->tripRepository->findBySlug($candidateSlug);
+                    if ($trip && !empty($trip->id)) {
+                        $data['trip_id'] = (int) $trip->id;
+                    }
+                } catch (\Throwable $e) {
+                    // Ignore; will proceed as general enquiry.
+                }
+            }
+        }
+
         // Validate required fields
         if (empty($data['name']) || empty($data['email']) || empty($data['message'])) {
             return ['success' => false, 'message' => __('Name, email, and message are required.', 'yatra')];
@@ -152,14 +199,17 @@ class EnquiryService
             return ['success' => false, 'message' => __('Failed to submit enquiry.', 'yatra')];
         }
         
-        // Get the full enquiry object for the action
-        $enquiry = $this->enquiryRepository->find($enquiryId);
-        
+        // Load with trip JOIN so listeners (e.g. Pro Email Automation's onEnquiryCreated
+        // → buildEnquiryVariables) receive trip_title / trip_slug. Without these, Pro
+        // resolves {{trip_name}} to the literal string "General Enquiry".
+        $enquiry = $this->enquiryRepository->findWithTrip($enquiryId)
+            ?: $this->enquiryRepository->find($enquiryId);
+
         /**
          * Action: Enquiry created
          * Fires after a new enquiry is successfully created
          * 
-         * @param object $enquiry The enquiry object
+         * @param object $enquiry The enquiry object (joined with trip when available)
          * @since 3.0.0
          */
         do_action('yatra_enquiry_created', $enquiry);

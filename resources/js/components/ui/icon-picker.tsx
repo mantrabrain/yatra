@@ -262,7 +262,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
           {value?.type === "image" && imagePreview ? (
             <img
               src={imagePreview}
-              alt="Selected"
+              alt={__("Selected", "yatra")}
               className="w-full h-full object-cover"
             />
           ) : (
@@ -496,7 +496,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                     <div className="relative overflow-hidden rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                       <img
                         src={imagePreview}
-                        alt="Preview"
+                        alt={__("Preview", "yatra")}
                         className="w-full h-64 object-contain"
                       />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">

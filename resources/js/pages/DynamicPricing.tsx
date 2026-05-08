@@ -94,12 +94,34 @@ const DynamicPricingPage: React.FC = () => {
     rule: any | null;
     title?: string;
     message?: string;
-    onConfirm?: () => void;
+    confirmText?: string;
+    variant?: "danger" | "warning" | "info";
+    isLoading?: boolean;
+    onConfirm?: () => void | Promise<void>;
   }>({
     isOpen: false,
     rule: null,
   });
   const [isSaving, setIsSaving] = useState(false);
+
+  const closeConfirmDialog = () =>
+    setConfirmDialog({
+      isOpen: false,
+      rule: null,
+      title: "",
+      message: "",
+      confirmText: "",
+      variant: "danger",
+      isLoading: false,
+      onConfirm: () => {},
+    });
+
+  const invalidateRules = () => {
+    queryClient.invalidateQueries({ queryKey: ["dynamic-pricing-rules"] });
+    queryClient.invalidateQueries({
+      queryKey: ["dynamic-pricing-statistics"],
+    });
+  };
 
   const handleSettingChange = (key: string, value: any) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
@@ -231,8 +253,11 @@ const DynamicPricingPage: React.FC = () => {
       );
     }
 
-    // Apply status filter
-    if (statusFilter !== "all") {
+    // Apply status filter. The "All" view excludes Trash by WordPress
+    // convention — trashed rules are only visible from the Trash filter.
+    if (statusFilter === "all") {
+      filtered = filtered.filter((rule: any) => rule.status !== "trash");
+    } else {
       filtered = filtered.filter((rule: any) => rule.status === statusFilter);
     }
 
@@ -256,10 +281,11 @@ const DynamicPricingPage: React.FC = () => {
     return filtered;
   }, [rules, searchTerm, statusFilter, sortBy, sortOrder]);
 
-  // Bulk action mutation
+  // Bulk action mutation. Uses Promise.allSettled so a single failed row does
+  // not throw away the work that succeeded; the toast reports partial state.
   const bulkMutation = useMutation({
     mutationFn: async ({ action, ids }: { action: string; ids: number[] }) => {
-      const promises = ids.map((id) => {
+      const requests = ids.map((id) => {
         if (action === "delete") {
           return apiClient.delete(`/dynamic-pricing/rules/${id}`);
         } else if (action === "restore") {
@@ -277,16 +303,27 @@ const DynamicPricingPage: React.FC = () => {
         }
         return Promise.resolve();
       });
-      return Promise.all(promises);
+
+      const results = await Promise.allSettled(requests);
+      const succeeded = results.filter((r) => r.status === "fulfilled").length;
+      const failed = results.length - succeeded;
+      return { succeeded, failed, total: results.length };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["dynamic-pricing-rules"] });
-      queryClient.invalidateQueries({
-        queryKey: ["dynamic-pricing-statistics"],
-      });
+    onSuccess: (result) => {
+      invalidateRules();
       setSelectedIds([]);
       setBulkAction("");
-      showToast(__("Bulk action completed successfully"), "success");
+
+      if (result.failed === 0) {
+        showToast(__("Bulk action completed successfully"), "success");
+      } else if (result.succeeded === 0) {
+        showToast(__("Failed to complete bulk action"), "error");
+      } else {
+        showToast(
+          `${result.succeeded}/${result.total} ${__("rules updated; some failed")}`,
+          "warning",
+        );
+      }
     },
     onError: () => {
       showToast(__("Failed to complete bulk action"), "error");
@@ -501,7 +538,13 @@ const DynamicPricingPage: React.FC = () => {
             statusFilter={statusFilter}
             setStatusFilter={setStatusFilter}
             statusOptions={[
-              { key: "all", label: __("All"), count: rules.length },
+              {
+                key: "all",
+                label: __("All"),
+                count:
+                  stats.total_rules ??
+                  rules.filter((r: any) => r.status !== "trash").length,
+              },
               {
                 key: "active",
                 label: __("Active"),
@@ -820,12 +863,38 @@ const DynamicPricingPage: React.FC = () => {
                       setConfirmDialog({
                         isOpen: true,
                         rule,
-                        title: __("Confirm Action"),
+                        title: __("Move Rule to Trash"),
                         message: __(
-                          "Are you sure you want to perform this action?",
+                          "Are you sure you want to move this pricing rule to Trash? It will stop applying to trip pricing immediately. You can restore it from the Trash filter.",
                         ),
-                        onConfirm: () => {
-                          // Handle action
+                        confirmText: __("Move to Trash"),
+                        variant: "warning",
+                        onConfirm: async () => {
+                          setConfirmDialog((prev) => ({
+                            ...prev,
+                            isLoading: true,
+                          }));
+                          try {
+                            await apiClient.put(
+                              `/dynamic-pricing/rules/${rule.id}`,
+                              { status: "trash" },
+                            );
+                            showToast(
+                              __("Pricing rule moved to Trash"),
+                              "success",
+                            );
+                            invalidateRules();
+                            closeConfirmDialog();
+                          } catch (error) {
+                            setConfirmDialog((prev) => ({
+                              ...prev,
+                              isLoading: false,
+                            }));
+                            showToast(
+                              __("Failed to move rule to Trash"),
+                              "error",
+                            );
+                          }
                         },
                       });
                     },
@@ -840,12 +909,37 @@ const DynamicPricingPage: React.FC = () => {
                       setConfirmDialog({
                         isOpen: true,
                         rule,
-                        title: __("Confirm Action"),
+                        title: __("Delete Pricing Rule Permanently"),
                         message: __(
-                          "Are you sure you want to perform this action?",
+                          "This will permanently delete the pricing rule. This action cannot be undone. Continue?",
                         ),
-                        onConfirm: () => {
-                          // Handle action
+                        confirmText: __("Delete Permanently"),
+                        variant: "danger",
+                        onConfirm: async () => {
+                          setConfirmDialog((prev) => ({
+                            ...prev,
+                            isLoading: true,
+                          }));
+                          try {
+                            await apiClient.delete(
+                              `/dynamic-pricing/rules/${rule.id}`,
+                            );
+                            showToast(
+                              __("Pricing rule deleted permanently"),
+                              "success",
+                            );
+                            invalidateRules();
+                            closeConfirmDialog();
+                          } catch (error) {
+                            setConfirmDialog((prev) => ({
+                              ...prev,
+                              isLoading: false,
+                            }));
+                            showToast(
+                              __("Failed to delete rule"),
+                              "error",
+                            );
+                          }
                         },
                       });
                     },
@@ -1655,18 +1749,13 @@ const DynamicPricingPage: React.FC = () => {
       {/* Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={confirmDialog.isOpen}
-        onClose={() =>
-          setConfirmDialog({
-            isOpen: false,
-            rule: null,
-            title: "",
-            message: "",
-            onConfirm: () => {},
-          })
-        }
+        onClose={closeConfirmDialog}
         onConfirm={() => confirmDialog.onConfirm?.()}
         title={confirmDialog.title || ""}
         message={confirmDialog.message || ""}
+        confirmText={confirmDialog.confirmText}
+        variant={confirmDialog.variant ?? "danger"}
+        isLoading={confirmDialog.isLoading ?? false}
       />
     </div>
   );

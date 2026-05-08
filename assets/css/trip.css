@@ -5888,7 +5888,10 @@ input.yatra-datepicker,
 }
 
 .yatra-enquiry-input,
-.yatra-enquiry-textarea {
+.yatra-enquiry-textarea ,
+.yatra-enquiry-input[type="text"],
+.yatra-enquiry-input[type="email"],
+.yatra-enquiry-input[type="tel"]{
     width: 100%;
     padding: 12px 16px;
     border: 1px solid #d1d5db;

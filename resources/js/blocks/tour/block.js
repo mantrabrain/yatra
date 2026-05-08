@@ -48,7 +48,7 @@
             __nextHasNoMarginBottom: true,
           }),
           el(RangeControl, {
-            label: __("Number of Tours", "yatra"),
+            label: __("Number of Trips", "yatra"),
             value: attributes.per_page,
             onChange: function (value) {
               setAttributes({ per_page: value || 10 });
@@ -70,7 +70,7 @@
             __nextHasNoMarginBottom: true,
           }),
           el(ToggleControl, {
-            label: __("Show only featured tours", "yatra"),
+            label: __("Show only featured trips", "yatra"),
             checked: attributes.featured,
             onChange: function (value) {
               setAttributes({ featured: value });

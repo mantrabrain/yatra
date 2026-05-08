@@ -97,9 +97,9 @@ class RouteMatcher
     public static function matchListingPage(string $path): ?array
     {
         $bases = [
-            'destination' => SettingsService::getString('destination_base', 'destination'),
-            'activity' => SettingsService::getString('activity_base', 'activity'),
-            'category' => SettingsService::getString('trip_category_base', 'trip-category'),
+            'destination' => SettingsService::getDestinationBase(),
+            'activity' => SettingsService::getActivityBase(),
+            'category' => SettingsService::getTripCategoryBase(),
         ];
 
         foreach ($bases as $type => $base) {
@@ -124,9 +124,9 @@ class RouteMatcher
     public static function matchTaxonomyPage(string $path): ?array
     {
         $bases = [
-            'destination' => SettingsService::getString('destination_base', 'destination'),
-            'activity' => SettingsService::getString('activity_base', 'activity'),
-            'category' => SettingsService::getString('trip_category_base', 'trip-category'),
+            'destination' => SettingsService::getDestinationBase(),
+            'activity' => SettingsService::getActivityBase(),
+            'category' => SettingsService::getTripCategoryBase(),
         ];
 
         foreach ($bases as $type => $base) {

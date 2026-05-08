@@ -44,7 +44,13 @@ class UrlParser
             $request_path = $path;
         }
 
-        return $request_path;
+        /**
+         * Normalize the storefront path segment Yatra uses for routing (no leading slash, site subdirectory removed).
+         * Map custom public URLs onto Yatra paths before {@see PrettyRouteMatcher} runs, e.g. `regions/norway` → `destination/norway`.
+         *
+         * @param string $request_path Already normalized relative path or empty string.
+         */
+        return (string) apply_filters('yatra_frontend_request_path', $request_path);
     }
 
     /**

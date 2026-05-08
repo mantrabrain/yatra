@@ -70,8 +70,6 @@ if (!defined('ABSPATH')) {
                 </div>
             </div>
 
-            <div class="yatra-quantity-note"><?php esc_html_e('Ages 3 and younger are not permitted.', 'yatra'); ?></div>
-
             <div class="yatra-enquiry-field">
                 <label for="enquiry-message" class="yatra-enquiry-label"><?php esc_html_e('Message', 'yatra'); ?> <span class="yatra-enquiry-required">*</span></label>
                 <textarea id="enquiry-message" name="message" class="yatra-enquiry-textarea" rows="3" placeholder="<?php esc_attr_e('Tell us about your travel plans, special requirements, or any questions you have...', 'yatra'); ?>" required></textarea>

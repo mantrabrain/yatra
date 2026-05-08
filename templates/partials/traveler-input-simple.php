@@ -33,12 +33,11 @@ if (!defined('ABSPATH')) {
     </div>
     <?php if (isset($min, $max)): ?>
         <span class="yatra-travelers-range"><?php
-            echo esc_html(sprintf(
-                /* translators: 1: minimum number of travelers, 2: maximum number of travelers */
-                __('Min: %1$d, Max: %2$d', 'yatra'),
-                (int) $min,
-                (int) $max
-            ));
+            // Separate short labels so Loco/po files can translate "Min" / "Max" without a long combined msgid.
+            // Colons are literal (not part of the translatable strings).
+            echo esc_html(
+                __('Min', 'yatra') . ': ' . (int) $min . ', ' . __('Max', 'yatra') . ': ' . (int) $max
+            );
         ?></span>
     <?php endif; ?>
 </div>

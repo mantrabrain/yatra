@@ -20,6 +20,11 @@ class SettingsService
     private static ?array $settings = null;
 
     /**
+     * Cached {@see self::getPermalinkBases()} per request (after {@see 'yatra_permalink_bases'} filter).
+     */
+    private static ?array $permalinkBasesCache = null;
+
+    /**
      * Settings option prefix in database
      * Each setting is stored as yatra_{key}
      */
@@ -499,6 +504,7 @@ class SettingsService
     public static function reload(): void
     {
         self::$settings = null;
+        self::$permalinkBasesCache = null;
         self::load();
     }
 
@@ -588,12 +594,135 @@ class SettingsService
     }
 
     /**
+     * Sanitize a single URL path segment used in Yatra rewrites (alphanumeric, underscore, hyphen).
+     */
+    private static function sanitizePermalinkSlug(string $value, string $fallback): string
+    {
+        $v = preg_replace('/[^a-z0-9_-]/i', '', $value);
+
+        return ($v !== '' && is_string($v)) ? $v : $fallback;
+    }
+
+    /**
+     * Default account path slug (before {@see 'yatra_permalink_bases'}).
+     */
+    private static function resolveDefaultAccountBaseSlug(): string
+    {
+        $customerPath = get_option('yatra_customer_account_page', '');
+        if (is_string($customerPath) && $customerPath !== '' && $customerPath !== '0') {
+            $slug = self::slugFromAccountPathString($customerPath);
+            if ($slug !== '') {
+                return self::sanitizePermalinkSlug($slug, 'account');
+            }
+        }
+
+        $base = self::getString('account_base', '');
+        $base = self::sanitizePermalinkSlug($base, '');
+
+        return $base !== '' ? $base : 'account';
+    }
+
+    /**
+     * Raw permalink configuration from options (not yet filtered).
+     *
+     * @return array<string, string>
+     */
+    private static function defaultPermalinkBases(): array
+    {
+        $trip = self::sanitizePermalinkSlug(self::getString('trip_base', 'trip'), 'trip');
+        $booking = self::sanitizePermalinkSlug(self::getString('booking_base', 'booking'), 'booking');
+        $account = self::resolveDefaultAccountBaseSlug();
+        $destination = self::sanitizePermalinkSlug(self::getString('destination_base', 'destination'), 'destination');
+        $activity = self::sanitizePermalinkSlug(self::getString('activity_base', 'activity'), 'activity');
+        $tripCategory = self::sanitizePermalinkSlug(self::getString('trip_category_base', 'trip-category'), 'trip-category');
+
+        return [
+            'trip_base' => $trip,
+            'booking_base' => $booking,
+            'account_base' => $account,
+            'destination_base' => $destination,
+            'activity_base' => $activity,
+            'trip_category_base' => $tripCategory,
+            /** Path segment after booking base for confirmation URLs, e.g. /{booking_base}/confirmation/{ref}/ */
+            'booking_flow_confirmation_segment' => 'confirmation',
+            /** Legacy pageless path /{prefix}/{reference}/ (default kept for old links). */
+            'legacy_booking_confirmation_prefix' => 'booking-confirmation',
+            /** Pageless remaining balance checkout /{prefix}/{token}/ */
+            'remaining_checkout_prefix' => 'remaining-checkout',
+            /** Email verification pretty path /{prefix}/{token}/ */
+            'email_verification_prefix' => 'yatra-verify-email',
+        ];
+    }
+
+    /**
+     * All path segments and prefixes used by Yatra rewrites, routing, and URL helpers.
+     *
+     * Third-party plugins can change slugs in one place via:
+     *
+     * `add_filter( 'yatra_permalink_bases', function ( array $bases ) { $bases['trip_base'] = 'tours'; return $bases; } );`
+     *
+     * **Full URLs (different from bases only):**
+     *
+     * - Outbound links: `yatra_destination_permalink`, `yatra_activity_permalink`, `yatra_category_permalink`, `yatra_trip_permalink`
+     *   ({@see yatra_get_destination_permalink()} and siblings in `includes/helpers.php`).
+     * - Inbound path mapping (pretty URLs): {@see \Yatra\Core\Routing\UrlParser::getCleanRequestPath()} filter `yatra_frontend_request_path`.
+     * - Inbound overrides: `yatra_pretty_route_match`, `yatra_plain_route_match` ({@see \Yatra\Core\Routing\PrettyRouteMatcher}, {@see \Yatra\Core\Routing\PlainPageMatcher}).
+     *
+     * After changing bases at runtime you must flush rewrite rules (or bump `yatra_rewrite_rules_version`
+     * in development). Use the {@see 'yatra_register_rewrite_rules'} action to register extra rules that
+     * depend on these bases.
+     *
+     * @return array<string, string>
+     */
+    public static function getPermalinkBases(): array
+    {
+        if (self::$permalinkBasesCache !== null) {
+            return self::$permalinkBasesCache;
+        }
+
+        $defaults = self::defaultPermalinkBases();
+        $filtered = apply_filters('yatra_permalink_bases', $defaults);
+        if (!is_array($filtered)) {
+            $filtered = $defaults;
+        }
+
+        $merged = array_merge($defaults, $filtered);
+        $out = [
+            'trip_base' => self::sanitizePermalinkSlug((string) ($merged['trip_base'] ?? ''), $defaults['trip_base']),
+            'booking_base' => self::sanitizePermalinkSlug((string) ($merged['booking_base'] ?? ''), $defaults['booking_base']),
+            'account_base' => self::sanitizePermalinkSlug((string) ($merged['account_base'] ?? ''), $defaults['account_base']),
+            'destination_base' => self::sanitizePermalinkSlug((string) ($merged['destination_base'] ?? ''), $defaults['destination_base']),
+            'activity_base' => self::sanitizePermalinkSlug((string) ($merged['activity_base'] ?? ''), $defaults['activity_base']),
+            'trip_category_base' => self::sanitizePermalinkSlug((string) ($merged['trip_category_base'] ?? ''), $defaults['trip_category_base']),
+            'booking_flow_confirmation_segment' => self::sanitizePermalinkSlug(
+                (string) ($merged['booking_flow_confirmation_segment'] ?? ''),
+                $defaults['booking_flow_confirmation_segment']
+            ),
+            'legacy_booking_confirmation_prefix' => self::sanitizePermalinkSlug(
+                (string) ($merged['legacy_booking_confirmation_prefix'] ?? ''),
+                $defaults['legacy_booking_confirmation_prefix']
+            ),
+            'remaining_checkout_prefix' => self::sanitizePermalinkSlug(
+                (string) ($merged['remaining_checkout_prefix'] ?? ''),
+                $defaults['remaining_checkout_prefix']
+            ),
+            'email_verification_prefix' => self::sanitizePermalinkSlug(
+                (string) ($merged['email_verification_prefix'] ?? ''),
+                $defaults['email_verification_prefix']
+            ),
+        ];
+
+        self::$permalinkBasesCache = $out;
+
+        return self::$permalinkBasesCache;
+    }
+
+    /**
      * Get trip base slug
      */
     public static function getTripBase(): string
     {
-        $base = self::getString('trip_base', 'trip');
-        return preg_replace('/[^a-z0-9_-]/i', '', $base) ?: 'trip';
+        return self::getPermalinkBases()['trip_base'];
     }
 
     /**
@@ -601,8 +730,7 @@ class SettingsService
      */
     public static function getBookingBase(): string
     {
-        $base = self::getString('booking_base', 'booking');
-        return preg_replace('/[^a-z0-9_-]/i', '', $base) ?: 'booking';
+        return self::getPermalinkBases()['booking_base'];
     }
 
     /**
@@ -612,18 +740,22 @@ class SettingsService
      */
     public static function getAccountBase(): string
     {
-        $customerPath = get_option('yatra_customer_account_page', '');
-        if (is_string($customerPath) && $customerPath !== '' && $customerPath !== '0') {
-            $slug = self::slugFromAccountPathString($customerPath);
-            if ($slug !== '') {
-                return $slug;
-            }
-        }
+        return self::getPermalinkBases()['account_base'];
+    }
 
-        $base = self::getString('account_base', '');
-        $base = preg_replace('/[^a-z0-9_-]/i', '', $base) ?: '';
+    public static function getDestinationBase(): string
+    {
+        return self::getPermalinkBases()['destination_base'];
+    }
 
-        return $base !== '' ? $base : 'account';
+    public static function getActivityBase(): string
+    {
+        return self::getPermalinkBases()['activity_base'];
+    }
+
+    public static function getTripCategoryBase(): string
+    {
+        return self::getPermalinkBases()['trip_category_base'];
     }
 
     private static function slugFromAccountPathString(string $path): string

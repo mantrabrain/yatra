@@ -7,7 +7,10 @@ import {
   ToggleControl,
 } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
+import { useEffect, useRef } from "@wordpress/element";
 import ServerSideRender from "@wordpress/server-side-render";
+import { ClassificationMultiSelect } from "../components/ClassificationMultiSelect";
+import { migrateNumericCsvPairToIds } from "../utils/migrateTaxonomyIds";
 
 interface ActivityBlockAttributes {
   order: "asc" | "desc";
@@ -15,6 +18,9 @@ interface ActivityBlockAttributes {
   per_page: number;
   title: string;
   show_pagination: boolean;
+  activityIds: number[];
+  activity_ids?: string;
+  activity?: string;
 }
 
 interface EditProps {
@@ -22,7 +28,38 @@ interface EditProps {
   setAttributes: (attrs: Partial<ActivityBlockAttributes>) => void;
 }
 
+function normalizeIds(arr: number[] | undefined): number[] {
+  return Array.isArray(arr)
+    ? [...new Set(arr.map((n) => parseInt(String(n), 10)).filter((n) => n > 0))]
+    : [];
+}
+
 export default function Edit({ attributes, setAttributes }: EditProps) {
+  const migratedOnce = useRef(false);
+
+  useEffect(() => {
+    if (migratedOnce.current) {
+      return;
+    }
+    migratedOnce.current = true;
+
+    let ids = normalizeIds(attributes.activityIds);
+    if (ids.length === 0) {
+      ids = migrateNumericCsvPairToIds(attributes.activity_ids, attributes.activity);
+    }
+    if (ids.length === 0) {
+      return;
+    }
+    setAttributes({
+      activityIds: ids,
+      activity: "",
+      activity_ids: "",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setAttributes]);
+
+  const activityIds = normalizeIds(attributes.activityIds);
+
   return (
     <>
       <InspectorControls>
@@ -71,6 +108,16 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             onChange={(value: boolean) =>
               setAttributes({ show_pagination: value })
             }
+          />
+          <ClassificationMultiSelect
+            taxonomy="activity"
+            label={__("Activities to show", "yatra")}
+            help={__(
+              "Use \"All published\" or narrow with search and checkboxes.",
+              "yatra",
+            )}
+            value={activityIds}
+            onChange={(ids) => setAttributes({ activityIds: ids })}
           />
         </PanelBody>
       </InspectorControls>

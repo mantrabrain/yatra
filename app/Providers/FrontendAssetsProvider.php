@@ -626,6 +626,13 @@ class FrontendAssetsProvider
             'translations' => $this->getFrontendTranslations(),
             'wishlistEnabled' => \Yatra\Services\SettingsService::wishlistEnabled(),
         ]);
+
+        // Match admin React (`yatra-admin`): register Jed translations for this handle so `wp.i18n` resolves
+        // strings from PHP/Loco JSON catalogs. Without this, only keys in `translations` above work; the rest
+        // stay English because the account bundle is not in `yatra-admin`'s Jed file (different script hash).
+        if (function_exists('wp_set_script_translations')) {
+            wp_set_script_translations('yatra-account-page', 'yatra', YATRA_PLUGIN_PATH . 'i18n/languages');
+        }
     }
 
     /**

@@ -7,7 +7,10 @@ import {
   ToggleControl,
 } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
+import { useEffect, useRef } from "@wordpress/element";
 import ServerSideRender from "@wordpress/server-side-render";
+import { ClassificationMultiSelect } from "../components/ClassificationMultiSelect";
+import { migrateNumericCsvPairToIds } from "../utils/migrateTaxonomyIds";
 
 export interface TripCategoryBlockAttributes {
   order: "asc" | "desc";
@@ -15,7 +18,9 @@ export interface TripCategoryBlockAttributes {
   per_page: number;
   title: string;
   show_pagination: boolean;
-  category: string;
+  categoryIds: number[];
+  category?: string;
+  category_ids?: string;
   show_trip_count: boolean;
   show_description: boolean;
   show_image: boolean;
@@ -28,20 +33,50 @@ interface EditProps {
   setAttributes: (attrs: Partial<TripCategoryBlockAttributes>) => void;
 }
 
+function normalizeIds(arr: number[] | undefined): number[] {
+  return Array.isArray(arr)
+    ? [...new Set(arr.map((n) => parseInt(String(n), 10)).filter((n) => n > 0))]
+    : [];
+}
+
 export default function Edit({ attributes, setAttributes }: EditProps) {
+  const migratedOnce = useRef(false);
+
+  useEffect(() => {
+    if (migratedOnce.current) {
+      return;
+    }
+    migratedOnce.current = true;
+
+    let ids = normalizeIds(attributes.categoryIds);
+    if (ids.length === 0) {
+      ids = migrateNumericCsvPairToIds(attributes.category_ids, attributes.category);
+    }
+    if (ids.length === 0) {
+      return;
+    }
+    setAttributes({
+      categoryIds: ids,
+      category: "",
+      category_ids: "",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setAttributes]);
+
   const {
     order,
     columns,
     per_page,
     title,
     show_pagination,
-    category,
     show_trip_count,
     show_description,
     show_image,
     hide_empty,
     featured_only,
   } = attributes;
+
+  const categoryIds = normalizeIds(attributes.categoryIds);
 
   return (
     <>
@@ -55,14 +90,15 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             value={title}
             onChange={(value: string) => setAttributes({ title: value })}
           />
-          <TextControl
-            label={__("Categories (slugs)", "yatra")}
+          <ClassificationMultiSelect
+            taxonomy="trip_category"
+            label={__("Trip categories to show", "yatra")}
             help={__(
-              "Optional. One slug or comma-separated slugs (same as the [yatra_trip_category] category attribute). Leave empty to list all categories.",
+              "All published lists every category; narrow with search and checkboxes. Yatra trip types only.",
               "yatra",
             )}
-            value={category}
-            onChange={(value: string) => setAttributes({ category: value })}
+            value={categoryIds}
+            onChange={(ids) => setAttributes({ categoryIds: ids })}
           />
           <SelectControl
             label={__("Order", "yatra")}

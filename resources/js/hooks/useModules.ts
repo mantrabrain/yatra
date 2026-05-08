@@ -112,6 +112,9 @@ export const useToggleModule = () => {
         window.yatraAdmin.dynamicFormFieldEnabled = enabledModules.some(
           (m) => m.slug === "dynamic_form_field",
         );
+        window.yatraAdmin.customLandingPagesModuleEnabled = enabledModules.some(
+          (m) => m.slug === "custom_landing_pages",
+        );
         window.yatraAdmin.showGoogleCalendarSettingsUI = enabledModules.some(
           (m) => m.slug === "google_calendar" || m.slug === "google-calendar",
         );
@@ -222,6 +225,9 @@ export const useBulkToggleModules = () => {
         );
         window.yatraAdmin.dynamicFormFieldEnabled = enabledModules.some(
           (m) => m.slug === "dynamic_form_field",
+        );
+        window.yatraAdmin.customLandingPagesModuleEnabled = enabledModules.some(
+          (m) => m.slug === "custom_landing_pages",
         );
         window.yatraAdmin.showGoogleCalendarSettingsUI = enabledModules.some(
           (m) => m.slug === "google_calendar" || m.slug === "google-calendar",

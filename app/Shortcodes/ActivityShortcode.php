@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\Shortcodes;
 
+use Yatra\Helpers\TripListingFilterBuilder;
 use Yatra\Services\SettingsService;
 
 /**
@@ -23,7 +24,7 @@ class ActivityShortcode extends BaseShortcode
             'show_description' => 'yes',
             'show_image' => 'yes',
             'show_pagination' => 'yes', // Default to show pagination like trip shortcode
-            'activity' => '', // Specific activity slug(s), comma separated
+            'activity' => '', // Classification IDs, comma-separated
             'hide_empty' => 'yes',
             'title' => 'Activity Listings'
         ]);
@@ -110,10 +111,14 @@ class ActivityShortcode extends BaseShortcode
                 'order' => $atts['order'] === 'asc' ? 'ASC' : 'DESC'
             ];
             
-            // Filter by specific activities if provided
-            if (!empty($atts['activity'])) {
-                $args['where']['slug'] = explode(',', $atts['activity']);
-            }
+            $args['where'] = $args['where'] ?? [];
+            TripListingFilterBuilder::applyTaxonomyWhere(
+                $args['where'],
+                $atts,
+                'activityIds',
+                'activity_ids',
+                'activity'
+            );
 
             // Get total count for pagination
             $count_args = $args;
@@ -356,7 +361,7 @@ class ActivityShortcode extends BaseShortcode
                 return yatra_get_activity_permalink($activity);
             }
 
-            $base = SettingsService::getString('activity_base', 'activity');
+            $base = SettingsService::getActivityBase();
             return home_url('/' . $base . '/' . $activity->slug . '/');
         }
         

@@ -2680,6 +2680,13 @@
 
       // Submit via REST API (public endpoint)
       const payload = Object.fromEntries(formData.entries());
+      // Ensure trip context is sent even if the hidden input is missing/empty.
+      if ((!payload.trip_id || String(payload.trip_id) === '0') && window.yatraTripData?.tripId) {
+        payload.trip_id = String(window.yatraTripData.tripId);
+      }
+      if (!payload.trip_slug && window.yatraTripData?.tripSlug) {
+        payload.trip_slug = String(window.yatraTripData.tripSlug);
+      }
 
       // Build REST URL
       const baseUrlRaw = (window.yatraTripData?.apiUrl || window.yatraTripData?.restUrl || window.wpApiSettings?.root || '/wp-json').replace(/\/$/, '');

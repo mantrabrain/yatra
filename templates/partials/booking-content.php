@@ -635,9 +635,7 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                            form="yatra-booking-form">
                                     <div class="yatra-service-info">
                                         <span class="yatra-service-name"><?php echo esc_html($service_name); ?></span>
-                                        <?php if ($service_description) : ?>
-                                        <span class="yatra-service-description"><?php echo esc_html($service_description); ?></span>
-                                        <?php endif; ?>
+                                        
                                     </div>
                                     <span class="yatra-service-price"><?php echo esc_html($price_label); ?></span>
                                 </label>

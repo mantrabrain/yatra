@@ -63,6 +63,9 @@ class AdminAssetsProvider
             'capabilities' => $capabilities,
             'roles' => $current_user->roles,
             'isPro' => defined('YATRA_PRO_VERSION'),
+            'customLandingPagesModuleEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
+                ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('custom_landing_pages')
+                : false,
             'version' => defined('YATRA_VERSION') ? YATRA_VERSION : '1.0.0',
             'proVersion' => defined('YATRA_PRO_VERSION') ? YATRA_PRO_VERSION : null,
 

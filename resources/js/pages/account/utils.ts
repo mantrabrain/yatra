@@ -4,6 +4,20 @@ import {
   formatYatraMoney,
 } from "../../lib/currency-display";
 
+function toBrowserLocaleTag(locale: string | undefined | null): string | undefined {
+  const raw = String(locale || "").trim();
+  if (!raw) return undefined;
+  // WP locales are often like "en_US"; Intl expects BCP47 like "en-US".
+  return raw.replace(/_/g, "-");
+}
+
+function getAccountLocale(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  const raw = (window as unknown as { yatraAccountPage?: { locale?: string } })
+    .yatraAccountPage?.locale;
+  return toBrowserLocaleTag(raw);
+}
+
 export const formatDate = (value: string | undefined | null) => {
   if (!value) {
     return __("N/A", "yatra");
@@ -17,7 +31,7 @@ export const formatDate = (value: string | undefined | null) => {
       return __("Invalid date", "yatra");
     }
 
-    return date.toLocaleDateString(undefined, {
+    return date.toLocaleDateString(getAccountLocale(), {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -134,7 +148,7 @@ export const formatPrice = (price: number) => {
     return __("Contact for pricing", "yatra");
   }
 
-  const formattedAmount = new Intl.NumberFormat(undefined, {
+  const formattedAmount = new Intl.NumberFormat(getAccountLocale(), {
     minimumFractionDigits: decimalPlaces,
     maximumFractionDigits: decimalPlaces,
   })
@@ -143,7 +157,7 @@ export const formatPrice = (price: number) => {
     .replace(/\./g, decimalSeparator)
     .replace(/TEMP_THOUSAND/g, thousandSeparator);
 
-  const currencySymbol = new Intl.NumberFormat(undefined, {
+  const currencySymbol = new Intl.NumberFormat(getAccountLocale(), {
     style: "currency",
     currency: globalCurrency,
   })
@@ -173,7 +187,7 @@ export const formatPriceForBooking = (price: number, currency?: string) => {
   // Always format the price, even if 0 - don't show "Contact for pricing" for bookings
   const numPrice = Number(price) || 0;
 
-  const formattedAmount = new Intl.NumberFormat(undefined, {
+  const formattedAmount = new Intl.NumberFormat(getAccountLocale(), {
     minimumFractionDigits: decimalPlaces,
     maximumFractionDigits: decimalPlaces,
   })
@@ -182,7 +196,7 @@ export const formatPriceForBooking = (price: number, currency?: string) => {
     .replace(/\./g, decimalSeparator)
     .replace(/TEMP_THOUSAND/g, thousandSeparator);
 
-  const currencySymbol = new Intl.NumberFormat(undefined, {
+  const currencySymbol = new Intl.NumberFormat(getAccountLocale(), {
     style: "currency",
     currency: currencyToUse,
   })
@@ -209,6 +223,7 @@ export function getYatraAccountPageGlobals(): {
   companyPhone: string;
   companyName: string;
   companyEmail: string;
+  locale: string;
 } {
   if (typeof window === "undefined") {
     return {
@@ -216,6 +231,7 @@ export function getYatraAccountPageGlobals(): {
       companyPhone: "",
       companyName: "",
       companyEmail: "",
+      locale: "",
     };
   }
   const p = (window as unknown as { yatraAccountPage?: Record<string, string> })
@@ -226,6 +242,7 @@ export function getYatraAccountPageGlobals(): {
     companyPhone: String(raw.companyPhone || "").trim(),
     companyName: String(raw.companyName || "").trim(),
     companyEmail: String(raw.companyEmail || "").trim(),
+    locale: String((raw as any).locale || "").trim(),
   };
 }
 

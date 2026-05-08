@@ -5,6 +5,7 @@
 
 import React from "react";
 import { AlertCircle, CheckCircle, Info, XCircle, X } from "lucide-react";
+import { __ } from "../../lib/i18n";
 
 interface AlertProps {
   variant?: "success" | "error" | "warning" | "info";
@@ -54,7 +55,7 @@ export const Alert: React.FC<AlertProps> = ({
           <button
             onClick={onClose}
             className="flex-shrink-0 text-current opacity-70 hover:opacity-100 transition-opacity"
-            aria-label="Close"
+            aria-label={__("Close", "yatra")}
           >
             <X className="w-4 h-4" />
           </button>

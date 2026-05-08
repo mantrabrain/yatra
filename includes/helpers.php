@@ -1298,7 +1298,11 @@ function yatra_get_booking_confirmation_url(string $reference = ''): string
         if ($booking_base === '') {
             $booking_base = 'book';
         }
-        $virtual_base = home_url('/' . $booking_base . '/confirmation/');
+        $confirmSeg = trim((string) SettingsService::getPermalinkBases()['booking_flow_confirmation_segment'], '/');
+        if ($confirmSeg === '') {
+            $confirmSeg = 'confirmation';
+        }
+        $virtual_base = home_url('/' . $booking_base . '/' . $confirmSeg . '/');
 
         /**
          * Override the base URL for booking confirmation (before the reference path segment).
@@ -1350,7 +1354,8 @@ function yatra_get_email_verification_url(string $secure_token): string
     if ($is_plain) {
         $url = add_query_arg('yatra_verify_email', $t, home_url('/'));
     } else {
-        $url = trailingslashit(home_url('/yatra-verify-email/' . $t . '/'));
+        $prefix = SettingsService::getPermalinkBases()['email_verification_prefix'];
+        $url = trailingslashit(home_url('/' . $prefix . '/' . $t . '/'));
     }
 
     /**
@@ -1623,6 +1628,8 @@ function yatra_build_archive_listing_sort_url(string $yatra_sort): string
  */
 function yatra_get_destination_permalink($destination): string
 {
+    $original = $destination;
+
     if (is_numeric($destination)) {
         global $wpdb;
         $table = ClassificationsTable::getTableName();
@@ -1632,24 +1639,27 @@ function yatra_get_destination_permalink($destination): string
             ClassificationTypes::DESTINATION
         ));
     }
-    
+
     $slug = is_object($destination) ? ($destination->slug ?? '') : '';
-    
+
     if (empty($slug)) {
         return '';
     }
-    
-    $base = SettingsService::getString('destination_base', 'destination');
+
+    $base = SettingsService::getDestinationBase();
     $permalink_structure = get_option('permalink_structure');
     $is_plain = empty($permalink_structure);
 
     if ($is_plain) {
         $key = preg_replace('/[^a-z0-9_-]/i', '', $base) ?: 'destination';
 
-        return add_query_arg([$key => $slug], home_url('/'));
+        $url = add_query_arg([$key => $slug], home_url('/'));
+    } else {
+        $url = home_url('/' . $base . '/' . $slug . '/');
     }
 
-    return home_url('/' . $base . '/' . $slug . '/');
+    /** @var string $url Override full destination URL or path (plain/pretty handled above). Third arg: slug. */
+    return (string) apply_filters('yatra_destination_permalink', $url, $original, $slug);
 }
 
 /**
@@ -1660,6 +1670,8 @@ function yatra_get_destination_permalink($destination): string
  */
 function yatra_get_activity_permalink($activity): string
 {
+    $original = $activity;
+
     if (is_numeric($activity)) {
         global $wpdb;
         $table = ClassificationsTable::getTableName();
@@ -1669,24 +1681,27 @@ function yatra_get_activity_permalink($activity): string
             ClassificationTypes::ACTIVITY
         ));
     }
-    
+
     $slug = is_object($activity) ? ($activity->slug ?? '') : '';
-    
+
     if (empty($slug)) {
         return '';
     }
-    
-    $base = SettingsService::getString('activity_base', 'activity');
+
+    $base = SettingsService::getActivityBase();
     $permalink_structure = get_option('permalink_structure');
     $is_plain = empty($permalink_structure);
 
     if ($is_plain) {
         $key = preg_replace('/[^a-z0-9_-]/i', '', $base) ?: 'activity';
 
-        return add_query_arg([$key => $slug], home_url('/'));
+        $url = add_query_arg([$key => $slug], home_url('/'));
+    } else {
+        $url = home_url('/' . $base . '/' . $slug . '/');
     }
 
-    return home_url('/' . $base . '/' . $slug . '/');
+    /** @var string $url Override full activity URL. Third arg: slug. */
+    return (string) apply_filters('yatra_activity_permalink', $url, $original, $slug);
 }
 
 /**
@@ -1697,6 +1712,8 @@ function yatra_get_activity_permalink($activity): string
  */
 function yatra_get_category_permalink($category): string
 {
+    $original = $category;
+
     if (is_numeric($category)) {
         global $wpdb;
         $table = ClassificationsTable::getTableName();
@@ -1706,24 +1723,27 @@ function yatra_get_category_permalink($category): string
             ClassificationTypes::CATEGORY
         ));
     }
-    
+
     $slug = is_object($category) ? ($category->slug ?? '') : '';
-    
+
     if (empty($slug)) {
         return '';
     }
-    
-    $base = SettingsService::getString('trip_category_base', 'trip-category');
+
+    $base = SettingsService::getTripCategoryBase();
     $permalink_structure = get_option('permalink_structure');
     $is_plain = empty($permalink_structure);
 
     if ($is_plain) {
         $key = preg_replace('/[^a-z0-9_-]/i', '', $base) ?: 'trip-category';
 
-        return add_query_arg([$key => $slug], home_url('/'));
+        $url = add_query_arg([$key => $slug], home_url('/'));
+    } else {
+        $url = home_url('/' . $base . '/' . $slug . '/');
     }
 
-    return home_url('/' . $base . '/' . $slug . '/');
+    /** @var string $url Override full trip-category URL. Third arg: slug. */
+    return (string) apply_filters('yatra_category_permalink', $url, $original, $slug);
 }
 
 /**
@@ -1734,6 +1754,8 @@ function yatra_get_category_permalink($category): string
  */
 function yatra_get_trip_permalink($trip): string
 {
+    $original = $trip;
+
     if (is_numeric($trip)) {
         global $wpdb;
         $table = TripsTable::getTableName();
@@ -1742,24 +1764,27 @@ function yatra_get_trip_permalink($trip): string
             (int) $trip
         ));
     }
-    
+
     $slug = is_object($trip) ? ($trip->slug ?? '') : '';
-    
+
     if (empty($slug)) {
         return '';
     }
-    
+
     $base = SettingsService::getTripBase();
     $permalink_structure = get_option('permalink_structure');
     $is_plain = empty($permalink_structure);
-    
+
     if ($is_plain) {
         $key = preg_replace('/[^a-z0-9_-]/i', '', $base) ?: 'trip';
 
-        return add_query_arg([$key => $slug], home_url('/'));
+        $url = add_query_arg([$key => $slug], home_url('/'));
+    } else {
+        $url = home_url('/' . $base . '/' . $slug . '/');
     }
-    
-    return home_url('/' . $base . '/' . $slug . '/');
+
+    /** @var string $url Override full trip URL. Third arg: slug. */
+    return (string) apply_filters('yatra_trip_permalink', $url, $original, $slug);
 }
 
 /**
@@ -1790,9 +1815,9 @@ function yatra_get_trip_listing_url(): string
 function yatra_get_taxonomy_listing_url(string $listing_type): string
 {
     $map = [
-        'destination' => SettingsService::getString('destination_base', 'destination'),
-        'activity' => SettingsService::getString('activity_base', 'activity'),
-        'category' => SettingsService::getString('trip_category_base', 'trip-category'),
+        'destination' => SettingsService::getDestinationBase(),
+        'activity' => SettingsService::getActivityBase(),
+        'category' => SettingsService::getTripCategoryBase(),
     ];
     $base = $map[$listing_type] ?? '';
     $base = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $base) ?: 'destination';

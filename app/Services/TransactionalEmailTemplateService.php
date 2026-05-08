@@ -455,7 +455,8 @@ class TransactionalEmailTemplateService
     private static function parseTemplate(string $template, array $variables): string
     {
         $rendered = (string) preg_replace_callback(
-            '/\{\{(\w+)\}\}/',
+            // Allow optional whitespace: {{trip_name}} and {{ trip_name }} both work.
+            '/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/',
             static function (array $m) use ($variables): string {
                 $key = $m[1];
 
@@ -468,7 +469,7 @@ class TransactionalEmailTemplateService
         );
 
         // Hard-strip any remaining merge-tags (defense-in-depth).
-        $rendered = (string) preg_replace('/\{\{\w+\}\}/', '', $rendered);
+        $rendered = (string) preg_replace('/\{\{\s*[a-zA-Z0-9_]+\s*\}\}/', '', $rendered);
 
         // Users sometimes paste helper text from the editor into the template.
         // If that happens, strip common helper headings so they don't appear in
@@ -716,6 +717,27 @@ class TransactionalEmailTemplateService
     {
         $trip = trim((string) ($enquiry->trip_title ?? ''));
         $tripSlug = (string) ($enquiry->trip_slug ?? '');
+        $tripId = isset($enquiry->trip_id) ? (int) $enquiry->trip_id : 0;
+
+        // Defense-in-depth: if repository join didn't provide trip_title/slug but we do have a trip_id,
+        // resolve the trip directly so {{trip_name}} doesn't fall back to "General enquiry".
+        if (($trip === '' || $tripSlug === '') && $tripId > 0) {
+            try {
+                $repo = new \Yatra\Repositories\TripRepository();
+                $tripRow = $repo->find($tripId);
+                if ($tripRow) {
+                    if ($trip === '' && !empty($tripRow->title)) {
+                        $trip = trim((string) $tripRow->title);
+                    }
+                    if ($tripSlug === '' && !empty($tripRow->slug)) {
+                        $tripSlug = (string) $tripRow->slug;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Ignore: keep existing values/fallback.
+            }
+        }
+
         $tripUrl = $tripSlug !== ''
             ? home_url('/' . SettingsService::getTripBase() . '/' . rawurlencode($tripSlug) . '/')
             : home_url('/');

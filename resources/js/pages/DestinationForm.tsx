@@ -26,6 +26,11 @@ import {
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { IconPicker, IconPickerValue } from "../components/ui/icon-picker";
 import { RichTextEditor } from "../components/ui/rich-text-editor";
+import {
+  ClassificationLandingPageField,
+  fetchPublishedPagePermalink,
+  parseLandingPageIdFromMetadata,
+} from "../components/classifications/ClassificationLandingPageField";
 
 interface DestinationFormData {
   name: string;
@@ -39,6 +44,7 @@ interface DestinationFormData {
   seo_title: string;
   seo_description: string;
   seo_keywords: string;
+  landing_page_id: number | null;
 }
 
 const DestinationForm: React.FC = () => {
@@ -54,6 +60,7 @@ const DestinationForm: React.FC = () => {
     seo_title: "",
     seo_description: "",
     seo_keywords: "",
+    landing_page_id: null,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -116,6 +123,9 @@ const DestinationForm: React.FC = () => {
         seo_title: destinationData.metadata?.seo_title || "",
         seo_description: destinationData.metadata?.seo_description || "",
         seo_keywords: destinationData.metadata?.seo_keywords || "",
+        landing_page_id: parseLandingPageIdFromMetadata(
+          destinationData.metadata as { landing_page_id?: unknown },
+        ),
       });
     }
   }, [destinationData, isEditMode]);
@@ -202,6 +212,7 @@ const DestinationForm: React.FC = () => {
         seo_title: data.seo_title.trim(),
         seo_description: data.seo_description.trim(),
         seo_keywords: data.seo_keywords.trim(),
+        landing_page_id: data.landing_page_id ?? null,
       };
 
       // If slug was manually edited, add flag to preserve it
@@ -344,7 +355,19 @@ const DestinationForm: React.FC = () => {
             {formData.slug && (
               <Button
                 variant="outline"
-                onClick={() => {
+                onClick={async () => {
+                  if (
+                    formData.landing_page_id &&
+                    window.yatraAdmin?.customLandingPagesModuleEnabled
+                  ) {
+                    const link = await fetchPublishedPagePermalink(
+                      formData.landing_page_id,
+                    );
+                    if (link) {
+                      window.open(link, "_blank", "noopener,noreferrer");
+                      return;
+                    }
+                  }
                   const targetUrl = buildYatraSinglePreviewUrl({
                     entity: "destination",
                     slug: formData.slug || "",
@@ -472,6 +495,14 @@ const DestinationForm: React.FC = () => {
                   />
                 </CardContent>
               </Card>
+
+              <ClassificationLandingPageField
+                selectId="yatra-destination-landing-page"
+                value={formData.landing_page_id}
+                onChange={(id) =>
+                  setFormData((prev) => ({ ...prev, landing_page_id: id }))
+                }
+              />
             </div>
 
             {/* Sidebar */}

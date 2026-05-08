@@ -7,6 +7,7 @@ declare global {
   interface Window {
     yatraAdmin?: {
       apiUrl?: string;
+      restUrl?: string;
       nonce?: string;
       brandLogoUrl?: string;
       pluginUrl?: string;
@@ -17,6 +18,8 @@ declare global {
       roles?: string[];
       capabilities?: Record<string, boolean>;
       isPro?: boolean;
+      /** Yatra → Modules → Custom Landing Pages enabled (Pro). */
+      customLandingPagesModuleEnabled?: boolean;
       isProActive?: boolean;
       version?: string;
       proVersion?: string | null;

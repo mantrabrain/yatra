@@ -482,6 +482,19 @@ class TripRepository extends BaseRepository
             }
         }
 
+        // Featured Priority (column on yatra_new_trips, indexed by idx_featured_priority).
+        // Admin form's Featured Priority dropdown is the single source of truth.
+        // Legacy `is_featured` shortcode/block flag is normalised upstream into featured_priority='featured'.
+        if (
+            !empty($filters['featured_priority'])
+            && is_string($filters['featured_priority'])
+            && in_array($filters['featured_priority'], ['featured', 'new', 'limited'], true)
+            && $this->tripTableHasColumn('featured_priority')
+        ) {
+            $wheres[] = 't.featured_priority = %s';
+            $params[] = $filters['featured_priority'];
+        }
+
         // Destination: checkbox classification IDs (OR) or single slug
         if (!empty($filters['destination_ids']) && is_array($filters['destination_ids'])) {
             $ids = array_values(array_filter(array_map('intval', $filters['destination_ids']), static fn (int $id): bool => $id > 0));
@@ -493,11 +506,21 @@ class TripRepository extends BaseRepository
                 $params = array_merge($params, $ids);
             }
         } elseif (!empty($filters['destination'])) {
-            $joins[] = "LEFT JOIN {$tripClassificationsTable} tcd ON tcd.trip_id = t.id";
-            $joins[] = "LEFT JOIN {$classificationsTable} dest ON dest.id = tcd.classification_id";
-            $wheres[] = 'dest.type = %s AND dest.slug = %s';
-            $params[] = ClassificationTypes::DESTINATION;
-            $params[] = $filters['destination'];
+            if (is_array($filters['destination'])) {
+                $slugs = array_values(array_filter(array_map('sanitize_title', $filters['destination'])));
+                if ($slugs !== []) {
+                    $placeholders = implode(',', array_fill(0, count($slugs), '%s'));
+                    $wheres[] = "EXISTS (SELECT 1 FROM {$tripClassificationsTable} tcdx INNER JOIN {$classificationsTable} destx ON destx.id = tcdx.classification_id AND destx.type = %s WHERE tcdx.trip_id = t.id AND tcdx.is_active = 1 AND destx.slug IN ({$placeholders}))";
+                    $params[] = ClassificationTypes::DESTINATION;
+                    $params = array_merge($params, $slugs);
+                }
+            } elseif (is_string($filters['destination']) && $filters['destination'] !== '') {
+                $joins[] = "LEFT JOIN {$tripClassificationsTable} tcd ON tcd.trip_id = t.id";
+                $joins[] = "LEFT JOIN {$classificationsTable} dest ON dest.id = tcd.classification_id";
+                $wheres[] = 'dest.type = %s AND dest.slug = %s';
+                $params[] = ClassificationTypes::DESTINATION;
+                $params[] = $filters['destination'];
+            }
         }
 
         // Activity: IDs or slug
@@ -510,11 +533,21 @@ class TripRepository extends BaseRepository
                 $params = array_merge($params, $ids);
             }
         } elseif (!empty($filters['activity'])) {
-            $joins[] = "LEFT JOIN {$tripClassificationsTable} tca ON tca.trip_id = t.id";
-            $joins[] = "LEFT JOIN {$classificationsTable} act ON act.id = tca.classification_id";
-            $wheres[] = 'act.type = %s AND act.slug = %s';
-            $params[] = ClassificationTypes::ACTIVITY;
-            $params[] = $filters['activity'];
+            if (is_array($filters['activity'])) {
+                $slugs = array_values(array_filter(array_map('sanitize_title', $filters['activity'])));
+                if ($slugs !== []) {
+                    $placeholders = implode(',', array_fill(0, count($slugs), '%s'));
+                    $wheres[] = "EXISTS (SELECT 1 FROM {$tripClassificationsTable} tcax INNER JOIN {$classificationsTable} actx ON actx.id = tcax.classification_id AND actx.type = %s WHERE tcax.trip_id = t.id AND tcax.is_active = 1 AND actx.slug IN ({$placeholders}))";
+                    $params[] = ClassificationTypes::ACTIVITY;
+                    $params = array_merge($params, $slugs);
+                }
+            } elseif (is_string($filters['activity']) && $filters['activity'] !== '') {
+                $joins[] = "LEFT JOIN {$tripClassificationsTable} tca ON tca.trip_id = t.id";
+                $joins[] = "LEFT JOIN {$classificationsTable} act ON act.id = tca.classification_id";
+                $wheres[] = 'act.type = %s AND act.slug = %s';
+                $params[] = ClassificationTypes::ACTIVITY;
+                $params[] = $filters['activity'];
+            }
         }
 
         // Category: IDs or slug
@@ -527,11 +560,21 @@ class TripRepository extends BaseRepository
                 $params = array_merge($params, $ids);
             }
         } elseif (!empty($filters['trip_category'])) {
-            $joins[] = "LEFT JOIN {$tripClassificationsTable} tcc ON tcc.trip_id = t.id";
-            $joins[] = "LEFT JOIN {$classificationsTable} cat ON cat.id = tcc.classification_id";
-            $wheres[] = 'cat.type = %s AND cat.slug = %s';
-            $params[] = ClassificationTypes::CATEGORY;
-            $params[] = $filters['trip_category'];
+            if (is_array($filters['trip_category'])) {
+                $slugs = array_values(array_filter(array_map('sanitize_title', $filters['trip_category'])));
+                if ($slugs !== []) {
+                    $placeholders = implode(',', array_fill(0, count($slugs), '%s'));
+                    $wheres[] = "EXISTS (SELECT 1 FROM {$tripClassificationsTable} tccx INNER JOIN {$classificationsTable} catx ON catx.id = tccx.classification_id AND catx.type = %s WHERE tccx.trip_id = t.id AND tccx.is_active = 1 AND catx.slug IN ({$placeholders}))";
+                    $params[] = ClassificationTypes::CATEGORY;
+                    $params = array_merge($params, $slugs);
+                }
+            } elseif (is_string($filters['trip_category']) && $filters['trip_category'] !== '') {
+                $joins[] = "LEFT JOIN {$tripClassificationsTable} tcc ON tcc.trip_id = t.id";
+                $joins[] = "LEFT JOIN {$classificationsTable} cat ON cat.id = tcc.classification_id";
+                $wheres[] = 'cat.type = %s AND cat.slug = %s';
+                $params[] = ClassificationTypes::CATEGORY;
+                $params[] = $filters['trip_category'];
+            }
         }
 
         // Special offers (OR within group)
@@ -824,6 +867,8 @@ class TripRepository extends BaseRepository
                 return "ORDER BY {$effPrice} DESC";
             case 'rating_high':
                 return "ORDER BY average_rating DESC";
+            case 'date_asc':
+                return "ORDER BY t.created_at ASC";
             case 'duration_short':
                 return "ORDER BY CAST(t.duration_days AS UNSIGNED) ASC, CAST(t.duration_nights AS UNSIGNED) ASC";
             case 'duration_long':

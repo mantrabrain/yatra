@@ -12,7 +12,9 @@ import { usePermissions } from "../hooks/usePermissions";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
+import { DatePicker } from "../components/ui/date-picker";
 import { PageHeader } from "../components/common/PageHeader";
+import { BookingPicker } from "../components/common/BookingPicker";
 import {
   Card,
   CardContent,
@@ -256,7 +258,7 @@ const PaymentForm: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {/* Booking ID */}
+                  {/* Booking */}
                   <div>
                     <label
                       htmlFor="booking_id"
@@ -267,26 +269,34 @@ const PaymentForm: React.FC = () => {
                     </label>
                     <HelpText
                       text={__(
-                        "Select the booking this payment is for. You can search by booking number or customer name.",
+                        "Search by booking code (e.g. YTR-123), customer name, or email. Results load from your existing bookings as you type.",
                         "yatra",
                       )}
                       className="mb-2"
                     />
-                    <Input
-                      id="booking_id"
-                      type="text"
+                    <BookingPicker
                       value={formData.booking_id}
-                      onChange={(e) =>
-                        handleFieldChange("booking_id", e.target.value)
-                      }
-                      placeholder={__("Enter booking ID or search...", "yatra")}
-                      className={errors.booking_id ? "border-red-500" : ""}
-                      required
+                      onChange={(id) => handleFieldChange("booking_id", id)}
+                      error={Boolean(errors.booking_id)}
+                      disabled={isEditMode}
+                      placeholder={__("Select a booking…", "yatra")}
+                      searchPlaceholder={__(
+                        "Search by booking code, name, or email…",
+                        "yatra",
+                      )}
                     />
                     {errors.booking_id && (
                       <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                         <Info className="w-4 h-4" />
                         {errors.booking_id}
+                      </p>
+                    )}
+                    {isEditMode && (
+                      <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        {__(
+                          "The booking linked to a payment cannot be changed after creation.",
+                          "yatra",
+                        )}
                       </p>
                     )}
                   </div>
@@ -400,15 +410,14 @@ const PaymentForm: React.FC = () => {
                         )}
                         className="mb-2"
                       />
-                      <Input
-                        id="payment_date"
-                        type="date"
+                      <DatePicker
                         value={formData.payment_date}
-                        onChange={(e) =>
-                          handleFieldChange("payment_date", e.target.value)
+                        onChange={(value) =>
+                          handleFieldChange("payment_date", value)
                         }
-                        className={errors.payment_date ? "border-red-500" : ""}
-                        required
+                        placeholder={__("Select payment date", "yatra")}
+                        maxDate={new Date()}
+                        error={Boolean(errors.payment_date)}
                       />
                       {errors.payment_date && (
                         <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">

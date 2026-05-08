@@ -24,6 +24,15 @@ final class PlainPageMatcher
      */
     public static function match(): ?array
     {
+        /**
+         * Override plain / query-arg routing entirely (runs before core matching).
+         * Return a handler route array compatible with {@see Router::handleRouteData()}.
+         */
+        $plain_override = apply_filters('yatra_plain_route_match', null);
+        if (is_array($plain_override) && isset($plain_override['type']) && is_string($plain_override['type']) && $plain_override['type'] !== '') {
+            return $plain_override;
+        }
+
         // Plain-style query routing (?yatra_page=activity&paged=2) must run even when the site uses
         // pretty permalinks — pagination links use home_url('/') + query args. Without this, the router
         // never sees those URLs and WordPress may 404 on paged front-page requests.

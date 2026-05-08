@@ -9,6 +9,7 @@
 
 import React from "react";
 import { taxService } from "../../services/TaxService";
+import { __ } from "../../lib/i18n";
 
 interface TaxDisplayProps {
   subtotal: number;
@@ -37,7 +38,9 @@ const TaxDisplay: React.FC<TaxDisplayProps> = ({
     <div className={`space-y-2 ${className}`}>
       {/* Subtotal */}
       <div className="flex justify-between text-sm">
-        <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
+        <span className="text-gray-600 dark:text-gray-400">
+          {__("Subtotal", "yatra")}
+        </span>
         <span className="font-medium text-gray-900 dark:text-gray-100">
           {taxService.formatPrice(taxCalculation.subtotal)}
         </span>
@@ -63,7 +66,7 @@ const TaxDisplay: React.FC<TaxDisplayProps> = ({
       <div className="border-t pt-2">
         <div className="flex justify-between">
           <span className="font-semibold text-gray-900 dark:text-gray-100">
-            Total
+            {__("Total", "yatra")}
           </span>
           <span className="font-bold text-lg text-gray-900 dark:text-gray-100">
             {taxService.formatPrice(taxCalculation.total_amount)}
@@ -74,7 +77,7 @@ const TaxDisplay: React.FC<TaxDisplayProps> = ({
       {/* Tax Inclusive Notice */}
       {taxCalculation.tax_inclusive && (
         <div className="text-xs text-gray-500 dark:text-gray-400 italic">
-          * Tax included in price
+          {__("* Tax included in price", "yatra")}
         </div>
       )}
     </div>

@@ -192,9 +192,9 @@ class TemplateLoader
 
         foreach (
             [
-                SettingsService::getString('destination_base', 'destination'),
-                SettingsService::getString('activity_base', 'activity'),
-                SettingsService::getString('trip_category_base', 'trip-category'),
+                SettingsService::getDestinationBase(),
+                SettingsService::getActivityBase(),
+                SettingsService::getTripCategoryBase(),
             ] as $base
         ) {
             $bk = preg_replace('/[^a-zA-Z0-9_-]/', '', $base) ?: '';
@@ -221,7 +221,8 @@ class TemplateLoader
         }
 
         $verifyPath = trim(UrlParser::getCleanRequestPath(), '/');
-        if ($verifyPath !== '' && strpos($verifyPath, 'yatra-verify-email/') === 0) {
+        $verifyPrefix = SettingsService::getPermalinkBases()['email_verification_prefix'];
+        if ($verifyPath !== '' && strpos($verifyPath, $verifyPrefix . '/') === 0) {
             return true;
         }
 
@@ -233,21 +234,17 @@ class TemplateLoader
      */
     public static function addTripRewriteRules(): void
     {
-        // Use centralized SettingsService for all settings
-        $trip_base = SettingsService::getTripBase();
-        $booking_base = SettingsService::getBookingBase();
-        $account_base = SettingsService::getAccountBase();
-        $account_base = preg_replace('/[^a-z0-9_-]/i', '', $account_base) ?: 'account';
-
-        // Get other bases with sanitization
-        $destination_base = SettingsService::getString('destination_base', 'destination');
-        $destination_base = preg_replace('/[^a-z0-9_-]/i', '', $destination_base) ?: 'destination';
-
-        $activity_base = SettingsService::getString('activity_base', 'activity');
-        $activity_base = preg_replace('/[^a-z0-9_-]/i', '', $activity_base) ?: 'activity';
-
-        $trip_category_base = SettingsService::getString('trip_category_base', 'trip-category');
-        $trip_category_base = preg_replace('/[^a-z0-9_-]/i', '', $trip_category_base) ?: 'trip-category';
+        $bases = SettingsService::getPermalinkBases();
+        $trip_base = $bases['trip_base'];
+        $booking_base = $bases['booking_base'];
+        $account_base = $bases['account_base'];
+        $destination_base = $bases['destination_base'];
+        $activity_base = $bases['activity_base'];
+        $trip_category_base = $bases['trip_category_base'];
+        $bookingConfirmSeg = $bases['booking_flow_confirmation_segment'];
+        $legacyBookingConfirmation = $bases['legacy_booking_confirmation_prefix'];
+        $remainingCheckout = $bases['remaining_checkout_prefix'];
+        $emailVerifyPrefix = $bases['email_verification_prefix'];
 
         // Add query vars first (must be registered before rewrite rules)
         // Single-trip slug query var matches trip URL base (e.g. trip=, tours=)
@@ -262,9 +259,9 @@ class TemplateLoader
         add_rewrite_tag('%yatra_page%', '([a-zA-Z0-9_-]+)');
         add_rewrite_tag('%paged%', '([0-9]+)');
 
-        // Add rewrite rule for email verification: /yatra-verify-email/{token}/
+        // Add rewrite rule for email verification: /{email_verification_prefix}/{token}/
         add_rewrite_rule(
-            '^yatra-verify-email/([a-zA-Z0-9_-]+)/?$',
+            '^' . $emailVerifyPrefix . '/([a-zA-Z0-9_-]+)/?$',
             'index.php?yatra_verify_email=$matches[1]',
             'top'
         );
@@ -359,9 +356,9 @@ class TemplateLoader
             'top'
         );
 
-        // Pageless booking confirmation: /{booking_base}/confirmation/{reference}/ (before trip slug rule)
+        // Pageless booking confirmation: /{booking_base}/{confirmation_segment}/{reference}/ (before trip slug rule)
         add_rewrite_rule(
-            '^' . $booking_base . '/confirmation/([a-zA-Z0-9_-]+)/?$',
+            '^' . $booking_base . '/' . $bookingConfirmSeg . '/([a-zA-Z0-9_-]+)/?$',
             'index.php?yatra_booking_confirmation=$matches[1]',
             'top'
         );
@@ -380,23 +377,32 @@ class TemplateLoader
             'top'
         );
 
-        // Add rewrite rule for booking confirmation page slug: /booking-confirmation/{reference}
+        // Legacy booking confirmation: /{legacy_booking_confirmation_prefix}/{reference}
         add_rewrite_rule(
-            '^booking-confirmation/([a-zA-Z0-9_-]+)/?$',
+            '^' . $legacyBookingConfirmation . '/([a-zA-Z0-9_-]+)/?$',
             'index.php?yatra_booking_confirmation=$matches[1]',
             'top'
         );
 
-        // Add rewrite rule for remaining checkout: /remaining-checkout/{token}/
+        // Remaining checkout: /{remaining_checkout_prefix}/{token}/
         add_rewrite_rule(
-            '^remaining-checkout/([a-zA-Z0-9_-]+)/?$',
+            '^' . $remainingCheckout . '/([a-zA-Z0-9_-]+)/?$',
             'index.php?yatra_remaining_checkout=$matches[1]',
             'top'
         );
+
+        /**
+         * Fires after Yatra registers its core rewrite tags/rules.
+         *
+         * Use {@see \Yatra\Services\SettingsService::getPermalinkBases()} for the same slugs/helpers use.
+         *
+         * @param array<string, string> $bases
+         */
+        do_action('yatra_register_rewrite_rules', $bases);
         
         // Check if rewrite rules need flushing (only flush once after plugin update/activation)
         $rewrite_version = get_option('yatra_rewrite_rules_version', '0');
-        $current_version = '1.0.8'; // Increment this when rewrite rules change
+        $current_version = '1.0.9'; // Increment this when rewrite rules change
         if ($rewrite_version !== $current_version) {
             flush_rewrite_rules(false);
             update_option('yatra_rewrite_rules_version', $current_version);
@@ -422,15 +428,11 @@ class TemplateLoader
         ];
 
         // Add dynamic base names for plain permalink support
-        $trip_base = SettingsService::getTripBase();
-        $destination_base = SettingsService::getString('destination_base', 'destination');
-        $activity_base = SettingsService::getString('activity_base', 'activity');
-        $category_base = SettingsService::getString('trip_category_base', 'trip-category');
-
-        $yatra_vars[] = $trip_base;
-        $yatra_vars[] = $destination_base;
-        $yatra_vars[] = $activity_base;
-        $yatra_vars[] = $category_base;
+        $pb = SettingsService::getPermalinkBases();
+        $yatra_vars[] = $pb['trip_base'];
+        $yatra_vars[] = $pb['destination_base'];
+        $yatra_vars[] = $pb['activity_base'];
+        $yatra_vars[] = $pb['trip_category_base'];
 
         return array_merge($vars, $yatra_vars);
     }

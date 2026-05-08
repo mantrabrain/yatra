@@ -134,9 +134,9 @@ final class Assets
             if ($path !== '') {
                 $bases = [
                     $tripBase,
-                    preg_replace('/[^a-zA-Z0-9_-]/', '', (string) \Yatra\Services\SettingsService::getString('destination_base', 'destination')),
-                    preg_replace('/[^a-zA-Z0-9_-]/', '', (string) \Yatra\Services\SettingsService::getString('activity_base', 'activity')),
-                    preg_replace('/[^a-zA-Z0-9_-]/', '', (string) \Yatra\Services\SettingsService::getString('trip_category_base', 'trip-category')),
+                    preg_replace('/[^a-zA-Z0-9_-]/', '', (string) \Yatra\Services\SettingsService::getDestinationBase()),
+                    preg_replace('/[^a-zA-Z0-9_-]/', '', (string) \Yatra\Services\SettingsService::getActivityBase()),
+                    preg_replace('/[^a-zA-Z0-9_-]/', '', (string) \Yatra\Services\SettingsService::getTripCategoryBase()),
                     preg_replace('/[^a-zA-Z0-9_-]/', '', (string) \Yatra\Services\SettingsService::getBookingBase()),
                     preg_replace('/[^a-zA-Z0-9_-]/', '', (string) \Yatra\Services\SettingsService::getAccountBase()),
                 ];

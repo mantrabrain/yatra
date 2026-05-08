@@ -4,9 +4,9 @@
   "name": "yatra/activity",
   "title": "Activity",
   "category": "yatra",
-  "icon": "buddicons-pm",
+  "icon": "universal-access",
   "description": "Display activity listings with customizable options",
-  "keywords": ["activity", "things to do", "yatra"],
+  "keywords": ["activity", "adventure", "yatra"],
   "textdomain": "yatra",
   "attributes": {
     "order": {
@@ -28,6 +28,10 @@
     "show_pagination": {
       "type": "boolean",
       "default": true
+    },
+    "activityIds": {
+      "type": "array",
+      "default": []
     }
   },
   "supports": {

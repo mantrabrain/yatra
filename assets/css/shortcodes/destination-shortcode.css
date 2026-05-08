@@ -81,6 +81,37 @@
     color: var(--yatra-primary-light, #60a5fa);
 }
 
+/*
+ * Whole-card click target.
+ *
+ * Promote the title link to a "stretched link" so the entire card is
+ * navigable, while keeping the visible <a> on the title for screen readers
+ * and SEO. The pseudo-element fills the overlay (which is `inset: 0` on the
+ * image wrapper), giving us a single canonical link target without nesting
+ * <a> elements. The featured badge is made non-interactive so clicks on it
+ * pass through to the stretched link.
+ */
+.yatra-category-card {
+    cursor: pointer;
+}
+
+.yatra-category-card-title-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+}
+
+.yatra-category-card-title-link:focus-visible::after {
+    outline: 2px solid var(--yatra-primary, #2563eb);
+    outline-offset: -2px;
+}
+
+.yatra-category-featured-badge {
+    pointer-events: none;
+}
+
 .yatra-category-card-stats {
     display: flex;
     gap: 20px;

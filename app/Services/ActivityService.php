@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Services;
 
 use Yatra\Repositories\ActivityRepository;
+use Yatra\Helpers\ClassificationLandingPageMetadata;
 use Yatra\Helpers\SlugHelper;
 use Yatra\Helpers\FormatHelper;
 use Yatra\Database\Tables\ClassificationsTable;
@@ -131,14 +132,12 @@ class ActivityService extends BaseService
 
         // Handle SEO metadata
         if (isset($data['seo_title']) || isset($data['seo_description']) || isset($data['seo_keywords'])) {
-            
-            $existing_metadata = [];
-            if (isset($data['metadata']) && is_array($data['metadata'])) {
-                $existing_metadata = $data['metadata'];
-            } elseif (isset($data['metadata'])) {
-                $existing_metadata = maybe_unserialize($data['metadata']);
-            }
-            
+            $existing_metadata = ClassificationLandingPageMetadata::baseMetadataMergedWithRequest(
+                null,
+                $this->repository,
+                $data
+            );
+
             // Add SEO fields to metadata
             if (isset($data['seo_title'])) {
                 $existing_metadata['seo_title'] = sanitize_text_field($data['seo_title']);
@@ -155,6 +154,8 @@ class ActivityService extends BaseService
             
             $data['metadata'] = $existing_metadata;
         }
+
+        ClassificationLandingPageMetadata::mergeLandingPageIntoData($data, null, $this->repository);
 
         return $data;
     }
@@ -232,20 +233,12 @@ class ActivityService extends BaseService
 
         // Handle SEO metadata
         if (isset($data['seo_title']) || isset($data['seo_description']) || isset($data['seo_keywords'])) {
-            // Get existing metadata
-            $existing_metadata = [];
-            if (isset($data['metadata']) && is_array($data['metadata'])) {
-                $existing_metadata = $data['metadata'];
-            } elseif (isset($data['metadata'])) {
-                $existing_metadata = maybe_unserialize($data['metadata']);
-            } else {
-                // Get existing metadata from database
-                $existing = $this->repository->find($id);
-                if ($existing && isset($existing->metadata)) {
-                    $existing_metadata = maybe_unserialize($existing->metadata);
-                }
-            }
-            
+            $existing_metadata = ClassificationLandingPageMetadata::baseMetadataMergedWithRequest(
+                $id,
+                $this->repository,
+                $data
+            );
+
             // Add/update SEO fields in metadata
             if (isset($data['seo_title'])) {
                 $existing_metadata['seo_title'] = sanitize_text_field($data['seo_title']);
@@ -262,6 +255,8 @@ class ActivityService extends BaseService
             
             $data['metadata'] = $existing_metadata;
         }
+
+        ClassificationLandingPageMetadata::mergeLandingPageIntoData($data, $id, $this->repository);
 
         return $data;
     }

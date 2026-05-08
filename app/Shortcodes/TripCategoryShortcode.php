@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\Shortcodes;
 
+use Yatra\Helpers\TripListingFilterBuilder;
 use Yatra\Services\SettingsService;
 
 /**
@@ -21,7 +22,7 @@ class TripCategoryShortcode extends BaseShortcode
             'show_description' => 'yes',
             'show_image' => 'yes',
             'show_pagination' => 'yes',
-            'category' => '',
+            'category' => '', // Classification IDs, comma-separated
             'hide_empty' => 'yes',
             'featured_only' => 'no',
             'title' => 'Trip Categories',
@@ -100,9 +101,13 @@ class TripCategoryShortcode extends BaseShortcode
                 ],
             ];
 
-            if (!empty($atts['category'])) {
-                $args['where']['slug'] = array_map('trim', explode(',', (string) $atts['category']));
-            }
+            TripListingFilterBuilder::applyTaxonomyWhere(
+                $args['where'],
+                $atts,
+                'categoryIds',
+                'category_ids',
+                'category'
+            );
 
             $count_args = $args;
             unset($count_args['limit'], $count_args['offset']);
@@ -389,7 +394,7 @@ class TripCategoryShortcode extends BaseShortcode
             return $url !== '' ? $url : '#';
         }
 
-        $base = SettingsService::getString('trip_category_base', 'trip-category');
+            $base = SettingsService::getTripCategoryBase();
 
         return isset($category->slug) ? home_url('/' . $base . '/' . $category->slug . '/') : '#';
     }

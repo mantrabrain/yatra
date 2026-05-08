@@ -36,6 +36,105 @@ npm install
 
 ---
 
+## 📄 Trip listings, destinations, activities & trip categories — shortcodes and blocks
+
+This section is for **site owners, marketers, and implementers** who want to embed Yatra catalogs on normal WordPress pages (block themes, classic pages, Elementor/WP Bakery-style builders that support blocks or shortcodes).
+
+### Why this exists
+
+You can publish a **plain WordPress page** (any URL you like, built with any page builder) and place a **Tour** listing or showcase block/shortcode on it. Catalog filters use **published classification IDs only** (digits), not slugs—in the block editor you pick items from a **multi-select** list; in shortcodes you pass comma-separated IDs.
+
+The **Tour** block and **`[yatra_trip]`** / **`[yatra_tour]`** shortcodes use the **same** filtering rules (IDs). Public trip **archive URLs** and the main trip listing can still use slug-based query parameters internally; that path is separate from these shortcodes/blocks.
+
+### How to find a classification ID (destination / activity / trip category / difficulty)
+
+In **WordPress Admin → Yatra → Trips**, open:
+
+| What you need | Typical admin location | Where the ID appears |
+|----------------|-------------------------|----------------------|
+| Destination | Destinations tab / list | Edit link: `…&tab=destinations&action=edit&id=44` → **44** is the ID |
+| Activity | Activities | Same pattern: **`id=`** in the edit URL |
+| Trip category | Categories | Same pattern: **`id=`** in the edit URL |
+| Difficulty | Difficulty levels | Same pattern (**trip listing / Tour block** only — shortcode attribute `difficulty`, block field **Difficulty levels**) |
+
+Trip categories here are **Yatra trip types** (e.g. *Adventure*, *Family*), not WooCommerce categories.
+
+### Trip listing — `[yatra_trip]` and `[yatra_tour]` (aliases)
+
+Both tags render the same trip grid.
+
+**Classification filters (IDs only)**
+
+| Attribute | Meaning |
+|-----------|---------|
+| `destination` | Comma-separated **destination classification IDs** only (e.g. `44` or `44,52`). |
+| `activity` | Comma-separated **activity IDs**. |
+| `category` | Comma-separated **trip category** IDs (Yatra trip types — not traveler categories). |
+
+If **any** token is non-numeric, that attribute is ignored for filtering (so stray text does not match partial lists).
+
+**Combining filters**
+
+You can use several attributes together. Filters stack: trips must match **every** dimension you set (among other optional constraints such as price range).
+
+**Examples**
+
+```text
+[yatra_trip destination="44"]
+
+[yatra_trip destination="44,52" per_page="9" columns="3"]
+
+[yatra_trip destination="44" activity="12" category="8"]
+```
+
+**Other useful attributes** (trip grid)
+
+- `featured` — `1` / `yes` style values: only trips marked featured (when stored on the trip).  
+- `search` — keyword search across trip fields (and searchable attribute metadata in filters).  
+- `difficulty` — comma-separated **difficulty classification IDs** (see table above).  
+- `price_min`, `price_max` — numeric.  
+- `duration_min`, `duration_max` — days (whole numbers).  
+- `order` — `asc` or `desc` (creation date ordering for this listing).  
+- `per_page`, `columns`, `show_pagination`, `title` — layout and header.
+
+Pagination for the grid uses the `trip_page` query argument where applicable.
+
+**Gutenberg block**
+
+Insert **Tour** (`yatra/tour`). **Trip Settings** controls layout. **Filters** provides multi-select pickers (loaded from `GET /wp-json/yatra/v1/block-editor/taxonomy-choices`), plus search, difficulty, price, and duration. Saving the block stores numeric ID arrays; legacy posts that still had comma-separated fields are migrated in the editor when you open the block.
+
+### Destination, activity, and trip category “showcase” listings
+
+These shortcodes render **cards** for destinations / activities / trip categories (not the trip grid):
+
+- **`[yatra_destination]`** — block **Destination** (`yatra/destination`)  
+- **`[yatra_activity]`** — block **Activity** (`yatra/activity`)  
+- **`[yatra_trip_category]`** — block **Trip categories** (`yatra/trip-category`)
+
+**Filtering which items appear**
+
+Use **comma-separated IDs** on the shortcodes (`destination`, `activity`, `category`). Omit the attribute to list **all published** items (subject to pagination and other options). Blocks use the same REST-backed multi-select; attributes are stored as ID arrays.
+
+**Examples**
+
+```text
+[yatra_destination destination="44"]
+
+[yatra_destination destination="44,52"]
+
+[yatra_activity activity="12"]
+
+[yatra_trip_category category="8"]
+```
+
+In the editor, use the multi-select picker in each block’s sidebar (with optional “filter list” search above the list).
+
+### Custom page URLs vs Yatra archives
+
+Choosing a URL such as **`/norway`** is done with normal **Pages → permalink** settings in WordPress. Yatra filters (Hooks) documented in PHP can remap **incoming** URLs and **outbound** archive links — see `SettingsService` / `includes/helpers.php` and filters like `yatra_destination_permalink` and `yatra_frontend_request_path` if developers need deep integration.
+
+---
+
 ## 🔧 Development Setup
 
 ### 1. WordPress Configuration

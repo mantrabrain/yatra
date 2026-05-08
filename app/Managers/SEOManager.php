@@ -234,9 +234,9 @@ class SEOManager
     private static function matchesTaxonomyListingRoot(string $type): bool
     {
         $bases = [
-            'destination' => SettingsService::getString('destination_base', 'destination'),
-            'activity' => SettingsService::getString('activity_base', 'activity'),
-            'category' => SettingsService::getString('trip_category_base', 'trip-category'),
+            'destination' => SettingsService::getDestinationBase(),
+            'activity' => SettingsService::getActivityBase(),
+            'category' => SettingsService::getTripCategoryBase(),
         ];
         $legacyKeys = [
             'destination' => 'yatra_destination_slug',

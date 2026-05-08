@@ -7,7 +7,7 @@ import React from "react";
 import { Upload, X, Video, Plus } from "lucide-react";
 import { Button } from "./button";
 import { Card, CardContent } from "./card";
-import { __ } from "../../lib/i18n";
+import { __, sprintf } from "../../lib/i18n";
 import { prepareWordPressMediaFrameOpen } from "../../lib/wp-media-open";
 import { MediaItem } from "../trip-form/types";
 
@@ -65,7 +65,12 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
 
   const handleMediaAdd = () => {
     if (items.length >= maxItems) {
-      alert(__(`Maximum ${maxItems} media items allowed`, "yatra"));
+      alert(
+        sprintf(
+          __("Maximum %d media items allowed", "yatra"),
+          Number(maxItems) || 0,
+        ),
+      );
       return;
     }
 
@@ -176,7 +181,10 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
                     {isImage(item) ? (
                       <img
                         src={item.thumbnail_url || item.url}
-                        alt={item.alt_text || `Media ${index + 1}`}
+                        alt={
+                          item.alt_text ||
+                          sprintf(__("Media %d", "yatra"), index + 1)
+                        }
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           console.error("Image load error:", e, "Item:", item); // Debug log
@@ -186,7 +194,9 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
                             .parentElement;
                           if (parent) {
                             parent.innerHTML =
-                              '<div class="flex items-center justify-center w-full h-full"><div class="text-gray-400 text-center"><div class="text-4xl mb-2">🖼️</div><div class="text-sm">Image not available</div></div></div>';
+                              '<div class="flex items-center justify-center w-full h-full"><div class="text-gray-400 text-center"><div class="text-4xl mb-2">🖼️</div><div class="text-sm">' +
+                              __("Image not available", "yatra") +
+                              "</div></div></div>";
                           }
                         }}
                         onLoad={() => {

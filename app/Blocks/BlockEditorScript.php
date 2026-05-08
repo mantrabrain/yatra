@@ -76,6 +76,7 @@ final class BlockEditorScript
             'wp-block-editor',
             'wp-components',
             'wp-i18n',
+            'wp-api-fetch',
             'wp-data',
             'wp-hooks',
             'wp-server-side-render',

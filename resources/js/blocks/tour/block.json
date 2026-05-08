@@ -17,6 +17,11 @@
       "type": "boolean",
       "default": false
     },
+    "featured_priority": {
+      "type": "string",
+      "default": "",
+      "enum": ["", "featured", "new", "limited"]
+    },
     "per_page": {
       "type": "number",
       "default": 10
@@ -32,6 +37,42 @@
     "show_pagination": {
       "type": "boolean",
       "default": true
+    },
+    "destinationIds": {
+      "type": "array",
+      "default": []
+    },
+    "activityIds": {
+      "type": "array",
+      "default": []
+    },
+    "categoryIds": {
+      "type": "array",
+      "default": []
+    },
+    "difficultyIds": {
+      "type": "array",
+      "default": []
+    },
+    "price_min": {
+      "type": "string",
+      "default": ""
+    },
+    "price_max": {
+      "type": "string",
+      "default": ""
+    },
+    "duration_min": {
+      "type": "string",
+      "default": ""
+    },
+    "duration_max": {
+      "type": "string",
+      "default": ""
+    },
+    "search": {
+      "type": "string",
+      "default": ""
     }
   },
   "supports": {

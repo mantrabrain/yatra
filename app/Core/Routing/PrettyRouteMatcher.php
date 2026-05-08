@@ -19,8 +19,24 @@ final class PrettyRouteMatcher
     {
         $path = trim($path, '/');
 
+        /**
+         * Override pretty-path routing entirely (runs before built-in rules).
+         * Return a route array shaped like handler data: keys include `type` (trip|taxonomy|listing|…),
+         * and type-specific keys such as `slug`, `taxonomy_type`, `listing_type`, `base`, `paged`, etc.
+         *
+         * @param array<string,mixed>|null $route_data Resolved route or null to use core matching.
+         * @param string $path Trimmed relative path ({@see UrlParser::getCleanRequestPath()} after `yatra_frontend_request_path`).
+         */
+        $override = apply_filters('yatra_pretty_route_match', null, $path);
+        if (is_array($override) && isset($override['type']) && is_string($override['type']) && $override['type'] !== '') {
+            return $override;
+        }
+
+        $pb = SettingsService::getPermalinkBases();
+
         // 1. Email verification
-        if (preg_match('/^yatra-verify-email\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {
+        $evQuoted = preg_quote($pb['email_verification_prefix'], '/');
+        if (preg_match('/^' . $evQuoted . '\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {
             return [
                 'type' => 'email_verification',
                 'token' => $matches[1],
@@ -58,9 +74,9 @@ final class PrettyRouteMatcher
 
         // 6. Taxonomy (pagination before single slug)
         $bases = [
-            'destination' => SettingsService::getString('destination_base', 'destination'),
-            'activity' => SettingsService::getString('activity_base', 'activity'),
-            'category' => SettingsService::getString('trip_category_base', 'trip-category'),
+            'destination' => SettingsService::getDestinationBase(),
+            'activity' => SettingsService::getActivityBase(),
+            'category' => SettingsService::getTripCategoryBase(),
         ];
 
         foreach ($bases as $type => $base) {
@@ -105,16 +121,18 @@ final class PrettyRouteMatcher
             ];
         }
 
-        // 8. Booking confirmation (pageless: /{booking_base}/confirmation/{ref}/ + legacy slug)
+        // 8. Booking confirmation (pageless: /{booking_base}/{confirmation_segment}/{ref}/ + legacy slug)
         $booking_base = SettingsService::getBookingBase();
-        if (preg_match('/^' . preg_quote($booking_base, '/') . '\/confirmation\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {
+        $confirmSeg = preg_quote($pb['booking_flow_confirmation_segment'], '/');
+        if (preg_match('/^' . preg_quote($booking_base, '/') . '\/' . $confirmSeg . '\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {
             return [
                 'type' => 'booking_confirmation',
                 'confirmation_id' => $matches[1],
             ];
         }
 
-        if (preg_match('/^booking-confirmation\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {
+        $legacyConfQuoted = preg_quote($pb['legacy_booking_confirmation_prefix'], '/');
+        if (preg_match('/^' . $legacyConfQuoted . '\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {
             return [
                 'type' => 'booking_confirmation',
                 'confirmation_id' => $matches[1],
@@ -122,7 +140,8 @@ final class PrettyRouteMatcher
         }
 
         // 9. Remaining checkout (rewrite) and legacy checkout/ path
-        if (preg_match('/^remaining-checkout\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {
+        $remQuoted = preg_quote($pb['remaining_checkout_prefix'], '/');
+        if (preg_match('/^' . $remQuoted . '\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {
             return [
                 'type' => 'checkout',
                 'token' => $matches[1],

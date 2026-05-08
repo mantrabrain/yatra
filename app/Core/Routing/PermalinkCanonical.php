@@ -111,9 +111,9 @@ final class PermalinkCanonical
 
         foreach (
             [
-                SettingsService::getString('destination_base', 'destination'),
-                SettingsService::getString('activity_base', 'activity'),
-                SettingsService::getString('trip_category_base', 'trip-category'),
+                SettingsService::getDestinationBase(),
+                SettingsService::getActivityBase(),
+                SettingsService::getTripCategoryBase(),
             ] as $base
         ) {
             $bk = preg_replace('/[^a-z0-9_-]/i', '', $base) ?: '';
@@ -172,7 +172,9 @@ final class PermalinkCanonical
         if ($rem !== '') {
             $t = preg_replace('/[^a-zA-Z0-9_-]/', '', $rem) ?? '';
             if ($t !== '') {
-                return trailingslashit(home_url('/remaining-checkout/' . $t . '/'));
+                $pb = SettingsService::getPermalinkBases();
+
+                return trailingslashit(home_url('/' . $pb['remaining_checkout_prefix'] . '/' . $t . '/'));
             }
         }
 
@@ -180,16 +182,18 @@ final class PermalinkCanonical
         if ($verify !== '') {
             $t = preg_replace('/[^a-zA-Z0-9_-]/', '', $verify) ?? '';
             if ($t !== '') {
-                return trailingslashit(home_url('/yatra-verify-email/' . $t . '/'));
+                $pb = SettingsService::getPermalinkBases();
+
+                return trailingslashit(home_url('/' . $pb['email_verification_prefix'] . '/' . $t . '/'));
             }
         }
 
         $trip_base = SettingsService::getTripBase();
         $booking_base = SettingsService::getBookingBase();
         $account_base = SettingsService::getAccountBase();
-        $dest_base = SettingsService::getString('destination_base', 'destination');
-        $act_base = SettingsService::getString('activity_base', 'activity');
-        $cat_base = SettingsService::getString('trip_category_base', 'trip-category');
+        $dest_base = SettingsService::getDestinationBase();
+        $act_base = SettingsService::getActivityBase();
+        $cat_base = SettingsService::getTripCategoryBase();
 
         $rawPage = isset($_GET['yatra_page']) ? trim(wp_unslash((string) $_GET['yatra_page'])) : '';
         $page = $rawPage !== '' ? (preg_replace('/[^a-z0-9_-]/i', '', $rawPage) ?? '') : '';
@@ -402,9 +406,9 @@ final class PermalinkCanonical
     private static function plainQueryKeysToStrip(): array
     {
         $tripKey = preg_replace('/[^a-z0-9_-]/i', '', SettingsService::getTripBase()) ?: 'trip';
-        $destKey = preg_replace('/[^a-z0-9_-]/i', '', SettingsService::getString('destination_base', 'destination')) ?: 'destination';
-        $actKey = preg_replace('/[^a-z0-9_-]/i', '', SettingsService::getString('activity_base', 'activity')) ?: 'activity';
-        $catKey = preg_replace('/[^a-z0-9_-]/i', '', SettingsService::getString('trip_category_base', 'trip-category')) ?: 'trip-category';
+        $destKey = preg_replace('/[^a-z0-9_-]/i', '', SettingsService::getDestinationBase()) ?: 'destination';
+        $actKey = preg_replace('/[^a-z0-9_-]/i', '', SettingsService::getActivityBase()) ?: 'activity';
+        $catKey = preg_replace('/[^a-z0-9_-]/i', '', SettingsService::getTripCategoryBase()) ?: 'trip-category';
 
         return array_values(array_unique([
             'yatra_page',

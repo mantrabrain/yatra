@@ -18,6 +18,7 @@ import {
   formatTravelDateRange,
   getBadge,
   formatPriceForBooking,
+  getYatraAccountPageGlobals,
 } from "./utils";
 import TaxDisplay from "../../components/booking/TaxDisplay";
 
@@ -30,7 +31,11 @@ const getCountryName = (code: string): string => {
     return code;
   }
   try {
-    const display = new Intl.DisplayNames(undefined, { type: "region" });
+    const locale = getYatraAccountPageGlobals().locale;
+    const tag = locale ? locale.replace(/_/g, "-") : undefined;
+    const display = new Intl.DisplayNames(tag ? [tag] : undefined, {
+      type: "region",
+    });
     const name = display.of(upperCode);
     return name && name !== upperCode ? name : code;
   } catch {
@@ -215,14 +220,14 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
               <div className="flex items-center gap-2">
                 <span className={getBadge(booking.booking_status)}>
                   {__(
-                    booking.booking_status || "pending",
-                    booking.booking_status || "pending",
+                    booking.booking_status || "Pending",
+                    booking.booking_status || "Pending",
                   )}
                 </span>
                 <span className={getBadge(booking.payment_status)}>
                   {__(
-                    booking.payment_status || "pending",
-                    booking.payment_status || "pending",
+                    booking.payment_status || "Pending",
+                    booking.payment_status || "Pending",
                   )}
                 </span>
               </div>
@@ -746,8 +751,8 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                 <div className="mt-1">
                   <span className={getBadge(booking.payment_status)}>
                     {__(
-                      booking.payment_status || "pending",
-                      booking.payment_status || "pending",
+                      booking.payment_status || "Pending",
+                      booking.payment_status || "Pending",
                     )}
                   </span>
                 </div>

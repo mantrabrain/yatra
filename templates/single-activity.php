@@ -283,7 +283,7 @@ yatra_get_header();
                 <p style="color: #6b7280; margin: 0 0 16px 0;">
                     <?php esc_html_e('No trips are currently available with this activity.', 'yatra'); ?>
                 </p>
-                <a href="<?php echo esc_url(home_url('/' . \Yatra\Services\SettingsService::getTripBase() . '/')); ?>" 
+                <a href="<?php echo esc_url(function_exists('yatra_get_trip_listing_url') ? yatra_get_trip_listing_url() : home_url('/' . \Yatra\Services\SettingsService::getTripBase() . '/')); ?>" 
                    style="color: #2563eb; text-decoration: none; font-weight: 500;">
                     <?php esc_html_e('Browse all trips', 'yatra'); ?>
                 </a>
@@ -291,7 +291,7 @@ yatra_get_header();
         <?php endif; ?>
         
         <div style="text-align: center;">
-            <a href="<?php echo esc_url(add_query_arg(['activity' => urlencode($activity->slug)], home_url('/' . \Yatra\Services\SettingsService::getTripBase() . '/'))); ?>" 
+            <a href="<?php echo esc_url(add_query_arg(['activity' => urlencode($activity->slug)], function_exists('yatra_get_trip_listing_url') ? yatra_get_trip_listing_url() : home_url('/' . \Yatra\Services\SettingsService::getTripBase() . '/'))); ?>" 
                class="yatra-btn" 
                style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: #059669; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; transition: background-color 0.2s;">
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -304,7 +304,7 @@ yatra_get_header();
 
     <!-- Back to Activities -->
     <div style="text-align: center; margin-top: 60px; padding-top: 40px; border-top: 1px solid #e5e7eb;">
-        <a href="<?php echo esc_url(home_url('/' . \Yatra\Services\SettingsService::getString('activity_base', 'activity') . '/')); ?>" 
+        <a href="<?php echo esc_url(function_exists('yatra_get_taxonomy_listing_url') ? yatra_get_taxonomy_listing_url('activity') : home_url('/' . \Yatra\Services\SettingsService::getActivityBase() . '/')); ?>" 
            style="color: #6b7280; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
