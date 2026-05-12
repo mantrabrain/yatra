@@ -33,8 +33,13 @@ class BookingPageHandler extends BasePageHandler
             $_GET['trip'] = sanitize_title($route_data['trip']);
         }
 
-        // Prevent 404 handling
-        $this->prevent404();
+        // Configure $wp_query + virtual WP_Post so FSE block themes don't fall back
+        // to 404.html — see BasePageHandler::setupPageEnvironment().
+        $this->setupPageEnvironment('singular', [
+            'title' => __('Booking', 'yatra'),
+            'post_type' => 'page',
+            'post_name' => $base,
+        ]);
 
         // Set up query vars for backward compatibility
         $this->setQueryVars([
@@ -261,17 +266,6 @@ class BookingPageHandler extends BasePageHandler
             $this->setGlobal('booking', $booking);
         }
 
-        // Load the booking page template
-        $template_path = YATRA_PLUGIN_PATH . 'templates/booking.php';
-
-        if (!file_exists($template_path)) {
-            $this->logError("Booking template not found: {$template_path}");
-            return false;
-        }
-
-        include $template_path;
-        $this->exit();
-
-        return true;
+        return $this->selectTemplate('booking', null, 'booking');
     }
 }

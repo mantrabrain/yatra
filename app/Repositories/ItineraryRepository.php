@@ -353,14 +353,25 @@ class ItineraryRepository extends BaseRepository
         // We do NOT touch the day table at all
         // The day_id should remain the same unless explicitly changed
 
-        // Format time field
+        // Format time field. We must distinguish "field not present in payload"
+        // (don't touch the column) from "field present but empty" (the user
+        // cleared the time and we should write null). Without this, switching an
+        // activity to time_type=duration/flexible left a stale "08:00 - 17:00"
+        // in the legacy `time` column even though start_time/end_time got
+        // nulled — so list views and the public template kept showing the old
+        // time range.
         $timeField = null;
-        if (!empty($data['start_time']) && !empty($data['end_time'])) {
-            $timeField = $data['start_time'] . ' - ' . $data['end_time'];
-        } elseif (!empty($data['start_time'])) {
-            $timeField = $data['start_time'];
-        } elseif (isset($data['time'])) {
-            $timeField = $data['time'];
+        $timeFieldExplicit = false;
+        if (array_key_exists('start_time', $data) || array_key_exists('end_time', $data) || array_key_exists('time', $data)) {
+            $timeFieldExplicit = true;
+            if (!empty($data['start_time']) && !empty($data['end_time'])) {
+                $timeField = $data['start_time'] . ' - ' . $data['end_time'];
+            } elseif (!empty($data['start_time'])) {
+                $timeField = $data['start_time'];
+            } elseif (!empty($data['time'])) {
+                $timeField = $data['time'];
+            }
+            // else: keep $timeField=null so the column gets cleared.
         }
 
         // Prepare included_items and excluded_items as JSON
@@ -396,8 +407,8 @@ class ItineraryRepository extends BaseRepository
             $updateFormat[] = '%s';
         }
 
-        if ($timeField !== null) {
-            $updateData['time'] = $timeField;
+        if ($timeFieldExplicit) {
+            $updateData['time'] = $timeField; // may be null — that's the clear-on-edit case
             $updateFormat[] = '%s';
         }
 
@@ -509,6 +520,14 @@ class ItineraryRepository extends BaseRepository
         if (isset($data['status'])) {
             $updateData['status'] = sanitize_text_field($data['status']);
             $updateFormat[] = '%s';
+        }
+
+        // Activity ordering: written by the React drag-and-drop reorder UI on the
+        // day-edit page. Backed by the existing `order` smallint column (idx_day_order
+        // index covers it). We accept 0+; clamp to non-negative.
+        if (isset($data['order'])) {
+            $updateData['order'] = max(0, (int) $data['order']);
+            $updateFormat[] = '%d';
         }
 
         // Note: We do NOT update day_id when mode='activity'

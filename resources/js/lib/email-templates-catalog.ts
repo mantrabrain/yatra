@@ -238,39 +238,46 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     event_key: "booking.created",
     name: __("New Booking Confirmation", "yatra"),
     description: __(
-      "Pro automation template. Enable Email Automation to edit and send.",
+      "Pro automation alternative for the free Booking Confirmation template. Enable Email Automation to edit and send.",
       "yatra",
     ),
     category: "booking",
     recipient_type: "customer",
     to_email: "{customer_email}",
     isCoreFree: false,
+    // Gate behind Email Automation so the free / Pro versions don't appear as
+    // a confusing duplicate in the customer's view (e.g. two "Payment Received"
+    // rows). isModuleGatedLocked() reads this and locks the row when the
+    // module isn't active.
+    requiresModule: "email_automation",
   },
   {
     template_key: "booking_payment",
     event_key: "payment.received",
     name: __("Booking payment notice", "yatra"),
     description: __(
-      "Pro automation template. Enable Email Automation to edit and send.",
+      "Pro automation alternative for the free Payment Received template. Enable Email Automation to edit and send.",
       "yatra",
     ),
     category: "payment",
     recipient_type: "customer",
     to_email: "{customer_email}",
     isCoreFree: false,
+    requiresModule: "email_automation",
   },
   {
     template_key: "booking_confirmed",
     event_key: "booking.confirmed",
     name: __("Booking Confirmed", "yatra"),
     description: __(
-      "Pro automation template. Enable Email Automation to edit and send.",
+      "Pro automation template fired on booking confirmation. Enable Email Automation to edit and send.",
       "yatra",
     ),
     category: "booking",
     recipient_type: "customer",
     to_email: "{customer_email}",
     isCoreFree: false,
+    requiresModule: "email_automation",
   },
   {
     template_key: "booking_completed",

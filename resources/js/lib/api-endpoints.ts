@@ -203,6 +203,11 @@ export const API_ENDPOINTS = {
     `/itinerary?trip_id=${tripId}`,
   ITINERARY_DAY_ENTRY_BY_DAY_ID: (dayId: string | number) =>
     `/itinerary/day-entry-by-day-id/${dayId}`,
+  // One-shot save of every activity for a single day. Replaces N sequential
+  // PUTs (one per activity) with a single batch request — the controller
+  // dispatches each row to update/create and returns per-row results.
+  ITINERARY_DAY_ACTIVITIES_BULK: (dayId: string | number) =>
+    `/itinerary/day/${dayId}/activities/bulk`,
 
   // Saved Trips
   SAVED_TRIPS: "/saved-trips",

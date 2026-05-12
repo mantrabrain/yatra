@@ -103,6 +103,8 @@ interface ItineraryEntry {
   excluded_items?: string[] | string | null;
   status: string;
   created_at: string;
+  order?: number;
+  time_type?: string;
 }
 
 interface DayGroup {
@@ -282,11 +284,14 @@ const Itinerary: React.FC = () => {
     };
   };
 
-  // Helper to parse time field to start_time and end_time
+  // Helper to parse the legacy `time` text field into start_time/end_time.
+  // Returns blanks when the source has nothing — the previous "08:00 / 17:00"
+  // fallback was the root cause of every entry rendering the same fake range
+  // even when the user had cleared the time or chosen Duration / Flexible.
   const parseTime = (
     time: string | null | undefined,
   ): { start_time: string; end_time: string } => {
-    if (!time) return { start_time: "08:00", end_time: "17:00" };
+    if (!time) return { start_time: "", end_time: "" };
 
     // Try to parse formats like "08:00-17:00" or "08:00 to 17:00"
     const timeMatch = time.match(
@@ -302,14 +307,13 @@ const Itinerary: React.FC = () => {
     // Try single time format
     const singleTime = time.match(/(\d{1,2}):(\d{2})/);
     if (singleTime) {
-      const hour = parseInt(singleTime[1]);
       return {
         start_time: `${singleTime[1].padStart(2, "0")}:${singleTime[2]}`,
-        end_time: `${((hour + 1) % 24).toString().padStart(2, "0")}:${singleTime[2]}`,
+        end_time: "",
       };
     }
 
-    return { start_time: "08:00", end_time: "17:00" };
+    return { start_time: "", end_time: "" };
   };
 
   const { data, isLoading, error, refetch } = useQuery<DayGroup[]>({
@@ -473,7 +477,14 @@ const Itinerary: React.FC = () => {
             }
 
             const mapped = mapItemIds(entry.item_type_id, entry.item_id);
-            const times = parseTime(entry.time);
+            // Prefer the dedicated start_time/end_time columns from the API.
+            // Fall back to parsing the legacy `time` text only when those are
+            // absent — the legacy parser injected fake "08:00 / 17:00" defaults
+            // when `time` was null, which is what was making every row in the
+            // table render the same clock range.
+            const times = entry.start_time
+              ? { start_time: entry.start_time, end_time: entry.end_time || "" }
+              : parseTime(entry.time);
 
             const processedEntry: ItineraryEntry = {
               id: entry.id || 0,
@@ -494,8 +505,8 @@ const Itinerary: React.FC = () => {
               description: entry.description || "",
               location: entry.location || "",
               duration: entry.duration || "",
-              start_time: times.start_time,
-              end_time: times.end_time,
+              start_time: times.start_time || "",
+              end_time: times.end_time || "",
               cost:
                 typeof entry.cost === "number" || typeof entry.cost === "string"
                   ? String(entry.cost)
@@ -508,6 +519,8 @@ const Itinerary: React.FC = () => {
               excluded_items: entry.excluded_items ?? [],
               status: entry.status || "active",
               created_at: entry.created_at || entry.createdAt || "",
+              order: Number.isFinite(Number(entry.order)) ? Number(entry.order) : 0,
+              time_type: entry.time_type || "exact",
             };
 
             allEntries.push(processedEntry);
@@ -592,6 +605,18 @@ const Itinerary: React.FC = () => {
         if (a.trip_id !== b.trip_id) return a.trip_id - b.trip_id;
         return a.day - b.day;
       });
+
+      // Lock in each day's activity order from the persisted `order` value set by
+      // the day-edit drag-sort. Done at build time (not just at render) so any
+      // downstream filter/map preserves the order.
+      for (const dg of grouped) {
+        dg.entries.sort((a, b) => {
+          const oa = Number.isFinite(Number(a.order)) ? Number(a.order) : 0;
+          const ob = Number.isFinite(Number(b.order)) ? Number(b.order) : 0;
+          if (oa !== ob) return oa - ob;
+          return a.id - b.id;
+        });
+      }
 
       return grouped;
     },
@@ -1857,10 +1882,13 @@ const Itinerary: React.FC = () => {
                 const key = `${dayGroup.trip_id}-${dayGroup.day}`;
                 const isExpanded = expandedDays.has(key);
                 const counts = getItemCounts(dayGroup.entries);
+                // Honor the persisted drag-sort `order` from the day-edit page.
+                // Tiebreak on id so equal-order rows stay stable across renders.
                 const sortedEntries = [...dayGroup.entries].sort((a, b) => {
-                  const timeA = a.start_time.split(":").map(Number);
-                  const timeB = b.start_time.split(":").map(Number);
-                  return timeA[0] * 60 + timeA[1] - (timeB[0] * 60 + timeB[1]);
+                  const orderA = typeof a.order === "number" ? a.order : 0;
+                  const orderB = typeof b.order === "number" ? b.order : 0;
+                  if (orderA !== orderB) return orderA - orderB;
+                  return a.id - b.id;
                 });
 
                 const tripsList = Array.isArray(tripsData) ? tripsData : [];
@@ -2134,12 +2162,21 @@ const Itinerary: React.FC = () => {
                                   title={__("Select this entry", "yatra")}
                                 />
                               </ConditionalRender>
-                              {/* Time */}
+                              {/* Time — render based on time_type: 'exact' shows the
+                                   start/end range only when values exist; 'duration' and
+                                   'flexible' show a label so the row isn't blank or
+                                   misleading. */}
                               <div className="flex flex-col items-center min-w-[80px]">
                                 <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                  {entry.end_time
-                                    ? `${formatTime(entry.start_time)} - ${formatTime(entry.end_time)}`
-                                    : formatTime(entry.start_time)}
+                                  {entry.time_type === "flexible"
+                                    ? __("Flexible", "yatra")
+                                    : entry.time_type === "duration"
+                                      ? entry.duration || __("Duration", "yatra")
+                                      : entry.start_time
+                                        ? entry.end_time
+                                          ? `${formatTime(entry.start_time)} - ${formatTime(entry.end_time)}`
+                                          : formatTime(entry.start_time)
+                                        : "—"}
                                 </div>
                                 <div className="mt-1 flex items-center gap-1">
                                   {entry.end_time ? (

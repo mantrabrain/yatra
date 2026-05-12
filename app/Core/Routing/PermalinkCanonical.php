@@ -201,11 +201,11 @@ final class PermalinkCanonical
         $tripSlugKey = preg_replace('/[^a-z0-9_-]/i', '', $trip_base) ?: 'trip';
         $tripSlug = '';
         if (isset($_GET[$tripSlugKey])) {
-            $tripSlug = sanitize_title(wp_unslash((string) $_GET[$tripSlugKey]));
+            $tripSlug = \Yatra\Helpers\SlugHelper::generate(wp_unslash((string) $_GET[$tripSlugKey]));
         } elseif (isset($_GET['yatra_trip'])) {
-            $tripSlug = sanitize_title(wp_unslash((string) $_GET['yatra_trip']));
+            $tripSlug = \Yatra\Helpers\SlugHelper::generate(wp_unslash((string) $_GET['yatra_trip']));
         } elseif (isset($_GET['yatra_trip_slug'])) {
-            $tripSlug = sanitize_title(wp_unslash((string) $_GET['yatra_trip_slug']));
+            $tripSlug = \Yatra\Helpers\SlugHelper::generate(wp_unslash((string) $_GET['yatra_trip_slug']));
         }
 
         if ($page === '' && $tripSlug !== '') {
@@ -229,10 +229,10 @@ final class PermalinkCanonical
                 }
                 $s = '';
                 if (isset($_GET[$bk])) {
-                    $s = sanitize_title(wp_unslash((string) $_GET[$bk]));
+                    $s = \Yatra\Helpers\SlugHelper::generate(wp_unslash((string) $_GET[$bk]));
                 }
                 if ($s === '' && isset($_GET[$legacySlugKey])) {
-                    $s = sanitize_title(wp_unslash((string) $_GET[$legacySlugKey]));
+                    $s = \Yatra\Helpers\SlugHelper::generate(wp_unslash((string) $_GET[$legacySlugKey]));
                 }
                 if ($s !== '') {
                     return trailingslashit(home_url('/' . $tbase . '/' . $s . '/'));
@@ -263,7 +263,7 @@ final class PermalinkCanonical
         }
 
         if ($page === $booking_base && !SettingsService::useCustomBookingPage()) {
-            $tripParam = isset($_GET['trip']) ? sanitize_title(wp_unslash((string) $_GET['trip'])) : '';
+            $tripParam = isset($_GET['trip']) ? \Yatra\Helpers\SlugHelper::generate(wp_unslash((string) $_GET['trip'])) : '';
             if ($tripParam !== '') {
                 return function_exists('yatra_get_booking_url') ? yatra_get_booking_url($tripParam) : trailingslashit(home_url('/' . $booking_base . '/' . $tripParam . '/'));
             }
@@ -276,7 +276,7 @@ final class PermalinkCanonical
             if ($page_id > 0) {
                 $url = get_permalink((int) $page_id);
                 if ($url) {
-                    $tripParam = isset($_GET['trip']) ? sanitize_title(wp_unslash((string) $_GET['trip'])) : '';
+                    $tripParam = isset($_GET['trip']) ? \Yatra\Helpers\SlugHelper::generate(wp_unslash((string) $_GET['trip'])) : '';
                     if ($tripParam !== '') {
                         return add_query_arg('trip', $tripParam, $url);
                     }
@@ -301,10 +301,10 @@ final class PermalinkCanonical
             $bk = preg_replace('/[^a-z0-9_-]/i', '', $base) ?: '';
             $slug = '';
             if ($bk !== '' && isset($_GET[$bk])) {
-                $slug = sanitize_title(wp_unslash((string) $_GET[$bk]));
+                $slug = \Yatra\Helpers\SlugHelper::generate(wp_unslash((string) $_GET[$bk]));
             }
             if ($slug === '' && isset($_GET[$legacySlugKey])) {
-                $slug = sanitize_title(wp_unslash((string) $_GET[$legacySlugKey]));
+                $slug = \Yatra\Helpers\SlugHelper::generate(wp_unslash((string) $_GET[$legacySlugKey]));
             }
             $url = trailingslashit(home_url('/' . $base . '/'));
             if ($slug !== '') {

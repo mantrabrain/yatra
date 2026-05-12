@@ -193,8 +193,8 @@ class TripService extends BaseService
             throw new \InvalidArgumentException('Trip slug is required');
         }
 
-        if (!preg_match('/^[a-z0-9-]+$/', $data['slug'])) {
-            throw new \InvalidArgumentException('Trip slug can only contain lowercase letters, numbers, and hyphens');
+        if (!preg_match('/^[\pL\pN-]+$/u', $data['slug'])) {
+            throw new \InvalidArgumentException('Trip slug can only contain letters, numbers, and hyphens');
         }
 
         // Check if slug is unique (exclude current trip when updating)
@@ -276,8 +276,8 @@ class TripService extends BaseService
      */
     protected function processBeforeCreate(array $data): array
     {
-        if (!preg_match('/^[a-z0-9-]+$/', $data['slug'])) {
-            throw new \InvalidArgumentException('Trip slug can only contain lowercase letters, numbers, and hyphens');
+        if (!preg_match('/^[\pL\pN-]+$/u', $data['slug'])) {
+            throw new \InvalidArgumentException('Trip slug can only contain letters, numbers, and hyphens');
         }
         
         if (empty($data['status'])) {

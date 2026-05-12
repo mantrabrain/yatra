@@ -89,8 +89,8 @@ const ItineraryForm: React.FC = () => {
     location_latitude: "",
     location_longitude: "",
     duration: "",
-    start_time: "08:00",
-    end_time: "17:00",
+    start_time: "",
+    end_time: "",
     time_type: "exact",
     cost: "",
     cost_per_person: true,
@@ -311,8 +311,12 @@ const ItineraryForm: React.FC = () => {
         location_latitude: entryData.location_latitude || "",
         location_longitude: entryData.location_longitude || "",
         duration: entryData.duration || "",
-        start_time: entryData.start_time || "08:00",
-        end_time: entryData.end_time || "17:00",
+        // Don't fake an "08:00" default for entries that were saved without a
+        // time — empty inputs let the user see "no time set" via the picker
+        // placeholder, and prevents the next save from baking the fake default
+        // back into the row.
+        start_time: entryData.start_time || "",
+        end_time: entryData.end_time || "",
         time_type: entryData.time_type || "exact",
         cost: entryData.cost || "",
         cost_per_person: entryData.cost_per_person !== false,
@@ -379,8 +383,18 @@ const ItineraryForm: React.FC = () => {
 
     if (!dayData || !dayData.entries) return;
 
+    // Sort by the persisted `order` column first (drag-sort writes here). Fall back
+    // to existing array order so activities created before the order column was
+    // honoured don't get shuffled. Tie-break on entry id so the order is stable.
     const activities = dayData.entries
       .filter((e: any) => e.item_type_id && e.item_id)
+      .slice()
+      .sort((a: any, b: any) => {
+        const ao = Number(a.order ?? 0);
+        const bo = Number(b.order ?? 0);
+        if (ao !== bo) return ao - bo;
+        return Number(a.id ?? 0) - Number(b.id ?? 0);
+      })
       .map((entry: any, index: number) => ({
         id: `activity-${entry.id || index}`,
         entryId: entry.id ? parseInt(entry.id.toString()) : null, // Store actual entry ID for updates
@@ -390,15 +404,30 @@ const ItineraryForm: React.FC = () => {
           title: entry.title || "",
           description: entry.description || "",
           location: entry.location || "",
+          // The form has lat/lng inputs and the DB column accepts them — without
+          // mapping here, opening an existing activity in edit mode would show
+          // empty coordinate fields and silently overwrite saved values.
+          location_latitude:
+            entry.location_latitude != null
+              ? entry.location_latitude.toString()
+              : "",
+          location_longitude:
+            entry.location_longitude != null
+              ? entry.location_longitude.toString()
+              : "",
           duration: entry.duration || "",
-          start_time: entry.start_time || "08:00",
-          end_time: entry.end_time || "17:00",
+          start_time: entry.start_time || "",
+          end_time: entry.end_time || "",
           time_type: entry.time_type || "exact",
           cost: entry.cost || "",
           cost_per_person: entry.cost_per_person !== false,
           notes: entry.notes || "",
           included_items: entry.included_items || [],
           excluded_items: entry.excluded_items || [],
+          // Gallery + video_url are saved by buildActivityPayload but were never
+          // re-loaded — admin would lose them after a single re-save.
+          gallery: Array.isArray(entry.gallery) ? entry.gallery : [],
+          video_url: entry.video_url || "",
           status: entry.status || "publish",
         },
         isExpanded: index === 0,
@@ -672,6 +701,28 @@ const ItineraryForm: React.FC = () => {
     );
   };
 
+  // Drag-and-drop reorder. Pure UI-state mutation — the array index becomes the
+  // `order` value sent in buildActivityPayload at save time, which writes into the
+  // existing `order` smallint column on yatra_new_trip_itinerary_day_entry.
+  // No new schema, no new column on the table view, no new endpoint.
+  const handleReorderActivities = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+    setActivityForms((prev) => {
+      if (
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= prev.length ||
+        toIndex >= prev.length
+      ) {
+        return prev;
+      }
+      const next = prev.slice();
+      const [moved] = next.splice(fromIndex, 1);
+      next.splice(toIndex, 0, moved);
+      return next;
+    });
+  };
+
   const handleRemoveActivity = (activityId: string) => {
     setActivityForms((prev) => prev.filter((af) => af.id !== activityId));
     setActivityIncludedItems((prev) => {
@@ -699,8 +750,8 @@ const ItineraryForm: React.FC = () => {
           description: "",
           location: "",
           duration: "",
-          start_time: "08:00",
-          end_time: "17:00",
+          start_time: "",
+          end_time: "",
           time_type: "exact",
           cost: "",
           cost_per_person: true,
@@ -933,6 +984,7 @@ const ItineraryForm: React.FC = () => {
                     onToggleExpand={handleToggleExpand}
                     onRemoveActivity={handleRemoveActivity}
                     onAddActivity={handleAddActivity}
+                    onReorderActivities={handleReorderActivities}
                     onFieldChange={handleActivityFieldChange}
                     onIncludedItemChange={handleActivityIncludedItemChange}
                     onExcludedItemChange={handleActivityExcludedItemChange}
@@ -999,8 +1051,7 @@ const ItineraryForm: React.FC = () => {
                       end_time: formData.end_time,
                       time_type: formData.time_type as
                         | "exact"
-                        | "approximate"
-                        | "all_day"
+                        | "duration"
                         | "flexible",
                       cost: formData.cost,
                       cost_per_person: formData.cost_per_person,

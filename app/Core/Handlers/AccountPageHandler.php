@@ -42,25 +42,19 @@ class AccountPageHandler extends BasePageHandler
             exit;
         }
 
-        $this->prevent404();
+        $this->setupPageEnvironment('singular', [
+            'title' => __('My Account', 'yatra'),
+            'post_type' => 'page',
+            'post_name' => $base,
+        ]);
 
         $this->setQueryVars([
             'yatra_account_page' => $page,
         ]);
 
-        $template_path = YATRA_PLUGIN_PATH . 'templates/account-page.php';
-
-        if (!file_exists($template_path)) {
-            $this->logError("Account page template not found: {$template_path}");
-            return false;
-        }
-
         $GLOBALS['yatra_loading_react_account_page'] = true;
 
-        include $template_path;
-        $this->exit();
-
-        return true;
+        return $this->selectTemplate('account-page', null, 'account');
     }
 
     /**

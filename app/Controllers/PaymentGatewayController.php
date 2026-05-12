@@ -200,15 +200,29 @@ class PaymentGatewayController extends BaseController
         $customerEmail = $booking->contact_email ?? ($booking->customer_email ?? '');
         $customerName = trim(($booking->contact_first_name ?? '') . ' ' . ($booking->contact_last_name ?? ''));
 
+        // Append `balance=paid` to the gateway's return URL so the booking-confirmation
+        // template can render a "balance just paid" banner instead of the generic "booking
+        // confirmed" copy. Same canonical URL — the flag only switches contextual content.
+        $confirmationUrl = $this->getConfirmationUrl($booking->reference ?? (string) $bookingId);
+        $confirmationUrl = add_query_arg('balance', 'paid', $confirmationUrl);
+
+        // Customer-account base is configurable under Settings → Permalink. Don't
+        // hardcode `/my-account` — that breaks for sites that have customised the slug.
+        $accountUrl = home_url('/' . SettingsService::getAccountBase());
+        $cancelUrl = add_query_arg(
+            ['tab' => 'payments', 'payment' => 'cancelled'],
+            $accountUrl
+        );
+
         $paymentData = [
             'amount' => $remainingAmount,
             'currency' => $booking->currency ?? get_option('yatra_currency', 'USD'),
             'booking_id' => $bookingId,
             'customer_email' => $customerEmail,
             'customer_name' => $customerName ?: $customerEmail,
-            'return_url' => $this->getConfirmationUrl($booking->reference ?? (string) $bookingId),
+            'return_url' => $confirmationUrl,
             'description' => sprintf(__('Remaining balance for Booking #%s', 'yatra'), $booking->reference ?? $bookingId),
-            'cancel_url' => home_url('/my-account?tab=payments&payment=cancelled'),
+            'cancel_url' => $cancelUrl,
         ];
 
         $result = $this->registry->processPayment($method, $paymentData);
@@ -307,13 +321,43 @@ class PaymentGatewayController extends BaseController
     }
 
     /**
-     * Get available gateways for checkout
+     * Get available gateways for checkout.
+     *
+     * For the *remaining-balance* checkout (when `yatra_has_remaining_session()` is
+     * true OR the request explicitly carries `?context=remaining`), offline gateways
+     * are filtered out — Pay Later / Bank Transfer don't actually collect money, so
+     * picking them to "settle a balance" leaves the booking still unpaid and the
+     * customer thinking they finished the flow. Filterable via
+     * `yatra_remaining_payment_allowed_gateways` if a site needs custom behaviour.
      */
     public function get_available_gateways(WP_REST_Request $request): WP_REST_Response
     {
+        $gateways = $this->registry->getForCheckout();
+
+        $context = sanitize_key((string) ($request->get_param('context') ?? ''));
+        $isRemainingFlow = $context === 'remaining'
+            || (function_exists('yatra_has_remaining_session') && yatra_has_remaining_session());
+
+        if ($isRemainingFlow) {
+            $gateways = array_values(array_filter($gateways, static function ($gw) {
+                return empty($gw['is_offline']);
+            }));
+
+            /**
+             * Filter the gateway list shown in the remaining-balance checkout.
+             *
+             * Default: every offline gateway (Pay Later, Bank Transfer, etc.) is
+             * removed so the customer can only pick a real-money method.
+             *
+             * @param array $gateways Gateway entries (id, title, is_offline, …).
+             */
+            $gateways = apply_filters('yatra_remaining_payment_allowed_gateways', $gateways);
+        }
+
         return new WP_REST_Response([
-            'gateways' => $this->registry->getForCheckout(),
+            'gateways' => $gateways,
             'currency' => get_option('yatra_currency', 'USD'),
+            'context' => $isRemainingFlow ? 'remaining' : 'initial',
         ], 200);
     }
 
@@ -365,15 +409,51 @@ class PaymentGatewayController extends BaseController
             'return_url' => esc_url_raw($request->get_param('return_url')),
         ];
 
-        // Enrich payment data with booking context (reference, trip title, cancel URL)
+        // Enrich payment data with booking context (reference, trip title, cancel URL).
+        // SECURITY: when a booking_id is supplied, the authoritative amount/currency must come
+        // from the database row, NOT from the client. Otherwise an attacker can pay $1 for a
+        // $1000 trip by tampering with the JSON body.
         if ($paymentData['booking_id'] > 0) {
             $booking = $this->bookingRepository->find($paymentData['booking_id']);
-            if ($booking) {
-                $paymentData['reference'] = $booking->reference ?? '';
-                $paymentData['trip_title'] = $booking->trip_title ?? '';
-                if (empty($paymentData['trip_id'])) {
-                    $paymentData['trip_id'] = (int) ($booking->trip_id ?? 0);
+            if (!$booking) {
+                return new WP_Error('booking_not_found', __('Booking not found.', 'yatra'), ['status' => 404]);
+            }
+
+            // If the booking is owned by a registered user, only that user (or an admin) may pay it.
+            // Guest bookings (user_id = 0) remain payable without auth — the booking session controls access.
+            $bookingUserId = (int) ($booking->user_id ?? 0);
+            if ($bookingUserId > 0) {
+                $currentUserId = (int) get_current_user_id();
+                if ($currentUserId !== $bookingUserId && !current_user_can('manage_options')) {
+                    return new WP_Error('forbidden', __('You do not have permission to pay for this booking.', 'yatra'), ['status' => 403]);
                 }
+            }
+
+            // Reject already-paid bookings to prevent duplicate intents.
+            if (isset($booking->payment_status) && $booking->payment_status === 'paid') {
+                return new WP_Error('already_paid', __('This booking is already fully paid.', 'yatra'), ['status' => 400]);
+            }
+
+            // Server-authoritative amount/currency. Use amount_due, falling back to total - paid for older rows.
+            $serverAmount = (float) ($booking->amount_due ?? ($booking->total_amount - $booking->amount_paid));
+            $serverCurrency = (string) ($booking->currency ?? get_option('yatra_currency', 'USD'));
+
+            if ($serverAmount <= 0) {
+                return new WP_Error('no_balance_due', __('This booking has no outstanding balance.', 'yatra'), ['status' => 400]);
+            }
+
+            // Tolerate sub-cent rounding drift only.
+            if (abs($paymentData['amount'] - $serverAmount) > 0.01) {
+                $this->log_amount_mismatch((int) $booking->id, $paymentData['amount'], $serverAmount);
+            }
+
+            // Always overwrite with server values regardless of what the client sent.
+            $paymentData['amount'] = $serverAmount;
+            $paymentData['currency'] = $serverCurrency;
+            $paymentData['reference'] = $booking->reference ?? '';
+            $paymentData['trip_title'] = $booking->trip_title ?? '';
+            if (empty($paymentData['trip_id'])) {
+                $paymentData['trip_id'] = (int) ($booking->trip_id ?? 0);
             }
         }
 
@@ -405,6 +485,28 @@ class PaymentGatewayController extends BaseController
     }
 
     /**
+     * Record an attempted payment-amount mismatch (client sent X, server expects Y).
+     * The transaction itself is forced to the server amount; this exists for fraud monitoring.
+     */
+    private function log_amount_mismatch(int $bookingId, float $clientAmount, float $serverAmount): void
+    {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log(sprintf(
+                '[Yatra] Payment amount mismatch for booking %d: client=%.4f server=%.4f',
+                $bookingId,
+                $clientAmount,
+                $serverAmount
+            ));
+        }
+
+        /**
+         * Fires when a client-supplied payment amount disagrees with the server-side booking amount.
+         * Useful for fraud-monitoring integrations.
+         */
+        do_action('yatra_payment_amount_mismatch', $bookingId, $clientAmount, $serverAmount);
+    }
+
+    /**
      * Confirm payment
      */
     public function confirm_payment(WP_REST_Request $request)
@@ -417,6 +519,47 @@ class PaymentGatewayController extends BaseController
         $gateway = $this->registry->get($gatewayId);
         if (!$gateway) {
             return new WP_Error('invalid_gateway', __('Gateway not found', 'yatra'), ['status' => 404]);
+        }
+
+        if ($bookingId <= 0 || $transactionId === '') {
+            return new WP_Error('invalid_request', __('booking_id and transaction_id are required.', 'yatra'), ['status' => 400]);
+        }
+
+        // Resolve the booking up front so we can enforce ownership BEFORE confirming a charge against it.
+        // Without this check, an anonymous attacker could mark booking B as paid by replaying a successful
+        // transaction_id that actually belongs to booking A.
+        $booking = $this->bookingRepository->find($bookingId);
+        if (!$booking) {
+            return new WP_Error('booking_not_found', __('Booking not found.', 'yatra'), ['status' => 404]);
+        }
+
+        $bookingUserId = (int) ($booking->user_id ?? 0);
+        if ($bookingUserId > 0) {
+            $currentUserId = (int) get_current_user_id();
+            if ($currentUserId !== $bookingUserId && !current_user_can('manage_options')) {
+                return new WP_Error('forbidden', __('You do not have permission to confirm this payment.', 'yatra'), ['status' => 403]);
+            }
+        }
+
+        // Idempotency: if we have already recorded this transaction, return the cached verification result
+        // without re-applying the payment. Prevents duplicate ledger rows and double-confirmed bookings
+        // when the user reloads the confirmation page.
+        $existing = $this->paymentRepository->findByTransactionId($transactionId);
+        if ($existing && (int) ($existing->booking_id ?? 0) === $bookingId) {
+            return new WP_REST_Response([
+                'success' => true,
+                'status' => $existing->status ?? 'completed',
+                'amount' => (float) ($existing->amount ?? 0),
+                'currency' => $existing->currency ?? null,
+                'transaction_id' => $transactionId,
+                'idempotent' => true,
+            ], 200);
+        }
+
+        // If a payment with this transaction id is already attached to a DIFFERENT booking, refuse —
+        // someone is trying to reuse a stranger's transaction to pay their own booking.
+        if ($existing && (int) ($existing->booking_id ?? 0) !== $bookingId) {
+            return new WP_Error('transaction_mismatch', __('Transaction does not belong to this booking.', 'yatra'), ['status' => 409]);
         }
 
         $result = $gateway->verifyPayment($transactionId);
@@ -434,10 +577,10 @@ class PaymentGatewayController extends BaseController
             );
 
             $this->handle_successful_payment(
-                $bookingId, 
-                $gatewayId, 
-                $transactionId, 
-                $result['amount'] ?? null, 
+                $bookingId,
+                $gatewayId,
+                $transactionId,
+                $result['amount'] ?? null,
                 $result['currency'] ?? null,
                 ($saveCard || $passForSchedule) ? $customerId : null,
                 ($saveCard || $passForSchedule) ? $paymentMethodId : null
@@ -507,15 +650,50 @@ class PaymentGatewayController extends BaseController
 
     /**
      * Get payment status
+     *
+     * Endpoint is public (`__return_true` permission) so guest checkouts can poll. Authorisation
+     * is enforced inline: registered-user bookings require the owning user (or an admin); guest
+     * bookings additionally require a matching short-lived booking_token transient so a stranger
+     * can't enumerate booking IDs to harvest payment metadata.
      */
     public function get_payment_status(WP_REST_Request $request)
     {
         $bookingId = (int) $request->get_param('booking_id');
+        $bookingToken = sanitize_text_field((string) ($request->get_param('booking_token') ?? ''));
+
+        if ($bookingId <= 0) {
+            return new WP_Error('invalid_booking', __('Invalid booking ID.', 'yatra'), ['status' => 400]);
+        }
 
         $payment = $this->paymentRepository->findLatestByBookingId($bookingId);
 
         if (!$payment) {
             return new WP_Error('payment_not_found', __('Payment not found', 'yatra'), ['status' => 404]);
+        }
+
+        $booking = $this->bookingRepository->find($bookingId);
+        $bookingUserId = $booking ? (int) ($booking->user_id ?? 0) : 0;
+        $currentUserId = (int) get_current_user_id();
+        $authorised = false;
+
+        if (current_user_can('manage_options')) {
+            $authorised = true;
+        } elseif ($bookingUserId > 0 && $currentUserId === $bookingUserId) {
+            $authorised = true;
+        } elseif ($bookingUserId === 0 && $bookingToken !== '') {
+            // Guest booking: require the booking-session transient to prove the requester is the
+            // browser that started this checkout.
+            $session = get_transient($bookingToken);
+            if (is_array($session) && (int) ($session['booking_id'] ?? 0) === $bookingId) {
+                $authorised = true;
+            }
+        }
+
+        if (!$authorised) {
+            if ($currentUserId > 0) {
+                return new WP_Error('forbidden', __('You do not have permission to view this payment.', 'yatra'), ['status' => 403]);
+            }
+            return new WP_Error('unauthorized', __('Authentication required.', 'yatra'), ['status' => 401]);
         }
 
         return new WP_REST_Response([
@@ -554,6 +732,16 @@ class PaymentGatewayController extends BaseController
 
         $paid_amount = $amount ?? (float) $booking->amount_due;
         $payment_currency = $currency ?? $booking->currency;
+
+        // Idempotency guard: skip if we have already recorded this gateway transaction for this booking.
+        // Prevents double-applied payments when both confirm_payment and the gateway's own return-handler
+        // (or a webhook) fire for the same charge.
+        if ($transactionId !== '') {
+            $existing = $this->paymentRepository->findByTransactionId($transactionId);
+            if ($existing && (int) ($existing->booking_id ?? 0) === $bookingId) {
+                return;
+            }
+        }
 
         $payment_data = [
             'booking_id' => $bookingId,

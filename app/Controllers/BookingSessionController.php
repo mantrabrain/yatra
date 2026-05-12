@@ -287,10 +287,44 @@ class BookingSessionController extends BaseController
         yatra_start_session();
         
         $data = $request->get_json_params();
-        
+
         // Check if this is a partial update (updating travelers or services in existing session)
         $existing_session = yatra_get_booking_session();
-        $is_partial_update = empty($data['trip_id']) && !empty($existing_session['trip_id']) && 
+
+        // REST requests don't always carry PHPSESSID into the WP session scope,
+        // so for partial updates (where the JS only sends e.g.
+        // `additional_services: [1]`) we may end up with an empty
+        // `$existing_session` here and incorrectly bounce to the "trip_id
+        // required" guard below. Same fix as create_booking: when the page
+        // URL has a `?booking_token=…` (or the body carries it), look up the
+        // matching transient and treat it as the session. Without this, every
+        // service-toggle returns 400.
+        if (empty($existing_session) || empty($existing_session['trip_id'])) {
+            $token = null;
+            if (!empty($data['booking_token']) && is_string($data['booking_token'])) {
+                $token = sanitize_text_field((string) $data['booking_token']);
+            } elseif (isset($_GET['booking_token']) && is_string($_GET['booking_token'])) {
+                $token = sanitize_text_field((string) wp_unslash($_GET['booking_token']));
+            }
+            if ($token) {
+                $transient_data = get_transient($token);
+                if (is_array($transient_data) && !empty($transient_data['trip_id'])) {
+                    $existing_session = $transient_data;
+                    // CRITICAL: also seed $_SESSION with the rehydrated data
+                    // AND the original token so yatra_set_booking_session()
+                    // (called below in the partial-update branch) writes the
+                    // updated session BACK into the same transient. Without
+                    // this, the helper generates a fresh random token and
+                    // writes to a different transient — the user's URL token
+                    // never gets the new selection persisted, and the next
+                    // refresh shows stale data.
+                    $_SESSION['yatra_booking'] = $existing_session;
+                    $_SESSION['yatra_booking_token'] = $token;
+                }
+            }
+        }
+
+        $is_partial_update = empty($data['trip_id']) && !empty($existing_session['trip_id']) &&
                              (isset($data['travelers']) || isset($data['traveler_counts']) || isset($data['additional_services']));
         
         if ($is_partial_update) {
@@ -632,6 +666,27 @@ class BookingSessionController extends BaseController
     {
         $session_data = yatra_get_booking_session();
 
+        // Recover from transient when PHPSESSID didn't propagate to REST.
+        // The JS appends `?booking_token=…` to the GET URL specifically so
+        // this branch can rehydrate after a page refresh — without it the
+        // sidebar's applied-coupon UI would never re-show and the remove
+        // button stayed hidden.
+        if (empty($session_data) || empty($session_data['trip_id'])) {
+            $token_raw = $request->get_param('booking_token');
+            if (empty($token_raw) && isset($_GET['booking_token']) && is_string($_GET['booking_token'])) {
+                $token_raw = wp_unslash((string) $_GET['booking_token']);
+            }
+            if (!empty($token_raw) && is_string($token_raw)) {
+                $token = sanitize_text_field($token_raw);
+                $transient_data = get_transient($token);
+                if (is_array($transient_data) && !empty($transient_data['trip_id'])) {
+                    $session_data = $transient_data;
+                    $_SESSION['yatra_booking'] = $session_data;
+                    $_SESSION['yatra_booking_token'] = $token;
+                }
+            }
+        }
+
         if (empty($session_data) || empty($session_data['trip_id'])) {
             return new WP_REST_Response([
                 'success' => false,
@@ -782,7 +837,27 @@ class BookingSessionController extends BaseController
 
         // Get session data
         $session = yatra_get_booking_session();
-        
+
+        // REST requests don't always carry PHPSESSID in the same scope as the
+        // page that rendered the booking form (cookie path mismatches, output
+        // buffering before session_start, server-side caching, etc). When
+        // `$session` is empty we try to rehydrate from the transient backup that
+        // BookingPageHandler writes when the form is rendered — the JS submit
+        // now carries `booking_token` in the request body for exactly this
+        // recovery path. Without this, `traveler_counts` / `pricing_type` /
+        // `price_types` are lost and a `traveler_based` trip's
+        // calculatePricing() collapses to 0, then BookingService rejects with
+        // "Total amount must be greater than zero."
+        if ((empty($session) || empty($session['trip_id'])) && !empty($data['booking_token'])) {
+            $tokenFromBody = sanitize_text_field((string) $data['booking_token']);
+            if ($tokenFromBody !== '') {
+                $transient_data = get_transient($tokenFromBody);
+                if (is_array($transient_data) && !empty($transient_data['trip_id'])) {
+                    $session = $transient_data;
+                }
+            }
+        }
+
         // Validate we have session data or direct booking data
         $trip_id = !empty($data['trip_id']) ? (int) $data['trip_id'] : ($session['trip_id'] ?? 0);
         
@@ -912,20 +987,77 @@ class BookingSessionController extends BaseController
             }
         }
         
-        // Use CalculationService as single source of truth
+        // Pricing single source of truth: ALWAYS use calculateFromSession.
+        //
+        // The booking session is kept in sync by the JS layer — every
+        // service toggle, traveler-count change, and coupon apply/remove
+        // POSTs to /booking/session, which updates the transient. The
+        // sidebar's `/booking/summary` then renders from
+        // `calculateFromSession($session, …)`. If we built a second pricing
+        // path here from form fields, any subtle drift (form missing a
+        // category_id, traveler_counts aggregated as 'default', etc) would
+        // produce a different total than the customer saw — they'd be
+        // charged something they didn't agree to. So we merge the latest
+        // session with any form-submitted overrides (services list,
+        // travel_date, availability_id) and let calculateFromSession do
+        // the math the same way the sidebar did.
         $calculationService = new CalculationService();
-        $pricing = $calculationService->calculatePricing([
-            'trip_id'           => $trip_id,
-            'travelers_count'   => $travelers_count,
-            'traveler_counts'   => $traveler_counts,
-            'travel_date'       => $travel_date,
-            'departure_time'    => $departure_time,
-            'selected_services' => $additional_services,
-            'availability_id'   => (!empty($availability_id) && is_numeric($availability_id)) ? (int) $availability_id : null,
-            'coupon_code'       => $coupon_code,
-            'payment_method'    => $payment_method,
-        ]);
-        
+        $session_for_pricing = is_array($session) ? $session : [];
+        $session_for_pricing['trip_id'] = $trip_id;
+        $session_for_pricing['travelers'] = $travelers_count;
+        // Prefer per-category counts when we have them — otherwise let
+        // calculateFromSession fall back to its internal handling.
+        if (!empty($traveler_counts) && is_array($traveler_counts)) {
+            $session_for_pricing['traveler_counts'] = $traveler_counts;
+        }
+        if (!empty($travel_date)) {
+            $session_for_pricing['travel_date'] = $travel_date;
+        }
+        if (!empty($departure_time)) {
+            $session_for_pricing['departure_time'] = $departure_time;
+        }
+        if (!empty($availability_id) && is_numeric($availability_id)) {
+            $session_for_pricing['availability_id'] = (int) $availability_id;
+        }
+        if (is_array($additional_services)) {
+            $session_for_pricing['additional_services'] = array_values(array_map('intval', $additional_services));
+        }
+
+        try {
+            $pricing = $calculationService->calculateFromSession(
+                $session_for_pricing,
+                $coupon_code,
+                $payment_method
+            );
+        } catch (\Throwable $e) {
+            $pricing = [];
+        }
+
+        // If the session is so degenerate that even calculateFromSession
+        // couldn't make a positive total (e.g. no traveler_counts at all),
+        // surface that cleanly so the booking is rejected with a friendly
+        // error rather than silently charging $0.
+        if (((float) ($pricing['final_total'] ?? 0)) <= 0) {
+            try {
+                $sessionPricing = $calculationService->calculatePricing([
+                    'trip_id'           => $trip_id,
+                    'travelers_count'   => $travelers_count,
+                    'traveler_counts'   => $traveler_counts,
+                    'travel_date'       => $travel_date,
+                    'departure_time'    => $departure_time,
+                    'selected_services' => $additional_services,
+                    'availability_id'   => (!empty($availability_id) && is_numeric($availability_id)) ? (int) $availability_id : null,
+                    'coupon_code'       => $coupon_code,
+                    'payment_method'    => $payment_method,
+                ]);
+                if (((float) ($sessionPricing['final_total'] ?? 0)) > 0) {
+                    $pricing = $sessionPricing;
+                }
+            } catch (\Throwable $e) {
+                // Keep $pricing as-is; downstream guard will surface a clean error.
+            }
+        }
+
         // Extract pricing results
         $total_amount           = $pricing['final_total'];
         $amount_due             = $pricing['amount_due'];
@@ -1680,9 +1812,42 @@ class BookingSessionController extends BaseController
 
         $is_offline_gateway = $this->isOfflineGateway($payment_gateway);
 
+        // Server-side guard: offline gateways (Pay Later, Bank Transfer, etc.) don't
+        // actually collect money. Letting them be selected for a remaining-balance
+        // payment leaves the booking unpaid while the customer thinks they finished
+        // the flow. The frontend already filters them out for this checkout — this
+        // catches a tampered client. Filterable so a custom Pay Later that does
+        // settle can opt back in.
+        $allow_offline_for_remaining = (bool) apply_filters(
+            'yatra_remaining_payment_allow_offline_gateway',
+            false,
+            $payment_gateway,
+            $booking
+        );
+        if ($is_offline_gateway && !$allow_offline_for_remaining) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('This payment method cannot be used to settle a remaining balance. Please choose a card-based gateway.', 'yatra'),
+                'data' => [
+                    'rejected_gateway' => $payment_gateway,
+                    'reason' => 'offline_not_allowed_for_remaining_payment',
+                ],
+            ], 400);
+        }
+
         // Online gateways: delegate to the same flow as new-booking checkout (PayPal redirect, Stripe intent, etc.).
         // Do not put confirmation URL in redirect_url here — that caused the browser to skip payment entirely.
         if (!$is_offline_gateway && $remaining_amount > 0) {
+            // The gateway needs an explicit return URL with the `balance=paid` flag so the
+            // confirmation page can show "balance just paid" content. Without setting it
+            // here, processPaymentWithGateway() would fall back to a plain confirmation URL
+            // and the customer would land on the generic post-booking template.
+            $remaining_return_url = add_query_arg(
+                'balance',
+                'paid',
+                $this->getConfirmationUrl($booking_reference)
+            );
+
             $payment_params = array_merge($data, [
                 'booking_id' => $booking_id,
                 'reference' => $booking_reference,
@@ -1691,21 +1856,42 @@ class BookingSessionController extends BaseController
                 'customer_email' => $customer_email,
                 'customer_name' => $customer_name !== '' ? $customer_name : $customer_email,
                 'trip_title' => $trip_title,
+                'return_url' => $remaining_return_url,
             ]);
 
             $payment_result = $this->processPaymentGateway($payment_gateway, $payment_params);
 
             if (!empty($payment_result['success'])) {
+                // Common identity fields the Stripe.js / PayPal SDK frontend expects on
+                // the response. process_remaining_payment is reached without going through
+                // the new-booking checkout, so the gateway result alone is missing
+                // customer_email / customer_name — re-attach them from the booking we
+                // already loaded above. Also overwrite confirmation_url AND redirect_url
+                // with the balance-tagged version so the post-payment landing page knows
+                // this was a remaining-balance flow.
+                //
+                // Why both fields: the Stripe.js helper buildConfirmationUrlFromBookingInfo()
+                // prefers bookingInfo.redirect_url and only falls back to rebuilding the URL
+                // from scratch (without query params) when redirect_url is absent. Without
+                // redirect_url being explicitly set here the `?balance=paid` flag would be
+                // lost on the final navigation after Stripe success.
+                $remaining_identity_fields = [
+                    'customer_email' => $customer_email,
+                    'customer_name' => $customer_name,
+                    'confirmation_url' => $remaining_return_url,
+                    'redirect_url' => $remaining_return_url,
+                ];
+
                 if (!empty($payment_result['payment_url'])) {
                     return new WP_REST_Response([
                         'success' => true,
                         'message' => __('Redirecting to payment...', 'yatra'),
-                        'data' => [
+                        'data' => array_merge([
                             'booking_id' => $booking_id,
                             'reference' => $booking_reference,
                             'payment_url' => $payment_result['payment_url'],
                             'is_remaining_payment' => true,
-                        ],
+                        ], $remaining_identity_fields),
                     ]);
                 }
 
@@ -1719,7 +1905,8 @@ class BookingSessionController extends BaseController
                                 'reference' => $booking_reference,
                                 'is_remaining_payment' => true,
                             ],
-                            $payment_result
+                            $payment_result,
+                            $remaining_identity_fields
                         ),
                     ]);
                 }
@@ -1728,12 +1915,12 @@ class BookingSessionController extends BaseController
                     return new WP_REST_Response([
                         'success' => true,
                         'message' => __('Payment processed.', 'yatra'),
-                        'data' => [
+                        'data' => array_merge([
                             'booking_id' => $booking_id,
                             'reference' => $booking_reference,
                             'redirect_url' => $payment_result['redirect_url'],
                             'is_remaining_payment' => true,
-                        ],
+                        ], $remaining_identity_fields),
                     ]);
                 }
             }
@@ -1750,8 +1937,17 @@ class BookingSessionController extends BaseController
             ], 400);
         }
 
-        // Offline gateways: no external redirect — confirmation page only
+        // Offline gateways: no external redirect — confirmation page only.
+        // Append `balance=paid` so the confirmation template renders the
+        // remaining-payment-specific banner ("balance received, fully paid")
+        // instead of the generic "booking confirmed" copy.
         yatra_clear_remaining_session();
+
+        $offline_redirect = add_query_arg(
+            'balance',
+            'paid',
+            $this->getConfirmationUrl($booking_reference)
+        );
 
         return new WP_REST_Response([
             'success' => true,
@@ -1766,7 +1962,7 @@ class BookingSessionController extends BaseController
                 'amount' => $remaining_amount,
                 'customer_email' => $customer_email,
                 'customer_name' => $customer_name,
-                'redirect_url' => $this->getConfirmationUrl($booking_reference),
+                'redirect_url' => $offline_redirect,
                 'is_remaining_payment' => true,
             ],
         ]);
@@ -2354,19 +2550,39 @@ class BookingSessionController extends BaseController
     public function apply_coupon(WP_REST_Request $request): WP_REST_Response
     {
         yatra_start_session();
-        
-        $data = $request->get_json_params();
+
+        $data = $request->get_json_params() ?? [];
         $code = isset($data['code']) ? strtoupper(sanitize_text_field($data['code'])) : '';
-        
+
         if (empty($code)) {
             return new WP_REST_Response([
                 'success' => false,
                 'message' => __('Please enter a coupon code.', 'yatra'),
             ], 400);
         }
-        
-        // Get current session
+
+        // Get current session — with token-rehydration fallback for REST
+        // contexts where PHPSESSID isn't propagated (same shape as the
+        // service-toggle / summary endpoints). Also writes back to $_SESSION
+        // so the subsequent `yatra_set_booking_session()` persists alongside
+        // the existing transient.
         $session = yatra_get_booking_session();
+        if (empty($session) || empty($session['trip_id'])) {
+            $token = null;
+            if (!empty($data['booking_token']) && is_string($data['booking_token'])) {
+                $token = sanitize_text_field((string) $data['booking_token']);
+            } elseif (isset($_GET['booking_token']) && is_string($_GET['booking_token'])) {
+                $token = sanitize_text_field((string) wp_unslash($_GET['booking_token']));
+            }
+            if ($token) {
+                $transient_data = get_transient($token);
+                if (is_array($transient_data) && !empty($transient_data['trip_id'])) {
+                    $session = $transient_data;
+                    $_SESSION['yatra_booking'] = $session;
+                    $_SESSION['yatra_booking_token'] = $token;
+                }
+            }
+        }
         if (empty($session) || empty($session['trip_id'])) {
             return new WP_REST_Response([
                 'success' => false,
@@ -2435,7 +2651,35 @@ class BookingSessionController extends BaseController
     {
         yatra_start_session();
         $session = yatra_get_booking_session();
-        $data = $request->get_json_params();
+        $data = $request->get_json_params() ?? [];
+
+        // Same REST-context session-rehydration fallback as set_session() /
+        // create_booking(): when PHPSESSID isn't propagated to the REST API
+        // scope, look up the transient by `booking_token` (from request body
+        // first, then ?booking_token=) so the partial summary refresh
+        // doesn't 400. Without this, every service-toggle re-render fails
+        // because trip_id resolves to 0.
+        //
+        // We also write the rehydrated session into $_SESSION so that the
+        // downstream buildPricingHtml() — which calls yatra_get_booking_session()
+        // again — sees the same data and doesn't fall back to its
+        // "Pricing information not available" branch.
+        if (empty($session) || empty($session['trip_id'])) {
+            $token = null;
+            if (!empty($data['booking_token']) && is_string($data['booking_token'])) {
+                $token = sanitize_text_field((string) $data['booking_token']);
+            } elseif (isset($_GET['booking_token']) && is_string($_GET['booking_token'])) {
+                $token = sanitize_text_field((string) wp_unslash($_GET['booking_token']));
+            }
+            if ($token) {
+                $transient_data = get_transient($token);
+                if (is_array($transient_data) && !empty($transient_data['trip_id'])) {
+                    $session = $transient_data;
+                    $_SESSION['yatra_booking'] = $session;
+                    $_SESSION['yatra_booking_token'] = $token;
+                }
+            }
+        }
 
         // Get trip_id from session (required)
         $trip_id = (int) ($session['trip_id'] ?? 0);
@@ -2736,10 +2980,21 @@ class BookingSessionController extends BaseController
         
         // Use CalculationService for on-demand pricing calculation
         $calculationService = new CalculationService();
-        
-        // Initialize additional services (will be populated later via filter)
-        $additional_services = [];
-        
+
+        // The selected-service ids the customer just submitted live in
+        // `$selected_service_ids_from_request` (line ~2635). The previous
+        // version of this method initialised a fresh `$additional_services
+        // = []` here and passed that empty list into calculateFromSession
+        // — which made the Pro AdditionalServicesModule's
+        // `addServicesToSubtotal` hook bail out at its `empty($selectedServiceIds)`
+        // guard, so every AJAX summary refresh wiped services out of the
+        // Trip Subtotal even though the sidebar still rendered the rows.
+        // Pass the real selected ids instead so CalculationService →
+        // Pro filter chain folds them into `$subtotal` correctly.
+        $additional_services = is_array($selected_service_ids_from_request)
+            ? array_values(array_map('intval', $selected_service_ids_from_request))
+            : [];
+
         // Create session-like data structure for calculation (trip data fetched from database)
         $session_like_data = [
             'trip_id' => $trip_id,
@@ -2918,6 +3173,12 @@ class BookingSessionController extends BaseController
             'tax_breakdown' => $pricing['tax_calculation']['tax_breakdown'],
             'total_tax_amount' => $pricing['tax_calculation']['total_tax_amount'],
             'tax_inclusive' => $pricing['tax_calculation']['tax_inclusive'],
+            // Dynamic-pricing data — without these, the AJAX-refreshed summary
+            // would never carry the DP line items even though CalculationService
+            // produces them on every recalculation.
+            'dynamic_pricing' => $pricing['dynamic_pricing'] ?? null,
+            'unit_price_before_dp' => $pricing['unit_price_before_dp'] ?? null,
+            'dp_total_adjustment' => $pricing['dp_total_adjustment'] ?? 0,
             // Currency for consistent formatting
             'currency' => $pricing['currency'] ?? \Yatra\Services\SettingsService::getCurrency(),
         ]);
@@ -3026,6 +3287,14 @@ class BookingSessionController extends BaseController
                 'total_tax_amount' => $data['total_tax_amount'] ?? 0,
                 'tax_inclusive' => $data['tax_inclusive'] ?? false,
             ],
+            // Dynamic-pricing breakdown — without this, the AJAX-refreshed
+            // sidebar would never show DP line items even though the page-load
+            // path does. Keys match CalculationService's pricing_data shape so
+            // Checkout::getDynamicPricing() returns identical results in both
+            // render contexts.
+            'dynamic_pricing'     => $data['dynamic_pricing'] ?? null,
+            'unit_price_before_dp' => $data['unit_price_before_dp'] ?? null,
+            'dp_total_adjustment' => $data['dp_total_adjustment'] ?? 0,
             'currency' => $data['currency'] ?? null,
         ];
         
@@ -3049,7 +3318,13 @@ class BookingSessionController extends BaseController
         
         // Create Checkout model instance
         $checkout = new \Yatra\Models\Checkout($trip, $session, $pricingCalculation);
-        
+
+        // Surface dynamic-pricing breakdown to the template scope. The partial
+        // reads `$dynamic_pricing` for the DP block; the page-load path
+        // already sets this in booking-content.php.
+        $dynamic_pricing = $pricingCalculation['dynamic_pricing'] ?? null;
+        $currency = $pricingCalculation['currency'] ?? null;
+
         // Load the template (uses $checkout model)
         $template_path = YATRA_PLUGIN_PATH . 'templates/partials/pricing-summary.php';
         
@@ -3069,8 +3344,29 @@ class BookingSessionController extends BaseController
     public function remove_coupon(WP_REST_Request $request): WP_REST_Response
     {
         yatra_start_session();
-        
+
+        $data = $request->get_json_params() ?? [];
         $session = yatra_get_booking_session();
+
+        // Same booking_token rehydration as apply_coupon — handle REST
+        // requests that arrive without a propagated PHPSESSID.
+        if (empty($session) || empty($session['trip_id'])) {
+            $token = null;
+            if (!empty($data['booking_token']) && is_string($data['booking_token'])) {
+                $token = sanitize_text_field((string) $data['booking_token']);
+            } elseif (isset($_GET['booking_token']) && is_string($_GET['booking_token'])) {
+                $token = sanitize_text_field((string) wp_unslash($_GET['booking_token']));
+            }
+            if ($token) {
+                $transient_data = get_transient($token);
+                if (is_array($transient_data) && !empty($transient_data['trip_id'])) {
+                    $session = $transient_data;
+                    $_SESSION['yatra_booking'] = $session;
+                    $_SESSION['yatra_booking_token'] = $token;
+                }
+            }
+        }
+
         if (empty($session)) {
             return new WP_REST_Response([
                 'success' => false,
@@ -3083,16 +3379,25 @@ class BookingSessionController extends BaseController
             unset($_SESSION['yatra_booking']['coupon']);
         }
         $_SESSION['yatra_booking']['timestamp'] = time();
-        
+
         // Also update local session array for calculation
         unset($session['coupon']);
         $session['timestamp'] = time();
-        
+
+        // Persist the coupon removal to the transient too — without this,
+        // the next /booking/summary AJAX (which the JS calls right after
+        // this endpoint) re-reads the still-couponed transient and the
+        // sidebar shows the coupon discount as if it never went away.
+        // `yatra_set_booking_session()` array_merges `$_SESSION['yatra_booking']`
+        // (already coupon-less above) with the passed data and writes the
+        // result into the transient keyed by the existing booking token.
+        yatra_set_booking_session($session);
+
         // Ensure session data is written immediately
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_write_close();
         }
-        
+
         $total_amount = $this->calculateSessionTotal($session);
         
         return new WP_REST_Response([

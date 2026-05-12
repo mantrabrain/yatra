@@ -364,7 +364,7 @@ const Trips: React.FC = () => {
     }
     const sanitized = value
       .toLowerCase()
-      .replace(/[^a-z0-9-]/g, "-")
+      .replace(/[^\p{L}\p{N}-]/gu, "-")
       .replace(/-+/g, "-")
       .replace(/^-|-$/g, "");
     setNewTripSlug(sanitized);
@@ -621,10 +621,10 @@ const Trips: React.FC = () => {
       setCreateTripError(__("Trip slug is required", "yatra"));
       return;
     }
-    if (!/^[a-z0-9-]+$/.test(slug)) {
+    if (!/^[\p{L}\p{N}-]+$/u.test(slug)) {
       setCreateTripError(
         __(
-          "Slug can only contain lowercase letters, numbers, and hyphens",
+          "Slug can only contain letters, numbers, and hyphens",
           "yatra",
         ),
       );

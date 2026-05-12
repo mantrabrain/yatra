@@ -9,58 +9,58 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-08T14:21:37+00:00\n"
+"POT-Creation-Date: 2026-05-12T10:17:59+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
 
-#: assets/admin/dist/js/app.js:36434
+#: assets/admin/dist/js/app.js:36579
 msgid "Failed to load reviews. Please try again."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36464
+#: assets/admin/dist/js/app.js:36609
 msgid "Select reviews to display as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36466
+#: assets/admin/dist/js/app.js:36611
 msgid "Save the trip first to select testimonials from reviews"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36471
+#: assets/admin/dist/js/app.js:36616
 #: templates/partials/single-trip/content-testimonials.php:15
 msgid "Testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36472
+#: assets/admin/dist/js/app.js:36617
 msgid "Select approved reviews to display as testimonials on the trip page"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36478
+#: assets/admin/dist/js/app.js:36623
 msgid "Loading reviews..."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36489
+#: assets/admin/dist/js/app.js:36634
 msgid "Retry"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36494
+#: assets/admin/dist/js/app.js:36639
 msgid "No approved reviews yet"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36495
+#: assets/admin/dist/js/app.js:36640
 msgid "Reviews will appear here once customers submit and they are approved"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36500
+#: assets/admin/dist/js/app.js:36645
 msgid "Select reviews to feature as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36509
+#: assets/admin/dist/js/app.js:36654
 #: templates/listing-trip.php:139
 msgid "Clear all"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36547
+#: assets/admin/dist/js/app.js:36692
 msgid "Selected as testimonial"
 msgstr ""
 
@@ -295,7 +295,7 @@ msgid "Filters"
 msgstr ""
 
 #: assets/dist/blocks/tour.js:350
-#: app/Providers/FrontendAssetsProvider.php:758
+#: app/Providers/FrontendAssetsProvider.php:775
 #: templates/listing-trip.php:379
 #: templates/single-taxonomy.php:71
 msgid "Destinations"
@@ -306,7 +306,7 @@ msgid "Choose \"All published\" or restrict the grid to destinations you tick. O
 msgstr ""
 
 #: assets/dist/blocks/tour.js:362
-#: app/Providers/FrontendAssetsProvider.php:759
+#: app/Providers/FrontendAssetsProvider.php:776
 #: templates/listing-trip.php:422
 #: templates/shortcodes/trip-search.php:173
 #: templates/single-taxonomy.php:76
@@ -402,7 +402,7 @@ msgid "When on, only categories with “Featured category” enabled in Yatra �
 msgstr ""
 
 #: assets/dist/js/account-page.js:1003
-#: app/Providers/FrontendAssetsProvider.php:732
+#: app/Providers/FrontendAssetsProvider.php:749
 #: templates/pdf/voucher.php:110
 #: assets/dist/js/account-page.js:939
 #: assets/dist/js/account-page.js:964
@@ -429,7 +429,7 @@ msgstr ""
 
 #: assets/dist/js/account-page.js:1042
 #: app/Blocks/TourBlock.php:86
-#: app/Controllers/BookingSessionController.php:2263
+#: app/Controllers/BookingSessionController.php:2371
 #: app/Services/EmailTemplateDefaults.php:218
 #: app/Services/EmailTemplateDefaults.php:291
 #: app/Services/EmailTemplateDefaults.php:325
@@ -454,9 +454,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: assets/dist/js/account-page.js:105
-#: assets/dist/js/index-BoN1WlyH.js:2155
-#: app/Providers/FrontendAssetsProvider.php:658
-#: app/Providers/FrontendAssetsProvider.php:745
+#: assets/dist/js/index-eQJQD6Tp.js:2159
+#: app/Providers/FrontendAssetsProvider.php:675
+#: app/Providers/FrontendAssetsProvider.php:762
 #: includes/helpers.php:329
 #: templates/partials/single-trip/content-sidebar.php:89
 #: templates/partials/single-trip/content-sidebar.php:147
@@ -475,8 +475,8 @@ msgid "Booking Date"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1073
-#: app/Controllers/TripController.php:2369
-#: templates/booking-confirmation.php:304
+#: app/Controllers/TripController.php:2392
+#: templates/booking-confirmation.php:371
 #: templates/partials/single-trip/content-sidebar.php:287
 #: templates/partials/single-trip/content-sidebar.php:379
 #: templates/partials/single-trip/enquiry-modal.php:61
@@ -485,37 +485,36 @@ msgid "Number of Travelers"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1083
-#: templates/booking-confirmation.php:364
+#: templates/booking-confirmation.php:431
 #: templates/partials/booking-content.php:198
 msgid "Payment Summary"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1086
-#: templates/booking-confirmation.php:467
-#: templates/partials/pricing-summary.php:73
+#: templates/booking-confirmation.php:534
 msgid "Gross Total"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1093
-#: templates/partials/pricing-summary.php:314
+#: templates/partials/pricing-summary.php:310
 msgid "Subtotal (Taxable Amount)"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1100
-#: templates/booking-confirmation.php:475
+#: templates/booking-confirmation.php:542
 msgid "Discount"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1110
-#: templates/booking-confirmation.php:483
-#: templates/partials/pricing-summary.php:157
+#: templates/booking-confirmation.php:550
+#: templates/partials/pricing-summary.php:210
 msgid "Itinerary Costs"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1120
 #: templates/partials/availability-card.php:195
 #: templates/partials/booking-content.php:610
-#: templates/partials/single-trip/content-itinerary.php:124
+#: templates/partials/single-trip/content-itinerary.php:139
 #: templates/partials/single-trip/content-sidebar.php:80
 #: templates/partials/single-trip/content-sidebar.php:138
 #: templates/single-activity.php:263
@@ -525,27 +524,27 @@ msgstr ""
 
 #: assets/dist/js/account-page.js:1125
 #: templates/partials/booking-content.php:614
-#: templates/partials/single-trip/content-itinerary.php:126
+#: templates/partials/single-trip/content-itinerary.php:141
 msgid "per booking"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1193
-#: app/Controllers/PaymentGatewayController.php:721
+#: app/Controllers/PaymentGatewayController.php:909
 #: app/Controllers/SettingsController.php:139
 #: app/Services/BookingTaxService.php:128
 #: app/Services/BookingTaxService.php:214
 #: app/Services/TaxService.php:45
 #: app/Services/TaxService.php:159
-#: templates/booking-confirmation.php:385
-#: templates/booking-confirmation.php:392
-#: templates/booking-confirmation.php:521
-#: templates/partials/pricing-summary.php:327
+#: templates/booking-confirmation.php:452
+#: templates/booking-confirmation.php:459
+#: templates/booking-confirmation.php:588
+#: templates/partials/pricing-summary.php:323
 msgid "Tax"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1207
-#: templates/booking-confirmation.php:540
-#: templates/partials/pricing-summary.php:340
+#: templates/booking-confirmation.php:607
+#: templates/partials/pricing-summary.php:336
 msgid "Net Amount"
 msgstr ""
 
@@ -572,17 +571,17 @@ msgid "travelers"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1274
-#: app/Controllers/BookingSessionController.php:2656
-#: app/Controllers/SingleTripController.php:461
-#: app/Controllers/SingleTripController.php:1853
-#: app/Controllers/SingleTripController.php:1888
-#: app/Controllers/SingleTripController.php:2014
-#: app/Models/Checkout.php:103
+#: app/Controllers/BookingSessionController.php:2764
+#: app/Controllers/SingleTripController.php:483
+#: app/Controllers/SingleTripController.php:1871
+#: app/Controllers/SingleTripController.php:1906
+#: app/Controllers/SingleTripController.php:2032
+#: app/Models/Checkout.php:111
 #: app/Services/BookingEmailRichMergeTags.php:328
 #: app/Services/EmailTemplateDefaults.php:319
 #: app/Services/EmailTemplateDefaults.php:368
 #: app/Services/EmailTemplateSampleData.php:74
-#: templates/booking-confirmation.php:335
+#: templates/booking-confirmation.php:402
 #: templates/partials/availability-card.php:316
 #: templates/partials/booking-content.php:327
 #: templates/partials/booking-form-fields.php:374
@@ -613,17 +612,17 @@ msgid "Special Requests"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1378
-#: templates/partials/booking-content.php:736
+#: templates/partials/booking-content.php:745
 msgid "Payment Information"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1381
-#: app/Providers/FrontendAssetsProvider.php:735
+#: app/Providers/FrontendAssetsProvider.php:752
 msgid "Payment Status"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1402
-#: templates/booking-confirmation.php:566
+#: templates/booking-confirmation.php:633
 #: templates/partials/remaining-checkout-content.php:70
 #: templates/pdf/voucher.php:186
 msgid "Amount Paid"
@@ -699,7 +698,7 @@ msgid "Multiple destinations"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1664
-#: templates/booking-confirmation.php:300
+#: templates/booking-confirmation.php:367
 #: templates/partials/booking-content.php:303
 #: templates/partials/remaining-checkout-content.php:84
 #: templates/partials/remaining-checkout-content.php:143
@@ -710,13 +709,13 @@ msgid "Travel Date"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1671
-#: app/Controllers/BookingSessionController.php:2266
-#: app/Controllers/BookingSessionController.php:2282
+#: app/Controllers/BookingSessionController.php:2374
+#: app/Controllers/BookingSessionController.php:2390
 #: app/Services/EmailTemplateDefaults.php:220
 #: app/Services/EmailTemplateDefaults.php:327
 #: app/Services/EmailTemplateDefaults.php:563
 #: app/Services/TransactionalEmailTemplateService.php:436
-#: templates/booking-confirmation.php:324
+#: templates/booking-confirmation.php:391
 #: templates/partials/availability-card.php:286
 #: templates/partials/booking-content.php:321
 #: templates/partials/booking-content.php:391
@@ -728,7 +727,7 @@ msgid "Travelers"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1675
-#: app/Providers/FrontendAssetsProvider.php:734
+#: app/Providers/FrontendAssetsProvider.php:751
 #: templates/partials/remaining-checkout-content.php:154
 #: templates/pdf/voucher.php:182
 #: assets/dist/js/account-page.js:1395
@@ -744,7 +743,7 @@ msgid "Due:"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1690
-#: templates/booking-confirmation.php:308
+#: templates/booking-confirmation.php:375
 msgid "Booked On"
 msgstr ""
 
@@ -824,6 +823,7 @@ msgid "Payment history will appear here once you make a booking."
 msgstr ""
 
 #: assets/dist/js/account-page.js:1930
+#: app/Core/Handlers/BookingPageHandler.php:39
 #: templates/partials/availability-section.php:112
 msgid "Booking"
 msgstr ""
@@ -845,7 +845,7 @@ msgid "Payment Date"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1986
-#: templates/booking-confirmation.php:726
+#: templates/booking-confirmation.php:793
 msgid "Download Invoice"
 msgstr ""
 
@@ -1185,6 +1185,7 @@ msgstr ""
 #: app/Repositories/TripRepository.php:3076
 #: includes/helpers.php:462
 #: includes/helpers.php:1959
+#: templates/partials/single-trip/content-itinerary.php:121
 msgid "Flexible"
 msgstr ""
 
@@ -1203,7 +1204,7 @@ msgid "Per person"
 msgstr ""
 
 #: assets/dist/js/account-page.js:2810
-#: app/Providers/FrontendAssetsProvider.php:736
+#: app/Providers/FrontendAssetsProvider.php:753
 #: templates/partials/single-trip/similar-trips.php:270
 #: templates/single-activity.php:274
 #: templates/single-destination.php:274
@@ -1284,7 +1285,7 @@ msgid "Manage bookings, payments, and documents – everything for your adventur
 msgstr ""
 
 #: assets/dist/js/account-page.js:3160
-#: app/Providers/FrontendAssetsProvider.php:727
+#: app/Providers/FrontendAssetsProvider.php:744
 #: app/Shortcodes/LoginShortcode.php:147
 msgid "Logout"
 msgstr ""
@@ -1403,12 +1404,12 @@ msgstr ""
 msgid "Booking not found or error loading booking"
 msgstr ""
 
-#: assets/dist/js/index-BoN1WlyH.js:1006
+#: assets/dist/js/index-eQJQD6Tp.js:1006
 #: templates/partials/single-trip/sticky-sidebar.php:233
 msgid "Close"
 msgstr ""
 
-#: assets/dist/js/index-BoN1WlyH.js:597
+#: assets/dist/js/index-eQJQD6Tp.js:597
 msgctxt "text direction"
 msgid "ltr"
 msgstr ""
@@ -1666,12 +1667,12 @@ msgid "Please enter a valid email address."
 msgstr ""
 
 #: app/Controllers/AuthController.php:329
-#: app/Controllers/BookingSessionController.php:1068
+#: app/Controllers/BookingSessionController.php:1112
 msgid "Password must be at least 8 characters long."
 msgstr ""
 
 #: app/Controllers/AuthController.php:336
-#: app/Controllers/BookingSessionController.php:1075
+#: app/Controllers/BookingSessionController.php:1119
 msgid "Passwords do not match."
 msgstr ""
 
@@ -1787,9 +1788,9 @@ msgid "Status is required."
 msgstr ""
 
 #: app/Controllers/BookingsController.php:490
-#: app/Controllers/PaymentGatewayController.php:625
-#: app/Controllers/PaymentGatewayController.php:795
-#: app/Controllers/PaymentGatewayController.php:912
+#: app/Controllers/PaymentGatewayController.php:813
+#: app/Controllers/PaymentGatewayController.php:983
+#: app/Controllers/PaymentGatewayController.php:1100
 #: app/Services/PaymentService.php:118
 #: app/Services/PaymentService.php:155
 #: app/Services/PaymentService.php:185
@@ -1807,15 +1808,18 @@ msgstr ""
 
 #: app/Controllers/BookingsController.php:598
 #: app/Controllers/BookingsController.php:659
+#: app/Controllers/PaymentGatewayController.php:665
 msgid "Invalid booking ID."
 msgstr ""
 
 #: app/Controllers/BookingsController.php:605
 #: app/Controllers/BookingsController.php:666
-#: app/Controllers/BookingSessionController.php:1628
+#: app/Controllers/BookingSessionController.php:1672
 #: app/Controllers/CustomerController.php:289
 #: app/Controllers/PaymentGatewayController.php:186
-#: app/Controllers/PaymentGatewayController.php:241
+#: app/Controllers/PaymentGatewayController.php:255
+#: app/Controllers/PaymentGatewayController.php:419
+#: app/Controllers/PaymentGatewayController.php:533
 #: app/Controllers/TripDownloadController.php:181
 #: app/Controllers/TripDownloadController.php:320
 #: app/Services/BookingService.php:487
@@ -1827,38 +1831,38 @@ msgid "Booking not found."
 msgstr ""
 
 #: app/Controllers/BookingsController.php:614
-#: app/Controllers/PaymentGatewayController.php:804
+#: app/Controllers/PaymentGatewayController.php:992
 msgid "You must be logged in to download vouchers."
 msgstr ""
 
 #: app/Controllers/BookingsController.php:619
-#: app/Controllers/PaymentGatewayController.php:809
+#: app/Controllers/PaymentGatewayController.php:997
 msgid "You do not have permission to access this voucher."
 msgstr ""
 
 #: app/Controllers/BookingsController.php:634
 #: app/Controllers/BookingsController.php:695
-#: app/Controllers/PaymentGatewayController.php:618
-#: app/Controllers/PaymentGatewayController.php:788
-#: app/Controllers/PaymentGatewayController.php:905
+#: app/Controllers/PaymentGatewayController.php:806
+#: app/Controllers/PaymentGatewayController.php:976
+#: app/Controllers/PaymentGatewayController.php:1093
 msgid "Invalid payment ID."
 msgstr ""
 
 #: app/Controllers/BookingsController.php:675
-#: app/Controllers/PaymentGatewayController.php:921
+#: app/Controllers/PaymentGatewayController.php:1109
 msgid "You must be logged in to download itineraries."
 msgstr ""
 
 #: app/Controllers/BookingsController.php:680
-#: app/Controllers/PaymentGatewayController.php:926
+#: app/Controllers/PaymentGatewayController.php:1114
 msgid "You do not have permission to access this itinerary."
 msgstr ""
 
 #: app/Controllers/BookingsController.php:748
 #: app/Controllers/BookingsController.php:841
-#: app/Controllers/PaymentGatewayController.php:738
-#: app/Controllers/PaymentGatewayController.php:854
-#: app/Controllers/PaymentGatewayController.php:970
+#: app/Controllers/PaymentGatewayController.php:926
+#: app/Controllers/PaymentGatewayController.php:1042
+#: app/Controllers/PaymentGatewayController.php:1158
 #: app/Services/EmailTemplateDefaults.php:254
 #: app/Services/EmailTemplateDefaults.php:287
 #: app/Services/EmailTemplateDefaults.php:486
@@ -1870,22 +1874,22 @@ msgstr ""
 
 #: app/Controllers/BookingsController.php:762
 #: app/Controllers/BookingsController.php:866
-#: app/Controllers/PaymentGatewayController.php:744
-#: app/Controllers/PaymentGatewayController.php:861
-#: app/Controllers/PaymentGatewayController.php:977
+#: app/Controllers/PaymentGatewayController.php:932
+#: app/Controllers/PaymentGatewayController.php:1049
+#: app/Controllers/PaymentGatewayController.php:1165
 msgid "Trip Booking"
 msgstr ""
 
 #: app/Controllers/BookingsController.php:763
 #: app/Controllers/BookingsController.php:868
-#: app/Controllers/PaymentGatewayController.php:862
-#: app/Controllers/PaymentGatewayController.php:979
+#: app/Controllers/PaymentGatewayController.php:1050
+#: app/Controllers/PaymentGatewayController.php:1167
 #, php-format
 msgid "%d days"
 msgstr ""
 
 #: app/Controllers/BookingsController.php:780
-#: app/Controllers/PaymentGatewayController.php:844
+#: app/Controllers/PaymentGatewayController.php:1032
 msgid "Voucher PDF generator is not installed. Please run composer install to install dompdf/dompdf."
 msgstr ""
 
@@ -1925,9 +1929,9 @@ msgstr ""
 
 #: app/Controllers/BookingSessionController.php:393
 #: app/Controllers/BookingSessionController.php:674
-#: app/Controllers/BookingSessionController.php:858
-#: app/Controllers/BookingSessionController.php:2473
-#: app/Controllers/BookingSessionController.php:2990
+#: app/Controllers/BookingSessionController.php:878
+#: app/Controllers/BookingSessionController.php:2581
+#: app/Controllers/BookingSessionController.php:3104
 #: app/Services/BookingService.php:328
 #: app/Services/EnquiryService.php:129
 #: app/Services/ReviewService.php:105
@@ -1959,153 +1963,159 @@ msgstr ""
 msgid "Guest checkout is not allowed. Please log in or create an account."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:792
+#: app/Controllers/BookingSessionController.php:812
 msgid "No trip selected for booking."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:819
-#: app/Controllers/BookingSessionController.php:1677
+#: app/Controllers/BookingSessionController.php:839
+#: app/Controllers/BookingSessionController.php:1721
 msgid "Email address is required."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:826
+#: app/Controllers/BookingSessionController.php:846
 msgid "Phone number is required."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:833
+#: app/Controllers/BookingSessionController.php:853
 msgid "Travel date is required."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:840
+#: app/Controllers/BookingSessionController.php:860
 msgid "At least one traveler is required."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:848
+#: app/Controllers/BookingSessionController.php:868
 msgid "Invalid email address."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:967
+#: app/Controllers/BookingSessionController.php:1011
 #: app/Services/BookingService.php:245
 msgid "This departure is not open for booking."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:978
+#: app/Controllers/BookingSessionController.php:1022
 #: app/Services/BookingService.php:254
 msgid "This departure is sold out."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:994
+#: app/Controllers/BookingSessionController.php:1038
 msgid "This departure is full. Waitlist is not available for this trip or date."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1083
+#: app/Controllers/BookingSessionController.php:1127
 msgid "An account with this email already exists. Please log in."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1247
-#: app/Controllers/BookingSessionController.php:1255
-#: app/Controllers/BookingSessionController.php:1263
+#: app/Controllers/BookingSessionController.php:1291
+#: app/Controllers/BookingSessionController.php:1299
+#: app/Controllers/BookingSessionController.php:1307
 msgid "Failed to create booking. Please try again."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1264
+#: app/Controllers/BookingSessionController.php:1308
 msgid "Booking ID was not generated."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1334
+#: app/Controllers/BookingSessionController.php:1378
 msgid "You are on the waitlist. We will contact you if a space opens up."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1405
+#: app/Controllers/BookingSessionController.php:1449
 msgid "Booking created. Redirecting to payment..."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1421
+#: app/Controllers/BookingSessionController.php:1465
 msgid "Booking created. Complete payment..."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1432
-#: app/Controllers/BookingSessionController.php:1741
+#: app/Controllers/BookingSessionController.php:1476
+#: app/Controllers/BookingSessionController.php:1840
 msgid "Payment processing failed. Please try again."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1454
+#: app/Controllers/BookingSessionController.php:1498
 msgid "Booking received!"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1460
+#: app/Controllers/BookingSessionController.php:1504
 msgid "Booking confirmed!"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1465
+#: app/Controllers/BookingSessionController.php:1509
 msgid "Booking confirmed! Payment will be collected later."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1468
+#: app/Controllers/BookingSessionController.php:1512
 msgid "Booking received! We will contact you to arrange payment."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1473
+#: app/Controllers/BookingSessionController.php:1517
 msgid "Booking received! Please complete the bank transfer. We will confirm once payment is verified."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1619
+#: app/Controllers/BookingSessionController.php:1663
 msgid "Invalid booking for remaining payment."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1649
+#: app/Controllers/BookingSessionController.php:1693
 #: app/Controllers/PaymentGatewayController.php:197
-#: app/Controllers/PaymentGatewayController.php:253
+#: app/Controllers/PaymentGatewayController.php:267
+#: app/Controllers/PaymentGatewayController.php:434
 #: templates/partials/remaining-checkout-content.php:19
 msgid "This booking is already fully paid."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1659
+#: app/Controllers/BookingSessionController.php:1703
 #: app/Controllers/PaymentGatewayController.php:191
-#: app/Controllers/PaymentGatewayController.php:247
+#: app/Controllers/PaymentGatewayController.php:261
+#: app/Controllers/PaymentGatewayController.php:428
 msgid "You do not have permission to pay for this booking."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1702
+#: app/Controllers/BookingSessionController.php:1742
+msgid "This payment method cannot be used to settle a remaining balance. Please choose a card-based gateway."
+msgstr ""
+
+#: app/Controllers/BookingSessionController.php:1800
 msgid "Redirecting to payment..."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1715
+#: app/Controllers/BookingSessionController.php:1813
 msgid "Complete payment..."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1730
+#: app/Controllers/BookingSessionController.php:1829
 msgid "Payment processed."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1758
+#: app/Controllers/BookingSessionController.php:1866
 msgid "Continue to confirmation."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:1804
+#: app/Controllers/BookingSessionController.php:1912
 msgid "This payment method is not available."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2250
+#: app/Controllers/BookingSessionController.php:2358
 msgid "Thank you for your booking! Your reservation has been confirmed."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2251
+#: app/Controllers/BookingSessionController.php:2359
 msgid "Thank you for your booking! Your reservation has been received and is pending confirmation."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2254
+#: app/Controllers/BookingSessionController.php:2362
 #, php-format
 msgid "Please complete your payment before %s to avoid automatic cancellation."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2262
+#: app/Controllers/BookingSessionController.php:2370
 #: app/Services/EmailTemplateDefaults.php:257
 #: app/Services/EmailTemplateDefaults.php:377
 msgid "Booking reference"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2264
+#: app/Controllers/BookingSessionController.php:2372
 #: app/Services/EmailTemplateDefaults.php:219
 #: app/Services/EmailTemplateDefaults.php:292
 #: app/Services/EmailTemplateDefaults.php:326
@@ -2115,8 +2125,8 @@ msgstr ""
 msgid "Travel date"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2265
-#: app/Providers/FrontendAssetsProvider.php:751
+#: app/Controllers/BookingSessionController.php:2373
+#: app/Providers/FrontendAssetsProvider.php:768
 #: templates/partials/availability-card.php:216
 #: templates/partials/single-trip/quick-facts.php:18
 #: templates/pdf/itinerary.php:151
@@ -2127,140 +2137,140 @@ msgstr ""
 msgid "Duration"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2265
+#: app/Controllers/BookingSessionController.php:2373
 #, php-format
 msgid "%d days / %d nights"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2268
+#: app/Controllers/BookingSessionController.php:2376
 msgid "Payment details"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2269
+#: app/Controllers/BookingSessionController.php:2377
 #, php-format
 msgid "Total: %s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2271
+#: app/Controllers/BookingSessionController.php:2379
 #, php-format
 msgid "Payment type: Deposit — due now %s, remaining %s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2273
+#: app/Controllers/BookingSessionController.php:2381
 #, php-format
 msgid "Payment type: Partial — due now %s, remaining %s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2275
+#: app/Controllers/BookingSessionController.php:2383
 msgid "Payment type: Full payment"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2278
+#: app/Controllers/BookingSessionController.php:2386
 msgid "Pay later — please contact us to arrange payment."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2280
+#: app/Controllers/BookingSessionController.php:2388
 msgid "Bank transfer — you will receive bank details separately."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2288
+#: app/Controllers/BookingSessionController.php:2396
 #, php-format
 msgid "Traveler %d: %s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2293
+#: app/Controllers/BookingSessionController.php:2401
 msgid "Full refund available"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2294
+#: app/Controllers/BookingSessionController.php:2402
 msgid "Partial refund available"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2295
+#: app/Controllers/BookingSessionController.php:2403
 msgid "No refund available"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2296
+#: app/Controllers/BookingSessionController.php:2404
 msgid "Flexible cancellation"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2298
+#: app/Controllers/BookingSessionController.php:2406
 msgid "Standard policy applies"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2300
+#: app/Controllers/BookingSessionController.php:2408
 msgid "Cancellation policy"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2301
+#: app/Controllers/BookingSessionController.php:2409
 #, php-format
 msgid "free cancellation up to %d days before departure"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2308
+#: app/Controllers/BookingSessionController.php:2416
 msgid "What’s next?"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2310
+#: app/Controllers/BookingSessionController.php:2418
 msgid "You will receive a detailed trip itinerary within 24–48 hours."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2311
+#: app/Controllers/BookingSessionController.php:2419
 msgid "Our team will contact you to confirm any special requirements."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2312
+#: app/Controllers/BookingSessionController.php:2420
 msgid "Please ensure travel documents meet entry requirements for your destination."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2314
+#: app/Controllers/BookingSessionController.php:2422
 msgid "If you have any questions, contact us anytime."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2337
+#: app/Controllers/BookingSessionController.php:2445
 #: app/Services/TransactionalEmailTemplateService.php:397
 #, php-format
 msgid "— %s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2364
+#: app/Controllers/BookingSessionController.php:2472
 msgid "Please enter a coupon code."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2373
-#: app/Controllers/BookingSessionController.php:2464
-#: app/Controllers/BookingSessionController.php:3077
+#: app/Controllers/BookingSessionController.php:2481
+#: app/Controllers/BookingSessionController.php:2572
+#: app/Controllers/BookingSessionController.php:3205
 msgid "No active booking session found."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2396
-#: app/Controllers/BookingSessionController.php:2733
+#: app/Controllers/BookingSessionController.php:2504
+#: app/Controllers/BookingSessionController.php:2841
 msgid "This coupon is not valid for your booking."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2418
+#: app/Controllers/BookingSessionController.php:2526
 msgid "Coupon applied successfully!"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2709
-#: app/Models/Checkout.php:188
-#: app/Services/CalculationService.php:521
-#: app/Services/CalculationService.php:547
+#: app/Controllers/BookingSessionController.php:2817
+#: app/Models/Checkout.php:203
+#: app/Services/CalculationService.php:583
+#: app/Services/CalculationService.php:609
 #: app/Services/DiscountService.php:979
 #: templates/partials/booking-content.php:50
 msgid "Group Discount"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:2984
+#: app/Controllers/BookingSessionController.php:3098
 #: templates/partials/pricing-summary.php:24
 msgid "Pricing information not available."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:3057
+#: app/Controllers/BookingSessionController.php:3185
 msgid "Template not found."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:3100
+#: app/Controllers/BookingSessionController.php:3228
 msgid "Coupon removed."
 msgstr ""
 
@@ -2485,8 +2495,8 @@ msgstr ""
 #: app/Controllers/ReportsController.php:320
 #: app/Controllers/TripController.php:834
 #: app/Controllers/TripController.php:877
-#: app/Controllers/TripController.php:1359
-#: app/Controllers/TripController.php:1364
+#: app/Controllers/TripController.php:1382
+#: app/Controllers/TripController.php:1387
 msgid "Unknown"
 msgstr ""
 
@@ -2514,19 +2524,19 @@ msgstr ""
 msgid "Item type deleted successfully"
 msgstr ""
 
-#: app/Controllers/ItineraryController.php:149
+#: app/Controllers/ItineraryController.php:162
 msgid "Itinerary entry created successfully"
 msgstr ""
 
-#: app/Controllers/ItineraryController.php:174
+#: app/Controllers/ItineraryController.php:187
 msgid "Itinerary entry updated successfully"
 msgstr ""
 
-#: app/Controllers/ItineraryController.php:198
+#: app/Controllers/ItineraryController.php:211
 msgid "Itinerary entry deleted successfully"
 msgstr ""
 
-#: app/Controllers/ItineraryController.php:224
+#: app/Controllers/ItineraryController.php:279
 #, php-format
 msgid "%d item(s) deleted successfully. %d item(s) failed to delete."
 msgstr ""
@@ -2568,62 +2578,86 @@ msgid "No valid module changes supplied."
 msgstr ""
 
 #: app/Controllers/PaymentGatewayController.php:180
-#: app/Controllers/PaymentGatewayController.php:235
+#: app/Controllers/PaymentGatewayController.php:249
 msgid "Invalid booking ID provided."
 msgstr ""
 
-#: app/Controllers/PaymentGatewayController.php:210
+#: app/Controllers/PaymentGatewayController.php:224
 #, php-format
 msgid "Remaining balance for Booking #%s"
 msgstr ""
 
-#: app/Controllers/PaymentGatewayController.php:217
+#: app/Controllers/PaymentGatewayController.php:231
 msgid "Unable to initiate payment."
 msgstr ""
 
-#: app/Controllers/PaymentGatewayController.php:227
+#: app/Controllers/PaymentGatewayController.php:241
 msgid "Booking session helpers not loaded."
 msgstr ""
 
-#: app/Controllers/PaymentGatewayController.php:259
+#: app/Controllers/PaymentGatewayController.php:273
 msgid "Trip associated with this booking is unavailable."
 msgstr ""
 
-#: app/Controllers/PaymentGatewayController.php:330
-#: app/Controllers/PaymentGatewayController.php:419
-#: app/Controllers/PaymentGatewayController.php:459
+#: app/Controllers/PaymentGatewayController.php:374
+#: app/Controllers/PaymentGatewayController.php:521
+#: app/Controllers/PaymentGatewayController.php:602
 msgid "Gateway not found"
 msgstr ""
 
-#: app/Controllers/PaymentGatewayController.php:347
+#: app/Controllers/PaymentGatewayController.php:391
 msgid "Gateway configuration saved"
 msgstr ""
 
-#: app/Controllers/PaymentGatewayController.php:347
+#: app/Controllers/PaymentGatewayController.php:391
 msgid "Failed to save configuration"
 msgstr ""
 
-#: app/Controllers/PaymentGatewayController.php:389
+#: app/Controllers/PaymentGatewayController.php:442
+msgid "This booking has no outstanding balance."
+msgstr ""
+
+#: app/Controllers/PaymentGatewayController.php:469
 msgid "Invalid payment amount"
 msgstr ""
 
-#: app/Controllers/PaymentGatewayController.php:395
+#: app/Controllers/PaymentGatewayController.php:475
 msgid "Payment failed"
 msgstr ""
 
-#: app/Controllers/PaymentGatewayController.php:518
+#: app/Controllers/PaymentGatewayController.php:525
+msgid "booking_id and transaction_id are required."
+msgstr ""
+
+#: app/Controllers/PaymentGatewayController.php:540
+msgid "You do not have permission to confirm this payment."
+msgstr ""
+
+#: app/Controllers/PaymentGatewayController.php:562
+msgid "Transaction does not belong to this booking."
+msgstr ""
+
+#: app/Controllers/PaymentGatewayController.php:671
 msgid "Payment not found"
 msgstr ""
 
-#: app/Controllers/PaymentGatewayController.php:661
+#: app/Controllers/PaymentGatewayController.php:694
+msgid "You do not have permission to view this payment."
+msgstr ""
+
+#: app/Controllers/PaymentGatewayController.php:696
+msgid "Authentication required."
+msgstr ""
+
+#: app/Controllers/PaymentGatewayController.php:849
 msgid "You do not have permission to access this invoice."
 msgstr ""
 
-#: app/Controllers/PaymentGatewayController.php:663
+#: app/Controllers/PaymentGatewayController.php:851
 msgid "You must be logged in to download invoices."
 msgstr ""
 
-#: app/Controllers/PaymentGatewayController.php:693
+#: app/Controllers/PaymentGatewayController.php:881
 msgid "Invoice PDF generator is not installed. Please run composer install to install dompdf/dompdf."
 msgstr ""
 
@@ -2671,12 +2705,12 @@ msgid "Loyal (4+)"
 msgstr ""
 
 #: app/Controllers/ReportsController.php:524
-#: app/Controllers/SingleTripController.php:1901
+#: app/Controllers/SingleTripController.php:1919
 msgid "Adult"
 msgstr ""
 
 #: app/Controllers/ReportsController.php:525
-#: app/Controllers/SingleTripController.php:1924
+#: app/Controllers/SingleTripController.php:1942
 msgid "Child"
 msgstr ""
 
@@ -2798,47 +2832,43 @@ msgstr ""
 msgid "Step %1$d of %2$d"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1492
-#: app/Repositories/ItineraryRepository.php:1046
+#: app/Controllers/SingleTripController.php:1520
+#: app/Repositories/ItineraryRepository.php:1065
 #: app/Services/ItineraryService.php:50
 #, php-format
 msgid "Day %d"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1701
-msgid "No custom content available for this section."
-msgstr ""
-
-#: app/Controllers/SingleTripController.php:1798
-#: app/Controllers/SingleTripController.php:2061
+#: app/Controllers/SingleTripController.php:1816
+#: app/Controllers/SingleTripController.php:2079
 #: templates/partials/availability-card.php:369
 #, php-format
 msgid "per group (%d-%d pax)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1800
-#: app/Controllers/SingleTripController.php:2063
+#: app/Controllers/SingleTripController.php:1818
+#: app/Controllers/SingleTripController.php:2081
 #: templates/partials/availability-card.php:371
 #, php-format
 msgid "per group (up to %d pax)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1802
-#: app/Controllers/SingleTripController.php:2065
+#: app/Controllers/SingleTripController.php:1820
+#: app/Controllers/SingleTripController.php:2083
 #: templates/partials/availability-card.php:373
 #, php-format
 msgid "per group (%d+ pax)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1804
-#: app/Controllers/SingleTripController.php:2067
+#: app/Controllers/SingleTripController.php:1822
+#: app/Controllers/SingleTripController.php:2085
 #: templates/partials/availability-card.php:375
 #: templates/partials/pricing-summary.php:48
 msgid "per group"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1832
-#: app/Controllers/SingleTripController.php:2015
+#: app/Controllers/SingleTripController.php:1850
+#: app/Controllers/SingleTripController.php:2033
 #: templates/partials/availability-card.php:357
 #: templates/partials/booking-content.php:334
 #: templates/partials/booking-form-fields.php:418
@@ -2846,7 +2876,7 @@ msgstr ""
 msgid "(Age %d-%d)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1834
+#: app/Controllers/SingleTripController.php:1852
 #: templates/partials/availability-card.php:359
 #: templates/partials/booking-content.php:336
 #: templates/partials/booking-form-fields.php:420
@@ -2854,7 +2884,7 @@ msgstr ""
 msgid "(Age %d+)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1836
+#: app/Controllers/SingleTripController.php:1854
 #: templates/partials/availability-card.php:361
 #: templates/partials/booking-content.php:338
 #: templates/partials/booking-form-fields.php:422
@@ -2862,59 +2892,59 @@ msgstr ""
 msgid "(Up to age %d)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1865
-#: app/Controllers/SingleTripController.php:2091
+#: app/Controllers/SingleTripController.php:1883
+#: app/Controllers/SingleTripController.php:2109
 #: templates/partials/availability-card.php:407
 #: templates/partials/booking-content.php:355
 #, php-format
 msgid "Decrease %s"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1869
-#: app/Controllers/SingleTripController.php:2095
+#: app/Controllers/SingleTripController.php:1887
+#: app/Controllers/SingleTripController.php:2113
 #: templates/partials/availability-card.php:413
 #: templates/partials/booking-content.php:359
 #, php-format
 msgid "Increase %s"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1896
-#: app/Controllers/SingleTripController.php:2115
+#: app/Controllers/SingleTripController.php:1914
+#: app/Controllers/SingleTripController.php:2133
 #: templates/partials/availability-card.php:434
 #: templates/partials/single-trip/sticky-sidebar.php:183
 msgid "Select travelers"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1902
+#: app/Controllers/SingleTripController.php:1920
 msgid "(Age 13-99)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1909
+#: app/Controllers/SingleTripController.php:1927
 msgid "Decrease adults"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1913
+#: app/Controllers/SingleTripController.php:1931
 msgid "Increase adults"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1925
+#: app/Controllers/SingleTripController.php:1943
 msgid "(Age 4-12)"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1932
+#: app/Controllers/SingleTripController.php:1950
 msgid "Decrease children"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1936
+#: app/Controllers/SingleTripController.php:1954
 msgid "Increase children"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1948
-#: app/Controllers/SingleTripController.php:2121
+#: app/Controllers/SingleTripController.php:1966
+#: app/Controllers/SingleTripController.php:2139
 msgid "Adult x 1"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:2326
+#: app/Controllers/SingleTripController.php:2344
 msgid "Custom Tab"
 msgstr ""
 
@@ -3107,54 +3137,54 @@ msgstr ""
 msgid "Revision restored successfully"
 msgstr ""
 
-#: app/Controllers/TripController.php:1944
+#: app/Controllers/TripController.php:1967
 msgid "Start"
 msgstr ""
 
-#: app/Controllers/TripController.php:1945
+#: app/Controllers/TripController.php:1968
 msgid "End"
 msgstr ""
 
-#: app/Controllers/TripController.php:1951
-#: app/Controllers/TripController.php:2056
+#: app/Controllers/TripController.php:1974
+#: app/Controllers/TripController.php:2079
 #: app/Services/TransactionalEmailTemplateService.php:433
 #: templates/partials/availability-card.php:169
 #: templates/pdf/itinerary.php:262
 msgid "Departure"
 msgstr ""
 
-#: app/Controllers/TripController.php:1952
-#: app/Controllers/TripController.php:2059
+#: app/Controllers/TripController.php:1975
+#: app/Controllers/TripController.php:2082
 #: templates/partials/availability-card.php:176
 msgid "Return"
 msgstr ""
 
-#: app/Controllers/TripController.php:1984
-#: app/Controllers/TripController.php:2068
+#: app/Controllers/TripController.php:2007
+#: app/Controllers/TripController.php:2091
 msgid "Group Departure"
 msgstr ""
 
-#: app/Controllers/TripController.php:2058
-#: app/Controllers/TripController.php:2071
+#: app/Controllers/TripController.php:2081
+#: app/Controllers/TripController.php:2094
 #: templates/partials/single-trip/content-location.php:85
 #: templates/partials/single-trip/content-location.php:517
 msgid "Starting Point"
 msgstr ""
 
-#: app/Controllers/TripController.php:2061
-#: app/Controllers/TripController.php:2072
+#: app/Controllers/TripController.php:2084
+#: app/Controllers/TripController.php:2095
 #: templates/partials/single-trip/content-location.php:86
 #: templates/partials/single-trip/content-location.php:541
 msgid "Ending Point"
 msgstr ""
 
-#: app/Controllers/TripController.php:2164
+#: app/Controllers/TripController.php:2187
 #, php-format
 msgid "+%d%%"
 msgstr ""
 
-#: app/Controllers/TripController.php:2170
-#: app/Controllers/TripController.php:2176
+#: app/Controllers/TripController.php:2193
+#: app/Controllers/TripController.php:2199
 #, php-format
 msgid "%d%% OFF"
 msgstr ""
@@ -3248,8 +3278,31 @@ msgstr ""
 msgid "Local snapshots removed."
 msgstr ""
 
+#: app/Core/Handlers/AccountPageHandler.php:46
+#: app/Providers/FrontendAssetsProvider.php:741
+#: app/Shortcodes/LoginShortcode.php:144
+#: templates/account-page.php:71
+msgid "My Account"
+msgstr ""
+
+#: app/Core/Handlers/BookingConfirmationPageHandler.php:35
+msgid "Booking Confirmation"
+msgstr ""
+
 #: app/Core/Handlers/CheckoutPageHandler.php:31
 msgid "Invalid checkout link."
+msgstr ""
+
+#: app/Core/Handlers/CheckoutPageHandler.php:36
+msgid "Checkout"
+msgstr ""
+
+#: app/Core/Handlers/EmailVerificationPageHandler.php:27
+msgid "Email Verification"
+msgstr ""
+
+#: app/Core/Handlers/ListingPageHandler.php:46
+msgid "Listing"
 msgstr ""
 
 #: app/Core/Handlers/LoginPageHandler.php:24
@@ -3260,9 +3313,8 @@ msgstr ""
 msgid "Too many requests"
 msgstr ""
 
-#: app/Core/Handlers/LoginPageHandler.php:127
-#: app/Core/Handlers/LoginPageHandler.php:133
-#: app/Providers/FrontendAssetsProvider.php:728
+#: app/Core/Handlers/LoginPageHandler.php:52
+#: app/Providers/FrontendAssetsProvider.php:745
 #: app/Shortcodes/MyAccountShortcode.php:60
 #: templates/account-page.php:51
 #: templates/partials/booking-auth.php:25
@@ -3270,11 +3322,7 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: app/Core/Handlers/LoginPageHandler.php:128
-msgid "Login to your Yatra account"
-msgstr ""
-
-#: app/Core/Handlers/LoginPageHandler.php:183
+#: app/Core/Handlers/LoginPageHandler.php:145
 msgid "Error"
 msgstr ""
 
@@ -3291,7 +3339,7 @@ msgid "Integrations"
 msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:59
-#: templates/booking-confirmation.php:450
+#: templates/booking-confirmation.php:517
 #: templates/partials/booking-content.php:592
 msgid "Additional Services"
 msgstr ""
@@ -3392,6 +3440,8 @@ msgid "Automatically schedule the remaining booking balance after a partial or d
 msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:208
+#: app/Models/Checkout.php:287
+#: templates/partials/pricing-summary.php:88
 #: templates/setup-wizard/complete-old.php:61
 #: templates/setup-wizard/complete.php:137
 msgid "Dynamic Pricing"
@@ -3424,7 +3474,7 @@ msgstr ""
 #. translators: %d day count
 #: app/Helpers/FormatHelper.php:294
 #: app/Helpers/FormatHelper.php:302
-#: templates/booking-confirmation.php:180
+#: templates/booking-confirmation.php:247
 #, php-format
 msgid "%d Day"
 msgid_plural "%d Days"
@@ -3433,7 +3483,7 @@ msgstr[1] ""
 
 #. translators: %d night count
 #: app/Helpers/FormatHelper.php:297
-#: templates/booking-confirmation.php:186
+#: templates/booking-confirmation.php:253
 #, php-format
 msgid "%d Night"
 msgid_plural "%d Nights"
@@ -3585,7 +3635,7 @@ msgstr ""
 msgid "unknown"
 msgstr ""
 
-#: app/Models/Checkout.php:209
+#: app/Models/Checkout.php:224
 #: app/Services/DiscountService.php:1095
 #: app/Services/DiscountService.php:1139
 msgid "Coupon Discount"
@@ -3874,7 +3924,7 @@ msgid "Plugin Homepage"
 msgstr ""
 
 #: app/Providers/AdminServiceProvider.php:342
-#: app/Providers/FrontendAssetsProvider.php:761
+#: app/Providers/FrontendAssetsProvider.php:778
 msgid "Contact"
 msgstr ""
 
@@ -3892,81 +3942,75 @@ msgstr ""
 msgid "Yatra Dashboard"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:724
-#: app/Shortcodes/LoginShortcode.php:144
-#: templates/account-page.php:71
-msgid "My Account"
-msgstr ""
-
-#: app/Providers/FrontendAssetsProvider.php:725
+#: app/Providers/FrontendAssetsProvider.php:742
 msgid "My Bookings"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:726
+#: app/Providers/FrontendAssetsProvider.php:743
 msgid "Account Settings"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:729
+#: app/Providers/FrontendAssetsProvider.php:746
 #: app/Shortcodes/MyAccountShortcode.php:64
 #: templates/partials/booking-auth.php:31
 msgid "Register"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:733
+#: app/Providers/FrontendAssetsProvider.php:750
 #: templates/pdf/itinerary.php:186
 msgid "Booking Status"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:739
-#: templates/partials/single-trip/content-itinerary.php:365
+#: app/Providers/FrontendAssetsProvider.php:756
+#: templates/partials/single-trip/content-itinerary.php:380
 #: templates/partials/single-trip/gallery-modal.php:29
 msgid "Loading..."
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:740
+#: app/Providers/FrontendAssetsProvider.php:757
 msgid "No data available"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:741
+#: app/Providers/FrontendAssetsProvider.php:758
 msgid "Error loading data"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:742
+#: app/Providers/FrontendAssetsProvider.php:759
 msgid "Please try again"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:746
+#: app/Providers/FrontendAssetsProvider.php:763
 msgid "Free"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:747
+#: app/Providers/FrontendAssetsProvider.php:764
 #: templates/partials/single-trip/quick-facts.php:111
 msgid "Price"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:750
+#: app/Providers/FrontendAssetsProvider.php:767
 #: templates/pdf/itinerary.php:144
 msgid "Trip Details"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:752
+#: app/Providers/FrontendAssetsProvider.php:769
 #: templates/partials/single-trip/quick-facts.php:44
 #: templates/shortcodes/search.php:93
 #: templates/trip-listing-card.php:343
 msgid "Difficulty"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:753
+#: app/Providers/FrontendAssetsProvider.php:770
 #: templates/partials/single-trip/quick-facts.php:78
 msgid "Group Size"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:756
+#: app/Providers/FrontendAssetsProvider.php:773
 #: templates/partials/single-trip/hero.php:15
 msgid "Home"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:757
+#: app/Providers/FrontendAssetsProvider.php:774
 #: templates/listing-activity.php:238
 #: templates/listing-destination.php:245
 #: templates/listing-trip-category.php:250
@@ -3974,7 +4018,7 @@ msgstr ""
 msgid "Trips"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:760
+#: app/Providers/FrontendAssetsProvider.php:777
 msgid "About Us"
 msgstr ""
 
@@ -5686,7 +5730,7 @@ msgstr ""
 #: app/Validators/DestinationValidator.php:133
 #: app/Validators/TripValidator.php:90
 #: app/Validators/TripValidator.php:151
-msgid "Slug can only contain lowercase letters, numbers, and hyphens"
+msgid "Slug can only contain letters, numbers, and hyphens"
 msgstr ""
 
 #: app/Validators/ActivityValidator.php:53
@@ -6428,179 +6472,200 @@ msgstr ""
 msgid "instead of"
 msgstr ""
 
-#: templates/booking-confirmation.php:80
+#: templates/booking-confirmation.php:117
+msgid "Balance Paid!"
+msgstr ""
+
+#: templates/booking-confirmation.php:119
 msgid "Booking Confirmed!"
 msgstr ""
 
-#: templates/booking-confirmation.php:82
+#: templates/booking-confirmation.php:121
 msgid "Booking Received!"
 msgstr ""
 
-#: templates/booking-confirmation.php:84
+#: templates/booking-confirmation.php:123
 msgid "Booking Cancelled"
 msgstr ""
 
-#: templates/booking-confirmation.php:86
+#: templates/booking-confirmation.php:125
 msgid "Booking Submitted!"
 msgstr ""
 
-#: templates/booking-confirmation.php:93
+#: templates/booking-confirmation.php:132
+msgid "Your remaining balance has been received. This booking is now fully paid."
+msgstr ""
+
+#: templates/booking-confirmation.php:134
 msgid "Thank you for your booking. We look forward to hosting you!"
 msgstr ""
 
-#: templates/booking-confirmation.php:95
+#: templates/booking-confirmation.php:136
 msgid "Thank you for your booking. Your booking is pending confirmation."
 msgstr ""
 
-#: templates/booking-confirmation.php:97
+#: templates/booking-confirmation.php:138
 msgid "This booking has been cancelled."
 msgstr ""
 
-#: templates/booking-confirmation.php:99
+#: templates/booking-confirmation.php:140
 msgid "Thank you for your booking submission."
 msgstr ""
 
-#: templates/booking-confirmation.php:104
+#: templates/booking-confirmation.php:145
 msgid "Booking Reference:"
 msgstr ""
 
+#: templates/booking-confirmation.php:157
+msgid "Balance payment received."
+msgstr ""
+
+#: templates/booking-confirmation.php:164
+#, php-format
+msgid "You've completed payment for booking %1$s. A receipt has been emailed to you. View or download your %2$s anytime from your account."
+msgstr ""
+
+#: templates/booking-confirmation.php:168
+msgid "payment history"
+msgstr ""
+
 #. translators: %d review count
-#: templates/booking-confirmation.php:153
+#: templates/booking-confirmation.php:220
 #, php-format
 msgid "%d Review"
 msgid_plural "%d Reviews"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/booking-confirmation.php:173
+#: templates/booking-confirmation.php:240
 #, php-format
 msgid "%d Days / %d Nights"
 msgstr ""
 
-#: templates/booking-confirmation.php:229
+#: templates/booking-confirmation.php:296
 msgid "Destinations:"
 msgstr ""
 
-#: templates/booking-confirmation.php:240
+#: templates/booking-confirmation.php:307
 msgid "Activities:"
 msgstr ""
 
-#: templates/booking-confirmation.php:251
+#: templates/booking-confirmation.php:318
 msgid "Trip Type:"
 msgstr ""
 
-#: templates/booking-confirmation.php:262
+#: templates/booking-confirmation.php:329
 msgid "Features:"
 msgstr ""
 
-#: templates/booking-confirmation.php:287
+#: templates/booking-confirmation.php:354
 #: templates/pdf/itinerary.php:214
 msgid "Booking Information"
 msgstr ""
 
-#: templates/booking-confirmation.php:292
+#: templates/booking-confirmation.php:359
 #: templates/partials/remaining-checkout-content.php:92
 #: templates/pdf/itinerary.php:225
 msgid "Status"
 msgstr ""
 
-#: templates/booking-confirmation.php:436
+#: templates/booking-confirmation.php:503
 msgid "Trip Base Price"
 msgstr ""
 
-#: templates/booking-confirmation.php:439
+#: templates/booking-confirmation.php:506
 msgid "Tax Incl."
 msgstr ""
 
-#: templates/booking-confirmation.php:457
+#: templates/booking-confirmation.php:524
 msgid "Service"
 msgstr ""
 
-#: templates/booking-confirmation.php:494
+#: templates/booking-confirmation.php:561
 msgid "(per person)"
 msgstr ""
 
-#: templates/booking-confirmation.php:496
+#: templates/booking-confirmation.php:563
 msgid "(per booking)"
 msgstr ""
 
-#: templates/booking-confirmation.php:498
+#: templates/booking-confirmation.php:565
 msgid "(flat rate)"
 msgstr ""
 
-#: templates/booking-confirmation.php:512
+#: templates/booking-confirmation.php:579
 msgid "Taxable Amount"
 msgstr ""
 
 #. translators: %1$s = tax name, %2$s = rate, %3$s = amount
-#: templates/booking-confirmation.php:552
+#: templates/booking-confirmation.php:619
 #, php-format
 msgid "Incl. %1$s%2$s: %3$s"
 msgstr ""
 
-#: templates/booking-confirmation.php:573
-#: templates/partials/pricing-summary.php:347
+#: templates/booking-confirmation.php:640
+#: templates/partials/pricing-summary.php:343
 #: templates/partials/remaining-checkout-content.php:162
 msgid "Due Now"
 msgstr ""
 
-#: templates/booking-confirmation.php:580
+#: templates/booking-confirmation.php:647
 msgid "Payment Method:"
 msgstr ""
 
-#: templates/booking-confirmation.php:592
+#: templates/booking-confirmation.php:659
 msgid "Contact Information"
 msgstr ""
 
-#: templates/booking-confirmation.php:619
+#: templates/booking-confirmation.php:686
 msgid "Name:"
 msgstr ""
 
-#: templates/booking-confirmation.php:626
+#: templates/booking-confirmation.php:693
 msgid "Email:"
 msgstr ""
 
-#: templates/booking-confirmation.php:633
+#: templates/booking-confirmation.php:700
 msgid "Phone:"
 msgstr ""
 
-#: templates/booking-confirmation.php:640
+#: templates/booking-confirmation.php:707
 msgid "Contact information not available"
 msgstr ""
 
-#: templates/booking-confirmation.php:656
+#: templates/booking-confirmation.php:723
 msgid "What's Next?"
 msgstr ""
 
-#: templates/booking-confirmation.php:663
+#: templates/booking-confirmation.php:730
 msgid "Check Your Email"
 msgstr ""
 
-#: templates/booking-confirmation.php:664
+#: templates/booking-confirmation.php:731
 msgid "We've sent a confirmation email with all the details to your registered email address."
 msgstr ""
 
-#: templates/booking-confirmation.php:671
+#: templates/booking-confirmation.php:738
 msgid "Detailed Itinerary"
 msgstr ""
 
-#: templates/booking-confirmation.php:672
+#: templates/booking-confirmation.php:739
 msgid "You'll receive a detailed itinerary and preparation guide within 24-48 hours."
 msgstr ""
 
-#: templates/booking-confirmation.php:679
+#: templates/booking-confirmation.php:746
 msgid "Prepare for Adventure"
 msgstr ""
 
-#: templates/booking-confirmation.php:680
+#: templates/booking-confirmation.php:747
 msgid "Ensure all travelers have valid ID or travel documents and any required visas for your destination."
 msgstr ""
 
-#: templates/booking-confirmation.php:693
+#: templates/booking-confirmation.php:760
 msgid "Return to Home"
 msgstr ""
 
-#: templates/booking-confirmation.php:736
+#: templates/booking-confirmation.php:803
 msgid "Print Confirmation"
 msgstr ""
 
@@ -7046,7 +7111,7 @@ msgstr ""
 
 #: templates/partials/availability-card.php:265
 #: templates/partials/availability-card.php:270
-#: templates/partials/booking-content.php:666
+#: templates/partials/booking-content.php:675
 #: templates/partials/single-trip/content-important-info.php:71
 msgid "Cancellation Policy"
 msgstr ""
@@ -7418,29 +7483,29 @@ msgid "per day"
 msgstr ""
 
 #: templates/partials/booking-content.php:617
-#: templates/partials/pricing-summary.php:232
+#: templates/partials/pricing-summary.php:285
 #: templates/partials/single-trip/content-included-excluded.php:19
-#: templates/partials/single-trip/content-itinerary.php:156
+#: templates/partials/single-trip/content-itinerary.php:171
 msgid "Included"
 msgstr ""
 
-#: templates/partials/booking-content.php:699
+#: templates/partials/booking-content.php:708
 msgid "Full policy available on trip details page"
 msgstr ""
 
-#: templates/partials/booking-content.php:709
+#: templates/partials/booking-content.php:718
 msgid "Booking Assurance"
 msgstr ""
 
-#: templates/partials/booking-content.php:716
+#: templates/partials/booking-content.php:725
 msgid "Instant confirmation"
 msgstr ""
 
-#: templates/partials/booking-content.php:722
+#: templates/partials/booking-content.php:731
 msgid "24/7 customer support"
 msgstr ""
 
-#: templates/partials/booking-content.php:729
+#: templates/partials/booking-content.php:738
 msgid "Secure payment processing"
 msgstr ""
 
@@ -7595,46 +7660,42 @@ msgstr ""
 msgid "Number of travelers"
 msgstr ""
 
-#: templates/partials/pricing-summary.php:166
+#. translators: %1$s = first rule name, %2$d = extra rules count
+#: templates/partials/pricing-summary.php:95
+#, php-format
+msgid "%1$s + %2$d more"
+msgstr ""
+
+#. translators: %d = total rules applied
+#: templates/partials/pricing-summary.php:99
+#, php-format
+msgid "%d rule applied"
+msgid_plural "%d rules applied"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/partials/pricing-summary.php:126
+msgid "Trip Subtotal"
+msgstr ""
+
+#: templates/partials/pricing-summary.php:219
 msgctxt "pricing type"
 msgid "(per person)"
 msgstr ""
 
-#: templates/partials/pricing-summary.php:193
+#: templates/partials/pricing-summary.php:246
 msgctxt "pricing type"
 msgid "(per booking)"
 msgstr ""
 
-#: templates/partials/pricing-summary.php:195
+#: templates/partials/pricing-summary.php:248
 msgctxt "pricing type"
 msgid "(flat rate)"
 msgstr ""
 
-#: templates/partials/pricing-summary.php:228
+#: templates/partials/pricing-summary.php:281
 msgid "Required"
 msgstr ""
-
-#: templates/partials/pricing-summary.php:258
-msgid "Original Price"
-msgstr ""
-
-#. translators: %s: savings percentage
-#: templates/partials/pricing-summary.php:271
-#, php-format
-msgid "You save %s"
-msgstr ""
-
-#: templates/partials/pricing-summary.php:292
-msgid "Limited time offer! Dynamic pricing applied."
-msgstr ""
-
-#. translators: %d: number of rules
-#: templates/partials/pricing-summary.php:296
-#, php-format
-msgid "%d dynamic pricing rule applied!"
-msgid_plural "%d dynamic pricing rules applied!"
-msgstr[0] ""
-msgstr[1] ""
 
 #: templates/partials/remaining-checkout-content.php:9
 msgid "No active booking session was found. Please initiate the remaining payment from your account page."
@@ -7674,6 +7735,14 @@ msgstr ""
 
 #: templates/partials/remaining-checkout-content.php:172
 msgid "Access travel documents inside your account"
+msgstr ""
+
+#: templates/partials/single-trip/content-custom.php:19
+msgid "Section"
+msgstr ""
+
+#: templates/partials/single-trip/content-custom.php:34
+msgid "No custom content available for this section."
 msgstr ""
 
 #: templates/partials/single-trip/content-downloads.php:99
@@ -7806,7 +7875,7 @@ msgid "What's Included & Excluded"
 msgstr ""
 
 #: templates/partials/single-trip/content-included-excluded.php:49
-#: templates/partials/single-trip/content-itinerary.php:176
+#: templates/partials/single-trip/content-itinerary.php:191
 msgid "Excluded"
 msgstr ""
 
@@ -7818,48 +7887,48 @@ msgstr ""
 msgid "Detailed itinerary information will be available soon. Please check back later or contact us for more details."
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:153
+#: templates/partials/single-trip/content-itinerary.php:168
 msgid "Included and excluded items"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:169
-#: templates/partials/single-trip/content-itinerary.php:189
+#: templates/partials/single-trip/content-itinerary.php:184
+#: templates/partials/single-trip/content-itinerary.php:204
 msgid "None"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:203
+#: templates/partials/single-trip/content-itinerary.php:218
 msgid "Photos"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:228
+#: templates/partials/single-trip/content-itinerary.php:243
 #, php-format
 msgid "Itinerary Gallery Image %d"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:298
+#: templates/partials/single-trip/content-itinerary.php:313
 msgid "Video thumbnail"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:334
-#: templates/partials/single-trip/content-itinerary.php:364
+#: templates/partials/single-trip/content-itinerary.php:349
+#: templates/partials/single-trip/content-itinerary.php:379
 msgid "Itinerary Gallery Image"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:345
+#: templates/partials/single-trip/content-itinerary.php:360
 msgid "Itinerary Gallery"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:348
+#: templates/partials/single-trip/content-itinerary.php:363
 #: templates/partials/single-trip/gallery-modal.php:12
 msgid "Close Gallery"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:353
+#: templates/partials/single-trip/content-itinerary.php:368
 #: templates/partials/single-trip/gallery-modal.php:17
 msgid "Previous Image"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:358
+#: templates/partials/single-trip/content-itinerary.php:373
 #: templates/partials/single-trip/gallery-modal.php:22
 msgid "Next Image"
 msgstr ""
@@ -9748,100 +9817,114 @@ msgstr ""
 msgid "More categories"
 msgstr ""
 
+#: assets/js/blocks/page-content.js:32
+#: assets/js/blocks/page-content.js:52
+#: assets/js/blocks/page-content.js:53
+msgid "Yatra Page Content"
+msgstr ""
+
+#: assets/js/blocks/page-content.js:33
+msgid "Renders the current Yatra page (single trip, listing, booking, etc.) based on the request route."
+msgstr ""
+
+#: assets/js/blocks/page-content.js:77
+msgid "Rendered on the front-end based on the current route. No editor preview."
+msgstr ""
+
 #: assets/js/stripe.js:145
 msgid "Complete Your Payment"
 msgstr ""
 
 #: assets/js/stripe.js:148
-#: assets/js/stripe.js:178
+#: assets/js/stripe.js:194
 msgid "Pay"
 msgstr ""
 
-#: assets/js/stripe.js:232
+#: assets/js/stripe.js:248
 msgid "One-tap checkout"
 msgstr ""
 
-#: assets/js/stripe.js:243
+#: assets/js/stripe.js:259
 msgid "Checking your device for wallet support…"
 msgstr ""
 
-#: assets/js/stripe.js:382
+#: assets/js/stripe.js:398
 msgid "Please pay using the Apple Pay or Google Pay button above."
 msgstr ""
 
-#: assets/js/stripe.js:466
+#: assets/js/stripe.js:482
 msgid "Apple Pay and Google Pay are not available on this browser/device."
 msgstr ""
 
-#: assets/js/stripe.js:470
+#: assets/js/stripe.js:486
 msgid "Use card payment instead or switch to a supported device."
 msgstr ""
 
-#: assets/js/stripe.js:477
+#: assets/js/stripe.js:493
 msgid "Great! Apple Pay or Google Pay is available on this device."
 msgstr ""
 
-#: assets/js/stripe.js:508
+#: assets/js/stripe.js:524
 msgid "Unable to load Apple Pay / Google Pay. Please try again later or use card payment."
 msgstr ""
 
-#: assets/js/stripe.js:511
+#: assets/js/stripe.js:527
 msgid "Wallet payment failed to load."
 msgstr ""
 
-#: assets/js/stripe.js:513
+#: assets/js/stripe.js:529
 msgid "Wallet payments could not be initialized. Use your card below, or try again after refreshing the page."
 msgstr ""
 
-#: assets/js/stripe.js:559
+#: assets/js/stripe.js:575
 msgid "Google Pay is not available in this browser. Try Chrome or Edge on desktop or Android, use HTTPS, and ensure you have a card in your Google account."
 msgstr ""
 
-#: assets/js/stripe.js:562
+#: assets/js/stripe.js:578
 msgid "Apple Pay is not available here. Use Safari on iPhone, iPad, or Mac, serve this page over HTTPS, and add your domain in Stripe for Apple Pay."
 msgstr ""
 
-#: assets/js/stripe.js:583
+#: assets/js/stripe.js:599
 msgid "Choose a payment option"
 msgstr ""
 
-#: assets/js/stripe.js:587
+#: assets/js/stripe.js:603
 msgid "Payment methods"
 msgstr ""
 
-#: assets/js/stripe.js:591
+#: assets/js/stripe.js:607
 msgid "Pick the option that works best for you."
 msgstr ""
 
-#: assets/js/stripe.js:600
+#: assets/js/stripe.js:616
 msgid "Card"
 msgstr ""
 
-#: assets/js/stripe.js:601
+#: assets/js/stripe.js:617
 msgid "Use any major debit or credit card via Stripe Elements."
 msgstr ""
 
-#: assets/js/stripe.js:609
+#: assets/js/stripe.js:625
 msgid "Google Pay"
 msgstr ""
 
-#: assets/js/stripe.js:610
+#: assets/js/stripe.js:626
 msgid "Pay instantly with the cards saved to your Google account."
 msgstr ""
 
-#: assets/js/stripe.js:618
+#: assets/js/stripe.js:634
 msgid "Apple Pay"
 msgstr ""
 
-#: assets/js/stripe.js:619
+#: assets/js/stripe.js:635
 msgid "Use Apple Wallet on iPhone, iPad, or Mac to pay securely."
 msgstr ""
 
-#: assets/js/stripe.js:764
+#: assets/js/stripe.js:780
 msgid "Checking if Google Pay or Apple Pay is available on this device…"
 msgstr ""
 
-#: assets/js/stripe.js:771
+#: assets/js/stripe.js:787
 msgid "This wallet is not available on this device or browser. Use card payment instead."
 msgstr ""
 

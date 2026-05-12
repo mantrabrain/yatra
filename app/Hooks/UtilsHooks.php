@@ -39,9 +39,11 @@ class UtilsHooks
             return;
         }
 
-        // Check if we're on a single trip page
+        // Check if we're on a single trip page (use query var, not global $trip —
+        // the booking template also assigns $trip at global scope, which would
+        // otherwise leak this menu into the booking page admin bar).
         global $trip;
-        if (!empty($trip) && !empty($trip->id)) {
+        if (function_exists('yatra_is_single_trip') && yatra_is_single_trip() && !empty($trip) && !empty($trip->id)) {
             // Build the edit URL for the trip
             $edit_url = admin_url('admin.php?page=yatra&subpage=trips&action=edit&id=' . (int) $trip->id);
 

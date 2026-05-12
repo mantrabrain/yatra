@@ -167,12 +167,12 @@ final class PlainPageMatcher
         if ($baseKey !== '') {
             $fromBase = $_GET[$baseKey] ?? null;
             if (is_string($fromBase)) {
-                $slug = sanitize_title(wp_unslash($fromBase));
+                $slug = \Yatra\Helpers\SlugHelper::generate(wp_unslash($fromBase));
             }
         }
         if ($slug === '') {
             $legacy = $_GET[$legacySlugKey] ?? '';
-            $slug = is_string($legacy) ? sanitize_title(wp_unslash($legacy)) : '';
+            $slug = is_string($legacy) ? \Yatra\Helpers\SlugHelper::generate(wp_unslash($legacy)) : '';
         }
         if ($slug !== '') {
             return [
@@ -232,7 +232,7 @@ final class PlainPageMatcher
                 continue;
             }
             $raw = $_GET[$b];
-            $slug = is_string($raw) ? sanitize_title(wp_unslash($raw)) : '';
+            $slug = is_string($raw) ? \Yatra\Helpers\SlugHelper::generate(wp_unslash($raw)) : '';
             if ($slug === '') {
                 continue;
             }
@@ -263,7 +263,7 @@ final class PlainPageMatcher
     {
         $key = self::tripSlugQueryKey();
         $slug = $_GET[$key] ?? $_GET['yatra_trip'] ?? $_GET['yatra_trip_slug'] ?? '';
-        $slug = is_string($slug) ? sanitize_title(wp_unslash($slug)) : '';
+        $slug = is_string($slug) ? \Yatra\Helpers\SlugHelper::generate(wp_unslash($slug)) : '';
 
         return $slug;
     }

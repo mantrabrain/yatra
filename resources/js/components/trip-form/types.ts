@@ -91,7 +91,7 @@ export interface ItineraryEntry {
   duration?: string;
   start_time: string;
   end_time: string;
-  time_type: "exact" | "approximate" | "all_day" | "flexible";
+  time_type: "exact" | "duration" | "flexible";
   cost?: string;
   cost_per_person: boolean;
   notes?: string;

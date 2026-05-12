@@ -342,18 +342,40 @@ class SingleTripController
     }
 
     /**
-     * Decode JSON safely
+     * Decode a trip JSON / serialized field safely.
      *
-     * @param string|null $json JSON string
-     * @return array Decoded array or empty array
+     * Accepts both JSON (`[...]`) and PHP-serialized (`a:N:{...}`) input because
+     * different code paths persist these columns differently: most fields are
+     * stored as JSON, but TripValidator::sanitize() uses `maybe_serialize()` for
+     * a handful of array fields (including `frontend_tabs`). If we only tried
+     * `json_decode`, the PHP-serialized payload would silently decode to null
+     * → empty array → admin-saved icons / tab labels disappear on the public
+     * trip page. Try `maybe_unserialize` first; fall back to JSON.
+     *
+     * NOTE on safety: `maybe_unserialize` is used on a trusted DB column written
+     * by our own validator. There's no user-controlled payload path that lands
+     * in this column without sanitisation. Pre-checking the `a:` / `s:` /
+     * `O:` prefix avoids tripping unserialize on random non-serialized data.
+     *
+     * @param string|null $value JSON string OR PHP-serialized string OR null.
+     * @return array Decoded array (empty on any failure).
      */
-    private function decodeJson(?string $json): array
+    private function decodeJson(?string $value): array
     {
-        if (empty($json)) {
+        if (empty($value) || !is_string($value)) {
             return [];
         }
 
-        $decoded = json_decode($json, true);
+        // Looks like PHP-serialized data — try maybe_unserialize first.
+        if (preg_match('/^(?:a|s|O):\d+:/', $value)) {
+            $decoded = maybe_unserialize($value);
+            if (is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        // Fall back to JSON.
+        $decoded = json_decode($value, true);
         return is_array($decoded) ? $decoded : [];
     }
 
@@ -1476,6 +1498,12 @@ class SingleTripController
                     'item_type_color' => !empty($entry->item_type_color) ? (string) $entry->item_type_color : '',
                     'start_time' => $entry->start_time ?: '',
                     'end_time' => $entry->end_time ?: '',
+                    // The public template needs time_type to know whether to render
+                    // exact times, the duration-only label, or "Flexible". Without
+                    // this, all rows fell through to the start_time branch and an
+                    // entry intended as "duration / flexible" still showed clock
+                    // values pulled from stale defaults.
+                    'time_type' => $entry->time_type ?: 'exact',
                     'location' => $entry->location ?: '',
                     'duration' => $entry->duration ?: '',
                     'cost' => !empty($entry->cost) ? (float) $entry->cost : null,
@@ -1685,24 +1713,14 @@ class SingleTripController
                 break;
 
             case 'custom':
-                // Always show custom tab if enabled, even if content is empty
-                echo '<section class="yatra-trip-section" id="' . esc_attr($tab->id) . '">';
-                echo '<h2 class="yatra-trip-section-title">';
-                echo yatra_svg_icon('book', 'yatra-trip-section-title-icon');
-                echo esc_html($tab->label);
-                echo '</h2>';
-                echo '<div class="yatra-custom-content">';
-                
-                // Display custom content if it exists, otherwise show empty message
-                $custom_content = $tab->custom_content ?? '';
-                if (!empty($custom_content)) {
-                    echo wp_kses_post($custom_content);
-                } else {
-                    echo '<p class="text-gray-500 text-center py-8">' . esc_html__('No custom content available for this section.', 'yatra') . '</p>';
-                }
-                
-                echo '</div>';
-                echo '</section>';
+                // Delegated to a partial so the admin-chosen icon (and label, content)
+                // flow through the same yatra_render_tab_icon() pipeline as every other
+                // tab type. Previously this branch hardcoded yatra_svg_icon('book')
+                // which silently dropped the icon admins selected in Trip Builder.
+                yatra_get_template('partials/single-trip/content-custom', [
+                    'trip' => $trip,
+                    'tab' => $tab,
+                ]);
                 break;
         }
     }

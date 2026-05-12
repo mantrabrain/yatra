@@ -8,6 +8,7 @@ import React, { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { __ } from "../lib/i18n";
 import { apiClient, apiService } from "../lib/api-client";
+import { unwrapApiPayload } from "../lib/unwrap-api-payload";
 import { useToast } from "../components/ui/toast";
 import {
   Card,
@@ -1641,8 +1642,12 @@ const GoogleAnalyticsReports: React.FC = () => {
   } = useQuery({
     queryKey: ["google-analytics-status"],
     queryFn: async () => {
-      const response = await apiService.getGoogleAnalyticsSettings();
-      return response?.data || {};
+      const raw = await apiService.getGoogleAnalyticsSettings();
+      const payload = unwrapApiPayload<Record<string, unknown>>(raw);
+      return (payload && typeof payload === "object" ? payload : {}) as Record<
+        string,
+        unknown
+      >;
     },
     refetchInterval: 30000, // Refresh every 30 seconds
   });
@@ -1667,8 +1672,10 @@ const GoogleAnalyticsReports: React.FC = () => {
   const clearGALogs = async () => {
     setClearingLogs(true);
     try {
-      const response = await apiService.clearGoogleAnalyticsEventLogs();
-      if (response.success) {
+      const raw = (await apiService.clearGoogleAnalyticsEventLogs()) as {
+        success?: boolean;
+      };
+      if (raw?.success) {
         showToast(__("Event logs cleared successfully.", "yatra"), "success");
         // Refetch fresh data to update the UI
         await refetchGAData();

@@ -77,6 +77,19 @@ class ItineraryController extends BaseController
                 'permission_callback' => [$this, 'check_permission'],
             ],
         ]);
+
+        // Bulk-update / -create activities for a single day in one request.
+        // Replaces the React day-edit "save" path that previously fired one PUT
+        // per activity (5 activities = 5 sequential round-trips). The endpoint
+        // accepts an `activities` array carrying full payloads + optional `id`
+        // per row; rows with `id` are PUTs, rows without are POSTs.
+        register_rest_route($namespace, '/' . $base . '/day/(?P<day_id>[\d]+)/activities/bulk', [
+            [
+                'methods' => \WP_REST_Server::EDITABLE,
+                'callback' => [$this, 'bulk_save_day_activities'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
     }
 
     /**
@@ -197,6 +210,48 @@ class ItineraryController extends BaseController
             return $this->success_response([
                 'message' => __('Itinerary entry deleted successfully', 'yatra'),
             ]);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Bulk-save the activities of a single day in one request.
+     *
+     * Body shape:
+     * {
+     *   "trip_id": 14,
+     *   "activities": [
+     *     { "id": 39, "title": "...", "order": 0, ...full activity fields... },
+     *     {           "title": "...", "order": 1, ... }   // no id => create
+     *   ]
+     * }
+     *
+     * Each row goes through the same validation / sanitisation as a single
+     * update / create — the difference is one HTTP round-trip and one cache
+     * invalidation instead of N. Returns per-row results so the React layer
+     * can surface partial failures without losing the rows that succeeded.
+     */
+    public function bulk_save_day_activities(WP_REST_Request $request)
+    {
+        try {
+            $dayId = (int) $request->get_param('day_id');
+            $body = $request->get_json_params() ?: [];
+            $tripId = isset($body['trip_id']) ? (int) $body['trip_id'] : 0;
+            $activities = $body['activities'] ?? [];
+
+            if ($dayId <= 0) {
+                return $this->error_response('Invalid day_id', 400);
+            }
+            if (!is_array($activities)) {
+                return $this->error_response('activities must be an array', 400);
+            }
+
+            $result = $this->service->bulkSaveDayActivities($dayId, $tripId, $activities);
+
+            return $this->success_response($result);
+        } catch (\InvalidArgumentException $e) {
+            return $this->error_response($e->getMessage(), 400);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }

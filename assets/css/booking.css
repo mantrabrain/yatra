@@ -2103,47 +2103,32 @@
 }
 
 /* Additional Services */
+/* Selected-service rows in the Pricing Summary — match the neutral
+   colour scheme of every other price row. The previous purple
+   gradient/text/dot was visually inconsistent with the traveler row
+   above. Yatra default row colour is `.yatra-price-row { color: #475569 }`
+   (inherits below). Right-side price uses #1e293b like category subtotals. */
 .yatra-price-service {
-    background: linear-gradient(90deg, rgba(139, 92, 246, 0.06) 0%, transparent 100%);
-    margin: 4px -12px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: none !important;
+    margin: 0;
+    padding: 10px 0;
 }
 
-
 .yatra-price-service span:first-child {
-    color: #6d28d9;
     font-weight: 500;
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
-.yatra-price-service span:first-child::before {
-    content: "";
-    width: 6px;
-    height: 6px;
-    background: #8b5cf6;
-    border-radius: 50%;
-}
-
 .yatra-price-service span:last-child {
     font-weight: 600;
-    color: #5b21b6;
+    color: #1e293b;
 }
 
-/* Included Service */
+/* Included Service — row stays in the default palette; only the
+   "Included" badge below keeps a green hue as a status signal. */
 .yatra-service-included {
-    background: linear-gradient(90deg, rgba(16, 185, 129, 0.06) 0%, transparent 100%);
-}
-
-.yatra-service-included span:first-child {
-    color: #047857;
-}
-
-.yatra-service-included span:first-child::before {
-    background: #10b981;
+    /* Intentionally no background override — matches the other rows. */
 }
 
 .yatra-service-included-badge {
@@ -2238,7 +2223,10 @@
 }
 
 .yatra-summary-info li:before {
-    content: "✓";
+    /* CSS Unicode escape (U+2713 CHECK MARK) — using the literal ✓ glyph
+       renders as mojibake ("âœ") when the CSS file isn't served with an
+       explicit UTF-8 charset and the browser falls back to Latin-1. */
+    content: "\2713";
     position: absolute;
     left: 0;
     color: #10b981;
@@ -2972,11 +2960,61 @@
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     transition: all 0.2s ease;
+    /* `position: relative` anchors the CSS tooltip below */
+    position: relative;
 }
 
 .yatra-service-item:hover {
     border-color: #cbd5e1;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* CSS tooltip for the service description — uses `data-tooltip` (not the
+   native `title` attribute) so we don't trigger the browser's built-in
+   tooltip on top of this one. Native tooltips also have a ~1s delay and
+   can be suppressed when hovering over a disabled control inside a
+   <label>; this version shows instantly and is consistent across
+   browsers. `aria-label` on the same element still serves screen-readers. */
+.yatra-service-item[data-tooltip]:hover::after,
+.yatra-service-item[data-tooltip]:focus-within::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1f2937;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.4;
+    max-width: 260px;
+    white-space: pre-wrap;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+    opacity: 0;
+    animation: yatra-tooltip-fade 0.15s ease-out 0.05s forwards;
+}
+
+.yatra-service-item[data-tooltip]:hover::before,
+.yatra-service-item[data-tooltip]:focus-within::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1f2937;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    animation: yatra-tooltip-fade 0.15s ease-out 0.05s forwards;
+}
+
+@keyframes yatra-tooltip-fade {
+    to { opacity: 1; }
 }
 
 .yatra-service-item.yatra-service-required {
@@ -3029,8 +3067,28 @@
 .yatra-service-price {
     font-size: 13px;
     font-weight: 600;
-    color: #7c3aed;
+    color: #1e293b;
     white-space: nowrap;
+}
+
+/* Description tooltip (the ⓘ icon next to a service name).
+   `currentColor` lets the SVG inherit the surrounding text colour rather
+   than overriding it inline — keeps the icon visually consistent with
+   the rest of the yatra-service-info block regardless of theme. */
+.yatra-service-tooltip {
+    display: inline-flex;
+    vertical-align: middle;
+    margin-left: 4px;
+    cursor: help;
+    opacity: 0.55;
+    color: currentColor;
+}
+.yatra-service-tooltip:hover {
+    opacity: 1;
+}
+.yatra-service-tooltip svg {
+    width: 14px;
+    height: 14px;
 }
 
 /* Services Total Row in Price Summary */

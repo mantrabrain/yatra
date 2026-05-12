@@ -164,10 +164,26 @@ class YatraStripe {
                 btn.disabled = true;
                 btn.textContent = __('Processing...', 'yatra');
                 
+                // Append `stripe=success` to the gateway's return URL using proper URL
+                // composition. The naive `+ '?stripe=success'` form breaks when
+                // confirmation_url already carries query params (e.g. `?balance=paid`
+                // from a remaining-balance flow) — two question marks produces an
+                // invalid URL and browsers drop the second segment, losing the flag.
+                let confirmReturnUrl = data.confirmation_url;
+                try {
+                    const u = new URL(confirmReturnUrl, window.location.origin);
+                    u.searchParams.set('stripe', 'success');
+                    confirmReturnUrl = u.toString();
+                } catch (_e) {
+                    // Fallback for malformed bases (shouldn't happen in practice)
+                    const join = confirmReturnUrl.includes('?') ? '&' : '?';
+                    confirmReturnUrl = `${confirmReturnUrl}${join}stripe=success`;
+                }
+
                 const { error } = await this.stripe.confirmPayment({
                     elements,
                     confirmParams: {
-                        return_url: data.confirmation_url + '?stripe=success',
+                        return_url: confirmReturnUrl,
                     },
                 });
                 

@@ -265,6 +265,15 @@
             if (pricingType) {
                 payload.pricing_type = pricingType;
             }
+            // Carry the page URL's booking_token into the summary refresh so
+            // the REST controller can rehydrate the session from the matching
+            // transient when PHPSESSID isn't carried into REST scope. Without
+            // this, /booking/summary returns 400 "No active booking session
+            // found." on every recalculation.
+            try {
+                const tok = new URLSearchParams(window.location.search).get('booking_token');
+                if (tok) payload.booking_token = tok;
+            } catch (e) { /* URLSearchParams unavailable — skip */ }
             return payload;
         }
 
@@ -380,23 +389,35 @@
          */
         function formDataToObject(formData) {
             const obj = {};
-            
+
             for (const [key, value] of formData.entries()) {
                 // Handle array notation like travelers[1][first_name]
                 const matches = key.match(/^([^\[]+)(?:\[([^\]]*)\])?(?:\[([^\]]*)\])?$/);
-                
+
                 if (matches) {
                     const [, base, index, field] = matches;
-                    
+
                     if (index !== undefined && field !== undefined) {
                         // Array of objects: travelers[1][first_name]
                         if (!obj[base]) obj[base] = {};
                         if (!obj[base][index]) obj[base][index] = {};
                         obj[base][index][field] = value;
                     } else if (index !== undefined) {
-                        // Simple array: items[0]
+                        // Array notation. PHP/HTML produces two flavours:
+                        //   items[0], items[1]  → keyed indices
+                        //   items[]             → push to end (multi-checkbox)
+                        // The empty-string variant is what `<input name="additional_services[]">`
+                        // sends when several checkboxes are selected. Previously
+                        // we did `obj[base][""] = value` which silently overwrote
+                        // on each entry and JSON-serialised to `[]` — so the
+                        // server saw no selected services, even when boxes were
+                        // checked.
                         if (!obj[base]) obj[base] = [];
-                        obj[base][index] = value;
+                        if (index === '') {
+                            obj[base].push(value);
+                        } else {
+                            obj[base][index] = value;
+                        }
                     } else {
                         // Simple key
                         obj[key] = value;
@@ -887,10 +908,42 @@
             bookingData.accept_privacy = $('input[name="accept_privacy"]').is(':checked');
             bookingData.subscribe_newsletter = $('input[name="subscribe_newsletter"]').is(':checked');
             bookingData.payment_due = parseFloat($form.attr('data-payment-due')) || window.yatraBookingData?.paymentDue || null;
-            bookingData.total_amount = summary.totalAmount ?? null;
-            bookingData.amount_due = summary.amountDue ?? null;
+            // The pay button uses a fallback chain (summary.totalAmount → data-summary-total
+            // attribute → data-payment-due) so it can show "$279" even before the async
+            // pricing refresh populates `summary.totalAmount`. The submit path must walk
+            // the same chain — otherwise the button label and the request body disagree
+            // and BookingService rejects with "Total amount must be greater than zero."
+            const $summaryEl = $('.yatra-booking-summary').first();
+            const resolveAmount = (preferred, attr) => {
+                const n = Number(preferred);
+                if (Number.isFinite(n) && n > 0) return n;
+                const a = parseFloat($summaryEl.attr(attr));
+                if (Number.isFinite(a) && a > 0) return a;
+                return null;
+            };
+            bookingData.total_amount =
+                resolveAmount(summary.totalAmount, 'data-summary-total') ??
+                resolveAmount(summary.amountDue, 'data-summary-due') ??
+                (parseFloat($form.attr('data-payment-due')) || null);
+            bookingData.amount_due =
+                resolveAmount(summary.amountDue, 'data-summary-due') ??
+                (parseFloat($form.attr('data-payment-due')) || null);
             bookingData.amount_paid = summary.amountPaid ?? null;
             bookingData.currency = window.yatraBookingData?.currency || bookingData.currency || $('input[name="currency"]').val() || 'USD';
+            // Carry the booking_token from the page URL into the REST request.
+            // Without this the server's `create_booking` cannot rehydrate the
+            // PHP session for the user (REST runs in a separate request and
+            // PHPSESSID propagation isn't guaranteed). Server falls back to
+            // looking up the transient by this token to recover `traveler_counts`,
+            // `pricing_type`, `price_types` — without those, `calculatePricing`
+            // returns 0 for `traveler_based` trips and the booking gets
+            // rejected with "Total amount must be greater than zero."
+            try {
+                const urlToken = new URLSearchParams(window.location.search).get('booking_token');
+                if (urlToken) {
+                    bookingData.booking_token = urlToken;
+                }
+            } catch (e) { /* URLSearchParams missing — ignore */ }
 
             // Dispatch unified booking submit event - gateways can intercept
             const submitEvent = new CustomEvent('yatra_booking_submit', {
@@ -1003,6 +1056,15 @@
             $btn.prop('disabled', true).text('Applying...');
             $message.hide();
             
+            // Carry booking_token so the REST endpoint can rehydrate the
+            // session in contexts where PHPSESSID isn't passed through —
+            // same pattern as the service-toggle and summary refresh.
+            const couponPayload = { code: code };
+            try {
+                const tok = new URLSearchParams(window.location.search).get('booking_token');
+                if (tok) couponPayload.booking_token = tok;
+            } catch (e) { /* URLSearchParams unavailable — skip */ }
+
             fetch(apiUrl + '/booking/coupon/apply', {
                 method: 'POST',
                 headers: {
@@ -1010,7 +1072,7 @@
                     'X-WP-Nonce': nonce
                 },
                 credentials: 'same-origin',
-                body: JSON.stringify({ code: code })
+                body: JSON.stringify(couponPayload)
             })
             .then(response => response.json())
             .then(response => {
@@ -1049,6 +1111,12 @@
             
             $btn.prop('disabled', true);
             
+            const removePayload = {};
+            try {
+                const tok = new URLSearchParams(window.location.search).get('booking_token');
+                if (tok) removePayload.booking_token = tok;
+            } catch (e) { /* URLSearchParams unavailable — skip */ }
+
             fetch(apiUrl + '/booking/coupon/remove', {
                 method: 'POST',
                 headers: {
@@ -1056,7 +1124,7 @@
                     'X-WP-Nonce': nonce
                 },
                 credentials: 'same-origin',
-                body: JSON.stringify({})
+                body: JSON.stringify(removePayload)
             })
             .then(response => response.json())
             .then(response => {
@@ -1177,6 +1245,19 @@
             } else {
                 sessionUrl = `${restBase}/yatra/v1/booking/session`;
             }
+
+            // Append booking_token from the page URL so the REST endpoint can
+            // rehydrate the session via transient when PHPSESSID hasn't been
+            // carried over — otherwise this GET returns "No active session"
+            // and we never reveal the applied-coupon UI (and its remove
+            // button) after a page refresh.
+            try {
+                const tok = new URLSearchParams(window.location.search).get('booking_token');
+                if (tok) {
+                    const sep = sessionUrl.includes('?') ? '&' : '?';
+                    sessionUrl = sessionUrl + sep + 'booking_token=' + encodeURIComponent(tok);
+                }
+            } catch (e) { /* URLSearchParams unavailable — skip */ }
 
             fetch(sessionUrl, {
                 method: 'GET',
@@ -1323,6 +1404,17 @@
                 sessionUrl = `${restBase}/yatra/v1/booking/session`;
             }
 
+            // Carry booking_token from URL so the REST endpoint can rehydrate
+            // the session even when PHPSESSID hasn't propagated to the REST
+            // context (root cause of the "POST /booking/session 400" we saw
+            // on service-toggle). Matches the same pattern the /booking/create
+            // submit uses.
+            const sessionPayload = { additional_services: serviceIds };
+            try {
+                const tok = new URLSearchParams(window.location.search).get('booking_token');
+                if (tok) sessionPayload.booking_token = tok;
+            } catch (e) { /* URLSearchParams unavailable — skip */ }
+
             fetch(sessionUrl, {
                 method: 'POST',
                 credentials: 'same-origin',
@@ -1330,9 +1422,7 @@
                     'Content-Type': 'application/json',
                     'X-WP-Nonce': nonce
                 },
-                body: JSON.stringify({
-                    additional_services: serviceIds
-                })
+                body: JSON.stringify(sessionPayload)
             })
             .then(response => response.json())
             .then(response => {

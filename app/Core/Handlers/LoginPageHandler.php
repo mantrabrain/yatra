@@ -47,31 +47,22 @@ class LoginPageHandler extends BasePageHandler
             return false;
         }
 
-        // Load the login page template with error handling
-        $template_path = YATRA_PLUGIN_PATH . 'templates/login-page.php';
-        
-        if (!file_exists($template_path)) {
+        // Configure $wp_query + virtual WP_Post (covers FSE block-theme rendering).
+        $this->setupPageEnvironment('singular', [
+            'title' => __('Login', 'yatra'),
+            'post_type' => 'page',
+            'post_name' => 'login',
+        ]);
 
-            
+        // Security headers
+        $this->setSecurityHeaders();
+
+        if (!$this->selectTemplate('login-page', null, 'login')) {
             // Fallback to shortcode if template is missing
             return $this->handleFallback();
         }
 
-        try {
-            // Set up WordPress environment
-            $this->setupWordPressEnvironment();
-            
-            // Security headers
-            $this->setSecurityHeaders();
-            
-            // Include the template
-            include $template_path;
-            exit;
-            
-        } catch (\Exception $e) {
-
-            return $this->handleFallback();
-        }
+        return true;
     }
 
     /**
@@ -106,35 +97,6 @@ class LoginPageHandler extends BasePageHandler
         
         set_transient($transient_key, $attempts + 1, 5 * MINUTE_IN_SECONDS);
         return true;
-    }
-
-    /**
-     * Setup WordPress environment for the login page
-     */
-    private function setupWordPressEnvironment(): void
-    {
-        global $wp_query;
-        
-        // Prevent 404
-        $wp_query->is_404 = false;
-        $wp_query->is_page = true;
-        $wp_query->is_singular = true;
-        
-        // Set proper headers
-        status_header(200);
-        
-        // Set page title and metadata
-        $wp_query->set('page_title', __('Login', 'yatra'));
-        $wp_query->set('meta_description', __('Login to your Yatra account', 'yatra'));
-        
-        // Set up post data for compatibility
-        $wp_query->set('post', (object) [
-            'ID' => 0,
-            'post_title' => __('Login', 'yatra'),
-            'post_content' => '',
-            'post_type' => 'page',
-            'post_status' => 'publish'
-        ]);
     }
 
     /**

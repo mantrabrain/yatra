@@ -43,8 +43,8 @@ class DestinationValidator
         }
 
         if (isset($data['slug']) && !empty($data['slug'])) {
-            if (!preg_match('/^[a-z0-9-]+$/', $data['slug'])) {
-                $errors['slug'][] = __('Slug can only contain lowercase letters, numbers, and hyphens', 'yatra');
+            if (!preg_match('/^[\pL\pN-]+$/u', $data['slug'])) {
+                $errors['slug'][] = __('Slug can only contain letters, numbers, and hyphens', 'yatra');
             }
         }
 
@@ -129,8 +129,8 @@ class DestinationValidator
             $errors['short_description'][] = __('Short description cannot exceed 500 characters', 'yatra');
         }
 
-        if (isset($data['slug']) && !empty($data['slug']) && !preg_match('/^[a-z0-9-]+$/', $data['slug'])) {
-            $errors['slug'][] = __('Slug can only contain lowercase letters, numbers, and hyphens', 'yatra');
+        if (isset($data['slug']) && !empty($data['slug']) && !preg_match('/^[\pL\pN-]+$/u', $data['slug'])) {
+            $errors['slug'][] = __('Slug can only contain letters, numbers, and hyphens', 'yatra');
         }
 
         if (isset($data['country_code']) && !empty($data['country_code']) && !preg_match('/^[A-Z]{2}$/', $data['country_code'])) {
@@ -188,7 +188,7 @@ class DestinationValidator
         }
 
         if (isset($data['slug'])) {
-            $sanitized['slug'] = sanitize_title($data['slug']);
+            $sanitized['slug'] = \Yatra\Helpers\SlugHelper::generate($data['slug']);
         }
 
         if (isset($data['description'])) {

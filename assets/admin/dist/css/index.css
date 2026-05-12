@@ -1544,6 +1544,9 @@ video {
 .gap-2 {
   gap: 0.5rem;
 }
+.gap-2\.5 {
+  gap: 0.625rem;
+}
 .gap-3 {
   gap: 0.75rem;
 }
@@ -1773,6 +1776,10 @@ video {
 .border-\[\#ffdede\] {
   --tw-border-opacity: 1;
   border-color: rgb(255 222 222 / var(--tw-border-opacity, 1));
+}
+.border-amber-100 {
+  --tw-border-opacity: 1;
+  border-color: rgb(254 243 199 / var(--tw-border-opacity, 1));
 }
 .border-amber-200 {
   --tw-border-opacity: 1;
@@ -2058,6 +2065,9 @@ video {
 .bg-blue-50\/60 {
   background-color: rgb(239 246 255 / 0.6);
 }
+.bg-blue-50\/90 {
+  background-color: rgb(239 246 255 / 0.9);
+}
 .bg-blue-500 {
   --tw-bg-opacity: 1;
   background-color: rgb(59 130 246 / var(--tw-bg-opacity, 1));
@@ -2100,6 +2110,9 @@ video {
 }
 .bg-gray-50\/70 {
   background-color: rgb(249 250 251 / 0.7);
+}
+.bg-gray-50\/80 {
+  background-color: rgb(249 250 251 / 0.8);
 }
 .bg-gray-900 {
   --tw-bg-opacity: 1;
@@ -2148,6 +2161,9 @@ video {
 .bg-orange-500 {
   --tw-bg-opacity: 1;
   background-color: rgb(249 115 22 / var(--tw-bg-opacity, 1));
+}
+.bg-orange-500\/10 {
+  background-color: rgb(249 115 22 / 0.1);
 }
 .bg-orange-600 {
   --tw-bg-opacity: 1;
@@ -2888,6 +2904,13 @@ video {
   --tw-text-opacity: 1;
   color: rgb(120 53 15 / var(--tw-text-opacity, 1));
 }
+.text-amber-900\/90 {
+  color: rgb(120 53 15 / 0.9);
+}
+.text-amber-950 {
+  --tw-text-opacity: 1;
+  color: rgb(69 26 3 / var(--tw-text-opacity, 1));
+}
 .text-blue-100 {
   --tw-text-opacity: 1;
   color: rgb(219 234 254 / var(--tw-text-opacity, 1));
@@ -2907,6 +2930,9 @@ video {
 .text-blue-800 {
   --tw-text-opacity: 1;
   color: rgb(30 64 175 / var(--tw-text-opacity, 1));
+}
+.text-blue-800\/90 {
+  color: rgb(30 64 175 / 0.9);
 }
 .text-blue-900 {
   --tw-text-opacity: 1;
@@ -3113,6 +3139,9 @@ video {
 .no-underline {
   text-decoration-line: none;
 }
+.decoration-blue-600\/40 {
+  text-decoration-color: rgb(37 99 235 / 0.4);
+}
 .underline-offset-2 {
   text-underline-offset: 2px;
 }
@@ -3210,6 +3239,10 @@ video {
 }
 .ring-blue-100\/60 {
   --tw-ring-color: rgb(219 234 254 / 0.6);
+}
+.ring-blue-400 {
+  --tw-ring-opacity: 1;
+  --tw-ring-color: rgb(96 165 250 / var(--tw-ring-opacity, 1));
 }
 .ring-blue-500 {
   --tw-ring-opacity: 1;
@@ -3845,6 +3878,11 @@ video {
 .hover\:text-blue-800:hover {
   --tw-text-opacity: 1;
   color: rgb(30 64 175 / var(--tw-text-opacity, 1));
+}
+
+.hover\:text-blue-950:hover {
+  --tw-text-opacity: 1;
+  color: rgb(23 37 84 / var(--tw-text-opacity, 1));
 }
 
 .hover\:text-gray-600:hover {
@@ -4570,6 +4608,10 @@ video {
   background-color: rgb(3 7 18 / var(--tw-bg-opacity, 1));
 }
 
+.dark\:bg-gray-950\/30:is(.dark *) {
+  background-color: rgb(3 7 18 / 0.3);
+}
+
 .dark\:bg-green-400:is(.dark *) {
   --tw-bg-opacity: 1;
   background-color: rgb(74 222 128 / var(--tw-bg-opacity, 1));
@@ -4609,6 +4651,10 @@ video {
   background-color: rgb(5 46 22 / 0.3);
 }
 
+.dark\:bg-green-950\/40:is(.dark *) {
+  background-color: rgb(5 46 22 / 0.4);
+}
+
 .dark\:bg-indigo-900\/20:is(.dark *) {
   background-color: rgb(49 46 129 / 0.2);
 }
@@ -4619,6 +4665,10 @@ video {
 
 .dark\:bg-indigo-900\/50:is(.dark *) {
   background-color: rgb(49 46 129 / 0.5);
+}
+
+.dark\:bg-orange-500\/15:is(.dark *) {
+  background-color: rgb(249 115 22 / 0.15);
 }
 
 .dark\:bg-orange-600\/60:is(.dark *) {
@@ -4964,6 +5014,10 @@ video {
   color: rgb(191 219 254 / var(--tw-text-opacity, 1));
 }
 
+.dark\:text-blue-200\/90:is(.dark *) {
+  color: rgb(191 219 254 / 0.9);
+}
+
 .dark\:text-blue-300:is(.dark *) {
   --tw-text-opacity: 1;
   color: rgb(147 197 253 / var(--tw-text-opacity, 1));
@@ -5159,6 +5213,11 @@ video {
 .dark\:ring-amber-500:is(.dark *) {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(245 158 11 / var(--tw-ring-opacity, 1));
+}
+
+.dark\:ring-blue-500:is(.dark *) {
+  --tw-ring-opacity: 1;
+  --tw-ring-color: rgb(59 130 246 / var(--tw-ring-opacity, 1));
 }
 
 .dark\:ring-blue-900\/30:is(.dark *) {
@@ -5592,6 +5651,10 @@ video {
 
   .sm\:justify-between {
     justify-content: space-between;
+  }
+
+  .sm\:p-5 {
+    padding: 1.25rem;
   }
 
   .sm\:px-4 {

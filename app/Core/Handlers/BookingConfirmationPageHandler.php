@@ -30,8 +30,13 @@ class BookingConfirmationPageHandler extends BasePageHandler
             return false;
         }
 
-        // Prevent 404 handling
-        $this->prevent404();
+        // Configure $wp_query + virtual WP_Post so FSE block themes don't fall back to 404.html.
+        $this->setupPageEnvironment('singular', [
+            'title' => __('Booking Confirmation', 'yatra'),
+            'object_id' => (int) ($booking->id ?? 0),
+            'post_type' => 'page',
+            'post_name' => $confirmation_id,
+        ]);
 
         // Load trip attributes for booking confirmation display
         if ($booking && !empty($booking->trip_id)) {
@@ -61,17 +66,6 @@ class BookingConfirmationPageHandler extends BasePageHandler
             'yatra_booking' => $booking,
         ]);
 
-        // Load the booking confirmation template
-        $template_path = YATRA_PLUGIN_PATH . 'templates/booking-confirmation.php';
-
-        if (!file_exists($template_path)) {
-            $this->logError("Booking confirmation template not found: {$template_path}");
-            return false;
-        }
-
-        include $template_path;
-        $this->exit();
-
-        return true;
+        return $this->selectTemplate('booking-confirmation', null, 'booking-confirmation');
     }
 }

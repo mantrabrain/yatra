@@ -68,9 +68,65 @@ if (!isset($checkout) || !($checkout instanceof \Yatra\Models\Checkout)) {
 </div>
 <?php endif; ?>
 
-<!-- Gross Total (base trip cost before services/discounts/taxes) -->
+<?php
+// Pull dynamic-pricing breakdown — either from the explicit `$dynamic_pricing`
+// template var (used by the AJAX summary refresh + initial page render) or, as
+// a fallback, from the Checkout model. Both paths point at the same data; the
+// fallback covers any future render context that forgets to pass the variable.
+if (!isset($dynamic_pricing) || !is_array($dynamic_pricing)) {
+    $dynamic_pricing = $checkout->getDynamicPricing();
+}
+$dp_total_adjustment = (float) $checkout->getDynamicPricingTotalAdjustment();
+$has_dp = !empty($dynamic_pricing) && !empty($dynamic_pricing['rules']);
+?>
+
+<?php
+// Additional Services are picked above the Pricing Summary in their own card
+// (see booking-content.php). When the user toggles a checkbox, booking.js
+// POSTs to /booking/session then refreshes this partial via /booking/summary —
+// the selected-services iteration further down then renders them inline as
+// compact price rows so the customer sees what's contributing to the total.
+?>
+
+<?php
+// Dynamic-pricing caption removed per UX request — the customer can see the
+// effective per-unit price in the traveler row itself; an extra "X pricing
+// rule applied" line just adds noise. The DP impact is implicit in the
+// post-DP price now displayed in the category row above.
+?>
+
+<?php if ($checkout->hasAdditionalServices()) : ?>
+<!-- Selected Additional Services — rendered ABOVE Trip Subtotal so the
+     subtotal reads as the natural sum of (traveler categories + services).
+     The Pro AdditionalServicesModule already folds these into the gross
+     total, so we only render the rows here for transparency — not for
+     summing again. -->
+<?php foreach ($checkout->getAdditionalServices() as $service) : ?>
+    <?php if (!empty($service['selected'])) :
+        $service_price = $service['calculated_price'] ?? $service['price'] ?? 0;
+        $is_included = !empty($service['is_included']);
+        $is_required = !empty($service['is_required']);
+    ?>
+        <div class="yatra-price-row yatra-price-service<?php echo $is_included ? ' yatra-service-included' : ''; ?>">
+            <span>
+                <?php echo esc_html($service['name']); ?>
+                <?php if ($is_required && !$is_included) : ?>
+                    <span class="yatra-service-badge yatra-badge-required"><?php esc_html_e('Required', 'yatra'); ?></span>
+                <?php endif; ?>
+            </span>
+            <?php if ($is_included) : ?>
+                <span class="yatra-service-included-badge"><?php esc_html_e('Included', 'yatra'); ?></span>
+            <?php else : ?>
+                <span><?php echo esc_html($checkout->formatPrice($service_price)); ?></span>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+<?php endforeach; ?>
+<?php endif; ?>
+
+<!-- Trip Subtotal (categories + services, before discounts/taxes) -->
 <div class="yatra-price-row yatra-price-subtotal">
-    <span><strong><?php esc_html_e('Gross Total', 'yatra'); ?></strong></span>
+    <span><strong><?php esc_html_e('Trip Subtotal', 'yatra'); ?></strong></span>
     <span id="summary-gross-total"><strong><?php echo esc_html($checkout->getFormattedGrossTotal()); ?></strong></span>
 </div>
 
@@ -212,96 +268,21 @@ if (!isset($checkout) || !($checkout instanceof \Yatra\Models\Checkout)) {
 </div>
 <?php endif; ?>
 
-<?php if ($checkout->hasAdditionalServices()) : ?>
-<!-- Additional Services -->
-<?php foreach ($checkout->getAdditionalServices() as $service) : ?>
-    <?php if (!empty($service['selected'])) : ?>
-        <?php 
-        $service_price = $service['calculated_price'] ?? $service['price'] ?? 0;
-        $is_included = !empty($service['is_included']);
-        $is_required = !empty($service['is_required']);
-        ?>
-        <div class="yatra-price-row yatra-price-service<?php echo $is_included ? ' yatra-service-included' : ''; ?>">
-            <span>
-                <?php echo esc_html($service['name']); ?>
-                <?php if ($is_required && !$is_included) : ?>
-                    <span class="yatra-service-badge yatra-badge-required"><?php esc_html_e('Required', 'yatra'); ?></span>
-                <?php endif; ?>
-            </span>
-            <?php if ($is_included) : ?>
-                <span class="yatra-service-included-badge"><?php esc_html_e('Included', 'yatra'); ?></span>
-            <?php else : ?>
-                <span><?php echo esc_html($checkout->formatPrice($service_price)); ?></span>
-            <?php endif; ?>
-        </div>
-    <?php endif; ?>
-<?php endforeach; ?>
-<?php endif; ?>
+<?php
+// (Selected Additional Services moved above the Trip Subtotal line for the
+// correct visual order: categories → services → subtotal. Old position
+// rendered them after the subtotal, which is what made the "double-count
+// looking" sidebar — visually it seemed like services were added on top of
+// an already-services-inclusive subtotal.)
+?>
 
-<?php if (!empty($dynamic_pricing) && !empty($dynamic_pricing['rules'])) :
-    $dp_show_original = filter_var($dynamic_pricing['show_original_price'] ?? false, FILTER_VALIDATE_BOOLEAN);
-    $dp_show_savings = filter_var($dynamic_pricing['show_savings_badge'] ?? false, FILTER_VALIDATE_BOOLEAN);
-    $dp_show_urgency = filter_var($dynamic_pricing['show_urgency_messages'] ?? false, FILTER_VALIDATE_BOOLEAN);
-    ?>
-<!-- Dynamic Pricing Information -->
-<div class="yatra-price-section yatra-dynamic-pricing-section">
-    <div class="yatra-price-section-title">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2v20m8-10H4"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-        </svg>
-        <?php echo esc_html($dynamic_pricing['label']); ?>
-    </div>
-    
-    <?php if ($dp_show_original && $dynamic_pricing['original_price'] > 0 && $dynamic_pricing['original_price'] != $dynamic_pricing['final_price']) : ?>
-    <div class="yatra-price-row yatra-original-price">
-        <span><?php esc_html_e('Original Price', 'yatra'); ?></span>
-        <span class="yatra-original-price-amount" style="text-decoration: line-through; color: #6b7280;">
-            <?php echo esc_html(yatra_format_price($dynamic_pricing['original_price'], $currency ?? null)); ?>
-        </span>
-    </div>
-    <?php endif; ?>
-    
-    <?php if ($dp_show_savings && $dynamic_pricing['savings'] > 0) : ?>
-    <div class="yatra-price-row yatra-savings-badge" style="background-color: #dcfce7; color: #166534; padding: 8px 12px; border-radius: 6px; margin: 8px 0;">
-        <span style="font-weight: 600;">
-            <?php 
-            printf(
-                /* translators: %s: savings percentage */
-                esc_html__('You save %s', 'yatra'),
-                '<span style="color: #16a34a; font-weight: 700;">' . number_format($dynamic_pricing['savings_percent'], 1) . '%</span>'
-            );
-            ?>
-        </span>
-        <span style="font-weight: 600; color: #16a34a;">
-            <?php echo esc_html(yatra_format_price($dynamic_pricing['savings'], $currency ?? null)); ?>
-        </span>
-    </div>
-    <?php endif; ?>
-    
-    <?php if ($dp_show_urgency && !empty($dynamic_pricing['rules'])) : ?>
-    <div class="yatra-price-row yatra-urgency-message" style="background-color: #fef3c7; color: #92400e; padding: 8px 12px; border-radius: 6px; margin: 8px 0; font-size: 14px;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        <?php 
-        $ruleCount = count($dynamic_pricing['rules']);
-        if ($ruleCount === 1) {
-            esc_html_e('Limited time offer! Dynamic pricing applied.', 'yatra');
-        } else {
-            printf(
-                /* translators: %d: number of rules */
-                esc_html(_n('%d dynamic pricing rule applied!', '%d dynamic pricing rules applied!', $ruleCount, 'yatra')),
-                (int) $ruleCount
-            );
-        }
-        ?>
-    </div>
-    <?php endif; ?>
-</div>
-<?php endif; ?>
+<?php
+// (Old "Dynamic Pricing" section with Original Price strike-through, savings
+// badge, and urgency banner removed — the compact line item at the top of
+// this template is now the single source of truth for DP in the sidebar.
+// Admins who want the strike-through / badge / urgency styling can re-add it
+// in a custom template override; keeping the default summary clean.)
+?>
 
 <!-- Taxable Amount (SubTotal - amount that tax is calculated on) -->
 <?php 

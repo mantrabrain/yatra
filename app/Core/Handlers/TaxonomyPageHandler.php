@@ -78,7 +78,14 @@ class TaxonomyPageHandler extends BasePageHandler
 
         $taxonomy_data->trips = $tripsWithReviews;
 
-        $this->prevent404();
+        // Configure $wp_query + virtual WP_Post so FSE block themes resolve an archive
+        // template (not 404.html) for taxonomy pages.
+        $this->setupPageEnvironment('archive', [
+            'title' => (string) ($taxonomy_data->name ?? $taxonomy_data->title ?? $slug),
+            'object_id' => (int) ($taxonomy_data->id ?? 0),
+            'post_type' => 'page',
+            'post_name' => $slug,
+        ]);
 
         $this->setGlobal('yatra_taxonomy_data', $taxonomy_data);
 
@@ -89,17 +96,7 @@ class TaxonomyPageHandler extends BasePageHandler
             'yatra_page' => $base,
         ]);
 
-        $template_path = YATRA_PLUGIN_PATH . 'templates/single-taxonomy.php';
-
-        if (!file_exists($template_path)) {
-            $this->logError("Taxonomy template not found: {$template_path}");
-            return false;
-        }
-
-        include $template_path;
-        $this->exit();
-
-        return true;
+        return $this->selectTemplate('single-taxonomy', null, 'taxonomy-' . $taxonomy_type);
     }
 
     /**

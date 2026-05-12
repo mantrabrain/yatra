@@ -332,6 +332,23 @@ class FrontendAssetsProvider
                 true
             );
         }
+
+        // Mobile sticky-sidebar + flatpickr init for the single-trip page. Lives in a
+        // dedicated file rather than as inline <script> in the partial because
+        // WordPress core's `convert_chars` filter (hooked to the_content) rewrites the
+        // `&&` operators inside inline scripts as `&#038;&#038;` — JS parsers don't
+        // decode HTML entities inside <script>, producing a SyntaxError. As a properly
+        // enqueued external file, the source is delivered verbatim.
+        $sidebarJs = YATRA_PLUGIN_PATH . 'assets/js/single-trip-sidebar.js';
+        if (file_exists($sidebarJs)) {
+            wp_enqueue_script(
+                'yatra-single-trip-sidebar',
+                YATRA_PLUGIN_URL . 'assets/js/single-trip-sidebar.js',
+                ['yatra-trip'], // depends on window.yatraTripData from yatra-trip
+                YATRA_VERSION . '.' . filemtime($sidebarJs),
+                true
+            );
+        }
         
         // Localize trip page data for JS (trip.js, booking.js)
         global $trip;

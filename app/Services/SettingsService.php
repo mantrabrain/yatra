@@ -65,7 +65,12 @@ class SettingsService
         'booking_reminder_days' => 3,
         'allow_waitlist' => true,
         'waitlist_auto_confirm' => false,
-        
+        // Pro: when enabled, the single-trip date_specific mode renders a
+        // <select> of available departure dates instead of the flatpickr
+        // calendar (desktop sidebar and mobile sticky bar). Renders no-op
+        // for free installs — see Settings UI + FrontendAssetsProvider gate.
+        'date_picker_as_dropdown' => false,
+
         // Payment
         'currency' => 'USD',
         'payment_test_mode' => true,

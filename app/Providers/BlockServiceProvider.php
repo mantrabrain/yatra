@@ -59,10 +59,10 @@ class BlockServiceProvider extends ServiceProvider
      * Register Yatra block category
      * 
      * @param array $categories Existing block categories
-     * @param \WP_Block_Editor_Context $context Block editor context
+     * @param \WP_Block_Editor_Context|null $context Block editor context
      * @return array Modified categories
      */
-    public function registerBlockCategory(array $categories, \WP_Block_Editor_Context $context): array
+    public function registerBlockCategory(array $categories, ?\WP_Block_Editor_Context $context = null): array
     {
         // Add Yatra category at the beginning
         array_unshift($categories, [

@@ -23,9 +23,43 @@ class PdfService
 
             $dompdfOptions = class_exists($optionsClass) ? new $optionsClass() : null;
             if ($dompdfOptions) {
-                $dompdfOptions->set('isRemoteEnabled', true);
+                // Remote loading is required so PDFs can render the site logo / trip images.
+                // Filter exists so site owners can lock it down to the local filesystem if they
+                // never use remote images and want to fully eliminate SSRF risk.
+                $remoteEnabled = (bool) apply_filters('yatra_pdf_remote_enabled', true);
+                $dompdfOptions->set('isRemoteEnabled', $remoteEnabled);
                 $dompdfOptions->set('isHtml5ParserEnabled', true);
                 $dompdfOptions->set('defaultFont', $defaultFont);
+
+                // Restrict file:// reads to within ABSPATH so a crafted template can't read /etc/passwd
+                // or other files outside the WordPress install.
+                if (defined('ABSPATH')) {
+                    $dompdfOptions->set('chroot', [ABSPATH]);
+                }
+
+                // Block file:// and php:// protocols from remote requests (only http/https allowed).
+                $dompdfOptions->set('allowedProtocols', [
+                    'http://' => ['rules' => []],
+                    'https://' => ['rules' => []],
+                ]);
+
+                // SSRF hardening for remote fetches: short timeout + identifying User-Agent so admins
+                // can spot dompdf traffic in logs. Does not stop SSRF on its own — sites that do not
+                // need remote images should disable via the `yatra_pdf_remote_enabled` filter above.
+                if ($remoteEnabled) {
+                    $httpContext = stream_context_create([
+                        'http' => [
+                            'timeout' => 5,
+                            'follow_location' => 0,
+                            'user_agent' => 'YatraPDF/' . (defined('YATRA_VERSION') ? YATRA_VERSION : '1.0'),
+                        ],
+                        'ssl' => [
+                            'verify_peer' => true,
+                            'verify_peer_name' => true,
+                        ],
+                    ]);
+                    $dompdfOptions->setHttpContext($httpContext);
+                }
             }
 
             $dompdf = $dompdfOptions ? new $dompdfClass($dompdfOptions) : new $dompdfClass();
@@ -93,8 +127,16 @@ class PdfService
             throw new \InvalidArgumentException("Template file not found: {$templateFile}");
         }
 
-        // Extract data variables for template
-        extract($data, EXTR_OVERWRITE);
+        // Defence in depth: only extract string-keyed entries with valid PHP-identifier names,
+        // and skip keys that would clobber locals already in scope (EXTR_SKIP). Stops a malicious
+        // $data array from injecting arbitrary local variables into the template scope.
+        $safeData = [];
+        foreach ($data as $key => $value) {
+            if (is_string($key) && preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key)) {
+                $safeData[$key] = $value;
+            }
+        }
+        extract($safeData, EXTR_SKIP);
 
         // Capture output
         ob_start();
@@ -121,8 +163,21 @@ class PdfService
 
     public function outputPdfDownload(string $pdfBinary, string $filename, bool $inline = false): void
     {
+        // Strip CR/LF (header injection) and any quotes/backslashes from the ASCII fallback name.
+        // Keep an RFC 5987 UTF-8 form so non-ASCII filenames still display correctly in modern browsers.
+        $cleanFilename = preg_replace('/[\r\n"\\\\]/', '', $filename) ?? '';
+        if ($cleanFilename === '') {
+            $cleanFilename = 'document.pdf';
+        }
+        $asciiFilename = preg_replace('/[^\x20-\x7E]/', '_', $cleanFilename) ?? 'document.pdf';
+        $encodedFilename = rawurlencode($cleanFilename);
+
         header('Content-Type: application/pdf');
-        header('Content-Disposition: ' . ($inline ? 'inline' : 'attachment') . '; filename="' . $filename . '"');
+        header(
+            'Content-Disposition: ' . ($inline ? 'inline' : 'attachment')
+            . '; filename="' . $asciiFilename . '"'
+            . "; filename*=UTF-8''" . $encodedFilename
+        );
         header('Cache-Control: no-cache, no-store, must-revalidate');
         header('Pragma: no-cache');
         header('Expires: 0');

@@ -43,8 +43,8 @@ class ActivityValidator
         }
 
         if (isset($data['slug']) && !empty($data['slug'])) {
-            if (!preg_match('/^[a-z0-9-]+$/', $data['slug'])) {
-                $errors['slug'][] = __('Slug can only contain lowercase letters, numbers, and hyphens', 'yatra');
+            if (!preg_match('/^[\pL\pN-]+$/u', $data['slug'])) {
+                $errors['slug'][] = __('Slug can only contain letters, numbers, and hyphens', 'yatra');
             }
         }
 
@@ -110,8 +110,8 @@ class ActivityValidator
             $errors['short_description'][] = __('Short description cannot exceed 500 characters', 'yatra');
         }
 
-        if (isset($data['slug']) && !empty($data['slug']) && !preg_match('/^[a-z0-9-]+$/', $data['slug'])) {
-            $errors['slug'][] = __('Slug can only contain lowercase letters, numbers, and hyphens', 'yatra');
+        if (isset($data['slug']) && !empty($data['slug']) && !preg_match('/^[\pL\pN-]+$/u', $data['slug'])) {
+            $errors['slug'][] = __('Slug can only contain letters, numbers, and hyphens', 'yatra');
         }
 
         if (isset($data['difficulty_level']) && !empty($data['difficulty_level'])) {
@@ -156,7 +156,7 @@ class ActivityValidator
         }
 
         if (isset($data['slug'])) {
-            $sanitized['slug'] = sanitize_title($data['slug']);
+            $sanitized['slug'] = \Yatra\Helpers\SlugHelper::generate($data['slug']);
         }
 
         if (isset($data['description'])) {

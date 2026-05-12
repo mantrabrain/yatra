@@ -6,7 +6,6 @@ namespace Yatra\Core\Handlers;
 
 use Yatra\Controllers\SingleTripController;
 use Yatra\Core\Assets\TripAssetManager;
-use Yatra\Core\Template\TemplateRenderer;
 use Yatra\Services\SettingsService;
 
 /**
@@ -38,6 +37,15 @@ class TripPageHandler extends BasePageHandler
         global $trip;
         $trip = $trip_data;
 
+        // Configure $wp_query + virtual WP_Post so FSE block themes resolve the
+        // singular template (not 404.html) and render the site header normally.
+        $this->setupPageEnvironment('singular', [
+            'title' => (string) ($trip->title ?? $trip->name ?? ''),
+            'object_id' => (int) ($trip->id ?? 0),
+            'post_type' => 'page',
+            'post_name' => $trip_slug,
+        ]);
+
         // Set up query vars for backward compatibility
         $this->setQueryVars([
             'yatra_trip_id' => $trip->id,
@@ -46,15 +54,6 @@ class TripPageHandler extends BasePageHandler
             'yatra_page' => $route_data['base'] ?? SettingsService::getTripBase(),
         ]);
 
-        // Create asset manager and render template
-        $asset_manager = new TripAssetManager();
-        $template_path = TemplateRenderer::getTemplatePath('single-trip');
-
-        // Render template with global $trip already set
-        if (!TemplateRenderer::render($template_path, [], $asset_manager)) {
-            return false;
-        }
-
-        return true;
+        return $this->selectTemplate('single-trip', new TripAssetManager(), 'trip');
     }
 }

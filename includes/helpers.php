@@ -2695,6 +2695,18 @@ if ( ! function_exists( 'yatra_get_header' ) ) {
     
 function yatra_get_header( $header_name = null ) {
     global $wp_version;
+
+    // When the template is being rendered as the body of the yatra/page-content
+    // server block inside a block-template canvas, the canvas already emits the
+    // doctype/html/head/body and the site header template part. Re-emitting them
+    // here would nest <html>/<body> and duplicate the header — so we no-op.
+    if (
+        class_exists( '\\Yatra\\Core\\Template\\FseTemplates' )
+        && \Yatra\Core\Template\FseTemplates::isRenderingInsideCanvas()
+    ) {
+        return;
+    }
+
     if (
         version_compare( $wp_version, '5.9', '>=' ) &&
         function_exists( 'wp_is_block_theme' ) &&
@@ -2759,6 +2771,17 @@ if ( ! function_exists( 'yatra_get_footer' ) ) {
 
 	function yatra_get_footer( $footer_name = null ) {
 		global $wp_version;
+
+		// Mirror of yatra_get_header(): when rendered inside the FSE canvas via
+		// the yatra/page-content block, the canvas already emits the footer
+		// template part and closes <body>/<html>. No-op here to avoid duplicates.
+		if (
+			class_exists( '\\Yatra\\Core\\Template\\FseTemplates' )
+			&& \Yatra\Core\Template\FseTemplates::isRenderingInsideCanvas()
+		) {
+			return;
+		}
+
 		if (
 			version_compare( $wp_version, '5.9', '>=' ) &&
 			function_exists( 'wp_is_block_theme' ) &&

@@ -61,12 +61,23 @@ final class PrettyRouteMatcher
             ];
         }
 
+        // Captured slug segments come in as URL-encoded UTF-8 when the request
+        // path contains non-ASCII characters (e.g. Cyrillic "моя-семья"
+        // arrives here as `%D0%BC%D0%BE%D1%8F-...`). The DB stores the raw
+        // decoded slug, so we must decode + normalise once here before
+        // returning the route data — otherwise downstream handlers query
+        // `findBySlug('%D0%BC...')` and 404 every non-Latin URL. Mirrors WP
+        // core's behaviour in `get_page_by_path`.
+        $decodeSlug = static function (string $raw): string {
+            return \Yatra\Helpers\SlugHelper::generate($raw);
+        };
+
         // 5. Single trip
         if (preg_match('/^' . preg_quote($trip_base, '/') . '\/([^\/]+)\/?$/', $path, $matches)) {
             if ($matches[1] !== 'page') {
                 return [
                     'type' => 'trip',
-                    'slug' => $matches[1],
+                    'slug' => $decodeSlug($matches[1]),
                     'base' => $trip_base,
                 ];
             }
@@ -84,7 +95,7 @@ final class PrettyRouteMatcher
                 return [
                     'type' => 'taxonomy',
                     'taxonomy_type' => $type,
-                    'slug' => $matches[1],
+                    'slug' => $decodeSlug($matches[1]),
                     'base' => $base,
                     'paged' => max(1, (int) $matches[2]),
                 ];
@@ -96,7 +107,7 @@ final class PrettyRouteMatcher
                 return [
                     'type' => 'taxonomy',
                     'taxonomy_type' => $type,
-                    'slug' => $matches[1],
+                    'slug' => $decodeSlug($matches[1]),
                     'base' => $base,
                 ];
             }

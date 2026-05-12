@@ -158,50 +158,91 @@ export const useItineraryFormSave = ({
           const endpoint = API_ENDPOINTS.ITINERARY_GET(dayEntryId, "day");
           const dayResponse = await apiClient.put(endpoint, dayPayload);
 
+          // Map each activityForm.id → its index in the parent activityForms array.
+          // The index is what becomes the persisted `order` value (the column on
+          // yatra_new_trip_itinerary_day_entry, written by the existing repo
+          // setter we just extended). Drag-and-drop reorders activityForms in the
+          // parent component, so reading the index here naturally captures the
+          // user's intended ordering. Using a Map (instead of filtered-array
+          // index) avoids the off-by-one when existing+new activities are split
+          // into separate loops below.
+          const orderById = new Map<string, number>(
+            activityForms.map((af, idx) => [af.id, idx]),
+          );
+
           const buildActivityPayload = (
             activityData: ActivityForm["data"],
-          ) => ({
-            trip_id: tripId,
-            day: day,
-            day_title: dayTitle,
-            item_type_id: parseInt(activityData.item_type_id!),
-            item_id: parseInt(activityData.item_id!),
-            title: activityData.title!.trim(),
-            description: (activityData.description || "").trim(),
-            location: (activityData.location || "").trim(),
-            duration:
-              (activityData.duration || "").trim() ||
-              (activityData.start_time &&
-              activityData.end_time &&
-              activityData.time_type === "exact"
-                ? calculateDuration(
-                    activityData.start_time,
-                    activityData.end_time,
-                    activityData.time_type,
-                  )
-                : null),
-            start_time: activityData.start_time || "08:00",
-            end_time: activityData.end_time || "17:00",
-            time_type: activityData.time_type || "exact",
-            cost: activityData.cost ? parseFloat(activityData.cost) : null,
-            cost_per_person: activityData.cost_per_person !== false,
-            notes: (activityData.notes || "").trim(),
-            included_items: Array.isArray(activityData.included_items)
-              ? activityData.included_items
-              : [],
-            excluded_items: Array.isArray(activityData.excluded_items)
-              ? activityData.excluded_items
-              : [],
-            gallery: activityData.gallery || [],
-            video_url: activityData.video_url || "",
-            status: activityData.status || "draft",
-          });
+            order: number,
+          ) => {
+            // Time fields only apply when time_type is 'exact'. For 'duration'
+            // the user expresses time only via the duration text; for 'flexible'
+            // there is no specific time at all. Sending defaults like 08:00
+            // would silently overwrite the user's intent and pollute every row
+            // with the same fake clock range.
+            const timeType = activityData.time_type || "exact";
+            const startTime =
+              timeType === "exact" && activityData.start_time
+                ? activityData.start_time
+                : null;
+            const endTime =
+              timeType === "exact" && activityData.end_time
+                ? activityData.end_time
+                : null;
+            return {
+              trip_id: tripId,
+              day: day,
+              day_title: dayTitle,
+              item_type_id: parseInt(activityData.item_type_id!),
+              item_id: parseInt(activityData.item_id!),
+              title: activityData.title!.trim(),
+              description: (activityData.description || "").trim(),
+              location: (activityData.location || "").trim(),
+              // Latitude / longitude were saved by the form but never sent in the
+              // payload before — saving silently dropped them. Send as floats; let
+              // the repo coerce empty strings to null.
+              location_latitude:
+                activityData.location_latitude !== undefined &&
+                activityData.location_latitude !== ""
+                  ? parseFloat(activityData.location_latitude as any)
+                  : null,
+              location_longitude:
+                activityData.location_longitude !== undefined &&
+                activityData.location_longitude !== ""
+                  ? parseFloat(activityData.location_longitude as any)
+                  : null,
+              duration:
+                (activityData.duration || "").trim() ||
+                (startTime && endTime
+                  ? calculateDuration(startTime, endTime, timeType)
+                  : null),
+              start_time: startTime,
+              end_time: endTime,
+              time_type: timeType,
+              cost: activityData.cost ? parseFloat(activityData.cost) : null,
+              cost_per_person: activityData.cost_per_person === true,
+              notes: (activityData.notes || "").trim(),
+              included_items: Array.isArray(activityData.included_items)
+                ? activityData.included_items
+                : [],
+              excluded_items: Array.isArray(activityData.excluded_items)
+                ? activityData.excluded_items
+                : [],
+              gallery: activityData.gallery || [],
+              video_url: activityData.video_url || "",
+              status: activityData.status || "draft",
+              order: Math.max(0, order),
+            };
+          };
 
-          const existingActivities = activityForms.filter((af) => af.entryId);
-          for (let index = 0; index < existingActivities.length; index++) {
-            const activityForm = existingActivities[index];
-            const activityData = activityForm.data;
-
+          // BATCH SAVE — replaces the previous loop that fired one PUT per
+          // activity (5 activities = 5 sequential round-trips). We collect every
+          // activity into a single payload and POST to the bulk endpoint, which
+          // dispatches each row to update / create server-side and invalidates
+          // caches once at the end. Each row carries `id` for updates or omits
+          // it for creates; `order` is the index in `activityForms` so the
+          // user's drag-sort ordering is what gets persisted.
+          const validatedRows = activityForms.map((af, index) => {
+            const activityData = af.data;
             if (
               !activityData.item_type_id ||
               !activityData.item_id ||
@@ -211,63 +252,49 @@ export const useItineraryFormSave = ({
                 `Activity ${index + 1} is missing required fields (item type, item, or title)`,
               );
             }
+            const order = orderById.get(af.id) ?? index;
+            const payload = buildActivityPayload(activityData, order) as any;
+            // Update vs create is determined by presence of `id`. For existing
+            // activities we send the entryId; for newly added rows we omit it.
+            if (af.entryId) {
+              payload.id =
+                typeof af.entryId === "string"
+                  ? parseInt(af.entryId, 10)
+                  : af.entryId;
+            }
+            return payload;
+          });
 
-            const payload = buildActivityPayload(activityData);
-            const activityEntryId =
-              typeof activityForm.entryId === "string"
-                ? parseInt(activityForm.entryId, 10)
-                : activityForm.entryId;
-
-            if (!activityEntryId) {
+          // dayEntryId here is the yatra_new_trip_itinerary_days.id row — same
+          // value that the day-update PUT just used a few lines above. The bulk
+          // endpoint scopes all writes to that day_id.
+          const bulkEndpoint =
+            API_ENDPOINTS.ITINERARY_DAY_ACTIVITIES_BULK(dayEntryId);
+          try {
+            const bulkResponse = await apiClient.put(bulkEndpoint, {
+              trip_id: tripId,
+              activities: validatedRows,
+            });
+            const bulkData =
+              (bulkResponse as any)?.data || (bulkResponse as any) || {};
+            // Surface a partial-failure error so the user knows something
+            // didn't save instead of silently swallowing it.
+            if (bulkData.failed && bulkData.failed > 0) {
+              const firstError = (bulkData.results || []).find(
+                (r: any) => r && r.ok === false,
+              );
               throw new Error(
-                `Activity ${index + 1} is missing an entry ID for update.`,
+                `${bulkData.failed} activit${
+                  bulkData.failed === 1 ? "y" : "ies"
+                } failed to save${
+                  firstError?.error ? `: ${firstError.error}` : ""
+                }`,
               );
             }
-
-            try {
-              // Activities always use mode=activity
-              const endpoint = API_ENDPOINTS.ITINERARY_GET(
-                activityEntryId,
-                "activity",
-              );
-              await apiClient.put(endpoint, payload);
-            } catch (error: any) {
-              throw new Error(
-                `Failed to update activity ${index + 1}: ${error?.message || "Unknown error"}`,
-              );
-            }
-          }
-
-          const newActivities = activityForms.filter((af) => !af.entryId);
-
-          if (newActivities.length > 0) {
-            const responses = [dayResponse.data || dayResponse];
-            for (let index = 0; index < newActivities.length; index++) {
-              const activityForm = newActivities[index];
-              const activityData = activityForm.data;
-
-              if (
-                !activityData.item_type_id ||
-                !activityData.item_id ||
-                !activityData.title?.trim()
-              ) {
-                throw new Error(
-                  `Activity ${index + 1} is missing required fields (item type, item, or title)`,
-                );
-              }
-
-              const payload = buildActivityPayload(activityData);
-
-              try {
-                const response = await apiClient.post("/itinerary", payload);
-                responses.push(response.data || response);
-              } catch (error: any) {
-                throw new Error(
-                  `Failed to save activity ${index + 1}: ${error?.message || "Unknown error"}`,
-                );
-              }
-            }
-            return responses[0];
+          } catch (error: any) {
+            throw new Error(
+              `Failed to save activities: ${error?.message || "Unknown error"}`,
+            );
           }
 
           return dayResponse.data || dayResponse;
@@ -318,6 +345,16 @@ export const useItineraryFormSave = ({
           const activityForm = validActivities[index];
           const activityData = activityForm.data;
 
+          const timeType = activityData.time_type || "exact";
+          const startTime =
+            timeType === "exact" && activityData.start_time
+              ? activityData.start_time
+              : null;
+          const endTime =
+            timeType === "exact" && activityData.end_time
+              ? activityData.end_time
+              : null;
+
           const payload = {
             trip_id: tripId,
             day: day,
@@ -335,20 +372,14 @@ export const useItineraryFormSave = ({
               : null,
             duration:
               (activityData.duration || "").trim() ||
-              (activityData.start_time &&
-              activityData.end_time &&
-              activityData.time_type === "exact"
-                ? calculateDuration(
-                    activityData.start_time,
-                    activityData.end_time,
-                    activityData.time_type,
-                  )
+              (startTime && endTime
+                ? calculateDuration(startTime, endTime, timeType)
                 : null),
-            start_time: activityData.start_time || "08:00",
-            end_time: activityData.end_time || "17:00",
-            time_type: activityData.time_type || "exact",
+            start_time: startTime,
+            end_time: endTime,
+            time_type: timeType,
             cost: activityData.cost ? parseFloat(activityData.cost) : null,
-            cost_per_person: activityData.cost_per_person !== false,
+            cost_per_person: activityData.cost_per_person === true,
             notes: (activityData.notes || "").trim(),
             included_items: Array.isArray(activityData.included_items)
               ? activityData.included_items
@@ -376,6 +407,11 @@ export const useItineraryFormSave = ({
       }
 
       // For activity mode, use all fields
+      const timeType = data.time_type || "exact";
+      const startTime =
+        timeType === "exact" && data.start_time ? data.start_time : null;
+      const endTime =
+        timeType === "exact" && data.end_time ? data.end_time : null;
       const payload = {
         trip_id: parseInt(data.trip_id),
         day: parseInt(data.day),
@@ -391,10 +427,14 @@ export const useItineraryFormSave = ({
         location_longitude: data.location_longitude
           ? parseFloat(data.location_longitude)
           : null,
-        duration: data.duration.trim() || calculateDuration(),
-        start_time: data.start_time,
-        end_time: data.end_time,
-        time_type: data.time_type,
+        duration:
+          data.duration.trim() ||
+          (startTime && endTime
+            ? calculateDuration(startTime, endTime, timeType)
+            : null),
+        start_time: startTime,
+        end_time: endTime,
+        time_type: timeType,
         cost: data.cost ? parseFloat(data.cost) : null,
         cost_per_person: data.cost_per_person,
         notes: data.notes.trim(),

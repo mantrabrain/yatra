@@ -237,14 +237,25 @@ class ItineraryMigration extends BaseMigration
 
         // Handle different data formats
         if (is_string($itineraryData)) {
-            // Try to unserialize if it's serialized data
-            $unserialized = @unserialize($itineraryData);
+            // Itinerary meta is only ever expected to hold scalars/arrays. Forbid object
+            // instantiation so a crafted serialized payload in legacy post meta cannot trigger
+            // PHP object-injection / __destruct gadget chains during migration.
+            $unserialized = false;
+            if ($itineraryData !== '' && (str_starts_with($itineraryData, 'a:') || str_starts_with($itineraryData, 's:'))) {
+                set_error_handler(static function (): bool { return true; }); // suppress unserialize notices
+                try {
+                    $unserialized = unserialize($itineraryData, ['allowed_classes' => false]);
+                } finally {
+                    restore_error_handler();
+                }
+            }
+
             if ($unserialized !== false) {
                 $itineraryData = $unserialized;
             } else {
-                // Try to decode JSON
-                $decoded = @json_decode($itineraryData, true);
-                if ($decoded !== null) {
+                // Try to decode JSON. Don't suppress with @ — log decode errors so silent data loss is visible.
+                $decoded = json_decode($itineraryData, true);
+                if (json_last_error() === JSON_ERROR_NONE && $decoded !== null) {
                     $itineraryData = $decoded;
                 }
             }

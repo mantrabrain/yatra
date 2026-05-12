@@ -42,7 +42,7 @@ class RouteMatcher
             return null;
         }
 
-        $slug = sanitize_title($slug);
+        $slug = \Yatra\Helpers\SlugHelper::generate($slug);
         $map = [
             'dashboard' => 'dashboard',
             'profile' => 'profile',

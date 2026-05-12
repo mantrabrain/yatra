@@ -307,6 +307,7 @@ class CacheHooks
     {
         self::invalidateListingCaches();
         Cache::clearByPrefix('yatra_trip_');
+        self::invalidateItineraryCaches((int) ($data['trip_id'] ?? 0), 0);
         Logger::info("Cache invalidated for itinerary day creation", ['day_id' => $dayId]);
     }
 
@@ -315,6 +316,9 @@ class CacheHooks
         Cache::delete(Cache::PREFIX_TRIP_DATA . ($data['trip_id'] ?? ''));
         self::invalidateListingCaches();
         Cache::clearByPrefix('yatra_trip_');
+        // Also blow the itinerary-prefixed cache so the day-edit page doesn't
+        // serve stale entries (same root cause as the activity hook below).
+        self::invalidateItineraryCaches((int) ($data['trip_id'] ?? 0), 0);
         Logger::info("Cache invalidated for itinerary day update", ['day_id' => $dayId]);
     }
 
@@ -322,6 +326,7 @@ class CacheHooks
     {
         self::invalidateListingCaches();
         Cache::clearByPrefix('yatra_trip_');
+        self::invalidateItineraryCaches(0, 0);
         Logger::info("Cache invalidated for itinerary day deletion", ['day_id' => $dayId]);
     }
 
@@ -332,6 +337,7 @@ class CacheHooks
     {
         self::invalidateListingCaches();
         Cache::clearByPrefix('yatra_trip_');
+        self::invalidateItineraryCaches((int) ($data['trip_id'] ?? 0), $activityId);
         Logger::info("Cache invalidated for itinerary activity creation", ['activity_id' => $activityId]);
     }
 
@@ -340,6 +346,7 @@ class CacheHooks
         Cache::delete(Cache::PREFIX_TRIP_DATA . ($data['trip_id'] ?? ''));
         self::invalidateListingCaches();
         Cache::clearByPrefix('yatra_trip_');
+        self::invalidateItineraryCaches((int) ($data['trip_id'] ?? 0), $activityId);
         Logger::info("Cache invalidated for itinerary activity update", ['activity_id' => $activityId]);
     }
 
@@ -347,6 +354,51 @@ class CacheHooks
     {
         self::invalidateListingCaches();
         Cache::clearByPrefix('yatra_trip_');
+        self::invalidateItineraryCaches(0, $activityId);
         Logger::info("Cache invalidated for itinerary activity deletion", ['activity_id' => $activityId]);
+    }
+
+    /**
+     * Clear every cache layer that can serve stale itinerary data after a write.
+     *
+     * The day-edit page reads via `GET /trips/{id}` → TripRepository::findWithRelationsCached
+     * → cached under `yatra_query_trip_with_relations_<id>` (PREFIX_QUERY_RESULT).
+     * That entire object — including `itinerary_days[].entries[].order` — is cached
+     * for the trip-data TTL. Until *that* key is dropped, the React load mapper sees
+     * the OLD order and a drag-sort reorder appears not to persist on reload.
+     *
+     * Three prefix families touch this data; we have to hit all of them:
+     *   1. `yatra_query_*` (PREFIX_QUERY_RESULT) — caches `trip_with_relations_<id>`,
+     *      `trips_with_filters_*`, etc. The actual culprit for reorder reverts.
+     *   2. `yatra_trip_*` (PREFIX_TRIP_DATA) — `yatra_trip_<id>` from findByIdCached.
+     *   3. `yatra_itinerary_*` (KEY_ITINERARY_BY_TRIP_ID + per-entry keys) — used by
+     *      direct ItineraryRepository::getByTripId reads (admin itinerary screen).
+     *
+     * `Cache::invalidateTrip($tripId)` already covers (1) + (2); we add (3) for the
+     * itinerary-specific keys it doesn't know about.
+     *
+     * @param int $tripId     Trip whose caches to clear (0 = unknown).
+     * @param int $activityId Activity row id for per-entry cache keys (0 = skip).
+     */
+    private static function invalidateItineraryCaches(int $tripId, int $activityId): void
+    {
+        // (1) + (2): drops PREFIX_TRIP_DATA + PREFIX_QUERY_RESULT — the actual fix
+        // for "reorder doesn't survive reload". The React day-edit page reads from
+        // the trip-with-relations cache, so until this clears, save→reload returns
+        // the pre-reorder snapshot.
+        if ($tripId > 0) {
+            Cache::invalidateTrip($tripId);
+        }
+
+        // (3): itinerary-prefixed caches that PREFIX_QUERY_RESULT doesn't include.
+        if ($tripId > 0) {
+            Cache::delete(Cache::KEY_ITINERARY_BY_TRIP_ID . '_' . $tripId);
+        }
+        Cache::clearByPrefix('yatra_itinerary_');
+
+        if ($activityId > 0) {
+            Cache::delete(Cache::KEY_ACTIVITY_ENTRY . '_' . $activityId);
+            Cache::delete(Cache::KEY_ITINERARY_ENTRY_WITH_RELATIONS . '_' . $activityId);
+        }
     }
 }

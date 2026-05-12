@@ -19,8 +19,13 @@ export const generateSlug = (text: string): string => {
       .trim()
       // Replace spaces and underscores with hyphens
       .replace(/[\s_]+/g, "-")
-      // Remove all non-word characters except hyphens
-      .replace(/[^\w-]+/g, "")
+      // Remove all non-word characters except hyphens. The Unicode property
+      // escapes (\p{L} = any letter, \p{N} = any digit) with the `u` flag let
+      // non-Latin alphabets through — Cyrillic ("Путешествие"), CJK, Devanagari,
+      // Arabic, etc. The previous `\w` shortcut was ASCII-only and stripped
+      // every Russian letter, producing an empty slug. WordPress's own
+      // sanitize_title() preserves these scripts server-side, so this matches.
+      .replace(/[^\p{L}\p{N}-]+/gu, "")
       // Replace multiple consecutive hyphens with a single hyphen
       .replace(/-+/g, "-")
       // Remove leading and trailing hyphens

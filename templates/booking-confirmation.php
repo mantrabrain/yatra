@@ -31,6 +31,43 @@ if (function_exists('yatra_clear_booking_session')) {
 $travel_date_formatted = \Yatra\Helpers\FormatHelper::formatDate((string) ($booking->travel_date ?? ''));
 $booking_date_formatted = \Yatra\Helpers\FormatHelper::formatDateTime((string) ($booking->created_at ?? ''));
 
+// "Balance just paid" context detection.
+// A `?balance=paid` query arg is appended by the remaining-payment flows
+// (see PaymentGatewayController::create_remaining_balance_intent and
+// BookingSessionController::process_remaining_payment). We only render the
+// "balance paid" copy when BOTH the flag is present AND the booking actually
+// reports a paid status — that way a stale bookmarked URL or a tampered
+// query string can't show misleading content if a balance is still due.
+$is_balance_paid_request = isset($_GET['balance']) && sanitize_key((string) $_GET['balance']) === 'paid';
+$booking_payment_status = (string) ($booking->payment_status ?? '');
+$booking_amount_due = (float) ($booking->amount_due ?? 0);
+$booking_is_fully_paid = $booking_payment_status === 'paid' || $booking_amount_due <= 0.01;
+$show_balance_paid_banner = $is_balance_paid_request && $booking_is_fully_paid;
+
+// Resolve the most recent gateway used on this booking.
+// `$booking->payment_gateway` is the *initial* method chosen at booking time
+// (e.g. Pay Later), which is misleading when the customer later settled the
+// balance via a different gateway (e.g. Stripe). Show the latest payment's
+// gateway in the Payment Method line; fall back to the booking's stored
+// gateway when no payment row exists yet.
+$display_payment_gateway = (string) ($booking->payment_gateway ?? '');
+if (!empty($booking->id)) {
+    try {
+        $latest_payment = (new \Yatra\Repositories\PaymentRepository())->findLatestByBookingId((int) $booking->id);
+        if ($latest_payment) {
+            $latest_gateway = (string) ($latest_payment->payment_gateway ?? $latest_payment->gateway ?? '');
+            if ($latest_gateway !== '') {
+                $display_payment_gateway = $latest_gateway;
+            }
+        }
+    } catch (\Throwable $e) {
+        // Repository unavailable for some reason — keep the booking's stored gateway.
+    }
+}
+
+// Resolved customer account URL (configurable via Settings → Permalink → Account base).
+$yatra_account_url = home_url('/' . \Yatra\Services\SettingsService::getAccountBase());
+
 // Get status color
 $status_colors = [
     'pending' => ['bg' => '#fef3c7', 'text' => '#d97706', 'label' => 'Pending'],
@@ -75,8 +112,10 @@ do_action('yatra_booking_confirmation_header', $booking);
                 </svg>
             </div>
             <h1 class="yatra-confirmation-title">
-                <?php 
-                if ($booking->status === 'confirmed') {
+                <?php
+                if ($show_balance_paid_banner) {
+                    esc_html_e('Balance Paid!', 'yatra');
+                } elseif ($booking->status === 'confirmed') {
                     esc_html_e('Booking Confirmed!', 'yatra');
                 } elseif ($booking->status === 'pending') {
                     esc_html_e('Booking Received!', 'yatra');
@@ -88,8 +127,10 @@ do_action('yatra_booking_confirmation_header', $booking);
                 ?>
             </h1>
             <p class="yatra-confirmation-subtitle">
-                <?php 
-                if ($booking->status === 'confirmed') {
+                <?php
+                if ($show_balance_paid_banner) {
+                    esc_html_e('Your remaining balance has been received. This booking is now fully paid.', 'yatra');
+                } elseif ($booking->status === 'confirmed') {
                     esc_html_e('Thank you for your booking. We look forward to hosting you!', 'yatra');
                 } elseif ($booking->status === 'pending') {
                     esc_html_e('Thank you for your booking. Your booking is pending confirmation.', 'yatra');
@@ -105,6 +146,32 @@ do_action('yatra_booking_confirmation_header', $booking);
                 <span class="yatra-ref-code"><?php echo esc_html($booking->reference); ?></span>
             </div>
         </div>
+
+        <?php if ($show_balance_paid_banner) : ?>
+            <div class="yatra-balance-paid-banner" role="status" aria-live="polite" style="margin: 16px 0; padding: 14px 18px; background: #d1fae5; border: 1px solid #6ee7b7; border-left: 4px solid #059669; border-radius: 8px; color: #065f46; display: flex; gap: 12px; align-items: flex-start;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex: 0 0 22px; width: 22px; height: 22px; margin-top: 1px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <div style="flex: 1; line-height: 1.45;">
+                    <strong style="display: block; margin-bottom: 2px;">
+                        <?php esc_html_e('Balance payment received.', 'yatra'); ?>
+                    </strong>
+                    <span>
+                        <?php
+                        printf(
+                            /* translators: 1: booking reference number (HTML <strong> wrapped), 2: link labelled "payment history" pointing to the customer account page (HTML <a> wrapped) */
+                            wp_kses(
+                                __('You\'ve completed payment for booking %1$s. A receipt has been emailed to you. View or download your %2$s anytime from your account.', 'yatra'),
+                                ['a' => ['href' => true], 'strong' => []]
+                            ),
+                            '<strong>' . esc_html((string) ($booking->reference ?? '')) . '</strong>',
+                            '<a href="' . esc_url(add_query_arg('tab', 'payments', $yatra_account_url)) . '">' . esc_html__('payment history', 'yatra') . '</a>'
+                        );
+                        ?>
+                    </span>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <?php
         // Resolve featured image URL (handle attachment ID or direct URL)
@@ -578,7 +645,7 @@ do_action('yatra_booking_confirmation_header', $booking);
                         
                         <div class="yatra-payment-method">
                             <span class="yatra-pm-label"><?php esc_html_e('Payment Method:', 'yatra'); ?></span>
-                            <span class="yatra-pm-value"><?php echo esc_html(ucwords(str_replace('_', ' ', $booking->payment_gateway))); ?></span>
+                            <span class="yatra-pm-value"><?php echo esc_html(ucwords(str_replace('_', ' ', (string) $display_payment_gateway))); ?></span>
                         </div>
                     </div>
 

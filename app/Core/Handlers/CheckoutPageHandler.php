@@ -31,8 +31,13 @@ class CheckoutPageHandler extends BasePageHandler
             wp_die(__('Invalid checkout link.', 'yatra'));
         }
 
-        // Prevent 404 handling
-        $this->prevent404();
+        // Configure $wp_query + virtual WP_Post so FSE block themes don't fall back to 404.html.
+        $this->setupPageEnvironment('singular', [
+            'title' => __('Checkout', 'yatra'),
+            'object_id' => (int) ($booking->id ?? 0),
+            'post_type' => 'page',
+            'post_name' => $token,
+        ]);
 
         // Set up global booking object
         $this->setGlobal('yatra_booking', $booking);
@@ -43,17 +48,6 @@ class CheckoutPageHandler extends BasePageHandler
             'yatra_booking' => $booking,
         ]);
 
-        // Load the checkout template
-        $template_path = YATRA_PLUGIN_PATH . 'templates/checkout.php';
-
-        if (!file_exists($template_path)) {
-            $this->logError("Checkout template not found: {$template_path}");
-            return false;
-        }
-
-        include $template_path;
-        $this->exit();
-
-        return true;
+        return $this->selectTemplate('checkout', null, 'checkout');
     }
 }

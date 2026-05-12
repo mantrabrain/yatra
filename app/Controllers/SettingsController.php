@@ -61,6 +61,9 @@ class SettingsController extends BaseController
         'booking_reminder_days' => 3,
         'allow_waitlist' => true,
         'waitlist_auto_confirm' => false,
+        // Pro: render available departure dates as a <select> instead of a
+        // flatpickr calendar on the single-trip sidebar (desktop + mobile).
+        'date_picker_as_dropdown' => false,
         
         // Payment Settings
         'currency' => 'USD',
@@ -392,6 +395,12 @@ class SettingsController extends BaseController
             }
 
             $settings = $this->syncAccountRouteSettingsForResponse($settings);
+
+            /**
+             * Allow Pro modules to align REST payloads with canonical option stores
+             * (e.g. GA4 settings that also live in yatra_google_analytics_settings).
+             */
+            $settings = apply_filters('yatra_rest_settings', $settings);
 
             return $this->success_response($settings);
         } catch (\Exception $e) {

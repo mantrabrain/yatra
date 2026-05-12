@@ -100,14 +100,29 @@ if (!defined('ABSPATH')) {
                                             <span class="yatra-entry-type" style="color: <?php echo esc_attr($type_color); ?>"><?php echo esc_html(yatra_itinerary_item_type_label((string) $entry['item_type'])); ?></span>
                                             <h4 class="yatra-entry-title"><?php echo esc_html($entry['title']); ?></h4>
                                         </div>
-                                        <?php if ($entry['start_time']): ?>
+                                        <?php
+                                        // Time block honours `time_type`:
+                                        //  - exact     → render the start/end time range (only if values exist)
+                                        //  - duration  → suppress the time pill entirely (the duration value renders
+                                        //                 in the meta row below)
+                                        //  - flexible  → render a "Flexible" label so readers know intentionally no time
+                                        $entryTimeType = $entry['time_type'] ?? 'exact';
+                                        $hasStart = !empty($entry['start_time']);
+                                        $hasEnd = !empty($entry['end_time']);
+                                        $showTimePill = ($entryTimeType === 'exact' && $hasStart) || $entryTimeType === 'flexible';
+                                        ?>
+                                        <?php if ($showTimePill): ?>
                                             <div class="yatra-entry-time">
                                                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                                 </svg>
                                                 <span>
-                                                    <?php echo esc_html($entry['start_time']); ?>
-                                                    <?php if ($entry['end_time']) { echo ' - ' . esc_html($entry['end_time']); } ?>
+                                                    <?php if ($entryTimeType === 'flexible'): ?>
+                                                        <?php esc_html_e('Flexible', 'yatra'); ?>
+                                                    <?php else: ?>
+                                                        <?php echo esc_html($entry['start_time']); ?>
+                                                        <?php if ($hasEnd) { echo ' - ' . esc_html($entry['end_time']); } ?>
+                                                    <?php endif; ?>
                                                 </span>
                                             </div>
                                         <?php endif; ?>

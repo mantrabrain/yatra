@@ -1271,6 +1271,18 @@ class TripController extends BaseController
                             }
                         }
 
+                        // Decode gallery JSON column on the entry so the React form
+                        // can re-populate the gallery picker without an extra fetch.
+                        $gallery = [];
+                        if (isset($entry->gallery)) {
+                            if (is_array($entry->gallery)) {
+                                $gallery = $entry->gallery;
+                            } elseif (is_string($entry->gallery) && $entry->gallery !== '') {
+                                $decoded = json_decode($entry->gallery, true);
+                                $gallery = is_array($decoded) ? $decoded : [];
+                            }
+                        }
+
                         return [
                             'id' => isset($entry->id) ? (int) $entry->id : null,
                             'day_id' => isset($entry->day_id) ? (int) $entry->day_id : null,
@@ -1281,6 +1293,14 @@ class TripController extends BaseController
                             'title' => $entry->title ?? '',
                             'description' => $entry->description ?? '',
                             'location' => $entry->location ?? '',
+                            // The entries table has lat/lng/gallery/video_url + an `order`
+                            // smallint column — but until this serializer included them, the
+                            // /trips/{id} response never carried them. The React activity
+                            // load mapper sorts by `entry.order`; without it, every entry
+                            // arrived with order=null, the sort fell through to id-order,
+                            // and drag-sort reorders never appeared to persist on reload.
+                            'location_latitude' => isset($entry->location_latitude) ? $entry->location_latitude : null,
+                            'location_longitude' => isset($entry->location_longitude) ? $entry->location_longitude : null,
                             'duration' => $entry->duration ?? '',
                             'cost' => isset($entry->cost) ? (float) $entry->cost : null,
                             'cost_per_person' => isset($entry->cost_per_person) ? (bool) $entry->cost_per_person : false,
@@ -1288,6 +1308,9 @@ class TripController extends BaseController
                             'item_type_id' => isset($entry->item_type_id) ? (int) $entry->item_type_id : null,
                             'item_id' => isset($entry->item_id) ? (int) $entry->item_id : null,
                             'status' => $entry->status ?? 'active',
+                            'order' => isset($entry->order) ? (int) $entry->order : 0,
+                            'gallery' => $gallery,
+                            'video_url' => $entry->video_url ?? '',
                             'created_at' => $entry->created_at ?? '',
                             'updated_at' => $entry->updated_at ?? '',
                             'included_items' => $includedItems,

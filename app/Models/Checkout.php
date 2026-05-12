@@ -92,33 +92,70 @@ class Checkout
         if (!$this->isTravelerBased() || empty($this->getPriceTypes())) {
             return [];
         }
-        
+
         $breakdown = [];
         $priceTypes = $this->getPriceTypes();
         $travelerCounts = $this->getTravelerCounts();
-        
+
+        // CalculationService now ships a per-category map of DP-adjusted unit
+        // prices. When present, we prefer it so the category row in the sidebar
+        // shows the price the customer is actually paying (e.g. Adult $157.52)
+        // instead of the pre-DP catalog price plus a separate "Dynamic
+        // Pricing −$21.48" subtraction line. The fallback keeps working for
+        // entry points (e.g. legacy sessions, partial recalcs) that don't
+        // carry this map.
+        $postDpPrices = isset($this->pricingCalculation['category_prices_post_dp'])
+            && is_array($this->pricingCalculation['category_prices_post_dp'])
+                ? $this->pricingCalculation['category_prices_post_dp']
+                : [];
+
+        // If the session carries explicit per-category counts, trust them
+        // verbatim. The previous "first category defaults to 1 when missing"
+        // fallback fired even alongside a real traveler_counts payload, which
+        // double-counted: e.g. with `{"53": 1}` (1 Senior) the Adult row at
+        // index 0 was getting a phantom +1, so the sidebar showed two
+        // travelers when the customer had picked one.
+        $hasExplicitCounts = is_array($travelerCounts) && !empty($travelerCounts);
+
         foreach ($priceTypes as $index => $pt) {
             $pt = (object) $pt;
             $categoryId = $pt->category_id ?? $index;
             $categoryLabel = $pt->category_label ?? __('Traveler', 'yatra');
-            $categoryPrice = isset($pt->effective_price) 
-                ? (float) $pt->effective_price 
+            $catalogPrice = isset($pt->effective_price)
+                ? (float) $pt->effective_price
                 : \Yatra\Services\TripPricingService::resolveCategoryEffectivePrice((array) $pt);
-            $count = isset($travelerCounts[$categoryId]) 
-                ? (int) $travelerCounts[$categoryId] 
-                : ($index === 0 ? 1 : 0);
-            
+
+            // Prefer DP-adjusted price (post-rules) when present.
+            $categoryPrice = isset($postDpPrices[(string) $categoryId])
+                ? (float) $postDpPrices[(string) $categoryId]
+                : $catalogPrice;
+
+            if ($hasExplicitCounts) {
+                $count = isset($travelerCounts[$categoryId]) ? (int) $travelerCounts[$categoryId] : 0;
+            } else {
+                // No per-category data at all (legacy session shape) — keep the
+                // old "default first category to 1" so empty sessions still
+                // render a sensible single-traveler row.
+                $count = $index === 0 ? 1 : 0;
+            }
+
             if ($count > 0) {
                 $breakdown[] = [
                     'category_id' => $categoryId,
                     'label' => $categoryLabel,
                     'count' => $count,
                     'price' => $categoryPrice,
+                    // The non-DP price stays available so the template can
+                    // optionally render strike-through original pricing if it
+                    // wants to highlight savings — but the default render is
+                    // the post-DP price baked in here.
+                    'catalog_price' => $catalogPrice,
                     'subtotal' => $categoryPrice * $count,
+                    'pricing_mode' => $pt->pricing_mode ?? 'per_person',
                 ];
             }
         }
-        
+
         return $breakdown;
     }
     
@@ -224,7 +261,54 @@ class Checkout
     {
         return $this->getGroupDiscountAmount() + $this->getCouponDiscountAmount();
     }
-    
+
+    // ========== Dynamic Pricing ==========
+    //
+    // These accessors expose the dynamic-pricing breakdown that CalculationService
+    // collects via the `yatra_price_breakdown` filter. The pricing-summary
+    // template uses them to render a "Dynamic Pricing" line item with the
+    // original price, applied rules, and savings, rather than silently folding
+    // the adjustment into the trip subtotal.
+
+    public function getDynamicPricing(): ?array
+    {
+        $dp = $this->pricingCalculation['dynamic_pricing'] ?? null;
+        if (!is_array($dp) || empty($dp['rules'])) {
+            return null;
+        }
+        return $dp;
+    }
+
+    public function hasDynamicPricing(): bool
+    {
+        return $this->getDynamicPricing() !== null;
+    }
+
+    /**
+     * Total dollar impact dynamic pricing has on the booking. Negative means
+     * a discount, positive means a markup. For traveler-based trips the DP
+     * filter fires per-category so we don't have a single per-unit delta; in
+     * that case fall back to the breakdown's savings field.
+     */
+    public function getDynamicPricingTotalAdjustment(): float
+    {
+        $delta = (float) ($this->pricingCalculation['dp_total_adjustment'] ?? 0);
+        if ($delta !== 0.0) {
+            return $delta;
+        }
+        $dp = $this->getDynamicPricing();
+        if ($dp && isset($dp['savings'])) {
+            return -1.0 * (float) $dp['savings']; // savings positive = discount, so negate for signed delta
+        }
+        return 0.0;
+    }
+
+    public function getDynamicPricingLabel(): string
+    {
+        $dp = $this->getDynamicPricing();
+        return $dp ? (string) ($dp['label'] ?? __('Dynamic Pricing', 'yatra')) : '';
+    }
+
     // ========== Tax Information ==========
     
     public function isTaxEnabled(): bool

@@ -514,12 +514,19 @@
 
   /**
    * Itinerary Gallery Modal Class
-   * Separate gallery modal for itinerary section - independent from hero gallery
+   * Separate gallery modal for itinerary section - independent from hero gallery.
+   *
+   * Scoping: a single modal element is reused, but the image set is RECOMPUTED on
+   * every click from the *closest* `.yatra-entry-gallery` ancestor. Clicking a
+   * thumbnail in Day 2 must open only Day 2's images (starting at the clicked one) —
+   * never the global pool of every day's images. The hidden
+   * `.yatra-itinerary-trip-gallery` div on the page is for SEO / structured data
+   * only; it intentionally no longer drives the modal.
    */
   class ItineraryGalleryModal {
     constructor() {
       this.modal = null;
-      this.images = [];
+      this.images = [];      // currently-visible image set (the active scope)
       this.currentIndex = 0;
       this.init();
     }
@@ -538,39 +545,53 @@
         console.warn('Itinerary gallery modal not found');
         return;
       }
-
-      console.log('Itinerary gallery modal found, collecting images...');
-      this.collectImages();
-      console.log('Itinerary gallery images collected:', this.images.length);
-      this.createThumbnails();
       this.attachEventListeners();
     }
 
-    collectImages() {
-      this.images = [];
+    /**
+     * Build the image list from a scope element (an `.yatra-entry-gallery` block).
+     * Falls back to the document if no scope is given (preserves the legacy
+     * "global pool" behaviour for the SEO-only thumbnails clicker).
+     */
+    collectImagesFrom(scope) {
+      const root = scope || document;
+      const images = [];
 
       const add = (img, fallbackAlt) => {
         const src = img.getAttribute('data-full-size') || getImageSrc(img);
         if (!src) return;
-        if (!this.images.some(i => i.src === src)) {
-          this.images.push({ src, alt: img.alt || fallbackAlt });
+        if (!images.some(i => i.src === src)) {
+          images.push({ src, alt: img.alt || fallbackAlt });
         }
       };
 
-      // Collect from itinerary gallery section (hidden gallery)
-      document.querySelectorAll('.yatra-itinerary-trip-gallery .yatra-gallery-item img').forEach((img) => {
-        add(img, `Itinerary Image ${this.images.length + 1}`);
+      // Visible gallery thumbnails inside the scope
+      root.querySelectorAll('.yatra-media-card img').forEach((img) => {
+        add(img, `Itinerary Gallery Image ${images.length + 1}`);
       });
 
-      // Collect from visible itinerary gallery items
-      document.querySelectorAll('.yatra-entry-gallery .yatra-media-card img').forEach((img) => {
-        add(img, `Itinerary Gallery Image ${this.images.length + 1}`);
+      // Video links inside the scope (fallback selector)
+      root.querySelectorAll('.yatra-itinerary-video-link img').forEach((img) => {
+        add(img, `Itinerary Video ${images.length + 1}`);
       });
 
-      // Collect from itinerary video items
-      document.querySelectorAll('.yatra-entry-video .yatra-media-card img, .yatra-entry-gallery .yatra-itinerary-video-link img').forEach((img) => {
-        add(img, `Itinerary Video Image ${this.images.length + 1}`);
-      });
+      // If still empty AND we were given no scope, fall back to the hidden global pool
+      // so legacy click handlers on `.yatra-itinerary-trip-gallery .yatra-gallery-item`
+      // continue to function.
+      if (images.length === 0 && !scope) {
+        document.querySelectorAll('.yatra-itinerary-trip-gallery .yatra-gallery-item img').forEach((img) => {
+          add(img, `Itinerary Image ${images.length + 1}`);
+        });
+      }
+
+      return images;
+    }
+
+    /** Replace the active image set and rebuild thumbnails. */
+    setActiveImages(images) {
+      this.images = images;
+      this.currentIndex = 0;
+      this.createThumbnails();
     }
 
     createThumbnails() {
@@ -695,28 +716,55 @@
         if (e.key === 'ArrowRight') this.next();
       });
 
-      // Attach click handlers to itinerary gallery links
-      const galleryLinks = document.querySelectorAll('.yatra-itinerary-gallery-link');
-      console.log('Attaching listeners to itinerary gallery links:', galleryLinks.length);
-      galleryLinks.forEach((link) => {
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          const imageIndex = parseInt(link.getAttribute('data-image-index') || '0');
-          console.log('Itinerary gallery link clicked, opening at index:', imageIndex);
-          this.open(imageIndex);
-        });
-      });
+      // Itinerary day gallery thumbnails — SCOPED to the clicked day.
+      // Every click recomputes the image set from the closest .yatra-entry-gallery so
+      // Day 2's modal only ever shows Day 2's photos, starting at the clicked one.
+      // Video links are intentionally NOT captured here — they have their own handler
+      // that opens YatraVideoPlayer (see further down in this file).
+      const onItineraryClick = (e) => {
+        const link = e.target.closest('.yatra-itinerary-gallery-link');
+        if (!link) return;
+        // Don't hijack video link clicks even if they happen to match
+        if (link.classList.contains('yatra-itinerary-video-link')) return;
+        const scope = link.closest('.yatra-entry-gallery');
+        if (!scope) return;
 
-      // Attach click handlers to itinerary gallery items in hidden section
+        e.preventDefault();
+
+        const scopedImages = this.collectImagesFrom(scope);
+        if (scopedImages.length === 0) return;
+
+        // Find the clicked image's index within the scoped set
+        const clickedImg = link.querySelector('img');
+        const clickedSrc = clickedImg
+          ? (clickedImg.getAttribute('data-full-size') || getImageSrc(clickedImg))
+          : null;
+        const startIndex = clickedSrc
+          ? Math.max(0, scopedImages.findIndex((i) => i.src === clickedSrc))
+          : 0;
+
+        this.setActiveImages(scopedImages);
+        this.open(startIndex);
+      };
+      // Delegated listener — works even if entries are added/removed dynamically
+      document.addEventListener('click', onItineraryClick);
+
+      // Legacy: clicks on the hidden SEO pool (kept for back-compat). These open
+      // the full pool because there's no per-day scope on the SEO container.
       const galleryItems = document.querySelectorAll('.yatra-itinerary-trip-gallery .yatra-gallery-item');
       galleryItems.forEach((item, index) => {
         item.addEventListener('click', () => {
+          const allImages = this.collectImagesFrom(null); // fall back to global
+          if (allImages.length === 0) return;
           const img = item.querySelector('img');
-          if (img) {
-            const src = img.getAttribute('data-full-size') || getImageSrc(img);
-            const imageIndex = this.images.findIndex(i => i.src === src);
-            this.open(imageIndex >= 0 ? imageIndex : index);
-          }
+          const src = img
+            ? (img.getAttribute('data-full-size') || getImageSrc(img))
+            : null;
+          const startIndex = src
+            ? Math.max(0, allImages.findIndex((i) => i.src === src))
+            : index;
+          this.setActiveImages(allImages);
+          this.open(startIndex);
         });
       });
     }
@@ -1372,7 +1420,26 @@
     }
 
     initDateField() {
-      if (!this.dateInput || typeof flatpickr === 'undefined') return;
+      if (!this.dateInput) return;
+
+      // Pro "date-as-dropdown" mode renders a <select> instead of a flatpickr
+      // input. Wire it up as a native dropdown — emit `change` on selection so
+      // the existing Check Availability listener picks the date up — and skip
+      // the rest of the flatpickr setup.
+      if (this.dateInput.tagName === 'SELECT') {
+        const setEnabled = () => {
+          if (this.checkAvailabilityBtn) {
+            const hasValue = !!this.dateInput.value;
+            this.checkAvailabilityBtn.disabled = !hasValue;
+            this.checkAvailabilityBtn.classList.toggle('disabled', !hasValue);
+          }
+        };
+        setEnabled();
+        this.dateInput.addEventListener('change', setEnabled);
+        return;
+      }
+
+      if (typeof flatpickr === 'undefined') return;
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -1384,7 +1451,7 @@
 
       // Set today's date as default value
       this.dateInput.value = todayStr;
-      
+
       // Enable button since we have a default date
       if (this.checkAvailabilityBtn) {
         this.checkAvailabilityBtn.disabled = false;

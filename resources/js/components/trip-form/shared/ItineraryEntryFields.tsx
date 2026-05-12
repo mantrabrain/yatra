@@ -571,15 +571,12 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
             className={textSize}
           >
             <option value="exact">{__("Exact Time", "yatra")}</option>
-            <option value="approximate">
-              {__("Approximate Time", "yatra")}
-            </option>
-            <option value="all_day">{__("All Day", "yatra")}</option>
+            <option value="duration">{__("Duration Only", "yatra")}</option>
             <option value="flexible">{__("Flexible", "yatra")}</option>
           </Select>
         </div>
 
-        {entry.time_type !== "all_day" && (
+        {entry.time_type === "exact" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label
@@ -1066,7 +1063,13 @@ const ItemTypeFormContent: React.FC<ItemTypeFormContentProps> = ({
 
   // Auto-generate slug from name (same as main form)
   const handleNameChange = (value: string) => {
-    const slug = value.toLowerCase().replace(/[^a-z0-9-]+/g, "-");
+    // Unicode-aware so Cyrillic / CJK / Devanagari names produce real slugs
+    // instead of empty strings. \p{L}=letter, \p{N}=digit with the `u` flag.
+    const slug = value
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}-]+/gu, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "");
     setFormData((prev) => ({
       ...prev,
       name: value,
@@ -1224,7 +1227,13 @@ const ItemFormContent: React.FC<ItemFormContentProps> = ({
 
   // Auto-generate slug from name (same as main form)
   const handleNameChange = (value: string) => {
-    const slug = value.toLowerCase().replace(/[^a-z0-9-]+/g, "-");
+    // Unicode-aware so Cyrillic / CJK / Devanagari names produce real slugs
+    // instead of empty strings. \p{L}=letter, \p{N}=digit with the `u` flag.
+    const slug = value
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}-]+/gu, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "");
     setFormData((prev) => ({
       ...prev,
       name: value,

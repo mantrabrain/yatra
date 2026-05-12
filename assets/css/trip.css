@@ -344,6 +344,20 @@ button.yatra-booking-button svg path {
     pointer-events: auto;
 }
 
+/*
+ * Hide the desktop sticky tab strip on mobile. On phones, the mobile sticky
+ * sidebar (yatra-mobile-sticky-sidebar) handles the "back to booking" affordance,
+ * and the horizontally-scrolling top nav competes with the theme header + the WP
+ * admin bar for limited vertical space. Same 768px breakpoint other trip mobile
+ * rules use elsewhere in this file.
+ */
+@media (max-width: 768px) {
+    .yatra-sticky-nav,
+    .yatra-sticky-nav-container {
+        display: none !important;
+    }
+}
+
 .yatra-sticky-nav-container {
     max-width: var(--yatra-container-max-width, 1300px);
     margin: 0 auto;
@@ -5578,6 +5592,21 @@ button[type="button"].yatra-group-discount-popover__trigger {
     padding: 8px;
 }
 
+/* Pro: date-as-dropdown — keep the <select> visually consistent with the
+   flatpickr input it replaces. The shared .yatra-booking-select rule above
+   already handles borders/appearance; this just sizes the control like the
+   readonly input variant and hides the native focus ring. */
+.yatra-booking-field-select.yatra-date-as-dropdown select.yatra-date-dropdown {
+    width: 100%;
+    min-width: 0;
+    background-image: none;
+    padding-right: 24px;
+}
+.yatra-mobile-field-btn select.yatra-mobile-date-dropdown {
+    background-image: none;
+    padding-right: 0;
+}
+
 /* Datepicker - Remove double border */
 .yatra-datepicker,
 .yatra-booking-field-select input.yatra-datepicker,
@@ -5587,6 +5616,8 @@ input.yatra-datepicker,
     border: none !important;
     outline: none !important;
     box-shadow: none !important;
+    margin:0;
+    padding:0;
 }
 
 .flatpickr-input {
@@ -6621,7 +6652,7 @@ input.yatra-datepicker,
 }
 
 .yatra-packing-items li::before {
-    content: '✓';
+    content: "\2713";
     position: absolute;
     left: 0;
     color: #10b981;

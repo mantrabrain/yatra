@@ -179,6 +179,78 @@ class ItineraryService
     }
 
     /**
+     * Bulk-save activities for a single day in one DB transaction-equivalent batch.
+     *
+     * Accepts an `activities` array; each row with `id` is updated, each row
+     * without `id` is created. Returns per-row result objects so the caller can
+     * surface partial failures. Cache invalidation fires once at the end (via
+     * the existing per-row hooks already invoked by the repository).
+     *
+     * @param int   $dayId      The yatra_new_trip_itinerary_days.id row.
+     * @param int   $tripId     The trip id (used for the create branch).
+     * @param array $activities Array of activity payloads. Each row may include
+     *                          an `id` (update) or omit it (create).
+     * @return array {created: int, updated: int, results: array}
+     */
+    public function bulkSaveDayActivities(int $dayId, int $tripId, array $activities): array
+    {
+        $results = [];
+        $created = 0;
+        $updated = 0;
+        $failed = 0;
+
+        foreach ($activities as $i => $row) {
+            if (!is_array($row)) {
+                $results[] = ['index' => $i, 'ok' => false, 'error' => 'Row is not an object'];
+                $failed++;
+                continue;
+            }
+            // The repo expects day_id + trip_id on creates; inject here so the
+            // client doesn't have to repeat them per row.
+            $row['day_id'] = $dayId;
+            if ($tripId > 0 && empty($row['trip_id'])) {
+                $row['trip_id'] = $tripId;
+            }
+
+            try {
+                if (!empty($row['id'])) {
+                    $entryId = (int) $row['id'];
+                    unset($row['id']);
+                    $ok = $this->repository->updateEntry($entryId, $row, 'activity');
+                    if ($ok) {
+                        $updated++;
+                        $results[] = ['index' => $i, 'ok' => true, 'id' => $entryId, 'op' => 'update'];
+                    } else {
+                        $failed++;
+                        $results[] = ['index' => $i, 'ok' => false, 'id' => $entryId, 'error' => 'updateEntry returned false'];
+                    }
+                } else {
+                    $newId = $this->repository->createEntry($row);
+                    if ($newId > 0) {
+                        $created++;
+                        $results[] = ['index' => $i, 'ok' => true, 'id' => $newId, 'op' => 'create'];
+                    } else {
+                        $failed++;
+                        $results[] = ['index' => $i, 'ok' => false, 'error' => 'createEntry returned 0'];
+                    }
+                }
+            } catch (\Throwable $e) {
+                $failed++;
+                $results[] = ['index' => $i, 'ok' => false, 'error' => $e->getMessage()];
+            }
+        }
+
+        return [
+            'day_id' => $dayId,
+            'trip_id' => $tripId,
+            'created' => $created,
+            'updated' => $updated,
+            'failed' => $failed,
+            'results' => $results,
+        ];
+    }
+
+    /**
      * Get itinerary entry by ID
      */
     public function find(int $id): ?\stdClass

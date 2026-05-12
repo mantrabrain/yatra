@@ -469,7 +469,7 @@ interface ItineraryEntry {
   duration?: string;
   start_time: string;
   end_time: string;
-  time_type: "exact" | "approximate" | "all_day" | "flexible";
+  time_type: "exact" | "duration" | "flexible";
   cost?: string;
   cost_per_person: boolean;
   notes?: string;
@@ -3176,9 +3176,9 @@ const TripForm: React.FC = () => {
 
     if (!formData.slug.trim()) {
       newErrors.slug = __("Slug is required", "yatra");
-    } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
+    } else if (!/^[\p{L}\p{N}-]+$/u.test(formData.slug)) {
       newErrors.slug = __(
-        "Slug can only contain lowercase letters, numbers, and hyphens",
+        "Slug can only contain letters, numbers, and hyphens",
         "yatra",
       );
     }

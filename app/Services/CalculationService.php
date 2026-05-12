@@ -115,7 +115,14 @@ class CalculationService
         $original_price   = (float) ($trip->original_price ?? 0);
         $discounted_price = $this->resolveDiscountedPrice($trip, $availability);
         $unit_price       = $discounted_price > 0 ? $discounted_price : $original_price;
-        
+
+        // Snapshot the pre-DP per-unit price so the pricing-summary template
+        // can render the dynamic-pricing impact as its own line item rather
+        // than silently absorbing it into the Gross Total. Without this, an
+        // admin/customer looking at the summary cannot tell what the trip
+        // would have cost without DP rules.
+        $unit_price_before_dp = $unit_price;
+
         // Apply Dynamic Pricing filter (Pro DynamicPricingModule hooks here)
         $unit_price = (float) apply_filters('yatra_booking_trip_price', $unit_price, $trip_id, [
             'departure_date'   => $travel_date,
@@ -204,11 +211,79 @@ class CalculationService
         }
         
         // ── Additional Services (if any) ─────────────────────────────
-        $additional_services_total = 0;
-        // Note: Additional services can be added here via filters
+        // Pull the available services for this trip via the Pro filter and
+        // mark which ones are selected (or required/included). Pricing data
+        // ships back to the template scope so the Pricing Summary partial's
+        // selected-services loop has something to render — previously
+        // `pricing_calculation['additional_services']` was never populated
+        // here, so the per-row services list in the sidebar always rendered
+        // empty even when the standalone Additional Services card showed
+        // ticked checkboxes.
+        $available_services = (array) apply_filters(
+            'yatra_booking_additional_services',
+            [],
+            $trip_id,
+            $travelers_count,
+            $traveler_counts,
+            $travel_date
+        );
+        $selected_service_ids = array_map('intval', (array) $selected_services);
+        $duration_days_for_services = (int) ($trip->duration_days ?? 1);
+        $additional_services_total = 0.0;
+        $additional_services_resolved = [];
+        foreach ($available_services as $svc) {
+            $svc = (array) $svc;
+            $svc_id = (int) ($svc['id'] ?? 0);
+            $is_required = !empty($svc['is_required']);
+            $is_included = !empty($svc['is_included']);
+            $is_selected = $is_required || $is_included || in_array($svc_id, $selected_service_ids, true);
+
+            $base_price = (float) ($svc['price'] ?? 0);
+            $price_per = $svc['price_per'] ?? 'person';
+            switch ($price_per) {
+                case 'person':
+                    $calculated_price = $base_price * max(1, $travelers_count);
+                    break;
+                case 'day':
+                    $calculated_price = $base_price * max(1, $duration_days_for_services);
+                    break;
+                case 'booking':
+                default:
+                    $calculated_price = $base_price;
+                    break;
+            }
+
+            $svc['selected'] = $is_selected;
+            $svc['calculated_price'] = $calculated_price;
+            $additional_services_resolved[] = $svc;
+
+            // Only paid (non-included) selected services contribute to the
+            // services subtotal. The taxable-amount line below will then
+            // include this naturally.
+            if ($is_selected && !$is_included) {
+                $additional_services_total += $calculated_price;
+            }
+        }
+        // Let Pro modules override the total (rounding, group rules, etc.).
+        $additional_services_total = (float) apply_filters(
+            'yatra_booking_services_total',
+            $additional_services_total,
+            $additional_services_resolved,
+            $trip_id,
+            $travelers_count,
+            $duration_days_for_services
+        );
         
-        // ── Taxable Amount (includes itinerary costs and services) ────
-        $taxable_amount = $discounted_subtotal + $itinerary_costs_total + $additional_services_total;
+        // ── Taxable Amount ────────────────────────────────────────────
+        // We DON'T add `$additional_services_total` again here. The Pro
+        // AdditionalServicesModule hooks into `yatra_calculate_subtotal`
+        // (above), which already folded selected services into `$subtotal`
+        // → `$discounted_subtotal`. Adding them a second time produced the
+        // visible double-count bug ($159 + $112 services = $271 subtotal,
+        // then $271 + $112 services = $383 net amount). `$additional_services_total`
+        // stays available in the result payload so the sidebar can render
+        // each service as a row for transparency.
+        $taxable_amount = $discounted_subtotal + $itinerary_costs_total;
         
         // ── Taxes ───────────────────────────────────────────────────────
         $tax_calculation = $this->calculateTaxes($taxable_amount);
@@ -239,14 +314,88 @@ class CalculationService
         // ── Gross total (subtotal before discounts/taxes, includes services) ───
         $gross_total = $subtotal;
         
+        // ── Dynamic-pricing breakdown (for the pricing-summary template) ─
+        // The DP module already has an `addPricingBreakdown` callback wired to
+        // the `yatra_price_breakdown` filter — but that filter was previously
+        // never fired anywhere, so the template's `$dynamic_pricing` block was
+        // dead code. We fire it here with the same context the per-unit DP
+        // filter received, so Pro DP can populate the breakdown row that the
+        // template renders.
+        //
+        // dp_total_adjustment is the signed dollar impact DP has on the trip
+        // subtotal:
+        //   - For regular pricing: per-unit delta × travelers (the line 120
+        //     filter is the single DP entry point).
+        //   - For traveler_based pricing: DP is applied per-category inside
+        //     calculateBaseAmount, so we recompute a "pristine" base amount
+        //     using the same TripPricingService::resolveCategoryEffectivePrice
+        //     anchor that calculateBaseAmount starts from, and subtract from
+        //     the real (post-DP) base_amount.
+        $dp_per_unit_delta = $unit_price - $unit_price_before_dp;
+        $dp_total_adjustment = 0.0;
+        $category_prices_post_dp = [];
+        if ($pricing_type === 'regular') {
+            $dp_total_adjustment = $dp_per_unit_delta * max(1, $travelers_count);
+        } elseif ($pricing_type === 'traveler_based' && !empty($price_types)) {
+            $pre_dp_base = 0.0;
+            foreach ($price_types as $pt) {
+                $pt_arr = (array) $pt;
+                $category_id = $pt_arr['category_id'] ?? 0;
+                $pricing_mode = $pt_arr['pricing_mode'] ?? 'per_person';
+                $pre_dp_price = (float) \Yatra\Services\TripPricingService::resolveCategoryEffectivePrice($pt_arr);
+                $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : 0;
+
+                // Capture the DP-adjusted per-category price so the pricing-summary
+                // category row can show the price the customer is actually paying
+                // — admins asked for one consolidated row (post-DP) instead of a
+                // pre-DP row plus a separate "Dynamic Pricing" subtraction line.
+                $post_dp_price = (float) apply_filters('yatra_booking_trip_price', $pre_dp_price, $trip_id, [
+                    'departure_date'   => $travel_date,
+                    'spots_remaining'  => $spots_for_dp,
+                    'availability_id'  => $availability_id_for_dp,
+                    'category_id'      => $category_id,
+                    'original_price'   => (float) ($pt_arr['original_price'] ?? 0),
+                    'discounted_price' => (float) ($pt_arr['discounted_price'] ?? $pt_arr['sale_price'] ?? 0),
+                ]);
+                if ($category_id) {
+                    $category_prices_post_dp[(string) $category_id] = $post_dp_price;
+                }
+
+                if ($pricing_mode === 'per_group') {
+                    if ($count > 0) {
+                        $pre_dp_base += $pre_dp_price;
+                    }
+                } else {
+                    $pre_dp_base += $pre_dp_price * $count;
+                }
+            }
+            $dp_total_adjustment = $base_amount - $pre_dp_base;
+        }
+        $price_breakdown = (array) apply_filters('yatra_price_breakdown', [], $trip_id, [
+            'price'             => $unit_price,
+            'original_price'    => $original_price,
+            'discounted_price'  => $discounted_price,
+            'departure_date'    => $travel_date,
+            'spots_remaining'   => $spots_for_dp,
+            'availability_id'   => $availability_id_for_dp,
+            'travelers_count'   => $travelers_count,
+            'gross_total'       => $gross_total,
+        ]);
+        $dynamic_pricing_breakdown = $price_breakdown['dynamic_pricing'] ?? null;
+
         // ── Build result ────────────────────────────────────────────
         $pricing_data = [
             // Price info
             'original_price'        => $original_price,
             'discounted_price'      => $discounted_price,
             'unit_price'            => $unit_price,
+            'unit_price_before_dp'  => $unit_price_before_dp,
+            'dp_per_unit_delta'     => $dp_per_unit_delta,
+            'dp_total_adjustment'   => $dp_total_adjustment,
+            'category_prices_post_dp' => $category_prices_post_dp,
+            'dynamic_pricing'       => $dynamic_pricing_breakdown,
             'pricing_type'          => $pricing_type,
-            
+
             // Base amounts
             'base_amount'           => $base_amount,
             'subtotal'              => $subtotal,
@@ -272,6 +421,12 @@ class CalculationService
             'currency'              => $currency,
             
             // Itinerary costs
+            // Additional services with `selected` / `calculated_price` flags
+            // — Checkout::getAdditionalServices() reads this; the sidebar's
+            // selected-services loop renders one row per ticked service.
+            'additional_services'   => $additional_services_resolved,
+            'services_total'        => $additional_services_total,
+
             'itinerary_costs'       => $itinerary_costs,
             'itinerary_costs_total' => $itinerary_costs_total,
             

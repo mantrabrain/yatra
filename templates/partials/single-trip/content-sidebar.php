@@ -230,6 +230,16 @@ if (!defined('ABSPATH')) {
                         }
                         $countAvailable = count($unique);
 
+                        // Pro feature: a Pro module can hook `yatra_use_date_dropdown`
+                        // to replace the flatpickr calendar with a <select> of available
+                        // departures, and supplies the option list via
+                        // `yatra_single_trip_date_dropdown_options`. Free plugin renders
+                        // calendar by default (filter returns false / [] when Pro is
+                        // inactive or the setting is off).
+                        $dropdown_options = (array) apply_filters('yatra_single_trip_date_dropdown_options', [], $trip, $pick);
+                        $yatra_use_date_dropdown = (bool) apply_filters('yatra_use_date_dropdown', false, $trip)
+                            && !empty($dropdown_options);
+
                         echo esc_html(sprintf(
                             _n('%d departure available', '%d departures available', $countAvailable, 'yatra'),
                             $countAvailable
@@ -240,17 +250,32 @@ if (!defined('ABSPATH')) {
 
         <form class="yatra-booking-form" data-booking-mode="date_specific">
             <!-- Date Selection -->
-            <div class="yatra-booking-field-select">
+            <div class="yatra-booking-field-select<?php echo $yatra_use_date_dropdown ? ' yatra-date-as-dropdown' : ''; ?>">
                 <div class="yatra-booking-field-icon">
                     <?php echo yatra_svg_icon('calendar', 'yatra-icon-sm'); ?>
                 </div>
-                <input type="text"
-                       id="travel_date"
-                       name="travel_date"
-                       class="yatra-booking-select yatra-datepicker"
-                       placeholder="<?php esc_attr_e('Select date', 'yatra'); ?>"
-                       readonly
-                       required>
+                <?php if ($yatra_use_date_dropdown): ?>
+                    <select id="travel_date"
+                            name="travel_date"
+                            class="yatra-booking-select yatra-date-dropdown"
+                            required>
+                        <option value=""><?php esc_html_e('Select a departure date', 'yatra'); ?></option>
+                        <?php foreach ($dropdown_options as $opt): ?>
+                            <option value="<?php echo esc_attr($opt['value']); ?>"
+                                    <?php if (!empty($opt['time'])): ?>data-departure-time="<?php echo esc_attr($opt['time']); ?>"<?php endif; ?>>
+                                <?php echo esc_html($opt['label']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                <?php else: ?>
+                    <input type="text"
+                           id="travel_date"
+                           name="travel_date"
+                           class="yatra-booking-select yatra-datepicker"
+                           placeholder="<?php esc_attr_e('Select date', 'yatra'); ?>"
+                           readonly
+                           required>
+                <?php endif; ?>
                 <svg class="yatra-select-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                 </svg>
@@ -330,19 +355,43 @@ if (!defined('ABSPATH')) {
 
             <form class="yatra-booking-form" data-booking-mode="flexible">
                 <!-- Date Selection (Flexible) -->
-                <div class="yatra-booking-field-select">
+                <?php
+                // Same Pro filter contract as the date_specific branch above.
+                // Flexible trips have no discrete availability set, so $pick is
+                // passed as null — the Pro hook synthesizes a list from the
+                // trip's available_from/to window.
+                $flex_dropdown_options = (array) apply_filters('yatra_single_trip_date_dropdown_options', [], $trip, null);
+                $flex_use_date_dropdown = (bool) apply_filters('yatra_use_date_dropdown', false, $trip)
+                    && !empty($flex_dropdown_options);
+                ?>
+                <div class="yatra-booking-field-select<?php echo $flex_use_date_dropdown ? ' yatra-date-as-dropdown' : ''; ?>">
                     <div class="yatra-booking-field-icon">
                         <?php echo yatra_svg_icon('calendar', 'yatra-icon-sm'); ?>
                     </div>
-                    <input type="text"
-                           id="travel_date"
-                           name="travel_date"
-                           class="yatra-booking-select yatra-datepicker"
-                           placeholder="<?php esc_attr_e('Select date', 'yatra'); ?>"
-                           data-min-date="<?php echo esc_attr($trip->getAvailableFrom() ?: date('Y-m-d')); ?>"
-                           data-max-date="<?php echo esc_attr($trip->getAvailableTo() ?: ''); ?>"
-                           readonly
-                           required>
+                    <?php if ($flex_use_date_dropdown): ?>
+                        <select id="travel_date"
+                                name="travel_date"
+                                class="yatra-booking-select yatra-date-dropdown"
+                                required>
+                            <option value=""><?php esc_html_e('Select a departure date', 'yatra'); ?></option>
+                            <?php foreach ($flex_dropdown_options as $opt): ?>
+                                <option value="<?php echo esc_attr($opt['value']); ?>"
+                                        <?php if (!empty($opt['time'])): ?>data-departure-time="<?php echo esc_attr($opt['time']); ?>"<?php endif; ?>>
+                                    <?php echo esc_html($opt['label']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    <?php else: ?>
+                        <input type="text"
+                               id="travel_date"
+                               name="travel_date"
+                               class="yatra-booking-select yatra-datepicker"
+                               placeholder="<?php esc_attr_e('Select date', 'yatra'); ?>"
+                               data-min-date="<?php echo esc_attr($trip->getAvailableFrom() ?: date('Y-m-d')); ?>"
+                               data-max-date="<?php echo esc_attr($trip->getAvailableTo() ?: ''); ?>"
+                               readonly
+                               required>
+                    <?php endif; ?>
                     <svg class="yatra-select-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>

@@ -58,9 +58,11 @@ interface RuleFormData {
   // Demand-based conditions
   demand_threshold_high?: number;
   demand_threshold_low?: number;
-  // Time-based conditions
-  apply_on_weekends?: boolean;
-  apply_on_weekdays?: boolean;
+  // Time-based conditions. `weekend_days` is the source of truth — the engine
+  // evaluates the rule only on those weekdays. The `apply_on_weekends` /
+  // `apply_on_weekdays` columns still exist in the DB schema for legacy reasons
+  // but the engine never reads them, so we don't surface them in the form to
+  // avoid the impression they do anything.
   weekend_days?: string[];
 }
 
@@ -164,8 +166,6 @@ const DynamicPricingRuleForm: React.FC = () => {
     priority: 1,
     demand_threshold_high: 80,
     demand_threshold_low: 30,
-    apply_on_weekends: false,
-    apply_on_weekdays: false,
     weekend_days: [],
   });
 
@@ -174,9 +174,79 @@ const DynamicPricingRuleForm: React.FC = () => {
   const [debouncedTripSearch, setDebouncedTripSearch] = useState("");
   const [showRuleTypeModal, setShowRuleTypeModal] = useState(false);
 
+  // Rule simulation state — drives the "When will this apply?" panel.
+  // We keep a small base price input so admins can see absolute dollar amounts
+  // for the discount/markup rather than just percentages.
+  const [previewBasePrice, setPreviewBasePrice] = useState<number>(100);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+  const [previewResult, setPreviewResult] = useState<{
+    rule_type: string;
+    base_price: number;
+    current_date: string;
+    scenarios: Array<{
+      label: string;
+      departure_date: string | null;
+      spots_remaining: number | null;
+      applies: boolean;
+      base_price: number;
+      final_price: number;
+      adjustment: number;
+      adjustment_percent: number;
+    }>;
+  } | null>(null);
+
   const handleSelectRuleType = (ruleType: string) => {
     handleChange("rule_type", ruleType);
     setShowRuleTypeModal(false);
+    // A new rule type changes which scenarios are meaningful — drop the old
+    // preview so stale results don't mislead the admin.
+    setPreviewResult(null);
+    setPreviewError(null);
+  };
+
+  const handleRunSimulation = async () => {
+    if (!formData.rule_type) {
+      setPreviewError(__("Pick a rule type first."));
+      return;
+    }
+    setPreviewLoading(true);
+    setPreviewError(null);
+    try {
+      const response = await apiClient.post(
+        "/dynamic-pricing/simulate-rule",
+        {
+          rule_type: formData.rule_type,
+          adjustment_type: formData.adjustment_type,
+          adjustment_value: formData.adjustment_value,
+          min_days_before: formData.min_days_before,
+          max_days_before: formData.max_days_before,
+          min_inventory: formData.min_inventory,
+          max_inventory: formData.max_inventory,
+          start_date: formData.start_date || null,
+          end_date: formData.end_date || null,
+          weekend_days: formData.weekend_days || [],
+          demand_threshold_low: formData.demand_threshold_low,
+          demand_threshold_high: formData.demand_threshold_high,
+          base_price: previewBasePrice > 0 ? previewBasePrice : 100,
+        },
+      );
+      // Controller returns { success: true, data: {...scenarios...} } — checking
+      // .success on .data would always be undefined and throw a false negative.
+      const envelope = response as any;
+      if (envelope?.success === false) {
+        throw new Error(envelope?.message || __("Simulation failed."));
+      }
+      const result = envelope?.data ?? envelope;
+      if (!result || !Array.isArray(result.scenarios)) {
+        throw new Error(__("Simulation returned an unexpected response."));
+      }
+      setPreviewResult(result);
+    } catch (e: any) {
+      setPreviewError(e?.message || __("Simulation failed."));
+    } finally {
+      setPreviewLoading(false);
+    }
   };
 
   // Debounce trip search
@@ -256,8 +326,6 @@ const DynamicPricingRuleForm: React.FC = () => {
         demand_threshold_low: ruleDetails.demand_threshold_low
           ? Number(ruleDetails.demand_threshold_low)
           : 30,
-        apply_on_weekends: Boolean(ruleDetails.apply_on_weekends),
-        apply_on_weekdays: Boolean(ruleDetails.apply_on_weekdays),
         weekend_days: Array.isArray(ruleDetails.weekend_days)
           ? ruleDetails.weekend_days
           : ruleDetails.weekend_days
@@ -1251,6 +1319,142 @@ const DynamicPricingRuleForm: React.FC = () => {
                           </div>
                         </div>
                       )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* "When will this apply?" preview panel.
+                  Runs the current (unsaved) form data through the engine
+                  against rule-type-appropriate sample scenarios so admins can
+                  see exactly when their rule fires, before saving. */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">
+                    {__("When will this rule apply?")}
+                  </CardTitle>
+                  <CardDescription>
+                    {__(
+                      "Run a simulation with the current settings to see which scenarios trigger the discount/markup. Nothing is saved.",
+                    )}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end gap-3 mb-3">
+                    <div className="flex-1">
+                      <Label htmlFor="preview-base-price">
+                        {__("Sample base price")}
+                      </Label>
+                      <Input
+                        id="preview-base-price"
+                        type="number"
+                        min={1}
+                        step="0.01"
+                        value={previewBasePrice}
+                        onChange={(e) =>
+                          setPreviewBasePrice(Number(e.target.value) || 0)
+                        }
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={handleRunSimulation}
+                      disabled={previewLoading || !formData.rule_type}
+                    >
+                      {previewLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          {__("Running...")}
+                        </>
+                      ) : (
+                        <>
+                          <Target className="w-4 h-4 mr-2" />
+                          {__("Run Preview")}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {previewError && (
+                    <p className="text-sm text-red-600 dark:text-red-400 mb-2">
+                      {previewError}
+                    </p>
+                  )}
+
+                  {previewResult && (
+                    <div className="overflow-x-auto rounded-md border border-gray-200 dark:border-gray-700">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-50 dark:bg-gray-900">
+                          <tr className="text-left">
+                            <th className="px-3 py-2 font-medium">
+                              {__("Scenario")}
+                            </th>
+                            <th className="px-3 py-2 font-medium">
+                              {__("Final Price")}
+                            </th>
+                            <th className="px-3 py-2 font-medium">
+                              {__("Change")}
+                            </th>
+                            <th className="px-3 py-2 font-medium">
+                              {__("Rule")}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {previewResult.scenarios.map((s, i) => (
+                            <tr
+                              key={i}
+                              className="border-t border-gray-200 dark:border-gray-700"
+                            >
+                              <td className="px-3 py-2">
+                                <div>{s.label}</div>
+                                {s.departure_date && (
+                                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                                    {s.departure_date}
+                                  </div>
+                                )}
+                              </td>
+                              <td className="px-3 py-2 font-medium">
+                                {previewResult.base_price > 0
+                                  ? `$${s.final_price.toFixed(2)}`
+                                  : "—"}
+                              </td>
+                              <td className="px-3 py-2">
+                                {s.applies ? (
+                                  <span
+                                    className={
+                                      s.adjustment < 0
+                                        ? "text-green-700 dark:text-green-400"
+                                        : "text-orange-700 dark:text-orange-400"
+                                    }
+                                  >
+                                    {s.adjustment > 0 ? "+" : ""}
+                                    ${s.adjustment.toFixed(2)} (
+                                    {s.adjustment_percent > 0 ? "+" : ""}
+                                    {s.adjustment_percent.toFixed(2)}%)
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-500 dark:text-gray-400">
+                                    —
+                                  </span>
+                                )}
+                              </td>
+                              <td className="px-3 py-2">
+                                {s.applies ? (
+                                  <span className="inline-flex items-center gap-1 text-green-700 dark:text-green-400">
+                                    <Check className="w-3.5 h-3.5" />
+                                    {__("Fires")}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-500 dark:text-gray-400">
+                                    {__("Skipped")}
+                                  </span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   )}
                 </CardContent>

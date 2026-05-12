@@ -189,9 +189,9 @@ const ActivityForm: React.FC = () => {
 
     if (!formData.slug.trim()) {
       newErrors.slug = __("Slug is required", "yatra");
-    } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
+    } else if (!/^[\p{L}\p{N}-]+$/u.test(formData.slug)) {
       newErrors.slug = __(
-        "Slug can only contain lowercase letters, numbers, and hyphens",
+        "Slug can only contain letters, numbers, and hyphens",
         "yatra",
       );
     }

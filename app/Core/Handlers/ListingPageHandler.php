@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yatra\Core\Handlers;
 
 use Yatra\Core\Assets\ListingAssetManager;
-use Yatra\Core\Template\TemplateRenderer;
 
 /**
  * Listing Page Handler
@@ -40,15 +39,14 @@ class ListingPageHandler extends BasePageHandler
         }
 
         $template = $template_map[$listing_type];
-        $template_path = TemplateRenderer::getTemplatePath($template);
 
-        if (!TemplateRenderer::templateExists($template)) {
-            $this->logError("Listing template not found: {$template}");
-            return false;
-        }
-
-        // Prevent 404 handling
-        $this->prevent404();
+        // Configure $wp_query + virtual WP_Post so FSE block themes resolve an archive
+        // template (not 404.html) and render the site header normally.
+        $this->setupPageEnvironment('archive', [
+            'title' => ucfirst($listing_type) . ' ' . __('Listing', 'yatra'),
+            'post_type' => 'page',
+            'post_name' => $base,
+        ]);
 
         // Set up query vars for backward compatibility
         $this->setQueryVars([
@@ -105,17 +103,7 @@ class ListingPageHandler extends BasePageHandler
 
         // SEO meta, canonical, and JSON-LD are handled by {@see \Yatra\Managers\SEOManager} + {@see \Yatra\Services\SEOService}.
 
-        // Create asset manager and render template
-        $asset_manager = new ListingAssetManager($listing_type);
-
-        if (!TemplateRenderer::render($template_path, [], $asset_manager)) {
-            $this->logError("Failed to render listing template for type: {$listing_type}");
-            return false;
-        }
-
-        $this->exit();
-
-        return true;
+        return $this->selectTemplate($template, new ListingAssetManager($listing_type), 'listing-' . $listing_type);
     }
 
 }

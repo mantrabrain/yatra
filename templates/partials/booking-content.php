@@ -427,9 +427,35 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                         <span><?php echo esc_html(yatra_format_duration($duration_days, $duration_nights)); ?></span>
                                     <?php endif; ?>
                                 <?php endif; ?>
-                                <?php if (!empty($trip->difficulty_level)) : ?>
+                                <?php
+                                // Resolve difficulty_level to a human label.
+                                // The trip row stores difficulty_level as the
+                                // classification FK id (e.g. 32), and that's
+                                // what we'd otherwise render — "32" on the
+                                // sidebar. Prefer the joined `difficulty_name`
+                                // when present; fall back to a one-row lookup
+                                // in wp_yatra_new_classifications when only the
+                                // id arrived; finally fall back to the raw
+                                // string (legacy trips that stored
+                                // 'easy'/'moderate' before the FK migration).
+                                $difficulty_label = '';
+                                $difficulty_raw = $trip->difficulty_level ?? null;
+                                if (!empty($trip->difficulty_name)) {
+                                    $difficulty_label = (string) $trip->difficulty_name;
+                                } elseif (is_numeric($difficulty_raw) && (int) $difficulty_raw > 0) {
+                                    global $wpdb;
+                                    $classifications_table = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+                                    $difficulty_label = (string) $wpdb->get_var($wpdb->prepare(
+                                        "SELECT name FROM {$classifications_table} WHERE id = %d LIMIT 1",
+                                        (int) $difficulty_raw
+                                    ));
+                                } elseif (is_string($difficulty_raw) && $difficulty_raw !== '') {
+                                    $difficulty_label = ucfirst($difficulty_raw);
+                                }
+                                ?>
+                                <?php if ($difficulty_label !== '') : ?>
                                 <span>•</span>
-                                <span><?php echo esc_html(ucfirst($trip->difficulty_level)); ?></span>
+                                <span><?php echo esc_html($difficulty_label); ?></span>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -526,9 +552,31 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                         </div>
                     <?php endif; ?>
 
-                    <!-- Coupon Code Section -->
+                    <!-- Coupon Code Section
+                         Server-side checks whether a coupon is already
+                         applied to this booking session so the correct UI
+                         (toggle-to-enter vs applied-with-remove) is rendered
+                         on the FIRST byte. Without this, the page always
+                         shipped with the applied-coupon block `display:none`
+                         and relied on the JS `loadCouponFromSession()` GET
+                         to flip the visibility — which fails on page refresh
+                         in REST contexts where PHPSESSID doesn't propagate,
+                         leaving the user without a remove button. -->
+                    <?php
+                    $applied_coupon = null;
+                    if (!empty($booking) && is_object($booking)) {
+                        $session_for_coupon = yatra_get_booking_session();
+                        if (is_array($session_for_coupon) && !empty($session_for_coupon['coupon']['code'])) {
+                            $applied_coupon = $session_for_coupon['coupon'];
+                        }
+                    }
+                    $coupon_is_applied = !empty($applied_coupon);
+                    $coupon_discount_amount_for_display = $coupon_is_applied
+                        ? (float) ($applied_coupon['discount_amount'] ?? $applied_coupon['calculated_amount'] ?? 0)
+                        : 0.0;
+                    ?>
                     <div class="yatra-coupon-section">
-                        <div class="yatra-coupon-toggle">
+                        <div class="yatra-coupon-toggle" <?php echo $coupon_is_applied ? 'style="display: none;"' : ''; ?>>
                             <button type="button" id="yatra-coupon-toggle-btn" class="yatra-coupon-toggle-btn">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"></path>
@@ -552,15 +600,17 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                             </div>
                             <div id="yatra-coupon-message" class="yatra-coupon-message" style="display: none;"></div>
                         </div>
-                        <!-- Applied Coupon Display -->
-                        <div class="yatra-applied-coupon" id="yatra-applied-coupon" style="display: none;">
+                        <!-- Applied Coupon Display — rendered visible on first paint when the
+                             session already has a coupon, so the remove button is reachable
+                             even before any JS runs. -->
+                        <div class="yatra-applied-coupon" id="yatra-applied-coupon" <?php echo $coupon_is_applied ? '' : 'style="display: none;"'; ?>>
                             <div class="yatra-applied-coupon-info">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                 </svg>
-                                <span class="yatra-coupon-code-display"></span>
-                                <span class="yatra-coupon-discount"></span>
+                                <span class="yatra-coupon-code-display"><?php echo $coupon_is_applied ? esc_html($applied_coupon['code']) : ''; ?></span>
+                                <span class="yatra-coupon-discount"><?php echo $coupon_is_applied && $coupon_discount_amount_for_display > 0 ? '-' . esc_html(yatra_format_price($coupon_discount_amount_for_display)) : ''; ?></span>
                             </div>
                             <button type="button" id="yatra-remove-coupon" class="yatra-remove-coupon-btn" title="<?php esc_attr_e('Remove coupon', 'yatra'); ?>">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -571,20 +621,27 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                         </div>
                     </div>
 
-                    <!-- Additional Services Section (Premium Feature) -->
+                    <!-- Additional Services Section (Premium Feature)
+                         Renders as its own card BEFORE the Pricing Summary
+                         (after the coupon code section). Checkbox toggles fire
+                         the change handler in booking.js → updateServicesInSession()
+                         → /booking/session POST → schedulePricingSummaryRefresh()
+                         → /booking/summary GET → re-render the pricing-summary
+                         partial below, which then shows the selected services
+                         as compact line items in the price breakdown. -->
                     <?php
                     /**
                      * Filter: Get additional services for this trip
                      * Allows premium modules to add extra services to the booking
                      */
                     $additional_services = apply_filters('yatra_booking_additional_services', [], $trip_id, $total_travelers, $traveler_counts ?? [], $travel_date);
-                    
+
                     // Get selected services from session (set from popup)
                     $session = yatra_get_booking_session();
-                    $selected_service_ids = isset($session['additional_services']) && is_array($session['additional_services']) 
-                        ? array_map('intval', $session['additional_services']) 
+                    $selected_service_ids = isset($session['additional_services']) && is_array($session['additional_services'])
+                        ? array_map('intval', $session['additional_services'])
                         : [];
-                    
+
                     if (!empty($additional_services)) :
                     ?>
                     <div class="yatra-additional-services-section">
@@ -593,18 +650,16 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                             <p class="yatra-services-subtitle"><?php esc_html_e('Enhance your trip with these optional add-ons', 'yatra'); ?></p>
                         </div>
                         <div class="yatra-services-list" id="yatra-additional-services">
-                            <?php foreach ($additional_services as $service) : 
+                            <?php foreach ($additional_services as $service) :
                                 $service_id = (int) $service['id'];
                                 $service_name = $service['name'];
-                                $service_description = $service['description'] ?? '';
+                                $service_description = (string) ($service['description'] ?? '');
                                 $service_price = (float) $service['price'];
                                 $service_price_per = $service['price_per'] ?? 'person';
-                                $service_image = $service['image_url'] ?? '';
-                                // Check is_required - handle various formats (bool, string "1", int 1)
                                 $is_required = isset($service['is_required']) && ($service['is_required'] === true || $service['is_required'] === 1 || $service['is_required'] === '1');
                                 $is_included = isset($service['is_included']) && ($service['is_included'] === true || $service['is_included'] === 1 || $service['is_included'] === '1');
                                 $is_selected = in_array($service_id, $selected_service_ids, false);
-                                
+
                                 $price_label = yatra_format_price($service_price);
                                 if ($service_price_per === 'person') {
                                     $price_label .= ' ' . __('per person', 'yatra');
@@ -616,26 +671,36 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                 if ($is_included) {
                                     $price_label = __('Included', 'yatra');
                                 }
-                                
-                                // Determine checked and disabled states
+
                                 $is_checked = $is_required || $is_included || $is_selected;
                                 $is_disabled = $is_required || $is_included;
                             ?>
+                            <?php
+                            // Description shown as a hover tooltip on the
+                            // whole row (no separate ⓘ icon). `title` lives
+                            // on the outer .yatra-service-item so hovering
+                            // anywhere in the block reveals the tooltip —
+                            // the small icon variant was easy to miss.
+                            $plain_description = $service_description !== '' ? wp_strip_all_tags($service_description) : '';
+                            ?>
                             <div class="yatra-service-item <?php echo $is_required ? 'yatra-service-required' : ''; ?> <?php echo $is_checked ? 'yatra-service-selected' : ''; ?>"
-                                 data-service-id="<?php echo esc_attr($service_id); ?>"
-                                 data-service-price="<?php echo esc_attr($service_price); ?>"
+                                 data-service-id="<?php echo esc_attr((string) $service_id); ?>"
+                                 data-service-price="<?php echo esc_attr((string) $service_price); ?>"
                                  data-service-price-per="<?php echo esc_attr($service_price_per); ?>"
-                                 data-is-required="<?php echo $is_required ? '1' : '0'; ?>">
+                                 data-is-required="<?php echo $is_required ? '1' : '0'; ?>"
+                                 <?php if ($plain_description !== '') : ?>
+                                 data-tooltip="<?php echo esc_attr($plain_description); ?>"
+                                 aria-label="<?php echo esc_attr($plain_description); ?>"
+                                 <?php endif; ?>>
                                 <label class="yatra-service-label">
-                                    <input type="checkbox" 
-                                           name="additional_services[]" 
-                                           value="<?php echo esc_attr($service_id); ?>"
+                                    <input type="checkbox"
+                                           name="additional_services[]"
+                                           value="<?php echo esc_attr((string) $service_id); ?>"
                                            <?php echo $is_checked ? 'checked' : ''; ?>
                                            <?php echo $is_disabled ? 'disabled' : ''; ?>
                                            form="yatra-booking-form">
                                     <div class="yatra-service-info">
                                         <span class="yatra-service-name"><?php echo esc_html($service_name); ?></span>
-                                        
                                     </div>
                                     <span class="yatra-service-price"><?php echo esc_html($price_label); ?></span>
                                 </label>
@@ -645,18 +710,29 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                     </div>
                     <?php endif; ?>
 
-                                        
-                    <!-- Price Breakdown -->
+                    <!-- Price Breakdown — services + dynamic-pricing summary + totals all live
+                         in one card so the sidebar reads as a single "Pricing Summary" panel. -->
                     <div class="yatra-summary-pricing" id="yatra-summary-pricing" data-pricing-type="<?php echo esc_attr($pricing_type); ?>" data-is-remaining="<?php echo esc_attr($is_remaining_payment ? 'yes' : 'no'); ?>">
-                        <!-- This section is loaded/updated via AJAX -->
                         <?php
                         // Get checkout model from booking object
                         $checkout = $booking->checkout ?? null;
-                        
+
+                        // Surface the dynamic-pricing breakdown as a template
+                        // variable so the partial can render the DP line items.
+                        // CalculationService stuffs the breakdown into
+                        // `pricing_calculation.dynamic_pricing` via the
+                        // `yatra_price_breakdown` filter; without exposing it
+                        // here the partial's DP block stays dark on first load.
+                        $dynamic_pricing = $pricing_calculation['dynamic_pricing'] ?? null;
+                        $currency = $pricing_calculation['currency'] ?? null;
+
+                        // The pricing-summary partial calls $render_additional_services()
+                        // at the right spot — right after the traveler/per-person rows
+                        // and before the Trip Subtotal — so the services row shares the
+                        // same compact "label … price" layout as the traveler row.
+
                         // Include pricing summary template (uses $checkout model)
                         include YATRA_PLUGIN_PATH . 'templates/partials/pricing-summary.php';
-
-                        
                         ?>
                     </div>
 

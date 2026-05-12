@@ -29,12 +29,33 @@ export function getYatraIconManifest(): Record<string, YatraManifestEntry> {
 
 export function getIconOptions(): IconOption[] {
   const m = yatraIconsManifest as Record<string, YatraManifestEntry>;
-  return Object.entries(m).map(([name, meta]) => ({
-    name,
-    label: meta.label,
-    category: meta.category,
-    svg: meta.svg,
-  }));
+  // Some manifest entries only carry `svg` (sync script left them without
+  // label/category). Without defensive defaults, IconPicker's search filter
+  // calls `.toLowerCase()` on undefined and crashes the whole panel.
+  // Derive a readable label from the slug ("hot-air-balloon" → "Hot Air
+  // Balloon") and fall back to a "general" bucket for the category so the
+  // search and category-filter UI still works.
+  const slugToLabel = (slug: string): string =>
+    slug
+      .split(/[-_\s]+/)
+      .filter(Boolean)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+  return Object.entries(m).map(([name, meta]) => {
+    const safeMeta = (meta || {}) as Partial<YatraManifestEntry>;
+    return {
+      name,
+      label:
+        typeof safeMeta.label === "string" && safeMeta.label.length > 0
+          ? safeMeta.label
+          : slugToLabel(name),
+      category:
+        typeof safeMeta.category === "string" && safeMeta.category.length > 0
+          ? safeMeta.category
+          : "general",
+      svg: safeMeta.svg || "",
+    };
+  });
 }
 
 export function getYatraIconSvg(slug: string): string | null {
