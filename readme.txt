@@ -4,7 +4,7 @@ Tags: tour-booking, tour-operator, travel, travel-booking, travel-agency
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.0.3
+Stable tag: 3.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -96,6 +96,7 @@ Tours & activities: trips, departures, PayPal, Pay Later, guests, email, reports
 * [Custom booking questions](https://wpyatra.com/pricing/) — drag-and-drop extra fields
 * [Mailchimp](https://wpyatra.com/pricing/), [Facebook Pixel](https://wpyatra.com/pricing/), [Google Analytics 4 Enhanced](https://wpyatra.com/pricing/)
 * [Abandoned Booking Recovery](https://wpyatra.com/pricing/)
+* [Custom Landing Pages](https://wpyatra.com/pricing/) — build dedicated, conversion-focused landing pages per trip or campaign
 
 **Traveler experience**
 
@@ -227,6 +228,20 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 
 == Changelog ==
 
+= 3.0.4 =
+* **Unicode / Cyrillic slugs (end-to-end):** `SlugHelper::generate()` now rawurldecodes percent-encoded UTF-8 and uses `mb_strtolower` with a Unicode-aware regex (`\pL\pN`), so Cyrillic / CJK trip, destination, activity, and category slugs round-trip cleanly through validators and pretty-permalink routing. `ActivityValidator`, `DestinationValidator`, and `TripValidator` now route raw user input through `SlugHelper` instead of `sanitize_title` (which stripped non-ASCII characters down to a single dash). `PrettyRouteMatcher` decodes captured slugs the same way before lookup, so a URL like `/trip/токио/` resolves correctly.
+* **Pricing — single source of truth:** `create_booking` now uses `CalculationService::calculateFromSession` as its primary path, so the sidebar pricing summary, the AJAX summary refresh, and the actual amount sent to the payment gateway are all driven by the same code. The calculation result exposes `unit_price_before_dp`, `dp_total_adjustment`, `category_prices_post_dp`, and a `dynamic_pricing` breakdown so templates can render a clean "Trip Pricing → Services → Itinerary → Dynamic Pricing → Discount" stack with no double-counting and no sidebar/payment drift.
+* **Pricing summary — UI cleanup:** services render as compact rows above Trip Subtotal (matching the traveler-row style instead of a separate card), Dynamic Pricing renders as one consolidated line (no "1 rule applied" caption), and service descriptions surface via a CSS `data-tooltip` hover (no native `title` attribute, no info-icon clutter). The duplicate-traveler bug (1 selected showing as 2) is fixed in `formDataToObject`'s handling of `name[]` array notation.
+* **Coupon UI persistence:** `remove_coupon` now writes back via `yatra_set_booking_session()` so the transient stays in sync, and the applied-coupon row's visible state is server-rendered on first paint — the Remove button is now visible after a page refresh.
+* **Session management:** `yatra_set_booking_session()` writes to both `$_SESSION` and a transient keyed by a `booking_token` in the URL, and `yatra_get_booking_session()` falls back to the transient when REST endpoints arrive without `PHPSESSID`. Service toggles, summary refresh, coupon apply / remove, and create-booking all resolve the same cart regardless of how the request authenticated.
+* **Mobile sticky bar:** the sticky-bottom booking widget's flatpickr / traveler-sync JavaScript is extracted into `assets/js/single-trip-sidebar.js` so it can no longer be mangled by WordPress's `convert_chars` content filter (which previously rewrote `&&` operators inside inline scripts as `&#038;&#038;` and broke the bar on some themes).
+* **FSE / block-theme support:** new `Yatra\Core\Template\FseTemplates` + `Yatra\Core\Routing\PageContext` provide a proper handoff between page handlers and the renderer so single-trip, booking, account, and confirmation pages render correctly inside the FSE template canvas.
+* **Custom trip tab:** new `templates/partials/single-trip/content-custom.php` lets an admin-defined "Custom" frontend tab render through the same `yatra_render_tab_icon()` pipeline as the built-in tabs.
+* **Pro toggle scaffolding:** Settings → Booking now has **"Show available dates as a dropdown"** with a PRO badge. The setting key (`date_picker_as_dropdown`) and free-side filter contract (`yatra_use_date_dropdown`, `yatra_single_trip_date_dropdown_options`) live in the free plugin; the actual behavior (gate, option-builder, flexible-trip date synthesis) is contributed by the corresponding Yatra Pro module.
+* **i18n / Loco Translate:** `Bootstrap::loadTextDomain()` now installs a `load_script_translation_file` filter that falls back to `WP_LANG_DIR/loco/plugins/` for `.json` script-translation files. This mirrors the existing `.mo` fallback so React surfaces (account page, admin app, blocks) pick up Loco-managed translations from Loco's standard private workspace.
+* **CI / DevOps:** the PHP-lint pipeline's silent-failure bug (subshell counter in `find | while`) is fixed; `xargs -0 -P 4 php -l` now aggregates failures correctly. Added `concurrency`, least-privilege `permissions: contents: read`, and `timeout-minutes` to every job; `composer validate --strict` moved before `composer install`; debug noise and the inline AI-report preamble removed from `$GITHUB_STEP_SUMMARY`.
+* Safe to update from 3.0.3.
+
 = 3.0.3 =
 * **Shortcodes:** **`[yatra_trip_category]`** — lists trip categories in the same card layout as destinations, with optional filters, pagination (`trip_category_page`), and AJAX-friendly behavior (see `TripCategoryShortcode` + `TripCategoryShortcodeAjax`).
 * **Shortcodes / blocks (`[yatra_trip]`, Trip block):** **Featured Priority** filter (`featured_priority` = `featured` / `new` / `limited`; mirrors the trip form's *Categorization → Featured Priority*) and **Difficulty / fitness-level** filter (`difficulty="3,5"`) are now first-class attributes. Legacy `featured="1"` is retained as a back-compat alias for `featured_priority="featured"` (`featured_priority` wins if both are set). Centralised in `TripListingFilterBuilder` so the same rules apply to both shortcode and block inputs.
@@ -301,6 +316,9 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 * For 2.x changelog entries, see the plugin’s GitHub releases or historical notes on the vendor site.
 
 == Upgrade Notice ==
+
+= 3.0.4 =
+Release **3.0.4** — Unicode / Cyrillic slug support end-to-end, pricing single-source-of-truth (sidebar = payment-gateway amount), pricing summary cleanup, services dedupe fix, Loco script-translation fallback so React surfaces (account page, admin) pick up `.json` translations from Loco's workspace, mobile sticky-bar JS extraction, FSE template support, and CI pipeline fixes. Safe to update from 3.0.3.
 
 = 3.0.3 =
 Release **3.0.3** (`[yatra_trip_category]` shortcode, versioned upgrades, discounts, single-trip and admin polish). Safe to update from 3.0.2.x.

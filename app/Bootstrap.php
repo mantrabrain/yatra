@@ -109,8 +109,14 @@ class Bootstrap
             // Set up WordPress hooks
             $this->setupWordPressHooks();
             
-            // Load text domain
-            $this->loadTextDomain();
+            // Load text domain on `init` — calling load_(plugin_)textdomain before `init`
+            // triggers WP 6.7+ _doing_it_wrong notices (and Loco's "premature text domain"
+            // warning). Use priority 1 so it runs before code that translates on `init`.
+            if (did_action('init')) {
+                $this->loadTextDomain();
+            } else {
+                add_action('init', [$this, 'loadTextDomain'], 1);
+            }
 
         } catch (\Throwable $e) {
             // Show admin notice if in admin area
