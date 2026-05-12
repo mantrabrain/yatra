@@ -1653,13 +1653,21 @@ const GoogleAnalyticsReports: React.FC = () => {
   });
 
   // Always use fresh data from API
-  const googleAnalyticsData = freshGAData || {};
+  const googleAnalyticsData = (freshGAData || {}) as {
+    measurement_id?: string;
+    eventLogs?: Array<{ status?: string; [key: string]: unknown }>;
+    connectionStatus?: {
+      measurementConnected?: boolean;
+      apiSecretConnected?: boolean;
+    };
+    [key: string]: unknown;
+  };
 
   const getEventStats = () => {
     const logs = googleAnalyticsData.eventLogs || [];
     return {
-      success: logs.filter((log: any) => log.status === "success").length,
-      errors: logs.filter((log: any) => log.status === "error").length,
+      success: logs.filter((log) => log.status === "success").length,
+      errors: logs.filter((log) => log.status === "error").length,
       total: logs.length,
     };
   };

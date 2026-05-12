@@ -14,6 +14,7 @@ module.exports = {
   },
   plugins: [
     '@typescript-eslint',
+    'react-hooks',
   ],
   rules: {
     // TypeScript specific rules
@@ -22,13 +23,18 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off', // Allow for WordPress patterns
-    
+
+    // React hooks rules — register so `eslint-disable-next-line react-hooks/exhaustive-deps`
+    // directives resolve under --report-unused-disable-directives.
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
+
     // General rules
     'no-console': 'off', // Allow console for debugging
     'no-debugger': 'error',
     'prefer-const': 'off', // Allow let for WordPress patterns
     'no-var': 'error',
-    
+
     // Allow unused variables with underscore prefix
     'no-unused-vars': 'off',
   },
