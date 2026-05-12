@@ -3034,7 +3034,7 @@
 .yatra-service-label input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: #7c3aed;
+    accent-color: var(--yatra-primary, #3b82f6);
     cursor: pointer;
     flex-shrink: 0;
 }

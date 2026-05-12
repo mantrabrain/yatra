@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Yatra - Travel Booking & Management 3.0.3\n"
+"Project-Id-Version: Yatra - Travel Booking & Management 3.0.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/yatra\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-12T12:44:37+00:00\n"
+"POT-Creation-Date: 2026-05-12T13:46:24+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -1931,7 +1931,7 @@ msgstr ""
 #: app/Controllers/BookingSessionController.php:729
 #: app/Controllers/BookingSessionController.php:933
 #: app/Controllers/BookingSessionController.php:2717
-#: app/Controllers/BookingSessionController.php:3251
+#: app/Controllers/BookingSessionController.php:3265
 #: app/Services/BookingService.php:328
 #: app/Services/EnquiryService.php:129
 #: app/Services/ReviewService.php:105
@@ -2239,7 +2239,7 @@ msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2589
 #: app/Controllers/BookingSessionController.php:2708
-#: app/Controllers/BookingSessionController.php:3373
+#: app/Controllers/BookingSessionController.php:3387
 msgid "No active booking session found."
 msgstr ""
 
@@ -2261,16 +2261,16 @@ msgstr ""
 msgid "Group Discount"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:3245
+#: app/Controllers/BookingSessionController.php:3259
 #: templates/partials/pricing-summary.php:24
 msgid "Pricing information not available."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:3332
+#: app/Controllers/BookingSessionController.php:3346
 msgid "Template not found."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:3405
+#: app/Controllers/BookingSessionController.php:3419
 msgid "Coupon removed."
 msgstr ""
 

@@ -121,6 +121,22 @@ class TripValidator
             $errors['sale_price'][] = __('Sale price must be a valid positive number', 'yatra');
         }
 
+        // Deposit fields (FlexiblePayments Pro feature — schema lives in free, used by Pro)
+        if (isset($data['deposit_amount']) && $data['deposit_amount'] !== '' && (!is_numeric($data['deposit_amount']) || (float)$data['deposit_amount'] < 0)) {
+            $errors['deposit_amount'][] = __('Deposit amount must be a valid positive number', 'yatra');
+        }
+
+        if (isset($data['deposit_percentage']) && $data['deposit_percentage'] !== '') {
+            if (!is_numeric($data['deposit_percentage'])) {
+                $errors['deposit_percentage'][] = __('Deposit percentage must be a valid number', 'yatra');
+            } else {
+                $pct = (float)$data['deposit_percentage'];
+                if ($pct < 0 || $pct > 100) {
+                    $errors['deposit_percentage'][] = __('Deposit percentage must be between 0 and 100', 'yatra');
+                }
+            }
+        }
+
         if (isset($data['duration_days']) && (!is_numeric($data['duration_days']) || (int)$data['duration_days'] < 0)) {
             $errors['duration_days'][] = __('Duration days must be a valid positive number', 'yatra');
         }
@@ -270,6 +286,22 @@ class TripValidator
 
         if (isset($data['payment_terms'])) {
             $sanitized['payment_terms'] = wp_kses_post($data['payment_terms']);
+        }
+
+        // Deposit fields — DB columns are decimal(10,2) / decimal(5,2).
+        // Cast empty string to null so the column resets cleanly when the admin
+        // clears the field (cast to float would coerce '' → 0.0 which is a
+        // semantically-different "fixed $0 deposit").
+        if (array_key_exists('deposit_amount', $data)) {
+            $sanitized['deposit_amount'] = ($data['deposit_amount'] === '' || $data['deposit_amount'] === null)
+                ? null
+                : (float)$data['deposit_amount'];
+        }
+
+        if (array_key_exists('deposit_percentage', $data)) {
+            $sanitized['deposit_percentage'] = ($data['deposit_percentage'] === '' || $data['deposit_percentage'] === null)
+                ? null
+                : (float)$data['deposit_percentage'];
         }
 
         if (isset($data['cancellation_policy'])) {

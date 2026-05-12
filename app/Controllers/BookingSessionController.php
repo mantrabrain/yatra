@@ -1142,8 +1142,8 @@ class BookingSessionController extends BaseController
             'payment_gateway' => $payment_gateway,
             'total_amount' => round((float) $total_amount, 4),
             'amount_due' => round((float) $amount_due, 4),
-            'deposit_percentage' => (int) apply_filters('yatra_deposit_percentage', 20),
-            'partial_percentage' => (int) apply_filters('yatra_partial_payment_percentage', 30),
+            'deposit_percentage' => (int) apply_filters('yatra_deposit_percentage', 20, ['trip_id' => $trip_id]),
+            'partial_percentage' => (int) apply_filters('yatra_partial_payment_percentage', 30, ['trip_id' => $trip_id]),
         ]);
 
         // Prepare contact data
@@ -3121,18 +3121,32 @@ class BookingSessionController extends BaseController
         // Note: CalculationService already includes itinerary costs in final_total
         // No need to add itinerary_costs_total again - it's already included in $total_amount
         
-        // Calculate due amount based on payment method
-        // Use filters for flexible payment settings (Pro feature)
+        // Calculate due amount based on payment method.
+        //
+        // Flow: compute a sensible default using the *percentage* filters (which
+        // Pro can already override per-trip via trip.deposit_percentage), then
+        // hand off to `yatra_calculate_amount_due` so Pro can apply absolute
+        // overrides too (e.g. trip.deposit_amount as a fixed cap). Doing both
+        // keeps the math consistent with CalculationService::calculatePaymentAmounts().
+        $context = ['trip_id' => $trip_id];
         $flexible_payments_enabled = apply_filters('yatra_flexible_payments_enabled', false);
-        $deposit_percentage = (int) apply_filters('yatra_deposit_percentage', 20);
-        $partial_percentage = (int) apply_filters('yatra_partial_payment_percentage', 30);
-        
+        $deposit_percentage = (int) apply_filters('yatra_deposit_percentage', 20, $context);
+        $partial_percentage = (int) apply_filters('yatra_partial_payment_percentage', 30, $context);
+
         $amount_due = $total_amount;
         if ($payment_method === 'deposit') {
             $amount_due = $total_amount * ($deposit_percentage / 100);
         } elseif ($payment_method === 'partial') {
             $amount_due = $total_amount * ($partial_percentage / 100);
         }
+
+        $amount_due = (float) apply_filters(
+            'yatra_calculate_amount_due',
+            $amount_due,
+            $total_amount,
+            $payment_method,
+            $context
+        );
 
         Logger::debug('Yatra booking summary: payment method and amount due', [
             'context' => 'booking_summary_rest',

@@ -21,9 +21,63 @@
         initPriceRange();
         initAdvancedSearch();
         initTravelersSelect();
+        initStretchedCardClicks();
         // Search functionality moved to shortcode-specific JS
         // initHorizontalSearchDropdowns();
         // initDurationSlider();
+    }
+
+    // Whole-card click target for the destination / activity / trip-category
+    // shortcode-as-block "category" cards. Trip listing cards intentionally
+    // opt out — those have multiple visible CTAs (View Details button, image
+    // link, title link, favorite, category/activity chips) and shouldn't
+    // hijack ambient clicks; the user navigates via the explicit controls.
+    //
+    // CSS-only "stretched link" (title link ::after with inset:0) is the
+    // canonical implementation and remains in place for screen-reader and
+    // crawler semantics — but in some layouts an intermediate ancestor with
+    // `position: relative` traps the absolute overlay, leaving the upper
+    // portion of the card non-clickable. This delegated click handler is the
+    // belt-and-braces fallback: it catches any click that didn't already land
+    // on a real interactive element and forwards it to the card's primary
+    // link. Modifier keys (ctrl/cmd/middle-click) open in a new tab to match
+    // the browser's normal `<a>` behavior.
+    function initStretchedCardClicks() {
+        const cardSelector = '.yatra-category-card';
+        const linkSelector = 'a.yatra-category-card-title-link';
+        // Click targets that should be allowed to handle their own event.
+        const interactive = 'a, button, input, select, textarea, label, [role="button"], [data-no-card-click]';
+
+        document.addEventListener('click', function (event) {
+            // Allow native links/buttons to do their thing.
+            if (event.target.closest(interactive)) {
+                return;
+            }
+            const card = event.target.closest(cardSelector);
+            if (!card) return;
+
+            const link = card.querySelector(linkSelector);
+            if (!link || !link.href) return;
+
+            // Cmd/Ctrl/middle-click → new tab. Plain click → same tab.
+            if (event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1) {
+                window.open(link.href, '_blank', 'noopener');
+            } else {
+                window.location.href = link.href;
+            }
+        });
+
+        // Keyboard parity: Enter on a focused card root navigates to the link.
+        document.addEventListener('keydown', function (event) {
+            if (event.key !== 'Enter') return;
+            if (event.target.closest(interactive)) return;
+            const card = event.target.closest(cardSelector);
+            if (!card) return;
+            const link = card.querySelector(linkSelector);
+            if (link && link.href) {
+                window.location.href = link.href;
+            }
+        });
     }
 
     // Advanced search toggle

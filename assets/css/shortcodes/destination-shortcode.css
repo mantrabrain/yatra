@@ -60,8 +60,12 @@
 .yatra-category-card-content {
     color: #ffffff;
     width: 100%;
-    z-index: 2;
-    position: relative;
+    /* No `position: relative` here: it would become the nearest positioned
+       ancestor for the title link's stretched `::after`, trapping the click
+       overlay to the bottom-strip content area instead of the whole card.
+       The overlay above (`.yatra-category-card-overlay`) is `position:
+       absolute; inset: 0` so the link's `::after` correctly fills the full
+       card via that wrapper. */
 }
 
 .yatra-category-card-title {

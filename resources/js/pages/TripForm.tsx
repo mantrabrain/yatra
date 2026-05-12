@@ -7594,89 +7594,196 @@ const TripForm: React.FC = () => {
                 </div>
               )}
 
-              {/* Deposit */}
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                  {__("Deposit & Payment Terms", "yatra")}
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="deposit_amount"
-                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                    >
-                      {__("Deposit Amount", "yatra")}
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                        {getCurrencySymbol(globalCurrency)}
-                      </span>
-                      <Input
-                        id="deposit_amount"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={formData.deposit_amount}
-                        onChange={(e) =>
-                          handleFieldChange("deposit_amount", e.target.value)
-                        }
-                        placeholder="0.00"
-                        className="pl-7"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="deposit_percentage"
-                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                    >
-                      {__("Deposit Percentage", "yatra")}
-                    </label>
-                    <div className="relative">
-                      <Input
-                        id="deposit_percentage"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        max="100"
-                        value={formData.deposit_percentage}
-                        onChange={(e) =>
-                          handleFieldChange(
-                            "deposit_percentage",
-                            e.target.value,
-                          )
-                        }
-                        placeholder="0"
-                        className="pr-7"
-                      />
-                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                        %
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <label
-                    htmlFor="payment_terms"
-                    className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                  >
-                    {__("Payment Terms", "yatra")}
-                  </label>
-                  <textarea
-                    id="payment_terms"
-                    value={formData.payment_terms}
-                    onChange={(e) =>
-                      handleFieldChange("payment_terms", e.target.value)
-                    }
-                    placeholder={__(
-                      "e.g., 50% deposit required at booking, balance due 30 days before departure",
-                      "yatra",
+              {/*
+                Deposit & Payment Terms — Pro feature (FlexiblePayments module).
+                The DB columns live in the free TripsTable schema so existing data
+                survives toggling Pro on/off. Editing is gated on
+                window.yatraAdmin.flexiblePaymentsEnabled (set true by Pro's
+                FlexiblePaymentsModule::addAdminData() on yatra_admin_localized_data).
+
+                We deliberately render the section in all three states (free / Pro
+                installed-but-module-off / Pro+module-on) so the feature is
+                discoverable in the free plugin. When unlocked → editable. When
+                locked → fields shown disabled inside a <fieldset disabled>, with a
+                PRO badge on the heading and a context-aware info banner above:
+                  - free: "Upgrade to Pro" link
+                  - Pro installed but module disabled: "Activate Module" link
+              */}
+              {(() => {
+                const flexiblePaymentsEnabled = Boolean(
+                  (window as any)?.yatraAdmin?.flexiblePaymentsEnabled,
+                );
+                const isLocked = !flexiblePaymentsEnabled;
+                const siteUrl =
+                  (window as any)?.yatraAdmin?.siteUrl ||
+                  "/wp-admin/admin.php?page=yatra";
+                const modulesPageUrl = `${siteUrl}/wp-admin/admin.php?page=yatra&subpage=modules`;
+                const pricingUrl = "https://mantrabrain.com/yatra-pricing/";
+
+                return (
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                      {__("Deposit & Payment Terms", "yatra")}
+                      {isLocked && <ProBadge isProActive={isPro} />}
+                    </h3>
+
+                    {isLocked && (
+                      <div className="mb-3 p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-md text-xs text-purple-900 dark:text-purple-100 flex items-start gap-2">
+                        <svg
+                          className="w-4 h-4 mt-0.5 text-purple-500 flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                          />
+                        </svg>
+                        <div className="flex-1">
+                          {isPro ? (
+                            <>
+                              {__(
+                                "Per-trip deposits need the Flexible Payments module.",
+                                "yatra",
+                              )}{" "}
+                              <a
+                                href={modulesPageUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline font-medium"
+                              >
+                                {__("Activate module", "yatra")}
+                              </a>
+                            </>
+                          ) : (
+                            <>
+                              {__(
+                                "Per-trip deposit amount, percentage and custom payment terms are a Yatra Pro feature.",
+                                "yatra",
+                              )}{" "}
+                              <a
+                                href={pricingUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline font-medium"
+                              >
+                                {__("Upgrade to Pro", "yatra")}
+                              </a>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     )}
-                    rows={2}
-                    className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
-                  />
-                </div>
-              </div>
+
+                    {/*
+                      <fieldset disabled> is the HTML-standard way to make every
+                      form control inside it non-interactive in one go — works
+                      for our <Input> and <textarea> without per-field disabled props.
+                    */}
+                    <fieldset
+                      disabled={isLocked}
+                      className={
+                        isLocked
+                          ? "opacity-60 cursor-not-allowed select-none"
+                          : ""
+                      }
+                      aria-label={
+                        isLocked
+                          ? __(
+                              "Deposit & Payment Terms (Pro feature, disabled)",
+                              "yatra",
+                            )
+                          : undefined
+                      }
+                    >
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label
+                            htmlFor="deposit_amount"
+                            className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                          >
+                            {__("Deposit Amount", "yatra")}
+                          </label>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                              {getCurrencySymbol(globalCurrency)}
+                            </span>
+                            <Input
+                              id="deposit_amount"
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={formData.deposit_amount}
+                              onChange={(e) =>
+                                handleFieldChange(
+                                  "deposit_amount",
+                                  e.target.value,
+                                )
+                              }
+                              placeholder="0.00"
+                              className="pl-7"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="deposit_percentage"
+                            className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                          >
+                            {__("Deposit Percentage", "yatra")}
+                          </label>
+                          <div className="relative">
+                            <Input
+                              id="deposit_percentage"
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              max="100"
+                              value={formData.deposit_percentage}
+                              onChange={(e) =>
+                                handleFieldChange(
+                                  "deposit_percentage",
+                                  e.target.value,
+                                )
+                              }
+                              placeholder="0"
+                              className="pr-7"
+                            />
+                            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                              %
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-4">
+                        <label
+                          htmlFor="payment_terms"
+                          className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                        >
+                          {__("Payment Terms", "yatra")}
+                        </label>
+                        <textarea
+                          id="payment_terms"
+                          value={formData.payment_terms}
+                          onChange={(e) =>
+                            handleFieldChange("payment_terms", e.target.value)
+                          }
+                          placeholder={__(
+                            "e.g., 50% deposit required at booking, balance due 30 days before departure",
+                            "yatra",
+                          )}
+                          rows={2}
+                          className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                        />
+                      </div>
+                    </fieldset>
+                  </div>
+                );
+              })()}
 
               {/* Group Pricing */}
               {/* Removed */}

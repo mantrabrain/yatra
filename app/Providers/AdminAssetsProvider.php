@@ -66,6 +66,11 @@ class AdminAssetsProvider
             'customLandingPagesModuleEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
                 ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('custom_landing_pages')
                 : false,
+            // Per-trip Deposit & Payment Terms is a Pro feature (FlexiblePayments).
+            // Default false; Pro's FlexiblePaymentsModule::addAdminData() flips this
+            // to true via the `yatra_admin_localized_data` filter when active, and
+            // the React TripForm hides/shows the section based on this flag.
+            'flexiblePaymentsEnabled' => false,
             'version' => defined('YATRA_VERSION') ? YATRA_VERSION : '1.0.0',
             'proVersion' => defined('YATRA_PRO_VERSION') ? YATRA_PRO_VERSION : null,
 

@@ -301,9 +301,10 @@ if ($checkout->hasTaxes() && $has_discount) :
 <!-- Tax Breakdown -->
 <div class="yatra-price-section yatra-tax-section">
     <div class="yatra-price-section-title">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 14l2 2 4-4"></path>
-            <path d="M21 12c.552 0 1-.448 1-1V8c0-.552-.448-1-1-1h-1V6a2 2 0 00-2-2H4a2 2 0 00-2 2v1c0 .552.448 1 1 1h1v1c0 .552.448 1 1 1h1M3 15a1 1 0 011-1h2.5a1 1 0 011 1v1.5"></path>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="19" y1="5" x2="5" y2="19"></line>
+            <circle cx="6.5" cy="6.5" r="2.5"></circle>
+            <circle cx="17.5" cy="17.5" r="2.5"></circle>
         </svg>
         <?php esc_html_e('Tax', 'yatra'); ?>
     </div>

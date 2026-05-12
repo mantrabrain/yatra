@@ -787,24 +787,30 @@ class CalculationService
     
     /**
      * Calculate payment amounts
-     * 
-     * Free: full payment only
-     * Pro FlexiblePayments: deposit/partial via yatra_calculate_amount_due filter
+     *
+     * Free: full payment only.
+     * Pro FlexiblePayments: deposit/partial via `yatra_calculate_amount_due`.
+     *
+     * $context carries `trip_id` (and may carry more later). It is forwarded
+     * to every payment-related filter so Pro can apply per-trip overrides
+     * (e.g. trip.deposit_amount, trip.deposit_percentage) instead of only
+     * the site-wide settings.
      */
     private function calculatePaymentAmounts(float $final_total, string $payment_method, array $context): array
     {
         $amount_due  = $final_total;
         $amount_paid = 0.0;
-        
-        // Apply Pro FlexiblePayments filter for deposit/partial
-        $amount_due = (float) apply_filters('yatra_calculate_amount_due', $amount_due, $final_total, $payment_method);
-        
+
+        // Apply Pro FlexiblePayments filter for deposit/partial. $context lets
+        // Pro look up the trip and honour per-trip overrides.
+        $amount_due = (float) apply_filters('yatra_calculate_amount_due', $amount_due, $final_total, $payment_method, $context);
+
         // Fallback: if no Pro module handled it, use basic logic (never use === on floats)
         $flexible_enabled   = apply_filters('yatra_flexible_payments_enabled', false);
         $unchanged          = abs($amount_due - $final_total) < 0.000001;
         if ($unchanged && $payment_method !== 'full' && $flexible_enabled) {
-            $deposit_percentage = (int) apply_filters('yatra_deposit_percentage', 20);
-            $partial_percentage = (int) apply_filters('yatra_partial_payment_percentage', 30);
+            $deposit_percentage = (int) apply_filters('yatra_deposit_percentage', 20, $context);
+            $partial_percentage = (int) apply_filters('yatra_partial_payment_percentage', 30, $context);
             if ($payment_method === 'deposit') {
                 $amount_due = round($final_total * ($deposit_percentage / 100), 2);
             } elseif ($payment_method === 'partial') {

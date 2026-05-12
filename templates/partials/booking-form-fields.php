@@ -550,13 +550,20 @@ $initial_due_amount = $initial_total_amount;
 $flexible_payments_enabled = apply_filters('yatra_flexible_payments_enabled', false);
 
 /**
- * Filter to get payment method options
- * Pro module can add deposit/partial payment options via this filter
+ * Filter to get payment method options.
+ *
+ * Pro module (FlexiblePayments) can add deposit/partial payment options here.
+ * We pass `trip_id` so the Pro module can look up per-trip overrides
+ * (trip.deposit_amount / trip.deposit_percentage) and expose the deposit
+ * option even when the site-wide "deposit_required" flag is off — i.e. a
+ * single trip can opt in to a custom deposit without enabling deposits for
+ * the whole catalogue.
  */
 $payment_method_options = apply_filters('yatra_payment_method_options', [], [
-    'deposit_required' => $deposit_required,
-    'deposit_percentage' => $deposit_percentage,
-    'partial_payment' => $partial_payment,
+    'trip_id'                    => isset($trip_id) ? (int) $trip_id : 0,
+    'deposit_required'           => $deposit_required,
+    'deposit_percentage'         => $deposit_percentage,
+    'partial_payment'            => $partial_payment,
     'partial_payment_percentage' => $partial_payment_percentage,
 ]);
 
