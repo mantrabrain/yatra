@@ -282,7 +282,16 @@ class PaymentService
      * @param object $payment Raw payment data
      * @return array
      */
-    private function formatPayment(object $payment): array
+    /**
+     * Format a raw payment row for the REST API.
+     *
+     * `public` so other services (notably {@see \Yatra\Services\CustomerService::getPaymentsForBookingIds()})
+     * can share the same formatter and we don't end up with two competing
+     * shapes — that's how the Account → Payments tab used to render
+     * blank/N/A for `date`, `method`, `reference`, and `type` even after the
+     * formatter here was updated.
+     */
+    public function formatPayment(object $payment): array
     {
         $contactName = isset($payment->contact_first_name)
             ? trim($payment->contact_first_name . ' ' . ($payment->contact_last_name ?? ''))
@@ -294,6 +303,11 @@ class PaymentService
         $processedAt = $payment->processed_at ?? null;
         $createdAt = $payment->created_at ?? null;
         $paymentDate = ($processedAt !== null && $processedAt !== '') ? $processedAt : ($createdAt ?? '');
+
+        // Build a human-readable payment reference once, then expose it under
+        // both `payment_number` (canonical) and `reference` (what the React
+        // Payment type at resources/js/pages/account/types.ts expects).
+        $reference = sprintf('PAY-%06d', (int) $payment->id);
 
         return [
             'id' => (int) $payment->id,
@@ -319,7 +333,19 @@ class PaymentService
             'processed_at' => $payment->processed_at,
             'created_at' => $payment->created_at,
             'payment_date' => $paymentDate,
-            'payment_number' => sprintf('PAY-%06d', (int) $payment->id),
+            'payment_number' => $reference,
+            // Aliases for the React Payment interface (account page).
+            // Without these, the payments tab rendered:
+            //  - reference: undefined  → blank line above "Booking:" label
+            //  - method: undefined     → blank under "Payment Method"
+            //  - date: undefined       → formatDate(undefined) → "N/A"
+            //  - type: undefined       → paymentTypeLabel(undefined) → empty
+            // Keeping the existing payment_* fields preserves any other
+            // consumer that reads them.
+            'reference' => $reference,
+            'method' => $gateway,
+            'date' => $paymentDate,
+            'type' => $payment->payment_type,
         ];
     }
 }

@@ -1,5 +1,5 @@
 import { j as jsxRuntimeExports, i as Calendar, h as FileText, l as Plane, ak as ArrowRight, M as MapPin, U as User, v as ChevronRight, aG as Sparkles, P as Package, k as CreditCard, bH as LifeBuoy, bo as Bell, aK as AlertCircle, a$ as CheckCircle2, ai as Clock, av as ExternalLink, ah as Users, o as Mail, b1 as Phone, aR as Download, r as reactExports, u as useQuery, am as CheckCircle, aj as DollarSign, w as React, aV as Eye, ax as PenSquare, aL as XCircle, bI as ShieldCheck, bJ as Heart, L as LayoutDashboard, bK as LogOut, bE as QueryClient, bF as client, bG as QueryClientProvider } from "./react-vendor-CGraIJLZ.js";
-import { f as formatYatraMoney, _ as __, h as applyCurrencyPosition, s as sprintf, a as apiClient, A as API_ENDPOINTS, u as useToast, T as ToastProvider } from "./index-eQJQD6Tp.js";
+import { f as formatYatraMoney, _ as __, h as applyCurrencyPosition, s as sprintf, i as _n, a as apiClient, A as API_ENDPOINTS, u as useToast, T as ToastProvider } from "./index-Co3Z88uc.js";
 function toBrowserLocaleTag(locale) {
   const raw = String(locale || "").trim();
   if (!raw) return void 0;
@@ -50,6 +50,43 @@ const formatTravelDateRange = (travelDate, endDate) => {
     formatDate(travelDate),
     formatDate(endDate)
   );
+};
+const getStatusLabel = (status) => {
+  const raw = typeof status === "string" ? status.toLowerCase().trim() : "";
+  switch (raw) {
+    case "pending":
+      return __("Pending", "yatra");
+    case "confirmed":
+      return __("Confirmed", "yatra");
+    case "processing":
+      return __("Processing", "yatra");
+    case "completed":
+      return __("Completed", "yatra");
+    case "cancelled":
+      return __("Cancelled", "yatra");
+    case "refunded":
+      return __("Refunded", "yatra");
+    case "failed":
+      return __("Failed", "yatra");
+    case "on_hold":
+      return __("On hold", "yatra");
+    case "paid":
+      return __("Paid", "yatra");
+    case "partial":
+      return __("Partial", "yatra");
+    case "awaiting_response":
+      return __("Awaiting response", "yatra");
+    case "resolved":
+      return __("Resolved", "yatra");
+    case "closed":
+      return __("Closed", "yatra");
+    case "open":
+      return __("Open", "yatra");
+    case "":
+      return __("Pending", "yatra");
+    default:
+      return raw.charAt(0).toUpperCase() + raw.slice(1).replace(/_/g, " ");
+  }
 };
 const getBadge = (status) => {
   const base = "px-2.5 py-0.5 rounded-full text-xs font-medium";
@@ -377,7 +414,7 @@ const Dashboard = ({
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-2 mb-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark transition-colors", children: booking.trip_title }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.booking_status), children: __(booking.booking_status, booking.booking_status) })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.booking_status), children: getStatusLabel(booking.booking_status) })
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-4 h-4" }),
@@ -393,9 +430,20 @@ const Dashboard = ({
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-3.5 h-3.5" }),
-                    booking.travelers,
-                    " ",
-                    booking.travelers === 1 ? __("Traveler", "yatra") : __("Travelers", "yatra")
+                    (() => {
+                      const n = Number(
+                        booking.travelers_count ?? booking.travelers ?? 0
+                      ) || 0;
+                      return sprintf(
+                        // translators: %d: number of travelers on this booking
+                        _n(
+                          "%d Traveler",
+                          "%d Travelers",
+                          n
+                        ),
+                        n
+                      );
+                    })()
                   ] })
                 ] })
               ] }),
@@ -544,7 +592,7 @@ const Dashboard = ({
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: formatDate(booking.booking_date || booking.created_at) })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.booking_status), children: __(booking.booking_status, booking.booking_status) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.booking_status), children: getStatusLabel(booking.booking_status) })
             ]
           },
           booking.id
@@ -563,7 +611,7 @@ const Dashboard = ({
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: formatDate(payment.date) })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(payment.status), children: __(payment.status, payment.status) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(payment.status), children: getStatusLabel(payment.status) })
             ]
           },
           payment.id
@@ -1023,14 +1071,8 @@ const BookingDetails = ({
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: __("Booking Overview", "yatra") }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.booking_status), children: __(
-                booking.booking_status || "Pending",
-                booking.booking_status || "Pending"
-              ) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.payment_status), children: __(
-                booking.payment_status || "Pending",
-                booking.payment_status || "Pending"
-              ) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.booking_status), children: getStatusLabel(booking.booking_status) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.payment_status), children: getStatusLabel(booking.payment_status) })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
@@ -1072,11 +1114,17 @@ const BookingDetails = ({
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-3 h-3" }),
                 __("Number of Travelers", "yatra")
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-900 dark:text-white", children: [
-                booking.travelers,
-                " ",
-                booking.travelers === 1 ? __("Traveler", "yatra") : __("Travelers", "yatra")
-              ] })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: (() => {
+                const t = booking.travelers;
+                const n = Number(
+                  booking.travelers_count ?? (Array.isArray(t) ? t.length : t) ?? 0
+                ) || 0;
+                return sprintf(
+                  // translators: %d: number of travelers on this booking
+                  _n("%d Traveler", "%d Travelers", n),
+                  n
+                );
+              })() })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 pt-4 border-t border-gray-200 dark:border-gray-700", children: [
@@ -1379,10 +1427,7 @@ const BookingDetails = ({
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Payment Status", "yatra") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.payment_status), children: __(
-                booking.payment_status || "Pending",
-                booking.payment_status || "Pending"
-              ) }) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.payment_status), children: getStatusLabel(booking.payment_status) }) })
             ] }),
             booking.payment_method && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1", children: [
@@ -1655,8 +1700,8 @@ const Bookings = ({
                 ] })
               ] }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-2 items-start", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.booking_status), children: __(booking.booking_status, booking.booking_status) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.payment_status), children: __(booking.payment_status, booking.payment_status) })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.booking_status), children: getStatusLabel(booking.booking_status) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.payment_status), children: getStatusLabel(booking.payment_status) })
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-booking-details grid grid-cols-2 md:grid-cols-5 gap-4 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg mb-4", children: [
@@ -1669,7 +1714,16 @@ const Bookings = ({
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Travelers", "yatra") }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: booking.travelers })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: (() => {
+                  const n = Number(
+                    booking.travelers_count ?? booking.travelers ?? 0
+                  ) || 0;
+                  return sprintf(
+                    // translators: %d: number of travelers on this booking
+                    _n("%d traveler", "%d travelers", n),
+                    n
+                  );
+                })() })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Total Amount", "yatra") }),
@@ -1938,7 +1992,7 @@ const Payments = ({ payments, onSectionChange }) => {
                 ] })
               ] }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-2 items-start", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(payment.status), children: __(payment.status, payment.status) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(payment.status), children: getStatusLabel(payment.status) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-3 py-1 rounded-lg text-xs font-medium bg-yatra-soft dark:bg-yatra-surface-dark-muted text-yatra-primary-dark dark:text-yatra-primary-light capitalize", children: paymentTypeLabel(payment.type) })
               ] })
             ] }),
@@ -2773,7 +2827,7 @@ const SavedTrips = ({ savedTrips, isLoading }) => {
                 }
                 return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "yatra-highlight-badge", children: highlightText }, idx);
               }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-trip-rating", children: [
+              reviewCount > 0 && avgRating > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-trip-rating", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-rating-stars", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
                     "svg",
@@ -2782,18 +2836,17 @@ const SavedTrips = ({ savedTrips, isLoading }) => {
                       height: "16",
                       fill: "#fbbf24",
                       viewBox: "0 0 24 24",
+                      "aria-hidden": "true",
                       children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" })
                     }
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "yatra-rating-value", children: avgRating > 0 ? avgRating.toFixed(1) : "0.0" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "yatra-rating-value", children: avgRating.toFixed(1) })
                 ] }),
-                reviewCount > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "yatra-reviews-count", children: [
-                  "(",
-                  reviewCount,
-                  " ",
-                  __("reviews", "yatra"),
-                  ")"
-                ] })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "yatra-reviews-count", children: sprintf(
+                  // translators: %d: number of reviews for the trip
+                  _n("(%d review)", "(%d reviews)", reviewCount),
+                  reviewCount
+                ) })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-trip-footer mt-auto flex flex-row items-center justify-between gap-4 border-t border-gray-100 pt-4 dark:border-gray-700", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-trip-price flex min-w-0 flex-col items-start gap-1 text-left", children: [

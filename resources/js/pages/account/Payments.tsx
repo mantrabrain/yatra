@@ -10,7 +10,7 @@ import {
   Download,
 } from "lucide-react";
 import { __ } from "../../lib/i18n";
-import { formatDate, getBadge, currency } from "./utils";
+import { formatDate, getBadge, getStatusLabel, currency } from "./utils";
 import { downloadInvoice, previewPaymentInvoice } from "./utils/downloads";
 import type { Payment } from "./types";
 
@@ -285,7 +285,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                     </div>
                     <div className="flex flex-wrap gap-2 items-start">
                       <span className={getBadge(payment.status)}>
-                        {__(payment.status, payment.status)}
+                        {getStatusLabel(payment.status)}
                       </span>
                       <span className="px-3 py-1 rounded-lg text-xs font-medium bg-yatra-soft dark:bg-yatra-surface-dark-muted text-yatra-primary-dark dark:text-yatra-primary-light capitalize">
                         {paymentTypeLabel(payment.type)}

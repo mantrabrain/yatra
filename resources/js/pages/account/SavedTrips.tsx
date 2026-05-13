@@ -1,6 +1,6 @@
 import React from "react";
 import { Heart, MapPin as MapPinIcon } from "lucide-react";
-import { __ } from "../../lib/i18n";
+import { __, _n, sprintf } from "../../lib/i18n";
 import { formatPrice } from "./utils";
 import { apiClient } from "../../lib/api-client";
 import { useToast } from "../../components/ui/toast";
@@ -224,26 +224,37 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
                     </div>
                   )}
 
-                  <div className="yatra-trip-rating">
-                    <div className="yatra-rating-stars">
-                      <svg
-                        width="16"
-                        height="16"
-                        fill="#fbbf24"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                      </svg>
-                      <span className="yatra-rating-value">
-                        {avgRating > 0 ? avgRating.toFixed(1) : "0.0"}
+                  {/* Only render the rating block when this trip actually has
+                      reviews. Previously the star + value rendered as "★ 0.0"
+                      even on trips with no reviews — a bare number under an
+                      icon with no surrounding label, which read as a glitchy
+                      "Star 0.0" badge on the card. Hiding the whole block on
+                      zero-review trips removes the noise. */}
+                  {reviewCount > 0 && avgRating > 0 && (
+                    <div className="yatra-trip-rating">
+                      <div className="yatra-rating-stars">
+                        <svg
+                          width="16"
+                          height="16"
+                          fill="#fbbf24"
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                        <span className="yatra-rating-value">
+                          {avgRating.toFixed(1)}
+                        </span>
+                      </div>
+                      <span className="yatra-reviews-count">
+                        {sprintf(
+                          // translators: %d: number of reviews for the trip
+                          _n("(%d review)", "(%d reviews)", reviewCount, "yatra"),
+                          reviewCount,
+                        )}
                       </span>
                     </div>
-                    {reviewCount > 0 && (
-                      <span className="yatra-reviews-count">
-                        ({reviewCount} {__("reviews", "yatra")})
-                      </span>
-                    )}
-                  </div>
+                  )}
 
                   <div className="yatra-trip-footer mt-auto flex flex-row items-center justify-between gap-4 border-t border-gray-100 pt-4 dark:border-gray-700">
                     <div className="yatra-trip-price flex min-w-0 flex-col items-start gap-1 text-left">

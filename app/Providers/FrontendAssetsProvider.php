@@ -233,7 +233,13 @@ class FrontendAssetsProvider
                 if ($handle === 'trip') {
                     $dependencies[] = 'yatra-api-helper';
                 }
-                
+                // `yatra-trip` and `yatra-listing` call `wp.i18n.__()` for
+                // user-facing strings; pull in `wp-i18n` so the global exists
+                // before they run and register their Jed JSON catalog below.
+                if (in_array($handle, ['trip', 'listing'], true)) {
+                    $dependencies[] = 'wp-i18n';
+                }
+
                 wp_enqueue_script(
                     "yatra-{$handle}",
                     YATRA_PLUGIN_URL . "assets/js/{$filename}",
@@ -241,6 +247,16 @@ class FrontendAssetsProvider
                     YATRA_VERSION . '.' . filemtime($filePath),
                     true
                 );
+
+                if (in_array($handle, ['trip', 'listing'], true)
+                    && function_exists('wp_set_script_translations')
+                ) {
+                    wp_set_script_translations(
+                        "yatra-{$handle}",
+                        'yatra',
+                        YATRA_PLUGIN_PATH . 'i18n/languages'
+                    );
+                }
             }
         }
 
@@ -250,10 +266,17 @@ class FrontendAssetsProvider
                 wp_enqueue_script(
                     'yatra-listing-wishlist',
                     YATRA_PLUGIN_URL . 'assets/js/listing-wishlist.js',
-                    ['jquery'],
+                    ['jquery', 'wp-i18n'],
                     YATRA_VERSION . '.' . filemtime($wishPath),
                     true
                 );
+                if (function_exists('wp_set_script_translations')) {
+                    wp_set_script_translations(
+                        'yatra-listing-wishlist',
+                        'yatra',
+                        YATRA_PLUGIN_PATH . 'i18n/languages'
+                    );
+                }
                 wp_localize_script('yatra-listing-wishlist', 'yatraWishlistConfig', [
                     'enabled' => true,
                     'restUrl' => rest_url('yatra/v1'),
@@ -327,10 +350,17 @@ class FrontendAssetsProvider
             wp_enqueue_script(
                 'yatra-booking',
                 YATRA_PLUGIN_URL . 'assets/js/booking.js',
-                ['jquery'],
+                ['jquery', 'wp-i18n'],
                 YATRA_VERSION . '.' . filemtime($bookingJs),
                 true
             );
+            if (function_exists('wp_set_script_translations')) {
+                wp_set_script_translations(
+                    'yatra-booking',
+                    'yatra',
+                    YATRA_PLUGIN_PATH . 'i18n/languages'
+                );
+            }
         }
 
         // Mobile sticky-sidebar + flatpickr init for the single-trip page. Lives in a
@@ -344,10 +374,17 @@ class FrontendAssetsProvider
             wp_enqueue_script(
                 'yatra-single-trip-sidebar',
                 YATRA_PLUGIN_URL . 'assets/js/single-trip-sidebar.js',
-                ['yatra-trip'], // depends on window.yatraTripData from yatra-trip
+                ['yatra-trip', 'wp-i18n'], // depends on window.yatraTripData from yatra-trip
                 YATRA_VERSION . '.' . filemtime($sidebarJs),
                 true
             );
+            if (function_exists('wp_set_script_translations')) {
+                wp_set_script_translations(
+                    'yatra-single-trip-sidebar',
+                    'yatra',
+                    YATRA_PLUGIN_PATH . 'i18n/languages'
+                );
+            }
         }
         
         // Localize trip page data for JS (trip.js, booking.js)

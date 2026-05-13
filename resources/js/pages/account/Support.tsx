@@ -13,6 +13,7 @@ import { __ } from "../../lib/i18n";
 import {
   formatDate,
   getBadge,
+  getStatusLabel,
   phoneToTelHref,
   getYatraAccountPageGlobals,
 } from "./utils";
@@ -249,7 +250,7 @@ const Support: React.FC<SupportProps> = ({ tickets }) => {
                     </div>
                     <div className="flex items-center gap-3">
                       <span className={getBadge(ticket.status)}>
-                        {__(ticket.status, ticket.status)}
+                        {getStatusLabel(ticket.status)}
                       </span>
                       <div
                         role="button"

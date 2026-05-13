@@ -10,6 +10,24 @@
  * @package Yatra
  */
 
+// Translation helpers — idempotent shim matching booking.js / trip.js so
+// `__()` resolves through wp.i18n when wp-i18n is enqueued, otherwise it
+// falls back to the source string.
+(function () {
+    if (typeof window.__ === 'function') return;
+    if (window.wp && window.wp.i18n && typeof window.wp.i18n.__ === 'function') {
+        window.__ = function (text, domain) { return window.wp.i18n.__(text, domain || 'yatra'); };
+        window._n = function (s, p, n, domain) { return window.wp.i18n._n(s, p, n, domain || 'yatra'); };
+        window._x = function (text, ctx, domain) { return window.wp.i18n._x(text, ctx, domain || 'yatra'); };
+        window.sprintf = window.sprintf || (window.wp.i18n.sprintf || function (fmt) { return fmt; });
+    } else {
+        window.__ = function (text) { return text; };
+        window._n = function (s, p, n) { return n === 1 ? s : p; };
+        window._x = function (text) { return text; };
+        window.sprintf = window.sprintf || function (fmt) { return fmt; };
+    }
+})();
+
 document.addEventListener('DOMContentLoaded', function() {
     function yatraGetFlatpickrLocale() {
         var l = window.yatraTripData && window.yatraTripData.flatpickrLocale;
@@ -573,7 +591,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (parts.length > 0) {
                 display.textContent = parts.join(', ');
             } else {
-                display.textContent = 'Select travelers';
+                display.textContent = __('Select travelers', 'yatra');
             }
         });
     }

@@ -4,6 +4,23 @@
  */
 /* jshint esversion: 6 */
 
+// Translation helpers (booking.js installs the same shims if it runs first;
+// idempotent setup so either load order works).
+(function () {
+    if (typeof window.__ === 'function') return;
+    if (window.wp && window.wp.i18n && typeof window.wp.i18n.__ === 'function') {
+        window.__ = function (text, domain) { return window.wp.i18n.__(text, domain || 'yatra'); };
+        window._n = function (s, p, n, domain) { return window.wp.i18n._n(s, p, n, domain || 'yatra'); };
+        window._x = function (text, ctx, domain) { return window.wp.i18n._x(text, ctx, domain || 'yatra'); };
+        window.sprintf = window.sprintf || (window.wp.i18n.sprintf || function (fmt) { return fmt; });
+    } else {
+        window.__ = function (text) { return text; };
+        window._n = function (s, p, n) { return n === 1 ? s : p; };
+        window._x = function (text) { return text; };
+        window.sprintf = window.sprintf || function (fmt) { return fmt; };
+    }
+})();
+
 (function() {
   'use strict';
 
@@ -1823,12 +1840,12 @@
 
       // Basic validation
       if (!date) {
-        alert('Please select a travel date');
+        alert(__('Please select a travel date', 'yatra'));
         return;
       }
 
       if (totalTravelers === 0) {
-        alert('Please select number of travelers');
+        alert(__('Please select number of travelers', 'yatra'));
         return;
       }
 
@@ -1879,9 +1896,10 @@
               // Try to get error message from response
               return response.json().then(err => {
                 console.error('API Error:', err);
-                throw new Error(err.message || 'Failed to fetch availability');
+                throw new Error(err.message || __('Failed to fetch availability', 'yatra'));
               }).catch(() => {
-                throw new Error('Failed to fetch availability (Status: ' + response.status + ')');
+                // translators: %d: HTTP status code
+                throw new Error(sprintf(__('Failed to fetch availability (Status: %d)', 'yatra'), response.status));
               });
             }
             return response.json();
@@ -1947,7 +1965,7 @@
           })
           .catch(error => {
             console.error('Error loading availability:', error);
-            alert('Failed to load availability. Please try again.');
+            alert(__('Failed to load availability. Please try again.', 'yatra'));
             this.resetButton();
           });
     }
@@ -2097,7 +2115,7 @@
       })
       .then(response => {
         if (!response.ok) {
-          throw new Error('Failed to fetch availability');
+          throw new Error(__('Failed to fetch availability', 'yatra'));
         }
         return response.json();
       })
@@ -2134,7 +2152,7 @@
       })
       .catch(error => {
         console.error('Error reloading availability:', error);
-        alert('Failed to reload availability. Please try again.');
+        alert(__('Failed to reload availability. Please try again.', 'yatra'));
         this.resetButton();
       });
     }
@@ -2620,15 +2638,20 @@
       const updateDisplay = () => {
         const adults = parseInt(adultsInput.value || 1);
         const children = parseInt(childrenInput.value || 0);
+        // translators: %d: number of adults
+        const adultPart = sprintf(_n('Adult x %d', 'Adult x %d', adults, 'yatra'), adults);
+        // translators: %d: number of children
+        const childPart = sprintf(_n('Child x %d', 'Child x %d', children, 'yatra'), children);
         let text = '';
         if (adults > 0 && children > 0) {
-          text = `Adult x ${adults}, Child x ${children}`;
+          // translators: %1$s: adult count phrase, %2$s: child count phrase
+          text = sprintf(__('%1$s, %2$s', 'yatra'), adultPart, childPart);
         } else if (adults > 0) {
-          text = `Adult x ${adults}`;
+          text = adultPart;
         } else if (children > 0) {
-          text = `Child x ${children}`;
+          text = childPart;
         } else {
-          text = 'Adult x 1';
+          text = sprintf(_n('Adult x %d', 'Adult x %d', 1, 'yatra'), 1);
         }
         display.textContent = text;
       };
@@ -2716,19 +2739,19 @@
       const message = formData.get('message');
 
       if (!name || !email || !message) {
-        this.showMessage('error', 'Please fill in all required fields.');
+        this.showMessage('error', __('Please fill in all required fields.', 'yatra'));
         return;
       }
 
       // Basic email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        this.showMessage('error', 'Please enter a valid email address.');
+        this.showMessage('error', __('Please enter a valid email address.', 'yatra'));
         return;
       }
 
       if (message.length < 10) {
-        this.showMessage('error', 'Please enter a message (at least 10 characters).');
+        this.showMessage('error', __('Please enter a message (at least 10 characters).', 'yatra'));
         return;
       }
 
@@ -2736,7 +2759,7 @@
       const submitBtn = this.form.querySelector('.yatra-enquiry-submit');
       const originalText = submitBtn ? submitBtn.textContent : 'Send Enquiry';
       if (submitBtn) {
-        submitBtn.textContent = 'Sending...';
+        submitBtn.textContent = __('Sending...', 'yatra');
         submitBtn.disabled = true;
       }
 
@@ -2772,13 +2795,13 @@
         .then(response => response.json())
         .then(result => {
           if (result.success) {
-            this.showMessage('success', result.message || result.data?.message || 'Thank you for your enquiry! We will get back to you soon.');
+            this.showMessage('success', result.message || result.data?.message || __('Thank you for your enquiry! We will get back to you soon.', 'yatra'));
             this.form.reset();
 
             // Reset the travelers display
             const display = document.getElementById('enquiry-participants-display');
             if (display) {
-              display.textContent = 'Adult x 1';
+              display.textContent = __('Adult x 1', 'yatra');
             }
             const adultsInput = document.getElementById('enquiry-adults');
             const childrenInput = document.getElementById('enquiry-children');
@@ -2793,7 +2816,7 @@
               }
             }, 3000);
           } else {
-            this.showMessage('error', result.message || result.data?.message || 'Failed to submit enquiry. Please try again.');
+            this.showMessage('error', result.message || result.data?.message || __('Failed to submit enquiry. Please try again.', 'yatra'));
           }
         })
         .catch(error => {
@@ -3208,19 +3231,19 @@
       }
 
       if (travelers < 1) {
-        this.showBookingError(btn, 'Please select at least 1 traveler to continue.');
+        this.showBookingError(btn, __('Please select at least 1 traveler to continue.', 'yatra'));
         return;
       }
 
       const originalText = btn.innerHTML;
-      btn.innerHTML = '<svg class="animate-spin" width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Processing...';
+      btn.innerHTML = '<svg class="animate-spin" width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> ' + __('Processing...', 'yatra');
       btn.disabled = true;
 
       if (!tripId || isNaN(parseInt(tripId)) || parseInt(tripId) <= 0) {
         console.error('Invalid trip ID:', tripId);
         btn.innerHTML = originalText;
         btn.disabled = false;
-        this.showBookingError(btn, 'Unable to process booking. Invalid trip data.');
+        this.showBookingError(btn, __('Unable to process booking. Invalid trip data.', 'yatra'));
         return;
       }
 
@@ -3496,14 +3519,14 @@
               console.error('Booking session error:', data);
               btn.innerHTML = originalText;
               btn.disabled = false;
-              this.showBookingError(btn, data.message || 'Unable to process booking. Please try again.');
+              this.showBookingError(btn, data.message || __('Unable to process booking. Please try again.', 'yatra'));
             }
           })
           .catch(error => {
             console.error('Error setting booking session:', error);
             btn.innerHTML = originalText;
             btn.disabled = false;
-            this.showBookingError(btn, 'Unable to process booking. Please try again.');
+            this.showBookingError(btn, __('Unable to process booking. Please try again.', 'yatra'));
           });
     }
 
@@ -3820,9 +3843,11 @@
           `.yatra-card-total-note[data-item="${itemIndex}"]`
       );
       if (noteElement) {
-        let travelerText = totalTravelers === 1
-            ? 'for 1 traveler'
-            : `for ${totalTravelers} travelers`;
+        // translators: %d: number of travelers (>= 2). The singular form is "for 1 traveler".
+        let travelerText = sprintf(
+            _n('for %d traveler', 'for %d travelers', totalTravelers, 'yatra'),
+            totalTravelers
+        );
 
         // Add group discount info if applied
         if (groupDiscountApplied && groupDiscountAmount > 0) {
@@ -4029,7 +4054,7 @@
 
       // Show success feedback
       const originalText = button.textContent;
-      button.textContent = 'Selected!';
+      button.textContent = __('Selected!', 'yatra');
       button.style.background = '#10b981';
       setTimeout(() => {
         button.textContent = originalText;
@@ -4077,7 +4102,7 @@
       })
           .then((resp) => {
             if (!resp.ok) {
-              throw new Error('Load more failed');
+              throw new Error(__('Load more failed', 'yatra'));
             }
             return resp.json();
           })
@@ -4290,7 +4315,7 @@
       this.toggleAllBtn.classList.toggle('is-all-expanded', isExpanded);
       const toggleText = this.toggleAllBtn.querySelector('.toggle-text');
       if (toggleText) {
-        toggleText.textContent = isExpanded ? 'Collapse All' : 'Expand All';
+        toggleText.textContent = isExpanded ? __('Collapse All', 'yatra') : __('Expand All', 'yatra');
       }
     }
   }
@@ -4421,7 +4446,7 @@
 
           if (result.success) {
             // Show success message
-            this.showMessage('success', result.data?.message || 'Thank you for your review!');
+            this.showMessage('success', result.data?.message || __('Thank you for your review!', 'yatra'));
 
             // Check if this was an edit or new submission
             const isEdit = this.form.querySelector('input[name="action_type"]')?.value === 'edit';
@@ -4712,9 +4737,9 @@
         const data = await response.json();
         if (data.success) {
           this.updateButtonState(true, tid);
-          this.showMessage(data.message || 'Trip saved to wishlist', 'success', btn);
+          this.showMessage(data.message || __('Trip saved to wishlist', 'yatra'), 'success', btn);
         } else {
-          this.showMessage(data.message || 'Failed to save trip', 'error', btn);
+          this.showMessage(data.message || __('Failed to save trip', 'yatra'), 'error', btn);
         }
       } catch (error) {
         console.error('Error saving trip:', error);
@@ -4742,9 +4767,9 @@
         const data = await response.json();
         if (data.success) {
           this.updateButtonState(false, tid);
-          this.showMessage(data.message || 'Trip removed from wishlist', 'success', btn);
+          this.showMessage(data.message || __('Trip removed from wishlist', 'yatra'), 'success', btn);
         } else {
-          this.showMessage(data.message || 'Failed to remove trip', 'error', btn);
+          this.showMessage(data.message || __('Failed to remove trip', 'yatra'), 'error', btn);
         }
       } catch (error) {
         console.error('Error removing trip:', error);
@@ -4764,7 +4789,7 @@
       buttons.forEach(btn => {
         if (isSaved) {
           btn.classList.add('saved', 'is-saved');
-          btn.setAttribute('aria-label', 'Remove from favorites');
+          btn.setAttribute('aria-label', __('Remove from favorites', 'yatra'));
           // Fill the heart icon and change color
           const svg = btn.querySelector('svg');
           if (svg) {
@@ -4774,7 +4799,7 @@
           }
         } else {
           btn.classList.remove('saved', 'is-saved');
-          btn.setAttribute('aria-label', 'Add to favorites');
+          btn.setAttribute('aria-label', __('Add to favorites', 'yatra'));
           // Unfill the heart icon
           const svg = btn.querySelector('svg');
           if (svg) {
@@ -4811,7 +4836,7 @@
         }
       } else {
         // Fallback: show alert and redirect to login
-        if (confirm('Please login to save trips to your wishlist. Would you like to go to the login page?')) {
+        if (confirm(__('Please login to save trips to your wishlist. Would you like to go to the login page?', 'yatra'))) {
           window.location.href = window.yatraTripData?.loginUrl || '/wp-login.php';
         }
       }
@@ -5184,7 +5209,7 @@ class DownloadsHandler {
       // Get download URL with signature using centralized helper
       const response = await window.YatraApiHelper.getDownloadInfo(downloadId);
       if (!response.ok) {
-        throw new Error('Download failed');
+        throw new Error(__('Download failed', 'yatra'));
       }
 
       const data = await response.json();
@@ -5215,7 +5240,7 @@ class DownloadsHandler {
       // Get download info using centralized helper
       const response = await window.YatraApiHelper.getDownloadInfo(downloadId);
       if (!response.ok) {
-        throw new Error('Failed to get file info');
+        throw new Error(__('Failed to get file info', 'yatra'));
       }
 
       const data = await response.json();

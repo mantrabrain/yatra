@@ -16,7 +16,13 @@ export interface Booking {
   /** Trip end (multi-day); optional on older rows. */
   end_date?: string | null;
   start_date?: string | null;
+  /** Traveler count. The bookings-list endpoint returns this as an integer,
+   *  but the single-booking detail endpoint overrides `travelers` with an
+   *  array of traveler-detail objects (see
+   *  BookingService::formatBookingWithDetails). Use `travelers_count` when
+   *  rendering the count — it is preserved as an integer in both shapes. */
   travelers: number;
+  travelers_count: number;
   total_amount: number;
   amount_paid?: number | null;
   amount_due?: number | null;

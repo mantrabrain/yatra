@@ -75,6 +75,60 @@ export const formatTravelDateRange = (
   );
 };
 
+/**
+ * Translate a known booking/payment/ticket status to a localized label.
+ *
+ * The previous account-page code did `__(booking.status, booking.status)` which
+ * mis-uses the textdomain argument: WP's i18n runtime treats the second arg as
+ * the textdomain (defaulting to 'default'), so it never finds the translation
+ * and silently returns the raw English key like 'confirmed'/'pending'. Worse,
+ * because the first argument is a runtime variable, the WP-CLI i18n extractor
+ * skips it — those strings never reach the .pot file and Loco never gets a
+ * chance to translate them.
+ *
+ * Mapping each known status to a static `__('Foo', 'yatra')` call fixes both
+ * problems at once: extractor sees the literals, translators can localize, and
+ * unknown values fall back to a title-cased rendition of the raw key.
+ */
+export const getStatusLabel = (status: string | undefined | null): string => {
+  const raw = typeof status === "string" ? status.toLowerCase().trim() : "";
+  switch (raw) {
+    case "pending":
+      return __("Pending", "yatra");
+    case "confirmed":
+      return __("Confirmed", "yatra");
+    case "processing":
+      return __("Processing", "yatra");
+    case "completed":
+      return __("Completed", "yatra");
+    case "cancelled":
+      return __("Cancelled", "yatra");
+    case "refunded":
+      return __("Refunded", "yatra");
+    case "failed":
+      return __("Failed", "yatra");
+    case "on_hold":
+      return __("On hold", "yatra");
+    case "paid":
+      return __("Paid", "yatra");
+    case "partial":
+      return __("Partial", "yatra");
+    case "awaiting_response":
+      return __("Awaiting response", "yatra");
+    case "resolved":
+      return __("Resolved", "yatra");
+    case "closed":
+      return __("Closed", "yatra");
+    case "open":
+      return __("Open", "yatra");
+    case "":
+      return __("Pending", "yatra");
+    default:
+      // Unknown status — title-case it so admins can see what's coming through.
+      return raw.charAt(0).toUpperCase() + raw.slice(1).replace(/_/g, " ");
+  }
+};
+
 export const getBadge = (status: string | undefined | null) => {
   const base = "px-2.5 py-0.5 rounded-full text-xs font-medium";
 

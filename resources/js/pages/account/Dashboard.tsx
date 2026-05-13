@@ -16,11 +16,12 @@ import {
   AlertCircle,
   Bell,
 } from "lucide-react";
-import { __, sprintf } from "../../lib/i18n";
+import { __, _n, sprintf } from "../../lib/i18n";
 import {
   formatDate,
   formatTravelDateRange,
   getBadge,
+  getStatusLabel,
   currency,
   phoneToTelHref,
 } from "./utils";
@@ -269,7 +270,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                             {booking.trip_title}
                           </h4>
                           <span className={getBadge(booking.booking_status)}>
-                            {__(booking.booking_status, booking.booking_status)}
+                            {getStatusLabel(booking.booking_status)}
                           </span>
                         </div>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
@@ -287,10 +288,25 @@ const Dashboard: React.FC<DashboardProps> = ({
                           </span>
                           <span className="flex items-center gap-1">
                             <User className="w-3.5 h-3.5" />
-                            {booking.travelers}{" "}
-                            {booking.travelers === 1
-                              ? __("Traveler", "yatra")
-                              : __("Travelers", "yatra")}
+                            {(() => {
+                              // Use `travelers_count` for the count — see
+                              // Booking interface comment in types.ts.
+                              const n = Number(
+                                booking.travelers_count ??
+                                  booking.travelers ??
+                                  0,
+                              ) || 0;
+                              return sprintf(
+                                // translators: %d: number of travelers on this booking
+                                _n(
+                                  "%d Traveler",
+                                  "%d Travelers",
+                                  n,
+                                  "yatra",
+                                ),
+                                n,
+                              );
+                            })()}
                           </span>
                         </div>
                       </div>
@@ -497,7 +513,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     </p>
                   </div>
                   <span className={getBadge(booking.booking_status)}>
-                    {__(booking.booking_status, booking.booking_status)}
+                    {getStatusLabel(booking.booking_status)}
                   </span>
                 </div>
               ))}
@@ -519,7 +535,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     </p>
                   </div>
                   <span className={getBadge(payment.status)}>
-                    {__(payment.status, payment.status)}
+                    {getStatusLabel(payment.status)}
                   </span>
                 </div>
               ))}

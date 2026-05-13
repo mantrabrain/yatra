@@ -3,6 +3,22 @@
  * Handles download functionality for the list view with visibility checks
  */
 
+// Translation helpers — idempotent shim matching the other frontend bundles.
+(function () {
+    if (typeof window.__ === 'function') return;
+    if (window.wp && window.wp.i18n && typeof window.wp.i18n.__ === 'function') {
+        window.__ = function (text, domain) { return window.wp.i18n.__(text, domain || 'yatra'); };
+        window._n = function (s, p, n, domain) { return window.wp.i18n._n(s, p, n, domain || 'yatra'); };
+        window._x = function (text, ctx, domain) { return window.wp.i18n._x(text, ctx, domain || 'yatra'); };
+        window.sprintf = window.sprintf || (window.wp.i18n.sprintf || function (fmt) { return fmt; });
+    } else {
+        window.__ = function (text) { return text; };
+        window._n = function (s, p, n) { return n === 1 ? s : p; };
+        window._x = function (text) { return text; };
+        window.sprintf = window.sprintf || function (fmt) { return fmt; };
+    }
+})();
+
 document.addEventListener('DOMContentLoaded', function() {
     // Use centralized API helper
     if (typeof window.YatraApiHelper === 'undefined') {
@@ -27,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Show loading state
             const originalContent = this.innerHTML;
-            this.innerHTML = '<span class="yatra-download-spinner"></span> Getting download...';
+            this.innerHTML = '<span class="yatra-download-spinner"></span> ' + __('Getting download...', 'yatra');
             this.disabled = true;
             
             // For booked_only downloads, we need to get booking ID
@@ -42,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => {
                 if (!response.ok) {
                     return response.json().then(err => {
-                        throw new Error(err.message || 'Download failed');
+                        throw new Error(err.message || __('Download failed', 'yatra'));
                     });
                 }
                 return response.json();
@@ -58,20 +74,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     link.click();
                     document.body.removeChild(link);
                 } else {
-                    throw new Error('No download URL provided');
+                    throw new Error(__('No download URL provided', 'yatra'));
                 }
             })
             .catch(error => {
                 console.error('Download error:', error);
                 
                 // Show user-friendly error message
-                let errorMessage = 'Download failed. Please try again.';
+                let errorMessage = __('Download failed. Please try again.', 'yatra');
                 if (error.message.includes('booking')) {
-                    errorMessage = 'This download requires a booking. Please book this trip first.';
+                    errorMessage = __('This download requires a booking. Please book this trip first.', 'yatra');
                 } else if (error.message.includes('login')) {
-                    errorMessage = 'Please log in to download this file.';
+                    errorMessage = __('Please log in to download this file.', 'yatra');
                 } else if (error.message.includes('permission')) {
-                    errorMessage = 'You do not have permission to download this file.';
+                    errorMessage = __('You do not have permission to download this file.', 'yatra');
                 }
                 
                 alert(errorMessage);
@@ -92,12 +108,12 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             
             const visibility = this.getAttribute('data-visibility');
-            let message = 'Download not available.';
-            
+            let message = __('Download not available.', 'yatra');
+
             if (visibility === 'logged_in') {
-                message = 'Please log in to download this file.';
+                message = __('Please log in to download this file.', 'yatra');
             } else if (visibility === 'booked_only') {
-                message = 'This download requires a booking for this trip.';
+                message = __('This download requires a booking for this trip.', 'yatra');
             }
             
             alert(message);

@@ -1,4 +1,21 @@
 // Wishlist functionality for trip listing page (Yatra Pro + setting)
+
+// Translation helpers — idempotent shim matching the other frontend bundles.
+(function () {
+    if (typeof window.__ === 'function') return;
+    if (window.wp && window.wp.i18n && typeof window.wp.i18n.__ === 'function') {
+        window.__ = function (text, domain) { return window.wp.i18n.__(text, domain || 'yatra'); };
+        window._n = function (s, p, n, domain) { return window.wp.i18n._n(s, p, n, domain || 'yatra'); };
+        window._x = function (text, ctx, domain) { return window.wp.i18n._x(text, ctx, domain || 'yatra'); };
+        window.sprintf = window.sprintf || (window.wp.i18n.sprintf || function (fmt) { return fmt; });
+    } else {
+        window.__ = function (text) { return text; };
+        window._n = function (s, p, n) { return n === 1 ? s : p; };
+        window._x = function (text) { return text; };
+        window.sprintf = window.sprintf || function (fmt) { return fmt; };
+    }
+})();
+
 class TripListingWishlist {
     constructor() {
         var cfg = window.yatraWishlistConfig || {};
@@ -98,9 +115,9 @@ class TripListingWishlist {
             const data = await response.json();
             if (data.success) {
                 this.updateButtonState(btn, true);
-                this.showMessage(data.message || 'Trip saved to wishlist', 'success', btn);
+                this.showMessage(data.message || __('Trip saved to wishlist', 'yatra'), 'success', btn);
             } else {
-                this.showMessage(data.message || 'Failed to save trip', 'error', btn);
+                this.showMessage(data.message || __('Failed to save trip', 'yatra'), 'error', btn);
             }
         } catch (error) {
             console.error('Error saving trip:', error);
@@ -127,9 +144,9 @@ class TripListingWishlist {
             const data = await response.json();
             if (data.success) {
                 this.updateButtonState(btn, false);
-                this.showMessage(data.message || 'Trip removed from wishlist', 'success', btn);
+                this.showMessage(data.message || __('Trip removed from wishlist', 'yatra'), 'success', btn);
             } else {
-                this.showMessage(data.message || 'Failed to remove trip', 'error', btn);
+                this.showMessage(data.message || __('Failed to remove trip', 'yatra'), 'error', btn);
             }
         } catch (error) {
             console.error('Error removing trip:', error);
@@ -143,8 +160,8 @@ class TripListingWishlist {
     updateButtonState(btn, isSaved) {
         if (isSaved) {
             btn.classList.add('saved', 'is-saved');
-            btn.setAttribute('aria-label', 'Remove from favorites');
-            btn.setAttribute('title', 'Remove from favorites');
+            btn.setAttribute('aria-label', __('Remove from favorites', 'yatra'));
+            btn.setAttribute('title', __('Remove from favorites', 'yatra'));
             // Fill the heart icon and change color
             const svg = btn.querySelector('svg');
             if (svg) {
@@ -154,8 +171,8 @@ class TripListingWishlist {
             }
         } else {
             btn.classList.remove('saved', 'is-saved');
-            btn.setAttribute('aria-label', 'Add to favorites');
-            btn.setAttribute('title', 'Add to favorites');
+            btn.setAttribute('aria-label', __('Add to favorites', 'yatra'));
+            btn.setAttribute('title', __('Add to favorites', 'yatra'));
             // Unfill the heart icon
             const svg = btn.querySelector('svg');
             if (svg) {

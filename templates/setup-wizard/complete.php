@@ -80,7 +80,7 @@ defined('ABSPATH') || exit;
         <div style="position: relative; z-index: 10;">
             <div style="display: inline-flex; align-items: center; gap: 12px; margin-bottom: 16px;">
                 <div style="width: 40px; height: 3px; background: linear-gradient(90deg, transparent, #fbbf24);"></div>
-                <span style="color: #f59e0b; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Achievement Unlocked</span>
+                <span style="color: #f59e0b; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;"><?php esc_html_e('Achievement Unlocked', 'yatra'); ?></span>
                 <div style="width: 40px; height: 3px; background: linear-gradient(90deg, #fbbf24, transparent);"></div>
             </div>
             <h1 style="text-align: center; margin: 0 0 12px; font-size: 32px; font-weight: 700; color: #111827; background: linear-gradient(135deg, #111827, #374151); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"><?php esc_html_e('Setup Complete!', 'yatra'); ?></h1>

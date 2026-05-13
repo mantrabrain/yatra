@@ -51,10 +51,17 @@ class LoginShortcode extends BaseShortcode
         wp_enqueue_script(
             'yatra-login-shortcode',
             YATRA_PLUGIN_URL . 'assets/js/login-shortcode.js',
-            ['jquery'],
+            ['jquery', 'wp-i18n'],
             YATRA_VERSION,
             true
         );
+        if (function_exists('wp_set_script_translations')) {
+            wp_set_script_translations(
+                'yatra-login-shortcode',
+                'yatra',
+                YATRA_PLUGIN_PATH . 'i18n/languages'
+            );
+        }
 
         // Localize script for AJAX with security and debugging
         wp_localize_script('yatra-login-shortcode', 'yatra_ajax', [

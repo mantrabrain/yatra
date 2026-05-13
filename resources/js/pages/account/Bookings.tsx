@@ -7,11 +7,12 @@ import {
   DollarSign,
   MapPin,
 } from "lucide-react";
-import { __ } from "../../lib/i18n";
+import { __, _n, sprintf } from "../../lib/i18n";
 import {
   formatDate,
   formatTravelDateRange,
   getBadge,
+  getStatusLabel,
   currency,
   phoneToTelHref,
 } from "./utils";
@@ -398,10 +399,10 @@ const Bookings: React.FC<BookingsProps> = ({
                     </div>
                     <div className="flex flex-wrap gap-2 items-start">
                       <span className={getBadge(booking.booking_status)}>
-                        {__(booking.booking_status, booking.booking_status)}
+                        {getStatusLabel(booking.booking_status)}
                       </span>
                       <span className={getBadge(booking.payment_status)}>
-                        {__(booking.payment_status, booking.payment_status)}
+                        {getStatusLabel(booking.payment_status)}
                       </span>
                     </div>
                   </div>
@@ -424,7 +425,19 @@ const Bookings: React.FC<BookingsProps> = ({
                         {__("Travelers", "yatra")}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {booking.travelers}
+                        {(() => {
+                          // Read `travelers_count` first — `travelers` is an
+                          // array on the booking-detail endpoint and would
+                          // coerce to NaN. See Booking interface comments.
+                          const n = Number(
+                            booking.travelers_count ?? booking.travelers ?? 0,
+                          ) || 0;
+                          return sprintf(
+                            // translators: %d: number of travelers on this booking
+                            _n("%d traveler", "%d travelers", n, "yatra"),
+                            n,
+                          );
+                        })()}
                       </p>
                     </div>
                     <div>

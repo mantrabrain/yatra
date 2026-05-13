@@ -3,8 +3,8 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-eQJQD6Tp.js": {
-    "file": "dist/js/index-eQJQD6Tp.js",
+  "_index-Co3Z88uc.js": {
+    "file": "dist/js/index-Co3Z88uc.js",
     "name": "index",
     "imports": [
       "_react-vendor-CGraIJLZ.js"
@@ -31,7 +31,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-CGraIJLZ.js",
-      "_index-eQJQD6Tp.js"
+      "_index-Co3Z88uc.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -41,7 +41,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-CGraIJLZ.js",
-      "_index-eQJQD6Tp.js"
+      "_index-Co3Z88uc.js"
     ]
   }
 }

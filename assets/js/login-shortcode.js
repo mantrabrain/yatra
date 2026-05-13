@@ -1,11 +1,27 @@
 /**
  * Login Shortcode JavaScript
- * 
+ *
  * Production-optimized login form interactions and functionality
- * 
+ *
  * @package Yatra
  * @version 1.0.0
  */
+
+// Translation helpers — idempotent shim matching the other frontend bundles.
+(function () {
+    if (typeof window.__ === 'function') return;
+    if (window.wp && window.wp.i18n && typeof window.wp.i18n.__ === 'function') {
+        window.__ = function (text, domain) { return window.wp.i18n.__(text, domain || 'yatra'); };
+        window._n = function (s, p, n, domain) { return window.wp.i18n._n(s, p, n, domain || 'yatra'); };
+        window._x = function (text, ctx, domain) { return window.wp.i18n._x(text, ctx, domain || 'yatra'); };
+        window.sprintf = window.sprintf || (window.wp.i18n.sprintf || function (fmt) { return fmt; });
+    } else {
+        window.__ = function (text) { return text; };
+        window._n = function (s, p, n) { return n === 1 ? s : p; };
+        window._x = function (text) { return text; };
+        window.sprintf = window.sprintf || function (fmt) { return fmt; };
+    }
+})();
 
 (function($) {
     'use strict';
@@ -84,12 +100,12 @@
                     $input.attr('type', 'text');
                     $eyeIcon.hide();
                     $eyeOffIcon.show();
-                    $toggle.attr('aria-label', 'Hide password');
+                    $toggle.attr('aria-label', __('Hide password', 'yatra'));
                 } else {
                     $input.attr('type', 'password');
                     $eyeIcon.show();
                     $eyeOffIcon.hide();
-                    $toggle.attr('aria-label', 'Show password');
+                    $toggle.attr('aria-label', __('Show password', 'yatra'));
                 }
             } catch (error) {
                 console.error('Error toggling password visibility:', error);
@@ -107,28 +123,28 @@
         if (!username) {
             return {
                 valid: false,
-                message: yatra_ajax?.strings?.validation_error || 'Please enter your email or username.'
+                message: yatra_ajax?.strings?.validation_error || __('Please enter your email or username.', 'yatra')
             };
         }
         
         if (!password) {
             return {
                 valid: false,
-                message: yatra_ajax?.strings?.validation_error || 'Please enter your password.'
+                message: yatra_ajax?.strings?.validation_error || __('Please enter your password.', 'yatra')
             };
         }
         
         if (username.length > 60) {
             return {
                 valid: false,
-                message: 'Username is too long.'
+                message: __('Username is too long.', 'yatra')
             };
         }
         
         if (password.length > 72) {
             return {
                 valid: false,
-                message: 'Password is too long.'
+                message: __('Password is too long.', 'yatra')
             };
         }
         
@@ -253,7 +269,7 @@
                         if (response.data && (response.data.redirect_url || response.data.redirect)) {
                             window.location.href = response.data.redirect_url || response.data.redirect;
                         } else {
-                            showFormSuccess($form, response.data.message || 'Login successful!');
+                            showFormSuccess($form, response.data.message || __('Login successful!', 'yatra'));
                             setTimeout(() => {
                                 window.location.reload();
                             }, 1500);

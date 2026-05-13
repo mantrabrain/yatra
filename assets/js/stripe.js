@@ -322,7 +322,7 @@ class YatraStripe {
         const publishableKey = window.yatraBookingData?.stripe?.publishableKey
             || window.yatraBookingData?.stripe?.publishable_key;
         if (!publishableKey) {
-            this.displayError('Stripe publishable key is missing. Please contact support.');
+            this.displayError(__('Stripe publishable key is missing. Please contact support.', 'yatra'));
             return;
         }
 
@@ -331,7 +331,7 @@ class YatraStripe {
             script.src = 'https://js.stripe.com/v3/';
             script.onload = () => this.setupStripeElements(publishableKey);
             script.onerror = () => {
-                this.displayError('Failed to load Stripe.js. Please try again or choose another payment method.');
+                this.displayError(__('Failed to load Stripe.js. Please try again or choose another payment method.', 'yatra'));
             };
             document.head.appendChild(script);
         } else {
@@ -382,7 +382,7 @@ class YatraStripe {
             }
         } catch (error) {
             console.error('Error initializing Stripe:', error);
-            this.displayError('Failed to initialize payment processor. Please try again or use another payment method.');
+            this.displayError(__('Failed to initialize payment processor. Please try again or use another payment method.', 'yatra'));
         }
     }
 
@@ -400,13 +400,13 @@ class YatraStripe {
         }
 
         if (!this.supportsCard) {
-            this.displayError('Please use Apple Pay or Google Pay above to complete your payment.');
+            this.displayError(__('Please use Apple Pay or Google Pay above to complete your payment.', 'yatra'));
             return false;
         }
 
         const bookingData = event?.detail?.bookingData || this.collectBookingData();
         if (!bookingData) {
-            this.displayError('Please complete the booking form before continuing.');
+            this.displayError(__('Please complete the booking form before continuing.', 'yatra'));
             return false;
         }
 
@@ -848,7 +848,7 @@ class YatraStripe {
         try {
             const bookingData = this.collectBookingData();
             if (!bookingData) {
-                throw new Error('Please complete the booking form before using Apple Pay or Google Pay.');
+                throw new Error(__('Please complete the booking form before using Apple Pay or Google Pay.', 'yatra'));
             }
 
             this.setLoadingState(true);
@@ -906,7 +906,7 @@ class YatraStripe {
         const bookingResult = await bookingResponse.json();
 
         if (!bookingResult.success) {
-            throw new Error(bookingResult.message || 'Failed to process request. Please try again.');
+            throw new Error(bookingResult.message || __('Failed to process request. Please try again.', 'yatra'));
         }
 
         const bookingInfo = bookingResult.data;
@@ -964,12 +964,12 @@ class YatraStripe {
 
         const intentPayload = await paymentIntentResponse.json();
         if (!paymentIntentResponse.ok) {
-            throw new Error(intentPayload?.message || 'Unable to process payment. Please try again.');
+            throw new Error(intentPayload?.message || __('Unable to process payment. Please try again.', 'yatra'));
         }
         const clientSecret = intentPayload.client_secret;
 
         if (!clientSecret) {
-            throw new Error(intentPayload?.error?.message || 'Unable to process payment. Please try again.');
+            throw new Error(intentPayload?.error?.message || __('Unable to process payment. Please try again.', 'yatra'));
         }
 
         const billingDetails = this.getBillingDetails(bookingData, formElement);
@@ -1229,7 +1229,7 @@ class YatraStripe {
 
             const payload = await response.json();
             if (!response.ok || payload?.success === false) {
-                throw new Error(payload?.message || 'Failed to record payment.');
+                throw new Error(payload?.message || __('Failed to record payment.', 'yatra'));
             }
 
             return payload;

@@ -536,24 +536,27 @@ class CustomerService
         $customerRepository = new \Yatra\Repositories\CustomerRepository();
         $payments = $customerRepository->getPaymentsForBookingIds($bookingIds, $limit);
 
-        return array_map(static function($payment) {
-            return [
-                'id' => (int) $payment->id,
-                'booking_id' => (int) $payment->booking_id,
-                'booking_reference' => $payment->booking_reference,
-                'amount' => (float) $payment->amount,
-                'currency' => $payment->currency,
-                'status' => $payment->status,
-                'payment_method' => $payment->payment_method,
-                'gateway' => $payment->gateway,
-                'transaction_id' => $payment->transaction_id,
-                'created_at' => $payment->created_at,
-                'updated_at' => $payment->updated_at,
-                'trip_title' => $payment->trip_title,
-                'booking_amount_due' => (float) $payment->booking_amount_due,
-                'booking_amount_paid' => (float) $payment->booking_amount_paid,
-                'booking_total_amount' => (float) $payment->booking_total_amount,
-            ];
+        // Route the customer-facing payments through the shared formatter so
+        // they emit the same field shape the rest of the app uses — most
+        // importantly the React Account → Payments tab's aliases
+        // (`date`, `method`, `reference`, `type`, `booking_number`,
+        // `payment_date`, `payment_number`). The previous inline formatter
+        // omitted those keys, which is why the Payments cards rendered
+        // "N/A" for the date, blank for the method, and an empty space
+        // above the "Booking:" label.
+        $paymentService = new \Yatra\Services\PaymentService();
+
+        return array_map(static function ($payment) use ($paymentService) {
+            $row = $paymentService->formatPayment($payment);
+            // Preserve the booking-amount summary fields used by the React
+            // payments tab to decide whether to render a "Pay Remaining" CTA.
+            // formatPayment doesn't know about these (they come from the
+            // CustomerRepository JOIN); attach them here so we keep the
+            // canonical shape AND the extra context.
+            $row['booking_amount_due']   = (float) ($payment->booking_amount_due ?? 0);
+            $row['booking_amount_paid']  = (float) ($payment->booking_amount_paid ?? 0);
+            $row['booking_total_amount'] = (float) ($payment->booking_total_amount ?? 0);
+            return $row;
         }, $payments);
     }
 

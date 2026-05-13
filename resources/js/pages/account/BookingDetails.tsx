@@ -12,11 +12,12 @@ import {
   ExternalLink,
   Download,
 } from "lucide-react";
-import { __ } from "../../lib/i18n";
+import { __, _n, sprintf } from "../../lib/i18n";
 import {
   formatDate,
   formatTravelDateRange,
   getBadge,
+  getStatusLabel,
   formatPriceForBooking,
   getYatraAccountPageGlobals,
 } from "./utils";
@@ -219,16 +220,10 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
               </h3>
               <div className="flex items-center gap-2">
                 <span className={getBadge(booking.booking_status)}>
-                  {__(
-                    booking.booking_status || "Pending",
-                    booking.booking_status || "Pending",
-                  )}
+                  {getStatusLabel(booking.booking_status)}
                 </span>
                 <span className={getBadge(booking.payment_status)}>
-                  {__(
-                    booking.payment_status || "Pending",
-                    booking.payment_status || "Pending",
-                  )}
+                  {getStatusLabel(booking.payment_status)}
                 </span>
               </div>
             </div>
@@ -282,10 +277,26 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                   {__("Number of Travelers", "yatra")}
                 </div>
                 <div className="text-sm text-gray-900 dark:text-white">
-                  {booking.travelers}{" "}
-                  {booking.travelers === 1
-                    ? __("Traveler", "yatra")
-                    : __("Travelers", "yatra")}
+                  {(() => {
+                    // The detail endpoint REPLACES `travelers` (which the
+                    // list endpoint sent as an integer count) with an array
+                    // of full traveler objects from getBookingTravelers().
+                    // Always read `travelers_count` — it's preserved as an
+                    // integer in both list and detail shapes, and falling
+                    // back to `travelers.length` covers the array case if
+                    // the count was missing from the payload.
+                    const t: any = (booking as any).travelers;
+                    const n = Number(
+                      (booking as any).travelers_count ??
+                        (Array.isArray(t) ? t.length : t) ??
+                        0,
+                    ) || 0;
+                    return sprintf(
+                      // translators: %d: number of travelers on this booking
+                      _n("%d Traveler", "%d Travelers", n, "yatra"),
+                      n,
+                    );
+                  })()}
                 </div>
               </div>
             </div>
@@ -750,10 +761,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                 </div>
                 <div className="mt-1">
                   <span className={getBadge(booking.payment_status)}>
-                    {__(
-                      booking.payment_status || "Pending",
-                      booking.payment_status || "Pending",
-                    )}
+                    {getStatusLabel(booking.payment_status)}
                   </span>
                 </div>
               </div>

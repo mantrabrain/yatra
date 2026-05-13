@@ -1,11 +1,30 @@
 /**
  * Booking Page JavaScript
- * 
+ *
  * Uses FormData API to automatically collect all form fields
  * and submit via REST API
- * 
+ *
  * @package Yatra
  */
+
+// Translation helper. Resolves through `wp.i18n.__` when WordPress's i18n
+// runtime is enqueued (it is — `yatra-booking` declares `wp-i18n` as a
+// dependency in FrontendAssetsProvider). Falls back to the source string if
+// wp.i18n is unavailable so the page never breaks on older environments.
+(function () {
+    if (typeof window.__ === 'function') return;
+    if (window.wp && window.wp.i18n && typeof window.wp.i18n.__ === 'function') {
+        window.__ = function (text, domain) { return window.wp.i18n.__(text, domain || 'yatra'); };
+        window._n = function (s, p, n, domain) { return window.wp.i18n._n(s, p, n, domain || 'yatra'); };
+        window._x = function (text, ctx, domain) { return window.wp.i18n._x(text, ctx, domain || 'yatra'); };
+        window.sprintf = window.sprintf || (window.wp.i18n.sprintf || function (fmt) { return fmt; });
+    } else {
+        window.__ = function (text) { return text; };
+        window._n = function (s, p, n) { return n === 1 ? s : p; };
+        window._x = function (text) { return text; };
+        window.sprintf = window.sprintf || function (fmt) { return fmt; };
+    }
+})();
 
 (function($) {
     'use strict';
@@ -162,7 +181,7 @@
                     parts.push(categoryLabel + ' x ' + count);
                 }
             });
-            const displayText = parts.length > 0 ? parts.join(', ') : 'Select travelers';
+            const displayText = parts.length > 0 ? parts.join(', ') : __('Select travelers', 'yatra');
             $('#yatra-travelers-display').text(displayText);
         }
         
@@ -300,7 +319,7 @@
             const flexDue = paymentMethod === 'deposit' || paymentMethod === 'partial';
 
             if (isOffline) {
-                $buttonText.text('Complete Booking');
+                $buttonText.text(__('Complete Booking', 'yatra'));
                 const showAmount = flexDue ? due : totalSafe;
                 if (showAmount > 0) {
                     $payAmount.text(formatCurrency(showAmount, currency)).show();
@@ -308,7 +327,7 @@
                     $payAmount.hide();
                 }
             } else {
-                $buttonText.text('Pay Now');
+                $buttonText.text(__('Pay Now', 'yatra'));
                 const payVal = flexDue && due > 0 ? due : totalSafe;
                 if (payVal > 0) {
                     $payAmount.text(formatCurrency(payVal, currency)).show();
@@ -333,7 +352,10 @@
             
             // Update index references
             $newTraveler.attr('data-traveler-index', index);
-            $newTraveler.find('.yatra-traveler-title').text('Traveler ' + index);
+            $newTraveler.find('.yatra-traveler-title').text(
+                /* translators: %d: traveler number (1-based) */
+                sprintf(__('Traveler %d', 'yatra'), index)
+            );
             
             // Add "Additional traveler" note
             if (!$newTraveler.find('.yatra-traveler-note').length) {
@@ -471,20 +493,20 @@
                 if (value && !isValidEmail(value)) {
                     isValid = false;
                     $field.addClass('error');
-                    errors.push('Please enter a valid email address');
+                    errors.push(__('Please enter a valid email address', 'yatra'));
                 }
             });
             
             // Validate terms checkbox
             if (!$('input[name="accept_terms"]').is(':checked')) {
                 isValid = false;
-                errors.push('Please accept the Terms and Conditions');
+                errors.push(__('Please accept the Terms and Conditions', 'yatra'));
             }
             
             // Validate privacy checkbox
             if (!$('input[name="accept_privacy"]').is(':checked')) {
                 isValid = false;
-                errors.push('Please accept the Privacy Policy');
+                errors.push(__('Please accept the Privacy Policy', 'yatra'));
             }
             
             if (!isValid && errors.length > 0) {
@@ -522,7 +544,7 @@
          */
         function showSuccessMessage(message, reference, opts) {
             opts = opts || {};
-            const heading = opts.heading || 'Booking Confirmed!';
+            const heading = opts.heading || __('Booking Confirmed!', 'yatra');
             const iconColor = opts.iconColor || '#22c55e';
             const footerHtml = opts.footerHtml !== undefined
                 ? opts.footerHtml
@@ -743,13 +765,13 @@
             const $gatewayDetails = $('#yatra-gateway-details');
             
             const gatewayMessages = {
-                'pay_later': '<p>Your booking will be reserved. Full payment is required before the trip date.</p>',
-                'bank_transfer': '<p>After completing your booking, you will receive bank details via email. Your booking will be confirmed once payment is received.</p>',
-                'stripe': '<p>You will be securely redirected to complete your payment with credit or debit card.</p>',
-                'paypal': '<p>You will be redirected to PayPal to complete your payment securely.</p>',
-                'razorpay': '<p>You will be redirected to Razorpay to complete your payment.</p>',
-                'esewa': '<p>You will be redirected to eSewa to complete your payment.</p>',
-                'khalti': '<p>You will be redirected to Khalti to complete your payment.</p>',
+                'pay_later': '<p>' + __('Your booking will be reserved. Full payment is required before the trip date.', 'yatra') + '</p>',
+                'bank_transfer': '<p>' + __('After completing your booking, you will receive bank details via email. Your booking will be confirmed once payment is received.', 'yatra') + '</p>',
+                'stripe': '<p>' + __('You will be securely redirected to complete your payment with credit or debit card.', 'yatra') + '</p>',
+                'paypal': '<p>' + __('You will be redirected to PayPal to complete your payment securely.', 'yatra') + '</p>',
+                'razorpay': '<p>' + __('You will be redirected to Razorpay to complete your payment.', 'yatra') + '</p>',
+                'esewa': '<p>' + __('You will be redirected to eSewa to complete your payment.', 'yatra') + '</p>',
+                'khalti': '<p>' + __('You will be redirected to Khalti to complete your payment.', 'yatra') + '</p>',
             };
             
             if (gatewayMessages[gateway] && $gatewayDetails.length) {
@@ -810,7 +832,7 @@
             
             
             if (!response.success) {
-                const errMsg = response.message || 'An error occurred. Please try again.';
+                const errMsg = response.message || __('An error occurred. Please try again.', 'yatra');
                 showFormError(errMsg);
                 $submitBtn.prop('disabled', false).html(originalBtnHtml);
                 return;
@@ -821,10 +843,10 @@
             if (data.waitlist) {
                 const reference = data.reference || 'N/A';
                 showSuccessMessage(
-                    response.message || "You're on the waitlist for this departure.",
+                    response.message || __("You're on the waitlist for this departure.", 'yatra'),
                     reference,
                     {
-                        heading: "You're on the waitlist",
+                        heading: __("You're on the waitlist", 'yatra'),
                         iconColor: '#ca8a04',
                         footerHtml: '<p style="margin-top: 24px; color: #6b7280;">We will contact you if a space opens up.</p>'
                     }
@@ -866,7 +888,7 @@
                     document.removeEventListener('yatra_payment_cancelled', onCancelled);
                 };
                 const onFailed = (e) => {
-                    showFormError(e.detail?.error || 'Payment failed. Please try again.');
+                    showFormError(e.detail?.error || __('Payment failed. Please try again.', 'yatra'));
                     $submitBtn.prop('disabled', false).html(originalBtnHtml);
                     cleanup();
                 };
@@ -881,7 +903,7 @@
             
             // Default: show success message
             const reference = data.reference || 'N/A';
-            showSuccessMessage(response.message || 'Success!', reference);
+            showSuccessMessage(response.message || __('Success!', 'yatra'), reference);
         }
 
         // Form submission - using FormData API
@@ -1003,7 +1025,7 @@
             .then(response => handlePaymentResponse(response, originalBtnHtml))
             .catch(error => {
                 console.error('Error:', error);
-                showFormError('An error occurred. Please try again.');
+                showFormError(__('An error occurred. Please try again.', 'yatra'));
                 $submitBtn.prop('disabled', false).html(originalBtnHtml);
             });
         }
@@ -1048,12 +1070,12 @@
             const $message = $('#yatra-coupon-message');
             
             if (!code) {
-                showCouponMessage('Please enter a coupon code.', 'error');
+                showCouponMessage(__('Please enter a coupon code.', 'yatra'), 'error');
                 return;
             }
             
             // Show loading state
-            $btn.prop('disabled', true).text('Applying...');
+            $btn.prop('disabled', true).text(__('Applying...', 'yatra'));
             $message.hide();
             
             // Carry booking_token so the REST endpoint can rehydrate the
@@ -1076,7 +1098,7 @@
             })
             .then(response => response.json())
             .then(response => {
-                $btn.prop('disabled', false).text('Apply');
+                $btn.prop('disabled', false).text(__('Apply', 'yatra'));
                 
                 if (response.success) {
                     appliedCoupon = response.data;
@@ -1096,13 +1118,13 @@
                     
                     showCouponMessage(response.message, 'success');
                 } else {
-                    showCouponMessage(response.message || 'Invalid coupon code.', 'error');
+                    showCouponMessage(response.message || __('Invalid coupon code.', 'yatra'), 'error');
                 }
             })
             .catch(error => {
                 console.error('Coupon error:', error);
-                $btn.prop('disabled', false).text('Apply');
-                showCouponMessage('An error occurred. Please try again.', 'error');
+                $btn.prop('disabled', false).text(__('Apply', 'yatra'));
+                showCouponMessage(__('An error occurred. Please try again.', 'yatra'), 'error');
             });
         }
         
@@ -1534,7 +1556,7 @@
         .then(response => {
             if (response.success) {
                 $messageEl.removeClass('error').addClass('success');
-                $messageEl.text(response.message || 'Login successful! Redirecting...');
+                $messageEl.text(response.message || __('Login successful! Redirecting...', 'yatra'));
                 $messageEl.show();
                 
                 // Reload page to show booking form
@@ -1543,7 +1565,7 @@
                 }, 1000);
             } else {
                 $messageEl.removeClass('success').addClass('error');
-                $messageEl.html(response.message || 'Invalid credentials. Please try again.');
+                $messageEl.html(response.message || __('Invalid credentials. Please try again.', 'yatra'));
                 $messageEl.show();
                 
                 // If email needs verification, show resend option
@@ -1562,7 +1584,7 @@
         })
         .catch(function() {
             $messageEl.removeClass('success').addClass('error');
-            $messageEl.text('An error occurred. Please try again.');
+            $messageEl.text(__('An error occurred. Please try again.', 'yatra'));
             $messageEl.show();
             
             $btn.prop('disabled', false);
@@ -1585,7 +1607,7 @@
         }
         
         // Disable button and show loading
-        $btn.prop('disabled', true).text('Sending...');
+        $btn.prop('disabled', true).text(__('Sending...', 'yatra'));
         
         fetch(apiUrl + '/auth/resend-verification', {
             method: 'POST',
@@ -1607,20 +1629,20 @@
                 // Start countdown timer
                 startResendCountdown($btn, response.remaining_seconds);
                 $messageEl.removeClass('success').addClass('error');
-                $messageEl.text('Please wait before requesting another email.');
+                $messageEl.text(__('Please wait before requesting another email.', 'yatra'));
                 $messageEl.show();
             } else {
                 $messageEl.removeClass('success').addClass('error');
                 $messageEl.text(response.message);
                 $messageEl.show();
-                $btn.prop('disabled', false).text('Resend verification link');
+                $btn.prop('disabled', false).text(__('Resend verification link', 'yatra'));
             }
         })
         .catch(function() {
             $messageEl.removeClass('success').addClass('error');
-            $messageEl.text('An error occurred. Please try again.');
+            $messageEl.text(__('An error occurred. Please try again.', 'yatra'));
             $messageEl.show();
-            $btn.prop('disabled', false).text('Resend verification link');
+            $btn.prop('disabled', false).text(__('Resend verification link', 'yatra'));
         });
     });
 
@@ -1633,7 +1655,7 @@
             if (seconds <= 0) {
                 $btn.data('countdown-active', false);
                 $btn.prop('disabled', false);
-                $btn.html('Resend verification link');
+                $btn.html(__('Resend verification link', 'yatra'));
                 return;
             }
             
@@ -1668,7 +1690,7 @@
         
         if (password !== confirmPassword) {
             $messageEl.removeClass('success').addClass('error');
-            $messageEl.text('Passwords do not match.');
+            $messageEl.text(__('Passwords do not match.', 'yatra'));
             $messageEl.show();
             return;
         }
@@ -1702,7 +1724,7 @@
         .then(response => {
             if (response.success) {
                 $messageEl.removeClass('error').addClass('success');
-                $messageEl.text(response.message || 'Account created! Please check your email to verify.');
+                $messageEl.text(response.message || __('Account created! Please check your email to verify.', 'yatra'));
                 $messageEl.show();
                 
                 // Reset form
@@ -1726,7 +1748,7 @@
                         // Show info message on login tab
                         const $loginMessage = $('#yatra-login-message');
                         $loginMessage.removeClass('error').addClass('success');
-                        $loginMessage.text('Please check your email and click the verification link, then login here.');
+                        $loginMessage.text(__('Please check your email and click the verification link, then login here.', 'yatra'));
                         $loginMessage.show();
                     }, 3000);
                 } else {
@@ -1737,7 +1759,7 @@
                 }
             } else {
                 $messageEl.removeClass('success').addClass('error');
-                $messageEl.text(response.message || 'Registration failed. Please try again.');
+                $messageEl.text(response.message || __('Registration failed. Please try again.', 'yatra'));
                 $messageEl.show();
                 
                 $btn.prop('disabled', false);
@@ -1747,7 +1769,7 @@
         })
         .catch(function() {
             $messageEl.removeClass('success').addClass('error');
-            $messageEl.text('An error occurred. Please try again.');
+            $messageEl.text(__('An error occurred. Please try again.', 'yatra'));
             $messageEl.show();
             
             $btn.prop('disabled', false);
