@@ -24,6 +24,8 @@ import {
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { useNavigate } from "../hooks/useNavigate";
 import { Skeleton } from "../components/ui/skeleton";
+import { EnquiryReplyAffordance } from "../components/ai/EnquiryReplyAffordance";
+import { Sparkles } from "lucide-react";
 
 interface Enquiry {
   id: number;
@@ -73,6 +75,11 @@ const EnquiryForm: React.FC = () => {
     status: "new",
     response_notes: "",
   });
+  // Tracks whether the AI is currently drafting a reply so the banner
+  // above the textarea can show / hide. Lives in EnquiryForm (not in
+  // EnquiryReplyAffordance) so the textarea + banner can render side by
+  // side without the affordance owning the layout.
+  const [aiDrafting, setAiDrafting] = useState(false);
 
   // Get enquiry id from URL (null for create, number for edit)
   const enquiryId = useMemo(() => {
@@ -367,11 +374,37 @@ const EnquiryForm: React.FC = () => {
               {isEdit && (
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base">
-                      {__("Response Notes", "yatra")}
-                    </CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">
+                        {__("Response Notes", "yatra")}
+                      </CardTitle>
+                      {enquiryId && (
+                        <EnquiryReplyAffordance
+                          enquiryId={Number(enquiryId)}
+                          value={formData.response_notes || ""}
+                          onAccept={(text) =>
+                            handleChange("response_notes", text)
+                          }
+                          autoDraftOnMount={
+                            !(formData.response_notes || "").trim() &&
+                            (formData.status === "new" ||
+                              !formData.responded_at)
+                          }
+                          onDraftingChange={setAiDrafting}
+                        />
+                      )}
+                    </div>
                   </CardHeader>
                   <CardContent>
+                    {aiDrafting && (
+                      <div className="mb-2 flex items-center gap-2 rounded-md border border-purple-200 bg-purple-50/60 px-2 py-1 text-xs text-purple-700 dark:border-purple-500/40 dark:bg-purple-900/20 dark:text-purple-200">
+                        <Sparkles className="h-3.5 w-3.5 animate-pulse" />
+                        {__(
+                          "AI is drafting a reply based on this enquiry, the trip details, and the customer's history…",
+                          "yatra",
+                        )}
+                      </div>
+                    )}
                     <textarea
                       value={formData.response_notes || ""}
                       onChange={(e) =>
@@ -382,7 +415,7 @@ const EnquiryForm: React.FC = () => {
                         "yatra",
                       )}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                      rows={4}
+                      rows={6}
                     />
                   </CardContent>
                 </Card>

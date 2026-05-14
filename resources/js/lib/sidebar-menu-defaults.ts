@@ -115,6 +115,7 @@ export const DEFAULT_MENU_ITEMS: MenuItemDefault[] = [
   { slug: "dynamic-pricing", label: "Dynamic Pricing", iconName: "TrendingUp" },
   { slug: "modules", label: "Modules", iconName: "Puzzle" },
   { slug: "white-label", label: "White Label", iconName: "Crown" },
+  { slug: "ai-assistant", label: "AI Assistant", iconName: "Sparkles" },
   { slug: "license", label: "License", iconName: "Key" },
   { slug: "settings", label: "Settings", iconName: "Settings" },
 ];
@@ -193,6 +194,7 @@ export const SELECTABLE_ICON_NAMES = [
   "Puzzle",
   "RotateCcw",
   "Tools",
+  "Sparkles",
 ];
 
 export function readMenuOverrides(): MenuOverrides {

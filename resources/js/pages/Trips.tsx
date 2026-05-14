@@ -22,7 +22,10 @@ import {
   X,
   ArrowUpDown,
   RefreshCw,
+  Sparkles,
 } from "lucide-react";
+import { CreateTripWithAiWizard } from "../components/ai/CreateTripWithAiWizard";
+import { isAiEligible, isAiModuleEnabled } from "../lib/ai-availability";
 import { __ } from "../lib/i18n";
 import { usePermissions } from "../hooks/usePermissions";
 import { Button } from "../components/ui/button";
@@ -124,6 +127,7 @@ const Trips: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(1);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isAiWizardOpen, setIsAiWizardOpen] = useState(false);
   const [newTripTitle, setNewTripTitle] = useState("");
   const [createTripError, setCreateTripError] = useState<string | null>(null);
   const [newTripSlug, setNewTripSlug] = useState("");
@@ -501,12 +505,12 @@ const Trips: React.FC = () => {
     const typeMap: Record<string, { className: string; label: string }> = {
       single_day: {
         className:
-          "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400",
+          "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
         label: __("Single Day", "yatra"),
       },
       multi_day: {
         className:
-          "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400",
+          "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400",
         label: __("Multi-Day", "yatra"),
       },
       flexible: {
@@ -1247,7 +1251,7 @@ const Trips: React.FC = () => {
           );
         }
         return (
-          <Badge className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400">
+          <Badge className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
             {attrCount} {__("attributes", "yatra")}
           </Badge>
         );
@@ -1486,12 +1490,26 @@ const Trips: React.FC = () => {
                   {__("Refresh Data", "yatra")}
                 </Button>
               )}
+              {isAiEligible() && isAiModuleEnabled() && (
+                <Button
+                  type="button"
+                  onClick={() => setIsAiWizardOpen(true)}
+                  className="inline-flex items-center gap-2 whitespace-nowrap bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 hover:from-blue-700 hover:to-blue-800"
+                  title={__(
+                    "Have AI draft an entire trip — details, itinerary, SEO — from a few setup questions.",
+                    "yatra",
+                  )}
+                >
+                  <Sparkles className="h-4 w-4 shrink-0" />
+                  <span>{__("Add Trip with AI", "yatra")}</span>
+                </Button>
+              )}
               <Button
                 onClick={handleCreateTrip}
-                className="flex items-center gap-2"
+                className="inline-flex items-center gap-2 whitespace-nowrap"
               >
-                <Plus className="w-4 h-4" />
-                {__("Add New Trip", "yatra")}
+                <Plus className="h-4 w-4 shrink-0" />
+                <span>{__("Add New Trip", "yatra")}</span>
               </Button>
             </div>
           }
@@ -1811,6 +1829,13 @@ const Trips: React.FC = () => {
           )}
         </div>
       </Modal>
+
+      {/* AI: "Add Trip with AI" wizard — multi-step setup → generate →
+          review → save. Drafts an entire trip from a few seed questions. */}
+      <CreateTripWithAiWizard
+        open={isAiWizardOpen}
+        onClose={() => setIsAiWizardOpen(false)}
+      />
 
       {/* Permanent Delete Confirmation (for Trash only) */}
       <ConfirmationDialog

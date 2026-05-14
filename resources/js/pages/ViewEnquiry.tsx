@@ -30,6 +30,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { ConditionalRender } from "../components/ui/conditional-render";
+import { EnquiryReplyAffordance } from "../components/ai/EnquiryReplyAffordance";
 import { Badge } from "../components/ui/badge";
 import { useNavigate } from "../hooks/useNavigate";
 import { Skeleton } from "../components/ui/skeleton";
@@ -561,12 +562,27 @@ const ViewEnquiry: React.FC = () => {
               </div>
             </div>
 
-            {/* Response Message */}
+            {/* Response Message — label + AI sparkle on the same
+                row so the operator sees the "Generate with AI"
+                option right where they're about to type. Uses the
+                same EnquiryReplyAffordance component the admin
+                EnquiryForm uses, so behavior (Generate / Warmer /
+                Shorter variants, sensitive-data toggle) is identical
+                across the two surfaces. */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                {__("Your Response", "yatra")}{" "}
-                <span className="text-red-500">*</span>
-              </label>
+              <div className="mb-1.5 flex items-center justify-between gap-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {__("Your Response", "yatra")}{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                {enquiryId && (
+                  <EnquiryReplyAffordance
+                    enquiryId={Number(enquiryId)}
+                    value={responseMessage}
+                    onAccept={(text) => setResponseMessage(text)}
+                  />
+                )}
+              </div>
               <textarea
                 value={responseMessage}
                 onChange={(e) => setResponseMessage(e.target.value)}

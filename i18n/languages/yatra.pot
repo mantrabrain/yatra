@@ -9,58 +9,58 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-14T03:58:37+00:00\n"
+"POT-Creation-Date: 2026-05-14T15:05:22+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
 
-#: assets/admin/dist/js/app.js:36579
+#: assets/admin/dist/js/app.js:39887
 msgid "Failed to load reviews. Please try again."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36609
+#: assets/admin/dist/js/app.js:39917
 msgid "Select reviews to display as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36611
+#: assets/admin/dist/js/app.js:39919
 msgid "Save the trip first to select testimonials from reviews"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36616
+#: assets/admin/dist/js/app.js:39924
 #: templates/partials/single-trip/content-testimonials.php:15
 msgid "Testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36617
+#: assets/admin/dist/js/app.js:39925
 msgid "Select approved reviews to display as testimonials on the trip page"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36623
+#: assets/admin/dist/js/app.js:39931
 msgid "Loading reviews..."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36634
+#: assets/admin/dist/js/app.js:39942
 msgid "Retry"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36639
+#: assets/admin/dist/js/app.js:39947
 msgid "No approved reviews yet"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36640
+#: assets/admin/dist/js/app.js:39948
 msgid "Reviews will appear here once customers submit and they are approved"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36645
+#: assets/admin/dist/js/app.js:39953
 msgid "Select reviews to feature as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36654
+#: assets/admin/dist/js/app.js:39962
 #: templates/listing-trip.php:139
 msgid "Clear all"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:36692
+#: assets/admin/dist/js/app.js:40000
 msgid "Selected as testimonial"
 msgstr ""
 
@@ -469,8 +469,8 @@ msgstr ""
 #: assets/dist/js/account-page.js:1115
 #: app/Controllers/TripController.php:2392
 #: templates/booking-confirmation.php:371
-#: templates/partials/single-trip/content-sidebar.php:312
-#: templates/partials/single-trip/content-sidebar.php:428
+#: templates/partials/single-trip/content-sidebar.php:318
+#: templates/partials/single-trip/content-sidebar.php:434
 #: templates/partials/single-trip/enquiry-modal.php:61
 #: templates/pdf/itinerary.php:159
 msgid "Number of Travelers"
@@ -515,7 +515,7 @@ msgstr ""
 #: templates/partials/booking-content.php:665
 #: templates/partials/single-trip/content-itinerary.php:139
 #: templates/partials/single-trip/content-sidebar.php:80
-#: templates/partials/single-trip/content-sidebar.php:138
+#: templates/partials/single-trip/content-sidebar.php:144
 #: templates/single-activity.php:263
 #: templates/single-destination.php:263
 msgid "per person"
@@ -609,12 +609,12 @@ msgid "Special Requests"
 msgstr ""
 
 #: assets/dist/js/account-page.js:142
-#: assets/dist/js/index-Co3Z88uc.js:2162
+#: assets/dist/js/index-vVK1TTm7.js:2162
 #: app/Providers/FrontendAssetsProvider.php:712
 #: app/Providers/FrontendAssetsProvider.php:799
 #: includes/helpers.php:329
 #: templates/partials/single-trip/content-sidebar.php:89
-#: templates/partials/single-trip/content-sidebar.php:147
+#: templates/partials/single-trip/content-sidebar.php:153
 #: templates/partials/single-trip/similar-trips.php:266
 #: templates/trip-listing-card.php:431
 msgid "Contact for pricing"
@@ -712,7 +712,7 @@ msgstr ""
 #: templates/partials/booking-content.php:303
 #: templates/partials/remaining-checkout-content.php:84
 #: templates/partials/remaining-checkout-content.php:143
-#: templates/pdf/invoice.php:134
+#: templates/pdf/invoice.php:131
 #: templates/pdf/itinerary.php:176
 #: assets/dist/js/account-page.js:1108
 msgid "Travel Date"
@@ -848,7 +848,7 @@ msgstr ""
 
 #: assets/dist/js/account-page.js:2003
 #: app/Services/EmailTemplateDefaults.php:487
-#: templates/pdf/invoice.php:135
+#: templates/pdf/invoice.php:132
 msgid "Amount"
 msgstr ""
 
@@ -924,7 +924,7 @@ msgid "Voucher"
 msgstr ""
 
 #: assets/dist/js/account-page.js:2187
-#: templates/pdf/invoice.php:38
+#: templates/pdf/invoice.php:35
 #: assets/dist/js/account-page.js:2106
 msgid "Invoice"
 msgstr ""
@@ -1134,7 +1134,7 @@ msgstr ""
 #: assets/dist/js/account-page.js:2681
 #: templates/listing-activity.php:246
 #: templates/partials/single-trip/content-sidebar.php:75
-#: templates/partials/single-trip/content-sidebar.php:132
+#: templates/partials/single-trip/content-sidebar.php:138
 #: templates/partials/single-trip/similar-trips.php:252
 #: templates/shortcodes/activity.php:100
 #: templates/shortcodes/destination.php:92
@@ -1185,7 +1185,7 @@ msgstr ""
 #: app/Repositories/SavedTripRepository.php:263
 #: app/Repositories/TripRepository.php:3076
 #: includes/helpers.php:462
-#: includes/helpers.php:2086
+#: includes/helpers.php:2049
 #: templates/partials/single-trip/content-itinerary.php:121
 msgid "Flexible"
 msgstr ""
@@ -1229,7 +1229,7 @@ msgstr ""
 
 #. translators: %s = branded plugin name.
 #: assets/dist/js/account-page.js:2876
-#: app/Providers/AdminServiceProvider.php:529
+#: app/Providers/AdminServiceProvider.php:497
 msgid "Dashboard"
 msgstr ""
 
@@ -1471,12 +1471,12 @@ msgstr ""
 msgid "Could not resolve document link."
 msgstr ""
 
-#: assets/dist/js/index-Co3Z88uc.js:1009
+#: assets/dist/js/index-vVK1TTm7.js:1009
 #: templates/partials/single-trip/sticky-sidebar.php:253
 msgid "Close"
 msgstr ""
 
-#: assets/dist/js/index-Co3Z88uc.js:597
+#: assets/dist/js/index-vVK1TTm7.js:597
 msgctxt "text direction"
 msgid "ltr"
 msgstr ""
@@ -2112,6 +2112,7 @@ msgid "Booking received!"
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:1592
+#: templates/partials/single-trip/ai-chat-widget.php:545
 msgid "Booking confirmed!"
 msgstr ""
 
@@ -2639,21 +2640,26 @@ msgstr ""
 msgid "%s is available on the Yatra Pro Agency plan only. Upgrade your license to enable it."
 msgstr ""
 
-#: app/Controllers/ModuleController.php:150
+#: app/Controllers/ModuleController.php:144
+#, php-format
+msgid "%s requires a Growth or Agency license. Upgrade your plan to enable it."
+msgstr ""
+
+#: app/Controllers/ModuleController.php:163
 msgid "No module changes supplied."
 msgstr ""
 
-#: app/Controllers/ModuleController.php:211
+#: app/Controllers/ModuleController.php:231
 #, php-format
 msgid "The following modules require Yatra Pro: %s"
 msgstr ""
 
-#: app/Controllers/ModuleController.php:225
+#: app/Controllers/ModuleController.php:245
 #, php-format
 msgid "Some modules were skipped because they require Yatra Pro: %s"
 msgstr ""
 
-#: app/Controllers/ModuleController.php:232
+#: app/Controllers/ModuleController.php:252
 msgid "No valid module changes supplied."
 msgstr ""
 
@@ -3355,14 +3361,6 @@ msgstr ""
 msgid "Local snapshots removed."
 msgstr ""
 
-#: app/Controllers/WhiteLabelController.php:63
-msgid "White Label settings can only be saved on an Agency Yearly or Agency Lifetime license."
-msgstr ""
-
-#: app/Controllers/WhiteLabelController.php:76
-msgid "White Label settings updated."
-msgstr ""
-
 #: app/Core/Handlers/AccountPageHandler.php:46
 #: app/Providers/FrontendAssetsProvider.php:778
 #: app/Shortcodes/LoginShortcode.php:151
@@ -3561,6 +3559,18 @@ msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:255
 msgid "Agency"
+msgstr ""
+
+#: app/Core/Modules/ModuleManager.php:269
+msgid "AI Assistant"
+msgstr ""
+
+#: app/Core/Modules/ModuleManager.php:270
+msgid "Generate trip descriptions, itineraries, SEO meta, and email copy without leaving the editor. Inline AI affordances on every long-text field — write less, finish more. Bring your own OpenAI or Anthropic key."
+msgstr ""
+
+#: app/Core/Modules/ModuleManager.php:271
+msgid "Productivity"
 msgstr ""
 
 #: app/Helpers/FormatHelper.php:245
@@ -3984,9 +3994,9 @@ msgstr ""
 msgid "Payment gateway is not available"
 msgstr ""
 
-#: app/Providers/AdminServiceProvider.php:287
-#: app/Providers/AdminServiceProvider.php:469
-#: app/Providers/AdminServiceProvider.php:472
+#: app/Providers/AdminServiceProvider.php:285
+#: app/Providers/AdminServiceProvider.php:437
+#: app/Providers/AdminServiceProvider.php:440
 #: app/Services/NoticeService.php:177
 #: app/Services/NoticeService.php:483
 #: core/Premium.php:232
@@ -3997,41 +4007,41 @@ msgid "Upgrade to Pro"
 msgstr ""
 
 #. translators: %s: plugin version number.
-#: app/Providers/AdminServiceProvider.php:324
+#: app/Providers/AdminServiceProvider.php:322
 #, php-format
 msgid "Version %s"
 msgstr ""
 
 #. translators: %s: linked author name (HTML).
-#: app/Providers/AdminServiceProvider.php:331
+#: app/Providers/AdminServiceProvider.php:329
 #, php-format
 msgid "By %s"
 msgstr ""
 
-#: app/Providers/AdminServiceProvider.php:341
+#: app/Providers/AdminServiceProvider.php:339
 msgid "View details"
 msgstr ""
 
-#: app/Providers/AdminServiceProvider.php:348
+#: app/Providers/AdminServiceProvider.php:346
 #: core/Premium.php:226
 msgid "Support"
 msgstr ""
 
-#: app/Providers/AdminServiceProvider.php:354
+#: app/Providers/AdminServiceProvider.php:352
 msgid "Plugin Homepage"
 msgstr ""
 
-#: app/Providers/AdminServiceProvider.php:361
+#: app/Providers/AdminServiceProvider.php:359
 #: app/Providers/FrontendAssetsProvider.php:815
 msgid "Contact"
 msgstr ""
 
-#: app/Providers/AdminServiceProvider.php:367
+#: app/Providers/AdminServiceProvider.php:365
 msgid "Rate the plugin"
 msgstr ""
 
 #. translators: %s = branded plugin name.
-#: app/Providers/AdminServiceProvider.php:528
+#: app/Providers/AdminServiceProvider.php:496
 #, php-format
 msgid "%s Dashboard"
 msgstr ""
@@ -4173,12 +4183,12 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: app/Repositories/TripRepository.php:3074
-#: includes/helpers.php:2084
+#: includes/helpers.php:2047
 msgid "Single day"
 msgstr ""
 
 #: app/Repositories/TripRepository.php:3075
-#: includes/helpers.php:2085
+#: includes/helpers.php:2048
 msgid "Multi-day"
 msgstr ""
 
@@ -4519,15 +4529,15 @@ msgstr ""
 msgid "Minimum amount of %s required for this coupon."
 msgstr ""
 
-#: app/Services/EmailService.php:216
+#: app/Services/EmailService.php:190
 msgid "Please configure all SMTP settings first."
 msgstr ""
 
-#: app/Services/EmailService.php:237
+#: app/Services/EmailService.php:211
 msgid "SMTP connection successful!"
 msgstr ""
 
-#: app/Services/EmailService.php:243
+#: app/Services/EmailService.php:217
 #, php-format
 msgid "SMTP connection failed: %s"
 msgstr ""
@@ -4575,6 +4585,7 @@ msgstr ""
 #: app/Services/EmailTemplateDefaults.php:564
 #: app/Services/TransactionalEmailTemplateService.php:439
 #: templates/partials/availability-card.php:499
+#: templates/partials/single-trip/ai-chat-widget.php:543
 msgid "Total"
 msgstr ""
 
@@ -6516,7 +6527,7 @@ msgid "Rest"
 msgstr ""
 
 #. translators: 1–2: range, 3: total, 4: item type, 5–6: pagination
-#: includes/helpers.php:1553
+#: includes/helpers.php:1516
 #, php-format
 msgid "Showing %1$d–%2$d of %3$d %4$s (page %5$d of %6$d)"
 msgstr ""
@@ -7330,7 +7341,7 @@ msgid "Flexible dates"
 msgstr ""
 
 #: templates/partials/availability-section.php:123
-#: templates/partials/single-trip/content-sidebar.php:457
+#: templates/partials/single-trip/content-sidebar.php:463
 #: templates/partials/single-trip/enquiry-modal.php:10
 msgid "Make Enquiry"
 msgstr ""
@@ -7839,6 +7850,115 @@ msgstr ""
 msgid "Access travel documents inside your account"
 msgstr ""
 
+#: templates/partials/single-trip/ai-chat-widget.php:99
+#, php-format
+msgid "Trip #%d"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:116
+msgid "Ask AI about this trip"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:117
+msgid "AI"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:137
+msgid "Trip Assistant"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:141
+#, php-format
+msgid "Online · ask about %s"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:145
+msgid "Close chat"
+msgstr ""
+
+#. translators: %s = trip name
+#: templates/partials/single-trip/ai-chat-widget.php:156
+#, php-format
+msgid "Hi! I can help with questions about %s — itinerary, what to pack, difficulty, best season. For bookings or quotes, please use the enquiry button above."
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:165
+msgid "What's included?"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:166
+msgid "What should I pack?"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:167
+msgid "Is it kid-friendly?"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:168
+msgid "Best season to go?"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:191
+msgid "Type your question…"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:196
+msgid "Send message"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:204
+msgid "AI replies may have inaccuracies. Confirm details via enquiry."
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:534
+msgid "Thinking…"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:535
+msgid "Chat failed. Please try again."
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:536
+msgid "No reply received."
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:537
+msgid "Network error. Please try again."
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:538
+msgid "Price summary"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:539
+#: templates/pdf/invoice.php:151
+msgid "Subtotal"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:540
+msgid "Group discount"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:541
+msgid "Coupon"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:542
+msgid "Taxes"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:544
+msgid "Due now"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:546
+msgid "Reference:"
+msgstr ""
+
+#: templates/partials/single-trip/ai-chat-widget.php:547
+msgid "View confirmation"
+msgstr ""
+
 #: templates/partials/single-trip/content-custom.php:19
 msgid "Section"
 msgstr ""
@@ -8084,7 +8204,7 @@ msgid "Time:"
 msgstr ""
 
 #: templates/partials/single-trip/content-location.php:91
-#: templates/pdf/invoice.php:132
+#: templates/pdf/invoice.php:129
 msgid "Description"
 msgstr ""
 
@@ -8126,63 +8246,63 @@ msgstr ""
 msgid "Send Enquiry"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:244
+#: templates/partials/single-trip/content-sidebar.php:250
 #, php-format
 msgid "%d departure available"
 msgid_plural "%d departures available"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/partials/single-trip/content-sidebar.php:262
-#: templates/partials/single-trip/content-sidebar.php:376
+#: templates/partials/single-trip/content-sidebar.php:268
+#: templates/partials/single-trip/content-sidebar.php:382
 msgid "Select a departure date"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:275
-#: templates/partials/single-trip/content-sidebar.php:389
+#: templates/partials/single-trip/content-sidebar.php:281
+#: templates/partials/single-trip/content-sidebar.php:395
 #: templates/partials/single-trip/enquiry-modal.php:53
 #: templates/partials/single-trip/sticky-sidebar.php:132
 #: templates/partials/single-trip/sticky-sidebar.php:141
 msgid "Select date"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:332
+#: templates/partials/single-trip/content-sidebar.php:338
 msgid "Flexible booking available"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:338
+#: templates/partials/single-trip/content-sidebar.php:344
 #, php-format
 msgid "Available: %s - %s"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:343
+#: templates/partials/single-trip/content-sidebar.php:349
 #, php-format
 msgid "Available from: %s"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:347
+#: templates/partials/single-trip/content-sidebar.php:353
 #, php-format
 msgid "Available until: %s"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:450
+#: templates/partials/single-trip/content-sidebar.php:456
 msgid "Check Availability"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:478
+#: templates/partials/single-trip/content-sidebar.php:488
 #, php-format
 msgid "Free cancellation up to %d %s%s before"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:484
+#: templates/partials/single-trip/content-sidebar.php:494
 msgid "Free cancellation"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:488
+#: templates/partials/single-trip/content-sidebar.php:498
 msgid "Cancellation policy applies"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:492
+#: templates/partials/single-trip/content-sidebar.php:502
 msgid "Cancellation policy may apply"
 msgstr ""
 
@@ -8684,63 +8804,59 @@ msgstr ""
 msgid "This document is generated electronically and is valid without a handwritten signature."
 msgstr ""
 
-#: templates/pdf/invoice.php:83
+#: templates/pdf/invoice.php:80
 msgid "Payment Invoice"
 msgstr ""
 
-#: templates/pdf/invoice.php:92
+#: templates/pdf/invoice.php:89
 msgid "Invoice To"
 msgstr ""
 
-#: templates/pdf/invoice.php:97
+#: templates/pdf/invoice.php:94
 msgid "Invoice Details"
 msgstr ""
 
-#: templates/pdf/invoice.php:100
+#: templates/pdf/invoice.php:97
 msgid "Invoice #:"
 msgstr ""
 
-#: templates/pdf/invoice.php:104
+#: templates/pdf/invoice.php:101
 #: templates/pdf/voucher.php:117
 msgid "Date:"
 msgstr ""
 
-#: templates/pdf/invoice.php:108
+#: templates/pdf/invoice.php:105
 #: templates/pdf/voucher.php:121
 msgid "Status:"
 msgstr ""
 
-#: templates/pdf/invoice.php:114
+#: templates/pdf/invoice.php:111
 #: templates/pdf/voucher.php:127
 msgid "Company"
 msgstr ""
 
-#: templates/pdf/invoice.php:133
+#: templates/pdf/invoice.php:130
 msgid "Booking Ref"
 msgstr ""
 
-#: templates/pdf/invoice.php:142
+#: templates/pdf/invoice.php:139
 msgid "Payment via"
 msgstr ""
 
-#: templates/pdf/invoice.php:154
-msgid "Subtotal"
-msgstr ""
-
-#: templates/pdf/invoice.php:165
+#: templates/pdf/invoice.php:162
 msgid "Booking Total"
 msgstr ""
 
-#: templates/pdf/invoice.php:169
+#: templates/pdf/invoice.php:166
 msgid "Total Paid"
 msgstr ""
 
-#: templates/pdf/invoice.php:173
+#: templates/pdf/invoice.php:170
 #: templates/pdf/voucher.php:190
 msgid "Balance Due"
 msgstr ""
 
-#: templates/pdf/invoice.php:177
+#: templates/pdf/invoice.php:174
 msgid "This Payment"
 msgstr ""
 

@@ -40,6 +40,7 @@ import {
 import { getErrorContext } from "../lib/errors";
 import { Modal } from "../components/ui/modal";
 import { useToast } from "../components/ui/toast";
+import { EnquiryReplyAffordance } from "../components/ai/EnquiryReplyAffordance";
 
 interface Enquiry {
   id: number;
@@ -960,12 +961,26 @@ const Enquiries: React.FC = () => {
               </div>
             </div>
 
-            {/* Response Message */}
+            {/* Response Message — label + AI sparkle on the same
+                row. Same EnquiryReplyAffordance the back-office
+                EnquiryForm / ViewEnquiry use, so generate /
+                warmer / shorter variants + the sensitive-data
+                toggle behave identically across every enquiry-
+                response surface. */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                {__("Your Response", "yatra")}{" "}
-                <span className="text-red-500">*</span>
-              </label>
+              <div className="mb-1.5 flex items-center justify-between gap-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {__("Your Response", "yatra")}{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                {selectedEnquiry?.id && (
+                  <EnquiryReplyAffordance
+                    enquiryId={Number(selectedEnquiry.id)}
+                    value={responseMessage}
+                    onAccept={(text) => setResponseMessage(text)}
+                  />
+                )}
+              </div>
               <textarea
                 value={responseMessage}
                 onChange={(e) => setResponseMessage(e.target.value)}

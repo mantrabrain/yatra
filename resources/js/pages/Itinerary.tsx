@@ -35,6 +35,9 @@ import {
   type IconSelectorProvider,
 } from "../components/ui/icon-selector";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
+import { BuildItineraryModal } from "../components/ai/BuildItineraryModal";
+import { isAiEligible, isAiModuleEnabled } from "../lib/ai-availability";
+import { Sparkles } from "lucide-react";
 import { BulkActionToolbar } from "../components/shared/BulkActionToolbar";
 import { getErrorContext } from "../lib/errors";
 
@@ -133,6 +136,10 @@ const Itinerary: React.FC = () => {
     : "";
 
   const [tripFilter, setTripFilter] = useState(tripIdParam || storedTripId);
+  // AI: standalone "Build Itinerary with AI" modal — only used when a
+  // trip is selected. State lives here so the toast + invalidation can
+  // be wired through this page's existing react-query setup.
+  const [aiModalOpen, setAiModalOpen] = useState(false);
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
   const [selectedEmptyDays, setSelectedEmptyDays] = useState<Set<string>>(
     new Set(),
@@ -1489,7 +1496,7 @@ const Itinerary: React.FC = () => {
       </div>
 
       {/* Trip Selector - Clean Design */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-blue-200 dark:border-gray-700 p-6 mb-6">
+      <div className="bg-gradient-to-r from-blue-50 to-blue-50 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-blue-200 dark:border-gray-700 p-6 mb-4">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
@@ -1556,8 +1563,8 @@ const Itinerary: React.FC = () => {
                     <Badge
                       className={
                         selectedTrip.trip_type === "single_day"
-                          ? "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400"
-                          : "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400"
+                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
+                          : "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400"
                       }
                     >
                       {selectedTrip.trip_type === "single_day"
@@ -1606,14 +1613,28 @@ const Itinerary: React.FC = () => {
             : __("Add Day", "yatra");
 
           return (
-            <div className="flex justify-end mt-4">
+            <div className="mb-3 flex flex-wrap items-center justify-end gap-3">
               <ConditionalRender capability="yatra_edit_trips">
+                {!isSingleDay && isAiEligible() && isAiModuleEnabled() && (
+                  <Button
+                    type="button"
+                    onClick={() => setAiModalOpen(true)}
+                    className="mr-1 inline-flex items-center gap-2 whitespace-nowrap bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 hover:from-blue-700 hover:to-blue-800"
+                    title={__(
+                      "Generate a day-by-day itinerary using AI, grounded in this trip's facts.",
+                      "yatra",
+                    )}
+                  >
+                    <Sparkles className="h-4 w-4 shrink-0" />
+                    <span>{__("Build with AI", "yatra")}</span>
+                  </Button>
+                )}
                 <Button
                   onClick={handleAddDay}
-                  className="flex items-center gap-2 bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                  className="inline-flex items-center gap-2 whitespace-nowrap bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
                 >
-                  <Plus className="w-4 h-4" />
-                  {buttonLabel}
+                  <Plus className="h-4 w-4 shrink-0" />
+                  <span>{buttonLabel}</span>
                 </Button>
               </ConditionalRender>
             </div>
@@ -1902,7 +1923,7 @@ const Itinerary: React.FC = () => {
                   <div
                     key={key}
                     data-day-key={key}
-                    className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-blue-200 dark:border-gray-700 mb-4 overflow-visible"
+                    className="bg-gradient-to-r from-blue-50 to-blue-50 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-blue-200 dark:border-gray-700 mb-4 overflow-visible"
                   >
                     {/* Day Header */}
                     <div className="flex items-center gap-4 px-4 py-3 rounded-t-lg">
@@ -2599,6 +2620,37 @@ const Itinerary: React.FC = () => {
         variant="danger"
         isLoading={deleteMutation.isPending}
       />
+      {/* AI: Build Itinerary modal — only meaningful when a trip is
+          selected. Mounting unconditionally so a future "open from URL"
+          deep-link works, but the body refuses to operate if tripFilter
+          is empty. */}
+      {tripFilter &&
+        (() => {
+          const selectedTrip = tripsData?.find(
+            (t: any) => String(t.id) === String(tripFilter),
+          );
+          const duration = Number(selectedTrip?.duration_days ?? 0);
+          return (
+            <BuildItineraryModal
+              open={aiModalOpen}
+              onClose={() => setAiModalOpen(false)}
+              tripId={Number(tripFilter)}
+              tripName={
+                ((selectedTrip?.title as string) ||
+                  (selectedTrip?.name as string) ||
+                  __("Selected trip", "yatra"))
+              }
+              tripDurationDays={Number.isFinite(duration) ? duration : 0}
+              onApplied={({ message }) => {
+                showToast(message, "success");
+                queryClient.invalidateQueries({ queryKey: ["itinerary"] });
+                queryClient.invalidateQueries({
+                  queryKey: ["trips-with-itinerary-meta"],
+                });
+              }}
+            />
+          );
+        })()}
     </div>
   );
 };

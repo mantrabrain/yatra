@@ -34,6 +34,7 @@ const sanitizeTextForSEO = (text: string, maxLength: number = 160): string => {
 };
 import {
   Save,
+  Send,
   Loader2,
   Sparkles,
   Calendar,
@@ -74,6 +75,10 @@ import {
 } from "lucide-react";
 import { RichTextEditor } from "../components/ui/rich-text-editor";
 import { IconPicker, IconPickerValue } from "../components/ui/icon-picker";
+import { AiFieldAffordance } from "../components/ai/AiFieldAffordance";
+import { AutoFillTripModal } from "../components/ai/AutoFillTripModal";
+import { BuildItineraryModal } from "../components/ai/BuildItineraryModal";
+import { isAiEligible, isAiModuleEnabled } from "../lib/ai-availability";
 import { __, sprintf } from "../lib/i18n";
 import { MEAL_PLAN_SELECT_OPTIONS } from "../lib/meal-plan-labels";
 import { usePermissions } from "../hooks/usePermissions";
@@ -269,6 +274,67 @@ interface TimeSlot {
   id: string;
   time: string; // HH:MM format
   label: string;
+}
+
+/**
+ * Pull a context payload out of the live formData for AI generation
+ * calls. Kept narrow on purpose — fewer tokens, no PII, and only the
+ * fields the prompt templates actually reference. Helpers stay free of
+ * React state so AiFieldAffordance's `buildContext` callback can be
+ * invoked from anywhere without re-deriving form deps.
+ */
+function buildTripAiContext(formData: any): Record<string, unknown> {
+  const amenityTitles = (items: any[] | undefined): string[] =>
+    Array.isArray(items)
+      ? items
+          .map((it) => (typeof it === "string" ? it : it?.title || it?.label))
+          .filter((s): s is string => typeof s === "string" && s.trim() !== "")
+      : [];
+
+  return {
+    name: formData?.title ?? "",
+    short_description: formData?.short_description ?? "",
+    description: stripHtml(formData?.description ?? ""),
+    destinations: namesFromIds(formData?.destinations),
+    categories: namesFromIds(formData?.categories),
+    activities: namesFromIds(formData?.activities),
+    difficulty_level: formData?.difficulty_level ?? "",
+    duration_days: formData?.duration_days ?? "",
+    duration_nights: formData?.duration_nights ?? "",
+    best_season: formData?.best_season ?? "",
+    price: formData?.price ?? "",
+    deposit_percentage: formData?.deposit_percentage ?? "",
+    booking_deadline_hours: formData?.booking_deadline_hours ?? "",
+    age_min: formData?.age_min ?? "",
+    age_max: formData?.age_max ?? "",
+    accommodation_type: formData?.accommodation_type ?? "",
+    transportation_included: formData?.transportation_included ?? "",
+    included_items: amenityTitles(formData?.included_items),
+    excluded_items: amenityTitles(formData?.excluded_items),
+  };
+}
+
+function stripHtml(value: string): string {
+  if (!value) return "";
+  return value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Best-effort name resolution for taxonomy fields. The form stores IDs
+ *  in some places and objects in others; we accept either. */
+function namesFromIds(value: any): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => {
+      if (typeof item === "string") return item;
+      if (item && typeof item === "object") {
+        return item.name || item.label || item.title || "";
+      }
+      return "";
+    })
+    .filter((s): s is string => typeof s === "string" && s.trim() !== "");
 }
 
 interface TripFormData {
@@ -494,6 +560,17 @@ const TripForm: React.FC = () => {
   // Downloads is now a FREE feature - always show the UI
   const showDownloadsUI = true;
 
+  // AI Assistant — modal state for the "Auto-fill" / "Generate itinerary"
+  // workflows. `aiModalMode` controls which preset the modal opens with.
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [aiModalMode, setAiModalMode] = useState<"all" | "itinerary">("all");
+  // Itinerary-builder modal is the SAME component the standalone
+  // Itinerary page uses. Going through it (instead of
+  // AutoFillTripModal's itineraryOnly mode) means all three entry
+  // points for "build itinerary with AI" — wizard, this trip-form
+  // tab, and the Itinerary page — converge on the same agent +
+  // applyItinerary persistence path.
+  const [itineraryBuildOpen, setItineraryBuildOpen] = useState(false);
   const [featuredImagePreview, setFeaturedImagePreview] = useState<string>("");
   const [isResolvingFeaturedImage, setIsResolvingFeaturedImage] =
     useState<boolean>(false);
@@ -4070,7 +4147,7 @@ const TripForm: React.FC = () => {
               {/* Short Description */}
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                  <label className="text-xs font-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
                     {__("Short Description", "yatra")}
                     <Badge
                       variant="outline"
@@ -4080,7 +4157,7 @@ const TripForm: React.FC = () => {
                     </Badge>
                     <button
                       type="button"
-                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 ml-auto"
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                       title={__(
                         "A brief summary that appears in listings. Recommended: 100-150 characters for best results.",
                         "yatra",
@@ -4089,20 +4166,31 @@ const TripForm: React.FC = () => {
                       <HelpCircle className="w-3.5 h-3.5" />
                     </button>
                   </label>
-                  <span
-                    className={`text-xs font-medium ${
-                      formData.short_description.length > 200
-                        ? "text-red-600 dark:text-red-400"
-                        : formData.short_description.length >= 100 &&
-                            formData.short_description.length <= 150
-                          ? "text-green-600 dark:text-green-400"
-                          : formData.short_description.length > 0
-                            ? "text-yellow-600 dark:text-yellow-400"
-                            : "text-gray-500 dark:text-gray-400"
-                    }`}
-                  >
-                    {formData.short_description.length}/200
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`text-xs font-medium ${
+                        formData.short_description.length > 200
+                          ? "text-red-600 dark:text-red-400"
+                          : formData.short_description.length >= 100 &&
+                              formData.short_description.length <= 150
+                            ? "text-green-600 dark:text-green-400"
+                            : formData.short_description.length > 0
+                              ? "text-yellow-600 dark:text-yellow-400"
+                              : "text-gray-500 dark:text-gray-400"
+                      }`}
+                    >
+                      {formData.short_description.length}/200
+                    </span>
+                    <AiFieldAffordance
+                      task="trip-short-description"
+                      label={__("Short Description", "yatra")}
+                      value={formData.short_description}
+                      onAccept={(v) =>
+                        handleFieldChange("short_description", v)
+                      }
+                      buildContext={() => buildTripAiContext(formData)}
+                    />
+                  </div>
                 </div>
                 <HelpText
                   text={__(
@@ -4136,15 +4224,24 @@ const TripForm: React.FC = () => {
 
               {/* Tour Description */}
               <div className="mb-4">
-                <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1.5">
-                  {__("Trip Description", "yatra")}
-                  <Badge
-                    variant="outline"
-                    className="ml-1 text-[10px] px-1.5 py-0 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800"
-                  >
-                    {__("Recommended", "yatra")}
-                  </Badge>
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                    {__("Trip Description", "yatra")}
+                    <Badge
+                      variant="outline"
+                      className="ml-1 text-[10px] px-1.5 py-0 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800"
+                    >
+                      {__("Recommended", "yatra")}
+                    </Badge>
+                  </label>
+                  <AiFieldAffordance
+                    task="trip-description"
+                    label={__("Description", "yatra")}
+                    value={formData.description}
+                    onAccept={(v) => handleFieldChange("description", v)}
+                    buildContext={() => buildTripAiContext(formData)}
+                  />
+                </div>
                 <HelpText
                   text={__(
                     "💡 Tell travelers what makes your trip special! Describe the experience, highlights, and what they'll see. Write 2-4 paragraphs. Be enthusiastic and detailed!",
@@ -4284,13 +4381,36 @@ const TripForm: React.FC = () => {
               {/* Trip Highlights */}
               <Card className="mt-6">
                 <CardHeader>
-                  <CardTitle>{__("Trip Highlights", "yatra")}</CardTitle>
-                  <CardDescription>
-                    {__(
-                      "Add key highlights that make your trip special. These will be displayed prominently on your trip page.",
-                      "yatra",
-                    )}
-                  </CardDescription>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <CardTitle>{__("Trip Highlights", "yatra")}</CardTitle>
+                      <CardDescription>
+                        {__(
+                          "Add key highlights that make your trip special. These will be displayed prominently on your trip page.",
+                          "yatra",
+                        )}
+                      </CardDescription>
+                    </div>
+                    {/* AI: generates 5-7 highlight strings. The
+                        affordance hands back a multi-line string;
+                        we split into the highlights array shape
+                        TripForm stores. */}
+                    <AiFieldAffordance
+                      task="trip-highlights"
+                      label={__("Highlights", "yatra")}
+                      value={(formData.highlights ?? []).join("\n")}
+                      onAccept={(raw) => {
+                        const list = raw
+                          .split(/\r?\n/)
+                          .map((l) =>
+                            l.replace(/^[\s\-\*•·●]+/, "").trim(),
+                          )
+                          .filter((l) => l !== "");
+                        handleFieldChange("highlights", list as any);
+                      }}
+                      buildContext={() => buildTripAiContext(formData)}
+                    />
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {formData.highlights.length > 0 ? (
@@ -5918,9 +6038,20 @@ const TripForm: React.FC = () => {
 
                   {/* Cancellation Policy */}
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
-                      {__("Cancellation Policy", "yatra")}
-                    </h4>
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                        {__("Cancellation Policy", "yatra")}
+                      </h4>
+                      <AiFieldAffordance
+                        task="trip-cancellation-policy"
+                        label={__("Cancellation Policy", "yatra")}
+                        value={formData.cancellation_policy}
+                        onAccept={(v) =>
+                          handleFieldChange("cancellation_policy", v)
+                        }
+                        buildContext={() => buildTripAiContext(formData)}
+                      />
+                    </div>
                     <textarea
                       id="cancellation_policy"
                       value={formData.cancellation_policy}
@@ -7857,11 +7988,47 @@ const TripForm: React.FC = () => {
             {/* Tab Content */}
             <div className="mt-6">
               {tripDetailsTab === "itinerary" && (
-                <ItinerarySection
-                  formData={formData as any}
-                  isEditMode={isEditMode}
-                  tripId={tripId}
-                />
+                <>
+                  {isAiEligible() && isAiModuleEnabled() && (
+                    <div className="mb-4 flex items-center justify-between rounded-md border border-blue-200 bg-blue-50/40 px-3 py-2 dark:border-blue-500/40 dark:bg-blue-900/20">
+                      <div className="text-xs text-blue-900 dark:text-blue-200">
+                        <Sparkles className="mr-1 inline h-3.5 w-3.5" />
+                        {isEditMode
+                          ? __(
+                              "Let AI draft a day-by-day plan with real activity blocks — you can edit each day after.",
+                              "yatra",
+                            )
+                          : __(
+                              "Save the trip first to enable AI itinerary generation — the agent needs a trip ID to attach days to.",
+                              "yatra",
+                            )}
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="border-blue-300 text-blue-700 hover:bg-blue-100 dark:border-blue-500/60 dark:text-blue-200"
+                        disabled={!isEditMode || !tripId}
+                        onClick={() => {
+                          // Same modal the Itinerary page uses, so all
+                          // three entry points share one agent + one
+                          // persistence path.
+                          if (isEditMode && tripId) {
+                            setItineraryBuildOpen(true);
+                          }
+                        }}
+                      >
+                        <Sparkles className="mr-1 h-3.5 w-3.5" />
+                        {__("Build with AI", "yatra")}
+                      </Button>
+                    </div>
+                  )}
+                  <ItinerarySection
+                    formData={formData as any}
+                    isEditMode={isEditMode}
+                    tripId={tripId}
+                  />
+                </>
               )}
               {tripDetailsTab === "included" && (
                 <IncludedSection
@@ -7921,12 +8088,26 @@ const TripForm: React.FC = () => {
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <label
-                      htmlFor="meta_title"
-                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                    >
-                      {__("Meta Title", "yatra")}
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label
+                        htmlFor="meta_title"
+                        className="block text-xs font-normal text-gray-500 dark:text-gray-400"
+                      >
+                        {__("Meta Title", "yatra")}
+                      </label>
+                      <AiFieldAffordance
+                        task="seo-meta-title"
+                        label={__("Meta Title", "yatra")}
+                        value={formData.meta_title}
+                        onAccept={(v) =>
+                          handleFieldChange(
+                            "meta_title",
+                            v.slice(0, 60),
+                          )
+                        }
+                        buildContext={() => buildTripAiContext(formData)}
+                      />
+                    </div>
                     <Input
                       id="meta_title"
                       type="text"
@@ -7946,12 +8127,26 @@ const TripForm: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label
-                      htmlFor="meta_description"
-                      className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                    >
-                      {__("Meta Description", "yatra")}
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label
+                        htmlFor="meta_description"
+                        className="block text-xs font-normal text-gray-500 dark:text-gray-400"
+                      >
+                        {__("Meta Description", "yatra")}
+                      </label>
+                      <AiFieldAffordance
+                        task="seo-meta-description"
+                        label={__("Meta Description", "yatra")}
+                        value={formData.meta_description}
+                        onAccept={(v) =>
+                          handleFieldChange(
+                            "meta_description",
+                            v.slice(0, 160),
+                          )
+                        }
+                        buildContext={() => buildTripAiContext(formData)}
+                      />
+                    </div>
                     <textarea
                       id="meta_description"
                       value={formData.meta_description}
@@ -8047,10 +8242,45 @@ const TripForm: React.FC = () => {
 
               {/* SECTION 2: FAQs */}
               <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                  <HelpCircle className="w-4 h-4 text-blue-500" />
-                  {__("Frequently Asked Questions", "yatra")}
-                </h3>
+                <div className="mb-4 flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <HelpCircle className="w-4 h-4 text-blue-500" />
+                    {__("Frequently Asked Questions", "yatra")}
+                  </h3>
+                  {/* AI: generates 5-7 Q&A pairs. Result text is
+                      parsed from "Q: …\nA: …" blocks separated by
+                      blank lines — same shape as the trip-faq
+                      prompt's documented output. Accept replaces
+                      the existing FAQ list wholesale. */}
+                  <AiFieldAffordance
+                    task="trip-faq"
+                    label={__("FAQ", "yatra")}
+                    value={(formData.faqs ?? [])
+                      .map((f: any) => `Q: ${f.question}\nA: ${f.answer}`)
+                      .join("\n\n")}
+                    onAccept={(raw) => {
+                      const parsed: Array<{
+                        question: string;
+                        answer: string;
+                      }> = [];
+                      const blocks = raw.replace(/\r\n?/g, "\n").split(/\n{2,}/);
+                      for (const block of blocks) {
+                        const q = block.match(/^\s*Q[:\.\-]\s*(.+)/im);
+                        const a = block.match(/A[:\.\-]\s*([\s\S]+)/im);
+                        if (q) {
+                          parsed.push({
+                            question: q[1].trim(),
+                            answer: a ? a[1].trim() : "",
+                          });
+                        }
+                      }
+                      if (parsed.length > 0) {
+                        handleFieldChange("faqs", parsed as any);
+                      }
+                    }}
+                    buildContext={() => buildTripAiContext(formData)}
+                  />
+                </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
                   {__(
                     "Answer common questions to build trust and reduce support inquiries. FAQs also help with SEO.",
@@ -8662,6 +8892,23 @@ const TripForm: React.FC = () => {
               {__("Revisions", "yatra")}
             </Button>
           )}
+          {isAiEligible() && isAiModuleEnabled() && (
+            <Button
+              type="button"
+              onClick={() => {
+                setAiModalMode("all");
+                setAiModalOpen(true);
+              }}
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-0 hover:from-purple-700 hover:to-indigo-700"
+              title={__(
+                "Generate description, itinerary, included items, SEO meta, and more — from this trip's facts.",
+                "yatra",
+              )}
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              {__("Auto-fill with AI", "yatra")}
+            </Button>
+          )}
           <Button
             variant="outline"
             onClick={handlePreview}
@@ -8692,7 +8939,12 @@ const TripForm: React.FC = () => {
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 mr-2" />
+                  {/* Send icon (paper-plane) — used to be Sparkles,
+                      which made it look like an AI feature; replaced
+                      so the publish button reads as a regular submit
+                      action, distinct from the actual AI affordances
+                      sprinkled across the form. */}
+                  <Send className="w-4 h-4 mr-2" />
                   {isEditMode
                     ? __("Update Trip", "yatra")
                     : __("Publish Trip", "yatra")}
@@ -9358,6 +9610,42 @@ const TripForm: React.FC = () => {
           </div>
         </div>
       </Modal>
+      {/* AI Assistant — auto-fill / itinerary modal. Mounted at the root
+          so it overlays the whole form regardless of which section is
+          currently active. */}
+      <AutoFillTripModal
+        open={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+        buildContext={() => buildTripAiContext(formData)}
+        itineraryOnly={aiModalMode === "itinerary"}
+        onFieldsAccepted={(updates) => {
+          for (const [key, value] of Object.entries(updates)) {
+            handleFieldChange(key as any, value as any);
+          }
+        }}
+      />
+      {/* Same modal as the standalone Itinerary page. We mount it
+          here so the Itinerary tab's "Build with AI" button can drive
+          the SAME agent + applyItinerary flow that the other two
+          surfaces use, instead of forking through AutoFillTripModal's
+          single-shot legacy parser. */}
+      {isEditMode && tripId && (
+        <BuildItineraryModal
+          open={itineraryBuildOpen}
+          onClose={() => setItineraryBuildOpen(false)}
+          tripId={tripId}
+          tripName={(formData as any)?.title || __("Trip", "yatra")}
+          tripDurationDays={Number((formData as any)?.duration_days) || 0}
+          onApplied={() => {
+            // Persistence happened server-side via applyItinerary; the
+            // trip form's local itinerary state needs to refresh so the
+            // newly-created day rows show up. The TripForm reloads
+            // itinerary data on a routing event — we just close the
+            // modal and let the user navigate / save normally.
+            setItineraryBuildOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 };

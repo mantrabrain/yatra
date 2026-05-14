@@ -76,8 +76,15 @@ class AdminAssetsProvider
             // and any other Agency-only UI affordances. Pro registers the filter
             // unconditionally so the value is always trustworthy.
             'isAgency' => (bool) apply_filters('yatra_is_agency_active', false),
+            // AI-eligibility flag (Growth + Agency). Drives the AI Assistant
+            // sidebar entry visibility and the per-field sparkle affordances
+            // in the trip / SEO editors.
+            'isAiEligible' => (bool) apply_filters('yatra_is_ai_eligible', false),
             'whiteLabelEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
                 ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('white_label')
+                : false,
+            'aiAssistantEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
+                ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('ai_assistant')
                 : false,
             'customLandingPagesModuleEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
                 ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('custom_landing_pages')

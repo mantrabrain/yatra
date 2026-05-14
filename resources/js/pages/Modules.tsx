@@ -6,6 +6,7 @@ import {
   ArrowUpDown,
   ExternalLink,
   Crown,
+  Sparkles,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { PageHeader } from "../components/common/PageHeader";
@@ -483,6 +484,20 @@ const Modules: React.FC = () => {
                             {__("Agency", "yatra")}
                           </Badge>
                         )}
+                        {/* Growth tier — AI Assistant + any future module
+                            requiring the Growth-or-Agency band. Without
+                            this branch the card showed NO plan badge at
+                            all, so customers couldn't tell which tier
+                            unlocks AI features. */}
+                        {module.plan === "growth" && (
+                          <Badge
+                            variant="outline"
+                            className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-600 text-white shadow-sm dark:from-emerald-500 dark:to-teal-400 dark:border-emerald-400 dark:text-white"
+                          >
+                            <Sparkles className="w-3 h-3" />
+                            {__("Growth", "yatra")}
+                          </Badge>
+                        )}
                         {module.plan === "personal" && (
                           <Badge
                             variant="outline"
@@ -583,8 +598,22 @@ const Modules: React.FC = () => {
       <PremiumUpgradeDialog
         open={premiumDialog.open}
         moduleName={premiumDialog.module?.name}
+        moduleSlug={premiumDialog.module?.slug}
         purchaseUrl={premiumDialog.module?.purchase_url}
         moduleDescription={premiumDialog.module?.description}
+        // Pass the module's plan tier so the dialog shows
+        // "Growth plan" / "Agency plan" badge + matching CTA copy —
+        // operators stop seeing the generic "Upgrade to Pro" message
+        // and know exactly which plan unlocks the module.
+        requiredPlan={
+          premiumDialog.module?.plan === "agency"
+            ? "agency"
+            : premiumDialog.module?.plan === "growth"
+              ? "growth"
+              : premiumDialog.module?.plan === "personal"
+                ? "personal"
+                : undefined
+        }
         onClose={() => setPremiumDialog({ open: false })}
       />
     </div>

@@ -264,6 +264,22 @@ class ModuleManager
                 'requires_agency' => true,
                 'settings_page' => 'white-label',
             ],
+            [
+                'slug' => 'ai_assistant',
+                'name' => __('AI Assistant', 'yatra'),
+                'description' => __('Generate trip descriptions, itineraries, SEO meta, and email copy without leaving the editor. Inline AI affordances on every long-text field — write less, finish more. Bring your own OpenAI or Anthropic key.', 'yatra'),
+                'category' => __('Productivity', 'yatra'),
+                'docs_url' => 'https://docs.yatra.com/modules/ai-assistant',
+                'is_premium' => true,
+                'purchase_url' => 'https://wpyatra.com/pricing?module=ai-assistant',
+                'is_core' => false,
+                'enabled' => false,
+                'tags' => ['ai', 'assistant', 'content', 'seo', 'productivity'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
+                'requires_pro' => true,
+                'requires_growth_or_agency' => true,
+                'settings_page' => 'ai-assistant',
+            ],
         ];
         
         return apply_filters('yatra_default_modules', $modules);
@@ -308,10 +324,19 @@ class ModuleManager
                 $is_available = (bool) apply_filters('yatra_is_agency_active', false);
             }
 
-            // Plan badge: 'agency' for Agency-only, 'personal' for any other
-            // Pro module, 'free' for core. Surfaced on the Modules page.
+            // Growth-or-Agency tier modules (e.g. AI Assistant) — require Pro
+            // AND a license tier at or above Growth.
+            if ($is_available && !empty($module['requires_growth_or_agency'])) {
+                $is_available = (bool) apply_filters('yatra_is_ai_eligible', false);
+            }
+
+            // Plan badge: 'agency' for Agency-only, 'growth' for the
+            // Growth-or-Agency band, 'personal' for any other Pro module,
+            // 'free' for core. Surfaced on the Modules page.
             if (!empty($module['requires_agency'])) {
                 $plan = 'agency';
+            } elseif (!empty($module['requires_growth_or_agency'])) {
+                $plan = 'growth';
             } elseif (!empty($module['requires_pro'])) {
                 $plan = 'personal';
             } else {
@@ -359,6 +384,13 @@ class ModuleManager
                     }
                 }
 
+                // Growth-or-Agency modules need at least a Growth license.
+                if (!empty($module['requires_growth_or_agency'])) {
+                    if (!apply_filters('yatra_is_ai_eligible', false)) {
+                        return false;
+                    }
+                }
+
                 return (bool) $module['enabled'];
             }
         }
@@ -397,6 +429,10 @@ class ModuleManager
 
                 if (!empty($module['requires_agency'])) {
                     return (bool) apply_filters('yatra_is_agency_active', false);
+                }
+
+                if (!empty($module['requires_growth_or_agency'])) {
+                    return (bool) apply_filters('yatra_is_ai_eligible', false);
                 }
 
                 return true;

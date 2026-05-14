@@ -26,6 +26,7 @@ import {
   List,
   Activity,
   Crown,
+  Sparkles,
   ChevronDown,
   ChevronRight,
   Mail,
@@ -453,12 +454,40 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       // here for the first time, an Agency admin enables the module from
       // Yatra → Modules.) The `whiteLabelEnabled` flag from
       // AdminAssetsProvider already implies Agency-active.
-      ...((window as any).yatraAdmin?.whiteLabelEnabled
+      // White Label — needs Agency-tier license AND module toggle on.
+      // Mirrors the AI Assistant gate below so both menus appear /
+      // disappear instantly when their module toggles, while staying
+      // license-safe if the client-side `whiteLabelEnabled` flag is
+      // ever stale or over-eager. AdminAssetsProvider seeds both
+      // `isAgency` and `whiteLabelEnabled`; useModules.ts updates the
+      // latter on toggle and fires `yatra-modules-updated` which bumps
+      // navRefreshKey → this memo recomputes → menu appears.
+      ...((window as any).yatraAdmin?.isAgency &&
+      (window as any).yatraAdmin?.whiteLabelEnabled
         ? [
             {
               subpage: "white-label",
               label: __("White Label", "yatra"),
               icon: Crown,
+              isPremium: true,
+            },
+          ]
+        : []),
+      // AI Assistant — only when BOTH the license tier qualifies
+      // (Growth or Agency) AND the module toggle is on. Operators who
+      // disable the module shouldn't keep seeing the menu item — it
+      // would lead to a settings page they've explicitly opted out of.
+      // The toggle handler in useModules.ts updates
+      // window.yatraAdmin.aiAssistantEnabled and fires
+      // `yatra-modules-updated`, which bumps navRefreshKey so this
+      // memo recomputes immediately without a page reload.
+      ...((window as any).yatraAdmin?.isAiEligible &&
+      (window as any).yatraAdmin?.aiAssistantEnabled
+        ? [
+            {
+              subpage: "ai-assistant",
+              label: __("AI Assistant", "yatra"),
+              icon: Sparkles,
               isPremium: true,
             },
           ]

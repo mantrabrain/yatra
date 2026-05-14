@@ -24,7 +24,13 @@ import {
   Info,
   Zap,
   ChevronDown,
+  Sparkles,
 } from "lucide-react";
+import { AiEmailTemplateModal } from "../components/ai/AiEmailTemplateModal";
+import {
+  isAiEligible,
+  isAiModuleEnabled,
+} from "../lib/ai-availability";
 import { Switch } from "../components/ui/switch";
 import {
   getCatalogEntryByTemplateKey,
@@ -127,6 +133,7 @@ const EmailTemplateForm: React.FC = () => {
   const [testEmail, setTestEmail] = useState("");
   const [copiedVar, setCopiedVar] = useState<string | null>(null);
   const [showEventDropdown, setShowEventDropdown] = useState(false);
+  const [showAiModal, setShowAiModal] = useState(false);
 
   useEffect(() => {
     if (isCreateMode && !isEmailAutomationModuleEnabled()) {
@@ -650,7 +657,7 @@ const EmailTemplateForm: React.FC = () => {
                 {Boolean(templateData?.is_system) || isCoreSettingsEdit ? (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
                         <Zap className="w-4 h-4" />
                         {formData.event_key || "-"}
                       </span>
@@ -660,7 +667,7 @@ const EmailTemplateForm: React.FC = () => {
                     </div>
                     {formData.event_key && (
                       <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
-                        <p className="text-sm text-indigo-700 dark:text-indigo-300">
+                        <p className="text-sm text-indigo-800 dark:text-indigo-300">
                           {events.find((e: any) => e.key === formData.event_key)
                             ?.description || ""}
                         </p>
@@ -677,7 +684,7 @@ const EmailTemplateForm: React.FC = () => {
                     >
                       {formData.event_key ? (
                         <div className="flex items-center gap-2">
-                          <Zap className="w-4 h-4 text-indigo-500" />
+                          <Zap className="w-4 h-4 text-blue-500" />
                           <span className="text-sm font-medium text-gray-900 dark:text-white">
                             {events.find(
                               (e: any) => e.key === formData.event_key,
@@ -725,7 +732,7 @@ const EmailTemplateForm: React.FC = () => {
                               <Mail
                                 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
                                   !formData.event_key
-                                    ? "text-indigo-500"
+                                    ? "text-blue-500"
                                     : "text-gray-400"
                                 }`}
                               />
@@ -734,7 +741,7 @@ const EmailTemplateForm: React.FC = () => {
                                   <span
                                     className={`text-sm font-medium ${
                                       !formData.event_key
-                                        ? "text-indigo-700 dark:text-indigo-400"
+                                        ? "text-blue-800 dark:text-blue-400"
                                         : "text-gray-900 dark:text-white"
                                     }`}
                                   >
@@ -748,7 +755,7 @@ const EmailTemplateForm: React.FC = () => {
                                 </p>
                               </div>
                               {!formData.event_key && (
-                                <Check className="w-4 h-4 text-indigo-500 flex-shrink-0" />
+                                <Check className="w-4 h-4 text-blue-500 flex-shrink-0" />
                               )}
                             </div>
                           </button>
@@ -773,7 +780,7 @@ const EmailTemplateForm: React.FC = () => {
                                 <Zap
                                   className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
                                     formData.event_key === event.key
-                                      ? "text-indigo-500"
+                                      ? "text-blue-500"
                                       : "text-gray-400"
                                   }`}
                                 />
@@ -782,7 +789,7 @@ const EmailTemplateForm: React.FC = () => {
                                     <span
                                       className={`text-sm font-medium ${
                                         formData.event_key === event.key
-                                          ? "text-indigo-700 dark:text-indigo-400"
+                                          ? "text-blue-800 dark:text-blue-400"
                                           : "text-gray-900 dark:text-white"
                                       }`}
                                     >
@@ -797,7 +804,7 @@ const EmailTemplateForm: React.FC = () => {
                                   </p>
                                 </div>
                                 {formData.event_key === event.key && (
-                                  <Check className="w-4 h-4 text-indigo-500 flex-shrink-0" />
+                                  <Check className="w-4 h-4 text-blue-500 flex-shrink-0" />
                                 )}
                               </div>
                             </button>
@@ -934,9 +941,29 @@ const EmailTemplateForm: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {__("Email Body (HTML)")}
-                </label>
+                {/* Label + AI sparkle on the same row — sparkle sits
+                    to the right of the "Email Body (HTML)" label so
+                    it's visually associated with the editor it
+                    affects, not floating above Subject Line. */}
+                <div className="mb-1 flex items-center justify-between">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {__("Email Body (HTML)")}
+                  </label>
+                  {!isCoreBodyReadOnly &&
+                    isAiEligible() &&
+                    isAiModuleEnabled() && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowAiModal(true)}
+                        className="border-blue-300 text-blue-700 hover:bg-blue-50 dark:border-blue-500/40 dark:text-blue-200 dark:hover:bg-blue-900/30"
+                      >
+                        <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+                        {__("Generate with AI", "yatra")}
+                      </Button>
+                    )}
+                </div>
                 <textarea
                   id="email-body"
                   value={formData.body}
@@ -1000,7 +1027,7 @@ const EmailTemplateForm: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Code className="w-5 h-5 text-purple-500" />
+                <Code className="w-5 h-5 text-blue-500" />
                 {__("Available Variables")}
               </CardTitle>
             </CardHeader>
@@ -1094,7 +1121,7 @@ const EmailTemplateForm: React.FC = () => {
                   <span className="text-gray-500 dark:text-gray-400">
                     {__("Event")}
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">
+                  <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400">
                     <Zap className="w-3 h-3" />
                     {formData.event_key || "-"}
                   </span>
@@ -1193,6 +1220,54 @@ const EmailTemplateForm: React.FC = () => {
         }}
         subject={previewData?.subject ?? ""}
         body={previewData?.body ?? ""}
+      />
+
+      {/* AI: subject + body generator. The merge-tag list comes from
+          the catalog entry when it's a core template, falling back
+          to a sensible default set when editing a custom template. */}
+      <AiEmailTemplateModal
+        open={showAiModal}
+        onClose={() => setShowAiModal(false)}
+        templateKey={
+          coreTemplateSlug || formData.event_key || "custom_template"
+        }
+        templateName={coreDef?.name || formData.name || formData.event_key}
+        templateDescription={
+          coreDef?.description || formData.description
+        }
+        recipientType={
+          (catalogEntryForCore?.recipientType as "customer" | "admin") ||
+          "customer"
+        }
+        mergeTags={(() => {
+          // Catalog stores mergeTags as a comma-string like
+          // "{{customer_name}}, {{booking_reference}}, …". Coerce to
+          // the bare tag names ('customer_name') that the agent's
+          // server-side normalizer accepts.
+          const raw = catalogEntryForCore?.mergeTags ?? "";
+          if (!raw) {
+            return [
+              "site_name",
+              "site_url",
+              "customer_name",
+              "customer_email",
+              "booking_reference",
+              "trip_name",
+              "travel_date",
+              "total_amount",
+              "currency",
+            ];
+          }
+          return raw
+            .split(",")
+            .map((s) => s.trim().replace(/^\{\{|\}\}$/g, "").trim())
+            .filter(Boolean);
+        })()}
+        currentSubject={formData.subject}
+        currentBody={formData.body}
+        onAccept={({ subject, body }) =>
+          setFormData({ ...formData, subject, body })
+        }
       />
     </div>
   );

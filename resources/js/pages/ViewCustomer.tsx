@@ -33,6 +33,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { ConditionalRender } from "../components/ui/conditional-render";
+import { CustomerSummaryCard } from "../components/ai/CustomerSummaryCard";
 import {
   Table,
   TableBody,
@@ -421,6 +422,11 @@ const ViewCustomer: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-3">
+            {/* AI Customer Summary — operator-triggered 3-line
+                snapshot. Self-gates on AI eligibility + module
+                state, so renders nothing in non-eligible tiers. */}
+            {customer?.id && <CustomerSummaryCard customerId={customer.id} />}
+
             {/* Customer Overview */}
             <Card>
               <CardHeader className="pb-2">

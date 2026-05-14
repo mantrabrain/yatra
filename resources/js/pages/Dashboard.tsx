@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { usePermissions } from "../hooks/usePermissions";
+import { TodaysBriefCard } from "../components/ai/TodaysBriefCard";
 import { StatCard } from "../components/common/StatCard";
 import {
   Card,
@@ -449,6 +450,11 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-3">
+      {/* AI: Today's Brief — operations summary. Renders nothing for
+          tiers that don't unlock AI Assistant, so non-eligible users
+          see the dashboard exactly as before. */}
+      <TodaysBriefCard />
+
       {/* Enhanced Welcome Message */}
       <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
         <CardContent className="p-4">

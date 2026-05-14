@@ -233,6 +233,22 @@ function toOrderMap(raw: MenuOrderMap | string[] | undefined): MenuOrderMap {
 }
 
 /* -------------------------------------------------------------------------- */
+/*  Plan tier badge                                                           */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Pill rendered in the White Label page header so operators see at a
+ * glance which license tier unlocks this page. Mirrors the badge style
+ * used on the Modules page card for visual consistency.
+ */
+const PlanBadge: React.FC = () => (
+  <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-purple-600 to-indigo-500 px-2.5 py-1 text-xs font-medium text-white shadow-sm">
+    <Crown className="h-3 w-3" />
+    {__("Agency plan", "yatra")}
+  </span>
+);
+
+/* -------------------------------------------------------------------------- */
 /*  Upgrade card (non-Agency)                                                 */
 /* -------------------------------------------------------------------------- */
 
@@ -245,15 +261,18 @@ const UpgradeCard: React.FC<{ meta?: WhiteLabelMeta }> = ({ meta }) => {
   return (
     <Card className="max-w-3xl">
       <CardHeader>
-        <div className="flex items-center gap-3">
+        <div className="flex items-start gap-3">
           <div className="rounded-md bg-amber-100 p-2 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
             <Crown className="h-5 w-5" />
           </div>
-          <div>
-            <CardTitle>{__("Agency plan required", "yatra")}</CardTitle>
-            <CardDescription>
+          <div className="flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <CardTitle>{__("White Label", "yatra")}</CardTitle>
+              <PlanBadge />
+            </div>
+            <CardDescription className="mt-1">
               {__(
-                "White Label is exclusive to the Yatra Pro Agency plan (Yearly or Lifetime).",
+                "White Label is exclusive to the Agency plan (Yearly or Lifetime). Upgrade to remove all Yatra / MantraBrain references from your clients' admin.",
                 "yatra",
               )}
             </CardDescription>

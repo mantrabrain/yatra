@@ -62,6 +62,7 @@ import Attributes from "./pages/Attributes";
 import AttributeForm from "./pages/AttributeForm";
 import License from "./pages/License";
 import WhiteLabel from "./pages/WhiteLabel";
+import AiAssistant from "./pages/AiAssistant";
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -320,6 +321,8 @@ const App: React.FC = () => {
         return <License />;
       case "white-label":
         return <WhiteLabel />;
+      case "ai-assistant":
+        return <AiAssistant />;
       case "dashboard":
       default:
         return <Dashboard />;

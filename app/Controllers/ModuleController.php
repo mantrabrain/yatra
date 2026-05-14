@@ -136,6 +136,19 @@ class ModuleController extends BaseController
             }
         }
 
+        // Growth-or-Agency gate (e.g. AI Assistant).
+        if ($enabled && !empty($target_module['requires_growth_or_agency'])) {
+            if (!apply_filters('yatra_is_ai_eligible', false)) {
+                return $this->error_response(
+                    sprintf(
+                        __('%s requires a Growth or Agency license. Upgrade your plan to enable it.', 'yatra'),
+                        $target_module['name']
+                    ),
+                    403
+                );
+            }
+        }
+
         $updated = ModuleManager::setModuleStatus($slug, (bool) $enabled);
 
         return $this->success_response([
@@ -194,6 +207,13 @@ class ModuleController extends BaseController
 
             if ($enabled && !empty($target_module['requires_agency'])) {
                 if (!apply_filters('yatra_is_agency_active', false)) {
+                    $blocked_modules[] = $target_module['name'];
+                    continue;
+                }
+            }
+
+            if ($enabled && !empty($target_module['requires_growth_or_agency'])) {
+                if (!apply_filters('yatra_is_ai_eligible', false)) {
                     $blocked_modules[] = $target_module['name'];
                     continue;
                 }

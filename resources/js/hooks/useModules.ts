@@ -126,6 +126,17 @@ export const useToggleModule = () => {
           (m) =>
             m.slug === "advanced_discount" || m.slug === "advanced-discount",
         );
+        // AI Assistant + White Label control top-level sidebar menus.
+        // Updating these flags here means the menu appears / disappears
+        // instantly when the operator toggles either module — Layout.tsx
+        // re-evaluates its memoized menuItems on the `yatra-modules-updated`
+        // event dispatched below.
+        window.yatraAdmin.aiAssistantEnabled = enabledModules.some(
+          (m) => m.slug === "ai_assistant" || m.slug === "ai-assistant",
+        );
+        window.yatraAdmin.whiteLabelEnabled = enabledModules.some(
+          (m) => m.slug === "white_label" || m.slug === "white-label",
+        );
         // Add flags for Pro feature modules
         window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(
           (m) => m.slug === "mailchimp",
@@ -239,6 +250,17 @@ export const useBulkToggleModules = () => {
         window.yatraAdmin.advancedDiscountEnabled = enabledModules.some(
           (m) =>
             m.slug === "advanced_discount" || m.slug === "advanced-discount",
+        );
+        // AI Assistant + White Label control top-level sidebar menus.
+        // Updating these flags here means the menu appears / disappears
+        // instantly when the operator toggles either module — Layout.tsx
+        // re-evaluates its memoized menuItems on the `yatra-modules-updated`
+        // event dispatched below.
+        window.yatraAdmin.aiAssistantEnabled = enabledModules.some(
+          (m) => m.slug === "ai_assistant" || m.slug === "ai-assistant",
+        );
+        window.yatraAdmin.whiteLabelEnabled = enabledModules.some(
+          (m) => m.slug === "white_label" || m.slug === "white-label",
         );
         // Add flags for Pro feature modules
         window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(

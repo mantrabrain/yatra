@@ -106,6 +106,12 @@ if (!defined('ABSPATH')) {
             </svg>
             <?php echo esc_html__('Send Enquiry', 'yatra'); ?>
         </button>
+        <?php
+        // AI: Chat-with-AI widget. The partial gates itself on the
+        // operator's enable flag + module-active state so it's a no-op
+        // when the feature is off.
+        yatra_get_template('partials/single-trip/ai-chat-widget', ['trip' => $trip]);
+        ?>
     </div>
     <?php else: ?>
     <div class="yatra-booking-card">
@@ -456,6 +462,10 @@ if (!defined('ABSPATH')) {
                     </svg>
                     <?php echo esc_html__('Make Enquiry', 'yatra'); ?>
                 </button>
+                <?php
+                // AI: Chat-with-AI widget — bookable-trip branch.
+                yatra_get_template('partials/single-trip/ai-chat-widget', ['trip' => $trip]);
+                ?>
 
                 <!-- Cancellation Policy Trust Signal -->
                 <?php 
