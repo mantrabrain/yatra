@@ -61,6 +61,7 @@ import DynamicPricingRuleForm from "./pages/DynamicPricingRuleForm";
 import Attributes from "./pages/Attributes";
 import AttributeForm from "./pages/AttributeForm";
 import License from "./pages/License";
+import WhiteLabel from "./pages/WhiteLabel";
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -317,6 +318,8 @@ const App: React.FC = () => {
         return <DynamicPricing />;
       case "license":
         return <License />;
+      case "white-label":
+        return <WhiteLabel />;
       case "dashboard":
       default:
         return <Dashboard />;

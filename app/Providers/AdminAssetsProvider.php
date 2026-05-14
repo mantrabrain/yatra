@@ -56,13 +56,29 @@ class AdminAssetsProvider
             'siteUrl' => home_url(),
             'adminUrl' => admin_url('admin.php'),
             'pluginUrl' => YATRA_PLUGIN_URL,
+            // Brand-name and brand-logo helpers are filter-backed (defaults
+            // wired in includes/helpers.php). Pro's WhiteLabel module
+            // overrides the filters when Agency white-label is active.
             'brandLogoUrl' => function_exists('yatra_get_brand_icon_url') ? yatra_get_brand_icon_url() : '',
+            'brandName' => function_exists('yatra_get_brand_name') ? yatra_get_brand_name() : 'Yatra',
+            // White-label-specific window.yatraAdmin keys (brandMenuOverrides,
+            // brandMenuOrder, brandUiChrome, brandPrimaryColor) are injected
+            // by Pro via the `yatra_admin_localized_data` filter applied at
+            // the bottom of this method. They are NOT set here because option
+            // storage is owned by Pro's WhiteLabel module.
             'permalinkStructure' => (get_option('permalink_structure') ?: '') ?: 'plain',
             'tripBase' => \Yatra\Services\SettingsService::getTripBase(),
             'bookingBase' => \Yatra\Services\SettingsService::getBookingBase(),
             'capabilities' => $capabilities,
             'roles' => $current_user->roles,
             'isPro' => defined('YATRA_PRO_VERSION'),
+            // Agency-tier flag — drives the sidebar's White Label entry visibility
+            // and any other Agency-only UI affordances. Pro registers the filter
+            // unconditionally so the value is always trustworthy.
+            'isAgency' => (bool) apply_filters('yatra_is_agency_active', false),
+            'whiteLabelEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
+                ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('white_label')
+                : false,
             'customLandingPagesModuleEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
                 ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('custom_landing_pages')
                 : false,

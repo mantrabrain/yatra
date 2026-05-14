@@ -471,6 +471,26 @@ const Modules: React.FC = () => {
                         {module.is_core && (
                           <Badge variant="outline">{__("Core", "yatra")}</Badge>
                         )}
+                        {/* Plan badge — Personal for any Pro module, Agency
+                            for white-label-tier modules. Always visible so
+                            customers know which plan unlocks the module. */}
+                        {module.plan === "agency" && (
+                          <Badge
+                            variant="outline"
+                            className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-500 border-purple-700 text-white shadow-sm dark:from-purple-500 dark:to-indigo-400 dark:border-purple-400 dark:text-white"
+                          >
+                            <Crown className="w-3 h-3" />
+                            {__("Agency", "yatra")}
+                          </Badge>
+                        )}
+                        {module.plan === "personal" && (
+                          <Badge
+                            variant="outline"
+                            className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-500/40 dark:text-blue-200"
+                          >
+                            {__("Personal", "yatra")}
+                          </Badge>
+                        )}
                         {/* Only show Premium badge if module is premium AND not available (Pro not active) */}
                         {module.is_premium && !module.is_available && (
                           <Badge

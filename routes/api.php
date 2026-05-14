@@ -83,6 +83,8 @@ $controllers = [
     // =============================================
     \Yatra\Controllers\SettingsController::class,
     \Yatra\Controllers\ModuleController::class,
+    // White Label routes live in yatra-pro/app/Modules/WhiteLabel/Controllers/
+    // and are registered by Pro's WhiteLabelModule::boot() at rest_api_init.
     \Yatra\Controllers\ReportsController::class,
     \Yatra\Controllers\ToolsController::class,
     \Yatra\Controllers\SampleDataController::class,

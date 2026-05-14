@@ -910,32 +910,122 @@ function yatra_trip_field(string $field, string $escape = 'html', $default = '')
 }
 
 /**
- * Public URL for the Yatra brand icon (admin menu + React sidebar). Empty if file is missing.
+ * ============================================
+ * BRAND / WHITE LABEL HELPERS (THIN WRAPPERS)
+ * ============================================
+ *
+ * The free plugin owns the function NAMES (so callers in plugin row meta,
+ * admin menu, PDF templates, etc. work without conditional `function_exists`
+ * checks), but every override lives in Yatra Pro's White Label module.
+ *
+ * Each helper here just applies a filter; Pro's WhiteLabel module registers
+ * filter callbacks when the module is enabled AND an Agency-tier license is
+ * active. Without Pro, every filter no-ops and these return the defaults —
+ * which is the correct behavior for a free-only install.
+ *
+ * Option storage, REST endpoints, sanitization, plugin-list rebranding,
+ * brand-color CSS injection, and dependency-link rewriting all live in
+ * yatra-pro/app/Modules/WhiteLabel/ — NOT here.
+ */
+
+/**
+ * Public URL for the Yatra brand icon (admin menu + React sidebar).
+ * Defaults to the bundled `yatra-icon.png`; Pro overrides via the
+ * `yatra_brand_icon_url` filter when a White Label logo is configured.
  */
 function yatra_get_brand_icon_url(): string
 {
-    if (!defined('YATRA_PLUGIN_PATH') || !defined('YATRA_PLUGIN_URL')) {
-        return '';
-    }
-
-    $candidates = [
-        'assets/images/yatra-icon.png',
-        'assets/images/yara-icon.png',
-    ];
-
-    foreach ($candidates as $relative) {
-        $file = YATRA_PLUGIN_PATH . $relative;
-        if (!is_readable($file)) {
-            continue;
+    $default = '';
+    if (defined('YATRA_PLUGIN_PATH') && defined('YATRA_PLUGIN_URL')) {
+        $candidates = [
+            'assets/images/yatra-icon.png',
+            'assets/images/yara-icon.png',
+        ];
+        foreach ($candidates as $relative) {
+            $file = YATRA_PLUGIN_PATH . $relative;
+            if (!is_readable($file)) {
+                continue;
+            }
+            $default = add_query_arg(
+                'ver',
+                (string) filemtime($file),
+                YATRA_PLUGIN_URL . $relative
+            );
+            break;
         }
-
-        $url = YATRA_PLUGIN_URL . $relative;
-
-        return add_query_arg('ver', (string) filemtime($file), $url);
     }
 
-    return '';
+    return (string) apply_filters('yatra_brand_icon_url', $default);
 }
+
+/**
+ * Whether the Agency White Label module is active and may override branding.
+ * Pro returns true via the `yatra_white_label_active` filter when its
+ * WhiteLabel module is enabled AND the license tier is Agency.
+ */
+function yatra_is_white_label_active(): bool
+{
+    return (bool) apply_filters('yatra_white_label_active', false);
+}
+
+/**
+ * Read a single white-label setting with a default fallback. Backed by a
+ * filter so option access stays in Pro.
+ *
+ * @param mixed $default
+ * @return mixed
+ */
+function yatra_get_white_label_setting(string $key, $default = '')
+{
+    return apply_filters('yatra_white_label_setting', $default, $key);
+}
+
+/**
+ * @return array<string, mixed>
+ */
+function yatra_get_white_label_settings(): array
+{
+    $value = apply_filters('yatra_white_label_settings', []);
+    return is_array($value) ? $value : [];
+}
+
+/**
+ * Branded plugin name shown in admin menu, plugin list, and PDFs.
+ */
+function yatra_get_brand_name(): string
+{
+    return (string) apply_filters('yatra_brand_name', 'Yatra');
+}
+
+/**
+ * Branded company/author name (replaces "MantraBrain").
+ */
+function yatra_get_brand_company(): string
+{
+    return (string) apply_filters('yatra_brand_company', 'MantraBrain');
+}
+
+/**
+ * Public website URL for the branded product.
+ */
+function yatra_get_brand_website_url(): string
+{
+    $url = (string) apply_filters('yatra_brand_website_url', 'https://wpyatra.com/');
+    return $url !== '' ? esc_url_raw($url) : 'https://wpyatra.com/';
+}
+
+/**
+ * Support URL surfaced in admin notices and the plugin row.
+ */
+function yatra_get_brand_support_url(): string
+{
+    $url = (string) apply_filters(
+        'yatra_brand_support_url',
+        'https://wordpress.org/support/plugin/yatra/reviews/?filter=5'
+    );
+    return $url !== '' ? esc_url_raw($url) : 'https://wordpress.org/support/plugin/yatra/reviews/?filter=5';
+}
+
 
 /**
  * ============================================

@@ -13,6 +13,7 @@ import {
   RefreshCw,
   Bug,
   ChevronDown,
+  Crown,
 } from "lucide-react";
 
 interface LicenseInfo {
@@ -26,6 +27,13 @@ interface LicenseInfo {
     license_limit?: number;
     site_count?: number;
     activations_left?: number;
+    price_id?: string | number;
+  };
+  plan?: {
+    name: string;
+    tier: string;
+    is_agency: boolean;
+    price_id: number | string | null;
   };
 }
 
@@ -569,6 +577,27 @@ const License: React.FC = () => {
 
               {/* License Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {licenseInfo.plan?.name && (
+                  <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      {__("Plan", "yatra")}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {licenseInfo.plan.name}
+                      </span>
+                      {licenseInfo.plan.is_agency && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gradient-to-r from-purple-600 to-indigo-500 text-white">
+                          <Crown className="w-3 h-3" />
+                          {licenseInfo.plan.tier === "agency_lifetime"
+                            ? __("Lifetime", "yatra")
+                            : __("Agency", "yatra")}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {licenseInfo.server_response?.customer_name && (
                   <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
                     <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">

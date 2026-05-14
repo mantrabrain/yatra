@@ -161,7 +161,7 @@ class EmailService
         $from_email = SettingsService::getString('from_email', '');
         return !empty($from_email) ? $from_email : $email;
     }
-    
+
     /**
      * Custom from name filter
      */

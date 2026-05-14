@@ -72,6 +72,13 @@ function getGravatarUrl(size: number): string {
 
 import { ConditionalRender } from "../components/ui/conditional-render";
 import {
+  readMenuOverrides,
+  readMenuOrder,
+  readUiChrome,
+  type MenuOverrides,
+} from "../lib/sidebar-menu-defaults";
+import { MenuIcon } from "../lib/menu-icon";
+import {
   Card,
   CardContent,
   CardHeader,
@@ -440,11 +447,173 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           ]
         : []),
       { subpage: "modules", label: "Modules", icon: Puzzle },
+      // White Label — only when the Agency-tier module is actually enabled.
+      // (Agency license alone is not enough; the module toggle must be on,
+      // otherwise users would see a link to a disabled feature. To get
+      // here for the first time, an Agency admin enables the module from
+      // Yatra → Modules.) The `whiteLabelEnabled` flag from
+      // AdminAssetsProvider already implies Agency-active.
+      ...((window as any).yatraAdmin?.whiteLabelEnabled
+        ? [
+            {
+              subpage: "white-label",
+              label: __("White Label", "yatra"),
+              icon: Crown,
+              isPremium: true,
+            },
+          ]
+        : []),
       { subpage: "license", label: "License", icon: Key },
       { subpage: "settings", label: "Settings", icon: Settings },
     ],
     [navRefreshKey],
   ); // Re-calculate when navRefreshKey changes
+
+  /**
+   * Apply White Label customizations on top of the base menuItems.
+   *
+   * Implementation: factor menuItems into a flat atom registry, apply
+   * label/icon/hidden overrides, then rebuild the menu tree honoring
+   * the saved parent override (cross-parent moves) and per-parent
+   * order map. URLs always come from the atom's intrinsic identity —
+   * promoting a submenu to top-level does NOT change its route, so
+   * App.tsx routing keeps working unchanged.
+   */
+  const brandedMenuItems = useMemo(() => {
+    const overrides: MenuOverrides = readMenuOverrides();
+    const orderMap = readMenuOrder();
+
+    interface Atom {
+      key: string; // "trips" or "trips.activities"
+      defaultParent: string; // "" for top-level, parent slug for submenu
+      label: string;
+      iconOverride?: unknown;
+      icon: any;
+      // Bag of routing/render props copied from the original menu item.
+      subpage: string;
+      tab?: string;
+      isPremium?: boolean;
+    }
+
+    const atoms: Atom[] = [];
+    const atomByKey = new Map<string, Atom>();
+
+    const apply = (
+      key: string,
+      defaultParent: string,
+      base: any,
+      fallbackLabel: string,
+    ): Atom | null => {
+      const ov = overrides[key];
+      if (ov?.hidden) return null;
+      const labelOverride =
+        ov?.label && typeof ov.label === "string" && ov.label.trim() !== ""
+          ? ov.label
+          : null;
+      const atom: Atom = {
+        key,
+        defaultParent,
+        label: labelOverride ?? fallbackLabel,
+        iconOverride: ov?.icon,
+        icon: base.icon,
+        subpage: base.subpage ?? defaultParent ?? key,
+        tab: base.tab,
+        isPremium: base.isPremium,
+      };
+      atoms.push(atom);
+      atomByKey.set(key, atom);
+      return atom;
+    };
+
+    for (const item of menuItems) {
+      apply(item.subpage, "", item, item.label);
+      if (item.submenu) {
+        for (const sub of item.submenu as any[]) {
+          apply(
+            `${item.subpage}.${sub.tab}`,
+            item.subpage,
+            { icon: sub.icon, subpage: item.subpage, tab: sub.tab },
+            sub.label,
+          );
+        }
+      }
+    }
+
+    // Resolve each atom's effective parent (override wins; "" = top-level).
+    const effectiveParent = (atom: Atom): string => {
+      const ov = overrides[atom.key];
+      if (ov && typeof ov.parent === "string") {
+        // Only accept the override if it points at a known top-level atom
+        // (or empty for top-level). Otherwise fall back to the default.
+        if (ov.parent === "") return "";
+        if (atomByKey.get(ov.parent)?.defaultParent === "") return ov.parent;
+      }
+      return atom.defaultParent;
+    };
+
+    // Group atoms by effective parent and order each group.
+    const groups = new Map<string, Atom[]>();
+    for (const atom of atoms) {
+      const parent = effectiveParent(atom);
+      // Self-parenting guard — should never happen but stay defensive.
+      if (parent === atom.key) continue;
+      const list = groups.get(parent) ?? [];
+      list.push(atom);
+      groups.set(parent, list);
+    }
+
+    const orderGroup = (parent: string, group: Atom[]): Atom[] => {
+      const saved = orderMap[parent] ?? [];
+      if (saved.length === 0) return group;
+      const byKey = new Map(group.map((a) => [a.key, a]));
+      const seen = new Set<string>();
+      const ordered: Atom[] = [];
+      for (const k of saved) {
+        const atom = byKey.get(k);
+        if (atom && !seen.has(k)) {
+          ordered.push(atom);
+          seen.add(k);
+        }
+      }
+      for (const atom of group) {
+        if (!seen.has(atom.key)) ordered.push(atom);
+      }
+      return ordered;
+    };
+
+    const topLevel = orderGroup("", groups.get("") ?? []);
+    return topLevel.map((atom) => {
+      const childAtoms = orderGroup(atom.key, groups.get(atom.key) ?? []);
+      return {
+        subpage: atom.subpage,
+        label: atom.label,
+        icon: atom.icon,
+        iconOverride: atom.iconOverride,
+        isPremium: atom.isPremium,
+        submenu: childAtoms.length
+          ? childAtoms.map((child) => ({
+              // Submenu rendering supports both legacy intra-parent items
+              // (matching parent's subpage) and promoted/demoted items
+              // that point at their own subpage.
+              tab: child.defaultParent === atom.subpage ? child.tab : undefined,
+              label: child.label,
+              icon: child.icon,
+              iconOverride: child.iconOverride,
+              // Promoted top-level items now-as-children get an absolute href.
+              href:
+                child.defaultParent === atom.subpage
+                  ? undefined
+                  : `${baseUrl}&subpage=${child.subpage}${child.tab ? `&tab=${child.tab}` : ""}`,
+              subpage: child.subpage,
+              tab_orig: child.tab,
+            }))
+          : undefined,
+      };
+    });
+  }, [menuItems, baseUrl]);
+
+  /** UI chrome visibility flags (version, Back to WP, Join Community). */
+  const uiChrome = useMemo(() => readUiChrome(), []);
 
   const isActive = (subpage: string, tab?: string) => {
     if (tab) {
@@ -496,31 +665,40 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="h-16 px-6 flex items-center justify-center border-b border-gray-200 dark:border-gray-700">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-3">
-                {window.yatraAdmin?.brandLogoUrl ? (
-                  <img
-                    src={window.yatraAdmin.brandLogoUrl}
-                    alt={__("Yatra", "yatra")}
-                    width={32}
-                    height={32}
-                    className="w-8 h-8 rounded-lg object-contain shrink-0 bg-blue-600 p-1 border border-blue-700 dark:border-blue-500"
-                  />
-                ) : (
-                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
-                    <span className="text-white font-bold text-lg">Y</span>
-                  </div>
-                )}
+                {(() => {
+                  const brandName =
+                    (window as any).yatraAdmin?.brandName || "Yatra";
+                  const brandInitial = brandName.charAt(0).toUpperCase() || "Y";
+                  return (window as any).yatraAdmin?.brandLogoUrl ? (
+                    <img
+                      src={(window as any).yatraAdmin.brandLogoUrl}
+                      alt={brandName}
+                      width={32}
+                      height={32}
+                      className="w-8 h-8 rounded-lg object-contain shrink-0 bg-blue-600 p-1 border border-blue-700 dark:border-blue-500"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                      <span className="text-white font-bold text-lg">
+                        {brandInitial}
+                      </span>
+                    </div>
+                  );
+                })()}
                 <div className="flex flex-col">
                   <span className="text-xl font-bold text-gray-900 dark:text-white">
-                    Yatra
+                    {(window as any).yatraAdmin?.brandName || "Yatra"}
                   </span>
-                  <div className="flex items-center gap-2 text-[10px] text-gray-500 dark:text-gray-400">
-                    <span>v{window.yatraAdmin?.version || "1.0.0"}</span>
-                    {(window as any).yatraAdmin?.proVersion && (
-                      <span className="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded font-medium">
-                        Pro v{(window as any).yatraAdmin?.proVersion}
-                      </span>
-                    )}
-                  </div>
+                  {!uiChrome.hideVersion && (
+                    <div className="flex items-center gap-2 text-[10px] text-gray-500 dark:text-gray-400">
+                      <span>v{window.yatraAdmin?.version || "1.0.0"}</span>
+                      {(window as any).yatraAdmin?.proVersion && (
+                        <span className="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded font-medium">
+                          Pro v{(window as any).yatraAdmin?.proVersion}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -528,7 +706,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
           {/* Navigation + Bottom Actions */}
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-            {menuItems.map((item) => {
+            {brandedMenuItems.map((item) => {
               const Icon = item.icon;
               const hasSubmenu = item.submenu && item.submenu.length > 0;
               const isExpanded = hasSubmenu && isMenuExpanded(item.subpage);
@@ -547,7 +725,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <Icon className="w-5 h-5" />
+                          <MenuIcon
+                            icon={(item as any).iconOverride}
+                            fallback={Icon}
+                            className="w-5 h-5"
+                          />
                           <span>{item.label}</span>
                         </div>
                         {isExpanded ? (
@@ -558,21 +740,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       </button>
                       {isExpanded && item.submenu && (
                         <div className="ml-4 mt-1 space-y-1">
-                          {item.submenu.map((subItem) => {
-                            const subActive = isActive(
-                              item.subpage,
-                              subItem.tab,
-                            );
+                          {item.submenu.map((subItem: any) => {
+                            // Promoted / demoted child carries its own
+                            // routing target via subpage + tab_orig; the
+                            // default in-parent child uses the parent's
+                            // subpage with its tab.
+                            const navSubpage = subItem.subpage ?? item.subpage;
+                            const navTab = subItem.tab ?? subItem.tab_orig;
+                            const subActive = navTab
+                              ? isActive(navSubpage, navTab)
+                              : isActive(navSubpage);
                             const SubIcon = subItem.icon;
                             return (
                               <a
-                                key={subItem.tab}
-                                href={getUrl(item.subpage, subItem.tab)}
+                                key={`${navSubpage}.${navTab ?? ""}`}
+                                href={getUrl(navSubpage, navTab)}
                                 onClick={(e) =>
                                   handleMenuNavClick(
                                     e,
-                                    item.subpage,
-                                    subItem.tab,
+                                    navSubpage,
+                                    navTab,
                                   )
                                 }
                                 className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors relative ${
@@ -584,9 +771,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 <div className="flex items-center gap-3">
                                   {SubIcon && (
                                     <div className="w-4 h-4">
-                                      {React.createElement(SubIcon, {
-                                        className: "w-4 h-4",
-                                      })}
+                                      <MenuIcon
+                                        icon={(subItem as any).iconOverride}
+                                        fallback={SubIcon}
+                                        className="w-4 h-4"
+                                      />
                                     </div>
                                   )}
                                   <span className="text-sm">
@@ -617,7 +806,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Icon className="w-5 h-5" />
+                        <MenuIcon
+                          icon={(item as any).iconOverride}
+                          fallback={Icon}
+                          className="w-5 h-5"
+                        />
                         <span>{item.label}</span>
                       </div>
                       {item.isPremium && !isProPluginActive() && (
@@ -681,21 +874,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           )}
 
           {/* Sticky bottom back link */}
-          <div className="border-t border-gray-200 dark:border-gray-700 p-4">
-            <a
-              href={
-                window.yatraAdmin?.siteUrl
-                  ? `${window.yatraAdmin.siteUrl}/wp-admin/`
-                  : "/wp-admin/"
-              }
-              className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              <span className="inline-flex items-center gap-2">
-                <ArrowLeft className="w-3 h-3" />
-                <span>{__("Back to WordPress", "yatra")}</span>
-              </span>
-            </a>
-          </div>
+          {!uiChrome.hideBackToWp && (
+            <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+              <a
+                href={
+                  window.yatraAdmin?.siteUrl
+                    ? `${window.yatraAdmin.siteUrl}/wp-admin/`
+                    : "/wp-admin/"
+                }
+                className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <span className="inline-flex items-center gap-2">
+                  <ArrowLeft className="w-3 h-3" />
+                  <span>{__("Back to WordPress", "yatra")}</span>
+                </span>
+              </a>
+            </div>
+          )}
         </aside>
 
         {/* Main Content */}
@@ -714,7 +909,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       : "Edit Trip";
                   }
 
-                  const activeItem = menuItems.find((item) =>
+                  const activeItem = brandedMenuItems.find((item) =>
                     isActive(item.subpage),
                   );
                   if (activeItem?.submenu && currentTab) {
@@ -729,29 +924,33 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
               <div className="flex items-center gap-4">
                 {/* Back to WordPress button */}
-                <a
-                  href={
-                    window.yatraAdmin?.siteUrl
-                      ? `${window.yatraAdmin.siteUrl}/wp-admin/`
-                      : "/wp-admin/"
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  {__("Back to WordPress", "yatra")}
-                </a>
+                {!uiChrome.hideBackToWp && (
+                  <a
+                    href={
+                      window.yatraAdmin?.siteUrl
+                        ? `${window.yatraAdmin.siteUrl}/wp-admin/`
+                        : "/wp-admin/"
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    {__("Back to WordPress", "yatra")}
+                  </a>
+                )}
 
-                <a
-                  href="https://www.facebook.com/groups/yatrawordpressplugin"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  <MessageSquare className="w-4 h-4 shrink-0" aria-hidden />
-                  {__("Join Community", "yatra")}
-                </a>
+                {!uiChrome.hideJoinCommunity && (
+                  <a
+                    href="https://www.facebook.com/groups/yatrawordpressplugin"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  >
+                    <MessageSquare className="w-4 h-4 shrink-0" aria-hidden />
+                    {__("Join Community", "yatra")}
+                  </a>
+                )}
 
                 {/* Flush permalink (same API as Settings → Permalink); icon + native title for tooltip */}
                 <Button

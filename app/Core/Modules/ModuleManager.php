@@ -248,6 +248,22 @@ class ModuleManager
                 'requires_pro' => true,
                 'settings_page' => 'abandoned-recovery',
             ],
+            [
+                'slug' => 'white_label',
+                'name' => __('White Label', 'yatra'),
+                'description' => __('Fully rebrand Yatra as your own product. Replace the plugin name, logo, author, support URL, and email/PDF branding shown to clients. Available exclusively on the Agency plan.', 'yatra'),
+                'category' => __('Agency', 'yatra'),
+                'docs_url' => 'https://docs.yatra.com/modules/white-label',
+                'is_premium' => true,
+                'purchase_url' => 'https://wpyatra.com/pricing?module=white-label',
+                'is_core' => false,
+                'enabled' => false,
+                'tags' => ['branding', 'agency', 'whitelabel', 'rebrand'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
+                'requires_pro' => true,
+                'requires_agency' => true,
+                'settings_page' => 'white-label',
+            ],
         ];
         
         return apply_filters('yatra_default_modules', $modules);
@@ -287,10 +303,26 @@ class ModuleManager
                 }
             }
 
+            // Agency-tier-only modules require both Pro AND an Agency license.
+            if ($is_available && !empty($module['requires_agency'])) {
+                $is_available = (bool) apply_filters('yatra_is_agency_active', false);
+            }
+
+            // Plan badge: 'agency' for Agency-only, 'personal' for any other
+            // Pro module, 'free' for core. Surfaced on the Modules page.
+            if (!empty($module['requires_agency'])) {
+                $plan = 'agency';
+            } elseif (!empty($module['requires_pro'])) {
+                $plan = 'personal';
+            } else {
+                $plan = 'free';
+            }
+
             $result[] = array_merge($module, [
                 'enabled' => $enabled,
                 'updated_at' => $stored_status[$slug]['updated_at'] ?? null,
                 'is_available' => $is_available,
+                'plan' => $plan,
             ]);
         }
 
@@ -318,14 +350,22 @@ class ModuleManager
                         return false;
                     }
                 }
-                
+
+                // Agency-tier-only modules also need an Agency license — a
+                // toggle stuck "on" must not keep working after a downgrade.
+                if (!empty($module['requires_agency'])) {
+                    if (!apply_filters('yatra_is_agency_active', false)) {
+                        return false;
+                    }
+                }
+
                 return (bool) $module['enabled'];
             }
         }
 
         return false;
     }
-    
+
     /**
      * Check if module is available (can be enabled)
      */
@@ -336,7 +376,7 @@ class ModuleManager
         if ($override !== null) {
             return (bool) $override;
         }
-        
+
         $modules = self::getModules();
         foreach ($modules as $module) {
             if ($module['slug'] === $slug) {
@@ -347,12 +387,18 @@ class ModuleManager
                     if (!$pro_active) {
                         return false;
                     }
-                    
+
                     // Check if this module is available in Pro
                     $available_modules = apply_filters('yatra_pro_available_modules', []);
-                    return in_array($slug, $available_modules, true);
+                    if (!in_array($slug, $available_modules, true)) {
+                        return false;
+                    }
                 }
-                
+
+                if (!empty($module['requires_agency'])) {
+                    return (bool) apply_filters('yatra_is_agency_active', false);
+                }
+
                 return true;
             }
         }

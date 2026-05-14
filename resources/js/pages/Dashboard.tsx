@@ -457,7 +457,7 @@ const Dashboard: React.FC = () => {
               <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                  {__("Welcome to Yatra Dashboard", "yatra")}
+                  {__("Welcome to Dashboard", "yatra")}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
                   {__(

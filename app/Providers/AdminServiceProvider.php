@@ -28,6 +28,13 @@ class AdminServiceProvider extends ServiceProvider
 
         add_filter('plugin_action_links_' . YATRA_PLUGIN_BASENAME, [$this, 'addPluginUpgradeLink']);
         add_filter('plugin_row_meta', [$this, 'filterPluginRowMeta'], 10, 4);
+        // White-label-specific hooks (all_plugins rebrand, dependency name
+        // rewrite, brand-color CSS injection) live in Pro's WhiteLabel
+        // module — see yatra-pro/app/Modules/WhiteLabel/Hooks/AdminHooks.php.
+        // The plugin_row_meta filter above stays here because it serves a
+        // dual purpose (links + version row); white-label conditional logic
+        // inside it reads filter-backed brand helpers, so Pro overrides it
+        // transparently without owning the hook.
 
         // Enqueue admin assets - use priority 20 to run after WordPress core
         add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets'], 20);
@@ -296,10 +303,15 @@ class AdminServiceProvider extends ServiceProvider
             return $plugin_meta;
         }
 
-        $home = 'https://wpyatra.com/';
+        $is_white_label = function_exists('yatra_is_white_label_active') && yatra_is_white_label_active();
+        $brand_company = function_exists('yatra_get_brand_company') ? yatra_get_brand_company() : 'MantraBrain';
+        $brand_home = function_exists('yatra_get_brand_website_url') ? yatra_get_brand_website_url() : 'https://wpyatra.com/';
+        $brand_support = function_exists('yatra_get_brand_support_url') ? yatra_get_brand_support_url() : 'https://wordpress.org/support/plugin/yatra/reviews/?filter=5';
+
+        $home = $brand_home;
         $org_plugin_page = 'https://wordpress.org/plugins/yatra/';
-        $support_url = 'https://wordpress.org/support/plugin/yatra/reviews/?filter=5';
-        $contact_url = 'https://mantrabrain.com/contact';
+        $support_url = $brand_support;
+        $contact_url = $brand_home;
         $rate_url = 'https://wordpress.org/support/plugin/yatra/reviews/?filter=5';
 
         $row = [];
@@ -315,14 +327,18 @@ class AdminServiceProvider extends ServiceProvider
         $row[] = sprintf(
             /* translators: %s: linked author name (HTML). */
             __('By %s', 'yatra'),
-            '<a href="' . esc_url($home) . '" target="_blank" rel="noopener noreferrer">MantraBrain</a>'
+            '<a href="' . esc_url($home) . '" target="_blank" rel="noopener noreferrer">' . esc_html($brand_company) . '</a>'
         );
 
-        $row[] = sprintf(
-            '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
-            esc_url($org_plugin_page),
-            esc_html__('View details', 'yatra')
-        );
+        // White-label sites should not link clients off to wp.org / Yatra rating
+        // pages. Show only the agency's own support + homepage links.
+        if (!$is_white_label) {
+            $row[] = sprintf(
+                '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+                esc_url($org_plugin_page),
+                esc_html__('View details', 'yatra')
+            );
+        }
 
         $row[] = sprintf(
             '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
@@ -336,20 +352,23 @@ class AdminServiceProvider extends ServiceProvider
             esc_html__('Plugin Homepage', 'yatra')
         );
 
-        $row[] = sprintf(
-            '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
-            esc_url($contact_url),
-            esc_html__('Contact', 'yatra')
-        );
+        if (!$is_white_label) {
+            $row[] = sprintf(
+                '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+                esc_url($contact_url),
+                esc_html__('Contact', 'yatra')
+            );
 
-        $row[] = sprintf(
-            '<a href="%s" target="_blank" rel="noopener noreferrer">%s <span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span></a>',
-            esc_url($rate_url),
-            esc_html__('Rate the plugin', 'yatra')
-        );
+            $row[] = sprintf(
+                '<a href="%s" target="_blank" rel="noopener noreferrer">%s <span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span></a>',
+                esc_url($rate_url),
+                esc_html__('Rate the plugin', 'yatra')
+            );
+        }
 
         return $row;
     }
+
 
     /**
      * Amber styling for Upgrade to Pro (admin menu + plugins list).
@@ -458,9 +477,11 @@ class AdminServiceProvider extends ServiceProvider
             ? yatra_get_brand_icon_url()
             : 'dashicons-palmtree';
 
+        $brand_name = function_exists('yatra_get_brand_name') ? yatra_get_brand_name() : 'Yatra';
+
         add_menu_page(
-            __('Yatra', 'yatra'),
-            __('Yatra', 'yatra'),
+            $brand_name,
+            $brand_name,
             'manage_options',
             'yatra',
             [$this, 'renderAdminPage'],
@@ -472,7 +493,7 @@ class AdminServiceProvider extends ServiceProvider
         // A submenu with the same slug as the parent replaces that entry with a distinct label.
         add_submenu_page(
             'yatra',
-            __('Yatra Dashboard', 'yatra'),
+            sprintf(/* translators: %s = branded plugin name. */ __('%s Dashboard', 'yatra'), $brand_name),
             __('Dashboard', 'yatra'),
             'manage_options',
             'yatra',

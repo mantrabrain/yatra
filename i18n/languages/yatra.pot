@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-13T08:20:43+00:00\n"
+"POT-Creation-Date: 2026-05-14T03:58:37+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -712,7 +712,7 @@ msgstr ""
 #: templates/partials/booking-content.php:303
 #: templates/partials/remaining-checkout-content.php:84
 #: templates/partials/remaining-checkout-content.php:143
-#: templates/pdf/invoice.php:128
+#: templates/pdf/invoice.php:134
 #: templates/pdf/itinerary.php:176
 #: assets/dist/js/account-page.js:1108
 msgid "Travel Date"
@@ -848,7 +848,7 @@ msgstr ""
 
 #: assets/dist/js/account-page.js:2003
 #: app/Services/EmailTemplateDefaults.php:487
-#: templates/pdf/invoice.php:129
+#: templates/pdf/invoice.php:135
 msgid "Amount"
 msgstr ""
 
@@ -924,7 +924,7 @@ msgid "Voucher"
 msgstr ""
 
 #: assets/dist/js/account-page.js:2187
-#: templates/pdf/invoice.php:32
+#: templates/pdf/invoice.php:38
 #: assets/dist/js/account-page.js:2106
 msgid "Invoice"
 msgstr ""
@@ -1185,7 +1185,7 @@ msgstr ""
 #: app/Repositories/SavedTripRepository.php:263
 #: app/Repositories/TripRepository.php:3076
 #: includes/helpers.php:462
-#: includes/helpers.php:1959
+#: includes/helpers.php:2086
 #: templates/partials/single-trip/content-itinerary.php:121
 msgid "Flexible"
 msgstr ""
@@ -1227,8 +1227,9 @@ msgstr ""
 msgid "upcoming adventures"
 msgstr ""
 
+#. translators: %s = branded plugin name.
 #: assets/dist/js/account-page.js:2876
-#: app/Providers/AdminServiceProvider.php:476
+#: app/Providers/AdminServiceProvider.php:529
 msgid "Dashboard"
 msgstr ""
 
@@ -2633,21 +2634,26 @@ msgstr ""
 msgid "%s requires Yatra Pro. Please install and activate Yatra Pro to enable this module."
 msgstr ""
 
-#: app/Controllers/ModuleController.php:136
+#: app/Controllers/ModuleController.php:131
+#, php-format
+msgid "%s is available on the Yatra Pro Agency plan only. Upgrade your license to enable it."
+msgstr ""
+
+#: app/Controllers/ModuleController.php:150
 msgid "No module changes supplied."
 msgstr ""
 
-#: app/Controllers/ModuleController.php:190
+#: app/Controllers/ModuleController.php:211
 #, php-format
 msgid "The following modules require Yatra Pro: %s"
 msgstr ""
 
-#: app/Controllers/ModuleController.php:204
+#: app/Controllers/ModuleController.php:225
 #, php-format
 msgid "Some modules were skipped because they require Yatra Pro: %s"
 msgstr ""
 
-#: app/Controllers/ModuleController.php:211
+#: app/Controllers/ModuleController.php:232
 msgid "No valid module changes supplied."
 msgstr ""
 
@@ -3349,6 +3355,14 @@ msgstr ""
 msgid "Local snapshots removed."
 msgstr ""
 
+#: app/Controllers/WhiteLabelController.php:63
+msgid "White Label settings can only be saved on an Agency Yearly or Agency Lifetime license."
+msgstr ""
+
+#: app/Controllers/WhiteLabelController.php:76
+msgid "White Label settings updated."
+msgstr ""
+
 #: app/Core/Handlers/AccountPageHandler.php:46
 #: app/Providers/FrontendAssetsProvider.php:778
 #: app/Shortcodes/LoginShortcode.php:151
@@ -3535,6 +3549,18 @@ msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:239
 msgid "Recover lost sales by automatically tracking abandoned bookings and sending targeted email sequences. Win back customers who left before completing their purchase."
+msgstr ""
+
+#: app/Core/Modules/ModuleManager.php:253
+msgid "White Label"
+msgstr ""
+
+#: app/Core/Modules/ModuleManager.php:254
+msgid "Fully rebrand Yatra as your own product. Replace the plugin name, logo, author, support URL, and email/PDF branding shown to clients. Available exclusively on the Agency plan."
+msgstr ""
+
+#: app/Core/Modules/ModuleManager.php:255
+msgid "Agency"
 msgstr ""
 
 #: app/Helpers/FormatHelper.php:245
@@ -3958,9 +3984,9 @@ msgstr ""
 msgid "Payment gateway is not available"
 msgstr ""
 
-#: app/Providers/AdminServiceProvider.php:278
-#: app/Providers/AdminServiceProvider.php:418
-#: app/Providers/AdminServiceProvider.php:421
+#: app/Providers/AdminServiceProvider.php:287
+#: app/Providers/AdminServiceProvider.php:469
+#: app/Providers/AdminServiceProvider.php:472
 #: app/Services/NoticeService.php:177
 #: app/Services/NoticeService.php:483
 #: core/Premium.php:232
@@ -3971,47 +3997,47 @@ msgid "Upgrade to Pro"
 msgstr ""
 
 #. translators: %s: plugin version number.
-#: app/Providers/AdminServiceProvider.php:310
+#: app/Providers/AdminServiceProvider.php:324
 #, php-format
 msgid "Version %s"
 msgstr ""
 
 #. translators: %s: linked author name (HTML).
-#: app/Providers/AdminServiceProvider.php:317
+#: app/Providers/AdminServiceProvider.php:331
 #, php-format
 msgid "By %s"
 msgstr ""
 
-#: app/Providers/AdminServiceProvider.php:324
+#: app/Providers/AdminServiceProvider.php:341
 msgid "View details"
 msgstr ""
 
-#: app/Providers/AdminServiceProvider.php:330
+#: app/Providers/AdminServiceProvider.php:348
 #: core/Premium.php:226
 msgid "Support"
 msgstr ""
 
-#: app/Providers/AdminServiceProvider.php:336
+#: app/Providers/AdminServiceProvider.php:354
 msgid "Plugin Homepage"
 msgstr ""
 
-#: app/Providers/AdminServiceProvider.php:342
+#: app/Providers/AdminServiceProvider.php:361
 #: app/Providers/FrontendAssetsProvider.php:815
 msgid "Contact"
 msgstr ""
 
-#: app/Providers/AdminServiceProvider.php:348
+#: app/Providers/AdminServiceProvider.php:367
 msgid "Rate the plugin"
 msgstr ""
 
-#: app/Providers/AdminServiceProvider.php:462
-#: app/Providers/AdminServiceProvider.php:463
-#: app/Providers/BlockServiceProvider.php:70
-msgid "Yatra"
+#. translators: %s = branded plugin name.
+#: app/Providers/AdminServiceProvider.php:528
+#, php-format
+msgid "%s Dashboard"
 msgstr ""
 
-#: app/Providers/AdminServiceProvider.php:475
-msgid "Yatra Dashboard"
+#: app/Providers/BlockServiceProvider.php:70
+msgid "Yatra"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:779
@@ -4147,12 +4173,12 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: app/Repositories/TripRepository.php:3074
-#: includes/helpers.php:1957
+#: includes/helpers.php:2084
 msgid "Single day"
 msgstr ""
 
 #: app/Repositories/TripRepository.php:3075
-#: includes/helpers.php:1958
+#: includes/helpers.php:2085
 msgid "Multi-day"
 msgstr ""
 
@@ -4426,30 +4452,30 @@ msgstr ""
 msgid "Customer deleted successfully."
 msgstr ""
 
-#: app/Services/CustomerService.php:612
+#: app/Services/CustomerService.php:615
 #, php-format
 msgid "Invoice #%s.pdf"
 msgstr ""
 
-#: app/Services/CustomerService.php:631
+#: app/Services/CustomerService.php:634
 #, php-format
 msgid "Travel Voucher #%s.pdf"
 msgstr ""
 
-#: app/Services/CustomerService.php:645
+#: app/Services/CustomerService.php:648
 #, php-format
 msgid "Travel Itinerary #%s.pdf"
 msgstr ""
 
-#: app/Services/CustomerService.php:727
+#: app/Services/CustomerService.php:730
 msgid "Cannot merge customer with itself."
 msgstr ""
 
-#: app/Services/CustomerService.php:734
+#: app/Services/CustomerService.php:737
 msgid "One or both customers not found."
 msgstr ""
 
-#: app/Services/CustomerService.php:751
+#: app/Services/CustomerService.php:754
 msgid "Customers merged successfully."
 msgstr ""
 
@@ -4493,15 +4519,15 @@ msgstr ""
 msgid "Minimum amount of %s required for this coupon."
 msgstr ""
 
-#: app/Services/EmailService.php:190
+#: app/Services/EmailService.php:216
 msgid "Please configure all SMTP settings first."
 msgstr ""
 
-#: app/Services/EmailService.php:211
+#: app/Services/EmailService.php:237
 msgid "SMTP connection successful!"
 msgstr ""
 
-#: app/Services/EmailService.php:217
+#: app/Services/EmailService.php:243
 #, php-format
 msgid "SMTP connection failed: %s"
 msgstr ""
@@ -6490,7 +6516,7 @@ msgid "Rest"
 msgstr ""
 
 #. translators: 1–2: range, 3: total, 4: item type, 5–6: pagination
-#: includes/helpers.php:1426
+#: includes/helpers.php:1553
 #, php-format
 msgid "Showing %1$d–%2$d of %3$d %4$s (page %5$d of %6$d)"
 msgstr ""
@@ -8058,7 +8084,7 @@ msgid "Time:"
 msgstr ""
 
 #: templates/partials/single-trip/content-location.php:91
-#: templates/pdf/invoice.php:126
+#: templates/pdf/invoice.php:132
 msgid "Description"
 msgstr ""
 
@@ -8658,63 +8684,63 @@ msgstr ""
 msgid "This document is generated electronically and is valid without a handwritten signature."
 msgstr ""
 
-#: templates/pdf/invoice.php:77
+#: templates/pdf/invoice.php:83
 msgid "Payment Invoice"
 msgstr ""
 
-#: templates/pdf/invoice.php:86
+#: templates/pdf/invoice.php:92
 msgid "Invoice To"
 msgstr ""
 
-#: templates/pdf/invoice.php:91
+#: templates/pdf/invoice.php:97
 msgid "Invoice Details"
 msgstr ""
 
-#: templates/pdf/invoice.php:94
+#: templates/pdf/invoice.php:100
 msgid "Invoice #:"
 msgstr ""
 
-#: templates/pdf/invoice.php:98
+#: templates/pdf/invoice.php:104
 #: templates/pdf/voucher.php:117
 msgid "Date:"
 msgstr ""
 
-#: templates/pdf/invoice.php:102
+#: templates/pdf/invoice.php:108
 #: templates/pdf/voucher.php:121
 msgid "Status:"
 msgstr ""
 
-#: templates/pdf/invoice.php:108
+#: templates/pdf/invoice.php:114
 #: templates/pdf/voucher.php:127
 msgid "Company"
 msgstr ""
 
-#: templates/pdf/invoice.php:127
+#: templates/pdf/invoice.php:133
 msgid "Booking Ref"
 msgstr ""
 
-#: templates/pdf/invoice.php:136
+#: templates/pdf/invoice.php:142
 msgid "Payment via"
 msgstr ""
 
-#: templates/pdf/invoice.php:148
+#: templates/pdf/invoice.php:154
 msgid "Subtotal"
 msgstr ""
 
-#: templates/pdf/invoice.php:159
+#: templates/pdf/invoice.php:165
 msgid "Booking Total"
 msgstr ""
 
-#: templates/pdf/invoice.php:163
+#: templates/pdf/invoice.php:169
 msgid "Total Paid"
 msgstr ""
 
-#: templates/pdf/invoice.php:167
+#: templates/pdf/invoice.php:173
 #: templates/pdf/voucher.php:190
 msgid "Balance Due"
 msgstr ""
 
-#: templates/pdf/invoice.php:171
+#: templates/pdf/invoice.php:177
 msgid "This Payment"
 msgstr ""
 

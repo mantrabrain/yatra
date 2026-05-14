@@ -8,6 +8,8 @@ import { apiClient } from "../lib/api-client";
 import { __ } from "../lib/i18n";
 import { useToast } from "../components/ui/toast";
 
+export type ModulePlan = "free" | "personal" | "agency";
+
 export interface ModuleDefinition {
   slug: string;
   name: string;
@@ -19,6 +21,8 @@ export interface ModuleDefinition {
   is_premium?: boolean;
   is_available?: boolean;
   requires_pro?: boolean;
+  requires_agency?: boolean;
+  plan?: ModulePlan;
   purchase_url?: string;
   video_url?: string;
   enabled: boolean;

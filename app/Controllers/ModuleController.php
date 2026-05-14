@@ -122,6 +122,20 @@ class ModuleController extends BaseController
             }
         }
 
+        // Agency-tier gate: even with Pro active, the white-label/agency-only
+        // modules need an Agency Yearly or Lifetime license.
+        if ($enabled && !empty($target_module['requires_agency'])) {
+            if (!apply_filters('yatra_is_agency_active', false)) {
+                return $this->error_response(
+                    sprintf(
+                        __('%s is available on the Yatra Pro Agency plan only. Upgrade your license to enable it.', 'yatra'),
+                        $target_module['name']
+                    ),
+                    403
+                );
+            }
+        }
+
         $updated = ModuleManager::setModuleStatus($slug, (bool) $enabled);
 
         return $this->success_response([
@@ -173,6 +187,13 @@ class ModuleController extends BaseController
             if ($enabled && !empty($target_module['requires_pro'])) {
                 $pro_active = apply_filters('yatra_is_pro_active', false);
                 if (!$pro_active) {
+                    $blocked_modules[] = $target_module['name'];
+                    continue;
+                }
+            }
+
+            if ($enabled && !empty($target_module['requires_agency'])) {
+                if (!apply_filters('yatra_is_agency_active', false)) {
                     $blocked_modules[] = $target_module['name'];
                     continue;
                 }

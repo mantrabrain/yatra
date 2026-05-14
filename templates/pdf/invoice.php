@@ -1,6 +1,9 @@
 <?php
 
 $companyName = (string) ($company_name ?? '');
+if ($companyName === '' && function_exists('yatra_get_brand_name')) {
+    $companyName = yatra_get_brand_name();
+}
 $companyAddress = (string) ($company_address ?? '');
 $companyEmail = (string) ($company_email ?? '');
 $companyPhone = (string) ($company_phone ?? '');
