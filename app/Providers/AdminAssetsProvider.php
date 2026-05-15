@@ -86,6 +86,9 @@ class AdminAssetsProvider
             'aiAssistantEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
                 ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('ai_assistant')
                 : false,
+            'whatsappEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
+                ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('whatsapp')
+                : false,
             'customLandingPagesModuleEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
                 ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('custom_landing_pages')
                 : false,

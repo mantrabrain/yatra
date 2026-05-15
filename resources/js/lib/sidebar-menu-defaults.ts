@@ -116,6 +116,7 @@ export const DEFAULT_MENU_ITEMS: MenuItemDefault[] = [
   { slug: "modules", label: "Modules", iconName: "Puzzle" },
   { slug: "white-label", label: "White Label", iconName: "Crown" },
   { slug: "ai-assistant", label: "AI Assistant", iconName: "Sparkles" },
+  { slug: "whatsapp", label: "WhatsApp", iconName: "MessageCircle" },
   { slug: "license", label: "License", iconName: "Key" },
   { slug: "settings", label: "Settings", iconName: "Settings" },
 ];
@@ -195,6 +196,7 @@ export const SELECTABLE_ICON_NAMES = [
   "RotateCcw",
   "Tools",
   "Sparkles",
+  "MessageCircle",
 ];
 
 export function readMenuOverrides(): MenuOverrides {

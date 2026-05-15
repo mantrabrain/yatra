@@ -9,58 +9,58 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-14T15:05:22+00:00\n"
+"POT-Creation-Date: 2026-05-15T13:15:28+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
 
-#: assets/admin/dist/js/app.js:39887
+#: assets/admin/dist/js/app.js:39909
 msgid "Failed to load reviews. Please try again."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:39917
+#: assets/admin/dist/js/app.js:39939
 msgid "Select reviews to display as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:39919
+#: assets/admin/dist/js/app.js:39941
 msgid "Save the trip first to select testimonials from reviews"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:39924
+#: assets/admin/dist/js/app.js:39946
 #: templates/partials/single-trip/content-testimonials.php:15
 msgid "Testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:39925
+#: assets/admin/dist/js/app.js:39947
 msgid "Select approved reviews to display as testimonials on the trip page"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:39931
+#: assets/admin/dist/js/app.js:39953
 msgid "Loading reviews..."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:39942
+#: assets/admin/dist/js/app.js:39964
 msgid "Retry"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:39947
+#: assets/admin/dist/js/app.js:39969
 msgid "No approved reviews yet"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:39948
+#: assets/admin/dist/js/app.js:39970
 msgid "Reviews will appear here once customers submit and they are approved"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:39953
+#: assets/admin/dist/js/app.js:39975
 msgid "Select reviews to feature as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:39962
+#: assets/admin/dist/js/app.js:39984
 #: templates/listing-trip.php:139
 msgid "Clear all"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:40000
+#: assets/admin/dist/js/app.js:40022
 msgid "Selected as testimonial"
 msgstr ""
 
@@ -609,7 +609,7 @@ msgid "Special Requests"
 msgstr ""
 
 #: assets/dist/js/account-page.js:142
-#: assets/dist/js/index-vVK1TTm7.js:2162
+#: assets/dist/js/index-DI1cgtCF.js:2162
 #: app/Providers/FrontendAssetsProvider.php:712
 #: app/Providers/FrontendAssetsProvider.php:799
 #: includes/helpers.php:329
@@ -1471,12 +1471,12 @@ msgstr ""
 msgid "Could not resolve document link."
 msgstr ""
 
-#: assets/dist/js/index-vVK1TTm7.js:1009
+#: assets/dist/js/index-DI1cgtCF.js:1009
 #: templates/partials/single-trip/sticky-sidebar.php:253
 msgid "Close"
 msgstr ""
 
-#: assets/dist/js/index-vVK1TTm7.js:597
+#: assets/dist/js/index-DI1cgtCF.js:597
 msgctxt "text direction"
 msgid "ltr"
 msgstr ""
@@ -3571,6 +3571,18 @@ msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:271
 msgid "Productivity"
+msgstr ""
+
+#: app/Core/Modules/ModuleManager.php:285
+msgid "WhatsApp Notifications"
+msgstr ""
+
+#: app/Core/Modules/ModuleManager.php:286
+msgid "Send booking confirmations, payment alerts, departure reminders, and review requests over WhatsApp — the channel customers actually read. Inbound messages route into your Yatra Enquiries inbox. Bring your own WhatsApp Business / Cloud API credentials; messages are billed by Meta, not by the plugin."
+msgstr ""
+
+#: app/Core/Modules/ModuleManager.php:287
+msgid "Communications"
 msgstr ""
 
 #: app/Helpers/FormatHelper.php:245

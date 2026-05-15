@@ -63,6 +63,7 @@ import AttributeForm from "./pages/AttributeForm";
 import License from "./pages/License";
 import WhiteLabel from "./pages/WhiteLabel";
 import AiAssistant from "./pages/AiAssistant";
+import Whatsapp from "./pages/Whatsapp";
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -323,6 +324,8 @@ const App: React.FC = () => {
         return <WhiteLabel />;
       case "ai-assistant":
         return <AiAssistant />;
+      case "whatsapp":
+        return <Whatsapp />;
       case "dashboard":
       default:
         return <Dashboard />;

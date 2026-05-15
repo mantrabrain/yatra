@@ -36,6 +36,7 @@ import {
   BadgePercent,
   Plane,
   MessageSquare,
+  MessageCircle,
   Puzzle,
   ArrowLeft,
   Loader2,
@@ -488,6 +489,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               subpage: "ai-assistant",
               label: __("AI Assistant", "yatra"),
               icon: Sparkles,
+              isPremium: true,
+            },
+          ]
+        : []),
+      // WhatsApp Notifications — Growth/Agency module. Same gate
+      // pattern as AI Assistant: needs the AI-eligibility flag (which
+      // is the Growth-or-Agency tier check) AND the module toggle on.
+      // useModules.ts updates `whatsappEnabled` on toggle + fires
+      // `yatra-modules-updated` so this menu appears instantly without
+      // a page reload.
+      ...((window as any).yatraAdmin?.isAiEligible &&
+      (window as any).yatraAdmin?.whatsappEnabled
+        ? [
+            {
+              subpage: "whatsapp",
+              label: __("WhatsApp", "yatra"),
+              icon: MessageCircle,
               isPremium: true,
             },
           ]

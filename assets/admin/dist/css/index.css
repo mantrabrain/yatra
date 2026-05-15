@@ -2202,6 +2202,9 @@ video {
   --tw-bg-opacity: 1;
   background-color: rgb(249 250 251 / var(--tw-bg-opacity, 1));
 }
+.bg-gray-50\/60 {
+  background-color: rgb(249 250 251 / 0.6);
+}
 .bg-gray-50\/70 {
   background-color: rgb(249 250 251 / 0.7);
 }
@@ -2251,6 +2254,9 @@ video {
 .bg-orange-50 {
   --tw-bg-opacity: 1;
   background-color: rgb(255 247 237 / var(--tw-bg-opacity, 1));
+}
+.bg-orange-50\/40 {
+  background-color: rgb(255 247 237 / 0.4);
 }
 .bg-orange-500 {
   --tw-bg-opacity: 1;
@@ -3153,6 +3159,9 @@ video {
 .text-orange-900 {
   --tw-text-opacity: 1;
   color: rgb(124 45 18 / var(--tw-text-opacity, 1));
+}
+.text-orange-900\/80 {
+  color: rgb(124 45 18 / 0.8);
 }
 .text-pink-700 {
   --tw-text-opacity: 1;
@@ -4543,6 +4552,11 @@ video {
   border-color: rgb(249 115 22 / var(--tw-border-opacity, 1));
 }
 
+.dark\:border-orange-700:is(.dark *) {
+  --tw-border-opacity: 1;
+  border-color: rgb(194 65 12 / var(--tw-border-opacity, 1));
+}
+
 .dark\:border-orange-700\/50:is(.dark *) {
   border-color: rgb(194 65 12 / 0.5);
 }
@@ -5314,6 +5328,11 @@ video {
   color: rgb(220 252 231 / var(--tw-text-opacity, 1));
 }
 
+.dark\:text-green-200:is(.dark *) {
+  --tw-text-opacity: 1;
+  color: rgb(187 247 208 / var(--tw-text-opacity, 1));
+}
+
 .dark\:text-green-300:is(.dark *) {
   --tw-text-opacity: 1;
   color: rgb(134 239 172 / var(--tw-text-opacity, 1));
@@ -5337,6 +5356,15 @@ video {
 .dark\:text-orange-100:is(.dark *) {
   --tw-text-opacity: 1;
   color: rgb(255 237 213 / var(--tw-text-opacity, 1));
+}
+
+.dark\:text-orange-200:is(.dark *) {
+  --tw-text-opacity: 1;
+  color: rgb(254 215 170 / var(--tw-text-opacity, 1));
+}
+
+.dark\:text-orange-200\/80:is(.dark *) {
+  color: rgb(254 215 170 / 0.8);
 }
 
 .dark\:text-orange-300:is(.dark *) {
@@ -5578,6 +5606,10 @@ video {
   background-color: rgb(120 53 15 / 0.2);
 }
 
+.dark\:hover\:bg-amber-900\/40:hover:is(.dark *) {
+  background-color: rgb(120 53 15 / 0.4);
+}
+
 .dark\:hover\:bg-amber-950\/40:hover:is(.dark *) {
   background-color: rgb(69 26 3 / 0.4);
 }
@@ -5700,6 +5732,10 @@ video {
 
 .dark\:hover\:bg-red-900\/20:hover:is(.dark *) {
   background-color: rgb(127 29 29 / 0.2);
+}
+
+.dark\:hover\:bg-red-900\/30:hover:is(.dark *) {
+  background-color: rgb(127 29 29 / 0.3);
 }
 
 .dark\:hover\:bg-red-950\/20:hover:is(.dark *) {

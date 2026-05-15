@@ -280,6 +280,22 @@ class ModuleManager
                 'requires_growth_or_agency' => true,
                 'settings_page' => 'ai-assistant',
             ],
+            [
+                'slug' => 'whatsapp',
+                'name' => __('WhatsApp Notifications', 'yatra'),
+                'description' => __('Send booking confirmations, payment alerts, departure reminders, and review requests over WhatsApp — the channel customers actually read. Inbound messages route into your Yatra Enquiries inbox. Bring your own WhatsApp Business / Cloud API credentials; messages are billed by Meta, not by the plugin.', 'yatra'),
+                'category' => __('Communications', 'yatra'),
+                'docs_url' => 'https://docs.yatra.com/modules/whatsapp',
+                'is_premium' => true,
+                'purchase_url' => 'https://wpyatra.com/pricing?module=whatsapp',
+                'is_core' => false,
+                'enabled' => false,
+                'tags' => ['whatsapp', 'notifications', 'messaging', 'communications', 'reminders'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
+                'requires_pro' => true,
+                'requires_growth_or_agency' => true,
+                'settings_page' => 'whatsapp',
+            ],
         ];
         
         return apply_filters('yatra_default_modules', $modules);

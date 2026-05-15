@@ -21,6 +21,7 @@ import {
   AlertTriangle,
   MessageCircle,
   Crown,
+  Info,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { useToast } from "../components/ui/toast";
@@ -441,6 +442,40 @@ const AiAssistant: React.FC = () => {
 
   /* ------------------------------- renderers ------------------------------- */
 
+  // Per-provider docs metadata — explains why an operator needs the
+  // key + where to find it + the canonical pricing page. Keyed by
+  // provider id so adding a future provider is one entry. Source of
+  // truth: each provider's published docs.
+  const providerDocs: Record<
+    string,
+    { whyDescription: string; whereToFind: string; docsUrl: string; pricingUrl: string }
+  > = {
+    openai: {
+      whyDescription: __(
+        "Authenticates every request the plugin sends to OpenAI on your behalf. OpenAI bills your account directly per request — the plugin adds no markup. Without a key, the AI sparkle affordances on Trip / SEO / Email editors stay disabled.",
+        "yatra",
+      ),
+      whereToFind: __(
+        "Sign in at platform.openai.com → API keys → Create new secret key. Copy the value (starts with sk-…) immediately — OpenAI shows it only once.",
+        "yatra",
+      ),
+      docsUrl: "https://platform.openai.com/api-keys",
+      pricingUrl: "https://openai.com/api/pricing/",
+    },
+    anthropic: {
+      whyDescription: __(
+        "Authenticates requests to Anthropic's Claude API. Anthropic bills your account directly per request — no plugin markup. Used for the same in-editor sparkle features OpenAI handles; pick whichever provider your team prefers.",
+        "yatra",
+      ),
+      whereToFind: __(
+        "Sign in at console.anthropic.com → Settings → API Keys → Create Key. Copy the value (starts with sk-ant-…) immediately — Anthropic shows it only once.",
+        "yatra",
+      ),
+      docsUrl: "https://console.anthropic.com/settings/keys",
+      pricingUrl: "https://www.anthropic.com/pricing#anthropic-api",
+    },
+  };
+
   const renderKeys = () => (
     <Card>
       <CardHeader>
@@ -453,10 +488,41 @@ const AiAssistant: React.FC = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Setup walkthrough — same pattern WhatsApp uses, so an
+            operator who configured one module knows what to expect
+            on the other. Explains the model: bring your own key,
+            usage is billed by the provider, the plugin adds no
+            markup. */}
+        <div className="rounded-md border border-blue-200 bg-blue-50/40 p-3 text-sm dark:border-blue-700 dark:bg-blue-900/20">
+          <div className="flex items-start gap-2">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+            <div className="space-y-2 text-blue-900 dark:text-blue-200">
+              <div className="font-medium">
+                {__(
+                  "How AI Assistant billing works",
+                  "yatra",
+                )}
+              </div>
+              <p className="text-xs">
+                {__(
+                  "You bring your own OpenAI or Anthropic key. Each AI generation (trip description, FAQ, email body, etc.) is a single API call your provider charges you for — usually fractions of a cent. The plugin never proxies traffic and adds no markup. You only need one key to start; you can save both and pick a default per task under the Defaults tab.",
+                  "yatra",
+                )}
+              </p>
+              <p className="text-[11px] opacity-80">
+                {__(
+                  "Click \"Where to find this\" next to a provider for the exact steps in their dashboard.",
+                  "yatra",
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
         {meta.providers.map((p) => {
           const status = meta.keys[p.id] ?? { configured: false, hint: "" };
           const draft = keyDrafts[p.id] ?? "";
           const visible = Boolean(showKey[p.id]);
+          const docs = providerDocs[p.id];
           return (
             <div
               key={p.id}
@@ -484,6 +550,55 @@ const AiAssistant: React.FC = () => {
                   <div className="text-xs text-gray-500">{status.hint}</div>
                 )}
               </div>
+
+              {/* Per-provider "why + where" callout. Two columns: a
+                  short why-needed paragraph + a where-to-find recipe
+                  with a deep link to the provider's keys page. Only
+                  renders when we have docs metadata for the provider
+                  — the fallback is silent so a future custom provider
+                  doesn't show a broken docs block. */}
+              {docs && (
+                <div className="mb-3 space-y-2 rounded-md border border-gray-100 bg-gray-50/60 p-3 text-xs text-gray-700 dark:border-gray-700 dark:bg-gray-800/40 dark:text-gray-300">
+                  <div className="flex items-start gap-1.5">
+                    <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gray-500" />
+                    <div>
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {__("Why it's needed:", "yatra")}
+                      </span>{" "}
+                      {docs.whyDescription}
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-1.5">
+                    <KeyRound className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gray-500" />
+                    <div>
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {__("Where to find it:", "yatra")}
+                      </span>{" "}
+                      {docs.whereToFind}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <a
+                      href={docs.docsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 rounded border border-gray-300 px-2 py-0.5 text-[11px] text-gray-700 hover:bg-white dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
+                    >
+                      {__("Open API keys page", "yatra")}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                    <a
+                      href={docs.pricingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 rounded border border-gray-300 px-2 py-0.5 text-[11px] text-gray-700 hover:bg-white dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
+                    >
+                      {__("Pricing", "yatra")}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                </div>
+              )}
 
               <div className="flex flex-wrap items-end gap-2">
                 <div className="flex-1 min-w-[240px]">
