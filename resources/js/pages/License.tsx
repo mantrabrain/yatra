@@ -33,7 +33,12 @@ interface LicenseInfo {
     name: string;
     tier: string;
     is_agency: boolean;
+    is_growth?: boolean;
+    is_personal?: boolean;
+    is_lifetime?: boolean;
     price_id: number | string | null;
+    matched_by?: "price_id" | "label" | "fallback" | "inactive" | "";
+    detected_label?: string;
   };
 }
 
@@ -582,19 +587,43 @@ const License: React.FC = () => {
                     <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                       {__("Plan", "yatra")}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="font-medium text-gray-900 dark:text-white">
                         {licenseInfo.plan.name}
                       </span>
                       {licenseInfo.plan.is_agency && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gradient-to-r from-purple-600 to-indigo-500 text-white">
                           <Crown className="w-3 h-3" />
-                          {licenseInfo.plan.tier === "agency_lifetime"
-                            ? __("Lifetime", "yatra")
-                            : __("Agency", "yatra")}
+                          {__("Agency", "yatra")}
+                        </span>
+                      )}
+                      {licenseInfo.plan.is_growth && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-600 text-white">
+                          {__("Growth", "yatra")}
+                        </span>
+                      )}
+                      {licenseInfo.plan.is_lifetime && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gradient-to-r from-amber-500 to-orange-500 text-white">
+                          {__("Lifetime", "yatra")}
                         </span>
                       )}
                     </div>
+                    {licenseInfo.plan.matched_by === "label" && (
+                      <p className="mt-2 text-[11px] text-gray-500 dark:text-gray-400">
+                        {__(
+                          "Detected from plan label (the original price ID was re-numbered on the store).",
+                          "yatra",
+                        )}
+                      </p>
+                    )}
+                    {licenseInfo.plan.matched_by === "fallback" && (
+                      <p className="mt-2 text-[11px] text-amber-600 dark:text-amber-400">
+                        {__(
+                          "Could not match price ID or label — defaulted to Personal. Contact support if your subscription is Growth or Agency.",
+                          "yatra",
+                        )}
+                      </p>
+                    )}
                   </div>
                 )}
 
