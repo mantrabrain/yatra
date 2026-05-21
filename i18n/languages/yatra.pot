@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-20T14:22:08+00:00\n"
+"POT-Creation-Date: 2026-05-21T14:07:52+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -695,7 +695,7 @@ msgstr ""
 msgid "Active Rules"
 msgstr ""
 
-# Source: resources/js/pages/License.tsx:664
+# Source: resources/js/pages/License.tsx:693
 #: assets/admin/dist/js/app.js
 msgid "Active Sites"
 msgstr ""
@@ -706,7 +706,7 @@ msgstr ""
 #: templates/listing-trip.php:424
 #: templates/shortcodes/trip-search.php:173
 #: templates/single-taxonomy.php:77
-#: templates/trip-listing-card.php:382
+#: templates/trip-listing-card.php:406
 #: assets/dist/blocks/tour.js:362
 msgid "Activities"
 msgstr ""
@@ -1506,7 +1506,7 @@ msgstr ""
 msgid "Advanced"
 msgstr ""
 
-# Source: resources/js/pages/License.tsx:391
+# Source: resources/js/pages/License.tsx:396
 #: assets/admin/dist/js/app.js
 msgid "Advanced Booking Management"
 msgstr ""
@@ -1546,7 +1546,7 @@ msgstr ""
 msgid "Age Restrictions"
 msgstr ""
 
-# Source: resources/js/pages/License.tsx:594, resources/js/pages/Modules.tsx:77, resources/js/pages/Modules.tsx:539
+# Source: resources/js/pages/License.tsx:597, resources/js/pages/Modules.tsx:77, resources/js/pages/Modules.tsx:539
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:255
 msgid "Agency"
@@ -3326,7 +3326,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: app/Controllers/SetupWizardController.php:83
 #: app/Core/Modules/ModuleManager.php:106
-#: templates/trip-listing-card.php:357
+#: templates/trip-listing-card.php:381
 #: assets/dist/js/account-page.js:1694
 #: assets/dist/js/account-page.js:2925
 msgid "Bookings"
@@ -4058,7 +4058,7 @@ msgstr ""
 msgid "City"
 msgstr ""
 
-# Source: resources/js/components/shared/ApplicableTripSelector.tsx:214, resources/js/components/shared/BulkActionToolbar.tsx:152, resources/js/pages/AiAssistant.tsx:679, resources/js/pages/ChannelManager.tsx:1156, resources/js/pages/ChannelManager.tsx:1451, resources/js/pages/License.tsx:759, resources/js/pages/TripConsentForm.tsx:245, resources/js/pages/Whatsapp.tsx:759
+# Source: resources/js/components/shared/ApplicableTripSelector.tsx:214, resources/js/components/shared/BulkActionToolbar.tsx:152, resources/js/pages/AiAssistant.tsx:679, resources/js/pages/ChannelManager.tsx:1156, resources/js/pages/ChannelManager.tsx:1451, resources/js/pages/License.tsx:788, resources/js/pages/TripConsentForm.tsx:245, resources/js/pages/Whatsapp.tsx:759
 #: assets/admin/dist/js/app.js
 msgid "Clear"
 msgstr ""
@@ -4790,7 +4790,7 @@ msgstr ""
 #: templates/partials/single-trip/content-sidebar.php:93
 #: templates/partials/single-trip/content-sidebar.php:157
 #: templates/partials/single-trip/similar-trips.php:268
-#: templates/trip-listing-card.php:431
+#: templates/trip-listing-card.php:455
 #: assets/dist/js/account-page.js:143
 #: assets/dist/js/index-DPUOGEIE.js:2162
 msgid "Contact for pricing"
@@ -4944,6 +4944,11 @@ msgstr ""
 # Source: resources/js/pages/Settings.tsx:8345
 #: assets/admin/dist/js/app.js
 msgid "Could not load this section. You may need permission to manage Yatra."
+msgstr ""
+
+# Source: resources/js/pages/License.tsx:621
+#: assets/admin/dist/js/app.js
+msgid "Could not match price ID or label — defaulted to Personal. Contact support if your subscription is Growth or Agency."
 msgstr ""
 
 # Source: resources/js/pages/account/Payments.tsx:361
@@ -6657,6 +6662,11 @@ msgstr ""
 msgid "Detailed description of what happens during this itinerary entry."
 msgstr ""
 
+# Source: resources/js/pages/License.tsx:613
+#: assets/admin/dist/js/app.js
+msgid "Detected from plan label (the original price ID was re-numbered on the store)."
+msgstr ""
+
 # Source: resources/js/pages/premium-pages/AbandonedRecovery.tsx:91
 #: assets/admin/dist/js/app.js
 msgid "Detection"
@@ -6684,7 +6694,7 @@ msgstr ""
 #: templates/partials/single-trip/quick-facts.php:44
 #: templates/pdf/itinerary.php:336
 #: templates/shortcodes/search.php:93
-#: templates/trip-listing-card.php:343
+#: templates/trip-listing-card.php:367
 msgid "Difficulty"
 msgstr ""
 
@@ -7207,7 +7217,7 @@ msgstr ""
 #: templates/shortcodes/search.php:132
 #: templates/shortcodes/trip-search.php:82
 #: templates/shortcodes/trip-search.php:219
-#: templates/trip-listing-card.php:293
+#: templates/trip-listing-card.php:317
 msgid "Duration"
 msgstr ""
 
@@ -7490,7 +7500,7 @@ msgstr ""
 msgid "Efficiency"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:434, resources/js/pages/AbandonedRecovery.tsx:670, resources/js/pages/AbandonedRecovery.tsx:1127, resources/js/pages/AbandonedRecovery.tsx:1458, resources/js/pages/Customers.tsx:450, resources/js/pages/Departures.tsx:1266, resources/js/pages/Enquiries.tsx:542, resources/js/pages/EnquiryForm.tsx:293, resources/js/pages/License.tsx:615, resources/js/pages/TripConsent.tsx:1079
+# Source: resources/js/components/Layout.tsx:434, resources/js/pages/AbandonedRecovery.tsx:670, resources/js/pages/AbandonedRecovery.tsx:1127, resources/js/pages/AbandonedRecovery.tsx:1458, resources/js/pages/Customers.tsx:450, resources/js/pages/Departures.tsx:1266, resources/js/pages/Enquiries.tsx:542, resources/js/pages/EnquiryForm.tsx:293, resources/js/pages/License.tsx:644, resources/js/pages/TripConsent.tsx:1079
 #: assets/admin/dist/js/app.js
 #: app/Services/EmailTemplateDefaults.php:580
 #: templates/pdf/consent.php:160
@@ -8652,7 +8662,7 @@ msgstr ""
 msgid "Expired"
 msgstr ""
 
-# Source: resources/js/pages/AbandonedRecovery.tsx:1549, resources/js/pages/License.tsx:627, resources/js/pages/License.tsx:653
+# Source: resources/js/pages/AbandonedRecovery.tsx:1549, resources/js/pages/License.tsx:656, resources/js/pages/License.tsx:682
 #: assets/admin/dist/js/app.js
 msgid "Expires"
 msgstr ""
@@ -10290,7 +10300,7 @@ msgstr ""
 
 # Source: resources/js/pages/DiscountForm.tsx:2693, resources/js/pages/premium-pages/DynamicPricing.tsx:109
 #: assets/admin/dist/js/app.js
-#: templates/trip-listing-card.php:199
+#: templates/trip-listing-card.php:223
 msgid "Group Discounts"
 msgstr ""
 
@@ -10319,7 +10329,7 @@ msgstr ""
 msgid "Group pricing"
 msgstr ""
 
-# Source: resources/js/pages/Modules.tsx:76, resources/js/pages/Modules.tsx:553
+# Source: resources/js/pages/License.tsx:602, resources/js/pages/Modules.tsx:76, resources/js/pages/Modules.tsx:553
 #: assets/admin/dist/js/app.js
 msgid "Growth"
 msgstr ""
@@ -11722,22 +11732,22 @@ msgstr ""
 msgid "Liability Waivers"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:538, resources/js/pages/License.tsx:353
+# Source: resources/js/components/Layout.tsx:538, resources/js/pages/License.tsx:358
 #: assets/admin/dist/js/app.js
 msgid "License"
 msgstr ""
 
-# Source: resources/js/pages/License.tsx:554
+# Source: resources/js/pages/License.tsx:559
 #: assets/admin/dist/js/app.js
 msgid "License Key"
 msgstr ""
 
-# Source: resources/js/pages/License.tsx:438
+# Source: resources/js/pages/License.tsx:443
 #: assets/admin/dist/js/app.js
 msgid "License Management"
 msgstr ""
 
-# Source: resources/js/pages/License.tsx:604
+# Source: resources/js/pages/License.tsx:633
 #: assets/admin/dist/js/app.js
 msgid "Licensed To"
 msgstr ""
@@ -11747,12 +11757,12 @@ msgstr ""
 msgid "Lifecycle Management"
 msgstr ""
 
-# Source: resources/js/pages/License.tsx:593
+# Source: resources/js/pages/License.tsx:607
 #: assets/admin/dist/js/app.js
 msgid "Lifetime"
 msgstr ""
 
-# Source: resources/js/pages/License.tsx:656
+# Source: resources/js/pages/License.tsx:685
 #: assets/admin/dist/js/app.js
 msgid "Lifetime License"
 msgstr ""
@@ -15098,7 +15108,7 @@ msgstr ""
 msgid "Placeholder text for input field"
 msgstr ""
 
-# Source: resources/js/pages/License.tsx:583
+# Source: resources/js/pages/License.tsx:588
 #: assets/admin/dist/js/app.js
 msgid "Plan"
 msgstr ""
@@ -15339,7 +15349,7 @@ msgstr ""
 msgid "Premium Feature"
 msgstr ""
 
-# Source: resources/js/pages/License.tsx:397
+# Source: resources/js/pages/License.tsx:402
 #: assets/admin/dist/js/app.js
 msgid "Premium Payment Gateways"
 msgstr ""
@@ -19339,7 +19349,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:5619
 #: assets/admin/dist/js/app.js
-#: app/Services/TripListingService.php:689
+#: app/Services/TripListingService.php:696
 msgid "Star"
 msgid_plural "Stars"
 msgstr[0] ""
@@ -22368,7 +22378,7 @@ msgstr ""
 #: templates/partials/single-trip/similar-trips.php:272
 #: templates/single-activity.php:274
 #: templates/single-destination.php:274
-#: templates/trip-listing-card.php:438
+#: templates/trip-listing-card.php:462
 #: assets/dist/js/account-page.js:1857
 #: assets/dist/js/account-page.js:2911
 msgid "View Details"
@@ -28369,52 +28379,52 @@ msgstr ""
 msgid "Duration: Longest"
 msgstr ""
 
-#: app/Services/TripListingService.php:769
+#: app/Services/TripListingService.php:776
 msgid "Discount Available"
 msgstr ""
 
-#: app/Services/TripListingService.php:775
+#: app/Services/TripListingService.php:782
 msgid "Early Bird Offer"
 msgstr ""
 
-#: app/Services/TripListingService.php:781
+#: app/Services/TripListingService.php:788
 msgid "Last Minute Deal"
 msgstr ""
 
-#: app/Services/TripListingService.php:787
+#: app/Services/TripListingService.php:794
 msgid "Instant Booking"
 msgstr ""
 
-#: app/Services/TripListingService.php:793
-#: app/Services/TripListingService.php:855
+#: app/Services/TripListingService.php:800
+#: app/Services/TripListingService.php:862
 msgid "Flexible Dates"
 msgstr ""
 
-#: app/Services/TripListingService.php:799
+#: app/Services/TripListingService.php:806
 msgid "Pay Later Available"
 msgstr ""
 
-#: app/Services/TripListingService.php:815
+#: app/Services/TripListingService.php:822
 msgid "Family Friendly"
 msgstr ""
 
-#: app/Services/TripListingService.php:821
+#: app/Services/TripListingService.php:828
 msgid "Kids Friendly"
 msgstr ""
 
-#: app/Services/TripListingService.php:827
+#: app/Services/TripListingService.php:834
 msgid "Senior Friendly"
 msgstr ""
 
-#: app/Services/TripListingService.php:833
+#: app/Services/TripListingService.php:840
 msgid "Adults Only"
 msgstr ""
 
-#: app/Services/TripListingService.php:849
+#: app/Services/TripListingService.php:856
 msgid "Instant Confirmation"
 msgstr ""
 
-#: app/Services/TripListingService.php:861
+#: app/Services/TripListingService.php:868
 msgid "Reserve Now, Pay Later"
 msgstr ""
 
@@ -30876,7 +30886,7 @@ msgstr ""
 #: templates/partials/single-trip/similar-trips.php:165
 #: templates/single-activity.php:174
 #: templates/single-destination.php:174
-#: templates/trip-listing-card.php:203
+#: templates/trip-listing-card.php:227
 msgid "Save to wishlist"
 msgstr ""
 
@@ -31012,7 +31022,7 @@ msgstr ""
 
 #. translators: %s: discount text (e.g. "10%")
 #: templates/partials/single-trip/similar-trips.php:157
-#: templates/trip-listing-card.php:188
+#: templates/trip-listing-card.php:212
 #, php-format
 msgid "%s OFF"
 msgstr ""
@@ -32232,28 +32242,28 @@ msgstr[1] ""
 msgid "There are no trips available for %s at the moment. Please check back later or explore other options."
 msgstr ""
 
-#: templates/trip-listing-card.php:222
+#: templates/trip-listing-card.php:246
 msgid "Trip location"
 msgstr ""
 
 #. translators: %d: number of reviews
-#: templates/trip-listing-card.php:309
+#: templates/trip-listing-card.php:333
 #, php-format
 msgid "%d review"
 msgid_plural "%d reviews"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/trip-listing-card.php:331
+#: templates/trip-listing-card.php:355
 msgid "Group size"
 msgstr ""
 
-#: templates/trip-listing-card.php:364
-#: templates/trip-listing-card.php:369
+#: templates/trip-listing-card.php:388
+#: templates/trip-listing-card.php:393
 msgid "Traveler types"
 msgstr ""
 
-#: templates/trip-listing-card.php:393
+#: templates/trip-listing-card.php:417
 msgid "More categories"
 msgstr ""
 
