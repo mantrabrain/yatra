@@ -493,7 +493,8 @@ class AdminServiceProvider extends ServiceProvider
         // A submenu with the same slug as the parent replaces that entry with a distinct label.
         add_submenu_page(
             'yatra',
-            sprintf(/* translators: %s = branded plugin name. */ __('%s Dashboard', 'yatra'), $brand_name),
+            /* translators: %s: branded plugin name. */
+            sprintf(__('%s Dashboard', 'yatra'), $brand_name),
             __('Dashboard', 'yatra'),
             'manage_options',
             'yatra',

@@ -30,10 +30,24 @@ export async function fetchEmailTemplate(
   );
 }
 
-export async function fetchEmailTemplateVariables(): Promise<EmailTemplateVariableMap> {
-  return unwrapApiPayload<EmailTemplateVariableMap>(
-    await apiClient.get(API_ENDPOINTS.EMAIL_TEMPLATE_VARIABLES),
-  );
+/**
+ * Fetch the merge-tag catalog for the Template Editor "Available
+ * Variables" sidebar.
+ *
+ * Pass `eventKey` to get only the variables that apply to that
+ * automation event (e.g. `booking.created` returns the booking +
+ * customer + payment tags but skips enquiry / consent). Omit it
+ * (or pass an empty string) to get the full union of all tags —
+ * matches the pre-3.0.5 behavior for callers that haven't been
+ * updated.
+ */
+export async function fetchEmailTemplateVariables(
+  eventKey?: string,
+): Promise<EmailTemplateVariableMap> {
+  const url = eventKey && eventKey.trim() !== ""
+    ? `${API_ENDPOINTS.EMAIL_TEMPLATE_VARIABLES}?event_key=${encodeURIComponent(eventKey.trim())}`
+    : API_ENDPOINTS.EMAIL_TEMPLATE_VARIABLES;
+  return unwrapApiPayload<EmailTemplateVariableMap>(await apiClient.get(url));
 }
 
 export async function createEmailTemplate(data: unknown): Promise<unknown> {

@@ -143,6 +143,15 @@ const AccountPage: React.FC = () => {
 
   const [section, setSection] = useState<Section>(getSectionFromUrl);
 
+  // Cross-section booking selection. Lifted here from Bookings.tsx so
+  // Dashboard's upcoming-trip cards can deep-link straight into the
+  // booking detail screen — click on the dashboard card sets this id
+  // AND switches to the "bookings" section; the Bookings component
+  // honours `initialBookingId` on mount/update to open the detail view.
+  const [pendingBookingId, setPendingBookingId] = useState<number | null>(
+    null,
+  );
+
   // Update section when URL changes
   React.useEffect(() => {
     const newSection = getSectionFromUrl();
@@ -166,6 +175,14 @@ const AccountPage: React.FC = () => {
       // Trigger URL change event
       window.dispatchEvent(new PopStateEvent("popstate"));
     }
+  };
+
+  // Open a specific booking from anywhere (currently used by the
+  // Dashboard's "Upcoming Trips" cards). Switches to the bookings tab
+  // and seeds the id so Bookings opens straight into the detail view.
+  const handleBookingOpen = (bookingId: number) => {
+    setPendingBookingId(bookingId);
+    handleSectionChange("bookings");
   };
 
   // State moved to individual components
@@ -440,6 +457,7 @@ const AccountPage: React.FC = () => {
             onSectionChange={(section: string) =>
               handleSectionChange(section as Section)
             }
+            onBookingOpen={handleBookingOpen}
           />
         );
       case "bookings":
@@ -451,6 +469,8 @@ const AccountPage: React.FC = () => {
             onSectionChange={(section: string) =>
               handleSectionChange(section as Section)
             }
+            initialBookingId={pendingBookingId}
+            onBookingIdConsumed={() => setPendingBookingId(null)}
           />
         );
       case "payments":

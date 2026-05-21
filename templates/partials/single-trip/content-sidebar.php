@@ -37,7 +37,11 @@ if (!defined('ABSPATH')) {
     $discount = [
         'has_discount'       => $displayPricing['has_discount'] && $displayPricing['max_discount_percentage'] > 0,
         'discount_text'      => $displayPricing['max_discount_percentage'] > 0
-            ? sprintf(__('Save up to %d%%', 'yatra'), $displayPricing['max_discount_percentage']) : '',
+            ? sprintf(
+                /* translators: %d: maximum discount percentage. */
+                __('Save up to %d%%', 'yatra'),
+                $displayPricing['max_discount_percentage']
+            ) : '',
         'discount_percentage' => $displayPricing['max_discount_percentage'],
     ];
 
@@ -247,6 +251,7 @@ if (!defined('ABSPATH')) {
                             && !empty($dropdown_options);
 
                         echo esc_html(sprintf(
+                            /* translators: %d: number of departures available. */
                             _n('%d departure available', '%d departures available', $countAvailable, 'yatra'),
                             $countAvailable
                         ));
@@ -341,16 +346,22 @@ if (!defined('ABSPATH')) {
                     <span class="yatra-availability-note">
                         <?php
                         if (!empty($trip->getAvailableFrom()) && !empty($trip->getAvailableTo())) {
-                            echo esc_html(sprintf(__('Available: %s - %s', 'yatra'),
+                            echo esc_html(sprintf(
+                                /* translators: 1: available-from date, 2: available-to date. */
+                                __('Available: %1$s - %2$s', 'yatra'),
                                 date_i18n(get_option('date_format'), strtotime($trip->getAvailableFrom())),
                                 date_i18n(get_option('date_format'), strtotime($trip->getAvailableTo()))
                             ));
                         } elseif (!empty($trip->getAvailableFrom())) {
-                            echo esc_html(sprintf(__('Available from: %s', 'yatra'),
+                            echo esc_html(sprintf(
+                                /* translators: %s: available-from date. */
+                                __('Available from: %s', 'yatra'),
                                 date_i18n(get_option('date_format'), strtotime($trip->getAvailableFrom()))
                             ));
                         } else {
-                            echo esc_html(sprintf(__('Available until: %s', 'yatra'),
+                            echo esc_html(sprintf(
+                                /* translators: %s: available-until date. */
+                                __('Available until: %s', 'yatra'),
                                 date_i18n(get_option('date_format'), strtotime($trip->getAvailableTo()))
                             ));
                         }
@@ -485,7 +496,8 @@ if (!defined('ABSPATH')) {
                             $time_value = $matches[1];
                             $time_unit = $matches[2];
                             $cancellation_text = sprintf(
-                                __('Free cancellation up to %d %s%s before', 'yatra'),
+                                /* translators: 1: numeric time value, 2: time unit (hour/day/week), 3: plural suffix ("s" or empty). */
+                                __('Free cancellation up to %1$d %2$s%3$s before', 'yatra'),
                                 $time_value,
                                 $time_unit,
                                 $time_value > 1 ? 's' : ''

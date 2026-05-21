@@ -29,6 +29,58 @@ class CustomerService
     }
 
     /**
+     * Link any prior guest bookings made under a customer's email
+     * to their newly-created WordPress user account.
+     *
+     * Without this, a customer who books as a guest first and only
+     * registers later will never see those earlier bookings in My
+     * Account — the rows persist with user_id=0 and the My Account
+     * query filters by user_id. Wired to the `user_register` hook
+     * (see Bootstrap::setupWordPressHooks).
+     *
+     * Returns the number of bookings that were linked. Returns 0
+     * silently on any failure — registration should never break on
+     * a reconciliation glitch, and the operator can re-run the
+     * reconciliation later via an admin tool if needed.
+     */
+    public function linkGuestBookingsToUser(int $user_id): int
+    {
+        if ($user_id <= 0) {
+            return 0;
+        }
+        $user = get_userdata($user_id);
+        if (!$user || empty($user->user_email)) {
+            return 0;
+        }
+
+        global $wpdb;
+        $table = \Yatra\Database\Tables\BookingsTable::getTableName();
+
+        // Match by exact email + user_id IS NULL/0. Limited to bookings
+        // not yet linked to any user so we never re-assign someone
+        // else's account.
+        $updated = $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE `{$table}` SET user_id = %d, updated_at = %s
+                 WHERE contact_email = %s
+                 AND (user_id IS NULL OR user_id = 0)",
+                $user_id,
+                current_time('mysql'),
+                $user->user_email
+            )
+        );
+
+        if ($updated && $updated > 0) {
+            // Side-effect hook so other modules (Pro: Channel Manager,
+            // notifications, audit log) can react. Fires once per
+            // registration with the count + the user object.
+            do_action('yatra_guest_bookings_linked', (int) $user_id, (int) $updated, $user);
+        }
+
+        return (int) max(0, (int) $updated);
+    }
+
+    /**
      * Get customer statistics
      *
      * @return array
@@ -266,7 +318,11 @@ class CustomerService
 
         return [
             'success' => true,
-            'message' => sprintf(__('Customer status updated to %s.', 'yatra'), $status),
+            'message' => sprintf(
+                /* translators: %s: new customer status. */
+                __('Customer status updated to %s.', 'yatra'),
+                $status
+            ),
         ];
     }
 
@@ -411,6 +467,28 @@ class CustomerService
             }
         }
 
+        // Unserialise the travelers payload here so both the legacy
+        // `travelers` key AND the React-side `travelers_data` alias
+        // share the same in-memory value — otherwise we'd unserialise
+        // twice and drift if one consumer mutates the array.
+        $travelersList = isset($booking->travelers) ? maybe_unserialize($booking->travelers) : null;
+        if (is_string($travelersList)) {
+            $decoded = json_decode($travelersList, true);
+            if (is_array($decoded)) {
+                $travelersList = $decoded;
+            }
+        }
+
+        // Derive customer_* convenience fields. The admin React maps
+        // contact_first_name + contact_last_name → customer_name at the
+        // page level (see ViewBooking.tsx), so we mirror the same shape
+        // server-side for the customer account view. Keeping ALL
+        // original contact_* fields too so any caller depending on the
+        // old shape (filters, integrations) stays unaffected.
+        $contactFirst = (string) ($booking->contact_first_name ?? '');
+        $contactLast  = (string) ($booking->contact_last_name ?? '');
+        $customerName = trim($contactFirst . ' ' . $contactLast);
+
         $details = [
             'id' => (int) ($booking->id ?? 0),
             'reference' => $booking->reference ?? null,
@@ -437,10 +515,19 @@ class CustomerService
             'contact_email' => $booking->contact_email ?? null,
             'contact_phone' => $booking->contact_phone ?? null,
             'contact_country' => $booking->contact_country ?? null,
+            // Convenience aliases the React account page (BookingDetails.tsx)
+            // reads as `customer_name`/`customer_email`/`customer_phone`.
+            'customer_name' => $customerName !== '' ? $customerName : null,
+            'customer_email' => $booking->contact_email ?? null,
+            'customer_phone' => $booking->contact_phone ?? null,
             'special_requests' => $booking->special_requests ?? null,
             'emergency_contact' => $emergencyContact,
             'contact_data' => isset($booking->contact_data) ? maybe_unserialize($booking->contact_data) : null,
-            'travelers' => isset($booking->travelers) ? maybe_unserialize($booking->travelers) : null,
+            'travelers' => $travelersList,
+            // React's BookingDetails reads `travelers_data` (same name
+            // the admin ViewBooking screen uses); alias it here so the
+            // "Travelers Information" card actually renders.
+            'travelers_data' => is_array($travelersList) ? $travelersList : [],
             'payments' => [],
         ];
 
@@ -612,7 +699,11 @@ class CustomerService
 
                 $documents[] = [
                     'id' => 'invoice-payment-' . $paymentId,
-                    'name' => sprintf(__('Invoice #%s.pdf', 'yatra'), $docRef),
+                    'name' => sprintf(
+                        /* translators: %s: booking reference or ID. */
+                        __('Invoice #%s.pdf', 'yatra'),
+                        $docRef
+                    ),
                     'trip_title' => $tripTitle,
                     'category' => 'invoice',
                     'updated_at' => $payment->created_at ?? $createdAt ?: date('Y-m-d H:i:s'),
@@ -631,7 +722,11 @@ class CustomerService
 
                 $documents[] = [
                     'id' => 'voucher-' . $bookingId, // Booking-based ID
-                    'name' => sprintf(__('Travel Voucher #%s.pdf', 'yatra'), $docRef),
+                    'name' => sprintf(
+                        /* translators: %s: booking reference or ID. */
+                        __('Travel Voucher #%s.pdf', 'yatra'),
+                        $docRef
+                    ),
                     'trip_title' => $tripTitle,
                     'category' => 'voucher',
                     'updated_at' => $createdAt ?: date('Y-m-d H:i:s'),
@@ -645,7 +740,11 @@ class CustomerService
 
                 $documents[] = [
                     'id' => 'itinerary-' . $bookingId, // Booking-based ID
-                    'name' => sprintf(__('Travel Itinerary #%s.pdf', 'yatra'), $docRef),
+                    'name' => sprintf(
+                        /* translators: %s: booking reference or ID. */
+                        __('Travel Itinerary #%s.pdf', 'yatra'),
+                        $docRef
+                    ),
                     'trip_title' => $tripTitle,
                     'category' => 'itinerary',
                     'updated_at' => $createdAt ?: date('Y-m-d H:i:s'),

@@ -205,19 +205,62 @@ async function fetchPreviewPdf(url: string): Promise<Blob> {
   return new Blob([bytes], { type: "application/pdf" });
 }
 
-function openPdfInNewTab(blob: Blob): void {
+/**
+ * Open a blob in a new tab while keeping the browser's user-gesture
+ * heuristic happy.
+ *
+ * Browsers gate `window.open` on the call originating from a *sync*
+ * user gesture. The preview flows here go user-click → `await fetch(…)`
+ * → `window.open(blobUrl)`; the await breaks the gesture chain, so
+ * Chrome/Safari block the popup and the user gets a noisy alert.
+ *
+ * Two-step pattern instead:
+ *   1. caller opens an `about:blank` window SYNCHRONOUSLY inside the
+ *      click handler — that pre-opened window IS attributed to the
+ *      gesture, so no popup-blocker dance.
+ *   2. once the fetch resolves, we navigate that same window to the
+ *      blob URL. If the pre-opened window was already blocked (rare —
+ *      means the site is restricted entirely), we silently fall back
+ *      to a download anchor so the user still gets the PDF.
+ */
+function openPdfInPreOpenedWindow(
+  blob: Blob,
+  preOpened: Window | null,
+  filename: string,
+): void {
   const objectUrl = URL.createObjectURL(blob);
-  const win = window.open(objectUrl, "_blank", "noopener,noreferrer");
-  if (!win) {
-    URL.revokeObjectURL(objectUrl);
-    throw new Error(
-      __(
-        "Popup blocked. Allow popups for this site to preview the PDF.",
-        "yatra",
-      ),
-    );
+
+  if (preOpened && !preOpened.closed) {
+    try {
+      preOpened.location.href = objectUrl;
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+      return;
+    } catch {
+      // Cross-origin / sandboxed navigation refused — close the empty
+      // window and fall through to the anchor fallback below.
+      try {
+        preOpened.close();
+      } catch {
+        /* ignore */
+      }
+    }
   }
+
+  // Fallback: open in a new tab via an anchor click. Crucially we DO
+  // NOT set `link.download` here — this is the PREVIEW path; using
+  // `download` would force the browser to save the file, which is
+  // exactly the bug we're trying to fix ("Preview button does the
+  // same as Download"). target="_blank" + no download attribute
+  // makes the browser open the PDF in its built-in viewer.
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
   window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+  void filename; // filename only matters for the download path
 }
 
 async function downloadBookingBinary(
@@ -368,22 +411,63 @@ export const downloadInvoice = (paymentId: number) =>
 export const downloadItinerary = (bookingId: number) =>
   downloadBookingBinary(bookingId, "itinerary");
 
+/**
+ * Pre-open an `about:blank` window inside the synchronous click
+ * handler so the browser still attributes the eventual navigation to
+ * the user gesture. Returns null when popups are blocked outright —
+ * callers degrade gracefully to a download anchor (see
+ * `openPdfInPreOpenedWindow`).
+ *
+ * IMPORTANT: we do NOT pass "noopener" / "noreferrer" here. With
+ * `noopener` set, `window.open()` is specified to return `null` so
+ * the caller can't navigate the new tab — which is the exact thing
+ * we need to do once the fetch resolves. The previous version of
+ * this function included noopener and silently always returned null,
+ * making EVERY click on Preview fall through to the download anchor.
+ * The blob URL we navigate to is same-origin and untrusted by
+ * design, so opener access from the new tab is harmless here.
+ */
+function preOpenPreviewWindow(): Window | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.open("about:blank", "_blank");
+  } catch {
+    return null;
+  }
+}
+
 /** Open payment invoice PDF in a new tab (REST preview JSON → blob). */
 export const previewPaymentInvoice = async (
   paymentId: number,
 ): Promise<void> => {
-  const { base, nonce } = getAccountRestConfig();
-  if (!nonce) {
-    throw new Error(
-      __(
-        "Missing security token. Reload the account page and try again.",
-        "yatra",
-      ),
-    );
+  // Open the window BEFORE the async fetch — the click is still the
+  // active user gesture at this point, so the popup blocker doesn't
+  // fire. Subsequent `await` calls are fine; we just navigate the
+  // already-opened window once we have the blob.
+  const preOpened = preOpenPreviewWindow();
+  try {
+    const { base, nonce } = getAccountRestConfig();
+    if (!nonce) {
+      throw new Error(
+        __(
+          "Missing security token. Reload the account page and try again.",
+          "yatra",
+        ),
+      );
+    }
+    const url = buildPaymentInvoiceUrl(base, paymentId, "preview");
+    const blob = await fetchPreviewPdf(url);
+    openPdfInPreOpenedWindow(blob, preOpened, `invoice-${paymentId}.pdf`);
+  } catch (e) {
+    if (preOpened && !preOpened.closed) {
+      try {
+        preOpened.close();
+      } catch {
+        /* ignore */
+      }
+    }
+    throw e;
   }
-  const url = buildPaymentInvoiceUrl(base, paymentId, "preview");
-  const blob = await fetchPreviewPdf(url);
-  openPdfInNewTab(blob);
 };
 
 export async function previewTravelDocument(doc: {
@@ -392,38 +476,57 @@ export async function previewTravelDocument(doc: {
   booking_id?: number;
   payment_id?: number;
 }): Promise<void> {
-  const { base, nonce } = getAccountRestConfig();
-  if (!nonce) {
-    throw new Error(
-      __(
-        "Missing security token. Reload the account page and try again.",
-        "yatra",
-      ),
-    );
-  }
-
-  if (doc.category === "invoice") {
-    const pid = doc.payment_id ?? parsePaymentIdFromHref(doc.url);
-    if (!pid) {
-      throw new Error(__("Could not resolve invoice link.", "yatra"));
+  const preOpened = preOpenPreviewWindow();
+  try {
+    const { base, nonce } = getAccountRestConfig();
+    if (!nonce) {
+      throw new Error(
+        __(
+          "Missing security token. Reload the account page and try again.",
+          "yatra",
+        ),
+      );
     }
-    const url = buildPaymentInvoiceUrl(base, pid, "preview");
-    const blob = await fetchPreviewPdf(url);
-    openPdfInNewTab(blob);
-    return;
-  }
 
-  if (doc.category === "voucher" || doc.category === "itinerary") {
-    const kind = doc.category === "voucher" ? "voucher" : "itinerary";
-    const bid = doc.booking_id ?? parseBookingDocFromHref(doc.url, kind);
-    if (!bid) {
-      throw new Error(__("Could not resolve document link.", "yatra"));
+    if (doc.category === "invoice") {
+      const pid = doc.payment_id ?? parsePaymentIdFromHref(doc.url);
+      if (!pid) {
+        throw new Error(__("Could not resolve invoice link.", "yatra"));
+      }
+      const url = buildPaymentInvoiceUrl(base, pid, "preview");
+      const blob = await fetchPreviewPdf(url);
+      openPdfInPreOpenedWindow(blob, preOpened, `invoice-${pid}.pdf`);
+      return;
     }
-    const url = buildBookingDocumentUrl(base, bid, kind, "preview");
-    const blob = await fetchPreviewPdf(url);
-    openPdfInNewTab(blob);
-    return;
-  }
 
-  window.open(doc.url, "_blank", "noopener,noreferrer");
+    if (doc.category === "voucher" || doc.category === "itinerary") {
+      const kind = doc.category === "voucher" ? "voucher" : "itinerary";
+      const bid = doc.booking_id ?? parseBookingDocFromHref(doc.url, kind);
+      if (!bid) {
+        throw new Error(__("Could not resolve document link.", "yatra"));
+      }
+      const url = buildBookingDocumentUrl(base, bid, kind, "preview");
+      const blob = await fetchPreviewPdf(url);
+      openPdfInPreOpenedWindow(blob, preOpened, `${kind}-${bid}.pdf`);
+      return;
+    }
+
+    // Unknown category — fall back to navigating the pre-opened
+    // window directly to the original URL, or open it fresh if the
+    // pre-open was blocked.
+    if (preOpened && !preOpened.closed) {
+      preOpened.location.href = doc.url;
+    } else {
+      window.open(doc.url, "_blank", "noopener,noreferrer");
+    }
+  } catch (e) {
+    if (preOpened && !preOpened.closed) {
+      try {
+        preOpened.close();
+      } catch {
+        /* ignore */
+      }
+    }
+    throw e;
+  }
 }

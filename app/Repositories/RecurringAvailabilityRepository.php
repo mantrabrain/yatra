@@ -80,6 +80,44 @@ class RecurringAvailabilityRepository extends BaseRepository
     }
 
     /**
+     * Find all rules matching ANY of the given trip IDs (batched
+     * counterpart of {@see self::findByTripId()}). Used by callers like
+     * {@see \Yatra\Repositories\DestinationRepository::computeStartingPriceForTripIds()}
+     * that previously issued one query per trip and got N+1 amplification.
+     *
+     * Currently supports just the `status` filter — that's all the
+     * batched callers need; ORDER and pagination are intentionally
+     * dropped because the caller folds the rows in PHP.
+     *
+     * @param list<int> $tripIds
+     */
+    public function findByTripIds(array $tripIds, array $filters = []): array
+    {
+        $tripIds = array_values(array_unique(array_filter(array_map('intval', $tripIds), static fn (int $id): bool => $id > 0)));
+        if ($tripIds === []) {
+            return [];
+        }
+
+        $table = esc_sql($this->table);
+        $placeholders = implode(',', array_fill(0, count($tripIds), '%d'));
+        $where = ["trip_id IN ({$placeholders})"];
+        $params = $tripIds;
+
+        if (!empty($filters['status']) && $filters['status'] !== 'all') {
+            $where[] = 'status = %s';
+            $params[] = (string) $filters['status'];
+        }
+
+        $query = "SELECT * FROM `{$table}` WHERE " . implode(' AND ', $where);
+
+        $results = $this->wpdb->get_results(
+            $this->wpdb->prepare($query, ...$params)
+        );
+
+        return array_map([$this, 'hydrateRule'], $results ?: []);
+    }
+
+    /**
      * Count rules by trip ID
      */
     public function countByTripId(int $tripId, array $filters = []): int

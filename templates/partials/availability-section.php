@@ -159,10 +159,14 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
          data-sort="<?php echo esc_attr($sort_key); ?>">
         <button type="button" class="yatra-availability-load-more-btn">
             <?php echo yatra_svg_icon('plus', 'yatra-icon-sm'); ?>
-            <?php echo esc_html(sprintf(__('Load more departures (%d remaining)', 'yatra'), $remaining_after_load)); ?>
+            <?php
+            /* translators: %d: number of additional departures still available to load. */
+            echo esc_html(sprintf(__('Load more departures (%d remaining)', 'yatra'), $remaining_after_load));
+            ?>
         </button>
         <span class="yatra-availability-count-info">
             <?php echo esc_html(sprintf(
+                /* translators: 1: number of departures currently loaded, 2: total number of departures matching the filter. */
                 __('Showing %1$d of %2$d departures', 'yatra'),
                 $availability_loaded_count,
                 $availability_total_matching

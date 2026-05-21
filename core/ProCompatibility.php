@@ -153,6 +153,7 @@ class Yatra_Pro_Compatibility
         // Different messages based on Yatra Pro status
         if ($yatra_pro_status['needs_installation']) {
             $message = sprintf(
+                /* translators: %s: comma-separated list of legacy Yatra add-on plugin names that now ship with Yatra Pro 2.0. */
                 _n(
                     'The following plugin has been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. To use these features, you need to install Yatra Pro 2.0.0. <em>Note: Updates for this plugin will only be available in Yatra Pro from now onwards.</em>',
                     'The following plugins have been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. To use these features, you need to install Yatra Pro 2.0.0. <em>Note: Updates for these plugins will only be available in Yatra Pro from now onwards.</em>',
@@ -163,6 +164,7 @@ class Yatra_Pro_Compatibility
             );
         } elseif ($yatra_pro_status['needs_activation']) {
             $message = sprintf(
+                /* translators: %s: comma-separated list of legacy Yatra add-on plugin names that now ship with Yatra Pro 2.0. */
                 _n(
                     'The following plugin has been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please activate Yatra Pro 2.0.0 to use these features. <em>Note: Updates for this plugin will only be available in Yatra Pro from now onwards.</em>',
                     'The following plugins have been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please activate Yatra Pro 2.0.0 to use these features. <em>Note: Updates for these plugins will only be available in Yatra Pro from now onwards.</em>',
@@ -173,6 +175,7 @@ class Yatra_Pro_Compatibility
             );
         } elseif ($yatra_pro_status['needs_upgrade']) {
             $message = sprintf(
+                /* translators: %s: comma-separated list of legacy Yatra add-on plugin names that now ship with Yatra Pro 2.0. */
                 _n(
                     'The following plugin has been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please upgrade Yatra Pro to version 2.0.0 or higher to use these features. <em>Note: Updates for this plugin will only be available in Yatra Pro from now onwards.</em>',
                     'The following plugins have been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please upgrade Yatra Pro to version 2.0.0 or higher to use these features. <em>Note: Updates for these plugins will only be available in Yatra Pro from now onwards.</em>',
@@ -183,6 +186,7 @@ class Yatra_Pro_Compatibility
             );
         } else {
             $message = sprintf(
+                /* translators: %s: comma-separated list of legacy Yatra add-on plugin names that now ship with Yatra Pro 2.0. */
                 _n(
                     'The following plugin has been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please make sure you have updated Yatra Pro to version 2.0.0, enable the related features, and deactivate this plugin. <em>Note: Updates for this plugin will only be available in Yatra Pro from now onwards.</em>',
                     'The following plugins have been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please make sure you have updated Yatra Pro to version 2.0.0, enable the related features, and deactivate these plugins. <em>Note: Updates for these plugins will only be available in Yatra Pro from now onwards.</em>',
@@ -632,6 +636,7 @@ class Yatra_Pro_Compatibility
         }
 
         $message = sprintf(
+            /* translators: %d: number of legacy add-on plugins that were deactivated. */
             __('Successfully deactivated %d plugin(s) and enabled corresponding features in Yatra Pro 2.0.0. The page will reload shortly.', 'yatra'),
             count($deactivated_plugins)
         );
@@ -704,6 +709,7 @@ class Yatra_Pro_Compatibility
         $result = activate_plugin($plugin_file);
 
         if (is_wp_error($result)) {
+            /* translators: %s: WordPress activation error message returned by activate_plugin(). */
             wp_send_json_error(array('message' => sprintf(__('Failed to activate Yatra Pro: %s', 'yatra'), $result->get_error_message())));
         }
 

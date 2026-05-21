@@ -167,7 +167,11 @@ class PaymentService
 
         return [
             'success' => true,
-            'message' => sprintf(__('Payment status updated to %s.', 'yatra'), $status),
+            'message' => sprintf(
+                /* translators: %s: new payment status. */
+                __('Payment status updated to %s.', 'yatra'),
+                $status
+            ),
         ];
     }
 

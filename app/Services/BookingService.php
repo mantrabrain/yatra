@@ -125,6 +125,7 @@ class BookingService
                     return [
                         'success' => false,
                         'message' => sprintf(
+                            /* translators: %d: maximum number of travelers allowed. */
                             __('Maximum %d travelers allowed for this trip.', 'yatra'),
                             $maxCapacity
                         )
@@ -448,7 +449,25 @@ class BookingService
                 $booking = (object) [];
             }
 
-            do_action(\Yatra\Hooks\TelemetryHookNames::BOOKING_CREATED, (int) $bookingId, $booking);
+            // Defer the public booking-created action when the row is
+            // still in `pending_verification`. Sending the booking
+            // confirmation email and firing analytics integrations
+            // before the customer has proven the email is theirs would
+            // (a) leak the booking details to whoever owns that
+            // address, and (b) inflate conversion metrics with bookings
+            // that may never be verified. BookingSessionController::
+            // verify_email() re-fires this action after the status flip
+            // so every listener (NotificationHooks, EmailAutomation,
+            // analytics modules) still runs — just *after* verification.
+            //
+            // Inventory + cache invalidation aren't routed through this
+            // action (they're called directly above), so seat-holding
+            // continues to work while the customer is in the holding
+            // state.
+            $bookingStatus = (string) ($data['status'] ?? ($booking->status ?? ''));
+            if ($bookingStatus !== 'pending_verification') {
+                do_action(\Yatra\Hooks\TelemetryHookNames::BOOKING_CREATED, (int) $bookingId, $booking);
+            }
 
             return [
                 'success' => true,
@@ -655,7 +674,11 @@ class BookingService
 
         return [
             'success' => true,
-            'message' => sprintf(__('Booking status updated to %s.', 'yatra'), $status),
+            'message' => sprintf(
+                /* translators: %s: new booking status. */
+                __('Booking status updated to %s.', 'yatra'),
+                $status
+            ),
         ];
     }
 
@@ -991,10 +1014,12 @@ class BookingService
         }
 
         if ($newStatus === 'cancelled') {
+            $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
+            $vars['cancellation_reason'] = (string) ($booking->cancellation_reason ?? '');
             TransactionalEmailTemplateService::sendIfEnabled(
                 TransactionalEmailTemplateService::TYPE_BOOKING_CANCELLATION,
                 $booking->contact_email,
-                TransactionalEmailTemplateService::variablesFromBooking($booking)
+                $vars
             );
 
             return;
@@ -1021,10 +1046,12 @@ class BookingService
                 return;
             }
 
+            $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
+            $vars['completion_date'] = date_i18n(get_option('date_format'));
             TransactionalEmailTemplateService::sendIfEnabled(
                 TransactionalEmailTemplateService::TYPE_BOOKING_COMPLETED,
                 $booking->contact_email,
-                TransactionalEmailTemplateService::variablesFromBooking($booking)
+                $vars
             );
 
             ReviewReminderService::scheduleReminder($bookingId);

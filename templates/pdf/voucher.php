@@ -38,14 +38,14 @@ $destination = (string) ($destination ?? '');
     <style>
         @page { size: A4 portrait; margin: 0mm; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { margin: 0; padding: 0; font-family: "DejaVu Sans", sans-serif; font-size: 12px; color: #111; }
+        body { margin: 0; padding: 0; font-family: "Noto Sans Devanagari", "Noto Sans Arabic", "Noto Sans CJK", "DejaVu Sans", sans-serif; font-size: 12px; color: #111; }
         .content { padding: 12mm 12mm 14mm 12mm; }
 
         .header { width: 100%; border-collapse: collapse; }
         .header td { vertical-align: top; }
         .brand { background: #059669; color: #fff; padding: 6mm 6mm; }
         .brand h1 { font-size: 20px; font-weight: 700; margin: 0; }
-        .brand p { font-size: 12px; margin-top: 4px; font-weight: 500; }
+        .brand p { font-size: 12px; margin-top: 4px; font-weight: 400; }
 
         .voucher-number { background: #f3f4f6; padding: 4mm 6mm; border-bottom: 2px solid #059669; }
         .voucher-number .number { font-size: 16px; font-weight: 700; color: #059669; }

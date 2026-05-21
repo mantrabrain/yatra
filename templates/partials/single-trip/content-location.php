@@ -150,7 +150,11 @@ if (!defined('ABSPATH')) {
                         
                                 // Add OpenStreetMap tiles with error handling
                                 var tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                    attribution: <?php echo wp_json_encode(sprintf(__('© %s contributors', 'yatra'), '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>')); ?>,
+                                    attribution: <?php echo wp_json_encode(sprintf(
+                                        /* translators: %s: map data provider link (e.g. OpenStreetMap). */
+                                        __('© %s contributors', 'yatra'),
+                                        '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                                    )); ?>,
                                     maxZoom: 19,
                                     minZoom: 2,
                                     errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',

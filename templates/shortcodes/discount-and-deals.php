@@ -25,10 +25,11 @@ if (function_exists('yatra_get_dynamic_pricing_display_flags')) {
         <h2 class="yatra-discount-title"><?php esc_html_e('Special Deals & Discounts', 'yatra'); ?></h2>
         <?php if (!empty($trips)): ?>
             <div class="yatra-discount-count">
-                <?php 
+                <?php
                 printf(
+                    /* translators: %d: number of deals currently available. */
                     _nx('%d Deal Available', '%d Deals Available', count($trips), 'deal count', 'yatra'),
-                    esc_html(count($trips))
+                    (int) count($trips)
                 );
                 ?>
             </div>

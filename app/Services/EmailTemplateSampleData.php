@@ -46,7 +46,7 @@ final class EmailTemplateSampleData
             $vars['footer_note'] = __('If you did not create an account, you can ignore this email.', 'yatra');
             $vars['expiry_notice_html'] = esc_html(
                 sprintf(
-                    /* translators: %d: hours */
+                    /* translators: %d: hours until link expiry */
                     __('This verification link expires in %d hours for your security.', 'yatra'),
                     24
                 )
@@ -82,6 +82,15 @@ final class EmailTemplateSampleData
             'travelers_count' => '2',
             'total_amount_formatted' => yatra_format_price(2499.0, $currency),
             'amount_due_formatted' => yatra_format_price(499.0, $currency),
+            // Aliases for the same monetary values — keep the preview
+            // consistent regardless of which spelling the template
+            // uses ({{total_amount}} vs {{total_amount_formatted}},
+            // {{balance_due}} vs {{amount_due_formatted}}, etc.).
+            'total_amount' => yatra_format_price(2499.0, $currency),
+            'balance_due' => yatra_format_price(499.0, $currency),
+            'amount_due' => yatra_format_price(499.0, $currency),
+            'amount_paid' => yatra_format_price(2000.0, $currency),
+            'amount_paid_formatted' => yatra_format_price(2000.0, $currency),
             'currency' => $currency,
             'booking_status' => __('confirmed', 'yatra'),
             'payment_status' => __('pending', 'yatra'),

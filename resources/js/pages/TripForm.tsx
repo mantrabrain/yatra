@@ -4766,6 +4766,7 @@ const TripForm: React.FC = () => {
                       label:
                         destination.name ||
                         sprintf(
+                          // translators: %s: numeric destination ID, used as a fallback when the destination has no name.
                           __("Destination #%s", "yatra"),
                           String(destination.id),
                         ),

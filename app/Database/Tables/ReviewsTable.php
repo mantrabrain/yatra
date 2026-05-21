@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `author_name` varchar(100) NOT NULL,
     `author_email` varchar(100) DEFAULT NULL,
     `author_location` varchar(100) DEFAULT NULL,
-    `status` enum('pending','approved','rejected') DEFAULT 'pending',
+    `status` enum('pending','approved','rejected','spam','trash') DEFAULT 'pending',
     `helpful_count` int(11) UNSIGNED DEFAULT 0,
     `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
     `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

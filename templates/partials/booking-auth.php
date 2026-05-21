@@ -204,13 +204,32 @@ $trip = $booking->trip ?? null;
                 <label class="yatra-checkbox-label">
                     <input type="checkbox" name="terms" required>
                     <span>
-                        <?php 
+                        <?php
+                        // Resolve Terms + Privacy URLs from Yatra settings,
+                        // falling back to WordPress' built-in privacy URL
+                        // when no Yatra setting is set. Previously both
+                        // links pointed at the privacy URL — a copy-paste
+                        // mistake that hid the Terms page from customers.
+                        $termsPageId = 0;
+                        $privacyPageId = 0;
+                        if (class_exists('\\Yatra\\Services\\SettingsService')) {
+                            $termsPageId = \Yatra\Services\SettingsService::getInt('terms_page_id', 0);
+                            $privacyPageId = \Yatra\Services\SettingsService::getInt('privacy_policy_page_id', 0);
+                        } else {
+                            $termsPageId = (int) get_option('yatra_terms_page_id', 0);
+                            $privacyPageId = (int) get_option('yatra_privacy_policy_page_id', 0);
+                        }
+                        $termsUrl = $termsPageId > 0 ? get_permalink($termsPageId) : '';
+                        $privacyUrl = $privacyPageId > 0 ? get_permalink($privacyPageId) : '';
+                        if ($privacyUrl === '' && function_exists('get_privacy_policy_url')) {
+                            $privacyUrl = (string) get_privacy_policy_url();
+                        }
                         printf(
                             /* translators: %1$s: terms link, %2$s: privacy link */
                             esc_html__('I agree to the %1$s and %2$s', 'yatra'),
-                            '<a href="' . esc_url(get_privacy_policy_url()) . '" target="_blank">' . esc_html__('Terms of Service', 'yatra') . '</a>',
-                            '<a href="' . esc_url(get_privacy_policy_url()) . '" target="_blank">' . esc_html__('Privacy Policy', 'yatra') . '</a>'
-                        ); 
+                            '<a href="' . esc_url($termsUrl) . '" target="_blank">' . esc_html__('Terms of Service', 'yatra') . '</a>',
+                            '<a href="' . esc_url($privacyUrl) . '" target="_blank">' . esc_html__('Privacy Policy', 'yatra') . '</a>'
+                        );
                         ?>
                     </span>
                 </label>

@@ -9,6 +9,14 @@
 (function() {
   'use strict';
 
+  // Translation helper. Same shim as tour-viewer.js — resolves
+  // through wp.i18n when available, falls back to identity otherwise.
+  // Call sites must pass `'yatra'` so wp i18n make-pot --domain=yatra
+  // picks them up (see tour-viewer.js for the full rationale).
+  var __ = (window.wp && window.wp.i18n && window.wp.i18n.__)
+    ? function (text, domain) { return window.wp.i18n.__(text, domain || 'yatra'); }
+    : function (text) { return text; };
+
   class YatraVideoPlayer {
     constructor() {
       this.modal = null;
@@ -30,12 +38,16 @@
         return;
       }
 
+      // Pre-compute the translated label OUT of the template literal
+      // so makepot extracts it reliably (see tour-viewer.js note).
+      var closeVideoLabel = __('Close Video', 'yatra');
+
       // Create modal HTML
       const modalHTML = `
         <div id="yatra-video-player-modal" class="yatra-video-player-modal" style="display: none;">
           <div class="yatra-video-player-overlay"></div>
           <div class="yatra-video-player-content">
-            <button type="button" class="yatra-video-player-close" aria-label="Close Video">
+            <button type="button" class="yatra-video-player-close" aria-label="${closeVideoLabel}">
               <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
               </svg>

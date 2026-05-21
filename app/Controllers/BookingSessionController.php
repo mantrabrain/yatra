@@ -150,6 +150,26 @@ class BookingSessionController extends BaseController
             'callback' => [$this, 'create_booking'],
             'permission_callback' => [$this, 'public_permission_callback'],
         ]);
+
+        // Verify a guest's booking email via magic-link token.
+        // Public + GET so the customer's browser can hit it from a
+        // plain email-client link. The token itself carries the
+        // authorisation (HMAC-signed); permission_callback is
+        // intentionally open. On success the booking transitions to
+        // 'pending' and the browser is redirected to the continuation
+        // URL (where the customer completes payment as normal).
+        register_rest_route($this->namespace, '/booking/verify-email', [
+            'methods' => 'GET',
+            'callback' => [$this, 'verify_email'],
+            'permission_callback' => '__return_true',
+            'args' => [
+                'token' => [
+                    'required' => true,
+                    'type' => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
+                ],
+            ],
+        ]);
         
         // Apply coupon code
         register_rest_route($this->namespace, '/booking/coupon/apply', [
@@ -765,11 +785,65 @@ class BookingSessionController extends BaseController
      * Remaining / balance payment: does not create a booking — only charges the existing row
      * and records a payment on success via the same gateway completion paths.
      */
+    /**
+     * Validate the booking-scoped CSRF nonce.
+     *
+     * Looks first in the `X-Yatra-Booking-Nonce` request header
+     * (the JS frontend's path), then in JSON body keys used by
+     * older or non-JS fallback flows. Returns true on a valid
+     * nonce, false otherwise.
+     *
+     * @param WP_REST_Request          $request
+     * @param array<string, mixed>|null $data    decoded JSON body
+     */
+    private function verifyBookingNonce(WP_REST_Request $request, $data): bool
+    {
+        $nonce = (string) $request->get_header('X-Yatra-Booking-Nonce');
+        if ($nonce === '' && \is_array($data)) {
+            $nonce = (string) (
+                $data['_yatra_booking_nonce']
+                ?? $data['yatra_booking_nonce']
+                ?? $data['booking_nonce']
+                ?? ''
+            );
+        }
+        if ($nonce === '') {
+            return false;
+        }
+        return (bool) wp_verify_nonce($nonce, 'yatra_booking_action');
+    }
+
     public function create_booking(WP_REST_Request $request): WP_REST_Response
     {
         global $wpdb;
-        
+
         $data = $request->get_json_params();
+
+        // ========================================
+        // CSRF — booking-scoped action nonce
+        // ========================================
+        // The public_permission_callback on this route intentionally
+        // bypasses WP's default cookie/nonce check so guests can hit it
+        // at all. That bypass would otherwise leave the endpoint open
+        // to cross-site forgery (any third-party page could POST a
+        // booking using the visitor's session).
+        //
+        // We validate a booking-scoped action nonce here instead. The
+        // token is minted at page-render time (FrontendAssetsProvider
+        // injects it into `yatraBookingData.bookingNonce`) and the JS
+        // forwards it in `X-Yatra-Booking-Nonce`. We also accept it in
+        // the JSON body for any non-JS fallback flow.
+        //
+        // Returns 403 on failure — distinct from the 401 used by the
+        // login/guest-checkout gates so frontends can distinguish
+        // "security check failed" from "auth required".
+        if (!$this->verifyBookingNonce($request, $data)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Security check failed. Please refresh the page and try again.', 'yatra'),
+                'code' => 'invalid_nonce',
+            ], 403);
+        }
 
         // ========================================
         // REMAINING PAYMENT vs NEW BOOKING
@@ -807,8 +881,6 @@ class BookingSessionController extends BaseController
             'auto_confirm_bookings' => \Yatra\Services\SettingsService::get('auto_confirm_bookings', false),
             'require_login' => \Yatra\Services\SettingsService::get('require_login', false),
             'allow_guest_checkout' => \Yatra\Services\SettingsService::get('allow_guest_checkout', true),
-            'cancellation_policy' => \Yatra\Services\SettingsService::get('cancellation_policy', 'full_refund'),
-            'cancellation_days' => (int) \Yatra\Services\SettingsService::get('cancellation_days', 7),
             'booking_expiry_hours' => (int) \Yatra\Services\SettingsService::get('booking_expiry_hours', 24),
             'auto_confirm_pay_later' => \Yatra\Services\SettingsService::get('auto_confirm_pay_later', true),
         ];
@@ -834,6 +906,25 @@ class BookingSessionController extends BaseController
                 'login_url' => wp_login_url(home_url($_SERVER['REQUEST_URI'] ?? '')),
             ], 401);
         }
+
+        // ========================================
+        // GUEST EMAIL VERIFICATION GATE
+        // ========================================
+        // When `require_guest_email_verification` is on AND the
+        // customer is not logged in, the booking goes through a
+        // two-step flow:
+        //   1. Booking row is created with status='pending_verification'
+        //      so the operator sees the intent in the admin and the
+        //      cron can purge unverified rows after N days.
+        //   2. A magic-link email is sent. Payment is NOT initiated
+        //      until the customer clicks the link.
+        //   3. On click, /yatra/v1/booking/verify-email validates the
+        //      HMAC token, flips status to 'pending', and redirects
+        //      to the payment continuation URL.
+        // Logged-in users skip this entirely — their email is already
+        // verified by WordPress on registration.
+        $needs_email_verification = !is_user_logged_in()
+            && (bool) \Yatra\Services\SettingsService::get('require_guest_email_verification', false);
 
         // Get session data
         $session = yatra_get_booking_session();
@@ -1369,6 +1460,21 @@ class BookingSessionController extends BaseController
             $booking_data['payment_method'] = 'full';
         }
 
+        // Hold the booking in `pending_verification` until the guest
+        // clicks the magic link. Payment is initiated only after the
+        // status flips to 'pending' (in the verify-email endpoint).
+        // We also pin the gateway to `pay_later` here because the
+        // payment selection at this point would otherwise lock the
+        // operator into a specific gateway before the customer has
+        // even confirmed their email — better to defer that choice
+        // until verification completes and the regular checkout
+        // resumes.
+        if ($needs_email_verification && !$isWaitlistCheckout) {
+            $booking_data['status'] = 'pending_verification';
+            $booking_data['payment_gateway'] = 'pay_later';
+            $booking_data['payment_method'] = 'full';
+        }
+
         try {
             $booking = $booking_service->createBooking($booking_data);
             // BookingService returns ['success'=>bool, 'booking_id'=>int, ...]
@@ -1506,6 +1612,74 @@ class BookingSessionController extends BaseController
 
         // Clear booking session
         yatra_clear_booking_session();
+
+        // ========================================
+        // GUEST EMAIL VERIFICATION — INTERCEPT
+        // ========================================
+        // Booking row + travelers + services are already saved at
+        // this point with status='pending_verification'. Send the
+        // magic-link email, return a structured "check your email"
+        // response, and DO NOT initiate payment. The customer's
+        // click on the verify-email endpoint transitions the booking
+        // to 'pending' and emits the payment-continuation URL.
+        if ($needs_email_verification) {
+            $verify_url = \Yatra\Services\GuestVerificationTokenService::buildVerifyUrl(
+                (int) $booking_id,
+                (string) $contact_data['email']
+            );
+
+            // Variables piped into the template email. All standard
+            // booking merge tags resolve normally (the row exists);
+            // we also pass intro_paragraph + footer_note + the
+            // expiry banner so operators that haven't customised
+            // the template still get good defaults.
+            $email_vars = [];
+            if ($saved_booking !== null) {
+                $email_vars = \Yatra\Services\TransactionalEmailTemplateService::variablesFromBooking($saved_booking);
+            }
+            // Belt-and-braces: ensure customer name + email are
+            // populated even when variablesFromBooking returned an
+            // empty shell (which shouldn't happen, but if it does
+            // we don't want the email to render "Hi ,").
+            $email_vars['customer_email'] = (string) ($email_vars['customer_email'] ?? $contact_data['email']);
+            $email_vars['customer_name'] = (string) ($email_vars['customer_name']
+                ?? trim(($contact_data['first_name'] ?? '') . ' ' . ($contact_data['last_name'] ?? '')));
+            $email_vars['customer_first_name'] = (string) ($email_vars['customer_first_name']
+                ?? ($contact_data['first_name'] ?? ''));
+            $email_vars['verification_link'] = $verify_url;
+            $email_vars['intro_paragraph'] = __(
+                "Thanks for booking with us! To confirm this is really your email, please click the button below. Your booking is held for you in the meantime — payment isn't taken until you verify.",
+                'yatra'
+            );
+            $email_vars['footer_note'] = __(
+                "If you didn't make this booking, you can safely ignore this email — no charges have been made.",
+                'yatra'
+            );
+            $email_vars['expiry_notice_html'] = '<strong>'
+                . esc_html__('This link expires in 48 hours.', 'yatra')
+                . '</strong>';
+
+            \Yatra\Services\TransactionalEmailTemplateService::sendIfEnabled(
+                \Yatra\Services\TransactionalEmailTemplateService::TYPE_GUEST_EMAIL_VERIFICATION,
+                (string) $contact_data['email'],
+                $email_vars
+            );
+
+            return new WP_REST_Response([
+                'success' => true,
+                'code' => 'email_verification_required',
+                'message' => __(
+                    "We've sent a verification email to your address. Click the link in that email to complete your booking — your spot is being held while you verify.",
+                    'yatra'
+                ),
+                'data' => [
+                    'booking_id' => $booking_id,
+                    'reference' => $booking_reference,
+                    'email' => $contact_data['email'],
+                    'expires_in_seconds' => (int) apply_filters('yatra_guest_verification_ttl_seconds', 48 * 3600),
+                ],
+            ]);
+        }
 
         // Check if this is an offline gateway
         $is_offline = $is_offline_gateway;
@@ -1661,8 +1835,6 @@ class BookingSessionController extends BaseController
                 'total_amount' => $total_amount,
                 'amount_due' => $amount_due,
                 'booking_status' => $booking_status,
-                'cancellation_policy' => $settings['cancellation_policy'],
-                'cancellation_days' => $settings['cancellation_days'],
                 'expiry_datetime' => $expiry_datetime,
             ]);
         }
@@ -2427,8 +2599,14 @@ class BookingSessionController extends BaseController
         $payment_method = $data['payment_method'] ?? 'full';
         $payment_gateway = $data['payment_gateway'] ?? 'pay_later';
         $booking_status = $data['booking_status'] ?? 'pending';
-        $cancellation_policy = $data['cancellation_policy'] ?? 'full_refund';
-        $cancellation_days = $data['cancellation_days'] ?? 7;
+        // Cancellation copy in the email now comes from the trip's
+        // own cancellation_policy field (set per-trip on the Trip
+        // editor), not from removed global settings. Falls back to
+        // empty so the paragraph is silently omitted when the trip
+        // doesn't have a policy set.
+        $trip_cancellation_policy = isset($trip->cancellation_policy)
+            ? wp_strip_all_tags((string) $trip->cancellation_policy)
+            : '';
         $expiry_datetime = $data['expiry_datetime'] ?? null;
         
         $customer_email = $contact['email'] ?? '';
@@ -2447,6 +2625,7 @@ class BookingSessionController extends BaseController
             : __('Thank you for your booking! Your reservation has been received and is pending confirmation.', 'yatra');
         if ($booking_status === 'pending' && $expiry_datetime) {
             $intro_paragraph .= ' ' . sprintf(
+                /* translators: %s: payment expiry date and time (formatted). */
                 __('Please complete your payment before %s to avoid automatic cancellation.', 'yatra'),
                 date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($expiry_datetime))
             );
@@ -2458,15 +2637,19 @@ class BookingSessionController extends BaseController
             <p style="margin:0 0 8px;"><strong><?php esc_html_e('Booking reference', 'yatra'); ?>:</strong> <?php echo esc_html($reference); ?></p>
             <p style="margin:0 0 8px;"><strong><?php esc_html_e('Trip', 'yatra'); ?>:</strong> <?php echo esc_html($trip->title); ?></p>
             <p style="margin:0 0 8px;"><strong><?php esc_html_e('Travel date', 'yatra'); ?>:</strong> <?php echo esc_html(date_i18n(get_option('date_format'), strtotime($travel_date))); ?></p>
-            <p style="margin:0 0 8px;"><strong><?php esc_html_e('Duration', 'yatra'); ?>:</strong> <?php echo esc_html(sprintf(__('%d days / %d nights', 'yatra'), (int) $trip->duration_days, (int) $trip->duration_nights)); ?></p>
+            <p style="margin:0 0 8px;"><strong><?php esc_html_e('Duration', 'yatra'); ?>:</strong> <?php /* translators: 1: number of days, 2: number of nights. */
+echo esc_html(sprintf(__('%1$d days / %2$d nights', 'yatra'), (int) $trip->duration_days, (int) $trip->duration_nights)); ?></p>
             <p style="margin:0;"><strong><?php esc_html_e('Travelers', 'yatra'); ?>:</strong> <?php echo esc_html((string) count($travelers)); ?></p>
         </div>
         <h3 style="font-size:16px;"><?php esc_html_e('Payment details', 'yatra'); ?></h3>
-        <p><?php echo esc_html(sprintf(__('Total: %s', 'yatra'), $formatted_total)); ?></p>
+        <p><?php /* translators: %s: total amount (formatted). */
+echo esc_html(sprintf(__('Total: %s', 'yatra'), $formatted_total)); ?></p>
         <?php if ($payment_method === 'deposit') : ?>
-            <p><?php echo esc_html(sprintf(__('Payment type: Deposit — due now %s, remaining %s', 'yatra'), $formatted_due, yatra_format_price($total_amount - $amount_due))); ?></p>
+            <p><?php /* translators: 1: amount due now (formatted), 2: remaining amount (formatted). */
+echo esc_html(sprintf(__('Payment type: Deposit — due now %1$s, remaining %2$s', 'yatra'), $formatted_due, yatra_format_price($total_amount - $amount_due))); ?></p>
         <?php elseif ($payment_method === 'partial') : ?>
-            <p><?php echo esc_html(sprintf(__('Payment type: Partial — due now %s, remaining %s', 'yatra'), $formatted_due, yatra_format_price($total_amount - $amount_due))); ?></p>
+            <p><?php /* translators: 1: amount due now (formatted), 2: remaining amount (formatted). */
+echo esc_html(sprintf(__('Payment type: Partial — due now %1$s, remaining %2$s', 'yatra'), $formatted_due, yatra_format_price($total_amount - $amount_due))); ?></p>
         <?php else : ?>
             <p><?php esc_html_e('Payment type: Full payment', 'yatra'); ?></p>
         <?php endif; ?>
@@ -2481,24 +2664,24 @@ class BookingSessionController extends BaseController
                 <?php
                 $traveler_name = trim(($traveler['first_name'] ?? '') . ' ' . ($traveler['last_name'] ?? ''));
                 ?>
-                <li><?php echo esc_html(sprintf(__('Traveler %d: %s', 'yatra'), $i + 1, $traveler_name ?: '—')); ?></li>
+                <li><?php /* translators: 1: traveler number (1-based), 2: traveler full name. */
+echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name ?: '—')); ?></li>
             <?php endforeach; ?>
         </ul>
         <?php
-        $cancellation_policy_labels = [
-            'full_refund' => __('Full refund available', 'yatra'),
-            'partial_refund' => __('Partial refund available', 'yatra'),
-            'no_refund' => __('No refund available', 'yatra'),
-            'flexible' => __('Flexible cancellation', 'yatra'),
-        ];
-        $policy_label = $cancellation_policy_labels[$cancellation_policy] ?? __('Standard policy applies', 'yatra');
-        ?>
-        <h3 style="font-size:16px;"><?php esc_html_e('Cancellation policy', 'yatra'); ?></h3>
-        <p><?php echo esc_html($policy_label); ?> — <?php echo esc_html(sprintf(__('free cancellation up to %d days before departure', 'yatra'), (int) $cancellation_days)); ?></p>
-        <?php
-        $custom_refund_policy = SettingsService::getString('refund_policy', '');
-        if ($custom_refund_policy !== '') {
-            echo '<p>' . esc_html($custom_refund_policy) . '</p>';
+        // Cancellation policy paragraph now sources from the trip's
+        // per-trip cancellation_policy field (set on the Trip
+        // editor). The previous version used global cancellation
+        // settings that were display-only — they appeared here but
+        // never enforced a real cancellation cutoff. We've removed
+        // those settings; if the trip itself doesn't define a
+        // policy, the whole section is silently omitted so the
+        // email isn't padded with empty headings.
+        if ($trip_cancellation_policy !== '') {
+            ?>
+            <h3 style="font-size:16px;"><?php esc_html_e('Cancellation policy', 'yatra'); ?></h3>
+            <p><?php echo esc_html($trip_cancellation_policy); ?></p>
+            <?php
         }
         ?>
         <h3 style="font-size:16px;"><?php esc_html_e('What’s next?', 'yatra'); ?></h3>
@@ -2530,6 +2713,7 @@ class BookingSessionController extends BaseController
             'intro_paragraph' => $intro_paragraph,
             'details_html' => $details_html,
             'details_html_only' => '1',
+            /* translators: %s: site name. */
             'footer_note' => sprintf(__('— %s', 'yatra'), get_bloginfo('name')),
             'transactional_context' => 'booking_created',
         ];
@@ -2641,6 +2825,287 @@ class BookingSessionController extends BaseController
                 'new_total_formatted' => yatra_format_price($total_amount - $discount_amount),
             ],
         ]);
+    }
+
+    /**
+     * Verify a guest's booking email via magic-link token.
+     *
+     * Flow:
+     *   1. Validate the HMAC token (forgery, expiry, email-binding).
+     *   2. Look up the booking; confirm it's in `pending_verification`.
+     *   3. Flip status to `pending` (or `confirmed` when auto-confirm
+     *      pay-later is enabled for this site) and fire the standard
+     *      yatra_booking_status_changed action so inventory + email
+     *      automations resume normally.
+     *   4. 302 redirect the browser to a continuation URL:
+     *        - If amount_due > 0: back to the booking page for the
+     *          payment step the customer skipped earlier.
+     *        - If amount_due == 0 / auto-confirm: to the booking
+     *          confirmation/thank-you page.
+     *   5. On any failure, render a friendly HTML page (not JSON) so
+     *      the customer sees readable text in their browser tab.
+     *
+     * @return WP_REST_Response|WP_Error|void
+     */
+    public function verify_email(WP_REST_Request $request)
+    {
+        $token = (string) $request->get_param('token');
+        $bookingRepo = new \Yatra\Repositories\BookingRepository();
+
+        // First decode just to extract the booking id (for the
+        // expectedEmail lookup). Verify() is called again below
+        // with the actual email so the email-binding check runs.
+        $partsPreview = explode('.', $token);
+        $bookingIdGuess = (\count($partsPreview) >= 1 && ctype_digit($partsPreview[0]))
+            ? (int) $partsPreview[0]
+            : 0;
+        $booking = $bookingIdGuess > 0 ? $bookingRepo->find($bookingIdGuess) : null;
+        $expectedEmail = $booking ? (string) ($booking->contact_email ?? '') : '';
+
+        $result = \Yatra\Services\GuestVerificationTokenService::verify($token, $expectedEmail);
+
+        if (!$result['ok']) {
+            $this->renderVerifyEmailErrorPage((string) ($result['reason'] ?? 'invalid'));
+        }
+        if ($booking === null) {
+            $this->renderVerifyEmailErrorPage('booking_not_found');
+        }
+
+        // Re-entrant: if the booking has already been verified, show the
+        // same success page (idempotent) — pre-3.0.5 silently redirected
+        // and the customer was left wondering whether anything happened.
+        $currentStatus = (string) ($booking->status ?? '');
+        $alreadyVerified = $currentStatus !== 'pending_verification';
+
+        if (!$alreadyVerified) {
+            // Flip status to 'pending' so downstream hooks (inventory /
+            // notification automations) see fresh data, then fire
+            // yatra_booking_created so the listeners we deferred at
+            // creation time (admin "new booking" notification + Pro
+            // email-automation booking.created fan-out) run now — i.e.
+            // *after* the customer has proven the email is theirs.
+            $bookingRepo->updateStatus((int) $booking->id, 'pending');
+            do_action('yatra_booking_email_verified', (int) $booking->id);
+
+            // Re-fetch so the post-verification action receives the
+            // booking row with the new status, then fire the deferred
+            // booking-created action. See BookingService::createBooking()
+            // for the matching skip-on-pending-verification branch.
+            $verifiedBooking = $bookingRepo->find((int) $booking->id);
+            if (is_object($verifiedBooking)) {
+                do_action(
+                    \Yatra\Hooks\TelemetryHookNames::BOOKING_CREATED,
+                    (int) $verifiedBooking->id,
+                    $verifiedBooking
+                );
+            }
+        }
+
+        $this->renderVerifyEmailSuccessPage(
+            (int) $booking->id,
+            (string) ($booking->reference ?? ''),
+            $alreadyVerified
+        );
+    }
+
+    /**
+     * Friendly HTML error page rendered when a verification link
+     * is invalid / expired / tampered with. Avoids JSON in the
+     * customer's browser tab (terrible UX). Reasons map to clear
+     * messages so customers know what to do next.
+     *
+     * Emits raw HTML and exits. We can't return WP_REST_Response with an
+     * HTML body because the REST server JSON-encodes the response data
+     * regardless of the Content-Type header on the response object —
+     * the customer would see `"<!doctype..."` (a JSON string) in their
+     * browser tab. Echoing + exiting short-circuits the REST pipeline.
+     *
+     * @return never
+     */
+    private function renderVerifyEmailErrorPage(string $reason): void
+    {
+        $messages = [
+            'expired' => __('This verification link has expired. Please make a new booking — we keep the link valid for 48 hours.', 'yatra'),
+            'invalid_signature' => __('This verification link is invalid or has been tampered with. Please make a new booking.', 'yatra'),
+            'malformed_token' => __('This verification link is malformed. Please make a new booking.', 'yatra'),
+            'email_changed' => __('The email on this booking has changed since the link was sent. Please contact support.', 'yatra'),
+            'booking_not_found' => __('We could not find a booking for this verification link. Please make a new booking.', 'yatra'),
+        ];
+        $message = $messages[$reason] ?? __('This verification link is no longer valid.', 'yatra');
+
+        $brandName = function_exists('yatra_get_brand_name') ? yatra_get_brand_name() : 'Yatra';
+        $html = sprintf(
+            '<!doctype html><html lang="%1$s"><head><meta charset="utf-8">'
+                . '<meta name="viewport" content="width=device-width,initial-scale=1">'
+                . '<title>%2$s</title>'
+                . '<style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f9fafb;margin:0;padding:40px 20px;color:#111827}'
+                . '.box{max-width:480px;margin:60px auto;background:#fff;border-radius:12px;padding:32px;box-shadow:0 1px 3px rgba(0,0,0,.1);text-align:center}'
+                . 'h1{font-size:20px;margin:0 0 12px}p{color:#4b5563;line-height:1.6;margin:0 0 20px}'
+                . 'a{display:inline-block;background:#2563eb;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600}</style></head>'
+                . '<body><div class="box"><h1>%3$s</h1><p>%4$s</p><a href="%5$s">%6$s</a></div></body></html>',
+            esc_attr(get_locale()),
+            esc_html__('Verification link issue', 'yatra'),
+            esc_html__('Verification link issue', 'yatra'),
+            esc_html($message),
+            esc_url(home_url('/')),
+            esc_html(sprintf(/* translators: %s: brand name */ __('Return to %s', 'yatra'), $brandName))
+        );
+
+        if (!headers_sent()) {
+            status_header(200);
+            nocache_headers();
+            header('Content-Type: text/html; charset=UTF-8');
+        }
+        echo $html;
+        exit;
+    }
+
+    /**
+     * Build the booking continuation URL (post-verification destination).
+     *
+     * If the site has a Yatra Bookings page, route through that with the
+     * booking reference; otherwise fall back to the trip URL. Filterable
+     * via `yatra_guest_verification_continuation_url` so integrations can
+     * route to a custom thank-you page.
+     */
+    private function continuationUrl(int $bookingId, string $reference): string
+    {
+        return (string) apply_filters(
+            'yatra_guest_verification_continuation_url',
+            add_query_arg(
+                ['booking_id' => $bookingId, 'verified' => '1'],
+                home_url('/' . \Yatra\Services\SettingsService::getBookingBase() . '/')
+            ),
+            $bookingId,
+            $reference
+        );
+    }
+
+    /**
+     * Friendly HTML success page rendered after the guest clicks the
+     * email-verification magic link.
+     *
+     * Pre-3.0.5 this endpoint silently 302-redirected to the booking page,
+     * which made guests believe nothing had happened — there was no visible
+     * "verified" feedback before they landed on the next step. This page
+     * gives them an unambiguous confirmation, the booking reference, and
+     * three explicit CTAs:
+     *   - Continue to booking (primary, continuation URL)
+     *   - My Account (when logged in)  /  Sign in (when not)
+     *   - Go to homepage (fallback)
+     *
+     * Idempotent: when the booking was already verified (re-click on the
+     * same link), the heading + copy switch to the "already verified"
+     * variant but the CTAs stay the same.
+     *
+     * Emits raw HTML and exits — same reasoning as
+     * {@see self::renderVerifyEmailErrorPage()}: WP_REST_Response
+     * JSON-encodes string bodies, so the customer would see
+     * `"<!doctype..."` in their tab instead of the rendered page.
+     *
+     * @return never
+     */
+    private function renderVerifyEmailSuccessPage(int $bookingId, string $reference, bool $alreadyVerified): void
+    {
+        // Booking is already persisted at this point and (for a fresh verify)
+        // the status flip + booking-created fan-out have just fired. The
+        // verified UI's primary action is therefore "View your booking
+        // confirmation" — NOT "Continue Booking", which mislabelled the
+        // booking as still in-progress and confused customers into thinking
+        // they needed to re-submit the form.
+        $confirmationUrl = function_exists('yatra_get_booking_confirmation_url')
+            ? yatra_get_booking_confirmation_url($reference)
+            : $this->continuationUrl($bookingId, $reference);
+
+        // Account / login URL — prefer Yatra's account page when present,
+        // fall back to wp_login_url() so the page never points nowhere.
+        $accountBase = \Yatra\Services\SettingsService::getAccountBase();
+        $accountUrl = $accountBase !== ''
+            ? home_url('/' . trim($accountBase, '/') . '/')
+            : home_url('/');
+        $isLoggedIn = function_exists('is_user_logged_in') && is_user_logged_in();
+        $secondaryUrl = $isLoggedIn ? $accountUrl : wp_login_url($confirmationUrl);
+        $secondaryLabel = $isLoggedIn
+            ? __('Go to My Account', 'yatra')
+            : __('Sign in', 'yatra');
+
+        $heading = $alreadyVerified
+            ? __('Email Already Verified', 'yatra')
+            : __('Email Verified', 'yatra');
+        $message = $alreadyVerified
+            ? __('Your booking email is already verified. You can view your booking confirmation, head to your account, or return to the homepage.', 'yatra')
+            : __('Thanks! Your booking email has been verified and your booking is confirmed. View the full confirmation below.', 'yatra');
+
+        $primaryLabel = __('View Booking Confirmation', 'yatra');
+        $homeLabel = __('Go to Homepage', 'yatra');
+        $referenceLabel = __('Booking reference', 'yatra');
+        $brandName = function_exists('yatra_get_brand_name') ? yatra_get_brand_name() : 'Yatra';
+
+        $referenceLine = $reference !== ''
+            ? sprintf(
+                '<div class="ref"><span class="ref-label">%s</span><code>%s</code></div>',
+                esc_html($referenceLabel),
+                esc_html($reference)
+            )
+            : '';
+
+        // Inline-only styling so the page renders correctly regardless of
+        // theme stylesheet load order (REST → wp_die/raw HTML response).
+        $html = sprintf(
+            '<!doctype html><html lang="%1$s"><head><meta charset="utf-8">'
+                . '<meta name="viewport" content="width=device-width,initial-scale=1">'
+                . '<title>%2$s · %3$s</title>'
+                . '<style>'
+                . 'body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f9fafb;margin:0;padding:40px 20px;color:#111827}'
+                . '.box{max-width:520px;margin:60px auto;background:#fff;border-radius:12px;padding:36px 32px;box-shadow:0 1px 3px rgba(0,0,0,.1);text-align:center}'
+                . '.tick{display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:50%%;background:#d1fae5;margin:0 auto 20px}'
+                . 'h1{font-size:24px;margin:0 0 12px;color:#065f46}'
+                . 'p{color:#4b5563;line-height:1.6;margin:0 0 24px}'
+                . '.ref{display:inline-flex;align-items:center;gap:8px;background:#f3f4f6;border-radius:6px;padding:8px 12px;margin:0 0 24px}'
+                . '.ref-label{font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:.04em}'
+                . '.ref code{font-weight:600;color:#111827}'
+                . '.actions{display:flex;flex-direction:column;gap:10px;margin-top:8px}'
+                . '.btn{display:inline-block;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center}'
+                . '.btn-primary{background:#059669;color:#fff}'
+                . '.btn-primary:hover{background:#047857}'
+                . '.btn-secondary{background:#fff;color:#1f2937;border:1px solid #d1d5db}'
+                . '.btn-secondary:hover{background:#f9fafb}'
+                . '.btn-tertiary{color:#4b5563;padding:8px 12px;font-weight:500}'
+                . '</style></head>'
+                . '<body><div class="box">'
+                . '<div class="tick" aria-hidden="true">'
+                . '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">'
+                . '<polyline points="20 6 9 17 4 12"></polyline></svg>'
+                . '</div>'
+                . '<h1>%2$s</h1>'
+                . '<p>%4$s</p>'
+                . '%5$s'
+                . '<div class="actions">'
+                . '<a class="btn btn-primary" href="%6$s">%7$s</a>'
+                . '<a class="btn btn-secondary" href="%8$s">%9$s</a>'
+                . '<a class="btn btn-tertiary" href="%10$s">%11$s</a>'
+                . '</div>'
+                . '</div></body></html>',
+            esc_attr(get_locale()),
+            esc_html($heading),
+            esc_html($brandName),
+            esc_html($message),
+            $referenceLine,
+            esc_url($confirmationUrl),
+            esc_html($primaryLabel),
+            esc_url($secondaryUrl),
+            esc_html($secondaryLabel),
+            esc_url(home_url('/')),
+            esc_html($homeLabel)
+        );
+
+        if (!headers_sent()) {
+            status_header(200);
+            nocache_headers();
+            header('Content-Type: text/html; charset=UTF-8');
+        }
+        echo $html;
+        exit;
     }
 
     /**

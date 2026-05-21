@@ -159,8 +159,8 @@ do_action('yatra_booking_confirmation_header', $booking);
                     <span>
                         <?php
                         printf(
-                            /* translators: 1: booking reference number (HTML <strong> wrapped), 2: link labelled "payment history" pointing to the customer account page (HTML <a> wrapped) */
                             wp_kses(
+                                /* translators: 1: booking reference number (HTML <strong> wrapped), 2: link labelled "payment history" pointing to the customer account page (HTML <a> wrapped). */
                                 __('You\'ve completed payment for booking %1$s. A receipt has been emailed to you. View or download your %2$s anytime from your account.', 'yatra'),
                                 ['a' => ['href' => true], 'strong' => []]
                             ),
@@ -216,8 +216,13 @@ do_action('yatra_booking_confirmation_header', $booking);
                                 <strong><?php echo esc_html(number_format($booking->trip_average_rating, 1)); ?></strong>
                                 <span>
                                     <?php
-                                    /* translators: %d review count */
-                                    printf(esc_html(_n('%d Review', '%d Reviews', (int) $booking->trip_review_count, 'yatra')), (int) $booking->trip_review_count);
+                                    printf(
+                                        esc_html(
+                                            /* translators: %d: number of reviews. */
+                                            _n('%d Review', '%d Reviews', (int) $booking->trip_review_count, 'yatra')
+                                        ),
+                                        (int) $booking->trip_review_count
+                                    );
                                     ?>
                                 </span>
                             </div>
@@ -237,20 +242,25 @@ do_action('yatra_booking_confirmation_header', $booking);
 
                                 if ($days > 0 && $nights > 0) {
                                     printf(
-                                        esc_html__('%d Days / %d Nights', 'yatra'),
+                                        /* translators: 1: number of days, 2: number of nights. */
+                                        esc_html__('%1$d Days / %2$d Nights', 'yatra'),
                                         $days,
                                         $nights
                                     );
                                 } elseif ($days > 0) {
                                     printf(
-                                        /* translators: %d day count */
-                                        esc_html(_n('%d Day', '%d Days', $days, 'yatra')),
+                                        esc_html(
+                                            /* translators: %d: number of days. */
+                                            _n('%d Day', '%d Days', $days, 'yatra')
+                                        ),
                                         $days
                                     );
                                 } elseif ($nights > 0) {
                                     printf(
-                                        /* translators: %d night count */
-                                        esc_html(_n('%d Night', '%d Nights', $nights, 'yatra')),
+                                        esc_html(
+                                            /* translators: %d: number of nights. */
+                                            _n('%d Night', '%d Nights', $nights, 'yatra')
+                                        ),
                                         $nights
                                     );
                                 }

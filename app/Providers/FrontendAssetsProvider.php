@@ -233,10 +233,16 @@ class FrontendAssetsProvider
                 if ($handle === 'trip') {
                     $dependencies[] = 'yatra-api-helper';
                 }
-                // `yatra-trip` and `yatra-listing` call `wp.i18n.__()` for
-                // user-facing strings; pull in `wp-i18n` so the global exists
-                // before they run and register their Jed JSON catalog below.
-                if (in_array($handle, ['trip', 'listing'], true)) {
+                // Scripts that call `wp.i18n.__()` for user-facing
+                // strings need wp-i18n as a dependency so the global
+                // exists before they run AND a `wp_set_script_translations`
+                // call below so WordPress loads each one's Jed JSON
+                // catalog (each handle has its own md5-named JSON
+                // because the .po references their respective source
+                // file paths). Add a handle here whenever you wrap a
+                // new string in __() inside its file.
+                $i18nHandles = ['trip', 'listing', 'stripe', 'tour-viewer', 'video-player'];
+                if (in_array($handle, $i18nHandles, true)) {
                     $dependencies[] = 'wp-i18n';
                 }
 
@@ -248,7 +254,11 @@ class FrontendAssetsProvider
                     true
                 );
 
-                if (in_array($handle, ['trip', 'listing'], true)
+                // Mirror the wp-i18n dep list above. wp_set_script_translations
+                // tells WordPress where to look for this script's Jed JSON
+                // catalog (path = plugin's i18n/languages/) and the loader
+                // hashes md5(handle src) to find the right file.
+                if (in_array($handle, $i18nHandles, true)
                     && function_exists('wp_set_script_translations')
                 ) {
                     wp_set_script_translations(
@@ -482,6 +492,14 @@ class FrontendAssetsProvider
                 'remainingAmount' => 0,
                 'totalAmount' => 0,
                 'amountPaid' => 0,
+                // Booking-scoped CSRF nonce — covers BOTH logged-in and
+                // guest checkouts. The REST endpoint's public
+                // permission_callback intentionally bypasses the WP REST
+                // cookie/nonce check (so guests can hit it at all);
+                // this token is what gates the actual write. The JS
+                // forwards it in the `X-Yatra-Booking-Nonce` header on
+                // every booking-create / booking-update POST.
+                'bookingNonce' => wp_create_nonce('yatra_booking_action'),
             ]
         ));
     }
@@ -586,6 +604,11 @@ class FrontendAssetsProvider
             'bookingBase' => \Yatra\Services\SettingsService::getBookingBase(),
             'permalinkStructure' => $is_plain ? 'plain' : $permalink_structure,
             'nonce' => wp_create_nonce('wp_rest'),
+            // Booking-scoped CSRF nonce. See enqueueTripDetailAssets()
+            // for the rationale: the booking REST endpoint bypasses
+            // the WP REST cookie/nonce check (so guests can use it),
+            // and this token is what gates the actual booking write.
+            'bookingNonce' => wp_create_nonce('yatra_booking_action'),
             'currency' => \Yatra\Services\SettingsService::getCurrency(),
             'currencyPosition' => \Yatra\Services\SettingsService::getString('currency_position', 'left'),
             'currency_position' => \Yatra\Services\SettingsService::getString('currency_position', 'left'),
@@ -736,19 +759,43 @@ class FrontendAssetsProvider
             ];
         }
 
+        // IMPORTANT — `month_abbrev` and `weekday_abbrev` are keyed by the
+        // TRANSLATED LONG NAME, not by a numeric index:
+        //
+        //   $wp_locale->month['01']                          = 'January'    (or 'जनवरी', 'enero'…)
+        //   $wp_locale->month_abbrev['January']              = 'Jan'        (or 'जन', 'ene'…)
+        //
+        // An earlier version of this code mistakenly indexed
+        // month_abbrev by '01'..'12' / weekday_abbrev by 0..6, which
+        // ALWAYS returned null → flatpickr's locale.months.shorthand
+        // shipped as an array of empty strings → the `M` token in any
+        // altFormat rendered as nothing. Net effect: a date set to
+        // "19 May 2026" displayed as "19  2026" (no month) under any
+        // non-en_US locale that exposed the bug.
+        //
+        // WP_Locale exposes get_month_abbrev() / get_weekday_abbrev()
+        // which take the long name and do the right lookup. We use
+        // those so the indexing rule lives inside core, not here.
         $months_long = [];
         $months_short = [];
         for ($m = 1; $m <= 12; ++$m) {
             $key = sprintf('%02d', $m);
-            $months_long[] = $wp_locale->month[$key] ?? '';
-            $months_short[] = $wp_locale->month_abbrev[$key] ?? '';
+            $long = $wp_locale->month[$key] ?? '';
+            $short = $long !== '' ? (string) $wp_locale->get_month_abbrev($long) : '';
+            $months_long[] = $long;
+            // Final fallback to the long name if the locale has no
+            // abbreviated form — better than shipping an empty string
+            // that flatpickr would render as blank.
+            $months_short[] = $short !== '' ? $short : $long;
         }
 
         $weekdays_long = [];
         $weekdays_short = [];
         for ($d = 0; $d <= 6; ++$d) {
-            $weekdays_long[] = $wp_locale->weekday[$d] ?? '';
-            $weekdays_short[] = $wp_locale->weekday_abbrev[$d] ?? '';
+            $long = $wp_locale->weekday[$d] ?? '';
+            $short = $long !== '' ? (string) $wp_locale->get_weekday_abbrev($long) : '';
+            $weekdays_long[] = $long;
+            $weekdays_short[] = $short !== '' ? $short : $long;
         }
 
         $payload = [

@@ -1151,8 +1151,7 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
             bulkMutationPending={deleteMutation.isPending}
             totalItems={bookings.length}
             bulkActionOptions={[
-              { value: "", label: __("Bulk Actions") },
-              { value: "delete", label: __("Delete") },
+              { value: "delete", label: __("Delete", "yatra") },
             ]}
             showColumnsDropdown={false}
             setShowColumnsDropdown={() => {}}

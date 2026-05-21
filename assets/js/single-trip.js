@@ -41,7 +41,70 @@ document.addEventListener('DOMContentLoaded', function() {
         return out;
     }
 
+    /**
+     * Convert a PHP date() format string to its Flatpickr equivalent.
+     *
+     * The two format spec tables overlap heavily — d/j/D/l/m/n/M/F/Y/y
+     * mean the same thing in both — but a few PHP tokens map to a
+     * different Flatpickr token (e.g. PHP `s` = seconds → Flatpickr
+     * `S`; PHP `a`/`A` AM-PM → Flatpickr `K`). Anything outside the
+     * map (literal punctuation, slashes, spaces) is passed through.
+     *
+     * Used to populate flatpickr's `altFormat`. We keep `dateFormat`
+     * itself locked to `Y-m-d` so the value submitted to the backend
+     * stays stable regardless of the operator's display preference;
+     * only the user-visible input swaps to their configured format.
+     *
+     * Kept in lockstep with the helper of the same shape in trip.js
+     * and the inline mapping in single-trip-sidebar.js — three call
+     * sites because each file ships as its own enqueued bundle and
+     * sharing across them would require a separate dep file.
+     *
+     * @param {string} php  PHP date() format from Settings → General → Date format
+     * @returns {string}    Flatpickr-compatible format string
+     */
+    function yatraPhpDateFormatToFlatpickr(php) {
+        if (!php || typeof php !== 'string') return 'F j, Y';
+        var map = {
+            // Day
+            d: 'd', j: 'j', D: 'D', l: 'l',
+            // Month
+            m: 'm', n: 'n', M: 'M', F: 'F',
+            // Year
+            Y: 'Y', y: 'y',
+            // Time
+            H: 'H', G: 'H', h: 'h', g: 'h',
+            i: 'i', s: 'S', a: 'K', A: 'K'
+        };
+        var out = '';
+        var esc = false;
+        for (var i = 0; i < php.length; i++) {
+            var ch = php[i];
+            if (esc) { out += ch; esc = false; continue; }
+            if (ch === '\\') { esc = true; continue; }
+            out += map[ch] || ch;
+        }
+        return out || 'F j, Y';
+    }
+
+    /**
+     * Resolve the operator's configured display format and convert it
+     * for Flatpickr. Falls back to `F j, Y` (e.g. "Jan 5, 2026") when
+     * settings haven't shipped a value.
+     */
+    function yatraResolveAltFormat() {
+        var cfg = window.yatraTripData || {};
+        // Pre-converted value wins (set server-side in some bundles); a
+        // raw PHP string is converted on the fly.
+        if (cfg.flatpickrAltFormat || cfg.altDateFormat) {
+            return cfg.flatpickrAltFormat || cfg.altDateFormat;
+        }
+        var php = cfg.dateFormat || cfg.date_format || '';
+        return yatraPhpDateFormatToFlatpickr(php);
+    }
+
     var fpLocale = yatraGetFlatpickrLocale();
+    var fpAltFormat = yatraResolveAltFormat();
 
     // Initialize date pickers when DOM is ready.
     //
@@ -80,7 +143,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (availabilityDates.length > 0) {
                 flatpickr(bookingDateInput, {
+                    // Backend value stays as Y-m-d (what the booking
+                    // form submits); only the user-visible input flips
+                    // to the operator's configured Date Format via
+                    // altInput/altFormat. Previously hardcoded which
+                    // ignored Settings → General → Date format.
                     dateFormat: 'Y-m-d',
+                    altInput: true,
+                    altFormat: fpAltFormat,
                     minDate: 'today',
                     enable: availabilityDates,
                     disableMobile: false,
@@ -92,7 +162,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Disable the input rather than silently falling back to
                 // "any date", which would violate the configured priority.
                 bookingDateInput.setAttribute('disabled', 'disabled');
-                bookingDateInput.setAttribute('placeholder', bookingDateInput.getAttribute('data-empty-text') || 'No departure dates available');
+                // Fallback placeholder when the template hasn't supplied
+                // `data-empty-text`. Wrapped in __() so the literal string
+                // can be translated; the data-attribute fallback is a
+                // server-rendered string that's already localised.
+                bookingDateInput.setAttribute(
+                    'placeholder',
+                    bookingDateInput.getAttribute('data-empty-text') || __('No departure dates available', 'yatra')
+                );
             }
         } else {
             // Flexible booking: any future date inside the trip's available
@@ -101,8 +178,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const minDate = bookingDateInput.getAttribute('data-min-date') || 'today';
             const maxDate = bookingDateInput.getAttribute('data-max-date');
 
+            // Flexible-date picker. Same altInput/altFormat pattern
+            // as the availability-restricted branch above — backend
+            // value stable, display matches operator preference.
             const config = {
                 dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: fpAltFormat,
                 minDate: minDate,
                 disableMobile: false,
                 locale: fpLocale
@@ -115,12 +197,17 @@ document.addEventListener('DOMContentLoaded', function() {
             flatpickr(bookingDateInput, config);
         }
     }
-    
-    // Enquiry modal date picker (always flexible)
+
+    // Enquiry modal date picker (always flexible). Same altFormat
+    // treatment so the enquiry form respects the operator's date
+    // format too — previously hardcoded to Y-m-d which jarred with
+    // any non-ISO display preference.
     const enquiryDateInput = document.getElementById('enquiry-travel-date');
     if (enquiryDateInput) {
         flatpickr(enquiryDateInput, {
             dateFormat: 'Y-m-d',
+            altInput: true,
+            altFormat: fpAltFormat,
             minDate: 'today',
             disableMobile: false,
             locale: fpLocale
@@ -393,10 +480,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         const adultInput = document.querySelector('input[name*="travelers[adults]"]');
                         if (adultInput) {
                             adultInput.value = groupSize;
-                            // Update display
+                            // Update display. The literal "Adult x %d"
+                            // is kept as the msgid so translators can
+                            // localise both the noun and the format
+                            // (some locales put the multiplier first).
+                            // Comment phrasing matches the other call
+                            // sites in trip.js so WP-CLI sees ONE
+                            // canonical translators-comment per msgid.
                             const display = document.querySelector('.yatra-participants-display');
                             if (display) {
-                                display.textContent = `Adult x ${groupSize}`;
+                                // translators: %d: number of adults
+                                display.textContent = __('Adult x %d', 'yatra').replace('%d', String(groupSize));
                             }
                         }
                     }
@@ -582,8 +676,13 @@ document.addEventListener('DOMContentLoaded', function () {
             inputs.forEach(input => {
                 const value = parseInt(input.value) || 0;
                 if (value > 0) {
-                    const label = input.getAttribute('data-category-label') || 'Traveler';
-                    parts.push(`${label} x ${value}`);
+                    const label = input.getAttribute('data-category-label') || __('Traveler', 'yatra');
+                    parts.push(sprintf(
+                        /* translators: 1: traveler category label, 2: count. */
+                        __('%1$s x %2$d', 'yatra'),
+                        label,
+                        value
+                    ));
                     total += value;
                 }
             });

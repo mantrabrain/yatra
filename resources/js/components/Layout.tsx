@@ -37,6 +37,7 @@ import {
   Plane,
   MessageSquare,
   MessageCircle,
+  Network,
   Puzzle,
   ArrowLeft,
   Loader2,
@@ -350,32 +351,40 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, []);
 
   const menuItems = useMemo(
+    // Every menu label is wrapped in __() with a literal string so
+    // gettext extraction (scripts/extract-js-pot.mjs) picks them up
+    // and Loco / Poedit / wp i18n can translate them. Previously most
+    // were raw English literals — translations existed in the .po but
+    // never reached the UI because there was no translation lookup at
+    // render time. Wrapping is the WordPress-canonical way; the
+    // pre_load_script_translations filter then delivers the locale
+    // data to wp.i18n on every admin page load.
     () => [
-      { subpage: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { subpage: "dashboard", label: __("Dashboard", "yatra"), icon: LayoutDashboard },
       {
         subpage: "trips",
-        label: "Trips",
+        label: __("Trips", "yatra"),
         icon: MapPin,
         submenu: [
-          { tab: "all", label: "All Trips", icon: List },
-          { tab: "activities", label: "Activities", icon: Activity },
-          { tab: "destinations", label: "Destinations", icon: Route },
-          { tab: "categories", label: "Categories", icon: FolderTree },
+          { tab: "all", label: __("All Trips", "yatra"), icon: List },
+          { tab: "activities", label: __("Activities", "yatra"), icon: Activity },
+          { tab: "destinations", label: __("Destinations", "yatra"), icon: Route },
+          { tab: "categories", label: __("Categories", "yatra"), icon: FolderTree },
           {
             tab: "difficulty-levels",
-            label: "Difficulty Levels",
+            label: __("Difficulty Levels", "yatra"),
             icon: TrendingUp,
           },
           // Availability - FREE feature, always show
-          { tab: "availability", label: "Availability", icon: CalendarDays },
+          { tab: "availability", label: __("Availability", "yatra"), icon: CalendarDays },
           // Attributes - FREE feature, always show
-          { tab: "attributes", label: "Attributes", icon: Tag },
+          { tab: "attributes", label: __("Attributes", "yatra"), icon: Tag },
           // Additional Services - show only if Pro plugin is active and module is enabled
           ...(isProPluginActive() && isModuleActive("additional_services")
             ? [
                 {
                   tab: "additional-services",
-                  label: "Additional Services",
+                  label: __("Additional Services", "yatra"),
                   icon: Package,
                   isPremium: true,
                 },
@@ -386,7 +395,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             ? [
                 {
                   tab: "trip-consent",
-                  label: "Trip Consent",
+                  label: __("Trip Consent", "yatra"),
                   icon: FileSignature,
                   isPremium: true,
                 },
@@ -396,29 +405,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       },
       {
         subpage: "traveler-categories",
-        label: "Traveler Categories",
+        label: __("Traveler Categories", "yatra"),
         icon: UserCircle,
       },
       {
         subpage: "itinerary",
-        label: "Itinerary",
+        label: __("Itinerary", "yatra"),
         icon: FileText,
         submenu: [
-          { tab: "item-types", label: "Item Types", icon: Tag },
-          { tab: "items", label: "Items", icon: Route },
-          { tab: "itinerary", label: "Itinerary", icon: FileText },
+          { tab: "item-types", label: __("Item Types", "yatra"), icon: Tag },
+          { tab: "items", label: __("Items", "yatra"), icon: Route },
+          { tab: "itinerary", label: __("Itinerary", "yatra"), icon: FileText },
         ],
       },
       // Departures - FREE feature, always show
-      { subpage: "departures", label: "Departures", icon: Calendar },
-      { subpage: "discounts", label: "Discounts", icon: BadgePercent },
-      { subpage: "payments", label: "Payments", icon: CreditCard },
-      { subpage: "bookings", label: "Bookings", icon: Calendar },
-      { subpage: "customers", label: "Customers", icon: UserCircle },
-      { subpage: "travelers", label: "Travelers", icon: Plane },
-      { subpage: "enquiries", label: "Enquiries", icon: MessageSquare },
-      { subpage: "reviews", label: "Reviews", icon: Star },
-      { subpage: "reports", label: "Reports", icon: BarChart3 },
+      { subpage: "departures", label: __("Departures", "yatra"), icon: Calendar },
+      { subpage: "discounts", label: __("Discounts", "yatra"), icon: BadgePercent },
+      { subpage: "payments", label: __("Payments", "yatra"), icon: CreditCard },
+      { subpage: "bookings", label: __("Bookings", "yatra"), icon: Calendar },
+      { subpage: "customers", label: __("Customers", "yatra"), icon: UserCircle },
+      { subpage: "travelers", label: __("Travelers", "yatra"), icon: Plane },
+      { subpage: "enquiries", label: __("Enquiries", "yatra"), icon: MessageSquare },
+      { subpage: "reviews", label: __("Reviews", "yatra"), icon: Star },
+      { subpage: "reports", label: __("Reports", "yatra"), icon: BarChart3 },
       // Email — SMTP & transactional for all; Pro adds automation tabs on the same screen
       {
         subpage: "email-automation",
@@ -431,7 +440,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         ? [
             {
               subpage: "abandoned-recovery",
-              label: "Abandoned Recovery",
+              label: __("Abandoned Recovery", "yatra"),
               icon: RotateCcw,
               isPremium: true,
             },
@@ -442,13 +451,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         ? [
             {
               subpage: "dynamic-pricing",
-              label: "Dynamic Pricing",
+              label: __("Dynamic Pricing", "yatra"),
               icon: TrendingUp,
               isPremium: true,
             },
           ]
         : []),
-      { subpage: "modules", label: "Modules", icon: Puzzle },
+      { subpage: "modules", label: __("Modules", "yatra"), icon: Puzzle },
       // White Label — only when the Agency-tier module is actually enabled.
       // (Agency license alone is not enough; the module toggle must be on,
       // otherwise users would see a link to a disabled feature. To get
@@ -510,8 +519,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             },
           ]
         : []),
-      { subpage: "license", label: "License", icon: Key },
-      { subpage: "settings", label: "Settings", icon: Settings },
+      // Channel Manager — Agency-tier OTA distribution hub. Same gate
+      // pattern as White Label: needs the Agency license AND the module
+      // toggle on. useModules.ts updates `channelManagerEnabled` on
+      // toggle + fires `yatra-modules-updated` so this menu appears
+      // instantly without a page reload.
+      ...((window as any).yatraAdmin?.isAgency &&
+      (window as any).yatraAdmin?.channelManagerEnabled
+        ? [
+            {
+              subpage: "channel-manager",
+              label: __("Channel Manager", "yatra"),
+              icon: Network,
+              isPremium: true,
+            },
+          ]
+        : []),
+      { subpage: "license", label: __("License", "yatra"), icon: Key },
+      { subpage: "settings", label: __("Settings", "yatra"), icon: Settings },
     ],
     [navRefreshKey],
   ); // Re-calculate when navRefreshKey changes
@@ -766,7 +791,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       <button
                         onClick={() => toggleMenu(item.subpage)}
                         className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${
-                          active || isExpanded
+                          active
                             ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium"
                             : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         }`}

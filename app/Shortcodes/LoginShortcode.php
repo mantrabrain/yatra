@@ -139,8 +139,9 @@ class LoginShortcode extends BaseShortcode
                 </div>
                 <h3><?php esc_html_e('Already Logged In', 'yatra'); ?></h3>
                 <p>
-                    <?php 
+                    <?php
                     printf(
+                        /* translators: %s: logged-in user's display name. */
                         esc_html__('You are logged in as %s.', 'yatra'),
                         '<strong>' . esc_html($user->display_name) . '</strong>'
                     );

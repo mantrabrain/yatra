@@ -971,8 +971,10 @@ class DiscountService extends BaseService
                     if (!empty($appliedCategories)) {
                         $firstCat = $appliedCategories[0];
                         if ($firstCat['discount_type'] === 'percentage') {
+                            /* translators: %s: discount percentage value. */
                             $discountInfo = sprintf(__('Group Discount (%s%%)', 'yatra'), $firstCat['discount_value']);
                         } else {
+                            /* translators: %s: formatted discount amount. */
                             $discountInfo = sprintf(__('Group Discount (%s)', 'yatra'), yatra_format_price($firstCat['discount_value']));
                         }
                     } else {
@@ -1017,8 +1019,10 @@ class DiscountService extends BaseService
                             'value' => $discountValue,
                             'amount' => round($calculatedAmount, 2),
                             'code' => $discount->code ?? null,
-                            'label' => $discountType === 'percentage' 
+                            'label' => $discountType === 'percentage'
+                                /* translators: %s: discount percentage value. */
                                 ? sprintf(__('Group Discount (%s%%)', 'yatra'), $discountValue)
+                                /* translators: %s: formatted discount amount. */
                                 : sprintf(__('Group Discount (%s)', 'yatra'), yatra_format_price($discountValue)),
                         ];
                     }
@@ -1058,8 +1062,10 @@ class DiscountService extends BaseService
                         'value' => $discountValue,
                         'amount' => round($calculatedAmount, 2),
                         'code' => $discount->code ?? null,
-                        'label' => $discountType === 'percentage' 
+                        'label' => $discountType === 'percentage'
+                            /* translators: %s: discount percentage value. */
                             ? sprintf(__('Group Discount (%s%%)', 'yatra'), $discountValue)
+                            /* translators: %s: formatted discount amount. */
                             : sprintf(__('Group Discount (%s)', 'yatra'), yatra_format_price($discountValue)),
                     ];
                 }
@@ -1068,7 +1074,7 @@ class DiscountService extends BaseService
 
         return null;
     }
-    
+
     /**
      * Calculate coupon discount for booking
      * 
@@ -1134,7 +1140,8 @@ class DiscountService extends BaseService
             'type'              => $discount->type,
             'amount'            => (float) $discount->amount,
             'calculated_amount' => round($calculated_discount, 2),
-            'label'             => $discount->type === 'percentage' 
+            'label'             => $discount->type === 'percentage'
+                /* translators: %s: discount percentage value. */
                 ? sprintf(__('Coupon (%s%%)', 'yatra'), $discount->amount)
                 : __('Coupon Discount', 'yatra'),
         ];
@@ -1216,8 +1223,9 @@ class DiscountService extends BaseService
         // Check minimum amount
         if (!empty($discount->min_amount) && $total < (float) $discount->min_amount) {
             return [
-                'valid' => false, 
+                'valid' => false,
                 'message' => sprintf(
+                    /* translators: %s: formatted minimum amount. */
                     __('Minimum amount of %s required for this coupon.', 'yatra'),
                     yatra_format_price((float) $discount->min_amount)
                 )

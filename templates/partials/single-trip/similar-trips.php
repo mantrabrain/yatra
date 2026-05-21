@@ -50,8 +50,10 @@ if (!defined('ABSPATH')) {
                     $duration_nights = (int) ($similar_trip->duration_nights ?? 0);
                     $duration = [
                         'has_duration' => $duration_days > 0,
-                        'formatted' => $duration_nights > 0 
-                            ? sprintf(_n('%d day %d night', '%d days %d nights', $duration_days, 'yatra'), $duration_days, $duration_nights)
+                        'formatted' => $duration_nights > 0
+                            /* translators: 1: number of days, 2: number of nights. */
+                            ? sprintf(_n('%1$d day %2$d night', '%1$d days %2$d nights', $duration_days, 'yatra'), $duration_days, $duration_nights)
+                            /* translators: %d: number of days. */
                             : sprintf(_n('%d day', '%d days', $duration_days, 'yatra'), $duration_days)
                     ];
                     

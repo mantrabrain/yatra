@@ -1750,7 +1750,9 @@ const PreviewForm: React.FC<PreviewFormProps> = ({
         form_id: formData.id || 0,
         form_version: 1,
         signer_name:
-          previewValues["full_name"] || previewValues["name"] || "Preview User",
+          previewValues["full_name"] ||
+          previewValues["name"] ||
+          __("Preview User", "yatra"),
         signer_email: previewValues["email"] || "preview@example.com",
         form_data: submittedFormData,
         signature_data: formData.require_signature ? signatureData : null,
@@ -1763,7 +1765,7 @@ const PreviewForm: React.FC<PreviewFormProps> = ({
         setIsSubmitted(true);
         showToast(__("Consent form saved successfully!"), "success");
       } else {
-        throw new Error(response?.message || "Failed to save");
+        throw new Error(response?.message || __("Failed to save", "yatra"));
       }
     } catch (error: any) {
       console.error("Failed to save consent:", error);
@@ -1806,8 +1808,8 @@ const PreviewForm: React.FC<PreviewFormProps> = ({
                       <span className="font-medium">{field.label}:</span>{" "}
                       {field.type === "checkbox"
                         ? previewChecked[field.id]
-                          ? "✓ Checked"
-                          : "✗ Not checked"
+                          ? __("✓ Checked", "yatra")
+                          : __("✗ Not checked", "yatra")
                         : previewValues[field.id] || "-"}
                     </li>
                   ))}

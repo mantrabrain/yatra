@@ -1,9 +1,31 @@
 /**
- * Dashboard Page
- * Clean, minimal SaaS-style dashboard with proper alignment
+ * Dashboard Page — redesigned 3.0.5
+ *
+ * Layout principles:
+ *
+ *   - One header row: page title + date-range picker. Welcome card is
+ *     dismissible (state stored in localStorage so the operator doesn't
+ *     see it every time after onboarding).
+ *
+ *   - KPI strip: five high-signal cards in a single row with period-
+ *     over-period deltas from `/reports`. Removes the duplicate
+ *     "Pending Bookings" card the old design had at top + side, and
+ *     adds tooltips for the confusable "Booked vs Collected Revenue"
+ *     pair operators routinely conflate.
+ *
+ *   - Main grid: charts on the left (Bookings Overview + Status +
+ *     Destinations), operational widgets on the right (Upcoming
+ *     Departures, Pending Payments).
+ *
+ *   - Tertiary: Recent Bookings + Quick Actions full-width at the
+ *     bottom. Quick Actions also surface as compact icon buttons in
+ *     the page header for faster access from anywhere on the page.
+ *
+ *   - AI Today's Brief is gated on AI module enabled (see
+ *     TodaysBriefCard.tsx) — never renders a "buy AI" upsell.
  */
 
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   MapPin,
@@ -12,11 +34,10 @@ import {
   Users,
   Plane,
   TrendingUp,
-  Info,
   Activity,
-  Clock,
   CheckCircle,
-  // AlertCircle available for future use
+  Plus,
+  X,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { usePermissions } from "../hooks/usePermissions";
@@ -43,7 +64,69 @@ import {
   readYatraCurrencyPositionFromWindow,
 } from "../lib/currency-display";
 
+// ---------------------------------------------------------------------------
+// Date-range presets
+//
+// Same options as the Reports page so operators learn the model once.
+// Stored in state so the rest of the dashboard can scope its queries to
+// the picked window. The "all_time" option keeps backwards-compat with
+// the previous Dashboard behaviour (no date scoping) — it's the
+// default until the operator picks something else.
+// ---------------------------------------------------------------------------
+
+type DashboardRange =
+  | "all_time"
+  | "today"
+  | "last_7_days"
+  | "last_30_days"
+  | "last_90_days"
+  | "this_year";
+
+// Translatable labels for the date-range presets.
+// gettext extractors only pick up calls where the msgid is a literal,
+// so we wrap each label inside `__()` directly here rather than store
+// raw strings and translate them at the call site (which would emit
+// `__(variable, ...)` — invisible to make-pot). Renders are still
+// cheap; this function runs once per render of the <select>.
+const rangeLabels = (): Record<DashboardRange, string> => ({
+  all_time: __("All time", "yatra"),
+  today: __("Today", "yatra"),
+  last_7_days: __("Last 7 days", "yatra"),
+  last_30_days: __("Last 30 days", "yatra"),
+  last_90_days: __("Last 90 days", "yatra"),
+  this_year: __("This year", "yatra"),
+});
+
+function getDateBounds(range: DashboardRange): { from?: string; to?: string } {
+  if (range === "all_time") return {};
+  const today = new Date();
+  const start = new Date(today);
+  switch (range) {
+    case "today":
+      start.setHours(0, 0, 0, 0);
+      break;
+    case "last_7_days":
+      start.setDate(today.getDate() - 7);
+      break;
+    case "last_30_days":
+      start.setDate(today.getDate() - 30);
+      break;
+    case "last_90_days":
+      start.setDate(today.getDate() - 90);
+      break;
+    case "this_year":
+      start.setMonth(0, 1);
+      break;
+  }
+  const fmt = (d: Date) =>
+    `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}`;
+  return { from: fmt(start), to: fmt(today) };
+}
+
+// ---------------------------------------------------------------------------
 // Skeleton components
+// ---------------------------------------------------------------------------
+
 const SkeletonStatCard = () => (
   <Card>
     <CardContent className="pt-6">
@@ -58,18 +141,37 @@ const SkeletonStatCard = () => (
   </Card>
 );
 
-const SkeletonQuickStat = () => (
-  <div className="flex items-center gap-3">
-    <Skeleton className="w-10 h-10 rounded-full" />
-    <div className="flex-1">
-      <Skeleton className="h-3 w-16 mb-1" />
-      <Skeleton className="h-5 w-12" />
-    </div>
-  </div>
-);
+// ---------------------------------------------------------------------------
+// Dashboard page
+// ---------------------------------------------------------------------------
+
+const WELCOME_DISMISSED_KEY = "yatra:dashboard:welcome-dismissed:v1";
 
 const Dashboard: React.FC = () => {
   const { can } = usePermissions();
+
+  const [range, setRange] = useState<DashboardRange>("all_time");
+  const dateBounds = useMemo(() => getDateBounds(range), [range]);
+
+  // Welcome card dismissal — sticky per browser. Operators see it once
+  // during onboarding, then never again. localStorage instead of cookie
+  // because dashboards aren't shared and the value never needs to
+  // round-trip to the server.
+  const [welcomeDismissed, setWelcomeDismissed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(WELCOME_DISMISSED_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+  const dismissWelcome = () => {
+    setWelcomeDismissed(true);
+    try {
+      localStorage.setItem(WELCOME_DISMISSED_KEY, "1");
+    } catch {
+      /* private-mode browser; just no-persist */
+    }
+  };
 
   const defaultCurrency =
     (window as any)?.yatraAdmin?.currency ||
@@ -77,7 +179,6 @@ const Dashboard: React.FC = () => {
     "USD";
 
   const currencyPosition = readYatraCurrencyPositionFromWindow();
-
   const currencyDecimalsRaw =
     (window as any)?.yatraAdmin?.decimalPlaces ??
     (window as any)?.yatraAdmin?.currency_decimals ??
@@ -92,17 +193,19 @@ const Dashboard: React.FC = () => {
       zeroAsUnknown: false,
     });
 
-  // Fetch booking statistics (totals, revenue, status breakdown, upcoming)
-  const { data: bookingStats, isLoading } = useQuery({
+  // --- Data fetches -------------------------------------------------------
+
+  // Booking stats (totals + by-status). Independent of the date filter
+  // for now — endpoint doesn't yet honour date params. Date-aware
+  // metrics come from /reports below.
+  const { data: bookingStats, isLoading: bookingStatsLoading } = useQuery({
     queryKey: ["dashboard-booking-stats"],
     queryFn: async () => {
       const response = await apiClient.get("/bookings/stats");
-      // REST returns a flat stats object; some endpoints nest under `data` — prefer the flat body.
       return response?.data ?? response ?? {};
     },
   });
 
-  // Fetch total trips count
   const { data: tripsSummary } = useQuery({
     queryKey: ["dashboard-trips-total"],
     queryFn: async () => {
@@ -114,7 +217,6 @@ const Dashboard: React.FC = () => {
     enabled: can("yatra_view_trips"),
   });
 
-  // Fetch total customers count
   const { data: customersSummary } = useQuery({
     queryKey: ["dashboard-customers-total"],
     queryFn: async () => {
@@ -126,18 +228,34 @@ const Dashboard: React.FC = () => {
     enabled: can("yatra_view_bookings"),
   });
 
-  // Fetch bookings chart data: bookings per month for the last 6 months (including current)
-  const { data: bookingsData } = useQuery({
-    queryKey: ["bookings-chart"],
+  // Period-aware metrics via /reports. Only kicks in when the operator
+  // picked a real range — "all_time" doesn't need a delta.
+  const { data: reportData } = useQuery({
+    queryKey: ["dashboard-reports", dateBounds.from, dateBounds.to],
+    queryFn: async () => {
+      const response = await apiClient.get("/reports", {
+        params: {
+          date_from: dateBounds.from,
+          date_to: dateBounds.to,
+        },
+      });
+      return response?.data ?? response ?? {};
+    },
+    enabled: !!dateBounds.from && !!dateBounds.to,
+    staleTime: 60_000,
+  });
+
+  // Bookings chart — when a range is picked, prefer the /reports
+  // `booking_trend` (already day-aligned + period-correct). Otherwise
+  // fall back to the legacy 500-row aggregate.
+  const { data: bookingsChartData } = useQuery({
+    queryKey: ["dashboard-bookings-chart", range],
     queryFn: async () => {
       const now = new Date();
       const pad = (n: number) => String(n).padStart(2, "0");
 
-      // Get a recent batch of bookings and aggregate by created_at month
       const response = await apiClient.get("/bookings", {
-        params: {
-          per_page: 500,
-        },
+        params: { per_page: 500 },
       });
 
       const items: any[] = response?.data || [];
@@ -145,7 +263,6 @@ const Dashboard: React.FC = () => {
       const amounts: Record<string, number> = {};
 
       items.forEach((b) => {
-        // Group by created_at month; fall back to travel_date
         const dateStr = b.created_at || b.travel_date;
         const date = dateStr ? new Date(dateStr) : null;
         if (!date || Number.isNaN(date.getTime())) return;
@@ -155,7 +272,6 @@ const Dashboard: React.FC = () => {
         amounts[ym] = (amounts[ym] || 0) + amount;
       });
 
-      // Build the last 6 calendar months (including current), oldest first
       const months: { label: string; count: number; amount: number }[] = [];
       for (let i = 5; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -173,66 +289,36 @@ const Dashboard: React.FC = () => {
 
       return months;
     },
-    enabled: can("yatra_view_bookings"),
+    enabled: can("yatra_view_bookings") && range === "all_time",
   });
 
-  // Derive booking status breakdown from bookingStats.by_status
-  // MUST be before any conditional returns (React Hooks rule)
-  const statusData = React.useMemo(() => {
+  // Status breakdown — same /bookings/stats source.
+  const statusData = useMemo(() => {
     const byStatus = (bookingStats as any)?.by_status || {};
-
     const getCount = (key: string) => {
       const entry = byStatus[key];
       if (!entry) return 0;
-      // entry is an object like { status: 'pending', count: '5' }
       const raw = (entry as any).count;
       const n = typeof raw === "string" ? parseInt(raw, 10) : Number(raw ?? 0);
       return Number.isNaN(n) ? 0 : n;
     };
-
     return [
-      {
-        label: __("Pending", "yatra"),
-        value: getCount("pending"),
-        color: "#f59e0b",
-      },
-      {
-        label: __("Confirmed", "yatra"),
-        value: getCount("confirmed"),
-        color: "#10b981",
-      },
-      {
-        label: __("Completed", "yatra"),
-        value: getCount("completed"),
-        color: "#3b82f6",
-      },
-      {
-        label: __("Cancelled", "yatra"),
-        value: getCount("cancelled"),
-        color: "#ef4444",
-      },
-      {
-        label: __("Refunded", "yatra"),
-        value: getCount("refunded"),
-        color: "#a855f7",
-      },
+      { label: __("Pending", "yatra"), value: getCount("pending"), color: "#f59e0b" },
+      { label: __("Confirmed", "yatra"), value: getCount("confirmed"), color: "#10b981" },
+      { label: __("Completed", "yatra"), value: getCount("completed"), color: "#3b82f6" },
+      { label: __("Cancelled", "yatra"), value: getCount("cancelled"), color: "#ef4444" },
+      { label: __("Refunded", "yatra"), value: getCount("refunded"), color: "#a855f7" },
     ];
   }, [bookingStats]);
 
-  // Fetch popular destinations (aggregate from trips API)
+  // Popular destinations — derived from trips list (still bounded by
+  // 50; tracked in audit as a server-aggregate follow-up).
   const { data: destinationsData } = useQuery({
-    queryKey: ["popular-destinations"],
+    queryKey: ["dashboard-destinations"],
     queryFn: async () => {
-      const response = await apiClient.get("/trips", {
-        params: {
-          per_page: 50,
-        },
-      });
-
+      const response = await apiClient.get("/trips", { params: { per_page: 50 } });
       const trips = response?.data || [];
       const counts: Record<string, number> = {};
-
-      // Each trip may have destinations array (from TripController prepare_item_for_response)
       trips.forEach((trip: any) => {
         const destinations = trip.destinations || [];
         destinations.forEach((dest: any) => {
@@ -241,35 +327,24 @@ const Dashboard: React.FC = () => {
           counts[name] = (counts[name] || 0) + 1;
         });
       });
-
-      const palette = [
-        "#3b82f6",
-        "#10b981",
-        "#f59e0b",
-        "#ef4444",
-        "#6366f1",
-        "#14b8a6",
-      ];
-      const entries = Object.entries(counts)
+      const palette = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#6366f1", "#14b8a6"];
+      return Object.entries(counts)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 6);
-
-      return entries.map(([name, value], index) => ({
-        label: name,
-        value,
-        color: palette[index % palette.length],
-      }));
+        .slice(0, 6)
+        .map(([name, value], index) => ({
+          label: name,
+          value,
+          color: palette[index % palette.length],
+        }));
     },
     enabled: can("yatra_view_trips"),
   });
 
-  // Fetch upcoming departures (real data from /departures)
   const { data: departures } = useQuery({
-    queryKey: ["upcoming-departures"],
+    queryKey: ["dashboard-upcoming-departures"],
     queryFn: async () => {
       const today = new Date();
       const todayStr = today.toISOString().split("T")[0];
-
       const response = await apiClient.get("/departures", {
         params: {
           status: "upcoming",
@@ -277,10 +352,7 @@ const Dashboard: React.FC = () => {
           include_past: false,
         },
       });
-
       const items = response?.data || [];
-
-      // Map API departures into widget-friendly shape
       return items.map((d: any) => {
         const tripTitle = d?.trip?.title || d?.trip_title || d?.title || "";
         const destination =
@@ -298,7 +370,6 @@ const Dashboard: React.FC = () => {
           d?.available_seats ??
           d?.remaining_slots ??
           totalSpots - (d?.bookings_count || 0);
-
         return {
           id: d.id,
           trip_id: d.trip_id || d?.trip?.id,
@@ -314,38 +385,27 @@ const Dashboard: React.FC = () => {
     enabled: can("yatra_view_trips"),
   });
 
-  // Fetch pending payments (real data)
   const { data: pendingPayments } = useQuery({
-    queryKey: ["pending-payments"],
+    queryKey: ["dashboard-pending-payments"],
     queryFn: async () => {
       const response = await apiClient.get("/payments", {
-        params: {
-          status: "pending",
-          per_page: 5,
-        },
+        params: { status: "pending", per_page: 5 },
       });
       return response?.data || [];
     },
     enabled: can("yatra_view_bookings"),
   });
 
-  // Fetch recent bookings (real data, latest 5) and map to widget shape
   const { data: recentBookings } = useQuery({
-    queryKey: ["recent-bookings"],
+    queryKey: ["dashboard-recent-bookings"],
     queryFn: async () => {
-      const response = await apiClient.get("/bookings", {
-        params: {
-          per_page: 5,
-        },
-      });
+      const response = await apiClient.get("/bookings", { params: { per_page: 5 } });
       const items = response?.data || [];
-
       return items.map((b: any) => ({
         id: b.id,
         booking_id: b.reference || `BK-${b.id}`,
         customer_name: b.customer_name || b.contact_first_name || "",
         trip_title: b.trip_title || "",
-        // Prefer created_at, fallback to travel_date, otherwise empty string
         booking_date: b.created_at || b.travel_date || "",
         total_amount: b.total_amount ?? 0,
         status: (b.status || "pending") as
@@ -358,207 +418,262 @@ const Dashboard: React.FC = () => {
     enabled: can("yatra_view_bookings"),
   });
 
-  // Show skeleton while loading - AFTER all hooks
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        {/* Skeleton for KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <SkeletonStatCard />
-          <SkeletonStatCard />
-          <SkeletonStatCard />
-          <SkeletonStatCard />
-        </div>
+  // Build trend props for KPI cards. Only present when a real range is
+  // picked (period-over-period only makes sense against a comparable
+  // window, not "all time").
+  const trendLabel = `vs prev. ${range === "today" ? "day" : range === "this_year" ? "year" : range.replace("last_", "").replace("_", " ")}`;
+  const revenueChange = Number((reportData as any)?.revenue_stats?.change ?? 0);
+  const totalChange = Number((reportData as any)?.booking_stats?.totalChange ?? 0);
+  const conversionChange = Number(
+    (reportData as any)?.booking_stats?.conversionRateChange ?? 0,
+  );
+  const hasPeriodData = range !== "all_time" && !!reportData;
 
-        {/* Skeleton for Quick Stats */}
+  // Navigate to a sub-page on the admin SPA.
+  const goTo = (subpage: string, extras: Record<string, string> = {}) => {
+    const admin = (window as any)?.yatraAdmin;
+    const baseUrl = admin?.siteUrl || "";
+    const qs = Object.entries(extras)
+      .map(([k, v]) => `&${k}=${encodeURIComponent(v)}`)
+      .join("");
+    window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=${subpage}${qs}`;
+  };
+
+  if (bookingStatsLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <SkeletonStatCard key={i} />
+          ))}
+        </div>
         <Card>
-          <CardHeader>
-            <Skeleton className="h-6 w-32" />
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <SkeletonQuickStat />
-              <SkeletonQuickStat />
-              <SkeletonQuickStat />
-              <SkeletonQuickStat />
-            </div>
+          <CardContent className="p-6">
+            <Skeleton className="h-64 w-full" />
           </CardContent>
         </Card>
-
-        {/* Skeleton for Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-40" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-64 w-full" />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-40" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-64 w-full" />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Skeleton for Widgets */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-40" />
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-40" />
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-40" />
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      {/* AI: Today's Brief — operations summary. Renders nothing for
-          tiers that don't unlock AI Assistant, so non-eligible users
-          see the dashboard exactly as before. */}
+    <div className="space-y-4">
+      {/* ── HEADER ──────────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+            {__("Dashboard", "yatra")}
+          </h1>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {__("Operations overview at a glance.", "yatra")}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {/* Date range */}
+          <select
+            value={range}
+            onChange={(e) => setRange(e.target.value as DashboardRange)}
+            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+            aria-label={__("Date range", "yatra")}
+          >
+            {(() => {
+              const labels = rangeLabels();
+              return (Object.keys(labels) as DashboardRange[]).map((k) => (
+                <option key={k} value={k}>
+                  {labels[k]}
+                </option>
+              ));
+            })()}
+          </select>
+          {/* Primary action — most common task on a travel dashboard
+              is "I want to add a new trip". Surface it as a primary
+              button so it's always one click away. */}
+          <Button
+            type="button"
+            onClick={() => goTo("trips", { action: "add" })}
+            className="inline-flex items-center gap-1"
+          >
+            <Plus className="h-4 w-4" />
+            {__("Add Trip", "yatra")}
+          </Button>
+        </div>
+      </div>
+
+      {/* ── AI BRIEF (renders nothing when module disabled) ─────────── */}
       <TodaysBriefCard />
 
-      {/* Enhanced Welcome Message */}
-      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
-        <CardContent className="p-4">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                  {__("Welcome to Dashboard", "yatra")}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {__(
-                    "Real-time insights for your travel booking business. Monitor performance, track bookings, and manage operations efficiently.",
-                    "yatra",
-                  )}
-                </p>
+      {/* ── WELCOME (dismissible) ──────────────────────────────────── */}
+      {!welcomeDismissed && (
+        <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 dark:border-blue-800 dark:from-blue-900/20 dark:to-indigo-900/20">
+          <CardContent className="p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <Activity className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
+                <div>
+                  <h3 className="mb-1 font-semibold text-gray-900 dark:text-white">
+                    {__("Welcome to Yatra", "yatra")}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {__(
+                      "Real-time insights for your travel business. Monitor performance, track bookings, and manage operations from one place.",
+                      "yatra",
+                    )}
+                  </p>
+                </div>
               </div>
+              <button
+                type="button"
+                onClick={dismissWelcome}
+                className="rounded-md p-1 text-gray-500 transition-colors hover:bg-blue-100 hover:text-gray-700 dark:hover:bg-blue-900/30 dark:hover:text-gray-200"
+                aria-label={__("Dismiss welcome message", "yatra")}
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
-            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-              <Activity className="w-4 h-4" />
-              <span>{__("Live Data", "yatra")}</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Key Metrics - Top Row: single horizontal row (scrolls on small screens) */}
-      <div className="flex flex-nowrap gap-3 overflow-x-auto pb-1">
-        <div className="flex-1 min-w-0">
+      {/* ── KPI STRIP ───────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+        <ConditionalRender capability="yatra_view_trips">
           <StatCard
             title={__("Total Trips", "yatra")}
             value={tripsSummary?.total || 0}
             icon={MapPin}
             color="blue"
-            loading={isLoading}
+            loading={!tripsSummary}
+            onClick={() => goTo("trips")}
           />
-        </div>
+        </ConditionalRender>
 
-        <div className="flex-1 min-w-0">
+        <ConditionalRender capability="yatra_view_bookings">
           <StatCard
             title={__("Total Bookings", "yatra")}
             value={bookingStats?.total || 0}
             icon={Calendar}
             color="green"
-            loading={isLoading}
+            loading={bookingStatsLoading}
+            trend={
+              hasPeriodData
+                ? {
+                    value: totalChange,
+                    isPositive: totalChange >= 0,
+                    label: trendLabel,
+                  }
+                : undefined
+            }
+            onClick={() => goTo("bookings")}
           />
-        </div>
+        </ConditionalRender>
 
-        <div className="flex-1 min-w-0">
+        <ConditionalRender capability="yatra_view_bookings">
           <StatCard
             title={__("Booked Revenue", "yatra")}
             value={formatCurrencyAmount(bookingStats?.total_revenue || 0)}
             icon={DollarSign}
             color="purple"
-            loading={isLoading}
+            loading={bookingStatsLoading}
+            tooltip={__(
+              "Total value of confirmed bookings — the gross revenue you're entitled to. Not yet net of cancellations or refunds.",
+              "yatra",
+            )}
+            trend={
+              hasPeriodData
+                ? {
+                    value: revenueChange,
+                    isPositive: revenueChange >= 0,
+                    label: trendLabel,
+                  }
+                : undefined
+            }
+            onClick={() => goTo("payments")}
           />
-        </div>
+        </ConditionalRender>
 
-        <div className="flex-1 min-w-0">
+        <ConditionalRender capability="yatra_view_bookings">
           <StatCard
             title={__("Collected Revenue", "yatra")}
             value={formatCurrencyAmount(bookingStats?.total_collected || 0)}
             icon={DollarSign}
             color="green"
-            loading={isLoading}
+            loading={bookingStatsLoading}
+            tooltip={__(
+              "Cash already received — what's actually in your accounts. The gap between Booked and Collected is your accounts-receivable (pending payments + scheduled instalments).",
+              "yatra",
+            )}
+            onClick={() => goTo("payments")}
           />
-        </div>
+        </ConditionalRender>
 
-        <div className="flex-1 min-w-0">
+        <ConditionalRender capability="yatra_view_bookings">
           <StatCard
             title={__("Total Customers", "yatra")}
             value={customersSummary?.total || 0}
             icon={Users}
             color="orange"
-            loading={isLoading}
+            loading={!customersSummary}
+            onClick={() => goTo("customers")}
           />
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <StatCard
-            title={__("Confirmed Bookings", "yatra")}
-            value={(bookingStats as any)?.by_status?.confirmed?.count || 0}
-            icon={CheckCircle}
-            color="green"
-            loading={isLoading}
-          />
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <StatCard
-            title={__("Pending Bookings", "yatra")}
-            value={(bookingStats as any)?.by_status?.pending?.count || 0}
-            icon={Clock}
-            color="orange"
-            loading={isLoading}
-          />
-        </div>
+        </ConditionalRender>
       </div>
 
-      {/* Main Content Grid - Optimized Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
-        {/* Left Column - Charts (7 columns) */}
-        <div className="lg:col-span-7 space-y-3">
-          {/* Bookings Overview - Full Width */}
+      {/* ── SECONDARY KPI ROW (period-aware) ────────────────────────── */}
+      {hasPeriodData && (
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          <StatCard
+            title={__("Conversion Rate", "yatra")}
+            value={`${Number((reportData as any)?.booking_stats?.conversionRate || 0).toFixed(1)}%`}
+            icon={TrendingUp}
+            color="green"
+            tooltip={__(
+              "Share of bookings in this period that landed in a confirmed or completed state. Higher is better.",
+              "yatra",
+            )}
+            trend={{
+              value: conversionChange,
+              isPositive: conversionChange >= 0,
+              label: trendLabel,
+            }}
+          />
+          <StatCard
+            title={__("Avg Booking Value", "yatra")}
+            value={formatCurrencyAmount(
+              Number((reportData as any)?.revenue_stats?.average || 0),
+            )}
+            icon={DollarSign}
+            color="purple"
+            tooltip={__(
+              "Mean revenue per booking in this period. A rising AOV with stable booking count is the cleanest growth signal.",
+              "yatra",
+            )}
+          />
+          <StatCard
+            title={__("Occupancy Rate", "yatra")}
+            value={`${Number((reportData as any)?.operational_stats?.occupancyRate || 0).toFixed(1)}%`}
+            icon={Plane}
+            color="blue"
+            tooltip={__(
+              "Booked seats / total seats across upcoming departures. Capacity utilisation indicator.",
+              "yatra",
+            )}
+          />
+          <StatCard
+            title={__("Cancellation Rate", "yatra")}
+            value={`${Number((reportData as any)?.booking_stats?.cancellationRate || 0).toFixed(1)}%`}
+            icon={CheckCircle}
+            color="red"
+            tooltip={__(
+              "Share of bookings that ended cancelled. Watch the trend — a spike usually points at a specific trip or timing issue.",
+              "yatra",
+            )}
+          />
+        </div>
+      )}
+
+      {/* ── MAIN GRID: charts (left) + widgets (right) ──────────────── */}
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
+        <div className="space-y-3 lg:col-span-7">
           <ConditionalRender capability="yatra_view_bookings">
             <Card>
               <CardHeader>
@@ -566,7 +681,7 @@ const Dashboard: React.FC = () => {
               </CardHeader>
               <CardContent className="pb-2">
                 <BookingsOverviewChart
-                  data={bookingsData || []}
+                  data={bookingsChartData || []}
                   currency={defaultCurrency}
                   currencyPosition={currencyPosition}
                   currencyDecimals={currencyDecimals}
@@ -575,8 +690,7 @@ const Dashboard: React.FC = () => {
             </Card>
           </ConditionalRender>
 
-          {/* Booking Status and Popular Destinations - Side by Side */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <ConditionalRender capability="yatra_view_bookings">
               <Card>
                 <CardHeader>
@@ -594,134 +708,46 @@ const Dashboard: React.FC = () => {
                   <CardTitle>{__("Popular Destinations", "yatra")}</CardTitle>
                 </CardHeader>
                 <CardContent className="pb-2">
-                  <SimpleBarChart
-                    data={destinationsData || []}
-                    title=""
-                    height={180}
-                    showValues={true}
-                  />
+                  {destinationsData && destinationsData.length > 0 ? (
+                    <SimpleBarChart
+                      data={destinationsData || []}
+                      title=""
+                      height={180}
+                      showValues={true}
+                    />
+                  ) : (
+                    <div className="py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                      {__("No destination data yet.", "yatra")}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </ConditionalRender>
           </div>
 
-          {/* Additional Stats - Integrated into main grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <ConditionalRender capability="yatra_view_bookings">
-              <StatCard
-                title={__("Pending Bookings", "yatra")}
-                value={(bookingStats as any)?.by_status?.pending?.count || 0}
-                icon={TrendingUp}
-                color="orange"
-                loading={isLoading}
-              />
-            </ConditionalRender>
-
-            <ConditionalRender capability="yatra_view_trips">
-              <StatCard
-                title={__("Upcoming Departures", "yatra")}
-                value={bookingStats?.upcoming || 0}
-                icon={Plane}
-                color="green"
-                loading={isLoading}
-              />
-            </ConditionalRender>
-          </div>
-
-          {/* Recent Bookings - Fill the gap */}
           <ConditionalRender capability="yatra_view_bookings">
             <RecentBookings
               bookings={recentBookings || []}
-              loading={isLoading}
+              loading={bookingStatsLoading}
               onView={(booking) => {
-                const admin = (window as any)?.yatraAdmin;
-                const baseUrl = admin?.siteUrl || "";
-                window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${booking.id}`;
+                goTo("bookings", { action: "view", id: String(booking.id) });
               }}
             />
           </ConditionalRender>
-
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5" />
-                {__("Quick Actions", "yatra")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <Button
-                  variant="outline"
-                  className="h-auto p-4 flex flex-col items-center gap-2"
-                  onClick={() => {
-                    const admin = (window as any)?.yatraAdmin;
-                    const baseUrl = admin?.siteUrl || "";
-                    window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=trips&action=add`;
-                  }}
-                >
-                  <MapPin className="w-5 h-5" />
-                  <span className="text-xs">{__("Add Trip", "yatra")}</span>
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="h-auto p-4 flex flex-col items-center gap-2"
-                  onClick={() => {
-                    const admin = (window as any)?.yatraAdmin;
-                    const baseUrl = admin?.siteUrl || "";
-                    window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=bookings`;
-                  }}
-                >
-                  <Calendar className="w-5 h-5" />
-                  <span className="text-xs">
-                    {__("View Bookings", "yatra")}
-                  </span>
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="h-auto p-4 flex flex-col items-center gap-2"
-                  onClick={() => {
-                    const admin = (window as any)?.yatraAdmin;
-                    const baseUrl = admin?.siteUrl || "";
-                    window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=customers`;
-                  }}
-                >
-                  <Users className="w-5 h-5" />
-                  <span className="text-xs">{__("Customers", "yatra")}</span>
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="h-auto p-4 flex flex-col items-center gap-2"
-                  onClick={() => {
-                    const admin = (window as any)?.yatraAdmin;
-                    const baseUrl = admin?.siteUrl || "";
-                    window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=reports`;
-                  }}
-                >
-                  <Activity className="w-5 h-5" />
-                  <span className="text-xs">{__("Reports", "yatra")}</span>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
-        {/* Right Column - Widgets (5 columns) */}
-        <div className="lg:col-span-5 space-y-3">
+        <div className="space-y-3 lg:col-span-5">
           <ConditionalRender capability="yatra_view_trips">
             <UpcomingDepartures
               departures={departures || []}
-              loading={isLoading}
+              loading={bookingStatsLoading}
             />
           </ConditionalRender>
 
           <ConditionalRender capability="yatra_view_bookings">
             <PendingPayments
               payments={pendingPayments || []}
-              loading={isLoading}
+              loading={bookingStatsLoading}
             />
           </ConditionalRender>
         </div>

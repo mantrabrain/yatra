@@ -32,6 +32,27 @@
     "destinationIds": {
       "type": "array",
       "default": []
+    },
+    "hide_empty": {
+      "type": "boolean",
+      "default": false,
+      "description": "When on, destinations with zero published trips are skipped. Off by default to preserve the historical 'show everything' behavior."
+    },
+    "featured_only": {
+      "type": "boolean",
+      "default": false
+    },
+    "show_trip_count": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_description": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_image": {
+      "type": "boolean",
+      "default": true
     }
   },
   "supports": {

@@ -70,6 +70,7 @@ class ReviewReminderService
         $review_url = get_permalink($trip->id) . '#reviews';
         $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
         $vars['review_url'] = esc_url($review_url);
+        $vars['completion_date'] = date_i18n(get_option('date_format'));
 
         TransactionalEmailTemplateService::sendIfEnabled(
             TransactionalEmailTemplateService::TYPE_REVIEW_REQUEST,

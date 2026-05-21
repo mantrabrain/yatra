@@ -276,7 +276,8 @@ class ItineraryController extends BaseController
                 'deleted' => $result['deleted'],
                 'failed' => $result['failed'],
                 'message' => sprintf(
-                    __('%d item(s) deleted successfully. %d item(s) failed to delete.', 'yatra'),
+                    /* translators: 1: number of items deleted, 2: number of items that failed to delete. */
+                    __('%1$d item(s) deleted successfully. %2$d item(s) failed to delete.', 'yatra'),
                     $result['deleted'],
                     $result['failed']
                 ),

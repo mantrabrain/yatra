@@ -736,16 +736,69 @@ class TripRepository extends BaseRepository
             }
         }
 
-        // Price range filter (effective list price, not original-only)
+        // Price range filter.
+        //
+        // The previous version compared a single legacy "effective"
+        // price (discounted → sale → original column) against the
+        // range. That excluded traveler-based trips whose real
+        // displayed price lives in the `price_types` JSON — so eg. a
+        // trip costing €3755 (Adult category) never appeared in search
+        // when the user set max=€3755, because its legacy
+        // original_price was €0 / stale.
+        //
+        // New approach: match a trip if EITHER the legacy effective
+        // price OR ANY per-category price in the JSON falls in the
+        // requested range. Numeric values in the `price_types` JSON
+        // are extracted with a regex on the raw text — works in all
+        // MySQL 5.7+ builds without needing JSON_VALUE / JSON_TABLE
+        // (which are inconsistent across MariaDB / older MySQL).
         $effPrice = $this->sqlTripEffectiveListPrice();
-        if (!empty($filters['price_min']) && $filters['price_min'] > 0) {
-            $wheres[] = "{$effPrice} >= %f";
-            $params[] = $filters['price_min'];
-        }
+        $priceMin = !empty($filters['price_min']) && $filters['price_min'] > 0 ? (float) $filters['price_min'] : null;
+        $priceMax = !empty($filters['price_max']) && $filters['price_max'] > 0 ? (float) $filters['price_max'] : null;
 
-        if (!empty($filters['price_max']) && $filters['price_max'] > 0) {
-            $wheres[] = "{$effPrice} <= %f";
-            $params[] = $filters['price_max'];
+        if ($priceMin !== null || $priceMax !== null) {
+            $legacyCond = [];
+            if ($priceMin !== null) { $legacyCond[] = "{$effPrice} >= %f"; $params[] = $priceMin; }
+            if ($priceMax !== null) { $legacyCond[] = "{$effPrice} <= %f"; $params[] = $priceMax; }
+            $legacyClause = implode(' AND ', $legacyCond);
+
+            // For per-category pricing, find ANY price in `price_types`
+            // JSON that falls in the requested range. This subquery
+            // creates an ad-hoc number sequence (n=0..49 covers up to
+            // 50 categories — far more than any real trip uses) and
+            // uses JSON_EXTRACT to fetch each entry's effective price.
+            $numbers = "(SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12 UNION ALL SELECT 13 UNION ALL SELECT 14 UNION ALL SELECT 15 UNION ALL SELECT 16 UNION ALL SELECT 17 UNION ALL SELECT 18 UNION ALL SELECT 19)";
+            // Each category's effective price = first non-null of
+            // discounted_price → sale_price → original_price → price.
+            $categoryEff = "COALESCE("
+                . "NULLIF(CAST(JSON_UNQUOTE(JSON_EXTRACT(t.price_types, CONCAT('$[', _n.n, '].discounted_price'))) AS DECIMAL(10,2)), 0),"
+                . "NULLIF(CAST(JSON_UNQUOTE(JSON_EXTRACT(t.price_types, CONCAT('$[', _n.n, '].sale_price'))) AS DECIMAL(10,2)), 0),"
+                . "NULLIF(CAST(JSON_UNQUOTE(JSON_EXTRACT(t.price_types, CONCAT('$[', _n.n, '].original_price'))) AS DECIMAL(10,2)), 0),"
+                . "NULLIF(CAST(JSON_UNQUOTE(JSON_EXTRACT(t.price_types, CONCAT('$[', _n.n, '].price'))) AS DECIMAL(10,2)), 0)"
+                . ")";
+            $catCond = [];
+            if ($priceMin !== null) { $catCond[] = "{$categoryEff} >= %f"; $params[] = $priceMin; }
+            if ($priceMax !== null) { $catCond[] = "{$categoryEff} <= %f"; $params[] = $priceMax; }
+            $catClause = implode(' AND ', $catCond);
+
+            // Guard the per-category branch against malformed JSON.
+            // JSON_EXTRACT throws on invalid JSON, and `price_types`
+            // can be NULL, '', '[]' or a stale string on legacy rows.
+            // JSON_VALID() + IFNULL() lets us bail cleanly for those.
+            $perCategoryExists = "("
+                . "t.price_types IS NOT NULL"
+                . " AND t.price_types <> ''"
+                . " AND JSON_VALID(t.price_types) = 1"
+                . " AND EXISTS ("
+                . "SELECT 1 FROM {$numbers} _n"
+                . " WHERE JSON_EXTRACT(t.price_types, CONCAT('$[', _n.n, ']')) IS NOT NULL"
+                . " AND {$catClause}"
+                . ")"
+                . ")";
+
+            // Match if EITHER condition passes — a single legacy-priced
+            // trip OR a per-category trip with any matching tier.
+            $wheres[] = "(({$legacyClause}) OR {$perCategoryExists})";
         }
         
         // Duration filter
@@ -2091,43 +2144,163 @@ private function getTripIdByDayId(int $dayId): int
 }
 
 /**
- * Save availability dates for a trip
+ * Save availability dates for a trip.
+ *
+ * Previously a flat DELETE-THEN-INSERT: every row for the trip was nuked
+ * and the incoming list rewritten. That made the trip-edit save lossy —
+ * when the Trip form only knew about a subset of fields on each date
+ * (e.g. it was loaded once, then the operator changed the seats on a
+ * single date through the Availability tab, then re-saved the Trip with
+ * the form's stale date payload), every field absent from the incoming
+ * row was reset to its hard-coded default. That's why operator edits
+ * to `seats_total` silently reverted to 20 after another trip-save:
+ *
+ *   1. Operator opens Trip → form loads `availability_dates` with
+ *      `seats_total = 20`.
+ *   2. Operator switches to Availability tab → edits Sept 5 to
+ *      `seats_total = 14` via the dedicated specific-date endpoint
+ *      (writes directly to the row, so the row is now 14).
+ *   3. Operator returns to the Trip form, edits something unrelated
+ *      (title / description), clicks Save. The form re-posts the date
+ *      list it loaded in step 1 — `seats_total = 20`.
+ *   4. saveAvailabilityDates DELETEs everything, INSERTs the
+ *      form-supplied list → Sept 5 is back to 20 (or the literal `20`
+ *      default if the form didn't include seats_total at all).
+ *
+ * Fix: snapshot the existing rows before the DELETE and, when the
+ * incoming row omits an editable field, fall back to the snapshot's
+ * value instead of the schema default. The literal `20` default is
+ * removed in favour of the trip's `max_travelers` (or 1 as a last
+ * resort) so new dates inserted by truly-new entries don't pretend the
+ * trip seats 20 people unless the trip actually says so.
+ *
+ * Match key for the snapshot: `departure_date` + `departure_time` (both
+ * normalised), which is the same identity the Availability UI uses.
  */
 public function saveAvailabilityDates(int $tripId, array $availabilityDates): void
     {
         global $wpdb;
         $table = TripAvailabilityDatesTable::getTableName();
-        
+
+        // Snapshot existing rows by date + time so partial incoming payloads
+        // can be merged with persisted values instead of clobbering them.
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- table name from schema helper.
+        $existingRows = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$table} WHERE trip_id = %d",
+            $tripId
+        ));
+        $snapshot = [];
+        if (is_array($existingRows)) {
+            foreach ($existingRows as $row) {
+                $key = self::availabilityRowKey(
+                    (string) ($row->departure_date ?? ''),
+                    (string) ($row->departure_time ?? '')
+                );
+                if ($key !== '') {
+                    $snapshot[$key] = $row;
+                }
+            }
+        }
+
+        // Fallback capacity when both the incoming row and the snapshot
+        // miss seats_total: read the trip's max_travelers once. The
+        // legacy literal `20` was a phantom default that punished sites
+        // whose actual trip capacity differs.
+        $tripFallbackSeats = 0;
+        $tripRow = $this->find($tripId);
+        if (is_object($tripRow) && isset($tripRow->max_travelers)) {
+            $tripFallbackSeats = (int) $tripRow->max_travelers;
+        }
+        if ($tripFallbackSeats <= 0) {
+            $tripFallbackSeats = 1;
+        }
+
         // Delete existing
         $wpdb->delete($table, ['trip_id' => $tripId], ['%d']);
-        
+
         // Insert new
         if (!empty($availabilityDates)) {
             foreach ($availabilityDates as $date) {
                 if (is_array($date) && !empty($date['departure_date'])) {
-                    $seatsTotal = isset($date['seats_total']) ? (int) $date['seats_total'] : 20;
-                    $seatsAvailable = isset($date['seats_available']) ? (int) $date['seats_available'] : $seatsTotal;
-                    
+                    $key = self::availabilityRowKey(
+                        (string) $date['departure_date'],
+                        (string) ($date['departure_time'] ?? '')
+                    );
+                    $existing = $key !== '' && isset($snapshot[$key]) ? $snapshot[$key] : null;
+
+                    $seatsTotal = isset($date['seats_total'])
+                        ? (int) $date['seats_total']
+                        : ($existing ? (int) ($existing->seats_total ?? $tripFallbackSeats) : $tripFallbackSeats);
+                    $seatsAvailable = isset($date['seats_available'])
+                        ? (int) $date['seats_available']
+                        : ($existing ? (int) ($existing->seats_available ?? $seatsTotal) : $seatsTotal);
+
+                    $arrivalDate = isset($date['arrival_date'])
+                        ? sanitize_text_field($date['arrival_date'])
+                        : (isset($date['return_date'])
+                            ? sanitize_text_field($date['return_date'])
+                            : ($existing ? $existing->arrival_date : null));
+                    $returnDate = isset($date['return_date'])
+                        ? sanitize_text_field($date['return_date'])
+                        : ($existing ? $existing->return_date : null);
+                    $arrivalTime = isset($date['arrival_time'])
+                        ? sanitize_text_field($date['arrival_time'])
+                        : ($existing ? $existing->arrival_time : null);
+
+                    $originalPrice = isset($date['original_price'])
+                        ? (float) $date['original_price']
+                        : (isset($date['price_override'])
+                            ? (float) $date['price_override']
+                            : ($existing && $existing->original_price !== null ? (float) $existing->original_price : null));
+                    $discountedPrice = isset($date['discounted_price'])
+                        ? (float) $date['discounted_price']
+                        : ($existing && $existing->discounted_price !== null ? (float) $existing->discounted_price : null);
+
+                    $fromLocation = isset($date['from_location']) ? sanitize_text_field($date['from_location']) : ($existing ? $existing->from_location : null);
+                    $toLocation = isset($date['to_location']) ? sanitize_text_field($date['to_location']) : ($existing ? $existing->to_location : null);
+                    $fromLat = isset($date['from_latitude']) && is_numeric($date['from_latitude'])
+                        ? (string) $date['from_latitude']
+                        : ($existing ? $existing->from_latitude : null);
+                    $fromLng = isset($date['from_longitude']) && is_numeric($date['from_longitude'])
+                        ? (string) $date['from_longitude']
+                        : ($existing ? $existing->from_longitude : null);
+                    $toLat = isset($date['to_latitude']) && is_numeric($date['to_latitude'])
+                        ? (string) $date['to_latitude']
+                        : ($existing ? $existing->to_latitude : null);
+                    $toLng = isset($date['to_longitude']) && is_numeric($date['to_longitude'])
+                        ? (string) $date['to_longitude']
+                        : ($existing ? $existing->to_longitude : null);
+
+                    if (isset($date['is_blackout'])) {
+                        $status = $date['is_blackout'] ? 'blocked' : 'available';
+                    } elseif (isset($date['status'])) {
+                        $status = sanitize_text_field($date['status']);
+                    } elseif ($existing) {
+                        $status = (string) ($existing->status ?? 'available');
+                    } else {
+                        $status = 'available';
+                    }
+
                     $insertData = [
                         'trip_id' => $tripId,
                         'departure_date' => sanitize_text_field($date['departure_date']),
-                        'arrival_date' => isset($date['arrival_date']) ? sanitize_text_field($date['arrival_date']) : ($date['return_date'] ?? null),
-                        'return_date' => isset($date['return_date']) ? sanitize_text_field($date['return_date']) : null,
-                        'departure_time' => isset($date['departure_time']) ? sanitize_text_field($date['departure_time']) : null,
-                        'arrival_time' => isset($date['arrival_time']) ? sanitize_text_field($date['arrival_time']) : null,
+                        'arrival_date' => $arrivalDate,
+                        'return_date' => $returnDate,
+                        'departure_time' => isset($date['departure_time']) ? sanitize_text_field($date['departure_time']) : ($existing ? $existing->departure_time : null),
+                        'arrival_time' => $arrivalTime,
                         'seats_total' => $seatsTotal,
                         'seats_available' => $seatsAvailable,
-                        'original_price' => isset($date['original_price']) ? (float) $date['original_price'] : (isset($date['price_override']) ? (float) $date['price_override'] : null),
-                        'discounted_price' => isset($date['discounted_price']) ? (float) $date['discounted_price'] : null,
-                        'from_location' => isset($date['from_location']) ? sanitize_text_field($date['from_location']) : null,
-                        'to_location' => isset($date['to_location']) ? sanitize_text_field($date['to_location']) : null,
-                        'from_latitude' => isset($date['from_latitude']) && is_numeric($date['from_latitude']) ? (string) $date['from_latitude'] : null,
-                        'from_longitude' => isset($date['from_longitude']) && is_numeric($date['from_longitude']) ? (string) $date['from_longitude'] : null,
-                        'to_latitude' => isset($date['to_latitude']) && is_numeric($date['to_latitude']) ? (string) $date['to_latitude'] : null,
-                        'to_longitude' => isset($date['to_longitude']) && is_numeric($date['to_longitude']) ? (string) $date['to_longitude'] : null,
-                        'status' => isset($date['is_blackout']) && $date['is_blackout'] ? 'blocked' : (isset($date['status']) ? sanitize_text_field($date['status']) : 'available'),
+                        'original_price' => $originalPrice,
+                        'discounted_price' => $discountedPrice,
+                        'from_location' => $fromLocation,
+                        'to_location' => $toLocation,
+                        'from_latitude' => $fromLat,
+                        'from_longitude' => $fromLng,
+                        'to_latitude' => $toLat,
+                        'to_longitude' => $toLng,
+                        'status' => $status,
                     ];
-                    
+
                     $wpdb->insert(
                         $table,
                         $insertData,
@@ -2136,6 +2309,21 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
                 }
             }
         }
+    }
+
+    /**
+     * Normalise a (date, time) pair to a single string key used to match
+     * incoming availability rows against the pre-delete snapshot. Time is
+     * left as-is for an exact comparison; empty time matches the "no
+     * specific time" row.
+     */
+    private static function availabilityRowKey(string $date, string $time): string
+    {
+        $date = trim($date);
+        if ($date === '') {
+            return '';
+        }
+        return $date . '|' . trim($time);
     }
 
     /**
@@ -2703,29 +2891,106 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
     }
 
     /**
-     * Get price range statistics for published trips
-     * 
+     * Get price range statistics for published trips.
+     *
+     * IMPORTANT: the previous SQL-only implementation only considered
+     * the legacy `original_price` / `discounted_price` / `sale_price`
+     * columns. For trips using traveler-based pricing (per-category
+     * prices stored in the `price_types` JSON column), those legacy
+     * columns are often empty or stale — so the computed max was lower
+     * than the actually-displayed price, and the price-range slider
+     * cut off above the real maximum (eg. trip cost €3755 but slider
+     * stopped at €3731). Worse, the trip then couldn't be filtered
+     * into the results because the effective-price WHERE excluded it.
+     *
+     * Fix: walk the published trips once in PHP and let
+     * `TripPricingService` decide each trip's effective price using
+     * the same logic the listing/single-trip pages use to DISPLAY the
+     * price. We also track the per-trip MIN/MAX across categories so
+     * the slider bounds cover every traveler tier (not only the
+     * default / cheapest).
+     *
      * @return object Object with min_price and max_price properties
      */
     public function getPriceRangeStats(): object
     {
         $table = $this->getTableName();
-        return $this->wpdb->get_row(
-            "SELECT 
-                MIN(sub.eff_price) as min_price,
-                MAX(sub.eff_price) as max_price
-             FROM (
-                SELECT (CASE
-                    WHEN CAST(discounted_price AS DECIMAL(10,2)) > 0 THEN CAST(discounted_price AS DECIMAL(10,2))
-                    WHEN CAST(sale_price AS DECIMAL(10,2)) > 0 THEN CAST(sale_price AS DECIMAL(10,2))
-                    ELSE CAST(original_price AS DECIMAL(10,2))
-                END) AS eff_price
-                FROM {$table}
-                WHERE status IN ('publish', 'published')
-                  AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')
-             ) sub
-             WHERE sub.eff_price > 0"
-        );
+        $rows = $this->wpdb->get_results(
+            "SELECT id, original_price, discounted_price, sale_price, price_types
+             FROM {$table}
+             WHERE status IN ('publish', 'published')
+               AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')"
+        ) ?: [];
+
+        $minPrice = null;
+        $maxPrice = null;
+
+        foreach ($rows as $row) {
+            $tripPrices = $this->collectTripDisplayPrices($row);
+            foreach ($tripPrices as $price) {
+                if ($price <= 0) {
+                    continue;
+                }
+                if ($minPrice === null || $price < $minPrice) {
+                    $minPrice = $price;
+                }
+                if ($maxPrice === null || $price > $maxPrice) {
+                    $maxPrice = $price;
+                }
+            }
+        }
+
+        return (object) [
+            'min_price' => $minPrice,
+            'max_price' => $maxPrice,
+        ];
+    }
+
+    /**
+     * Collect every price a single trip might display to a user.
+     *
+     * Returns BOTH the legacy "regular" effective price AND every
+     * per-category effective price from `price_types`. Used by
+     * `getPriceRangeStats()` so the price-range slider's bounds cover
+     * the full range a customer could see — eg. for a traveler-based
+     * trip with Adult €3755 / Child €1500 / Infant €100, the array
+     * includes all three so the slider stretches from €100 to €3755.
+     *
+     * @param object $row Raw trip row (must include `price_types`,
+     *                    `original_price`, `discounted_price`,
+     *                    `sale_price`).
+     * @return float[]
+     */
+    protected function collectTripDisplayPrices(object $row): array
+    {
+        $prices = [];
+
+        // Legacy regular pricing.
+        $legacyPrice = \Yatra\Services\TripPricingService::resolveRegularCurrentPrice($row);
+        if ($legacyPrice > 0) {
+            $prices[] = $legacyPrice;
+        }
+
+        // Per-category prices (traveler-based pricing). Decode whether
+        // `price_types` is stored as a JSON string (raw DB row) or an
+        // already-decoded array (in-memory trip object).
+        $priceTypes = $row->price_types ?? null;
+        if (is_string($priceTypes) && $priceTypes !== '') {
+            $decoded = json_decode($priceTypes, true);
+            if (is_array($decoded)) {
+                $priceTypes = $decoded;
+            }
+        }
+        if (is_array($priceTypes)) {
+            foreach ($priceTypes as $pt) {
+                $price = \Yatra\Services\TripPricingService::resolveCategoryEffectivePrice((array) $pt);
+                if ($price > 0) {
+                    $prices[] = $price;
+                }
+            }
+        }
+
+        return $prices;
     }
 
     /**

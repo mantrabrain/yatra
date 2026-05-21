@@ -440,3 +440,47 @@
         flex-direction: column;
     }
 }
+
+/* ============================================
+   MOBILE-INPUT HYGIENE
+   ============================================
+   Match the booking-form mobile rules so the customer's full
+   journey (browse → book → login → register → manage account)
+   feels consistent on phones. Two concerns are addressed at
+   <=768px:
+
+   1. iOS auto-zoom: any input below 16px computed font-size
+      triggers a 1.25x viewport zoom on focus. The desktop styles
+      use 1rem (16px) already, but we re-declare it inside the
+      media query to win any theme override that might lower it.
+   2. Tap-target comfort: bump min-height to 48px and pad the
+      input vertically for thumb-friendly hit areas. Apple HIG
+      minimum is 44pt; Material is 48dp — we use the larger so
+      portrait phone use isn't cramped.
+   ============================================ */
+@media (max-width: 768px) {
+    .yatra-login-shortcode .yatra-form-input,
+    .yatra-login-shortcode input[type="text"],
+    .yatra-login-shortcode input[type="email"],
+    .yatra-login-shortcode input[type="password"],
+    .yatra-login-shortcode input[type="tel"],
+    .yatra-login-shortcode select,
+    .yatra-login-shortcode textarea {
+        font-size: 16px;
+        min-height: 48px;
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+
+    /*
+     * The submit / primary-action button on login + register
+     * gets the same 48px floor so the CTA matches input height
+     * and is easy to tap one-handed.
+     */
+    .yatra-login-shortcode button[type="submit"],
+    .yatra-login-shortcode .yatra-btn-primary,
+    .yatra-login-shortcode .yatra-submit-btn {
+        min-height: 48px;
+        font-size: 16px;
+    }
+}

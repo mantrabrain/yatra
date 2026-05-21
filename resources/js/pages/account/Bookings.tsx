@@ -28,6 +28,15 @@ interface BookingsProps {
   conciergePhone?: string;
   conciergeEmail?: string;
   onSectionChange: (section: string) => void;
+  /**
+   * Booking id to deep-link into on mount/update. Set by AccountPage
+   * when the user clicks an "Upcoming Trips" card on the Dashboard so
+   * we open the detail screen instead of dropping them on the list.
+   * Consumed (cleared back to null) on the same render so subsequent
+   * Back-to-list interactions stay local to this component.
+   */
+  initialBookingId?: number | null;
+  onBookingIdConsumed?: () => void;
 }
 
 const Bookings: React.FC<BookingsProps> = ({
@@ -35,6 +44,8 @@ const Bookings: React.FC<BookingsProps> = ({
   conciergePhone = "",
   conciergeEmail = "",
   onSectionChange,
+  initialBookingId = null,
+  onBookingIdConsumed,
 }) => {
   const conciergeTel = phoneToTelHref(conciergePhone);
   const conciergeMail = String(conciergeEmail || "").trim();
@@ -43,8 +54,20 @@ const Bookings: React.FC<BookingsProps> = ({
     "all" | "upcoming" | "pending" | "completed"
   >("all");
   const [selectedBookingId, setSelectedBookingId] = useState<number | null>(
-    null,
+    initialBookingId,
   );
+
+  // When the parent seeds a deep-link booking id (Dashboard "Upcoming
+  // Trips" click), adopt it and tell the parent we've consumed it so
+  // the user can navigate away without the id rebinding on every
+  // re-render.
+  React.useEffect(() => {
+    if (initialBookingId && initialBookingId !== selectedBookingId) {
+      setSelectedBookingId(initialBookingId);
+      onBookingIdConsumed?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialBookingId]);
   const [payLoading, setPayLoading] = useState<number | null>(null);
 
   const {
@@ -433,7 +456,7 @@ const Bookings: React.FC<BookingsProps> = ({
                             booking.travelers_count ?? booking.travelers ?? 0,
                           ) || 0;
                           return sprintf(
-                            // translators: %d: number of travelers on this booking
+                            // translators: %d: number of travelers on this booking.
                             _n("%d traveler", "%d travelers", n, "yatra"),
                             n,
                           );

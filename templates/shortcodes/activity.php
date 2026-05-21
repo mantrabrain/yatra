@@ -33,11 +33,12 @@ $column_class = 'yatra-activity-grid-' . min(max($columns, 1), 6);
         <?php endif; ?>
         <?php if (!empty($activities)): ?>
             <div class="yatra-activity-count">
-                <?php 
+                <?php
                 printf(
-                    esc_html__('Showing %d of %d activities', 'yatra'),
-                    esc_html(count($activities)),
-                    esc_html($total_found)
+                    /* translators: 1: number of activities shown, 2: total activities available. */
+                    esc_html__('Showing %1$d of %2$d activities', 'yatra'),
+                    (int) count($activities),
+                    (int) $total_found
                 );
                 ?>
             </div>

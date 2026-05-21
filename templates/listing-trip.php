@@ -81,6 +81,7 @@ yatra_get_header();
                     <?php elseif (!empty($current_filter_name) || !empty($current_filter_slug)) : ?>
                         <p class="yatra-listing-archive-lede"><?php
                         printf(
+                            /* translators: %s: applied taxonomy filter label (destination, activity, or category name). */
                             esc_html__('Filtered by: %s', 'yatra'),
                             esc_html($current_filter_name !== '' ? $current_filter_name : (string) $current_filter_slug)
                         );
@@ -90,7 +91,8 @@ yatra_get_header();
                         <?php
                         if ($yatra_results['display_total'] > 0) {
                             echo sprintf(
-                                __('Showing <strong>%d-%d</strong> of %d trips (Page %d of %d)', 'yatra'),
+                                /* translators: 1: first item index on the page, 2: last item index on the page, 3: total trips, 4: current page number, 5: total page count. */
+                                __('Showing <strong>%1$d-%2$d</strong> of %3$d trips (Page %4$d of %5$d)', 'yatra'),
                                 (int) $yatra_results['start_item'],
                                 (int) $yatra_results['end_item'],
                                 (int) $yatra_results['display_total'],

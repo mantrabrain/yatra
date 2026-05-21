@@ -6,6 +6,7 @@ namespace Yatra\Upgrades;
 
 use Yatra\Upgrades\Contracts\UpgradeStepInterface;
 use Yatra\Upgrades\Versions\Upgrade_3_0_3;
+use Yatra\Upgrades\Versions\Upgrade_3_0_5;
 
 /**
  * Register Free upgrade steps (add a class per release when DB/data migration is required).
@@ -25,6 +26,7 @@ final class FreeUpgradeRegistry
     {
         return [
             Upgrade_3_0_3::class,
+            Upgrade_3_0_5::class,
         ];
     }
 
@@ -40,8 +42,13 @@ final class FreeUpgradeRegistry
             }
         }
 
+        // version_compare() with two args returns -1 / 0 / 1 — exactly
+        // what usort wants. Passing '<=>' as the operator (legacy mistake)
+        // throws a ValueError under PHP 8+ since '<=>' isn't in the
+        // operator allowlist; pre-PHP 8 it silently returned null and
+        // usort would have produced an unstable ordering anyway.
         usort($out, static function (string $a, string $b): int {
-            return version_compare($a::targetVersion(), $b::targetVersion(), '<=>');
+            return version_compare($a::targetVersion(), $b::targetVersion());
         });
 
         return $out;

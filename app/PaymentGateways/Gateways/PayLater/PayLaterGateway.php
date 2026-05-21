@@ -100,11 +100,19 @@ class PayLaterGateway extends AbstractPaymentGateway
             'remaining_amount' => $amount - $depositAmount,
             'payment_deadline' => $paymentDeadline,
             'deadline_days' => $deadlineDays,
-            'message' => $requireDeposit 
-                ? sprintf(__('A deposit of %s is required to confirm your booking. Full payment is due %d days before your trip.', 'yatra'), 
-                    number_format($depositAmount, 2), $deadlineDays)
-                : sprintf(__('Your booking is reserved! Full payment of %s is due %d days before your trip.', 'yatra'), 
-                    number_format($amount, 2), $deadlineDays),
+            'message' => $requireDeposit
+                ? sprintf(
+                    /* translators: 1: formatted deposit amount, 2: number of days before the trip. */
+                    __('A deposit of %1$s is required to confirm your booking. Full payment is due %2$d days before your trip.', 'yatra'),
+                    number_format($depositAmount, 2),
+                    $deadlineDays
+                )
+                : sprintf(
+                    /* translators: 1: formatted total amount, 2: number of days before the trip. */
+                    __('Your booking is reserved! Full payment of %1$s is due %2$d days before your trip.', 'yatra'),
+                    number_format($amount, 2),
+                    $deadlineDays
+                ),
         ];
     }
 

@@ -226,6 +226,7 @@ final class EmailTemplateDefaults
 
         $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">'
             . sprintf(
+                /* translators: %s: customer name */
                 esc_html__('Hello %s,', 'yatra'),
                 $name
             )
@@ -263,7 +264,11 @@ final class EmailTemplateDefaults
         }));
 
         $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">'
-            . sprintf(esc_html__('Dear %s,', 'yatra'), $name)
+            . sprintf(
+                /* translators: %s: customer name */
+                esc_html__('Dear %s,', 'yatra'),
+                $name
+            )
             . '</p>'
             . '<p style="margin:0 0 8px;color:#475569;">'
             . esc_html__('We’ve received your payment — thank you! Here’s a quick summary.', 'yatra')
@@ -295,7 +300,11 @@ final class EmailTemplateDefaults
         }));
 
         $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">'
-            . sprintf(esc_html__('Hello %s,', 'yatra'), $name)
+            . sprintf(
+                /* translators: %s: customer name */
+                esc_html__('Hello %s,', 'yatra'),
+                $name
+            )
             . '</p>'
             . '<p style="margin:0 0 20px;color:#475569;">'
             . esc_html__('Your booking has been cancelled as requested. If you have questions, just reply to this email.', 'yatra')
@@ -337,7 +346,11 @@ final class EmailTemplateDefaults
         }
 
         $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">'
-            . sprintf(esc_html__('Dear %s,', 'yatra'), $name)
+            . sprintf(
+                /* translators: %s: customer name */
+                esc_html__('Dear %s,', 'yatra'),
+                $name
+            )
             . '</p>'
             . '<p style="margin:0 0 20px;color:#475569;">'
             . ($days !== ''
@@ -393,7 +406,11 @@ final class EmailTemplateDefaults
 
         $inner = $testBlock
             . '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">'
-            . sprintf(esc_html__('Hello %s,', 'yatra'), $recipient)
+            . sprintf(
+                /* translators: %s: customer name */
+                esc_html__('Hello %s,', 'yatra'),
+                $recipient
+            )
             . '</p>'
             . '<p style="margin:0 0 20px;color:#475569;">'
             . sprintf(
@@ -447,7 +464,11 @@ final class EmailTemplateDefaults
             . '</div>';
 
         $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">'
-            . sprintf(esc_html__('Hello %s,', 'yatra'), $first)
+            . sprintf(
+                /* translators: %s: customer name */
+                esc_html__('Hello %s,', 'yatra'),
+                $first
+            )
             . '</p>'
             . ($intro !== '' ? '<p style="margin:0 0 20px;color:#475569;">' . $intro . '</p>' : '')
             . EmailTemplateLayout::button($link, __('Verify email address', 'yatra'))

@@ -56,11 +56,24 @@ if (!defined('ABSPATH')) {
                                     $location = !empty($testimonial->location) ? $testimonial->location : '';
                                     
                                     if ($trip_date && $location) {
-                                        echo esc_html(sprintf(__('Traveled %s in %s', 'yatra'), $trip_date, $location));
+                                        echo esc_html(sprintf(
+                                            /* translators: 1: trip date, 2: location name. */
+                                            __('Traveled %1$s in %2$s', 'yatra'),
+                                            $trip_date,
+                                            $location
+                                        ));
                                     } elseif ($trip_date) {
-                                        echo esc_html(sprintf(__('Traveled %s', 'yatra'), $trip_date));
+                                        echo esc_html(sprintf(
+                                            /* translators: %s: trip date. */
+                                            __('Traveled %s', 'yatra'),
+                                            $trip_date
+                                        ));
                                     } elseif ($location) {
-                                        echo esc_html(sprintf(__('Traveled in %s', 'yatra'), $location));
+                                        echo esc_html(sprintf(
+                                            /* translators: %s: location name. */
+                                            __('Traveled in %s', 'yatra'),
+                                            $location
+                                        ));
                                     } else {
                                         echo esc_html__('Verified Traveler', 'yatra');
                                     }

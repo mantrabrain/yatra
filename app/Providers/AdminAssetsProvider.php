@@ -89,6 +89,17 @@ class AdminAssetsProvider
             'whatsappEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
                 ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('whatsapp')
                 : false,
+            'channelManagerEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
+                ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('channel_manager')
+                : false,
+            // Single source of truth for every country dropdown in the
+            // React admin. Pulled from the canonical FormatHelper —
+            // operators that want a curated or reordered list apply
+            // the `yatra_countries_list` filter once and it propagates
+            // to every dropdown automatically.
+            'countries' => class_exists('\\Yatra\\Helpers\\FormatHelper')
+                ? \Yatra\Helpers\FormatHelper::getCountries()
+                : [],
             'customLandingPagesModuleEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
                 ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('custom_landing_pages')
                 : false,
@@ -433,12 +444,31 @@ class AdminAssetsProvider
      */
     private function loadWordPressTranslations(): void
     {
-        // Use WordPress built-in function to load script translations
-        // Specify the path where WordPress should look for JSON translation files
+        // Use WordPress built-in function to load script translations.
+        // The third argument MUST be an absolute path to the directory
+        // that contains the per-locale .json translation files.
+        //
+        // Previously this passed YATRA_PLUGIN_FILE — i.e. the main
+        // plugin PHP FILE path, not its directory. Appending
+        // "/i18n/languages" yielded ".../plugin/yatra.php/i18n/languages",
+        // a path that doesn't exist, so WordPress silently fell back to
+        // shipping source-English strings to the React admin regardless
+        // of the operator's WP locale.
+        //
+        // Use YATRA_PLUGIN_PATH (the directory, ending in /) instead,
+        // matching the block-editor side that has always worked.
+        //
+        // The actual JSON file shipped here is generated at BUILD time
+        // by scripts/build-translation-json.mjs from each locale's .po
+        // file. That script writes ONE consolidated JSON per locale
+        // named `yatra-{locale}-{md5(bundle src path)}.json`, so
+        // WordPress's native script-translation loader finds it on
+        // first try — no runtime filter / merge needed.
         if (function_exists('wp_set_script_translations')) {
-            wp_set_script_translations('yatra-admin', 'yatra', YATRA_PLUGIN_FILE . '/i18n/languages');
+            wp_set_script_translations('yatra-admin', 'yatra', YATRA_PLUGIN_PATH . 'i18n/languages');
         }
     }
+
 
     /**
      * Enqueue setup wizard assets

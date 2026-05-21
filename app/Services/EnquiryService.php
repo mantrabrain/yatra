@@ -350,7 +350,11 @@ class EnquiryService
         return [
             'success' => true,
             'affected' => $affected,
-            'message' => sprintf(__('%d enquiries updated.', 'yatra'), $affected),
+            'message' => sprintf(
+                /* translators: %d: number of enquiries updated. */
+                __('%d enquiries updated.', 'yatra'),
+                $affected
+            ),
         ];
     }
 
@@ -367,7 +371,11 @@ class EnquiryService
         return [
             'success' => true,
             'affected' => $affected,
-            'message' => sprintf(__('%d enquiries deleted.', 'yatra'), $affected),
+            'message' => sprintf(
+                /* translators: %d: number of enquiries deleted. */
+                __('%d enquiries deleted.', 'yatra'),
+                $affected
+            ),
         ];
     }
 

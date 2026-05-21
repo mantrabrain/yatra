@@ -54,9 +54,16 @@ class SettingsController extends BaseController
         'auto_confirm_pay_later' => true,
         'require_login' => false,
         'allow_guest_checkout' => true,
-        'cancellation_policy' => 'full_refund',
-        'cancellation_days' => 7,
-        'refund_policy' => '',
+        // cancellation_policy / cancellation_days / refund_policy were
+        // removed in 3.0.5 — they only inserted text into the booking
+        // confirmation email but did NOT enforce a cancellation cutoff
+        // because Yatra has no customer-facing self-service
+        // cancellation flow. Per-trip cancellation copy on the Trip
+        // editor is the supported way to communicate policy. If those
+        // legacy options still exist in wp_options on upgraded sites
+        // they're harmless orphans — the save endpoint no longer
+        // accepts them, and the email template skips the cancellation
+        // paragraph when the global setting is absent.
         'booking_expiry_hours' => 24,
         'booking_reminder_days' => 3,
         'allow_waitlist' => true,
@@ -99,6 +106,7 @@ class SettingsController extends BaseController
         'email_template_admin_cancellation' => true,
         'email_template_trip_consent' => true,
         'email_template_customer_verification' => true,
+        'email_template_guest_verification' => true,
         'email_template_booking_completed' => true,
         'email_template_booking_expired_customer' => true,
         'email_template_admin_booking_expired' => true,
@@ -124,6 +132,11 @@ class SettingsController extends BaseController
         'customer_registration' => true,
         'customer_fields' => [],
         'require_email_verification' => false,
+        // Per-booking verification for guest checkouts. Distinct from the
+        // account-creation `require_email_verification` flag because a guest
+        // never registers — the verification is gated on the booking itself
+        // (BookingSessionController checks this when admitting a guest).
+        'require_guest_email_verification' => false,
         'customer_account_page' => '',
         'allow_customer_reviews' => true,
         'customer_dashboard_enabled' => true,
@@ -563,10 +576,76 @@ class SettingsController extends BaseController
                 \Yatra\Services\SettingsService::reload();
             }
 
-            return $this->success_response([
+            // Cross-validation: booking-auth settings interact via OR
+            // logic in booking-content.php, so some combinations are
+            // semantically inconsistent or redundant. We don't block
+            // the save (the resulting state still has well-defined
+            // behavior), but we surface a clear notice so the operator
+            // understands what they just configured.
+            //
+            //   require_login=true  + allow_guest_checkout=true   →
+            //     require_login wins; allow_guest_checkout is a no-op.
+            //   require_login=true  + allow_guest_checkout=false  →
+            //     Strictest setting (login required, no guest path).
+            //     Internally consistent.
+            //   require_login=false + allow_guest_checkout=false  →
+            //     Guests blocked, logged-in users can book. Consistent.
+            //   require_login=false + allow_guest_checkout=true   →
+            //     Default. Permissive.
+            $notices = [];
+            $effective_require_login = \array_key_exists('require_login', $data)
+                ? (bool) $data['require_login']
+                : (bool) \Yatra\Services\SettingsService::get('require_login', false);
+            $effective_allow_guest = \array_key_exists('allow_guest_checkout', $data)
+                ? (bool) $data['allow_guest_checkout']
+                : (bool) \Yatra\Services\SettingsService::get('allow_guest_checkout', true);
+
+            if ($effective_require_login && $effective_allow_guest) {
+                $notices[] = [
+                    'level' => 'warning',
+                    'code' => 'booking_auth_redundant',
+                    'message' => __(
+                        'Heads up: "Require login" is on, so "Allow guest checkout" has no effect — every customer will need to log in to book. To accept guests, turn "Require login" off.',
+                        'yatra'
+                    ),
+                ];
+            }
+
+            // Scheduled Payments + guest checkout — incompatible at
+            // the gateway level. Scheduled charges require a saved
+            // payment-method tied to a customer record on the
+            // gateway side (Stripe Customer, etc.), which in turn
+            // requires a logged-in WP user. When both settings are
+            // on, the system gracefully skips installment creation
+            // for guest bookings — but operators expect them to
+            // work and only discover the gap when reconciling
+            // unpaid bookings weeks later. Surface this proactively.
+            $effective_scheduled_payments = \array_key_exists('enable_scheduled_payments', $data)
+                ? (bool) $data['enable_scheduled_payments']
+                : (bool) \Yatra\Services\SettingsService::get('enable_scheduled_payments', false);
+            if (
+                $effective_scheduled_payments
+                && $effective_allow_guest
+                && !$effective_require_login
+            ) {
+                $notices[] = [
+                    'level' => 'info',
+                    'code' => 'scheduled_payments_guest_caveat',
+                    'message' => __(
+                        'Scheduled Payments is on with guest checkout allowed. Scheduled installments only run for bookings made by logged-in customers (they need a saved payment method tied to their account). Guest bookings will be charged in full at checkout instead. Turn on "Require login" if every booking must support installments.',
+                        'yatra'
+                    ),
+                ];
+            }
+
+            $response = [
                 'message' => 'Settings updated successfully',
                 'updated' => $updated,
-            ]);
+            ];
+            if ($notices !== []) {
+                $response['notices'] = $notices;
+            }
+            return $this->success_response($response);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
@@ -637,9 +716,6 @@ class SettingsController extends BaseController
             }
             $int_value = (int) $value;
             // Validate ranges for specific fields
-            if ($key === 'cancellation_days' && $int_value < 0) {
-                return null;
-            }
             if ($key === 'booking_expiry_hours' && $int_value < 0) {
                 return null;
             }
@@ -697,9 +773,6 @@ class SettingsController extends BaseController
             }
             if ($key === 'company_website' || $key === 'company_logo' || $key === 'google_analytics' || $key === 'facebook_pixel') {
                 return esc_url_raw($value);
-            }
-            if ($key === 'refund_policy' || $key === 'cancellation_policy') {
-                return sanitize_textarea_field($value);
             }
             if ($key === 'seo_trip_meta_title') {
                 // Allow more characters for meta title, but strip HTML

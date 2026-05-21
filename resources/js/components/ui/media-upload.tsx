@@ -67,6 +67,7 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
     if (items.length >= maxItems) {
       alert(
         sprintf(
+          // translators: %d: maximum number of media items allowed.
           __("Maximum %d media items allowed", "yatra"),
           Number(maxItems) || 0,
         ),
@@ -183,6 +184,7 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
                         src={item.thumbnail_url || item.url}
                         alt={
                           item.alt_text ||
+                          // translators: %d: media item sequence number (1-based).
                           sprintf(__("Media %d", "yatra"), index + 1)
                         }
                         className="w-full h-full object-cover"

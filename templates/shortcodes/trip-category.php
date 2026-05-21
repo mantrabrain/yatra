@@ -26,9 +26,10 @@ $column_class = 'yatra-destination-grid-' . min(max($columns, 1), 6);
             <div class="yatra-destination-count">
                 <?php
                 printf(
-                    esc_html__('Showing %d of %d categories', 'yatra'),
-                    esc_html(count($categories)),
-                    esc_html($total_found)
+                    /* translators: 1: number of categories shown, 2: total categories available. */
+                    esc_html__('Showing %1$d of %2$d categories', 'yatra'),
+                    (int) count($categories),
+                    (int) $total_found
                 );
                 ?>
             </div>

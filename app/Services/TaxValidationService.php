@@ -88,7 +88,12 @@ class TaxValidationService
             }
             
             if (!empty($tax_errors)) {
-                $errors[] = sprintf(__('Tax %d: %s', 'yatra'), $index + 1, implode(', ', $tax_errors));
+                $errors[] = sprintf(
+                    /* translators: 1: tax index number, 2: comma-separated list of error messages. */
+                    __('Tax %1$d: %2$s', 'yatra'),
+                    $index + 1,
+                    implode(', ', $tax_errors)
+                );
             }
         }
         

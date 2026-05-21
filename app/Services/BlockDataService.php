@@ -91,6 +91,10 @@ class BlockDataService
             'activityIds' => [],
             'activity' => '',
             'activity_ids' => '',
+            'show_trip_count' => true,
+            'show_description' => true,
+            'show_image' => true,
+            'hide_empty' => false,
         ];
     }
 
@@ -108,6 +112,11 @@ class BlockDataService
             'destinationIds' => [],
             'destination' => '',
             'destination_ids' => '',
+            'show_trip_count' => true,
+            'show_description' => true,
+            'show_image' => true,
+            'hide_empty' => false,
+            'featured_only' => false,
         ];
     }
 
@@ -126,7 +135,7 @@ class BlockDataService
             'show_trip_count' => true,
             'show_description' => true,
             'show_image' => true,
-            'hide_empty' => true,
+            'hide_empty' => false,
             'featured_only' => false,
             'categoryIds' => [],
             'category_ids' => '',
@@ -445,6 +454,15 @@ class BlockDataService
         $cols = max(1, min(self::LISTING_COLUMNS_MAX, (int) ($attributes['columns'] ?? 3)));
 
         $showPag = self::coerceToBool($attributes['show_pagination'] ?? true, true);
+        // Forward the same visibility / hide-empty toggles the
+        // trip-category block has exposed since v3.0 so all three
+        // taxonomy blocks share one user-facing surface. hide_empty
+        // is what actually skips activities with zero published
+        // trips (see ActivityShortcode::getActivities).
+        $showTripCount = self::coerceToBool($attributes['show_trip_count'] ?? true, true);
+        $showDescription = self::coerceToBool($attributes['show_description'] ?? true, true);
+        $showImage = self::coerceToBool($attributes['show_image'] ?? true, true);
+        $hideEmpty = self::coerceToBool($attributes['hide_empty'] ?? true, true);
 
         return [
             'order' => $order,
@@ -458,6 +476,10 @@ class BlockDataService
                 'activity_ids',
                 'activity'
             ),
+            'show_trip_count' => $showTripCount ? 'yes' : 'no',
+            'show_description' => $showDescription ? 'yes' : 'no',
+            'show_image' => $showImage ? 'yes' : 'no',
+            'hide_empty' => $hideEmpty ? 'yes' : 'no',
         ];
     }
 
@@ -479,6 +501,14 @@ class BlockDataService
         $cols = max(1, min(self::LISTING_COLUMNS_MAX, (int) ($attributes['columns'] ?? 3)));
 
         $showPag = self::coerceToBool($attributes['show_pagination'] ?? true, true);
+        // Forward the visibility + hide_empty + featured_only toggles
+        // so the destination block exposes the same controls the
+        // [yatra_destination] shortcode already accepts.
+        $showTripCount = self::coerceToBool($attributes['show_trip_count'] ?? true, true);
+        $showDescription = self::coerceToBool($attributes['show_description'] ?? true, true);
+        $showImage = self::coerceToBool($attributes['show_image'] ?? true, true);
+        $hideEmpty = self::coerceToBool($attributes['hide_empty'] ?? true, true);
+        $featuredOnly = self::coerceToBool($attributes['featured_only'] ?? false, false);
 
         return [
             'order' => $order,
@@ -492,6 +522,11 @@ class BlockDataService
                 'destination_ids',
                 'destination'
             ),
+            'show_trip_count' => $showTripCount ? 'yes' : 'no',
+            'show_description' => $showDescription ? 'yes' : 'no',
+            'show_image' => $showImage ? 'yes' : 'no',
+            'hide_empty' => $hideEmpty ? 'yes' : 'no',
+            'featured_only' => $featuredOnly ? 'yes' : 'no',
         ];
     }
 

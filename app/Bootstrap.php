@@ -254,9 +254,26 @@ class Bootstrap
         // Register activation/deactivation hooks
         register_activation_hook(YATRA_PLUGIN_FILE, [$this, 'activate']);
         register_deactivation_hook(YATRA_PLUGIN_FILE, [$this, 'deactivate']);
-        
+
         if (class_exists(\Yatra\Upgrades\FreeUpgradeRunner::class)) {
             \Yatra\Upgrades\FreeUpgradeRunner::register();
+        }
+
+        // On user registration, link any guest bookings made under
+        // the same email. Otherwise a customer who booked as guest
+        // first and then created an account would lose visibility of
+        // that earlier booking from My Account (the rows live with
+        // user_id=0 and the customer page filters by user_id).
+        if (class_exists('\\Yatra\\Services\\CustomerService')) {
+            add_action('user_register', static function ($user_id): void {
+                try {
+                    (new \Yatra\Services\CustomerService())->linkGuestBookingsToUser((int) $user_id);
+                } catch (\Throwable $e) {
+                    // Never block registration on a reconciliation
+                    // failure. The booking remains accessible via the
+                    // confirmation email link either way.
+                }
+            }, 20, 1);
         }
     }
 

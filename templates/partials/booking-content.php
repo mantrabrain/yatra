@@ -331,10 +331,13 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                 $age_info = '';
                                 if (isset($pt->age_min) || isset($pt->age_max)) {
                                     if (isset($pt->age_min) && isset($pt->age_max)) {
-                                        $age_info = sprintf(__('(Age %d-%d)', 'yatra'), $pt->age_min, $pt->age_max);
+                                        /* translators: 1: minimum age, 2: maximum age. */
+                                        $age_info = sprintf(__('(Age %1$d-%2$d)', 'yatra'), $pt->age_min, $pt->age_max);
                                     } elseif (isset($pt->age_min)) {
+                                        /* translators: %d: minimum age. */
                                         $age_info = sprintf(__('(Age %d+)', 'yatra'), $pt->age_min);
                                     } else {
+                                        /* translators: %d: maximum age. */
                                         $age_info = sprintf(__('(Up to age %d)', 'yatra'), $pt->age_max);
                                     }
                                 }
@@ -352,10 +355,12 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                     'plus_disabled' => false,
                                     'minus_attrs' => [
                                         'data-target' => $input_id,
+                                        /* translators: %s: traveler category label (e.g. "Adult", "Child"). */
                                         'aria-label' => sprintf(__('Decrease %s', 'yatra'), $category_label),
                                     ],
                                     'plus_attrs' => [
                                         'data-target' => $input_id,
+                                        /* translators: %s: traveler category label (e.g. "Adult", "Child"). */
                                         'aria-label' => sprintf(__('Increase %s', 'yatra'), $category_label),
                                     ],
                                     'input_attrs' => [

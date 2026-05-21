@@ -372,9 +372,19 @@ class RecurringAvailabilityService
     private function generateMonthlyDates(object $rule, string $fromDate, string $toDate): array
     {
         $dates = [];
-        $weekOfMonth = $rule->week_of_month;
-        $dayOfWeek = (int) $rule->day_of_week;
-        $excludedDates = $rule->excluded_dates;
+
+        // Legacy rows (migrated from the pre-3.x schema) can land here
+        // with `week_of_month` NULL or missing entirely — the column is
+        // nullable in the DB but {@see self::getNthWeekdayOfMonth()}'s
+        // signature requires `string`, so calling it with NULL was
+        // crashing the trip page on PHP 7.4+. Bail out cleanly instead.
+        $weekOfMonth = $rule->week_of_month ?? null;
+        if (!is_string($weekOfMonth) || $weekOfMonth === '') {
+            return $dates;
+        }
+
+        $dayOfWeek = (int) ($rule->day_of_week ?? 0);
+        $excludedDates = $rule->excluded_dates ?? [];
         $selectedMonths = !empty($rule->months) ? $rule->months : [];
         
         // Start from the first day of the starting month

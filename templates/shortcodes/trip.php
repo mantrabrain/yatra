@@ -38,9 +38,10 @@ if (!empty($atts['title'])) {
             <div class="yatra-tour-count">
                 <?php
                 printf(
-                    esc_html__('Showing %d of %d trips', 'yatra'),
-                    count($trip_items),
-                    $total_found
+                    /* translators: 1: number of trips shown, 2: total trips available. */
+                    esc_html__('Showing %1$d of %2$d trips', 'yatra'),
+                    (int) count($trip_items),
+                    (int) $total_found
                 );
                 ?>
             </div>

@@ -296,6 +296,22 @@ class ModuleManager
                 'requires_growth_or_agency' => true,
                 'settings_page' => 'whatsapp',
             ],
+            [
+                'slug' => 'channel_manager',
+                'name' => __('Channel Manager', 'yatra'),
+                'description' => __('Sync your trips + departures + inventory to Viator, GetYourGuide, Klook, and TripAdvisor Experiences. Pull bookings back into Yatra as native bookings. Real-time inventory sync prevents oversells across channels. Per-channel pricing offsets cover OTA commission. The single biggest revenue lever for tour operators on multiple platforms.', 'yatra'),
+                'category' => __('Distribution', 'yatra'),
+                'docs_url' => 'https://docs.yatra.com/modules/channel-manager',
+                'is_premium' => true,
+                'purchase_url' => 'https://wpyatra.com/pricing?module=channel-manager',
+                'is_core' => false,
+                'enabled' => false,
+                'tags' => ['ota', 'channel', 'viator', 'getyourguide', 'distribution', 'agency'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
+                'requires_pro' => true,
+                'requires_agency' => true,
+                'settings_page' => 'channel-manager',
+            ],
         ];
         
         return apply_filters('yatra_default_modules', $modules);

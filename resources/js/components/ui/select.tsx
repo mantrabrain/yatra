@@ -31,7 +31,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 
     return (
       <select
-        className={`flex h-11 w-full rounded-md border-2 border-gray-300 bg-white px-4 text-base text-gray-900 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:focus-visible:ring-blue-400 transition-colors cursor-pointer ${className}`}
+        className={`flex h-12 w-full rounded-md border-2 border-gray-300 bg-white px-4 text-base text-gray-900 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:focus-visible:ring-blue-400 transition-colors cursor-pointer ${className}`}
         ref={ref}
         style={{
           paddingRight: "2.5rem",

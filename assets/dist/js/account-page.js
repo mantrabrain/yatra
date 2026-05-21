@@ -1,5 +1,5 @@
-import { j as jsxRuntimeExports, p as Calendar, k as FileText, b as Plane, aq as ArrowRight, q as MapPin, G as User, x as ChevronRight, S as Sparkles, h as Package, i as CreditCard, bT as LifeBuoy, bw as Bell, av as AlertCircle, az as CheckCircle2, ao as Clock, N as ExternalLink, U as Users, d as Mail, ba as Phone, a$ as Download, r as reactExports, u as useQuery, as as CheckCircle, ap as DollarSign, a2 as React, aT as Eye, aE as PenSquare, aV as XCircle, bP as ShieldCheck, aS as Heart, s as LayoutDashboard, bU as LogOut, bQ as QueryClient, bR as client, bS as QueryClientProvider } from "./react-vendor-Cxehg311.js";
-import { f as formatYatraMoney, _ as __, h as applyCurrencyPosition, s as sprintf, i as _n, a as apiClient, A as API_ENDPOINTS, u as useToast, T as ToastProvider } from "./index-DI1cgtCF.js";
+import { j as jsxRuntimeExports, p as Calendar, k as FileText, b as Plane, ar as ArrowRight, q as MapPin, G as User, x as ChevronRight, S as Sparkles, h as Package, i as CreditCard, bY as LifeBuoy, bx as Bell, aw as AlertCircle, aA as CheckCircle2, ap as Clock, O as ExternalLink, U as Users, d as Mail, bb as Phone, b0 as Download, r as reactExports, a3 as React, u as useQuery, au as CheckCircle, aq as DollarSign, aU as Eye, aG as PenSquare, aW as XCircle, bQ as ShieldCheck, aT as Heart, s as LayoutDashboard, bZ as LogOut, bV as QueryClient, bW as client, bX as QueryClientProvider } from "./react-vendor-Bma80Tyf.js";
+import { f as formatYatraMoney, _ as __, h as applyCurrencyPosition, s as sprintf, i as _n, a as apiClient, A as API_ENDPOINTS, u as useToast, T as ToastProvider } from "./index-DPUOGEIE.js";
 function toBrowserLocaleTag(locale) {
   const raw = String(locale || "").trim();
   if (!raw) return void 0;
@@ -46,6 +46,7 @@ const formatTravelDateRange = (travelDate, endDate) => {
     return formatDate(travelDate);
   }
   return sprintf(
+    // translators: 1: start date, 2: end date. Joined with an en-dash for travel date ranges.
     __("%1$s – %2$s", "yatra"),
     formatDate(travelDate),
     formatDate(endDate)
@@ -221,7 +222,8 @@ const Dashboard = ({
   notifications,
   conciergePhone = "",
   conciergeEmail = "",
-  onSectionChange
+  onSectionChange,
+  onBookingOpen
 }) => {
   var _a;
   const conciergeTel = phoneToTelHref(conciergePhone);
@@ -274,6 +276,7 @@ const Dashboard = ({
                   className: "text-lg font-bold mb-2",
                   style: { color: "#ffffff" },
                   children: sprintf(
+                    // translators: %s: customer first name (or "Traveler" fallback).
                     __("Welcome back, %s!", "yatra"),
                     ((_a = displayProfile == null ? void 0 : displayProfile.name) == null ? void 0 : _a.split(" ")[0]) || __("Traveler", "yatra")
                   )
@@ -405,53 +408,73 @@ const Dashboard = ({
             }
           )
         ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6", children: upcomingBookings.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: upcomingBookings.map((booking) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "div",
-          {
-            className: "yatra-booking-card yatra-booking-card-upcoming group relative border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:shadow-md transition-all cursor-pointer bg-gradient-to-r from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-800/50",
-            children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-12 h-12 bg-gradient-to-br from-yatra-primary to-yatra-primary-darker rounded-lg flex items-center justify-center shadow-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-6 h-6 text-white" }) }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-2 mb-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark transition-colors", children: booking.trip_title }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.booking_status), children: getStatusLabel(booking.booking_status) })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-4 h-4" }),
-                  booking.destination || __("Multiple destinations", "yatra")
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { className: "w-3.5 h-3.5" }),
-                    formatTravelDateRange(
-                      booking.travel_date,
-                      booking.end_date
-                    )
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6", children: upcomingBookings.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: upcomingBookings.map((booking) => {
+          const openBooking = () => {
+            const id = Number(booking.id);
+            if (!id) return;
+            if (onBookingOpen) {
+              onBookingOpen(id);
+            } else {
+              onSectionChange("bookings");
+            }
+          };
+          return /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              role: "button",
+              tabIndex: 0,
+              onClick: openBooking,
+              onKeyDown: (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  openBooking();
+                }
+              },
+              className: "yatra-booking-card yatra-booking-card-upcoming group relative border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:shadow-md transition-all cursor-pointer bg-gradient-to-r from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-800/50",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-12 h-12 bg-gradient-to-br from-yatra-primary to-yatra-primary-darker rounded-lg flex items-center justify-center shadow-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-6 h-6 text-white" }) }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-2 mb-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark transition-colors", children: booking.trip_title }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.booking_status), children: getStatusLabel(booking.booking_status) })
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-3.5 h-3.5" }),
-                    (() => {
-                      const n = Number(
-                        booking.travelers_count ?? booking.travelers ?? 0
-                      ) || 0;
-                      return sprintf(
-                        // translators: %d: number of travelers on this booking
-                        _n(
-                          "%d Traveler",
-                          "%d Travelers",
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-4 h-4" }),
+                    booking.destination || __("Multiple destinations", "yatra")
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { className: "w-3.5 h-3.5" }),
+                      formatTravelDateRange(
+                        booking.travel_date,
+                        booking.end_date
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-3.5 h-3.5" }),
+                      (() => {
+                        const n = Number(
+                          booking.travelers_count ?? booking.travelers ?? 0
+                        ) || 0;
+                        return sprintf(
+                          // translators: %d: number of travelers on this booking
+                          _n(
+                            "%d Traveler",
+                            "%d Travelers",
+                            n
+                          ),
                           n
-                        ),
-                        n
-                      );
-                    })()
+                        );
+                      })()
+                    ] })
                   ] })
-                ] })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark transition-colors flex-shrink-0" })
-            ] })
-          },
-          booking.id
-        )) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-12", children: [
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark transition-colors flex-shrink-0" })
+              ] })
+            },
+            booking.id
+          );
+        }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-12", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { className: "w-8 h-8 text-gray-400" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500 dark:text-gray-400 font-medium mb-1", children: __("No upcoming trips", "yatra") }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-400 dark:text-gray-500", children: __("Start planning your next adventure!", "yatra") })
@@ -778,18 +801,27 @@ async function fetchPreviewPdf(url) {
   }
   return new Blob([bytes], { type: "application/pdf" });
 }
-function openPdfInNewTab(blob) {
+function openPdfInPreOpenedWindow(blob, preOpened, filename) {
   const objectUrl = URL.createObjectURL(blob);
-  const win = window.open(objectUrl, "_blank", "noopener,noreferrer");
-  if (!win) {
-    URL.revokeObjectURL(objectUrl);
-    throw new Error(
-      __(
-        "Popup blocked. Allow popups for this site to preview the PDF.",
-        "yatra"
-      )
-    );
+  if (preOpened && !preOpened.closed) {
+    try {
+      preOpened.location.href = objectUrl;
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 6e4);
+      return;
+    } catch {
+      try {
+        preOpened.close();
+      } catch {
+      }
+    }
   }
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
   window.setTimeout(() => URL.revokeObjectURL(objectUrl), 6e4);
 }
 async function downloadBookingBinary(bookingId, kind) {
@@ -908,52 +940,86 @@ const downloadDocument = async (options) => {
 };
 const downloadVoucher = (bookingId) => downloadBookingBinary(bookingId, "voucher");
 const downloadInvoice = (paymentId) => downloadPaymentInvoiceBinary(paymentId);
-const previewPaymentInvoice = async (paymentId) => {
-  const { base, nonce } = getAccountRestConfig();
-  if (!nonce) {
-    throw new Error(
-      __(
-        "Missing security token. Reload the account page and try again.",
-        "yatra"
-      )
-    );
+function preOpenPreviewWindow() {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.open("about:blank", "_blank");
+  } catch {
+    return null;
   }
-  const url = buildPaymentInvoiceUrl(base, paymentId, "preview");
-  const blob = await fetchPreviewPdf(url);
-  openPdfInNewTab(blob);
+}
+const previewPaymentInvoice = async (paymentId) => {
+  const preOpened = preOpenPreviewWindow();
+  try {
+    const { base, nonce } = getAccountRestConfig();
+    if (!nonce) {
+      throw new Error(
+        __(
+          "Missing security token. Reload the account page and try again.",
+          "yatra"
+        )
+      );
+    }
+    const url = buildPaymentInvoiceUrl(base, paymentId, "preview");
+    const blob = await fetchPreviewPdf(url);
+    openPdfInPreOpenedWindow(blob, preOpened, `invoice-${paymentId}.pdf`);
+  } catch (e) {
+    if (preOpened && !preOpened.closed) {
+      try {
+        preOpened.close();
+      } catch {
+      }
+    }
+    throw e;
+  }
 };
 async function previewTravelDocument(doc) {
-  const { base, nonce } = getAccountRestConfig();
-  if (!nonce) {
-    throw new Error(
-      __(
-        "Missing security token. Reload the account page and try again.",
-        "yatra"
-      )
-    );
-  }
-  if (doc.category === "invoice") {
-    const pid = doc.payment_id ?? parsePaymentIdFromHref(doc.url);
-    if (!pid) {
-      throw new Error(__("Could not resolve invoice link.", "yatra"));
+  const preOpened = preOpenPreviewWindow();
+  try {
+    const { base, nonce } = getAccountRestConfig();
+    if (!nonce) {
+      throw new Error(
+        __(
+          "Missing security token. Reload the account page and try again.",
+          "yatra"
+        )
+      );
     }
-    const url = buildPaymentInvoiceUrl(base, pid, "preview");
-    const blob = await fetchPreviewPdf(url);
-    openPdfInNewTab(blob);
-    return;
-  }
-  if (doc.category === "voucher" || doc.category === "itinerary") {
-    const kind = doc.category === "voucher" ? "voucher" : "itinerary";
-    const bid = doc.booking_id ?? parseBookingDocFromHref(doc.url, kind);
-    if (!bid) {
-      throw new Error(__("Could not resolve document link.", "yatra"));
+    if (doc.category === "invoice") {
+      const pid = doc.payment_id ?? parsePaymentIdFromHref(doc.url);
+      if (!pid) {
+        throw new Error(__("Could not resolve invoice link.", "yatra"));
+      }
+      const url = buildPaymentInvoiceUrl(base, pid, "preview");
+      const blob = await fetchPreviewPdf(url);
+      openPdfInPreOpenedWindow(blob, preOpened, `invoice-${pid}.pdf`);
+      return;
     }
-    const url = buildBookingDocumentUrl(base, bid, kind, "preview");
-    const blob = await fetchPreviewPdf(url);
-    openPdfInNewTab(blob);
-    return;
+    if (doc.category === "voucher" || doc.category === "itinerary") {
+      const kind = doc.category === "voucher" ? "voucher" : "itinerary";
+      const bid = doc.booking_id ?? parseBookingDocFromHref(doc.url, kind);
+      if (!bid) {
+        throw new Error(__("Could not resolve document link.", "yatra"));
+      }
+      const url = buildBookingDocumentUrl(base, bid, kind, "preview");
+      const blob = await fetchPreviewPdf(url);
+      openPdfInPreOpenedWindow(blob, preOpened, `${kind}-${bid}.pdf`);
+      return;
+    }
+    if (preOpened && !preOpened.closed) {
+      preOpened.location.href = doc.url;
+    } else {
+      window.open(doc.url, "_blank", "noopener,noreferrer");
+    }
+  } catch (e) {
+    if (preOpened && !preOpened.closed) {
+      try {
+        preOpened.close();
+      } catch {
+      }
+    }
+    throw e;
   }
-  window.open(doc.url, "_blank", "noopener,noreferrer");
 }
 const getCountryName = (code) => {
   if (!code || typeof code !== "string") {
@@ -1068,13 +1134,7 @@ const BookingDetails = ({
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-6", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-2 space-y-6", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: __("Booking Overview", "yatra") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.booking_status), children: getStatusLabel(booking.booking_status) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.payment_status), children: getStatusLabel(booking.payment_status) })
-            ] })
-          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-between mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: __("Booking Overview", "yatra") }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Booking Number", "yatra") }),
@@ -1263,19 +1323,48 @@ const BookingDetails = ({
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white mb-4", children: __("Customer Information", "yatra") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white mb-1", children: booking.customer_name }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400", children: [
-              booking.customer_email && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-4 h-4" }),
-                booking.customer_email
-              ] }),
-              booking.customer_phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-4 h-4" }),
-                booking.customer_phone
+          (() => {
+            const leadTraveler = Array.isArray(booking.travelers_data) && booking.travelers_data.length > 0 ? booking.travelers_data[0] : null;
+            const leadFields = leadTraveler && typeof leadTraveler === "object" ? leadTraveler.fields || leadTraveler : null;
+            const firstName = booking.contact_first_name || leadFields && leadFields.first_name || "";
+            const lastName = booking.contact_last_name || leadFields && leadFields.last_name || "";
+            const fullName = [firstName, lastName].filter(Boolean).join(" ").trim() || booking.customer_name || "";
+            const email = booking.contact_email || booking.customer_email || leadFields && leadFields.email || "";
+            const phone = booking.contact_phone || booking.customer_phone || leadFields && leadFields.phone || "";
+            const country = booking.contact_country || leadFields && leadFields.country || "";
+            const hasAny = fullName || email || phone || country;
+            if (!hasAny) {
+              return /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("No customer information recorded.", "yatra") });
+            }
+            return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              fullName && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white mb-1", children: fullName }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400", children: [
+                email && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-4 h-4" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "a",
+                    {
+                      href: `mailto:${email}`,
+                      className: "hover:text-yatra-primary dark:hover:text-yatra-on-dark",
+                      children: email
+                    }
+                  )
+                ] }),
+                phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-4 h-4" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "a",
+                    {
+                      href: `tel:${String(phone).replace(/\s+/g, "")}`,
+                      className: "hover:text-yatra-primary dark:hover:text-yatra-on-dark",
+                      children: phone
+                    }
+                  )
+                ] }),
+                country && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: country })
               ] })
-            ] })
-          ] }) })
+            ] }) });
+          })()
         ] }),
         booking.travelers_data && booking.travelers_data.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2", children: [
@@ -1426,6 +1515,10 @@ const BookingDetails = ({
           /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white mb-4", children: __("Payment Information", "yatra") }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Booking Status", "yatra") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.booking_status), children: getStatusLabel(booking.booking_status) }) })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Payment Status", "yatra") }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: getBadge(booking.payment_status), children: getStatusLabel(booking.payment_status) }) })
             ] }),
@@ -1480,15 +1573,23 @@ const Bookings = ({
   bookings,
   conciergePhone = "",
   conciergeEmail = "",
-  onSectionChange
+  onSectionChange,
+  initialBookingId = null,
+  onBookingIdConsumed
 }) => {
   const conciergeTel = phoneToTelHref(conciergePhone);
   const conciergeMail = String(conciergeEmail || "").trim();
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [bookingFilter, setBookingFilter] = reactExports.useState("all");
   const [selectedBookingId, setSelectedBookingId] = reactExports.useState(
-    null
+    initialBookingId
   );
+  React.useEffect(() => {
+    if (initialBookingId && initialBookingId !== selectedBookingId) {
+      setSelectedBookingId(initialBookingId);
+      onBookingIdConsumed == null ? void 0 : onBookingIdConsumed();
+    }
+  }, [initialBookingId]);
   const [payLoading, setPayLoading] = reactExports.useState(null);
   const {
     data: bookingDetailsData,
@@ -1719,7 +1820,7 @@ const Bookings = ({
                     booking.travelers_count ?? booking.travelers ?? 0
                   ) || 0;
                   return sprintf(
-                    // translators: %d: number of travelers on this booking
+                    // translators: %d: number of travelers on this booking.
                     _n("%d traveler", "%d travelers", n),
                     n
                   );
@@ -2611,82 +2712,29 @@ const Profile = ({
         ] })
       ] })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-sections grid gap-6 lg:grid-cols-2", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-communication bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" }),
-          __("Communication Preferences", "yatra")
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-preferences space-y-3 text-sm", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-3 cursor-pointer", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "input",
-              {
-                type: "checkbox",
-                defaultChecked: true,
-                className: "w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-700 dark:text-gray-300", children: __("Booking reminders", "yatra") })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-3 cursor-pointer", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "input",
-              {
-                type: "checkbox",
-                defaultChecked: true,
-                className: "w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-700 dark:text-gray-300", children: __("Payment notifications", "yatra") })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-3 cursor-pointer", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "input",
-              {
-                type: "checkbox",
-                className: "w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-700 dark:text-gray-300", children: __("Promotional offers", "yatra") })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-3 cursor-pointer", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "input",
-              {
-                type: "checkbox",
-                defaultChecked: true,
-                className: "w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-700 dark:text-gray-300", children: __("Trip updates", "yatra") })
-          ] })
-        ] })
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "yatra-profile-sections grid gap-6 lg:grid-cols-1", children: wishlistEnabled && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-saved-trips bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Heart, { className: "w-5 h-5 text-red-600 dark:text-red-400" }),
+        __("Saved Trips", "yatra")
       ] }),
-      wishlistEnabled && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-saved-trips bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Heart, { className: "w-5 h-5 text-red-600 dark:text-red-400" }),
-          __("Saved Trips", "yatra")
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "yatra-saved-trips-list space-y-3", children: savedTrips.length > 0 ? savedTrips.map((trip) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          "div",
-          {
-            className: "yatra-saved-trip-item flex items-center justify-between border border-gray-100 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-900/40 transition-colors",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white truncate", children: trip.trip_title || trip.title }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: formatDate(trip.next_departure) })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-right ml-4 flex-shrink-0", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("From", "yatra") }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: currency(trip.price_from || trip.price || 0) })
-              ] })
-            ]
-          },
-          trip.id || trip.trip_id
-        )) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 text-center py-4", children: __("No saved trips yet", "yatra") }) })
-      ] })
-    ] })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "yatra-saved-trips-list space-y-3", children: savedTrips.length > 0 ? savedTrips.map((trip) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          className: "yatra-saved-trip-item flex items-center justify-between border border-gray-100 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-900/40 transition-colors",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white truncate", children: trip.trip_title || trip.title }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: formatDate(trip.next_departure) })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-right ml-4 flex-shrink-0", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("From", "yatra") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: currency(trip.price_from || trip.price || 0) })
+            ] })
+          ]
+        },
+        trip.id || trip.trip_id
+      )) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 text-center py-4", children: __("No saved trips yet", "yatra") }) })
+    ] }) })
   ] });
 };
 const SavedTrips = ({ savedTrips, isLoading }) => {
@@ -2944,6 +2992,9 @@ const AccountPage = () => {
     return "dashboard";
   };
   const [section, setSection] = reactExports.useState(getSectionFromUrl);
+  const [pendingBookingId, setPendingBookingId] = reactExports.useState(
+    null
+  );
   React.useEffect(() => {
     const newSection = getSectionFromUrl();
     setSection(newSection);
@@ -2958,6 +3009,10 @@ const AccountPage = () => {
       localStorage.setItem("yatra-account-active-section", newSection);
       window.dispatchEvent(new PopStateEvent("popstate"));
     }
+  };
+  const handleBookingOpen = (bookingId) => {
+    setPendingBookingId(bookingId);
+    handleSectionChange("bookings");
   };
   const unwrapArrayResponse = (response) => {
     if (!response) return [];
@@ -3131,7 +3186,8 @@ const AccountPage = () => {
             notifications,
             conciergePhone: accountShell.companyPhone,
             conciergeEmail: accountShell.companyEmail,
-            onSectionChange: (section2) => handleSectionChange(section2)
+            onSectionChange: (section2) => handleSectionChange(section2),
+            onBookingOpen: handleBookingOpen
           }
         );
       case "bookings":
@@ -3141,7 +3197,9 @@ const AccountPage = () => {
             bookings,
             conciergePhone: accountShell.companyPhone,
             conciergeEmail: accountShell.companyEmail,
-            onSectionChange: (section2) => handleSectionChange(section2)
+            onSectionChange: (section2) => handleSectionChange(section2),
+            initialBookingId: pendingBookingId,
+            onBookingIdConsumed: () => setPendingBookingId(null)
           }
         );
       case "payments":

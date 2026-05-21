@@ -6,6 +6,7 @@ namespace Yatra\Upgrades;
 
 use Yatra\Core\Database;
 use Yatra\Services\InstallerService;
+use Yatra\Upgrades\Versions\Upgrade_3_0_5;
 
 /**
  * Orchestrates Yatra Free upgrades: {@see Database::createTables()} for schema sync, then version-gated
@@ -78,5 +79,20 @@ final class FreeUpgradeRunner
         // the new admin UI showed phantom "1 on All & Active" badges for
         // legacy rows that rendered as broken weekly rules.
         InstallerService::maybeNormalizeAvailabilityRulesLegacyData();
+        // Widen bookings.status enum to accept 'pending_verification' and
+        // restore rows that earlier inserts coerced to '' under the old
+        // enum. Version-independent (runs on every admin pageview, gated
+        // by its own one-shot option) so installs whose stored version
+        // already moved past 3.0.5 by a failed upgrade attempt still heal.
+        InstallerService::maybeAddPendingVerificationBookingStatus();
+
+        // Widen reviews.status enum to accept 'spam' / 'trash' (and
+        // recover rows previously coerced to ''). Called directly here
+        // rather than relying on the version-chain in runAdminUpgrades()
+        // because the bug ships IN 3.0.5 itself — installs whose stored
+        // yatra_version already equals the code version short-circuit
+        // past the chain. The upgrade step's own one-shot option flag
+        // gates the work so this is cheap on subsequent pageviews.
+        Upgrade_3_0_5::run(YATRA_VERSION, YATRA_VERSION);
     }
 }

@@ -25,6 +25,7 @@ import {
   useModulesQuery,
   useToggleModule,
   ModuleDefinition,
+  ModulePlan,
   useBulkToggleModules,
 } from "../hooks/useModules";
 import { usePermissions } from "../hooks/usePermissions";
@@ -38,6 +39,7 @@ const Modules: React.FC = () => {
   const bulkToggleMutation = useBulkToggleModules();
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<"all" | string>("all");
+  const [planFilter, setPlanFilter] = useState<"all" | ModulePlan>("all");
   const [sortOption, setSortOption] = useState<
     "name_asc" | "name_desc" | "status_enabled" | "status_disabled"
   >("name_asc");
@@ -52,6 +54,28 @@ const Modules: React.FC = () => {
     });
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [modules]);
+
+  // Plan-filter dropdown only lists the tiers actually present in the
+  // current module set — keeps the menu clean on sites where only some
+  // tiers are in play (e.g. a free-only install shouldn't list Agency).
+  // Modules with no `plan` field are treated as Free so they're filterable.
+  const availablePlans = useMemo(() => {
+    const set = new Set<ModulePlan>();
+    modules.forEach((module) => {
+      set.add(module.plan ?? "free");
+    });
+    // Canonical order from cheapest tier to most premium so the dropdown
+    // reads like a price-ladder, not random.
+    const order: ModulePlan[] = ["free", "personal", "growth", "agency"];
+    return order.filter((tier) => set.has(tier));
+  }, [modules]);
+
+  const planLabels: Record<ModulePlan, string> = {
+    free: __("Free", "yatra"),
+    personal: __("Personal", "yatra"),
+    growth: __("Growth", "yatra"),
+    agency: __("Agency", "yatra"),
+  };
 
   const filteredModules = useMemo(() => {
     let list = modules;
@@ -74,6 +98,12 @@ const Modules: React.FC = () => {
       );
     }
 
+    if (planFilter !== "all") {
+      // Modules without an explicit plan are treated as Free — matches
+      // the Free-tier badge fallthrough in the card renderer below.
+      list = list.filter((module) => (module.plan ?? "free") === planFilter);
+    }
+
     const sorted = [...list];
     sorted.sort((a, b) => {
       switch (sortOption) {
@@ -90,7 +120,7 @@ const Modules: React.FC = () => {
     });
 
     return sorted;
-  }, [modules, searchTerm, categoryFilter, sortOption]);
+  }, [modules, searchTerm, categoryFilter, planFilter, sortOption]);
 
   const moduleMap = useMemo(() => {
     const map = new Map<string, ModuleDefinition>();
@@ -313,7 +343,8 @@ const Modules: React.FC = () => {
               <Select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full lg:w-48"
+                className="w-full lg:w-44"
+                aria-label={__("Filter by category", "yatra")}
               >
                 <option value="all">{__("All Categories", "yatra")}</option>
                 {categories.map((category) => (
@@ -322,12 +353,34 @@ const Modules: React.FC = () => {
                   </option>
                 ))}
               </Select>
+              {/* Plan filter — only renders when there are at least two
+                  tiers represented in the modules list. A site that only
+                  has Free modules doesn't need a plan filter, and showing
+                  a one-option dropdown is worse UX than no dropdown. */}
+              {availablePlans.length > 1 && (
+                <Select
+                  value={planFilter}
+                  onChange={(e) =>
+                    setPlanFilter(e.target.value as "all" | ModulePlan)
+                  }
+                  className="w-full lg:w-44"
+                  aria-label={__("Filter by plan", "yatra")}
+                >
+                  <option value="all">{__("All Plans", "yatra")}</option>
+                  {availablePlans.map((tier) => (
+                    <option key={tier} value={tier}>
+                      {planLabels[tier]}
+                    </option>
+                  ))}
+                </Select>
+              )}
               <Select
                 value={sortOption}
                 onChange={(e) =>
                   setSortOption(e.target.value as typeof sortOption)
                 }
-                className="w-full lg:w-48"
+                className="w-full lg:w-44"
+                aria-label={__("Sort modules", "yatra")}
               >
                 <option value="name_asc">{__("Name A → Z", "yatra")}</option>
                 <option value="name_desc">{__("Name Z → A", "yatra")}</option>
@@ -340,12 +393,14 @@ const Modules: React.FC = () => {
               </Select>
               {(searchTerm ||
                 categoryFilter !== "all" ||
+                planFilter !== "all" ||
                 sortOption !== "name_asc") && (
                 <Button
                   variant="outline"
                   onClick={() => {
                     setSearchTerm("");
                     setCategoryFilter("all");
+                    setPlanFilter("all");
                     setSortOption("name_asc");
                   }}
                 >

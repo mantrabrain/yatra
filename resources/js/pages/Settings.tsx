@@ -755,9 +755,7 @@ interface SettingsData {
   auto_confirm_bookings: boolean;
   require_login: boolean;
   allow_guest_checkout: boolean;
-  cancellation_policy: string;
-  cancellation_days: number;
-  refund_policy: string;
+  require_guest_email_verification: boolean;
   booking_expiry_hours: number;
   booking_reminder_days: number;
   allow_waitlist: boolean;
@@ -2271,9 +2269,7 @@ const Settings: React.FC = () => {
       auto_confirm_bookings: false,
       require_login: false,
       allow_guest_checkout: true,
-      cancellation_policy: "full_refund",
-      cancellation_days: 7,
-      refund_policy: "Full refund if cancelled 7 days before departure",
+      require_guest_email_verification: false,
       booking_expiry_hours: 24,
       booking_reminder_days: 3,
       allow_waitlist: true,
@@ -5090,11 +5086,11 @@ const Settings: React.FC = () => {
                     htmlFor="booking_confirmation"
                     className="font-medium cursor-pointer"
                   >
-                    {__("Enable Booking Confirmation", "yatra")}
+                    {__("Send Booking Confirmation Email", "yatra")}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     {__(
-                      "Controls post-checkout confirmation (page and customer email when templates/notifications allow).",
+                      "Send a confirmation email to the customer immediately after a successful booking. The post-checkout page is always shown; this toggle only controls the email.",
                       "yatra",
                     )}
                   </p>
@@ -5170,6 +5166,43 @@ const Settings: React.FC = () => {
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     {__(
                       "Allow customers to book without creating an account",
+                      "yatra",
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {/*
+                Guest email verification — only meaningful when guest
+                checkout is allowed AND login isn't required, since
+                logged-in customers' emails are verified by WordPress
+                on registration. We still render the checkbox at all
+                times so operators can pre-configure before flipping
+                the parent toggles; the help text explains the
+                dependency rather than hiding the control.
+              */}
+              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                <input
+                  type="checkbox"
+                  id="require_guest_email_verification"
+                  checked={formData.require_guest_email_verification}
+                  name="require_guest_email_verification"
+                  onChange={handleFieldChange}
+                  disabled={
+                    !formData.allow_guest_checkout || formData.require_login
+                  }
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50"
+                />
+                <div className="flex-1">
+                  <Label
+                    htmlFor="require_guest_email_verification"
+                    className="font-medium cursor-pointer"
+                  >
+                    {__("Require Guest Email Verification", "yatra")}
+                  </Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {__(
+                      "Hold guest bookings until the customer clicks a magic link sent to their email. Stops typo'd addresses and form-spam bots. Only applies when guest checkout is allowed and login isn't required — logged-in customers are already verified.",
                       "yatra",
                     )}
                   </p>
@@ -5264,75 +5297,26 @@ const Settings: React.FC = () => {
               </div>
             </div>
 
-            <SectionDivider
-              title={__("Cancellation & Refund Policy", "yatra")}
-            />
+            {/*
+              Cancellation & Refund Policy section removed.
 
-            <div className="space-y-4">
-              <FormField
-                id="cancellation_policy"
-                label={__("Cancellation Policy", "yatra")}
-                description={__(
-                  "What happens when a booking is cancelled",
-                  "yatra",
-                )}
-              >
-                <Select
-                  id="cancellation_policy"
-                  value={formData.cancellation_policy}
-                  name="cancellation_policy"
-                  onChange={handleFieldChange}
-                >
-                  <option value="no_refund">{__("No Refund", "yatra")}</option>
-                  <option value="full_refund">
-                    {__("Full Refund", "yatra")}
-                  </option>
-                  <option value="partial_refund">
-                    {__("Partial Refund", "yatra")}
-                  </option>
-                </Select>
-              </FormField>
+              Earlier versions exposed three settings here
+              (cancellation_policy dropdown, cancellation_days number,
+              refund_policy textarea). All three were display-only —
+              they appeared in the booking confirmation email but
+              did NOT enforce any cancellation cutoff or compute any
+              refund amount, because Yatra has no customer-facing
+              self-service cancellation flow. The names implied
+              enforcement that did not exist, which is worse than
+              having no setting at all.
 
-              <FormField
-                id="cancellation_days"
-                label={__("Cancellation Days Before Departure", "yatra")}
-                description={__(
-                  "Number of days before departure when cancellation is allowed",
-                  "yatra",
-                )}
-              >
-                <Input
-                  id="cancellation_days"
-                  type="number"
-                  value={formData.cancellation_days}
-                  name="cancellation_days"
-                  onChange={handleFieldChange}
-                  min="0"
-                />
-              </FormField>
-
-              <FormField
-                id="refund_policy"
-                label={__("Refund Policy", "yatra")}
-                description={__(
-                  "Detailed refund policy description shown to customers",
-                  "yatra",
-                )}
-              >
-                <textarea
-                  id="refund_policy"
-                  value={formData.refund_policy}
-                  name="refund_policy"
-                  onChange={handleFieldChange}
-                  rows={4}
-                  className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
-                  placeholder={__(
-                    "Enter your refund policy details...",
-                    "yatra",
-                  )}
-                />
-              </FormField>
-            </div>
+              Per-trip cancellation copy still lives on the Trip
+              editor (Trip Builder → cancellation_policy field) and
+              is what the booking confirmation page + email now
+              show. To restore site-wide cancellation enforcement,
+              build the cancellation REST endpoint and re-add gated
+              settings here.
+            */}
 
             <SectionDivider title={__("Booking Expiry & Reminders", "yatra")} />
 

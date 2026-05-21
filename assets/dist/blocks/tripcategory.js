@@ -333,6 +333,10 @@
       components.ToggleControl,
       {
         label: i18n.__("Hide empty categories", "yatra"),
+        help: i18n.__(
+          "Skip categories that have no published trips assigned. Off by default — turn on for a tighter live catalog, leave off for editorial / onboarding views.",
+          "yatra"
+        ),
         checked: hide_empty,
         onChange: (value) => setAttributes({ hide_empty: value })
       }
@@ -413,7 +417,7 @@
     },
     hide_empty: {
       type: "boolean",
-      "default": true
+      "default": false
     },
     featured_only: {
       type: "boolean",

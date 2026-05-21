@@ -21,14 +21,34 @@ if (!defined('ABSPATH')) {
                 ?>
                 <div class="yatra-gallery-item" data-image-index="<?php echo esc_attr($index); ?>" itemscope itemtype="https://schema.org/ImageObject">
                     <img src="<?php echo esc_url($image); ?>"
-                         alt="<?php echo esc_attr(sprintf(__('Photo %d of %s trip gallery', 'yatra'), $index + 1, $trip->getTitle())); ?>"
-                         title="<?php echo esc_attr(sprintf(__('Photo %d - %s', 'yatra'), $index + 1, $trip->getTitle())); ?>"
+                         alt="<?php echo esc_attr(sprintf(
+                             /* translators: 1: photo number, 2: trip title. */
+                             __('Photo %1$d of %2$s trip gallery', 'yatra'),
+                             $index + 1,
+                             $trip->getTitle()
+                         )); ?>"
+                         title="<?php echo esc_attr(sprintf(
+                             /* translators: 1: photo number, 2: trip title. */
+                             __('Photo %1$d - %2$s', 'yatra'),
+                             $index + 1,
+                             $trip->getTitle()
+                         )); ?>"
                          itemprop="url" content="<?php echo esc_url($image); ?>"
                          data-yatra-src="<?php echo esc_url($image); ?>"
                          data-no-lazy="1">
                     <meta itemprop="contentUrl" content="<?php echo esc_url($image); ?>">
-                    <meta itemprop="name" content="<?php echo esc_attr(sprintf(__('Photo %d - %s', 'yatra'), $index + 1, $trip->getTitle())); ?>">
-                    <meta itemprop="description" content="<?php echo esc_attr(sprintf(__('Photo %d from the %s trip gallery', 'yatra'), $index + 1, $trip->getTitle())); ?>">
+                    <meta itemprop="name" content="<?php echo esc_attr(sprintf(
+                        /* translators: 1: photo number, 2: trip title. */
+                        __('Photo %1$d - %2$s', 'yatra'),
+                        $index + 1,
+                        $trip->getTitle()
+                    )); ?>">
+                    <meta itemprop="description" content="<?php echo esc_attr(sprintf(
+                        /* translators: 1: photo number, 2: trip title. */
+                        __('Photo %1$d from the %2$s trip gallery', 'yatra'),
+                        $index + 1,
+                        $trip->getTitle()
+                    )); ?>">
                     <meta itemprop="position" content="<?php echo $index + 1; ?>">
                     <meta itemprop="encodingFormat" content="image/jpeg">
                 </div>

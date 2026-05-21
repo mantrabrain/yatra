@@ -153,7 +153,11 @@ class PayPalGateway extends AbstractPaymentGateway
         $currency = $paymentData['currency'] ?? 'USD';
         $bookingId = $paymentData['booking_id'] ?? 0;
         $reference = $paymentData['reference'] ?? $bookingId;
-        $description = $paymentData['description'] ?? sprintf(__('Booking #%s', 'yatra'), $reference);
+        $description = $paymentData['description'] ?? sprintf(
+            /* translators: %s: booking reference. */
+            __('Booking #%s', 'yatra'),
+            $reference
+        );
         $returnUrl = $paymentData['return_url'] ?? yatra_get_booking_confirmation_url((string) $reference);
         $cancelUrl = $paymentData['cancel_url'] ?? home_url('/book/?payment=cancelled&ref=' . $reference);
 
@@ -220,7 +224,11 @@ class PayPalGateway extends AbstractPaymentGateway
             'intent' => 'CAPTURE',
             'purchase_units' => [[
                 'custom_id' => (string) $bookingId,
-                'description' => $paymentData['description'] ?? sprintf(__('Booking #%s', 'yatra'), $bookingId),
+                'description' => $paymentData['description'] ?? sprintf(
+                    /* translators: %s: booking reference. */
+                    __('Booking #%s', 'yatra'),
+                    $bookingId
+                ),
                 'amount' => [
                     'currency_code' => $currency,
                     'value' => $amount,

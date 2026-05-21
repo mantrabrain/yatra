@@ -25,7 +25,11 @@ class DestinationShortcode extends BaseShortcode
             'show_image' => 'yes',
             'show_pagination' => 'yes', // Default to show pagination like trip shortcode
             'destination' => '', // Classification IDs, comma-separated
-            'hide_empty' => 'yes',
+            // hide_empty defaults to 'no' to preserve the historical
+            // behavior (show every destination, even ones with zero
+            // trips). Operators that prefer the empty-archive defense
+            // opt in with hide_empty="yes".
+            'hide_empty' => 'no',
             'featured_only' => 'no',
             'title' => 'Destination Showcase'
         ]);
@@ -273,10 +277,22 @@ class DestinationShortcode extends BaseShortcode
                 ];
             }
 
-            // Filter out empty destinations if requested
+            // Filter out destinations that have no published trips.
+            //
+            // See ActivityShortcode for the full rationale — the
+            // prior implementation only filtered on term-metadata
+            // emptiness (which never actually fires), so destinations
+            // with zero trips were rendered with empty trip counts
+            // and broken archive links. We now drop any destination
+            // whose trip_count (computed above from
+            // TripClassificationsTable JOIN TripsTable WHERE
+            // status=publish) is zero, plus the original sanity
+            // check on name/slug.
             if ($atts['hide_empty'] === 'yes') {
-                $destinations = array_filter($destinations, function($destination) {
-                    return !empty($destination['term']->name) && !empty($destination['term']->slug);
+                $destinations = array_filter($destinations, static function ($destination) {
+                    return (int) ($destination['trip_count'] ?? 0) > 0
+                        && !empty($destination['term']->name)
+                        && !empty($destination['term']->slug);
                 });
             }
             

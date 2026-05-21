@@ -33,10 +33,21 @@ const QUERY_KEY = ["ai-dashboard-digest"];
 export const TodaysBriefCard: React.FC = () => {
   const queryClient = useQueryClient();
 
-  // Skip rendering entirely when the operator's license can't unlock
-  // AI at all. Avoids tempting non-eligible users with a card that
-  // would just redirect them to an upgrade page.
-  if (!isAiEligible()) {
+  // Skip rendering entirely when the operator can't or hasn't enabled
+  // AI. Two gates, both must pass:
+  //
+  //   1. `isAiEligible()` — license tier unlocks AI at all. If false,
+  //      the card would just redirect to an upgrade page and is noise
+  //      for the operator.
+  //
+  //   2. `isAiModuleEnabled()` — the AI Assistant module is switched on
+  //      under Modules. If false, the card previously rendered the
+  //      whole gradient banner with an "Enable AI Assistant module..."
+  //      CTA inside, which surprised operators who had explicitly
+  //      decided not to enable AI. Hide it entirely instead — the
+  //      Modules page itself is the right entry point for "I want to
+  //      turn this on", not the dashboard.
+  if (!isAiEligible() || !isAiModuleEnabled()) {
     return null;
   }
 
@@ -189,20 +200,11 @@ const BriefBody: React.FC<{
     );
   }
 
-  if (digest.state === "module_disabled") {
-    if (!isAiModuleEnabled()) {
-      return (
-        <CtaLine
-          message={__(
-            "Enable the AI Assistant module to generate a daily operations brief.",
-            "yatra",
-          )}
-          href="admin.php?page=yatra&subpage=modules"
-          label={__("Open Modules", "yatra")}
-        />
-      );
-    }
-  }
+  // The `module_disabled` state is unreachable here — the parent
+  // <TodaysBriefCard> returns null before this body renders when the
+  // module is off. Server may still send this state during a brief
+  // race window between module toggle + client cache; treat it the
+  // same as no-API-key (caller wants AI but something isn't ready).
 
   if (digest.state === "no_api_key") {
     return (
@@ -291,7 +293,10 @@ const MetricPill: React.FC<{
   value: string;
   tone?: "default" | "amber";
   link?: string;
-}> = ({ icon: Icon, label, value, tone = "default", link }) => {
+  /** Hover hint — surfaces via `title=`, since the brief already has a
+      lot of moving parts and a dedicated popover is overkill. */
+  tooltip?: string;
+}> = ({ icon: Icon, label, value, tone = "default", link, tooltip }) => {
   const n = parseInt(value, 10);
   const safe = Number.isFinite(n) ? n : 0;
   const accent =
@@ -302,7 +307,10 @@ const MetricPill: React.FC<{
         : "text-gray-900 dark:text-white";
 
   const body = (
-    <div className="flex items-center gap-2 rounded-md bg-white px-2.5 py-2 shadow-sm ring-1 ring-blue-100 hover:ring-blue-300 dark:bg-gray-900/60 dark:ring-blue-500/30">
+    <div
+      className="flex items-center gap-2 rounded-md bg-white px-2.5 py-2 shadow-sm ring-1 ring-blue-100 hover:ring-blue-300 dark:bg-gray-900/60 dark:ring-blue-500/30"
+      title={tooltip}
+    >
       <Icon className="h-4 w-4 text-blue-500" />
       <div>
         <div className={`text-base font-semibold leading-none ${accent}`}>

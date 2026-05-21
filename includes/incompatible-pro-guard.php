@@ -194,10 +194,12 @@ function yatra_admin_notice_incompatible_pro_deactivated(): void
         <p>
             <?php
             printf(
-                /* translators: 1: detected Yatra Pro version, 2: minimum required Pro version, 3: current Yatra Free version */
-                esc_html__(
-                    'Your site had Yatra Pro %1$s active together with Yatra %3$s. Pro versions older than %2$s are not compatible with Yatra 3.0 and were causing fatal errors (missing classes such as Yatra_Form). Yatra Pro has been deactivated automatically.',
-                    'yatra'
+                esc_html(
+                    /* translators: 1: detected Yatra Pro version, 2: minimum required Pro version, 3: current Yatra Free version. */
+                    __(
+                        'Your site had Yatra Pro %1$s active together with Yatra %3$s. Pro versions older than %2$s are not compatible with Yatra 3.0 and were causing fatal errors (missing classes such as Yatra_Form). Yatra Pro has been deactivated automatically.',
+                        'yatra'
+                    )
                 ),
                 esc_html($pro_v !== '' ? $pro_v : '?'),
                 esc_html($min_v),
@@ -209,8 +211,8 @@ function yatra_admin_notice_incompatible_pro_deactivated(): void
             <?php
             $account_url = yatra_get_compatible_pro_account_url();
             printf(
-                /* translators: 1: minimum Yatra Pro version, 2: HTML link to MantraBrain store account */
                 wp_kses_post(
+                    /* translators: 1: minimum Yatra Pro version, 2: HTML link to MantraBrain store account. */
                     __('Please download and install <strong>Yatra Pro %1$s or newer</strong> from your MantraBrain store account: %2$s to use Pro features with this version of Yatra.', 'yatra')
                 ),
                 esc_html($min_v),

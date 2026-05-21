@@ -294,7 +294,11 @@ class SampleDataService
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'message' => sprintf(__('Error importing sample data: %s', 'yatra'), $e->getMessage()),
+                'message' => sprintf(
+                    /* translators: %s: error message. */
+                    __('Error importing sample data: %s', 'yatra'),
+                    $e->getMessage()
+                ),
                 'data' => $results
             ];
         }

@@ -83,28 +83,33 @@
         const countryOptions = generateCountryOptions();
 
         /**
-         * Generate country select options HTML
+         * Generate country select options HTML.
+         *
+         * Each English country name is wrapped in `__()` so it's
+         * extractable and translatable per WordPress conventions.
+         * Keys (ISO 3166-1 alpha-2 codes) are untranslated, as they
+         * should be — they're identifiers, not user-facing text.
          */
         function generateCountryOptions() {
             const countries = {
-                'AF': 'Afghanistan', 'AL': 'Albania', 'DZ': 'Algeria', 'AR': 'Argentina',
-                'AU': 'Australia', 'AT': 'Austria', 'BD': 'Bangladesh', 'BE': 'Belgium',
-                'BR': 'Brazil', 'BT': 'Bhutan', 'CA': 'Canada', 'CN': 'China',
-                'CO': 'Colombia', 'CZ': 'Czech Republic', 'DK': 'Denmark', 'EG': 'Egypt',
-                'FI': 'Finland', 'FR': 'France', 'DE': 'Germany', 'GR': 'Greece',
-                'HK': 'Hong Kong', 'HU': 'Hungary', 'IS': 'Iceland', 'IN': 'India',
-                'ID': 'Indonesia', 'IE': 'Ireland', 'IL': 'Israel', 'IT': 'Italy',
-                'JP': 'Japan', 'KE': 'Kenya', 'KR': 'South Korea', 'MY': 'Malaysia',
-                'MV': 'Maldives', 'MX': 'Mexico', 'NL': 'Netherlands', 'NZ': 'New Zealand',
-                'NP': 'Nepal', 'NO': 'Norway', 'PK': 'Pakistan', 'PE': 'Peru',
-                'PH': 'Philippines', 'PL': 'Poland', 'PT': 'Portugal', 'RO': 'Romania',
-                'RU': 'Russia', 'SA': 'Saudi Arabia', 'SG': 'Singapore', 'ZA': 'South Africa',
-                'ES': 'Spain', 'LK': 'Sri Lanka', 'SE': 'Sweden', 'CH': 'Switzerland',
-                'TW': 'Taiwan', 'TH': 'Thailand', 'TR': 'Turkey', 'AE': 'United Arab Emirates',
-                'GB': 'United Kingdom', 'US': 'United States', 'VN': 'Vietnam'
+                'AF': __('Afghanistan', 'yatra'), 'AL': __('Albania', 'yatra'), 'DZ': __('Algeria', 'yatra'), 'AR': __('Argentina', 'yatra'),
+                'AU': __('Australia', 'yatra'), 'AT': __('Austria', 'yatra'), 'BD': __('Bangladesh', 'yatra'), 'BE': __('Belgium', 'yatra'),
+                'BR': __('Brazil', 'yatra'), 'BT': __('Bhutan', 'yatra'), 'CA': __('Canada', 'yatra'), 'CN': __('China', 'yatra'),
+                'CO': __('Colombia', 'yatra'), 'CZ': __('Czech Republic', 'yatra'), 'DK': __('Denmark', 'yatra'), 'EG': __('Egypt', 'yatra'),
+                'FI': __('Finland', 'yatra'), 'FR': __('France', 'yatra'), 'DE': __('Germany', 'yatra'), 'GR': __('Greece', 'yatra'),
+                'HK': __('Hong Kong', 'yatra'), 'HU': __('Hungary', 'yatra'), 'IS': __('Iceland', 'yatra'), 'IN': __('India', 'yatra'),
+                'ID': __('Indonesia', 'yatra'), 'IE': __('Ireland', 'yatra'), 'IL': __('Israel', 'yatra'), 'IT': __('Italy', 'yatra'),
+                'JP': __('Japan', 'yatra'), 'KE': __('Kenya', 'yatra'), 'KR': __('South Korea', 'yatra'), 'MY': __('Malaysia', 'yatra'),
+                'MV': __('Maldives', 'yatra'), 'MX': __('Mexico', 'yatra'), 'NL': __('Netherlands', 'yatra'), 'NZ': __('New Zealand', 'yatra'),
+                'NP': __('Nepal', 'yatra'), 'NO': __('Norway', 'yatra'), 'PK': __('Pakistan', 'yatra'), 'PE': __('Peru', 'yatra'),
+                'PH': __('Philippines', 'yatra'), 'PL': __('Poland', 'yatra'), 'PT': __('Portugal', 'yatra'), 'RO': __('Romania', 'yatra'),
+                'RU': __('Russia', 'yatra'), 'SA': __('Saudi Arabia', 'yatra'), 'SG': __('Singapore', 'yatra'), 'ZA': __('South Africa', 'yatra'),
+                'ES': __('Spain', 'yatra'), 'LK': __('Sri Lanka', 'yatra'), 'SE': __('Sweden', 'yatra'), 'CH': __('Switzerland', 'yatra'),
+                'TW': __('Taiwan', 'yatra'), 'TH': __('Thailand', 'yatra'), 'TR': __('Turkey', 'yatra'), 'AE': __('United Arab Emirates', 'yatra'),
+                'GB': __('United Kingdom', 'yatra'), 'US': __('United States', 'yatra'), 'VN': __('Vietnam', 'yatra')
             };
-            
-            let options = '<option value="">Select Country</option>';
+
+            let options = '<option value="">' + __('Select Country', 'yatra') + '</option>';
             for (const [code, name] of Object.entries(countries)) {
                 options += `<option value="${code}">${name}</option>`;
             }
@@ -178,7 +183,12 @@
                 const count = parseInt($(this).val()) || 0;
                 const categoryLabel = $(this).closest('.yatra-quantity-row').find('.yatra-quantity-title').text();
                 if (count > 0) {
-                    parts.push(categoryLabel + ' x ' + count);
+                    parts.push(sprintf(
+                        /* translators: 1: traveler category label, 2: count. */
+                        __('%1$s x %2$d', 'yatra'),
+                        categoryLabel,
+                        count
+                    ));
                 }
             });
             const displayText = parts.length > 0 ? parts.join(', ') : __('Select travelers', 'yatra');
@@ -189,8 +199,11 @@
          * Update display text for regular pricing
          */
         function updateRegularTravelersDisplayText(count) {
-            const label = count === 1 ? 'traveler' : 'travelers';
-            $('#yatra-travelers-display-regular').text(count + ' ' + label);
+            $('#yatra-travelers-display-regular').text(sprintf(
+                /* translators: %d: number of travelers on this booking. */
+                _n('%d traveler', '%d travelers', count, 'yatra'),
+                count
+            ));
         }
 
         
@@ -353,13 +366,18 @@
             // Update index references
             $newTraveler.attr('data-traveler-index', index);
             $newTraveler.find('.yatra-traveler-title').text(
-                /* translators: %d: traveler number (1-based) */
+                /* translators: %d: traveler sequence number. */
                 sprintf(__('Traveler %d', 'yatra'), index)
             );
             
-            // Add "Additional traveler" note
+            // Add "Additional traveler" note. The class wrapper is
+            // markup (not translatable); only the visible label runs
+            // through __() so translators see a clean msgid in the
+            // pot rather than HTML noise.
             if (!$newTraveler.find('.yatra-traveler-note').length) {
-                $newTraveler.find('.yatra-traveler-header').append('<span class="yatra-traveler-note">Additional traveler</span>');
+                $newTraveler.find('.yatra-traveler-header').append(
+                    '<span class="yatra-traveler-note">' + __('Additional traveler', 'yatra') + '</span>'
+                );
             }
             
             // Update all field IDs and names
@@ -481,7 +499,11 @@
                     isValid = false;
                     $field.addClass('error');
                     const label = $field.closest('.yatra-form-group').find('label').text().replace('*', '').trim();
-                    errors.push(label + ' is required');
+                    errors.push(sprintf(
+                        /* translators: %s: form field label. */
+                        __('%s is required', 'yatra'),
+                        label
+                    ));
                 }
             });
             
@@ -546,15 +568,21 @@
             opts = opts || {};
             const heading = opts.heading || __('Booking Confirmed!', 'yatra');
             const iconColor = opts.iconColor || '#22c55e';
+            const confirmationEmailText = __('A confirmation email has been sent to your email address.', 'yatra');
             const footerHtml = opts.footerHtml !== undefined
                 ? opts.footerHtml
-                : '<p style="margin-top: 24px; color: #6b7280;">A confirmation email has been sent to your email address.</p>';
+                : '<p style="margin-top: 24px; color: #6b7280;">' + confirmationEmailText + '</p>';
+            const referenceText = sprintf(
+                /* translators: %s: booking reference number. */
+                __('Reference: %s', 'yatra'),
+                reference
+            );
             const $success = $('<div class="yatra-booking-success" style="text-align: center; padding: 60px 20px;">' +
                 '<svg style="width: 80px; height: 80px; color: ' + iconColor + '; margin-bottom: 24px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
                 '<circle cx="12" cy="12" r="10"></circle><polyline points="9,12 12,15 16,10"></polyline></svg>' +
                 '<h2 style="font-size: 28px; margin-bottom: 12px; color: #111827;">' + heading + '</h2>' +
                 '<p style="font-size: 18px; color: #6b7280; margin-bottom: 8px;">' + message + '</p>' +
-                '<p style="font-size: 16px; color: #111827; font-weight: 600;">Reference: ' + reference + '</p>' +
+                '<p style="font-size: 16px; color: #111827; font-weight: 600;">' + referenceText + '</p>' +
                 footerHtml +
                 '</div>');
             
@@ -828,27 +856,54 @@
          * Handle payment response from server
          */
         function handlePaymentResponse(response, originalBtnHtml) {
-            
-            
-            
+
+
+
             if (!response.success) {
                 const errMsg = response.message || __('An error occurred. Please try again.', 'yatra');
                 showFormError(errMsg);
                 $submitBtn.prop('disabled', false).html(originalBtnHtml);
                 return;
             }
-            
+
+            // Guest email verification path — booking is held in
+            // pending_verification until the customer clicks the
+            // magic link in their inbox. Render a "check your email"
+            // success screen and DO NOT redirect to payment.
+            if (response.code === 'email_verification_required') {
+                const data = response.data || {};
+                const reference = data.reference || __('N/A', 'yatra');
+                const email = data.email || '';
+                showSuccessMessage(
+                    response.message || __("We've sent a verification email. Click the link to complete your booking.", 'yatra'),
+                    reference,
+                    {
+                        heading: __('Check your email', 'yatra'),
+                        iconColor: '#2563eb',
+                        footerHtml:
+                            '<p style="margin-top: 20px; color: #374151;">' +
+                            __('We sent a verification link to:', 'yatra') +
+                            ' <strong>' + (email || __('your email', 'yatra')) + '</strong>' +
+                            '</p>' +
+                            '<p style="margin-top: 12px; color: #6b7280; font-size: 14px;">' +
+                            __("Didn't see it? Check your spam folder. The link expires in 48 hours.", 'yatra') +
+                            '</p>'
+                    }
+                );
+                return;
+            }
+
             const data = response.data || {};
 
             if (data.waitlist) {
-                const reference = data.reference || 'N/A';
+                const reference = data.reference || __('N/A', 'yatra');
                 showSuccessMessage(
                     response.message || __("You're on the waitlist for this departure.", 'yatra'),
                     reference,
                     {
                         heading: __("You're on the waitlist", 'yatra'),
                         iconColor: '#ca8a04',
-                        footerHtml: '<p style="margin-top: 24px; color: #6b7280;">We will contact you if a space opens up.</p>'
+                        footerHtml: '<p style="margin-top: 24px; color: #6b7280;">' + __('We will contact you if a space opens up.', 'yatra') + '</p>'
                     }
                 );
                 return;
@@ -902,7 +957,7 @@
             }
             
             // Default: show success message
-            const reference = data.reference || 'N/A';
+            const reference = data.reference || __('N/A', 'yatra');
             showSuccessMessage(response.message || __('Success!', 'yatra'), reference);
         }
 
@@ -1009,14 +1064,26 @@
             $submitBtn.prop('disabled', true).html(
                 '<svg class="animate-spin" style="display: inline-block; width: 20px; height: 20px; margin-right: 8px; animation: spin 1s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
                 '<circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="12"></circle></svg>' +
-                '<span>Processing...</span>'
+                '<span>' + __('Processing...', 'yatra') + '</span>'
             );
+
+            // CSRF protection — the booking REST endpoint's
+            // permission_callback intentionally bypasses WP's default
+            // cookie/nonce check (so guests can hit it at all). The
+            // server validates this booking-scoped action nonce
+            // instead. Falls back to the hidden form field on the
+            // booking page when the localized var isn't present (e.g.
+            // older cached scripts).
+            const bookingNonce = window.yatraBookingData?.bookingNonce
+                || $('input[name="yatra_booking_nonce"]').val()
+                || '';
 
             fetch(createUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-WP-Nonce': nonce
+                    'X-WP-Nonce': nonce,
+                    'X-Yatra-Booking-Nonce': bookingNonce
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify(bookingData)
@@ -1570,9 +1637,11 @@
                 
                 // If email needs verification, show resend option
                 if (response.needs_verification && response.email) {
+                    const didntReceiveText = __("Didn't receive the email?", 'yatra');
+                    const resendLinkText = __('Resend verification link', 'yatra');
                     const $resendLink = $('<div class="yatra-resend-verification" style="margin-top: 12px; text-align: center;">' +
-                        '<span style="color: #6b7280; font-size: 14px;">Didn\'t receive the email? </span>' +
-                        '<button type="button" class="yatra-resend-btn" data-email="' + response.email + '" style="background: none; border: none; color: #3b82f6; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: underline;">Resend verification link</button>' +
+                        '<span style="color: #6b7280; font-size: 14px;">' + didntReceiveText + ' </span>' +
+                        '<button type="button" class="yatra-resend-btn" data-email="' + response.email + '" style="background: none; border: none; color: #3b82f6; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: underline;">' + resendLinkText + '</button>' +
                         '</div>');
                     $messageEl.after($resendLink);
                 }
@@ -1665,7 +1734,14 @@
                 ? `${mins}:${secs.toString().padStart(2, '0')}` 
                 : `${secs}s`;
             
-            $btn.html(`<span style="color: #9ca3af;">Resend in </span><span style="color: #3b82f6; font-weight: 700;">${timeStr}</span>`);
+            // Resend-OTP countdown label. The %s placeholder is the
+            // remaining time as MM:SS — we wrap the literal so the
+            // whole sentence translates, then slot the timer in via
+            // replace() to avoid a dynamic msgid that gettext can't
+            // extract.
+            /* translators: %s is the remaining time (e.g. "0:45") before the verification code can be resent. */
+            const resendTxt = __('Resend in %s', 'yatra').replace('%s', timeStr);
+            $btn.html(`<span style="color: #9ca3af;">${resendTxt}</span>`);
             
             seconds--;
             setTimeout(updateCountdown, 1000);

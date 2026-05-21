@@ -74,6 +74,36 @@ class FormatHelper
         'GB' => 'United Kingdom', 'US' => 'United States', 'UY' => 'Uruguay', 'UZ' => 'Uzbekistan',
         'VU' => 'Vanuatu', 'VA' => 'Vatican City', 'VE' => 'Venezuela', 'VN' => 'Vietnam',
         'YE' => 'Yemen', 'ZM' => 'Zambia', 'ZW' => 'Zimbabwe',
+        // ISO-3166-1 territories and special regions added so customers
+        // from common tourism markets (Hong Kong, Puerto Rico, Greenland,
+        // Gibraltar, Faroe Islands, etc.) can select their location.
+        'HK' => 'Hong Kong', 'MO' => 'Macao', 'PR' => 'Puerto Rico',
+        'GI' => 'Gibraltar', 'GL' => 'Greenland', 'FO' => 'Faroe Islands',
+        'GG' => 'Guernsey', 'IM' => 'Isle of Man', 'JE' => 'Jersey',
+        'AX' => 'Aland Islands', 'SJ' => 'Svalbard and Jan Mayen',
+        'BM' => 'Bermuda', 'KY' => 'Cayman Islands', 'AI' => 'Anguilla',
+        'AW' => 'Aruba', 'CW' => 'Curacao', 'SX' => 'Sint Maarten',
+        'BQ' => 'Bonaire, Sint Eustatius and Saba',
+        'MS' => 'Montserrat', 'VG' => 'British Virgin Islands',
+        'TC' => 'Turks and Caicos Islands',
+        'BL' => 'Saint Barthelemy', 'MF' => 'Saint Martin (French)',
+        'PM' => 'Saint Pierre and Miquelon',
+        'SH' => 'Saint Helena, Ascension and Tristan da Cunha',
+        'FK' => 'Falkland Islands',
+        'GS' => 'South Georgia and the South Sandwich Islands',
+        'PF' => 'French Polynesia', 'NC' => 'New Caledonia',
+        'WF' => 'Wallis and Futuna', 'CK' => 'Cook Islands',
+        'NU' => 'Niue', 'TK' => 'Tokelau',
+        'GP' => 'Guadeloupe', 'MQ' => 'Martinique',
+        'RE' => 'Reunion', 'YT' => 'Mayotte',
+        'AS' => 'American Samoa', 'GU' => 'Guam',
+        'MP' => 'Northern Mariana Islands', 'VI' => 'U.S. Virgin Islands',
+        'UM' => 'U.S. Minor Outlying Islands',
+        'TF' => 'French Southern Territories',
+        'IO' => 'British Indian Ocean Territory', 'BV' => 'Bouvet Island',
+        'HM' => 'Heard Island and McDonald Islands',
+        'AQ' => 'Antarctica', 'PN' => 'Pitcairn',
+        'EH' => 'Western Sahara', 'XK' => 'Kosovo',
     ];
 
     /**
@@ -258,13 +288,39 @@ class FormatHelper
     }
 
     /**
-     * Get all countries as options array
-     * 
-     * @return array [code => name]
+     * Canonical country list — single source of truth used by every
+     * country / nationality dropdown in both Free and Pro plugins.
+     *
+     * Returns the full ISO-3166-1 alpha-2 set (sovereign states +
+     * dependent territories + commonly-accepted regions). Sorted
+     * alphabetically by name so the rendered dropdown is browseable
+     * without operators having to scan a code-ordered list.
+     *
+     * Filterable via `yatra_countries_list` for operators that want
+     * to:
+     *   - Prepend "popular" entries (US, GB, IN, etc.) above an
+     *     `---` separator for faster picking
+     *   - Remove territories that don't apply to their market
+     *   - Rename a region (e.g. business-language preferences)
+     *
+     * @return array<string, string>  [ISO-3166 code => display name]
      */
     public static function getCountries(): array
     {
-        return self::COUNTRY_NAMES;
+        $countries = self::COUNTRY_NAMES;
+
+        // Stable alphabetical sort by display name. Operators expect
+        // "Argentina" before "Australia" before "Austria" — code-order
+        // (AR/AU/AT) is computer-friendly but not human-friendly.
+        asort($countries, SORT_STRING | SORT_FLAG_CASE);
+
+        if (\function_exists('apply_filters')) {
+            $filtered = apply_filters('yatra_countries_list', $countries);
+            if (\is_array($filtered) && $filtered !== []) {
+                return $filtered;
+            }
+        }
+        return $countries;
     }
 
     /**

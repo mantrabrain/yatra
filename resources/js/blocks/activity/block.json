@@ -32,6 +32,23 @@
     "activityIds": {
       "type": "array",
       "default": []
+    },
+    "hide_empty": {
+      "type": "boolean",
+      "default": false,
+      "description": "When on, activities with zero published trips are skipped. Off by default to preserve the historical 'show everything' behavior."
+    },
+    "show_trip_count": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_description": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_image": {
+      "type": "boolean",
+      "default": true
     }
   },
   "supports": {

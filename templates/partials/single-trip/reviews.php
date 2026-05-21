@@ -79,7 +79,10 @@ if (!defined('ABSPATH')) {
                             <?php endif; endfor; ?>
                     </div>
                     <p class="yatra-reviews-based-on">
-                        <?php echo esc_html(sprintf(_n('based on %s review', 'based on %s reviews', $total_reviews, 'yatra'), number_format($total_reviews))); ?>
+                        <?php
+                        /* translators: %s: formatted total number of reviews. */
+                        echo esc_html(sprintf(_n('based on %s review', 'based on %s reviews', $total_reviews, 'yatra'), number_format($total_reviews)));
+                        ?>
                     </p>
                 </div>
 
@@ -224,7 +227,10 @@ if (!defined('ABSPATH')) {
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    <p><?php echo esc_html(sprintf(__('You can edit your review for %s more.', 'yatra'), $edit_time_remaining)); ?></p>
+                    <p><?php
+                        /* translators: %s: remaining edit time (e.g. "12 minutes"). */
+                        echo esc_html(sprintf(__('You can edit your review for %s more.', 'yatra'), $edit_time_remaining));
+                    ?></p>
                 </div>
             <?php else: ?>
                 <h3 class="yatra-review-form-title"><?php echo esc_html__('Write a Review', 'yatra'); ?></h3>
@@ -268,7 +274,10 @@ if (!defined('ABSPATH')) {
                             <?php endfor; ?>
                         </div>
                         <?php if ($minimum_rating > 1): ?>
-                            <p class="yatra-field-hint"><?php echo esc_html(sprintf(__('Minimum rating: %d star(s)', 'yatra'), $minimum_rating)); ?></p>
+                            <p class="yatra-field-hint"><?php
+                                /* translators: %d: minimum allowed star rating. */
+                                echo esc_html(sprintf(__('Minimum rating: %d star(s)', 'yatra'), $minimum_rating));
+                            ?></p>
                         <?php endif; ?>
                     </div>
 

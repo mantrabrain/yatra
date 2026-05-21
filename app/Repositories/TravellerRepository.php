@@ -801,7 +801,11 @@ class TravellerRepository
         return [
             'success' => true,
             'deleted' => $deletedCount,
-            'message' => sprintf(_n('%d traveler deleted.', '%d travelers deleted.', $deletedCount, 'yatra'), $deletedCount),
+            'message' => sprintf(
+                /* translators: %d: number of travelers deleted. */
+                _n('%d traveler deleted.', '%d travelers deleted.', $deletedCount, 'yatra'),
+                $deletedCount
+            ),
         ];
     }
 }

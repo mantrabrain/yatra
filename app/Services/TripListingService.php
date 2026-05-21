@@ -372,25 +372,34 @@ class TripListingService extends BaseService
         
         // Get filtered trips from repository
         $tripResult = $this->tripRepository->findWithFilters($filters, $page, $perPage);
-        
-        // Load reviews for each trip (same approach as SingleTripController)
-        $tripsWithReviews = [];
+
+        // average_rating + review_count are aggregated in the listing
+        // SQL ({@see TripRepository::findWithFilters()} — `AVG(r.rating)`
+        // / `COUNT(DISTINCT r.id)` over the LEFT-JOINed approved-reviews
+        // rows), so the listing card has everything it needs to render
+        // the star block without an extra round-trip per trip.
+        //
+        // A previous version called `findApprovedByTripId(LIMIT 10)`
+        // here for every displayed trip — an N+1 with a JOIN to
+        // wp_users — and recomputed the average from the truncated
+        // list. That was both slow and *less accurate* than the SQL
+        // aggregate (capped at 10 reviews per trip). Drop it.
+        //
+        // `reviews` stays present-but-empty for templates that probe
+        // the property defensively (`is_array($trip->reviews)`).
         foreach ($tripResult['trips'] as $trip) {
-            // Load reviews for this trip
-            $trip->reviews = $this->getReviewsForTrip((int) $trip->id);
-            
-            // Calculate rating stats (same as SingleTripController)
-            $trip->average_rating = $this->calculateAverageRating($trip->reviews);
-            $trip->review_count = count($trip->reviews);
-            
-            $tripsWithReviews[] = $trip;
+            if (!isset($trip->reviews)) {
+                $trip->reviews = [];
+            }
+            $trip->review_count = (int) ($trip->review_count ?? 0);
+            $trip->average_rating = (float) ($trip->average_rating ?? 0);
         }
-        
+
         // Get filter options for UI (cached separately)
         $filterOptions = $this->getFilterOptions();
-        
+
         return [
-            'trips' => $tripsWithReviews,
+            'trips' => $tripResult['trips'],
             'total' => $tripResult['total'],
             'pages' => $tripResult['pages'],
             'page' => $tripResult['page'],
@@ -541,22 +550,20 @@ class TripListingService extends BaseService
         $filters = [$taxonomyType => $slug];
 
         $result = $this->tripRepository->findWithFilters($filters, 1, $limit);
-        
-        // Load reviews for each trip (same approach as getFilteredTrips)
-        $tripsWithReviews = [];
+
+        // Rating + count come from the listing SQL aggregate; see
+        // {@see self::buildTripListingResult()} for why we don't reload
+        // approved reviews per trip here (was an N+1).
         foreach ($result['trips'] as $trip) {
-            // Load reviews for this trip
-            $trip->reviews = $this->getReviewsForTrip((int) $trip->id);
-            
-            // Calculate rating stats (same as SingleTripController)
-            $trip->average_rating = $this->calculateAverageRating($trip->reviews);
-            $trip->review_count = count($trip->reviews);
-            
-            $tripsWithReviews[] = $trip;
+            if (!isset($trip->reviews)) {
+                $trip->reviews = [];
+            }
+            $trip->review_count = (int) ($trip->review_count ?? 0);
+            $trip->average_rating = (float) ($trip->average_rating ?? 0);
         }
-        
+
         return [
-            'trips' => $tripsWithReviews,
+            'trips' => $result['trips'],
             'total' => $result['total']
         ];
     }

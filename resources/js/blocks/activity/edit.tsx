@@ -21,6 +21,10 @@ interface ActivityBlockAttributes {
   activityIds: number[];
   activity_ids?: string;
   activity?: string;
+  show_trip_count: boolean;
+  show_description: boolean;
+  show_image: boolean;
+  hide_empty: boolean;
 }
 
 interface EditProps {
@@ -118,6 +122,41 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             )}
             value={activityIds}
             onChange={(ids) => setAttributes({ activityIds: ids })}
+          />
+        </PanelBody>
+
+        <PanelBody title={__("Display options", "yatra")} initialOpen={false}>
+          <ToggleControl
+            label={__("Show trip count", "yatra")}
+            checked={attributes.show_trip_count}
+            onChange={(value: boolean) =>
+              setAttributes({ show_trip_count: value })
+            }
+          />
+          <ToggleControl
+            label={__("Show description", "yatra")}
+            checked={attributes.show_description}
+            onChange={(value: boolean) =>
+              setAttributes({ show_description: value })
+            }
+          />
+          <ToggleControl
+            label={__("Show image", "yatra")}
+            checked={attributes.show_image}
+            onChange={(value: boolean) =>
+              setAttributes({ show_image: value })
+            }
+          />
+          <ToggleControl
+            label={__("Hide empty activities", "yatra")}
+            help={__(
+              "Skip activities that have no published trips assigned. Off by default — turn on for a tighter live catalog, leave off for editorial / onboarding views.",
+              "yatra",
+            )}
+            checked={attributes.hide_empty}
+            onChange={(value: boolean) =>
+              setAttributes({ hide_empty: value })
+            }
           />
         </PanelBody>
       </InspectorControls>

@@ -248,6 +248,17 @@ const Bookings: React.FC = () => {
           "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
         label: __("Pending"),
       },
+      // Guest-checkout holding state: row exists but the customer hasn't
+      // clicked the email-verification link yet, so the booking-created
+      // fan-out (admin notify + customer confirmation) is deferred.
+      // Visually amber-on-amber so it reads as "waiting on something
+      // outside our control" — distinct from the regular yellow "pending"
+      // (which means waiting on the operator).
+      pending_verification: {
+        className:
+          "bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-300 border border-amber-200 dark:border-amber-800",
+        label: __("Awaiting email verification"),
+      },
       cancelled: {
         className:
           "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",

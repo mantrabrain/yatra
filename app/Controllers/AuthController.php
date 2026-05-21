@@ -530,25 +530,36 @@ class AuthController
         
         $stored_token = get_user_meta($user_id, 'yatra_verification_token', true);
         $token_expiry = get_user_meta($user_id, 'yatra_verification_token_expiry', true);
-        
+
+        // Idempotent path: the token+expiry are deleted as soon as a successful
+        // verification completes (see below), so a second click on the same
+        // link previously fell into the "Invalid or expired" branch and made
+        // already-verified customers believe their account was broken. Detect
+        // the prior-success state explicitly and reuse the success page so the
+        // outcome is clear regardless of how many times the link is clicked.
+        $already_verified = get_user_meta($user_id, 'yatra_email_verified', true) === '1';
+        if ($already_verified) {
+            self::showVerificationSuccess(true);
+            return;
+        }
+
         if (empty($stored_token) || $stored_token !== $token) {
             self::showVerificationError(__('Invalid or expired verification link.', 'yatra'));
             return;
         }
-        
+
         if ($token_expiry && time() > (int) $token_expiry) {
             self::showVerificationError(__('This verification link has expired. Please register again.', 'yatra'));
             return;
         }
-        
+
         // Mark as verified
         update_user_meta($user_id, 'yatra_email_verified', '1');
         delete_user_meta($user_id, 'yatra_verification_token');
         delete_user_meta($user_id, 'yatra_verification_token_expiry');
-        
-        $redirect_url = add_query_arg(['email_verified' => '1'], yatra_get_checkout_url());
-        wp_safe_redirect($redirect_url);
-        exit;
+
+        self::showVerificationSuccess(false);
+        return;
     }
 
     /**
@@ -579,7 +590,7 @@ class AuthController
 
         $expiryNoticeHtml = esc_html(
             sprintf(
-                /* translators: %d: hours until expiry */
+                /* translators: %d: hours until link expiry */
                 __('This verification link expires in %d hours for your security.', 'yatra'),
                 24
             )
@@ -591,6 +602,7 @@ class AuthController
             [
                 'customer_first_name' => $first_name,
                 'customer_name' => $first_name,
+                'customer_email' => $email,
                 'verification_link' => $verificationUrl,
                 'intro_paragraph' => $introParagraph,
                 'footer_note' => $footerNote,
@@ -600,19 +612,79 @@ class AuthController
     }
 
     /**
-     * Show verification error page
+     * Show verification error page (hard-fail dead-end with a route back home).
+     * Every string is translatable — operators run Yatra in many locales and
+     * the pre-3.0.5 hardcoded "Verification Failed" heading was untranslatable.
      */
     private static function showVerificationError(string $message): void
     {
+        $heading = esc_html__('Verification Failed', 'yatra');
+        $cta = esc_html__('Go to Homepage', 'yatra');
+
         wp_die(
             '<div style="text-align: center; padding: 50px; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif;">
-                <h1 style="color: #dc2626; margin-bottom: 20px;">Verification Failed</h1>
+                <h1 style="color: #dc2626; margin-bottom: 20px;">' . $heading . '</h1>
                 <p style="color: #4b5563; font-size: 16px; margin-bottom: 30px;">' . esc_html($message) . '</p>
-                <a href="' . esc_url(home_url()) . '" style="display: inline-block; background: #3b82f6; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">Go to Homepage</a>
+                <a href="' . esc_url(home_url()) . '" style="display: inline-block; background: #3b82f6; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">' . $cta . '</a>
             </div>',
             __('Verification Failed', 'yatra'),
             ['response' => 400]
         );
+    }
+
+    /**
+     * Render an unambiguous "email verified" confirmation page.
+     *
+     * The pre-3.0.5 flow silently 302-redirected to the checkout URL with a
+     * `?email_verified=1` flag, relying on `booking-auth.php` to surface a
+     * one-liner notice. That notice only renders when the auth form itself
+     * renders (no booking session / logged-in user → notice never shown), so
+     * customers regularly saw "nothing happened" after clicking the link.
+     *
+     * Now we render a dedicated success page with explicit confirmation, the
+     * verified email-state, and a primary CTA back into the booking flow.
+     * Idempotent: a second click on the same link reaches `$already=true`
+     * and shows "Your email is already verified" instead of the misleading
+     * "Invalid or expired link" error.
+     *
+     * @param bool $already True when the user has already been verified by an
+     *                      earlier click on the same link (idempotent path).
+     */
+    private static function showVerificationSuccess(bool $already): void
+    {
+        $checkoutUrl = function_exists('yatra_get_checkout_url')
+            ? yatra_get_checkout_url()
+            : home_url('/');
+        $continueUrl = add_query_arg(['email_verified' => '1'], $checkoutUrl);
+
+        $heading = $already
+            ? esc_html__('Email Already Verified', 'yatra')
+            : esc_html__('Email Verified', 'yatra');
+        $message = $already
+            ? esc_html__('Your email address is already verified — no further action is needed. You can continue with your booking.', 'yatra')
+            : esc_html__('Your email address has been verified successfully. You can now log in and continue with your booking.', 'yatra');
+        $cta = esc_html__('Continue to Checkout', 'yatra');
+        $homeCta = esc_html__('Go to Homepage', 'yatra');
+        $title = $already
+            ? __('Email Already Verified', 'yatra')
+            : __('Email Verified', 'yatra');
+
+        // Inline-only styling so the page renders correctly regardless of
+        // theme stylesheet load order (wp_die() can fire before themes
+        // enqueue their styles).
+        $body = '<div style="text-align: center; padding: 50px 20px; max-width: 520px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif;">'
+            . '<div style="display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 50%; background: #d1fae5; margin: 0 auto 24px;">'
+            . '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+            . '<polyline points="20 6 9 17 4 12"></polyline>'
+            . '</svg>'
+            . '</div>'
+            . '<h1 style="color: #065f46; margin: 0 0 12px; font-size: 26px;">' . $heading . '</h1>'
+            . '<p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 28px;">' . $message . '</p>'
+            . '<a href="' . esc_url($continueUrl) . '" style="display: inline-block; background: #059669; color: #fff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-right: 8px;">' . $cta . '</a>'
+            . '<a href="' . esc_url(home_url()) . '" style="display: inline-block; color: #4b5563; padding: 12px 16px; text-decoration: none; font-weight: 500;">' . $homeCta . '</a>'
+            . '</div>';
+
+        wp_die($body, $title, ['response' => 200]);
     }
 
     /**

@@ -3,7 +3,6 @@ import {
   User,
   PenSquare,
   ShieldCheck,
-  Mail,
   Heart,
   CheckCircle,
   XCircle,
@@ -394,56 +393,15 @@ const Profile: React.FC<ProfileProps> = ({
         )}
       </div>
 
-      {/* Additional Sections */}
-      <div className="yatra-profile-sections grid gap-6 lg:grid-cols-2">
-        <div className="yatra-profile-communication bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
-          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <Mail className="w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" />
-            {__("Communication Preferences", "yatra")}
-          </h3>
-          <div className="yatra-profile-preferences space-y-3 text-sm">
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                defaultChecked
-                className="w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
-              />
-              <span className="text-gray-700 dark:text-gray-300">
-                {__("Booking reminders", "yatra")}
-              </span>
-            </label>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                defaultChecked
-                className="w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
-              />
-              <span className="text-gray-700 dark:text-gray-300">
-                {__("Payment notifications", "yatra")}
-              </span>
-            </label>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                className="w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
-              />
-              <span className="text-gray-700 dark:text-gray-300">
-                {__("Promotional offers", "yatra")}
-              </span>
-            </label>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                defaultChecked
-                className="w-4 h-4 rounded text-yatra-primary focus:ring-yatra-primary"
-              />
-              <span className="text-gray-700 dark:text-gray-300">
-                {__("Trip updates", "yatra")}
-              </span>
-            </label>
-          </div>
-        </div>
-
+      {/* Additional Sections.
+          Communication Preferences card was removed: it shipped as four
+          checkboxes with `defaultChecked` and no onChange / no save
+          handler / no API persistence — purely decorative. Showing
+          fake toggles is worse than not shipping the feature because
+          customers expect a "Save" round-trip and refresh-revert.
+          Re-introduce only when there's a real preferences endpoint
+          + service-side honouring (suppress emails when toggled off). */}
+      <div className="yatra-profile-sections grid gap-6 lg:grid-cols-1">
         {wishlistEnabled && (
           <div className="yatra-profile-saved-trips bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
             <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">

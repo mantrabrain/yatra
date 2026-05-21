@@ -241,12 +241,13 @@ class YatraStripe {
         if (this.supportsPaymentRequest) {
             const requestWrapper = document.createElement('div');
             requestWrapper.className = 'yatra-stripe-payment-request-wrapper';
-            const walletNote = window.yatraTranslations?.stripeWalletNote || 'Pay instantly with Apple Pay or Google Pay.';
+            const walletNote = window.yatraTranslations?.stripeWalletNote || __('Pay instantly with Apple Pay or Google Pay.', 'yatra');
+            const walletTitle = __('Apple Pay & Google Pay', 'yatra');
             requestWrapper.innerHTML = `
                 <div class="yatra-wallet-header">
                     <div>
                         <p class="yatra-wallet-eyebrow">${__('One-tap checkout', 'yatra')}</p>
-                        <h4 class="yatra-wallet-title">Apple Pay & Google Pay</h4>
+                        <h4 class="yatra-wallet-title">${walletTitle}</h4>
                     </div>
                     <div class="yatra-wallet-badges">
                         <span class="wallet-badge wallet-badge--apple"> Pay</span>
@@ -412,7 +413,7 @@ class YatraStripe {
 
         if (!this.stripe || !this.cardElement) {
             this.initializeStripe();
-            this.displayError('Stripe is still loading. Please wait a moment and try again.');
+            this.displayError(__('Stripe is still loading. Please wait a moment and try again.', 'yatra'));
             return false;
         }
 
@@ -451,11 +452,11 @@ class YatraStripe {
                 });
                 window.location.href = this.buildConfirmationUrlFromBookingInfo(bookingInfo);
             } else {
-                throw new Error('Payment processing was not completed. Please check your payment details and try again.');
+                throw new Error(__('Payment processing was not completed. Please check your payment details and try again.', 'yatra'));
             }
         } catch (error) {
             console.error('Stripe payment error:', error);
-            this.displayError(error.message || 'Payment failed. Please try again or use another payment method.');
+            this.displayError(error.message || __('Payment failed. Please try again or use another payment method.', 'yatra'));
             this.setLoadingState(false);
         }
 
@@ -887,7 +888,7 @@ class YatraStripe {
             if (event && typeof event.complete === 'function') {
                 event.complete('fail');
             }
-            this.displayError(error.message || 'Payment failed. Please try again or use another payment method.');
+            this.displayError(error.message || __('Payment failed. Please try again or use another payment method.', 'yatra'));
             this.setLoadingState(false);
         }
     }
@@ -920,7 +921,7 @@ class YatraStripe {
                     .join(' ') || bookingData.full_name;
 
             if (!customerEmail) {
-                throw new Error('Email address is required.');
+                throw new Error(__('Email address is required.', 'yatra'));
             }
 
             const billingDetails = this.getBillingDetails(bookingData, formElement);
@@ -940,7 +941,7 @@ class YatraStripe {
                 .join(' ') || bookingData.full_name;
 
         if (!customerEmail) {
-            throw new Error('Email address is required.');
+            throw new Error(__('Email address is required.', 'yatra'));
         }
 
         const paymentIntentResponse = await fetch(`${this.apiUrl}/payment/create-intent`, {
@@ -1108,7 +1109,10 @@ class YatraStripe {
 
         if (isLoading) {
             this.submitButton.disabled = true;
-            this.submitButton.innerHTML = '<span class="yatra-spinner"></span> Processing Payment...';
+            // Spinner markup is fixed; only the user-visible text is
+            // wrapped so it ends up in the .pot with a clean msgid.
+            this.submitButton.innerHTML =
+                '<span class="yatra-spinner"></span> ' + __('Processing Payment...', 'yatra');
         } else {
             this.submitButton.disabled = false;
             this.submitButton.innerHTML = this.originalButtonHtml;

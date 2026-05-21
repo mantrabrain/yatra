@@ -69,6 +69,7 @@ export const formatTravelDateRange = (
     return formatDate(travelDate);
   }
   return sprintf(
+    // translators: 1: start date, 2: end date. Joined with an en-dash for travel date ranges.
     __("%1$s – %2$s", "yatra"),
     formatDate(travelDate),
     formatDate(endDate),

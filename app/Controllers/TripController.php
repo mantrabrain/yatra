@@ -2184,18 +2184,21 @@ class TripController extends BaseController
         if ($dynamic_pricing_enabled && $B > $eps && $F > $B + $eps) {
             $p = (int) round((($F - $B) / $B) * 100);
 
+            /* translators: %d: dynamic pricing increase percentage. */
             return $p > 0 ? sprintf(__('+%d%%', 'yatra'), $p) : '';
         }
 
         if ($O > $eps && $F < $O - $eps) {
             $p = (int) round((($O - $F) / $O) * 100);
 
+            /* translators: %d: discount percentage. */
             return $p > 0 ? sprintf(__('%d%% OFF', 'yatra'), $p) : '';
         }
 
         if ($O <= $eps && $B > $eps && $F < $B - $eps) {
             $p = (int) round((($B - $F) / $B) * 100);
 
+            /* translators: %d: discount percentage. */
             return $p > 0 ? sprintf(__('%d%% OFF', 'yatra'), $p) : '';
         }
 

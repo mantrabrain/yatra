@@ -30,6 +30,17 @@ class TransactionalEmailTemplateService
     /** Customer account email verification (e.g. checkout registration). */
     public const TYPE_CUSTOMER_EMAIL_VERIFICATION = 'customer_email_verification';
 
+    /**
+     * Guest-checkout email verification — sent BEFORE payment when
+     * `require_guest_email_verification` is on. The booking is held
+     * in `pending_verification` status until the customer clicks the
+     * magic link. Distinct from `customer_email_verification` because
+     * (a) the recipient is not a registered user, and (b) the link
+     * resumes the in-flight booking flow rather than completing
+     * account registration.
+     */
+    public const TYPE_GUEST_EMAIL_VERIFICATION = 'guest_email_verification';
+
     public const TYPE_BOOKING_COMPLETED = 'booking_completed';
 
     public const TYPE_BOOKING_EXPIRED_CUSTOMER = 'booking_expired_customer';
@@ -72,6 +83,7 @@ class TransactionalEmailTemplateService
             'admin_booking_cancelled' => self::TYPE_ADMIN_BOOKING_CANCELLED,
             'trip_consent_request' => self::TYPE_TRIP_CONSENT_REQUEST,
             'customer_email_verification' => self::TYPE_CUSTOMER_EMAIL_VERIFICATION,
+            'guest_email_verification' => self::TYPE_GUEST_EMAIL_VERIFICATION,
             'booking_completed' => self::TYPE_BOOKING_COMPLETED,
             'booking_expired_customer' => self::TYPE_BOOKING_EXPIRED_CUSTOMER,
             'admin_booking_expired' => self::TYPE_ADMIN_BOOKING_EXPIRED,
@@ -205,6 +217,11 @@ class TransactionalEmailTemplateService
                 'flag' => 'email_template_customer_verification',
                 'subject' => 'email_tpl_customer_verification_subject',
                 'body' => 'email_tpl_customer_verification_body',
+            ],
+            self::TYPE_GUEST_EMAIL_VERIFICATION => [
+                'flag' => 'email_template_guest_verification',
+                'subject' => 'email_tpl_guest_verification_subject',
+                'body' => 'email_tpl_guest_verification_body',
             ],
             self::TYPE_BOOKING_COMPLETED => [
                 'flag' => 'email_template_booking_completed',
@@ -394,6 +411,7 @@ class TransactionalEmailTemplateService
                 $variables['details_html'] = self::fallbackBookingDetailsHtml($variables);
             }
             if (!isset($variables['footer_note']) || trim($variables['footer_note']) === '') {
+                /* translators: %s: site name. */
                 $variables['footer_note'] = sprintf(__('— %s', 'yatra'), get_bloginfo('name'));
             }
         }
@@ -493,81 +511,111 @@ class TransactionalEmailTemplateService
 
         switch ($type) {
             case self::TYPE_BOOKING_CONFIRMATION:
-                return sprintf(__('✈️ [%s] Booking update · %s', 'yatra'), $site, $ref);
+                /* translators: 1: site name, 2: booking reference. */
+                return sprintf(__('✈️ [%1$s] Booking update · %2$s', 'yatra'), $site, $ref);
 
             case self::TYPE_PAYMENT_CONFIRMATION:
-                return sprintf(__('✅ [%s] Payment received · %s', 'yatra'), $site, $ref);
+                /* translators: 1: site name, 2: booking reference. */
+                return sprintf(__('✅ [%1$s] Payment received · %2$s', 'yatra'), $site, $ref);
 
             case self::TYPE_BOOKING_CANCELLATION:
-                return sprintf(__('📋 [%s] Booking cancelled · %s', 'yatra'), $site, $ref);
+                /* translators: 1: site name, 2: booking reference. */
+                return sprintf(__('📋 [%1$s] Booking cancelled · %2$s', 'yatra'), $site, $ref);
 
             case self::TYPE_BOOKING_REMINDER:
-                return sprintf(__('🗓️ [%s] Your trip is coming up · %s', 'yatra'), $site, $ref);
+                /* translators: 1: site name, 2: booking reference. */
+                return sprintf(__('🗓️ [%1$s] Your trip is coming up · %2$s', 'yatra'), $site, $ref);
 
             case self::TYPE_ADMIN_NEW_BOOKING:
-                return sprintf(__('🔔 [%s] New booking · %s (#%s)', 'yatra'), $site, $ref, $v['booking_id'] ?? '');
+                /* translators: 1: site name, 2: booking reference, 3: booking ID. */
+                return sprintf(__('🔔 [%1$s] New booking · %2$s (#%3$s)', 'yatra'), $site, $ref, $v['booking_id'] ?? '');
 
             case self::TYPE_ADMIN_PAYMENT_RECEIVED:
-                return sprintf(__('✅ [%s] Payment received · %s (#%s)', 'yatra'), $site, $ref, $v['booking_id'] ?? '');
+                /* translators: 1: site name, 2: booking reference, 3: booking ID. */
+                return sprintf(__('✅ [%1$s] Payment received · %2$s (#%3$s)', 'yatra'), $site, $ref, $v['booking_id'] ?? '');
 
             case self::TYPE_ADMIN_BOOKING_CANCELLED:
-                return sprintf(__('📋 [%s] Booking cancelled · %s (#%s)', 'yatra'), $site, $ref, $v['booking_id'] ?? '');
+                /* translators: 1: site name, 2: booking reference, 3: booking ID. */
+                return sprintf(__('📋 [%1$s] Booking cancelled · %2$s (#%3$s)', 'yatra'), $site, $ref, $v['booking_id'] ?? '');
 
             case self::TYPE_TRIP_CONSENT_REQUEST:
                 $formName = $v['form_name'] ?? __('consent form', 'yatra');
 
-                return sprintf(__('📝 [%s] Action required · %s', 'yatra'), $site, $formName);
+                /* translators: 1: site name, 2: consent form name. */
+                return sprintf(__('📝 [%1$s] Action required · %2$s', 'yatra'), $site, $formName);
 
             case self::TYPE_CUSTOMER_EMAIL_VERIFICATION:
+                /* translators: %s: site name. */
                 return sprintf(__('✉️ [%s] Verify your email address', 'yatra'), $site);
 
+            case self::TYPE_GUEST_EMAIL_VERIFICATION:
+                // Distinct subject so customers can tell apart "verify
+                // your account" from "verify to complete your booking".
+                /* translators: %s: site name. */
+                return sprintf(__('✉️ [%s] Verify your email to complete your booking', 'yatra'), $site);
+
             case self::TYPE_BOOKING_COMPLETED:
-                return sprintf(__('🌟 [%s] Trip complete · %s', 'yatra'), $site, $ref);
+                /* translators: 1: site name, 2: booking reference. */
+                return sprintf(__('🌟 [%1$s] Trip complete · %2$s', 'yatra'), $site, $ref);
 
             case self::TYPE_BOOKING_EXPIRED_CUSTOMER:
-                return sprintf(__('⏱️ [%s] Booking expired · %s', 'yatra'), $site, $ref);
+                /* translators: 1: site name, 2: booking reference. */
+                return sprintf(__('⏱️ [%1$s] Booking expired · %2$s', 'yatra'), $site, $ref);
 
             case self::TYPE_ADMIN_BOOKING_EXPIRED:
-                return sprintf(__('⏱️ [%s] Booking expired · %s (#%s)', 'yatra'), $site, $ref, $v['booking_id'] ?? '');
+                /* translators: 1: site name, 2: booking reference, 3: booking ID. */
+                return sprintf(__('⏱️ [%1$s] Booking expired · %2$s (#%3$s)', 'yatra'), $site, $ref, $v['booking_id'] ?? '');
 
             case self::TYPE_SCHEDULED_PAYMENT_REMINDER:
-                return sprintf(__('💳 [%s] Upcoming payment · %s', 'yatra'), $site, $ref);
+                /* translators: 1: site name, 2: booking reference. */
+                return sprintf(__('💳 [%1$s] Upcoming payment · %2$s', 'yatra'), $site, $ref);
 
             case self::TYPE_SCHEDULED_PAYMENT_SUCCEEDED:
-                return sprintf(__('✅ [%s] Scheduled payment received · %s', 'yatra'), $site, $ref);
+                /* translators: 1: site name, 2: booking reference. */
+                return sprintf(__('✅ [%1$s] Scheduled payment received · %2$s', 'yatra'), $site, $ref);
 
             case self::TYPE_SCHEDULED_PAYMENT_FAILED:
-                return sprintf(__('⚠️ [%s] Payment issue · %s', 'yatra'), $site, $ref);
+                /* translators: 1: site name, 2: booking reference. */
+                return sprintf(__('⚠️ [%1$s] Payment issue · %2$s', 'yatra'), $site, $ref);
 
             case self::TYPE_ADMIN_SCHEDULED_PAYMENT_FAILED:
-                return sprintf(__('⚠️ [%s] Scheduled payment failed · %s', 'yatra'), $site, $ref);
+                /* translators: 1: site name, 2: booking reference. */
+                return sprintf(__('⚠️ [%1$s] Scheduled payment failed · %2$s', 'yatra'), $site, $ref);
 
             case self::TYPE_ENQUIRY_ADMIN:
                 $who = $v['customer_name'] ?? __('Customer', 'yatra');
 
-                return sprintf(__('💬 [%s] New enquiry · %s', 'yatra'), $site, $who);
+                /* translators: 1: site name, 2: customer name. */
+                return sprintf(__('💬 [%1$s] New enquiry · %2$s', 'yatra'), $site, $who);
 
             case self::TYPE_ENQUIRY_CUSTOMER_RECEIVED:
+                /* translators: %s: site name. */
                 return sprintf(__('✉️ [%s] We received your message', 'yatra'), $site);
 
             case self::TYPE_ENQUIRY_CUSTOMER_RESPONSE:
+                /* translators: %s: site name. */
                 return sprintf(__('💬 [%s] Re: your enquiry', 'yatra'), $site);
 
             case self::TYPE_REVIEW_REQUEST:
                 $trip = $v['trip_name'] ?? __('your trip', 'yatra');
 
-                return sprintf(__('⭐ [%s] How was %s?', 'yatra'), $site, $trip);
+                /* translators: 1: site name, 2: trip name. */
+                return sprintf(__('⭐ [%1$s] How was %2$s?', 'yatra'), $site, $trip);
 
             case self::TYPE_ABANDONED_BOOKING_RECOVERY_FIRST:
+                /* translators: %s: site name. */
                 return sprintf(__('🛒 [%s] Complete your booking', 'yatra'), $site);
 
             case self::TYPE_ABANDONED_BOOKING_RECOVERY_SECOND:
+                /* translators: %s: site name. */
                 return sprintf(__('⏳ [%s] Still interested? Your booking is waiting', 'yatra'), $site);
 
             case self::TYPE_ABANDONED_BOOKING_RECOVERY_FINAL:
+                /* translators: %s: site name. */
                 return sprintf(__('⚠️ [%s] Final reminder: complete your booking', 'yatra'), $site);
 
             default:
+                /* translators: %s: site name. */
                 return sprintf(__('✉️ [%s] Notification', 'yatra'), $site);
         }
     }
@@ -603,6 +651,16 @@ class TransactionalEmailTemplateService
                 return EmailTemplateDefaults::fallbackTransactionalTripConsent($v);
 
             case self::TYPE_CUSTOMER_EMAIL_VERIFICATION:
+                return EmailTemplateDefaults::fallbackTransactionalCustomerEmailVerification($v);
+
+            case self::TYPE_GUEST_EMAIL_VERIFICATION:
+                // Reuse the customer-verification body. The flow is
+                // similar — click a magic link to prove ownership of
+                // the address — and operators that have already
+                // customised the customer-verification copy get a
+                // consistent look across both. Differentiating copy is
+                // injected at call-time via the intro_paragraph /
+                // footer_note merge tags by the booking handler.
                 return EmailTemplateDefaults::fallbackTransactionalCustomerEmailVerification($v);
 
             case self::TYPE_BOOKING_COMPLETED:
@@ -677,6 +735,7 @@ class TransactionalEmailTemplateService
             ? date_i18n(get_option('date_format'), strtotime((string) $booking->travel_date))
             : '';
 
+        $bookingId = (int) ($booking->id ?? 0);
         $base = [
             'customer_name' => trim((string) (($booking->contact_first_name ?? '') . ' ' . ($booking->contact_last_name ?? ''))),
             'customer_first_name' => (string) ($booking->contact_first_name ?? ''),
@@ -684,7 +743,8 @@ class TransactionalEmailTemplateService
             'customer_email' => (string) ($booking->contact_email ?? ''),
             'customer_phone' => (string) ($booking->contact_phone ?? ''),
             'booking_reference' => (string) ($booking->reference ?? ''),
-            'booking_id' => (string) (int) ($booking->id ?? 0),
+            'booking_id' => (string) $bookingId,
+            'booking_url' => $bookingId > 0 ? home_url('/my-account/bookings/' . $bookingId) : home_url('/'),
             'trip_name' => (string) ($booking->trip_title ?? ''),
             'trip_url' => !empty($booking->trip_slug)
                 ? home_url('/' . SettingsService::getTripBase() . '/' . rawurlencode((string) $booking->trip_slug) . '/')
@@ -693,6 +753,20 @@ class TransactionalEmailTemplateService
             'travelers_count' => (string) (int) ($booking->travelers_count ?? 0),
             'total_amount_formatted' => yatra_format_price((float) ($booking->total_amount ?? 0)),
             'amount_due_formatted' => yatra_format_price((float) ($booking->amount_due ?? 0)),
+            // Aliases for the legacy / customer-customised template
+            // syntax: many templates (including ones edited via Settings
+            // → Email Templates) reference `{{total_amount}}` and
+            // `{{balance_due}}` directly rather than the
+            // `_formatted` variants. Without these aliases the
+            // placeholders survived unsubstituted into the rendered
+            // email body. Aliases use the same formatted-with-currency
+            // value as the canonical keys above so templates remain
+            // visually consistent regardless of which name is used.
+            'total_amount' => yatra_format_price((float) ($booking->total_amount ?? 0)),
+            'balance_due' => yatra_format_price((float) ($booking->amount_due ?? 0)),
+            'amount_due' => yatra_format_price((float) ($booking->amount_due ?? 0)),
+            'amount_paid' => yatra_format_price((float) ($booking->amount_paid ?? 0)),
+            'amount_paid_formatted' => yatra_format_price((float) ($booking->amount_paid ?? 0)),
             'currency' => $currency,
             'booking_status' => (string) ($booking->status ?? ''),
             'payment_status' => (string) ($booking->payment_status ?? ''),
@@ -742,16 +816,35 @@ class TransactionalEmailTemplateService
             ? home_url('/' . SettingsService::getTripBase() . '/' . rawurlencode($tripSlug) . '/')
             : home_url('/');
 
-        return [
+        $created = (string) ($enquiry->created_at ?? '');
+        $enquiryDate = $created !== ''
+            ? date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($created) ?: time())
+            : '';
+
+        $vars = [
             'customer_name' => (string) ($enquiry->name ?? ''),
             'customer_email' => (string) ($enquiry->email ?? ''),
             'customer_phone' => (string) ($enquiry->phone ?? ''),
+            'enquiry_id' => (string) (int) ($enquiry->id ?? 0),
+            'enquiry_date' => $enquiryDate,
+            'subject' => (string) ($enquiry->subject ?? ''),
             'trip_name' => $trip !== '' ? $trip : __('General enquiry', 'yatra'),
             'trip_url' => $tripUrl,
             'message' => nl2br(esc_html((string) ($enquiry->message ?? ''))),
-            'response' => $responsePlain !== '' ? nl2br(esc_html($responsePlain)) : '',
-            'response_message' => $responsePlain !== '' ? nl2br(esc_html($responsePlain)) : '',
+            'original_message' => (string) ($enquiry->message ?? ''),
         ];
+
+        // Response-only tags are injected solely on the response email so the
+        // sidebar for `enquiry.created` doesn't surface tags that would render
+        // empty in that context.
+        if ($responsePlain !== '') {
+            $responseHtml = nl2br(esc_html($responsePlain));
+            $vars['response'] = $responseHtml;
+            $vars['response_message'] = $responseHtml;
+            $vars['response_date'] = date_i18n(get_option('date_format') . ' ' . get_option('time_format'));
+        }
+
+        return $vars;
     }
 
     /**

@@ -1512,11 +1512,18 @@ class SingleTripController
                     'excluded' => !empty($entry->excluded_items) ? json_decode($entry->excluded_items, true) : [],
                     'gallery' => !empty($entry->gallery) ? $this->decodeGallery($entry->gallery) : [],
                     'video_url' => $entry->video_url ?: '',
+                    // The admin "Notes / Instructions" textarea ("Additional notes
+                    // or special instructions for this activity") was stored but
+                    // never reached the public template — the array key was
+                    // simply absent. Without this, operators saw their notes
+                    // discarded silently on the live trip page.
+                    'notes' => (string) ($entry->notes ?? ''),
                 ];
             }
 
             $itinerary[] = [
                 'day' => (int) $day->day_number,
+                /* translators: %d: itinerary day number. */
                 'day_title' => $day->title ?: sprintf(__('Day %d', 'yatra'), $day->day_number),
                 'day_description' => $day->description ?: '',
                 'entries' => $formatted_entries,
@@ -1813,10 +1820,13 @@ class SingleTripController
                 $pricing_label = '';
                 if ($is_per_group) {
                     if (!empty($price_type->min_pax) && !empty($price_type->max_pax)) {
-                        $pricing_label = sprintf(__('per group (%d-%d pax)', 'yatra'), $price_type->min_pax, $price_type->max_pax);
+                        /* translators: 1: minimum pax for the group price, 2: maximum pax. */
+                        $pricing_label = sprintf(__('per group (%1$d-%2$d pax)', 'yatra'), $price_type->min_pax, $price_type->max_pax);
                     } elseif (!empty($price_type->max_pax)) {
+                        /* translators: %d: maximum pax for the group price. */
                         $pricing_label = sprintf(__('per group (up to %d pax)', 'yatra'), $price_type->max_pax);
                     } elseif (!empty($price_type->min_pax)) {
+                        /* translators: %d: minimum pax for the group price. */
                         $pricing_label = sprintf(__('per group (%d+ pax)', 'yatra'), $price_type->min_pax);
                     } else {
                         $pricing_label = __('per group', 'yatra');
@@ -1847,10 +1857,13 @@ class SingleTripController
                 $age_max = $price_type->age_max ?? null;
                 if ($age_min !== null || $age_max !== null) {
                     if ($age_min !== null && $age_max !== null) {
-                        $age_info = sprintf(__('(Age %d-%d)', 'yatra'), $age_min, $age_max);
+                        /* translators: 1: minimum age, 2: maximum age. */
+                        $age_info = sprintf(__('(Age %1$d-%2$d)', 'yatra'), $age_min, $age_max);
                     } elseif ($age_min !== null) {
+                        /* translators: %d: minimum age. */
                         $age_info = sprintf(__('(Age %d+)', 'yatra'), $age_min);
                     } else {
+                        /* translators: %d: maximum age. */
                         $age_info = sprintf(__('(Up to age %d)', 'yatra'), $age_max);
                     }
                 }
@@ -1880,10 +1893,12 @@ class SingleTripController
                     'plus_disabled' => false,
                     'minus_attrs' => [
                         'data-target' => $input_id,
+                        /* translators: %s: traveler category label (e.g. "Adult", "Child"). */
                         'aria-label' => sprintf(__('Decrease %s', 'yatra'), $price_type->category_label),
                     ],
                     'plus_attrs' => [
                         'data-target' => $input_id,
+                        /* translators: %s: traveler category label (e.g. "Adult", "Child"). */
                         'aria-label' => sprintf(__('Increase %s', 'yatra'), $price_type->category_label),
                     ],
                     'input_attrs' => [
@@ -2030,7 +2045,8 @@ class SingleTripController
                 $pt_min = isset($pt->age_min) ? (int) $pt->age_min : 0;
                 $pt_max = isset($pt->age_max) ? (int) $pt->age_max : 99;
                 $pt_label = $pt->category_label ?? $pt->label ?? __('Traveler', 'yatra');
-                $pt_age_text = ($pt_min > 0 || $pt_max < 99) ? sprintf(__('(Age %d-%d)', 'yatra'), $pt_min, $pt_max) : '';
+                /* translators: 1: minimum age, 2: maximum age. */
+                $pt_age_text = ($pt_min > 0 || $pt_max < 99) ? sprintf(__('(Age %1$d-%2$d)', 'yatra'), $pt_min, $pt_max) : '';
                 
                 // Use initial traveler count if provided, otherwise use default
                 $pt_category_id = $pt->category_id ?? $pt_index;
@@ -2076,10 +2092,13 @@ class SingleTripController
                 $pricing_label = '';
                 if ($pt_is_per_group) {
                     if (!empty($pt->min_pax) && !empty($pt->max_pax)) {
-                        $pricing_label = sprintf(__('per group (%d-%d pax)', 'yatra'), $pt->min_pax, $pt->max_pax);
+                        /* translators: 1: minimum pax for the group price, 2: maximum pax. */
+                        $pricing_label = sprintf(__('per group (%1$d-%2$d pax)', 'yatra'), $pt->min_pax, $pt->max_pax);
                     } elseif (!empty($pt->max_pax)) {
+                        /* translators: %d: maximum pax for the group price. */
                         $pricing_label = sprintf(__('per group (up to %d pax)', 'yatra'), $pt->max_pax);
                     } elseif (!empty($pt->min_pax)) {
+                        /* translators: %d: minimum pax for the group price. */
                         $pricing_label = sprintf(__('per group (%d+ pax)', 'yatra'), $pt->min_pax);
                     } else {
                         $pricing_label = __('per group', 'yatra');
@@ -2106,10 +2125,12 @@ class SingleTripController
                     'plus_disabled' => false,
                     'minus_attrs' => [
                         'data-target' => 'traveler_' . $pt_category_id . '_' . $item_id,
+                        /* translators: %s: traveler category label (e.g. "Adult", "Child"). */
                         'aria-label' => sprintf(__('Decrease %s', 'yatra'), $pt_label),
                     ],
                     'plus_attrs' => [
                         'data-target' => 'traveler_' . $pt_category_id . '_' . $item_id,
+                        /* translators: %s: traveler category label (e.g. "Adult", "Child"). */
                         'aria-label' => sprintf(__('Increase %s', 'yatra'), $pt_label),
                     ],
                     'input_attrs' => [

@@ -36,7 +36,7 @@ $amountDue = (string) ($amount_due ?? '0.00');
     <style>
         @page { size: A4 portrait; margin: 0mm; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { margin: 0; padding: 0; font-family: "DejaVu Sans", sans-serif; font-size: 12px; color: #111; }
+        body { margin: 0; padding: 0; font-family: "Noto Sans Devanagari", "Noto Sans Arabic", "Noto Sans CJK", "DejaVu Sans", sans-serif; font-size: 12px; color: #111; }
         .content { padding: 12mm 12mm 14mm 12mm; }
 
         .header { width: 100%; border-collapse: collapse; }

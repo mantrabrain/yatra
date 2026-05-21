@@ -229,7 +229,10 @@ $initial_total_price = $display_sale_price;
                             </div>
                             <div class="yatra-card-info-content">
                                 <div class="yatra-card-info-label"><?php esc_html_e('Seats left', 'yatra'); ?></div>
-                                <div class="yatra-card-info-value"><?php echo esc_html(sprintf(_n('%d seat', '%d seats', $seats_available, 'yatra'), $seats_available)); ?></div>
+                                <div class="yatra-card-info-value"><?php
+                                    /* translators: %d: number of seats remaining. */
+                                    echo esc_html(sprintf(_n('%d seat', '%d seats', $seats_available, 'yatra'), $seats_available));
+                                ?></div>
                             </div>
                         </div>
                         
@@ -252,7 +255,8 @@ $initial_total_price = $display_sale_price;
                                     $time_value = $matches[1];
                                     $time_unit = $matches[2];
                                     $cancellation_value = sprintf(
-                                        __('Up to %d %s%s before', 'yatra'),
+                                        /* translators: 1: numeric amount, 2: time unit (hour/day/week), 3: plural "s" suffix if applicable. */
+                                        __('Up to %1$d %2$s%3$s before', 'yatra'),
                                         $time_value,
                                         $time_unit,
                                         $time_value > 1 ? 's' : ''
@@ -354,10 +358,13 @@ $initial_total_price = $display_sale_price;
                             $pt_age_max = isset($pt->age_max) ? (int) $pt->age_max : null;
                             if ($pt_age_min !== null || $pt_age_max !== null) {
                                 if ($pt_age_min !== null && $pt_age_max !== null) {
-                                    $pt_age_text = sprintf(__('(Age %d-%d)', 'yatra'), $pt_age_min, $pt_age_max);
+                                    /* translators: 1: minimum age, 2: maximum age. */
+                                    $pt_age_text = sprintf(__('(Age %1$d-%2$d)', 'yatra'), $pt_age_min, $pt_age_max);
                                 } elseif ($pt_age_min !== null) {
+                                    /* translators: %d: minimum age. */
                                     $pt_age_text = sprintf(__('(Age %d+)', 'yatra'), $pt_age_min);
                                 } else {
+                                    /* translators: %d: maximum age. */
                                     $pt_age_text = sprintf(__('(Up to age %d)', 'yatra'), $pt_age_max);
                                 }
                             }
@@ -366,10 +373,13 @@ $initial_total_price = $display_sale_price;
                             $pricing_label = '';
                             if ($pt_is_per_group) {
                                 if (!empty($pt->min_pax) && !empty($pt->max_pax)) {
-                                    $pricing_label = sprintf(__('per group (%d-%d pax)', 'yatra'), $pt->min_pax, $pt->max_pax);
+                                    /* translators: 1: minimum pax for the group price, 2: maximum pax. */
+                                    $pricing_label = sprintf(__('per group (%1$d-%2$d pax)', 'yatra'), $pt->min_pax, $pt->max_pax);
                                 } elseif (!empty($pt->max_pax)) {
+                                    /* translators: %d: maximum pax for the group price. */
                                     $pricing_label = sprintf(__('per group (up to %d pax)', 'yatra'), $pt->max_pax);
                                 } elseif (!empty($pt->min_pax)) {
+                                    /* translators: %d: minimum pax for the group price. */
                                     $pricing_label = sprintf(__('per group (%d+ pax)', 'yatra'), $pt->min_pax);
                                 } else {
                                     $pricing_label = __('per group', 'yatra');
@@ -404,12 +414,14 @@ $initial_total_price = $display_sale_price;
                                     'data-target' => $input_id,
                                     'data-item' => $item_id,
                                     'data-category' => $pt_category_id,
+                                    /* translators: %s: traveler category label (e.g. "Adult", "Child"). */
                                     'aria-label' => sprintf(__('Decrease %s', 'yatra'), $pt_label),
                                 ],
                                 'plus_attrs' => [
                                     'data-target' => $input_id,
                                     'data-item' => $item_id,
                                     'data-category' => $pt_category_id,
+                                    /* translators: %s: traveler category label (e.g. "Adult", "Child"). */
                                     'aria-label' => sprintf(__('Increase %s', 'yatra'), $pt_label),
                                 ],
                                 'input_attrs' => [

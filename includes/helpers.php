@@ -201,9 +201,11 @@ function yatra_get_review_edit_time_remaining(object $review): string
     $minutes = floor(($seconds_remaining % 3600) / 60);
     
     if ($hours > 0) {
+        /* translators: %d: number of hours remaining. */
         return sprintf(_n('%d hour', '%d hours', $hours, 'yatra'), $hours);
     }
-    
+
+    /* translators: %d: number of minutes remaining. */
     return sprintf(_n('%d minute', '%d minutes', $minutes, 'yatra'), $minutes);
 }
 
@@ -450,11 +452,12 @@ if (!function_exists('yatra_format_duration')) {
     function yatra_format_duration(int $days, ?int $nights = null): string
     {
         if ($days > 0 && $nights !== null && $nights > 0) {
-            /* translators: 1: days count, 2: nights count */
+            /* translators: 1: number of days, 2: number of nights. */
             return sprintf(__('%1$d days / %2$d nights', 'yatra'), $days, $nights);
         }
         if ($days > 0) {
             return sprintf(
+                /* translators: %d: number of days. */
                 _n('%d day', '%d days', $days, 'yatra'),
                 $days
             );

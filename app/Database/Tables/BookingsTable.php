@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `payment_transaction_id` varchar(255) DEFAULT NULL,
     `payment_date` datetime DEFAULT NULL,
     `payment_notes` text,
-    `status` enum('pending','confirmed','processing','completed','cancelled','refunded','failed','on_hold','waitlist') DEFAULT 'pending',
+    `status` enum('pending','pending_verification','confirmed','processing','completed','cancelled','refunded','failed','on_hold','waitlist') DEFAULT 'pending',
     `cancellation_reason` text,
     `cancelled_at` datetime DEFAULT NULL,
     `cancelled_by` bigint(20) UNSIGNED DEFAULT NULL,

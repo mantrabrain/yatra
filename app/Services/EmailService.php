@@ -214,7 +214,11 @@ class EmailService
         } catch (Exception $e) {
             return [
                 'success' => false,
-                'message' => sprintf(__('SMTP connection failed: %s', 'yatra'), $e->getMessage())
+                'message' => sprintf(
+                    /* translators: %s: SMTP error message. */
+                    __('SMTP connection failed: %s', 'yatra'),
+                    $e->getMessage()
+                )
             ];
         }
     }

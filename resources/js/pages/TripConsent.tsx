@@ -28,7 +28,7 @@ import { useToast } from "../components/ui/toast";
 import { Modal } from "../components/ui/modal";
 import { apiClient } from "../lib/api-client";
 import { apiService } from "../lib/api-client";
-import { __ } from "../lib/i18n";
+import { __, sprintf } from "../lib/i18n";
 import PremiumUpgradeCard from "./premium-pages/TripConsent";
 import {
   Plus,
@@ -875,7 +875,12 @@ const SignedConsentsList: React.FC = () => {
                 render: (consent: SignedConsent) => (
                   <div>
                     <div className="text-sm text-gray-900 dark:text-white">
-                      {consent.form_name || `Form #${consent.form_id}`}
+                      {consent.form_name ||
+                        sprintf(
+                          // translators: %d: consent form ID, used as a fallback when the form has no name.
+                          __("Form #%d", "yatra"),
+                          consent.form_id,
+                        )}
                     </div>
                     <div className="text-xs text-gray-500">
                       v{consent.form_version}
@@ -895,7 +900,11 @@ const SignedConsentsList: React.FC = () => {
                         #{consent.booking_id}
                         {consent.traveler_index > 0 && (
                           <span className="ml-1 text-xs text-gray-400">
-                            (Traveler {consent.traveler_index})
+                            {sprintf(
+                              // translators: %d: traveler sequence number within the booking.
+                              __("(Traveler %d)", "yatra"),
+                              consent.traveler_index,
+                            )}
                           </span>
                         )}
                       </>
@@ -931,8 +940,14 @@ const SignedConsentsList: React.FC = () => {
                     }
                   >
                     {consent.status === "signed"
-                      ? __("Signed")
-                      : consent.status}
+                      ? __("Signed", "yatra")
+                      : consent.status === "expired"
+                        ? __("Expired", "yatra")
+                        : consent.status === "revoked"
+                          ? __("Revoked", "yatra")
+                          : consent.status === "pending"
+                            ? __("Pending", "yatra")
+                            : consent.status}
                   </Badge>
                 ),
               },
@@ -1103,8 +1118,8 @@ const SignedConsentsList: React.FC = () => {
                         <span className="text-sm font-medium text-gray-900 dark:text-white">
                           {typeof value === "boolean"
                             ? value
-                              ? "✓ Yes"
-                              : "✗ No"
+                              ? __("✓ Yes", "yatra")
+                              : __("✗ No", "yatra")
                             : String(value)}
                         </span>
                       </div>
@@ -1127,7 +1142,7 @@ const SignedConsentsList: React.FC = () => {
                 <div className="bg-white border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                   <img
                     src={selectedConsent.signature_data}
-                    alt="Signature"
+                    alt={__("Signature", "yatra")}
                     className="max-h-24 mx-auto"
                   />
                 </div>
@@ -1142,7 +1157,7 @@ const SignedConsentsList: React.FC = () => {
                 <div className="bg-white border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                   <img
                     src={selectedConsent.initials_data}
-                    alt="Initials"
+                    alt={__("Initials", "yatra")}
                     className="max-h-16 mx-auto"
                   />
                 </div>

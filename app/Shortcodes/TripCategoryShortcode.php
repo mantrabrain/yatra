@@ -23,7 +23,11 @@ class TripCategoryShortcode extends BaseShortcode
             'show_image' => 'yes',
             'show_pagination' => 'yes',
             'category' => '', // Classification IDs, comma-separated
-            'hide_empty' => 'yes',
+            // hide_empty defaults to 'no' to preserve the historical
+            // behavior (show every category, even ones with zero
+            // trips). Operators that prefer the empty-archive defense
+            // opt in with hide_empty="yes".
+            'hide_empty' => 'no',
             'featured_only' => 'no',
             'title' => 'Trip Categories',
         ]);
@@ -220,9 +224,22 @@ class TripCategoryShortcode extends BaseShortcode
                 ];
             }
 
+            // Filter out trip categories that have no published trips.
+            //
+            // See ActivityShortcode for the full rationale — the
+            // prior implementation only filtered on term-metadata
+            // emptiness (which never actually fires), so empty
+            // categories were rendered with "0 trips" badges and
+            // broken archive links. We now drop any category whose
+            // trip_count (computed above from
+            // TripClassificationsTable JOIN TripsTable WHERE
+            // status=publish) is zero, plus the original sanity
+            // check on name/slug.
             if (($atts['hide_empty'] ?? 'yes') === 'yes') {
                 $categories = array_filter($categories, static function ($row) {
-                    return !empty($row['term']->name) && !empty($row['term']->slug);
+                    return (int) ($row['trip_count'] ?? 0) > 0
+                        && !empty($row['term']->name)
+                        && !empty($row['term']->slug);
                 });
             }
 

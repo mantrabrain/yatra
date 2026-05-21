@@ -130,6 +130,18 @@ if (!defined('ABSPATH')) {
 
                                     <p class="yatra-entry-description"><?php echo esc_html($entry['description']); ?></p>
 
+                                    <?php if (!empty($entry['notes'])): ?>
+                                        <div class="yatra-entry-notes" role="note" aria-label="<?php esc_attr_e('Note', 'yatra'); ?>">
+                                            <div class="yatra-entry-notes__head">
+                                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                                <span class="yatra-entry-notes__label"><?php esc_html_e('Note', 'yatra'); ?></span>
+                                            </div>
+                                            <div class="yatra-entry-notes__body"><?php echo wp_kses_post(wpautop($entry['notes'])); ?></div>
+                                        </div>
+                                    <?php endif; ?>
+
                                     <?php if (!empty($entry['cost']) && $entry['cost'] > 0): ?>
                                         <div class="yatra-entry-cost">
                                             <span class="yatra-cost-amount">
@@ -240,7 +252,11 @@ if (!defined('ABSPATH')) {
                                                             <div class="yatra-media-card">
                                                                 <img src="<?php echo esc_url($media['thumbnail_url'] ?? $media['url'] ?? ''); ?>" 
                                                                      data-full-size="<?php echo esc_url($media['url'] ?? ''); ?>"
-                                                                     alt="<?php echo esc_attr($media['alt_text'] ?? $media['caption'] ?? $media['title'] ?? sprintf(__('Itinerary Gallery Image %d', 'yatra'), $global_index + $index + 1)); ?>"
+                                                                     alt="<?php echo esc_attr($media['alt_text'] ?? $media['caption'] ?? $media['title'] ?? sprintf(
+                                                                         /* translators: %d: gallery image sequence number. */
+                                                                         __('Itinerary Gallery Image %d', 'yatra'),
+                                                                         $global_index + $index + 1
+                                                                     )); ?>"
                                                                      loading="lazy">
                                                                 <?php if (isset($media['type']) && $media['type'] === 'video'): ?>
                                                                     <div class="yatra-media-overlay">

@@ -155,8 +155,81 @@ class ReviewService
     }
 
     /**
+     * Create a review on behalf of a customer (admin path).
+     *
+     * Differs from {@see submitReview()} in three deliberate ways:
+     *
+     *   1. Skips the "already reviewed this trip" guard. An admin entering
+     *      a customer's quote from email isn't a duplicate the user can fix.
+     *   2. Skips the `reviews.auto_approve` setting lookup. The status
+     *      arrives from the operator (already enum-clamped by the
+     *      controller) and is the source of truth.
+     *   3. Doesn't fall back to the current user's display_name/email as
+     *      reviewer — admins enter the customer's identity by hand.
+     *
+     * Field aliasing (customer_name → author_name etc.) is handled at the
+     * controller layer; this method receives canonical column names only.
+     *
+     * @param array $data Canonical review payload: trip_id, rating, title,
+     *                    content, author_name, author_email, status,
+     *                    optional created_by.
+     * @return array {success: bool, review_id?: int, message: string}
+     */
+    public function createReviewAsAdmin(array $data): array
+    {
+        if (empty($data['trip_id']) || empty($data['rating'])) {
+            return ['success' => false, 'message' => __('Trip and rating are required.', 'yatra')];
+        }
+
+        $trip = $this->tripRepository->find((int) $data['trip_id']);
+        if (!$trip) {
+            return ['success' => false, 'message' => __('Trip not found.', 'yatra')];
+        }
+
+        $rating = (int) $data['rating'];
+        if ($rating < 1 || $rating > 5) {
+            return ['success' => false, 'message' => __('Rating must be between 1 and 5.', 'yatra')];
+        }
+
+        if (empty($data['author_name'])) {
+            return ['success' => false, 'message' => __('Customer name is required.', 'yatra')];
+        }
+        if (empty($data['content'])) {
+            return ['success' => false, 'message' => __('Review content is required.', 'yatra')];
+        }
+
+        // Default status only when the controller didn't supply one. The
+        // controller already clamps the value against the ENUM so we
+        // trust it as-is when present.
+        if (!isset($data['status']) || $data['status'] === '') {
+            $data['status'] = 'pending';
+        }
+
+        try {
+            $reviewId = $this->reviewRepository->create($data);
+        } catch (\Throwable $e) {
+            return [
+                'success' => false,
+                'message' => __('Failed to create review.', 'yatra') . ' ' . $e->getMessage(),
+            ];
+        }
+
+        if (!$reviewId) {
+            return ['success' => false, 'message' => __('Failed to create review.', 'yatra')];
+        }
+
+        $this->updateTripRatingCache((int) $data['trip_id']);
+
+        return [
+            'success'   => true,
+            'review_id' => $reviewId,
+            'message'   => __('Review created successfully.', 'yatra'),
+        ];
+    }
+
+    /**
      * Update a review
-     * 
+     *
      * @param int   $id   Review ID
      * @param array $data Review data
      * @return array {success: bool, message: string}
@@ -232,7 +305,11 @@ class ReviewService
 
         return [
             'success' => true,
-            'message' => sprintf(__('Review status updated to %s.', 'yatra'), $status),
+            'message' => sprintf(
+                /* translators: %s: new review status. */
+                __('Review status updated to %s.', 'yatra'),
+                $status
+            ),
         ];
     }
 
@@ -256,7 +333,11 @@ class ReviewService
         return [
             'success'  => true,
             'affected' => $affected,
-            'message'  => sprintf(__('%d reviews updated.', 'yatra'), $affected),
+            'message'  => sprintf(
+                /* translators: %d: number of reviews updated. */
+                __('%d reviews updated.', 'yatra'),
+                $affected
+            ),
         ];
     }
 
@@ -273,7 +354,11 @@ class ReviewService
         return [
             'success'  => true,
             'affected' => $affected,
-            'message'  => sprintf(__('%d reviews deleted.', 'yatra'), $affected),
+            'message'  => sprintf(
+                /* translators: %d: number of reviews deleted. */
+                __('%d reviews deleted.', 'yatra'),
+                $affected
+            ),
         ];
     }
 

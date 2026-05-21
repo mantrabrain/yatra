@@ -22,6 +22,17 @@ import { Select } from "../components/ui/select";
 import BookingsOverviewChart from "../components/charts/BookingsOverviewChart";
 import BookingStatusChart from "../components/charts/BookingStatusChart";
 import { formatYatraMoney } from "../lib/currency-display";
+import {
+  bucketSeries,
+  bucketStatusSeries,
+  buildCsv,
+  csvFilename,
+  downloadCsv,
+  type SeriesPoint,
+  type StatusPoint,
+  type TrendView,
+} from "../lib/report-series";
+import { isModuleActive, isProPluginActive } from "../lib/plugin-utils";
 
 // Skeleton Loading Components
 const SkeletonCard = () => (
@@ -268,429 +279,297 @@ const TravelReportCategories = [
 ];
 
 // Detailed Breakdown Chart Component
+//
+// REWRITE NOTE (3.0.5):
+// The previous implementation fabricated daily/weekly/monthly values by
+// multiplying period totals by a `seasonalFactor` so the chart "looked
+// like" historical data. Operators were making decisions on numbers
+// that didn't exist in the database. This version reads day-level
+// trends straight from `/reports` (booking_trend / revenue_trend /
+// occupancy_trend) and buckets them via `report-series.bucketSeries`
+// when the operator picks Weekly or Monthly. The numbers always come
+// from real bookings.
 const DetailedBreakdownChart: React.FC<{
   viewType: string;
   dateRange: string;
   selectedCategory: string;
   reportData?: any;
-}> = ({ viewType, dateRange, selectedCategory, reportData }) => {
+}> = ({ viewType, selectedCategory, reportData }) => {
   const globalCurrency = (window as any)?.yatraAdmin?.currency || "USD";
   const formatCurrencyAmount = (amount: number) =>
     formatYatraMoney(Number(amount) || 0, globalCurrency, {
       zeroAsUnknown: false,
     });
 
-  // Generate chart data based on view type using real API data
-  const generateChartData = () => {
-    const data = [];
-    const today = new Date();
-
-    // Base values from API data - NO FALLBACKS, use real data only
-    const baseBookings = reportData?.booking_stats?.totalBookings || 0;
-    const baseRevenue = reportData?.revenue_stats?.totalRevenue || 0;
-    const baseDepartures = reportData?.departure_stats?.totalDepartures || 0;
-
-    if (viewType === "daily") {
-      const days =
-        dateRange === "last_7_days"
-          ? 7
-          : dateRange === "last_30_days"
-            ? 30
-            : 90;
-      for (let i = days - 1; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(date.getDate() - i);
-
-        // Calculate daily values from totals with realistic distribution
-        const dayIndex = days - i - 1; // 0 for most recent day
-        const seasonalFactor = 0.8 + (dayIndex / days) * 0.4; // Recent days have higher activity
-        const dailyBookings = Math.floor(
-          (baseBookings / days) * seasonalFactor,
-        );
-        const dailyRevenue = Math.floor((baseRevenue / days) * seasonalFactor);
-        const dailyDepartures = Math.floor(
-          (baseDepartures / days) * seasonalFactor,
-        );
-
-        data.push({
-          name: date.toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-          }),
-          bookings: dailyBookings,
-          revenue: dailyRevenue,
-          departures: dailyDepartures,
-        });
-      }
-    } else if (viewType === "weekly") {
-      const weeks = 8; // Show last 8 weeks for better chart readability
-      for (let i = weeks - 1; i >= 0; i--) {
-        const weekStart = new Date(today);
-        weekStart.setDate(weekStart.getDate() - i * 7);
-
-        // Calculate weekly values from totals with realistic distribution
-        const weekIndex = weeks - i - 1; // 0 for most recent week
-        const seasonalFactor = 0.7 + (weekIndex / weeks) * 0.6; // Recent weeks have higher activity
-        const weeklyBookings = Math.floor((baseBookings / 4) * seasonalFactor);
-        const weeklyRevenue = Math.floor((baseRevenue / 4) * seasonalFactor);
-        const weeklyDepartures = Math.floor(
-          (baseDepartures / 4) * seasonalFactor,
-        );
-
-        data.push({
-          name: `W${weeks - i}`,
-          bookings: weeklyBookings,
-          revenue: weeklyRevenue,
-          departures: weeklyDepartures,
-        });
-      }
-    } else if (viewType === "monthly") {
-      const months = 6; // Show last 6 months for better chart readability
-      for (let i = months - 1; i >= 0; i--) {
-        const monthDate = new Date(today);
-        monthDate.setMonth(monthDate.getMonth() - i);
-
-        // Calculate monthly values from totals with realistic distribution
-        const monthIndex = months - i - 1; // 0 for most recent month
-        const seasonalFactor = 0.6 + (monthIndex / months) * 0.8; // Recent months have higher activity
-        const monthlyBookings = Math.floor(baseBookings * seasonalFactor);
-        const monthlyRevenue = Math.floor(baseRevenue * seasonalFactor);
-        const monthlyDepartures = Math.floor(baseDepartures * seasonalFactor);
-
-        data.push({
-          name: monthDate.toLocaleDateString("en-US", { month: "short" }),
-          bookings: monthlyBookings,
-          revenue: monthlyRevenue,
-          departures: monthlyDepartures,
-        });
-      }
+  // Pick the right source series for the selected report category.
+  // Each is already day-aligned and gap-filled by the backend.
+  const sourceSeries: SeriesPoint[] = useMemo(() => {
+    if (!reportData) return [];
+    if (selectedCategory === "revenue-analysis") {
+      return (reportData.revenue_trend as SeriesPoint[]) || [];
     }
+    if (selectedCategory === "departure-management") {
+      // occupancy_trend stores rate-per-day (already aggregated). For a
+      // bar chart we want a comparable absolute (counts of departures),
+      // so we derive from departures_table when present. Fall back to
+      // booking_trend so the chart never goes empty.
+      const dep = reportData.departures_table || [];
+      if (Array.isArray(dep) && dep.length > 0) {
+        const byDay = new Map<string, number>();
+        for (const d of dep) {
+          const date = (d?.date || "").slice(0, 10);
+          if (!date) continue;
+          byDay.set(date, (byDay.get(date) || 0) + 1);
+        }
+        return Array.from(byDay.entries()).map(([date, value]) => ({
+          date,
+          label: date,
+          value,
+        }));
+      }
+      return (reportData.booking_trend as SeriesPoint[]) || [];
+    }
+    return (reportData.booking_trend as SeriesPoint[]) || [];
+  }, [reportData, selectedCategory]);
 
-    return data;
-  };
+  // viewType can be "summary" (a synthetic UI option that maps to
+  // "daily" for the chart) or any TrendView. Coerce defensively.
+  const view: TrendView =
+    viewType === "weekly" || viewType === "monthly" ? viewType : "daily";
+  const bucketed = useMemo(
+    () => bucketSeries(sourceSeries, view),
+    [sourceSeries, view],
+  );
 
-  const chartData = generateChartData();
-  const maxRevenue = Math.max(...chartData.map((d) => d.revenue));
-  const maxBookings = Math.max(...chartData.map((d) => d.bookings));
+  // Empty-state guard: the chart formerly fell back to fabricated
+  // values; now we render an honest "no data" instead. Better the
+  // operator sees the truth than a synthetic 12-bar chart.
+  if (!reportData || bucketed.length === 0) {
+    return (
+      <div className="py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+        {__("No data in this period yet.", "yatra")}
+      </div>
+    );
+  }
+
+  // Find max for bar-width normalisation. Guard against zero.
+  const maxValue = Math.max(1, ...bucketed.map((p) => p.value));
+  const isRevenue = selectedCategory === "revenue-analysis";
+  const isDepartures = selectedCategory === "departure-management";
+
+  const barClass = isRevenue
+    ? "bg-emerald-500"
+    : isDepartures
+      ? "bg-purple-500"
+      : "bg-blue-500";
+
+  const valueLabel = (v: number) =>
+    isRevenue
+      ? formatCurrencyAmount(v)
+      : v.toLocaleString();
 
   return (
     <div className="space-y-4">
       <div className="text-center">
-        <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-          {selectedCategory === "booking-overview" &&
-            __("Bookings Trend", "yatra")}
-          {selectedCategory === "revenue-analysis" &&
-            __("Revenue Trend", "yatra")}
-          {selectedCategory === "departure-management" &&
-            __("Departures Trend", "yatra")}
-          {![
-            "booking-overview",
-            "revenue-analysis",
-            "departure-management",
-          ].includes(selectedCategory) && __("Performance Trend", "yatra")}
+        <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+          {isRevenue
+            ? __("Revenue Trend", "yatra")
+            : isDepartures
+              ? __("Departures Trend", "yatra")
+              : __("Bookings Trend", "yatra")}
         </h4>
       </div>
 
-      {/* Simple Bar Chart */}
+      {/* Bucketed bar chart — values are real data straight from the
+          backend trend arrays. Bar widths normalised against the max
+          in the bucketed set so a single outlier doesn't squash the
+          rest into invisibility. */}
       <div className="space-y-2">
-        {chartData.map((item, index) => (
-          <div key={index} className="flex items-center gap-2">
-            <div className="w-8 text-xs text-gray-600 dark:text-gray-400 text-right">
-              {item.name}
+        {bucketed.map((item, index) => (
+          <div key={`${item.date}-${index}`} className="flex items-center gap-2">
+            <div className="w-20 shrink-0 text-right text-xs text-gray-600 dark:text-gray-400">
+              {item.label}
             </div>
-            <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-4 relative">
-              {/* Revenue Bar */}
-              {selectedCategory === "revenue-analysis" && (
-                <div
-                  className="bg-green-500 h-4 rounded-full flex items-center justify-end pr-1"
-                  style={{ width: `${(item.revenue / maxRevenue) * 100}%` }}
-                >
-                  <span className="text-xs text-white font-medium">
-                    {formatCurrencyAmount(item.revenue / 1000)}k
-                  </span>
-                </div>
-              )}
-
-              {/* Bookings Bar */}
-              {(selectedCategory === "booking-overview" ||
-                !["revenue-analysis", "departure-management"].includes(
-                  selectedCategory,
-                )) && (
-                <div
-                  className="bg-blue-500 h-4 rounded-full flex items-center justify-end pr-1"
-                  style={{ width: `${(item.bookings / maxBookings) * 100}%` }}
-                >
-                  <span className="text-xs text-white font-medium">
-                    {item.bookings}
-                  </span>
-                </div>
-              )}
-
-              {/* Departures Bar */}
-              {selectedCategory === "departure-management" && (
-                <div
-                  className="bg-purple-500 h-4 rounded-full flex items-center justify-end pr-1"
-                  style={{
-                    width: `${(item.departures / Math.max(...chartData.map((d) => d.departures))) * 100}%`,
-                  }}
-                >
-                  <span className="text-xs text-white font-medium">
-                    {item.departures}
-                  </span>
-                </div>
-              )}
+            <div className="relative h-4 flex-1 rounded-full bg-gray-100 dark:bg-gray-700">
+              <div
+                className={`flex h-4 items-center justify-end rounded-full pr-1.5 ${barClass}`}
+                style={{
+                  width: `${Math.max(2, (item.value / maxValue) * 100)}%`,
+                }}
+              >
+                <span className="text-[11px] font-medium text-white">
+                  {valueLabel(item.value)}
+                </span>
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Legend */}
-      <div className="flex flex-wrap gap-2 text-xs">
-        {selectedCategory === "revenue-analysis" && (
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-green-500 rounded"></div>
-            <span className="text-gray-600 dark:text-gray-400">
-              {__("Revenue", "yatra")}
-            </span>
-          </div>
-        )}
-        {(selectedCategory === "booking-overview" ||
-          !["revenue-analysis", "departure-management"].includes(
-            selectedCategory,
-          )) && (
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-blue-500 rounded"></div>
-            <span className="text-gray-600 dark:text-gray-400">
-              {__("Bookings", "yatra")}
-            </span>
-          </div>
-        )}
-        {selectedCategory === "departure-management" && (
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-purple-500 rounded"></div>
-            <span className="text-gray-600 dark:text-gray-400">
-              {__("Departures", "yatra")}
-            </span>
-          </div>
-        )}
+      <div className="flex items-center gap-1 text-xs">
+        <div className={`h-3 w-3 rounded ${barClass}`}></div>
+        <span className="text-gray-600 dark:text-gray-400">
+          {isRevenue
+            ? __("Revenue", "yatra")
+            : isDepartures
+              ? __("Departures", "yatra")
+              : __("Bookings", "yatra")}
+        </span>
       </div>
     </div>
   );
 };
 
 // Detailed Breakdown Table Component
+//
+// REWRITE NOTE (3.0.5):
+// Replaces the previous synthetic data path that:
+//   - Fabricated daily/weekly/monthly bookings + revenue from period
+//     totals * a `seasonalFactor`
+//   - Made up confirmed/pending/cancelled splits (80/15/5 fixed ratio)
+//   - Made up customer satisfaction (90 * factor), efficiency (85 *
+//     factor), lead time (7..14 * inverse-factor)
+//   - Cycled "topTrip" through trip_performance[i % 3] regardless of
+//     which period the row represented
+//
+// New version reads four trend arrays from the backend, all day-aligned:
+//   - booking_trend  : { date, label, value }   total bookings/day
+//   - revenue_trend  : { date, label, value }   revenue/day
+//   - status_trend   : { date, label, confirmed, pending, cancelled,
+//                       completed }   per-day status split
+//   - traveler_segments.trend : { date, label, value }   travellers/day
+//
+// We bucket those into the operator's selected view (daily/weekly/
+// monthly) using report-series.bucketSeries / bucketStatusSeries and
+// render only columns we can stand behind. Columns whose source data
+// doesn't exist (customer satisfaction, efficiency, top-trip-per-
+// period) are removed — better than rendering invented numbers.
 const DetailedBreakdownTable: React.FC<{
   viewType: string;
   dateRange: string;
   selectedCategory: string;
   reportData: any;
-}> = ({ viewType, dateRange, selectedCategory, reportData }) => {
-  // Generate breakdown data based on view type and category using real API data
-  const generateBreakdownData = () => {
-    const data = [];
-    const today = new Date();
+}> = ({ viewType, selectedCategory, reportData }) => {
+  // Suppress lints — these props are intentionally received for API
+  // stability with the parent but the view bucket pipeline doesn't
+  // need dateRange directly; backend already handed us the slice.
+  // (Recovery of formatCurrencyAmount happens later in the component.)
+  // viewType can be "summary" (UI-only) or a real TrendView. Coerce
+  // anything that's not weekly/monthly to "daily" — same rule the
+  // chart uses, so chart + table always agree on bucketing.
+  const effectiveView: TrendView =
+    viewType === "weekly" || viewType === "monthly" ? viewType : "daily";
 
-    // Base values from API data - NO FALLBACKS, use real data only
-    const baseBookings = reportData?.booking_stats?.totalBookings || 0;
-    const baseRevenue = reportData?.revenue_stats?.totalRevenue || 0;
-    // These are available for more granular breakdown if needed
-    const _baseConfirmed = reportData?.booking_stats?.confirmedBookings || 0;
-    const _basePending = reportData?.booking_stats?.pendingBookings || 0;
-    const _baseCancelled = reportData?.booking_stats?.cancelledBookings || 0;
-    void _baseConfirmed;
-    void _basePending;
-    void _baseCancelled; // Suppress unused warnings
-    const baseDepartures = reportData?.departure_stats?.totalDepartures || 0;
-    const baseCapacity = reportData?.departure_stats?.totalCapacity || 0;
-    const baseOccupancy = reportData?.operational_stats?.occupancyRate || 0;
+  const bookingTrend: SeriesPoint[] =
+    (reportData?.booking_trend as SeriesPoint[]) || [];
+  const revenueTrend: SeriesPoint[] =
+    (reportData?.revenue_trend as SeriesPoint[]) || [];
+  const statusTrend: StatusPoint[] =
+    (reportData?.status_trend as StatusPoint[]) || [];
+  const occupancyTrend: SeriesPoint[] =
+    (reportData?.occupancy_trend as SeriesPoint[]) || [];
 
-    if (viewType === "daily") {
-      const days =
-        dateRange === "last_7_days"
-          ? 7
-          : dateRange === "last_30_days"
-            ? 30
-            : 90;
-      for (let i = days - 1; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(date.getDate() - i);
+  // Bucket each series identically so rows in the same bucket line up.
+  const bookingsBucketed = bucketSeries(bookingTrend, effectiveView);
+  const revenueBucketed = bucketSeries(revenueTrend, effectiveView);
+  const statusBucketed = bucketStatusSeries(statusTrend, effectiveView);
 
-        // Calculate daily distribution from totals with realistic patterns
-        const dayIndex = days - i - 1; // 0 for most recent day
-        const seasonalFactor = 0.8 + (dayIndex / days) * 0.4; // Recent days have higher activity
-        const dailyBookings = Math.floor(
-          (baseBookings / days) * seasonalFactor,
-        );
-        const dailyRevenue = Math.floor((baseRevenue / days) * seasonalFactor);
-        const dailyConfirmed = Math.floor(dailyBookings * 0.8);
-        const dailyPending = Math.floor(dailyBookings * 0.15);
-        const dailyCancelled = Math.max(
-          0,
-          dailyBookings - dailyConfirmed - dailyPending,
-        );
+  // For occupancy per period: we have a per-day rate (%), and rates
+  // don't sum across days — they average. Recompute properly using
+  // departures_table when bucketing.
+  const departuresTable = (reportData?.departures_table as any[]) || [];
+  type OccupancyAgg = { booked: number; capacity: number };
+  const occByDay = new Map<string, OccupancyAgg>();
+  for (const d of departuresTable) {
+    const date = (d?.date || "").slice(0, 10);
+    if (!date) continue;
+    const acc = occByDay.get(date) || { booked: 0, capacity: 0 };
+    acc.booked += Number(d?.bookedSeats ?? d?.booked ?? 0);
+    acc.capacity += Number(d?.maxSeats ?? d?.capacity ?? 0);
+    occByDay.set(date, acc);
+  }
+  // Same bucket-key strategy used by bucketSeries — re-derive labels.
+  const occBookingSeries: SeriesPoint[] = Array.from(occByDay.entries()).map(
+    ([date, agg]) => ({ date, label: date, value: agg.booked }),
+  );
+  const occCapacitySeries: SeriesPoint[] = Array.from(occByDay.entries()).map(
+    ([date, agg]) => ({ date, label: date, value: agg.capacity }),
+  );
+  const occBookedBucketed = bucketSeries(occBookingSeries, effectiveView);
+  const occCapacityBucketed = bucketSeries(occCapacitySeries, effectiveView);
 
-        data.push({
-          period: date.toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-          }),
-          fullDate: date.toISOString().split("T")[0],
-          // Booking Overview - based on real data
-          bookings: dailyBookings,
-          confirmed: dailyConfirmed,
-          pending: dailyPending,
-          cancelled: dailyCancelled,
-          // Revenue Analysis - based on real data
-          revenue: dailyRevenue,
-          collected: Math.floor(dailyRevenue * 0.85),
-          outstanding: Math.floor(dailyRevenue * 0.15),
-          avgBookingValue:
-            dailyBookings > 0 ? Math.floor(dailyRevenue / dailyBookings) : 0,
-          // Trip Performance - based on real data
-          tripBookings: dailyBookings,
-          topTrip:
-            reportData?.trip_performance?.topTrips?.[0]?.label || "No Data",
-          occupancyRate: Math.floor(baseOccupancy * seasonalFactor),
-          // Departure Management - based on real data
-          departures: Math.floor((baseDepartures / days) * seasonalFactor),
-          capacity: Math.floor((baseCapacity / days) * seasonalFactor),
-          booked: Math.floor(
-            (baseCapacity / days) * seasonalFactor * (baseOccupancy / 100),
-          ),
-          // Customer Insights - derived from bookings
-          newCustomers: Math.floor(dailyBookings * 0.3),
-          returningCustomers: Math.floor(dailyBookings * 0.7),
-          customerSatisfaction: Math.floor(90 * seasonalFactor),
-          // Operational Metrics - based on real data
-          leadTime: Math.floor(7 * (2 - seasonalFactor)), // Lower lead time for recent periods
-          cancellationRate:
-            dailyBookings > 0
-              ? Math.floor((dailyCancelled / dailyBookings) * 100)
-              : 0,
-          efficiency: Math.floor(85 * seasonalFactor),
-        });
-      }
-    } else if (viewType === "weekly") {
-      const weeks = 12;
-      for (let i = weeks - 1; i >= 0; i--) {
-        const weekStart = new Date(today);
-        weekStart.setDate(weekStart.getDate() - i * 7);
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekEnd.getDate() + 6);
-
-        // Calculate weekly distribution from totals with realistic patterns
-        const weekIndex = weeks - i - 1; // 0 for most recent week
-        const seasonalFactor = 0.7 + (weekIndex / weeks) * 0.6; // Recent weeks have higher activity
-        const weeklyBookings = Math.floor((baseBookings / 4) * seasonalFactor);
-        const weeklyRevenue = Math.floor((baseRevenue / 4) * seasonalFactor);
-        const weeklyConfirmed = Math.floor(weeklyBookings * 0.8);
-        const weeklyPending = Math.floor(weeklyBookings * 0.15);
-        const weeklyCancelled =
-          weeklyBookings - weeklyConfirmed - weeklyPending;
-
-        data.push({
-          period: `${weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${weekEnd.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
-          fullDate: weekStart.toISOString().split("T")[0],
-          // Booking Overview - based on real data
-          bookings: weeklyBookings,
-          confirmed: weeklyConfirmed,
-          pending: weeklyPending,
-          cancelled: weeklyCancelled,
-          // Revenue Analysis - based on real data
-          revenue: weeklyRevenue,
-          collected: Math.floor(weeklyRevenue * 0.85),
-          outstanding: Math.floor(weeklyRevenue * 0.15),
-          avgBookingValue:
-            weeklyBookings > 0 ? Math.floor(weeklyRevenue / weeklyBookings) : 0,
-          // Trip Performance - based on real data
-          tripBookings: weeklyBookings,
-          topTrip:
-            reportData?.trip_performance?.topTrips?.[i % 3]?.label || "No Data",
-          occupancyRate: Math.floor(baseOccupancy * seasonalFactor),
-          // Departure Management - based on real data
-          departures: Math.floor((baseDepartures / 4) * seasonalFactor),
-          capacity: Math.floor((baseCapacity / 4) * seasonalFactor),
-          booked: Math.floor(
-            (baseCapacity / 4) * seasonalFactor * (baseOccupancy / 100),
-          ),
-          // Customer Insights - derived from bookings
-          newCustomers: Math.floor(weeklyBookings * 0.3),
-          returningCustomers: Math.floor(weeklyBookings * 0.7),
-          customerSatisfaction: Math.floor(88 * seasonalFactor),
-          // Operational Metrics - based on real data
-          leadTime: Math.floor(8 * (2 - seasonalFactor)), // Lower lead time for recent periods
-          cancellationRate:
-            weeklyBookings > 0
-              ? Math.floor((weeklyCancelled / weeklyBookings) * 100)
-              : 0,
-          efficiency: Math.floor(87 * seasonalFactor),
-        });
-      }
-    } else if (viewType === "monthly") {
-      const months = 12;
-      for (let i = months - 1; i >= 0; i--) {
-        const monthDate = new Date(today);
-        monthDate.setMonth(monthDate.getMonth() - i);
-
-        // Calculate monthly distribution from totals with realistic patterns
-        const monthIndex = months - i - 1; // 0 for most recent month
-        const seasonalFactor = 0.6 + (monthIndex / months) * 0.8; // Recent months have higher activity
-        const monthlyBookings = Math.floor(baseBookings * seasonalFactor);
-        const monthlyRevenue = Math.floor(baseRevenue * seasonalFactor);
-        const monthlyConfirmed = Math.floor(monthlyBookings * 0.8);
-        const monthlyPending = Math.floor(monthlyBookings * 0.15);
-        const monthlyCancelled =
-          monthlyBookings - monthlyConfirmed - monthlyPending;
-
-        data.push({
-          period: monthDate.toLocaleDateString("en-US", {
-            month: "long",
-            year: "numeric",
-          }),
-          fullDate: monthDate.toISOString().split("T")[0],
-          // Booking Overview - based on real data
-          bookings: monthlyBookings,
-          confirmed: monthlyConfirmed,
-          pending: monthlyPending,
-          cancelled: monthlyCancelled,
-          // Revenue Analysis - based on real data
-          revenue: monthlyRevenue,
-          collected: Math.floor(monthlyRevenue * 0.85),
-          outstanding: Math.floor(monthlyRevenue * 0.15),
-          avgBookingValue:
-            monthlyBookings > 0
-              ? Math.floor(monthlyRevenue / monthlyBookings)
-              : 0,
-          // Trip Performance - based on real data
-          tripBookings: monthlyBookings,
-          topTrip:
-            reportData?.trip_performance?.topTrips?.[i % 3]?.label || "No Data",
-          occupancyRate: Math.floor(baseOccupancy * seasonalFactor),
-          // Departure Management - based on real data
-          departures: Math.floor(baseDepartures * seasonalFactor),
-          capacity: Math.floor(baseCapacity * seasonalFactor),
-          booked: Math.floor(
-            baseCapacity * seasonalFactor * (baseOccupancy / 100),
-          ),
-          // Customer Insights - derived from bookings
-          newCustomers: Math.floor(monthlyBookings * 0.3),
-          returningCustomers: Math.floor(monthlyBookings * 0.7),
-          customerSatisfaction: Math.floor(90 * seasonalFactor),
-          // Operational Metrics - based on real data
-          leadTime: Math.floor(10 * (2 - seasonalFactor)), // Lower lead time for recent periods
-          cancellationRate:
-            monthlyBookings > 0
-              ? Math.floor((monthlyCancelled / monthlyBookings) * 100)
-              : 0,
-          efficiency: Math.floor(88 * seasonalFactor),
-        });
-      }
-    }
-
-    return data;
+  // Build the unified row set the table iterates. Each row carries
+  // every field a category column might want; unsupported fields stay
+  // null so the renderer can show "—" instead of a fabricated number.
+  type Row = {
+    period: string;
+    fullDate: string;
+    // Booking columns
+    bookings: number;
+    confirmed: number;
+    pending: number;
+    cancelled: number;
+    // Revenue
+    revenue: number;
+    avgBookingValue: number;
+    // Trip performance
+    occupancyRate: number;
+    booked: number;
+    capacity: number;
+    // Departures
+    departures: number;
   };
+  const breakdownData: Row[] = bookingsBucketed.map((bRow, i) => {
+    const rev = revenueBucketed[i]?.value ?? 0;
+    const status = statusBucketed[i];
+    const ob = occBookedBucketed.find((p) => p.label === bRow.label);
+    const oc = occCapacityBucketed.find((p) => p.label === bRow.label);
+    const bookedSeats = ob?.value ?? 0;
+    const capacitySeats = oc?.value ?? 0;
+    const occRate = capacitySeats > 0
+      ? Math.round((bookedSeats / capacitySeats) * 1000) / 10
+      : 0;
+    return {
+      period: bRow.label,
+      fullDate: bRow.date,
+      bookings: bRow.value,
+      confirmed: status?.confirmed ?? 0,
+      pending: status?.pending ?? 0,
+      cancelled: status?.cancelled ?? 0,
+      revenue: rev,
+      avgBookingValue: bRow.value > 0 ? Math.round(rev / bRow.value) : 0,
+      occupancyRate: occRate,
+      booked: bookedSeats,
+      capacity: capacitySeats,
+      departures: capacitySeats > 0 ? 1 : 0, // count via departures_table when available
+    };
+  });
 
-  const breakdownData = generateBreakdownData();
+  // Restore departures count if departures_table has them by bucket.
+  if (departuresTable.length > 0) {
+    const depCountSeries: SeriesPoint[] = (() => {
+      const m = new Map<string, number>();
+      for (const d of departuresTable) {
+        const date = (d?.date || "").slice(0, 10);
+        if (!date) continue;
+        m.set(date, (m.get(date) || 0) + 1);
+      }
+      return Array.from(m.entries()).map(([date, value]) => ({
+        date,
+        label: date,
+        value,
+      }));
+    })();
+    const depBucketed = bucketSeries(depCountSeries, effectiveView);
+    breakdownData.forEach((row) => {
+      const hit = depBucketed.find((p) => p.label === row.period);
+      row.departures = hit?.value ?? 0;
+    });
+  }
+
+  // Suppress legacy unused references to avoid TS dead-code warnings
+  // until the rest of the table renderer is also pruned.
+  void occupancyTrend;
 
   const globalCurrency = (window as any)?.yatraAdmin?.currency || "USD";
   const formatCurrencyAmount = (amount: number) =>
@@ -722,6 +601,11 @@ const DetailedBreakdownTable: React.FC<{
           </tr>
         );
       case "revenue-analysis":
+        // Dropped "Collected" / "Outstanding" columns: we don't track
+        // per-period collected vs. outstanding at the trend level. The
+        // payment_status block in the Revenue Analysis section shows
+        // the period-aggregate paid/pending/refunded split — that's
+        // the right place for it.
         return (
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -731,10 +615,7 @@ const DetailedBreakdownTable: React.FC<{
               {__("Total Revenue", "yatra")}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__("Collected", "yatra")}
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__("Outstanding", "yatra")}
+              {__("Bookings", "yatra")}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               {__("Avg Booking Value", "yatra")}
@@ -742,6 +623,9 @@ const DetailedBreakdownTable: React.FC<{
           </tr>
         );
       case "trip-performance":
+        // Dropped "Top Trip" column: top trip is a period-level concept,
+        // not a per-bucket one. The Top Trips card above the table
+        // shows the real ranking.
         return (
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -749,9 +633,6 @@ const DetailedBreakdownTable: React.FC<{
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               {__("Trip Bookings", "yatra")}
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__("Top Trip", "yatra")}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               {__("Occupancy Rate", "yatra")}
@@ -873,11 +754,10 @@ const DetailedBreakdownTable: React.FC<{
             <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600 dark:text-green-400">
               {formatCurrencyAmount(row.revenue)}
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 dark:text-blue-400">
-              {formatCurrencyAmount(row.collected)}
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-orange-600 dark:text-orange-400">
-              {formatCurrencyAmount(row.outstanding)}
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400">
+                {row.bookings}
+              </span>
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-purple-600 dark:text-purple-400">
               {formatCurrencyAmount(row.avgBookingValue)}
@@ -888,12 +768,7 @@ const DetailedBreakdownTable: React.FC<{
           <>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400">
-                {row.tripBookings}
-              </span>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/20 text-purple-800 dark:text-purple-400">
-                {row.topTrip}
+                {row.bookings}
               </span>
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
@@ -937,80 +812,52 @@ const DetailedBreakdownTable: React.FC<{
                   <div
                     className="bg-green-500 h-2 rounded-full"
                     style={{
-                      width: `${Math.round((row.booked / row.capacity) * 100)}%`,
+                      width: row.capacity > 0
+                        ? `${Math.round((row.booked / row.capacity) * 100)}%`
+                        : "0%",
                     }}
                   ></div>
                 </div>
                 <span className="text-xs font-medium">
-                  {Math.round((row.booked / row.capacity) * 100)}%
+                  {row.capacity > 0
+                    ? Math.round((row.booked / row.capacity) * 100)
+                    : 0}%
                 </span>
               </div>
-            </td>
-          </>
-        )}
-        {selectedCategory === "customer-insights" && (
-          <>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400">
-                {row.newCustomers}
-              </span>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400">
-                {row.returningCustomers}
-              </span>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-              <div className="flex items-center">
-                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mr-2">
-                  <div
-                    className="bg-green-500 h-2 rounded-full"
-                    style={{ width: `${row.customerSatisfaction}%` }}
-                  ></div>
-                </div>
-                <span className="text-xs font-medium">
-                  {row.customerSatisfaction}%
-                </span>
-              </div>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600 dark:text-green-400">
-              {formatCurrencyAmount(row.revenue)}
-            </td>
-          </>
-        )}
-        {selectedCategory === "operational-metrics" && (
-          <>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400">
-                {row.leadTime}
-              </span>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400">
-                {row.cancellationRate}%
-              </span>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-              <div className="flex items-center">
-                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mr-2">
-                  <div
-                    className="bg-green-500 h-2 rounded-full"
-                    style={{ width: `${row.efficiency}%` }}
-                  ></div>
-                </div>
-                <span className="text-xs font-medium">{row.efficiency}%</span>
-              </div>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/20 text-purple-800 dark:text-purple-400">
-                {row.bookings}
-              </span>
             </td>
           </>
         )}
       </tr>
     ));
   };
+
+  // Customer-Insights + Operational-Metrics no longer ship a per-period
+  // breakdown table — we don't aggregate those metrics day-by-day yet,
+  // and the previous version filled them with synthetic numbers. Show
+  // a calm note pointing the operator at the summary cards above.
+  const categoriesWithoutBreakdown = new Set([
+    "customer-insights",
+    "operational-metrics",
+  ]);
+  if (categoriesWithoutBreakdown.has(selectedCategory)) {
+    return (
+      <div className="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+        {__(
+          "Per-period breakdown isn't available for this section. The summary cards above show the aggregate for the selected date range.",
+          "yatra",
+        )}
+      </div>
+    );
+  }
+
+  // Empty-state for ranges with no data — better than a 0-bar table.
+  if (breakdownData.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+        {__("No data in this date range yet.", "yatra")}
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-x-auto">
@@ -1126,8 +973,17 @@ const FacebookPixelReports: React.FC = () => {
   const eventStats = getEventStats();
   const recentEvents = getRecentEvents();
 
-  // Check if Facebook Pixel is configured
-  if (!facebookPixelData.pixel_id) {
+  // Empty-state gate.
+  // Three conditions all funnel into the same "Not Configured" screen
+  // because, from the operator's point of view, they look the same:
+  //   1. Pro plugin isn't installed/activated at all
+  //   2. Pro is installed but the Facebook Pixel module is toggled off
+  //      under Modules — pre-existing pixel_id stays in the DB and
+  //      would otherwise let this tab render with stale data
+  //   3. Module is on but no Pixel ID has been saved yet
+  const fbModuleActive =
+    isProPluginActive() && isModuleActive("facebook_pixel");
+  if (!fbModuleActive || !facebookPixelData.pixel_id) {
     return (
       <div className="text-center py-12">
         <div className="mx-auto w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
@@ -1143,16 +999,25 @@ const FacebookPixelReports: React.FC = () => {
           {__("Facebook Pixel Not Configured", "yatra")}
         </h3>
         <p className="text-gray-600 dark:text-gray-400 mb-4">
-          {__(
-            "Configure your Facebook Pixel in Settings to start tracking conversion events.",
-            "yatra",
-          )}
+          {!fbModuleActive
+            ? __(
+                "Enable the Facebook Pixel module under Modules and add your Pixel ID in Settings to start tracking conversion events.",
+                "yatra",
+              )
+            : __(
+                "Configure your Facebook Pixel in Settings to start tracking conversion events.",
+                "yatra",
+              )}
         </p>
         <a
-          href={`${(window as any).yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=settings#integration`}
+          href={`${(window as any).yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=${
+            !fbModuleActive ? "modules" : "settings#integration"
+          }`}
           className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
-          {__("Configure Facebook Pixel", "yatra")}
+          {!fbModuleActive
+            ? __("Open Modules", "yatra")
+            : __("Configure Facebook Pixel", "yatra")}
         </a>
       </div>
     );
@@ -1698,8 +1563,14 @@ const GoogleAnalyticsReports: React.FC = () => {
   const eventStats = getEventStats();
   const recentEvents = getRecentEvents();
 
-  // Check if Google Analytics is configured
-  if (!googleAnalyticsData.measurement_id) {
+  // Empty-state gate. Mirrors the Facebook Pixel tab: same three
+  // funnel paths (no Pro, module disabled, no Measurement ID) → same
+  // visual treatment. Splits the CTA + body between
+  // "Enable the module" vs. "Configure in Settings" based on which
+  // condition tripped.
+  const gaModuleActive =
+    isProPluginActive() && isModuleActive("google_analytics");
+  if (!gaModuleActive || !googleAnalyticsData.measurement_id) {
     return (
       <div className="text-center py-12">
         <div className="mx-auto w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
@@ -1718,16 +1589,25 @@ const GoogleAnalyticsReports: React.FC = () => {
           {__("Google Analytics 4 Not Configured", "yatra")}
         </h3>
         <p className="text-gray-600 dark:text-gray-400 mb-4">
-          {__(
-            "Configure your Google Analytics 4 in Settings to start tracking conversion events.",
-            "yatra",
-          )}
+          {!gaModuleActive
+            ? __(
+                "Enable the Google Analytics 4 module under Modules and add your Measurement ID in Settings to start tracking conversion events.",
+                "yatra",
+              )
+            : __(
+                "Configure your Google Analytics 4 in Settings to start tracking conversion events.",
+                "yatra",
+              )}
         </p>
         <a
-          href={`${(window as any).yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=settings#integration`}
+          href={`${(window as any).yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=${
+            !gaModuleActive ? "modules" : "settings#integration"
+          }`}
           className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
-          {__("Configure Google Analytics 4", "yatra")}
+          {!gaModuleActive
+            ? __("Open Modules", "yatra")
+            : __("Configure Google Analytics 4", "yatra")}
         </a>
       </div>
     );
@@ -2284,43 +2164,132 @@ const TravelBookingReports: React.FC = () => {
       zeroAsUnknown: false,
     });
 
+  // CSV export — bundles the visible breakdown (or summary KPIs when
+  // no breakdown is appropriate) into a downloadable file scoped to
+  // the picked date range. Doesn't hit the network; everything we
+  // already have in memory is enough.
+  const handleExportCsv = () => {
+    const params = getDateRangeParams(dateRange);
+    const rows: (string | number | null | undefined)[][] = [];
+
+    // Top KPI summary first — operators paste this into the email
+    // before the detail table.
+    rows.push(["Yatra Reports — Summary"]);
+    rows.push([
+      `Date range: ${params.start} to ${params.end}`,
+    ]);
+    rows.push([]);
+    rows.push(["Metric", "Value"]);
+    rows.push(["Total bookings", travelKPIs.totalBookings]);
+    rows.push(["Total revenue", travelKPIs.totalRevenue]);
+    rows.push(["Avg booking value", travelKPIs.avgBookingValue]);
+    rows.push(["Occupancy rate (%)", travelKPIs.occupancyRate]);
+    rows.push(["Cancellation rate (%)", travelKPIs.cancellationRate]);
+    rows.push(["Upcoming departures", travelKPIs.upcomingDepartures]);
+    rows.push([]);
+
+    // Booking trend (day-level) if the operator has revenue/booking data.
+    const trend: any[] = reportData?.booking_trend || [];
+    const revenueTrend: any[] = reportData?.revenue_trend || [];
+    if (trend.length) {
+      rows.push(["Day", "Bookings", "Revenue"]);
+      trend.forEach((row: any, i: number) => {
+        rows.push([
+          row.date || row.label,
+          row.value,
+          revenueTrend[i]?.value ?? "",
+        ]);
+      });
+      rows.push([]);
+    }
+
+    // Top trips
+    const tp = reportData?.trip_performance || [];
+    if (tp.length) {
+      rows.push(["Trip", "Bookings", "Revenue", "Occupancy %"]);
+      tp.forEach((t: any) => {
+        rows.push([t.label, t.value, t.revenue, t.occupancy]);
+      });
+      rows.push([]);
+    }
+
+    // Payment methods
+    const pm = reportData?.payment_methods || [];
+    if (pm.length) {
+      rows.push(["Payment method", "Count", "Revenue"]);
+      pm.forEach((m: any) => {
+        rows.push([m.method, m.count, m.revenue]);
+      });
+      rows.push([]);
+    }
+
+    // Top destinations
+    const dest = reportData?.top_destinations || [];
+    if (dest.length) {
+      rows.push(["Destination", "Bookings", "Revenue"]);
+      dest.forEach((d: any) => {
+        rows.push([d.label, d.value, d.revenue]);
+      });
+      rows.push([]);
+    }
+
+    const blob = buildCsv(rows);
+    downloadCsv(blob, csvFilename("reports", params.start, params.end));
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      {/* ── HEADER ──────────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-2xl font-bold text-gray-900 dark:text-white">
             <SVGIcons.BarChart />
-            Travel Booking Reports
+            {__("Travel Booking Reports", "yatra")}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Essential analytics for your travel booking business
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {__(
+              "Essential analytics for your travel booking business.",
+              "yatra",
+            )}
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-400"
+            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+            aria-label={__("Date range", "yatra")}
           >
-            <option value="today">Today</option>
-            <option value="last_7_days">Last 7 Days</option>
-            <option value="last_30_days">Last 30 Days</option>
-            <option value="last_90_days">Last 90 Days</option>
-            <option value="this_year">This Year</option>
+            <option value="today">{__("Today", "yatra")}</option>
+            <option value="last_7_days">{__("Last 7 days", "yatra")}</option>
+            <option value="last_30_days">{__("Last 30 days", "yatra")}</option>
+            <option value="last_90_days">{__("Last 90 days", "yatra")}</option>
+            <option value="this_year">{__("This year", "yatra")}</option>
           </select>
 
           <select
             value={viewType}
             onChange={(e) => setViewType(e.target.value)}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-400"
+            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+            aria-label={__("Breakdown view", "yatra")}
           >
             <option value="summary">{__("Summary View", "yatra")}</option>
             <option value="daily">{__("Daily Breakdown", "yatra")}</option>
             <option value="weekly">{__("Weekly Breakdown", "yatra")}</option>
             <option value="monthly">{__("Monthly Breakdown", "yatra")}</option>
           </select>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleExportCsv}
+            disabled={isLoading || !reportData}
+            title={__("Download this report's data as CSV", "yatra")}
+          >
+            {__("Export CSV", "yatra")}
+          </Button>
         </div>
       </div>
 
@@ -2793,6 +2762,221 @@ const TravelBookingReports: React.FC = () => {
                           reportData?.booking_stats?.cancellationRate || 0
                         ).toFixed(1)}
                         %
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── REVENUE ANALYSIS — Payment method breakdown ─────────
+                  Operators routinely want to know which gateways are
+                  pulling weight (and which they could turn off). The
+                  data is computed in the backend per request. */}
+              {selectedCategory === "revenue-analysis" &&
+                Array.isArray(reportData?.payment_methods) &&
+                reportData.payment_methods.length > 0 && (
+                  <div className="mt-6">
+                    <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+                      {__("Payment Methods", "yatra")}
+                    </h3>
+                    <p className="mb-3 text-xs text-gray-500 dark:text-gray-400">
+                      {__(
+                        "Bookings and gross revenue split by payment gateway. Ranked by revenue.",
+                        "yatra",
+                      )}
+                    </p>
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+                      {reportData.payment_methods
+                        .slice(0, 6)
+                        .map((m: any) => (
+                          <div
+                            key={m.method}
+                            className="rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800"
+                          >
+                            <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                              {m.method}
+                            </p>
+                            <p className="mt-1 text-lg font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">
+                              {formatCurrencyAmount(m.revenue)}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {m.count} {__("bookings", "yatra")}
+                            </p>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+              {/* ── TRIP PERFORMANCE — Top destinations ────────────────
+                  Geographic concentration. Useful when paired with
+                  Top Trips: a single trip can dominate a destination,
+                  or a destination can have a long tail of small wins. */}
+              {selectedCategory === "trip-performance" &&
+                Array.isArray(reportData?.top_destinations) &&
+                reportData.top_destinations.length > 0 && (
+                  <div className="mt-6">
+                    <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+                      {__("Top Destinations", "yatra")}
+                    </h3>
+                    <p className="mb-3 text-xs text-gray-500 dark:text-gray-400">
+                      {__(
+                        "Booking count and revenue by primary destination. Useful for spotting geographic concentration.",
+                        "yatra",
+                      )}
+                    </p>
+                    <div className="space-y-2">
+                      {reportData.top_destinations.map((d: any) => {
+                        const max = Math.max(
+                          1,
+                          ...reportData.top_destinations.map(
+                            (x: any) => x.value,
+                          ),
+                        );
+                        return (
+                          <div
+                            key={d.label}
+                            className="flex items-center gap-3"
+                          >
+                            <div className="w-32 truncate text-sm text-gray-700 dark:text-gray-200">
+                              {d.label}
+                            </div>
+                            <div className="relative h-3 flex-1 rounded-full bg-gray-100 dark:bg-gray-700">
+                              <div
+                                className="h-3 rounded-full bg-blue-500"
+                                style={{
+                                  width: `${Math.max(2, (d.value / max) * 100)}%`,
+                                }}
+                              />
+                            </div>
+                            <div className="w-16 text-right text-sm tabular-nums text-gray-700 dark:text-gray-200">
+                              {d.value}
+                            </div>
+                            <div className="w-24 text-right text-sm font-medium tabular-nums text-emerald-600 dark:text-emerald-400">
+                              {formatCurrencyAmount(d.revenue || 0)}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+              {/* ── OPERATIONAL METRICS — Lead time histogram ──────────
+                  How far in advance customers book. Same-day = last-
+                  minute demand. >quarter = need solid deposit policy. */}
+              {selectedCategory === "operational-metrics" &&
+                reportData?.lead_time && (
+                  <div className="mt-6">
+                    <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+                      {__("Booking Lead Time", "yatra")}
+                    </h3>
+                    <p className="mb-3 text-xs text-gray-500 dark:text-gray-400">
+                      {__(
+                        "Time between booking creation and travel date. Average:",
+                        "yatra",
+                      )}{" "}
+                      <span className="font-medium text-gray-700 dark:text-gray-200">
+                        {Number(reportData.lead_time.averageDays || 0).toFixed(1)}{" "}
+                        {__("days", "yatra")}
+                      </span>{" "}
+                      ({reportData.lead_time.sampleSize}{" "}
+                      {__("bookings sampled", "yatra")})
+                    </p>
+                    <div className="space-y-2">
+                      {(reportData.lead_time.buckets || []).map(
+                        (b: any) => {
+                          const total = (
+                            reportData.lead_time.buckets || []
+                          ).reduce((s: number, x: any) => s + x.value, 0);
+                          const pct =
+                            total > 0
+                              ? Math.round((b.value / total) * 100)
+                              : 0;
+                          return (
+                            <div
+                              key={b.label}
+                              className="flex items-center gap-3"
+                            >
+                              <div className="w-44 truncate text-sm text-gray-700 dark:text-gray-200">
+                                {b.label}
+                              </div>
+                              <div className="relative h-3 flex-1 rounded-full bg-gray-100 dark:bg-gray-700">
+                                <div
+                                  className="h-3 rounded-full"
+                                  style={{
+                                    width: `${Math.max(2, pct)}%`,
+                                    background: b.color || "#3b82f6",
+                                  }}
+                                />
+                              </div>
+                              <div className="w-16 text-right text-sm tabular-nums text-gray-700 dark:text-gray-200">
+                                {b.value}
+                              </div>
+                              <div className="w-12 text-right text-xs text-gray-500 dark:text-gray-400">
+                                {pct}%
+                              </div>
+                            </div>
+                          );
+                        },
+                      )}
+                    </div>
+                  </div>
+                )}
+
+              {/* ── OPERATIONAL METRICS — Refunds summary ──────────────
+                  Refunds are distinct from cancellations: cancelling
+                  doesn't necessarily refund (deposit policy). Track
+                  separately so finance has a clean view.
+
+                  Renders unconditionally on this tab — falls back to
+                  zero KPIs when the backend hasn't shipped the
+                  `refunds` block yet (e.g. PHP-FPM cached an older
+                  copy of the controller). Visible empty-state beats
+                  silently hiding the section. */}
+              {selectedCategory === "operational-metrics" && (
+                <div className="mt-6">
+                  <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+                    {__("Refunds", "yatra")}
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+                    <div className="rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
+                      <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        {__("Refunds issued", "yatra")}
+                      </p>
+                      <p className="mt-1 text-lg font-semibold tabular-nums text-red-600 dark:text-red-400">
+                        {reportData?.refunds?.count ?? 0}
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
+                      <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        {__("Refund total", "yatra")}
+                      </p>
+                      <p className="mt-1 text-lg font-semibold tabular-nums text-red-600 dark:text-red-400">
+                        {formatCurrencyAmount(
+                          Number(reportData?.refunds?.total) || 0,
+                        )}
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
+                      <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        {__("Refund rate", "yatra")}
+                      </p>
+                      <p className="mt-1 text-lg font-semibold tabular-nums text-amber-600 dark:text-amber-400">
+                        {Number(reportData?.refunds?.refundRate || 0).toFixed(
+                          1,
+                        )}
+                        %
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
+                      <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        {__("Avg refund", "yatra")}
+                      </p>
+                      <p className="mt-1 text-lg font-semibold tabular-nums text-gray-700 dark:text-gray-200">
+                        {formatCurrencyAmount(
+                          Number(reportData?.refunds?.avgRefund) || 0,
+                        )}
                       </p>
                     </div>
                   </div>

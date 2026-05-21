@@ -88,7 +88,8 @@ class ItineraryRepository extends BaseRepository
                 
                 throw new \InvalidArgumentException(
                     sprintf(
-                        __('Day %s already exists for this trip. Please use day %d instead.', 'yatra'),
+                        /* translators: 1: comma-separated list of existing day numbers, 2: next available day number. */
+                        __('Day %1$s already exists for this trip. Please use day %2$d instead.', 'yatra'),
                         $existingDaysList,
                         $nextDay
                     )
@@ -1062,6 +1063,7 @@ class ItineraryRepository extends BaseRepository
         [
             'trip_id' => (int) $day->trip_id,
             'day_id' => $dayId,
+            /* translators: %d: itinerary day number. */
             'title' => $day->title ?: sprintf(__('Day %d', 'yatra'), (int) $day->day_number),
             'description' => '',
             'location' => null,

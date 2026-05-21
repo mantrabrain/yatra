@@ -270,7 +270,11 @@ class ToolsController extends BaseController
             }
 
             return $this->success_response([
-                'message' => sprintf(__('%d records imported successfully', 'yatra'), $imported_count),
+                'message' => sprintf(
+                    /* translators: %d: number of records imported. */
+                    __('%d records imported successfully', 'yatra'),
+                    $imported_count
+                ),
                 'imported_count' => $imported_count
             ]);
 
@@ -378,7 +382,11 @@ class ToolsController extends BaseController
             Logger::info("Logs cleared: {$type}");
 
             return $this->success_response([
-                'message' => sprintf(__('%s logs cleared successfully', 'yatra'), ucfirst($type)),
+                'message' => sprintf(
+                    /* translators: %s: log type label (e.g. "Error", "Payment"). */
+                    __('%s logs cleared successfully', 'yatra'),
+                    ucfirst($type)
+                ),
                 'cleared_count' => $cleared
             ]);
 
@@ -1190,7 +1198,11 @@ class ToolsController extends BaseController
             
             return $this->success_response([
                 'success' => true,
-                'message' => sprintf(__('Cron job "%s" executed successfully', 'yatra'), $hook),
+                'message' => sprintf(
+                    /* translators: %s: cron hook name. */
+                    __('Cron job "%s" executed successfully', 'yatra'),
+                    $hook
+                ),
             ]);
             
         } catch (\Exception $e) {

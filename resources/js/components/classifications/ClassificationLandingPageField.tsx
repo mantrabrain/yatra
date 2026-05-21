@@ -303,6 +303,7 @@ export function ClassificationLandingPageField({
           {totalPublished !== null && totalPublished > 100 && !loading && (
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {sprintf(
+                // translators: %d: total number of published pages on the site.
                 __(
                   "Showing the first 100 published pages (of %d). Change the selection in WordPress → Pages if yours is not listed.",
                   "yatra",

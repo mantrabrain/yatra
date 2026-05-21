@@ -51,7 +51,7 @@
     },
     "hide_empty": {
       "type": "boolean",
-      "default": true
+      "default": false
     },
     "featured_only": {
       "type": "boolean",

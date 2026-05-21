@@ -8,7 +8,19 @@ import { apiClient } from "../lib/api-client";
 import { __ } from "../lib/i18n";
 import { useToast } from "../components/ui/toast";
 
-export type ModulePlan = "free" | "personal" | "agency";
+/**
+ * Plan tier a module belongs to.
+ *
+ * - `free`     — bundled with the free Yatra plugin, no license required.
+ * - `personal` — unlocked by the entry-level Pro license.
+ * - `growth`   — middle tier (AI Assistant + the same-band modules).
+ * - `agency`   — top tier (white-label + agency-only modules).
+ *
+ * `growth` was previously missing from this union even though
+ * `Modules.tsx` already renders a `module.plan === "growth"` badge, which
+ * surfaced a `TS2367` "no overlap" warning on every type-check.
+ */
+export type ModulePlan = "free" | "personal" | "growth" | "agency";
 
 export interface ModuleDefinition {
   slug: string;
@@ -140,6 +152,14 @@ export const useToggleModule = () => {
         window.yatraAdmin.whatsappEnabled = enabledModules.some(
           (m) => m.slug === "whatsapp",
         );
+        // Channel Manager controls a top-level Agency-only sidebar menu.
+        // Updating this flag here means the menu appears / disappears
+        // instantly when the operator toggles the module — Layout.tsx
+        // re-evaluates its memoized menuItems on the
+        // `yatra-modules-updated` event dispatched below.
+        window.yatraAdmin.channelManagerEnabled = enabledModules.some(
+          (m) => m.slug === "channel_manager" || m.slug === "channel-manager",
+        );
         // Add flags for Pro feature modules
         window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(
           (m) => m.slug === "mailchimp",
@@ -267,6 +287,14 @@ export const useBulkToggleModules = () => {
         );
         window.yatraAdmin.whatsappEnabled = enabledModules.some(
           (m) => m.slug === "whatsapp",
+        );
+        // Channel Manager controls a top-level Agency-only sidebar menu.
+        // Updating this flag here means the menu appears / disappears
+        // instantly when the operator toggles the module — Layout.tsx
+        // re-evaluates its memoized menuItems on the
+        // `yatra-modules-updated` event dispatched below.
+        window.yatraAdmin.channelManagerEnabled = enabledModules.some(
+          (m) => m.slug === "channel_manager" || m.slug === "channel-manager",
         );
         // Add flags for Pro feature modules
         window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Repositories;
 
 use Yatra\Constants\ClassificationTypes;
+use Yatra\Utils\Cache;
 
 /**
  * Trip Category Repository
@@ -172,14 +173,49 @@ class TripCategoryRepository extends BaseRepository
     /**
      * Get published categories with trip counts, ratings, and pricing stats
      */
+    /**
+     * Wipe listing caches when a trip-category row is written so
+     * {@see self::getPublishedWithTripCounts()} doesn't serve stale
+     * aggregates. {@see \Yatra\Hooks\CacheHooks} only watches trips /
+     * activities / destinations / bookings — category writes have no
+     * corresponding domain action.
+     */
+    protected function afterWrite(string $operation, int $id, array $context = []): void
+    {
+        Cache::invalidateListingCaches();
+    }
+
     public function getPublishedWithTripCounts(): array
     {
+        // Cache the full payload. /trip-categories used to run the
+        // GROUP BY aggregate plus one MIN-price SELECT per category on
+        // every request. Cache key uses the `trip_listing_` prefix that
+        // {@see \Yatra\Utils\Cache::invalidateListingCaches()} clears on
+        // every trip / category write (the latter via this class's
+        // afterWrite override), so visitors always see current data
+        // after admin edits.
+        return $this->cacheQueryResult(
+            'trip_listing_categories_with_counts_v2',
+            function (): array {
+                return $this->fetchPublishedWithTripCounts();
+            },
+            Cache::DURATION_LISTINGS
+        );
+    }
+
+    /**
+     * Uncached worker for {@see self::getPublishedWithTripCounts()}.
+     *
+     * @return array<int, \stdClass>
+     */
+    private function fetchPublishedWithTripCounts(): array
+    {
         $table = esc_sql($this->table);
-        
+
         // Use TripRepository for trips table
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $trip_table = esc_sql($tripRepository->getTableName());
-        
+
         // Use TripClassificationsTable for trip-category relationships
         $trip_cat_table = esc_sql(\Yatra\Database\Tables\TripClassificationsTable::getTableName());
         $reviews_table = esc_sql(\Yatra\Database\Tables\ReviewsTable::getTableName());
@@ -187,7 +223,7 @@ class TripCategoryRepository extends BaseRepository
         // TripClassificationsTable uses classification_id + classification_type (not category_id).
         // ClassificationsTable holds all taxonomy rows — restrict to type = category.
         $query = $this->wpdb->prepare(
-            "SELECT c.*, 
+            "SELECT c.*,
                    COUNT(DISTINCT tc.trip_id) AS trips_count,
                    COALESCE(AVG(r.rating), 0) AS avg_rating,
                    GROUP_CONCAT(DISTINCT tc.trip_id) AS trip_ids

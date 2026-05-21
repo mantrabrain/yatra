@@ -42,6 +42,12 @@ interface DashboardProps {
   conciergePhone?: string;
   conciergeEmail?: string;
   onSectionChange: (section: string) => void;
+  /**
+   * Open a specific booking's detail view. Used by the "Upcoming
+   * Trips" cards so clicking one deep-links to the booking detail
+   * instead of dumping the user on the generic Bookings list.
+   */
+  onBookingOpen?: (bookingId: number) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
@@ -53,6 +59,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   conciergePhone = "",
   conciergeEmail = "",
   onSectionChange,
+  onBookingOpen,
 }) => {
   const conciergeTel = phoneToTelHref(conciergePhone);
   const conciergeMail = String(conciergeEmail || "").trim();
@@ -119,6 +126,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 style={{ color: "#ffffff" }}
               >
                 {sprintf(
+                  // translators: %s: customer first name (or "Traveler" fallback).
                   __("Welcome back, %s!", "yatra"),
                   displayProfile?.name?.split(" ")[0] || __("Traveler", "yatra"),
                 )}
@@ -253,9 +261,35 @@ const Dashboard: React.FC<DashboardProps> = ({
           <div className="p-6">
             {upcomingBookings.length > 0 ? (
               <div className="space-y-4">
-                {upcomingBookings.map((booking) => (
+                {upcomingBookings.map((booking) => {
+                  // Each card was rendered with `cursor-pointer`, a
+                  // hover-shadow and a `ChevronRight` affordance — i.e.
+                  // styled as a clickable nav element — but had no
+                  // onClick handler, so clicking did nothing. Deep-link
+                  // into the booking detail view via the parent
+                  // AccountPage so the user lands directly on the
+                  // selected booking rather than the generic list.
+                  const openBooking = () => {
+                    const id = Number(booking.id);
+                    if (!id) return;
+                    if (onBookingOpen) {
+                      onBookingOpen(id);
+                    } else {
+                      onSectionChange("bookings");
+                    }
+                  };
+                  return (
                   <div
                     key={booking.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={openBooking}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        openBooking();
+                      }
+                    }}
                     className="yatra-booking-card yatra-booking-card-upcoming group relative border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:shadow-md transition-all cursor-pointer bg-gradient-to-r from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-800/50"
                   >
                     <div className="flex items-start gap-4">
@@ -313,7 +347,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                       <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark transition-colors flex-shrink-0" />
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center py-12">

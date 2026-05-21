@@ -35,7 +35,7 @@ $formatDate = static function (?string $date): string {
             margin: 22mm 13mm;
         }
         body {
-            font-family: 'DejaVu Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'Noto Sans Devanagari', 'Noto Sans Arabic', 'Noto Sans CJK', 'DejaVu Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-size: 11.5px;
             color: #111827;
             line-height: 1.32;
@@ -68,7 +68,7 @@ $formatDate = static function (?string $date): string {
         }
         .section-title {
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             margin-top: 16px;
             margin-bottom: 5px;
             page-break-after: avoid;
@@ -87,7 +87,7 @@ $formatDate = static function (?string $date): string {
         }
         .responses th {
             background: #f3f4f6;
-            font-weight: 600;
+            font-weight: 700;
         }
         .responses tr {
             page-break-inside: avoid;
@@ -124,7 +124,7 @@ $formatDate = static function (?string $date): string {
         }
         .signature-label {
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 5px;
             color: #374151;
         }

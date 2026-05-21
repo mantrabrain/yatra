@@ -8,11 +8,34 @@ use Yatra\Exceptions\ValidationException;
 
 /**
  * Booking Validator
- * 
+ *
  * Comprehensive validation for booking data
  */
 class BookingValidator
 {
+    /**
+     * Statuses a booking row may legally hold.
+     *
+     * `pending_verification` is the holding state used when
+     * `require_guest_email_verification` is on: the row is created but is not
+     * actionable until the guest clicks the verification link, at which
+     * point {@see BookingSessionController::confirmEmailVerifiedBooking()}
+     * (the `pending_verification` → `pending` transition) takes over.
+     *
+     * Keep this list as the single source of truth — both validate* and
+     * sanitize use it, so adding a new status anywhere in the booking
+     * lifecycle just needs one edit here.
+     */
+    private const VALID_BOOKING_STATUSES = [
+        'pending',
+        'pending_verification',
+        'confirmed',
+        'cancelled',
+        'completed',
+        'refunded',
+        'waitlist',
+    ];
+
     /**
      * Validate booking creation data
      */
@@ -46,8 +69,7 @@ class BookingValidator
 
         // Validate status
         if (isset($data['status'])) {
-            $validStatuses = ['pending', 'confirmed', 'cancelled', 'completed', 'refunded', 'waitlist'];
-            if (!in_array($data['status'], $validStatuses, true)) {
+            if (!in_array($data['status'], self::VALID_BOOKING_STATUSES, true)) {
                 $errors['status'][] = __('Invalid booking status', 'yatra');
             }
         }
@@ -147,8 +169,7 @@ class BookingValidator
         }
 
         if (isset($data['status'])) {
-            $validStatuses = ['pending', 'confirmed', 'cancelled', 'completed', 'refunded', 'waitlist'];
-            if (!in_array($data['status'], $validStatuses, true)) {
+            if (!in_array($data['status'], self::VALID_BOOKING_STATUSES, true)) {
                 $errors['status'][] = __('Invalid booking status', 'yatra');
             }
         }
@@ -244,8 +265,7 @@ class BookingValidator
 
         // Enum fields
         if (isset($data['status'])) {
-            $validStatuses = ['pending', 'confirmed', 'cancelled', 'completed', 'refunded', 'waitlist'];
-            $sanitized['status'] = in_array($data['status'], $validStatuses, true) ? $data['status'] : 'pending';
+            $sanitized['status'] = in_array($data['status'], self::VALID_BOOKING_STATUSES, true) ? $data['status'] : 'pending';
         }
 
         if (isset($data['payment_method'])) {

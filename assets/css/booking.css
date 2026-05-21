@@ -2296,10 +2296,83 @@
         padding: 24px;
     }
 
+    /*
+     * Mobile-input hygiene. Two reasons every booking-form input
+     * gets re-styled here at <=768px:
+     *
+     * 1. font-size: 16px (mandatory). iOS Safari auto-zooms the
+     *    viewport when a user focuses an <input>/<select>/<textarea>
+     *    whose computed font-size is below 16px. Our desktop styles
+     *    use 15px, which triggers a 1.25x zoom + scroll-position
+     *    jump on focus — disorienting on a long booking form. 16px
+     *    silences the zoom.
+     *
+     * 2. Vertical padding bumped to 14px. With 16px text that gives
+     *    ~48px total tap height (Material Design minimum is 48dp,
+     *    Apple HIG is 44pt). 44px works for thumbs in landscape;
+     *    48px works in portrait too, where most mobile bookings
+     *    actually happen.
+     */
+    .yatra-form-group input[type="text"],
+    .yatra-form-group input[type="email"],
+    .yatra-form-group input[type="tel"],
+    .yatra-form-group input[type="date"],
+    .yatra-form-group input[type="number"],
+    .yatra-form-group input[type="password"],
+    .yatra-form-group select,
+    .yatra-form-group textarea,
+    .yatra-booking-form input,
+    .yatra-booking-form select,
+    .yatra-booking-form textarea {
+        font-size: 16px;
+        padding-top: 14px;
+        padding-bottom: 14px;
+        min-height: 48px;
+    }
+
+    .yatra-booking-form textarea {
+        min-height: 96px;
+    }
+
+    /*
+     * Inline login + register tabs on the booking page (rendered by
+     * booking-auth.php). Same hygiene as the booking form so the
+     * "log in to continue" path doesn't suddenly feel cramped /
+     * trigger iOS zoom mid-checkout.
+     */
+    .yatra-booking-auth input[type="text"],
+    .yatra-booking-auth input[type="email"],
+    .yatra-booking-auth input[type="tel"],
+    .yatra-booking-auth input[type="password"],
+    .yatra-auth-form input[type="text"],
+    .yatra-auth-form input[type="email"],
+    .yatra-auth-form input[type="tel"],
+    .yatra-auth-form input[type="password"] {
+        font-size: 16px;
+        min-height: 48px;
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+
+    .yatra-booking-auth .yatra-auth-submit,
+    .yatra-auth-form .yatra-auth-submit {
+        min-height: 48px;
+        font-size: 16px;
+    }
+
+    /*
+     * Stacking rules — keep these INSIDE the @media (max-width: 768px)
+     * block. On phones we want the form row to flow vertically and
+     * half/third fields to span full width; on desktop they should
+     * stay side-by-side as defined at line ~890. (A prior edit
+     * accidentally closed this media block too early, leaking these
+     * column-direction rules to every viewport — which is why all
+     * fields appeared full-width on desktop.)
+     */
     .yatra-form-row {
         flex-direction: column;
     }
-    
+
     .yatra-field-half,
     .yatra-field-third {
         flex: 1 1 100%;

@@ -284,6 +284,38 @@
         value: activityIds,
         onChange: (ids) => setAttributes({ activityIds: ids })
       }
+    )), /* @__PURE__ */ element.createElement(components.PanelBody, { title: i18n.__("Display options", "yatra"), initialOpen: false }, /* @__PURE__ */ element.createElement(
+      components.ToggleControl,
+      {
+        label: i18n.__("Show trip count", "yatra"),
+        checked: attributes2.show_trip_count,
+        onChange: (value) => setAttributes({ show_trip_count: value })
+      }
+    ), /* @__PURE__ */ element.createElement(
+      components.ToggleControl,
+      {
+        label: i18n.__("Show description", "yatra"),
+        checked: attributes2.show_description,
+        onChange: (value) => setAttributes({ show_description: value })
+      }
+    ), /* @__PURE__ */ element.createElement(
+      components.ToggleControl,
+      {
+        label: i18n.__("Show image", "yatra"),
+        checked: attributes2.show_image,
+        onChange: (value) => setAttributes({ show_image: value })
+      }
+    ), /* @__PURE__ */ element.createElement(
+      components.ToggleControl,
+      {
+        label: i18n.__("Hide empty activities", "yatra"),
+        help: i18n.__(
+          "Skip activities that have no published trips assigned. Off by default — turn on for a tighter live catalog, leave off for editorial / onboarding views.",
+          "yatra"
+        ),
+        checked: attributes2.hide_empty,
+        onChange: (value) => setAttributes({ hide_empty: value })
+      }
     ))), /* @__PURE__ */ element.createElement("div", { className: "yatra-block-editor-preview" }, /* @__PURE__ */ element.createElement(
       ServerSideRender,
       {
@@ -330,6 +362,23 @@
     activityIds: {
       type: "array",
       "default": []
+    },
+    hide_empty: {
+      type: "boolean",
+      "default": false,
+      description: "When on, activities with zero published trips are skipped. Off by default to preserve the historical 'show everything' behavior."
+    },
+    show_trip_count: {
+      type: "boolean",
+      "default": true
+    },
+    show_description: {
+      type: "boolean",
+      "default": true
+    },
+    show_image: {
+      type: "boolean",
+      "default": true
     }
   };
   const supports = {

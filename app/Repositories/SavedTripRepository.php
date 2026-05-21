@@ -254,8 +254,10 @@ class SavedTripRepository extends BaseRepository
                 if (function_exists('yatra_format_duration')) {
                     $duration = yatra_format_duration($durationDays, $durationNights);
                 } else {
+                    /* translators: %d: number of days. */
                     $duration = sprintf(__('%d Days', 'yatra'), $durationDays);
                     if (!empty($durationNights)) {
+                        /* translators: %d: number of nights. */
                         $duration .= ' / ' . sprintf(__('%d Nights', 'yatra'), $durationNights);
                     }
                 }

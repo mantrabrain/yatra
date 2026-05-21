@@ -221,7 +221,11 @@ class PaymentGatewayController extends BaseController
             'customer_email' => $customerEmail,
             'customer_name' => $customerName ?: $customerEmail,
             'return_url' => $confirmationUrl,
-            'description' => sprintf(__('Remaining balance for Booking #%s', 'yatra'), $booking->reference ?? $bookingId),
+            'description' => sprintf(
+                /* translators: %s: booking reference. */
+                __('Remaining balance for Booking #%s', 'yatra'),
+                $booking->reference ?? $bookingId
+            ),
             'cancel_url' => $cancelUrl,
         ];
 
@@ -1047,6 +1051,7 @@ class PaymentGatewayController extends BaseController
             'status_class' => in_array(strtolower((string) ($payment->status ?? '')), ['confirmed', 'completed', 'success'], true) ? 'confirmed' : 
                            (in_array(strtolower((string) ($payment->status ?? '')), ['cancelled'], true) ? 'cancelled' : 'pending'),
             'trip_title' => $trip ? ($trip->title ?? $payment->trip_title ?? __('Trip Booking', 'yatra')) : ($payment->trip_title ?? __('Trip Booking', 'yatra')),
+            /* translators: %d: trip duration in days. */
             'trip_duration' => $trip && $trip->duration ? sprintf(__('%d days', 'yatra'), (int) $trip->duration) : '',
             'trip_difficulty' => $trip ? ($trip->difficulty_name ?? '') : '',
             'departure_location' => $trip ? ($trip->departure_location ?? '') : '',
@@ -1114,98 +1119,64 @@ class PaymentGatewayController extends BaseController
             return new WP_Error('forbidden', __('You do not have permission to access this itinerary.', 'yatra'), ['status' => 403]);
         }
 
-        // Get trip details if available
-        $trip = null;
-        if (!empty($payment->trip_id)) {
-            $trip = $this->tripRepository->find((int) $payment->trip_id);
+        // Delegate all the template-data composition + PDF rendering to
+        // the shared ItineraryPdfBuilder so the booking-side path
+        // (BookingsController::renderItineraryFromBookingData) and this
+        // payment-side path produce IDENTICAL PDFs from the same input.
+        $builder = new \Yatra\Services\ItineraryPdfBuilder();
+        if (!$builder->pdfService()->isAvailable()) {
+            return new WP_Error(
+                'pdf_engine_missing',
+                __('Itinerary PDF generator is not installed. Please run composer install to install dompdf/dompdf.', 'yatra'),
+                ['status' => 500]
+            );
         }
 
-        // Get company settings
-        $companyName = SettingsService::get('company_name', get_bloginfo('name'));
-        $companyAddress = SettingsService::get('company_address', '');
-        $companyEmail = SettingsService::get('company_email', get_option('admin_email'));
-        $companyPhone = SettingsService::get('company_phone', '');
-        $currency = SettingsService::getCurrency();
-        $currencySymbol = FormatHelper::getCurrencySymbol($currency);
-
-        // Format dates
-        $bookingDate = !empty($payment->created_at) ? date_i18n(get_option('date_format'), strtotime($payment->created_at)) : '';
-        $travelDate = !empty($payment->travel_date) ? date_i18n(get_option('date_format'), strtotime($payment->travel_date)) : '';
-        
-        // Calculate return date if duration is available
-        $returnDate = '';
-        if (!empty($payment->travel_date) && !empty($trip->duration ?? 0)) {
-            $returnTimestamp = strtotime($payment->travel_date . ' +' . (int) ($trip->duration ?? 0) . ' days');
-            $returnDate = date_i18n(get_option('date_format'), $returnTimestamp);
-        }
-
-        // Generate booking reference
-        $bookingRef = '';
-        if (!empty($payment->booking_id)) {
-            $bookingRef = 'YTR-' . strtoupper(str_pad((string) $payment->booking_id, 8, '0', STR_PAD_LEFT));
-        }
-
-        // Generate PDF using PDF service
-        $pdfService = new PdfService();
+        $bookingRef = !empty($payment->booking_id)
+            ? 'YTR-' . strtoupper(str_pad((string) $payment->booking_id, 8, '0', STR_PAD_LEFT))
+            : 'PENDING';
         $filename = 'Travel-Itinerary-' . $bookingRef . '.pdf';
 
-        // Prepare template data with null-safe access
-        $templateData = [
-            'company_name' => $companyName,
-            'company_address' => $companyAddress,
-            'company_email' => $companyEmail,
-            'company_phone' => $companyPhone,
-            'customer_name' => trim(($payment->contact_first_name ?? '') . ' ' . ($payment->contact_last_name ?? '')) ?: ($payment->customer_name ?? __('Customer', 'yatra')),
-            'customer_email' => $payment->contact_email ?? $payment->customer_email ?? '',
-            'booking_ref' => $bookingRef,
-            'booking_date' => $bookingDate,
-            'booking_status' => ucfirst($payment->status ?? 'confirmed'),
-            'status_class' => in_array(strtolower((string) ($payment->status ?? '')), ['confirmed', 'completed', 'success'], true) ? 'confirmed' : 
-                           (in_array(strtolower((string) ($payment->status ?? '')), ['cancelled'], true) ? 'cancelled' : 'pending'),
-            'trip_title' => $trip ? ($trip->title ?? $payment->trip_title ?? __('Trip Booking', 'yatra')) : ($payment->trip_title ?? __('Trip Booking', 'yatra')),
-            'trip_description' => $trip ? ($trip->description ?? $trip->content ?? '') : '',
-            'trip_duration' => $trip && $trip->duration ? sprintf(__('%d days', 'yatra'), (int) $trip->duration) : '',
-            'trip_difficulty' => $trip ? ($trip->difficulty_name ?? '') : '',
-            'trip_highlights' => $trip ? ($trip->highlights ?? $trip->trip_highlights ?? '') : '',
-            'trip_includes' => $trip ? ($trip->includes ?? $trip->trip_includes ?? '') : '',
-            'trip_excludes' => $trip ? ($trip->excludes ?? $trip->trip_excludes ?? '') : '',
-            'departure_location' => $trip ? ($trip->departure_location ?? '') : '',
-            'destination' => $trip ? ($trip->destination ?? $payment->destination ?? '') : ($payment->destination ?? ''),
-            'travel_date' => $travelDate,
-            'return_date' => $returnDate,
-            'currency_symbol' => $currencySymbol,
-            'total_amount' => number_format((float) ($payment->booking_total_amount ?? $payment->amount ?? 0), 2),
-            'amount_paid' => number_format((float) ($payment->booking_amount_paid ?? $payment->amount ?? 0), 2),
-            'amount_due' => number_format((float) ($payment->booking_amount_due ?? 0), 2),
-            'traveler_count' => (int) ($payment->traveler_count ?? 1),
-        ];
-
-        $pdfBinary = $pdfService->renderTemplateToPdfSafely('pdf/itinerary.php', $templateData, [
-            'paper' => 'A4',
-            'orientation' => 'portrait',
-            'default_font' => 'DejaVu Sans',
-        ]);
+        $pdfBinary = $builder->buildFromPaymentRecord($payment);
 
         if ($isPreview) {
-            // For preview, return PDF as inline display
             return new WP_REST_Response([
                 'success' => true,
                 'pdf_data' => base64_encode($pdfBinary),
                 'filename' => $filename,
             ]);
-        } else {
-            // For download, output PDF as download
-            $pdfService->outputPdfDownload($pdfBinary, $filename);
-            exit;
         }
+
+        $builder->pdfService()->outputPdfDownload($pdfBinary, $filename);
+        exit;
     }
 
     /**
-     * Issue a stateless, signed token that grants access to a single payment's invoice.
+     * Default invoice-token TTL — 1 year. Customers download invoices
+     * for tax/expense reports months later, so a short TTL would hurt
+     * legitimate use. The TTL is still meaningful as defense-in-depth:
+     * a leaked link (forwarded email, posted in a help-desk ticket,
+     * cached by a public mail relay) eventually expires.
      *
-     * The token is bound to the payment id + booking id and signed with the WP auth salt,
-     * so it cannot be forged without the site secret. It is safe to embed in the
-     * confirmation page link so guests (or users who logged out after checkout) can still
+     * Filterable via `yatra_invoice_token_ttl_seconds` so operators
+     * can tighten or loosen on a per-site basis.
+     */
+    private const INVOICE_TOKEN_DEFAULT_TTL = 365 * 86400;
+
+    /**
+     * Issue a stateless, signed token that grants access to a single
+     * payment's invoice. v2 format embeds an issued-at timestamp so
+     * tokens have a defined expiry window — older v1 tokens (no
+     * expiry component) are still honored by verifyInvoiceToken() so
+     * pre-existing confirmation emails don't break.
+     *
+     * v2 format: `v2.<iat>.<hmac>` where hmac signs `paymentId|bookingId|iat`.
+     * v1 format: bare `<hmac>` over `paymentId|bookingId` (legacy).
+     *
+     * The token is bound to the payment id + booking id and signed
+     * with the WP auth salt, so it cannot be forged without the site
+     * secret. It is safe to embed in the confirmation page link so
+     * guests (or users who logged out after checkout) can still
      * download their invoice without a session.
      */
     public static function issueInvoiceToken(int $paymentId, int $bookingId): string
@@ -1213,18 +1184,68 @@ class PaymentGatewayController extends BaseController
         if ($paymentId <= 0 || $bookingId <= 0) {
             return '';
         }
-        return hash_hmac('sha256', $paymentId . '|' . $bookingId, wp_salt('auth') . '|yatra_invoice');
+        $iat = time();
+        $hmac = hash_hmac(
+            'sha256',
+            $paymentId . '|' . $bookingId . '|' . $iat,
+            wp_salt('auth') . '|yatra_invoice'
+        );
+        return 'v2.' . $iat . '.' . $hmac;
     }
 
     /**
      * Verify a token previously issued by self::issueInvoiceToken().
+     *
+     * Accepts both formats:
+     *   - v2 (`v2.<iat>.<hmac>`): validates HMAC + checks token age
+     *     against the configured TTL.
+     *   - v1 (bare hmac, no expiry): legacy tokens already in the
+     *     wild via prior confirmation emails. We accept them
+     *     indefinitely — those URLs were already issued and revoking
+     *     them now would break existing customer bookmarks.
      */
     public static function verifyInvoiceToken(string $token, int $paymentId, int $bookingId): bool
     {
         if ($token === '' || $paymentId <= 0 || $bookingId <= 0) {
             return false;
         }
-        $expected = self::issueInvoiceToken($paymentId, $bookingId);
-        return $expected !== '' && hash_equals($expected, $token);
+
+        // v2 path — token starts with the version prefix.
+        if (strncmp($token, 'v2.', 3) === 0) {
+            $parts = explode('.', $token);
+            if (\count($parts) !== 3) return false;
+            $iatStr = $parts[1];
+            $providedHmac = $parts[2];
+            if (!ctype_digit($iatStr)) return false;
+            $iat = (int) $iatStr;
+
+            $expectedHmac = hash_hmac(
+                'sha256',
+                $paymentId . '|' . $bookingId . '|' . $iat,
+                wp_salt('auth') . '|yatra_invoice'
+            );
+            if (!hash_equals($expectedHmac, $providedHmac)) {
+                return false;
+            }
+
+            $ttl = (int) apply_filters(
+                'yatra_invoice_token_ttl_seconds',
+                self::INVOICE_TOKEN_DEFAULT_TTL
+            );
+            if ($ttl > 0 && (time() - $iat) > $ttl) {
+                return false;
+            }
+            return true;
+        }
+
+        // v1 legacy path — bare HMAC over (paymentId|bookingId).
+        // Kept for confirmation emails already sent before the v2
+        // upgrade landed. New code paths always issue v2.
+        $expectedLegacy = hash_hmac(
+            'sha256',
+            $paymentId . '|' . $bookingId,
+            wp_salt('auth') . '|yatra_invoice'
+        );
+        return hash_equals($expectedLegacy, $token);
     }
 }

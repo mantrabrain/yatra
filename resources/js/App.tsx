@@ -64,6 +64,7 @@ import License from "./pages/License";
 import WhiteLabel from "./pages/WhiteLabel";
 import AiAssistant from "./pages/AiAssistant";
 import Whatsapp from "./pages/Whatsapp";
+import ChannelManager from "./pages/ChannelManager";
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -326,6 +327,8 @@ const App: React.FC = () => {
         return <AiAssistant />;
       case "whatsapp":
         return <Whatsapp />;
+      case "channel-manager":
+        return <ChannelManager />;
       case "dashboard":
       default:
         return <Dashboard />;

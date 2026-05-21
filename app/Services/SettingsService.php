@@ -58,9 +58,21 @@ class SettingsService
         'auto_confirm_bookings' => false,
         'require_login' => false,
         'allow_guest_checkout' => true,
-        'cancellation_policy' => 'full_refund',
-        'cancellation_days' => 7,
-        'refund_policy' => '',
+        // Hold guest bookings in `pending_verification` status until
+        // the customer clicks a magic link sent to the email they
+        // gave. Defends against typo'd email addresses (a booking
+        // with the wrong email is unreachable forever) and against
+        // form-spam bots that submit junk emails. Only applies when
+        // `allow_guest_checkout` is true and the customer is not
+        // logged in.
+        'require_guest_email_verification' => false,
+        // cancellation_policy / cancellation_days / refund_policy
+        // removed — see SettingsController::$default_settings for
+        // the rationale. Leaving the keys out of this defaults map
+        // means SettingsService::get() returns null for legacy
+        // callers, and email/template render paths handle absence
+        // gracefully by skipping the cancellation paragraph or
+        // falling back to the per-trip cancellation_policy.
         'booking_expiry_hours' => 24,
         'booking_reminder_days' => 3,
         'allow_waitlist' => true,
@@ -101,6 +113,53 @@ class SettingsService
         'admin_email' => '',
         'enable_admin_notifications' => true,
         'enable_customer_notifications' => true,
+
+        // Email template enable flags.
+        //
+        // These mirror SettingsController::$default_settings + the
+        // entries InstallerService seeds on activation. They're
+        // duplicated here because SettingsService::isEnabled() falls
+        // back to THIS array when the wp_option doesn't exist — and
+        // there are two installation paths where the option is
+        // missing in production:
+        //   1. Sites that upgraded from a Yatra version that didn't
+        //      seed the flag (InstallerService runs only on initial
+        //      activation, not on update).
+        //   2. Sites whose operator never opened Settings → never
+        //      hit the REST save endpoint that would write defaults.
+        // Without this fallback, the verification email + booking
+        // confirmation + every transactional email silently no-ops
+        // on those installs (sendIfEnabled gates on the flag).
+        'email_template_booking' => true,
+        'email_template_confirmation' => true,
+        'email_template_cancellation' => true,
+        'email_template_reminder' => true,
+        'email_template_admin_new_booking' => true,
+        'email_template_admin_payment' => true,
+        'email_template_admin_cancellation' => true,
+        'email_template_trip_consent' => true,
+        'email_template_customer_verification' => true,
+        'email_template_guest_verification' => true,
+        'email_template_booking_completed' => true,
+        'email_template_booking_expired_customer' => true,
+        'email_template_admin_booking_expired' => true,
+        'email_template_scheduled_payment_reminder' => true,
+        'email_template_scheduled_payment_succeeded' => true,
+        'email_template_scheduled_payment_failed' => true,
+        'email_template_admin_scheduled_payment_failed' => true,
+        'email_template_enquiry_received' => true,
+        'email_template_enquiry_admin' => true,
+        'email_template_enquiry_response' => true,
+        'email_template_review_request' => true,
+        'email_template_abandoned_booking_recovery_first' => true,
+        'email_template_abandoned_booking_recovery_second' => true,
+        'email_template_abandoned_booking_recovery_final' => true,
+        // Customer-registration gate (AuthController::register reads
+        // this exact key). Mismatched name vs InstallerService's
+        // `enable_customer_registration` seed — keeping both names
+        // here so register() works regardless of which key was
+        // saved on prior installs.
+        'customer_registration' => true,
         
         // Trip
         'trip_base' => 'trip',

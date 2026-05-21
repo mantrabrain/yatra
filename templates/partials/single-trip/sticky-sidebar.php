@@ -55,6 +55,7 @@ if ($effective_min > 0) {
 
         $discount['has_discount'] = true;
         $discount['discount_percentage'] = $max_discount_pct;
+        /* translators: %d: maximum discount percentage. */
         $discount['discount_text'] = sprintf(__('Up to %d%%', 'yatra'), $max_discount_pct);
     }
 } else {
@@ -87,6 +88,7 @@ if ($effective_min > 0) {
                 
                 $discount['has_discount'] = true;
                 $discount['discount_percentage'] = $pct;
+                /* translators: %d: discount percentage. */
                 $discount['discount_text'] = sprintf(__('%d%%', 'yatra'), $pct);
             }
         }

@@ -465,21 +465,50 @@
     }
 
     /**
-     * Initialize filter section toggle functionality
+     * Initialize filter section toggle functionality.
+     *
+     * Uses event delegation on `document` rather than binding to each
+     * .yatra-filter-title once at load. Two reasons:
+     *
+     *   1. Robust to re-renders: when a filter changes the listing
+     *      area may re-fetch + replace the sidebar HTML; per-element
+     *      listeners attached at DOMContentLoaded would silently
+     *      stop firing after replacement. Delegation survives that.
+     *
+     *   2. Handles SVG-target edge cases: clicking the down-arrow
+     *      SVG fires the click on the SVG element. The previous
+     *      `title.addEventListener` relied on the click bubbling up
+     *      to the title parent — which works in modern browsers but
+     *      is fragile across older WebKit variants and any future
+     *      CSS that introduces a stacking context inside the title.
+     *      `closest('.yatra-filter-title')` catches the click no
+     *      matter which descendant element was the actual target.
+     *
+     * Clicks on `.yatra-clear-section` (the "clear this filter" X)
+     * are explicitly excluded so they don't ALSO trigger a toggle.
      */
     function initializeFilterToggle() {
-        const filterTitles = document.querySelectorAll('.yatra-filter-title');
-        
-        filterTitles.forEach(function(title) {
-            title.addEventListener('click', function() {
-                const section = this.closest('.yatra-filter-section');
-                if (section) {
-                    section.classList.toggle('open');
-                }
-            });
+        document.addEventListener('click', function(e) {
+            // Skip clicks on the clear-section button (and any of its
+            // children, eg the X icon SVG) — those have their own
+            // handler and shouldn't toggle the section open/closed.
+            if (e.target.closest('.yatra-clear-section')) {
+                return;
+            }
+
+            var title = e.target.closest('.yatra-filter-title');
+            if (!title) {
+                return;
+            }
+
+            var section = title.closest('.yatra-filter-section');
+            if (section) {
+                section.classList.toggle('open');
+            }
         });
 
-        // Open all sections by default
+        // Open all sections by default on first render. Subsequent
+        // re-renders inherit whatever state the new HTML ships with.
         document.querySelectorAll('.yatra-filter-section').forEach(function(section) {
             section.classList.add('open');
         });

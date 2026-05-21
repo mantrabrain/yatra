@@ -9,6 +9,7 @@ use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Database\Tables\TripsTable;
 use Yatra\Database\Tables\ReviewsTable;
+use Yatra\Utils\Cache;
 
 /**
  * Destination Repository
@@ -77,6 +78,22 @@ class DestinationRepository extends BaseRepository
     }
 
     /**
+     * Wipe listing caches whenever a destination row is created /
+     * updated / deleted so {@see self::getPublishedWithTripCounts()}
+     * (and any other `destination_listing_*` / `trip_listing_*` keys)
+     * never serve stale aggregates after admin edits. The matching
+     * {@see \Yatra\Hooks\CacheHooks::onDestinationUpdated()} listeners
+     * only fire when a `yatra_destination_*` action is dispatched
+     * elsewhere, which today nothing does — so without this override an
+     * admin edit could keep showing old `trips_count` / `starting_price`
+     * for up to {@see Cache::DURATION_DESTINATION_DATA} seconds.
+     */
+    protected function afterWrite(string $operation, int $id, array $context = []): void
+    {
+        Cache::invalidateListingCaches();
+    }
+
+    /**
      * Get published destinations with attached trip counts.
      *
      * This uses the new TripClassificationsTable relation table to count how many
@@ -85,8 +102,32 @@ class DestinationRepository extends BaseRepository
      */
     public function getPublishedWithTripCounts(): array
     {
-        global $wpdb;
+        // The underlying SQL + price walk has been made O(1) in the
+        // number of trips per destination (see
+        // {@see self::computeStartingPriceForTripIds()}), so the
+        // uncached path is now fast on its own. We still cache the full
+        // result for repeat visits, but the cache key sits behind
+        // {@see \Yatra\Utils\Cache::invalidateListingCaches()} (which
+        // matches the `destination_listing_` prefix) and gets wiped
+        // automatically whenever a trip/destination row is written via
+        // {@see \Yatra\Hooks\CacheHooks}. Users always see real data
+        // immediately after admin edits — no manual cache-bust needed.
+        return $this->cacheQueryResult(
+            'destination_listing_with_trip_counts_v2',
+            function (): array {
+                return $this->fetchPublishedWithTripCounts();
+            },
+            Cache::DURATION_DESTINATION_DATA
+        );
+    }
 
+    /**
+     * Uncached worker for {@see self::getPublishedWithTripCounts()}.
+     *
+     * @return array<int, \stdClass>
+     */
+    private function fetchPublishedWithTripCounts(): array
+    {
         $destTable    = esc_sql($this->table);
         $relTable     = TripClassificationsTable::getTableName();
         $tripsTable   = TripsTable::getTableName();
@@ -96,13 +137,13 @@ class DestinationRepository extends BaseRepository
         // avg_rating is computed from approved reviews across all those trips.
         // starting_price is computed in PHP using both regular trip prices and
         // traveler-based pricing from recurring availability rules.
-        $sql = "SELECT d.*, 
+        $sql = "SELECT d.*,
                        COUNT(DISTINCT tc.trip_id) AS trips_count,
                        COALESCE(AVG(r.rating), 0) AS avg_rating,
                        GROUP_CONCAT(DISTINCT tc.trip_id) AS trip_ids
                 FROM `{$destTable}` d
                 LEFT JOIN `{$relTable}` tc
-                  ON tc.classification_id = d.id 
+                  ON tc.classification_id = d.id
                   AND tc.classification_type = %s
                 LEFT JOIN `{$tripsTable}` t
                   ON t.id = tc.trip_id
@@ -136,20 +177,115 @@ class DestinationRepository extends BaseRepository
             return 0.0;
         }
 
-        $tripIds = array_filter(array_map('intval', explode(',', $tripIdsCsv)));
+        $tripIds = array_values(array_unique(array_filter(array_map('intval', explode(',', $tripIdsCsv)))));
         if (empty($tripIds)) {
             return 0.0;
         }
 
+        // Batch-load all trip rows in ONE query (was: SELECT-per-trip,
+        // which made every /destinations request issue O(trips_per_dest)
+        // queries — multiplied across all destinations on the page).
+        $tripsTable   = TripsTable::getTableName();
+        $placeholders = implode(',', array_fill(0, count($tripIds), '%d'));
+        $rows         = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT id, sale_price, discounted_price, original_price FROM `{$tripsTable}` WHERE id IN ({$placeholders})",
+                ...$tripIds
+            )
+        ) ?: [];
+
         $minPrice = null;
-        foreach ($tripIds as $tripId) {
-            $price = $this->getEffectiveTripBasePrice($tripId);
-            if ($price > 0 && ($minPrice === null || $price < $minPrice)) {
-                $minPrice = $price;
+        $unpricedIds = [];
+
+        foreach ($rows as $row) {
+            $tripEffective = \Yatra\Services\TripPricingService::getEffectivePrice($row);
+            if ($tripEffective > 0) {
+                if ($minPrice === null || $tripEffective < $minPrice) {
+                    $minPrice = $tripEffective;
+                }
+            } else {
+                $unpricedIds[] = (int) $row->id;
+            }
+        }
+
+        // Only fall back to RecurringAvailabilityRepository for trips
+        // that have no trip-level price set. Even there, batch the rule
+        // query across all such trip IDs instead of N separate calls.
+        if (!empty($unpricedIds)) {
+            $fallbackMin = $this->minPriceFromRecurringRulesForTripIds($unpricedIds);
+            if ($fallbackMin > 0 && ($minPrice === null || $fallbackMin < $minPrice)) {
+                $minPrice = $fallbackMin;
             }
         }
 
         return $minPrice ?? 0.0;
+    }
+
+    /**
+     * Batched version of the traveler-pricing fallback that used to run
+     * once per trip. Pulls every active rule for the given trip IDs in a
+     * single query and scans them in PHP.
+     *
+     * @param list<int> $tripIds
+     */
+    private function minPriceFromRecurringRulesForTripIds(array $tripIds): float
+    {
+        if ($tripIds === []) {
+            return 0.0;
+        }
+
+        $rulesRepo = new RecurringAvailabilityRepository();
+        if (!method_exists($rulesRepo, 'findByTripIds')) {
+            // Older repository — fall back to per-trip lookup but only
+            // for the (small) set of trips with no trip-level price.
+            $candidates = [];
+            foreach ($tripIds as $tid) {
+                $rules = $rulesRepo->findByTripId($tid, ['status' => 'active']);
+                foreach ($rules as $rule) {
+                    $this->collectRulePriceCandidates($rule, $candidates);
+                }
+            }
+            return $candidates === [] ? 0.0 : (float) min($candidates);
+        }
+
+        $rules = $rulesRepo->findByTripIds($tripIds, ['status' => 'active']);
+        $candidates = [];
+        foreach ($rules as $rule) {
+            $this->collectRulePriceCandidates($rule, $candidates);
+        }
+        return $candidates === [] ? 0.0 : (float) min($candidates);
+    }
+
+    /**
+     * @param list<float> $candidates Accumulator passed by reference.
+     */
+    private function collectRulePriceCandidates(object $rule, array &$candidates): void
+    {
+        if (!empty($rule->sale_price) && (float) $rule->sale_price > 0) {
+            $candidates[] = (float) $rule->sale_price;
+        }
+        if (!empty($rule->original_price) && (float) $rule->original_price > 0) {
+            $candidates[] = (float) $rule->original_price;
+        }
+        if (!empty($rule->traveler_pricing) && is_array($rule->traveler_pricing)) {
+            foreach ($rule->traveler_pricing as $pricing) {
+                if (!empty($pricing['effective_price']) && (float) $pricing['effective_price'] > 0) {
+                    $candidates[] = (float) $pricing['effective_price'];
+                }
+            }
+        }
+        if (!empty($rule->time_slots) && is_array($rule->time_slots)) {
+            foreach ($rule->time_slots as $slot) {
+                if (empty($slot['traveler_pricing']) || !is_array($slot['traveler_pricing'])) {
+                    continue;
+                }
+                foreach ($slot['traveler_pricing'] as $pricing) {
+                    if (!empty($pricing['effective_price']) && (float) $pricing['effective_price'] > 0) {
+                        $candidates[] = (float) $pricing['effective_price'];
+                    }
+                }
+            }
+        }
     }
 
     /**

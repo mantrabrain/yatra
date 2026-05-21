@@ -17,7 +17,7 @@
     "type-check": "node ./node_modules/typescript/bin/tsc --noEmit",
     "format": "node ./node_modules/prettier/bin/prettier.cjs --write \"resources/js/**/*.{ts,tsx,js,jsx}\"",
     "format:check": "node ./node_modules/prettier/bin/prettier.cjs --check \"resources/js/**/*.{ts,tsx,js,jsx}\"",
-    "makepot": "babel assets/dist assets/admin/dist --out-file /dev/null && WP_MEMORY_LIMIT=1G php -d memory_limit=1G $(which wp) --allow-root i18n make-pot . i18n/languages/yatra.pot --include=\"app,includes,templates\" --domain=yatra --location --headers='{\"Language-Team\":\"Yatra Development Team <mantrabrain@gmail.com>\",\"Last-Translator\":\"Yatra Dev <mantrabrain@gmail.com>\",\"Language\":\"en_US\",\"Plural-Forms\":\"nplurals=2; plural=(n != 1);\"}' && WP_MEMORY_LIMIT=1G php -d memory_limit=1G $(which wp) --allow-root i18n make-pot . i18n/languages/yatra.pot --merge=i18n/languages/yatra-js.pot && rm -f i18n/languages/yatra-js.pot",
+    "makepot": "node scripts/extract-js-pot.mjs && WP_MEMORY_LIMIT=1G php -d memory_limit=1G $(which wp) --allow-root i18n make-pot . i18n/languages/yatra.pot --include=\"app,includes,templates,resources/js\" --domain=yatra --location --headers='{\"Language-Team\":\"Yatra Development Team <mantrabrain@gmail.com>\",\"Last-Translator\":\"Yatra Dev <mantrabrain@gmail.com>\",\"Language\":\"en_US\",\"Plural-Forms\":\"nplurals=2; plural=(n != 1);\"}' && WP_MEMORY_LIMIT=1G php -d memory_limit=1G $(which wp) --allow-root i18n make-pot . i18n/languages/yatra.pot --merge=i18n/languages/yatra-js.pot && rm -f i18n/languages/yatra-js.pot",
     "i18n": "npm run makepot",
     "zip": "bash ./build.sh"
   },

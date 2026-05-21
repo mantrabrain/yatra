@@ -760,6 +760,7 @@ class BookingsController extends BaseController
             'status_class' => in_array(strtolower($statusRaw), ['confirmed', 'completed', 'success'], true) ? 'confirmed' :
                 (in_array(strtolower($statusRaw), ['cancelled'], true) ? 'cancelled' : 'pending'),
             'trip_title' => $trip ? ($trip->title ?? $booking['trip_title'] ?? __('Trip Booking', 'yatra')) : ($booking['trip_title'] ?? __('Trip Booking', 'yatra')),
+            /* translators: %d: trip duration in days. */
             'trip_duration' => $trip && $trip->duration ? sprintf(__('%d days', 'yatra'), (int) $trip->duration) : '',
             'trip_difficulty' => $trip ? ($trip->difficulty_name ?? '') : '',
             'departure_location' => $trip ? ($trip->departure_location ?? '') : '',
@@ -807,41 +808,8 @@ class BookingsController extends BaseController
      */
     private function renderItineraryFromBookingData(array $booking, bool $isPreview)
     {
-        $tripRepository = new TripRepository();
-        $trip = null;
-        $tripId = (int) ($booking['trip_id'] ?? 0);
-        if ($tripId > 0) {
-            $trip = $tripRepository->find($tripId);
-        }
-
-        $companyName = SettingsService::get('company_name', get_bloginfo('name'));
-        $companyAddress = SettingsService::get('company_address', '');
-        $companyEmail = SettingsService::get('company_email', get_option('admin_email'));
-        $companyPhone = SettingsService::get('company_phone', '');
-        $currency = SettingsService::getCurrency();
-        $currencySymbol = FormatHelper::getCurrencySymbol($currency);
-
-        $createdAt = $booking['created_at'] ?? $booking['booking_date'] ?? '';
-        $bookingDate = !empty($createdAt) ? date_i18n(get_option('date_format'), strtotime((string) $createdAt)) : '';
-        $travelDateRaw = $booking['travel_date'] ?? '';
-        $travelDate = !empty($travelDateRaw) ? date_i18n(get_option('date_format'), strtotime((string) $travelDateRaw)) : '';
-
-        $returnDate = '';
-        if (!empty($travelDateRaw) && $trip && !empty($trip->duration)) {
-            $returnTimestamp = strtotime((string) $travelDateRaw . ' +' . (int) $trip->duration . ' days');
-            $returnDate = date_i18n(get_option('date_format'), $returnTimestamp);
-        }
-
-        $statusRaw = (string) ($booking['booking_status'] ?? $booking['status'] ?? '');
-        $bookingId = (int) ($booking['id'] ?? 0);
-        $bookingRef = 'YTR-' . strtoupper(str_pad((string) $bookingId, 8, '0', STR_PAD_LEFT));
-
-        $customerName = trim(
-            (string) ($booking['contact_first_name'] ?? '') . ' ' . (string) ($booking['contact_last_name'] ?? '')
-        ) ?: (string) ($booking['customer_name'] ?? __('Customer', 'yatra'));
-
-        $pdfService = new PdfService();
-        if (!$pdfService->isAvailable()) {
+        $builder = new \Yatra\Services\ItineraryPdfBuilder();
+        if (!$builder->pdfService()->isAvailable()) {
             return new WP_Error(
                 'pdf_engine_missing',
                 __('Itinerary PDF generator is not installed. Please run composer install to install dompdf/dompdf.', 'yatra'),
@@ -849,43 +817,17 @@ class BookingsController extends BaseController
             );
         }
 
+        $bookingId = (int) ($booking['id'] ?? 0);
+        $bookingRef = $bookingId > 0
+            ? 'YTR-' . strtoupper(str_pad((string) $bookingId, 8, '0', STR_PAD_LEFT))
+            : 'PENDING';
         $filename = 'Travel-Itinerary-' . $bookingRef . '.pdf';
 
-        $templateData = [
-            'company_name' => $companyName,
-            'company_address' => $companyAddress,
-            'company_email' => $companyEmail,
-            'company_phone' => $companyPhone,
-            'customer_name' => $customerName,
-            'customer_email' => (string) ($booking['contact_email'] ?? $booking['customer_email'] ?? ''),
-            'booking_ref' => $bookingRef,
-            'booking_date' => $bookingDate,
-            'booking_status' => ucfirst($statusRaw ?: 'pending'),
-            'status_class' => in_array(strtolower($statusRaw), ['confirmed', 'completed', 'success'], true) ? 'confirmed' :
-                (in_array(strtolower($statusRaw), ['cancelled'], true) ? 'cancelled' : 'pending'),
-            'trip_title' => $trip ? ($trip->title ?? $booking['trip_title'] ?? __('Trip Booking', 'yatra')) : ($booking['trip_title'] ?? __('Trip Booking', 'yatra')),
-            'trip_description' => $trip ? ($trip->description ?? $trip->content ?? '') : '',
-            'trip_duration' => $trip && $trip->duration ? sprintf(__('%d days', 'yatra'), (int) $trip->duration) : '',
-            'trip_difficulty' => $trip ? ($trip->difficulty_name ?? '') : '',
-            'trip_highlights' => $trip ? ($trip->highlights ?? $trip->trip_highlights ?? '') : '',
-            'trip_includes' => $trip ? ($trip->includes ?? $trip->trip_includes ?? '') : '',
-            'trip_excludes' => $trip ? ($trip->excludes ?? $trip->trip_excludes ?? '') : '',
-            'departure_location' => $trip ? ($trip->departure_location ?? '') : '',
-            'destination' => $trip ? ($trip->destination ?? '') : '',
-            'travel_date' => $travelDate,
-            'return_date' => $returnDate,
-            'currency_symbol' => $currencySymbol,
-            'total_amount' => number_format((float) ($booking['total_amount'] ?? 0), 2),
-            'amount_paid' => number_format((float) ($booking['amount_paid'] ?? 0), 2),
-            'amount_due' => number_format((float) ($booking['amount_due'] ?? 0), 2),
-            'traveler_count' => (int) ($booking['travelers_count'] ?? $booking['travelers'] ?? 1),
-        ];
-
-        $pdfBinary = $pdfService->renderTemplateToPdfSafely('pdf/itinerary.php', $templateData, [
-            'paper' => 'A4',
-            'orientation' => 'portrait',
-            'default_font' => 'DejaVu Sans',
-        ]);
+        // The builder accepts the booking array shape directly — just
+        // forward `id` as `booking_id` so the reference resolves the
+        // same as the legacy code, and let it normalise everything else.
+        $source = $booking + ['booking_id' => $bookingId];
+        $pdfBinary = $builder->build($source);
 
         if ($isPreview) {
             return new WP_REST_Response([
@@ -895,7 +837,7 @@ class BookingsController extends BaseController
             ]);
         }
 
-        $pdfService->outputPdfDownload($pdfBinary, $filename);
+        $builder->pdfService()->outputPdfDownload($pdfBinary, $filename);
         exit;
     }
 }

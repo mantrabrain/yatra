@@ -25,7 +25,11 @@ class ActivityShortcode extends BaseShortcode
             'show_image' => 'yes',
             'show_pagination' => 'yes', // Default to show pagination like trip shortcode
             'activity' => '', // Classification IDs, comma-separated
-            'hide_empty' => 'yes',
+            // hide_empty defaults to 'no' to preserve the historical
+            // behavior (show every activity, even ones with zero
+            // trips). Operators that prefer the empty-archive defense
+            // opt in with hide_empty="yes".
+            'hide_empty' => 'no',
             'title' => 'Activity Listings'
         ]);
     }
@@ -259,10 +263,23 @@ class ActivityShortcode extends BaseShortcode
                 ];
             }
             
-            // Filter out empty activities if requested
+            // Filter out activities that have no published trips.
+            //
+            // Previously this only checked term name/slug presence —
+            // which never actually fires because all valid terms have
+            // both. As a result the shortcode would render activity
+            // cards with "0 trips" badges, leading users to click
+            // into empty archive pages. With hide_empty=yes we now
+            // drop any activity whose trip_count (computed above
+            // from TripClassificationsTable JOIN TripsTable WHERE
+            // status=publish) is zero. Term-metadata sanity is also
+            // preserved as a secondary safety check so we don't
+            // render orphan terms.
             if ($atts['hide_empty'] === 'yes') {
-                $activities = array_filter($activities, function($activity) {
-                    return !empty($activity['term']->name) && !empty($activity['term']->slug);
+                $activities = array_filter($activities, static function ($activity) {
+                    return (int) ($activity['trip_count'] ?? 0) > 0
+                        && !empty($activity['term']->name)
+                        && !empty($activity['term']->slug);
                 });
             }
             

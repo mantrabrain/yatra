@@ -49,7 +49,11 @@ $yatra_hero_dp_flags = function_exists('yatra_get_dynamic_pricing_display_flags'
                                 $hero_star_class = 'yatra-star';
                             }
                             ?>
-                            <span class="<?php echo esc_attr($hero_star_class); ?>" aria-label="<?php echo esc_attr(sprintf(_n('%d star', '%d stars', $i, 'yatra'), $i)); ?>">★</span>
+                            <span class="<?php echo esc_attr($hero_star_class); ?>" aria-label="<?php echo esc_attr(sprintf(
+                                /* translators: %d: star rating number (1-5). */
+                                _n('%d star', '%d stars', $i, 'yatra'),
+                                $i
+                            )); ?>">★</span>
                         <?php endfor; ?>
                     </div>
                     <span class="yatra-rating-number" itemprop="ratingValue"><?php echo esc_html(number_format($trip->getAverageRating(), 1)); ?></span>
@@ -62,7 +66,11 @@ $yatra_hero_dp_flags = function_exists('yatra_get_dynamic_pricing_display_flags'
                 <?php else: ?>
                     <div class="yatra-rating-stars yatra-no-rating">
                         <?php for ($i = 1; $i <= 5; $i++): ?>
-                            <span class="yatra-star" aria-label="<?php echo esc_attr(sprintf(_n('%d star', '%d stars', $i, 'yatra'), $i)); ?>">★</span>
+                            <span class="yatra-star" aria-label="<?php echo esc_attr(sprintf(
+                                /* translators: %d: star rating number (1-5). */
+                                _n('%d star', '%d stars', $i, 'yatra'),
+                                $i
+                            )); ?>">★</span>
                         <?php endfor; ?>
                     </div>
                     <span class="yatra-rating-text yatra-no-reviews"><?php echo esc_html__('No reviews yet', 'yatra'); ?></span>
@@ -81,9 +89,18 @@ $yatra_hero_dp_flags = function_exists('yatra_get_dynamic_pricing_display_flags'
                     <span>
                         <?php 
                         if (!empty($trip->getDurationNights()) && $trip->getDurationNights() > 0) {
-                            echo esc_html(sprintf(_n('%d day %d night', '%d days %d nights', $trip->getDurationDays(), 'yatra'), $trip->getDurationDays(), $trip->getDurationNights()));
+                            echo esc_html(sprintf(
+                                /* translators: 1: number of days, 2: number of nights. */
+                                _n('%1$d day %2$d night', '%1$d days %2$d nights', $trip->getDurationDays(), 'yatra'),
+                                $trip->getDurationDays(),
+                                $trip->getDurationNights()
+                            ));
                         } else {
-                            echo esc_html(sprintf(_n('%d day', '%d days', $trip->getDurationDays(), 'yatra'), $trip->getDurationDays()));
+                            echo esc_html(sprintf(
+                                /* translators: %d: number of days. */
+                                _n('%d day', '%d days', $trip->getDurationDays(), 'yatra'),
+                                $trip->getDurationDays()
+                            ));
                         }
                         ?>
                     </span>
@@ -193,7 +210,11 @@ $yatra_hero_dp_flags = function_exists('yatra_get_dynamic_pricing_display_flags'
             <?php if (!empty($main_image_url)): ?>
                 <a href="#" class="yatra-hero-main-img-link" data-gallery="hero-gallery" data-image-index="0">
                     <img src="<?php echo esc_url($main_image_url); ?>"
-                         alt="<?php echo esc_attr(sprintf(__('Main image for %s', 'yatra'), $trip->getTitle())); ?>"
+                         alt="<?php echo esc_attr(sprintf(
+                             /* translators: %s: trip title. */
+                             __('Main image for %s', 'yatra'),
+                             $trip->getTitle()
+                         )); ?>"
                          title="<?php echo esc_attr($trip->getTitle()); ?>"
                          itemprop="url" content="<?php echo esc_url($main_image_url); ?>"
                          data-yatra-src="<?php echo esc_url($main_image_url); ?>"
@@ -206,7 +227,11 @@ $yatra_hero_dp_flags = function_exists('yatra_get_dynamic_pricing_display_flags'
                 <meta itemprop="height" content="630">
             <?php else: ?>
                 <img src="<?php echo esc_url(plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE)); ?>"
-                     alt="<?php echo esc_attr(sprintf(__('Placeholder image for %s', 'yatra'), $trip->getTitle())); ?>"
+                     alt="<?php echo esc_attr(sprintf(
+                         /* translators: %s: trip title. */
+                         __('Placeholder image for %s', 'yatra'),
+                         $trip->getTitle()
+                     )); ?>"
                      title="<?php echo esc_attr($trip->getTitle()); ?>"
                      itemprop="url" content="<?php echo esc_url(plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE)); ?>"
                      class="yatra-hero-main-img">
@@ -290,7 +315,11 @@ $yatra_hero_dp_flags = function_exists('yatra_get_dynamic_pricing_display_flags'
                             <button type="button" class="yatra-view-all-photos-btn yatra-gallery-play-btn"
                                     data-gallery="hero-gallery">
                                 <?php echo yatra_svg_icon('camera', 'yatra-icon-sm'); ?>
-                                <?php echo sprintf(esc_html__('View all %d photos', 'yatra'), $total_images); ?>
+                                <?php echo sprintf(
+                                    /* translators: %d: total number of photos in the trip gallery. */
+                                    esc_html__('View all %d photos', 'yatra'),
+                                    $total_images
+                                ); ?>
                             </button>
                         <?php endif; ?>
                     </div>

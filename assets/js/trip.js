@@ -311,7 +311,15 @@
           const imageUrls = Array.isArray(mediaData.images) ? mediaData.images : [];
           imageUrls.forEach((url, index) => {
             if (url && typeof url === 'string' && !this.images.some(i => i.src === url)) {
-              this.images.push({ src: url, alt: `Gallery Image ${index + 1}` });
+              this.images.push({
+                src: url,
+                // Indexed alt text — sprintf isn't guaranteed
+                // available on every page, so we replace() the
+                // %d placeholder ourselves. Keeps the msgid a
+                // literal so makepot extracts cleanly.
+                /* translators: %d is the 1-based image index in the gallery. */
+                alt: __('Gallery Image %d', 'yatra').replace('%d', String(index + 1)),
+              });
             }
           });
         } catch (e) {
@@ -321,21 +329,22 @@
 
       // 2. Collect from hero slides (covers any images not in the JSON blob).
       document.querySelectorAll('.yatra-trip-hero-slide img').forEach((img, index) => {
-        add(img, `Gallery Image ${index + 1}`);
+        /* translators: %d is the 1-based image index in the gallery. */
+        add(img, __('Gallery Image %d', 'yatra').replace('%d', String(index + 1)));
       });
 
       // 3. Collect from gallery section (hero gallery only, NOT itinerary).
       document.querySelectorAll('.yatra-trip-gallery .yatra-gallery-item img').forEach((img) => {
-        add(img, 'Gallery Image');
+        add(img, __('Gallery Image', 'yatra'));
       });
 
       // 4. Collect from hero main image.
       const heroMainImg = document.querySelector('.yatra-hero-main-img');
-      if (heroMainImg) add(heroMainImg, 'Main Image');
+      if (heroMainImg) add(heroMainImg, __('Main Image', 'yatra'));
 
       // 5. Collect from side images.
       document.querySelectorAll('.yatra-side-image-item img').forEach((img) => {
-        add(img, 'Side Image');
+        add(img, __('Side Image', 'yatra'));
       });
     }
 
@@ -584,12 +593,20 @@
 
       // Visible gallery thumbnails inside the scope
       root.querySelectorAll('.yatra-media-card img').forEach((img) => {
-        add(img, `Itinerary Gallery Image ${images.length + 1}`);
+        add(img, sprintf(
+          /* translators: %d: gallery image sequence number. */
+          __('Itinerary Gallery Image %d', 'yatra'),
+          images.length + 1
+        ));
       });
 
       // Video links inside the scope (fallback selector)
       root.querySelectorAll('.yatra-itinerary-video-link img').forEach((img) => {
-        add(img, `Itinerary Video ${images.length + 1}`);
+        add(img, sprintf(
+          /* translators: %d: itinerary video sequence number. */
+          __('Itinerary Video %d', 'yatra'),
+          images.length + 1
+        ));
       });
 
       // If still empty AND we were given no scope, fall back to the hidden global pool
@@ -597,7 +614,11 @@
       // continue to function.
       if (images.length === 0 && !scope) {
         document.querySelectorAll('.yatra-itinerary-trip-gallery .yatra-gallery-item img').forEach((img) => {
-          add(img, `Itinerary Image ${images.length + 1}`);
+          add(img, sprintf(
+            /* translators: %d: itinerary image sequence number. */
+            __('Itinerary Image %d', 'yatra'),
+            images.length + 1
+          ));
         });
       }
 
@@ -938,7 +959,7 @@
       
       if (images.length > 0) {
         img.src = images[0];
-        img.alt = 'Trip Image 1';
+        img.alt = __('Trip Image 1', 'yatra');
         if (link) {
           link.href = '#';
           link.dataset.imageIndex = '0';
@@ -1158,6 +1179,10 @@
 
       const overlay = document.createElement('div');
       overlay.className = 'yatra-media-overlay yatra-media-tour-overlay';
+      const tourFallbackTitle = __('360° Virtual Tour', 'yatra');
+      /* translators: %s: tour type (e.g. "360°"). */
+      const tourTypeLabel = sprintf(__('%s Experience', 'yatra'), tour.tour_type || '360°');
+      const tourActionLabel = __('Click to explore', 'yatra');
       overlay.innerHTML = `
         <div class="yatra-tour-info">
           <div class="yatra-tour-icon">
@@ -1172,9 +1197,9 @@
             </svg>
           </div>
           <div class="yatra-tour-details">
-            <div class="yatra-tour-title">${tour.title || '360° Virtual Tour'}</div>
-            <div class="yatra-tour-type">${tour.tour_type || '360°'} Experience</div>
-            <div class="yatra-tour-action">Click to explore</div>
+            <div class="yatra-tour-title">${tour.title || tourFallbackTitle}</div>
+            <div class="yatra-tour-type">${tourTypeLabel}</div>
+            <div class="yatra-tour-action">${tourActionLabel}</div>
           </div>
         </div>
       `;
@@ -1214,6 +1239,7 @@
 
       const overlay = document.createElement('div');
       overlay.className = 'yatra-media-overlay yatra-media-document-overlay';
+      const documentFallbackTitle = __('Document', 'yatra');
       overlay.innerHTML = `
         <div class="yatra-document-info">
           <div class="yatra-document-icon">
@@ -1225,7 +1251,7 @@
             </svg>
           </div>
           <div class="yatra-document-details">
-            <div class="yatra-document-title">${doc.title || 'Document'}</div>
+            <div class="yatra-document-title">${doc.title || documentFallbackTitle}</div>
             <div class="yatra-document-size">${this.formatFileSize(doc.file_size || 0)}</div>
           </div>
         </div>
@@ -1268,13 +1294,15 @@
         const img = item.querySelector('img');
         if (img && images[index + 1]) {
           img.src = images[index + 1];
-          img.alt = `Trip Image ${index + 2}`;
+          /* translators: %d: image sequence number in the trip gallery. */
+          img.alt = sprintf(__('Trip Image %d', 'yatra'), index + 2);
         }
       });
     }
 
     updateSideVideos(sideImages) {
       const videos = this.mediaData.videos || [];
+      const fallbackVideoTitle = __('Trip Video', 'yatra');
       sideImages.forEach((item, index) => {
         const img = item.querySelector('img');
         if (img && videos[index + 1]) {
@@ -1282,13 +1310,14 @@
           if (video.thumbnail) {
             img.src = video.thumbnail;
           }
-          img.alt = video.title || 'Trip Video';
+          img.alt = video.title || fallbackVideoTitle;
         }
       });
     }
 
     updateSideYoutubeVideos(sideImages) {
       const youtubeVideos = this.mediaData.youtube_videos || [];
+      const fallbackYoutubeTitle = __('YouTube Video', 'yatra');
       sideImages.forEach((item, index) => {
         const img = item.querySelector('img');
         if (img && youtubeVideos[index + 1]) {
@@ -1296,13 +1325,14 @@
           if (video.thumbnail) {
             img.src = video.thumbnail;
           }
-          img.alt = video.title || 'YouTube Video';
+          img.alt = video.title || fallbackYoutubeTitle;
         }
       });
     }
 
     updateSideTours(sideImages) {
       const virtualTours = this.mediaData.virtual_tours || [];
+      const fallbackTourTitle = __('360° Virtual Tour', 'yatra');
       sideImages.forEach((item, index) => {
         const img = item.querySelector('img');
         if (img && virtualTours[index + 1]) {
@@ -1310,19 +1340,20 @@
           if (tour.thumbnail) {
             img.src = tour.thumbnail;
           }
-          img.alt = tour.title || '360° Virtual Tour';
+          img.alt = tour.title || fallbackTourTitle;
         }
       });
     }
 
     updateSideDocuments(sideImages) {
       const documents = this.mediaData.documents || [];
+      const fallbackDocumentTitle = __('Trip Document', 'yatra');
       sideImages.forEach((item, index) => {
         const img = item.querySelector('img');
         if (img && documents[index + 1]) {
           const doc = documents[index + 1];
           // Keep existing image for documents
-          img.alt = doc.title || 'Trip Document';
+          img.alt = doc.title || fallbackDocumentTitle;
         }
       });
     }
@@ -1655,19 +1686,23 @@
         travelerInputs.forEach((input) => {
           const value = parseInt(input.value || 0);
           if (value > 0) {
-            const categoryLabel = input.getAttribute('data-category-label') || 'Traveler';
+            const categoryLabel = input.getAttribute('data-category-label') || __('Traveler', 'yatra');
             parts.push(`${categoryLabel} x ${value}`);
           }
         });
 
         if (parts.length === 0) {
-          // Default to first category with value 1
+          // Default to first category with value 1. `data-category-label`
+          // is rendered server-side via the PHP textdomain, so it's
+          // already translated. The "x 1" suffix is the only piece
+          // we need to keep translatable here.
           const firstInput = travelerInputs[0];
           if (firstInput) {
-            const categoryLabel = firstInput.getAttribute('data-category-label') || 'Traveler';
-            display.textContent = `${categoryLabel} x 1`;
+            const categoryLabel = firstInput.getAttribute('data-category-label') || __('Traveler', 'yatra');
+            /* translators: %s is the traveler-category label (e.g. "Adult", "Child"). Renders as "Adult x 1". */
+            display.textContent = __('%s x 1', 'yatra').replace('%s', categoryLabel);
           } else {
-            display.textContent = '1 Traveler';
+            display.textContent = __('1 Traveler', 'yatra');
           }
         } else {
           display.textContent = parts.join(', ');
@@ -1763,7 +1798,7 @@
                   const catValue = parseInt(catInput.value) || 0;
                   if (catValue > 0) {
                     const catRow = catInput.closest('.yatra-quantity-row');
-                    const categoryLabel = catRow ? catRow.querySelector('.yatra-quantity-title')?.textContent : 'Traveler';
+                    const categoryLabel = catRow ? catRow.querySelector('.yatra-quantity-title')?.textContent : __('Traveler', 'yatra');
                     parts.push(`${categoryLabel} x ${catValue}`);
                   }
                 });
@@ -1854,7 +1889,15 @@
         this.checkAvailabilityBtn.dataset.originalHtml = this.checkAvailabilityBtn.innerHTML;
       }
       if (this.checkAvailabilityBtn) {
-        this.checkAvailabilityBtn.innerHTML = '<svg class="animate-spin" width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Checking...';
+        // Spinner SVG is fixed markup (not translatable). Only the
+        // user-visible "Checking..." label runs through __() so it
+        // ends up in the .pot with a clean msgid and translates with
+        // the rest of the UI.
+        this.checkAvailabilityBtn.innerHTML =
+          '<svg class="animate-spin" width="18" height="18" fill="none" viewBox="0 0 24 24">' +
+            '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"></circle>' +
+            '<path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>' +
+          '</svg> ' + __('Checking...', 'yatra');
         this.checkAvailabilityBtn.disabled = true;
       }
 
@@ -2016,11 +2059,12 @@
       const newItem = document.createElement('a');
       newItem.href = '#availability';
       newItem.className = 'yatra-sticky-nav-item';
+      const availabilityLabel = __('Availability', 'yatra');
       newItem.innerHTML = `
                 <svg class="yatra-icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
-                <span>Availability</span>
+                <span>${availabilityLabel}</span>
             `;
 
       // Insert before the target item (or after "What's Included" if no target)
@@ -2089,7 +2133,7 @@
         this.checkAvailabilityBtn.dataset.originalHtml = this.checkAvailabilityBtn.innerHTML;
       }
       if (this.checkAvailabilityBtn) {
-        this.checkAvailabilityBtn.innerHTML = '<svg class="animate-spin" width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Loading...';
+        this.checkAvailabilityBtn.innerHTML = '<svg class="animate-spin" width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> ' + __('Loading...', 'yatra');
         this.checkAvailabilityBtn.disabled = true;
       }
       
@@ -2252,7 +2296,11 @@
               // Update departures available text
               const departuresText = document.querySelector('.yatra-departures-available-text');
               if (departuresText && data.departures_count !== undefined) {
-                departuresText.textContent = data.departures_count + ' departure' + (data.departures_count !== 1 ? 's' : '') + ' available';
+                departuresText.textContent = sprintf(
+                  /* translators: %d: number of departures available. */
+                  _n('%d departure available', '%d departures available', data.departures_count, 'yatra'),
+                  data.departures_count
+                );
               }
 
               // Update traveler dropdown HTML
@@ -2370,7 +2418,7 @@
         }
       });
 
-      display.textContent = parts.length > 0 ? parts.join(', ') : '0 Travelers';
+      display.textContent = parts.length > 0 ? parts.join(', ') : __('0 Travelers', 'yatra');
     }
 
     /**
@@ -2435,7 +2483,8 @@
       }
 
       if (totalNoteEl) {
-        totalNoteEl.textContent = 'for ' + totalTravelers + ' traveler' + (totalTravelers !== 1 ? 's' : '');
+        /* translators: %d is the number of travelers. Singular form is "for 1 traveler", plural "for N travelers". */
+        totalNoteEl.textContent = sprintf(_n('for %d traveler', 'for %d travelers', totalTravelers, 'yatra'), totalTravelers);
       }
 
       // Update the card participants display
@@ -2757,7 +2806,7 @@
 
       // Show loading
       const submitBtn = this.form.querySelector('.yatra-enquiry-submit');
-      const originalText = submitBtn ? submitBtn.textContent : 'Send Enquiry';
+      const originalText = submitBtn ? submitBtn.textContent : __('Send Enquiry', 'yatra');
       if (submitBtn) {
         submitBtn.textContent = __('Sending...', 'yatra');
         submitBtn.disabled = true;
@@ -2821,7 +2870,7 @@
         })
         .catch(error => {
           console.error('Enquiry submission error:', error);
-          this.showMessage('error', 'An error occurred. Please try again later.');
+          this.showMessage('error', __('An error occurred. Please try again later.', 'yatra'));
         })
         .finally(() => {
           if (submitBtn) {
@@ -2888,19 +2937,31 @@
     }
 
     getActualSections() {
-      // Base sections that are always present in order
-      const baseSections = ['overview', 'itinerary', 'included', 'location', 'important-info'];
-      
-      // Conditional sections that may or may not be present
-      const conditionalSections = ['downloads', 'faq', 'trip-story', 'what-makes-special', 'testimonials'];
-      
-      // Combine all sections and filter to only include those that actually exist on the page
-      const allSections = [...baseSections, ...conditionalSections];
-      
-      return allSections.filter(sectionId => {
-        const element = document.getElementById(sectionId);
-        return element && element.offsetParent !== null; // Check if element exists and is visible
+      // Derive section IDs from the sticky nav items themselves rather
+      // than hardcoding the list. The previous hardcoded version only knew
+      // about the built-in sections (overview, itinerary, included, …) so
+      // admin-defined CUSTOM tabs — whose ID is `custom_<timestamp>` — were
+      // silently dropped: their nav-link still scrolled, but updateActiveNav
+      // never highlighted them as you scrolled past, and the "is this
+      // section on-screen" check below was always false for them.
+      //
+      // Reading from this.navItems means every enabled tab (built-in OR
+      // custom) participates in active-state tracking without needing this
+      // list updated for each new tab type.
+      const seen = new Set();
+      const ids = [];
+      this.navItems.forEach((item) => {
+        const href = item.getAttribute('href');
+        if (!href || !href.startsWith('#')) return;
+        const id = href.substring(1);
+        if (!id || seen.has(id)) return;
+        const element = document.getElementById(id);
+        if (element && element.offsetParent !== null) {
+          seen.add(id);
+          ids.push(id);
+        }
       });
+      return ids;
     }
 
     attachEventListeners() {
@@ -3074,6 +3135,13 @@
     }
 
     updateActiveNav() {
+      // `offsetTop` is relative to the closest positioned ancestor, not the
+      // document. When a section lives inside a `position: relative` wrapper
+      // (any of the layout containers on this page), offsetTop is wrong by
+      // the wrapper's offset, so the "active" pill never lit up correctly
+      // for some tabs — most visibly the newly-added custom tabs that sit
+      // further down the DOM. `getBoundingClientRect().top + pageYOffset`
+      // always gives the document-relative top regardless of ancestors.
       const scrollPos = window.scrollY + 150;
       let activeSectionId = null;
 
@@ -3081,8 +3149,9 @@
       this.sections.forEach((sectionId) => {
         const section = document.getElementById(sectionId);
         if (section) {
-          const sectionTop = section.offsetTop;
-          const sectionBottom = sectionTop + section.offsetHeight;
+          const rect = section.getBoundingClientRect();
+          const sectionTop = rect.top + window.pageYOffset;
+          const sectionBottom = sectionTop + rect.height;
 
           if (scrollPos >= sectionTop && scrollPos < sectionBottom) {
             activeSectionId = sectionId;
@@ -3560,16 +3629,19 @@
             const value = parseInt(input.value) || 0;
             if (value > 0) {
               const row = input.closest('.yatra-quantity-row');
-              const categoryLabel = row ? row.querySelector('.yatra-quantity-title')?.textContent : 'Traveler';
+              const categoryLabel = row ? row.querySelector('.yatra-quantity-title')?.textContent : __('Traveler', 'yatra');
               parts.push(`${categoryLabel} x ${value}`);
             }
           });
 
           if (parts.length === 0) {
-            // Default to first category
+            // Default to first category. The label is read from the
+            // DOM (server-rendered → already translated). Only the
+            // " x 1" suffix is the literal we have to localise here.
             const firstRow = categoryInputs[0]?.closest('.yatra-quantity-row');
-            const firstLabel = firstRow ? firstRow.querySelector('.yatra-quantity-title')?.textContent : 'Traveler';
-            display.textContent = `${firstLabel} x 1`;
+            const firstLabel = firstRow ? firstRow.querySelector('.yatra-quantity-title')?.textContent : __('Traveler', 'yatra');
+            /* translators: %s is the traveler-category label (e.g. "Adult", "Child"). Renders as "Adult x 1". */
+            display.textContent = __('%s x 1', 'yatra').replace('%s', firstLabel);
           } else {
             display.textContent = parts.join(', ');
           }
@@ -3743,7 +3815,7 @@
         const value = parseInt(input.value) || 0;
         if (value > 0) {
           const row = input.closest('.yatra-quantity-row');
-          const categoryLabel = row ? row.querySelector('.yatra-quantity-title')?.textContent : 'Traveler';
+          const categoryLabel = row ? row.querySelector('.yatra-quantity-title')?.textContent : __('Traveler', 'yatra');
           parts.push(`${categoryLabel} x ${value}`);
 
           // Also update sidebar inputs if they exist
@@ -3843,8 +3915,8 @@
           `.yatra-card-total-note[data-item="${itemIndex}"]`
       );
       if (noteElement) {
-        // translators: %d: number of travelers (>= 2). The singular form is "for 1 traveler".
         let travelerText = sprintf(
+            /* translators: %d is the number of travelers. Singular form is "for 1 traveler", plural "for N travelers". */
             _n('for %d traveler', 'for %d travelers', totalTravelers, 'yatra'),
             totalTravelers
         );
@@ -3854,7 +3926,11 @@
           const discountText = (typeof yatra_format_price_js === 'function')
               ? yatra_format_price_js(groupDiscountAmount)
               : String(groupDiscountAmount.toFixed(2));
-          travelerText += ` (Group discount: -${discountText})`;
+          travelerText += sprintf(
+            /* translators: %s: formatted discount amount. */
+            __(' (Group discount: -%s)', 'yatra'),
+            discountText
+          );
         }
         noteElement.textContent = travelerText;
       }
@@ -3971,8 +4047,12 @@
 
         // Update badge content
         const discountText = discountResult.discountType === 'percentage'
-            ? `${discountResult.discountPercentage}% group discount applied!`
-            : `Group discount applied!`;
+            ? sprintf(
+                /* translators: %s: discount percentage. */
+                __('%s%% group discount applied!', 'yatra'),
+                discountResult.discountPercentage
+              )
+            : __('Group discount applied!', 'yatra');
         badge.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> ${discountText}`;
       } else if (badge) {
         badge.remove();
@@ -4081,7 +4161,9 @@
 
       const originalHTML = btn.innerHTML;
       const loadingSvg = '<svg class="yatra-spinner" width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> ';
-      btn.innerHTML = loadingSvg + 'Loading...';
+      // Spinner SVG is fixed markup; only the visible label is wrapped
+      // so it ends up in the .pot and translates with the rest of the UI.
+      btn.innerHTML = loadingSvg + __('Loading...', 'yatra');
       btn.disabled = true;
 
       const url = buildAvailabilityTemplateUrl(tripId, {
@@ -4141,7 +4223,9 @@
             }
 
             const remaining = Math.max(0, total - displayed);
-            btn.innerHTML = `<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Load more departures (${remaining} remaining)`;
+            /* translators: %d: number of additional departures still available to load. */
+            const loadMoreLabel = sprintf(__('Load more departures (%d remaining)', 'yatra'), remaining);
+            btn.innerHTML = `<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> ${loadMoreLabel}`;
             btn.disabled = false;
 
             loadMoreContainer.dataset.currentPage = String(nextPage);
@@ -4149,7 +4233,15 @@
             loadMoreContainer.dataset.total = String(total);
 
             if (countInfo) {
-              countInfo.textContent = `Showing ${displayed} of ${total} departures`;
+              // Pagination summary. Two placeholders preserved as
+              // %1$d / %2$d so translators can reorder them (some
+              // locales prefer "Of N, showing M" word order).
+              /* translators: %1$d is the number of departures shown so far; %2$d is the total available. */
+              countInfo.textContent = sprintf(
+                __('Showing %1$d of %2$d departures', 'yatra'),
+                displayed,
+                total
+              );
             }
           })
           .catch((err) => {
@@ -4430,7 +4522,8 @@
 
         // Disable button and show loading
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="yatra-loading-spinner"></span> Submitting...';
+        submitBtn.innerHTML =
+          '<span class="yatra-loading-spinner"></span> ' + __('Submitting...', 'yatra');
 
         try {
           const formData = new FormData(this.form);
@@ -4465,11 +4558,11 @@
               }
             }
           } else {
-            this.showMessage('error', result.data?.message || 'Failed to submit review. Please try again.');
+            this.showMessage('error', result.data?.message || __('Failed to submit review. Please try again.', 'yatra'));
           }
         } catch (error) {
           console.error('Review submission error:', error);
-          this.showMessage('error', 'An error occurred. Please try again.');
+          this.showMessage('error', __('An error occurred. Please try again.', 'yatra'));
         } finally {
           submitBtn.disabled = false;
           submitBtn.innerHTML = originalText;
@@ -4743,7 +4836,7 @@
         }
       } catch (error) {
         console.error('Error saving trip:', error);
-        this.showMessage('An error occurred. Please try again.', 'error', btn);
+        this.showMessage(__('An error occurred. Please try again.', 'yatra'), 'error', btn);
       } finally {
         btn.disabled = false;
         btn.classList.remove('loading');
@@ -4773,7 +4866,7 @@
         }
       } catch (error) {
         console.error('Error removing trip:', error);
-        this.showMessage('An error occurred. Please try again.', 'error', btn);
+        this.showMessage(__('An error occurred. Please try again.', 'yatra'), 'error', btn);
       } finally {
         btn.disabled = false;
         btn.classList.remove('loading');
@@ -4825,11 +4918,15 @@
           const loginMessage = document.createElement('div');
           loginMessage.className = 'yatra-login-prompt';
           loginMessage.style.cssText = 'padding: 40px; text-align: center;';
+          const loginRequiredHeading = __('Login Required', 'yatra');
+          const loginRequiredBody = __('Please login to save trips to your wishlist.', 'yatra');
+          const loginButtonLabel = __('Login', 'yatra');
+          const cancelButtonLabel = __('Cancel', 'yatra');
           loginMessage.innerHTML = `
-                        <h3 style="margin-bottom: 20px;">Login Required</h3>
-                        <p style="margin-bottom: 30px;">Please login to save trips to your wishlist.</p>
-                        <a href="${window.yatraTripData?.loginUrl || '/wp-login.php'}" class="yatra-btn" style="display: inline-block; margin-right: 10px;">Login</a>
-                        <button type="button" class="yatra-btn-secondary" onclick="this.closest('.yatra-enquiry-modal').classList.remove('active'); document.body.style.overflow = '';">Cancel</button>
+                        <h3 style="margin-bottom: 20px;">${loginRequiredHeading}</h3>
+                        <p style="margin-bottom: 30px;">${loginRequiredBody}</p>
+                        <a href="${window.yatraTripData?.loginUrl || '/wp-login.php'}" class="yatra-btn" style="display: inline-block; margin-right: 10px;">${loginButtonLabel}</a>
+                        <button type="button" class="yatra-btn-secondary" onclick="this.closest('.yatra-enquiry-modal').classList.remove('active'); document.body.style.overflow = '';">${cancelButtonLabel}</button>
                     `;
           modalContent.innerHTML = '';
           modalContent.appendChild(loginMessage);
@@ -5088,7 +5185,7 @@ class ItineraryVideoHandler {
         if (!videoUrl || videoUrl === '#') return;
         
         const img = overlay.closest('.yatra-media-card').querySelector('img');
-        const videoTitle = img ? img.alt : 'Itinerary Video';
+        const videoTitle = img ? img.alt : __('Itinerary Video', 'yatra');
         
         // Extract video ID from URL
         let videoId = '';
@@ -5228,7 +5325,7 @@ class DownloadsHandler {
     } catch (error) {
       console.error('Download error:', error);
       // Show error message to user
-      this.showNotification('Download failed. Please try again.', 'error');
+      this.showNotification(__('Download failed. Please try again.', 'yatra'), 'error');
     }
   }
 
@@ -5246,14 +5343,14 @@ class DownloadsHandler {
       const data = await response.json();
       
       if (data.download_url) {
-        this.loadPreview(data.download_url, data.title || 'Preview');
+        this.loadPreview(data.download_url, data.title || __('Preview', 'yatra'));
       } else {
         throw new Error('File URL not found');
       }
     } catch (error) {
       console.error('Preview error:', error);
       this.closePreviewModal();
-      this.showNotification('Failed to load preview. Please try again.', 'error');
+      this.showNotification(__('Failed to load preview. Please try again.', 'yatra'), 'error');
     }
   }
 
@@ -5283,11 +5380,13 @@ class DownloadsHandler {
         <iframe src="${fileUrl}" style="width: 100%; height: 500px; border: none; border-radius: 8px;"></iframe>
       `;
     } else {
+      const previewUnavailableTitle = __('Preview not available for this file type', 'yatra');
+      const previewUnavailableHint = __('Please download the file to view its contents', 'yatra');
       previewContent.innerHTML = `
         <div style="text-align: center; padding: 40px;">
           <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;">📄</div>
-          <p style="color: #6b7280; margin-bottom: 16px;">Preview not available for this file type</p>
-          <p style="color: #9ca3af; font-size: 14px;">Please download the file to view its contents</p>
+          <p style="color: #6b7280; margin-bottom: 16px;">${previewUnavailableTitle}</p>
+          <p style="color: #9ca3af; font-size: 14px;">${previewUnavailableHint}</p>
         </div>
       `;
     }
@@ -5311,10 +5410,11 @@ class DownloadsHandler {
       // Reset loading state
       const previewContent = document.getElementById('preview-content');
       if (previewContent) {
+        const loadingPreviewLabel = __('Loading preview...', 'yatra');
         previewContent.innerHTML = `
           <div class="yatra-preview-loading">
             <div class="yatra-preview-spinner"></div>
-            <p>Loading preview...</p>
+            <p>${loadingPreviewLabel}</p>
           </div>
         `;
       }

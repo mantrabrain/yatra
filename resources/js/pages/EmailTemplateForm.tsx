@@ -164,9 +164,15 @@ const EmailTemplateForm: React.FC = () => {
     enabled: Boolean(id) && !isCoreSettingsEdit,
   });
 
+  // Event-scoped variables: the sidebar re-fetches whenever the
+  // operator switches the trigger event so the "Available
+  // Variables" panel reflects only tags that will actually
+  // resolve at send-time for the chosen event. Empty event_key
+  // returns the full union (for the create-template starter
+  // state before they've picked an event).
   const { data: variablesData } = useQuery({
-    queryKey: ["email-variables"],
-    queryFn: () => fetchEmailTemplateVariables(),
+    queryKey: ["email-variables", formData.event_key || ""],
+    queryFn: () => fetchEmailTemplateVariables(formData.event_key || ""),
     enabled: !isCoreSettingsEdit && isEmailAutomationModuleEnabled(),
   });
 
@@ -1033,9 +1039,52 @@ const EmailTemplateForm: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               {!isCoreSettingsEdit && (
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {__("Click to copy, double-click to insert at cursor")}
-                </p>
+                <>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {__("Click to copy, double-click to insert at cursor")}
+                  </p>
+                  {/*
+                    Subtitle showing which event the variables list is
+                    scoped to. Without this hint, operators see a
+                    different set of tags every time they switch the
+                    event dropdown and have no clear explanation why.
+                  */}
+                  {formData.event_key ? (
+                    // Show the technical event KEY (dot-notation, monospace)
+                    // as the primary label so it can't be confused with the
+                    // template's display title — earlier versions showed
+                    // the event's friendly name, which often matches what
+                    // operators name their templates ("Customer email
+                    // verification" appears as both the event name and a
+                    // common template title) and made it unclear what the
+                    // chip was scoped to. Friendly name still appears as
+                    // the parenthesised clarifier.
+                    <p className="text-xs text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/30 rounded px-2 py-1.5">
+                      {__("Variables available for trigger event:", "yatra")}{" "}
+                      <code className="font-mono text-blue-800 dark:text-blue-200 bg-blue-100 dark:bg-blue-900/40 px-1 rounded">
+                        {formData.event_key}
+                      </code>
+                      {(() => {
+                        const match = events.find(
+                          (e: any) => e.key === formData.event_key,
+                        );
+                        return match?.name ? (
+                          <span className="text-blue-600/80 dark:text-blue-400/80">
+                            {" "}
+                            ({match.name})
+                          </span>
+                        ) : null;
+                      })()}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 rounded px-2 py-1.5">
+                      {__(
+                        "Pick a trigger event below to see the variables that apply to that event. Showing the full catalog until then.",
+                        "yatra",
+                      )}
+                    </p>
+                  )}
+                </>
               )}
 
               {isCoreSettingsEdit && coreDef?.mergeTags ? (

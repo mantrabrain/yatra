@@ -45,11 +45,22 @@ class ReviewController extends BaseController
         // ADMIN ROUTES
         // =====================
         
-        // List reviews
+        // List reviews + create review (admin)
         register_rest_route($namespace, '/' . $base, [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'getReviews'],
+                'permission_callback' => [$this, 'checkAdminPermission'],
+            ],
+            [
+                // The admin "Add New Review" form (resources/js/pages/ReviewForm.tsx)
+                // POSTs here. Distinct from the public-facing
+                // `POST /trips/{trip_id}/reviews` route below: the admin path
+                // bypasses the "already reviewed this trip" gate, accepts
+                // any DB-valid status (incl. spam/trash post-3.0.5 migration),
+                // and stamps `created_by` with the current admin user id.
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'createReview'],
                 'permission_callback' => [$this, 'checkAdminPermission'],
             ],
         ]);
@@ -253,7 +264,7 @@ class ReviewController extends BaseController
     public function updateReview(WP_REST_Request $request): WP_REST_Response
     {
         $id = (int) $request->get_param('id');
-        $data = $request->get_json_params();
+        $data = $this->mapAdminReviewPayload($request->get_json_params() ?? []);
 
         $result = $this->reviewService->updateReview($id, $data);
 
@@ -262,6 +273,96 @@ class ReviewController extends BaseController
         }
 
         return new WP_REST_Response($result);
+    }
+
+    /**
+     * POST /reviews — Admin "Add New Review" endpoint.
+     *
+     * The admin React form posts the operator-curated fields here. This
+     * path differs from `submitReview` (which the public review form uses)
+     * in three ways:
+     *
+     *   1. No "already reviewed this trip" gate — admins should be able to
+     *      enter reviews on behalf of customers without tripping the
+     *      duplicate-prevention guard.
+     *   2. Honours the operator-supplied `status` rather than deriving it
+     *      from the `reviews.auto_approve` setting — the admin is the
+     *      authority for whether the row is pending / approved / spam etc.
+     *   3. Stamps `created_by` with the current admin user id so audits
+     *      can attribute who added the review.
+     */
+    public function createReview(WP_REST_Request $request): WP_REST_Response
+    {
+        $data = $this->mapAdminReviewPayload($request->get_json_params() ?? []);
+
+        // created_by is set here (controller) rather than in the service
+        // so the service stays input-agnostic — service methods may also
+        // be called from CLI / cron / tests where there's no current user.
+        $data['created_by'] = get_current_user_id() ?: null;
+
+        $result = $this->reviewService->createReviewAsAdmin($data);
+
+        if (!$result['success']) {
+            return new WP_REST_Response($result, 400);
+        }
+
+        return new WP_REST_Response($result, 201);
+    }
+
+    /**
+     * Translate the admin form's payload shape into the field names the
+     * service + repository expect.
+     *
+     * The admin React form (resources/js/pages/ReviewForm.tsx) ships:
+     *   - customer_name, customer_email, comment, verified, status
+     *
+     * The DB columns (and {@see ReviewRepository::prepareReviewData()})
+     * speak:
+     *   - author_name, author_email, content, status
+     *   (no `verified` column exists yet — silently dropped)
+     *
+     * Doing this map at the controller layer keeps the service free of
+     * UI-specific aliases, and means future UIs can either send the
+     * legacy alias names or the canonical names with no double-mapping.
+     *
+     * @param array<string, mixed> $payload Raw JSON from the request.
+     * @return array<string, mixed> Canonical, service-ready payload.
+     */
+    private function mapAdminReviewPayload(array $payload): array
+    {
+        // Field aliases: admin-side name → canonical DB-column name.
+        $aliases = [
+            'customer_name'  => 'author_name',
+            'customer_email' => 'author_email',
+            'comment'        => 'content',
+        ];
+
+        foreach ($aliases as $from => $to) {
+            if (array_key_exists($from, $payload) && !array_key_exists($to, $payload)) {
+                $payload[$to] = $payload[$from];
+            }
+            // Don't unset the alias — leaving both is harmless because
+            // prepareReviewData ignores unknown keys, and it keeps the
+            // payload introspectable in logs.
+        }
+
+        // `verified` has no column in wp_yatra_new_reviews yet. Drop it
+        // explicitly so a future log of the payload doesn't suggest the
+        // value was honoured.
+        if (array_key_exists('verified', $payload)) {
+            unset($payload['verified']);
+        }
+
+        // Clamp status to the actual enum. Anything else gets coerced to
+        // 'pending' so we never write '' (the silent-truncation pit that
+        // motivated the Upgrade_3_0_5 migration in the first place).
+        if (array_key_exists('status', $payload)) {
+            $allowed = ['pending', 'approved', 'rejected', 'spam', 'trash'];
+            $status = is_string($payload['status']) ? $payload['status'] : '';
+            $payload['status'] = in_array($status, $allowed, true) ? $status : 'pending';
+        }
+
+        return $payload;
     }
 
     /**

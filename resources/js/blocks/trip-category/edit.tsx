@@ -164,6 +164,10 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
           />
           <ToggleControl
             label={__("Hide empty categories", "yatra")}
+            help={__(
+              "Skip categories that have no published trips assigned. Off by default — turn on for a tighter live catalog, leave off for editorial / onboarding views.",
+              "yatra",
+            )}
             checked={hide_empty}
             onChange={(value: boolean) => setAttributes({ hide_empty: value })}
           />

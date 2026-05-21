@@ -45,17 +45,41 @@ if (!($trip instanceof \Yatra\Models\Trip)) {
 $title = $trip->getTitle();
 $duration = $trip->getDuration();
 $difficulty = $trip->getDifficulty();
-// Calculate rating directly from reviews array (working correctly)
-$reviews = $trip->reviews ?? [];
-$review_count = count($reviews);
-$average_rating = 0;
 
-if ($review_count > 0) {
-    $total_rating = 0;
-    foreach ($reviews as $review) {
-        $total_rating += (float) ($review->rating ?? 0);
+// Prefer the SQL-aggregated average_rating / review_count that the
+// repository attaches to every listing row (AVG(r.rating) /
+// COUNT(DISTINCT r.id) over approved reviews). Falling back to a PHP
+// recount over `$trip->reviews` is only there for legacy callers that
+// hand-populate the reviews array without the aggregates.
+//
+// Earlier this block ALWAYS recounted from `$trip->reviews` — which
+// (a) forced the listing service into an N+1 of `findApprovedByTripId`
+// per displayed trip just to feed the recount, and (b) silently
+// rendered 0 stars on shortcode/block paths that already pass
+// aggregates with `reviews => []`.
+$sql_avg = isset($trip->average_rating) ? (float) $trip->average_rating : null;
+if ($sql_avg === null && isset($trip->avg_rating)) {
+    $sql_avg = (float) $trip->avg_rating;
+}
+$sql_count = isset($trip->review_count) ? (int) $trip->review_count : null;
+if ($sql_count === null && isset($trip->reviews_count)) {
+    $sql_count = (int) $trip->reviews_count;
+}
+
+$reviews = $trip->reviews ?? [];
+if ($sql_avg !== null || $sql_count !== null) {
+    $average_rating = $sql_avg !== null ? round($sql_avg, 1) : 0;
+    $review_count = $sql_count !== null ? $sql_count : count($reviews);
+} else {
+    $review_count = count($reviews);
+    $average_rating = 0;
+    if ($review_count > 0) {
+        $total_rating = 0;
+        foreach ($reviews as $review) {
+            $total_rating += (float) ($review->rating ?? 0);
+        }
+        $average_rating = round($total_rating / $review_count, 1);
     }
-    $average_rating = round($total_rating / $review_count, 1);
 }
 
 $rating = [

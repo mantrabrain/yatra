@@ -101,6 +101,7 @@ class ModuleController extends BaseController
         if ($enabled && !empty($target_module['is_premium']) && !$target_module['is_available']) {
             return $this->error_response(
                 sprintf(
+                    /* translators: %s: module name. */
                     __('%s is a premium module. Yatra Pro is required to enable this module.', 'yatra'),
                     $target_module['name']
                 ),
@@ -114,6 +115,7 @@ class ModuleController extends BaseController
             if (!$pro_active) {
                 return $this->error_response(
                     sprintf(
+                        /* translators: %s: module name. */
                         __('%s requires Yatra Pro. Please install and activate Yatra Pro to enable this module.', 'yatra'),
                         $target_module['name']
                     ),
@@ -128,6 +130,7 @@ class ModuleController extends BaseController
             if (!apply_filters('yatra_is_agency_active', false)) {
                 return $this->error_response(
                     sprintf(
+                        /* translators: %s: module name. */
                         __('%s is available on the Yatra Pro Agency plan only. Upgrade your license to enable it.', 'yatra'),
                         $target_module['name']
                     ),
@@ -141,6 +144,7 @@ class ModuleController extends BaseController
             if (!apply_filters('yatra_is_ai_eligible', false)) {
                 return $this->error_response(
                     sprintf(
+                        /* translators: %s: module name. */
                         __('%s requires a Growth or Agency license. Upgrade your plan to enable it.', 'yatra'),
                         $target_module['name']
                     ),
@@ -228,6 +232,7 @@ class ModuleController extends BaseController
         if (empty($sanitized) && !empty($blocked_modules)) {
             return $this->error_response(
                 sprintf(
+                    /* translators: %s: comma-separated list of module names. */
                     __('The following modules require Yatra Pro: %s', 'yatra'),
                     implode(', ', $blocked_modules)
                 ),
@@ -238,10 +243,11 @@ class ModuleController extends BaseController
         if (!empty($blocked_modules)) {
             // Partial success - some modules processed, some blocked
             $updated = ModuleManager::setMultipleStatuses($sanitized);
-            
+
             return $this->success_response([
                 'data' => $updated,
                 'message' => sprintf(
+                    /* translators: %s: comma-separated list of module names. */
                     __('Some modules were skipped because they require Yatra Pro: %s', 'yatra'),
                     implode(', ', $blocked_modules)
                 ),

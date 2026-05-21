@@ -96,7 +96,11 @@ if ($yatra_chat_trip_id <= 0) {
     return;
 }
 if ($yatra_chat_trip_name === '') {
-    $yatra_chat_trip_name = sprintf(__('Trip #%d', 'yatra'), $yatra_chat_trip_id);
+    $yatra_chat_trip_name = sprintf(
+        /* translators: %d: trip post ID. */
+        __('Trip #%d', 'yatra'),
+        $yatra_chat_trip_id
+    );
 }
 
 $yatra_chat_rest = esc_url_raw(rest_url('yatra/v1/ai/trip-chat/' . $yatra_chat_trip_id));
@@ -138,7 +142,11 @@ $yatra_chat_widget_id = 'yatra-ai-chat-' . $yatra_chat_trip_id;
                 </div>
                 <div class="yatra-ai-chat-panel-subtitle">
                     <span class="yatra-ai-chat-online-dot" aria-hidden="true"></span>
-                    <?php echo esc_html(sprintf(__('Online · ask about %s', 'yatra'), $yatra_chat_trip_name)); ?>
+                    <?php echo esc_html(sprintf(
+                        /* translators: %s: trip name. */
+                        __('Online · ask about %s', 'yatra'),
+                        $yatra_chat_trip_name
+                    )); ?>
                 </div>
             </div>
         </div>

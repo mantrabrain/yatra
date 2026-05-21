@@ -23,6 +23,7 @@ import {
   formatDate as formatDateUtil,
   formatDateForInput,
 } from "../lib/dateFormat";
+import { getCountryOptions } from "../lib/countries";
 import { apiService } from "../lib/api-client";
 import { usePermissions } from "../hooks/usePermissions";
 import { getCurrencySymbol } from "../data/currencies";
@@ -91,39 +92,12 @@ interface BookingFormData {
   notes: string;
 }
 
-// Country list for country fields
-const countryList = [
-  { code: "US", name: "United States" },
-  { code: "GB", name: "United Kingdom" },
-  { code: "CA", name: "Canada" },
-  { code: "AU", name: "Australia" },
-  { code: "DE", name: "Germany" },
-  { code: "FR", name: "France" },
-  { code: "IN", name: "India" },
-  { code: "NP", name: "Nepal" },
-  { code: "CN", name: "China" },
-  { code: "JP", name: "Japan" },
-  { code: "BR", name: "Brazil" },
-  { code: "MX", name: "Mexico" },
-  { code: "ES", name: "Spain" },
-  { code: "IT", name: "Italy" },
-  { code: "NL", name: "Netherlands" },
-  { code: "CH", name: "Switzerland" },
-  { code: "SE", name: "Sweden" },
-  { code: "NO", name: "Norway" },
-  { code: "DK", name: "Denmark" },
-  { code: "FI", name: "Finland" },
-  { code: "NZ", name: "New Zealand" },
-  { code: "SG", name: "Singapore" },
-  { code: "AE", name: "United Arab Emirates" },
-  { code: "TH", name: "Thailand" },
-  { code: "MY", name: "Malaysia" },
-  { code: "ID", name: "Indonesia" },
-  { code: "PH", name: "Philippines" },
-  { code: "VN", name: "Vietnam" },
-  { code: "KR", name: "South Korea" },
-  { code: "ZA", name: "South Africa" },
-];
+// Country list — pulled from the canonical source (PHP
+// FormatHelper::getCountries() → localized to window.yatraAdmin.countries).
+// One source of truth; operators that want a curated subset apply
+// the `yatra_countries_list` PHP filter once and every dropdown
+// (admin + public booking + Pro modules) picks it up.
+const countryList = getCountryOptions();
 
 // Normalize ISO/date-like string to formatted date using shared date library
 const normalizeDateInput = (value?: string | null) => {

@@ -34,24 +34,11 @@ $is_dynamic_form_enabled = apply_filters('yatra_dynamic_form_field_enabled', fal
 $form_config = yatra_get_booking_form_config();
 
 
-// Country list for country type fields
-$countries = [
-    'AF' => 'Afghanistan', 'AL' => 'Albania', 'DZ' => 'Algeria', 'AR' => 'Argentina',
-    'AU' => 'Australia', 'AT' => 'Austria', 'BD' => 'Bangladesh', 'BE' => 'Belgium',
-    'BR' => 'Brazil', 'BT' => 'Bhutan', 'CA' => 'Canada', 'CN' => 'China',
-    'CO' => 'Colombia', 'CZ' => 'Czech Republic', 'DK' => 'Denmark', 'EG' => 'Egypt',
-    'FI' => 'Finland', 'FR' => 'France', 'DE' => 'Germany', 'GR' => 'Greece',
-    'HK' => 'Hong Kong', 'HU' => 'Hungary', 'IS' => 'Iceland', 'IN' => 'India',
-    'ID' => 'Indonesia', 'IE' => 'Ireland', 'IL' => 'Israel', 'IT' => 'Italy',
-    'JP' => 'Japan', 'KE' => 'Kenya', 'KR' => 'South Korea', 'MY' => 'Malaysia',
-    'MV' => 'Maldives', 'MX' => 'Mexico', 'NL' => 'Netherlands', 'NZ' => 'New Zealand',
-    'NP' => 'Nepal', 'NO' => 'Norway', 'PK' => 'Pakistan', 'PE' => 'Peru',
-    'PH' => 'Philippines', 'PL' => 'Poland', 'PT' => 'Portugal', 'RO' => 'Romania',
-    'RU' => 'Russia', 'SA' => 'Saudi Arabia', 'SG' => 'Singapore', 'ZA' => 'South Africa',
-    'ES' => 'Spain', 'LK' => 'Sri Lanka', 'SE' => 'Sweden', 'CH' => 'Switzerland',
-    'TW' => 'Taiwan', 'TH' => 'Thailand', 'TR' => 'Turkey', 'AE' => 'United Arab Emirates',
-    'GB' => 'United Kingdom', 'US' => 'United States', 'VN' => 'Vietnam'
-];
+// Country list — pulls from the canonical FormatHelper source so every
+// dropdown (admin, public booking, Pro modules) shows the same full
+// ISO-3166-1 list. Operators that want a "popular countries" subset
+// or custom ordering apply the `yatra_countries_list` filter.
+$countries = \Yatra\Helpers\FormatHelper::getCountries();
 
 /**
  * Render a single form field based on configuration
@@ -415,10 +402,13 @@ if ($pricing_type === 'traveler_based' && !empty($price_types)) {
         $age_info = '';
         if (isset($pt->age_min) || isset($pt->age_max)) {
             if (isset($pt->age_min) && isset($pt->age_max)) {
-                $age_info = sprintf(__('(Age %d-%d)', 'yatra'), $pt->age_min, $pt->age_max);
+                /* translators: 1: minimum age, 2: maximum age. */
+                $age_info = sprintf(__('(Age %1$d-%2$d)', 'yatra'), $pt->age_min, $pt->age_max);
             } elseif (isset($pt->age_min)) {
+                /* translators: %d: minimum age. */
                 $age_info = sprintf(__('(Age %d+)', 'yatra'), $pt->age_min);
             } else {
+                /* translators: %d: maximum age. */
                 $age_info = sprintf(__('(Up to age %d)', 'yatra'), $pt->age_max);
             }
         }
@@ -488,11 +478,13 @@ $initial_due_amount = $initial_total_amount;
                 $category_info = $traveler_category_map[$i];
                 $category_label = $category_info['category_label'];
                 $category_index = $category_info['category_index'];
-                $traveler_label = sprintf(__('%s %d', 'yatra'), $category_label, $category_index);
+                /* translators: 1: traveler category label (e.g. Adult, Child), 2: sequential index within that category. */
+                $traveler_label = sprintf(__('%1$s %2$d', 'yatra'), $category_label, $category_index);
                 if ($i === 1) {
                     $traveler_label .= ' (' . __('Lead Traveler', 'yatra') . ')';
                 }
             } else {
+            /* translators: %d: traveler sequence number. */
             $traveler_label = ($i === 1) ? __('Traveler 1 (Lead Traveler)', 'yatra') : sprintf(__('Traveler %d', 'yatra'), $i);
             }
         ?>

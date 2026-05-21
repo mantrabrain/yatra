@@ -299,7 +299,50 @@
           onChange: (ids) => setAttributes({ destinationIds: ids })
         }
       )
-    )), /* @__PURE__ */ element.createElement("div", { className: "yatra-block-editor-preview" }, /* @__PURE__ */ element.createElement(
+    ), /* @__PURE__ */ element.createElement(components.PanelBody, { title: i18n.__("Display options", "yatra"), initialOpen: false }, /* @__PURE__ */ element.createElement(
+      components.ToggleControl,
+      {
+        label: i18n.__("Show trip count", "yatra"),
+        checked: attributes2.show_trip_count,
+        onChange: (value) => setAttributes({ show_trip_count: value })
+      }
+    ), /* @__PURE__ */ element.createElement(
+      components.ToggleControl,
+      {
+        label: i18n.__("Show description", "yatra"),
+        checked: attributes2.show_description,
+        onChange: (value) => setAttributes({ show_description: value })
+      }
+    ), /* @__PURE__ */ element.createElement(
+      components.ToggleControl,
+      {
+        label: i18n.__("Show image", "yatra"),
+        checked: attributes2.show_image,
+        onChange: (value) => setAttributes({ show_image: value })
+      }
+    ), /* @__PURE__ */ element.createElement(
+      components.ToggleControl,
+      {
+        label: i18n.__("Hide empty destinations", "yatra"),
+        help: i18n.__(
+          "Skip destinations that have no published trips assigned. Off by default — turn on for a tighter live catalog, leave off for editorial / onboarding views.",
+          "yatra"
+        ),
+        checked: attributes2.hide_empty,
+        onChange: (value) => setAttributes({ hide_empty: value })
+      }
+    ), /* @__PURE__ */ element.createElement(
+      components.ToggleControl,
+      {
+        label: i18n.__("Featured only (filter list)", "yatra"),
+        help: i18n.__(
+          "When on, only destinations marked as featured in Yatra → Destinations are listed.",
+          "yatra"
+        ),
+        checked: attributes2.featured_only,
+        onChange: (value) => setAttributes({ featured_only: value })
+      }
+    ))), /* @__PURE__ */ element.createElement("div", { className: "yatra-block-editor-preview" }, /* @__PURE__ */ element.createElement(
       ServerSideRender,
       {
         block: "yatra/destination",
@@ -346,6 +389,27 @@
     destinationIds: {
       type: "array",
       "default": []
+    },
+    hide_empty: {
+      type: "boolean",
+      "default": false,
+      description: "When on, destinations with zero published trips are skipped. Off by default to preserve the historical 'show everything' behavior."
+    },
+    featured_only: {
+      type: "boolean",
+      "default": false
+    },
+    show_trip_count: {
+      type: "boolean",
+      "default": true
+    },
+    show_description: {
+      type: "boolean",
+      "default": true
+    },
+    show_image: {
+      type: "boolean",
+      "default": true
     }
   };
   const supports = {

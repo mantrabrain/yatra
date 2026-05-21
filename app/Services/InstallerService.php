@@ -147,9 +147,11 @@ class InstallerService
         update_option('yatra_auto_confirm_bookings', false);
         update_option('yatra_require_login', false);
         update_option('yatra_allow_guest_checkout', true);
-        update_option('yatra_cancellation_policy', 'full_refund');
-        update_option('yatra_cancellation_days', 7);
-        update_option('yatra_refund_policy', '');
+        // cancellation_policy / cancellation_days / refund_policy
+        // intentionally not seeded — these are removed settings (see
+        // SettingsController::$default_settings comment). Existing
+        // sites that already have orphan values stored will keep
+        // them in wp_options; new sites won't acquire them.
         update_option('yatra_booking_expiry_hours', 24);
         update_option('yatra_booking_reminder_days', 3);
         update_option('yatra_allow_waitlist', true);
@@ -178,6 +180,7 @@ class InstallerService
         update_option('yatra_email_template_admin_cancellation', true);
         update_option('yatra_email_template_trip_consent', true);
         update_option('yatra_email_template_customer_verification', true);
+        update_option('yatra_email_template_guest_verification', true);
         update_option('yatra_email_template_booking_completed', true);
         update_option('yatra_email_template_booking_expired_customer', true);
         update_option('yatra_email_template_admin_booking_expired', true);
@@ -403,6 +406,96 @@ class InstallerService
     }
 
     /**
+     * Ensure `wp_yatra_new_bookings.status` accepts `pending_verification`.
+     *
+     * The 3.0.5 guest email-verification feature introduced a new holding
+     * status (`pending_verification`) but the production ENUM only listed
+     * the legacy values. Until the column is widened, MySQL non-strict
+     * mode silently coerces the value to `''` on insert — which makes
+     * every booking placed with verification enabled appear broken:
+     *
+     *   1. The admin booking list renders an empty status badge (the
+     *      React status map has no entry for `''` so the row falls into
+     *      the default branch with an empty label).
+     *   2. `BookingService::createBooking` sees the in-memory
+     *      `$data['status'] === 'pending_verification'` and defers
+     *      firing `yatra_booking_created`, so the customer never gets
+     *      the booking-confirmation email.
+     *   3. `verify_email` reads the persisted status (now `''`),
+     *      decides the booking is "already verified", skips the deferred
+     *      fan-out — so neither the status flip nor the booking email
+     *      ever fires.
+     *
+     * Doing the widening here (runIdempotentMaintenance — every admin
+     * pageview) instead of a pure version-gated upgrade step means it
+     * heals installs whose stored yatra_version was already bumped to
+     * 3.0.5 by an earlier failed upgrade attempt. Cheap: one
+     * INFORMATION_SCHEMA query gated by a one-shot option flag, ALTER
+     * runs at most once per install.
+     *
+     * Also backfills any rows whose status was silently coerced to `''`
+     * by the pre-widening insert path: those bookings *should* have
+     * landed in `pending_verification`, so we restore them there. The
+     * original verify-email magic link still works because the HMAC
+     * token is bound to booking_id + email, not status.
+     */
+    public static function maybeAddPendingVerificationBookingStatus(): void
+    {
+        if (get_option('yatra_booking_status_pending_verification_v1')) {
+            return;
+        }
+
+        if (!class_exists('Yatra\\Database\\Tables\\BookingsTable')) {
+            return;
+        }
+
+        $table = \Yatra\Database\Tables\BookingsTable::getTableName();
+        if (!self::databaseTableExists($table)) {
+            return;
+        }
+
+        global $wpdb;
+
+        $columnInfo = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS
+                 WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s",
+                DB_NAME,
+                $table,
+                'status'
+            )
+        );
+
+        $columnType = is_object($columnInfo) ? (string) ($columnInfo->COLUMN_TYPE ?? '') : '';
+        $needsAlter = $columnType !== '' && strpos($columnType, 'pending_verification') === false;
+
+        if ($needsAlter) {
+            // Match the original column shape exactly minus the new enum
+            // value — nullable, default 'pending', no NOT NULL.
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name escaped, enum literal is static.
+            $wpdb->query(
+                'ALTER TABLE `' . esc_sql($table) . "` "
+                . "MODIFY COLUMN `status` "
+                . "enum('pending','pending_verification','confirmed','processing','completed','cancelled','refunded','failed','on_hold','waitlist') "
+                . "DEFAULT 'pending'"
+            );
+        }
+
+        // Backfill: bookings whose insert hit the old ENUM during a
+        // verification flow ended up with status='' (silent coerce).
+        // Now that the enum accepts pending_verification, restore them.
+        // Filtered to a narrow signal (status='' AND payment_status='pending')
+        // so we don't accidentally re-stamp unrelated edge cases.
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name from schema helper, literal values only.
+        $wpdb->query(
+            "UPDATE `{$table}` SET `status` = 'pending_verification' "
+            . "WHERE `status` = '' AND `payment_status` = 'pending'"
+        );
+
+        update_option('yatra_booking_status_pending_verification_v1', '1', false);
+    }
+
+    /**
      * Fill canonical + legacy email identity options when empty (upgrades, partial installs, or empty strings in DB).
      * Idempotent; safe to run on each admin load via maybeBackfillEmailTemplateDefaults().
      */
@@ -484,6 +577,7 @@ class InstallerService
         }
 
         add_option('yatra_email_template_customer_verification', true);
+        add_option('yatra_email_template_guest_verification', true);
 
         $defaults = EmailTemplateDefaults::settingsOptionDefaults();
         foreach (['email_tpl_customer_verification_subject', 'email_tpl_customer_verification_body'] as $key) {

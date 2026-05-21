@@ -1736,6 +1736,28 @@ button.yatra-booking-button svg path {
     padding-top: 0;
 }
 
+/*
+ * Responsive: collapse the trip-detail two-column grid to a single
+ * column at tablet-portrait and below. Without this, the fixed
+ * `1fr 400px` causes the booking sidebar to overflow the viewport
+ * on phones — and because the sidebar is `position: sticky`, it
+ * starts covering the hero gallery + section navigation as soon as
+ * the user scrolls. Stacking puts the gallery/content first and the
+ * booking card after, in normal document flow.
+ */
+@media (max-width: 1024px) {
+    .yatra-trip-container {
+        grid-template-columns: 1fr;
+    }
+    .yatra-trip-container .yatra-trip-sidebar,
+    .yatra-trip-sidebar-column .yatra-trip-sidebar,
+    .yatra-trip-sidebar {
+        position: static;
+        top: auto;
+        order: 2;
+    }
+}
+
 /* ============================================
    MAIN CONTENT
    ============================================ */
@@ -2239,6 +2261,46 @@ button.yatra-booking-button svg path {
     line-height: 1.6;
     color: #4b5563;
     margin: 0 0 12px 0;
+}
+
+.yatra-entry-notes {
+    display: block;
+    padding: 10px 12px;
+    margin: 0 0 12px 0;
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #78350f;
+}
+
+.yatra-entry-notes__head {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    color: #b45309;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 11px;
+}
+
+.yatra-entry-notes__head svg {
+    color: #d97706;
+}
+
+.yatra-entry-notes__body {
+    color: #78350f;
+}
+
+.yatra-entry-notes__body p {
+    margin: 0 0 6px 0;
+}
+
+.yatra-entry-notes__body p:last-child {
+    margin-bottom: 0;
 }
 
 .yatra-entry-cost {
@@ -13070,7 +13132,6 @@ a.yatra-card-book-btn:hover {
 
 /* --- What makes this trip special --- */
 #what-makes-special .yatra-trip-special-container {
-    max-width: 800px;
     margin: 0 auto;
 }
 
@@ -13214,7 +13275,6 @@ a.yatra-card-book-btn:hover {
 
 /* --- Trip story --- */
 #trip-story .yatra-trip-story-container {
-    max-width: 800px;
     margin: 0 auto;
 }
 
@@ -13522,7 +13582,6 @@ a.yatra-card-book-btn:hover {
 }
 
 #faq .faq-container {
-    max-width: 800px;
     margin: 0 auto;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
@@ -13643,5 +13702,53 @@ a.yatra-card-book-btn:hover {
 
     #faq .faq-item.active .faq-answer {
         padding: 0 var(--yatra-small-gap) 14px var(--yatra-small-gap);
+    }
+}
+
+/* ============================================
+   MOBILE-INPUT HYGIENE (single-trip booking widget)
+   ============================================
+   Applied last so it wins specificity ties against earlier desktop
+   rules without needing !important. Two concerns:
+
+   1. iOS Safari auto-zoom: any <input>/<select>/<textarea> with
+      computed font-size < 16px triggers a 1.25x viewport zoom on
+      focus. The trip page's sticky booking widget often contains
+      a date / traveler / discount field — zoom + scroll-jump
+      breaks the user mid-typing.
+
+   2. Tap-target comfort: bump the rendered control height to ~48px
+      so thumbs in portrait have room. Apple HIG minimum is 44pt;
+      48dp (Material) is more forgiving and matches the public
+      booking form (booking.css).
+   ============================================ */
+@media (max-width: 768px) {
+    .yatra-trip-sidebar input,
+    .yatra-trip-sidebar select,
+    .yatra-trip-sidebar textarea,
+    .yatra-booking-card input,
+    .yatra-booking-card select,
+    .yatra-booking-card textarea {
+        font-size: 16px;
+        min-height: 48px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    .yatra-trip-sidebar textarea,
+    .yatra-booking-card textarea {
+        min-height: 96px;
+    }
+
+    /*
+     * The "Book now" / "Reserve" CTA in the booking card needs the
+     * same comfortable size. Buttons inside the card sometimes
+     * inherit smaller padding from utility classes.
+     */
+    .yatra-booking-card button,
+    .yatra-booking-card .yatra-book-now-btn,
+    .yatra-booking-card .yatra-trip-cta {
+        min-height: 48px;
+        font-size: 16px;
     }
 }

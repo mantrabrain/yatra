@@ -69,16 +69,19 @@ $type_labels = [
     'destination' => [
         'singular' => __('Destination', 'yatra'),
         'plural' => __('Destinations', 'yatra'),
+        /* translators: %s: destination name (e.g. "Nepal"). */
         'trips_title' => __('Trips in %s', 'yatra'),
     ],
     'activity' => [
         'singular' => __('Activity', 'yatra'),
         'plural' => __('Activities', 'yatra'),
+        /* translators: %s: term name (activity or category, e.g. "Hiking" or "Adventure"). */
         'trips_title' => __('%s Trips', 'yatra'),
     ],
     'category' => [
         'singular' => __('Category', 'yatra'),
         'plural' => __('Categories', 'yatra'),
+        /* translators: %s: term name (activity or category, e.g. "Hiking" or "Adventure"). */
         'trips_title' => __('%s Trips', 'yatra'),
     ],
 ];
@@ -165,7 +168,10 @@ yatra_get_header();
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
                     </svg>
-                    <?php echo sprintf(_n('%d Trip', '%d Trips', $total_trips, 'yatra'), (int) $total_trips); ?>
+                    <?php
+                    /* translators: %d: total number of trips in this taxonomy term. */
+                    echo sprintf(_n('%d Trip', '%d Trips', $total_trips, 'yatra'), (int) $total_trips);
+                    ?>
                 </span>
             </div>
         </div>
@@ -187,7 +193,8 @@ yatra_get_header();
                                 
                                 if ($total_trips > 0) {
                                     echo sprintf(
-                                        __('Showing <strong>%d-%d</strong> of %d trips (Page %d of %d)', 'yatra'),
+                                        /* translators: 1: first item index on the page, 2: last item index on the page, 3: total trips, 4: current page number, 5: total page count. */
+                                        __('Showing <strong>%1$d-%2$d</strong> of %3$d trips (Page %4$d of %5$d)', 'yatra'),
                                         $start_item,
                                         $end_item,
                                         $total_trips,
@@ -257,7 +264,10 @@ yatra_get_header();
                     </svg>
                 </div>
                 <h3><?php echo esc_html__('No trips found', 'yatra'); ?></h3>
-                <p><?php echo sprintf(esc_html__('There are no trips available for %s at the moment. Please check back later or explore other options.', 'yatra'), esc_html($taxonomy_data->name)); ?></p>
+                <p><?php
+                    /* translators: %s: taxonomy term name (destination, activity, or category). */
+                    echo sprintf(esc_html__('There are no trips available for %s at the moment. Please check back later or explore other options.', 'yatra'), esc_html($taxonomy_data->name));
+                ?></p>
                 <a href="<?php echo esc_url(home_url('/' . \Yatra\Services\SettingsService::getTripBase() . '/')); ?>" class="yatra-btn yatra-btn-primary yatra-archive-card-cta">
                     <?php echo yatra_svg_icon('globe', 'yatra-btn-icon'); ?>
                     <span><?php echo esc_html__('Browse All Trips', 'yatra'); ?></span>

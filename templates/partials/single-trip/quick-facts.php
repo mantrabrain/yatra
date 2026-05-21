@@ -59,9 +59,10 @@ if (!defined('ABSPATH')) {
             <div class="yatra-quick-fact-content">
                 <div class="yatra-quick-fact-label"><?php echo esc_html__('Landmarks', 'yatra'); ?></div>
                 <div class="yatra-quick-fact-value">
-                    <?php 
+                    <?php
                     $landmark_count = count($landmarks);
-                    echo esc_html(sprintf(_n('%d landmark', '%d landmarks', $landmark_count, 'yatra'), $landmark_count)); 
+                    /* translators: %d: number of landmarks. */
+                    echo esc_html(sprintf(_n('%d landmark', '%d landmarks', $landmark_count, 'yatra'), $landmark_count));
                     ?>
                 </div>
             </div>
@@ -77,10 +78,11 @@ if (!defined('ABSPATH')) {
         <div class="yatra-quick-fact-content">
             <div class="yatra-quick-fact-label"><?php echo esc_html__('Group Size', 'yatra'); ?></div>
             <div class="yatra-quick-fact-value">
-                <?php 
+                <?php
                 $min_travelers = $trip->getMinTravelers();
                 $max_travelers = $trip->getMaxTravelers();
-                echo esc_html(sprintf(__('%d-%d travelers', 'yatra'), $min_travelers, $max_travelers)); 
+                /* translators: 1: minimum travelers, 2: maximum travelers. */
+                echo esc_html(sprintf(__('%1$d-%2$d travelers', 'yatra'), $min_travelers, $max_travelers));
                 ?>
             </div>
         </div>

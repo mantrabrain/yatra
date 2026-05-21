@@ -40,6 +40,7 @@ import {
   RotateCcw,
   Sparkles,
   MessageCircle,
+  Network,
 } from "lucide-react";
 
 export const ICON_MAP: Record<string, LucideIcon> = {
@@ -73,6 +74,7 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   RotateCcw,
   Sparkles,
   MessageCircle,
+  Network,
   Tools: Wrench,
 };
 

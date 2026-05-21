@@ -97,6 +97,7 @@ class UtilsHooks
                     'title' => $title,
                     'href'  => $edit_url,
                     'meta'  => [
+                        /* translators: %s: object type label (e.g. trip, booking). */
                         'title' => sprintf(__('Edit this %s in Yatra admin', 'yatra'), $type),
                     ],
                 ]);

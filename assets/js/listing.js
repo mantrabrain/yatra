@@ -16,7 +16,10 @@
     }
 
     function init() {
-        initFilterToggles();
+        // Filter sidebar toggles (.yatra-filter-title click → toggle .open
+        // on the section) live in listing-filters.js. Keeping a second
+        // copy here meant TWO toggles fired per click, leaving the
+        // section in its original state — i.e. the arrow appeared dead.
         initViewToggle();
         initPriceRange();
         initAdvancedSearch();
@@ -153,23 +156,6 @@
 
         dropdown.addEventListener('click', function(e) {
             e.stopPropagation();
-        });
-    }
-
-    // Filter section toggles
-    function initFilterToggles() {
-        const filterTitles = document.querySelectorAll('.yatra-filter-title');
-        
-        filterTitles.forEach(title => {
-            title.addEventListener('click', function() {
-                const section = this.closest('.yatra-filter-section');
-                section.classList.toggle('open');
-            });
-        });
-
-        // Open all filter sections by default
-        document.querySelectorAll('.yatra-filter-section').forEach(section => {
-            section.classList.add('open');
         });
     }
 

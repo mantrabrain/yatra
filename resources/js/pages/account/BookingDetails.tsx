@@ -212,20 +212,19 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Booking Overview */}
+          {/* Booking Overview.
+              The header used to render two bare status badges side-by-side
+              — `booking_status` and `payment_status` — which both read
+              "Pending" with no label, so the user couldn't tell which was
+              which. Both statuses now live in the right sidebar with
+              explicit "Booking Status" / "Payment Status" labels (see
+              the Payment Information card below), so we drop the
+              ambiguous badges from this header. */}
           <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {__("Booking Overview", "yatra")}
               </h3>
-              <div className="flex items-center gap-2">
-                <span className={getBadge(booking.booking_status)}>
-                  {getStatusLabel(booking.booking_status)}
-                </span>
-                <span className={getBadge(booking.payment_status)}>
-                  {getStatusLabel(booking.payment_status)}
-                </span>
-              </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -492,32 +491,108 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
             </div>
           </div>
 
-          {/* Customer Information */}
+          {/* Customer Information.
+              The API (CustomerService::getBookingDetailsForUser) returns
+              the booking's CONTACT fields — `contact_first_name`,
+              `contact_last_name`, `contact_email`, `contact_phone`,
+              `contact_country` — straight from the bookings table. This
+              card was previously reading `customer_name`/`customer_email`
+              /`customer_phone`, which the API never set, so the section
+              was always blank.
+
+              Also fall back to the trip's lead-traveler fields (first
+              entry in `travelers_data`) when the contact_* columns are
+              empty, since some legacy flows wrote the lead traveler's
+              info there instead. */}
           <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               {__("Customer Information", "yatra")}
             </h3>
-            <div className="space-y-3">
-              <div>
-                <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                  {booking.customer_name}
-                </div>
-                <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                  {booking.customer_email && (
-                    <div className="flex items-center gap-1.5">
-                      <Mail className="w-4 h-4" />
-                      {booking.customer_email}
+            {(() => {
+              const leadTraveler =
+                Array.isArray(booking.travelers_data) &&
+                booking.travelers_data.length > 0
+                  ? booking.travelers_data[0]
+                  : null;
+              const leadFields =
+                leadTraveler && typeof leadTraveler === "object"
+                  ? (leadTraveler as any).fields || (leadTraveler as any)
+                  : null;
+
+              const firstName =
+                (booking as any).contact_first_name ||
+                (leadFields && leadFields.first_name) ||
+                "";
+              const lastName =
+                (booking as any).contact_last_name ||
+                (leadFields && leadFields.last_name) ||
+                "";
+              const fullName =
+                [firstName, lastName].filter(Boolean).join(" ").trim() ||
+                (booking as any).customer_name ||
+                "";
+              const email =
+                (booking as any).contact_email ||
+                (booking as any).customer_email ||
+                (leadFields && leadFields.email) ||
+                "";
+              const phone =
+                (booking as any).contact_phone ||
+                (booking as any).customer_phone ||
+                (leadFields && leadFields.phone) ||
+                "";
+              const country =
+                (booking as any).contact_country ||
+                (leadFields && leadFields.country) ||
+                "";
+
+              const hasAny = fullName || email || phone || country;
+
+              if (!hasAny) {
+                return (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {__("No customer information recorded.", "yatra")}
+                  </p>
+                );
+              }
+
+              return (
+                <div className="space-y-3">
+                  <div>
+                    {fullName && (
+                      <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                        {fullName}
+                      </div>
+                    )}
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
+                      {email && (
+                        <div className="flex items-center gap-1.5">
+                          <Mail className="w-4 h-4" />
+                          <a
+                            href={`mailto:${email}`}
+                            className="hover:text-yatra-primary dark:hover:text-yatra-on-dark"
+                          >
+                            {email}
+                          </a>
+                        </div>
+                      )}
+                      {phone && (
+                        <div className="flex items-center gap-1.5">
+                          <PhoneIcon className="w-4 h-4" />
+                          <a
+                            href={`tel:${String(phone).replace(/\s+/g, "")}`}
+                            className="hover:text-yatra-primary dark:hover:text-yatra-on-dark"
+                          >
+                            {phone}
+                          </a>
+                        </div>
+                      )}
+                      {country && <div>{country}</div>}
                     </div>
-                  )}
-                  {booking.customer_phone && (
-                    <div className="flex items-center gap-1.5">
-                      <PhoneIcon className="w-4 h-4" />
-                      {booking.customer_phone}
-                    </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            </div>
+              );
+            })()}
           </div>
 
           {/* Travelers Information */}
@@ -749,12 +824,27 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Payment Information */}
+          {/* Payment Information.
+              Hosts BOTH the booking-status and the payment-status
+              badges, each with an explicit label, so the previous
+              "two unlabelled Pending pills in the overview header"
+              ambiguity is gone — the user can tell at a glance which
+              status is which. */}
           <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               {__("Payment Information", "yatra")}
             </h3>
             <div className="space-y-3">
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                  {__("Booking Status", "yatra")}
+                </div>
+                <div className="mt-1">
+                  <span className={getBadge(booking.booking_status)}>
+                    {getStatusLabel(booking.booking_status)}
+                  </span>
+                </div>
+              </div>
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
                   {__("Payment Status", "yatra")}

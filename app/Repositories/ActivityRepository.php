@@ -152,10 +152,44 @@ class ActivityRepository extends BaseRepository
      * Get published activities with trip counts and stats
      * Uses the new ClassificationsTable and TripClassificationsTable
      */
+    /**
+     * Wipe listing caches whenever an activity row is created /
+     * updated / deleted so {@see self::getPublishedWithTripCounts()}
+     * never serves stale aggregates. See the matching override in
+     * {@see DestinationRepository::afterWrite()} for the full reasoning
+     * — the existing `yatra_activity_*` CacheHooks listeners only fire
+     * when an action of that name is dispatched, and no caller does.
+     */
+    protected function afterWrite(string $operation, int $id, array $context = []): void
+    {
+        Cache::invalidateListingCaches();
+    }
+
     public function getPublishedWithTripCounts(): array
     {
-        global $wpdb;
+        // Cache the aggregate so repeat visits skip the GROUP BY +
+        // per-activity MIN-price subquery. Cache key sits behind the
+        // `activity_listing_` prefix wiped by
+        // {@see \Yatra\Utils\Cache::invalidateListingCaches()}, which
+        // runs whenever an activity/trip row is written (via this
+        // class's afterWrite or {@see \Yatra\Hooks\CacheHooks} on trip
+        // writes). Stale data is impossible after admin edits.
+        return $this->cacheQueryResult(
+            'activity_listing_with_trip_counts_v2',
+            function (): array {
+                return $this->fetchPublishedWithTripCounts();
+            },
+            Cache::DURATION_ACTIVITY_DATA
+        );
+    }
 
+    /**
+     * Uncached worker for {@see self::getPublishedWithTripCounts()}.
+     *
+     * @return array<int, \stdClass>
+     */
+    private function fetchPublishedWithTripCounts(): array
+    {
         $actTable     = esc_sql($this->table);
         $relTable     = TripClassificationsTable::getTableName();
         $tripsTable   = TripsTable::getTableName();
@@ -176,13 +210,13 @@ class ActivityRepository extends BaseRepository
         }
         $statusIn = implode(',', array_fill(0, count($statuses), '%s'));
 
-        $sql = "SELECT a.*, 
+        $sql = "SELECT a.*,
                        COUNT(DISTINCT tc.trip_id) AS trips_count,
                        COALESCE(AVG(r.rating), 0) AS avg_rating,
                        GROUP_CONCAT(DISTINCT tc.trip_id) AS trip_ids
                 FROM `{$actTable}` a
                 LEFT JOIN `{$relTable}` tc
-                  ON tc.classification_id = a.id 
+                  ON tc.classification_id = a.id
                   AND tc.classification_type = %s
                 LEFT JOIN `{$tripsTable}` t
                   ON t.id = tc.trip_id

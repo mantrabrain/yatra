@@ -139,7 +139,11 @@ class BookingCronService
         $extra = '';
         if ($amount_due > 0) {
             $extra = '<p><strong>' . esc_html__('Payment reminder', 'yatra') . '</strong></p>'
-                . '<p>' . esc_html(sprintf(__('Outstanding balance: %s — please pay before travel.', 'yatra'), yatra_format_price($amount_due))) . '</p>';
+                . '<p>' . esc_html(sprintf(
+                    /* translators: %s: formatted outstanding balance amount. */
+                    __('Outstanding balance: %s — please pay before travel.', 'yatra'),
+                    yatra_format_price($amount_due)
+                )) . '</p>';
         }
         $extra .= '<p><strong>' . esc_html__('Preparation checklist', 'yatra') . '</strong></p><ul>'
             . '<li>' . esc_html__('Valid government-issued ID', 'yatra') . '</li>'
