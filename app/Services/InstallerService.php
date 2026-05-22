@@ -406,7 +406,7 @@ class InstallerService
     }
 
     /**
-     * Ensure `wp_yatra_new_bookings.status` accepts `pending_verification`.
+     * Ensure `wp_yatra_bookings.status` accepts `pending_verification`.
      *
      * The 3.0.5 guest email-verification feature introduced a new holding
      * status (`pending_verification`) but the production ENUM only listed

@@ -18,7 +18,7 @@ class TripAvailabilityRulesTable extends BaseTable
      * 
      * @var string
      */
-    protected static string $table = 'yatra_new_trip_availability_rules';
+    protected static string $table = 'yatra_trip_availability_rules';
 
     /**
      * Get the complete table schema as raw SQL CREATE TABLE statement

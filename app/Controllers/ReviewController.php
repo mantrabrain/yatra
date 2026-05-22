@@ -346,7 +346,7 @@ class ReviewController extends BaseController
             // payload introspectable in logs.
         }
 
-        // `verified` has no column in wp_yatra_new_reviews yet. Drop it
+        // `verified` has no column in wp_yatra_reviews yet. Drop it
         // explicitly so a future log of the payload doesn't suggest the
         // value was honoured.
         if (array_key_exists('verified', $payload)) {

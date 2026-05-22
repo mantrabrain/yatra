@@ -48,6 +48,9 @@ class AppServiceProvider extends ServiceProvider
         // Initialize review and enquiry hooks
         \Yatra\Hooks\ReviewHooks::init();
 
+        // Garbage-collect deleted-trip IDs out of user wishlist meta.
+        \Yatra\Hooks\SavedTripHooks::init();
+
         // Initialize REST API hooks
         \Yatra\Hooks\RestApiHooks::init();
 

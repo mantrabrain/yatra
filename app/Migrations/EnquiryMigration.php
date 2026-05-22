@@ -14,7 +14,7 @@ use Yatra\Utils\Logger;
  *            number_of_adults, number_of_childs, message, subject,
  *            additional_fields, ip_address, created_at
  *
- * New system: wp_yatra_new_enquiries
+ * New system: wp_yatra_enquiries
  *   Columns: id, trip_id, name, email, phone, message, travel_date,
  *            metadata (JSON), travelers_count, status, response_notes,
  *            responded_at, responded_by, ip_address, user_agent, source,

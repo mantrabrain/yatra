@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Repositories;
 
 use Yatra\Constants\ClassificationTypes;
+use Yatra\Database\Tables\BookingDeparturesTable;
 use Yatra\Database\Tables\BookingsTable;
 use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\ReviewsTable;
@@ -22,48 +23,26 @@ use Yatra\Utils\Cache;
  */
 class BookingRepository extends BaseRepository
 {
-    private ?string $resolvedBookingsTable = null;
-
-    private function getResolvedBookingsTable(): string
-    {
-        if ($this->resolvedBookingsTable !== null) {
-            return $this->resolvedBookingsTable;
-        }
-        $candidates = [
-            $this->wpdb->prefix . 'yatra_new_bookings',
-            $this->wpdb->prefix . 'yatra_bookings',
-        ];
-        foreach ($candidates as $candidate) {
-            $pattern = $this->wpdb->esc_like($candidate);
-            $exists = $this->wpdb->get_var($this->wpdb->prepare('SHOW TABLES LIKE %s', $pattern));
-            if ($exists === $candidate) {
-                $this->resolvedBookingsTable = $candidate;
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    }
-                return $candidate;
-            }
-        }
-        // Fallback to default
-        $this->resolvedBookingsTable = BookingsTable::getTableName();
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            }
-        return $this->resolvedBookingsTable;
-    }
-
     /**
-     * Get full table name with prefix
+     * Get full table name with prefix. Single source of truth =
+     * {@see BookingsTable::getTableName()}. A previous "try both names"
+     * resolver existed to bridge the 3.0.4 → 3.0.5 rename (when the
+     * physical table could be either `wp_yatra_new_bookings` or
+     * `wp_yatra_bookings`); now that
+     * {@see \Yatra\Upgrades\Versions\Upgrade_3_0_5} guarantees the
+     * canonical name, the probe is no longer needed.
      */
     protected function getTableName(): string
     {
-        return $this->getResolvedBookingsTable();
+        return BookingsTable::getTableName();
     }
 
     /**
-     * Public accessor for resolved bookings table (e.g. joins from other repositories).
+     * Public accessor for the bookings table name (e.g. joins from other repositories).
      */
     public function getBookingsTableName(): string
     {
-        return $this->getResolvedBookingsTable();
+        return BookingsTable::getTableName();
     }
 
     /**
@@ -1161,8 +1140,7 @@ class BookingRepository extends BaseRepository
     {
         $table = $this->getTableName();
 
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $relationTable = $this->wpdb->prefix . 'yatra_booking_departures';
+        $relationTable = BookingDeparturesTable::getTableName();
 
         $bookings = $this->wpdb->get_results($this->wpdb->prepare(
             "SELECT b.* FROM {$table} b

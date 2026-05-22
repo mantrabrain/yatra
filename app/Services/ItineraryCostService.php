@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\Services;
 
+use Yatra\Database\Tables\BookingsTable;
 use Yatra\Repositories\ItineraryRepository;
 
 /**
@@ -148,7 +149,7 @@ class ItineraryCostService
         try {
             // Get booking details directly from database to avoid potential loops
             global $wpdb;
-            $table_name = $wpdb->prefix . 'yatra_new_bookings';
+            $table_name = BookingsTable::getTableName();
             
             $booking = $wpdb->get_row($wpdb->prepare(
                 "SELECT trip_id, travelers_count, travel_date, itinerary_costs FROM {$table_name} WHERE id = %d",

@@ -292,6 +292,20 @@ class FrontendAssetsProvider
                     'restUrl' => rest_url('yatra/v1'),
                     'nonce' => wp_create_nonce('wp_rest'),
                     'isLoggedIn' => is_user_logged_in(),
+                    'loginUrl' => wp_login_url(),
+                    'i18n' => [
+                        'loginRequired' => __('Login Required', 'yatra'),
+                        'loginPrompt'   => __('Please login to save trips to your wishlist.', 'yatra'),
+                        'login'         => __('Login', 'yatra'),
+                        'cancel'        => __('Cancel', 'yatra'),
+                        'genericError'  => __('An error occurred. Please try again.', 'yatra'),
+                        'saved'         => __('Trip saved to wishlist', 'yatra'),
+                        'removed'       => __('Trip removed from wishlist', 'yatra'),
+                        'saveFailed'    => __('Failed to save trip', 'yatra'),
+                        'removeFailed'  => __('Failed to remove trip', 'yatra'),
+                        'addAria'       => __('Add to favorites', 'yatra'),
+                        'removeAria'    => __('Remove from favorites', 'yatra'),
+                    ],
                 ]);
             }
         }

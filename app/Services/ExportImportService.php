@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace Yatra\Services;
 
 use Yatra\Constants\ClassificationTypes;
-use Yatra\Utils\Logger;
+use Yatra\Database\Tables\BookingsTable;
+use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Database\Tables\DiscountsTable;
+use Yatra\Database\Tables\TripItineraryDayEntryTable;
+use Yatra\Database\Tables\TripItineraryDaysTable;
 use Yatra\Repositories\ExportImportRepository;
+use Yatra\Utils\Logger;
 
 /**
  * Export/Import Service
@@ -24,27 +29,27 @@ class ExportImportService
     private const BATCH_SIZE = 500;
 
     /**
-     * Unprefixed physical table names (Yatra 3.x uses yatra_new_* — not legacy yatra_trips, etc.).
+     * Unprefixed physical table names (Yatra 3.x uses yatra_* — not legacy yatra_trips, etc.).
      *
      * @var array<string, string>
      */
     private const TABLE_SUFFIX_MAP = [
-        'trips' => 'yatra_new_trips',
-        'bookings' => 'yatra_new_bookings',
-        'customers' => 'yatra_new_customers',
-        'reviews' => 'yatra_new_reviews',
-        'payments' => 'yatra_new_booking_payments',
-        'enquiries' => 'yatra_new_enquiries',
-        'discounts' => 'yatra_new_discounts',
-        'travelers' => 'yatra_new_booking_travellers',
-        'traveler_meta' => 'yatra_new_booking_traveller_meta',
-        'availability' => 'yatra_new_trip_availability_dates',
-        'availability_rules' => 'yatra_new_trip_availability_rules',
-        'departures' => 'yatra_new_trip_departures',
-        'booking_departures' => 'yatra_new_booking_departures',
-        'trip_classifications' => 'yatra_new_trip_classifications',
-        'trip_content' => 'yatra_new_trip_content',
-        'trip_revisions' => 'yatra_new_trip_revisions',
+        'trips' => 'yatra_trips',
+        'bookings' => 'yatra_bookings',
+        'customers' => 'yatra_customers',
+        'reviews' => 'yatra_reviews',
+        'payments' => 'yatra_booking_payments',
+        'enquiries' => 'yatra_enquiries',
+        'discounts' => 'yatra_discounts',
+        'travelers' => 'yatra_booking_travellers',
+        'traveler_meta' => 'yatra_booking_traveller_meta',
+        'availability' => 'yatra_trip_availability_dates',
+        'availability_rules' => 'yatra_trip_availability_rules',
+        'departures' => 'yatra_trip_departures',
+        'booking_departures' => 'yatra_booking_departures',
+        'trip_classifications' => 'yatra_trip_classifications',
+        'trip_content' => 'yatra_trip_content',
+        'trip_revisions' => 'yatra_trip_revisions',
     ];
 
     /**
@@ -315,8 +320,8 @@ class ExportImportService
                 }
 
                 if ($dataType === 'itinerary') {
-                    $daysTable = $wpdb->prefix . 'yatra_new_trip_itinerary_days';
-                    $entriesTable = $wpdb->prefix . 'yatra_new_trip_itinerary_day_entry';
+                    $daysTable = TripItineraryDaysTable::getTableName();
+                    $entriesTable = TripItineraryDayEntryTable::getTableName();
                     $allDays = [];
                     $allEntries = [];
 
@@ -357,7 +362,7 @@ class ExportImportService
 
                 $classType = self::classificationTypeForDataType($dataType);
                 if ($classType !== null) {
-                    $tableName = $wpdb->prefix . 'yatra_new_classifications';
+                    $tableName = ClassificationsTable::getTableName();
                     if (!$repository->tableExists($tableName)) {
                         $exportData['data'][$dataType] = [];
                         continue;
@@ -603,8 +608,8 @@ class ExportImportService
                         Logger::warning('Skipping itinerary: expected { days, entries } from Yatra 3 export; legacy flat arrays are not supported');
                         continue;
                     }
-                    $daysTable = $wpdb->prefix . 'yatra_new_trip_itinerary_days';
-                    $entriesTable = $wpdb->prefix . 'yatra_new_trip_itinerary_day_entry';
+                    $daysTable = TripItineraryDaysTable::getTableName();
+                    $entriesTable = TripItineraryDayEntryTable::getTableName();
                     $dayTotal = count($payload['days']);
                     $entryTotal = count($payload['entries']);
                     $importStats['itinerary'] = [
@@ -725,7 +730,7 @@ class ExportImportService
                 $mergedMap = self::getMergedTableMap();
                 $classType = self::classificationTypeForDataType($dataType);
                 if ($classType !== null) {
-                    $tableName = $wpdb->prefix . 'yatra_new_classifications';
+                    $tableName = ClassificationsTable::getTableName();
                 } elseif (isset($mergedMap[$dataType])) {
                     $tableName = $wpdb->prefix . $mergedMap[$dataType];
                 } else {
@@ -1298,7 +1303,7 @@ class ExportImportService
     private static function ensureUniqueDiscountCode(string $code): string
     {
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_new_discounts';
+        $table = DiscountsTable::getTableName();
         $base = $code;
         $candidate = $base;
         for ($n = 0; $n < 5000; $n++) {
@@ -1320,7 +1325,7 @@ class ExportImportService
     private static function ensureUniqueBookingReference(string $reference): string
     {
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_new_bookings';
+        $table = BookingsTable::getTableName();
         $base = $reference;
         $candidate = $base;
         for ($n = 0; $n < 5000; $n++) {
@@ -1473,8 +1478,8 @@ class ExportImportService
                 continue;
             }
             if ($dataType === 'itinerary') {
-                $daysTable = $wpdb->prefix . 'yatra_new_trip_itinerary_days';
-                $entriesTable = $wpdb->prefix . 'yatra_new_trip_itinerary_day_entry';
+                $daysTable = TripItineraryDaysTable::getTableName();
+                $entriesTable = TripItineraryDayEntryTable::getTableName();
                 if ($repository->tableExists($daysTable)) {
                     $total += $repository->getRecordCount($daysTable);
                 }
@@ -1485,7 +1490,7 @@ class ExportImportService
             }
             $classType = self::classificationTypeForDataType($dataType);
             if ($classType !== null) {
-                $tableName = $wpdb->prefix . 'yatra_new_classifications';
+                $tableName = ClassificationsTable::getTableName();
                 if ($repository->tableExists($tableName)) {
                     $total += $repository->getClassificationCount($tableName, $classType);
                 }

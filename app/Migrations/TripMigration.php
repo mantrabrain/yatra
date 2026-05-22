@@ -47,7 +47,7 @@ class TripMigration extends BaseMigration
                 
                 if ($this->isForceMigration()) {
                     // Force migration: Always insert new (create duplicates)
-                    $slug = $this->generateUniqueSlug($baseSlug, 'yatra_new_trips');
+                    $slug = $this->generateUniqueSlug($baseSlug, 'yatra_trips');
                 } else {
                     // Regular migration: Check if already exists
                     $existingTripId = $this->wpdb->get_var($this->wpdb->prepare(
@@ -57,7 +57,7 @@ class TripMigration extends BaseMigration
                     
                     if (!$existingTripId) {
                         // Generate unique slug for new insert
-                        $slug = $this->generateUniqueSlug($baseSlug, 'yatra_new_trips');
+                        $slug = $this->generateUniqueSlug($baseSlug, 'yatra_trips');
                     }
                 }
 

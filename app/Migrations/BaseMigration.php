@@ -133,7 +133,7 @@ abstract class BaseMigration
      * Shared taxonomy migration handler.
      *
      * Migrates old WordPress taxonomy terms into the unified ClassificationsTable
-     * (wp_yatra_new_classifications) using the `type` column to differentiate.
+     * (wp_yatra_classifications) using the `type` column to differentiate.
      *
      * @param string|array<int, string> $taxonomy One taxonomy slug, or several (e.g. `trip_category` + `tour_category`) merged into one classification type.
      * @param string $classificationType The classification type value for the new table (e.g. 'destination', 'activity', 'attribute')

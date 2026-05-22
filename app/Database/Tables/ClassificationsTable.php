@@ -35,7 +35,7 @@ class ClassificationsTable extends BaseTable
      * 
      * @var string The base table name without WordPress prefix
      */
-    protected static string $table = 'yatra_new_classifications';
+    protected static string $table = 'yatra_classifications';
 
     /**
      * Get the complete table schema as raw SQL CREATE TABLE statement

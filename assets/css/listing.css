@@ -1626,8 +1626,8 @@ body .yatra-filter-sidebar .yatra-price-range .yatra-price-slider input[type="ra
     background: #ffffff !important;
     color: #ef4444 !important;
     transform: scale(1.1) !important;
-    border-color: #ef4444 !important;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
 .yatra-favorite-btn svg {
@@ -1637,24 +1637,47 @@ body .yatra-filter-sidebar .yatra-price-range .yatra-price-slider input[type="ra
     display: block !important;
 }
 
+/* Saved state: keep the button neutral (no red ring on the button itself);
+ * only the heart icon glyph turns red and gets filled.
+ *
+ * stroke is set to NONE (and stroke-width to 0) when filled — otherwise the
+ * 2px outward stroke makes the filled heart look ~2px chunkier than the
+ * outlined heart on neighboring cards, which reads as "different icon". */
 .yatra-favorite-btn.saved,
 .yatra-favorite-btn.is-saved {
     background: #ffffff !important;
     color: #ef4444 !important;
-    border-color: #ef4444 !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
 }
 
 .yatra-favorite-btn.saved svg,
 .yatra-favorite-btn.is-saved svg {
     fill: #ef4444 !important;
-    stroke: #ef4444 !important;
+    stroke: none !important;
+    stroke-width: 0 !important;
+}
+
+.yatra-favorite-btn.saved svg path,
+.yatra-favorite-btn.is-saved svg path {
+    fill: #ef4444 !important;
+    stroke: none !important;
+    stroke-width: 0 !important;
 }
 
 .yatra-favorite-btn.saved:hover,
 .yatra-favorite-btn.is-saved:hover {
-    background: #fee2e2 !important;
+    background: #ffffff !important;
     color: #dc2626 !important;
-    border-color: #dc2626 !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.yatra-favorite-btn.saved:hover svg,
+.yatra-favorite-btn.is-saved:hover svg,
+.yatra-favorite-btn.saved:hover svg path,
+.yatra-favorite-btn.is-saved:hover svg path {
+    fill: #dc2626 !important;
+    stroke: none !important;
+    stroke-width: 0 !important;
 }
 
 .yatra-trip-content {

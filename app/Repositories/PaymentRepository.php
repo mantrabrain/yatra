@@ -20,7 +20,7 @@ class PaymentRepository extends BaseRepository
     /**
      * Table name without prefix
      */
-    // private const TABLE_NAME = 'yatra_new_booking_payments';
+    // private const TABLE_NAME = 'yatra_booking_payments';
 
     /** @var bool|null */
     private ?bool $customerColumnExists = null;

@@ -169,7 +169,7 @@ class TravelerCategoryService extends BaseService
         if (!empty($data['name'])) {
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['name'],
-                'yatra_new_classifications',
+                'yatra_classifications',
                 'slug'
             );
         } elseif (isset($data['slug'])) {
@@ -266,7 +266,7 @@ class TravelerCategoryService extends BaseService
             // Slug was manually edited - preserve it but ensure uniqueness
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['slug'],
-                'yatra_new_classifications',
+                'yatra_classifications',
                 'slug',
                 $id // Exclude current record when checking uniqueness
             );
@@ -274,7 +274,7 @@ class TravelerCategoryService extends BaseService
             // Auto-generate slug from name if name is provided and slug not manually edited
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['name'],
-                'yatra_new_classifications',
+                'yatra_classifications',
                 'slug',
                 $id // Exclude current record when checking uniqueness
             );

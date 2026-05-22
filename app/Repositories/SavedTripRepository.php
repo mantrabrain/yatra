@@ -19,6 +19,68 @@ class SavedTripRepository extends BaseRepository
     private const META_KEY = 'yatra_saved_trips';
 
     /**
+     * Acquire a short-lived per-user lock to serialize read-modify-write on
+     * the saved-trips meta. Without this, two concurrent tabs writing to the
+     * same user's wishlist can lose one of the updates.
+     */
+    private function acquireUserLock(int $userId): bool
+    {
+        $key = 'yatra_saved_trips_lock_' . $userId;
+        $deadline = microtime(true) + 1.5;
+        do {
+            // wp_cache_add returns false if the key already exists (atomic check-and-set).
+            if (wp_cache_add($key, 1, 'yatra', 5)) {
+                return true;
+            }
+            usleep(25000); // 25ms
+        } while (microtime(true) < $deadline);
+        return false;
+    }
+
+    private function releaseUserLock(int $userId): void
+    {
+        wp_cache_delete('yatra_saved_trips_lock_' . $userId, 'yatra');
+    }
+
+    /**
+     * Remove a specific trip ID from every user that has it saved. Used by the
+     * trip-deletion cleanup hook so orphan IDs don't accumulate forever.
+     */
+    public function removeTripFromAllUsers(int $tripId): int
+    {
+        if ($tripId <= 0) {
+            return 0;
+        }
+
+        global $wpdb;
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT user_id, meta_value FROM {$wpdb->usermeta} WHERE meta_key = %s",
+                self::META_KEY
+            )
+        );
+        if (!$rows) {
+            return 0;
+        }
+
+        $touched = 0;
+        foreach ($rows as $row) {
+            $raw = maybe_unserialize($row->meta_value);
+            $ids = $this->normalizeSavedTripIdsFromMeta(is_array($raw) ? $raw : []);
+            if (!in_array($tripId, $ids, true)) {
+                continue;
+            }
+            $filtered = array_values(array_filter(
+                $ids,
+                static fn (int $id): bool => $id !== $tripId
+            ));
+            update_user_meta((int) $row->user_id, self::META_KEY, $filtered);
+            $touched++;
+        }
+        return $touched;
+    }
+
+    /**
      * Normalize stored meta to a list of trip IDs (handles legacy rows with trip_id keys).
      *
      * @param mixed $savedData
@@ -79,30 +141,38 @@ class SavedTripRepository extends BaseRepository
             return false;
         }
 
-        $savedData = get_user_meta($userId, self::META_KEY, true);
-        $savedTripIds = $this->normalizeSavedTripIdsFromMeta(is_array($savedData) ? $savedData : []);
-
-        if (in_array($tripId, $savedTripIds, true)) {
-            return true;
-        }
-
         $tripRepository = new TripRepository();
         $trip = $tripRepository->find($tripId);
-
         if (!$trip) {
             return false;
         }
 
-        $savedTripIds[] = $tripId;
-        $savedTripIds = array_values(array_unique($savedTripIds));
+        // Serialize concurrent writes per user so two tabs can't lose each
+        // other's updates on the read-modify-write of the meta row. We still
+        // proceed if the lock can't be acquired — better to risk a rare
+        // overwrite than to block the user entirely.
+        $this->acquireUserLock($userId);
+        try {
+            $savedData = get_user_meta($userId, self::META_KEY, true);
+            $savedTripIds = $this->normalizeSavedTripIdsFromMeta(is_array($savedData) ? $savedData : []);
 
-        $updated = update_user_meta($userId, self::META_KEY, $savedTripIds);
-        if ($updated !== false) {
-            return true;
+            if (in_array($tripId, $savedTripIds, true)) {
+                return true;
+            }
+
+            $savedTripIds[] = $tripId;
+            $savedTripIds = array_values(array_unique($savedTripIds));
+
+            $updated = update_user_meta($userId, self::META_KEY, $savedTripIds);
+            if ($updated !== false) {
+                return true;
+            }
+
+            // update_user_meta() returns false when the value is unchanged; treat as success if the trip is stored.
+            return $this->isSaved($userId, $tripId);
+        } finally {
+            $this->releaseUserLock($userId);
         }
-
-        // update_user_meta() returns false when the value is unchanged; treat as success if the trip is stored.
-        return $this->isSaved($userId, $tripId);
     }
 
     /**
@@ -115,31 +185,40 @@ class SavedTripRepository extends BaseRepository
     public function removeTrip(int $userId, int $tripId): bool
     {
         $tripId = (int) $tripId;
-        if ($tripId <= 0 || !$this->isSaved($userId, $tripId)) {
+        if ($tripId <= 0) {
             return false;
         }
 
-        $savedData = get_user_meta($userId, self::META_KEY, true);
-        if (!is_array($savedData) || $savedData === []) {
-            return false;
+        $this->acquireUserLock($userId);
+        try {
+            $savedData = get_user_meta($userId, self::META_KEY, true);
+            if (!is_array($savedData) || $savedData === []) {
+                return false;
+            }
+
+            $before = $this->normalizeSavedTripIdsFromMeta($savedData);
+            if (!in_array($tripId, $before, true)) {
+                return false;
+            }
+
+            $savedTripIds = array_values(array_filter(
+                $before,
+                static fn (int $id): bool => $id !== $tripId
+            ));
+
+            if (count($savedTripIds) === count($before)) {
+                return false;
+            }
+
+            $updated = update_user_meta($userId, self::META_KEY, $savedTripIds);
+            if ($updated !== false) {
+                return true;
+            }
+
+            return !$this->isSaved($userId, $tripId);
+        } finally {
+            $this->releaseUserLock($userId);
         }
-
-        $before = $this->normalizeSavedTripIdsFromMeta($savedData);
-        $savedTripIds = array_values(array_filter(
-            $before,
-            static fn (int $id): bool => $id !== $tripId
-        ));
-
-        if (count($savedTripIds) === count($before)) {
-            return false;
-        }
-
-        $updated = update_user_meta($userId, self::META_KEY, $savedTripIds);
-        if ($updated !== false) {
-            return true;
-        }
-
-        return !$this->isSaved($userId, $tripId);
     }
 
     /**

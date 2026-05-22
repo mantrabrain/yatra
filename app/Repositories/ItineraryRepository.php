@@ -145,7 +145,7 @@ class ItineraryRepository extends BaseRepository
     public function createEntry(array $data): int
     {
         global $wpdb;
-        $tableEntries = $this->getTableName(); // yatra_new_trip_itinerary_day_entry
+        $tableEntries = $this->getTableName(); // yatra_trip_itinerary_day_entry
         $tableDays = TripItineraryDaysTable::getTableName();
 
         // Determine if this is a day entry or an activity entry

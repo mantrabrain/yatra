@@ -26,7 +26,7 @@ class DiscountsTable extends BaseTable
      * 
      * @var string The base table name without WordPress prefix
      */
-    protected static string $table = 'yatra_new_discounts';
+    protected static string $table = 'yatra_discounts';
 
     /**
      * Columns that exist on {@see getSchema()} (excluding `id`) for repository mass-assignment.

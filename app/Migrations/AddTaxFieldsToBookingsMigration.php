@@ -2,6 +2,8 @@
 
 namespace Yatra\Migrations;
 
+use Yatra\Database\Tables\BookingsTable;
+
 /**
  * Add Tax Fields to Bookings Migration
  * 
@@ -26,7 +28,7 @@ class AddTaxFieldsToBookingsMigration
     {
         global $wpdb;
         
-        $tableName = $wpdb->prefix . 'yatra_new_bookings';
+        $tableName = BookingsTable::getTableName();
         
         // Check if tax_amount column already exists
         $columnExists = $wpdb->get_var($wpdb->prepare(
@@ -63,7 +65,7 @@ class AddTaxFieldsToBookingsMigration
     {
         global $wpdb;
         
-        $tableName = $wpdb->prefix . 'yatra_new_bookings';
+        $tableName = BookingsTable::getTableName();
         
         // Remove tax columns
         $sql = "ALTER TABLE `{$tableName}` 
@@ -98,7 +100,7 @@ class AddTaxFieldsToBookingsMigration
     {
         global $wpdb;
         
-        $tableName = $wpdb->prefix . 'yatra_new_bookings';
+        $tableName = BookingsTable::getTableName();
         
         // Get bookings without tax data
         $bookings = $wpdb->get_results("

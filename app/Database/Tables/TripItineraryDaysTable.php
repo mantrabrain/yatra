@@ -20,7 +20,7 @@ class TripItineraryDaysTable extends BaseTable
      * 
      * @var string The base table name without WordPress prefix
      */
-    protected static string $table = 'yatra_new_trip_itinerary_days';
+    protected static string $table = 'yatra_trip_itinerary_days';
 
     /**
      * Get the complete table schema as raw SQL CREATE TABLE statement

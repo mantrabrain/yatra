@@ -439,7 +439,7 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                 // what we'd otherwise render — "32" on the
                                 // sidebar. Prefer the joined `difficulty_name`
                                 // when present; fall back to a one-row lookup
-                                // in wp_yatra_new_classifications when only the
+                                // in wp_yatra_classifications when only the
                                 // id arrived; finally fall back to the raw
                                 // string (legacy trips that stored
                                 // 'easy'/'moderate' before the FK migration).

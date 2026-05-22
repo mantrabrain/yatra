@@ -186,7 +186,7 @@ class ItineraryService
      * surface partial failures. Cache invalidation fires once at the end (via
      * the existing per-row hooks already invoked by the repository).
      *
-     * @param int   $dayId      The yatra_new_trip_itinerary_days.id row.
+     * @param int   $dayId      The yatra_trip_itinerary_days.id row.
      * @param int   $tripId     The trip id (used for the create branch).
      * @param array $activities Array of activity payloads. Each row may include
      *                          an `id` (update) or omit it (create).

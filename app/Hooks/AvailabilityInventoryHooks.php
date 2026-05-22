@@ -250,7 +250,7 @@ class AvailabilityInventoryHooks
     }
 
     /**
-     * Infer yatra_new_trip_availability_dates.id when the booking row missed availability_id
+     * Infer yatra_trip_availability_dates.id when the booking row missed availability_id
      * (common when checkout omits it). Uses booking→departure time to disambiguate multiple slots per day.
      */
     private static function resolveAvailabilityIdForBooking(int $bookingId, int $tripId, string $travelDate): int

@@ -33,7 +33,7 @@ use Yatra\Utils\Logger;
  *                  installment, transaction_id, booking_details
  *
  * New system:
- *   wp_yatra_new_bookings + wp_yatra_new_booking_payments
+ *   wp_yatra_bookings + wp_yatra_booking_payments
  */
 class BookingMigration extends BaseMigration
 {

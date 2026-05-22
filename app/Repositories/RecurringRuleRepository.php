@@ -11,7 +11,7 @@ use Yatra\Database\Tables\TripAvailabilityRulesTable;
  * Recurring Rule Repository
  * Handles database operations for recurring departure rules
  * 
- * Table: yatra_new_trip_availability_rules
+ * Table: yatra_trip_availability_rules
  * 
  * Fields:
  * - id (primary key)

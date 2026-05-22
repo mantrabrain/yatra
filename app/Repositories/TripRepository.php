@@ -482,7 +482,7 @@ class TripRepository extends BaseRepository
             }
         }
 
-        // Featured Priority (column on yatra_new_trips, indexed by idx_featured_priority).
+        // Featured Priority (column on yatra_trips, indexed by idx_featured_priority).
         // Admin form's Featured Priority dropdown is the single source of truth.
         // Legacy `is_featured` shortcode/block flag is normalised upstream into featured_priority='featured'.
         if (

@@ -73,7 +73,7 @@ class ActivityService extends BaseService
         if (!empty($data['name'])) {
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['name'],
-                'yatra_new_classifications',
+                'yatra_classifications',
                 'slug'
             );
         } elseif (isset($data['slug'])) {

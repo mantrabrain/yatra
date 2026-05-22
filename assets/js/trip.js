@@ -4738,14 +4738,11 @@
    */
   class WishlistHandler {
     constructor() {
-      if (!window.yatraTripData?.wishlistEnabled) {
-        return;
-      }
-      this.apiUrl = window.yatraTripData?.apiUrl || '/wp-json/yatra/v1';
-      this.nonce = window.yatraTripData?.nonce || '';
-      this.tripId = window.yatraTripData?.tripId || 0;
-      this.isLoggedIn = window.yatraTripData?.isLoggedIn || false;
-      this.init();
+      // Wishlist clicks are now handled exclusively by listing-wishlist.js
+      // (which covers every .yatra-favorite-btn on listing, single-trip hero,
+      // and similar-trips). Registering this second handler caused every click
+      // to fire two REST requests racing against each other.
+      return;
     }
 
     init() {

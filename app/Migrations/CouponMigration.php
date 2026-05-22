@@ -18,7 +18,7 @@ use Yatra\Utils\Logger;
  *   - post_meta 'yatra_coupon_using_limit' = max usage limit
  *   - post_meta 'yatra_coupon_usages_bookings' = array of booking IDs (usage count = count of this array)
  *
- * New system: Custom table wp_yatra_new_discounts
+ * New system: Custom table wp_yatra_discounts
  */
 class CouponMigration extends BaseMigration
 {

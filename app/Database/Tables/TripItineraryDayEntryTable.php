@@ -20,7 +20,7 @@ class TripItineraryDayEntryTable extends BaseTable
      * 
      * @var string The base table name without WordPress prefix
      */
-    protected static string $table = 'yatra_new_trip_itinerary_day_entry';
+    protected static string $table = 'yatra_trip_itinerary_day_entry';
 
     /**
      * Get the complete table schema as raw SQL CREATE TABLE statement
@@ -36,7 +36,7 @@ class TripItineraryDayEntryTable extends BaseTable
         return <<<SQL
 CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `day_id` bigint(20) unsigned NOT NULL COMMENT 'Reference to yatra_new_trip_itinerary_days.id',
+    `day_id` bigint(20) unsigned NOT NULL COMMENT 'Reference to yatra_trip_itinerary_days.id',
     `trip_id` bigint(20) unsigned NOT NULL,
     `title` varchar(255) NOT NULL COMMENT 'Entry title (activity name, meal type, etc.)',
     `description` text DEFAULT NULL COMMENT 'Entry description/details',

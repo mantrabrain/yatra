@@ -29,7 +29,7 @@ class AvailabilityResolutionService
 
     public function __construct()
     {
-        // Use the new recurring availability rules engine (wp_yatra_new_trip_availability_rules).
+        // Use the new recurring availability rules engine (wp_yatra_trip_availability_rules).
         // The admin Availability Rules UI writes to this schema; the single-trip page must use
         // the same engine to keep Preview and frontend availability consistent.
         $this->recurringAvailabilityService = new RecurringAvailabilityService(

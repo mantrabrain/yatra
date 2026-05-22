@@ -10,7 +10,7 @@ use Yatra\Database\Tables\BookingDeparturesTable;
  * Booking Departure Repository
  * Manages the relationship between bookings and departures
  * 
- * Table: wp_yatra_new_booking_departures
+ * Table: wp_yatra_booking_departures
  */
 class BookingDepartureRepository extends BaseRepository
 {

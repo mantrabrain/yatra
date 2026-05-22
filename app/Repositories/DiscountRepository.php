@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\BookingsTable;
 use Yatra\Database\Tables\DiscountsTable;
 
 /**
@@ -138,15 +139,12 @@ class DiscountRepository extends BaseRepository
     public function countUsage(string $code): int
     {
         global $wpdb;
-        
-        // Try new bookings table first, then fallback to old table
-        $bookingsTable = $wpdb->prefix . 'yatra_new_bookings';
-        $tableExists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $bookingsTable));
-        
-        if (!$tableExists) {
-            $bookingsTable = $wpdb->prefix . 'yatra_bookings';
-        }
-        
+
+        // Canonical bookings table — post 3.0.5 rename. Previous code had
+        // a fallback probe for `yatra_new_bookings`; that's no longer
+        // needed since the migration guarantees the canonical name.
+        $bookingsTable = BookingsTable::getTableName();
+
         $count = $wpdb->get_var(
             $wpdb->prepare(
                 "SELECT COUNT(*) FROM `{$bookingsTable}` 
@@ -160,7 +158,7 @@ class DiscountRepository extends BaseRepository
     }
 
     /**
-     * Status counts for admin toolbar (matches wp_yatra_new_discounts.status values).
+     * Status counts for admin toolbar (matches wp_yatra_discounts.status values).
      *
      * @return array{all: int, publish: int, draft: int, trash: int, expired: int}
      */

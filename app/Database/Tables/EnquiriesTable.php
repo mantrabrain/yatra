@@ -27,7 +27,7 @@ class EnquiriesTable extends BaseTable
      * 
      * @var string The base table name without WordPress prefix
      */
-    protected static string $table = 'yatra_new_enquiries';
+    protected static string $table = 'yatra_enquiries';
 
     /**
      * Get the complete table schema as raw SQL CREATE TABLE statement

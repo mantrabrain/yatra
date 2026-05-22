@@ -1220,8 +1220,8 @@ button.yatra-booking-button svg path {
     background: #ffffff !important;
     color: #ef4444 !important;
     transform: scale(1.1) !important;
-    border-color: #ef4444 !important;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
 .yatra-favorite-btn svg {

@@ -15,7 +15,7 @@ use Yatra\Utils\Logger;
  *   - post_meta 'yatra_customer_booking_meta' = array of booking meta params
  *   - post_meta 'yatra_user_id' = WordPress user ID
  *
- * New system: Custom table wp_yatra_new_customers
+ * New system: Custom table wp_yatra_customers
  */
 class CustomerMigration extends BaseMigration
 {

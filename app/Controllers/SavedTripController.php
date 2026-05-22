@@ -103,10 +103,6 @@ class SavedTripController extends BaseController
             }
         }
 
-        if (!empty($_POST['trip_id']) && absint($_POST['trip_id']) > 0) {
-            return absint($_POST['trip_id']);
-        }
-
         $data = $request->get_json_params();
         if (is_array($data)) {
             foreach (['trip_id', 'tripId', 'id'] as $key) {
