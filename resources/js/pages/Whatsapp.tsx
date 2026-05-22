@@ -26,6 +26,8 @@ import {
   Plus,
   Trash2,
   UserCircle,
+  Webhook,
+  Users,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { PageHeader } from "../components/common/PageHeader";
@@ -40,9 +42,19 @@ import {
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+import { Select } from "../components/ui/select";
 import { Badge } from "../components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../components/ui/table";
 import { Pagination } from "../components/shared/Pagination";
 import { useToast } from "../components/ui/toast";
+import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
 import {
   whatsappApi,
   type WhatsappMeta,
@@ -64,7 +76,7 @@ import {
  *   - Custom templates: every field editable, including delete
  */
 
-type WhatsappTab = "delivery" | "templates" | "widget" | "logs";
+type WhatsappTab = "delivery" | "templates" | "widget" | "logs" | "opt-ins";
 
 function getInitialTab(): WhatsappTab {
   if (typeof window === "undefined") return "delivery";
@@ -72,6 +84,7 @@ function getInitialTab(): WhatsappTab {
   if (tab === "templates" || tab === "template") return "templates";
   if (tab === "widget") return "widget";
   if (tab === "logs" || tab === "log") return "logs";
+  if (tab === "opt-ins" || tab === "optins") return "opt-ins";
   return "delivery";
 }
 
@@ -151,6 +164,7 @@ const Whatsapp: React.FC = () => {
     { key: "templates", label: __("Templates", "yatra"), icon: FileText },
     { key: "widget", label: __("Frontend widget", "yatra"), icon: MessageCircle },
     { key: "logs", label: __("Message logs", "yatra"), icon: MessageCircle },
+    { key: "opt-ins", label: __("Opt-ins", "yatra"), icon: Users },
   ];
 
   return (
@@ -199,6 +213,7 @@ const Whatsapp: React.FC = () => {
               ) : (
                 <DeliverySection
                   cfg={cfg}
+                  meta={meta}
                   onSaveCredential={(field, value) =>
                     saveCredential.mutate({ field, value })
                   }
@@ -235,6 +250,9 @@ const Whatsapp: React.FC = () => {
 
           {activeTab === "logs" &&
             (automationReady ? <LogsList /> : <WhatsappModulePrompt />)}
+
+          {activeTab === "opt-ins" &&
+            (automationReady ? <OptInsList /> : <WhatsappModulePrompt />)}
         </CardContent>
       </Card>
     </div>
@@ -315,10 +333,11 @@ const WhatsappModulePrompt: React.FC = () => (
 
 const DeliverySection: React.FC<{
   cfg: WhatsappSettingsResponse;
+  meta: WhatsappMeta;
   onSaveCredential: (field: string, value: string) => void;
   onSaveSettings: (patch: Partial<WhatsappSettings>) => void;
   saving: boolean;
-}> = ({ cfg, onSaveCredential, onSaveSettings, saving }) => {
+}> = ({ cfg, meta, onSaveCredential, onSaveSettings, saving }) => {
   const settings = cfg.settings;
   const credStatus = cfg.credentials?.cloud_api ?? {};
 
@@ -500,6 +519,8 @@ const DeliverySection: React.FC<{
         </CardContent>
       </Card>
 
+      <WebhookSetupCard meta={meta} />
+
       {/* Identifiers + admin phone */}
       <Card>
         <CardHeader>
@@ -677,6 +698,177 @@ const DeliverySection: React.FC<{
   );
 };
 
+/**
+ * Renders the read-only webhook configuration block — the operator
+ * copies these values into Meta's WhatsApp → Webhooks subscription:
+ *   • Callback URL          → this plugin's REST endpoint
+ *   • Verify token          → auto-generated on first settings save
+ *   • App Secret status     → visibility flag (the secret itself is
+ *                             encrypted at rest and never sent here)
+ */
+const WebhookSetupCard: React.FC<{ meta: WhatsappMeta }> = ({ meta }) => {
+  const { showToast } = useToast();
+  const webhook = meta.webhook;
+  const [justCopied, setJustCopied] = useState<"url" | "token" | null>(null);
+
+  const copy = async (text: string, label: "url" | "token") => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback for non-secure contexts
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      setJustCopied(label);
+      window.setTimeout(() => setJustCopied(null), 2000);
+    } catch (_e) {
+      showToast(__("Failed to copy to clipboard.", "yatra"), "error");
+    }
+  };
+
+  const tokenMissing = !webhook?.verify_token;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Webhook className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          {__("Meta webhook setup", "yatra")}
+        </CardTitle>
+        <CardDescription>
+          {__(
+            "Paste these values into your Meta app → WhatsApp → Configuration → Webhooks. Once verified, Meta will deliver message status callbacks (sent / delivered / read / failed) and inbound replies here.",
+            "yatra",
+          )}{" "}
+          <a
+            href="https://developers.facebook.com/docs/whatsapp/cloud-api/guides/set-up-webhooks"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline dark:text-blue-400"
+          >
+            {__("Setup guide", "yatra")}{" "}
+            <ExternalLink className="inline h-3 w-3" />
+          </a>
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Callback URL */}
+        <div>
+          <Label htmlFor="whatsapp-webhook-url" className="text-xs text-gray-500 dark:text-gray-400">
+            {__("Callback URL", "yatra")}
+          </Label>
+          <div className="mt-1 flex gap-2">
+            <Input
+              id="whatsapp-webhook-url"
+              readOnly
+              value={webhook?.url || ""}
+              className="font-mono text-sm"
+              onFocus={(e) => e.currentTarget.select()}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => copy(webhook?.url || "", "url")}
+              disabled={!webhook?.url}
+              aria-label={__("Copy callback URL", "yatra")}
+            >
+              {justCopied === "url" ? (
+                <>
+                  <Check className="mr-1.5 h-3.5 w-3.5" />
+                  {__("Copied", "yatra")}
+                </>
+              ) : (
+                <>
+                  <Copy className="mr-1.5 h-3.5 w-3.5" />
+                  {__("Copy", "yatra")}
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Verify token */}
+        <div>
+          <Label htmlFor="whatsapp-verify-token" className="text-xs text-gray-500 dark:text-gray-400">
+            {__("Verify token", "yatra")}
+          </Label>
+          <div className="mt-1 flex gap-2">
+            <Input
+              id="whatsapp-verify-token"
+              readOnly
+              value={webhook?.verify_token || ""}
+              placeholder={
+                tokenMissing
+                  ? __("Will be generated when you save settings for the first time.", "yatra")
+                  : ""
+              }
+              className="font-mono text-sm"
+              onFocus={(e) => e.currentTarget.select()}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => copy(webhook?.verify_token || "", "token")}
+              disabled={tokenMissing}
+              aria-label={__("Copy verify token", "yatra")}
+            >
+              {justCopied === "token" ? (
+                <>
+                  <Check className="mr-1.5 h-3.5 w-3.5" />
+                  {__("Copied", "yatra")}
+                </>
+              ) : (
+                <>
+                  <Copy className="mr-1.5 h-3.5 w-3.5" />
+                  {__("Copy", "yatra")}
+                </>
+              )}
+            </Button>
+          </div>
+          {tokenMissing && (
+            <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+              {__(
+                "Save your settings once to generate a verify token, then come back to copy it.",
+                "yatra",
+              )}
+            </p>
+          )}
+        </div>
+
+        {/* App secret status (read-only) */}
+        <div className="rounded-md bg-gray-50 dark:bg-gray-800/50 px-3 py-2.5 text-sm">
+          {webhook?.app_secret_configured ? (
+            <span className="inline-flex items-center gap-2 text-green-700 dark:text-green-400">
+              <CheckCircle2 className="h-4 w-4" />
+              {__(
+                "App Secret is configured — webhook signatures will be verified.",
+                "yatra",
+              )}
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-2 text-amber-700 dark:text-amber-400">
+              <XCircle className="h-4 w-4" />
+              {__(
+                "App Secret not set — inbound webhook events will be rejected for security. Paste your Meta App Secret above as “Webhook verify secret”.",
+                "yatra",
+              )}
+            </span>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 const CredentialField: React.FC<{
   label: string;
   description?: string;
@@ -831,13 +1023,21 @@ const TemplatesList: React.FC<{
   const eventName = (key: string) =>
     events.find((e) => e.key === key)?.name ?? key;
 
+  // Confirm-before-delete state, replaces native window.confirm()
+  // for visual + accessibility consistency with the rest of the admin.
+  const [pendingDelete, setPendingDelete] = useState<{ id: number; name: string } | null>(null);
+
   const deleteTpl = useMutation({
     mutationFn: (id: number) => whatsappApi.deleteTemplate(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["whatsapp-templates"] });
       showToast(__("Template deleted.", "yatra"), "success");
+      setPendingDelete(null);
     },
-    onError: (e: any) => showToast(extractError(e), "error"),
+    onError: (e: any) => {
+      showToast(extractError(e), "error");
+      setPendingDelete(null);
+    },
   });
 
   const restoreDefaults = useMutation({
@@ -1004,19 +1204,11 @@ const TemplatesList: React.FC<{
                               variant="outline"
                               size="sm"
                               className="border-red-200 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/30"
-                              onClick={() => {
-                                if (
-                                  confirm(
-                                    __(
-                                      "Delete this template? This can't be undone.",
-                                      "yatra",
-                                    ),
-                                  )
-                                ) {
-                                  deleteTpl.mutate(tpl.id);
-                                }
-                              }}
+                              onClick={() =>
+                                setPendingDelete({ id: tpl.id, name: tpl.name })
+                              }
                               disabled={deleteTpl.isPending}
+                              aria-label={__("Delete template", "yatra")}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
@@ -1031,6 +1223,28 @@ const TemplatesList: React.FC<{
           </div>
         </CardContent>
       </Card>
+      <ConfirmationDialog
+        isOpen={pendingDelete !== null}
+        onClose={() => {
+          if (!deleteTpl.isPending) setPendingDelete(null);
+        }}
+        onConfirm={() => {
+          if (pendingDelete) deleteTpl.mutate(pendingDelete.id);
+        }}
+        title={__("Delete template?", "yatra")}
+        description={
+          pendingDelete
+            ? __(
+                "Delete the “{name}” template? This cannot be undone, and any events bound to it will stop sending until you create a replacement.",
+                "yatra",
+              ).replace("{name}", pendingDelete.name)
+            : ""
+        }
+        confirmText={__("Delete template", "yatra")}
+        cancelText={__("Cancel", "yatra")}
+        variant="danger"
+        isLoading={deleteTpl.isPending}
+      />
     </div>
   );
 };
@@ -1956,18 +2170,37 @@ const WidgetSection: React.FC<{
 
 const LogsList: React.FC = () => {
   const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [phoneFilter, setPhoneFilter] = useState<string>("");
+  // Debounced phone filter so we don't re-query on every keystroke.
+  const [phoneFilterApplied, setPhoneFilterApplied] = useState<string>("");
   const perPage = 20;
 
+  React.useEffect(() => {
+    const t = window.setTimeout(() => setPhoneFilterApplied(phoneFilter.trim()), 350);
+    return () => window.clearTimeout(t);
+  }, [phoneFilter]);
+
+  // Reset to page 1 whenever a filter changes.
+  React.useEffect(() => {
+    setPage(1);
+  }, [statusFilter, phoneFilterApplied]);
+
   const { data, isLoading } = useQuery({
-    queryKey: ["whatsapp-messages", page, perPage],
-    queryFn: () => whatsappApi.listMessages(perPage * page),
+    queryKey: ["whatsapp-messages", page, perPage, statusFilter, phoneFilterApplied],
+    queryFn: () =>
+      whatsappApi.listMessages({
+        page,
+        per_page: perPage,
+        ...(statusFilter ? { status: statusFilter } : {}),
+        ...(phoneFilterApplied ? { phone: phoneFilterApplied } : {}),
+      }),
     refetchInterval: 15000,
+    placeholderData: (prev) => prev, // smoother pagination — keep last page visible while loading
   });
 
-  const allRows = data?.data ?? [];
-  const totalItems = allRows.length;
-  const start = (page - 1) * perPage;
-  const rows = allRows.slice(start, start + perPage);
+  const rows = data?.data ?? [];
+  const totalItems = data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
 
   if (isLoading) {
@@ -1980,51 +2213,94 @@ const LogsList: React.FC = () => {
     );
   }
 
+  const hasFilters = !!(statusFilter || phoneFilter);
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
           <Clock className="w-5 h-5 text-blue-500" />
           {__("Message logs", "yatra")}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        {rows.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-            {__("No messages sent yet", "yatra")}
+        </h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          {__(
+            "Every outbound send and inbound reply, filterable by status or phone. Updated every 15 seconds.",
+            "yatra",
+          )}
+        </p>
+      </div>
+
+      {/* Canonical Yatra filter row — same pattern as Discounts / Bookings */}
+      <Card>
+        <CardContent className="p-3">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-2">
+            <div className="flex-1 min-w-0">
+              <Input
+                type="text"
+                value={phoneFilter}
+                onChange={(e) => setPhoneFilter(e.target.value)}
+                placeholder={__("Search by phone…", "yatra")}
+                aria-label={__("Search by phone", "yatra")}
+                className="w-full"
+              />
+            </div>
+            <Select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              aria-label={__("Filter by status", "yatra")}
+              className="w-full lg:w-48 lg:flex-none"
+            >
+              <option value="">{__("All statuses", "yatra")}</option>
+              <option value="queued">{__("Queued", "yatra")}</option>
+              <option value="sent">{__("Sent", "yatra")}</option>
+              <option value="delivered">{__("Delivered", "yatra")}</option>
+              <option value="read">{__("Read", "yatra")}</option>
+              <option value="failed">{__("Failed", "yatra")}</option>
+              <option value="received">{__("Received (inbound)", "yatra")}</option>
+            </Select>
+            {hasFilters && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setStatusFilter("");
+                  setPhoneFilter("");
+                }}
+                className="w-full lg:w-auto"
+              >
+                {__("Reset", "yatra")}
+              </Button>
+            )}
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-800">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                    {__("Direction", "yatra")}
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                    {__("Phone", "yatra")}
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                    {__("Body / Error", "yatra")}
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                    {__("Template", "yatra")}
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                    {__("Status", "yatra")}
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-0">
+          {rows.length === 0 ? (
+            <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+              {totalItems === 0 && !statusFilter && !phoneFilterApplied
+                ? __("No messages sent yet.", "yatra")
+                : __("No messages match your filters.", "yatra")}
+            </div>
+          ) : (
+            <Table>
+              <TableHeader className="bg-gray-50 dark:bg-gray-800/50">
+                <TableRow>
+                  <TableHead className="w-28">{__("Direction", "yatra")}</TableHead>
+                  <TableHead className="w-44">{__("Phone", "yatra")}</TableHead>
+                  <TableHead>{__("Body / Error", "yatra")}</TableHead>
+                  <TableHead className="w-48">{__("Template", "yatra")}</TableHead>
+                  <TableHead className="w-28">{__("Status", "yatra")}</TableHead>
+                  <TableHead className="w-44 whitespace-nowrap">
                     {__("Sent", "yatra")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800/50"
-                  >
-                    <td className="px-4 py-3">
+                  <TableRow key={row.id}>
+                    <TableCell>
                       <Badge
                         className={
                           row.direction === "inbound"
@@ -2034,17 +2310,21 @@ const LogsList: React.FC = () => {
                       >
                         {row.direction}
                       </Badge>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                    </TableCell>
+                    <TableCell className="font-mono text-gray-900 dark:text-white whitespace-nowrap">
                       {row.phone}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-200 max-w-md truncate">
-                      {row.error_message || row.body || "—"}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                      {row.template_key || "—"}
-                    </td>
-                    <td className="px-4 py-3">
+                    </TableCell>
+                    <TableCell className="text-gray-700 dark:text-gray-200">
+                      <div className="max-w-md truncate" title={row.error_message || row.body || ""}>
+                        {row.error_message || row.body || "—"}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-gray-500 dark:text-gray-400">
+                      <span className="truncate block max-w-[12rem]" title={row.template_key || ""}>
+                        {row.template_key || "—"}
+                      </span>
+                    </TableCell>
+                    <TableCell>
                       <Badge
                         className={
                           row.status === "sent" ||
@@ -2058,32 +2338,233 @@ const LogsList: React.FC = () => {
                       >
                         {row.status}
                       </Badge>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                    </TableCell>
+                    <TableCell className="text-gray-500 dark:text-gray-400 whitespace-nowrap">
                       {row.created_at
                         ? new Date(row.created_at).toLocaleString()
                         : "—"}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
+          )}
+          {rows.length > 0 && totalPages > 1 && (
+            <div className="border-t border-gray-200 px-4 py-3 dark:border-gray-700">
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={perPage}
+                onPageChange={setPage}
+                itemName={__("messages", "yatra")}
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+/* -------------------------------------------------------------------------- */
+/*  Opt-ins                                                                   */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * GDPR audit view — every phone number that has opted in (or been
+ * explicitly opted out via inbound STOP keyword). Read-only here;
+ * mutations happen via the booking form (in) and inbound webhook (out).
+ *
+ * Exports to CSV for data-portability requests.
+ */
+const OptInsList: React.FC = () => {
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"all" | "in" | "out">("all");
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["whatsapp-opt-ins"],
+    queryFn: () => whatsappApi.listOptIns(),
+    staleTime: 30 * 1000,
+  });
+
+  const rows = data?.data ?? [];
+
+  const filtered = useMemo(() => {
+    return rows.filter((r) => {
+      if (filter === "in" && !r.opted_in) return false;
+      if (filter === "out" && r.opted_in) return false;
+      if (search.trim() !== "") {
+        const needle = search.trim().toLowerCase();
+        if (
+          !r.phone.toLowerCase().includes(needle) &&
+          !r.source.toLowerCase().includes(needle)
+        ) return false;
+      }
+      return true;
+    });
+  }, [rows, filter, search]);
+
+  const inCount = useMemo(() => rows.filter((r) => r.opted_in).length, [rows]);
+  const outCount = rows.length - inCount;
+
+  const exportCsv = () => {
+    // Build CSV client-side to avoid a server round-trip. RFC 4180:
+    // quote every field, double-quote escapes embedded quotes, CRLF line endings.
+    const escape = (v: string) => '"' + v.replace(/"/g, '""') + '"';
+    const lines = [
+      ["phone", "opted_in", "source", "updated_at"].map(escape).join(","),
+      ...filtered.map((r) =>
+        [r.phone, r.opted_in ? "yes" : "no", r.source, r.updated_at]
+          .map((v) => escape(String(v ?? "")))
+          .join(","),
+      ),
+    ];
+    const csv = lines.join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `whatsapp-opt-ins-${new Date().toISOString().split("T")[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-12 flex justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+            <Users className="w-5 h-5 text-blue-500" />
+            {__("Opt-in audit", "yatra")}
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {__(
+              "Every phone number that's opted into WhatsApp messaging, plus those that opted out via inbound STOP keyword. Export this list for GDPR / privacy requests.",
+              "yatra",
+            )}
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={exportCsv}
+          disabled={filtered.length === 0}
+        >
+          <ExternalLink className="mr-1.5 h-4 w-4" />
+          {__("Export CSV", "yatra")}
+        </Button>
+      </div>
+
+      {/* Canonical Yatra filter row */}
+      <Card>
+        <CardContent className="p-3">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-2">
+            <div className="flex-1 min-w-0">
+              <Input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={__("Search by phone or source…", "yatra")}
+                aria-label={__("Search opt-ins", "yatra")}
+                className="w-full"
+              />
+            </div>
+            <Select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value as "all" | "in" | "out")}
+              aria-label={__("Filter opt-in status", "yatra")}
+              className="w-full lg:w-56 lg:flex-none"
+            >
+              <option value="all">{__("All", "yatra")} ({rows.length})</option>
+              <option value="in">{__("Opted in", "yatra")} ({inCount})</option>
+              <option value="out">{__("Opted out", "yatra")} ({outCount})</option>
+            </Select>
+            {(search || filter !== "all") && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setSearch("");
+                  setFilter("all");
+                }}
+                className="w-full lg:w-auto"
+              >
+                {__("Reset", "yatra")}
+              </Button>
+            )}
           </div>
-        )}
-        {rows.length > 0 && totalPages > 1 && (
-          <div className="border-t border-gray-200 px-4 py-3 dark:border-gray-700">
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              itemsPerPage={perPage}
-              onPageChange={setPage}
-              itemName={__("messages", "yatra")}
-            />
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-0">
+          {filtered.length === 0 ? (
+            <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+              {rows.length === 0
+                ? __(
+                    "No opt-in records yet. Records appear here when customers tick the WhatsApp opt-in on a booking form, or reply STOP to opt out.",
+                    "yatra",
+                  )
+                : __("No records match your search.", "yatra")}
+            </div>
+          ) : (
+            <Table>
+              <TableHeader className="bg-gray-50 dark:bg-gray-800/50">
+                <TableRow>
+                  <TableHead className="w-44">{__("Phone", "yatra")}</TableHead>
+                  <TableHead className="w-32">{__("Status", "yatra")}</TableHead>
+                  <TableHead>{__("Source", "yatra")}</TableHead>
+                  <TableHead className="w-44 whitespace-nowrap">
+                    {__("Updated", "yatra")}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((row) => (
+                  <TableRow key={row.phone}>
+                    <TableCell className="font-mono text-gray-900 dark:text-white whitespace-nowrap">
+                      {row.phone}
+                    </TableCell>
+                    <TableCell>
+                      {row.opted_in ? (
+                        <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                          <CheckCircle2 className="mr-1 h-3 w-3" />
+                          {__("Opted in", "yatra")}
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                          <XCircle className="mr-1 h-3 w-3" />
+                          {__("Opted out", "yatra")}
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-gray-500 dark:text-gray-400">
+                      {row.source || "—"}
+                    </TableCell>
+                    <TableCell className="text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                      {row.updated_at}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

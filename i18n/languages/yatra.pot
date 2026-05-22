@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-21T14:07:52+00:00\n"
+"POT-Creation-Date: 2026-05-22T14:46:32+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -372,7 +372,7 @@ msgstr ""
 msgid "A higher number = higher priority (1–100). When more than one rule matches, the global Rule Priority Mode in Settings decides whether the highest-priority rule wins, every rule stacks, or the customer gets the best price."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1350
+# Source: resources/js/pages/ChannelManager.tsx:1389
 #: assets/admin/dist/js/app.js
 msgid "A mapping links one of your trips to its counterpart product on a channel. One trip can be mapped to many channels (each can have its own price offset); one channel holds one mapping per trip."
 msgstr ""
@@ -533,7 +533,7 @@ msgstr ""
 msgid "API Token"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1060
+# Source: resources/js/pages/ChannelManager.tsx:1087
 #: assets/admin/dist/js/app.js
 msgid "API credentials"
 msgstr ""
@@ -654,13 +654,13 @@ msgstr ""
 msgid "Accommodation Type"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:460
+# Source: resources/js/pages/ChannelManager.tsx:471
 #: assets/admin/dist/js/app.js
 #: templates/partials/booking-form-fields.php:664
 msgid "Account"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:886
+# Source: resources/js/pages/ChannelManager.tsx:913
 #: assets/admin/dist/js/app.js
 msgid "Account label (internal)"
 msgstr ""
@@ -670,7 +670,7 @@ msgstr ""
 msgid "Action completed successfully"
 msgstr ""
 
-# Source: resources/js/components/shared/Table.tsx:239, resources/js/components/shared/Table.tsx:695, resources/js/components/trips/TripsTable.tsx:123, resources/js/pages/AbandonedRecovery.tsx:806, resources/js/pages/ChannelManager.tsx:465, resources/js/pages/ChannelManager.tsx:1502, resources/js/pages/Customers.tsx:653, resources/js/pages/PastDepartures.tsx:211, resources/js/pages/ViewCustomer.tsx:616, resources/js/pages/Whatsapp.tsx:916
+# Source: resources/js/components/shared/Table.tsx:239, resources/js/components/shared/Table.tsx:695, resources/js/components/trips/TripsTable.tsx:123, resources/js/pages/AbandonedRecovery.tsx:806, resources/js/pages/ChannelManager.tsx:476, resources/js/pages/ChannelManager.tsx:1541, resources/js/pages/Customers.tsx:653, resources/js/pages/PastDepartures.tsx:211, resources/js/pages/ViewCustomer.tsx:616, resources/js/pages/Whatsapp.tsx:1116
 #: assets/admin/dist/js/app.js
 msgid "Actions"
 msgstr ""
@@ -685,7 +685,7 @@ msgstr ""
 msgid "Activate module"
 msgstr ""
 
-# Source: resources/js/components/availability/RecurringRules.tsx:341, resources/js/components/availability/RecurringRules.tsx:708, resources/js/components/availability/RecurringRules.tsx:742, resources/js/components/email/EmailTemplatesList.tsx:856, resources/js/components/trips/TripsFilters.tsx:53, resources/js/components/trips/TripsTable.tsx:80, resources/js/pages/AbandonedRecoveryEmailForm.tsx:183, resources/js/pages/ChannelManager.tsx:1565, resources/js/pages/ChannelManager.tsx:2002, resources/js/pages/CustomerForm.tsx:800, resources/js/pages/Customers.tsx:215, resources/js/pages/Customers.tsx:442, resources/js/pages/Customers.tsx:793, resources/js/pages/DepartureRecurringRuleForm.tsx:403, resources/js/pages/DynamicPricing.tsx:500, resources/js/pages/DynamicPricing.tsx:550, resources/js/pages/DynamicPricingRuleForm.tsx:1157, resources/js/pages/EmailAutomation.tsx:162, resources/js/pages/EmailSequenceForm.tsx:430, resources/js/pages/EmailSequenceForm.tsx:894, resources/js/pages/EmailTemplateForm.tsx:609, resources/js/pages/RecurringRuleForm.tsx:2503, resources/js/pages/RecurringRulesPage.tsx:276, resources/js/pages/RecurringRulesPage.tsx:539, resources/js/pages/Settings.tsx:4502, resources/js/pages/ViewCustomer.tsx:176, resources/js/pages/ViewDeparture.tsx:720, resources/js/pages/Whatsapp.tsx:988, resources/js/pages/Whatsapp.tsx:1205
+# Source: resources/js/components/availability/RecurringRules.tsx:341, resources/js/components/availability/RecurringRules.tsx:708, resources/js/components/availability/RecurringRules.tsx:742, resources/js/components/email/EmailTemplatesList.tsx:856, resources/js/components/trips/TripsFilters.tsx:53, resources/js/components/trips/TripsTable.tsx:80, resources/js/pages/AbandonedRecoveryEmailForm.tsx:183, resources/js/pages/ChannelManager.tsx:1604, resources/js/pages/ChannelManager.tsx:2072, resources/js/pages/CustomerForm.tsx:800, resources/js/pages/Customers.tsx:215, resources/js/pages/Customers.tsx:442, resources/js/pages/Customers.tsx:793, resources/js/pages/DepartureRecurringRuleForm.tsx:403, resources/js/pages/DynamicPricing.tsx:500, resources/js/pages/DynamicPricing.tsx:550, resources/js/pages/DynamicPricingRuleForm.tsx:1157, resources/js/pages/EmailAutomation.tsx:162, resources/js/pages/EmailSequenceForm.tsx:430, resources/js/pages/EmailSequenceForm.tsx:894, resources/js/pages/EmailTemplateForm.tsx:609, resources/js/pages/RecurringRuleForm.tsx:2503, resources/js/pages/RecurringRulesPage.tsx:276, resources/js/pages/RecurringRulesPage.tsx:539, resources/js/pages/Settings.tsx:4502, resources/js/pages/ViewCustomer.tsx:176, resources/js/pages/ViewDeparture.tsx:720, resources/js/pages/Whatsapp.tsx:1188, resources/js/pages/Whatsapp.tsx:1419
 #: assets/admin/dist/js/app.js
 msgid "Active"
 msgstr ""
@@ -702,7 +702,7 @@ msgstr ""
 
 # Source: resources/js/components/Layout.tsx:370, resources/js/components/trip-form/sections/ItinerarySection.tsx:82, resources/js/pages/Activities.tsx:602
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:860
+#: app/Providers/FrontendAssetsProvider.php:874
 #: templates/listing-trip.php:424
 #: templates/shortcodes/trip-search.php:173
 #: templates/single-taxonomy.php:77
@@ -1079,7 +1079,7 @@ msgstr ""
 msgid "Add Your First Entry"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1473
+# Source: resources/js/pages/ChannelManager.tsx:1512
 #: assets/admin/dist/js/app.js
 msgid "Add a channel first, then come back here to map your trips to it."
 msgstr ""
@@ -1124,7 +1124,7 @@ msgstr ""
 msgid "Add an API key in Yatra → AI Assistant first."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:215
+# Source: resources/js/pages/ChannelManager.tsx:216
 #: assets/admin/dist/js/app.js
 msgid "Add an OTA, paste in your provider credentials, and set commission + price offset. Start in sandbox mode until your first test booking flows through."
 msgstr ""
@@ -1139,7 +1139,7 @@ msgstr ""
 msgid "Add an OpenAI or Anthropic key under Yatra → AI Assistant first."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1382
+# Source: resources/js/pages/ChannelManager.tsx:1421
 #: assets/admin/dist/js/app.js
 msgid "Add at least one channel first."
 msgstr ""
@@ -1159,7 +1159,7 @@ msgstr ""
 msgid "Add at least one traveler category"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:446, resources/js/pages/ChannelManager.tsx:721
+# Source: resources/js/pages/ChannelManager.tsx:457, resources/js/pages/ChannelManager.tsx:748
 #: assets/admin/dist/js/app.js
 msgid "Add channel"
 msgstr ""
@@ -1169,7 +1169,7 @@ msgstr ""
 msgid "Add custom attributes for advanced filtering and search capabilities."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:889, resources/js/pages/Whatsapp.tsx:1151
+# Source: resources/js/pages/Whatsapp.tsx:1089, resources/js/pages/Whatsapp.tsx:1365
 #: assets/admin/dist/js/app.js
 msgid "Add custom template"
 msgstr ""
@@ -1209,7 +1209,7 @@ msgstr ""
 msgid "Add key selling points like \"Private guide\", \"All meals included\", or \"Skip-the-line tickets\""
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1390
+# Source: resources/js/pages/ChannelManager.tsx:1429
 #: assets/admin/dist/js/app.js
 msgid "Add mapping"
 msgstr ""
@@ -1249,7 +1249,7 @@ msgstr ""
 msgid "Add notable landmarks or points of interest visited during this trip"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:430
+# Source: resources/js/pages/ChannelManager.tsx:441
 #: assets/admin/dist/js/app.js
 msgid "Add one connection per OTA you want to distribute on. Credentials are stored libsodium-encrypted; nothing is proxied through any third-party service."
 msgstr ""
@@ -1324,7 +1324,7 @@ msgstr ""
 msgid "Add visual content, videos, stories, and testimonials to showcase your trip"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:593
+# Source: resources/js/pages/ChannelManager.tsx:620
 #: assets/admin/dist/js/app.js
 msgid "Add your first channel"
 msgstr ""
@@ -1388,12 +1388,12 @@ msgstr ""
 msgid "Address Information"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:933
+# Source: resources/js/pages/ChannelManager.tsx:960
 #: assets/admin/dist/js/app.js
 msgid "Adds (or subtracts) a percentage to your base trip price before pushing to this channel. Use a positive number to cover the OTA's commission so your net stays whole; negative to run a channel discount."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1755
+# Source: resources/js/pages/Whatsapp.tsx:1969
 #: assets/admin/dist/js/app.js
 msgid "Adds a \"Chat on WhatsApp\" affordance to your public site. Free for the operator — uses wa.me deep linking, no per-tap charges. Independent of the Cloud API credentials you configured under Delivery."
 msgstr ""
@@ -1438,7 +1438,7 @@ msgstr ""
 msgid "Adjusts price by booking velocity score (recomputed by cron / on each booking)."
 msgstr ""
 
-# Source: resources/js/components/email/EmailTemplatesList.tsx:651, resources/js/components/email/EmailTemplatesList.tsx:823, resources/js/pages/EmailTemplateForm.tsx:1243, resources/js/pages/Whatsapp.tsx:962, resources/js/pages/Whatsapp.tsx:1413
+# Source: resources/js/components/email/EmailTemplatesList.tsx:651, resources/js/components/email/EmailTemplatesList.tsx:823, resources/js/pages/EmailTemplateForm.tsx:1243, resources/js/pages/Whatsapp.tsx:1162, resources/js/pages/Whatsapp.tsx:1627
 #: assets/admin/dist/js/app.js
 #: app/Services/EmailTemplateDefaults.php:975
 #: app/Services/EmailTemplateDefaults.php:1072
@@ -1461,12 +1461,12 @@ msgstr ""
 msgid "Admin notice when a scheduled payment permanently fails."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:555
+# Source: resources/js/pages/Whatsapp.tsx:576
 #: assets/admin/dist/js/app.js
 msgid "Admin phone (for operator notifications)"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1617
+# Source: resources/js/pages/Whatsapp.tsx:1831
 #: assets/admin/dist/js/app.js
 msgid "Admin-recipient templates send to the admin phone in Delivery settings."
 msgstr ""
@@ -1582,7 +1582,7 @@ msgstr ""
 msgid "Alert when available seats drop below this number"
 msgstr ""
 
-# Source: resources/js/components/availability/RecurringRules.tsx:739, resources/js/components/email/EmailTemplatesList.tsx:853, resources/js/components/ui/icon-picker.tsx:402, resources/js/pages/AbandonedRecovery.tsx:340, resources/js/pages/Activities.tsx:476, resources/js/pages/AdditionalServices.tsx:320, resources/js/pages/Attributes.tsx:511, resources/js/pages/Availability.tsx:1610, resources/js/pages/Bookings.tsx:916, resources/js/pages/Categories.tsx:1080, resources/js/pages/Customers.tsx:790, resources/js/pages/Departures.tsx:424, resources/js/pages/Destinations.tsx:375, resources/js/pages/DifficultyLevels.tsx:666, resources/js/pages/Discounts.tsx:227, resources/js/pages/DynamicPricing.tsx:543, resources/js/pages/Enquiries.tsx:598, resources/js/pages/ItemTypes.tsx:435, resources/js/pages/ItemTypes.tsx:847, resources/js/pages/Items.tsx:397, resources/js/pages/Itinerary.tsx:1446, resources/js/pages/Payments.tsx:844, resources/js/pages/Reviews.tsx:598, resources/js/pages/TravelerCategories.tsx:727, resources/js/pages/Travelers.tsx:442, resources/js/pages/TripConsent.tsx:338, resources/js/pages/Trips.tsx:869
+# Source: resources/js/components/availability/RecurringRules.tsx:739, resources/js/components/email/EmailTemplatesList.tsx:853, resources/js/components/ui/icon-picker.tsx:402, resources/js/pages/AbandonedRecovery.tsx:340, resources/js/pages/Activities.tsx:476, resources/js/pages/AdditionalServices.tsx:320, resources/js/pages/Attributes.tsx:511, resources/js/pages/Availability.tsx:1610, resources/js/pages/Bookings.tsx:916, resources/js/pages/Categories.tsx:1080, resources/js/pages/Customers.tsx:790, resources/js/pages/Departures.tsx:424, resources/js/pages/Destinations.tsx:375, resources/js/pages/DifficultyLevels.tsx:666, resources/js/pages/Discounts.tsx:227, resources/js/pages/DynamicPricing.tsx:543, resources/js/pages/Enquiries.tsx:598, resources/js/pages/ItemTypes.tsx:435, resources/js/pages/ItemTypes.tsx:847, resources/js/pages/Items.tsx:397, resources/js/pages/Itinerary.tsx:1446, resources/js/pages/Payments.tsx:844, resources/js/pages/Reviews.tsx:598, resources/js/pages/TravelerCategories.tsx:727, resources/js/pages/Travelers.tsx:442, resources/js/pages/TripConsent.tsx:338, resources/js/pages/Trips.tsx:869, resources/js/pages/Whatsapp.tsx:2491
 #: assets/admin/dist/js/app.js
 msgid "All"
 msgstr ""
@@ -1691,7 +1691,7 @@ msgstr ""
 msgid "All categories have pricing added"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1370
+# Source: resources/js/pages/ChannelManager.tsx:1409
 #: assets/admin/dist/js/app.js
 msgid "All channels"
 msgstr ""
@@ -1711,6 +1711,11 @@ msgstr ""
 msgid "All prompts reset to defaults."
 msgstr ""
 
+# Source: resources/js/pages/Whatsapp.tsx:2253
+#: assets/admin/dist/js/app.js
+msgid "All statuses"
+msgstr ""
+
 # Source: resources/js/components/dashboard/SystemAlerts.tsx:120
 #: assets/admin/dist/js/app.js
 msgid "All systems operational"
@@ -1721,7 +1726,7 @@ msgstr ""
 msgid "All time"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:404
+# Source: resources/js/pages/Whatsapp.tsx:423
 #: assets/admin/dist/js/app.js
 msgid "All values below come from Meta's WhatsApp Business Platform. Bring your own credentials — messages are billed directly by Meta, no markup from the plugin."
 msgstr ""
@@ -1766,12 +1771,12 @@ msgstr ""
 msgid "Allow waitlist when a date is full"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1888
+# Source: resources/js/pages/Whatsapp.tsx:2102
 #: assets/admin/dist/js/app.js
 msgid "Also show a full-width CTA in the single-trip sidebar"
 msgstr ""
 
-# Source: resources/js/pages/AbandonedRecovery.tsx:408, resources/js/pages/Bookings.tsx:514, resources/js/pages/Bookings.tsx:545, resources/js/pages/Bookings.tsx:641, resources/js/pages/ChannelManager.tsx:2120, resources/js/pages/Discounts.tsx:600, resources/js/pages/Payments.tsx:457, resources/js/pages/Payments.tsx:480, resources/js/pages/Payments.tsx:557, resources/js/pages/ViewCustomer.tsx:613, resources/js/pages/account/Payments.tsx:301
+# Source: resources/js/pages/AbandonedRecovery.tsx:408, resources/js/pages/Bookings.tsx:514, resources/js/pages/Bookings.tsx:545, resources/js/pages/Bookings.tsx:641, resources/js/pages/ChannelManager.tsx:2190, resources/js/pages/Discounts.tsx:600, resources/js/pages/Payments.tsx:457, resources/js/pages/Payments.tsx:480, resources/js/pages/Payments.tsx:557, resources/js/pages/ViewCustomer.tsx:613, resources/js/pages/account/Payments.tsx:301
 #: assets/admin/dist/js/app.js
 #: app/Services/EmailTemplateDefaults.php:508
 #: templates/pdf/invoice.php:132
@@ -1899,6 +1904,16 @@ msgstr ""
 msgid "Anything else AI should know"
 msgstr ""
 
+# Source: resources/js/pages/Whatsapp.tsx:852
+#: assets/admin/dist/js/app.js
+msgid "App Secret is configured — webhook signatures will be verified."
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:860
+#: assets/admin/dist/js/app.js
+msgid "App Secret not set — inbound webhook events will be rejected for security. Paste your Meta App Secret above as “Webhook verify secret”."
+msgstr ""
+
 # Source: resources/js/pages/ItemTypeForm.tsx:476
 #: assets/admin/dist/js/app.js
 msgid "Appearance"
@@ -2012,7 +2027,7 @@ msgstr ""
 msgid "Apply pricing when booking velocity falls below this percentage (e.g., 30 = low demand)"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:750
+# Source: resources/js/pages/ChannelManager.tsx:777
 #: assets/admin/dist/js/app.js
 msgid "Apply to partner program"
 msgstr ""
@@ -2590,7 +2605,7 @@ msgstr ""
 msgid "Auto-generated from the title. Click \"Customize URL\" if you need a custom slug."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2224
+# Source: resources/js/pages/ChannelManager.tsx:2294
 #: assets/admin/dist/js/app.js
 msgid "Auto-refreshes every 15 seconds while open. Rows older than 90 days are purged automatically by a daily cron."
 msgstr ""
@@ -2773,7 +2788,7 @@ msgstr ""
 msgid "Available To"
 msgstr ""
 
-# Source: resources/js/pages/EmailTemplateForm.tsx:1037, resources/js/pages/Whatsapp.tsx:1500
+# Source: resources/js/pages/EmailTemplateForm.tsx:1037, resources/js/pages/Whatsapp.tsx:1714
 #: assets/admin/dist/js/app.js
 msgid "Available Variables"
 msgstr ""
@@ -2783,12 +2798,12 @@ msgstr ""
 msgid "Available merge tags"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:318
+# Source: resources/js/pages/ChannelManager.tsx:319
 #: assets/admin/dist/js/app.js
 msgid "Available on the Agency plan. Standalone channel managers charge $99–299/month for the same capability — it's included here at no extra cost."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:261
+# Source: resources/js/pages/Whatsapp.tsx:279
 #: assets/admin/dist/js/app.js
 msgid "Available on the Growth plan (or Agency). Send booking + payment + reminder messages — bring your own Meta Cloud API credentials."
 msgstr ""
@@ -2923,7 +2938,7 @@ msgstr ""
 msgid "Back to WordPress"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:807, resources/js/pages/ChannelManager.tsx:1894
+# Source: resources/js/pages/ChannelManager.tsx:834, resources/js/pages/ChannelManager.tsx:1964
 #: assets/admin/dist/js/app.js
 msgid "Back to list"
 msgstr ""
@@ -2933,7 +2948,7 @@ msgstr ""
 msgid "Back to review"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1145
+# Source: resources/js/pages/Whatsapp.tsx:1359
 #: assets/admin/dist/js/app.js
 msgid "Back to templates"
 msgstr ""
@@ -2985,7 +3000,7 @@ msgstr ""
 msgid "Before trip date"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:401
+# Source: resources/js/pages/Whatsapp.tsx:420
 #: assets/admin/dist/js/app.js
 msgid "Before you start — getting WhatsApp Cloud API access"
 msgstr ""
@@ -3046,7 +3061,7 @@ msgstr ""
 msgid "Body"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:2008
+# Source: resources/js/pages/Whatsapp.tsx:2292
 #: assets/admin/dist/js/app.js
 msgid "Body / Error"
 msgstr ""
@@ -3155,7 +3170,7 @@ msgstr ""
 
 # Source: resources/js/pages/AbandonedRecovery.tsx:1421, resources/js/pages/BookingForm.tsx:888, resources/js/pages/ViewBooking.tsx:471, resources/js/pages/account/BookingDetails.tsx:120, resources/js/pages/account/BookingDetails.tsx:150, resources/js/pages/account/BookingDetails.tsx:195
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:833
+#: app/Providers/FrontendAssetsProvider.php:847
 #: templates/pdf/voucher.php:110
 #: assets/dist/js/account-page.js:1053
 #: assets/dist/js/account-page.js:1078
@@ -3188,7 +3203,7 @@ msgstr ""
 msgid "Booking History"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2122
+# Source: resources/js/pages/ChannelManager.tsx:2192
 #: assets/admin/dist/js/app.js
 #: app/Services/EmailTemplateDefaults.php:505
 #: app/Services/EmailTemplateDefaults.php:544
@@ -3240,7 +3255,7 @@ msgstr ""
 
 # Source: resources/js/pages/AbandonedRecovery.tsx:757, resources/js/pages/BookingForm.tsx:1702, resources/js/pages/Dashboard.tsx:697, resources/js/pages/account/BookingDetails.tsx:840
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:834
+#: app/Providers/FrontendAssetsProvider.php:848
 #: assets/dist/js/account-page.js:1518
 msgid "Booking Status"
 msgstr ""
@@ -3357,7 +3372,7 @@ msgstr ""
 msgid "Bookings for generated dates create specific availability entries"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:128, resources/js/pages/ChannelManager.tsx:2059
+# Source: resources/js/pages/ChannelManager.tsx:129, resources/js/pages/ChannelManager.tsx:2129
 #: assets/admin/dist/js/app.js
 msgid "Bookings inbox"
 msgstr ""
@@ -3377,17 +3392,17 @@ msgstr ""
 msgid "Boost your revenue by offering optional add-ons like airport transfers, travel insurance, equipment rental, and meals during trip booking."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:988
+# Source: resources/js/pages/ChannelManager.tsx:1015
 #: assets/admin/dist/js/app.js
 msgid "Both flags must be considered together: a disabled channel won't sync at all, regardless of mode; sandbox mode lets you test live API calls against the OTA's staging environment without affecting real bookings."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1860
+# Source: resources/js/pages/Whatsapp.tsx:2074
 #: assets/admin/dist/js/app.js
 msgid "Bottom left"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1852
+# Source: resources/js/pages/Whatsapp.tsx:2066
 #: assets/admin/dist/js/app.js
 msgid "Bottom right"
 msgstr ""
@@ -3458,7 +3473,7 @@ msgstr ""
 msgid "Brief description of when this email is sent"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:258
+# Source: resources/js/pages/ChannelManager.tsx:259
 #: assets/admin/dist/js/app.js
 msgid "Bring your own credentials"
 msgstr ""
@@ -3546,12 +3561,12 @@ msgstr ""
 msgid "Bulk status updated successfully"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:506
+# Source: resources/js/pages/Whatsapp.tsx:527
 #: assets/admin/dist/js/app.js
 msgid "Business identifiers"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1868
+# Source: resources/js/pages/Whatsapp.tsx:2082
 #: assets/admin/dist/js/app.js
 msgid "Button label"
 msgstr ""
@@ -3608,6 +3623,11 @@ msgstr ""
 msgid "Call us"
 msgstr ""
 
+# Source: resources/js/pages/Whatsapp.tsx:765
+#: assets/admin/dist/js/app.js
+msgid "Callback URL"
+msgstr ""
+
 # Source: resources/js/pages/AbandonedRecoveryEmailForm.tsx:135
 #: assets/admin/dist/js/app.js
 msgid "Campaign Information"
@@ -3618,14 +3638,16 @@ msgstr ""
 msgid "Campaign Name"
 msgstr ""
 
-# Source: resources/js/components/Tools.tsx:3181, resources/js/components/ai/AiEmailTemplateModal.tsx:102, resources/js/components/ai/AiEmailTemplateModal.tsx:275, resources/js/components/ai/AutoFillTripModal.tsx:332, resources/js/components/ai/AutoFillTripModal.tsx:658, resources/js/components/ai/BuildItineraryModal.tsx:169, resources/js/components/ai/BuildItineraryModal.tsx:708, resources/js/components/ai/BuildItineraryModal.tsx:719, resources/js/components/ai/CreateTripWithAiWizard.tsx:419, resources/js/components/ai/CreateTripWithAiWizard.tsx:954, resources/js/components/availability/RecurringRules.tsx:608, resources/js/components/availability/RecurringRules.tsx:627, resources/js/components/email/EmailTemplatesList.tsx:941, resources/js/components/itinerary/DayConflictDialog.tsx:75, resources/js/components/modals/RuleTypeSelectionModal.tsx:101, resources/js/components/shared/BulkActionToolbar.tsx:339, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1163, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1325, resources/js/components/ui/confirmation-dialog.tsx:94, resources/js/pages/AbandonedRecoveryEmailForm.tsx:337, resources/js/pages/Activities.tsx:552, resources/js/pages/Activities.tsx:596, resources/js/pages/ActivityForm.tsx:682, resources/js/pages/AdditionalServices.tsx:366, resources/js/pages/AttributeForm.tsx:1180, resources/js/pages/Attributes.tsx:580, resources/js/pages/Attributes.tsx:623, resources/js/pages/Availability.tsx:983, resources/js/pages/Availability.tsx:1048, resources/js/pages/AvailabilityForm.tsx:1668, resources/js/pages/BookingForm.tsx:1833, resources/js/pages/Bookings.tsx:1011, resources/js/pages/Categories.tsx:979, resources/js/pages/CategoryForm.tsx:826, resources/js/pages/ChannelManager.tsx:1780, resources/js/pages/CustomerForm.tsx:941, resources/js/pages/Customers.tsx:896, resources/js/pages/DepartureForm.tsx:307, resources/js/pages/DepartureRecurringRuleForm.tsx:417, resources/js/pages/DestinationForm.tsx:688, resources/js/pages/Destinations.tsx:419, resources/js/pages/DifficultyLevelForm.tsx:524, resources/js/pages/DifficultyLevels.tsx:593, resources/js/pages/DiscountForm.tsx:2678, resources/js/pages/Discounts.tsx:979, resources/js/pages/Discounts.tsx:1090, resources/js/pages/DynamicPricingRuleForm.tsx:1489, resources/js/pages/DynamicPricingRuleForm.tsx:1501, resources/js/pages/Enquiries.tsx:822, resources/js/pages/Enquiries.tsx:871, resources/js/pages/Enquiries.tsx:917, resources/js/pages/ItemForm.tsx:491, resources/js/pages/ItemTypeForm.tsx:577, resources/js/pages/ItemTypes.tsx:708, resources/js/pages/ItemTypes.tsx:808, resources/js/pages/Items.tsx:685, resources/js/pages/Items.tsx:777, resources/js/pages/ItineraryForm.tsx:1157, resources/js/pages/PaymentForm.tsx:563, resources/js/pages/Payments.tsx:753, resources/js/pages/RecurringRuleForm.tsx:2608, resources/js/pages/RecurringRulesPage.tsx:439, resources/js/pages/RecurringRulesPage.tsx:458, resources/js/pages/ReviewForm.tsx:558, resources/js/pages/Reviews.tsx:471, resources/js/pages/Settings.tsx:1650, resources/js/pages/Settings.tsx:2040, resources/js/pages/TravelerCategories.tsx:644, resources/js/pages/TravelerCategoryForm.tsx:834, resources/js/pages/Travelers.tsx:626, resources/js/pages/TripConsent.tsx:363, resources/js/pages/TripForm.tsx:9423, resources/js/pages/TripForm.tsx:9530, resources/js/pages/TripForm.tsx:9558, resources/js/pages/Trips.tsx:1734, resources/js/pages/Trips.tsx:1864, resources/js/pages/ViewEnquiry.tsx:518, resources/js/pages/account/Profile.tsx:249, resources/js/pages/account/Profile.tsx:389
+# Source: resources/js/components/Tools.tsx:3181, resources/js/components/ai/AiEmailTemplateModal.tsx:102, resources/js/components/ai/AiEmailTemplateModal.tsx:275, resources/js/components/ai/AutoFillTripModal.tsx:332, resources/js/components/ai/AutoFillTripModal.tsx:658, resources/js/components/ai/BuildItineraryModal.tsx:169, resources/js/components/ai/BuildItineraryModal.tsx:708, resources/js/components/ai/BuildItineraryModal.tsx:719, resources/js/components/ai/CreateTripWithAiWizard.tsx:419, resources/js/components/ai/CreateTripWithAiWizard.tsx:954, resources/js/components/availability/RecurringRules.tsx:608, resources/js/components/availability/RecurringRules.tsx:627, resources/js/components/email/EmailTemplatesList.tsx:941, resources/js/components/itinerary/DayConflictDialog.tsx:75, resources/js/components/modals/RuleTypeSelectionModal.tsx:101, resources/js/components/shared/BulkActionToolbar.tsx:339, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1163, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1325, resources/js/components/ui/confirmation-dialog.tsx:94, resources/js/pages/AbandonedRecoveryEmailForm.tsx:337, resources/js/pages/Activities.tsx:552, resources/js/pages/Activities.tsx:596, resources/js/pages/ActivityForm.tsx:682, resources/js/pages/AdditionalServices.tsx:366, resources/js/pages/AttributeForm.tsx:1180, resources/js/pages/Attributes.tsx:580, resources/js/pages/Attributes.tsx:623, resources/js/pages/Availability.tsx:983, resources/js/pages/Availability.tsx:1048, resources/js/pages/AvailabilityForm.tsx:1668, resources/js/pages/BookingForm.tsx:1833, resources/js/pages/Bookings.tsx:1011, resources/js/pages/Categories.tsx:979, resources/js/pages/CategoryForm.tsx:826, resources/js/pages/ChannelManager.tsx:592, resources/js/pages/ChannelManager.tsx:1689, resources/js/pages/ChannelManager.tsx:1850, resources/js/pages/CustomerForm.tsx:941, resources/js/pages/Customers.tsx:896, resources/js/pages/DepartureForm.tsx:307, resources/js/pages/DepartureRecurringRuleForm.tsx:417, resources/js/pages/DestinationForm.tsx:688, resources/js/pages/Destinations.tsx:419, resources/js/pages/DifficultyLevelForm.tsx:524, resources/js/pages/DifficultyLevels.tsx:593, resources/js/pages/DiscountForm.tsx:2678, resources/js/pages/Discounts.tsx:979, resources/js/pages/Discounts.tsx:1090, resources/js/pages/DynamicPricingRuleForm.tsx:1489, resources/js/pages/DynamicPricingRuleForm.tsx:1501, resources/js/pages/Enquiries.tsx:822, resources/js/pages/Enquiries.tsx:871, resources/js/pages/Enquiries.tsx:917, resources/js/pages/ItemForm.tsx:491, resources/js/pages/ItemTypeForm.tsx:577, resources/js/pages/ItemTypes.tsx:708, resources/js/pages/ItemTypes.tsx:808, resources/js/pages/Items.tsx:685, resources/js/pages/Items.tsx:777, resources/js/pages/ItineraryForm.tsx:1157, resources/js/pages/PaymentForm.tsx:563, resources/js/pages/Payments.tsx:753, resources/js/pages/RecurringRuleForm.tsx:2608, resources/js/pages/RecurringRulesPage.tsx:439, resources/js/pages/RecurringRulesPage.tsx:458, resources/js/pages/ReviewForm.tsx:558, resources/js/pages/Reviews.tsx:471, resources/js/pages/Settings.tsx:1650, resources/js/pages/Settings.tsx:2040, resources/js/pages/TravelerCategories.tsx:644, resources/js/pages/TravelerCategoryForm.tsx:834, resources/js/pages/Travelers.tsx:626, resources/js/pages/TripConsent.tsx:363, resources/js/pages/TripForm.tsx:9423, resources/js/pages/TripForm.tsx:9530, resources/js/pages/TripForm.tsx:9558, resources/js/pages/Trips.tsx:1734, resources/js/pages/Trips.tsx:1864, resources/js/pages/ViewEnquiry.tsx:518, resources/js/pages/Whatsapp.tsx:1244, resources/js/pages/account/Profile.tsx:249, resources/js/pages/account/Profile.tsx:389
 #: assets/admin/dist/js/app.js
+#: app/Providers/FrontendAssetsProvider.php:300
 #: templates/partials/booking-content.php:180
 #: templates/partials/single-trip/enquiry-modal.php:83
 #: assets/dist/js/account-page.js:2577
 #: assets/dist/js/account-page.js:2708
+#: assets/js/listing-wishlist.js:38
 #: assets/js/stripe.js:151
-#: assets/js/trip.js:4924
+#: assets/js/trip.js:4921
 msgid "Cancel"
 msgstr ""
 
@@ -3855,7 +3877,7 @@ msgstr ""
 msgid "Change logo"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:459, resources/js/pages/ChannelManager.tsx:1496, resources/js/pages/ChannelManager.tsx:1676, resources/js/pages/ChannelManager.tsx:1920, resources/js/pages/ChannelManager.tsx:2246
+# Source: resources/js/pages/ChannelManager.tsx:470, resources/js/pages/ChannelManager.tsx:1535, resources/js/pages/ChannelManager.tsx:1746, resources/js/pages/ChannelManager.tsx:1990, resources/js/pages/ChannelManager.tsx:2316
 #: assets/admin/dist/js/app.js
 msgid "Channel"
 msgstr ""
@@ -3866,52 +3888,52 @@ msgstr ""
 msgid "Channel Manager"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:316
+# Source: resources/js/pages/ChannelManager.tsx:317
 #: assets/admin/dist/js/app.js
 msgid "Channel Manager — Agency plan"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1874
+# Source: resources/js/pages/ChannelManager.tsx:1944
 #: assets/admin/dist/js/app.js
 msgid "Channel and trip are locked once a mapping exists. Delete + recreate if you need to re-point this mapping elsewhere."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:660
+# Source: resources/js/pages/ChannelManager.tsx:687
 #: assets/admin/dist/js/app.js
 msgid "Channel created. Add credentials next to enable sync."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:390
+# Source: resources/js/pages/ChannelManager.tsx:397
 #: assets/admin/dist/js/app.js
 msgid "Channel deleted."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1710, resources/js/pages/ChannelManager.tsx:1947
+# Source: resources/js/pages/ChannelManager.tsx:1780, resources/js/pages/ChannelManager.tsx:2017
 #: assets/admin/dist/js/app.js
 msgid "Channel product ID"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2116
+# Source: resources/js/pages/ChannelManager.tsx:2186
 #: assets/admin/dist/js/app.js
 msgid "Channel ref"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:661
+# Source: resources/js/pages/ChannelManager.tsx:688
 #: assets/admin/dist/js/app.js
 msgid "Channel saved."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:986
+# Source: resources/js/pages/ChannelManager.tsx:1013
 #: assets/admin/dist/js/app.js
 msgid "Channel state"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:126
+# Source: resources/js/pages/ChannelManager.tsx:127
 #: assets/admin/dist/js/app.js
 msgid "Channels"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:830
+# Source: resources/js/pages/ChannelManager.tsx:857
 #: assets/admin/dist/js/app.js
 msgid "Channels are created in disabled + sandbox mode by default. You'll add credentials and test the connection on the next screen, then flip Enabled on once you've verified everything works."
 msgstr ""
@@ -3931,7 +3953,7 @@ msgstr ""
 msgid "Charts use dynamic pricing history when a booking applies an adjusted price. Complete a checkout (or recalculate pricing) after rules are active to populate metrics."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1871
+# Source: resources/js/pages/Whatsapp.tsx:2085
 #: assets/admin/dist/js/app.js
 msgid "Chat on WhatsApp"
 msgstr ""
@@ -4047,7 +4069,7 @@ msgstr ""
 msgid "Choose which standard ecommerce events Yatra should emit to GA4 on the storefront and booking flow."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2427
+# Source: resources/js/pages/ChannelManager.tsx:2497
 #: assets/admin/dist/js/app.js
 msgid "Circuit: {state}."
 msgstr ""
@@ -4058,7 +4080,7 @@ msgstr ""
 msgid "City"
 msgstr ""
 
-# Source: resources/js/components/shared/ApplicableTripSelector.tsx:214, resources/js/components/shared/BulkActionToolbar.tsx:152, resources/js/pages/AiAssistant.tsx:679, resources/js/pages/ChannelManager.tsx:1156, resources/js/pages/ChannelManager.tsx:1451, resources/js/pages/License.tsx:788, resources/js/pages/TripConsentForm.tsx:245, resources/js/pages/Whatsapp.tsx:759
+# Source: resources/js/components/shared/ApplicableTripSelector.tsx:214, resources/js/components/shared/BulkActionToolbar.tsx:152, resources/js/pages/AiAssistant.tsx:679, resources/js/pages/ChannelManager.tsx:1183, resources/js/pages/ChannelManager.tsx:1490, resources/js/pages/License.tsx:788, resources/js/pages/TripConsentForm.tsx:245, resources/js/pages/Whatsapp.tsx:951
 #: assets/admin/dist/js/app.js
 msgid "Clear"
 msgstr ""
@@ -4189,7 +4211,7 @@ msgstr ""
 msgid "Click a tag to copy; paste into subject or HTML body."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1484
+# Source: resources/js/pages/Whatsapp.tsx:1698
 #: assets/admin/dist/js/app.js
 msgid "Click a variable on the right to copy, double-click to insert at the cursor."
 msgstr ""
@@ -4209,7 +4231,7 @@ msgstr ""
 msgid "Click the save icon to preserve your custom slug."
 msgstr ""
 
-# Source: resources/js/pages/EmailTemplateForm.tsx:1044, resources/js/pages/Whatsapp.tsx:1518
+# Source: resources/js/pages/EmailTemplateForm.tsx:1044, resources/js/pages/Whatsapp.tsx:1732
 #: assets/admin/dist/js/app.js
 msgid "Click to copy, double-click to insert at cursor"
 msgstr ""
@@ -4254,7 +4276,7 @@ msgstr ""
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:166, resources/js/components/ai/AutoFillTripModal.tsx:523, resources/js/components/ai/BuildItineraryModal.tsx:299, resources/js/components/ai/BuildItineraryModal.tsx:761, resources/js/components/ai/BuildItineraryModal.tsx:770, resources/js/components/ai/CreateTripWithAiWizard.tsx:833, resources/js/components/email/EmailPreviewModal.tsx:46, resources/js/components/shared/ApplicableTripSelector.tsx:303, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1204, resources/js/components/ui/alert.tsx:58, resources/js/components/ui/icon-picker.tsx:583, resources/js/components/ui/toast.tsx:165, resources/js/pages/AbandonedRecovery.tsx:1432, resources/js/pages/Departures.tsx:1257, resources/js/pages/TripConsent.tsx:1061, resources/js/pages/TripForm.tsx:9456
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/sticky-sidebar.php:255
-#: assets/dist/js/index-DPUOGEIE.js:1009
+#: assets/dist/js/index-Bw48uY9G.js:1009
 msgid "Close"
 msgstr ""
 
@@ -4270,7 +4292,7 @@ msgstr ""
 msgid "Closed"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:419
+# Source: resources/js/pages/Whatsapp.tsx:438
 #: assets/admin/dist/js/app.js
 msgid "Cloud API: Get started"
 msgstr ""
@@ -4364,7 +4386,7 @@ msgstr ""
 msgid "Comma-separated tags to add to all synced subscribers (e.g., \"yatra, booking\")"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:950
+# Source: resources/js/pages/ChannelManager.tsx:977
 #: assets/admin/dist/js/app.js
 msgid "Commission (%) — informational"
 msgstr ""
@@ -4428,7 +4450,7 @@ msgstr ""
 msgid "Completion tokens"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:578
+# Source: resources/js/pages/Whatsapp.tsx:599
 #: assets/admin/dist/js/app.js
 msgid "Compliance & opt-in"
 msgstr ""
@@ -4554,12 +4576,12 @@ msgstr ""
 msgid "Configure your travel booking plugin settings"
 msgstr ""
 
-# Source: resources/js/pages/AiAssistant.tsx:540, resources/js/pages/ChannelManager.tsx:1163, resources/js/pages/Whatsapp.tsx:766
+# Source: resources/js/pages/AiAssistant.tsx:540, resources/js/pages/ChannelManager.tsx:1190, resources/js/pages/Whatsapp.tsx:958
 #: assets/admin/dist/js/app.js
 msgid "Configured"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:427
+# Source: resources/js/pages/ChannelManager.tsx:438
 #: assets/admin/dist/js/app.js
 msgid "Configured channels"
 msgstr ""
@@ -4617,12 +4639,12 @@ msgstr ""
 msgid "Connect Google Calendar"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:214
+# Source: resources/js/pages/ChannelManager.tsx:215
 #: assets/admin/dist/js/app.js
 msgid "Connect a channel"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1667
+# Source: resources/js/pages/ChannelManager.tsx:1737
 #: assets/admin/dist/js/app.js
 msgid "Connect one of your trips to a product on the channel. You'll need the channel's product ID — check the channel's partner portal or the URL of the product page."
 msgstr ""
@@ -4642,7 +4664,7 @@ msgstr ""
 msgid "Connect your Google account to start syncing bookings"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:585
+# Source: resources/js/pages/ChannelManager.tsx:612
 #: assets/admin/dist/js/app.js
 msgid "Connect your first OTA to start distributing trips. You'll need API credentials from that OTA's partner portal — there's a help link inside the form."
 msgstr ""
@@ -4667,12 +4689,12 @@ msgstr ""
 msgid "Connecting..."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:841, resources/js/pages/Settings.tsx:6893
+# Source: resources/js/pages/ChannelManager.tsx:868, resources/js/pages/Settings.tsx:6893
 #: assets/admin/dist/js/app.js
 msgid "Connection"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:674
+# Source: resources/js/pages/ChannelManager.tsx:701
 #: assets/admin/dist/js/app.js
 msgid "Connection OK — credentials accepted by the OTA."
 msgstr ""
@@ -4687,7 +4709,7 @@ msgstr ""
 msgid "Connection encryption type"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:678
+# Source: resources/js/pages/ChannelManager.tsx:705
 #: assets/admin/dist/js/app.js
 msgid "Connection failed."
 msgstr ""
@@ -4697,7 +4719,7 @@ msgstr ""
 msgid "Connection successful."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:259
+# Source: resources/js/pages/ChannelManager.tsx:260
 #: assets/admin/dist/js/app.js
 msgid "Connections go direct to the OTA. No proxying, no markup."
 msgstr ""
@@ -4784,19 +4806,19 @@ msgstr ""
 
 # Source: resources/js/lib/currency-display.ts:137, resources/js/pages/account/utils.ts:203
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:735
-#: app/Providers/FrontendAssetsProvider.php:846
+#: app/Providers/FrontendAssetsProvider.php:749
+#: app/Providers/FrontendAssetsProvider.php:860
 #: includes/helpers.php:331
 #: templates/partials/single-trip/content-sidebar.php:93
 #: templates/partials/single-trip/content-sidebar.php:157
-#: templates/partials/single-trip/similar-trips.php:268
+#: templates/partials/single-trip/similar-trips.php:270
 #: templates/trip-listing-card.php:455
 #: assets/dist/js/account-page.js:143
-#: assets/dist/js/index-DPUOGEIE.js:2162
+#: assets/dist/js/index-Bw48uY9G.js:2162
 msgid "Contact for pricing"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1785
+# Source: resources/js/pages/Whatsapp.tsx:1999
 #: assets/admin/dist/js/app.js
 msgid "Contact phone (E.164)"
 msgstr ""
@@ -4861,12 +4883,12 @@ msgstr ""
 msgid "Coords Set"
 msgstr ""
 
-# Source: resources/js/components/shared/Table.tsx:373, resources/js/pages/TripForm.tsx:3888
+# Source: resources/js/components/shared/Table.tsx:373, resources/js/pages/TripForm.tsx:3888, resources/js/pages/Whatsapp.tsx:786, resources/js/pages/Whatsapp.tsx:827
 #: assets/admin/dist/js/app.js
 msgid "Copied"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1219, resources/js/pages/Itinerary.tsx:1715, resources/js/pages/Settings.tsx:463
+# Source: resources/js/pages/ChannelManager.tsx:1246, resources/js/pages/Itinerary.tsx:1715, resources/js/pages/Settings.tsx:463, resources/js/pages/Whatsapp.tsx:791, resources/js/pages/Whatsapp.tsx:832
 #: assets/admin/dist/js/app.js
 msgid "Copy"
 msgstr ""
@@ -4874,6 +4896,11 @@ msgstr ""
 # Source: resources/js/pages/TripForm.tsx:4130
 #: assets/admin/dist/js/app.js
 msgid "Copy URL"
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:781
+#: assets/admin/dist/js/app.js
+msgid "Copy callback URL"
 msgstr ""
 
 # Source: resources/js/pages/Discounts.tsx:690, resources/js/pages/Discounts.tsx:691
@@ -4904,6 +4931,11 @@ msgstr ""
 # Source: resources/js/pages/Settings.tsx:6440
 #: assets/admin/dist/js/app.js
 msgid "Copy this Pixel ID and paste it in the field above"
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:822
+#: assets/admin/dist/js/app.js
+msgid "Copy verify token"
 msgstr ""
 
 # Source: resources/js/components/Layout.tsx:1136, resources/js/pages/Modules.tsx:528
@@ -4986,7 +5018,7 @@ msgstr ""
 msgid "Could not start payment. Please try again."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1194
+# Source: resources/js/pages/ChannelManager.tsx:1221
 #: assets/admin/dist/js/app.js
 msgid "Couldn't copy — copy manually."
 msgstr ""
@@ -5345,7 +5377,7 @@ msgstr ""
 msgid "Create categories here"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:819
+# Source: resources/js/pages/ChannelManager.tsx:846
 #: assets/admin/dist/js/app.js
 msgid "Create channel"
 msgstr ""
@@ -5380,7 +5412,7 @@ msgstr ""
 msgid "Create legally compliant consent forms with digital signatures and automate the collection process with Yatra Pro."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1796
+# Source: resources/js/pages/ChannelManager.tsx:1866
 #: assets/admin/dist/js/app.js
 msgid "Create mapping"
 msgstr ""
@@ -5405,7 +5437,7 @@ msgstr ""
 msgid "Create recurring time slots for your single-day trip (supports multiple time slots per day)"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1179
+# Source: resources/js/pages/Whatsapp.tsx:1393
 #: assets/admin/dist/js/app.js
 msgid "Create template"
 msgstr ""
@@ -5501,7 +5533,7 @@ msgstr ""
 msgid "Creating…"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1050, resources/js/pages/Whatsapp.tsx:120
+# Source: resources/js/pages/ChannelManager.tsx:1077, resources/js/pages/Whatsapp.tsx:133
 #: assets/admin/dist/js/app.js
 msgid "Credential saved."
 msgstr ""
@@ -5521,7 +5553,7 @@ msgstr ""
 msgid "Cultural"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:900, resources/js/pages/Settings.tsx:3587
+# Source: resources/js/pages/ChannelManager.tsx:927, resources/js/pages/Settings.tsx:3587
 #: assets/admin/dist/js/app.js
 #: app/Controllers/SetupWizardController.php:93
 #: templates/setup-wizard/currency.php:45
@@ -5570,7 +5602,7 @@ msgstr ""
 msgid "Currently booked seats (read-only)"
 msgstr ""
 
-# Source: resources/js/components/email/EmailTemplatesList.tsx:556, resources/js/pages/EmailTemplateForm.tsx:1192, resources/js/pages/EmailTemplateForm.tsx:1254, resources/js/pages/Whatsapp.tsx:976
+# Source: resources/js/components/email/EmailTemplatesList.tsx:556, resources/js/pages/EmailTemplateForm.tsx:1192, resources/js/pages/EmailTemplateForm.tsx:1254, resources/js/pages/Whatsapp.tsx:1176
 #: assets/admin/dist/js/app.js
 msgid "Custom"
 msgstr ""
@@ -5625,7 +5657,7 @@ msgstr ""
 msgid "Custom title for search engines. Use {name} as placeholder."
 msgstr ""
 
-# Source: resources/js/components/email/EmailTemplatesList.tsx:651, resources/js/components/email/EmailTemplatesList.tsx:822, resources/js/pages/AbandonedRecovery.tsx:367, resources/js/pages/Bookings.tsx:512, resources/js/pages/Bookings.tsx:526, resources/js/pages/Bookings.tsx:577, resources/js/pages/ChannelManager.tsx:2117, resources/js/pages/Customers.tsx:462, resources/js/pages/Customers.tsx:492, resources/js/pages/Customers.tsx:645, resources/js/pages/EmailTemplateForm.tsx:1244, resources/js/pages/Enquiries.tsx:232, resources/js/pages/Enquiries.tsx:643, resources/js/pages/Payments.tsx:456, resources/js/pages/Payments.tsx:470, resources/js/pages/Payments.tsx:525, resources/js/pages/Reviews.tsx:354, resources/js/pages/Reviews.tsx:542, resources/js/pages/Reviews.tsx:653, resources/js/pages/Settings.tsx:3576, resources/js/pages/ViewEnquiry.tsx:441, resources/js/pages/ViewPayment.tsx:470, resources/js/pages/Whatsapp.tsx:963, resources/js/pages/Whatsapp.tsx:1390
+# Source: resources/js/components/email/EmailTemplatesList.tsx:651, resources/js/components/email/EmailTemplatesList.tsx:822, resources/js/pages/AbandonedRecovery.tsx:367, resources/js/pages/Bookings.tsx:512, resources/js/pages/Bookings.tsx:526, resources/js/pages/Bookings.tsx:577, resources/js/pages/ChannelManager.tsx:2187, resources/js/pages/Customers.tsx:462, resources/js/pages/Customers.tsx:492, resources/js/pages/Customers.tsx:645, resources/js/pages/EmailTemplateForm.tsx:1244, resources/js/pages/Enquiries.tsx:232, resources/js/pages/Enquiries.tsx:643, resources/js/pages/Payments.tsx:456, resources/js/pages/Payments.tsx:470, resources/js/pages/Payments.tsx:525, resources/js/pages/Reviews.tsx:354, resources/js/pages/Reviews.tsx:542, resources/js/pages/Reviews.tsx:653, resources/js/pages/Settings.tsx:3576, resources/js/pages/ViewEnquiry.tsx:441, resources/js/pages/ViewPayment.tsx:470, resources/js/pages/Whatsapp.tsx:1163, resources/js/pages/Whatsapp.tsx:1604
 #: assets/admin/dist/js/app.js
 #: app/Controllers/BookingsController.php:748
 #: app/Controllers/PaymentGatewayController.php:930
@@ -6068,7 +6100,7 @@ msgstr ""
 msgid "Default Value"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:541
+# Source: resources/js/pages/Whatsapp.tsx:562
 #: assets/admin/dist/js/app.js
 msgid "Default country code"
 msgstr ""
@@ -6093,7 +6125,7 @@ msgstr ""
 msgid "Default price (used on page load)"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:932
+# Source: resources/js/pages/ChannelManager.tsx:959
 #: assets/admin/dist/js/app.js
 msgid "Default price offset (%)"
 msgstr ""
@@ -6108,7 +6140,7 @@ msgstr ""
 msgid "Default system"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:847
+# Source: resources/js/pages/Whatsapp.tsx:1047
 #: assets/admin/dist/js/app.js
 msgid "Default templates restored."
 msgstr ""
@@ -6143,12 +6175,12 @@ msgstr ""
 msgid "Define your voice once — it flows into every generation across trips, SEO, and emails. The more specific, the more your AI output sounds like you."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2438
+# Source: resources/js/pages/ChannelManager.tsx:2508
 #: assets/admin/dist/js/app.js
 msgid "Degraded"
 msgstr ""
 
-# Source: resources/js/components/availability/RecurringRules.tsx:570, resources/js/components/availability/RecurringRules.tsx:607, resources/js/components/availability/RecurringRules.tsx:800, resources/js/components/email/EmailTemplatesList.tsx:722, resources/js/components/email/EmailTemplatesList.tsx:873, resources/js/components/email/EmailTemplatesList.tsx:940, resources/js/pages/AbandonedRecovery.tsx:482, resources/js/pages/AbandonedRecovery.tsx:1154, resources/js/pages/Availability.tsx:952, resources/js/pages/Availability.tsx:982, resources/js/pages/Bookings.tsx:785, resources/js/pages/Bookings.tsx:1010, resources/js/pages/ChannelManager.tsx:1444, resources/js/pages/Customers.tsx:632, resources/js/pages/Customers.tsx:895, resources/js/pages/Destinations.tsx:418, resources/js/pages/DifficultyLevels.tsx:187, resources/js/pages/DifficultyLevels.tsx:592, resources/js/pages/Discounts.tsx:954, resources/js/pages/Discounts.tsx:1089, resources/js/pages/Enquiries.tsx:286, resources/js/pages/Enquiries.tsx:884, resources/js/pages/ItemTypes.tsx:707, resources/js/pages/Items.tsx:684, resources/js/pages/Itinerary.tsx:2560, resources/js/pages/Itinerary.tsx:2619, resources/js/pages/Payments.tsx:727, resources/js/pages/Payments.tsx:752, resources/js/pages/RecurringRulesPage.tsx:405, resources/js/pages/RecurringRulesPage.tsx:438, resources/js/pages/RecurringRulesPage.tsx:572, resources/js/pages/Reviews.tsx:470, resources/js/pages/Settings.tsx:2039, resources/js/pages/TravelerCategories.tsx:643, resources/js/pages/Travelers.tsx:320, resources/js/pages/Travelers.tsx:450, resources/js/pages/Travelers.tsx:625, resources/js/pages/TripConsent.tsx:362
+# Source: resources/js/components/availability/RecurringRules.tsx:570, resources/js/components/availability/RecurringRules.tsx:607, resources/js/components/availability/RecurringRules.tsx:800, resources/js/components/email/EmailTemplatesList.tsx:722, resources/js/components/email/EmailTemplatesList.tsx:873, resources/js/components/email/EmailTemplatesList.tsx:940, resources/js/pages/AbandonedRecovery.tsx:482, resources/js/pages/AbandonedRecovery.tsx:1154, resources/js/pages/Availability.tsx:952, resources/js/pages/Availability.tsx:982, resources/js/pages/Bookings.tsx:785, resources/js/pages/Bookings.tsx:1010, resources/js/pages/ChannelManager.tsx:1483, resources/js/pages/Customers.tsx:632, resources/js/pages/Customers.tsx:895, resources/js/pages/Destinations.tsx:418, resources/js/pages/DifficultyLevels.tsx:187, resources/js/pages/DifficultyLevels.tsx:592, resources/js/pages/Discounts.tsx:954, resources/js/pages/Discounts.tsx:1089, resources/js/pages/Enquiries.tsx:286, resources/js/pages/Enquiries.tsx:884, resources/js/pages/ItemTypes.tsx:707, resources/js/pages/Items.tsx:684, resources/js/pages/Itinerary.tsx:2560, resources/js/pages/Itinerary.tsx:2619, resources/js/pages/Payments.tsx:727, resources/js/pages/Payments.tsx:752, resources/js/pages/RecurringRulesPage.tsx:405, resources/js/pages/RecurringRulesPage.tsx:438, resources/js/pages/RecurringRulesPage.tsx:572, resources/js/pages/Reviews.tsx:470, resources/js/pages/Settings.tsx:2039, resources/js/pages/TravelerCategories.tsx:643, resources/js/pages/Travelers.tsx:320, resources/js/pages/Travelers.tsx:450, resources/js/pages/Travelers.tsx:625, resources/js/pages/TripConsent.tsx:362
 #: assets/admin/dist/js/app.js
 msgid "Delete"
 msgstr ""
@@ -6293,9 +6325,39 @@ msgstr ""
 msgid "Delete Trip Permanently"
 msgstr ""
 
+# Source: resources/js/pages/ChannelManager.tsx:591
+#: assets/admin/dist/js/app.js
+msgid "Delete channel"
+msgstr ""
+
+# Source: resources/js/pages/ChannelManager.tsx:582
+#: assets/admin/dist/js/app.js
+msgid "Delete channel?"
+msgstr ""
+
+# Source: resources/js/pages/ChannelManager.tsx:1687
+#: assets/admin/dist/js/app.js
+msgid "Delete mapping"
+msgstr ""
+
+# Source: resources/js/pages/ChannelManager.tsx:1671
+#: assets/admin/dist/js/app.js
+msgid "Delete mapping?"
+msgstr ""
+
+# Source: resources/js/pages/ChannelManager.tsx:1686
+#: assets/admin/dist/js/app.js
+msgid "Delete mappings"
+msgstr ""
+
 # Source: resources/js/pages/Bookings.tsx:468, resources/js/pages/Customers.tsx:416, resources/js/pages/Discounts.tsx:533, resources/js/pages/Payments.tsx:407
 #: assets/admin/dist/js/app.js
 msgid "Delete permanently"
+msgstr ""
+
+# Source: resources/js/pages/ChannelManager.tsx:1670
+#: assets/admin/dist/js/app.js
+msgid "Delete selected mappings?"
 msgstr ""
 
 # Source: resources/js/pages/TripForm.tsx:8592
@@ -6303,19 +6365,29 @@ msgstr ""
 msgid "Delete tab"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:546
+# Source: resources/js/pages/Whatsapp.tsx:1211, resources/js/pages/Whatsapp.tsx:1243
 #: assets/admin/dist/js/app.js
-msgid "Delete this channel? Credentials and trip mappings linked to it will be removed. This cannot be undone."
+msgid "Delete template"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1600
+# Source: resources/js/pages/Whatsapp.tsx:1234
+#: assets/admin/dist/js/app.js
+msgid "Delete template?"
+msgstr ""
+
+# Source: resources/js/pages/ChannelManager.tsx:585
+#: assets/admin/dist/js/app.js
+msgid "Delete the “{name}” channel? Credentials and trip mappings linked to it will be removed. This cannot be undone."
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:1237
+#: assets/admin/dist/js/app.js
+msgid "Delete the “{name}” template? This cannot be undone, and any events bound to it will stop sending until you create a replacement."
+msgstr ""
+
+# Source: resources/js/pages/ChannelManager.tsx:1679
 #: assets/admin/dist/js/app.js
 msgid "Delete this mapping? The trip will no longer sync to this channel. Existing bookings already in the inbox are not affected."
-msgstr ""
-
-# Source: resources/js/pages/Whatsapp.tsx:1010
-#: assets/admin/dist/js/app.js
-msgid "Delete this template? This can't be undone."
 msgstr ""
 
 # Source: resources/js/components/trips/TripsTable.tsx:196
@@ -6323,7 +6395,7 @@ msgstr ""
 msgid "Delete trip"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1332
+# Source: resources/js/pages/ChannelManager.tsx:1675
 #: assets/admin/dist/js/app.js
 msgid "Delete {n} mappings? They will stop syncing immediately. Existing bookings are unaffected."
 msgstr ""
@@ -6343,7 +6415,12 @@ msgstr ""
 msgid "Delicious meal options for different dietary requirements."
 msgstr ""
 
-# Source: resources/js/pages/EmailAutomation.tsx:527, resources/js/pages/Whatsapp.tsx:150
+# Source: resources/js/pages/Whatsapp.tsx:2256
+#: assets/admin/dist/js/app.js
+msgid "Delivered"
+msgstr ""
+
+# Source: resources/js/pages/EmailAutomation.tsx:527, resources/js/pages/Whatsapp.tsx:163
 #: assets/admin/dist/js/app.js
 msgid "Delivery"
 msgstr ""
@@ -6378,7 +6455,7 @@ msgstr ""
 msgid "Departing in 7d"
 msgstr ""
 
-# Source: resources/js/pages/Availability.tsx:709, resources/js/pages/Availability.tsx:1644, resources/js/pages/ChannelManager.tsx:2118
+# Source: resources/js/pages/Availability.tsx:709, resources/js/pages/Availability.tsx:1644, resources/js/pages/ChannelManager.tsx:2188
 #: assets/admin/dist/js/app.js
 #: app/Controllers/TripController.php:1974
 #: app/Controllers/TripController.php:2079
@@ -6433,7 +6510,7 @@ msgstr ""
 msgid "Departure moved to trash."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:634
+# Source: resources/js/pages/Whatsapp.tsx:655
 #: assets/admin/dist/js/app.js
 msgid "Departure reminder (hours before)"
 msgstr ""
@@ -6546,7 +6623,7 @@ msgstr ""
 msgid "Describe what this service includes..."
 msgstr ""
 
-# Source: resources/js/components/email/EmailTemplatesList.tsx:612, resources/js/components/email/EmailTemplatesList.tsx:744, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:320, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1143, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1305, resources/js/pages/Activities.tsx:133, resources/js/pages/Activities.tsx:682, resources/js/pages/Activities.tsx:825, resources/js/pages/ActivityForm.tsx:475, resources/js/pages/AdditionalServicesForm.tsx:430, resources/js/pages/AttributeForm.tsx:786, resources/js/pages/Attributes.tsx:463, resources/js/pages/Attributes.tsx:750, resources/js/pages/Categories.tsx:649, resources/js/pages/Categories.tsx:1107, resources/js/pages/CategoryForm.tsx:548, resources/js/pages/DestinationForm.tsx:480, resources/js/pages/Destinations.tsx:500, resources/js/pages/Destinations.tsx:648, resources/js/pages/DifficultyLevelForm.tsx:388, resources/js/pages/DifficultyLevels.tsx:120, resources/js/pages/DifficultyLevels.tsx:703, resources/js/pages/DiscountForm.tsx:1259, resources/js/pages/EmailSequenceForm.tsx:453, resources/js/pages/EmailTemplateForm.tsx:641, resources/js/pages/ItemForm.tsx:415, resources/js/pages/ItemTypeForm.tsx:452, resources/js/pages/ItemTypes.tsx:373, resources/js/pages/ItemTypes.tsx:557, resources/js/pages/Items.tsx:336, resources/js/pages/Items.tsx:533, resources/js/pages/TravelerCategories.tsx:512, resources/js/pages/TravelerCategories.tsx:756, resources/js/pages/TravelerCategoryForm.tsx:528, resources/js/pages/TripConsentForm.tsx:950, resources/js/pages/TripForm.tsx:4239, resources/js/pages/TripForm.tsx:6973, resources/js/pages/Whatsapp.tsx:1237
+# Source: resources/js/components/email/EmailTemplatesList.tsx:612, resources/js/components/email/EmailTemplatesList.tsx:744, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:320, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1143, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1305, resources/js/pages/Activities.tsx:133, resources/js/pages/Activities.tsx:682, resources/js/pages/Activities.tsx:825, resources/js/pages/ActivityForm.tsx:475, resources/js/pages/AdditionalServicesForm.tsx:430, resources/js/pages/AttributeForm.tsx:786, resources/js/pages/Attributes.tsx:463, resources/js/pages/Attributes.tsx:750, resources/js/pages/Categories.tsx:649, resources/js/pages/Categories.tsx:1107, resources/js/pages/CategoryForm.tsx:548, resources/js/pages/DestinationForm.tsx:480, resources/js/pages/Destinations.tsx:500, resources/js/pages/Destinations.tsx:648, resources/js/pages/DifficultyLevelForm.tsx:388, resources/js/pages/DifficultyLevels.tsx:120, resources/js/pages/DifficultyLevels.tsx:703, resources/js/pages/DiscountForm.tsx:1259, resources/js/pages/EmailSequenceForm.tsx:453, resources/js/pages/EmailTemplateForm.tsx:641, resources/js/pages/ItemForm.tsx:415, resources/js/pages/ItemTypeForm.tsx:452, resources/js/pages/ItemTypes.tsx:373, resources/js/pages/ItemTypes.tsx:557, resources/js/pages/Items.tsx:336, resources/js/pages/Items.tsx:533, resources/js/pages/TravelerCategories.tsx:512, resources/js/pages/TravelerCategories.tsx:756, resources/js/pages/TravelerCategoryForm.tsx:528, resources/js/pages/TripConsentForm.tsx:950, resources/js/pages/TripForm.tsx:4239, resources/js/pages/TripForm.tsx:6973, resources/js/pages/Whatsapp.tsx:1451
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-location.php:91
 #: templates/pdf/invoice.php:129
@@ -6612,7 +6689,7 @@ msgstr ""
 msgid "Destination deleted successfully"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:559
+# Source: resources/js/pages/Whatsapp.tsx:580
 #: assets/admin/dist/js/app.js
 msgid "Destination for any template with recipient type \"Admin\" — for example a \"New booking\" alert sent to the operator. Leave blank to skip those sends. Must be in E.164 format."
 msgstr ""
@@ -6635,7 +6712,7 @@ msgstr ""
 
 # Source: resources/js/components/Layout.tsx:371, resources/js/pages/Destinations.tsx:425, resources/js/pages/TripForm.tsx:4753
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:859
+#: app/Providers/FrontendAssetsProvider.php:873
 #: templates/listing-trip.php:381
 #: templates/single-taxonomy.php:71
 #: assets/dist/blocks/tour.js:350
@@ -6690,7 +6767,7 @@ msgstr ""
 
 # Source: resources/js/components/ai/CreateTripWithAiWizard.tsx:1163, resources/js/pages/Trips.tsx:771, resources/js/pages/Trips.tsx:1163
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:853
+#: app/Providers/FrontendAssetsProvider.php:867
 #: templates/partials/single-trip/quick-facts.php:44
 #: templates/pdf/itinerary.php:336
 #: templates/shortcodes/search.php:93
@@ -6757,7 +6834,7 @@ msgstr ""
 msgid "Digital signatures"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:2002
+# Source: resources/js/pages/Whatsapp.tsx:2290
 #: assets/admin/dist/js/app.js
 msgid "Direction"
 msgstr ""
@@ -6777,7 +6854,7 @@ msgstr ""
 msgid "Disable module"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1143, resources/js/pages/ChannelManager.tsx:516, resources/js/pages/Reports.tsx:1803, resources/js/pages/TripForm.tsx:8753, resources/js/pages/Whatsapp.tsx:989, resources/js/pages/Whatsapp.tsx:1205
+# Source: resources/js/components/Layout.tsx:1143, resources/js/pages/ChannelManager.tsx:527, resources/js/pages/Reports.tsx:1803, resources/js/pages/TripForm.tsx:8753, resources/js/pages/Whatsapp.tsx:1189, resources/js/pages/Whatsapp.tsx:1419
 #: assets/admin/dist/js/app.js
 msgid "Disabled"
 msgstr ""
@@ -6972,12 +7049,12 @@ msgstr ""
 msgid "Display messages like \"Price increases soon\" for demand-based rules"
 msgstr ""
 
-# Source: resources/js/pages/AttributeForm.tsx:927, resources/js/pages/ChannelManager.tsx:872
+# Source: resources/js/pages/AttributeForm.tsx:927, resources/js/pages/ChannelManager.tsx:899
 #: assets/admin/dist/js/app.js
 msgid "Display name"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:112, resources/js/pages/ChannelManager.tsx:135
+# Source: resources/js/pages/ChannelManager.tsx:113, resources/js/pages/ChannelManager.tsx:136
 #: assets/admin/dist/js/app.js
 msgid "Distribute your tours on global OTAs from one dashboard. Push inventory and pricing automatically, receive bookings back into a unified inbox."
 msgstr ""
@@ -7148,7 +7225,7 @@ msgstr ""
 msgid "Draw your signature here"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1923
+# Source: resources/js/pages/Whatsapp.tsx:2137
 #: assets/admin/dist/js/app.js
 msgid "Drop the button anywhere using the shortcode [yatra_whatsapp_button label=\"Chat with us\"]. Supports label, message, and trip_name attributes."
 msgstr ""
@@ -7207,10 +7284,10 @@ msgstr ""
 msgid "Duplicating..."
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:667, resources/js/pages/ChannelManager.tsx:2249, resources/js/pages/Itinerary.tsx:2195, resources/js/pages/Trips.tsx:761, resources/js/pages/Trips.tsx:1123, resources/js/pages/ViewDeparture.tsx:516, resources/js/pages/ViewDeparture.tsx:644
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:667, resources/js/pages/ChannelManager.tsx:2319, resources/js/pages/Itinerary.tsx:2195, resources/js/pages/Trips.tsx:761, resources/js/pages/Trips.tsx:1123, resources/js/pages/ViewDeparture.tsx:516, resources/js/pages/ViewDeparture.tsx:644
 #: assets/admin/dist/js/app.js
 #: app/Controllers/BookingSessionController.php:2640
-#: app/Providers/FrontendAssetsProvider.php:852
+#: app/Providers/FrontendAssetsProvider.php:866
 #: templates/partials/availability-card.php:216
 #: templates/partials/single-trip/quick-facts.php:18
 #: templates/pdf/itinerary.php:335
@@ -7306,7 +7383,7 @@ msgstr ""
 msgid "Early bird discounts"
 msgstr ""
 
-# Source: resources/js/components/availability/AvailabilityCalendar.tsx:451, resources/js/components/availability/RecurringRules.tsx:539, resources/js/components/email/EmailTemplatesList.tsx:706, resources/js/pages/Activities.tsx:1033, resources/js/pages/AdditionalServices.tsx:720, resources/js/pages/Attributes.tsx:774, resources/js/pages/Availability.tsx:929, resources/js/pages/AvailabilityForm.tsx:638, resources/js/pages/Bookings.tsx:686, resources/js/pages/Categories.tsx:820, resources/js/pages/ChannelManager.tsx:537, resources/js/pages/ChannelManager.tsx:1582, resources/js/pages/Customers.tsx:592, resources/js/pages/Departures.tsx:940, resources/js/pages/Destinations.tsx:865, resources/js/pages/DifficultyLevels.tsx:162, resources/js/pages/Discounts.tsx:864, resources/js/pages/DynamicPricing.tsx:703, resources/js/pages/EmailAutomation.tsx:292, resources/js/pages/Enquiries.tsx:279, resources/js/pages/ItemTypes.tsx:627, resources/js/pages/Items.tsx:604, resources/js/pages/Payments.tsx:606, resources/js/pages/RecurringRuleForm.tsx:273, resources/js/pages/RecurringRuleForm.tsx:275, resources/js/pages/RecurringRulesPage.tsx:385, resources/js/pages/Reviews.tsx:421, resources/js/pages/TravelerCategories.tsx:580, resources/js/pages/TripConsent.tsx:585, resources/js/pages/Trips.tsx:1367, resources/js/pages/Whatsapp.tsx:1000
+# Source: resources/js/components/availability/AvailabilityCalendar.tsx:451, resources/js/components/availability/RecurringRules.tsx:539, resources/js/components/email/EmailTemplatesList.tsx:706, resources/js/pages/Activities.tsx:1033, resources/js/pages/AdditionalServices.tsx:720, resources/js/pages/Attributes.tsx:774, resources/js/pages/Availability.tsx:929, resources/js/pages/AvailabilityForm.tsx:638, resources/js/pages/Bookings.tsx:686, resources/js/pages/Categories.tsx:820, resources/js/pages/ChannelManager.tsx:548, resources/js/pages/ChannelManager.tsx:1621, resources/js/pages/Customers.tsx:592, resources/js/pages/Departures.tsx:940, resources/js/pages/Destinations.tsx:865, resources/js/pages/DifficultyLevels.tsx:162, resources/js/pages/Discounts.tsx:864, resources/js/pages/DynamicPricing.tsx:703, resources/js/pages/EmailAutomation.tsx:292, resources/js/pages/Enquiries.tsx:279, resources/js/pages/ItemTypes.tsx:627, resources/js/pages/Items.tsx:604, resources/js/pages/Payments.tsx:606, resources/js/pages/RecurringRuleForm.tsx:273, resources/js/pages/RecurringRuleForm.tsx:275, resources/js/pages/RecurringRulesPage.tsx:385, resources/js/pages/Reviews.tsx:421, resources/js/pages/TravelerCategories.tsx:580, resources/js/pages/TripConsent.tsx:585, resources/js/pages/Trips.tsx:1367, resources/js/pages/Whatsapp.tsx:1200
 #: assets/admin/dist/js/app.js
 msgid "Edit"
 msgstr ""
@@ -7465,12 +7542,12 @@ msgstr ""
 msgid "Edit and customize all system email templates with your branding."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:722
+# Source: resources/js/pages/ChannelManager.tsx:749
 #: assets/admin/dist/js/app.js
 msgid "Edit channel"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1871
+# Source: resources/js/pages/ChannelManager.tsx:1941
 #: assets/admin/dist/js/app.js
 msgid "Edit mapping"
 msgstr ""
@@ -7480,7 +7557,7 @@ msgstr ""
 msgid "Edit slug"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1580
+# Source: resources/js/pages/ChannelManager.tsx:1619
 #: assets/admin/dist/js/app.js
 msgid "Edit this mapping"
 msgstr ""
@@ -7682,7 +7759,7 @@ msgstr ""
 msgid "Emergency contact phone number"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1425
+# Source: resources/js/pages/ChannelManager.tsx:1464
 #: assets/admin/dist/js/app.js
 msgid "Enable"
 msgstr ""
@@ -7787,7 +7864,7 @@ msgstr ""
 msgid "Enable the AI Assistant module first, then turn this on."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:350
+# Source: resources/js/pages/ChannelManager.tsx:351
 #: assets/admin/dist/js/app.js
 msgid "Enable the Channel Manager module"
 msgstr ""
@@ -7807,12 +7884,12 @@ msgstr ""
 msgid "Enable the Google Analytics 4 module under Modules and add your Measurement ID in Settings to start tracking conversion events."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:288
+# Source: resources/js/pages/Whatsapp.tsx:306
 #: assets/admin/dist/js/app.js
 msgid "Enable the WhatsApp Notifications module"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:777
+# Source: resources/js/pages/ChannelManager.tsx:804
 #: assets/admin/dist/js/app.js
 msgid "Enable the channel before syncing."
 msgstr ""
@@ -7827,7 +7904,7 @@ msgstr ""
 msgid "Enable this tab to select an icon"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1772
+# Source: resources/js/pages/Whatsapp.tsx:1986
 #: assets/admin/dist/js/app.js
 msgid "Enable widget"
 msgstr ""
@@ -7837,7 +7914,7 @@ msgstr ""
 msgid "Enable wishlist (saved trips)"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1142, resources/js/pages/ChannelManager.tsx:515, resources/js/pages/ChannelManager.tsx:996, resources/js/pages/Modules.tsx:506, resources/js/pages/Reports.tsx:1802, resources/js/pages/TripConsentForm.tsx:1207, resources/js/pages/TripForm.tsx:7108, resources/js/pages/TripForm.tsx:8752
+# Source: resources/js/components/Layout.tsx:1142, resources/js/pages/ChannelManager.tsx:526, resources/js/pages/ChannelManager.tsx:1023, resources/js/pages/Modules.tsx:506, resources/js/pages/Reports.tsx:1802, resources/js/pages/TripConsentForm.tsx:1207, resources/js/pages/TripForm.tsx:7108, resources/js/pages/TripForm.tsx:8752
 #: assets/admin/dist/js/app.js
 msgid "Enabled"
 msgstr ""
@@ -7852,7 +7929,7 @@ msgstr ""
 msgid "Enabled: {modules}"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:444
+# Source: resources/js/pages/Whatsapp.tsx:463
 #: assets/admin/dist/js/app.js
 msgid "Encrypted credentials Meta requires for the plugin to send messages on your behalf. Stored with libsodium AEAD; the browser only ever sees a masked last-4 hint."
 msgstr ""
@@ -7986,7 +8063,7 @@ msgstr ""
 msgid "Enter a Pixel name and enter your website URL"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1583
+# Source: resources/js/pages/Whatsapp.tsx:1797
 #: assets/admin/dist/js/app.js
 msgid "Enter a destination phone number."
 msgstr ""
@@ -8414,7 +8491,7 @@ msgstr ""
 
 # Source: resources/js/components/shared/Table.tsx:84
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:842
+#: app/Providers/FrontendAssetsProvider.php:856
 msgid "Error loading data"
 msgstr ""
 
@@ -8513,7 +8590,7 @@ msgstr ""
 msgid "Essential analytics for your travel booking business."
 msgstr ""
 
-# Source: resources/js/components/email/EmailTemplatesList.tsx:566, resources/js/components/email/EmailTemplatesList.tsx:735, resources/js/pages/EmailTemplateForm.tsx:1171, resources/js/pages/Whatsapp.tsx:904
+# Source: resources/js/components/email/EmailTemplatesList.tsx:566, resources/js/components/email/EmailTemplatesList.tsx:735, resources/js/pages/EmailTemplateForm.tsx:1171, resources/js/pages/Whatsapp.tsx:1104
 #: assets/admin/dist/js/app.js
 msgid "Event"
 msgstr ""
@@ -8553,17 +8630,27 @@ msgstr ""
 msgid "Every X Days"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2062
+# Source: resources/js/pages/ChannelManager.tsx:2132
 #: assets/admin/dist/js/app.js
 msgid "Every booking received from connected OTAs lands here. The flow is two-phase for safety: bookings are first staged (received), then promoted into the main booking list. Promoted bookings go through the same notifications, payments and reporting as direct sales."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1839
+# Source: resources/js/pages/Whatsapp.tsx:2053
 #: assets/admin/dist/js/app.js
 msgid "Every frontend page"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2216
+# Source: resources/js/pages/Whatsapp.tsx:2226
+#: assets/admin/dist/js/app.js
+msgid "Every outbound send and inbound reply, filterable by status or phone. Updated every 15 seconds."
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:2454
+#: assets/admin/dist/js/app.js
+msgid "Every phone number that's opted into WhatsApp messaging, plus those that opted out via inbound STOP keyword. Export this list for GDPR / privacy requests."
+msgstr ""
+
+# Source: resources/js/pages/ChannelManager.tsx:2286
 #: assets/admin/dist/js/app.js
 msgid "Every push (you → channel), pull (channel → you), and inbound webhook from the last 90 days. Filter by failed status when debugging a sync; the error column carries the exact response from the OTA's API."
 msgstr ""
@@ -8687,12 +8774,12 @@ msgstr ""
 msgid "Expiry date must be after the valid from date"
 msgstr ""
 
-# Source: resources/js/pages/Reports.tsx:2291
+# Source: resources/js/pages/Reports.tsx:2291, resources/js/pages/Whatsapp.tsx:2467
 #: assets/admin/dist/js/app.js
 msgid "Export CSV"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1498
+# Source: resources/js/pages/ChannelManager.tsx:1537
 #: assets/admin/dist/js/app.js
 msgid "External product"
 msgstr ""
@@ -8729,7 +8816,7 @@ msgstr ""
 msgid "Facebook Pixel Not Configured"
 msgstr ""
 
-# Source: resources/js/pages/BookingForm.tsx:1724, resources/js/pages/PaymentForm.tsx:523, resources/js/pages/Payments.tsx:237, resources/js/pages/Payments.tsx:448, resources/js/pages/Payments.tsx:864, resources/js/pages/ViewPayment.tsx:159, resources/js/pages/account/utils.ts:110
+# Source: resources/js/pages/BookingForm.tsx:1724, resources/js/pages/PaymentForm.tsx:523, resources/js/pages/Payments.tsx:237, resources/js/pages/Payments.tsx:448, resources/js/pages/Payments.tsx:864, resources/js/pages/ViewPayment.tsx:159, resources/js/pages/Whatsapp.tsx:2258, resources/js/pages/account/utils.ts:110
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/account-page.js:71
 msgid "Failed"
@@ -8773,6 +8860,11 @@ msgstr ""
 # Source: resources/js/pages/GoogleCalendar.tsx:71
 #: assets/admin/dist/js/app.js
 msgid "Failed to connect to Google Calendar"
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:732
+#: assets/admin/dist/js/app.js
+msgid "Failed to copy to clipboard."
 msgstr ""
 
 # Source: resources/js/hooks/useWordPressMedia.ts:184
@@ -9457,7 +9549,7 @@ msgstr ""
 msgid "Failed to validate Measurement ID."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2439
+# Source: resources/js/pages/ChannelManager.tsx:2509
 #: assets/admin/dist/js/app.js
 msgid "Failing"
 msgstr ""
@@ -9588,6 +9680,16 @@ msgstr ""
 msgid "Filter by plan"
 msgstr ""
 
+# Source: resources/js/pages/Whatsapp.tsx:2250
+#: assets/admin/dist/js/app.js
+msgid "Filter by status"
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:2488
+#: assets/admin/dist/js/app.js
+msgid "Filter opt-in status"
+msgstr ""
+
 # Source: resources/js/pages/Attributes.tsx:364, resources/js/pages/Attributes.tsx:725
 #: assets/admin/dist/js/app.js
 #: templates/listing-trip.php:140
@@ -9674,7 +9776,7 @@ msgstr ""
 
 # Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:575, resources/js/pages/Itinerary.tsx:2193, resources/js/pages/Trips.tsx:519, resources/js/pages/account/SavedTrips.tsx:174
 #: assets/admin/dist/js/app.js
-#: app/Repositories/SavedTripRepository.php:265
+#: app/Repositories/SavedTripRepository.php:344
 #: app/Repositories/TripRepository.php:3341
 #: includes/helpers.php:465
 #: includes/helpers.php:2052
@@ -9734,7 +9836,7 @@ msgstr ""
 msgid "For PHP-level debug output, use WordPress wp-config.php (WP_DEBUG). The options below are implemented by the plugin."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:224
+# Source: resources/js/pages/ChannelManager.tsx:225
 #: assets/admin/dist/js/app.js
 msgid "For each trip you want to sell on that OTA, link it to its counterpart product on their side. One trip can map to many channels with different prices and inventory rules."
 msgstr ""
@@ -9823,7 +9925,7 @@ msgstr ""
 
 # Source: resources/js/pages/Modules.tsx:74
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:847
+#: app/Providers/FrontendAssetsProvider.php:861
 msgid "Free"
 msgstr ""
 
@@ -9848,7 +9950,7 @@ msgstr ""
 #: templates/listing-activity.php:246
 #: templates/partials/single-trip/content-sidebar.php:79
 #: templates/partials/single-trip/content-sidebar.php:142
-#: templates/partials/single-trip/similar-trips.php:254
+#: templates/partials/single-trip/similar-trips.php:256
 #: templates/shortcodes/activity.php:101
 #: templates/shortcodes/destination.php:93
 #: templates/shortcodes/trip-category.php:88
@@ -9918,7 +10020,7 @@ msgstr ""
 msgid "Frontend Tabs Management"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:152
+# Source: resources/js/pages/Whatsapp.tsx:165
 #: assets/admin/dist/js/app.js
 msgid "Frontend widget"
 msgstr ""
@@ -10396,12 +10498,12 @@ msgstr ""
 msgid "Have AI draft an entire trip — details, itinerary, SEO — from a few setup questions."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:461
+# Source: resources/js/pages/ChannelManager.tsx:472
 #: assets/admin/dist/js/app.js
 msgid "Health"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2436
+# Source: resources/js/pages/ChannelManager.tsx:2506
 #: assets/admin/dist/js/app.js
 msgid "Healthy"
 msgstr ""
@@ -10431,7 +10533,7 @@ msgid ""
 "We noticed you started booking {trip_name} but didn't complete it..."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1807
+# Source: resources/js/pages/Whatsapp.tsx:2021
 #: assets/admin/dist/js/app.js
 msgid "Hi! I'd like to know more about {{trip_name}}."
 msgstr ""
@@ -10476,7 +10578,7 @@ msgstr ""
 msgid "Hide this menu item"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1128
+# Source: resources/js/pages/ChannelManager.tsx:1155
 #: assets/admin/dist/js/app.js
 msgid "Hide value"
 msgstr ""
@@ -10611,7 +10713,7 @@ msgstr ""
 msgid "How each pricing rule is performing"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:625
+# Source: resources/js/pages/Whatsapp.tsx:646
 #: assets/admin/dist/js/app.js
 msgid "How far before / after a trip the time-based templates fire. Clamped 1–168 hours."
 msgstr ""
@@ -10661,7 +10763,7 @@ msgstr ""
 msgid "How often to recalculate demand scores"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:923
+# Source: resources/js/pages/ChannelManager.tsx:950
 #: assets/admin/dist/js/app.js
 msgid "How prices and seat counts on this channel differ from your base trip. These apply across every trip mapped to this channel — individual mappings can override on a per-trip basis."
 msgstr ""
@@ -10686,12 +10788,12 @@ msgstr ""
 msgid "How the email will look"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:873
+# Source: resources/js/pages/ChannelManager.tsx:900
 #: assets/admin/dist/js/app.js
 msgid "How this channel appears in the admin UI. Leave blank to use the OTA's name."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1911
+# Source: resources/js/pages/ChannelManager.tsx:1981
 #: assets/admin/dist/js/app.js
 msgid "How this trip maps to the channel's product. Updating the external product ID re-points subsequent syncs but does not retroactively affect bookings already received."
 msgstr ""
@@ -10757,7 +10859,7 @@ msgstr ""
 msgid "IP Address"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:901
+# Source: resources/js/pages/ChannelManager.tsx:928
 #: assets/admin/dist/js/app.js
 msgid "ISO 4217 code (e.g. USD, EUR, GBP). Must match the currency your products are priced in on the OTA — mismatches cause failed pricing pushes."
 msgstr ""
@@ -10807,7 +10909,7 @@ msgstr ""
 msgid "If you set both Minimum and Maximum, the rule applies only inside that window (Minimum ≤ days before departure ≤ Maximum)."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1225
+# Source: resources/js/pages/ChannelManager.tsx:1252
 #: assets/admin/dist/js/app.js
 msgid "If your site is behind a firewall or VPN, make sure this URL is reachable from the public internet — otherwise the OTA's webhook deliveries will time out and you'll only get bookings on the next hourly cron tick."
 msgstr ""
@@ -10827,12 +10929,12 @@ msgstr ""
 msgid "Immediately"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1938
+# Source: resources/js/pages/ChannelManager.tsx:2008
 #: assets/admin/dist/js/app.js
 msgid "Immutable. One trip per channel."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1921
+# Source: resources/js/pages/ChannelManager.tsx:1991
 #: assets/admin/dist/js/app.js
 msgid "Immutable. To move this trip to a different channel, delete this mapping and create a new one."
 msgstr ""
@@ -10899,7 +11001,7 @@ msgstr ""
 msgid "Inactive Rules"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1203
+# Source: resources/js/pages/ChannelManager.tsx:1230
 #: assets/admin/dist/js/app.js
 msgid "Inbound webhook URL"
 msgstr ""
@@ -11002,7 +11104,7 @@ msgstr ""
 msgid "Integration"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:739
+# Source: resources/js/pages/ChannelManager.tsx:766
 #: assets/admin/dist/js/app.js
 msgid "Integration docs"
 msgstr ""
@@ -11125,12 +11227,12 @@ msgstr ""
 msgid "Inventory Management"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:233
+# Source: resources/js/pages/ChannelManager.tsx:234
 #: assets/admin/dist/js/app.js
 msgid "Inventory and pricing push within seconds of any change. Bookings arrive via webhook, are staged for safety, then promoted into the standard booking list — instantly visible everywhere else."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:966
+# Source: resources/js/pages/ChannelManager.tsx:993
 #: assets/admin/dist/js/app.js
 msgid "Inventory buffer (seats)"
 msgstr ""
@@ -11499,7 +11601,7 @@ msgstr ""
 msgid "Landmark Name"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1447
+# Source: resources/js/pages/Whatsapp.tsx:1661
 #: assets/admin/dist/js/app.js
 msgid "Language code"
 msgstr ""
@@ -11561,7 +11663,7 @@ msgstr ""
 msgid "Last Updated"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:464, resources/js/pages/ChannelManager.tsx:1501
+# Source: resources/js/pages/ChannelManager.tsx:475, resources/js/pages/ChannelManager.tsx:1540
 #: assets/admin/dist/js/app.js
 msgid "Last sync"
 msgstr ""
@@ -11586,7 +11688,7 @@ msgstr ""
 msgid "Last updated a few minutes ago — refreshes when something material changes."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2421
+# Source: resources/js/pages/ChannelManager.tsx:2491
 #: assets/admin/dist/js/app.js
 msgid "Last {total}: {ok} OK, {fail} failed."
 msgstr ""
@@ -11667,7 +11769,7 @@ msgstr ""
 msgid "Leave blank to keep the default Yatra blue."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1875
+# Source: resources/js/pages/Whatsapp.tsx:2089
 #: assets/admin/dist/js/app.js
 msgid "Leave blank to show only the WhatsApp icon."
 msgstr ""
@@ -11805,7 +11907,7 @@ msgstr ""
 msgid "Link expiry (hours)"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1728
+# Source: resources/js/pages/ChannelManager.tsx:1798
 #: assets/admin/dist/js/app.js
 msgid "Link to the channel's public listing for this product. Shown as a quick-jump link in the mappings table so you can verify changes after syncing."
 msgstr ""
@@ -11825,7 +11927,7 @@ msgstr ""
 msgid "Listing URL:"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:503
+# Source: resources/js/pages/ChannelManager.tsx:514
 #: assets/admin/dist/js/app.js
 msgid "Live"
 msgstr ""
@@ -11887,7 +11989,7 @@ msgstr ""
 
 # Source: resources/js/components/dashboard/PendingPayments.tsx:62, resources/js/components/dashboard/RecentBookings.tsx:74, resources/js/components/dashboard/SystemAlerts.tsx:56, resources/js/components/dashboard/UpcomingDepartures.tsx:62, resources/js/pages/CustomerForm.tsx:272, resources/js/pages/ItemForm.tsx:263, resources/js/pages/PastDepartures.tsx:193, resources/js/pages/ViewCustomer.tsx:347
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:840
+#: app/Providers/FrontendAssetsProvider.php:854
 #: templates/partials/single-trip/content-itinerary.php:396
 #: templates/partials/single-trip/gallery-modal.php:29
 #: assets/js/trip.js:2136
@@ -11959,7 +12061,7 @@ msgstr ""
 
 # Source: resources/js/components/Layout.tsx:1326, resources/js/pages/AccountPage.tsx:550
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:828
+#: app/Providers/FrontendAssetsProvider.php:842
 #: app/Shortcodes/LoginShortcode.php:155
 #: assets/dist/js/account-page.js:3271
 msgid "Logout"
@@ -12265,37 +12367,37 @@ msgstr ""
 msgid "Map Yatra customer fields to Mailchimp merge fields. This controls what data is synced when a customer is added to your list."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1477
+# Source: resources/js/pages/ChannelManager.tsx:1516
 #: assets/admin/dist/js/app.js
 msgid "Map each trip you want to sell on a channel to its counterpart product on that channel's side."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:223
+# Source: resources/js/pages/ChannelManager.tsx:224
 #: assets/admin/dist/js/app.js
 msgid "Map your trips"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1656
+# Source: resources/js/pages/ChannelManager.tsx:1726
 #: assets/admin/dist/js/app.js
 msgid "Mapping created."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1275
+# Source: resources/js/pages/ChannelManager.tsx:1309
 #: assets/admin/dist/js/app.js
 msgid "Mapping deleted."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1909
+# Source: resources/js/pages/ChannelManager.tsx:1979
 #: assets/admin/dist/js/app.js
 msgid "Mapping link"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1850
+# Source: resources/js/pages/ChannelManager.tsx:1920
 #: assets/admin/dist/js/app.js
 msgid "Mapping saved."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1263
+# Source: resources/js/pages/ChannelManager.tsx:1297
 #: assets/admin/dist/js/app.js
 msgid "Mapping synced."
 msgstr ""
@@ -12687,12 +12789,12 @@ msgstr ""
 msgid "Message"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1460
+# Source: resources/js/pages/Whatsapp.tsx:1674
 #: assets/admin/dist/js/app.js
 msgid "Message body"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:153, resources/js/pages/Whatsapp.tsx:1988
+# Source: resources/js/pages/Whatsapp.tsx:166, resources/js/pages/Whatsapp.tsx:2223
 #: assets/admin/dist/js/app.js
 msgid "Message logs"
 msgstr ""
@@ -12717,7 +12819,7 @@ msgstr ""
 msgid "Meta description for the trip archive page. Should be 150-160 characters for best SEO results."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1437
+# Source: resources/js/pages/Whatsapp.tsx:1651
 #: assets/admin/dist/js/app.js
 msgid "Meta template name"
 msgstr ""
@@ -12725,6 +12827,11 @@ msgstr ""
 # Source: resources/js/pages/Settings.tsx:7906
 #: assets/admin/dist/js/app.js
 msgid "Meta title for the trip archive page. This will appear in search engine results for /trip/ page."
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:743
+#: assets/admin/dist/js/app.js
+msgid "Meta webhook setup"
 msgstr ""
 
 # Source: resources/js/pages/Payments.tsx:485, resources/js/pages/Payments.tsx:568
@@ -12855,7 +12962,7 @@ msgstr ""
 msgid "Missing security token. Reload the account page and try again."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:462
+# Source: resources/js/pages/ChannelManager.tsx:473
 #: assets/admin/dist/js/app.js
 msgid "Mode"
 msgstr ""
@@ -13016,7 +13123,7 @@ msgstr ""
 msgid "N/A"
 msgstr ""
 
-# Source: resources/js/pages/AbandonedRecovery.tsx:662, resources/js/pages/AbandonedRecovery.tsx:1452, resources/js/pages/Activities.tsx:122, resources/js/pages/Activities.tsx:643, resources/js/pages/ActivityForm.tsx:403, resources/js/pages/AdditionalServices.tsx:395, resources/js/pages/AttributeForm.tsx:713, resources/js/pages/Attributes.tsx:670, resources/js/pages/Categories.tsx:592, resources/js/pages/Categories.tsx:1031, resources/js/pages/CategoryForm.tsx:476, resources/js/pages/Customers.tsx:449, resources/js/pages/DestinationForm.tsx:408, resources/js/pages/Destinations.tsx:463, resources/js/pages/DifficultyLevelForm.tsx:318, resources/js/pages/DifficultyLevels.tsx:95, resources/js/pages/DifficultyLevels.tsx:641, resources/js/pages/DifficultyLevels.tsx:693, resources/js/pages/DynamicPricing.tsx:509, resources/js/pages/Enquiries.tsx:541, resources/js/pages/EnquiryForm.tsx:281, resources/js/pages/ItemTypes.tsx:858, resources/js/pages/Items.tsx:840, resources/js/pages/TripConsent.tsx:393, resources/js/pages/ViewCustomer.tsx:552, resources/js/pages/Whatsapp.tsx:901
+# Source: resources/js/pages/AbandonedRecovery.tsx:662, resources/js/pages/AbandonedRecovery.tsx:1452, resources/js/pages/Activities.tsx:122, resources/js/pages/Activities.tsx:643, resources/js/pages/ActivityForm.tsx:403, resources/js/pages/AdditionalServices.tsx:395, resources/js/pages/AttributeForm.tsx:713, resources/js/pages/Attributes.tsx:670, resources/js/pages/Categories.tsx:592, resources/js/pages/Categories.tsx:1031, resources/js/pages/CategoryForm.tsx:476, resources/js/pages/Customers.tsx:449, resources/js/pages/DestinationForm.tsx:408, resources/js/pages/Destinations.tsx:463, resources/js/pages/DifficultyLevelForm.tsx:318, resources/js/pages/DifficultyLevels.tsx:95, resources/js/pages/DifficultyLevels.tsx:641, resources/js/pages/DifficultyLevels.tsx:693, resources/js/pages/DynamicPricing.tsx:509, resources/js/pages/Enquiries.tsx:541, resources/js/pages/EnquiryForm.tsx:281, resources/js/pages/ItemTypes.tsx:858, resources/js/pages/Items.tsx:840, resources/js/pages/TripConsent.tsx:393, resources/js/pages/ViewCustomer.tsx:552, resources/js/pages/Whatsapp.tsx:1101
 #: assets/admin/dist/js/app.js
 #: templates/pdf/itinerary.php:346
 msgid "Name"
@@ -13118,7 +13225,7 @@ msgstr ""
 msgid "New Trip"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1665
+# Source: resources/js/pages/ChannelManager.tsx:1735
 #: assets/admin/dist/js/app.js
 msgid "New trip mapping"
 msgstr ""
@@ -13218,7 +13325,7 @@ msgstr ""
 msgid "No activities found"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2235
+# Source: resources/js/pages/ChannelManager.tsx:2305
 #: assets/admin/dist/js/app.js
 msgid "No activity yet — enable a channel and create a mapping to start seeing events here."
 msgstr ""
@@ -13284,12 +13391,12 @@ msgstr ""
 msgid "No categories found"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2102
+# Source: resources/js/pages/ChannelManager.tsx:2172
 #: assets/admin/dist/js/app.js
 msgid "No channel bookings yet"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:582
+# Source: resources/js/pages/ChannelManager.tsx:609
 #: assets/admin/dist/js/app.js
 msgid "No channels yet"
 msgstr ""
@@ -13322,7 +13429,7 @@ msgstr ""
 
 # Source: resources/js/components/charts/SimpleBarChart.tsx:34, resources/js/components/charts/SimpleLineChart.tsx:37, resources/js/components/charts/SimplePieChart.tsx:36, resources/js/components/charts/SimplePieChart.tsx:45
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:841
+#: app/Providers/FrontendAssetsProvider.php:855
 msgid "No data available"
 msgstr ""
 
@@ -13493,7 +13600,7 @@ msgstr ""
 msgid "No landmarks added yet"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1469
+# Source: resources/js/pages/ChannelManager.tsx:1508
 #: assets/admin/dist/js/app.js
 msgid "No mappings yet"
 msgstr ""
@@ -13508,9 +13615,14 @@ msgstr ""
 msgid "No merge fields available. Please select a list first."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1994
+# Source: resources/js/pages/Whatsapp.tsx:2284
 #: assets/admin/dist/js/app.js
-msgid "No messages sent yet"
+msgid "No messages match your filters."
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:2283
+#: assets/admin/dist/js/app.js
+msgid "No messages sent yet."
 msgstr ""
 
 # Source: resources/js/pages/Modules.tsx:460
@@ -13529,6 +13641,11 @@ msgstr ""
 msgid "No new notifications"
 msgstr ""
 
+# Source: resources/js/pages/Whatsapp.tsx:2517
+#: assets/admin/dist/js/app.js
+msgid "No opt-in records yet. Records appear here when customers tick the WhatsApp opt-in on a booking form, or reply STOP to opt out."
+msgstr ""
+
 # Source: resources/js/components/ui/multi-select.tsx:168, resources/js/components/ui/searchable-select.tsx:222
 #: assets/admin/dist/js/app.js
 msgid "No options found"
@@ -13539,7 +13656,7 @@ msgstr ""
 msgid "No options. Click \"Add Option\" to add dropdown choices."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:248
+# Source: resources/js/pages/ChannelManager.tsx:249
 #: assets/admin/dist/js/app.js
 msgid "No overbooking"
 msgstr ""
@@ -13590,7 +13707,7 @@ msgstr ""
 msgid "No prompts available."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2425
+# Source: resources/js/pages/ChannelManager.tsx:2495
 #: assets/admin/dist/js/app.js
 msgid "No recent activity."
 msgstr ""
@@ -13598,6 +13715,11 @@ msgstr ""
 # Source: resources/js/components/dashboard/RecentBookings.tsx:137
 #: assets/admin/dist/js/app.js
 msgid "No recent bookings"
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:2521
+#: assets/admin/dist/js/app.js
+msgid "No records match your search."
 msgstr ""
 
 # Source: resources/js/components/availability/RecurringRules.tsx:855, resources/js/pages/RecurringRulesPage.tsx:632
@@ -13657,7 +13779,7 @@ msgstr ""
 msgid "No templates found"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:927
+# Source: resources/js/pages/Whatsapp.tsx:1127
 #: assets/admin/dist/js/app.js
 msgid "No templates yet — click Add custom template."
 msgstr ""
@@ -13871,12 +13993,12 @@ msgstr ""
 msgid "Number of travelers must be at least 1"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1696
+# Source: resources/js/pages/ChannelManager.tsx:1766
 #: assets/admin/dist/js/app.js
 msgid "Numeric ID of the trip in this site's trip list. Find it in the URL when editing the trip (the ?id= or post=… value)."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:508
+# Source: resources/js/pages/Whatsapp.tsx:529
 #: assets/admin/dist/js/app.js
 msgid "Numeric IDs from Meta + the admin phone that receives operator-recipient templates."
 msgstr ""
@@ -13907,17 +14029,17 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:852
+# Source: resources/js/pages/ChannelManager.tsx:879
 #: assets/admin/dist/js/app.js
 msgid "OTA channel"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:197
+# Source: resources/js/pages/ChannelManager.tsx:198
 #: assets/admin/dist/js/app.js
 msgid "OTAs (Online Travel Agencies) — Viator, GetYourGuide, Klook, TripAdvisor, Airbnb Experiences — drive 30–60% of bookings for most tour operators. Managing them by hand means updating inventory and prices in multiple dashboards, copy-pasting bookings between systems, and risking overbooking when seats sell on two channels at once."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:244
+# Source: resources/js/pages/ChannelManager.tsx:245
 #: assets/admin/dist/js/app.js
 msgid "OTAs market your trips to millions of travelers worldwide."
 msgstr ""
@@ -13937,7 +14059,7 @@ msgstr ""
 msgid "October"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1775
+# Source: resources/js/pages/Whatsapp.tsx:1989
 #: assets/admin/dist/js/app.js
 msgid "Off by default. When on, renders per the display rules below."
 msgstr ""
@@ -13967,7 +14089,7 @@ msgstr ""
 msgid "Offer tiered pricing based on group size and booking volume."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1499
+# Source: resources/js/pages/ChannelManager.tsx:1538
 #: assets/admin/dist/js/app.js
 msgid "Offset"
 msgstr ""
@@ -13998,7 +14120,7 @@ msgstr ""
 msgid "Once Daily"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1358
+# Source: resources/js/pages/ChannelManager.tsx:1397
 #: assets/admin/dist/js/app.js
 msgid "Once mapped, every change to your trip's availability or price triggers a sync within seconds. Use the per-mapping offset to override the channel default when one trip needs different pricing logic."
 msgstr ""
@@ -14099,12 +14221,12 @@ msgstr ""
 msgid "Open Google Analytics →"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:364, resources/js/pages/EmailAutomation.tsx:505, resources/js/pages/Reports.tsx:1019, resources/js/pages/Reports.tsx:1609, resources/js/pages/Whatsapp.tsx:305
+# Source: resources/js/pages/ChannelManager.tsx:365, resources/js/pages/EmailAutomation.tsx:505, resources/js/pages/Reports.tsx:1019, resources/js/pages/Reports.tsx:1609, resources/js/pages/Whatsapp.tsx:323
 #: assets/admin/dist/js/app.js
 msgid "Open Modules"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:429
+# Source: resources/js/pages/Whatsapp.tsx:448
 #: assets/admin/dist/js/app.js
 msgid "Open WhatsApp Manager"
 msgstr ""
@@ -14114,7 +14236,7 @@ msgstr ""
 msgid "OpenStreetMap Integration"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2247
+# Source: resources/js/pages/ChannelManager.tsx:2317
 #: assets/admin/dist/js/app.js
 msgid "Operation"
 msgstr ""
@@ -14134,17 +14256,27 @@ msgstr ""
 msgid "Operations summary"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:602
+# Source: resources/js/pages/Whatsapp.tsx:2451
+#: assets/admin/dist/js/app.js
+msgid "Opt-in audit"
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:623
 #: assets/admin/dist/js/app.js
 msgid "Opt-in checkbox copy"
 msgstr ""
 
-# Source: resources/js/pages/ViewCustomer.tsx:868
+# Source: resources/js/pages/Whatsapp.tsx:167
+#: assets/admin/dist/js/app.js
+msgid "Opt-ins"
+msgstr ""
+
+# Source: resources/js/pages/ViewCustomer.tsx:868, resources/js/pages/Whatsapp.tsx:2492, resources/js/pages/Whatsapp.tsx:2545
 #: assets/admin/dist/js/app.js
 msgid "Opted in"
 msgstr ""
 
-# Source: resources/js/pages/ViewCustomer.tsx:869
+# Source: resources/js/pages/ViewCustomer.tsx:869, resources/js/pages/Whatsapp.tsx:2493, resources/js/pages/Whatsapp.tsx:2550
 #: assets/admin/dist/js/app.js
 msgid "Opted out"
 msgstr ""
@@ -14209,7 +14341,7 @@ msgstr ""
 msgid "Optional maximum discount cap. For example, if discount is 20% with max $500, a $5000 booking gets $500 off (not $1000)."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:887
+# Source: resources/js/pages/ChannelManager.tsx:914
 #: assets/admin/dist/js/app.js
 msgid "Optional note shown in logs and reports. Useful when you run multiple accounts on the same OTA (e.g. 'US production', 'EU staging')."
 msgstr ""
@@ -14224,7 +14356,7 @@ msgstr ""
 msgid "Optional transaction ID or reference number from the payment gateway."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:486
+# Source: resources/js/pages/Whatsapp.tsx:505
 #: assets/admin/dist/js/app.js
 msgid "Optional — only needed when receiving messages."
 msgstr ""
@@ -14348,12 +14480,12 @@ msgstr ""
 msgid "Override the default trip price for this specific departure"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1974
+# Source: resources/js/pages/ChannelManager.tsx:2044
 #: assets/admin/dist/js/app.js
 msgid "Overrides the channel's default offset for this trip only. 0 inherits the channel default."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1742
+# Source: resources/js/pages/ChannelManager.tsx:1812
 #: assets/admin/dist/js/app.js
 msgid "Overrides the channel's default offset for this trip only. Use 0 to inherit the channel default. Set positive to mark up, negative to discount."
 msgstr ""
@@ -14508,7 +14640,7 @@ msgstr ""
 msgid "Paste secret from GA4"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1114
+# Source: resources/js/pages/ChannelManager.tsx:1141
 #: assets/admin/dist/js/app.js
 msgid "Paste the credential value…"
 msgstr ""
@@ -14518,7 +14650,12 @@ msgstr ""
 msgid "Paste the full URL from YouTube or Vimeo. The video will be embedded on your trip page."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1206
+# Source: resources/js/pages/Whatsapp.tsx:746
+#: assets/admin/dist/js/app.js
+msgid "Paste these values into your Meta app → WhatsApp → Configuration → Webhooks. Once verified, Meta will deliver message status callbacks (sent / delivered / read / failed) and inbound replies here."
+msgstr ""
+
+# Source: resources/js/pages/ChannelManager.tsx:1233
 #: assets/admin/dist/js/app.js
 msgid "Paste this URL into the OTA's partner portal under booking notifications. Whenever a booking is made on the OTA, they POST it here and it appears in the Bookings inbox seconds later. The endpoint verifies the request signature, so only the OTA can deliver to it."
 msgstr ""
@@ -14528,17 +14665,17 @@ msgstr ""
 msgid "Pattern"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1434
+# Source: resources/js/pages/ChannelManager.tsx:1473
 #: assets/admin/dist/js/app.js
 msgid "Pause"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1994
+# Source: resources/js/pages/ChannelManager.tsx:2064
 #: assets/admin/dist/js/app.js
 msgid "Pause or partially-sync this mapping without losing its configuration. Pausing keeps all settings; flipping it back resumes from where it left off."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1566, resources/js/pages/EmailAutomation.tsx:168, resources/js/pages/EmailSequenceForm.tsx:431, resources/js/pages/EmailSequenceForm.tsx:896, resources/js/pages/RecurringRulesPage.tsx:288, resources/js/pages/RecurringRulesPage.tsx:541
+# Source: resources/js/pages/ChannelManager.tsx:1605, resources/js/pages/EmailAutomation.tsx:168, resources/js/pages/EmailSequenceForm.tsx:431, resources/js/pages/EmailSequenceForm.tsx:896, resources/js/pages/RecurringRulesPage.tsx:288, resources/js/pages/RecurringRulesPage.tsx:541
 #: assets/admin/dist/js/app.js
 msgid "Paused"
 msgstr ""
@@ -14652,7 +14789,7 @@ msgstr ""
 
 # Source: resources/js/pages/BookingForm.tsx:1734, resources/js/pages/PaymentForm.tsx:505, resources/js/pages/ViewBooking.tsx:1230, resources/js/pages/account/BookingDetails.tsx:850
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:836
+#: app/Providers/FrontendAssetsProvider.php:850
 #: assets/dist/js/account-page.js:1522
 msgid "Payment Status"
 msgstr ""
@@ -14844,7 +14981,7 @@ msgstr ""
 msgid "Per trip · per day"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:254
+# Source: resources/js/pages/ChannelManager.tsx:255
 #: assets/admin/dist/js/app.js
 msgid "Per-channel offsets cover commission while keeping margins."
 msgstr ""
@@ -14854,7 +14991,7 @@ msgstr ""
 msgid "Per-customer usage limit must be a positive number or 0 for unlimited"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1741, resources/js/pages/ChannelManager.tsx:1973
+# Source: resources/js/pages/ChannelManager.tsx:1811, resources/js/pages/ChannelManager.tsx:2043
 #: assets/admin/dist/js/app.js
 msgid "Per-mapping price offset (%)"
 msgstr ""
@@ -14930,7 +15067,7 @@ msgstr ""
 msgid "Permalink Settings"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:452
+# Source: resources/js/pages/Whatsapp.tsx:471
 #: assets/admin/dist/js/app.js
 msgid "Permanent access token"
 msgstr ""
@@ -14955,14 +15092,14 @@ msgstr ""
 msgid "Personal plan"
 msgstr ""
 
-# Source: resources/js/pages/AbandonedRecovery.tsx:679, resources/js/pages/AbandonedRecovery.tsx:1464, resources/js/pages/Departures.tsx:1267, resources/js/pages/EnquiryForm.tsx:307, resources/js/pages/ViewCustomer.tsx:561, resources/js/pages/Whatsapp.tsx:2005
+# Source: resources/js/pages/AbandonedRecovery.tsx:679, resources/js/pages/AbandonedRecovery.tsx:1464, resources/js/pages/Departures.tsx:1267, resources/js/pages/EnquiryForm.tsx:307, resources/js/pages/ViewCustomer.tsx:561, resources/js/pages/Whatsapp.tsx:2291, resources/js/pages/Whatsapp.tsx:2527
 #: assets/admin/dist/js/app.js
 #: app/Services/EmailTemplateDefaults.php:581
 #: templates/setup-wizard/business.php:39
 msgid "Phone"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1630
+# Source: resources/js/pages/Whatsapp.tsx:1844
 #: assets/admin/dist/js/app.js
 msgid "Phone (E.164)"
 msgstr ""
@@ -14980,7 +15117,7 @@ msgstr ""
 msgid "Phone number"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:517
+# Source: resources/js/pages/Whatsapp.tsx:538
 #: assets/admin/dist/js/app.js
 msgid "Phone number ID"
 msgstr ""
@@ -15018,7 +15155,7 @@ msgstr ""
 msgid "Physical difficulty level required for this trip"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1506
+# Source: resources/js/pages/Whatsapp.tsx:1720
 #: assets/admin/dist/js/app.js
 msgid "Pick a Trigger Event above to see the variables you can use here."
 msgstr ""
@@ -15033,7 +15170,7 @@ msgstr ""
 msgid "Pick a trigger event below to see the variables that apply to that event. Showing the full catalog until then."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1295
+# Source: resources/js/pages/Whatsapp.tsx:1509
 #: assets/admin/dist/js/app.js
 msgid "Pick an event…"
 msgstr ""
@@ -15053,7 +15190,7 @@ msgstr ""
 msgid "Pick primary color"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:853
+# Source: resources/js/pages/ChannelManager.tsx:880
 #: assets/admin/dist/js/app.js
 msgid "Pick the OTA you're connecting. Once a channel is created, this is locked — to switch OTAs you'd add a new channel."
 msgstr ""
@@ -15063,7 +15200,7 @@ msgstr ""
 msgid "Pick the sections to generate. AI runs them in parallel, then you review each result before anything touches the form."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:843
+# Source: resources/js/pages/ChannelManager.tsx:870
 #: assets/admin/dist/js/app.js
 msgid "Pick which OTA this connection is for and give it a friendly label."
 msgstr ""
@@ -15275,7 +15412,7 @@ msgstr ""
 msgid "Popular Service Types"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1844
+# Source: resources/js/pages/Whatsapp.tsx:2058
 #: assets/admin/dist/js/app.js
 msgid "Position"
 msgstr ""
@@ -15300,7 +15437,7 @@ msgstr ""
 msgid "Powerful Features"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1801
+# Source: resources/js/pages/Whatsapp.tsx:2015
 #: assets/admin/dist/js/app.js
 msgid "Pre-filled message"
 msgstr ""
@@ -15363,11 +15500,11 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/account-page.js:2378
 #: assets/dist/js/account-page.js:2380
-#: assets/js/trip.js:5346
+#: assets/js/trip.js:5343
 msgid "Preview"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1906
+# Source: resources/js/pages/Whatsapp.tsx:2120
 #: assets/admin/dist/js/app.js
 msgid "Preview URL the button will open"
 msgstr ""
@@ -15454,7 +15591,7 @@ msgstr ""
 
 # Source: resources/js/components/availability/AvailabilityCalendar.tsx:399, resources/js/components/availability/RecurringRules.tsx:471, resources/js/components/availability/RecurringRules.tsx:786, resources/js/components/trips/TripsTable.tsx:116, resources/js/pages/AdditionalServices.tsx:396, resources/js/pages/AdditionalServices.tsx:443, resources/js/pages/AdditionalServices.tsx:550, resources/js/pages/AdditionalServicesForm.tsx:479, resources/js/pages/Availability.tsx:858, resources/js/pages/Availability.tsx:1679, resources/js/pages/RecurringRuleForm.tsx:1686, resources/js/pages/RecurringRuleForm.tsx:2039, resources/js/pages/Trips.tsx:746, resources/js/pages/Trips.tsx:1096, resources/js/pages/Trips.tsx:1568
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:848
+#: app/Providers/FrontendAssetsProvider.php:862
 #: templates/partials/single-trip/quick-facts.php:113
 msgid "Price"
 msgstr ""
@@ -15525,7 +15662,7 @@ msgstr ""
 msgid "Pricing & Payment"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:921
+# Source: resources/js/pages/ChannelManager.tsx:948
 #: assets/admin/dist/js/app.js
 msgid "Pricing & inventory rules"
 msgstr ""
@@ -15804,7 +15941,7 @@ msgstr ""
 msgid "Public Chat Widget"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1752
+# Source: resources/js/pages/Whatsapp.tsx:1966
 #: assets/admin/dist/js/app.js
 msgid "Public WhatsApp widget"
 msgstr ""
@@ -15814,7 +15951,7 @@ msgstr ""
 msgid "Public catalog links and redirects use this WordPress page URL instead of the default Yatra taxonomy path."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1727, resources/js/pages/ChannelManager.tsx:1960
+# Source: resources/js/pages/ChannelManager.tsx:1797, resources/js/pages/ChannelManager.tsx:2030
 #: assets/admin/dist/js/app.js
 msgid "Public listing URL (optional)"
 msgstr ""
@@ -15864,27 +16001,27 @@ msgstr ""
 msgid "Purple"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1589
+# Source: resources/js/pages/ChannelManager.tsx:1628
 #: assets/admin/dist/js/app.js
 msgid "Push inventory + pricing now"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2021
+# Source: resources/js/pages/ChannelManager.tsx:2091
 #: assets/admin/dist/js/app.js
 msgid "Push prices to this channel. Turn off for channels that run their own promotions."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1769
+# Source: resources/js/pages/ChannelManager.tsx:1839
 #: assets/admin/dist/js/app.js
 msgid "Push prices to this channel. Turn off when prices are managed on the channel side (e.g. for promotions you control there)."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1760
+# Source: resources/js/pages/ChannelManager.tsx:1830
 #: assets/admin/dist/js/app.js
 msgid "Push seat availability to this channel. Turn off if you're using the channel's own inventory system instead."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2012
+# Source: resources/js/pages/ChannelManager.tsx:2082
 #: assets/admin/dist/js/app.js
 msgid "Push seat availability to this channel. Turn off when the channel manages its own inventory."
 msgstr ""
@@ -15904,6 +16041,11 @@ msgstr ""
 msgid "Question"
 msgstr ""
 
+# Source: resources/js/pages/Whatsapp.tsx:2254
+#: assets/admin/dist/js/app.js
+msgid "Queued"
+msgstr ""
+
 # Source: resources/js/lib/email-templates-catalog.ts:490
 #: assets/admin/dist/js/app.js
 msgid "Queued when a booking is marked completed, then sent after the delay in Review settings (if reviews are enabled)."
@@ -15920,7 +16062,7 @@ msgstr ""
 msgid "Quick Links"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1961
+# Source: resources/js/pages/ChannelManager.tsx:2031
 #: assets/admin/dist/js/app.js
 msgid "Quick-jump link shown in the mappings table."
 msgstr ""
@@ -15963,7 +16105,7 @@ msgstr ""
 msgid "Re-run this section"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:243
+# Source: resources/js/pages/ChannelManager.tsx:244
 #: assets/admin/dist/js/app.js
 msgid "Reach new customers"
 msgstr ""
@@ -15973,7 +16115,12 @@ msgstr ""
 msgid "Reacts to seats remaining on the chosen departure (works with time slots too)."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:599
+# Source: resources/js/pages/Whatsapp.tsx:2257
+#: assets/admin/dist/js/app.js
+msgid "Read"
+msgstr ""
+
+# Source: resources/js/pages/ChannelManager.tsx:626
 #: assets/admin/dist/js/app.js
 msgid "Read the setup guide"
 msgstr ""
@@ -15993,7 +16140,7 @@ msgstr ""
 msgid "Real-time insights for your travel business. Monitor performance, track bookings, and manage operations from one place."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:249
+# Source: resources/js/pages/ChannelManager.tsx:250
 #: assets/admin/dist/js/app.js
 msgid "Real-time inventory keeps stock in sync across every channel."
 msgstr ""
@@ -16023,9 +16170,14 @@ msgstr ""
 msgid "Receive marketing emails"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2123
+# Source: resources/js/pages/ChannelManager.tsx:2193
 #: assets/admin/dist/js/app.js
 msgid "Received"
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:2259
+#: assets/admin/dist/js/app.js
+msgid "Received (inbound)"
 msgstr ""
 
 # Source: resources/js/pages/AbandonedRecovery.tsx:1011
@@ -16049,7 +16201,7 @@ msgstr ""
 msgid "Recent pricing events"
 msgstr ""
 
-# Source: resources/js/components/email/EmailTemplatesList.tsx:637, resources/js/components/email/EmailTemplatesList.tsx:754, resources/js/pages/EmailAutomation.tsx:391, resources/js/pages/EmailTemplateForm.tsx:1227, resources/js/pages/Whatsapp.tsx:907, resources/js/pages/Whatsapp.tsx:1372
+# Source: resources/js/components/email/EmailTemplatesList.tsx:637, resources/js/components/email/EmailTemplatesList.tsx:754, resources/js/pages/EmailAutomation.tsx:391, resources/js/pages/EmailTemplateForm.tsx:1227, resources/js/pages/Whatsapp.tsx:1107, resources/js/pages/Whatsapp.tsx:1586
 #: assets/admin/dist/js/app.js
 msgid "Recipient"
 msgstr ""
@@ -16265,7 +16417,7 @@ msgstr ""
 msgid "Refunds issued"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:594
+# Source: resources/js/pages/Whatsapp.tsx:615
 #: assets/admin/dist/js/app.js
 msgid "Refuses sends to phone numbers that haven't explicitly opted in. Admin-recipient templates are exempt (the operator owns that number)."
 msgstr ""
@@ -16340,7 +16492,7 @@ msgstr ""
 msgid "Reminder days"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:622
+# Source: resources/js/pages/Whatsapp.tsx:643
 #: assets/admin/dist/js/app.js
 msgid "Reminder schedule"
 msgstr ""
@@ -16372,10 +16524,10 @@ msgstr ""
 
 # Source: resources/js/pages/account/SavedTrips.tsx:142
 #: assets/admin/dist/js/app.js
+#: app/Providers/FrontendAssetsProvider.php:307
 #: assets/dist/js/account-page.js:2817
-#: assets/js/listing-wishlist.js:163
-#: assets/js/listing-wishlist.js:164
-#: assets/js/trip.js:4885
+#: assets/js/listing-wishlist.js:45
+#: assets/js/trip.js:4882
 msgid "Remove from favorites"
 msgstr ""
 
@@ -16414,7 +16566,7 @@ msgstr ""
 msgid "Removes the small \"v3.0.4\" tag shown next to the brand name in the sidebar header."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1894
+# Source: resources/js/pages/Whatsapp.tsx:2108
 #: assets/admin/dist/js/app.js
 msgid "Renders an \"Ask about this trip on WhatsApp\" button next to the booking form, separate from the floating button."
 msgstr ""
@@ -16530,7 +16682,7 @@ msgstr ""
 msgid "Require initials"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:591
+# Source: resources/js/pages/Whatsapp.tsx:612
 #: assets/admin/dist/js/app.js
 msgid "Require opt-in before sending"
 msgstr ""
@@ -16561,7 +16713,7 @@ msgstr ""
 msgid "Required for Conversions API. Enables server-side tracking for better accuracy."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:453
+# Source: resources/js/pages/Whatsapp.tsx:472
 #: assets/admin/dist/js/app.js
 msgid "Required for every API call to Meta. Find it under Meta for Developers → your app → WhatsApp → API Setup, or generate a permanent token under Business Settings → System Users."
 msgstr ""
@@ -16571,12 +16723,12 @@ msgstr ""
 msgid "Required mentions"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:477
+# Source: resources/js/pages/Whatsapp.tsx:496
 #: assets/admin/dist/js/app.js
 msgid "Required only when receiving inbound replies. Find it under your app → Settings → Basic → App Secret."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1168
+# Source: resources/js/pages/ChannelManager.tsx:1195
 #: assets/admin/dist/js/app.js
 msgid "Required — sync will fail without this."
 msgstr ""
@@ -16586,7 +16738,7 @@ msgstr ""
 msgid "Requires an API secret from the same GA4 data stream."
 msgstr ""
 
-# Source: resources/js/components/shared/SearchFilterToolbar.tsx:126, resources/js/components/trips/TripsFilters.tsx:65, resources/js/pages/Enquiries.tsx:576, resources/js/pages/ItemTypes.tsx:891, resources/js/pages/Items.tsx:874, resources/js/pages/Modules.tsx:407, resources/js/pages/Reviews.tsx:576, resources/js/pages/Trips.tsx:1610
+# Source: resources/js/components/shared/SearchFilterToolbar.tsx:126, resources/js/components/trips/TripsFilters.tsx:65, resources/js/pages/Enquiries.tsx:576, resources/js/pages/ItemTypes.tsx:891, resources/js/pages/Items.tsx:874, resources/js/pages/Modules.tsx:407, resources/js/pages/Reviews.tsx:576, resources/js/pages/Trips.tsx:1610, resources/js/pages/Whatsapp.tsx:2271, resources/js/pages/Whatsapp.tsx:2505
 #: assets/admin/dist/js/app.js
 #: templates/shortcodes/search.php:149
 msgid "Reset"
@@ -16695,7 +16847,7 @@ msgstr ""
 msgid "Restore Rule"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:884
+# Source: resources/js/pages/Whatsapp.tsx:1084
 #: assets/admin/dist/js/app.js
 msgid "Restore default templates"
 msgstr ""
@@ -16844,7 +16996,7 @@ msgstr ""
 msgid "Review each section below. You can re-run any individual section, or fill in details for sections AI needs more info on."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:646
+# Source: resources/js/pages/Whatsapp.tsx:667
 #: assets/admin/dist/js/app.js
 msgid "Review request (hours after)"
 msgstr ""
@@ -16911,7 +17063,7 @@ msgstr ""
 msgid "Rolling 13-month token totals, per provider, per task. Costs are paid directly to your AI provider — no markup is added."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1006
+# Source: resources/js/pages/ChannelManager.tsx:1033
 #: assets/admin/dist/js/app.js
 msgid "Routes API calls to the OTA's sandbox environment. Always start in sandbox until a test booking has flowed through end-to-end. Switch off only after you've verified the connection in production."
 msgstr ""
@@ -17101,12 +17253,12 @@ msgstr ""
 msgid "Sample base price"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:502
+# Source: resources/js/pages/ChannelManager.tsx:513
 #: assets/admin/dist/js/app.js
 msgid "Sandbox"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1005
+# Source: resources/js/pages/ChannelManager.tsx:1032
 #: assets/admin/dist/js/app.js
 msgid "Sandbox / test mode"
 msgstr ""
@@ -17131,7 +17283,7 @@ msgstr ""
 msgid "Saturday"
 msgstr ""
 
-# Source: resources/js/components/ai/CreateTripWithAiWizard.tsx:1053, resources/js/pages/AiAssistant.tsx:656, resources/js/pages/AiAssistant.tsx:1489, resources/js/pages/ChannelManager.tsx:1147, resources/js/pages/EnquiryForm.tsx:252, resources/js/pages/Whatsapp.tsx:755
+# Source: resources/js/components/ai/CreateTripWithAiWizard.tsx:1053, resources/js/pages/AiAssistant.tsx:656, resources/js/pages/AiAssistant.tsx:1489, resources/js/pages/ChannelManager.tsx:1174, resources/js/pages/EnquiryForm.tsx:252, resources/js/pages/Whatsapp.tsx:947
 #: assets/admin/dist/js/app.js
 msgid "Save"
 msgstr ""
@@ -17182,7 +17334,7 @@ msgstr ""
 msgid "Save Trip First"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:670
+# Source: resources/js/pages/Whatsapp.tsx:691
 #: assets/admin/dist/js/app.js
 msgid "Save WhatsApp settings"
 msgstr ""
@@ -17202,7 +17354,7 @@ msgstr ""
 msgid "Save brand voice"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:820, resources/js/pages/ChannelManager.tsx:1902, resources/js/pages/Whatsapp.tsx:1180
+# Source: resources/js/pages/ChannelManager.tsx:847, resources/js/pages/ChannelManager.tsx:1972, resources/js/pages/Whatsapp.tsx:1394
 #: assets/admin/dist/js/app.js
 msgid "Save changes"
 msgstr ""
@@ -17242,9 +17394,14 @@ msgstr ""
 msgid "Save up to 30%"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1942
+# Source: resources/js/pages/Whatsapp.tsx:2156
 #: assets/admin/dist/js/app.js
 msgid "Save widget settings"
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:839
+#: assets/admin/dist/js/app.js
+msgid "Save your settings once to generate a verify token, then come back to copy it."
 msgstr ""
 
 # Source: resources/js/pages/TripConsentForm.tsx:1819, resources/js/pages/TripConsentForm.tsx:1825
@@ -17291,7 +17448,7 @@ msgstr ""
 msgid "Savings"
 msgstr ""
 
-# Source: resources/js/components/ai/BuildItineraryModal.tsx:755, resources/js/pages/AiAssistant.tsx:873, resources/js/pages/AiAssistant.tsx:1089, resources/js/pages/AiAssistant.tsx:1484, resources/js/pages/EmailAutomation.tsx:658, resources/js/pages/Whatsapp.tsx:665, resources/js/pages/Whatsapp.tsx:1173, resources/js/pages/Whatsapp.tsx:1937, resources/js/pages/WhiteLabel.tsx:1555
+# Source: resources/js/components/ai/BuildItineraryModal.tsx:755, resources/js/pages/AiAssistant.tsx:873, resources/js/pages/AiAssistant.tsx:1089, resources/js/pages/AiAssistant.tsx:1484, resources/js/pages/EmailAutomation.tsx:658, resources/js/pages/Whatsapp.tsx:686, resources/js/pages/Whatsapp.tsx:1387, resources/js/pages/Whatsapp.tsx:2151, resources/js/pages/WhiteLabel.tsx:1555
 #: assets/admin/dist/js/app.js
 msgid "Saving…"
 msgstr ""
@@ -17453,6 +17610,21 @@ msgstr ""
 msgid "Search by name, email, phone..."
 msgstr ""
 
+# Source: resources/js/pages/Whatsapp.tsx:2243
+#: assets/admin/dist/js/app.js
+msgid "Search by phone"
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:2480
+#: assets/admin/dist/js/app.js
+msgid "Search by phone or source…"
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:2242
+#: assets/admin/dist/js/app.js
+msgid "Search by phone…"
+msgstr ""
+
 # Source: resources/js/components/itinerary/DayFormFields.tsx:91, resources/js/pages/Availability.tsx:1127, resources/js/pages/Departures.tsx:1037, resources/js/pages/Itinerary.tsx:1534
 #: assets/admin/dist/js/app.js
 msgid "Search by trip name or ID..."
@@ -17549,6 +17721,11 @@ msgstr ""
 msgid "Search modules..."
 msgstr ""
 
+# Source: resources/js/pages/Whatsapp.tsx:2481
+#: assets/admin/dist/js/app.js
+msgid "Search opt-ins"
+msgstr ""
+
 # Source: resources/js/components/itinerary/DayFormFields.tsx:90, resources/js/pages/Availability.tsx:1126, resources/js/pages/Departures.tsx:1036, resources/js/pages/Itinerary.tsx:1533
 #: assets/admin/dist/js/app.js
 msgid "Search or select a trip..."
@@ -17624,7 +17801,7 @@ msgstr ""
 msgid "Seats"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:967
+# Source: resources/js/pages/ChannelManager.tsx:994
 #: assets/admin/dist/js/app.js
 msgid "Seats held back from this channel so direct-bookers and other OTAs always have stock. Example: a 20-seat departure with a buffer of 2 will only ever show 18 seats on this channel."
 msgstr ""
@@ -17809,7 +17986,7 @@ msgstr ""
 msgid "Select activities..."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1493
+# Source: resources/js/pages/ChannelManager.tsx:1532
 #: assets/admin/dist/js/app.js
 msgid "Select all"
 msgstr ""
@@ -18054,7 +18231,7 @@ msgstr ""
 msgid "Select item..."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1521
+# Source: resources/js/pages/ChannelManager.tsx:1560
 #: assets/admin/dist/js/app.js
 msgid "Select mapping"
 msgstr ""
@@ -18399,7 +18576,7 @@ msgstr ""
 msgid "Send before trip (days)"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:137
+# Source: resources/js/pages/Whatsapp.tsx:150
 #: assets/admin/dist/js/app.js
 msgid "Send booking + payment + reminder messages over WhatsApp."
 msgstr ""
@@ -18419,7 +18596,7 @@ msgstr ""
 msgid "Send duplicate events from your server with an API secret—useful when ad blockers affect the browser tag or for reconciliation."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8436, resources/js/pages/Whatsapp.tsx:1599
+# Source: resources/js/pages/Settings.tsx:8436, resources/js/pages/Whatsapp.tsx:1813
 #: assets/admin/dist/js/app.js
 msgid "Send failed."
 msgstr ""
@@ -18439,7 +18616,7 @@ msgstr ""
 msgid "Send initial recovery email within customizable timeframe."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:608
+# Source: resources/js/pages/Whatsapp.tsx:629
 #: assets/admin/dist/js/app.js
 msgid "Send me booking updates and trip reminders on WhatsApp. Reply STOP to opt out anytime."
 msgstr ""
@@ -18469,12 +18646,12 @@ msgstr ""
 msgid "Send second recovery email after this many hours"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1644
+# Source: resources/js/pages/Whatsapp.tsx:1858
 #: assets/admin/dist/js/app.js
 msgid "Send test"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1613
+# Source: resources/js/pages/Whatsapp.tsx:1827
 #: assets/admin/dist/js/app.js
 msgid "Send test message"
 msgstr ""
@@ -18484,7 +18661,7 @@ msgstr ""
 msgid "Send the scheduled payment reminder email this many days before the due date (0 to disable reminders)."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:533
+# Source: resources/js/pages/Whatsapp.tsx:554
 #: assets/admin/dist/js/app.js
 msgid "Sender display name"
 msgstr ""
@@ -18496,27 +18673,27 @@ msgstr ""
 msgid "Sending..."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:792
+# Source: resources/js/pages/ChannelManager.tsx:819
 #: assets/admin/dist/js/app.js
 msgid "Sends a signed synthetic booking to your own webhook URL so you can confirm the round-trip works."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1621
+# Source: resources/js/pages/Whatsapp.tsx:1835
 #: assets/admin/dist/js/app.js
 msgid "Sends this template to the phone you enter below."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1416
+# Source: resources/js/pages/Whatsapp.tsx:1630
 #: assets/admin/dist/js/app.js
 msgid "Sends to the admin phone in Delivery settings"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1393
+# Source: resources/js/pages/Whatsapp.tsx:1607
 #: assets/admin/dist/js/app.js
 msgid "Sends to the booking customer"
 msgstr ""
 
-# Source: resources/js/pages/EmailAutomation.tsx:403, resources/js/pages/Whatsapp.tsx:2017
+# Source: resources/js/pages/EmailAutomation.tsx:403, resources/js/pages/Whatsapp.tsx:2255, resources/js/pages/Whatsapp.tsx:2296
 #: assets/admin/dist/js/app.js
 msgid "Sent"
 msgstr ""
@@ -18602,7 +18779,7 @@ msgstr ""
 msgid "Sent when a traveler must sign a trip consent form (Trip Consent module)."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1595
+# Source: resources/js/pages/Whatsapp.tsx:1809
 #: assets/admin/dist/js/app.js
 msgid "Sent — check your WhatsApp."
 msgstr ""
@@ -18836,6 +19013,11 @@ msgstr ""
 msgid "Setup"
 msgstr ""
 
+# Source: resources/js/pages/Whatsapp.tsx:756
+#: assets/admin/dist/js/app.js
+msgid "Setup guide"
+msgstr ""
+
 # Source: resources/js/pages/Settings.tsx:8311
 #: assets/admin/dist/js/app.js
 msgid "Share non-sensitive technical details so we can make Yatra better. You can turn this off anytime. See what we collect on our site:"
@@ -18861,7 +19043,7 @@ msgstr ""
 msgid "Short description"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1243
+# Source: resources/js/pages/Whatsapp.tsx:1457
 #: assets/admin/dist/js/app.js
 msgid "Short description shown in the template list"
 msgstr ""
@@ -18921,7 +19103,7 @@ msgstr ""
 msgid "Show key"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1823
+# Source: resources/js/pages/Whatsapp.tsx:2037
 #: assets/admin/dist/js/app.js
 msgid "Show on"
 msgstr ""
@@ -18946,7 +19128,7 @@ msgstr ""
 msgid "Show this menu item"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1129
+# Source: resources/js/pages/ChannelManager.tsx:1156
 #: assets/admin/dist/js/app.js
 msgid "Show value"
 msgstr ""
@@ -19148,7 +19330,7 @@ msgstr ""
 msgid "Single final charge on a date, or multiple installments."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1831
+# Source: resources/js/pages/Whatsapp.tsx:2045
 #: assets/admin/dist/js/app.js
 msgid "Single trip pages only"
 msgstr ""
@@ -19224,7 +19406,7 @@ msgstr ""
 msgid "Smart Triggers"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:253
+# Source: resources/js/pages/ChannelManager.tsx:254
 #: assets/admin/dist/js/app.js
 msgid "Smart pricing"
 msgstr ""
@@ -19260,7 +19442,7 @@ msgstr ""
 msgid "Sort modules"
 msgstr ""
 
-# Source: resources/js/pages/Departures.tsx:857, resources/js/pages/Departures.tsx:1124, resources/js/pages/PastDepartures.tsx:210, resources/js/pages/ViewDeparture.tsx:524, resources/js/pages/ViewDeparture.tsx:927
+# Source: resources/js/pages/Departures.tsx:857, resources/js/pages/Departures.tsx:1124, resources/js/pages/PastDepartures.tsx:210, resources/js/pages/ViewDeparture.tsx:524, resources/js/pages/ViewDeparture.tsx:927, resources/js/pages/Whatsapp.tsx:2529
 #: assets/admin/dist/js/app.js
 msgid "Source"
 msgstr ""
@@ -19442,7 +19624,7 @@ msgstr ""
 msgid "Statistics"
 msgstr ""
 
-# Source: resources/js/components/availability/RecurringRules.tsx:494, resources/js/components/availability/RecurringRules.tsx:701, resources/js/components/availability/RecurringRules.tsx:791, resources/js/components/email/EmailTemplatesList.tsx:667, resources/js/components/email/EmailTemplatesList.tsx:759, resources/js/components/trips/TripsTable.tsx:117, resources/js/pages/AbandonedRecovery.tsx:426, resources/js/pages/AbandonedRecovery.tsx:762, resources/js/pages/AbandonedRecovery.tsx:1527, resources/js/pages/AbandonedRecoveryEmailForm.tsx:176, resources/js/pages/Activities.tsx:151, resources/js/pages/Activities.tsx:644, resources/js/pages/Activities.tsx:707, resources/js/pages/Activities.tsx:908, resources/js/pages/ActivityForm.tsx:509, resources/js/pages/ActivityForm.tsx:518, resources/js/pages/AdditionalServices.tsx:399, resources/js/pages/AdditionalServices.tsx:463, resources/js/pages/AdditionalServices.tsx:647, resources/js/pages/AdditionalServicesForm.tsx:564, resources/js/pages/AttributeForm.tsx:1031, resources/js/pages/AttributeForm.tsx:1040, resources/js/pages/Attributes.tsx:394, resources/js/pages/Attributes.tsx:672, resources/js/pages/Attributes.tsx:735, resources/js/pages/Availability.tsx:896, resources/js/pages/Availability.tsx:1528, resources/js/pages/Availability.tsx:1684, resources/js/pages/AvailabilityForm.tsx:1609, resources/js/pages/Bookings.tsx:515, resources/js/pages/Bookings.tsx:553, resources/js/pages/Bookings.tsx:668, resources/js/pages/Categories.tsx:730, resources/js/pages/Categories.tsx:1032, resources/js/pages/Categories.tsx:1132, resources/js/pages/CategoryForm.tsx:631, resources/js/pages/ChannelManager.tsx:463, resources/js/pages/ChannelManager.tsx:2121, resources/js/pages/ChannelManager.tsx:2248, resources/js/pages/CustomerForm.tsx:782, resources/js/pages/Customers.tsx:454, resources/js/pages/Customers.tsx:481, resources/js/pages/Customers.tsx:565, resources/js/pages/Customers.tsx:650, resources/js/pages/Departures.tsx:851, resources/js/pages/Departures.tsx:1104, resources/js/pages/DestinationForm.tsx:514, resources/js/pages/DestinationForm.tsx:523, resources/js/pages/Destinations.tsx:464, resources/js/pages/Destinations.tsx:525, resources/js/pages/Destinations.tsx:735, resources/js/pages/DifficultyLevelForm.tsx:455, resources/js/pages/DifficultyLevels.tsx:140, resources/js/pages/DifficultyLevels.tsx:708, resources/js/pages/DiscountForm.tsx:2590, resources/js/pages/Discounts.tsx:603, resources/js/pages/Discounts.tsx:634, resources/js/pages/Discounts.tsx:848, resources/js/pages/DynamicPricing.tsx:575, resources/js/pages/DynamicPricing.tsx:675, resources/js/pages/DynamicPricingRuleForm.tsx:1150, resources/js/pages/EmailAutomation.tsx:400, resources/js/pages/EmailSequenceForm.tsx:877, resources/js/pages/Enquiries.tsx:253, resources/js/pages/Enquiries.tsx:544, resources/js/pages/Enquiries.tsx:713, resources/js/pages/EnquiryForm.tsx:431, resources/js/pages/ItemForm.tsx:436, resources/js/pages/ItemTypeForm.tsx:522, resources/js/pages/ItemTypes.tsx:378, resources/js/pages/ItemTypes.tsx:568, resources/js/pages/ItemTypes.tsx:859, resources/js/pages/Items.tsx:341, resources/js/pages/Items.tsx:545, resources/js/pages/Items.tsx:842, resources/js/pages/ItineraryForm.tsx:1091, resources/js/pages/Payments.tsx:459, resources/js/pages/Payments.tsx:490, resources/js/pages/Payments.tsx:579, resources/js/pages/RecurringRuleForm.tsx:2491, resources/js/pages/RecurringRulesPage.tsx:376, resources/js/pages/ReviewForm.tsx:475, resources/js/pages/Reviews.tsx:369, resources/js/pages/Reviews.tsx:544, resources/js/pages/Reviews.tsx:691, resources/js/pages/TravelerCategories.tsx:542, resources/js/pages/TravelerCategories.tsx:698, resources/js/pages/TravelerCategories.tsx:771, resources/js/pages/TravelerCategoryForm.tsx:768, resources/js/pages/TravelerCategoryForm.tsx:777, resources/js/pages/TripConsent.tsx:394, resources/js/pages/TripConsent.tsx:439, resources/js/pages/TripConsent.tsx:512, resources/js/pages/TripConsent.tsx:933, resources/js/pages/TripConsentForm.tsx:974, resources/js/pages/Trips.tsx:751, resources/js/pages/Trips.tsx:1106, resources/js/pages/Trips.tsx:1570, resources/js/pages/ViewBooking.tsx:1165, resources/js/pages/ViewCustomer.tsx:614, resources/js/pages/Whatsapp.tsx:913, resources/js/pages/Whatsapp.tsx:2014
+# Source: resources/js/components/availability/RecurringRules.tsx:494, resources/js/components/availability/RecurringRules.tsx:701, resources/js/components/availability/RecurringRules.tsx:791, resources/js/components/email/EmailTemplatesList.tsx:667, resources/js/components/email/EmailTemplatesList.tsx:759, resources/js/components/trips/TripsTable.tsx:117, resources/js/pages/AbandonedRecovery.tsx:426, resources/js/pages/AbandonedRecovery.tsx:762, resources/js/pages/AbandonedRecovery.tsx:1527, resources/js/pages/AbandonedRecoveryEmailForm.tsx:176, resources/js/pages/Activities.tsx:151, resources/js/pages/Activities.tsx:644, resources/js/pages/Activities.tsx:707, resources/js/pages/Activities.tsx:908, resources/js/pages/ActivityForm.tsx:509, resources/js/pages/ActivityForm.tsx:518, resources/js/pages/AdditionalServices.tsx:399, resources/js/pages/AdditionalServices.tsx:463, resources/js/pages/AdditionalServices.tsx:647, resources/js/pages/AdditionalServicesForm.tsx:564, resources/js/pages/AttributeForm.tsx:1031, resources/js/pages/AttributeForm.tsx:1040, resources/js/pages/Attributes.tsx:394, resources/js/pages/Attributes.tsx:672, resources/js/pages/Attributes.tsx:735, resources/js/pages/Availability.tsx:896, resources/js/pages/Availability.tsx:1528, resources/js/pages/Availability.tsx:1684, resources/js/pages/AvailabilityForm.tsx:1609, resources/js/pages/Bookings.tsx:515, resources/js/pages/Bookings.tsx:553, resources/js/pages/Bookings.tsx:668, resources/js/pages/Categories.tsx:730, resources/js/pages/Categories.tsx:1032, resources/js/pages/Categories.tsx:1132, resources/js/pages/CategoryForm.tsx:631, resources/js/pages/ChannelManager.tsx:474, resources/js/pages/ChannelManager.tsx:2191, resources/js/pages/ChannelManager.tsx:2318, resources/js/pages/CustomerForm.tsx:782, resources/js/pages/Customers.tsx:454, resources/js/pages/Customers.tsx:481, resources/js/pages/Customers.tsx:565, resources/js/pages/Customers.tsx:650, resources/js/pages/Departures.tsx:851, resources/js/pages/Departures.tsx:1104, resources/js/pages/DestinationForm.tsx:514, resources/js/pages/DestinationForm.tsx:523, resources/js/pages/Destinations.tsx:464, resources/js/pages/Destinations.tsx:525, resources/js/pages/Destinations.tsx:735, resources/js/pages/DifficultyLevelForm.tsx:455, resources/js/pages/DifficultyLevels.tsx:140, resources/js/pages/DifficultyLevels.tsx:708, resources/js/pages/DiscountForm.tsx:2590, resources/js/pages/Discounts.tsx:603, resources/js/pages/Discounts.tsx:634, resources/js/pages/Discounts.tsx:848, resources/js/pages/DynamicPricing.tsx:575, resources/js/pages/DynamicPricing.tsx:675, resources/js/pages/DynamicPricingRuleForm.tsx:1150, resources/js/pages/EmailAutomation.tsx:400, resources/js/pages/EmailSequenceForm.tsx:877, resources/js/pages/Enquiries.tsx:253, resources/js/pages/Enquiries.tsx:544, resources/js/pages/Enquiries.tsx:713, resources/js/pages/EnquiryForm.tsx:431, resources/js/pages/ItemForm.tsx:436, resources/js/pages/ItemTypeForm.tsx:522, resources/js/pages/ItemTypes.tsx:378, resources/js/pages/ItemTypes.tsx:568, resources/js/pages/ItemTypes.tsx:859, resources/js/pages/Items.tsx:341, resources/js/pages/Items.tsx:545, resources/js/pages/Items.tsx:842, resources/js/pages/ItineraryForm.tsx:1091, resources/js/pages/Payments.tsx:459, resources/js/pages/Payments.tsx:490, resources/js/pages/Payments.tsx:579, resources/js/pages/RecurringRuleForm.tsx:2491, resources/js/pages/RecurringRulesPage.tsx:376, resources/js/pages/ReviewForm.tsx:475, resources/js/pages/Reviews.tsx:369, resources/js/pages/Reviews.tsx:544, resources/js/pages/Reviews.tsx:691, resources/js/pages/TravelerCategories.tsx:542, resources/js/pages/TravelerCategories.tsx:698, resources/js/pages/TravelerCategories.tsx:771, resources/js/pages/TravelerCategoryForm.tsx:768, resources/js/pages/TravelerCategoryForm.tsx:777, resources/js/pages/TripConsent.tsx:394, resources/js/pages/TripConsent.tsx:439, resources/js/pages/TripConsent.tsx:512, resources/js/pages/TripConsent.tsx:933, resources/js/pages/TripConsentForm.tsx:974, resources/js/pages/Trips.tsx:751, resources/js/pages/Trips.tsx:1106, resources/js/pages/Trips.tsx:1570, resources/js/pages/ViewBooking.tsx:1165, resources/js/pages/ViewCustomer.tsx:614, resources/js/pages/Whatsapp.tsx:1113, resources/js/pages/Whatsapp.tsx:2294, resources/js/pages/Whatsapp.tsx:2528
 #: assets/admin/dist/js/app.js
 #: templates/booking-confirmation.php:369
 #: templates/partials/remaining-checkout-content.php:92
@@ -19520,7 +19702,7 @@ msgstr ""
 msgid "Still Thinking About {trip_name}? - {site_name}"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1063
+# Source: resources/js/pages/ChannelManager.tsx:1090
 #: assets/admin/dist/js/app.js
 msgid "Stored encrypted with libsodium AEAD (XChaCha20-Poly1305). After saving, the value is never sent back to the browser — you only see a masked last-4 hint to confirm something is set."
 msgstr ""
@@ -19646,7 +19828,7 @@ msgstr ""
 msgid "Successful Events"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2250
+# Source: resources/js/pages/ChannelManager.tsx:2320
 #: assets/admin/dist/js/app.js
 msgid "Summary / Error"
 msgstr ""
@@ -19676,7 +19858,7 @@ msgstr ""
 msgid "Support URL"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:438
+# Source: resources/js/pages/ChannelManager.tsx:449
 #: assets/admin/dist/js/app.js
 msgid "Supported OTAs:"
 msgstr ""
@@ -19731,7 +19913,7 @@ msgstr ""
 msgid "Sync Settings"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:129, resources/js/pages/ChannelManager.tsx:2213
+# Source: resources/js/pages/ChannelManager.tsx:130, resources/js/pages/ChannelManager.tsx:2283
 #: assets/admin/dist/js/app.js
 msgid "Sync activity"
 msgstr ""
@@ -19746,7 +19928,7 @@ msgstr ""
 msgid "Sync completed successfully"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1992
+# Source: resources/js/pages/ChannelManager.tsx:2062
 #: assets/admin/dist/js/app.js
 msgid "Sync controls"
 msgstr ""
@@ -19756,17 +19938,17 @@ msgstr ""
 msgid "Sync failed"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1265, resources/js/pages/ChannelManager.tsx:1860
+# Source: resources/js/pages/ChannelManager.tsx:1299, resources/js/pages/ChannelManager.tsx:1930
 #: assets/admin/dist/js/app.js
 msgid "Sync failed."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1759, resources/js/pages/ChannelManager.tsx:2011
+# Source: resources/js/pages/ChannelManager.tsx:1829, resources/js/pages/ChannelManager.tsx:2081
 #: assets/admin/dist/js/app.js
 msgid "Sync inventory"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:786, resources/js/pages/ChannelManager.tsx:1891
+# Source: resources/js/pages/ChannelManager.tsx:813, resources/js/pages/ChannelManager.tsx:1961
 #: assets/admin/dist/js/app.js
 msgid "Sync now"
 msgstr ""
@@ -19776,27 +19958,27 @@ msgstr ""
 msgid "Sync on Booking"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1768, resources/js/pages/ChannelManager.tsx:2020
+# Source: resources/js/pages/ChannelManager.tsx:1838, resources/js/pages/ChannelManager.tsx:2090
 #: assets/admin/dist/js/app.js
 msgid "Sync pricing"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:232
+# Source: resources/js/pages/ChannelManager.tsx:233
 #: assets/admin/dist/js/app.js
 msgid "Sync runs automatically"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1416
+# Source: resources/js/pages/ChannelManager.tsx:1455
 #: assets/admin/dist/js/app.js
 msgid "Sync selected"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1500
+# Source: resources/js/pages/ChannelManager.tsx:1539
 #: assets/admin/dist/js/app.js
 msgid "Sync state"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1860
+# Source: resources/js/pages/ChannelManager.tsx:1930
 #: assets/admin/dist/js/app.js
 msgid "Synced."
 msgstr ""
@@ -19806,7 +19988,7 @@ msgstr ""
 msgid "Syncing..."
 msgstr ""
 
-# Source: resources/js/components/email/EmailTemplatesList.tsx:552, resources/js/pages/EmailTemplateForm.tsx:1253, resources/js/pages/Whatsapp.tsx:975, resources/js/pages/Whatsapp.tsx:1155
+# Source: resources/js/components/email/EmailTemplatesList.tsx:552, resources/js/pages/EmailTemplateForm.tsx:1253, resources/js/pages/Whatsapp.tsx:1175, resources/js/pages/Whatsapp.tsx:1369
 #: assets/admin/dist/js/app.js
 msgid "System"
 msgstr ""
@@ -19821,17 +20003,17 @@ msgstr ""
 msgid "System prompt"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1480
+# Source: resources/js/pages/Whatsapp.tsx:1694
 #: assets/admin/dist/js/app.js
 msgid "System template body is locked. Create a custom template to author your own copy for this event."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1263
+# Source: resources/js/pages/Whatsapp.tsx:1477
 #: assets/admin/dist/js/app.js
 msgid "System templates can't change events"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1426
+# Source: resources/js/pages/Whatsapp.tsx:1640
 #: assets/admin/dist/js/app.js
 msgid "System templates can't change recipient type."
 msgstr ""
@@ -19841,7 +20023,7 @@ msgstr ""
 msgid "System templates cannot change events"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:866
+# Source: resources/js/pages/Whatsapp.tsx:1066
 #: assets/admin/dist/js/app.js
 msgid "System templates ship with the plugin — you can toggle them on/off but not edit or delete them. Add custom templates for any event you want."
 msgstr ""
@@ -19965,7 +20147,7 @@ msgstr ""
 msgid "Temperature"
 msgstr ""
 
-# Source: resources/js/components/email/EmailTemplatesList.tsx:517, resources/js/components/email/EmailTemplatesList.tsx:734, resources/js/pages/EmailAutomation.tsx:397, resources/js/pages/Whatsapp.tsx:2011
+# Source: resources/js/components/email/EmailTemplatesList.tsx:517, resources/js/components/email/EmailTemplatesList.tsx:734, resources/js/pages/EmailAutomation.tsx:397, resources/js/pages/Whatsapp.tsx:2293
 #: assets/admin/dist/js/app.js
 msgid "Template"
 msgstr ""
@@ -19990,7 +20172,7 @@ msgstr ""
 msgid "Template created successfully"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1102
+# Source: resources/js/pages/Whatsapp.tsx:1316
 #: assets/admin/dist/js/app.js
 msgid "Template created."
 msgstr ""
@@ -20000,12 +20182,12 @@ msgstr ""
 msgid "Template deleted"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:838
+# Source: resources/js/pages/Whatsapp.tsx:1034
 #: assets/admin/dist/js/app.js
 msgid "Template deleted."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1191
+# Source: resources/js/pages/Whatsapp.tsx:1405
 #: assets/admin/dist/js/app.js
 msgid "Template details"
 msgstr ""
@@ -20015,7 +20197,7 @@ msgstr ""
 msgid "Template duplicated successfully"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1226
+# Source: resources/js/pages/Whatsapp.tsx:1440
 #: assets/admin/dist/js/app.js
 msgid "Template name"
 msgstr ""
@@ -20035,7 +20217,7 @@ msgstr ""
 msgid "Template saved successfully"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1103
+# Source: resources/js/pages/Whatsapp.tsx:1317
 #: assets/admin/dist/js/app.js
 msgid "Template saved."
 msgstr ""
@@ -20045,7 +20227,7 @@ msgstr ""
 msgid "Template updated"
 msgstr ""
 
-# Source: resources/js/pages/EmailAutomation.tsx:532, resources/js/pages/Whatsapp.tsx:151
+# Source: resources/js/pages/EmailAutomation.tsx:532, resources/js/pages/Whatsapp.tsx:164
 #: assets/admin/dist/js/app.js
 msgid "Templates"
 msgstr ""
@@ -20080,7 +20262,7 @@ msgstr ""
 msgid "Test Mode"
 msgstr ""
 
-# Source: resources/js/pages/AiAssistant.tsx:670, resources/js/pages/ChannelManager.tsx:769
+# Source: resources/js/pages/AiAssistant.tsx:670, resources/js/pages/ChannelManager.tsx:796
 #: assets/admin/dist/js/app.js
 msgid "Test connection"
 msgstr ""
@@ -20090,7 +20272,7 @@ msgstr ""
 msgid "Test email sent successfully"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:802
+# Source: resources/js/pages/ChannelManager.tsx:829
 #: assets/admin/dist/js/app.js
 msgid "Test webhook"
 msgstr ""
@@ -20156,12 +20338,12 @@ msgstr ""
 msgid "The price will be calculated as a percentage of the trip base price."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1948
+# Source: resources/js/pages/ChannelManager.tsx:2018
 #: assets/admin/dist/js/app.js
 msgid "The product's ID on the channel side. Editing this re-points the mapping — all future syncs target the new product. Existing bookings already received are not modified."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1711
+# Source: resources/js/pages/ChannelManager.tsx:1781
 #: assets/admin/dist/js/app.js
 msgid "The product's ID on the channel side. For Viator this is a product code (e.g. 12345P1); for GetYourGuide it's the offer/option ID. Copy it from the channel's partner portal."
 msgstr ""
@@ -20242,7 +20424,7 @@ msgstr ""
 msgid "This email will be triggered when the selected event occurs"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1513
+# Source: resources/js/pages/Whatsapp.tsx:1727
 #: assets/admin/dist/js/app.js
 msgid "This event has no variables."
 msgstr ""
@@ -20277,7 +20459,7 @@ msgstr ""
 msgid "This is a flat fee charged once per booking."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1216
+# Source: resources/js/pages/Whatsapp.tsx:1430
 #: assets/admin/dist/js/app.js
 msgid "This is a system template. You can toggle it on or off but every other field is locked — that way plugin updates can safely refresh the copy. Create a custom template if you need different content for this event."
 msgstr ""
@@ -20297,7 +20479,7 @@ msgstr ""
 msgid "This link is view-only. Subject, body, and status cannot be changed from this screen."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:203
+# Source: resources/js/pages/ChannelManager.tsx:204
 #: assets/admin/dist/js/app.js
 msgid "This module connects directly to each OTA's API. Inventory + pricing are pushed automatically whenever a booking, departure, or availability change happens here. Bookings made on the OTA flow back into the same booking list as direct sales — same customer notifications, same revenue reporting, same automation rules."
 msgstr ""
@@ -20620,7 +20802,7 @@ msgstr ""
 
 # Source: resources/js/pages/AbandonedRecovery.tsx:725, resources/js/pages/AbandonedRecovery.tsx:1510, resources/js/pages/BookingForm.tsx:1200, resources/js/pages/ViewBooking.tsx:1298, resources/js/pages/account/BookingDetails.tsx:871, resources/js/pages/account/Bookings.tsx:468
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:835
+#: app/Providers/FrontendAssetsProvider.php:849
 #: templates/partials/remaining-checkout-content.php:154
 #: templates/pdf/voucher.php:182
 #: assets/dist/js/account-page.js:1533
@@ -20984,7 +21166,7 @@ msgstr ""
 msgid "Traveler-based pricing only"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:427, resources/js/pages/AbandonedRecovery.tsx:717, resources/js/pages/AbandonedRecovery.tsx:1502, resources/js/pages/Bookings.tsx:532, resources/js/pages/Bookings.tsx:612, resources/js/pages/ChannelManager.tsx:2119, resources/js/pages/Departures.tsx:807, resources/js/pages/Enquiries.tsx:243, resources/js/pages/Enquiries.tsx:693, resources/js/pages/Travelers.tsx:366, resources/js/pages/ViewBooking.tsx:557, resources/js/pages/ViewDeparture.tsx:758, resources/js/pages/account/Bookings.tsx:448
+# Source: resources/js/components/Layout.tsx:427, resources/js/pages/AbandonedRecovery.tsx:717, resources/js/pages/AbandonedRecovery.tsx:1502, resources/js/pages/Bookings.tsx:532, resources/js/pages/Bookings.tsx:612, resources/js/pages/ChannelManager.tsx:2189, resources/js/pages/Departures.tsx:807, resources/js/pages/Enquiries.tsx:243, resources/js/pages/Enquiries.tsx:693, resources/js/pages/Travelers.tsx:366, resources/js/pages/ViewBooking.tsx:557, resources/js/pages/ViewDeparture.tsx:758, resources/js/pages/account/Bookings.tsx:448
 #: assets/admin/dist/js/app.js
 #: app/Controllers/BookingSessionController.php:2642
 #: app/Controllers/BookingSessionController.php:2661
@@ -21024,12 +21206,12 @@ msgstr ""
 msgid "Trigger"
 msgstr ""
 
-# Source: resources/js/pages/EmailTemplateForm.tsx:661, resources/js/pages/Whatsapp.tsx:1253
+# Source: resources/js/pages/EmailTemplateForm.tsx:661, resources/js/pages/Whatsapp.tsx:1467
 #: assets/admin/dist/js/app.js
 msgid "Trigger Event"
 msgstr ""
 
-# Source: resources/js/components/itinerary/DayFormFields.tsx:54, resources/js/pages/AbandonedRecovery.tsx:381, resources/js/pages/AbandonedRecovery.tsx:1487, resources/js/pages/Availability.tsx:1110, resources/js/pages/BookingForm.tsx:898, resources/js/pages/Bookings.tsx:513, resources/js/pages/Bookings.tsx:529, resources/js/pages/Bookings.tsx:593, resources/js/pages/ChannelManager.tsx:1497, resources/js/pages/Departures.tsx:721, resources/js/pages/Departures.tsx:1020, resources/js/pages/Departures.tsx:1247, resources/js/pages/Enquiries.tsx:235, resources/js/pages/Enquiries.tsx:543, resources/js/pages/Enquiries.tsx:666, resources/js/pages/Itinerary.tsx:1520, resources/js/pages/RecurringRuleForm.tsx:624, resources/js/pages/ReviewForm.tsx:304, resources/js/pages/Reviews.tsx:351, resources/js/pages/Reviews.tsx:541, resources/js/pages/Reviews.tsx:636, resources/js/pages/Travelers.tsx:297, resources/js/pages/Travelers.tsx:559, resources/js/pages/TripForm.tsx:9638, resources/js/pages/Trips.tsx:743, resources/js/pages/Trips.tsx:955, resources/js/pages/ViewBooking.tsx:521, resources/js/pages/ViewCustomer.tsx:611, resources/js/pages/ViewEnquiry.tsx:421, resources/js/pages/ViewPayment.tsx:453, resources/js/pages/ViewReview.tsx:320, resources/js/pages/account/BookingDetails.tsx:240
+# Source: resources/js/components/itinerary/DayFormFields.tsx:54, resources/js/pages/AbandonedRecovery.tsx:381, resources/js/pages/AbandonedRecovery.tsx:1487, resources/js/pages/Availability.tsx:1110, resources/js/pages/BookingForm.tsx:898, resources/js/pages/Bookings.tsx:513, resources/js/pages/Bookings.tsx:529, resources/js/pages/Bookings.tsx:593, resources/js/pages/ChannelManager.tsx:1536, resources/js/pages/Departures.tsx:721, resources/js/pages/Departures.tsx:1020, resources/js/pages/Departures.tsx:1247, resources/js/pages/Enquiries.tsx:235, resources/js/pages/Enquiries.tsx:543, resources/js/pages/Enquiries.tsx:666, resources/js/pages/Itinerary.tsx:1520, resources/js/pages/RecurringRuleForm.tsx:624, resources/js/pages/ReviewForm.tsx:304, resources/js/pages/Reviews.tsx:351, resources/js/pages/Reviews.tsx:541, resources/js/pages/Reviews.tsx:636, resources/js/pages/Travelers.tsx:297, resources/js/pages/Travelers.tsx:559, resources/js/pages/TripForm.tsx:9638, resources/js/pages/Trips.tsx:743, resources/js/pages/Trips.tsx:955, resources/js/pages/ViewBooking.tsx:521, resources/js/pages/ViewCustomer.tsx:611, resources/js/pages/ViewEnquiry.tsx:421, resources/js/pages/ViewPayment.tsx:453, resources/js/pages/ViewReview.tsx:320, resources/js/pages/account/BookingDetails.tsx:240
 #: assets/admin/dist/js/app.js
 #: app/Blocks/TourBlock.php:86
 #: app/Controllers/BookingSessionController.php:2638
@@ -21154,7 +21336,7 @@ msgstr ""
 
 # Source: resources/js/pages/TripForm.tsx:2574, resources/js/pages/TripForm.tsx:7938, resources/js/pages/ViewDeparture.tsx:590
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:851
+#: app/Providers/FrontendAssetsProvider.php:865
 #: templates/pdf/itinerary.php:389
 msgid "Trip Details"
 msgstr ""
@@ -21166,7 +21348,7 @@ msgstr ""
 msgid "Trip Highlights"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1695, resources/js/pages/ChannelManager.tsx:1937, resources/js/pages/ViewBooking.tsx:527
+# Source: resources/js/pages/ChannelManager.tsx:1765, resources/js/pages/ChannelManager.tsx:2007, resources/js/pages/ViewBooking.tsx:527
 #: assets/admin/dist/js/app.js
 msgid "Trip ID"
 msgstr ""
@@ -21336,7 +21518,7 @@ msgstr ""
 msgid "Trip is required"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:127, resources/js/pages/ChannelManager.tsx:1347
+# Source: resources/js/pages/ChannelManager.tsx:128, resources/js/pages/ChannelManager.tsx:1386
 #: assets/admin/dist/js/app.js
 msgid "Trip mappings"
 msgstr ""
@@ -21443,7 +21625,7 @@ msgstr ""
 
 # Source: resources/js/components/Layout.tsx:366, resources/js/pages/Activities.tsx:142, resources/js/pages/Activities.tsx:687, resources/js/pages/Activities.tsx:812, resources/js/pages/AdditionalServices.tsx:458, resources/js/pages/AdditionalServices.tsx:611, resources/js/pages/Categories.tsx:639, resources/js/pages/Categories.tsx:1112, resources/js/pages/Destinations.tsx:505, resources/js/pages/Destinations.tsx:635, resources/js/pages/DifficultyLevels.tsx:130, resources/js/pages/TripConsent.tsx:543
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:858
+#: app/Providers/FrontendAssetsProvider.php:872
 #: templates/listing-activity.php:238
 #: templates/listing-destination.php:245
 #: templates/listing-trip-category.php:250
@@ -21517,7 +21699,7 @@ msgstr ""
 msgid "Turn abandoned bookings into completed reservations with intelligent automated recovery sequences and maximize your revenue with Yatra Pro."
 msgstr ""
 
-# Source: resources/js/components/ai/CreateTripWithAiWizard.tsx:1122, resources/js/pages/Discounts.tsx:599, resources/js/pages/Discounts.tsx:614, resources/js/pages/EmailTemplateForm.tsx:1189, resources/js/pages/EmailTemplateForm.tsx:1249, resources/js/pages/ItemTypes.tsx:370, resources/js/pages/ItemTypes.tsx:532, resources/js/pages/Items.tsx:333, resources/js/pages/Items.tsx:510, resources/js/pages/Items.tsx:841, resources/js/pages/Whatsapp.tsx:910
+# Source: resources/js/components/ai/CreateTripWithAiWizard.tsx:1122, resources/js/pages/Discounts.tsx:599, resources/js/pages/Discounts.tsx:614, resources/js/pages/EmailTemplateForm.tsx:1189, resources/js/pages/EmailTemplateForm.tsx:1249, resources/js/pages/ItemTypes.tsx:370, resources/js/pages/ItemTypes.tsx:532, resources/js/pages/Items.tsx:333, resources/js/pages/Items.tsx:510, resources/js/pages/Items.tsx:841, resources/js/pages/Whatsapp.tsx:1110
 #: assets/admin/dist/js/app.js
 msgid "Type"
 msgstr ""
@@ -21931,7 +22113,7 @@ msgstr ""
 msgid "Update your password to keep your account secure."
 msgstr ""
 
-# Source: resources/js/pages/Attributes.tsx:745, resources/js/pages/ItemTypes.tsx:598, resources/js/pages/Items.tsx:575, resources/js/pages/TravelerCategories.tsx:556, resources/js/pages/account/Documents.tsx:201
+# Source: resources/js/pages/Attributes.tsx:745, resources/js/pages/ItemTypes.tsx:598, resources/js/pages/Items.tsx:575, resources/js/pages/TravelerCategories.tsx:556, resources/js/pages/Whatsapp.tsx:2531, resources/js/pages/account/Documents.tsx:201
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/account-page.js:2313
 msgid "Updated"
@@ -21968,12 +22150,12 @@ msgstr ""
 msgid "Upgrade plan"
 msgstr ""
 
-# Source: resources/js/components/modules/PremiumUpgradeDialog.tsx:123, resources/js/pages/ChannelManager.tsx:336, resources/js/pages/WhiteLabel.tsx:293
+# Source: resources/js/components/modules/PremiumUpgradeDialog.tsx:123, resources/js/pages/ChannelManager.tsx:337, resources/js/pages/WhiteLabel.tsx:293
 #: assets/admin/dist/js/app.js
 msgid "Upgrade to Agency"
 msgstr ""
 
-# Source: resources/js/components/modules/PremiumUpgradeDialog.tsx:125, resources/js/pages/Whatsapp.tsx:272
+# Source: resources/js/components/modules/PremiumUpgradeDialog.tsx:125, resources/js/pages/Whatsapp.tsx:290
 #: assets/admin/dist/js/app.js
 msgid "Upgrade to Growth"
 msgstr ""
@@ -22157,7 +22339,7 @@ msgstr ""
 msgid "Use {{placeholders}} to inject runtime context (e.g. {{name}}, {{extra_context}}). Removing a placeholder means the assistant won't see that field — edit with care."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1813
+# Source: resources/js/pages/Whatsapp.tsx:2027
 #: assets/admin/dist/js/app.js
 msgid "Use {{trip_name}} to insert the current trip's name when the widget renders on a single-trip page. Replaced with the actual title at render time."
 msgstr ""
@@ -22167,7 +22349,7 @@ msgstr ""
 msgid "Use {{variable}} syntax to insert dynamic content"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1473
+# Source: resources/js/pages/Whatsapp.tsx:1687
 #: assets/admin/dist/js/app.js
 msgid "Use {{variable}} syntax — variables come from the trigger event."
 msgstr ""
@@ -22288,6 +22470,11 @@ msgstr ""
 msgid "Verified Purchase"
 msgstr ""
 
+# Source: resources/js/pages/Whatsapp.tsx:801
+#: assets/admin/dist/js/app.js
+msgid "Verify token"
+msgstr ""
+
 # Source: resources/js/pages/TripConsent.tsx:454, resources/js/pages/TripConsent.tsx:572, resources/js/pages/TripForm.tsx:8390
 #: assets/admin/dist/js/app.js
 msgid "Version"
@@ -22374,8 +22561,8 @@ msgstr ""
 
 # Source: resources/js/pages/AbandonedRecovery.tsx:448, resources/js/pages/TripConsent.tsx:958, resources/js/pages/account/Bookings.tsx:505, resources/js/pages/account/SavedTrips.tsx:285
 #: assets/admin/dist/js/app.js
-#: app/Providers/FrontendAssetsProvider.php:837
-#: templates/partials/single-trip/similar-trips.php:272
+#: app/Providers/FrontendAssetsProvider.php:851
+#: templates/partials/single-trip/similar-trips.php:274
 #: templates/single-activity.php:274
 #: templates/single-destination.php:274
 #: templates/trip-listing-card.php:462
@@ -22550,7 +22737,7 @@ msgstr ""
 msgid "Visit support center"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1792
+# Source: resources/js/pages/Whatsapp.tsx:2006
 #: assets/admin/dist/js/app.js
 msgid "Visitors land on a chat with THIS number. Can be any WhatsApp-enabled phone — doesn't have to be the Cloud-API phone you use for outbound automation."
 msgstr ""
@@ -22618,22 +22805,22 @@ msgstr ""
 msgid "We couldn’t connect to the trips service. Please refresh or try again shortly."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1192
+# Source: resources/js/pages/ChannelManager.tsx:1219
 #: assets/admin/dist/js/app.js
 msgid "Webhook URL copied."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:704
+# Source: resources/js/pages/ChannelManager.tsx:731
 #: assets/admin/dist/js/app.js
 msgid "Webhook self-test failed — see Sync activity for details."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:695
+# Source: resources/js/pages/ChannelManager.tsx:722
 #: assets/admin/dist/js/app.js
 msgid "Webhook self-test succeeded — your endpoint is reachable."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:476
+# Source: resources/js/pages/Whatsapp.tsx:495
 #: assets/admin/dist/js/app.js
 msgid "Webhook verify secret (App Secret)"
 msgstr ""
@@ -22708,12 +22895,12 @@ msgstr ""
 msgid "What This Module Does"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:194
+# Source: resources/js/pages/ChannelManager.tsx:195
 #: assets/admin/dist/js/app.js
 msgid "What is a Channel Manager?"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:951
+# Source: resources/js/pages/ChannelManager.tsx:978
 #: assets/admin/dist/js/app.js
 msgid "What the OTA deducts from each sale. Not sent to the channel — used here only to estimate your net revenue in reports."
 msgstr ""
@@ -22765,38 +22952,38 @@ msgstr ""
 msgid "WhatsApp"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:525
+# Source: resources/js/pages/Whatsapp.tsx:546
 #: assets/admin/dist/js/app.js
 msgid "WhatsApp Business Account ID"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:441
+# Source: resources/js/pages/Whatsapp.tsx:460
 #: assets/admin/dist/js/app.js
 msgid "WhatsApp Cloud API credentials"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:259
+# Source: resources/js/pages/Whatsapp.tsx:277
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:285
 msgid "WhatsApp Notifications"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:159
+# Source: resources/js/pages/Whatsapp.tsx:173
 #: assets/admin/dist/js/app.js
 msgid "WhatsApp credentials, system + custom templates, and message logs — bring your own Cloud API account."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:109
+# Source: resources/js/pages/Whatsapp.tsx:122
 #: assets/admin/dist/js/app.js
 msgid "WhatsApp settings saved."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:863
+# Source: resources/js/pages/Whatsapp.tsx:1063
 #: assets/admin/dist/js/app.js
 msgid "WhatsApp templates"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2245
+# Source: resources/js/pages/ChannelManager.tsx:2315
 #: assets/admin/dist/js/app.js
 msgid "When"
 msgstr ""
@@ -22821,7 +23008,7 @@ msgstr ""
 msgid "When a trip is added to the booking session / checkout."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2105
+# Source: resources/js/pages/ChannelManager.tsx:2175
 #: assets/admin/dist/js/app.js
 msgid "When an OTA sends a booking webhook, it'll appear here within seconds. The list auto-refreshes every 30 seconds while this tab is open."
 msgstr ""
@@ -22861,12 +23048,12 @@ msgstr ""
 msgid "When is it available & who can book it?"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:997
+# Source: resources/js/pages/ChannelManager.tsx:1024
 #: assets/admin/dist/js/app.js
 msgid "When off, this channel won't push inventory or pricing, and incoming bookings won't be ingested. Logs still record any attempts so you can audit them."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2003
+# Source: resources/js/pages/ChannelManager.tsx:2073
 #: assets/admin/dist/js/app.js
 msgid "When off, this mapping won't push inventory or pricing, and bookings received for it are still ingested (so cancellations of pre-existing bookings keep working)."
 msgstr ""
@@ -22946,7 +23133,7 @@ msgstr ""
 msgid "Where to find it:"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1095, resources/js/pages/Whatsapp.tsx:726
+# Source: resources/js/pages/ChannelManager.tsx:1122, resources/js/pages/Whatsapp.tsx:918
 #: assets/admin/dist/js/app.js
 msgid "Where to find this"
 msgstr ""
@@ -22956,7 +23143,7 @@ msgstr ""
 msgid "Which AI service handles each generation by default. Per-feature usage runs through the provider whose API key is configured under API Keys above."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1677
+# Source: resources/js/pages/ChannelManager.tsx:1747
 #: assets/admin/dist/js/app.js
 msgid "Which channel this mapping pushes to."
 msgstr ""
@@ -22995,6 +23182,11 @@ msgstr ""
 # Source: resources/js/components/ai/BuildItineraryModal.tsx:376
 #: assets/admin/dist/js/app.js
 msgid "Wildlife"
+msgstr ""
+
+# Source: resources/js/pages/Whatsapp.tsx:810
+#: assets/admin/dist/js/app.js
+msgid "Will be generated when you save settings for the first time."
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:5458
@@ -23185,12 +23377,12 @@ msgstr ""
 msgid "Your latest updates"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:353
+# Source: resources/js/pages/ChannelManager.tsx:354
 #: assets/admin/dist/js/app.js
 msgid "Your license tier qualifies. Turn on Channel Manager under Modules to start configuring it."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:291
+# Source: resources/js/pages/Whatsapp.tsx:309
 #: assets/admin/dist/js/app.js
 msgid "Your license tier qualifies. Turn on WhatsApp Notifications under Modules to start configuring it."
 msgstr ""
@@ -23211,7 +23403,7 @@ msgstr ""
 msgid "Your reCAPTCHA site key"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:536
+# Source: resources/js/pages/Whatsapp.tsx:557
 #: assets/admin/dist/js/app.js
 msgid "Your tour brand"
 msgstr ""
@@ -23364,7 +23556,7 @@ msgstr ""
 msgid "category-slug"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2414
+# Source: resources/js/pages/ChannelManager.tsx:2484
 #: assets/admin/dist/js/app.js
 msgid "circuit open"
 msgstr ""
@@ -23500,7 +23692,7 @@ msgstr ""
 msgid "disable the booking calendar and make trips enquiry-only"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1719
+# Source: resources/js/pages/ChannelManager.tsx:1789
 #: assets/admin/dist/js/app.js
 msgid "e.g. 12345P1 (Viator) or 87654 (GetYourGuide)"
 msgstr ""
@@ -23540,7 +23732,7 @@ msgstr ""
 msgid "e.g. Mention our 24/7 support hotline. Keep total length under 120 words. Emphasize peace of mind."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:895
+# Source: resources/js/pages/ChannelManager.tsx:922
 #: assets/admin/dist/js/app.js
 msgid "e.g. US production account"
 msgstr ""
@@ -23550,7 +23742,7 @@ msgstr ""
 msgid "e.g. Warm, adventurous, never corporate. Speak directly to the traveler. We're a small team, not a corporation."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:1232
+# Source: resources/js/pages/Whatsapp.tsx:1446
 #: assets/admin/dist/js/app.js
 msgid "e.g. Welcome to your trip"
 msgstr ""
@@ -23945,7 +24137,7 @@ msgstr ""
 msgid "entries"
 msgstr ""
 
-# Source: resources/js/components/ai/AutoFillTripModal.tsx:650, resources/js/components/ai/CreateTripWithAiWizard.tsx:934, resources/js/pages/ChannelManager.tsx:526, resources/js/pages/ChannelManager.tsx:2086
+# Source: resources/js/components/ai/AutoFillTripModal.tsx:650, resources/js/components/ai/CreateTripWithAiWizard.tsx:934, resources/js/pages/ChannelManager.tsx:537, resources/js/pages/ChannelManager.tsx:2156
 #: assets/admin/dist/js/app.js
 msgid "failed"
 msgstr ""
@@ -24035,12 +24227,12 @@ msgstr ""
 msgid "items"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2079
+# Source: resources/js/pages/ChannelManager.tsx:2149
 #: assets/admin/dist/js/app.js
 msgid "live booking, visible everywhere"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:2081
+# Source: resources/js/pages/Whatsapp.tsx:2360
 #: assets/admin/dist/js/app.js
 msgid "messages"
 msgstr ""
@@ -24135,7 +24327,7 @@ msgstr ""
 msgid "on waitlist"
 msgstr ""
 
-# Source: resources/js/pages/RecurringRuleForm.tsx:822, resources/js/pages/Whatsapp.tsx:715
+# Source: resources/js/pages/RecurringRuleForm.tsx:822, resources/js/pages/Whatsapp.tsx:907
 #: assets/admin/dist/js/app.js
 msgid "optional"
 msgstr ""
@@ -24201,12 +24393,12 @@ msgstr ""
 msgid "person"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2078
+# Source: resources/js/pages/ChannelManager.tsx:2148
 #: assets/admin/dist/js/app.js
 msgid "promoted"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2087
+# Source: resources/js/pages/ChannelManager.tsx:2157
 #: assets/admin/dist/js/app.js
 msgid "promotion failed — check the error column"
 msgstr ""
@@ -24221,12 +24413,12 @@ msgstr ""
 msgid "ready"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2070
+# Source: resources/js/pages/ChannelManager.tsx:2140
 #: assets/admin/dist/js/app.js
 msgid "received"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2416
+# Source: resources/js/pages/ChannelManager.tsx:2486
 #: assets/admin/dist/js/app.js
 msgid "recovering"
 msgstr ""
@@ -24286,7 +24478,7 @@ msgstr ""
 msgid "sk-… or sk-ant-…"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:2071
+# Source: resources/js/pages/ChannelManager.tsx:2141
 #: assets/admin/dist/js/app.js
 msgid "staged — not yet a real booking"
 msgstr ""
@@ -24388,7 +24580,7 @@ msgstr ""
 msgid "{module} enabled successfully."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1406
+# Source: resources/js/pages/ChannelManager.tsx:1445
 #: assets/admin/dist/js/app.js
 msgid "{n} selected"
 msgstr ""
@@ -25008,8 +25200,8 @@ msgid "Booking session updated."
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:437
-#: app/Controllers/SavedTripController.php:164
-#: app/Controllers/SavedTripController.php:195
+#: app/Controllers/SavedTripController.php:160
+#: app/Controllers/SavedTripController.php:191
 msgid "Trip ID is required."
 msgstr ""
 
@@ -26256,7 +26448,7 @@ msgid "Local snapshots removed."
 msgstr ""
 
 #: app/Core/Handlers/AccountPageHandler.php:46
-#: app/Providers/FrontendAssetsProvider.php:825
+#: app/Providers/FrontendAssetsProvider.php:839
 #: app/Shortcodes/LoginShortcode.php:152
 #: templates/account-page.php:71
 msgid "My Account"
@@ -26287,12 +26479,14 @@ msgid "Too many requests"
 msgstr ""
 
 #: app/Core/Handlers/LoginPageHandler.php:52
-#: app/Providers/FrontendAssetsProvider.php:829
+#: app/Providers/FrontendAssetsProvider.php:299
+#: app/Providers/FrontendAssetsProvider.php:843
 #: app/Shortcodes/MyAccountShortcode.php:60
 #: templates/account-page.php:51
 #: templates/partials/booking-auth.php:25
 #: templates/shortcodes/login.php:97
-#: assets/js/trip.js:4923
+#: assets/js/listing-wishlist.js:37
+#: assets/js/trip.js:4920
 msgid "Login"
 msgstr ""
 
@@ -26811,7 +27005,7 @@ msgid "Plugin Homepage"
 msgstr ""
 
 #: app/Providers/AdminServiceProvider.php:359
-#: app/Providers/FrontendAssetsProvider.php:862
+#: app/Providers/FrontendAssetsProvider.php:876
 msgid "Contact"
 msgstr ""
 
@@ -26825,35 +27019,94 @@ msgstr ""
 msgid "%s Dashboard"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:826
+#: app/Providers/FrontendAssetsProvider.php:297
+#: templates/partials/booking-content.php:80
+#: templates/partials/booking-form-fields.php:676
+#: assets/js/listing-wishlist.js:35
+#: assets/js/trip.js:4918
+msgid "Login Required"
+msgstr ""
+
+#: app/Providers/FrontendAssetsProvider.php:298
+#: assets/js/listing-wishlist.js:36
+#: assets/js/trip.js:4919
+msgid "Please login to save trips to your wishlist."
+msgstr ""
+
+#: app/Providers/FrontendAssetsProvider.php:301
+#: core/ProCompatibility.php:408
+#: assets/js/booking.js:863
+#: assets/js/booking.js:1095
+#: assets/js/booking.js:1194
+#: assets/js/booking.js:1656
+#: assets/js/booking.js:1712
+#: assets/js/booking.js:1848
+#: assets/js/listing-wishlist.js:39
+#: assets/js/trip.js:4565
+#: assets/js/trip.js:4836
+#: assets/js/trip.js:4866
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: app/Providers/FrontendAssetsProvider.php:302
+#: assets/js/listing-wishlist.js:40
+#: assets/js/trip.js:4830
+msgid "Trip saved to wishlist"
+msgstr ""
+
+#: app/Providers/FrontendAssetsProvider.php:303
+#: assets/js/listing-wishlist.js:41
+#: assets/js/trip.js:4860
+msgid "Trip removed from wishlist"
+msgstr ""
+
+#: app/Providers/FrontendAssetsProvider.php:304
+#: assets/js/listing-wishlist.js:42
+#: assets/js/trip.js:4832
+msgid "Failed to save trip"
+msgstr ""
+
+#: app/Providers/FrontendAssetsProvider.php:305
+#: assets/js/listing-wishlist.js:43
+#: assets/js/trip.js:4862
+msgid "Failed to remove trip"
+msgstr ""
+
+#: app/Providers/FrontendAssetsProvider.php:306
+#: assets/js/listing-wishlist.js:44
+#: assets/js/trip.js:4892
+msgid "Add to favorites"
+msgstr ""
+
+#: app/Providers/FrontendAssetsProvider.php:840
 msgid "My Bookings"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:827
+#: app/Providers/FrontendAssetsProvider.php:841
 msgid "Account Settings"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:830
+#: app/Providers/FrontendAssetsProvider.php:844
 #: app/Shortcodes/MyAccountShortcode.php:64
 #: templates/partials/booking-auth.php:31
 msgid "Register"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:843
+#: app/Providers/FrontendAssetsProvider.php:857
 msgid "Please try again"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:854
+#: app/Providers/FrontendAssetsProvider.php:868
 #: templates/partials/single-trip/quick-facts.php:79
 msgid "Group Size"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:857
+#: app/Providers/FrontendAssetsProvider.php:871
 #: templates/partials/single-trip/hero.php:15
 msgid "Home"
 msgstr ""
 
-#: app/Providers/FrontendAssetsProvider.php:861
+#: app/Providers/FrontendAssetsProvider.php:875
 msgid "About Us"
 msgstr ""
 
@@ -26870,30 +27123,30 @@ msgid "Day %1$s already exists for this trip. Please use day %2$d instead."
 msgstr ""
 
 #. translators: %d: number of days.
-#: app/Repositories/SavedTripRepository.php:258
+#: app/Repositories/SavedTripRepository.php:337
 #, php-format
 msgid "%d Days"
 msgstr ""
 
 #. translators: %d: number of nights.
-#: app/Repositories/SavedTripRepository.php:261
+#: app/Repositories/SavedTripRepository.php:340
 #, php-format
 msgid "%d Nights"
 msgstr ""
 
-#: app/Repositories/SavedTripRepository.php:274
+#: app/Repositories/SavedTripRepository.php:353
 msgid "Private Tour"
 msgstr ""
 
-#: app/Repositories/SavedTripRepository.php:276
+#: app/Repositories/SavedTripRepository.php:355
 msgid "Small Group"
 msgstr ""
 
-#: app/Repositories/SavedTripRepository.php:302
+#: app/Repositories/SavedTripRepository.php:381
 msgid "All Meals Included"
 msgstr ""
 
-#: app/Repositories/SavedTripRepository.php:305
+#: app/Repositories/SavedTripRepository.php:384
 msgid "Expert Guide"
 msgstr ""
 
@@ -29006,19 +29259,6 @@ msgstr ""
 msgid "Deactivating plugins and enabling features..."
 msgstr ""
 
-#: core/ProCompatibility.php:408
-#: assets/js/booking.js:863
-#: assets/js/booking.js:1095
-#: assets/js/booking.js:1194
-#: assets/js/booking.js:1656
-#: assets/js/booking.js:1712
-#: assets/js/booking.js:1848
-#: assets/js/trip.js:4565
-#: assets/js/trip.js:4839
-#: assets/js/trip.js:4869
-msgid "An error occurred. Please try again."
-msgstr ""
-
 #: core/ProCompatibility.php:409
 #: templates/setup-wizard/theme.php:120
 #: templates/setup-wizard/theme.php:221
@@ -29926,12 +30166,6 @@ msgstr ""
 msgid "Login here"
 msgstr ""
 
-#: templates/partials/booking-content.php:80
-#: templates/partials/booking-form-fields.php:676
-#: assets/js/trip.js:4921
-msgid "Login Required"
-msgstr ""
-
 #: templates/partials/booking-content.php:81
 msgid "Please login or create an account to continue with your booking"
 msgstr ""
@@ -30747,7 +30981,7 @@ msgstr ""
 
 #: templates/partials/single-trip/gallery-modal.php:28
 #: templates/partials/single-trip/hero.php:304
-#: templates/partials/single-trip/hero.php:330
+#: templates/partials/single-trip/hero.php:333
 #: assets/js/trip.js:338
 msgid "Gallery Image"
 msgstr ""
@@ -30883,6 +31117,7 @@ msgid "360°"
 msgstr ""
 
 #: templates/partials/single-trip/hero.php:310
+#: templates/partials/single-trip/hero.php:311
 #: templates/partials/single-trip/similar-trips.php:165
 #: templates/single-activity.php:174
 #: templates/single-destination.php:174
@@ -30891,7 +31126,7 @@ msgid "Save to wishlist"
 msgstr ""
 
 #. translators: %d: total number of photos in the trip gallery.
-#: templates/partials/single-trip/hero.php:320
+#: templates/partials/single-trip/hero.php:323
 #, php-format
 msgid "View all %d photos"
 msgstr ""
@@ -32935,7 +33170,7 @@ msgid "Getting download..."
 msgstr ""
 
 #: assets/js/downloads-list.js:61
-#: assets/js/trip.js:5309
+#: assets/js/trip.js:5306
 msgid "Download failed"
 msgstr ""
 
@@ -32944,7 +33179,7 @@ msgid "No download URL provided"
 msgstr ""
 
 #: assets/js/downloads-list.js:84
-#: assets/js/trip.js:5328
+#: assets/js/trip.js:5325
 msgid "Download failed. Please try again."
 msgstr ""
 
@@ -32962,32 +33197,6 @@ msgstr ""
 
 #: assets/js/downloads-list.js:116
 msgid "This download requires a booking for this trip."
-msgstr ""
-
-#: assets/js/listing-wishlist.js:118
-#: assets/js/trip.js:4833
-msgid "Trip saved to wishlist"
-msgstr ""
-
-#: assets/js/listing-wishlist.js:120
-#: assets/js/trip.js:4835
-msgid "Failed to save trip"
-msgstr ""
-
-#: assets/js/listing-wishlist.js:147
-#: assets/js/trip.js:4863
-msgid "Trip removed from wishlist"
-msgstr ""
-
-#: assets/js/listing-wishlist.js:149
-#: assets/js/trip.js:4865
-msgid "Failed to remove trip"
-msgstr ""
-
-#: assets/js/listing-wishlist.js:174
-#: assets/js/listing-wishlist.js:175
-#: assets/js/trip.js:4895
-msgid "Add to favorites"
 msgstr ""
 
 #: assets/js/login-shortcode.js:103
@@ -33370,35 +33579,31 @@ msgstr ""
 msgid "Load more failed"
 msgstr ""
 
-#: assets/js/trip.js:4922
-msgid "Please login to save trips to your wishlist."
-msgstr ""
-
-#: assets/js/trip.js:4936
+#: assets/js/trip.js:4933
 msgid "Please login to save trips to your wishlist. Would you like to go to the login page?"
 msgstr ""
 
-#: assets/js/trip.js:5188
+#: assets/js/trip.js:5185
 msgid "Itinerary Video"
 msgstr ""
 
-#: assets/js/trip.js:5340
+#: assets/js/trip.js:5337
 msgid "Failed to get file info"
 msgstr ""
 
-#: assets/js/trip.js:5353
+#: assets/js/trip.js:5350
 msgid "Failed to load preview. Please try again."
 msgstr ""
 
-#: assets/js/trip.js:5383
+#: assets/js/trip.js:5380
 msgid "Preview not available for this file type"
 msgstr ""
 
-#: assets/js/trip.js:5384
+#: assets/js/trip.js:5381
 msgid "Please download the file to view its contents"
 msgstr ""
 
-#: assets/js/trip.js:5413
+#: assets/js/trip.js:5410
 msgid "Loading preview..."
 msgstr ""
 

@@ -1380,6 +1380,9 @@ video {
 .max-w-\[120px\] {
   max-width: 120px;
 }
+.max-w-\[12rem\] {
+  max-width: 12rem;
+}
 .max-w-\[150px\] {
   max-width: 150px;
 }
@@ -6249,6 +6252,10 @@ video {
 
   .lg\:w-48 {
     width: 12rem;
+  }
+
+  .lg\:w-56 {
+    width: 14rem;
   }
 
   .lg\:w-64 {

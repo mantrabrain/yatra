@@ -6,6 +6,15 @@ export interface WhatsappMeta {
   is_module_enabled: boolean;
   is_configured: boolean;
   providers: Array<{ id: string; label: string; disabled?: boolean }>;
+  /** Meta webhook setup info — operator pastes these into WhatsApp
+   *  Business Manager → Webhooks subscription. `app_secret_configured`
+   *  is a visibility flag only; the secret itself is encrypted at rest
+   *  and never sent to the client. */
+  webhook: {
+    url: string;
+    verify_token: string;
+    app_secret_configured: boolean;
+  };
   upgrade_url: string;
   docs_url: string;
 }
@@ -169,9 +178,23 @@ export const whatsappApi = {
       params,
     ) as Promise<WhatsappTestSendResult>,
 
-  listMessages: (perPage = 50) =>
-    apiClient.get("/whatsapp/messages", { params: { per_page: perPage } }) as Promise<{
+  /**
+   * Paginated message log. Returns `total` so the UI can render correct
+   * page counts without local slicing. `page` is 1-indexed.
+   */
+  listMessages: (params: { page?: number; per_page?: number; status?: string; phone?: string } = {}) =>
+    apiClient.get("/whatsapp/messages", {
+      params: {
+        page: params.page ?? 1,
+        per_page: params.per_page ?? 20,
+        ...(params.status ? { status: params.status } : {}),
+        ...(params.phone ? { phone: params.phone } : {}),
+      },
+    }) as Promise<{
       data: WhatsappMessageRow[];
+      total: number;
+      page: number;
+      per_page: number;
     }>,
 
   listOptIns: () =>

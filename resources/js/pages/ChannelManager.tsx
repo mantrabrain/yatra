@@ -45,6 +45,7 @@ import { Label } from "../components/ui/label";
 import { Select } from "../components/ui/select";
 import { Badge } from "../components/ui/badge";
 import { useToast } from "../components/ui/toast";
+import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
 import {
   channelManagerApi,
   type ChannelHealth,
@@ -377,6 +378,12 @@ const ChannelsSection: React.FC<{ meta: ChannelManagerMeta }> = ({ meta }) => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [editing, setEditing] = useState<number | "new" | null>(null);
+  // Confirmation dialog for delete — replaces native window.confirm()
+  // so the destructive prompt matches the rest of the admin UI.
+  const [pendingDeleteChannel, setPendingDeleteChannel] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["channel-manager-channels"],
@@ -388,8 +395,12 @@ const ChannelsSection: React.FC<{ meta: ChannelManagerMeta }> = ({ meta }) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["channel-manager-channels"] });
       showToast(__("Channel deleted.", "yatra"), "success");
+      setPendingDeleteChannel(null);
     },
-    onError: (e: any) => showToast(extractError(e), "error"),
+    onError: (e: any) => {
+      showToast(extractError(e), "error");
+      setPendingDeleteChannel(null);
+    },
   });
 
   if (isLoading) {
@@ -540,18 +551,12 @@ const ChannelsSection: React.FC<{ meta: ChannelManagerMeta }> = ({ meta }) => {
                               variant="outline"
                               size="sm"
                               className="border-red-200 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/30"
-                              onClick={() => {
-                                if (
-                                  confirm(
-                                    __(
-                                      "Delete this channel? Credentials and trip mappings linked to it will be removed. This cannot be undone.",
-                                      "yatra",
-                                    ),
-                                  )
-                                ) {
-                                  deleteChannel.mutate(ch.id);
-                                }
-                              }}
+                              onClick={() =>
+                                setPendingDeleteChannel({
+                                  id: ch.id,
+                                  name: ch.display_name || ch.channel_type,
+                                })
+                              }
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
@@ -566,6 +571,28 @@ const ChannelsSection: React.FC<{ meta: ChannelManagerMeta }> = ({ meta }) => {
           )}
         </CardContent>
       </Card>
+      <ConfirmationDialog
+        isOpen={pendingDeleteChannel !== null}
+        onClose={() => {
+          if (!deleteChannel.isPending) setPendingDeleteChannel(null);
+        }}
+        onConfirm={() => {
+          if (pendingDeleteChannel) deleteChannel.mutate(pendingDeleteChannel.id);
+        }}
+        title={__("Delete channel?", "yatra")}
+        description={
+          pendingDeleteChannel
+            ? __(
+                "Delete the “{name}” channel? Credentials and trip mappings linked to it will be removed. This cannot be undone.",
+                "yatra",
+              ).replace("{name}", pendingDeleteChannel.name)
+            : ""
+        }
+        confirmText={__("Delete channel", "yatra")}
+        cancelText={__("Cancel", "yatra")}
+        variant="danger"
+        isLoading={deleteChannel.isPending}
+      />
     </div>
   );
 };
@@ -1244,6 +1271,13 @@ const MappingsSection: React.FC = () => {
   const [showAdd, setShowAdd] = useState(false);
   const [editing, setEditing] = useState<MappingRow | null>(null);
   const [selected, setSelected] = useState<Set<number>>(new Set());
+  // Unified pending-delete state. `kind` differentiates a single-row
+  // delete from a bulk delete so one <ConfirmationDialog> can serve both.
+  const [pendingDelete, setPendingDelete] = useState<
+    | { kind: "one"; id: number }
+    | { kind: "bulk"; ids: number[] }
+    | null
+  >(null);
 
   const { data: channelsData } = useQuery({
     queryKey: ["channel-manager-channels"],
@@ -1273,8 +1307,12 @@ const MappingsSection: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["channel-manager-mappings"] });
       showToast(__("Mapping deleted.", "yatra"), "success");
+      setPendingDelete(null);
     },
-    onError: (e: any) => showToast(extractError(e), "error"),
+    onError: (e: any) => {
+      showToast(extractError(e), "error");
+      setPendingDelete(null);
+    },
   });
 
   const bulkAction = useMutation({
@@ -1286,8 +1324,12 @@ const MappingsSection: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ["channel-manager-mappings"] });
       setSelected(new Set());
       showToast(res.message, res.ok ? "success" : "error");
+      setPendingDelete(null);
     },
-    onError: (e: any) => showToast(extractError(e), "error"),
+    onError: (e: any) => {
+      showToast(extractError(e), "error");
+      setPendingDelete(null);
+    },
   });
 
   const channels = channelsData?.data ?? [];
@@ -1328,13 +1370,10 @@ const MappingsSection: React.FC = () => {
     const ids = Array.from(selected);
     if (ids.length === 0) return;
     if (action === "delete") {
-      const ok = confirm(
-        __(
-          "Delete {n} mappings? They will stop syncing immediately. Existing bookings are unaffected.",
-          "yatra",
-        ).replace("{n}", String(ids.length)),
-      );
-      if (!ok) return;
+      // Defer to the confirmation dialog — its onConfirm handler
+      // dispatches the actual bulkAction mutation.
+      setPendingDelete({ kind: "bulk", ids });
+      return;
     }
     bulkAction.mutate({ action, ids });
   };
@@ -1594,18 +1633,9 @@ const MappingsSection: React.FC = () => {
                               variant="outline"
                               size="sm"
                               className="border-red-200 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/30"
-                              onClick={() => {
-                                if (
-                                  confirm(
-                                    __(
-                                      "Delete this mapping? The trip will no longer sync to this channel. Existing bookings already in the inbox are not affected.",
-                                      "yatra",
-                                    ),
-                                  )
-                                ) {
-                                  deleteMapping.mutate(m.id);
-                                }
-                              }}
+                              onClick={() =>
+                                setPendingDelete({ kind: "one", id: m.id })
+                              }
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
@@ -1620,6 +1650,46 @@ const MappingsSection: React.FC = () => {
           )}
         </CardContent>
       </Card>
+      <ConfirmationDialog
+        isOpen={pendingDelete !== null}
+        onClose={() => {
+          if (!deleteMapping.isPending && !bulkAction.isPending) {
+            setPendingDelete(null);
+          }
+        }}
+        onConfirm={() => {
+          if (!pendingDelete) return;
+          if (pendingDelete.kind === "one") {
+            deleteMapping.mutate(pendingDelete.id);
+          } else {
+            bulkAction.mutate({ action: "delete", ids: pendingDelete.ids });
+          }
+        }}
+        title={
+          pendingDelete?.kind === "bulk"
+            ? __("Delete selected mappings?", "yatra")
+            : __("Delete mapping?", "yatra")
+        }
+        description={
+          pendingDelete?.kind === "bulk"
+            ? __(
+                "Delete {n} mappings? They will stop syncing immediately. Existing bookings are unaffected.",
+                "yatra",
+              ).replace("{n}", String(pendingDelete.ids.length))
+            : __(
+                "Delete this mapping? The trip will no longer sync to this channel. Existing bookings already in the inbox are not affected.",
+                "yatra",
+              )
+        }
+        confirmText={
+          pendingDelete?.kind === "bulk"
+            ? __("Delete mappings", "yatra")
+            : __("Delete mapping", "yatra")
+        }
+        cancelText={__("Cancel", "yatra")}
+        variant="danger"
+        isLoading={deleteMapping.isPending || bulkAction.isPending}
+      />
     </div>
   );
 };

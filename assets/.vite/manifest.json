@@ -3,11 +3,11 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-DPUOGEIE.js": {
-    "file": "dist/js/index-DPUOGEIE.js",
+  "_index-Bw48uY9G.js": {
+    "file": "dist/js/index-Bw48uY9G.js",
     "name": "index",
     "imports": [
-      "_react-vendor-Bma80Tyf.js"
+      "_react-vendor-BWLheVxV.js"
     ],
     "css": [
       "admin/dist/css/index.css"
@@ -17,8 +17,8 @@
     "file": "admin/dist/css/react-vendor.css",
     "src": "_react-vendor-!~{001}~.js"
   },
-  "_react-vendor-Bma80Tyf.js": {
-    "file": "dist/js/react-vendor-Bma80Tyf.js",
+  "_react-vendor-BWLheVxV.js": {
+    "file": "dist/js/react-vendor-BWLheVxV.js",
     "name": "react-vendor",
     "css": [
       "admin/dist/css/react-vendor.css"
@@ -30,8 +30,8 @@
     "src": "resources/js/account-page.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-Bma80Tyf.js",
-      "_index-DPUOGEIE.js"
+      "_react-vendor-BWLheVxV.js",
+      "_index-Bw48uY9G.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -40,8 +40,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-Bma80Tyf.js",
-      "_index-DPUOGEIE.js"
+      "_react-vendor-BWLheVxV.js",
+      "_index-Bw48uY9G.js"
     ]
   }
 }
