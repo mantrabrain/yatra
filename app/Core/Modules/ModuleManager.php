@@ -312,6 +312,22 @@ class ModuleManager
                 'requires_agency' => true,
                 'settings_page' => 'channel-manager',
             ],
+            [
+                'slug' => 'webhooks',
+                'name' => __('Webhooks', 'yatra'),
+                'description' => __('Push every Yatra event (booking, payment, refund, customer, enquiry, trip, departure) to your CRM, accounting tool, Zapier, Make, Slack, or any HTTPS endpoint. HMAC-SHA256 signed payloads, automatic retry with exponential backoff, full delivery log with payload inspection + replay, per-endpoint encrypted secrets. The integration backbone for agencies wiring Yatra into a custom tech stack.', 'yatra'),
+                'category' => __('Integrations', 'yatra'),
+                'docs_url' => 'https://docs.yatra.com/modules/webhooks',
+                'is_premium' => true,
+                'purchase_url' => 'https://wpyatra.com/pricing?module=webhooks',
+                'is_core' => false,
+                'enabled' => false,
+                'tags' => ['webhook', 'integration', 'zapier', 'crm', 'api', 'agency', 'automation'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
+                'requires_pro' => true,
+                'requires_agency' => true,
+                'settings_page' => 'webhooks',
+            ],
         ];
         
         return apply_filters('yatra_default_modules', $modules);

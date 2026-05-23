@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-22T14:46:32+00:00\n"
+"POT-Creation-Date: 2026-05-23T03:59:16+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -327,6 +327,11 @@ msgstr ""
 msgid "5 Stars"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:317
+#: assets/admin/dist/js/app.js
+msgid "5 attempts with jittered exponential delay."
+msgstr ""
+
 # Source: resources/js/components/ai/CustomerSummaryCard.tsx:66
 #: assets/admin/dist/js/app.js
 msgid "A 3-line operator-facing snapshot — status, last trip, anything notable for ops."
@@ -377,7 +382,7 @@ msgstr ""
 msgid "A mapping links one of your trips to its counterpart product on a channel. One trip can be mapped to many channels (each can have its own price offset); one channel holds one mapping per trip."
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:499, resources/js/components/ai/AiFieldAffordance.tsx:172, resources/js/components/ai/AiFieldAffordance.tsx:176, resources/js/pages/AiAssistant.tsx:146
+# Source: resources/js/components/Layout.tsx:500, resources/js/components/ai/AiFieldAffordance.tsx:172, resources/js/components/ai/AiFieldAffordance.tsx:176, resources/js/pages/AiAssistant.tsx:146
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:269
 msgid "AI Assistant"
@@ -584,7 +589,7 @@ msgstr ""
 msgid "Abandoned Bookings"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:443
+# Source: resources/js/components/Layout.tsx:444
 #: assets/admin/dist/js/app.js
 msgid "Abandoned Recovery"
 msgstr ""
@@ -685,7 +690,7 @@ msgstr ""
 msgid "Activate module"
 msgstr ""
 
-# Source: resources/js/components/availability/RecurringRules.tsx:341, resources/js/components/availability/RecurringRules.tsx:708, resources/js/components/availability/RecurringRules.tsx:742, resources/js/components/email/EmailTemplatesList.tsx:856, resources/js/components/trips/TripsFilters.tsx:53, resources/js/components/trips/TripsTable.tsx:80, resources/js/pages/AbandonedRecoveryEmailForm.tsx:183, resources/js/pages/ChannelManager.tsx:1604, resources/js/pages/ChannelManager.tsx:2072, resources/js/pages/CustomerForm.tsx:800, resources/js/pages/Customers.tsx:215, resources/js/pages/Customers.tsx:442, resources/js/pages/Customers.tsx:793, resources/js/pages/DepartureRecurringRuleForm.tsx:403, resources/js/pages/DynamicPricing.tsx:500, resources/js/pages/DynamicPricing.tsx:550, resources/js/pages/DynamicPricingRuleForm.tsx:1157, resources/js/pages/EmailAutomation.tsx:162, resources/js/pages/EmailSequenceForm.tsx:430, resources/js/pages/EmailSequenceForm.tsx:894, resources/js/pages/EmailTemplateForm.tsx:609, resources/js/pages/RecurringRuleForm.tsx:2503, resources/js/pages/RecurringRulesPage.tsx:276, resources/js/pages/RecurringRulesPage.tsx:539, resources/js/pages/Settings.tsx:4502, resources/js/pages/ViewCustomer.tsx:176, resources/js/pages/ViewDeparture.tsx:720, resources/js/pages/Whatsapp.tsx:1188, resources/js/pages/Whatsapp.tsx:1419
+# Source: resources/js/components/availability/RecurringRules.tsx:341, resources/js/components/availability/RecurringRules.tsx:708, resources/js/components/availability/RecurringRules.tsx:742, resources/js/components/email/EmailTemplatesList.tsx:856, resources/js/components/trips/TripsFilters.tsx:53, resources/js/components/trips/TripsTable.tsx:80, resources/js/pages/AbandonedRecoveryEmailForm.tsx:183, resources/js/pages/ChannelManager.tsx:1604, resources/js/pages/ChannelManager.tsx:2072, resources/js/pages/CustomerForm.tsx:800, resources/js/pages/Customers.tsx:215, resources/js/pages/Customers.tsx:442, resources/js/pages/Customers.tsx:793, resources/js/pages/DepartureRecurringRuleForm.tsx:403, resources/js/pages/DynamicPricing.tsx:500, resources/js/pages/DynamicPricing.tsx:550, resources/js/pages/DynamicPricingRuleForm.tsx:1157, resources/js/pages/EmailAutomation.tsx:162, resources/js/pages/EmailSequenceForm.tsx:430, resources/js/pages/EmailSequenceForm.tsx:894, resources/js/pages/EmailTemplateForm.tsx:609, resources/js/pages/RecurringRuleForm.tsx:2503, resources/js/pages/RecurringRulesPage.tsx:276, resources/js/pages/RecurringRulesPage.tsx:539, resources/js/pages/Settings.tsx:4502, resources/js/pages/ViewCustomer.tsx:176, resources/js/pages/ViewDeparture.tsx:720, resources/js/pages/Webhooks.tsx:523, resources/js/pages/Webhooks.tsx:1463, resources/js/pages/Whatsapp.tsx:1188, resources/js/pages/Whatsapp.tsx:1419
 #: assets/admin/dist/js/app.js
 msgid "Active"
 msgstr ""
@@ -700,7 +705,7 @@ msgstr ""
 msgid "Active Sites"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:370, resources/js/components/trip-form/sections/ItinerarySection.tsx:82, resources/js/pages/Activities.tsx:602
+# Source: resources/js/components/Layout.tsx:371, resources/js/components/trip-form/sections/ItinerarySection.tsx:82, resources/js/pages/Activities.tsx:602
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:874
 #: templates/listing-trip.php:424
@@ -1179,6 +1184,11 @@ msgstr ""
 msgid "Add customer email templates under Email → Templates first."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:470, resources/js/pages/Webhooks.tsx:1388
+#: assets/admin/dist/js/app.js
+msgid "Add endpoint"
+msgstr ""
+
 # Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:870
 #: assets/admin/dist/js/app.js
 msgid "Add excluded item..."
@@ -1279,6 +1289,11 @@ msgstr ""
 msgid "Add pricing to override trip default pricing for specific traveler categories. Leave empty to use trip default pricing."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:164
+#: assets/admin/dist/js/app.js
+msgid "Add row"
+msgstr ""
+
 # Source: resources/js/pages/EmailSequenceForm.tsx:867
 #: assets/admin/dist/js/app.js
 msgid "Add steps with delays and email templates"
@@ -1329,6 +1344,11 @@ msgstr ""
 msgid "Add your first channel"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:613
+#: assets/admin/dist/js/app.js
+msgid "Add your first endpoint to start receiving events. Common targets: Zapier catch hooks, Make scenarios, internal CRM ingest URLs, Slack webhook URLs."
+msgstr ""
+
 # Source: resources/js/pages/Settings.tsx:7806
 #: assets/admin/dist/js/app.js
 msgid "Adding..."
@@ -1339,7 +1359,7 @@ msgstr ""
 msgid "Additional Details"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:387, resources/js/pages/AdditionalServices.tsx:333, resources/js/pages/ViewBooking.tsx:722, resources/js/pages/premium-pages/AdditionalServices.tsx:153
+# Source: resources/js/components/Layout.tsx:388, resources/js/pages/AdditionalServices.tsx:333, resources/js/pages/ViewBooking.tsx:722, resources/js/pages/premium-pages/AdditionalServices.tsx:153
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:59
 #: templates/booking-confirmation.php:527
@@ -1375,6 +1395,11 @@ msgstr ""
 # Source: resources/js/pages/BookingForm.tsx:1246
 #: assets/admin/dist/js/app.js
 msgid "Additional notes or special requests"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1686
+#: assets/admin/dist/js/app.js
+msgid "Additional payload fields"
 msgstr ""
 
 # Source: resources/js/pages/ViewCustomer.tsx:492, resources/js/pages/account/Profile.tsx:195
@@ -1671,7 +1696,7 @@ msgstr ""
 msgid "All Travelers"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:369, resources/js/components/shared/ApplicableTripSelector.tsx:173, resources/js/pages/AdditionalServices.tsx:618, resources/js/pages/AdditionalServicesForm.tsx:615, resources/js/pages/DynamicPricing.tsx:659, resources/js/pages/DynamicPricingRuleForm.tsx:1203, resources/js/pages/Travelers.tsx:401, resources/js/pages/TripConsent.tsx:542, resources/js/pages/Trips.tsx:1473
+# Source: resources/js/components/Layout.tsx:370, resources/js/components/shared/ApplicableTripSelector.tsx:173, resources/js/pages/AdditionalServices.tsx:618, resources/js/pages/AdditionalServicesForm.tsx:615, resources/js/pages/DynamicPricing.tsx:659, resources/js/pages/DynamicPricingRuleForm.tsx:1203, resources/js/pages/Travelers.tsx:401, resources/js/pages/TripConsent.tsx:542, resources/js/pages/Trips.tsx:1473
 #: assets/admin/dist/js/app.js
 #: app/Services/SEOService.php:315
 #: app/Services/TripListingPageContextFactory.php:115
@@ -1696,6 +1721,16 @@ msgstr ""
 msgid "All channels"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:2063
+#: assets/admin/dist/js/app.js
+msgid "All endpoints"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2076
+#: assets/admin/dist/js/app.js
+msgid "All events"
+msgstr ""
+
 # Source: resources/js/components/Tools.tsx:3209
 #: assets/admin/dist/js/app.js
 msgid "All legacy data types will be migrated to the new Yatra 3.0 database structure. The migration runs asynchronously via WordPress cron."
@@ -1711,7 +1746,7 @@ msgstr ""
 msgid "All prompts reset to defaults."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:2253
+# Source: resources/js/pages/Webhooks.tsx:2089, resources/js/pages/Whatsapp.tsx:2253
 #: assets/admin/dist/js/app.js
 msgid "All statuses"
 msgstr ""
@@ -2475,6 +2510,11 @@ msgstr ""
 msgid "Attach files to this trip and control who can access them."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:2155, resources/js/pages/Webhooks.tsx:2375
+#: assets/admin/dist/js/app.js
+msgid "Attempts"
+msgstr ""
+
 # Source: resources/js/pages/Attributes.tsx:278, resources/js/pages/Attributes.tsx:705
 #: assets/admin/dist/js/app.js
 msgid "Attribute"
@@ -2495,7 +2535,7 @@ msgstr ""
 msgid "Attribute updated successfully"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:381, resources/js/pages/Attributes.tsx:629, resources/js/pages/Trips.tsx:786, resources/js/pages/Trips.tsx:1239
+# Source: resources/js/components/Layout.tsx:382, resources/js/pages/Attributes.tsx:629, resources/js/pages/Trips.tsx:786, resources/js/pages/Trips.tsx:1239
 #: assets/admin/dist/js/app.js
 msgid "Attributes"
 msgstr ""
@@ -2645,6 +2685,11 @@ msgstr ""
 msgid "Automated workflows and notifications"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:316
+#: assets/admin/dist/js/app.js
+msgid "Automatic retry with backoff"
+msgstr ""
+
 # Source: resources/js/pages/Settings.tsx:6148
 #: assets/admin/dist/js/app.js
 msgid "Automatically add customers to Mailchimp when they make a booking"
@@ -2715,7 +2760,7 @@ msgstr ""
 msgid "Automation"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:379, resources/js/pages/Trips.tsx:776, resources/js/pages/Trips.tsx:1188
+# Source: resources/js/components/Layout.tsx:380, resources/js/pages/Trips.tsx:776, resources/js/pages/Trips.tsx:1188
 #: assets/admin/dist/js/app.js
 #: templates/partials/availability-section.php:30
 #: assets/js/trip.js:2062
@@ -2801,6 +2846,11 @@ msgstr ""
 # Source: resources/js/pages/ChannelManager.tsx:319
 #: assets/admin/dist/js/app.js
 msgid "Available on the Agency plan. Standalone channel managers charge $99–299/month for the same capability — it's included here at no extra cost."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:296
+#: assets/admin/dist/js/app.js
+msgid "Available on the Agency plan. The integration backbone for agencies wiring Yatra into a custom tech stack — sync bookings to CRMs, post revenue events to accounting tools, trigger Zapier workflows, ping Slack on VIP bookings."
 msgstr ""
 
 # Source: resources/js/pages/Whatsapp.tsx:279
@@ -2933,7 +2983,7 @@ msgstr ""
 msgid "Back to Services"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:961, resources/js/components/Layout.tsx:1011, resources/js/components/Layout.tsx:1302
+# Source: resources/js/components/Layout.tsx:975, resources/js/components/Layout.tsx:1025, resources/js/components/Layout.tsx:1316
 #: assets/admin/dist/js/app.js
 msgid "Back to WordPress"
 msgstr ""
@@ -3008,6 +3058,11 @@ msgstr ""
 # Source: resources/js/pages/Settings.tsx:7092
 #: assets/admin/dist/js/app.js
 msgid "Begin checkout"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1906
+#: assets/admin/dist/js/app.js
+msgid "Below is the signing secret for "
 msgstr ""
 
 # Source: resources/js/pages/TripForm.tsx:8123
@@ -3337,7 +3392,7 @@ msgstr ""
 msgid "Booking status updated"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:425, resources/js/components/trips/TripsTable.tsx:119, resources/js/pages/AccountPage.tsx:44, resources/js/pages/Bookings.tsx:796, resources/js/pages/Customers.tsx:452, resources/js/pages/Customers.tsx:472, resources/js/pages/Customers.tsx:537, resources/js/pages/Customers.tsx:647, resources/js/pages/Departures.tsx:824, resources/js/pages/Reports.tsx:416, resources/js/pages/Reports.tsx:618, resources/js/pages/Reports.tsx:701, resources/js/pages/Reports.tsx:712, resources/js/pages/Trips.tsx:809, resources/js/pages/Trips.tsx:1264, resources/js/pages/ViewDeparture.tsx:414, resources/js/pages/account/Bookings.tsx:229
+# Source: resources/js/components/Layout.tsx:426, resources/js/components/trips/TripsTable.tsx:119, resources/js/pages/AccountPage.tsx:44, resources/js/pages/Bookings.tsx:796, resources/js/pages/Customers.tsx:452, resources/js/pages/Customers.tsx:472, resources/js/pages/Customers.tsx:537, resources/js/pages/Customers.tsx:647, resources/js/pages/Departures.tsx:824, resources/js/pages/Reports.tsx:416, resources/js/pages/Reports.tsx:618, resources/js/pages/Reports.tsx:701, resources/js/pages/Reports.tsx:712, resources/js/pages/Trips.tsx:809, resources/js/pages/Trips.tsx:1264, resources/js/pages/ViewDeparture.tsx:414, resources/js/pages/account/Bookings.tsx:229
 #: assets/admin/dist/js/app.js
 #: app/Controllers/SetupWizardController.php:83
 #: app/Core/Modules/ModuleManager.php:106
@@ -3576,6 +3631,11 @@ msgstr ""
 msgid "Buttons, links, and highlights. Default is the standard Yatra blue; choose a hex color that matches your brand or theme accent."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1716
+#: assets/admin/dist/js/app.js
+msgid "By default Yatra generates a strong random 32-byte signing secret. If your receiver already has a secret configured (e.g. you're migrating from another system), paste it below — minimum 24 characters."
+msgstr ""
+
 # Source: resources/js/pages/TripConsentForm.tsx:718
 #: assets/admin/dist/js/app.js
 msgid "By signing below, I confirm that I have read and understood this consent form, that I am at least 18 years of age (or have parental/guardian consent), and that I agree to abide by all rules and instructions provided by the trip organizers."
@@ -3638,7 +3698,7 @@ msgstr ""
 msgid "Campaign Name"
 msgstr ""
 
-# Source: resources/js/components/Tools.tsx:3181, resources/js/components/ai/AiEmailTemplateModal.tsx:102, resources/js/components/ai/AiEmailTemplateModal.tsx:275, resources/js/components/ai/AutoFillTripModal.tsx:332, resources/js/components/ai/AutoFillTripModal.tsx:658, resources/js/components/ai/BuildItineraryModal.tsx:169, resources/js/components/ai/BuildItineraryModal.tsx:708, resources/js/components/ai/BuildItineraryModal.tsx:719, resources/js/components/ai/CreateTripWithAiWizard.tsx:419, resources/js/components/ai/CreateTripWithAiWizard.tsx:954, resources/js/components/availability/RecurringRules.tsx:608, resources/js/components/availability/RecurringRules.tsx:627, resources/js/components/email/EmailTemplatesList.tsx:941, resources/js/components/itinerary/DayConflictDialog.tsx:75, resources/js/components/modals/RuleTypeSelectionModal.tsx:101, resources/js/components/shared/BulkActionToolbar.tsx:339, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1163, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1325, resources/js/components/ui/confirmation-dialog.tsx:94, resources/js/pages/AbandonedRecoveryEmailForm.tsx:337, resources/js/pages/Activities.tsx:552, resources/js/pages/Activities.tsx:596, resources/js/pages/ActivityForm.tsx:682, resources/js/pages/AdditionalServices.tsx:366, resources/js/pages/AttributeForm.tsx:1180, resources/js/pages/Attributes.tsx:580, resources/js/pages/Attributes.tsx:623, resources/js/pages/Availability.tsx:983, resources/js/pages/Availability.tsx:1048, resources/js/pages/AvailabilityForm.tsx:1668, resources/js/pages/BookingForm.tsx:1833, resources/js/pages/Bookings.tsx:1011, resources/js/pages/Categories.tsx:979, resources/js/pages/CategoryForm.tsx:826, resources/js/pages/ChannelManager.tsx:592, resources/js/pages/ChannelManager.tsx:1689, resources/js/pages/ChannelManager.tsx:1850, resources/js/pages/CustomerForm.tsx:941, resources/js/pages/Customers.tsx:896, resources/js/pages/DepartureForm.tsx:307, resources/js/pages/DepartureRecurringRuleForm.tsx:417, resources/js/pages/DestinationForm.tsx:688, resources/js/pages/Destinations.tsx:419, resources/js/pages/DifficultyLevelForm.tsx:524, resources/js/pages/DifficultyLevels.tsx:593, resources/js/pages/DiscountForm.tsx:2678, resources/js/pages/Discounts.tsx:979, resources/js/pages/Discounts.tsx:1090, resources/js/pages/DynamicPricingRuleForm.tsx:1489, resources/js/pages/DynamicPricingRuleForm.tsx:1501, resources/js/pages/Enquiries.tsx:822, resources/js/pages/Enquiries.tsx:871, resources/js/pages/Enquiries.tsx:917, resources/js/pages/ItemForm.tsx:491, resources/js/pages/ItemTypeForm.tsx:577, resources/js/pages/ItemTypes.tsx:708, resources/js/pages/ItemTypes.tsx:808, resources/js/pages/Items.tsx:685, resources/js/pages/Items.tsx:777, resources/js/pages/ItineraryForm.tsx:1157, resources/js/pages/PaymentForm.tsx:563, resources/js/pages/Payments.tsx:753, resources/js/pages/RecurringRuleForm.tsx:2608, resources/js/pages/RecurringRulesPage.tsx:439, resources/js/pages/RecurringRulesPage.tsx:458, resources/js/pages/ReviewForm.tsx:558, resources/js/pages/Reviews.tsx:471, resources/js/pages/Settings.tsx:1650, resources/js/pages/Settings.tsx:2040, resources/js/pages/TravelerCategories.tsx:644, resources/js/pages/TravelerCategoryForm.tsx:834, resources/js/pages/Travelers.tsx:626, resources/js/pages/TripConsent.tsx:363, resources/js/pages/TripForm.tsx:9423, resources/js/pages/TripForm.tsx:9530, resources/js/pages/TripForm.tsx:9558, resources/js/pages/Trips.tsx:1734, resources/js/pages/Trips.tsx:1864, resources/js/pages/ViewEnquiry.tsx:518, resources/js/pages/Whatsapp.tsx:1244, resources/js/pages/account/Profile.tsx:249, resources/js/pages/account/Profile.tsx:389
+# Source: resources/js/components/Tools.tsx:3181, resources/js/components/ai/AiEmailTemplateModal.tsx:102, resources/js/components/ai/AiEmailTemplateModal.tsx:275, resources/js/components/ai/AutoFillTripModal.tsx:332, resources/js/components/ai/AutoFillTripModal.tsx:658, resources/js/components/ai/BuildItineraryModal.tsx:169, resources/js/components/ai/BuildItineraryModal.tsx:708, resources/js/components/ai/BuildItineraryModal.tsx:719, resources/js/components/ai/CreateTripWithAiWizard.tsx:419, resources/js/components/ai/CreateTripWithAiWizard.tsx:954, resources/js/components/availability/RecurringRules.tsx:608, resources/js/components/availability/RecurringRules.tsx:627, resources/js/components/email/EmailTemplatesList.tsx:941, resources/js/components/itinerary/DayConflictDialog.tsx:75, resources/js/components/modals/RuleTypeSelectionModal.tsx:101, resources/js/components/shared/BulkActionToolbar.tsx:339, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1163, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1325, resources/js/components/ui/confirmation-dialog.tsx:94, resources/js/pages/AbandonedRecoveryEmailForm.tsx:337, resources/js/pages/Activities.tsx:552, resources/js/pages/Activities.tsx:596, resources/js/pages/ActivityForm.tsx:682, resources/js/pages/AdditionalServices.tsx:366, resources/js/pages/AttributeForm.tsx:1180, resources/js/pages/Attributes.tsx:580, resources/js/pages/Attributes.tsx:623, resources/js/pages/Availability.tsx:983, resources/js/pages/Availability.tsx:1048, resources/js/pages/AvailabilityForm.tsx:1668, resources/js/pages/BookingForm.tsx:1833, resources/js/pages/Bookings.tsx:1011, resources/js/pages/Categories.tsx:979, resources/js/pages/CategoryForm.tsx:826, resources/js/pages/ChannelManager.tsx:592, resources/js/pages/ChannelManager.tsx:1689, resources/js/pages/ChannelManager.tsx:1850, resources/js/pages/CustomerForm.tsx:941, resources/js/pages/Customers.tsx:896, resources/js/pages/DepartureForm.tsx:307, resources/js/pages/DepartureRecurringRuleForm.tsx:417, resources/js/pages/DestinationForm.tsx:688, resources/js/pages/Destinations.tsx:419, resources/js/pages/DifficultyLevelForm.tsx:524, resources/js/pages/DifficultyLevels.tsx:593, resources/js/pages/DiscountForm.tsx:2678, resources/js/pages/Discounts.tsx:979, resources/js/pages/Discounts.tsx:1090, resources/js/pages/DynamicPricingRuleForm.tsx:1489, resources/js/pages/DynamicPricingRuleForm.tsx:1501, resources/js/pages/Enquiries.tsx:822, resources/js/pages/Enquiries.tsx:871, resources/js/pages/Enquiries.tsx:917, resources/js/pages/ItemForm.tsx:491, resources/js/pages/ItemTypeForm.tsx:577, resources/js/pages/ItemTypes.tsx:708, resources/js/pages/ItemTypes.tsx:808, resources/js/pages/Items.tsx:685, resources/js/pages/Items.tsx:777, resources/js/pages/ItineraryForm.tsx:1157, resources/js/pages/PaymentForm.tsx:563, resources/js/pages/Payments.tsx:753, resources/js/pages/RecurringRuleForm.tsx:2608, resources/js/pages/RecurringRulesPage.tsx:439, resources/js/pages/RecurringRulesPage.tsx:458, resources/js/pages/ReviewForm.tsx:558, resources/js/pages/Reviews.tsx:471, resources/js/pages/Settings.tsx:1650, resources/js/pages/Settings.tsx:2040, resources/js/pages/TravelerCategories.tsx:644, resources/js/pages/TravelerCategoryForm.tsx:834, resources/js/pages/Travelers.tsx:626, resources/js/pages/TripConsent.tsx:363, resources/js/pages/TripForm.tsx:9423, resources/js/pages/TripForm.tsx:9530, resources/js/pages/TripForm.tsx:9558, resources/js/pages/Trips.tsx:1734, resources/js/pages/Trips.tsx:1864, resources/js/pages/ViewEnquiry.tsx:518, resources/js/pages/Webhooks.tsx:641, resources/js/pages/Webhooks.tsx:1391, resources/js/pages/Webhooks.tsx:1777, resources/js/pages/Whatsapp.tsx:1244, resources/js/pages/account/Profile.tsx:249, resources/js/pages/account/Profile.tsx:389
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:300
 #: templates/partials/booking-content.php:180
@@ -3740,6 +3800,21 @@ msgstr ""
 msgid "Caps on the public chat widget to protect your AI provider budget. Higher numbers = more freedom for visitors and more potential cost. Each field is clamped to a safe range on save."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:966
+#: assets/admin/dist/js/app.js
+msgid "Captured"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:880
+#: assets/admin/dist/js/app.js
+msgid "Captured live"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1235
+#: assets/admin/dist/js/app.js
+msgid "Captured live from a real event firing."
+msgstr ""
+
 # Source: resources/js/pages/Settings.tsx:4781
 #: assets/admin/dist/js/app.js
 msgid "Card (Stripe Elements)"
@@ -3755,7 +3830,7 @@ msgstr ""
 msgid "Cash already received — what's actually in your accounts. The gap between Booked and Collected is your accounts-receivable (pending payments + scheduled instalments)."
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:372, resources/js/pages/Categories.tsx:985
+# Source: resources/js/components/Layout.tsx:373, resources/js/pages/Categories.tsx:985
 #: assets/admin/dist/js/app.js
 #: templates/listing-trip.php:338
 #: templates/single-taxonomy.php:83
@@ -3882,7 +3957,7 @@ msgstr ""
 msgid "Channel"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:532
+# Source: resources/js/components/Layout.tsx:533
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:301
 msgid "Channel Manager"
@@ -4009,6 +4084,11 @@ msgstr ""
 msgid "Choose a trip to manage its itinerary entries and day-by-day schedule"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1539
+#: assets/admin/dist/js/app.js
+msgid "Choose an event…"
+msgstr ""
+
 # Source: resources/js/pages/ItemTypeForm.tsx:485
 #: assets/admin/dist/js/app.js
 msgid "Choose an icon to represent this item type visually. Icons help users quickly identify different types. You can also upload a custom image."
@@ -4080,7 +4160,7 @@ msgstr ""
 msgid "City"
 msgstr ""
 
-# Source: resources/js/components/shared/ApplicableTripSelector.tsx:214, resources/js/components/shared/BulkActionToolbar.tsx:152, resources/js/pages/AiAssistant.tsx:679, resources/js/pages/ChannelManager.tsx:1183, resources/js/pages/ChannelManager.tsx:1490, resources/js/pages/License.tsx:788, resources/js/pages/TripConsentForm.tsx:245, resources/js/pages/Whatsapp.tsx:951
+# Source: resources/js/components/shared/ApplicableTripSelector.tsx:214, resources/js/components/shared/BulkActionToolbar.tsx:152, resources/js/pages/AiAssistant.tsx:679, resources/js/pages/ChannelManager.tsx:1183, resources/js/pages/ChannelManager.tsx:1490, resources/js/pages/License.tsx:788, resources/js/pages/TripConsentForm.tsx:245, resources/js/pages/Webhooks.tsx:1019, resources/js/pages/Webhooks.tsx:1122, resources/js/pages/Whatsapp.tsx:951
 #: assets/admin/dist/js/app.js
 msgid "Clear"
 msgstr ""
@@ -4154,6 +4234,11 @@ msgstr ""
 # Source: resources/js/pages/DynamicPricing.tsx:975
 #: assets/admin/dist/js/app.js
 msgid "Click \"Create Rule\" button above to get started"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:973
+#: assets/admin/dist/js/app.js
+msgid "Click \"Listen for sample\" then perform the action that triggers this event in Yatra. We'll show you the real payload — no guesswork."
 msgstr ""
 
 # Source: resources/js/pages/AiAssistant.tsx:513
@@ -4273,10 +4358,10 @@ msgstr ""
 msgid "Client Secret"
 msgstr ""
 
-# Source: resources/js/components/ai/AiEmailTemplateModal.tsx:166, resources/js/components/ai/AutoFillTripModal.tsx:523, resources/js/components/ai/BuildItineraryModal.tsx:299, resources/js/components/ai/BuildItineraryModal.tsx:761, resources/js/components/ai/BuildItineraryModal.tsx:770, resources/js/components/ai/CreateTripWithAiWizard.tsx:833, resources/js/components/email/EmailPreviewModal.tsx:46, resources/js/components/shared/ApplicableTripSelector.tsx:303, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1204, resources/js/components/ui/alert.tsx:58, resources/js/components/ui/icon-picker.tsx:583, resources/js/components/ui/toast.tsx:165, resources/js/pages/AbandonedRecovery.tsx:1432, resources/js/pages/Departures.tsx:1257, resources/js/pages/TripConsent.tsx:1061, resources/js/pages/TripForm.tsx:9456
+# Source: resources/js/components/ai/AiEmailTemplateModal.tsx:166, resources/js/components/ai/AutoFillTripModal.tsx:523, resources/js/components/ai/BuildItineraryModal.tsx:299, resources/js/components/ai/BuildItineraryModal.tsx:761, resources/js/components/ai/BuildItineraryModal.tsx:770, resources/js/components/ai/CreateTripWithAiWizard.tsx:833, resources/js/components/email/EmailPreviewModal.tsx:46, resources/js/components/shared/ApplicableTripSelector.tsx:303, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1204, resources/js/components/ui/alert.tsx:58, resources/js/components/ui/icon-picker.tsx:583, resources/js/components/ui/toast.tsx:165, resources/js/pages/AbandonedRecovery.tsx:1432, resources/js/pages/Departures.tsx:1257, resources/js/pages/TripConsent.tsx:1061, resources/js/pages/TripForm.tsx:9456, resources/js/pages/Webhooks.tsx:2337
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/sticky-sidebar.php:255
-#: assets/dist/js/index-Bw48uY9G.js:1009
+#: assets/dist/js/index-PSYjntAM.js:1009
 msgid "Close"
 msgstr ""
 
@@ -4814,7 +4899,7 @@ msgstr ""
 #: templates/partials/single-trip/similar-trips.php:270
 #: templates/trip-listing-card.php:455
 #: assets/dist/js/account-page.js:143
-#: assets/dist/js/index-Bw48uY9G.js:2162
+#: assets/dist/js/index-PSYjntAM.js:2162
 msgid "Contact for pricing"
 msgstr ""
 
@@ -4883,12 +4968,12 @@ msgstr ""
 msgid "Coords Set"
 msgstr ""
 
-# Source: resources/js/components/shared/Table.tsx:373, resources/js/pages/TripForm.tsx:3888, resources/js/pages/Whatsapp.tsx:786, resources/js/pages/Whatsapp.tsx:827
+# Source: resources/js/components/shared/Table.tsx:373, resources/js/pages/TripForm.tsx:3888, resources/js/pages/Webhooks.tsx:1927, resources/js/pages/Webhooks.tsx:2484, resources/js/pages/Whatsapp.tsx:786, resources/js/pages/Whatsapp.tsx:827
 #: assets/admin/dist/js/app.js
 msgid "Copied"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1246, resources/js/pages/Itinerary.tsx:1715, resources/js/pages/Settings.tsx:463, resources/js/pages/Whatsapp.tsx:791, resources/js/pages/Whatsapp.tsx:832
+# Source: resources/js/pages/ChannelManager.tsx:1246, resources/js/pages/Itinerary.tsx:1715, resources/js/pages/Settings.tsx:463, resources/js/pages/Webhooks.tsx:1932, resources/js/pages/Webhooks.tsx:2489, resources/js/pages/Whatsapp.tsx:791, resources/js/pages/Whatsapp.tsx:832
 #: assets/admin/dist/js/app.js
 msgid "Copy"
 msgstr ""
@@ -4938,7 +5023,7 @@ msgstr ""
 msgid "Copy verify token"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1136, resources/js/pages/Modules.tsx:528
+# Source: resources/js/components/Layout.tsx:1150, resources/js/pages/Modules.tsx:528
 #: assets/admin/dist/js/app.js
 msgid "Core"
 msgstr ""
@@ -5397,6 +5482,11 @@ msgstr ""
 msgid "Create drip campaigns and automated email sequences for different triggers."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1789
+#: assets/admin/dist/js/app.js
+msgid "Create endpoint"
+msgstr ""
+
 # Source: resources/js/pages/premium-pages/DynamicPricing.tsx:36
 #: assets/admin/dist/js/app.js
 msgid "Create intelligent pricing rules based on demand, season, and booking patterns."
@@ -5472,7 +5562,7 @@ msgstr ""
 msgid "Create your first rule to see performance metrics"
 msgstr ""
 
-# Source: resources/js/components/trips/TripsTable.tsx:121, resources/js/pages/AbandonedRecovery.tsx:1541, resources/js/pages/Attributes.tsx:740, resources/js/pages/Categories.tsx:757, resources/js/pages/Categories.tsx:1033, resources/js/pages/DifficultyLevels.tsx:147, resources/js/pages/DifficultyLevels.tsx:642, resources/js/pages/DifficultyLevels.tsx:713, resources/js/pages/DynamicPricing.tsx:576, resources/js/pages/DynamicPricing.tsx:690, resources/js/pages/Trips.tsx:816, resources/js/pages/Trips.tsx:1277, resources/js/pages/ViewBooking.tsx:1483, resources/js/pages/ViewDeparture.tsx:907, resources/js/pages/ViewPayment.tsx:502, resources/js/pages/ViewReview.tsx:430, resources/js/pages/account/BookingDetails.tsx:917
+# Source: resources/js/components/trips/TripsTable.tsx:121, resources/js/pages/AbandonedRecovery.tsx:1541, resources/js/pages/Attributes.tsx:740, resources/js/pages/Categories.tsx:757, resources/js/pages/Categories.tsx:1033, resources/js/pages/DifficultyLevels.tsx:147, resources/js/pages/DifficultyLevels.tsx:642, resources/js/pages/DifficultyLevels.tsx:713, resources/js/pages/DynamicPricing.tsx:576, resources/js/pages/DynamicPricing.tsx:690, resources/js/pages/Trips.tsx:816, resources/js/pages/Trips.tsx:1277, resources/js/pages/ViewBooking.tsx:1483, resources/js/pages/ViewDeparture.tsx:907, resources/js/pages/ViewPayment.tsx:502, resources/js/pages/ViewReview.tsx:430, resources/js/pages/Webhooks.tsx:2176, resources/js/pages/Webhooks.tsx:2377, resources/js/pages/account/BookingDetails.tsx:917
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/account-page.js:1559
 msgid "Created"
@@ -5632,6 +5722,11 @@ msgstr ""
 msgid "Custom Forms"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1665
+#: assets/admin/dist/js/app.js
+msgid "Custom HTTP headers"
+msgstr ""
+
 # Source: resources/js/components/ui/icon-picker.tsx:205
 #: assets/admin/dist/js/app.js
 msgid "Custom Image"
@@ -5778,7 +5873,7 @@ msgstr ""
 msgid "Customer updated successfully"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:426, resources/js/pages/Customers.tsx:704
+# Source: resources/js/components/Layout.tsx:427, resources/js/pages/Customers.tsx:704
 #: assets/admin/dist/js/app.js
 msgid "Customers"
 msgstr ""
@@ -5838,7 +5933,7 @@ msgstr ""
 msgid "Daily focus emphasis"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:363, resources/js/pages/AbandonedRecovery.tsx:897, resources/js/pages/AccountPage.tsx:43, resources/js/pages/Dashboard.tsx:465
+# Source: resources/js/components/Layout.tsx:364, resources/js/pages/AbandonedRecovery.tsx:897, resources/js/pages/AccountPage.tsx:43, resources/js/pages/Dashboard.tsx:465
 #: assets/admin/dist/js/app.js
 #: app/Providers/AdminServiceProvider.php:498
 #: assets/dist/js/account-page.js:2924
@@ -6185,6 +6280,11 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:634
+#: assets/admin/dist/js/app.js
+msgid "Delete \"{name}\"? Its delivery log will also be removed. This cannot be undone."
+msgstr ""
+
 # Source: resources/js/pages/Activities.tsx:539
 #: assets/admin/dist/js/app.js
 msgid "Delete Activity Permanently"
@@ -6335,6 +6435,16 @@ msgstr ""
 msgid "Delete channel?"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:605, resources/js/pages/Webhooks.tsx:640
+#: assets/admin/dist/js/app.js
+msgid "Delete endpoint"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:631
+#: assets/admin/dist/js/app.js
+msgid "Delete endpoint?"
+msgstr ""
+
 # Source: resources/js/pages/ChannelManager.tsx:1687
 #: assets/admin/dist/js/app.js
 msgid "Delete mapping"
@@ -6415,9 +6525,24 @@ msgstr ""
 msgid "Delicious meal options for different dietary requirements."
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:2256
+# Source: resources/js/pages/Webhooks.tsx:2092, resources/js/pages/Webhooks.tsx:2257, resources/js/pages/Webhooks.tsx:2381, resources/js/pages/Whatsapp.tsx:2256
 #: assets/admin/dist/js/app.js
 msgid "Delivered"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:236
+#: assets/admin/dist/js/app.js
+msgid "Deliveries"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2211
+#: assets/admin/dist/js/app.js
+msgid "Deliveries appear here once an event fires. Use the Ping button on an endpoint to fire a test event."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2091, resources/js/pages/Webhooks.tsx:2253
+#: assets/admin/dist/js/app.js
+msgid "Delivering"
 msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:527, resources/js/pages/Whatsapp.tsx:163
@@ -6430,9 +6555,29 @@ msgstr ""
 msgid "Delivery (addresses & SMTP), core templates for everyone, and optional Pro sequences and logs."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:2370
+#: assets/admin/dist/js/app.js
+msgid "Delivery ID"
+msgstr ""
+
 # Source: resources/js/pages/TripConsentForm.tsx:1523
 #: assets/admin/dist/js/app.js
 msgid "Delivery Settings"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2329
+#: assets/admin/dist/js/app.js
+msgid "Delivery inspector"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2044
+#: assets/admin/dist/js/app.js
+msgid "Delivery log"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2029, resources/js/pages/Webhooks.tsx:2310
+#: assets/admin/dist/js/app.js
+msgid "Delivery re-queued."
 msgstr ""
 
 # Source: resources/js/pages/DynamicPricing.tsx:1573
@@ -6530,7 +6675,7 @@ msgstr ""
 msgid "Departure updated successfully"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:422, resources/js/pages/Departures.tsx:984, resources/js/pages/Reports.tsx:415, resources/js/pages/Reports.tsx:652
+# Source: resources/js/components/Layout.tsx:423, resources/js/pages/Departures.tsx:984, resources/js/pages/Reports.tsx:415, resources/js/pages/Reports.tsx:652
 #: assets/admin/dist/js/app.js
 msgid "Departures"
 msgstr ""
@@ -6623,7 +6768,7 @@ msgstr ""
 msgid "Describe what this service includes..."
 msgstr ""
 
-# Source: resources/js/components/email/EmailTemplatesList.tsx:612, resources/js/components/email/EmailTemplatesList.tsx:744, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:320, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1143, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1305, resources/js/pages/Activities.tsx:133, resources/js/pages/Activities.tsx:682, resources/js/pages/Activities.tsx:825, resources/js/pages/ActivityForm.tsx:475, resources/js/pages/AdditionalServicesForm.tsx:430, resources/js/pages/AttributeForm.tsx:786, resources/js/pages/Attributes.tsx:463, resources/js/pages/Attributes.tsx:750, resources/js/pages/Categories.tsx:649, resources/js/pages/Categories.tsx:1107, resources/js/pages/CategoryForm.tsx:548, resources/js/pages/DestinationForm.tsx:480, resources/js/pages/Destinations.tsx:500, resources/js/pages/Destinations.tsx:648, resources/js/pages/DifficultyLevelForm.tsx:388, resources/js/pages/DifficultyLevels.tsx:120, resources/js/pages/DifficultyLevels.tsx:703, resources/js/pages/DiscountForm.tsx:1259, resources/js/pages/EmailSequenceForm.tsx:453, resources/js/pages/EmailTemplateForm.tsx:641, resources/js/pages/ItemForm.tsx:415, resources/js/pages/ItemTypeForm.tsx:452, resources/js/pages/ItemTypes.tsx:373, resources/js/pages/ItemTypes.tsx:557, resources/js/pages/Items.tsx:336, resources/js/pages/Items.tsx:533, resources/js/pages/TravelerCategories.tsx:512, resources/js/pages/TravelerCategories.tsx:756, resources/js/pages/TravelerCategoryForm.tsx:528, resources/js/pages/TripConsentForm.tsx:950, resources/js/pages/TripForm.tsx:4239, resources/js/pages/TripForm.tsx:6973, resources/js/pages/Whatsapp.tsx:1451
+# Source: resources/js/components/email/EmailTemplatesList.tsx:612, resources/js/components/email/EmailTemplatesList.tsx:744, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:320, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1143, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1305, resources/js/pages/Activities.tsx:133, resources/js/pages/Activities.tsx:682, resources/js/pages/Activities.tsx:825, resources/js/pages/ActivityForm.tsx:475, resources/js/pages/AdditionalServicesForm.tsx:430, resources/js/pages/AttributeForm.tsx:786, resources/js/pages/Attributes.tsx:463, resources/js/pages/Attributes.tsx:750, resources/js/pages/Categories.tsx:649, resources/js/pages/Categories.tsx:1107, resources/js/pages/CategoryForm.tsx:548, resources/js/pages/DestinationForm.tsx:480, resources/js/pages/Destinations.tsx:500, resources/js/pages/Destinations.tsx:648, resources/js/pages/DifficultyLevelForm.tsx:388, resources/js/pages/DifficultyLevels.tsx:120, resources/js/pages/DifficultyLevels.tsx:703, resources/js/pages/DiscountForm.tsx:1259, resources/js/pages/EmailSequenceForm.tsx:453, resources/js/pages/EmailTemplateForm.tsx:641, resources/js/pages/ItemForm.tsx:415, resources/js/pages/ItemTypeForm.tsx:452, resources/js/pages/ItemTypes.tsx:373, resources/js/pages/ItemTypes.tsx:557, resources/js/pages/Items.tsx:336, resources/js/pages/Items.tsx:533, resources/js/pages/TravelerCategories.tsx:512, resources/js/pages/TravelerCategories.tsx:756, resources/js/pages/TravelerCategoryForm.tsx:528, resources/js/pages/TripConsentForm.tsx:950, resources/js/pages/TripForm.tsx:4239, resources/js/pages/TripForm.tsx:6973, resources/js/pages/Webhooks.tsx:1447, resources/js/pages/Whatsapp.tsx:1451
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-location.php:91
 #: templates/pdf/invoice.php:129
@@ -6650,7 +6795,7 @@ msgstr ""
 msgid "Design"
 msgstr ""
 
-# Source: resources/js/pages/Destinations.tsx:495, resources/js/pages/Destinations.tsx:567
+# Source: resources/js/pages/Destinations.tsx:495, resources/js/pages/Destinations.tsx:567, resources/js/pages/Webhooks.tsx:1397
 #: assets/admin/dist/js/app.js
 #: app/Blocks/DestinationBlock.php:91
 #: templates/pdf/itinerary.php:341
@@ -6710,7 +6855,7 @@ msgstr ""
 msgid "Destination(s)"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:371, resources/js/pages/Destinations.tsx:425, resources/js/pages/TripForm.tsx:4753
+# Source: resources/js/components/Layout.tsx:372, resources/js/pages/Destinations.tsx:425, resources/js/pages/TripForm.tsx:4753
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:873
 #: templates/listing-trip.php:381
@@ -6786,7 +6931,7 @@ msgstr ""
 msgid "Difficulty Level Icon or Image"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:375, resources/js/pages/DifficultyLevels.tsx:598
+# Source: resources/js/components/Layout.tsx:376, resources/js/pages/DifficultyLevels.tsx:598
 #: assets/admin/dist/js/app.js
 msgid "Difficulty Levels"
 msgstr ""
@@ -6849,12 +6994,12 @@ msgstr ""
 msgid "Disable Selected"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1165, resources/js/pages/Modules.tsx:180
+# Source: resources/js/components/Layout.tsx:1179, resources/js/pages/Modules.tsx:180
 #: assets/admin/dist/js/app.js
 msgid "Disable module"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1143, resources/js/pages/ChannelManager.tsx:527, resources/js/pages/Reports.tsx:1803, resources/js/pages/TripForm.tsx:8753, resources/js/pages/Whatsapp.tsx:1189, resources/js/pages/Whatsapp.tsx:1419
+# Source: resources/js/components/Layout.tsx:1157, resources/js/pages/ChannelManager.tsx:527, resources/js/pages/Reports.tsx:1803, resources/js/pages/TripForm.tsx:8753, resources/js/pages/Whatsapp.tsx:1189, resources/js/pages/Whatsapp.tsx:1419
 #: assets/admin/dist/js/app.js
 msgid "Disabled"
 msgstr ""
@@ -6864,7 +7009,7 @@ msgstr ""
 msgid "Disabled first"
 msgstr ""
 
-# Source: resources/js/hooks/useModules.ts:333
+# Source: resources/js/hooks/useModules.ts:341
 #: assets/admin/dist/js/app.js
 msgid "Disabled: {modules}"
 msgstr ""
@@ -6872,6 +7017,11 @@ msgstr ""
 # Source: resources/js/components/ai/AiFieldAffordance.tsx:269, resources/js/components/ai/BuildItineraryModal.tsx:739, resources/js/components/ai/EnquiryReplyAffordance.tsx:270
 #: assets/admin/dist/js/app.js
 msgid "Discard"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1010
+#: assets/admin/dist/js/app.js
+msgid "Discard the captured sample"
 msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:295
@@ -6999,7 +7149,7 @@ msgstr ""
 msgid "Discounted price must be less than original price"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:423, resources/js/pages/Discounts.tsx:1105
+# Source: resources/js/components/Layout.tsx:424, resources/js/pages/Discounts.tsx:1105
 #: assets/admin/dist/js/app.js
 msgid "Discounts"
 msgstr ""
@@ -7284,7 +7434,7 @@ msgstr ""
 msgid "Duplicating..."
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:667, resources/js/pages/ChannelManager.tsx:2319, resources/js/pages/Itinerary.tsx:2195, resources/js/pages/Trips.tsx:761, resources/js/pages/Trips.tsx:1123, resources/js/pages/ViewDeparture.tsx:516, resources/js/pages/ViewDeparture.tsx:644
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:667, resources/js/pages/ChannelManager.tsx:2319, resources/js/pages/Itinerary.tsx:2195, resources/js/pages/Trips.tsx:761, resources/js/pages/Trips.tsx:1123, resources/js/pages/ViewDeparture.tsx:516, resources/js/pages/ViewDeparture.tsx:644, resources/js/pages/Webhooks.tsx:2164, resources/js/pages/Webhooks.tsx:2390
 #: assets/admin/dist/js/app.js
 #: app/Controllers/BookingSessionController.php:2640
 #: app/Providers/FrontendAssetsProvider.php:866
@@ -7324,7 +7474,7 @@ msgstr ""
 msgid "Dynamic Form Field"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:454, resources/js/pages/DynamicPricing.tsx:348, resources/js/pages/premium-pages/DynamicPricing.tsx:155
+# Source: resources/js/components/Layout.tsx:455, resources/js/pages/DynamicPricing.tsx:348, resources/js/pages/premium-pages/DynamicPricing.tsx:155
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:208
 #: app/Models/Checkout.php:309
@@ -7346,6 +7496,16 @@ msgstr ""
 # Source: resources/js/pages/WhiteLabel.tsx:1255
 #: assets/admin/dist/js/app.js
 msgid "Each color is independent — clear one to fall back to its Yatra default while keeping the others."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:462
+#: assets/admin/dist/js/app.js
+msgid "Each endpoint receives a signed POST when one of its subscribed events fires. The signing secret is shown once on create — store it in your receiver's config."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1095
+#: assets/admin/dist/js/app.js
+msgid "Each row is a dot-path inside data{}. The value shown is from the real captured sample — your receiver will get that same key, at that same nesting."
 msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:886
@@ -7383,7 +7543,7 @@ msgstr ""
 msgid "Early bird discounts"
 msgstr ""
 
-# Source: resources/js/components/availability/AvailabilityCalendar.tsx:451, resources/js/components/availability/RecurringRules.tsx:539, resources/js/components/email/EmailTemplatesList.tsx:706, resources/js/pages/Activities.tsx:1033, resources/js/pages/AdditionalServices.tsx:720, resources/js/pages/Attributes.tsx:774, resources/js/pages/Availability.tsx:929, resources/js/pages/AvailabilityForm.tsx:638, resources/js/pages/Bookings.tsx:686, resources/js/pages/Categories.tsx:820, resources/js/pages/ChannelManager.tsx:548, resources/js/pages/ChannelManager.tsx:1621, resources/js/pages/Customers.tsx:592, resources/js/pages/Departures.tsx:940, resources/js/pages/Destinations.tsx:865, resources/js/pages/DifficultyLevels.tsx:162, resources/js/pages/Discounts.tsx:864, resources/js/pages/DynamicPricing.tsx:703, resources/js/pages/EmailAutomation.tsx:292, resources/js/pages/Enquiries.tsx:279, resources/js/pages/ItemTypes.tsx:627, resources/js/pages/Items.tsx:604, resources/js/pages/Payments.tsx:606, resources/js/pages/RecurringRuleForm.tsx:273, resources/js/pages/RecurringRuleForm.tsx:275, resources/js/pages/RecurringRulesPage.tsx:385, resources/js/pages/Reviews.tsx:421, resources/js/pages/TravelerCategories.tsx:580, resources/js/pages/TripConsent.tsx:585, resources/js/pages/Trips.tsx:1367, resources/js/pages/Whatsapp.tsx:1200
+# Source: resources/js/components/availability/AvailabilityCalendar.tsx:451, resources/js/components/availability/RecurringRules.tsx:539, resources/js/components/email/EmailTemplatesList.tsx:706, resources/js/pages/Activities.tsx:1033, resources/js/pages/AdditionalServices.tsx:720, resources/js/pages/Attributes.tsx:774, resources/js/pages/Availability.tsx:929, resources/js/pages/AvailabilityForm.tsx:638, resources/js/pages/Bookings.tsx:686, resources/js/pages/Categories.tsx:820, resources/js/pages/ChannelManager.tsx:548, resources/js/pages/ChannelManager.tsx:1621, resources/js/pages/Customers.tsx:592, resources/js/pages/Departures.tsx:940, resources/js/pages/Destinations.tsx:865, resources/js/pages/DifficultyLevels.tsx:162, resources/js/pages/Discounts.tsx:864, resources/js/pages/DynamicPricing.tsx:703, resources/js/pages/EmailAutomation.tsx:292, resources/js/pages/Enquiries.tsx:279, resources/js/pages/ItemTypes.tsx:627, resources/js/pages/Items.tsx:604, resources/js/pages/Payments.tsx:606, resources/js/pages/RecurringRuleForm.tsx:273, resources/js/pages/RecurringRuleForm.tsx:275, resources/js/pages/RecurringRulesPage.tsx:385, resources/js/pages/Reviews.tsx:421, resources/js/pages/TravelerCategories.tsx:580, resources/js/pages/TripConsent.tsx:585, resources/js/pages/Trips.tsx:1367, resources/js/pages/Webhooks.tsx:585, resources/js/pages/Whatsapp.tsx:1200
 #: assets/admin/dist/js/app.js
 msgid "Edit"
 msgstr ""
@@ -7511,7 +7671,7 @@ msgstr ""
 msgid "Edit Pricing Rule"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1280, resources/js/pages/account/Profile.tsx:105
+# Source: resources/js/components/Layout.tsx:1294, resources/js/pages/account/Profile.tsx:105
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/account-page.js:2461
 msgid "Edit Profile"
@@ -7547,6 +7707,11 @@ msgstr ""
 msgid "Edit channel"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1388
+#: assets/admin/dist/js/app.js
+msgid "Edit endpoint"
+msgstr ""
+
 # Source: resources/js/pages/ChannelManager.tsx:1941
 #: assets/admin/dist/js/app.js
 msgid "Edit mapping"
@@ -7577,7 +7742,7 @@ msgstr ""
 msgid "Efficiency"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:434, resources/js/pages/AbandonedRecovery.tsx:670, resources/js/pages/AbandonedRecovery.tsx:1127, resources/js/pages/AbandonedRecovery.tsx:1458, resources/js/pages/Customers.tsx:450, resources/js/pages/Departures.tsx:1266, resources/js/pages/Enquiries.tsx:542, resources/js/pages/EnquiryForm.tsx:293, resources/js/pages/License.tsx:644, resources/js/pages/TripConsent.tsx:1079
+# Source: resources/js/components/Layout.tsx:435, resources/js/pages/AbandonedRecovery.tsx:670, resources/js/pages/AbandonedRecovery.tsx:1127, resources/js/pages/AbandonedRecovery.tsx:1458, resources/js/pages/Customers.tsx:450, resources/js/pages/Departures.tsx:1266, resources/js/pages/Enquiries.tsx:542, resources/js/pages/EnquiryForm.tsx:293, resources/js/pages/License.tsx:644, resources/js/pages/TripConsent.tsx:1079
 #: assets/admin/dist/js/app.js
 #: app/Services/EmailTemplateDefaults.php:580
 #: templates/pdf/consent.php:160
@@ -7834,7 +7999,7 @@ msgstr ""
 msgid "Enable deposit and partial payment options for bookings. Allow customers to pay a percentage upfront and the rest later."
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1166, resources/js/pages/Modules.tsx:181
+# Source: resources/js/components/Layout.tsx:1180, resources/js/pages/Modules.tsx:181
 #: assets/admin/dist/js/app.js
 msgid "Enable module"
 msgstr ""
@@ -7884,6 +8049,11 @@ msgstr ""
 msgid "Enable the Google Analytics 4 module under Modules and add your Measurement ID in Settings to start tracking conversion events."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:363
+#: assets/admin/dist/js/app.js
+msgid "Enable the Webhooks module"
+msgstr ""
+
 # Source: resources/js/pages/Whatsapp.tsx:306
 #: assets/admin/dist/js/app.js
 msgid "Enable the WhatsApp Notifications module"
@@ -7914,7 +8084,7 @@ msgstr ""
 msgid "Enable wishlist (saved trips)"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1142, resources/js/pages/ChannelManager.tsx:526, resources/js/pages/ChannelManager.tsx:1023, resources/js/pages/Modules.tsx:506, resources/js/pages/Reports.tsx:1802, resources/js/pages/TripConsentForm.tsx:1207, resources/js/pages/TripForm.tsx:7108, resources/js/pages/TripForm.tsx:8752
+# Source: resources/js/components/Layout.tsx:1156, resources/js/pages/ChannelManager.tsx:526, resources/js/pages/ChannelManager.tsx:1023, resources/js/pages/Modules.tsx:506, resources/js/pages/Reports.tsx:1802, resources/js/pages/TripConsentForm.tsx:1207, resources/js/pages/TripForm.tsx:7108, resources/js/pages/TripForm.tsx:8752
 #: assets/admin/dist/js/app.js
 msgid "Enabled"
 msgstr ""
@@ -7924,7 +8094,7 @@ msgstr ""
 msgid "Enabled first"
 msgstr ""
 
-# Source: resources/js/hooks/useModules.ts:332
+# Source: resources/js/hooks/useModules.ts:340
 #: assets/admin/dist/js/app.js
 msgid "Enabled: {modules}"
 msgstr ""
@@ -7932,6 +8102,11 @@ msgstr ""
 # Source: resources/js/pages/Whatsapp.tsx:463
 #: assets/admin/dist/js/app.js
 msgid "Encrypted credentials Meta requires for the plugin to send messages on your behalf. Stored with libsodium AEAD; the browser only ever sees a masked last-4 hint."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:308
+#: assets/admin/dist/js/app.js
+msgid "Encrypted per-endpoint secrets"
 msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:198, resources/js/pages/premium-pages/TripConsent.tsx:81
@@ -7973,12 +8148,32 @@ msgstr ""
 msgid "Ending Point"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:485
+#: assets/admin/dist/js/app.js
+msgid "Endpoint"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:404
+#: assets/admin/dist/js/app.js
+msgid "Endpoint deleted."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1333
+#: assets/admin/dist/js/app.js
+msgid "Endpoint updated."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:235
+#: assets/admin/dist/js/app.js
+msgid "Endpoints"
+msgstr ""
+
 # Source: resources/js/components/modules/PremiumUpgradeDialog.tsx:159
 #: assets/admin/dist/js/app.js
 msgid "Enhanced customer management tools"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:428, resources/js/pages/Enquiries.tsx:498
+# Source: resources/js/components/Layout.tsx:429, resources/js/pages/Enquiries.tsx:498
 #: assets/admin/dist/js/app.js
 msgid "Enquiries"
 msgstr ""
@@ -8407,7 +8602,7 @@ msgstr ""
 msgid "Equipment rental"
 msgstr ""
 
-# Source: resources/js/components/ai/CreateTripWithAiWizard.tsx:1549, resources/js/components/ui/modal.tsx:117, resources/js/pages/ItineraryForm.tsx:1129, resources/js/pages/ViewBooking.tsx:1206
+# Source: resources/js/components/ai/CreateTripWithAiWizard.tsx:1549, resources/js/components/ui/modal.tsx:117, resources/js/pages/ItineraryForm.tsx:1129, resources/js/pages/ViewBooking.tsx:1206, resources/js/pages/Webhooks.tsx:2404
 #: assets/admin/dist/js/app.js
 #: app/Core/Handlers/LoginPageHandler.php:145
 msgid "Error"
@@ -8590,7 +8785,7 @@ msgstr ""
 msgid "Essential analytics for your travel booking business."
 msgstr ""
 
-# Source: resources/js/components/email/EmailTemplatesList.tsx:566, resources/js/components/email/EmailTemplatesList.tsx:735, resources/js/pages/EmailTemplateForm.tsx:1171, resources/js/pages/Whatsapp.tsx:1104
+# Source: resources/js/components/email/EmailTemplatesList.tsx:566, resources/js/components/email/EmailTemplatesList.tsx:735, resources/js/pages/EmailTemplateForm.tsx:1171, resources/js/pages/Webhooks.tsx:534, resources/js/pages/Webhooks.tsx:2120, resources/js/pages/Webhooks.tsx:2369, resources/js/pages/Whatsapp.tsx:1104
 #: assets/admin/dist/js/app.js
 msgid "Event"
 msgstr ""
@@ -8640,9 +8835,19 @@ msgstr ""
 msgid "Every frontend page"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:2047
+#: assets/admin/dist/js/app.js
+msgid "Every outbound POST attempt with status, response, and the full payload that was sent. Click any row to inspect the JSON your receiver got."
+msgstr ""
+
 # Source: resources/js/pages/Whatsapp.tsx:2226
 #: assets/admin/dist/js/app.js
 msgid "Every outbound send and inbound reply, filterable by status or phone. Updated every 15 seconds."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:321
+#: assets/admin/dist/js/app.js
+msgid "Every payload preserved for 90 days."
 msgstr ""
 
 # Source: resources/js/pages/Whatsapp.tsx:2454
@@ -8754,6 +8959,11 @@ msgstr ""
 msgid "Expires"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:953
+#: assets/admin/dist/js/app.js
+msgid "Expires in"
+msgstr ""
+
 # Source: resources/js/pages/DiscountForm.tsx:1614, resources/js/pages/Discounts.tsx:602, resources/js/pages/Discounts.tsx:629, resources/js/pages/Discounts.tsx:835
 #: assets/admin/dist/js/app.js
 msgid "Expiry Date"
@@ -8816,10 +9026,20 @@ msgstr ""
 msgid "Facebook Pixel Not Configured"
 msgstr ""
 
-# Source: resources/js/pages/BookingForm.tsx:1724, resources/js/pages/PaymentForm.tsx:523, resources/js/pages/Payments.tsx:237, resources/js/pages/Payments.tsx:448, resources/js/pages/Payments.tsx:864, resources/js/pages/ViewPayment.tsx:159, resources/js/pages/Whatsapp.tsx:2258, resources/js/pages/account/utils.ts:110
+# Source: resources/js/pages/BookingForm.tsx:1724, resources/js/pages/PaymentForm.tsx:523, resources/js/pages/Payments.tsx:237, resources/js/pages/Payments.tsx:448, resources/js/pages/Payments.tsx:864, resources/js/pages/ViewPayment.tsx:159, resources/js/pages/Webhooks.tsx:2261, resources/js/pages/Whatsapp.tsx:2258, resources/js/pages/account/utils.ts:110
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/account-page.js:71
 msgid "Failed"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2265
+#: assets/admin/dist/js/app.js
+msgid "Failed (final)"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2093
+#: assets/admin/dist/js/app.js
+msgid "Failed (retrying)"
 msgstr ""
 
 # Source: resources/js/pages/Reports.tsx:1263, resources/js/pages/Reports.tsx:1856
@@ -9069,7 +9289,7 @@ msgstr ""
 msgid "Failed to fetch day entry"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:142, resources/js/pages/Settings.tsx:3401
+# Source: resources/js/components/Layout.tsx:143, resources/js/pages/Settings.tsx:3401
 #: assets/admin/dist/js/app.js
 msgid "Failed to flush rewrite rules"
 msgstr ""
@@ -9499,12 +9719,12 @@ msgstr ""
 msgid "Failed to update item"
 msgstr ""
 
-# Source: resources/js/hooks/useModules.ts:207
+# Source: resources/js/hooks/useModules.ts:211
 #: assets/admin/dist/js/app.js
 msgid "Failed to update module."
 msgstr ""
 
-# Source: resources/js/hooks/useModules.ts:341
+# Source: resources/js/hooks/useModules.ts:349
 #: assets/admin/dist/js/app.js
 msgid "Failed to update modules."
 msgstr ""
@@ -9630,6 +9850,11 @@ msgstr ""
 msgid "Field Type"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1698
+#: assets/admin/dist/js/app.js
+msgid "Field key (e.g. tenant_id)"
+msgstr ""
+
 # Source: resources/js/pages/TripConsentForm.tsx:1160
 #: assets/admin/dist/js/app.js
 msgid "Field label"
@@ -9638,6 +9863,11 @@ msgstr ""
 # Source: resources/js/pages/AttributeForm.tsx:325
 #: assets/admin/dist/js/app.js
 msgid "Field type is required"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:903
+#: assets/admin/dist/js/app.js
+msgid "Fields ship in the JSON body of the POST under their original keys — nested structure is preserved (e.g. customer.email arrives as data.customer.email, not flattened)."
 msgstr ""
 
 # Source: resources/js/pages/TripForm.tsx:7021
@@ -9675,12 +9905,22 @@ msgstr ""
 msgid "Filter by category"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:2060
+#: assets/admin/dist/js/app.js
+msgid "Filter by endpoint"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2073
+#: assets/admin/dist/js/app.js
+msgid "Filter by event"
+msgstr ""
+
 # Source: resources/js/pages/Modules.tsx:367
 #: assets/admin/dist/js/app.js
 msgid "Filter by plan"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:2250
+# Source: resources/js/pages/Webhooks.tsx:2086, resources/js/pages/Whatsapp.tsx:2250
 #: assets/admin/dist/js/app.js
 msgid "Filter by status"
 msgstr ""
@@ -9801,17 +10041,17 @@ msgstr ""
 msgid "Flush Rewrite Rules"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1038, resources/js/components/Layout.tsx:1043
+# Source: resources/js/components/Layout.tsx:1052, resources/js/components/Layout.tsx:1057
 #: assets/admin/dist/js/app.js
 msgid "Flush permalink"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1042
+# Source: resources/js/components/Layout.tsx:1056
 #: assets/admin/dist/js/app.js
 msgid "Flushing rewrite rules"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1037, resources/js/pages/Settings.tsx:7873
+# Source: resources/js/components/Layout.tsx:1051, resources/js/pages/Settings.tsx:7873
 #: assets/admin/dist/js/app.js
 msgid "Flushing..."
 msgstr ""
@@ -9995,6 +10235,11 @@ msgstr ""
 msgid "From Name"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:881
+#: assets/admin/dist/js/app.js
+msgid "From last delivery"
+msgstr ""
+
 # Source: resources/js/pages/AvailabilityForm.tsx:859, resources/js/pages/RecurringRuleForm.tsx:2276
 #: assets/admin/dist/js/app.js
 msgid "From location (departure)"
@@ -10046,6 +10291,11 @@ msgstr ""
 # Source: resources/js/pages/TripConsentForm.tsx:1220
 #: assets/admin/dist/js/app.js
 msgid "Full Width"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:320
+#: assets/admin/dist/js/app.js
+msgid "Full delivery log + replay"
 msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:636
@@ -10452,6 +10702,16 @@ msgstr ""
 msgid "Guided tour feature coming soon!"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:312
+#: assets/admin/dist/js/app.js
+msgid "HMAC-SHA256 signed payloads"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:242
+#: assets/admin/dist/js/app.js
+msgid "HMAC-signed outbound events. HTTPS endpoints only, encrypted secrets, automatic retry with exponential backoff, full delivery log with payload inspection + replay."
+msgstr ""
+
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:372
 #: assets/admin/dist/js/app.js
 msgid "HTML"
@@ -10460,6 +10720,16 @@ msgstr ""
 # Source: resources/js/pages/EmailTemplateForm.tsx:986
 #: assets/admin/dist/js/app.js
 msgid "HTML email content..."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:459
+#: assets/admin/dist/js/app.js
+msgid "HTTP endpoints"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1399
+#: assets/admin/dist/js/app.js
+msgid "HTTPS-only. We sign every request with HMAC-SHA256 — your receiver verifies the X-Yatra-Signature header against your stored secret."
 msgstr ""
 
 # Source: resources/js/components/ai/BuildItineraryModal.tsx:454
@@ -10498,7 +10768,17 @@ msgstr ""
 msgid "Have AI draft an entire trip — details, itinerary, SEO — from a few setup questions."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:472
+# Source: resources/js/pages/Webhooks.tsx:1677
+#: assets/admin/dist/js/app.js
+msgid "Header name (e.g. Authorization)"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1678
+#: assets/admin/dist/js/app.js
+msgid "Header value (e.g. Bearer xyz)"
+msgstr ""
+
+# Source: resources/js/pages/ChannelManager.tsx:472, resources/js/pages/Webhooks.tsx:561
 #: assets/admin/dist/js/app.js
 msgid "Health"
 msgstr ""
@@ -10566,6 +10846,11 @@ msgstr ""
 # Source: resources/js/pages/WhiteLabel.tsx:1418
 #: assets/admin/dist/js/app.js
 msgid "Hide or show specific pieces of admin chrome — useful when delivering the app to clients who shouldn't be reminded of the underlying platform."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:919
+#: assets/admin/dist/js/app.js
+msgid "Hide payload preview"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:7323
@@ -10843,6 +11128,11 @@ msgstr ""
 msgid "I understand that participation in this trip involves inherent risks, including but not limited to physical injury, illness, property damage, and other hazards. I voluntarily assume all risks associated with my participation and agree to hold harmless the trip organizers, guides, and affiliated parties from any liability arising from my participation."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1899
+#: assets/admin/dist/js/app.js
+msgid "I've saved it"
+msgstr ""
+
 # Source: resources/js/pages/Attributes.tsx:669, resources/js/pages/TravelerCategories.tsx:696
 #: assets/admin/dist/js/app.js
 msgid "ID"
@@ -10991,7 +11281,7 @@ msgstr ""
 msgid "In the event of a medical emergency, I authorize the trip organizers to seek and consent to medical treatment on my behalf. I understand that I am responsible for any medical expenses incurred during the trip."
 msgstr ""
 
-# Source: resources/js/components/availability/RecurringRules.tsx:347, resources/js/components/availability/RecurringRules.tsx:709, resources/js/components/availability/RecurringRules.tsx:747, resources/js/components/email/EmailTemplatesList.tsx:861, resources/js/components/trips/TripsFilters.tsx:55, resources/js/components/trips/TripsTable.tsx:82, resources/js/pages/AbandonedRecoveryEmailForm.tsx:184, resources/js/pages/CustomerForm.tsx:802, resources/js/pages/Customers.tsx:220, resources/js/pages/Customers.tsx:443, resources/js/pages/Customers.tsx:798, resources/js/pages/DynamicPricing.tsx:501, resources/js/pages/DynamicPricing.tsx:555, resources/js/pages/DynamicPricingRuleForm.tsx:1158, resources/js/pages/EmailTemplateForm.tsx:609, resources/js/pages/RecurringRuleForm.tsx:2504, resources/js/pages/RecurringRulesPage.tsx:282, resources/js/pages/RecurringRulesPage.tsx:540, resources/js/pages/ViewCustomer.tsx:181
+# Source: resources/js/components/availability/RecurringRules.tsx:347, resources/js/components/availability/RecurringRules.tsx:709, resources/js/components/availability/RecurringRules.tsx:747, resources/js/components/email/EmailTemplatesList.tsx:861, resources/js/components/trips/TripsFilters.tsx:55, resources/js/components/trips/TripsTable.tsx:82, resources/js/pages/AbandonedRecoveryEmailForm.tsx:184, resources/js/pages/CustomerForm.tsx:802, resources/js/pages/Customers.tsx:220, resources/js/pages/Customers.tsx:443, resources/js/pages/Customers.tsx:798, resources/js/pages/DynamicPricing.tsx:501, resources/js/pages/DynamicPricing.tsx:555, resources/js/pages/DynamicPricingRuleForm.tsx:1158, resources/js/pages/EmailTemplateForm.tsx:609, resources/js/pages/RecurringRuleForm.tsx:2504, resources/js/pages/RecurringRulesPage.tsx:282, resources/js/pages/RecurringRulesPage.tsx:540, resources/js/pages/ViewCustomer.tsx:181, resources/js/pages/Webhooks.tsx:528
 #: assets/admin/dist/js/app.js
 msgid "Inactive"
 msgstr ""
@@ -11082,6 +11372,21 @@ msgstr ""
 msgid "Inline AI generation grounded in your trip data. Bring your own key."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1194
+#: assets/admin/dist/js/app.js
+msgid "Input (full event data)"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1433
+#: assets/admin/dist/js/app.js
+msgid "Insecure URL — http:// is only accepted in WP_DEBUG mode for local development. Production receivers must use https://."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2189
+#: assets/admin/dist/js/app.js
+msgid "Inspect payload + response"
+msgstr ""
+
 # Source: resources/js/pages/account/Payments.tsx:29
 #: assets/admin/dist/js/app.js
 #: app/Services/EmailTemplateSampleData.php:116
@@ -11117,6 +11422,11 @@ msgstr ""
 # Source: resources/js/pages/premium-pages/DynamicPricing.tsx:273
 #: assets/admin/dist/js/app.js
 msgid "Intelligent pricing in 4 simple steps"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1456
+#: assets/admin/dist/js/app.js
+msgid "Internal CRM ingest — sales team"
 msgstr ""
 
 # Source: resources/js/pages/DiscountForm.tsx:1219
@@ -11256,6 +11566,11 @@ msgstr ""
 msgid "Invoices"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1910
+#: assets/admin/dist/js/app.js
+msgid "It will not be shown again — copy it now and store it in your receiver's configuration. If you lose it, you'll need to regenerate (which invalidates the old one)."
+msgstr ""
+
 # Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:197, resources/js/pages/Items.tsx:332, resources/js/pages/Items.tsx:488
 #: assets/admin/dist/js/app.js
 msgid "Item"
@@ -11286,7 +11601,7 @@ msgstr ""
 msgid "Item Type Status"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:416, resources/js/pages/ItemTypes.tsx:814
+# Source: resources/js/components/Layout.tsx:417, resources/js/pages/ItemTypes.tsx:814
 #: assets/admin/dist/js/app.js
 msgid "Item Types"
 msgstr ""
@@ -11412,7 +11727,7 @@ msgstr ""
 msgid "Item updated successfully"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:417, resources/js/pages/ItemTypes.tsx:383, resources/js/pages/ItemTypes.tsx:576, resources/js/pages/Items.tsx:783
+# Source: resources/js/components/Layout.tsx:418, resources/js/pages/ItemTypes.tsx:383, resources/js/pages/ItemTypes.tsx:576, resources/js/pages/Items.tsx:783
 #: assets/admin/dist/js/app.js
 msgid "Items"
 msgstr ""
@@ -11458,7 +11773,7 @@ msgstr ""
 msgid "Itineraries"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:413, resources/js/components/Layout.tsx:418, resources/js/pages/TripForm.tsx:7970, resources/js/pages/TripForm.tsx:8685, resources/js/pages/account/Documents.tsx:16, resources/js/pages/account/Documents.tsx:128
+# Source: resources/js/components/Layout.tsx:414, resources/js/components/Layout.tsx:419, resources/js/pages/TripForm.tsx:7970, resources/js/pages/TripForm.tsx:8685, resources/js/pages/account/Documents.tsx:16, resources/js/pages/account/Documents.tsx:128
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-itinerary.php:9
 #: templates/partials/single-trip/content-itinerary.php:10
@@ -11511,7 +11826,7 @@ msgstr ""
 msgid "January"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1023
+# Source: resources/js/components/Layout.tsx:1037
 #: assets/admin/dist/js/app.js
 msgid "Join Community"
 msgstr ""
@@ -11663,6 +11978,11 @@ msgstr ""
 msgid "Last Updated"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:568
+#: assets/admin/dist/js/app.js
+msgid "Last delivery"
+msgstr ""
+
 # Source: resources/js/pages/ChannelManager.tsx:475, resources/js/pages/ChannelManager.tsx:1540
 #: assets/admin/dist/js/app.js
 msgid "Last sync"
@@ -11809,6 +12129,11 @@ msgstr ""
 msgid "Leave pricing fields empty to use the trip's default pricing. Fill them in only if you want to override the default pricing for this specific date."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1720
+#: assets/admin/dist/js/app.js
+msgid "Leave unchecked to keep the existing secret. Check to rotate to a new one — receivers using the old secret will start failing signature verification until you update them."
+msgstr ""
+
 # Source: resources/js/pages/premium-pages/TripConsent.tsx:41, resources/js/pages/premium-pages/TripConsent.tsx:66
 #: assets/admin/dist/js/app.js
 msgid "Legal Compliance"
@@ -11834,7 +12159,12 @@ msgstr ""
 msgid "Liability Waivers"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:538, resources/js/pages/License.tsx:358
+# Source: resources/js/pages/Webhooks.tsx:309
+#: assets/admin/dist/js/app.js
+msgid "Libsodium-backed at-rest encryption."
+msgstr ""
+
+# Source: resources/js/components/Layout.tsx:552, resources/js/pages/License.tsx:358
 #: assets/admin/dist/js/app.js
 msgid "License"
 msgstr ""
@@ -11922,6 +12252,16 @@ msgstr ""
 msgid "List"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1006
+#: assets/admin/dist/js/app.js
+msgid "Listen for sample"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:934
+#: assets/admin/dist/js/app.js
+msgid "Listening for"
+msgstr ""
+
 # Source: resources/js/pages/Settings.tsx:7518, resources/js/pages/Settings.tsx:7554, resources/js/pages/Settings.tsx:7594, resources/js/pages/Settings.tsx:7630
 #: assets/admin/dist/js/app.js
 msgid "Listing URL:"
@@ -11952,7 +12292,7 @@ msgstr ""
 msgid "Loading image..."
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1112
+# Source: resources/js/components/Layout.tsx:1126
 #: assets/admin/dist/js/app.js
 msgid "Loading modules…"
 msgstr ""
@@ -12049,9 +12389,19 @@ msgstr ""
 msgid "Location set"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1483
+#: assets/admin/dist/js/app.js
+msgid "Log delivery payloads"
+msgstr ""
+
 # Source: resources/js/pages/Settings.tsx:8186
 #: assets/admin/dist/js/app.js
 msgid "Log system events and errors for troubleshooting"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:553
+#: assets/admin/dist/js/app.js
+msgid "Logging off"
 msgstr ""
 
 # Source: resources/js/pages/WhiteLabel.tsx:990
@@ -12059,7 +12409,7 @@ msgstr ""
 msgid "Logo"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1326, resources/js/pages/AccountPage.tsx:550
+# Source: resources/js/components/Layout.tsx:1340, resources/js/pages/AccountPage.tsx:550
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:842
 #: app/Shortcodes/LoginShortcode.php:155
@@ -12205,7 +12555,7 @@ msgstr ""
 msgid "Manage add-ons and extras that customers can select when booking"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1191
+# Source: resources/js/components/Layout.tsx:1205
 #: assets/admin/dist/js/app.js
 msgid "Manage all modules"
 msgstr ""
@@ -12977,12 +13327,12 @@ msgstr ""
 msgid "Module disabled"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:460, resources/js/components/Layout.tsx:1087, resources/js/pages/Modules.tsx:268
+# Source: resources/js/components/Layout.tsx:461, resources/js/components/Layout.tsx:1101, resources/js/pages/Modules.tsx:268
 #: assets/admin/dist/js/app.js
 msgid "Modules"
 msgstr ""
 
-# Source: resources/js/hooks/useModules.ts:336
+# Source: resources/js/hooks/useModules.ts:344
 #: assets/admin/dist/js/app.js
 msgid "Modules updated successfully."
 msgstr ""
@@ -13101,6 +13451,11 @@ msgstr ""
 msgid "Must Complete"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1441
+#: assets/admin/dist/js/app.js
+msgid "Must use HTTPS in production."
+msgstr ""
+
 # Source: resources/js/pages/Settings.tsx:536
 #: assets/admin/dist/js/app.js
 msgid "My Booking Calendar"
@@ -13123,7 +13478,7 @@ msgstr ""
 msgid "N/A"
 msgstr ""
 
-# Source: resources/js/pages/AbandonedRecovery.tsx:662, resources/js/pages/AbandonedRecovery.tsx:1452, resources/js/pages/Activities.tsx:122, resources/js/pages/Activities.tsx:643, resources/js/pages/ActivityForm.tsx:403, resources/js/pages/AdditionalServices.tsx:395, resources/js/pages/AttributeForm.tsx:713, resources/js/pages/Attributes.tsx:670, resources/js/pages/Categories.tsx:592, resources/js/pages/Categories.tsx:1031, resources/js/pages/CategoryForm.tsx:476, resources/js/pages/Customers.tsx:449, resources/js/pages/DestinationForm.tsx:408, resources/js/pages/Destinations.tsx:463, resources/js/pages/DifficultyLevelForm.tsx:318, resources/js/pages/DifficultyLevels.tsx:95, resources/js/pages/DifficultyLevels.tsx:641, resources/js/pages/DifficultyLevels.tsx:693, resources/js/pages/DynamicPricing.tsx:509, resources/js/pages/Enquiries.tsx:541, resources/js/pages/EnquiryForm.tsx:281, resources/js/pages/ItemTypes.tsx:858, resources/js/pages/Items.tsx:840, resources/js/pages/TripConsent.tsx:393, resources/js/pages/ViewCustomer.tsx:552, resources/js/pages/Whatsapp.tsx:1101
+# Source: resources/js/pages/AbandonedRecovery.tsx:662, resources/js/pages/AbandonedRecovery.tsx:1452, resources/js/pages/Activities.tsx:122, resources/js/pages/Activities.tsx:643, resources/js/pages/ActivityForm.tsx:403, resources/js/pages/AdditionalServices.tsx:395, resources/js/pages/AttributeForm.tsx:713, resources/js/pages/Attributes.tsx:670, resources/js/pages/Categories.tsx:592, resources/js/pages/Categories.tsx:1031, resources/js/pages/CategoryForm.tsx:476, resources/js/pages/Customers.tsx:449, resources/js/pages/DestinationForm.tsx:408, resources/js/pages/Destinations.tsx:463, resources/js/pages/DifficultyLevelForm.tsx:318, resources/js/pages/DifficultyLevels.tsx:95, resources/js/pages/DifficultyLevels.tsx:641, resources/js/pages/DifficultyLevels.tsx:693, resources/js/pages/DynamicPricing.tsx:509, resources/js/pages/Enquiries.tsx:541, resources/js/pages/EnquiryForm.tsx:281, resources/js/pages/ItemTypes.tsx:858, resources/js/pages/Items.tsx:840, resources/js/pages/TripConsent.tsx:393, resources/js/pages/ViewCustomer.tsx:552, resources/js/pages/Webhooks.tsx:1407, resources/js/pages/Whatsapp.tsx:1101
 #: assets/admin/dist/js/app.js
 #: templates/pdf/itinerary.php:346
 msgid "Name"
@@ -13252,6 +13607,11 @@ msgstr ""
 #: templates/single-taxonomy.php:320
 #: templates/single-taxonomy.php:325
 msgid "Next"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2396
+#: assets/admin/dist/js/app.js
+msgid "Next attempt"
 msgstr ""
 
 # Source: resources/js/components/ai/CreateTripWithAiWizard.tsx:1146
@@ -13427,6 +13787,11 @@ msgstr ""
 msgid "No customers found"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:756
+#: assets/admin/dist/js/app.js
+msgid "No data"
+msgstr ""
+
 # Source: resources/js/components/charts/SimpleBarChart.tsx:34, resources/js/components/charts/SimpleLineChart.tsx:37, resources/js/components/charts/SimplePieChart.tsx:36, resources/js/components/charts/SimplePieChart.tsx:45
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:855
@@ -13446,6 +13811,11 @@ msgstr ""
 # Source: resources/js/pages/Trips.tsx:1196
 #: assets/admin/dist/js/app.js
 msgid "No dates"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2206
+#: assets/admin/dist/js/app.js
+msgid "No deliveries yet"
 msgstr ""
 
 # Source: resources/js/pages/Departures.tsx:1207
@@ -13518,6 +13888,11 @@ msgstr ""
 # Source: resources/js/pages/EmailAutomation.tsx:383
 #: assets/admin/dist/js/app.js
 msgid "No emails sent yet"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:612
+#: assets/admin/dist/js/app.js
+msgid "No endpoints configured yet"
 msgstr ""
 
 # Source: resources/js/pages/Enquiries.tsx:736
@@ -13605,6 +13980,11 @@ msgstr ""
 msgid "No mappings yet"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:2207
+#: assets/admin/dist/js/app.js
+msgid "No matches"
+msgstr ""
+
 # Source: resources/js/components/ui/media-upload.tsx:272
 #: assets/admin/dist/js/app.js
 msgid "No media items yet. Click 'Add Media' to get started."
@@ -13630,7 +14010,7 @@ msgstr ""
 msgid "No modules available yet."
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1118
+# Source: resources/js/components/Layout.tsx:1132
 #: assets/admin/dist/js/app.js
 msgid "No modules found."
 msgstr ""
@@ -13740,6 +14120,11 @@ msgstr ""
 # Source: resources/js/pages/DynamicPricing.tsx:1255
 #: assets/admin/dist/js/app.js
 msgid "No rule-level impact recorded in the last 30 days"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:939
+#: assets/admin/dist/js/app.js
+msgid "No sample captured yet"
 msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:438, resources/js/pages/account/SavedTrips.tsx:64
@@ -13879,6 +14264,11 @@ msgstr ""
 # Source: resources/js/pages/CategoryForm.tsx:605
 #: assets/admin/dist/js/app.js
 msgid "None (Top Level)"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:128
+#: assets/admin/dist/js/app.js
+msgid "None configured."
 msgstr ""
 
 # Source: resources/js/components/availability/AvailabilityCalendar.tsx:524, resources/js/pages/account/BookingDetails.tsx:805, resources/js/pages/account/Documents.tsx:236
@@ -14160,6 +14550,11 @@ msgstr ""
 msgid "Only empty recurring-generated departures can be deleted"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1491
+#: assets/admin/dist/js/app.js
+msgid "Only metadata (status, duration, attempts) is stored. Saves disk on high-volume endpoints, but the inspector won't show payload or response bodies."
+msgstr ""
+
 # Source: resources/js/pages/DiscountForm.tsx:2608
 #: assets/admin/dist/js/app.js
 msgid "Only published coupons can be used by customers."
@@ -14168,6 +14563,11 @@ msgstr ""
 # Source: resources/js/pages/TripForm.tsx:3968
 #: assets/admin/dist/js/app.js
 msgid "Only the Trip Title and Trip URL are required to create a draft. Everything else is optional for now, but filling it in is highly recommended for better discovery and conversions."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1084
+#: assets/admin/dist/js/app.js
+msgid "Only the dot-paths you tick will ship in data{…}. Nested structure is preserved (picking customer.email keeps it nested, not flattened). Useful to strip PII or fields a downstream system bills you for."
 msgstr ""
 
 # Source: resources/js/pages/TripConsentForm.tsx:1485
@@ -14190,7 +14590,7 @@ msgstr ""
 msgid "Only uppercase letters, numbers, hyphens, and underscores are allowed"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1104, resources/js/pages/account/Support.tsx:106, resources/js/pages/account/utils.ts:124
+# Source: resources/js/components/Layout.tsx:1118, resources/js/pages/account/Support.tsx:106, resources/js/pages/account/utils.ts:124
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/account-page.js:85
 msgid "Open"
@@ -14463,6 +14863,11 @@ msgstr ""
 msgid "Our team is available 24/7 for urgent requests. Submit a ticket or contact us directly."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1183
+#: assets/admin/dist/js/app.js
+msgid "Output (what your receiver gets)"
+msgstr ""
+
 # Source: resources/js/pages/account/Payments.tsx:185
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/account-page.js:2039
@@ -14525,6 +14930,11 @@ msgstr ""
 # Source: resources/js/pages/TripForm.tsx:9303
 #: assets/admin/dist/js/app.js
 msgid "PHASE 4: ADVANCED"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1049
+#: assets/admin/dist/js/app.js
+msgid "POSTs the entire envelope + data block — every field under its original key. Recommended when your receiver picks what it needs."
 msgstr ""
 
 # Source: resources/js/pages/premium-pages/AbandonedRecovery.tsx:167, resources/js/pages/premium-pages/AdditionalServices.tsx:157, resources/js/pages/premium-pages/DynamicPricing.tsx:159, resources/js/pages/premium-pages/TripConsent.tsx:164
@@ -14660,6 +15070,11 @@ msgstr ""
 msgid "Paste this URL into the OTA's partner portal under booking notifications. Whenever a booking is made on the OTA, they POST it here and it appears in the Bookings inbox seconds later. The endpoint verifies the request signature, so only the OTA can deliver to it."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1756
+#: assets/admin/dist/js/app.js
+msgid "Paste your signing secret (min 24 chars)"
+msgstr ""
+
 # Source: resources/js/components/availability/RecurringRules.tsx:395, resources/js/components/availability/RecurringRules.tsx:761, resources/js/pages/RecurringRulesPage.tsx:323
 #: assets/admin/dist/js/app.js
 msgid "Pattern"
@@ -14707,6 +15122,16 @@ msgstr ""
 # Source: resources/js/pages/Itinerary.tsx:1731
 #: assets/admin/dist/js/app.js
 msgid "Payload"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:893
+#: assets/admin/dist/js/app.js
+msgid "Payload fields to send"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2413
+#: assets/admin/dist/js/app.js
+msgid "Payload sent"
 msgstr ""
 
 # Source: resources/js/components/shared/Table.tsx:402, resources/js/pages/TripForm.tsx:3914
@@ -14884,7 +15309,7 @@ msgstr ""
 msgid "Payment status updated"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:424, resources/js/pages/AccountPage.tsx:45, resources/js/pages/Payments.tsx:759
+# Source: resources/js/components/Layout.tsx:425, resources/js/pages/AccountPage.tsx:45, resources/js/pages/Payments.tsx:759
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:180
 #: app/Core/Modules/ModuleManager.php:195
@@ -15072,6 +15497,11 @@ msgstr ""
 msgid "Permanent access token"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:2094
+#: assets/admin/dist/js/app.js
+msgid "Permanent failure"
+msgstr ""
+
 # Source: resources/js/pages/AdditionalServices.tsx:602
 #: assets/admin/dist/js/app.js
 msgid "Person"
@@ -15185,6 +15615,11 @@ msgstr ""
 msgid "Pick brand accent color"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:959
+#: assets/admin/dist/js/app.js
+msgid "Pick from the real fields below — these are the exact paths your receiver will see."
+msgstr ""
+
 # Source: resources/js/pages/Settings.tsx:3958
 #: assets/admin/dist/js/app.js
 msgid "Pick primary color"
@@ -15200,9 +15635,19 @@ msgstr ""
 msgid "Pick the sections to generate. AI runs them in parallel, then you review each result before anything touches the form."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1512
+#: assets/admin/dist/js/app.js
+msgid "Pick the single event that triggers this endpoint. The field selector below will then show you the exact payload shape so you can choose which data to forward."
+msgstr ""
+
 # Source: resources/js/pages/ChannelManager.tsx:870
 #: assets/admin/dist/js/app.js
 msgid "Pick which OTA this connection is for and give it a friendly label."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:897
+#: assets/admin/dist/js/app.js
+msgid "Pick which fields from this event's data block should be forwarded. The envelope (id, type, api_version, occurred_at) is always sent so receivers can route the event."
 msgstr ""
 
 # Source: resources/js/pages/TripForm.tsx:6244
@@ -15491,7 +15936,7 @@ msgstr ""
 msgid "Premium Payment Gateways"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:942
+# Source: resources/js/components/Layout.tsx:956
 #: assets/admin/dist/js/app.js
 msgid "Premium features & integrations — view plans."
 msgstr ""
@@ -15548,6 +15993,11 @@ msgstr ""
 # Source: resources/js/pages/TripForm.tsx:8207
 #: assets/admin/dist/js/app.js
 msgid "Preview how your trip appears in search results"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:920
+#: assets/admin/dist/js/app.js
+msgid "Preview payload"
 msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:388
@@ -15931,6 +16381,11 @@ msgstr ""
 msgid "Protect your business with comprehensive liability waiver forms."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1736
+#: assets/admin/dist/js/app.js
+msgid "Provide a 24+ character secret instead of letting Yatra auto-generate one."
+msgstr ""
+
 # Source: resources/js/pages/TripForm.tsx:7006
 #: assets/admin/dist/js/app.js
 msgid "Public"
@@ -15991,6 +16446,11 @@ msgstr ""
 msgid "Published entries are visible in trip schedules. Draft entries are saved but not visible. Trashed entries are deleted."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1236
+#: assets/admin/dist/js/app.js
+msgid "Pulled from the most recent successful delivery for this event."
+msgstr ""
+
 # Source: resources/js/pages/Settings.tsx:7116
 #: assets/admin/dist/js/app.js
 msgid "Purchase"
@@ -15999,6 +16459,11 @@ msgstr ""
 # Source: resources/js/pages/ItemTypeForm.tsx:255
 #: assets/admin/dist/js/app.js
 msgid "Purple"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:210, resources/js/pages/Webhooks.tsx:224
+#: assets/admin/dist/js/app.js
+msgid "Push every Yatra event to your CRM, accounting tool, Zapier, Make, Slack, or any HTTPS endpoint."
 msgstr ""
 
 # Source: resources/js/pages/ChannelManager.tsx:1628
@@ -16041,7 +16506,7 @@ msgstr ""
 msgid "Question"
 msgstr ""
 
-# Source: resources/js/pages/Whatsapp.tsx:2254
+# Source: resources/js/pages/Webhooks.tsx:2090, resources/js/pages/Webhooks.tsx:2249, resources/js/pages/Whatsapp.tsx:2254
 #: assets/admin/dist/js/app.js
 msgid "Queued"
 msgstr ""
@@ -16067,7 +16532,7 @@ msgstr ""
 msgid "Quick-jump link shown in the mappings table."
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1090
+# Source: resources/js/components/Layout.tsx:1104
 #: assets/admin/dist/js/app.js
 msgid "Quickly enable or disable feature packs."
 msgstr ""
@@ -16095,6 +16560,11 @@ msgstr ""
 msgid "Rating must be between 1 and 5"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1005
+#: assets/admin/dist/js/app.js
+msgid "Re-capture sample"
+msgstr ""
+
 # Source: resources/js/components/Tools.tsx:3192
 #: assets/admin/dist/js/app.js
 msgid "Re-migrate All"
@@ -16118,6 +16588,11 @@ msgstr ""
 # Source: resources/js/pages/Whatsapp.tsx:2257
 #: assets/admin/dist/js/app.js
 msgid "Read"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:349
+#: assets/admin/dist/js/app.js
+msgid "Read the docs"
 msgstr ""
 
 # Source: resources/js/pages/ChannelManager.tsx:626
@@ -16437,6 +16912,11 @@ msgstr ""
 msgid "Regenerate from scratch"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:598
+#: assets/admin/dist/js/app.js
+msgid "Regenerate signing secret"
+msgstr ""
+
 # Source: resources/js/pages/Settings.tsx:3767
 #: assets/admin/dist/js/app.js
 msgid "Regional Settings"
@@ -16546,6 +17026,11 @@ msgstr ""
 msgid "Remove option"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:154
+#: assets/admin/dist/js/app.js
+msgid "Remove row"
+msgstr ""
+
 # Source: resources/js/pages/TripForm.tsx:5793
 #: assets/admin/dist/js/app.js
 msgid "Remove time slot"
@@ -16596,6 +17081,21 @@ msgstr ""
 msgid "Replace the calendar date picker with a dropdown listing every available departure date on the single-trip sidebar and the mobile sticky bar. Best for trips with a small set of fixed departures."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1737
+#: assets/admin/dist/js/app.js
+msgid "Replaces the current secret. Receivers using the old one will start failing signature verification."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2195, resources/js/pages/Webhooks.tsx:2353
+#: assets/admin/dist/js/app.js
+msgid "Replay delivery"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2348
+#: assets/admin/dist/js/app.js
+msgid "Replaying…"
+msgstr ""
+
 # Source: resources/js/pages/EmailTemplateForm.tsx:902
 #: assets/admin/dist/js/app.js
 msgid "Reply-To Email"
@@ -16616,7 +17116,7 @@ msgstr ""
 msgid "Report sections"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:430, resources/js/pages/Settings.tsx:7361
+# Source: resources/js/components/Layout.tsx:431, resources/js/pages/Settings.tsx:7361
 #: assets/admin/dist/js/app.js
 msgid "Reports"
 msgstr ""
@@ -16738,7 +17238,7 @@ msgstr ""
 msgid "Requires an API secret from the same GA4 data stream."
 msgstr ""
 
-# Source: resources/js/components/shared/SearchFilterToolbar.tsx:126, resources/js/components/trips/TripsFilters.tsx:65, resources/js/pages/Enquiries.tsx:576, resources/js/pages/ItemTypes.tsx:891, resources/js/pages/Items.tsx:874, resources/js/pages/Modules.tsx:407, resources/js/pages/Reviews.tsx:576, resources/js/pages/Trips.tsx:1610, resources/js/pages/Whatsapp.tsx:2271, resources/js/pages/Whatsapp.tsx:2505
+# Source: resources/js/components/shared/SearchFilterToolbar.tsx:126, resources/js/components/trips/TripsFilters.tsx:65, resources/js/pages/Enquiries.tsx:576, resources/js/pages/ItemTypes.tsx:891, resources/js/pages/Items.tsx:874, resources/js/pages/Modules.tsx:407, resources/js/pages/Reviews.tsx:576, resources/js/pages/Trips.tsx:1610, resources/js/pages/Webhooks.tsx:2106, resources/js/pages/Whatsapp.tsx:2271, resources/js/pages/Whatsapp.tsx:2505
 #: assets/admin/dist/js/app.js
 #: templates/shortcodes/search.php:149
 msgid "Reset"
@@ -16804,6 +17304,16 @@ msgstr ""
 # Source: resources/js/pages/EnquiryForm.tsx:379
 #: assets/admin/dist/js/app.js
 msgid "Response Notes"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2426
+#: assets/admin/dist/js/app.js
+msgid "Response body"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2438
+#: assets/admin/dist/js/app.js
+msgid "Response headers"
 msgstr ""
 
 # Source: resources/js/pages/Enquiries.tsx:347, resources/js/pages/ViewEnquiry.tsx:103
@@ -17006,7 +17516,7 @@ msgstr ""
 msgid "Review title is required"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:429, resources/js/pages/Reviews.tsx:477
+# Source: resources/js/components/Layout.tsx:430, resources/js/pages/Reviews.tsx:477
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/quick-facts.php:157
 #: templates/partials/single-trip/reviews.php:15
@@ -17053,7 +17563,7 @@ msgstr ""
 msgid "Reward early bookings with attractive discounts."
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:138, resources/js/pages/Settings.tsx:3397
+# Source: resources/js/components/Layout.tsx:139, resources/js/pages/Settings.tsx:3397
 #: assets/admin/dist/js/app.js
 msgid "Rewrite rules flushed successfully"
 msgstr ""
@@ -17061,6 +17571,11 @@ msgstr ""
 # Source: resources/js/pages/AiAssistant.tsx:1111
 #: assets/admin/dist/js/app.js
 msgid "Rolling 13-month token totals, per provider, per task. Costs are paid directly to your AI provider — no markup is added."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1732
+#: assets/admin/dist/js/app.js
+msgid "Rotate to a new signing secret"
 msgstr ""
 
 # Source: resources/js/pages/ChannelManager.tsx:1033
@@ -17253,6 +17768,11 @@ msgstr ""
 msgid "Sample base price"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:938
+#: assets/admin/dist/js/app.js
+msgid "Sample ready"
+msgstr ""
+
 # Source: resources/js/pages/ChannelManager.tsx:513
 #: assets/admin/dist/js/app.js
 msgid "Sandbox"
@@ -17354,7 +17874,7 @@ msgstr ""
 msgid "Save brand voice"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:847, resources/js/pages/ChannelManager.tsx:1972, resources/js/pages/Whatsapp.tsx:1394
+# Source: resources/js/pages/ChannelManager.tsx:847, resources/js/pages/ChannelManager.tsx:1972, resources/js/pages/Webhooks.tsx:1791, resources/js/pages/Whatsapp.tsx:1394
 #: assets/admin/dist/js/app.js
 msgid "Save changes"
 msgstr ""
@@ -17448,7 +17968,7 @@ msgstr ""
 msgid "Savings"
 msgstr ""
 
-# Source: resources/js/components/ai/BuildItineraryModal.tsx:755, resources/js/pages/AiAssistant.tsx:873, resources/js/pages/AiAssistant.tsx:1089, resources/js/pages/AiAssistant.tsx:1484, resources/js/pages/EmailAutomation.tsx:658, resources/js/pages/Whatsapp.tsx:686, resources/js/pages/Whatsapp.tsx:1387, resources/js/pages/Whatsapp.tsx:2151, resources/js/pages/WhiteLabel.tsx:1555
+# Source: resources/js/components/ai/BuildItineraryModal.tsx:755, resources/js/pages/AiAssistant.tsx:873, resources/js/pages/AiAssistant.tsx:1089, resources/js/pages/AiAssistant.tsx:1484, resources/js/pages/EmailAutomation.tsx:658, resources/js/pages/Webhooks.tsx:1786, resources/js/pages/Whatsapp.tsx:686, resources/js/pages/Whatsapp.tsx:1387, resources/js/pages/Whatsapp.tsx:2151, resources/js/pages/WhiteLabel.tsx:1555
 #: assets/admin/dist/js/app.js
 msgid "Saving…"
 msgstr ""
@@ -17986,7 +18506,7 @@ msgstr ""
 msgid "Select activities..."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1532
+# Source: resources/js/pages/ChannelManager.tsx:1532, resources/js/pages/Webhooks.tsx:1113
 #: assets/admin/dist/js/app.js
 msgid "Select all"
 msgstr ""
@@ -18289,6 +18809,11 @@ msgstr ""
 # Source: resources/js/pages/Settings.tsx:6098
 #: assets/admin/dist/js/app.js
 msgid "Select the Mailchimp audience to sync subscribers to."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1554
+#: assets/admin/dist/js/app.js
+msgid "Select the Yatra event that should fire this webhook"
 msgstr ""
 
 # Source: resources/js/pages/DepartureForm.tsx:201
@@ -18611,6 +19136,11 @@ msgstr ""
 msgid "Send first recovery email after this many hours"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1222
+#: assets/admin/dist/js/app.js
+msgid "Send full payload mode — every field above ships in the POST body, exactly as shown."
+msgstr ""
+
 # Source: resources/js/pages/premium-pages/AbandonedRecovery.tsx:100
 #: assets/admin/dist/js/app.js
 msgid "Send initial recovery email within customizable timeframe."
@@ -18629,6 +19159,11 @@ msgstr ""
 # Source: resources/js/pages/Settings.tsx:8445
 #: assets/admin/dist/js/app.js
 msgid "Send now"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1076
+#: assets/admin/dist/js/app.js
+msgid "Send only selected fields"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:5345
@@ -18654,6 +19189,16 @@ msgstr ""
 # Source: resources/js/pages/Whatsapp.tsx:1827
 #: assets/admin/dist/js/app.js
 msgid "Send test message"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:591
+#: assets/admin/dist/js/app.js
+msgid "Send test ping"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1046
+#: assets/admin/dist/js/app.js
+msgid "Send the full payload"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4310
@@ -18701,6 +19246,11 @@ msgstr ""
 # Source: resources/js/lib/email-templates-catalog.ts:363
 #: assets/admin/dist/js/app.js
 msgid "Sent after a scheduled / installment charge succeeds."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1667
+#: assets/admin/dist/js/app.js
+msgid "Sent alongside Yatra's signed headers on every request. Useful for receivers that require Bearer / Basic auth on TOP of the HMAC signature, or for tagging requests for routing. Reserved headers (X-Yatra-*, Content-Length, Host, Cookie) are blocked."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:343
@@ -18983,7 +19533,7 @@ msgstr ""
 msgid "Set your trip's availability period, capacity limits, and booking requirements. This helps automate bookings and prevent overbooking."
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:539, resources/js/components/dashboard/QuickActions.tsx:61, resources/js/pages/AbandonedRecovery.tsx:923, resources/js/pages/DynamicPricing.tsx:389, resources/js/pages/Modules.tsx:619, resources/js/pages/Modules.tsx:633, resources/js/pages/Settings.tsx:8532, resources/js/pages/Settings.tsx:8601, resources/js/pages/TripConsentForm.tsx:915
+# Source: resources/js/components/Layout.tsx:553, resources/js/components/dashboard/QuickActions.tsx:61, resources/js/pages/AbandonedRecovery.tsx:923, resources/js/pages/DynamicPricing.tsx:389, resources/js/pages/Modules.tsx:619, resources/js/pages/Modules.tsx:633, resources/js/pages/Settings.tsx:8532, resources/js/pages/Settings.tsx:8601, resources/js/pages/TripConsentForm.tsx:915
 #: assets/admin/dist/js/app.js
 msgid "Settings"
 msgstr ""
@@ -19261,6 +19811,16 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: templates/pdf/consent.php:156
 msgid "Signer Name"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1712, resources/js/pages/Webhooks.tsx:1891
+#: assets/admin/dist/js/app.js
+msgid "Signing secret"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1921
+#: assets/admin/dist/js/app.js
+msgid "Signing secret value"
 msgstr ""
 
 # Source: resources/js/pages/Customers.tsx:765
@@ -19577,6 +20137,11 @@ msgstr ""
 msgid "Start building your itinerary by adding your first entry to create a detailed schedule for your trip."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1466
+#: assets/admin/dist/js/app.js
+msgid "Start delivering events as soon as this is saved."
+msgstr ""
+
 # Source: resources/js/pages/account/SavedTrips.tsx:67
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/account-page.js:2773
@@ -19619,12 +20184,22 @@ msgstr ""
 msgid "State/Province"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1688
+#: assets/admin/dist/js/app.js
+msgid "Static fields merged into every payload's \"data\" block. Use this to tag events with operator-specific metadata (tenant_id, environment, region, source_app) without writing a server-side filter. Operator fields never overwrite Yatra's canonical entity fields."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1699
+#: assets/admin/dist/js/app.js
+msgid "Static value (e.g. acme-prod)"
+msgstr ""
+
 # Source: resources/js/pages/ViewCustomer.tsx:729
 #: assets/admin/dist/js/app.js
 msgid "Statistics"
 msgstr ""
 
-# Source: resources/js/components/availability/RecurringRules.tsx:494, resources/js/components/availability/RecurringRules.tsx:701, resources/js/components/availability/RecurringRules.tsx:791, resources/js/components/email/EmailTemplatesList.tsx:667, resources/js/components/email/EmailTemplatesList.tsx:759, resources/js/components/trips/TripsTable.tsx:117, resources/js/pages/AbandonedRecovery.tsx:426, resources/js/pages/AbandonedRecovery.tsx:762, resources/js/pages/AbandonedRecovery.tsx:1527, resources/js/pages/AbandonedRecoveryEmailForm.tsx:176, resources/js/pages/Activities.tsx:151, resources/js/pages/Activities.tsx:644, resources/js/pages/Activities.tsx:707, resources/js/pages/Activities.tsx:908, resources/js/pages/ActivityForm.tsx:509, resources/js/pages/ActivityForm.tsx:518, resources/js/pages/AdditionalServices.tsx:399, resources/js/pages/AdditionalServices.tsx:463, resources/js/pages/AdditionalServices.tsx:647, resources/js/pages/AdditionalServicesForm.tsx:564, resources/js/pages/AttributeForm.tsx:1031, resources/js/pages/AttributeForm.tsx:1040, resources/js/pages/Attributes.tsx:394, resources/js/pages/Attributes.tsx:672, resources/js/pages/Attributes.tsx:735, resources/js/pages/Availability.tsx:896, resources/js/pages/Availability.tsx:1528, resources/js/pages/Availability.tsx:1684, resources/js/pages/AvailabilityForm.tsx:1609, resources/js/pages/Bookings.tsx:515, resources/js/pages/Bookings.tsx:553, resources/js/pages/Bookings.tsx:668, resources/js/pages/Categories.tsx:730, resources/js/pages/Categories.tsx:1032, resources/js/pages/Categories.tsx:1132, resources/js/pages/CategoryForm.tsx:631, resources/js/pages/ChannelManager.tsx:474, resources/js/pages/ChannelManager.tsx:2191, resources/js/pages/ChannelManager.tsx:2318, resources/js/pages/CustomerForm.tsx:782, resources/js/pages/Customers.tsx:454, resources/js/pages/Customers.tsx:481, resources/js/pages/Customers.tsx:565, resources/js/pages/Customers.tsx:650, resources/js/pages/Departures.tsx:851, resources/js/pages/Departures.tsx:1104, resources/js/pages/DestinationForm.tsx:514, resources/js/pages/DestinationForm.tsx:523, resources/js/pages/Destinations.tsx:464, resources/js/pages/Destinations.tsx:525, resources/js/pages/Destinations.tsx:735, resources/js/pages/DifficultyLevelForm.tsx:455, resources/js/pages/DifficultyLevels.tsx:140, resources/js/pages/DifficultyLevels.tsx:708, resources/js/pages/DiscountForm.tsx:2590, resources/js/pages/Discounts.tsx:603, resources/js/pages/Discounts.tsx:634, resources/js/pages/Discounts.tsx:848, resources/js/pages/DynamicPricing.tsx:575, resources/js/pages/DynamicPricing.tsx:675, resources/js/pages/DynamicPricingRuleForm.tsx:1150, resources/js/pages/EmailAutomation.tsx:400, resources/js/pages/EmailSequenceForm.tsx:877, resources/js/pages/Enquiries.tsx:253, resources/js/pages/Enquiries.tsx:544, resources/js/pages/Enquiries.tsx:713, resources/js/pages/EnquiryForm.tsx:431, resources/js/pages/ItemForm.tsx:436, resources/js/pages/ItemTypeForm.tsx:522, resources/js/pages/ItemTypes.tsx:378, resources/js/pages/ItemTypes.tsx:568, resources/js/pages/ItemTypes.tsx:859, resources/js/pages/Items.tsx:341, resources/js/pages/Items.tsx:545, resources/js/pages/Items.tsx:842, resources/js/pages/ItineraryForm.tsx:1091, resources/js/pages/Payments.tsx:459, resources/js/pages/Payments.tsx:490, resources/js/pages/Payments.tsx:579, resources/js/pages/RecurringRuleForm.tsx:2491, resources/js/pages/RecurringRulesPage.tsx:376, resources/js/pages/ReviewForm.tsx:475, resources/js/pages/Reviews.tsx:369, resources/js/pages/Reviews.tsx:544, resources/js/pages/Reviews.tsx:691, resources/js/pages/TravelerCategories.tsx:542, resources/js/pages/TravelerCategories.tsx:698, resources/js/pages/TravelerCategories.tsx:771, resources/js/pages/TravelerCategoryForm.tsx:768, resources/js/pages/TravelerCategoryForm.tsx:777, resources/js/pages/TripConsent.tsx:394, resources/js/pages/TripConsent.tsx:439, resources/js/pages/TripConsent.tsx:512, resources/js/pages/TripConsent.tsx:933, resources/js/pages/TripConsentForm.tsx:974, resources/js/pages/Trips.tsx:751, resources/js/pages/Trips.tsx:1106, resources/js/pages/Trips.tsx:1570, resources/js/pages/ViewBooking.tsx:1165, resources/js/pages/ViewCustomer.tsx:614, resources/js/pages/Whatsapp.tsx:1113, resources/js/pages/Whatsapp.tsx:2294, resources/js/pages/Whatsapp.tsx:2528
+# Source: resources/js/components/availability/RecurringRules.tsx:494, resources/js/components/availability/RecurringRules.tsx:701, resources/js/components/availability/RecurringRules.tsx:791, resources/js/components/email/EmailTemplatesList.tsx:667, resources/js/components/email/EmailTemplatesList.tsx:759, resources/js/components/trips/TripsTable.tsx:117, resources/js/pages/AbandonedRecovery.tsx:426, resources/js/pages/AbandonedRecovery.tsx:762, resources/js/pages/AbandonedRecovery.tsx:1527, resources/js/pages/AbandonedRecoveryEmailForm.tsx:176, resources/js/pages/Activities.tsx:151, resources/js/pages/Activities.tsx:644, resources/js/pages/Activities.tsx:707, resources/js/pages/Activities.tsx:908, resources/js/pages/ActivityForm.tsx:509, resources/js/pages/ActivityForm.tsx:518, resources/js/pages/AdditionalServices.tsx:399, resources/js/pages/AdditionalServices.tsx:463, resources/js/pages/AdditionalServices.tsx:647, resources/js/pages/AdditionalServicesForm.tsx:564, resources/js/pages/AttributeForm.tsx:1031, resources/js/pages/AttributeForm.tsx:1040, resources/js/pages/Attributes.tsx:394, resources/js/pages/Attributes.tsx:672, resources/js/pages/Attributes.tsx:735, resources/js/pages/Availability.tsx:896, resources/js/pages/Availability.tsx:1528, resources/js/pages/Availability.tsx:1684, resources/js/pages/AvailabilityForm.tsx:1609, resources/js/pages/Bookings.tsx:515, resources/js/pages/Bookings.tsx:553, resources/js/pages/Bookings.tsx:668, resources/js/pages/Categories.tsx:730, resources/js/pages/Categories.tsx:1032, resources/js/pages/Categories.tsx:1132, resources/js/pages/CategoryForm.tsx:631, resources/js/pages/ChannelManager.tsx:474, resources/js/pages/ChannelManager.tsx:2191, resources/js/pages/ChannelManager.tsx:2318, resources/js/pages/CustomerForm.tsx:782, resources/js/pages/Customers.tsx:454, resources/js/pages/Customers.tsx:481, resources/js/pages/Customers.tsx:565, resources/js/pages/Customers.tsx:650, resources/js/pages/Departures.tsx:851, resources/js/pages/Departures.tsx:1104, resources/js/pages/DestinationForm.tsx:514, resources/js/pages/DestinationForm.tsx:523, resources/js/pages/Destinations.tsx:464, resources/js/pages/Destinations.tsx:525, resources/js/pages/Destinations.tsx:735, resources/js/pages/DifficultyLevelForm.tsx:455, resources/js/pages/DifficultyLevels.tsx:140, resources/js/pages/DifficultyLevels.tsx:708, resources/js/pages/DiscountForm.tsx:2590, resources/js/pages/Discounts.tsx:603, resources/js/pages/Discounts.tsx:634, resources/js/pages/Discounts.tsx:848, resources/js/pages/DynamicPricing.tsx:575, resources/js/pages/DynamicPricing.tsx:675, resources/js/pages/DynamicPricingRuleForm.tsx:1150, resources/js/pages/EmailAutomation.tsx:400, resources/js/pages/EmailSequenceForm.tsx:877, resources/js/pages/Enquiries.tsx:253, resources/js/pages/Enquiries.tsx:544, resources/js/pages/Enquiries.tsx:713, resources/js/pages/EnquiryForm.tsx:431, resources/js/pages/ItemForm.tsx:436, resources/js/pages/ItemTypeForm.tsx:522, resources/js/pages/ItemTypes.tsx:378, resources/js/pages/ItemTypes.tsx:568, resources/js/pages/ItemTypes.tsx:859, resources/js/pages/Items.tsx:341, resources/js/pages/Items.tsx:545, resources/js/pages/Items.tsx:842, resources/js/pages/ItineraryForm.tsx:1091, resources/js/pages/Payments.tsx:459, resources/js/pages/Payments.tsx:490, resources/js/pages/Payments.tsx:579, resources/js/pages/RecurringRuleForm.tsx:2491, resources/js/pages/RecurringRulesPage.tsx:376, resources/js/pages/ReviewForm.tsx:475, resources/js/pages/Reviews.tsx:369, resources/js/pages/Reviews.tsx:544, resources/js/pages/Reviews.tsx:691, resources/js/pages/TravelerCategories.tsx:542, resources/js/pages/TravelerCategories.tsx:698, resources/js/pages/TravelerCategories.tsx:771, resources/js/pages/TravelerCategoryForm.tsx:768, resources/js/pages/TravelerCategoryForm.tsx:777, resources/js/pages/TripConsent.tsx:394, resources/js/pages/TripConsent.tsx:439, resources/js/pages/TripConsent.tsx:512, resources/js/pages/TripConsent.tsx:933, resources/js/pages/TripConsentForm.tsx:974, resources/js/pages/Trips.tsx:751, resources/js/pages/Trips.tsx:1106, resources/js/pages/Trips.tsx:1570, resources/js/pages/ViewBooking.tsx:1165, resources/js/pages/ViewCustomer.tsx:614, resources/js/pages/Webhooks.tsx:518, resources/js/pages/Webhooks.tsx:2148, resources/js/pages/Webhooks.tsx:2372, resources/js/pages/Whatsapp.tsx:1113, resources/js/pages/Whatsapp.tsx:2294, resources/js/pages/Whatsapp.tsx:2528
 #: assets/admin/dist/js/app.js
 #: templates/booking-confirmation.php:369
 #: templates/partials/remaining-checkout-content.php:92
@@ -19702,6 +20277,16 @@ msgstr ""
 msgid "Still Thinking About {trip_name}? - {site_name}"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:990
+#: assets/admin/dist/js/app.js
+msgid "Stop listening"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1767
+#: assets/admin/dist/js/app.js
+msgid "Stored encrypted at rest. Treat it like a password."
+msgstr ""
+
 # Source: resources/js/pages/ChannelManager.tsx:1090
 #: assets/admin/dist/js/app.js
 msgid "Stored encrypted with libsodium AEAD (XChaCha20-Poly1305). After saving, the value is never sent back to the browser — you only see a masked last-4 hint to confirm something is set."
@@ -19715,6 +20300,11 @@ msgstr ""
 # Source: resources/js/pages/Settings.tsx:8236
 #: assets/admin/dist/js/app.js
 msgid "Stores frequently used data for faster loads. Stays off while WP_DEBUG or Debug mode (above) is on."
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1487
+#: assets/admin/dist/js/app.js
+msgid "Stores the full POST body + receiver response on every attempt (90-day retention). Recommended for debugging."
 msgstr ""
 
 # Source: resources/js/pages/TripForm.tsx:8703
@@ -19736,6 +20326,11 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: app/PaymentGateways/PaymentGatewayRegistry.php:182
 msgid "Stripe"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:313
+#: assets/admin/dist/js/app.js
+msgid "Stripe-style signature header."
 msgstr ""
 
 # Source: resources/js/pages/AiAssistant.tsx:944
@@ -20374,6 +20969,11 @@ msgstr ""
 msgid "Theme"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1226
+#: assets/admin/dist/js/app.js
+msgid "These are the exact JSON bytes that will be POSTed to your receiver. Keys stay nested under their original paths."
+msgstr ""
+
 # Source: resources/js/pages/Settings.tsx:5497
 #: assets/admin/dist/js/app.js
 msgid "These options apply to trip review forms on the frontend (who may review, moderation, minimum stars, and reminder scheduling)."
@@ -20730,7 +21330,12 @@ msgstr ""
 msgid "Today's Brief is part of the AI Assistant module — available on Growth and Agency plans."
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1073
+# Source: resources/js/pages/Webhooks.tsx:366
+#: assets/admin/dist/js/app.js
+msgid "Toggle \"Webhooks\" on under Yatra → Modules to start configuring endpoints."
+msgstr ""
+
+# Source: resources/js/components/Layout.tsx:1087
 #: assets/admin/dist/js/app.js
 msgid "Toggle modules panel"
 msgstr ""
@@ -20760,7 +21365,12 @@ msgstr ""
 msgid "Tone description"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1065
+# Source: resources/js/pages/Webhooks.tsx:1763
+#: assets/admin/dist/js/app.js
+msgid "Too short — need at least 24 characters."
+msgstr ""
+
+# Source: resources/js/components/Layout.tsx:1079
 #: assets/admin/dist/js/app.js
 msgid "Tools"
 msgstr ""
@@ -21103,7 +21713,7 @@ msgstr ""
 msgid "Traveler"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:408, resources/js/pages/DiscountForm.tsx:2000, resources/js/pages/TravelerCategories.tsx:650
+# Source: resources/js/components/Layout.tsx:409, resources/js/pages/DiscountForm.tsx:2000, resources/js/pages/TravelerCategories.tsx:650
 #: assets/admin/dist/js/app.js
 msgid "Traveler Categories"
 msgstr ""
@@ -21166,7 +21776,7 @@ msgstr ""
 msgid "Traveler-based pricing only"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:427, resources/js/pages/AbandonedRecovery.tsx:717, resources/js/pages/AbandonedRecovery.tsx:1502, resources/js/pages/Bookings.tsx:532, resources/js/pages/Bookings.tsx:612, resources/js/pages/ChannelManager.tsx:2189, resources/js/pages/Departures.tsx:807, resources/js/pages/Enquiries.tsx:243, resources/js/pages/Enquiries.tsx:693, resources/js/pages/Travelers.tsx:366, resources/js/pages/ViewBooking.tsx:557, resources/js/pages/ViewDeparture.tsx:758, resources/js/pages/account/Bookings.tsx:448
+# Source: resources/js/components/Layout.tsx:428, resources/js/pages/AbandonedRecovery.tsx:717, resources/js/pages/AbandonedRecovery.tsx:1502, resources/js/pages/Bookings.tsx:532, resources/js/pages/Bookings.tsx:612, resources/js/pages/ChannelManager.tsx:2189, resources/js/pages/Departures.tsx:807, resources/js/pages/Enquiries.tsx:243, resources/js/pages/Enquiries.tsx:693, resources/js/pages/Travelers.tsx:366, resources/js/pages/ViewBooking.tsx:557, resources/js/pages/ViewDeparture.tsx:758, resources/js/pages/account/Bookings.tsx:448
 #: assets/admin/dist/js/app.js
 #: app/Controllers/BookingSessionController.php:2642
 #: app/Controllers/BookingSessionController.php:2661
@@ -21201,6 +21811,11 @@ msgstr ""
 msgid "Treat this like a password — anyone with it can send fake events to your GA4 property. Restrict who can view Yatra settings."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1973
+#: assets/admin/dist/js/app.js
+msgid "Treat this secret like a password. Anyone with it can forge requests that appear to come from Yatra."
+msgstr ""
+
 # Source: resources/js/pages/EmailSequenceForm.tsx:473, resources/js/pages/EmailSequenceForm.tsx:910
 #: assets/admin/dist/js/app.js
 msgid "Trigger"
@@ -21209,6 +21824,16 @@ msgstr ""
 # Source: resources/js/pages/EmailTemplateForm.tsx:661, resources/js/pages/Whatsapp.tsx:1467
 #: assets/admin/dist/js/app.js
 msgid "Trigger Event"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1510
+#: assets/admin/dist/js/app.js
+msgid "Trigger event"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:947
+#: assets/admin/dist/js/app.js
+msgid "Trigger this event in Yatra (create a booking, submit an enquiry, etc.). The real payload will appear here automatically."
 msgstr ""
 
 # Source: resources/js/components/itinerary/DayFormFields.tsx:54, resources/js/pages/AbandonedRecovery.tsx:381, resources/js/pages/AbandonedRecovery.tsx:1487, resources/js/pages/Availability.tsx:1110, resources/js/pages/BookingForm.tsx:898, resources/js/pages/Bookings.tsx:513, resources/js/pages/Bookings.tsx:529, resources/js/pages/Bookings.tsx:593, resources/js/pages/ChannelManager.tsx:1536, resources/js/pages/Departures.tsx:721, resources/js/pages/Departures.tsx:1020, resources/js/pages/Departures.tsx:1247, resources/js/pages/Enquiries.tsx:235, resources/js/pages/Enquiries.tsx:543, resources/js/pages/Enquiries.tsx:666, resources/js/pages/Itinerary.tsx:1520, resources/js/pages/RecurringRuleForm.tsx:624, resources/js/pages/ReviewForm.tsx:304, resources/js/pages/Reviews.tsx:351, resources/js/pages/Reviews.tsx:541, resources/js/pages/Reviews.tsx:636, resources/js/pages/Travelers.tsx:297, resources/js/pages/Travelers.tsx:559, resources/js/pages/TripForm.tsx:9638, resources/js/pages/Trips.tsx:743, resources/js/pages/Trips.tsx:955, resources/js/pages/ViewBooking.tsx:521, resources/js/pages/ViewCustomer.tsx:611, resources/js/pages/ViewEnquiry.tsx:421, resources/js/pages/ViewPayment.tsx:453, resources/js/pages/ViewReview.tsx:320, resources/js/pages/account/BookingDetails.tsx:240
@@ -21303,7 +21928,7 @@ msgstr ""
 msgid "Trip Category Base"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:398
+# Source: resources/js/components/Layout.tsx:399
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:74
 msgid "Trip Consent"
@@ -21623,7 +22248,7 @@ msgstr ""
 msgid "Trip:"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:366, resources/js/pages/Activities.tsx:142, resources/js/pages/Activities.tsx:687, resources/js/pages/Activities.tsx:812, resources/js/pages/AdditionalServices.tsx:458, resources/js/pages/AdditionalServices.tsx:611, resources/js/pages/Categories.tsx:639, resources/js/pages/Categories.tsx:1112, resources/js/pages/Destinations.tsx:505, resources/js/pages/Destinations.tsx:635, resources/js/pages/DifficultyLevels.tsx:130, resources/js/pages/TripConsent.tsx:543
+# Source: resources/js/components/Layout.tsx:367, resources/js/pages/Activities.tsx:142, resources/js/pages/Activities.tsx:687, resources/js/pages/Activities.tsx:812, resources/js/pages/AdditionalServices.tsx:458, resources/js/pages/AdditionalServices.tsx:611, resources/js/pages/Categories.tsx:639, resources/js/pages/Categories.tsx:1112, resources/js/pages/Destinations.tsx:505, resources/js/pages/Destinations.tsx:635, resources/js/pages/DifficultyLevels.tsx:130, resources/js/pages/TripConsent.tsx:543
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:872
 #: templates/listing-activity.php:238
@@ -21664,7 +22289,7 @@ msgstr ""
 msgid "Try adjusting your filters or check back later."
 msgstr ""
 
-# Source: resources/js/pages/Activities.tsx:1095, resources/js/pages/AdditionalServices.tsx:803, resources/js/pages/Attributes.tsx:834, resources/js/pages/Bookings.tsx:963, resources/js/pages/Customers.tsx:842, resources/js/pages/Destinations.tsx:928, resources/js/pages/Discounts.tsx:1212, resources/js/pages/Items.tsx:924, resources/js/pages/Payments.tsx:912, resources/js/pages/TravelerCategories.tsx:819
+# Source: resources/js/pages/Activities.tsx:1095, resources/js/pages/AdditionalServices.tsx:803, resources/js/pages/Attributes.tsx:834, resources/js/pages/Bookings.tsx:963, resources/js/pages/Customers.tsx:842, resources/js/pages/Destinations.tsx:928, resources/js/pages/Discounts.tsx:1212, resources/js/pages/Items.tsx:924, resources/js/pages/Payments.tsx:912, resources/js/pages/TravelerCategories.tsx:819, resources/js/pages/Webhooks.tsx:2215
 #: assets/admin/dist/js/app.js
 msgid "Try adjusting your filters to see more results."
 msgstr ""
@@ -21732,6 +22357,11 @@ msgstr ""
 # Source: resources/js/pages/WhiteLabel.tsx:1416
 #: assets/admin/dist/js/app.js
 msgid "UI chrome"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1417
+#: assets/admin/dist/js/app.js
+msgid "URL"
 msgstr ""
 
 # Source: resources/js/pages/TripForm.tsx:4125
@@ -22150,7 +22780,7 @@ msgstr ""
 msgid "Upgrade plan"
 msgstr ""
 
-# Source: resources/js/components/modules/PremiumUpgradeDialog.tsx:123, resources/js/pages/ChannelManager.tsx:337, resources/js/pages/WhiteLabel.tsx:293
+# Source: resources/js/components/modules/PremiumUpgradeDialog.tsx:123, resources/js/pages/ChannelManager.tsx:337, resources/js/pages/Webhooks.tsx:342, resources/js/pages/WhiteLabel.tsx:293
 #: assets/admin/dist/js/app.js
 msgid "Upgrade to Agency"
 msgstr ""
@@ -22165,7 +22795,7 @@ msgstr ""
 msgid "Upgrade to Personal"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:939, resources/js/components/ProFeature.tsx:134, resources/js/components/modules/PremiumUpgradeDialog.tsx:128, resources/js/components/notices/InlineNotices.tsx:85, resources/js/pages/AdditionalServicesForm.tsx:284, resources/js/pages/TripConsentForm.tsx:762, resources/js/pages/TripForm.tsx:7806, resources/js/pages/premium-pages/AbandonedRecovery.tsx:150, resources/js/pages/premium-pages/AbandonedRecovery.tsx:325, resources/js/pages/premium-pages/AdditionalServices.tsx:140, resources/js/pages/premium-pages/AdditionalServices.tsx:311, resources/js/pages/premium-pages/DynamicPricing.tsx:142, resources/js/pages/premium-pages/DynamicPricing.tsx:374, resources/js/pages/premium-pages/EmailAutomation.tsx:137, resources/js/pages/premium-pages/EmailAutomation.tsx:297, resources/js/pages/premium-pages/TripConsent.tsx:147, resources/js/pages/premium-pages/TripConsent.tsx:322
+# Source: resources/js/components/Layout.tsx:953, resources/js/components/ProFeature.tsx:134, resources/js/components/modules/PremiumUpgradeDialog.tsx:128, resources/js/components/notices/InlineNotices.tsx:85, resources/js/pages/AdditionalServicesForm.tsx:284, resources/js/pages/TripConsentForm.tsx:762, resources/js/pages/TripForm.tsx:7806, resources/js/pages/premium-pages/AbandonedRecovery.tsx:150, resources/js/pages/premium-pages/AbandonedRecovery.tsx:325, resources/js/pages/premium-pages/AdditionalServices.tsx:140, resources/js/pages/premium-pages/AdditionalServices.tsx:311, resources/js/pages/premium-pages/DynamicPricing.tsx:142, resources/js/pages/premium-pages/DynamicPricing.tsx:374, resources/js/pages/premium-pages/EmailAutomation.tsx:137, resources/js/pages/premium-pages/EmailAutomation.tsx:297, resources/js/pages/premium-pages/TripConsent.tsx:147, resources/js/pages/premium-pages/TripConsent.tsx:322
 #: assets/admin/dist/js/app.js
 #: app/Providers/AdminServiceProvider.php:285
 #: app/Providers/AdminServiceProvider.php:437
@@ -22304,6 +22934,11 @@ msgstr ""
 msgid "Use formatting, bullet lists, and links to explain this difficulty level. HTML is supported."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1731
+#: assets/admin/dist/js/app.js
+msgid "Use my own signing secret"
+msgstr ""
+
 # Source: resources/js/pages/Trips.tsx:1523
 #: assets/admin/dist/js/app.js
 msgid "Use the search box to find trips by name. Use filters to show only published, draft, or other status trips. Click column headers to sort."
@@ -22369,12 +23004,12 @@ msgstr ""
 msgid "Used in admin lists, analytics, and price-history exports. Customers never see this name."
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1225, resources/js/components/Layout.tsx:1248
+# Source: resources/js/components/Layout.tsx:1239, resources/js/components/Layout.tsx:1262
 #: assets/admin/dist/js/app.js
 msgid "User avatar"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1220
+# Source: resources/js/components/Layout.tsx:1234
 #: assets/admin/dist/js/app.js
 msgid "User menu"
 msgstr ""
@@ -22468,6 +23103,11 @@ msgstr ""
 # Source: resources/js/pages/ReviewForm.tsx:517, resources/js/pages/ViewReview.tsx:412
 #: assets/admin/dist/js/app.js
 msgid "Verified Purchase"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1944
+#: assets/admin/dist/js/app.js
+msgid "Verify the signature on your receiver"
 msgstr ""
 
 # Source: resources/js/pages/Whatsapp.tsx:801
@@ -22825,6 +23465,12 @@ msgstr ""
 msgid "Webhook verify secret (App Secret)"
 msgstr ""
 
+# Source: resources/js/components/Layout.tsx:546, resources/js/pages/Webhooks.tsx:294
+#: assets/admin/dist/js/app.js
+#: app/Core/Modules/ModuleManager.php:317
+msgid "Webhooks"
+msgstr ""
+
 # Source: resources/js/pages/Settings.tsx:3752, resources/js/pages/WhiteLabel.tsx:970
 #: assets/admin/dist/js/app.js
 msgid "Website URL"
@@ -22947,7 +23593,7 @@ msgstr ""
 msgid "What's included"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:516
+# Source: resources/js/components/Layout.tsx:517
 #: assets/admin/dist/js/app.js
 msgid "WhatsApp"
 msgstr ""
@@ -23153,7 +23799,7 @@ msgstr ""
 msgid "Which day number is this in the itinerary?"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:480, resources/js/pages/WhiteLabel.tsx:270
+# Source: resources/js/components/Layout.tsx:481, resources/js/pages/WhiteLabel.tsx:270
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:253
 msgid "White Label"
@@ -23429,6 +24075,11 @@ msgstr ""
 msgid "ZIP/Postal Code"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1412
+#: assets/admin/dist/js/app.js
+msgid "Zapier — booking sync"
+msgstr ""
+
 # Source: resources/js/pages/Settings.tsx:6377
 #: assets/admin/dist/js/app.js
 msgid "access advanced conversion tracking features"
@@ -23545,6 +24196,11 @@ msgstr ""
 msgid "calls"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:1079
+#: assets/admin/dist/js/app.js
+msgid "capture a sample first"
+msgstr ""
+
 # Source: resources/js/pages/Categories.tsx:1222, resources/js/pages/TravelerCategories.tsx:872
 #: assets/admin/dist/js/app.js
 #: templates/listing-trip-category.php:56
@@ -23570,6 +24226,11 @@ msgstr ""
 # Source: resources/js/pages/Settings.tsx:3664
 #: assets/admin/dist/js/app.js
 msgid "company@example.com"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:509
+#: assets/admin/dist/js/app.js
+msgid "consecutive failures"
 msgstr ""
 
 # Source: resources/js/pages/TripConsent.tsx:989
@@ -23659,6 +24320,11 @@ msgstr ""
 # Source: resources/js/pages/AiAssistant.tsx:1402, resources/js/pages/AiAssistant.tsx:1427
 #: assets/admin/dist/js/app.js
 msgid "default"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:2230
+#: assets/admin/dist/js/app.js
+msgid "deliveries"
 msgstr ""
 
 # Source: resources/js/pages/Departures.tsx:1234
@@ -24147,6 +24813,16 @@ msgstr ""
 msgid "features."
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:548
+#: assets/admin/dist/js/app.js
+msgid "fields"
+msgstr ""
+
+# Source: resources/js/pages/Webhooks.tsx:1103
+#: assets/admin/dist/js/app.js
+msgid "fields selected"
+msgstr ""
+
 # Source: resources/js/components/ai/CreateTripWithAiWizard.tsx:1250
 #: assets/admin/dist/js/app.js
 msgid "food tours, rickshaw rides, mosque visits, river cruise"
@@ -24327,7 +25003,7 @@ msgstr ""
 msgid "on waitlist"
 msgstr ""
 
-# Source: resources/js/pages/RecurringRuleForm.tsx:822, resources/js/pages/Whatsapp.tsx:907
+# Source: resources/js/pages/RecurringRuleForm.tsx:822, resources/js/pages/Webhooks.tsx:1449, resources/js/pages/Whatsapp.tsx:907
 #: assets/admin/dist/js/app.js
 msgid "optional"
 msgstr ""
@@ -24498,6 +25174,11 @@ msgstr ""
 msgid "templates"
 msgstr ""
 
+# Source: resources/js/pages/Webhooks.tsx:432
+#: assets/admin/dist/js/app.js
+msgid "this endpoint"
+msgstr ""
+
 # Source: resources/js/pages/Availability.tsx:1709
 #: assets/admin/dist/js/app.js
 msgid "time slots"
@@ -24570,12 +25251,12 @@ msgstr ""
 msgid "your-email@gmail.com"
 msgstr ""
 
-# Source: resources/js/hooks/useModules.ts:198
+# Source: resources/js/hooks/useModules.ts:202
 #: assets/admin/dist/js/app.js
 msgid "{module} disabled successfully."
 msgstr ""
 
-# Source: resources/js/hooks/useModules.ts:194
+# Source: resources/js/hooks/useModules.ts:198
 #: assets/admin/dist/js/app.js
 msgid "{module} enabled successfully."
 msgstr ""
@@ -26495,6 +27176,7 @@ msgid "Automatically sync bookings and departures to Google Calendar. Keep trave
 msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:46
+#: app/Core/Modules/ModuleManager.php:319
 msgid "Integrations"
 msgstr ""
 
@@ -26593,6 +27275,10 @@ msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:303
 msgid "Distribution"
+msgstr ""
+
+#: app/Core/Modules/ModuleManager.php:318
+msgid "Push every Yatra event (booking, payment, refund, customer, enquiry, trip, departure) to your CRM, accounting tool, Zapier, Make, Slack, or any HTTPS endpoint. HMAC-SHA256 signed payloads, automatic retry with exponential backoff, full delivery log with payload inspection + replay, per-endpoint encrypted secrets. The integration backbone for agencies wiring Yatra into a custom tech stack."
 msgstr ""
 
 #: app/Helpers/FormatHelper.php:275

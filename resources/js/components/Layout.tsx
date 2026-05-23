@@ -38,6 +38,7 @@ import {
   MessageSquare,
   MessageCircle,
   Network,
+  Webhook,
   Puzzle,
   ArrowLeft,
   Loader2,
@@ -531,6 +532,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               subpage: "channel-manager",
               label: __("Channel Manager", "yatra"),
               icon: Network,
+              isPremium: true,
+            },
+          ]
+        : []),
+      // Webhooks — Agency-tier outbound integration hub. Same gate
+      // as Channel Manager / White Label: Agency license + module on.
+      ...((window as any).yatraAdmin?.isAgency &&
+      (window as any).yatraAdmin?.webhooksEnabled
+        ? [
+            {
+              subpage: "webhooks",
+              label: __("Webhooks", "yatra"),
+              icon: Webhook,
               isPremium: true,
             },
           ]

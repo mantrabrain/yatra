@@ -65,6 +65,7 @@ import WhiteLabel from "./pages/WhiteLabel";
 import AiAssistant from "./pages/AiAssistant";
 import Whatsapp from "./pages/Whatsapp";
 import ChannelManager from "./pages/ChannelManager";
+import Webhooks from "./pages/Webhooks";
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -329,6 +330,8 @@ const App: React.FC = () => {
         return <Whatsapp />;
       case "channel-manager":
         return <ChannelManager />;
+      case "webhooks":
+        return <Webhooks />;
       case "dashboard":
       default:
         return <Dashboard />;

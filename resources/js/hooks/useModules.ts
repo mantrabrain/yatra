@@ -160,6 +160,10 @@ export const useToggleModule = () => {
         window.yatraAdmin.channelManagerEnabled = enabledModules.some(
           (m) => m.slug === "channel_manager" || m.slug === "channel-manager",
         );
+        // Webhooks — Agency-only sidebar menu, same instant-toggle pattern.
+        window.yatraAdmin.webhooksEnabled = enabledModules.some(
+          (m) => m.slug === "webhooks",
+        );
         // Add flags for Pro feature modules
         window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(
           (m) => m.slug === "mailchimp",
@@ -295,6 +299,10 @@ export const useBulkToggleModules = () => {
         // `yatra-modules-updated` event dispatched below.
         window.yatraAdmin.channelManagerEnabled = enabledModules.some(
           (m) => m.slug === "channel_manager" || m.slug === "channel-manager",
+        );
+        // Webhooks — Agency-only sidebar menu, same instant-toggle pattern.
+        window.yatraAdmin.webhooksEnabled = enabledModules.some(
+          (m) => m.slug === "webhooks",
         );
         // Add flags for Pro feature modules
         window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(

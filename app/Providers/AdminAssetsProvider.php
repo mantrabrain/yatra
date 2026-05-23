@@ -92,6 +92,9 @@ class AdminAssetsProvider
             'channelManagerEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
                 ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('channel_manager')
                 : false,
+            'webhooksEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
+                ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('webhooks')
+                : false,
             // Single source of truth for every country dropdown in the
             // React admin. Pulled from the canonical FormatHelper —
             // operators that want a curated or reordered list apply
