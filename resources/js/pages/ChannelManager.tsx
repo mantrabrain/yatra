@@ -1386,6 +1386,57 @@ const MappingsSection: React.FC = () => {
     channels.map((c) => [c.id, c]),
   );
 
+  // Resolve every mapping's trip_id → title + admin-edit URL so the
+  // listing renders a friendly trip name (with a clickable link)
+  // instead of the bare numeric id. One batched /trips fetch keyed on
+  // the comma-joined id list keeps the network traffic to a single
+  // request even when the operator has dozens of mappings, and React
+  // Query's 5-minute staleTime means subsequent visits read straight
+  // from cache.
+  const tripIdsForLookup = useMemo(() => {
+    const ids = new Set<number>();
+    mappings.forEach((m: MappingRow) => {
+      if (m.trip_id) ids.add(Number(m.trip_id));
+    });
+    return Array.from(ids).sort((a, b) => a - b);
+  }, [mappings]);
+
+  const { data: tripsLookup } = useQuery<
+    Map<number, { title: string; edit_url: string }>
+  >({
+    queryKey: ["channel-manager-mapping-trip-titles", tripIdsForLookup],
+    enabled: tripIdsForLookup.length > 0,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      // /trips supports a comma-separated `include` (or `ids`) filter on
+      // most Yatra builds; if the active build doesn't, the response
+      // simply returns the first page and unmatched ids fall back to
+      // "Trip #N" in the row renderer — safe degradation.
+      const params: Record<string, any> = {
+        per_page: Math.max(tripIdsForLookup.length, 25),
+        include: tripIdsForLookup.join(","),
+      };
+      const res: any = await apiClient.get("/trips", { params });
+      const items: any[] = res?.data?.data || res?.data || res || [];
+      const map = new Map<number, { title: string; edit_url: string }>();
+      if (Array.isArray(items)) {
+        items.forEach((t: any) => {
+          const id = Number(t?.id || 0);
+          if (!id) return;
+          map.set(id, {
+            title: String(t?.title || t?.name || `Trip #${id}`),
+            edit_url:
+              t?.edit_url ||
+              t?.admin_edit_url ||
+              t?.permalink ||
+              `${(window as any)?.yatraAdmin?.adminUrl || "admin.php"}?page=yatra&subpage=trips&action=edit&id=${id}`,
+          });
+        });
+      }
+      return map;
+    },
+  });
+
   // If we're showing the edit form, render that instead of the list.
   if (editing !== null) {
     return (
@@ -1449,17 +1500,19 @@ const MappingsSection: React.FC = () => {
             </span>
           </p>
         </div>
-        <div className="flex items-center gap-2 flex-nowrap">
+        <div className="flex items-center gap-2 flex-wrap">
           {/* The shared Select renders w-full by default so its
               flex item stretches to fill the row and pushes the
               Add button onto a second line. Constraining it to a
               fixed pixel width keeps the filter dropdown and the
-              Add button on the same row at every viewport size
-              the Mappings toolbar is used at. */}
+              Add button on the same row when there is space —
+              and flex-wrap (not nowrap) lets the Button drop
+              below cleanly on truly narrow viewports instead of
+              overflowing the parent. */}
           <Select
             value={String(filterChannel)}
             onChange={(e) => setFilterChannel(Number(e.target.value))}
-            className="w-56 flex-shrink-0"
+            className="w-56"
           >
             <option value="0">{__("All channels", "yatra")}</option>
             {channels.map((c) => (
@@ -1471,7 +1524,6 @@ const MappingsSection: React.FC = () => {
           <Button
             onClick={() => setShowAdd(true)}
             disabled={channels.length === 0}
-            className="flex-shrink-0"
             title={
               channels.length === 0
                 ? __(
@@ -1622,9 +1674,31 @@ const MappingsSection: React.FC = () => {
                             `#${m.channel_id}`}
                         </td>
                         <td className="px-4 py-3 text-sm">
-                          <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800">
-                            #{m.trip_id}
-                          </code>
+                          {(() => {
+                            const trip = tripsLookup?.get(m.trip_id);
+                            const title = trip?.title || `Trip #${m.trip_id}`;
+                            const url = trip?.edit_url;
+                            return (
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                {url ? (
+                                  <a
+                                    href={url}
+                                    className="truncate font-medium text-blue-600 hover:underline dark:text-blue-400"
+                                    title={title}
+                                  >
+                                    {title}
+                                  </a>
+                                ) : (
+                                  <span className="truncate font-medium" title={title}>
+                                    {title}
+                                  </span>
+                                )}
+                                <code className="flex-shrink-0 rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                                  #{m.trip_id}
+                                </code>
+                              </div>
+                            );
+                          })()}
                         </td>
                         <td className="px-4 py-3 text-sm">
                           {m.external_url ? (
