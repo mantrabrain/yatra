@@ -67,18 +67,18 @@ class BookingsController extends BaseController
         // BOOKINGS ROUTES
         // =====================
         
-        // List bookings
+        // List bookings — view cap.
         register_rest_route($this->namespace, '/bookings', [
             'methods' => 'GET',
             'callback' => [$this, 'getBookings'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
+            'permission_callback' => [$this, 'checkCanView'],
         ]);
 
-        // Get single booking
+        // Get single booking — view cap.
         register_rest_route($this->namespace, '/bookings/(?P<id>\d+)', [
             'methods' => 'GET',
             'callback' => [$this, 'getBooking'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
+            'permission_callback' => [$this, 'checkCanView'],
             'args' => [
                 'id' => [
                     'required' => true,
@@ -88,64 +88,73 @@ class BookingsController extends BaseController
             ],
         ]);
 
-        // Create booking
+        // Create booking — create cap.
         register_rest_route($this->namespace, '/bookings', [
             'methods' => 'POST',
             'callback' => [$this, 'createBooking'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
+            'permission_callback' => [$this, 'checkCanCreate'],
         ]);
 
-        // Update booking
+        // Update booking — edit cap.
         register_rest_route($this->namespace, '/bookings/(?P<id>\d+)', [
             'methods' => 'PUT',
             'callback' => [$this, 'updateBooking'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
+            'permission_callback' => [$this, 'checkCanEdit'],
         ]);
 
-        // Delete booking
+        // Delete booking — critical-sensitivity delete cap. Only
+        // Owner role gets this by default.
         register_rest_route($this->namespace, '/bookings/(?P<id>\d+)', [
             'methods' => 'DELETE',
             'callback' => [$this, 'deleteBooking'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
+            'permission_callback' => [$this, 'checkCanDelete'],
         ]);
 
-        // Update booking status
+        // Update booking status — dedicated change-status cap so
+        // Front Desk (who has this cap but NOT edit) can flip
+        // confirmed → checked-in without being able to mutate other
+        // fields.
         register_rest_route($this->namespace, '/bookings/(?P<id>\d+)/status', [
             'methods' => 'PUT',
             'callback' => [$this, 'updateBookingStatus'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
+            'permission_callback' => [$this, 'checkCanChangeStatus'],
         ]);
 
-        // Get booking statistics
+        // Get booking statistics — view cap (aggregates only).
         register_rest_route($this->namespace, '/bookings/stats', [
             'methods' => 'GET',
             'callback' => [$this, 'getBookingStats'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
+            'permission_callback' => [$this, 'checkCanView'],
         ]);
 
-        // Send booking email
+        // Send booking email — edit cap. Sending a transactional
+        // re-confirmation is a write-side operation against the
+        // customer's record.
         register_rest_route($this->namespace, '/bookings/(?P<id>\d+)/send-email', [
             'methods' => 'POST',
             'callback' => [$this, 'sendBookingEmail'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
+            'permission_callback' => [$this, 'checkCanEdit'],
         ]);
 
         // =====================
         // PAYMENTS ROUTES
         // =====================
-        
-        // Get booking payments
+
+        // Get booking payments — view cap.
         register_rest_route($this->namespace, '/bookings/(?P<id>\d+)/payments', [
             'methods' => 'GET',
             'callback' => [$this, 'getBookingPayments'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
+            'permission_callback' => [$this, 'checkCanView'],
         ]);
 
-        // Add payment to booking
+        // Add payment to booking — edit cap (modifies the booking's
+        // payment state). Refunds + payment deletion live on the
+        // dedicated PaymentController with their own high-sensitivity
+        // caps.
         register_rest_route($this->namespace, '/bookings/(?P<id>\d+)/payments', [
             'methods' => 'POST',
             'callback' => [$this, 'addPayment'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
+            'permission_callback' => [$this, 'checkCanEdit'],
         ]);
 
         // NOTE: Payment CRUD operations moved to PaymentController
@@ -154,18 +163,19 @@ class BookingsController extends BaseController
         // =====================
         // TRAVELERS ROUTES
         // =====================
-        
+
+        // Travelers list — view cap.
         register_rest_route($this->namespace, '/travelers', [
             'methods' => 'GET',
             'callback' => [$this, 'getTravelers'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
+            'permission_callback' => [$this, 'checkCanView'],
         ]);
 
-        // Traveler bulk actions
+        // Traveler bulk actions — edit cap.
         register_rest_route($this->namespace, '/travelers/bulk', [
             'methods' => 'PUT',
             'callback' => [$this, 'bulkTravelers'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
+            'permission_callback' => [$this, 'checkCanEdit'],
         ]);
 
         // Download travel voucher for a booking
@@ -184,15 +194,51 @@ class BookingsController extends BaseController
     }
 
     /**
-     * Check admin permission
+     * Granular permission checks — one per operation. WP administrators
+     * pass every cap via the Team module's admin-fallback filter
+     * (priority 7 / 8), so an explicit `manage_options` check isn't
+     * needed at this layer — the cap covers it.
+     */
+    public function checkCanView(): bool
+    {
+        return current_user_can('yatra_view_bookings');
+    }
+
+    public function checkCanCreate(): bool
+    {
+        return current_user_can('yatra_create_bookings');
+    }
+
+    public function checkCanEdit(): bool
+    {
+        return current_user_can('yatra_edit_bookings');
+    }
+
+    public function checkCanDelete(): bool
+    {
+        // Critical-sensitivity cap. By default only the Owner role
+        // holds this — Manager, Sales Agent, Front Desk, etc. cannot
+        // delete bookings even when they can edit them.
+        return current_user_can('yatra_delete_bookings');
+    }
+
+    public function checkCanChangeStatus(): bool
+    {
+        // Separate from edit — Front Desk has this without the
+        // broader edit cap so they can confirm/check-in bookings
+        // without being able to mutate other fields.
+        return current_user_can('yatra_change_booking_status');
+    }
+
+    /**
+     * @deprecated Kept for any external code (snippet, integration)
+     * that referenced the old method name. Routes to the view-only
+     * cap — safer than the old `view OR manage_options` shorthand,
+     * and admin users still pass via the admin-fallback layer.
      */
     public function checkAdminPermission(): bool
     {
-        // Allow custom booking capability or fallback to manage_options
-        if (current_user_can('yatra_view_bookings')) {
-            return true;
-        }
-        return current_user_can('manage_options');
+        return $this->checkCanView();
     }
 
     // =========================================================================

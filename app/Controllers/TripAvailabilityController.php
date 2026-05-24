@@ -37,59 +37,64 @@ class TripAvailabilityController extends BaseController
     {
         $namespace = 'yatra/v1';
         
-        // All departures endpoint (without trip ID)
+        // All departures endpoint (without trip ID) — view cap.
         register_rest_route($namespace, '/departures', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_all_departures'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
             ],
         ]);
-        
+
         $base = 'trips/(?P<trip_id>[\d]+)/departures';
 
-        // Departures endpoints
+        // Departures list + create — view cap for read, manage cap
+        // for create (a departure is a scheduled trip instance, not
+        // trip content edit).
         register_rest_route($namespace, '/' . $base, [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_departures'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
             ],
             [
                 'methods' => \WP_REST_Server::CREATABLE,
                 'callback' => [$this, 'create_departure'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_manage_permission'],
             ],
         ]);
 
+        // Single departure — view / update / delete. Update is a
+        // manage operation; DELETE is the cancellation cap because
+        // dropping a departure typically means cancelling it.
         register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_departure'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
             ],
             [
                 'methods' => \WP_REST_Server::EDITABLE,
                 'callback' => [$this, 'update_departure'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_manage_permission'],
             ],
             [
                 'methods' => \WP_REST_Server::DELETABLE,
                 'callback' => [$this, 'delete_departure'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_cancel_permission'],
             ],
         ]);
 
-        // Past departures endpoint
+        // Past departures endpoint — view cap.
         register_rest_route($namespace, '/' . $base . '/past', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_past_departures'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
             ],
         ]);
 
-        // Available dates endpoint (for frontend)
+        // Available dates endpoint (for frontend booking widget).
         register_rest_route($namespace, '/trips/(?P<trip_id>[\d]+)/available-dates', [
             [
                 'methods' => \WP_REST_Server::READABLE,
@@ -98,18 +103,20 @@ class TripAvailabilityController extends BaseController
             ],
         ]);
 
-        // Recurring rules endpoints
+        // Recurring rules — these are availability templates on the
+        // TRIP, not on individual departures. Gated on the trip-edit
+        // cap (same as the other availability controllers).
         $rulesBase = 'trips/(?P<trip_id>[\d]+)/recurring-rules';
         register_rest_route($namespace, '/' . $rulesBase, [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_recurring_rules'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
             ],
             [
                 'methods' => \WP_REST_Server::CREATABLE,
                 'callback' => [$this, 'create_recurring_rule'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_trip_edit_permission'],
             ],
         ]);
 
@@ -117,36 +124,73 @@ class TripAvailabilityController extends BaseController
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_recurring_rule'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
             ],
             [
                 'methods' => \WP_REST_Server::EDITABLE,
                 'callback' => [$this, 'update_recurring_rule'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_trip_edit_permission'],
             ],
             [
                 'methods' => \WP_REST_Server::DELETABLE,
                 'callback' => [$this, 'delete_recurring_rule'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_trip_edit_permission'],
             ],
         ]);
 
-        // Preview recurring rule dates
+        // Preview recurring-rule dates — view cap.
         register_rest_route($namespace, '/' . $rulesBase . '/(?P<id>[\d]+)/preview', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'preview_recurring_rule'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
             ],
         ]);
     }
 
     /**
-     * Check permission
+     * Granular cap checks for every Departure endpoint. The previous
+     * implementation gated everything on `manage_options` which
+     * locked Sales Agent / Front Desk / Guide / Accountant / Auditor
+     * out of the departures REST surface despite the role bundles
+     * granting them view / manage / cancel caps. WP admins pass via
+     * the Team module's admin-fallback filter.
+     */
+    public function check_view_permission(?WP_REST_Request $request = null): bool
+    {
+        return current_user_can('yatra_view_departures');
+    }
+
+    public function check_manage_permission(?WP_REST_Request $request = null): bool
+    {
+        // Held by Owner / Manager / Guide. Used for create + update.
+        return current_user_can('yatra_manage_departures');
+    }
+
+    public function check_cancel_permission(?WP_REST_Request $request = null): bool
+    {
+        // Held by Owner / Manager only by default. Cancelling a
+        // departure is a customer-affecting action (refunds, emails)
+        // so it gets the stricter cap than ordinary management.
+        return current_user_can('yatra_cancel_departures');
+    }
+
+    public function check_trip_edit_permission(?WP_REST_Request $request = null): bool
+    {
+        // Recurring rules belong to the parent trip, not to any one
+        // departure. Their lifecycle matches the trip-edit cap.
+        return current_user_can('yatra_edit_trips');
+    }
+
+    /**
+     * @deprecated Kept for any external code referencing the old
+     * method. Routes to view — safer default than the old
+     * `manage_options` shorthand. Admin users still pass via the
+     * admin-fallback layer.
      */
     public function check_permission(?WP_REST_Request $request = null): bool
     {
-        return current_user_can('manage_options');
+        return $this->check_view_permission($request);
     }
 
     // =========================================================================

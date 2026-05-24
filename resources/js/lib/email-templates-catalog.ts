@@ -6,7 +6,14 @@
  * on/off + content from site settings while the module is off — view-only until the module is active.
  */
 
-import { __ } from "./i18n";
+import { __, sprintf, brandName } from "./i18n";
+
+// Pre-compute "{brand} Pro" once at module load. Used by the
+// operator-facing template descriptions below so a white-labelled
+// site shows the operator's brand instead of literal "Yatra Pro".
+// brandName() reads window.yatraAdmin.brandName which is injected
+// before any React module loads, so this value is always correct.
+const BRAND_PRO_NAME = brandName() + " Pro";
 import type { EmailSettingsValues } from "../components/settings/email-settings-types";
 
 /** Rich booking merge tags (gateway, schedule, travelers, booking meta, special requests). */
@@ -506,9 +513,13 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     template_key: "abandoned_booking_recovery_first",
     event_key: "booking.abandoned_recovery",
     name: __("Abandoned booking recovery (First)", "yatra"),
-    description: __(
-      "First reminder sent by Yatra Pro abandoned checkout recovery (module copy in {{recovery_intro_html}}).",
-      "yatra",
+    description: sprintf(
+      /* translators: %s: brand name (e.g. "Yatra Pro" or operator's white-labeled brand) */
+      __(
+        "First reminder sent by %s abandoned checkout recovery (module copy in {{recovery_intro_html}}).",
+        "yatra",
+      ),
+      BRAND_PRO_NAME,
     ),
     category: "booking",
     recipient_type: "customer",
@@ -526,9 +537,13 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     template_key: "abandoned_booking_recovery_second",
     event_key: "booking.abandoned_recovery",
     name: __("Abandoned booking recovery (Second)", "yatra"),
-    description: __(
-      "Second reminder sent by Yatra Pro abandoned checkout recovery (module copy in {{recovery_intro_html}}).",
-      "yatra",
+    description: sprintf(
+      /* translators: %s: brand name */
+      __(
+        "Second reminder sent by %s abandoned checkout recovery (module copy in {{recovery_intro_html}}).",
+        "yatra",
+      ),
+      BRAND_PRO_NAME,
     ),
     category: "booking",
     recipient_type: "customer",
@@ -546,9 +561,13 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     template_key: "abandoned_booking_recovery_final",
     event_key: "booking.abandoned_recovery",
     name: __("Abandoned booking recovery (Final)", "yatra"),
-    description: __(
-      "Final reminder sent by Yatra Pro abandoned checkout recovery (module copy in {{recovery_intro_html}}).",
-      "yatra",
+    description: sprintf(
+      /* translators: %s: brand name */
+      __(
+        "Final reminder sent by %s abandoned checkout recovery (module copy in {{recovery_intro_html}}).",
+        "yatra",
+      ),
+      BRAND_PRO_NAME,
     ),
     category: "booking",
     recipient_type: "customer",

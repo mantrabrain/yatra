@@ -811,40 +811,31 @@ class AttributeController extends BaseController
     }
 
     /**
-     * Check permissions for read operations
+     * Granular permission checks. Trip attributes are a trip-taxonomy
+     * concept — they classify trips for filtering / display — so the
+     * Team module's `yatra_manage_trip_taxonomies` cap is the right
+     * gate for write operations, and `yatra_view_trips` for reads.
+     * WP administrators pass every cap via the Team module's admin-
+     * fallback filter so no explicit `manage_options` check is needed.
      */
     public function get_permissions_check(): bool
     {
-        return current_user_can('manage_options');
+        return current_user_can('yatra_view_trips');
     }
 
-    /**
-     * Check permissions for create/update/delete operations
-     */
     public function check_permission(?WP_REST_Request $request = null): bool
     {
-        $hasPermission = current_user_can('manage_options');
-        
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            }
-        
-        return $hasPermission;
+        return current_user_can('yatra_manage_trip_taxonomies');
     }
 
-    /**
-     * Check permissions for search operations
-     */
     public function search_permissions_check(): bool
     {
-        return current_user_can('manage_options');
+        return current_user_can('yatra_view_trips');
     }
 
-    /**
-     * Check permissions for update operations
-     */
     public function update_permissions_check(): bool
     {
-        return current_user_can('manage_options');
+        return current_user_can('yatra_manage_trip_taxonomies');
     }
 
     /**

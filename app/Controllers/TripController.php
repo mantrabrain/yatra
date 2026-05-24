@@ -62,21 +62,21 @@ class TripController extends BaseController
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_items'],
-                'permission_callback' => [$this, 'check_read_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
             ],
             [
                 'methods' => \WP_REST_Server::CREATABLE,
                 'callback' => [$this, 'create_item'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_create_permission'],
             ],
         ]);
 
-        // Duplicate trip: POST /trips/{id}/duplicate
+        // Duplicate is a create — produces a new trip row.
         register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/duplicate', [
             [
                 'methods' => \WP_REST_Server::CREATABLE,
                 'callback' => [$this, 'duplicate_item'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_create_permission'],
             ],
         ]);
 
@@ -84,44 +84,52 @@ class TripController extends BaseController
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_item'],
-                'permission_callback' => [$this, 'check_read_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
             ],
             [
+                // EDITABLE covers both content edits AND publish/unpublish
+                // state changes (the React form sends both via PUT).
+                // We accept either edit OR publish cap — handlers should
+                // refuse to change `status` when the user holds only the
+                // edit cap, but the route gate lets both through.
                 'methods' => \WP_REST_Server::EDITABLE,
                 'callback' => [$this, 'update_item'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_edit_or_publish_permission'],
             ],
             [
+                // Soft-delete (trash) → edit cap. Trash is reversible
+                // and is the day-to-day "remove from catalogue" action.
                 'methods' => \WP_REST_Server::DELETABLE,
                 'callback' => [$this, 'delete_item'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_edit_permission'],
             ],
         ]);
 
-        // Permanent delete endpoint
+        // Permanent delete — bypasses trash. High-sensitivity action,
+        // gated on the dedicated delete cap.
         register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/permanent-delete', [
             [
                 'methods' => \WP_REST_Server::DELETABLE,
                 'callback' => [$this, 'permanent_delete_item'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_delete_permission'],
             ],
         ]);
 
-        // Search endpoint
+        // Search endpoint — view cap.
         register_rest_route($namespace, '/' . $base . '/search', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'search_items'],
-                'permission_callback' => [$this, 'check_read_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
             ],
         ]);
 
-        // Revisions endpoints
+        // Revisions list — view cap.
         register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/revisions', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_revisions'],
-                'permission_callback' => [$this, 'check_read_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
             ],
         ]);
 
@@ -129,12 +137,13 @@ class TripController extends BaseController
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_revision'],
-                'permission_callback' => [$this, 'check_read_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
             ],
             [
+                // Restoring a revision overwrites the live trip → edit cap.
                 'methods' => \WP_REST_Server::EDITABLE,
                 'callback' => [$this, 'restore_revision'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_edit_permission'],
             ],
         ]);
 
@@ -166,32 +175,33 @@ class TripController extends BaseController
             ],
         ]);
 
-        // Status statistics for admin views
+        // Status statistics for admin views — view cap.
         register_rest_route($namespace, '/' . $base . '/stats', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'getStats'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
             ],
         ]);
 
-        // Trip attributes endpoints (admin only — never expose unauthenticated read/write)
+        // Test endpoint — view cap (read-only diagnostic).
         register_rest_route($namespace, '/' . $base . '/test', [
             'methods' => \WP_REST_Server::READABLE,
             'callback' => [$this, 'test_endpoint'],
-            'permission_callback' => [$this, 'check_permission'],
+            'permission_callback' => [$this, 'check_view_permission'],
         ]);
 
+        // Trip-attribute assignments — trip-taxonomy edits go here.
         register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/attributes', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_trip_attributes'],
-                'permission_callback' => [$this, 'check_read_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
             ],
             [
                 'methods' => \WP_REST_Server::CREATABLE,
                 'callback' => [$this, 'update_trip_attributes'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_taxonomy_permission'],
             ],
         ]);
 
@@ -199,9 +209,53 @@ class TripController extends BaseController
             [
                 'methods' => \WP_REST_Server::DELETABLE,
                 'callback' => [$this, 'delete_trip_attribute'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_taxonomy_permission'],
             ],
         ]);
+    }
+
+    /**
+     * Granular cap checks for every Trip endpoint. Overrides the
+     * BaseController defaults (which gate everything on `manage_options`
+     * and locked out every yatra_* role from the trips REST surface).
+     * WP admins pass via the Team module's admin-fallback filter.
+     */
+    public function check_view_permission(?WP_REST_Request $request = null): bool
+    {
+        return current_user_can('yatra_view_trips');
+    }
+
+    public function check_create_permission(?WP_REST_Request $request = null): bool
+    {
+        return current_user_can('yatra_create_trips');
+    }
+
+    public function check_edit_permission(?WP_REST_Request $request = null): bool
+    {
+        return current_user_can('yatra_edit_trips');
+    }
+
+    /**
+     * EDITABLE / PUT routes that may carry either a content edit or a
+     * status change pass when the caller holds EITHER cap. The actual
+     * handler should refuse to change `status` when only `edit` is
+     * held — that's a future hardening, but the route gate already
+     * keeps non-trip-staff out.
+     */
+    public function check_edit_or_publish_permission(?WP_REST_Request $request = null): bool
+    {
+        return current_user_can('yatra_edit_trips')
+            || current_user_can('yatra_publish_trips');
+    }
+
+    public function check_delete_permission(?WP_REST_Request $request = null): bool
+    {
+        return current_user_can('yatra_delete_trips');
+    }
+
+    public function check_taxonomy_permission(?WP_REST_Request $request = null): bool
+    {
+        return current_user_can('yatra_manage_trip_taxonomies');
     }
 
     /**
@@ -889,8 +943,13 @@ class TripController extends BaseController
     public function restore_revision(WP_REST_Request $request)
     {
         try {
-            // Check permissions
-            if (!current_user_can('yatra_edit_trips')) {
+            // Check permissions — admin fallback ensures site owners
+            // always pass even when the Team module isn't active and
+            // the yatra_edit_trips cap isn't on the admin role.
+            if (
+                !current_user_can('manage_options')
+                && !current_user_can('yatra_edit_trips')
+            ) {
                 return $this->error_response(__('You do not have permission to restore revisions', 'yatra'), 403);
             }
 

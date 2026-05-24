@@ -352,11 +352,13 @@ class RecurringAvailabilityController extends BaseController
     }
 
     /**
-     * Check if user has permission
+     * Recurring availability writes — trip-edits cap. Same gate as the
+     * other availability controllers. WP admins pass via the Team
+     * module's admin-fallback filter.
      */
     public function check_permission(?\WP_REST_Request $request = null): bool
     {
-        return current_user_can('manage_options');
+        return current_user_can('yatra_edit_trips');
     }
 }
 

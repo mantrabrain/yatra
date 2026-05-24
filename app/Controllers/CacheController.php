@@ -112,11 +112,14 @@ class CacheController extends BaseController
     }
 
     /**
-     * Check permissions for cache operations
+     * Cache management endpoints — gated on the settings cap. Cache
+     * flushes / regenerates are an operational task that fits the
+     * same risk profile as other settings changes. WP admins pass
+     * via the Team module's admin-fallback filter.
      */
     public function checkPermissions(): bool
     {
-        return current_user_can('manage_options');
+        return current_user_can('yatra_manage_settings');
     }
 
     /**

@@ -37,45 +37,85 @@ export const usePermissions = (): UsePermissionsReturn => {
   }, []);
 
   /**
-   * Check if user has a specific capability
+   * Check if the current user has a specific capability.
+   *
+   * Sources, in order:
+   *   1. `window.yatraAdmin.capabilities` — server-built map of every
+   *      `yatra_*` cap the user passes via WP-native `current_user_can`.
+   *      Built by AdminAssetsProvider from `$current_user->allcaps`,
+   *      filtered to the `yatra_` prefix.
+   *   2. `window.yatraAdmin.userCaps` — Team module's enriched list,
+   *      includes the same caps + anything added via the user_has_cap
+   *      filter (admin fallback, per-user grants, derived caps).
+   *   3. `window.yatraAdmin.isWpAdmin` — last-resort fallback for site
+   *      owners so they're never locked out of anything.
+   *
+   * Default-deny when none match. The previous implementation had a
+   * hardcoded "every user gets yatra_view_trips / yatra_edit_trips /
+   * yatra_view_bookings" map that broke the Team & Access module — an
+   * Accountant calling `can('yatra_edit_trips')` returned true via that
+   * defaults map, leaking Tools / Modules / etc. into their UI even
+   * though their role doesn't grant edit_trips.
+   *
    * @param capability - Capability to check
    * @returns True if user has capability
    */
   const can = useCallback(
     (capability: string): boolean => {
-      // Check direct capabilities
+      // 1) Server-built per-user cap map (yatra_* only).
       if (capabilities[capability] === true) {
         return true;
       }
 
-      // Check permissions array
+      // 2) Team module's enriched userCaps list.
+      const userCaps = (window.yatraAdmin as { userCaps?: string[] } | undefined)
+        ?.userCaps;
+      if (Array.isArray(userCaps) && userCaps.includes(capability)) {
+        return true;
+      }
+
+      // 3) Legacy permissions array (kept for back-compat with any
+      //    code path that pre-dates the capabilities map).
       if (permissions.includes(capability)) {
         return true;
       }
 
-      // Check for Pro-only features
+      // 4) WP admin fallback — site owners pass everything.
+      //
+      // Belt-and-suspenders: we check THREE signals in case one of
+      // them goes missing on a particular install. All three are
+      // injected by AdminAssetsProvider, but defense in depth is
+      // cheap and protects against:
+      //   - server-side filters stripping isWpAdmin from localized data
+      //   - JSON-encoding edge cases where booleans get coerced
+      //   - roles arrays that contain admin even when capabilities map
+      //     was built from a stale $current_user (page-cache + role
+      //     changes)
+      const adm = window.yatraAdmin as
+        | {
+            isWpAdmin?: unknown;
+            roles?: unknown;
+            capabilities?: Record<string, unknown>;
+          }
+        | undefined;
+      if (adm) {
+        if (adm.isWpAdmin === true || adm.isWpAdmin === "1" || adm.isWpAdmin === 1) {
+          return true;
+        }
+        if (Array.isArray(adm.roles) && adm.roles.includes("administrator")) {
+          return true;
+        }
+        if (adm.capabilities && adm.capabilities["manage_options"] === true) {
+          return true;
+        }
+      }
+
+      // 5) Pro-only check stays for completeness.
       if (capability.startsWith("yatra_pro_") && !isPro) {
         return false;
       }
 
-      // Default capabilities
-      const defaultCapabilities: Record<string, boolean> = {
-        manage_yatra: true, // Default admin capability
-        yatra_view_trips: true,
-        yatra_edit_trips: true,
-        yatra_delete_trips: true,
-        yatra_view_bookings: true,
-        yatra_edit_bookings: true,
-        yatra_delete_bookings: true,
-        yatra_view_customers: true,
-        yatra_edit_customers: true,
-        yatra_delete_customers: true,
-        yatra_view_reviews: true,
-        yatra_edit_reviews: true,
-        yatra_delete_reviews: true,
-      };
-
-      return defaultCapabilities[capability] || false;
+      return false;
     },
     [capabilities, permissions, isPro],
   );

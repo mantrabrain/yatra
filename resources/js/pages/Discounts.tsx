@@ -185,7 +185,7 @@ const Discounts: React.FC = () => {
       });
       return response;
     },
-    enabled: can("yatra_view_bookings"),
+    enabled: can("yatra_manage_discounts"),
   });
 
   const { data: discountStats } = useQuery({
@@ -203,7 +203,7 @@ const Discounts: React.FC = () => {
         };
       }
     },
-    enabled: can("yatra_view_bookings"),
+    enabled: can("yatra_manage_discounts"),
   });
 
   const discountStatusCounts = useMemo(() => {
@@ -1107,7 +1107,7 @@ const Discounts: React.FC = () => {
           "Create and manage discount coupons for your trips",
           "yatra",
         )}
-        actionCapability="yatra_edit_bookings"
+        actionCapability="yatra_manage_discounts"
         actions={
           <Button
             onClick={handleCreateDiscount}
@@ -1167,7 +1167,7 @@ const Discounts: React.FC = () => {
         </CardContent>
       </Card>
 
-      <ConditionalRender capability="yatra_view_bookings">
+      <ConditionalRender capability="yatra_manage_discounts">
         <>
           <BulkActionToolbar
             selectedIds={selectedIds}
@@ -1219,7 +1219,7 @@ const Discounts: React.FC = () => {
                       )
                 }
                 onCreateClick={
-                  can("yatra_edit_bookings") ? handleCreateDiscount : undefined
+                  can("yatra_manage_discounts") ? handleCreateDiscount : undefined
                 }
                 onSort={handleSort}
                 getSortIcon={getSortIcon}
@@ -1229,7 +1229,7 @@ const Discounts: React.FC = () => {
                 isAllSelected={isAllSelected}
                 getItemId={(discount: Discount) => discount.id}
                 skeletonRows={5}
-                capability="yatra_view_bookings"
+                capability="yatra_manage_discounts"
               />
             </CardContent>
           </Card>

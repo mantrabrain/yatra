@@ -88,7 +88,7 @@ const ViewEnquiry: React.FC = () => {
       // Some endpoints return { success, data }, others return the object directly
       return (response as any)?.data ?? response;
     },
-    enabled: !!enquiryId && can("yatra_view_bookings"),
+    enabled: !!enquiryId && can("yatra_view_enquiries"),
   });
 
   // Respond mutation
@@ -299,7 +299,7 @@ const ViewEnquiry: React.FC = () => {
               <ArrowLeft className="w-4 h-4" />
               {__("Back", "yatra")}
             </Button>
-            <ConditionalRender capability="yatra_edit_bookings">
+            <ConditionalRender capability="yatra_respond_to_enquiries">
               <div className="flex items-center gap-2">
                 {enquiry.status !== "responded" &&
                   enquiry.status !== "closed" && (
@@ -325,7 +325,7 @@ const ViewEnquiry: React.FC = () => {
         }
       />
 
-      <ConditionalRender capability="yatra_view_bookings">
+      <ConditionalRender capability="yatra_view_enquiries">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-3">

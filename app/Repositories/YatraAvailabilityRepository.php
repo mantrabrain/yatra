@@ -201,21 +201,50 @@ class YatraAvailabilityRepository extends BaseRepository
         $departureDate = esc_sql($departureDate);
         $seatsToReserve = (int) $seatsToReserve;
 
-        // Check if enough seats are available
+        if ($seatsToReserve <= 0) return false;
+
+        // Early-exit when there's clearly not enough capacity. This is
+        // a "fail fast" optimisation — the atomic UPDATE below is the
+        // actual authority (the AND seats_available >= guard prevents
+        // overbooking even if this pre-check raced with a concurrent
+        // reservation), but skipping the UPDATE round-trip when the
+        // answer is already obvious is cheap.
         $available = $this->getAvailableSeats($tripId, $departureDate);
         if ($available < $seatsToReserve) {
             return false;
         }
 
-        $sql = "UPDATE `{$table}` 
+        $sql = "UPDATE `{$table}`
                 SET seats_reserved = seats_reserved + {$seatsToReserve},
                     seats_available = seats_available - {$seatsToReserve},
                     updated_at = CURRENT_TIMESTAMP
-                WHERE trip_id = {$tripId} 
+                WHERE trip_id = {$tripId}
                 AND departure_date = '{$departureDate}'
                 AND seats_available >= {$seatsToReserve}";
 
-        return $this->wpdb->query($sql) !== false;
+        // CRITICAL: anti-overbooking authority. `$wpdb->query()`
+        // returns the number of rows affected for UPDATE statements,
+        // or `false` on error. We MUST distinguish:
+        //
+        //   - false        → SQL error (return false; caller treats
+        //                    as failed reservation).
+        //   - 0 rows       → another writer beat us to the seats; the
+        //                    `AND seats_available >= …` guard rejected
+        //                    the write. Return false — this is the
+        //                    overbooking-prevention path.
+        //   - 1+ rows      → reservation succeeded atomically. The
+        //                    decrement-and-guard happened in a single
+        //                    DB statement so no race is possible.
+        //
+        // Previous behaviour was `return $wpdb->query($sql) !== false`
+        // which incorrectly returned TRUE on the 0-rows case — meaning
+        // callers thought they had reserved seats when in fact the DB
+        // had refused the write. With concurrent OTA + local bookings,
+        // that resulted in real overbooking even though the SQL was
+        // safe.
+        $rows = $this->wpdb->query($sql);
+        if ($rows === false) return false;
+        return (int) $rows > 0;
     }
 
     /**

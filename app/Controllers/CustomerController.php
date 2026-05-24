@@ -117,69 +117,72 @@ class CustomerController extends BaseController
         // ADMIN ROUTES
         // =====================
 
-        // List & Create customers
+        // List + create customers. List gates on view, create gates
+        // on edit (creating a customer is a write).
         register_rest_route($namespace, '/' . $base, [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'getCustomers'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanView'],
             ],
             [
                 'methods' => \WP_REST_Server::CREATABLE,
                 'callback' => [$this, 'createCustomer'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanEdit'],
             ],
         ]);
 
-        // Single customer operations
+        // Single customer — read / update / delete with distinct caps.
         register_rest_route($namespace, '/' . $base . '/(?P<id>\d+)', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'getCustomer'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanView'],
             ],
             [
                 'methods' => \WP_REST_Server::EDITABLE,
                 'callback' => [$this, 'updateCustomer'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanEdit'],
             ],
             [
                 'methods' => \WP_REST_Server::DELETABLE,
                 'callback' => [$this, 'deleteCustomer'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanEdit'],
             ],
         ]);
 
-        // Customer's bookings (admin)
+        // Customer bookings list — view cap.
         register_rest_route($namespace, '/' . $base . '/(?P<id>\d+)/bookings', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'getCustomerBookings'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanView'],
             ],
         ]);
 
-        // Merge customers
+        // Merge customers — destructive write. Edit cap.
         register_rest_route($namespace, '/' . $base . '/merge', [
             [
                 'methods' => \WP_REST_Server::CREATABLE,
                 'callback' => [$this, 'mergeCustomers'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanEdit'],
             ],
         ]);
 
-        // Customer statistics
+        // Customer statistics — view cap.
         register_rest_route($namespace, '/' . $base . '/stats', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'getCustomerStats'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanView'],
             ],
         ]);
     }
 
     /**
-     * Check if user is logged in
+     * Check if user is logged in (for /me, /my-bookings etc. — these
+     * are customer-facing endpoints that work for any logged-in WP
+     * user, not just team members).
      */
     public function checkCustomerPermission(): bool
     {
@@ -187,11 +190,31 @@ class CustomerController extends BaseController
     }
 
     /**
-     * Check admin permission
+     * Granular admin-side permission checks. WP administrators pass
+     * every cap via the Team module's admin-fallback filter, so an
+     * explicit `manage_options` check isn't needed here.
+     */
+    public function checkCanView(): bool
+    {
+        return current_user_can('yatra_view_customers');
+    }
+
+    public function checkCanEdit(): bool
+    {
+        return current_user_can('yatra_edit_customers');
+    }
+
+    /**
+     * @deprecated Kept for any external code referencing the old
+     * method name. The previous implementation OR-ed
+     * `yatra_manage_customers` which was never registered anywhere
+     * — that arm has been removed because it was always false in
+     * practice. Routes to view-only — admin users still pass via
+     * the admin-fallback layer.
      */
     public function checkAdminPermission(): bool
     {
-        return current_user_can('manage_options') || current_user_can('yatra_manage_customers');
+        return $this->checkCanView();
     }
 
     // =========================================================================

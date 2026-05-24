@@ -164,7 +164,7 @@ const Customers: React.FC = () => {
 
       return await apiService.getCustomers(paramsObj);
     },
-    enabled: can("yatra_view_bookings"),
+    enabled: can("yatra_view_customers"),
   });
 
   // Fetch customer stats (counts)
@@ -173,7 +173,7 @@ const Customers: React.FC = () => {
     queryFn: async () => {
       return await apiService.getCustomerStats();
     },
-    enabled: can("yatra_view_bookings"),
+    enabled: can("yatra_view_customers"),
   });
   const statsData: any = statsRaw ?? {};
 
@@ -592,7 +592,7 @@ const Customers: React.FC = () => {
       label: __("Edit"),
       icon: <Edit className="w-4 h-4" />,
       onClick: (customer: Customer) => handleEdit(customer),
-      condition: () => can("yatra_edit_bookings"),
+      condition: () => can("yatra_edit_customers"),
     },
     {
       key: "mark_active",
@@ -603,7 +603,7 @@ const Customers: React.FC = () => {
         queryClient.invalidateQueries({ queryKey: ["customers"] });
       },
       condition: (customer: Customer) =>
-        can("yatra_edit_bookings") && customer.status !== "active",
+        can("yatra_edit_customers") && customer.status !== "active",
     },
     {
       key: "mark_inactive",
@@ -614,7 +614,7 @@ const Customers: React.FC = () => {
         queryClient.invalidateQueries({ queryKey: ["customers"] });
       },
       condition: (customer: Customer) =>
-        can("yatra_edit_bookings") && customer.status !== "inactive",
+        can("yatra_edit_customers") && customer.status !== "inactive",
     },
     {
       key: "mark_blocked",
@@ -625,7 +625,7 @@ const Customers: React.FC = () => {
         queryClient.invalidateQueries({ queryKey: ["customers"] });
       },
       condition: (customer: Customer) =>
-        can("yatra_edit_bookings") && customer.status !== "blocked",
+        can("yatra_edit_customers") && customer.status !== "blocked",
     },
     {
       key: "delete",
@@ -633,7 +633,7 @@ const Customers: React.FC = () => {
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (customer: Customer) => handleDelete(customer),
       variant: "destructive" as const,
-      condition: () => can("yatra_delete_bookings"),
+      condition: () => can("yatra_delete_customers"),
     },
   ];
 
@@ -703,7 +703,7 @@ const Customers: React.FC = () => {
       <PageHeader
         title={__("Customers")}
         description={__("Manage your customer database")}
-        actionCapability="yatra_edit_bookings"
+        actionCapability="yatra_edit_customers"
         actions={
           <Button
             onClick={handleCreateCustomer}
@@ -717,7 +717,7 @@ const Customers: React.FC = () => {
 
       <div className="space-y-3">
         {/* Search and Filters Card */}
-        <ConditionalRender capability="yatra_view_bookings">
+        <ConditionalRender capability="yatra_view_customers">
           <Card>
             <CardContent className="p-4">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
@@ -774,7 +774,7 @@ const Customers: React.FC = () => {
         </ConditionalRender>
 
         {/* Bulk Actions Toolbar */}
-        <ConditionalRender capability="yatra_view_bookings">
+        <ConditionalRender capability="yatra_view_customers">
           <BulkActionToolbar
             selectedIds={selectedIds}
             bulkAction={bulkAction}
@@ -815,7 +815,7 @@ const Customers: React.FC = () => {
         </ConditionalRender>
 
         {/* Customers Table Card */}
-        <ConditionalRender capability="yatra_view_bookings">
+        <ConditionalRender capability="yatra_view_customers">
           <Card>
             <CardContent className="p-0">
               {isLoading ? (
@@ -843,7 +843,7 @@ const Customers: React.FC = () => {
                       : __("Customers will appear here when bookings are made")
                   }
                   onCreateClick={
-                    can("yatra_edit_bookings")
+                    can("yatra_edit_customers")
                       ? handleCreateCustomer
                       : undefined
                   }
@@ -855,7 +855,7 @@ const Customers: React.FC = () => {
                   isAllSelected={isAllSelected}
                   getItemId={(customer: Customer) => customer.id}
                   skeletonRows={5}
-                  capability="yatra_view_bookings"
+                  capability="yatra_view_customers"
                 />
               )}
             </CardContent>

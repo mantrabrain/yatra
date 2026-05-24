@@ -83,7 +83,19 @@ class SettingsController extends BaseController
         'deposit_percentage' => 20,
         'gateway_configs' => [],
         'gateway_order' => [],
-        
+
+        // Discount Stacking Mode — controls how the Advanced Discount and
+        // Dynamic Pricing modules combine when both can fire on the same
+        // booking. Default 'both' preserves the legacy stacked behavior
+        // (discount on top of DP-adjusted price). The Settings → Pricing
+        // tab only surfaces this setting when BOTH modules are enabled,
+        // and CalculationService only enforces a non-default mode when
+        // BOTH modules are loaded — so sites with only one (or neither)
+        // module see zero behavior change.
+        //
+        // Allowed: 'both' | 'discount_only' | 'dynamic_pricing_only' | 'best_for_customer'
+        'discount_stacking_mode' => 'both',
+
         // Scheduled/Recurring Payment Settings (Pro feature - defaults disabled)
         'enable_scheduled_payments' => false,
         'scheduled_payment_type' => 'single', // single, installments
@@ -322,15 +334,20 @@ class SettingsController extends BaseController
         }
     }
 
+    /**
+     * Plugin settings — high-sensitivity cap. By default only the
+     * Owner role holds `yatra_manage_settings` (Manager doesn't, by
+     * design — settings include payment gateway routing, email
+     * delivery configuration, currency formatting and similar
+     * global behaviour). WP admins pass via the Team module's
+     * admin-fallback filter.
+     */
     public function check_permission(?WP_REST_Request $request = null): bool
     {
         if (!is_user_logged_in()) {
             return false;
         }
-
-        // Match other Yatra admin surfaces (e.g. Email Automation, Pro modules)
-        return current_user_can('manage_options')
-            || current_user_can('manage_yatra');
+        return current_user_can('yatra_manage_settings');
     }
 
     /**
@@ -766,6 +783,15 @@ class SettingsController extends BaseController
                 $v = is_string($value) ? strtolower(trim($value)) : '';
 
                 return in_array($v, $allowed, true) ? $v : (is_string($default) ? $default : 'left');
+            }
+            if ($key === 'discount_stacking_mode') {
+                // Strict enum — any other value silently falls back to the
+                // backward-compatible default so a malformed POST cannot
+                // change pricing behavior unexpectedly.
+                $allowed = ['both', 'discount_only', 'dynamic_pricing_only', 'best_for_customer'];
+                $v = is_string($value) ? strtolower(trim($value)) : '';
+
+                return in_array($v, $allowed, true) ? $v : 'both';
             }
             // Special handling for specific fields
             if ($key === 'company_email' || $key === 'admin_email' || $key === 'from_email' || $key === 'smtp_username') {

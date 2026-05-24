@@ -206,25 +206,38 @@ class DepartureService
     }
 
     /**
-     * Increment booked count (when booking is created)
+     * Increment booked count (when booking is created).
+     *
+     * @param bool $force When true, bypasses the capacity guard so the
+     *   increment lands even if it would exceed `max_capacity`. Use
+     *   only for after-the-fact reconciliation paths — most commonly
+     *   external-channel bookings (Viator / GetYourGuide / any OTA
+     *   webhook) where the seat has ALREADY been sold on the OTA
+     *   side. Refusing to record the increment would hide the oversell
+     *   from the operator and break reconciliation. Direct-checkout
+     *   callers should leave this false to keep overbooking protection.
      */
-    public function incrementBookedCount(int $id, int $amount = 1): bool
+    public function incrementBookedCount(int $id, int $amount = 1, bool $force = false): bool
     {
         $departure = $this->repository->findModel($id);
-        
+
         if (!$departure) {
             throw new \InvalidArgumentException('Departure not found');
         }
-        
-        // Check if capacity allows (only when max_capacity is set)
-        $currentBooked = (int) ($departure->booked_count ?? 0);
-        $maxCapacity = $departure->max_capacity !== null ? (int) $departure->max_capacity : 0;
-        if ($maxCapacity > 0 && ($currentBooked + $amount > $maxCapacity)) {
-            // Do not throw; just prevent exceeding capacity
-            return false;
+
+        // Capacity pre-check is the same guard as before — but only
+        // for non-forced callers. Forced callers (OTA ingest) skip it
+        // entirely and rely on the repository to write unconditionally.
+        if (!$force) {
+            $currentBooked = (int) ($departure->booked_count ?? 0);
+            $maxCapacity = $departure->max_capacity !== null ? (int) $departure->max_capacity : 0;
+            if ($maxCapacity > 0 && ($currentBooked + $amount > $maxCapacity)) {
+                // Do not throw; just prevent exceeding capacity.
+                return false;
+            }
         }
-        
-        $ok = $this->repository->incrementBookedCount($id, $amount);
+
+        $ok = $this->repository->incrementBookedCount($id, $amount, $force);
         if ($ok) {
             $dep = $this->repository->findModel($id);
             if ($dep) {

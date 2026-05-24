@@ -82,7 +82,11 @@ class ItemTypeController extends BaseController
             case 'DELETE':
                 return current_user_can('yatra_edit_trips');
             default:
-                return current_user_can('manage_options');
+                // Unknown HTTP method — deny explicitly. The earlier
+                // fallback to `manage_options` was a regression that
+                // silently broadened admin-only access for any verb not
+                // in the explicit switch.
+                return false;
         }
     }
 

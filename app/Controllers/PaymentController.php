@@ -39,58 +39,89 @@ class PaymentController extends BaseController
      */
     public function register_routes(): void
     {
+        // Payment stats — view cap (read-only aggregates).
         register_rest_route($this->namespace, '/payments/stats', [
             [
                 'methods' => 'GET',
                 'callback' => [$this, 'getPaymentStats'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanView'],
             ],
         ]);
 
-        // List all payments
+        // List + create payments. Create needs the edit-bookings cap
+        // because adding a payment mutates the booking's payment state.
         register_rest_route($this->namespace, '/payments', [
             [
                 'methods' => 'GET',
                 'callback' => [$this, 'getPayments'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanView'],
             ],
             [
                 'methods' => 'POST',
                 'callback' => [$this, 'createPayment'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanEdit'],
             ]
         ]);
 
-        // Get single payment
+        // Single-payment read / update / delete. Update + delete are
+        // refund-equivalent operations from the customer's perspective
+        // (changing the amount or removing a recorded payment can
+        // affect what the customer owes), so we gate them on the
+        // dedicated refund cap. Accountant role holds refund without
+        // holding edit-bookings, so they can issue refunds without
+        // also being able to edit the underlying booking.
         register_rest_route($this->namespace, '/payments/(?P<id>\d+)', [
             [
                 'methods' => 'GET',
                 'callback' => [$this, 'getPayment'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanView'],
             ],
             [
                 'methods' => 'PUT',
                 'callback' => [$this, 'updatePayment'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanRefund'],
             ],
             [
                 'methods' => 'DELETE',
                 'callback' => [$this, 'deletePayment'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanRefund'],
             ]
         ]);
     }
 
     /**
-     * Check admin permission (align with bookings list — shop managers may only have yatra caps).
+     * Granular permission checks. WP administrators pass every cap
+     * via the Team module's admin-fallback filter, so an explicit
+     * `manage_options` check isn't needed at this layer.
+     */
+    public function checkCanView(): bool
+    {
+        return current_user_can('yatra_view_bookings');
+    }
+
+    public function checkCanEdit(): bool
+    {
+        return current_user_can('yatra_edit_bookings');
+    }
+
+    public function checkCanRefund(): bool
+    {
+        // Refund cap is high-sensitivity. Held by Owner + Manager +
+        // Accountant by default. Sales Agent / Front Desk / Guide
+        // can record payments via the create endpoint above but
+        // cannot modify or delete existing ones.
+        return current_user_can('yatra_refund_bookings');
+    }
+
+    /**
+     * @deprecated Kept for any external code referencing the old
+     * method name. Routes to view — safer than the old "view OR
+     * manage_options" shorthand, and admin users still pass via
+     * the admin-fallback layer.
      */
     public function checkAdminPermission(): bool
     {
-        if (current_user_can('yatra_view_bookings')) {
-            return true;
-        }
-
-        return current_user_can('manage_options');
+        return $this->checkCanView();
     }
 
     /**

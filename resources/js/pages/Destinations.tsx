@@ -181,7 +181,7 @@ const Destinations: React.FC = () => {
         return null;
       }
     },
-    enabled: can("manage_yatra"),
+    enabled: can("yatra_access_admin"),
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 

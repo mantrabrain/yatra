@@ -148,11 +148,15 @@ class PaymentGatewayController extends BaseController
     }
 
     /**
-     * Check admin permission
+     * Payment gateway config — critical-sensitivity cap. By default
+     * only the Owner role holds `yatra_manage_payment_gateways`
+     * (Manager doesn't, deliberately — gateway keys are among the
+     * most sensitive credentials on the site). WP admins pass via
+     * the Team module's admin-fallback filter.
      */
     public function check_admin_permission(): bool
     {
-        return current_user_can('manage_options');
+        return current_user_can('yatra_manage_payment_gateways');
     }
 
     public function check_customer_permission(): bool

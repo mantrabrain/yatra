@@ -65,11 +65,14 @@ class SampleDataController
     }
 
     /**
-     * Check user permissions
+     * Sample-data import / cleanup — gated on the settings cap.
+     * Installing or removing sample content is a one-time setup
+     * task with the same risk profile as other settings changes.
+     * WP admins pass via the Team module's admin-fallback filter.
      */
     public function check_permissions()
     {
-        return current_user_can('manage_options');
+        return current_user_can('yatra_manage_settings');
     }
 
     /**

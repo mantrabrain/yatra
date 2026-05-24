@@ -58,6 +58,7 @@ import BookingStatusChart from "../components/charts/BookingStatusChart";
 import { UpcomingDepartures } from "../components/dashboard/UpcomingDepartures";
 import { PendingPayments } from "../components/dashboard/PendingPayments";
 import { RecentBookings } from "../components/dashboard/RecentBookings";
+import RoleDashboard from "./RoleDashboard";
 import { apiClient } from "../lib/api-client";
 import {
   formatYatraMoney,
@@ -148,6 +149,19 @@ const SkeletonStatCard = () => (
 const WELCOME_DISMISSED_KEY = "yatra:dashboard:welcome-dismissed:v1";
 
 const Dashboard: React.FC = () => {
+  // Role-aware split: the full admin dashboard (charts, KPIs, ops widgets)
+  // is built for site owners/managers. Non-admin team members (Sales,
+  // Accountant, Guide, etc.) see a focused, cap-filtered RoleDashboard
+  // instead — they shouldn't see KPI cards or charts they can't read.
+  // The branch is intentionally before any hooks because `isWpAdmin` is
+  // a stable, server-injected flag — the component never flips between
+  // dashboards within a single mount, so hook order stays consistent.
+  const isWpAdmin = (window.yatraAdmin as { isWpAdmin?: boolean } | undefined)
+    ?.isWpAdmin;
+  if (!isWpAdmin) {
+    return <RoleDashboard />;
+  }
+
   const { can } = usePermissions();
 
   const [range, setRange] = useState<DashboardRange>("all_time");
@@ -567,7 +581,7 @@ const Dashboard: React.FC = () => {
           />
         </ConditionalRender>
 
-        <ConditionalRender capability="yatra_view_bookings">
+        <ConditionalRender capability="yatra_view_financial_reports">
           <StatCard
             title={__("Booked Revenue", "yatra")}
             value={formatCurrencyAmount(bookingStats?.total_revenue || 0)}
@@ -591,7 +605,7 @@ const Dashboard: React.FC = () => {
           />
         </ConditionalRender>
 
-        <ConditionalRender capability="yatra_view_bookings">
+        <ConditionalRender capability="yatra_view_financial_reports">
           <StatCard
             title={__("Collected Revenue", "yatra")}
             value={formatCurrencyAmount(bookingStats?.total_collected || 0)}
@@ -606,7 +620,7 @@ const Dashboard: React.FC = () => {
           />
         </ConditionalRender>
 
-        <ConditionalRender capability="yatra_view_bookings">
+        <ConditionalRender capability="yatra_view_customers">
           <StatCard
             title={__("Total Customers", "yatra")}
             value={customersSummary?.total || 0}
@@ -619,55 +633,67 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* ── SECONDARY KPI ROW (period-aware) ────────────────────────── */}
+      {/* These are operational + revenue indicators. Wrap each card in
+       *  the appropriate cap — revenue-flavoured for finance roles
+       *  (Accountant), conversion / occupancy / cancellation for
+       *  operational roles (Sales Agent / Manager / Marketing). */}
       {hasPeriodData && (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <StatCard
-            title={__("Conversion Rate", "yatra")}
-            value={`${Number((reportData as any)?.booking_stats?.conversionRate || 0).toFixed(1)}%`}
-            icon={TrendingUp}
-            color="green"
-            tooltip={__(
-              "Share of bookings in this period that landed in a confirmed or completed state. Higher is better.",
-              "yatra",
-            )}
-            trend={{
-              value: conversionChange,
-              isPositive: conversionChange >= 0,
-              label: trendLabel,
-            }}
-          />
-          <StatCard
-            title={__("Avg Booking Value", "yatra")}
-            value={formatCurrencyAmount(
-              Number((reportData as any)?.revenue_stats?.average || 0),
-            )}
-            icon={DollarSign}
-            color="purple"
-            tooltip={__(
-              "Mean revenue per booking in this period. A rising AOV with stable booking count is the cleanest growth signal.",
-              "yatra",
-            )}
-          />
-          <StatCard
-            title={__("Occupancy Rate", "yatra")}
-            value={`${Number((reportData as any)?.operational_stats?.occupancyRate || 0).toFixed(1)}%`}
-            icon={Plane}
-            color="blue"
-            tooltip={__(
-              "Booked seats / total seats across upcoming departures. Capacity utilisation indicator.",
-              "yatra",
-            )}
-          />
-          <StatCard
-            title={__("Cancellation Rate", "yatra")}
-            value={`${Number((reportData as any)?.booking_stats?.cancellationRate || 0).toFixed(1)}%`}
-            icon={CheckCircle}
-            color="red"
-            tooltip={__(
-              "Share of bookings that ended cancelled. Watch the trend — a spike usually points at a specific trip or timing issue.",
-              "yatra",
-            )}
-          />
+          <ConditionalRender capability="yatra_view_operational_reports">
+            <StatCard
+              title={__("Conversion Rate", "yatra")}
+              value={`${Number((reportData as any)?.booking_stats?.conversionRate || 0).toFixed(1)}%`}
+              icon={TrendingUp}
+              color="green"
+              tooltip={__(
+                "Share of bookings in this period that landed in a confirmed or completed state. Higher is better.",
+                "yatra",
+              )}
+              trend={{
+                value: conversionChange,
+                isPositive: conversionChange >= 0,
+                label: trendLabel,
+              }}
+            />
+          </ConditionalRender>
+          <ConditionalRender capability="yatra_view_financial_reports">
+            <StatCard
+              title={__("Avg Booking Value", "yatra")}
+              value={formatCurrencyAmount(
+                Number((reportData as any)?.revenue_stats?.average || 0),
+              )}
+              icon={DollarSign}
+              color="purple"
+              tooltip={__(
+                "Mean revenue per booking in this period. A rising AOV with stable booking count is the cleanest growth signal.",
+                "yatra",
+              )}
+            />
+          </ConditionalRender>
+          <ConditionalRender capability="yatra_view_operational_reports">
+            <StatCard
+              title={__("Occupancy Rate", "yatra")}
+              value={`${Number((reportData as any)?.operational_stats?.occupancyRate || 0).toFixed(1)}%`}
+              icon={Plane}
+              color="blue"
+              tooltip={__(
+                "Booked seats / total seats across upcoming departures. Capacity utilisation indicator.",
+                "yatra",
+              )}
+            />
+          </ConditionalRender>
+          <ConditionalRender capability="yatra_view_operational_reports">
+            <StatCard
+              title={__("Cancellation Rate", "yatra")}
+              value={`${Number((reportData as any)?.booking_stats?.cancellationRate || 0).toFixed(1)}%`}
+              icon={CheckCircle}
+              color="red"
+              tooltip={__(
+                "Share of bookings that ended cancelled. Watch the trend — a spike usually points at a specific trip or timing issue.",
+                "yatra",
+              )}
+            />
+          </ConditionalRender>
         </div>
       )}
 
@@ -702,7 +728,7 @@ const Dashboard: React.FC = () => {
               </Card>
             </ConditionalRender>
 
-            <ConditionalRender capability="yatra_view_trips">
+            <ConditionalRender capability="yatra_view_operational_reports">
               <Card>
                 <CardHeader>
                   <CardTitle>{__("Popular Destinations", "yatra")}</CardTitle>
@@ -737,14 +763,14 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="space-y-3 lg:col-span-5">
-          <ConditionalRender capability="yatra_view_trips">
+          <ConditionalRender capability="yatra_view_departures">
             <UpcomingDepartures
               departures={departures || []}
               loading={bookingStatsLoading}
             />
           </ConditionalRender>
 
-          <ConditionalRender capability="yatra_view_bookings">
+          <ConditionalRender capability="yatra_view_financial_reports">
             <PendingPayments
               payments={pendingPayments || []}
               loading={bookingStatsLoading}

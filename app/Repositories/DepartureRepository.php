@@ -485,28 +485,66 @@ class DepartureRepository extends BaseRepository
     }
 
     /**
-     * Increment booked count
+     * Atomically increment booked count, refusing the write when it
+     * would exceed max_capacity.
+     *
+     * The capacity guard lives in the SQL WHERE clause — not in PHP —
+     * so concurrent writers can't both read "we have room" and then
+     * both succeed. Each writer's UPDATE either updates 1 row (the
+     * reservation succeeded; capacity was decremented atomically) or
+     * 0 rows (the seats were taken between read and write; the caller
+     * should treat this as "departure full").
+     *
+     * `max_capacity = 0` or NULL means "unlimited" — the guard
+     * intentionally allows unlimited writes in that case.
+     *
+     * Returns true only when 1 row was actually updated. Previous
+     * behaviour returned true unconditionally, which created a
+     * check-then-act overbooking race in `DepartureService::
+     * incrementBookedCount()`.
      */
-    public function incrementBookedCount(int $id, int $amount = 1): bool
+    public function incrementBookedCount(int $id, int $amount = 1, bool $force = false): bool
     {
+        if ($amount <= 0 || $id <= 0) return false;
+
         $table = esc_sql($this->table);
-        
-        $this->wpdb->query($this->wpdb->prepare(
-            "UPDATE `{$table}` 
-             SET booked_count = booked_count + %d, 
-                 updated_at = %s
-             WHERE id = %d",
-            $amount,
-            current_time('mysql'),
-            $id
-        ));
-        
-        // Recalculate status
+
+        // The capacity guard (`booked_count + %d <= max_capacity`) is
+        // the right default for direct bookings — it stops the website
+        // checkout from overselling a seat that's no longer there.
+        //
+        // For external-channel bookings (Viator / GetYourGuide / any
+        // OTA webhook) the seat has ALREADY been sold on the OTA. We
+        // MUST record the booking locally even if our view of capacity
+        // says "no room left" — refusing to record would just hide the
+        // oversell from the operator and make reconciliation impossible.
+        // Callers that own that case pass `$force = true` and the
+        // capacity clause is dropped from the WHERE.
+        $sql = "UPDATE `{$table}`
+                SET booked_count = booked_count + %d,
+                    updated_at = %s
+                WHERE id = %d";
+        $args = [$amount, current_time('mysql'), $id];
+
+        if (!$force) {
+            $sql .= "
+                   AND (max_capacity IS NULL
+                        OR max_capacity = 0
+                        OR booked_count + %d <= max_capacity)";
+            $args[] = $amount;
+        }
+
+        $result = $this->wpdb->query($this->wpdb->prepare($sql, $args));
+
+        if ($result === false) return false;       // SQL error
+        if ((int) $result === 0) return false;     // capacity guard rejected the write (only possible when !$force)
+
+        // Recalculate status only when the reservation actually landed.
         $departure = $this->findModel($id);
         if ($departure) {
             $this->update($id, ['status' => $departure->calculateStatus()]);
         }
-        
+
         return true;
     }
 

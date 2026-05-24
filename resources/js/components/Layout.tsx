@@ -39,8 +39,10 @@ import {
   MessageCircle,
   Network,
   Webhook,
+  Users,
   Puzzle,
   ArrowLeft,
+  Gift,
   Loader2,
   RotateCcw,
   Sun,
@@ -48,6 +50,7 @@ import {
 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { Button } from "../components/ui/button";
+import { Tooltip } from "../components/ui/tooltip";
 import { useToast } from "../components/ui/toast";
 import { postFlushRewriteRules } from "../api/settings-api";
 
@@ -97,6 +100,7 @@ import {
 } from "../hooks/useModules";
 import { isProPluginActive, isModuleActive } from "../lib/plugin-utils";
 import { navigateMenu } from "../hooks/useNavigate";
+import { canCap } from "../hooks/useCapabilities";
 import { InlineNotices } from "./notices/InlineNotices";
 
 interface LayoutProps {
@@ -361,11 +365,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     // pre_load_script_translations filter then delivers the locale
     // data to wp.i18n on every admin page load.
     () => [
-      { subpage: "dashboard", label: __("Dashboard", "yatra"), icon: LayoutDashboard },
+      { subpage: "dashboard", label: __("Dashboard", "yatra"), icon: LayoutDashboard, cap: "yatra_access_admin" },
       {
         subpage: "trips",
         label: __("Trips", "yatra"),
         icon: MapPin,
+        cap: "yatra_view_trips",
         submenu: [
           { tab: "all", label: __("All Trips", "yatra"), icon: List },
           { tab: "activities", label: __("Activities", "yatra"), icon: Activity },
@@ -408,11 +413,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         subpage: "traveler-categories",
         label: __("Traveler Categories", "yatra"),
         icon: UserCircle,
+        cap: "yatra_manage_trip_taxonomies",
       },
       {
         subpage: "itinerary",
         label: __("Itinerary", "yatra"),
         icon: FileText,
+        cap: "yatra_edit_trips",
         submenu: [
           { tab: "item-types", label: __("Item Types", "yatra"), icon: Tag },
           { tab: "items", label: __("Items", "yatra"), icon: Route },
@@ -420,21 +427,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         ],
       },
       // Departures - FREE feature, always show
-      { subpage: "departures", label: __("Departures", "yatra"), icon: Calendar },
-      { subpage: "discounts", label: __("Discounts", "yatra"), icon: BadgePercent },
-      { subpage: "payments", label: __("Payments", "yatra"), icon: CreditCard },
-      { subpage: "bookings", label: __("Bookings", "yatra"), icon: Calendar },
-      { subpage: "customers", label: __("Customers", "yatra"), icon: UserCircle },
-      { subpage: "travelers", label: __("Travelers", "yatra"), icon: Plane },
-      { subpage: "enquiries", label: __("Enquiries", "yatra"), icon: MessageSquare },
-      { subpage: "reviews", label: __("Reviews", "yatra"), icon: Star },
-      { subpage: "reports", label: __("Reports", "yatra"), icon: BarChart3 },
+      { subpage: "departures", label: __("Departures", "yatra"), icon: Calendar, cap: "yatra_view_departures" },
+      { subpage: "discounts", label: __("Discounts", "yatra"), icon: BadgePercent, cap: "yatra_manage_discounts" },
+      { subpage: "payments", label: __("Payments", "yatra"), icon: CreditCard, cap: "yatra_view_financial_reports" },
+      { subpage: "bookings", label: __("Bookings", "yatra"), icon: Calendar, cap: "yatra_view_bookings" },
+      { subpage: "customers", label: __("Customers", "yatra"), icon: UserCircle, cap: "yatra_view_customers" },
+      { subpage: "travelers", label: __("Travelers", "yatra"), icon: Plane, cap: "yatra_view_customers" },
+      { subpage: "enquiries", label: __("Enquiries", "yatra"), icon: MessageSquare, cap: "yatra_view_enquiries" },
+      { subpage: "reviews", label: __("Reviews", "yatra"), icon: Star, cap: "yatra_view_reviews" },
+      { subpage: "reports", label: __("Reports", "yatra"), icon: BarChart3, cap: "yatra_view_operational_reports" },
       // Email — SMTP & transactional for all; Pro adds automation tabs on the same screen
       {
         subpage: "email-automation",
         label: __("Email", "yatra"),
         icon: Mail,
         isPremium: false,
+        cap: "yatra_manage_emails",
       },
       // Abandoned Booking Recovery - show only if Pro plugin is active and module is enabled
       ...(isProPluginActive() && isModuleActive("abandoned_booking_recovery")
@@ -444,6 +452,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               label: __("Abandoned Recovery", "yatra"),
               icon: RotateCcw,
               isPremium: true,
+              cap: "yatra_manage_email_automation",
             },
           ]
         : []),
@@ -455,10 +464,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               label: __("Dynamic Pricing", "yatra"),
               icon: TrendingUp,
               isPremium: true,
+              cap: "yatra_edit_trips",
             },
           ]
         : []),
-      { subpage: "modules", label: __("Modules", "yatra"), icon: Puzzle },
+      { subpage: "modules", label: __("Modules", "yatra"), icon: Puzzle, cap: "yatra_manage_modules" },
       // White Label — only when the Agency-tier module is actually enabled.
       // (Agency license alone is not enough; the module toggle must be on,
       // otherwise users would see a link to a disabled feature. To get
@@ -481,6 +491,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               label: __("White Label", "yatra"),
               icon: Crown,
               isPremium: true,
+              cap: "yatra_manage_white_label",
             },
           ]
         : []),
@@ -500,6 +511,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               label: __("AI Assistant", "yatra"),
               icon: Sparkles,
               isPremium: true,
+              cap: "yatra_manage_ai",
             },
           ]
         : []),
@@ -517,6 +529,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               label: __("WhatsApp", "yatra"),
               icon: MessageCircle,
               isPremium: true,
+              cap: "yatra_manage_whatsapp",
             },
           ]
         : []),
@@ -533,6 +546,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               label: __("Channel Manager", "yatra"),
               icon: Network,
               isPremium: true,
+              cap: "yatra_manage_channel_manager",
             },
           ]
         : []),
@@ -546,12 +560,37 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               label: __("Webhooks", "yatra"),
               icon: Webhook,
               isPremium: true,
+              cap: "yatra_manage_webhooks",
             },
           ]
         : []),
-      { subpage: "license", label: __("License", "yatra"), icon: Key },
-      { subpage: "settings", label: __("Settings", "yatra"), icon: Settings },
-    ],
+      // Team & Access — Agency-tier granular roles + capability-level
+      // access + audit log. Gate matches Webhooks: Agency license +
+      // module on. The page itself is also cap-gated server-side; the
+      // sidebar entry is just UX.
+      ...((window as any).yatraAdmin?.isAgency &&
+      (window as any).yatraAdmin?.teamEnabled
+        ? [
+            {
+              subpage: "team",
+              label: __("Team & Access", "yatra"),
+              icon: Users,
+              isPremium: true,
+              cap: "yatra_manage_team",
+            },
+          ]
+        : []),
+      { subpage: "license", label: __("License", "yatra"), icon: Key, cap: "yatra_manage_settings" },
+      { subpage: "settings", label: __("Settings", "yatra"), icon: Settings, cap: "yatra_manage_settings" },
+    ]
+      // Cap-gate every entry. canCap() returns true for WP admins and
+      // when the Team module isn't enabled (= admin-only mode), so this
+      // is a no-op on every site without team management. With team
+      // management active, non-admin team members only see the menus
+      // their role's caps permit.
+      //
+      // Items without a `cap` field are always shown (default-allow).
+      .filter((item: any) => !item.cap || canCap(item.cap)),
     [navRefreshKey],
   ); // Re-calculate when navRefreshKey changes
 
@@ -986,27 +1025,56 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           {/* Top Bar */}
           <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 flex items-center">
             <div className="flex items-center justify-between w-full">
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                {(() => {
-                  // Show specific text for trip form page
-                  if (isTripFormPage) {
-                    return currentAction === "create"
-                      ? "Create Trip"
-                      : "Edit Trip";
-                  }
+              <div className="flex items-center gap-3 flex-wrap min-w-0">
+                <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  {(() => {
+                    // Show specific text for trip form page
+                    if (isTripFormPage) {
+                      return currentAction === "create"
+                        ? "Create Trip"
+                        : "Edit Trip";
+                    }
 
-                  const activeItem = brandedMenuItems.find((item) =>
-                    isActive(item.subpage),
-                  );
-                  if (activeItem?.submenu && currentTab) {
-                    const activeSubItem = activeItem.submenu.find(
-                      (sub) => sub.tab === currentTab,
+                    const activeItem = brandedMenuItems.find((item) =>
+                      isActive(item.subpage),
                     );
-                    return activeSubItem?.label || activeItem.label;
-                  }
-                  return activeItem?.label || "Dashboard";
-                })()}
-              </h1>
+                    if (activeItem?.submenu && currentTab) {
+                      const activeSubItem = activeItem.submenu.find(
+                        (sub) => sub.tab === currentTab,
+                      );
+                      return activeSubItem?.label || activeItem.label;
+                    }
+                    return activeItem?.label || "Dashboard";
+                  })()}
+                </h1>
+
+                {/* Conversion pill — visible only on free-plugin installs. */}
+                {/* Hidden as soon as the Pro plugin is active. Single edit */}
+                {/* in this top-bar surfaces it on every admin page.        */}
+                {/* Gift icon leads on the "free" promise (operators read   */}
+                {/* the icon before the text). Real Tooltip component       */}
+                {/* instead of the browser `title` attribute so the hint    */}
+                {/* matches the rest of the admin's hover-help style.       */}
+                {!isProPluginActive() && (
+                  <Tooltip
+                    side="bottom"
+                    content={__(
+                      "Spin up a free Pro trial site in one click — no credit card required.",
+                      "yatra",
+                    )}
+                  >
+                    <a
+                      href="https://try.wpyatra.com/try-yatra-pro/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900 ring-1 ring-amber-200 hover:bg-amber-100 hover:ring-amber-300 dark:bg-amber-950/40 dark:text-amber-100 dark:ring-amber-800 dark:hover:bg-amber-900/50 transition-colors"
+                    >
+                      <Gift className="h-3.5 w-3.5" />
+                      {__("Try Yatra Pro for free", "yatra")}
+                    </a>
+                  </Tooltip>
+                )}
+              </div>
 
               <div className="flex items-center gap-4">
                 {/* Back to WordPress button */}

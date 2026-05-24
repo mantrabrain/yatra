@@ -695,8 +695,14 @@ const Payments: React.FC = () => {
           setIsBulkPending(false);
         }
       },
+      // Refund cap matches the backend gate on PaymentController's
+      // update + delete endpoints. Previously this checked
+      // `yatra_edit_bookings`, which let Sales Agent / Front Desk
+      // see the Refund button — they'd then 403 on click. Accountant
+      // role holds `yatra_refund_bookings` without `yatra_edit_bookings`,
+      // so this is also what makes the button visible for them.
       condition: (payment: Payment) =>
-        can("yatra_edit_bookings") && payment.payment_status !== "refunded",
+        can("yatra_refund_bookings") && payment.payment_status !== "refunded",
     },
     {
       key: "mark_cancelled",

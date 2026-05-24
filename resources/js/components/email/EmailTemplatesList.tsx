@@ -888,7 +888,7 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
             )}
             onCreateClick={automationModuleActive ? handleCreate : undefined}
             getItemId={(template: UnifiedEmailTemplate) => template.id}
-            capability="manage_yatra"
+            capability="yatra_manage_emails"
             skeletonRows={5}
             selectedItemIds={selectedIds}
             onSelectItem={handleSelectOne}

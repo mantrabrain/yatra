@@ -40,7 +40,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       label: __("Generate Report", "yatra"),
       icon: FileText,
       onClick: onGenerateReport,
-      capability: "yatra_view_reports",
+      capability: "yatra_view_operational_reports",
       color: "green",
     },
     {
@@ -54,14 +54,14 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       label: __("View Analytics", "yatra"),
       icon: BarChart3,
       onClick: onViewAnalytics,
-      capability: "yatra_view_reports",
+      capability: "yatra_view_operational_reports",
       color: "orange",
     },
     {
       label: __("Settings", "yatra"),
       icon: Settings,
       onClick: onViewSettings,
-      capability: "manage_yatra",
+      capability: "yatra_access_admin",
       color: "gray",
     },
   ];

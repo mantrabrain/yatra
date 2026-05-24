@@ -45,11 +45,13 @@ import {
   TrendingUp,
   BarChart3,
   Palette,
+  Percent,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { prepareWordPressMediaFrameOpen } from "../lib/wp-media-open";
 import { usePermissions } from "../hooks/usePermissions";
 import { useToast } from "../components/ui/toast";
+import { navigateMenu } from "../hooks/useNavigate";
 import { apiClient, apiService } from "../lib/api-client";
 import {
   fetchBookingPageShortcodeStatus,
@@ -632,6 +634,7 @@ type SettingsSection =
   | "booking"
   | "booking_form"
   | "payment"
+  | "pricing"
   | "trip"
   | "customer"
   | "review"
@@ -780,6 +783,17 @@ interface SettingsData {
   scheduled_payment_reminder_days: number;
   gateway_configs: Record<string, PaymentGatewayConfig>;
   gateway_order?: string[];
+
+  // Pricing Settings
+  // Controls how Advanced Discount + Dynamic Pricing combine on the same
+  // booking. Surfaced in Settings → Pricing only when BOTH modules are
+  // enabled; backend enforcement is also gated by both modules being on,
+  // so a stale 'discount_only' value on a site that disabled DP is inert.
+  discount_stacking_mode?:
+    | "both"
+    | "discount_only"
+    | "dynamic_pricing_only"
+    | "best_for_customer";
 
   // Email Settings
   admin_email: string;
@@ -2187,7 +2201,7 @@ const Settings: React.FC = () => {
         throw error;
       }
     },
-    enabled: can("manage_yatra"),
+    enabled: can("yatra_manage_settings"),
     // Avoid overwriting in-progress edits due to background refetches
   });
 
@@ -2209,12 +2223,12 @@ const Settings: React.FC = () => {
         return {};
       }
     },
-    enabled: can("manage_yatra"),
+    enabled: can("yatra_manage_settings"),
     staleTime: Infinity,
   });
 
   useEffect(() => {
-    if (viewingSection !== "advanced" || !can("manage_yatra")) {
+    if (viewingSection !== "advanced" || !can("yatra_manage_settings")) {
       return;
     }
     let cancelled = false;
@@ -2289,6 +2303,7 @@ const Settings: React.FC = () => {
       scheduled_payment_type: "single",
       scheduled_payment_days: 15,
       scheduled_payment_installments: 1,
+      discount_stacking_mode: "both",
       scheduled_payment_interval: 30,
       scheduled_payment_reminder_days: 3,
       gateway_configs: {
@@ -3418,7 +3433,7 @@ const Settings: React.FC = () => {
     },
     // Used by multiple sections (Booking page, Legal pages, etc.), so keep it available
     // whenever the user can manage Yatra settings.
-    enabled: can("manage_yatra"),
+    enabled: can("yatra_manage_settings"),
   });
 
   // Check shortcode on-demand when user selects a page
@@ -3571,6 +3586,25 @@ const Settings: React.FC = () => {
       label: __("Payment", "yatra"),
       icon: DollarSign,
     },
+    // Pricing tab — visible on every Pro install so the Discount
+    // Stacking control is *discoverable*. The setting itself only
+    // takes effect when BOTH Advanced Discount and Dynamic Pricing
+    // are enabled; the case "pricing" render gives a clear status
+    // banner + disables the dropdown when prerequisites are missing.
+    //
+    // Truthy check (not `=== true`) because some WP installs end up
+    // with `isPro` serialized as `1` instead of `true` through the
+    // PHP→JSON→JS pipeline. Free installs serialize false (or omit
+    // the key), which stays falsy and correctly hides the tab.
+    ...((window as any)?.yatraAdmin?.isPro
+      ? [
+          {
+            id: "pricing" as SettingsSection,
+            label: __("Pricing", "yatra"),
+            icon: Percent,
+          },
+        ]
+      : []),
     {
       id: "customer" as SettingsSection,
       label: __("Customer", "yatra"),
@@ -5359,6 +5393,187 @@ const Settings: React.FC = () => {
             </div>
           </div>
         );
+
+      case "pricing": {
+        // Snapshot the two Pro-module flags. The free plugin's
+        // AdminAssetsProvider sets these directly from the canonical
+        // ModuleManager::isModuleEnabled(). Truthy check (not
+        // `=== true`) is mandatory because wp_localize_script
+        // serializes every scalar to a string before handing it to
+        // JS — true becomes "1", false becomes "". Comparing
+        // === true would always be false for an enabled module,
+        // which was why every operator saw the "not active" banner
+        // even on a correctly-configured site.
+        const adEnabled = !!(window as any)?.yatraAdmin?.advancedDiscountEnabled;
+        const dpEnabled = !!(window as any)?.yatraAdmin?.dynamicPricingEnabled;
+        const bothActive = adEnabled && dpEnabled;
+        return (
+          <div className="space-y-6">
+            <div className="rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-gray-600 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-400">
+              {__(
+                "Controls what happens when both a Discount (coupon or group discount) and a Dynamic Pricing rule could apply to the same booking. The control only takes effect when both the Advanced Discount and Dynamic Pricing modules are turned on.",
+                "yatra",
+              )}
+            </div>
+
+            {/* Module-status banner. Green when both modules are on,
+                amber when the setting is inert because one (or both)
+                is off. Either way the dropdown stays rendered so the
+                operator knows the feature exists and what it does. */}
+            {bothActive ? (
+              <div className="rounded-md border border-green-200 bg-green-50 p-3 text-xs text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200">
+                <div className="flex items-start gap-2">
+                  <Check className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                  <div>
+                    <div className="font-medium">
+                      {__("Active", "yatra")}
+                    </div>
+                    <div className="mt-0.5">
+                      {__(
+                        "Advanced Discount and Dynamic Pricing are both enabled. Your stacking choice below is being applied to every new booking calculation.",
+                        "yatra",
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                  <div>
+                    <div className="font-medium">
+                      {__("Not active yet", "yatra")}
+                    </div>
+                    <div className="mt-0.5">
+                      {__(
+                        "This setting only applies when BOTH modules below are enabled. Without both, bookings calculate exactly as they do today (no stacking control).",
+                        "yatra",
+                      )}
+                    </div>
+                    <ul className="mt-2 space-y-1">
+                      <li className="flex items-center gap-1.5">
+                        {adEnabled ? (
+                          <Check className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
+                        ) : (
+                          <XCircle className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                        )}
+                        <span>
+                          {__("Advanced Discount module", "yatra")}{" "}
+                          {adEnabled
+                            ? __("(enabled)", "yatra")
+                            : __("(not enabled)", "yatra")}
+                        </span>
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        {dpEnabled ? (
+                          <Check className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
+                        ) : (
+                          <XCircle className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                        )}
+                        <span>
+                          {__("Dynamic Pricing module", "yatra")}{" "}
+                          {dpEnabled
+                            ? __("(enabled)", "yatra")
+                            : __("(not enabled)", "yatra")}
+                        </span>
+                      </li>
+                    </ul>
+                    <button
+                      type="button"
+                      onClick={() => navigateMenu("modules")}
+                      className="mt-2 inline-flex items-center gap-1 text-amber-900 underline hover:text-amber-700 dark:text-amber-100 dark:hover:text-amber-300"
+                    >
+                      {__("Open Modules", "yatra")}
+                      <ExternalLink className="h-3 w-3" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <FormField
+              id="discount_stacking_mode"
+              label={__("Discount Stacking", "yatra")}
+              description={__(
+                "Pick how Discounts and Dynamic Pricing combine on the same booking.",
+                "yatra",
+              )}
+            >
+              <Select
+                id="discount_stacking_mode"
+                name="discount_stacking_mode"
+                value={formData.discount_stacking_mode ?? "both"}
+                onChange={handleFieldChange}
+                disabled={!bothActive}
+              >
+                <option value="both">
+                  {__(
+                    "Both apply (legacy) — Dynamic Pricing and Discount stack",
+                    "yatra",
+                  )}
+                </option>
+                <option value="best_for_customer">
+                  {__(
+                    "Best for the customer — pick whichever single mechanism gives the larger reduction",
+                    "yatra",
+                  )}
+                </option>
+                <option value="discount_only">
+                  {__(
+                    "Discount only — if a coupon or group discount applies, ignore Dynamic Pricing",
+                    "yatra",
+                  )}
+                </option>
+                <option value="dynamic_pricing_only">
+                  {__(
+                    "Dynamic Pricing only — if a Dynamic Pricing rule fires, ignore the discount",
+                    "yatra",
+                  )}
+                </option>
+              </Select>
+            </FormField>
+
+            <div className="rounded-md border border-blue-200 bg-blue-50 p-3 text-xs text-blue-800 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-200">
+              {__("What each mode does:", "yatra")}
+              <ul className="mt-2 ml-4 list-disc space-y-1">
+                <li>
+                  <strong>{__("Both apply", "yatra")}</strong>
+                  {" — "}
+                  {__(
+                    "default and matches the original behavior. A coupon stacks on top of the Dynamic Pricing-adjusted price.",
+                    "yatra",
+                  )}
+                </li>
+                <li>
+                  <strong>{__("Best for the customer", "yatra")}</strong>
+                  {" — "}
+                  {__(
+                    "calculates both scenarios and picks the cheaper one for the customer. Never combines.",
+                    "yatra",
+                  )}
+                </li>
+                <li>
+                  <strong>{__("Discount only", "yatra")}</strong>
+                  {" — "}
+                  {__(
+                    "when a discount is valid, Dynamic Pricing is skipped for that booking.",
+                    "yatra",
+                  )}
+                </li>
+                <li>
+                  <strong>{__("Dynamic Pricing only", "yatra")}</strong>
+                  {" — "}
+                  {__(
+                    "when a Dynamic Pricing rule reduced the price, discount codes and group discounts are ignored for that booking.",
+                    "yatra",
+                  )}
+                </li>
+              </ul>
+            </div>
+          </div>
+        );
+      }
 
       case "customer":
         return (
@@ -8555,7 +8770,7 @@ const Settings: React.FC = () => {
         }
       />
 
-      <ConditionalRender capability="manage_yatra">
+      <ConditionalRender capability="yatra_manage_settings">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
           {/* Left Sidebar */}
           <div className="lg:col-span-1">

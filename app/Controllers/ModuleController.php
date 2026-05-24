@@ -52,17 +52,22 @@ class ModuleController extends BaseController
         ]);
     }
 
+    /**
+     * Module toggle — critical-sensitivity cap. Enabling or disabling
+     * a Pro module flips significant feature surfaces (Webhooks,
+     * Channel Manager, Team & Access, etc.) on or off, so only the
+     * Owner role holds `yatra_manage_modules` by default. The
+     * previous implementation gated this on `yatra_edit_trips` which
+     * meant any trip editor could toggle modules — that was the wrong
+     * cap entirely. WP admins pass via the Team module's admin-
+     * fallback filter.
+     */
     public function check_permission(?WP_REST_Request $request = null): bool
     {
         if (!is_user_logged_in()) {
             return false;
         }
-
-        if (current_user_can('manage_options')) {
-            return true;
-        }
-
-        return current_user_can('yatra_edit_trips');
+        return current_user_can('yatra_manage_modules');
     }
 
     public function get_modules(): WP_REST_Response

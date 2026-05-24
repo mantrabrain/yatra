@@ -100,7 +100,7 @@ const EnquiryForm: React.FC = () => {
         // Some endpoints return { success, data }, others return the object directly
         return (response as any)?.data ?? response;
       },
-      enabled: !!enquiryId && can("yatra_edit_bookings"),
+      enabled: !!enquiryId && can("yatra_respond_to_enquiries"),
     });
 
   // Fetch trips for dropdown
@@ -109,7 +109,7 @@ const EnquiryForm: React.FC = () => {
     queryFn: async () => {
       return await apiService.getTrips({ per_page: 100 });
     },
-    enabled: can("yatra_edit_bookings"),
+    enabled: can("yatra_respond_to_enquiries"),
   });
 
   // Normalize trips response to array
@@ -255,7 +255,7 @@ const EnquiryForm: React.FC = () => {
         }
       />
 
-      <ConditionalRender capability="yatra_edit_bookings">
+      <ConditionalRender capability="yatra_respond_to_enquiries">
         <form onSubmit={handleSubmit}>
           {saveMutation.isError && (
             <div className="mb-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">

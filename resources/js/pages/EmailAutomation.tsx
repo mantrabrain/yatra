@@ -19,6 +19,9 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { PageHeader } from "../components/common/PageHeader";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
+import { Modal } from "../components/ui/modal";
+import { Alert } from "../components/ui/alert";
+import { Label } from "../components/ui/label";
 import PremiumUpgradeCard from "./premium-pages/EmailAutomation";
 import {
   Mail,
@@ -48,11 +51,23 @@ import { Pagination } from "../components/shared";
 
 interface EmailLog {
   id: number;
+  template_id?: number | null;
   template_key: string;
+  sequence_id?: number | null;
   recipient_email: string;
   recipient_name: string;
   subject: string;
+  // Full HTML body — only loaded when the detail modal asks for it
+  // (the list query also returns it, but it can be large; the modal
+  // is the only consumer of this field).
+  body?: string;
+  context_type?: string | null;
+  context_id?: number | null;
   status: "sent" | "failed" | "opened" | "clicked";
+  error_message?: string | null;
+  // Server-side JSON-encoded — may arrive as a string OR a parsed object
+  // depending on the response shape.
+  metadata?: string | Record<string, unknown> | null;
   sent_at: string;
 }
 
@@ -322,6 +337,11 @@ const EmailSequencesList: React.FC = () => {
 const EmailLogsList: React.FC = () => {
   const [page, setPage] = useState(1);
   const perPage = 20;
+  // Modal state for the per-row "View details" action. Holds the
+  // selected log row so the modal can render the full payload without
+  // a second API roundtrip — the list query already returns body +
+  // metadata.
+  const [viewingLog, setViewingLog] = useState<EmailLog | null>(null);
 
   const { data: logsData, isLoading } = useQuery({
     queryKey: ["email-logs", page, perPage],
@@ -402,6 +422,9 @@ const EmailLogsList: React.FC = () => {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                     {__("Sent")}
                   </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                    {__("Actions")}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -442,6 +465,15 @@ const EmailLogsList: React.FC = () => {
                         ? new Date(log.sent_at).toLocaleString()
                         : "—"}
                     </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        type="button"
+                        onClick={() => setViewingLog(log)}
+                        className="text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
+                      >
+                        {__("View details", "yatra")}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -461,9 +493,263 @@ const EmailLogsList: React.FC = () => {
           </div>
         )}
       </CardContent>
+
+      {viewingLog && (
+        <EmailLogDetailsModal log={viewingLog} onClose={() => setViewingLog(null)} />
+      )}
     </Card>
   );
 };
+
+/* -------------------------------------------------------------------------- */
+/*  EmailLogDetailsModal                                                      */
+/*                                                                            */
+/*  Read-only inspector for a single email log row. Shows recipient, status, */
+/*  template, full HTML body, error message (if failed), and metadata JSON.  */
+/*                                                                            */
+/*  Body is rendered inside a sandboxed iframe (srcdoc + sandbox="") so:      */
+/*    1. Operator-visible markup looks like the real email                    */
+/*    2. The iframe can't navigate the parent, run scripts, or read storage  */
+/*    3. Plugin CSS doesn't leak into the preview (and vice versa)           */
+/* -------------------------------------------------------------------------- */
+
+const EmailLogDetailsModal: React.FC<{
+  log: EmailLog;
+  onClose: () => void;
+}> = ({ log, onClose }) => {
+  // Body view toggle — "preview" renders the HTML in a sandboxed
+  // iframe; "raw" shows the source markup in a <pre>. Operators
+  // debugging template variables / merge tags want the raw view to
+  // verify substitutions; visual proofing wants the preview.
+  const [bodyView, setBodyView] = useState<"preview" | "raw">("preview");
+  // Tracks whether the raw HTML has been copied to clipboard so we
+  // can flash a "Copied!" label briefly.
+  const [copied, setCopied] = useState(false);
+  const copyRawToClipboard = async () => {
+    if (!log.body) return;
+    try {
+      await navigator.clipboard.writeText(log.body);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* clipboard denied — silently skip */
+    }
+  };
+
+  // Parse metadata defensively — server stores it as a JSON string in
+  // longtext, but some code paths may deliver it as a parsed object.
+  const metadata: Record<string, unknown> | null = useMemo(() => {
+    if (!log.metadata) return null;
+    if (typeof log.metadata === "object") return log.metadata as Record<string, unknown>;
+    try {
+      const parsed = JSON.parse(String(log.metadata));
+      return typeof parsed === "object" && parsed !== null ? parsed : null;
+    } catch {
+      return null;
+    }
+  }, [log.metadata]);
+
+  const statusClass =
+    log.status === "sent"
+      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+      : log.status === "failed"
+        ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+        : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
+
+  return (
+    <Modal
+      isOpen
+      onClose={onClose}
+      title={
+        <div className="flex items-center gap-2">
+          <Mail className="w-5 h-5 text-blue-500" />
+          {__("Email details", "yatra")}
+        </div>
+      }
+      size="full"
+      footer={
+        <div className="flex justify-end">
+          <Button variant="outline" onClick={onClose}>
+            {__("Close", "yatra")}
+          </Button>
+        </div>
+      }
+    >
+      <div className="space-y-4">
+        {/* Header strip — status + sent_at + recipient at a glance */}
+        <div className="rounded-md border border-gray-200 dark:border-gray-700 p-3 space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className={statusClass}>{log.status}</Badge>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {log.sent_at ? new Date(log.sent_at).toLocaleString() : "—"}
+            </span>
+          </div>
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
+            <DetailRow label={__("Recipient", "yatra")}>
+              <div className="font-medium text-gray-900 dark:text-white">
+                {log.recipient_name || "—"}
+              </div>
+              <div className="text-gray-500 dark:text-gray-400 break-all">
+                {log.recipient_email}
+              </div>
+            </DetailRow>
+            <DetailRow label={__("Subject", "yatra")}>
+              <span className="text-gray-900 dark:text-white break-words">
+                {log.subject || "—"}
+              </span>
+            </DetailRow>
+            <DetailRow label={__("Template", "yatra")}>
+              <code className="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
+                {log.template_key || "—"}
+              </code>
+              {log.template_id ? (
+                <span className="text-xs text-gray-500 ml-1">
+                  (id {log.template_id})
+                </span>
+              ) : null}
+            </DetailRow>
+            <DetailRow label={__("Sequence", "yatra")}>
+              {log.sequence_id ? (
+                <span className="text-gray-900 dark:text-white">
+                  #{log.sequence_id}
+                </span>
+              ) : (
+                <span className="text-xs text-gray-400">
+                  {__("Transactional (no sequence)", "yatra")}
+                </span>
+              )}
+            </DetailRow>
+            {(log.context_type || log.context_id) && (
+              <DetailRow label={__("Context", "yatra")}>
+                <span className="text-gray-900 dark:text-white">
+                  {log.context_type || "—"}
+                  {log.context_id ? ` #${log.context_id}` : ""}
+                </span>
+              </DetailRow>
+            )}
+          </dl>
+        </div>
+
+        {/* Error block — only shown on failed status */}
+        {log.status === "failed" && log.error_message && (
+          <Alert variant="error" title={__("Send failed", "yatra")}>
+            <pre className="text-xs whitespace-pre-wrap break-words font-mono">
+              {log.error_message}
+            </pre>
+          </Alert>
+        )}
+
+        {/* Body section. Two view modes:                                    */}
+        {/*   - Preview: sandboxed iframe so the email's own CSS / inline     */}
+        {/*     styles render accurately without leaking into admin chrome.   */}
+        {/*     `sandbox=""` (empty string) is the strictest mode — no       */}
+        {/*     scripts, no forms, no top-nav, no clickable links.            */}
+        {/*   - Raw: HTML source in a <pre> so operators can verify merge    */}
+        {/*     tags, debug template variable substitution, copy for tickets. */}
+        <div>
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+            <Label className="text-sm font-medium">
+              {__("Message body", "yatra")}
+            </Label>
+            <div className="flex items-center gap-2">
+              {/* View-toggle pills. Single-purpose styling so the active   */}
+              {/* mode is unmistakable.                                    */}
+              <div
+                role="tablist"
+                aria-label={__("Body view", "yatra")}
+                className="inline-flex rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden text-xs"
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={bodyView === "preview"}
+                  onClick={() => setBodyView("preview")}
+                  className={`px-3 py-1 font-medium transition-colors ${
+                    bodyView === "preview"
+                      ? "bg-blue-600 text-white"
+                      : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }`}
+                >
+                  {__("Preview", "yatra")}
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={bodyView === "raw"}
+                  onClick={() => setBodyView("raw")}
+                  className={`px-3 py-1 font-medium border-l border-gray-200 dark:border-gray-700 transition-colors ${
+                    bodyView === "raw"
+                      ? "bg-blue-600 text-white"
+                      : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }`}
+                >
+                  {__("Raw HTML", "yatra")}
+                </button>
+              </div>
+              {bodyView === "raw" && log.body && (
+                <button
+                  type="button"
+                  onClick={copyRawToClipboard}
+                  className="text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
+                >
+                  {copied ? __("Copied!", "yatra") : __("Copy", "yatra")}
+                </button>
+              )}
+              {bodyView === "preview" && (
+                <span className="text-xs text-gray-400 hidden sm:inline">
+                  {__("Sandboxed — links not clickable", "yatra")}
+                </span>
+              )}
+            </div>
+          </div>
+          {log.body && log.body.trim() !== "" ? (
+            bodyView === "preview" ? (
+              <iframe
+                title={__("Email body preview", "yatra")}
+                srcDoc={log.body}
+                sandbox=""
+                className="w-full h-[480px] rounded-md border border-gray-200 dark:border-gray-700 bg-white"
+              />
+            ) : (
+              <pre className="w-full h-[480px] text-xs bg-gray-50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 rounded-md p-3 overflow-auto whitespace-pre-wrap break-all font-mono text-gray-800 dark:text-gray-200">
+                {log.body}
+              </pre>
+            )
+          ) : (
+            <div className="text-sm text-gray-400 italic rounded-md border border-dashed border-gray-200 dark:border-gray-700 p-4 text-center">
+              {__("(Body not recorded for this log entry.)", "yatra")}
+            </div>
+          )}
+        </div>
+
+        {/* Metadata JSON — collapsible-style block. Useful for debugging   */}
+        {/* operator-side: queue id, retry count, headers, attachment names. */}
+        {metadata && Object.keys(metadata).length > 0 && (
+          <div>
+            <Label className="text-sm font-medium block mb-1.5">
+              {__("Metadata", "yatra")}
+            </Label>
+            <pre className="text-xs bg-gray-50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 rounded-md p-3 overflow-x-auto max-h-48 overflow-y-auto font-mono">
+              {JSON.stringify(metadata, null, 2)}
+            </pre>
+          </div>
+        )}
+      </div>
+    </Modal>
+  );
+};
+
+const DetailRow: React.FC<{ label: string; children: React.ReactNode }> = ({
+  label,
+  children,
+}) => (
+  <div>
+    <dt className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400 font-medium">
+      {label}
+    </dt>
+    <dd className="mt-0.5">{children}</dd>
+  </div>
+);
 
 type EmailHubTab = "delivery" | "templates" | "sequences" | "logs";
 
@@ -518,6 +804,28 @@ const EmailAutomation: React.FC = () => {
     return t;
   });
 
+  /**
+   * Persist tab changes to the URL so the operator can:
+   *   - bookmark / share a direct link to a specific tab
+   *   - use the browser back button to step through tab history
+   *   - reload the page and stay on the same tab
+   *
+   * Using `replaceState` (not `pushState`) for the initial sync so we
+   * don't add a bogus history entry on first mount; subsequent user-
+   * driven tab switches go through `switchTab` which uses
+   * `replaceState` too — back/forward should navigate AWAY from this
+   * page entirely, not cycle through its tabs.
+   */
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("tab") === activeTab) return;
+    url.searchParams.set("tab", activeTab);
+    window.history.replaceState({}, "", url.toString());
+  }, [activeTab]);
+
+  const switchTab = (next: EmailHubTab) => setActiveTab(next);
+
   const showProAutomationExtras = isProPluginActive();
   const automationReady = isEmailAutomationModuleEnabled();
 
@@ -564,7 +872,7 @@ const EmailAutomation: React.FC = () => {
               <button
                 key={tab.key}
                 type="button"
-                onClick={() => setActiveTab(tab.key)}
+                onClick={() => switchTab(tab.key)}
                 className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === tab.key
                     ? "border-blue-500 text-blue-600 dark:text-blue-400"

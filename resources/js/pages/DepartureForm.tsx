@@ -109,7 +109,12 @@ const DepartureForm: React.FC = () => {
           : __("Departure created successfully", "yatra"),
         "success",
       );
-      window.location.href = `?page=yatra&subpage=trips&tab=departures&trip_id=${tripId}`;
+      // Return to the standalone Departures page (where the user came
+       // from). Previously this sent operators to the Trips page with a
+       // departures-tab query string, which surprised anyone who reached
+       // the form via the Departures sidebar entry — the table they
+       // expected to see post-save was nowhere on the trip page.
+      window.location.href = `?page=yatra&subpage=departures${tripId ? `&trip_id=${tripId}` : ""}`;
     },
     onError: (error: any) => {
       showToast(
@@ -144,7 +149,9 @@ const DepartureForm: React.FC = () => {
   };
 
   const handleBack = () => {
-    window.location.href = `?page=yatra&subpage=trips&tab=departures${tripId ? `&trip_id=${tripId}` : ""}`;
+    // Mirror the save redirect — return to the Departures page rather
+    // than the Trips page so back-from-form lands where the user was.
+    window.location.href = `?page=yatra&subpage=departures${tripId ? `&trip_id=${tripId}` : ""}`;
   };
 
   if (isLoadingDeparture) {

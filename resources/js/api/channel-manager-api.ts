@@ -223,4 +223,117 @@ export const channelManagerApi = {
     apiClient.get("/channel-manager/logs", { params: filters }) as Promise<{
       data: SyncLogRow[];
     }>,
+
+  /* --------------------- reconciliation report --------------------- */
+  /** Cross-channel snapshot — flags inventory staleness, pending
+   *  booking promotions, sync success/fail counts, and breaker states.
+   *  Suitable both for the React reconciliation tab AND for external
+   *  monitoring polling. */
+  getReconciliation: () =>
+    apiClient.get("/channel-manager/reconciliation") as Promise<{
+      data: ChannelManagerReconciliation;
+    }>,
+
+  /** Per-channel + per-provider + global latency aggregation. avg /
+   *  p50 / p95 / p99 of duration_ms across 24h and 7d windows. */
+  getLatency: () =>
+    apiClient.get("/channel-manager/latency") as Promise<{
+      data: ChannelManagerLatency;
+    }>,
 };
+
+/* -------------------------------------------------------------------------- */
+/*  Reconciliation + latency shapes                                           */
+/* -------------------------------------------------------------------------- */
+
+export interface ChannelManagerReconciliation {
+  generated_at: string;
+  window: {
+    inventory_stale_seconds: number;
+    recent_24h_cutoff: string;
+    recent_7d_cutoff: string;
+  };
+  totals: {
+    channels: { total: number; enabled: number };
+    mappings_active: number;
+    inventory_stale: number;
+    bookings_pending: number;
+    bookings_failed_7d: number;
+    syncs_24h: { success: number; failed: number };
+    syncs_7d: { success: number; failed: number };
+    breakers_open: number;
+  };
+  channels: Array<{
+    channel: {
+      id: number;
+      type: string;
+      display_name: string;
+      is_enabled: boolean;
+      last_sync_at: string | null;
+      last_sync_status: string | null;
+    };
+    mappings: {
+      total: number;
+      active: number;
+      paused: number;
+      stale: number;
+      last_failed: number;
+    };
+    bookings: {
+      pending: number;
+      failed_7d: number;
+      promoted_7d: number;
+    };
+    syncs: {
+      success_24h: number;
+      failed_24h: number;
+      success_7d: number;
+      failed_7d: number;
+    };
+    breaker: {
+      state: string;
+      [k: string]: unknown;
+    };
+    latest_failure: {
+      operation: string;
+      http_status: number | null;
+      error_message: string;
+      occurred_at: string;
+    } | null;
+    needs_attention: boolean;
+  }>;
+}
+
+interface LatencyWindowSummary {
+  samples: number;
+  avg_ms: number | null;
+  p50_ms: number | null;
+  p95_ms: number | null;
+  p99_ms: number | null;
+  success_count: number;
+  fail_count: number;
+}
+
+export interface ChannelManagerLatency {
+  generated_at: string;
+  sample_cap: number;
+  global: {
+    last_24h: LatencyWindowSummary;
+    last_7d: LatencyWindowSummary;
+  };
+  per_provider: Array<{
+    provider: string;
+    last_24h: LatencyWindowSummary;
+    last_7d: LatencyWindowSummary;
+  }>;
+  per_channel: Array<{
+    channel: {
+      id: number;
+      type: string;
+      display_name: string;
+      is_enabled: boolean;
+    };
+    last_24h: LatencyWindowSummary;
+    last_7d: LatencyWindowSummary;
+  }>;
+}

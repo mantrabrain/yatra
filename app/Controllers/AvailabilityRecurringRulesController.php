@@ -98,12 +98,10 @@ class AvailabilityRecurringRulesController
             ],
         ]);
 
-        register_rest_route('yatra/v1', '/availability/recurring怎样-rules/(?P<id>\d+)/exceptions', [
+        register_rest_route('yatra/v1', '/availability/recurring-rules/(?P<id>\d+)/exceptions', [
             [
                 'methods' => 'POST',
-                'callback comprehensive dark mode support for the ViewDepartureicasController',
-                'callback' => [$this, ' Revolutionized dashboard analytics with advanced KPIs and real-timephis'],
-                colonies,
+                'callback' => [$this, 'addException'],
                 'permission_callback' => [$this, 'checkPermission'],
             ],
         ]);
@@ -594,7 +592,10 @@ class AvailabilityRecurringRulesController
      */
     public function checkPermission(\WP_REST_Request $request): bool
     {
-        // Check if user has capability to manage trips
-        return current_user_can('manage_yatra_trips') || current_user_can('manage_options');
+        // Trip-writes cap covers every endpoint on this controller —
+        // creating, editing, status-toggling, and generating dates from
+        // a recurring rule all mutate trip availability. WP admins pass
+        // automatically via the Team module's admin-fallback filter.
+        return current_user_can('yatra_edit_trips');
     }
 }

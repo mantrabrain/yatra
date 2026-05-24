@@ -469,20 +469,160 @@ class AdminServiceProvider extends ServiceProvider
     }
 
     /**
+     * Map the Yatra menu visibility cap to `manage_options` for users
+     * who don't otherwise have it, so WP admins keep seeing the menu
+     * even when the Team & Access module (which formally defines the
+     * cap on roles) is not installed.
+     *
+     * Mechanism: hook `user_has_cap` to grant `yatra_access_admin`
+     * whenever the user already has `manage_options`. Pro/Team's
+     * Capabilities filter does the same thing via the admin-fallback
+     * path; this is a free-plugin safety-net so the cap is always
+     * truthy for site owners regardless of Pro install state.
+     *
+     * Idempotent — adding the same filter callback twice is a no-op in WP.
+     */
+    public static function bootstrapMenuCapability(): void
+    {
+        add_filter('user_has_cap', static function (array $allcaps, array $caps, array $args, \WP_User $user): array {
+            if (empty($allcaps['manage_options'])) return $allcaps;
+            // Only set if the cap was asked-about (avoids polluting
+            // unrelated cap checks with a key we don't need to answer).
+            foreach ($caps as $cap) {
+                if ($cap === 'yatra_access_admin') {
+                    $allcaps['yatra_access_admin'] = true;
+                    break;
+                }
+            }
+            return $allcaps;
+        }, 8, 4);
+
+        // Module-state cap gate. ALWAYS installed by the free plugin
+        // so it runs regardless of whether the Pro plugin / Team
+        // module are active. Strips every yatra_* cap from non-admin
+        // users UNLESS something returns true from the
+        // `yatra_team_role_enforcement_active` filter.
+        //
+        // Signal semantics (set by the Pro Team module):
+        //   - Module ENABLED: signal returns TRUE → no strip, defer
+        //     to Team's Capabilities filter (priority 8) for layered
+        //     logic (admin fallback, expiry, revoke, role, grant).
+        //   - Module DISABLED + "keep access" setting OFF (default):
+        //     signal returns FALSE → strip yatra_* caps for non-admins.
+        //   - Module DISABLED + "keep access" setting ON: signal
+        //     returns TRUE → no strip; WP-native role machinery
+        //     resolves caps from the stored role records.
+        //
+        // Why this lives in the free plugin: when Pro is deactivated,
+        // the Team module's own filter doesn't load. Without this
+        // free-side gate, users with a stored yatra_* role assignment
+        // (e.g. yatra_sales_agent) would still get their caps via
+        // WP-native role resolution — meaning deactivating Pro would
+        // NOT actually disable Yatra role-based access. This filter
+        // ensures the gate is honored regardless of Pro state.
+        //
+        // Priority 7 — runs BEFORE Team's Capabilities::filterUserHasCap
+        // (priority 8). Admin users (`manage_options`) are always
+        // exempt — they pass yatra_* caps via the admin fallback above
+        // plus per-controller manage_options short-circuits.
+        add_filter('user_has_cap', static function (array $allcaps, array $caps, array $args, \WP_User $user): array {
+            // Admin fallback FIRST — site owners always pass every
+            // yatra_* cap regardless of enforcement state OR whether
+            // the Pro Team module is installed. This is the contract
+            // that makes the free plugin usable on any site: an
+            // administrator who installs Yatra and visits Bookings /
+            // Trips / Settings must always have access without any
+            // role configuration step.
+            //
+            // We grant the SPECIFIC yatra_* caps being asked about
+            // (not a blanket pollution of every key) — keeps the
+            // $allcaps array tidy for downstream filters.
+            //
+            // CRITICAL: this admin grant must run BEFORE the
+            // enforcement-signal check below. Earlier code returned
+            // $allcaps unchanged for admins, which silently broke
+            // every controller that gates on a granular cap (e.g.
+            // `current_user_can('yatra_view_bookings')`) — admins
+            // don't have those caps by default because they're
+            // custom-registered. The old controllers worked because
+            // each one OR-ed `manage_options` into its own check; new
+            // controllers gate on the granular cap only and rely on
+            // this filter to make the admin path work uniformly.
+            if (!empty($allcaps['manage_options'])) {
+                foreach ($caps as $cap) {
+                    if (\is_string($cap) && strpos($cap, 'yatra_') === 0) {
+                        $allcaps[$cap] = true;
+                    }
+                }
+                return $allcaps;
+            }
+
+            /**
+             * Access signal. The Pro Team module hooks this to
+             * return true when:
+             *   - The Team module is enabled, OR
+             *   - The module is disabled but the operator has flipped
+             *     the "keep access on module disable" setting to ON.
+             *
+             * Defaults to false when no hook is installed (e.g. Pro
+             * deactivated) → we strip yatra_* caps for non-admins.
+             *
+             * @param bool $active
+             */
+            $active = (bool) apply_filters('yatra_team_role_enforcement_active', false);
+            if ($active) {
+                return $allcaps; // defer to Team module's filter
+            }
+
+            // Strip every yatra_* cap on this user. `yatra_access_admin`
+            // is stripped too — non-admin users shouldn't see the menu
+            // when the module isn't actively enforcing.
+            foreach ($allcaps as $cap => $on) {
+                if ($on && \is_string($cap) && strpos($cap, 'yatra_') === 0) {
+                    $allcaps[$cap] = false;
+                }
+            }
+            return $allcaps;
+        }, 7, 4);
+
+        // NOTE: actual removal of Yatra team roles when the Team &
+        // Access module is disabled lives INSIDE the Pro Team module
+        // (see TeamModule::registerAlwaysOn → 'yatra_module_deactive'
+        // hook). That keeps role lifecycle owned by the module that
+        // creates the roles.
+    }
+
+    /**
      * Register admin menu
      */
     public function registerAdminMenu(): void
     {
+        self::bootstrapMenuCapability();
+
         $menu_icon = (function_exists('yatra_get_brand_icon_url') && yatra_get_brand_icon_url() !== '')
             ? yatra_get_brand_icon_url()
             : 'dashicons-palmtree';
 
         $brand_name = function_exists('yatra_get_brand_name') ? yatra_get_brand_name() : 'Yatra';
 
+        // Menu visibility cap. By default WP requires `manage_options`
+        // which only WP administrators have — invisible to every
+        // Yatra-only role (Accountant, Sales Agent, Guide, etc.). The
+        // Team & Access module's RoleProvisioner adds `yatra_access_admin`
+        // to every system role + grants it to admins via the user_has_cap
+        // filter. If Pro/Team isn't installed on this site, the cap
+        // doesn't exist anywhere → no role qualifies → behavior is
+        // identical to the old `manage_options` gate, and admins still
+        // pass because they have `manage_options`. So this is a strict
+        // expansion: same admins see it as before, plus team roles when
+        // Team & Access is on. We pass an OR-style check by using a
+        // filter so non-Pro sites can override.
+        $menu_cap = (string) apply_filters('yatra_admin_menu_cap', 'yatra_access_admin');
+
         add_menu_page(
             $brand_name,
             $brand_name,
-            'manage_options',
+            $menu_cap,
             'yatra',
             [$this, 'renderAdminPage'],
             $menu_icon,
@@ -496,7 +636,7 @@ class AdminServiceProvider extends ServiceProvider
             /* translators: %s: branded plugin name. */
             sprintf(__('%s Dashboard', 'yatra'), $brand_name),
             __('Dashboard', 'yatra'),
-            'manage_options',
+            $menu_cap,
             'yatra',
             [$this, 'renderAdminPage']
         );

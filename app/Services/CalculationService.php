@@ -198,9 +198,69 @@ class CalculationService
         // ── Total discounts ─────────────────────────────────────────────
         $total_discount_amount = ($group_discount_data['amount'] ?? 0) + ($coupon_discount_data['calculated_amount'] ?? 0);
         $total_discount_amount = min($total_discount_amount, $subtotal); // discount cannot exceed subtotal
-        
+
         $discounted_subtotal = max(0, $subtotal - $total_discount_amount);
-        
+
+        // ── Discount stacking hook ───────────────────────────────────────
+        // Premium-only enforcement point. The Pro Advanced Discount module
+        // listens here when paired with Dynamic Pricing and rewrites the
+        // discount/DP combination according to the operator's stacking
+        // mode. Free sites (and sites missing either module) receive no
+        // listener and the snapshot passes through unchanged — pricing
+        // stays bit-for-bit identical to the pre-feature behavior.
+        //
+        // `pre_dp_base_amount` is the base before DP fires — works for
+        // BOTH regular pricing (where DP modifies $unit_price) and
+        // traveler-based pricing (where DP fires per-category inside
+        // calculateBaseAmount and would otherwise be invisible to a
+        // post-hoc listener doing `$unit_price < $unit_price_before_dp`).
+        // Cheap to compute (no DB hits, just arithmetic) so we always
+        // pay the cost — far cheaper than asking listeners to recompute.
+        $pre_dp_base_amount = $this->computeBaseAmountWithoutDynamicPricing(
+            $unit_price_before_dp,
+            $travelers_count,
+            $traveler_counts,
+            $pricing_type,
+            $price_types
+        );
+        $stackingSnapshot = (array) apply_filters('yatra_pricing_after_discount_stack', [
+            'unit_price'             => $unit_price,
+            'unit_price_before_dp'   => $unit_price_before_dp,
+            'base_amount'            => $base_amount,
+            'pre_dp_base_amount'     => $pre_dp_base_amount,
+            'subtotal'               => $subtotal,
+            'group_discount_data'    => $group_discount_data,
+            'coupon_discount_data'   => $coupon_discount_data,
+            'total_discount_amount'  => $total_discount_amount,
+            'discounted_subtotal'    => $discounted_subtotal,
+        ], [
+            'trip_id'                => $trip_id,
+            'travelers_count'        => $travelers_count,
+            'traveler_counts'        => $traveler_counts,
+            'pricing_type'           => $pricing_type,
+            'price_types'            => $price_types,
+            'travel_date'            => $travel_date,
+            'spots_for_dp'           => $spots_for_dp,
+            'availability_id_for_dp' => $availability_id_for_dp,
+            'coupon_code'            => $coupon_code,
+            'selected_services'      => $selected_services,
+            'original_price'         => $original_price,
+            'discounted_price'       => $discounted_price,
+            'calculation_service'    => $this,
+            'discount_service'       => $discountService,
+        ]);
+        if (isset($stackingSnapshot['unit_price']))            { $unit_price            = (float) $stackingSnapshot['unit_price']; }
+        if (isset($stackingSnapshot['base_amount']))           { $base_amount           = (float) $stackingSnapshot['base_amount']; }
+        if (isset($stackingSnapshot['subtotal']))              { $subtotal              = (float) $stackingSnapshot['subtotal']; }
+        if (isset($stackingSnapshot['group_discount_data']) && is_array($stackingSnapshot['group_discount_data'])) {
+            $group_discount_data = $stackingSnapshot['group_discount_data'];
+        }
+        if (isset($stackingSnapshot['coupon_discount_data']) && is_array($stackingSnapshot['coupon_discount_data'])) {
+            $coupon_discount_data = $stackingSnapshot['coupon_discount_data'];
+        }
+        if (isset($stackingSnapshot['total_discount_amount'])) { $total_discount_amount = (float) $stackingSnapshot['total_discount_amount']; }
+        if (isset($stackingSnapshot['discounted_subtotal']))   { $discounted_subtotal   = (float) $stackingSnapshot['discounted_subtotal']; }
+
         // ── Itinerary Costs ─────────────────────────────────────────
         $itinerary_costs = apply_filters('yatra_booking_itinerary_costs', [], $trip_id, $travelers_count, $traveler_counts, $travel_date);
         $itinerary_costs_total = 0;
@@ -331,7 +391,23 @@ class CalculationService
         //     using the same TripPricingService::resolveCategoryEffectivePrice
         //     anchor that calculateBaseAmount starts from, and subtract from
         //     the real (post-DP) base_amount.
-        $dp_per_unit_delta = $unit_price - $unit_price_before_dp;
+        // If the discount-stacking filter reverted DP (the Pro
+        // "discount_only" or "best_for_customer→discount" path
+        // mutated $base_amount back to its pre-DP value), the
+        // breakdown should reflect that — otherwise the per-category
+        // line items would still display DP-adjusted prices that
+        // don't match the final total customers actually pay.
+        //
+        // Free-only sites (no filter listener) hit the else branch
+        // exactly as before: $base_amount tracks the post-DP value,
+        // $dp_was_suppressed stays false, and the existing breakdown
+        // math runs unchanged. So the pre-feature display contract
+        // is bit-for-bit preserved.
+        $dp_was_suppressed = $pre_dp_base_amount > 0
+            && abs($base_amount - $pre_dp_base_amount) < 0.005;
+        $dp_per_unit_delta = $dp_was_suppressed
+            ? 0.0
+            : $unit_price - $unit_price_before_dp;
         $dp_total_adjustment = 0.0;
         $category_prices_post_dp = [];
         if ($pricing_type === 'regular') {
@@ -346,17 +422,22 @@ class CalculationService
                 $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : 0;
 
                 // Capture the DP-adjusted per-category price so the pricing-summary
-                // category row can show the price the customer is actually paying
-                // — admins asked for one consolidated row (post-DP) instead of a
-                // pre-DP row plus a separate "Dynamic Pricing" subtraction line.
-                $post_dp_price = (float) apply_filters('yatra_booking_trip_price', $pre_dp_price, $trip_id, [
-                    'departure_date'   => $travel_date,
-                    'spots_remaining'  => $spots_for_dp,
-                    'availability_id'  => $availability_id_for_dp,
-                    'category_id'      => $category_id,
-                    'original_price'   => (float) ($pt_arr['original_price'] ?? 0),
-                    'discounted_price' => (float) ($pt_arr['discounted_price'] ?? $pt_arr['sale_price'] ?? 0),
-                ]);
+                // category row can show the price the customer is actually paying.
+                // When DP was suppressed by the stacking enforcer, skip the DP
+                // filter entirely and surface the pristine pre-DP price so the
+                // breakdown matches the final total.
+                if ($dp_was_suppressed) {
+                    $post_dp_price = $pre_dp_price;
+                } else {
+                    $post_dp_price = (float) apply_filters('yatra_booking_trip_price', $pre_dp_price, $trip_id, [
+                        'departure_date'   => $travel_date,
+                        'spots_remaining'  => $spots_for_dp,
+                        'availability_id'  => $availability_id_for_dp,
+                        'category_id'      => $category_id,
+                        'original_price'   => (float) ($pt_arr['original_price'] ?? 0),
+                        'discounted_price' => (float) ($pt_arr['discounted_price'] ?? $pt_arr['sale_price'] ?? 0),
+                    ]);
+                }
                 if ($category_id) {
                     $category_prices_post_dp[(string) $category_id] = $post_dp_price;
                 }
@@ -369,7 +450,7 @@ class CalculationService
                     $pre_dp_base += $pre_dp_price * $count;
                 }
             }
-            $dp_total_adjustment = $base_amount - $pre_dp_base;
+            $dp_total_adjustment = $dp_was_suppressed ? 0.0 : ($base_amount - $pre_dp_base);
         }
         $price_breakdown = (array) apply_filters('yatra_price_breakdown', [], $trip_id, [
             'price'             => $unit_price,
@@ -609,7 +690,62 @@ class CalculationService
      * For traveler-based: uses per-category effective prices × counts
      * For regular: uses unit_price × travelers_count
      */
-    private function calculateBaseAmount(
+    /**
+     * Compute the base amount for a trip WITHOUT firing the Dynamic
+     * Pricing filter, regardless of pricing type.
+     *
+     * Used by the Advanced Discount stacking enforcer to detect whether
+     * DP actually adjusted the booking (compare actual base_amount to
+     * the no-DP base_amount) and to compute the "discount-only" alt
+     * scenario where DP must be fully neutralized.
+     *
+     * For regular pricing this is just unit_price × travelers_count.
+     * For traveler-based pricing it walks the per-category prices via
+     * the canonical TripPricingService anchor (identical math to the
+     * breakdown's `$pre_dp_base` at lines ~384-415 of calculatePricing).
+     * Per-category prices come from saved trip data — DP filter is
+     * deliberately NOT applied.
+     */
+    public function computeBaseAmountWithoutDynamicPricing(
+        float $unit_price,
+        int $travelers_count,
+        array $traveler_counts,
+        string $pricing_type,
+        array $price_types
+    ): float {
+        if ($pricing_type === 'traveler_based' && !empty($price_types)) {
+            $base_amount = 0.0;
+            foreach ($price_types as $pt) {
+                $pt = (array) $pt;
+                $category_id = $pt['category_id'] ?? 0;
+                $pricing_mode = $pt['pricing_mode'] ?? 'per_person';
+                $category_price = (float) TripPricingService::resolveCategoryEffectivePrice($pt);
+                $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : 0;
+
+                if ($pricing_mode === 'per_group') {
+                    if ($count > 0) {
+                        $base_amount += $category_price;
+                    }
+                } else {
+                    $base_amount += $category_price * $count;
+                }
+            }
+            return round($base_amount, 2);
+        }
+
+        return round($unit_price * max(1, $travelers_count), 2);
+    }
+
+    /**
+     * Compute the base amount for a trip from a given per-unit price.
+     *
+     * Public so Pro extensions (e.g. the Advanced Discount stacking-
+     * enforcer) can re-derive the base when they need to recompute the
+     * downstream pipeline with a different unit price — for example,
+     * the "discount_only" stacking mode reverts the DP adjustment and
+     * has to recompute base/subtotal/discounts against the pre-DP price.
+     */
+    public function calculateBaseAmount(
         float $unit_price,
         int $travelers_count,
         array $traveler_counts,
@@ -663,7 +799,7 @@ class CalculationService
     /**
      * Calculate group discount
      */
-    private function calculateGroupDiscount(
+    public function calculateGroupDiscount(
         int $trip_id,
         float $subtotal,
         int $travelers_count,

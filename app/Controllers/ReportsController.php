@@ -22,9 +22,19 @@ class ReportsController extends BaseController
         ]);
     }
 
+    /**
+     * Reports gate — either of the registered view-reports caps grants
+     * access. Accountant role holds `yatra_view_financial_reports`;
+     * Manager / Marketing / Sales Agent / Auditor hold
+     * `yatra_view_operational_reports`. The endpoint returns the same
+     * combined payload either way today; future per-section gating
+     * (financial-only vs ops-only sections) can layer on this baseline.
+     * WP admins pass via the Team module's admin-fallback filter.
+     */
     public function check_permission(?WP_REST_Request $request = null): bool
     {
-        return current_user_can('manage_options');
+        return current_user_can('yatra_view_financial_reports')
+            || current_user_can('yatra_view_operational_reports');
     }
 
     /**

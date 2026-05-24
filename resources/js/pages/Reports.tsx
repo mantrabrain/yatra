@@ -33,6 +33,7 @@ import {
   type TrendView,
 } from "../lib/report-series";
 import { isModuleActive, isProPluginActive } from "../lib/plugin-utils";
+import { canCap } from "../hooks/useCapabilities";
 
 // Skeleton Loading Components
 const SkeletonCard = () => (
@@ -226,48 +227,67 @@ const SVGIcons = {
 };
 
 // Travel Business Report Categories
-const TravelReportCategories = [
+// Each category declares the capability that gates it. The Reports
+// page filters this list by `usePermissions().can()` at render time
+// so an Accountant only sees Revenue + Operational tabs, a Marketing
+// role sees Customer + Operational + Pixel + GA, etc. Categories
+// without a `cap` field are visible to anyone who can see Reports
+// (the page itself is already gated at the sidebar layer).
+const TravelReportCategories: Array<{
+  id: string;
+  title: string;
+  icon: string;
+  description: string;
+  cap: string;
+}> = [
   {
     id: "booking-overview",
     title: "Booking Overview",
     icon: "Calendar",
     description: "Booking volume, status distribution, trends",
+    cap: "yatra_view_operational_reports",
   },
   {
     id: "revenue-analysis",
     title: "Revenue Analysis",
     icon: "DollarSign",
     description: "Revenue trends, payment status, profitability",
+    cap: "yatra_view_financial_reports",
   },
   {
     id: "trip-performance",
     title: "Trip Performance",
     icon: "MapPin",
     description: "Trip popularity, occupancy rates, capacity utilization",
+    cap: "yatra_view_operational_reports",
   },
   {
     id: "departure-management",
     title: "Departure Management",
     icon: "Truck",
     description: "Upcoming departures, capacity planning, scheduling",
+    cap: "yatra_view_departures",
   },
   {
     id: "customer-insights",
     title: "Customer Insights",
     icon: "Users",
     description: "Customer behavior, retention, demographics",
+    cap: "yatra_view_customers",
   },
   {
     id: "operational-metrics",
     title: "Operational Metrics",
     icon: "Activity",
     description: "Lead times, cancellations, efficiency metrics",
+    cap: "yatra_view_operational_reports",
   },
   {
     id: "facebook-pixel",
     title: "Facebook Pixel",
     icon: "Facebook",
     description: "Conversion tracking, event analytics, pixel performance",
+    cap: "yatra_view_operational_reports",
   },
   {
     id: "google-analytics",
@@ -275,6 +295,7 @@ const TravelReportCategories = [
     icon: "Google",
     description:
       "Enhanced e-commerce tracking, Measurement Protocol, visitor analytics",
+    cap: "yatra_view_operational_reports",
   },
 ];
 
@@ -2089,9 +2110,29 @@ const GoogleAnalyticsReports: React.FC = () => {
 };
 
 const TravelBookingReports: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState("booking-overview");
+  // Cap-filter the category list. canCap honors the WP admin fallback
+  // (admins see everything), the Team module's userCaps array (granular
+  // role-based), and falls back to default-allow when no team module is
+  // installed (so non-Team installs keep their pre-existing behavior).
+  const visibleCategories = useMemo(
+    () => TravelReportCategories.filter((c) => canCap(c.cap)),
+    [],
+  );
+
+  const [selectedCategory, setSelectedCategory] = useState(
+    () => visibleCategories[0]?.id || "booking-overview",
+  );
   const [dateRange, setDateRange] = useState("last_30_days");
   const [viewType, setViewType] = useState("summary"); // 'summary', 'daily', 'weekly', 'monthly'
+
+  // If the operator's currently-selected tab becomes invalid (e.g.
+  // role changed mid-session), fall back to the first visible tab.
+  React.useEffect(() => {
+    if (!visibleCategories.some((c) => c.id === selectedCategory)) {
+      const fallback = visibleCategories[0]?.id;
+      if (fallback) setSelectedCategory(fallback);
+    }
+  }, [visibleCategories, selectedCategory]);
 
   // Fetch real data from Yatra ReportsController using apiClient
   const { data: reportData, isLoading } = useQuery({
@@ -2432,7 +2473,7 @@ const TravelBookingReports: React.FC = () => {
               onChange={(e) => setSelectedCategory(e.target.value)}
               aria-label={__("Report section", "yatra")}
             >
-              {TravelReportCategories.map((category) => (
+              {visibleCategories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {__(category.title, "yatra")}
                 </option>
@@ -2444,7 +2485,7 @@ const TravelBookingReports: React.FC = () => {
             className="hidden md:flex min-w-0 flex-nowrap items-stretch gap-1 overflow-x-auto overflow-y-hidden scroll-smooth px-4 pe-6 pb-1 sm:px-6 sm:pe-8 [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]"
             aria-label={__("Report sections", "yatra")}
           >
-            {TravelReportCategories.map((category) => (
+            {visibleCategories.map((category) => (
               <button
                 key={category.id}
                 type="button"

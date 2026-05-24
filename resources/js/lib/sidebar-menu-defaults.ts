@@ -119,6 +119,7 @@ export const DEFAULT_MENU_ITEMS: MenuItemDefault[] = [
   { slug: "whatsapp", label: "WhatsApp", iconName: "MessageCircle" },
   { slug: "channel-manager", label: "Channel Manager", iconName: "Network" },
   { slug: "webhooks", label: "Webhooks", iconName: "Webhook" },
+  { slug: "team", label: "Team & Access", iconName: "Users" },
   { slug: "license", label: "License", iconName: "Key" },
   { slug: "settings", label: "Settings", iconName: "Settings" },
 ];

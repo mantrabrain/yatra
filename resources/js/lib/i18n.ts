@@ -10,6 +10,16 @@ declare global {
       restUrl?: string;
       nonce?: string;
       brandLogoUrl?: string;
+      /**
+       * Operator-facing brand name. When the White Label module is
+       * active (Agency-tier only) and the operator has filled in
+       * "Plugin name" in WL settings, this is THAT value — otherwise
+       * it's "Yatra". Use this everywhere instead of hardcoding
+       * "Yatra" so the UI reflects the operator's brand for resellers.
+       *
+       * Injected by AdminAssetsProvider via `yatra_get_brand_name()`.
+       */
+      brandName?: string;
       pluginUrl?: string;
       currentUserAvatar?: string;
       currentUser?: number;
@@ -97,6 +107,31 @@ declare global {
         redirect_uri?: string;
         last_sync?: string | null;
       };
+      // Team & Access (Agency-tier) — injected by Team module's
+      // LocalizedData service. Absent when module isn't installed.
+      teamEnabled?: boolean;
+      /**
+       * Forward-looking "keep access on module disable" setting.
+       * Only consulted when the Team & Access module is DISABLED:
+       *   - `false` (default): yatra_* caps are stripped for non-admin
+       *     users until the module is re-enabled.
+       *   - `true`: WP-native role machinery keeps resolving caps from
+       *     the stored role records — team members keep their access
+       *     even after disabling the module.
+       *
+       * When the module is enabled, this setting is irrelevant —
+       * caps resolve normally through the full layered chain (admin
+       * fallback, expiry, revoke, role, grant).
+       */
+      teamKeepAccessOnModuleDisable?: boolean;
+      isWpAdmin?: boolean;
+      userCaps?: string[];
+      userScopes?: {
+        destinations: number[];
+        activities: number[];
+        trips: number[];
+        categories: number[];
+      };
     };
   }
 }
@@ -162,7 +197,26 @@ function sprintf(format: string, ...args: (string | number)[]): string {
   );
 }
 
-export { __, _x, sprintf };
+/**
+ * Operator brand name — "Yatra" by default, or whatever the operator
+ * has set in the White Label module (Agency tier).
+ *
+ * Use this in user-visible strings instead of hardcoding "Yatra":
+ *
+ *   const brand = brandName();
+ *   sprintf(__("%s role", "yatra"), brand)   // "Acme role" if rebranded
+ *
+ * Always pass the brand as an interpolated argument so the translatable
+ * string stays generic — that keeps `make-pot` extraction working AND
+ * means a translator only has to translate "%s role" once, regardless
+ * of brand.
+ */
+function brandName(): string {
+  if (typeof window === "undefined") return "Yatra";
+  return (window.yatraAdmin?.brandName as string | undefined) || "Yatra";
+}
+
+export { __, _x, sprintf, brandName };
 
 /**
  * Get translated string with number

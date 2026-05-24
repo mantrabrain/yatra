@@ -199,4 +199,57 @@ export const whatsappApi = {
 
   listOptIns: () =>
     apiClient.get("/whatsapp/opt-ins") as Promise<{ data: WhatsappOptInRow[] }>,
+
+  /* ----------------------- template versions ----------------------- */
+  /**
+   * Append-only edit history for a template. Returned newest-first.
+   * Operators restore from this list when a recent edit needs rollback.
+   */
+  listTemplateVersions: (id: number) =>
+    apiClient.get(`/whatsapp/templates/${id}/versions`) as Promise<{
+      data: WhatsappTemplateVersion[];
+    }>,
+
+  /**
+   * Restore the template to a prior snapshot. Server snapshots the
+   * CURRENT state first so the chain stays linear ("undo this restore"
+   * is just another restore from the most-recent row).
+   */
+  restoreTemplateVersion: (id: number, versionId: number) =>
+    apiClient.post(
+      `/whatsapp/templates/${id}/versions/${versionId}/restore`,
+      {},
+    ) as Promise<{
+      data: WhatsappTemplate;
+      message: string;
+    }>,
 };
+
+/* -------------------------------------------------------------------------- */
+/*  Template version-history shape                                            */
+/* -------------------------------------------------------------------------- */
+
+/** One snapshot of a template at a moment in time. */
+export interface WhatsappTemplateVersion {
+  id: number;
+  template_id: number;
+  /** Monotonic per template — UI displays as "v3". */
+  version_number: number;
+  /** Frozen copy of the row state at the time of the change. Subset
+   *  of the fields on WhatsappTemplate plus settings as plain object. */
+  snapshot: {
+    name?: string;
+    description?: string;
+    body?: string;
+    event_key?: string;
+    recipient_type?: "customer" | "admin";
+    is_active?: boolean;
+    settings?: Record<string, unknown>;
+    is_system?: boolean;
+  };
+  /** Short human hint of what changed in THIS edit (e.g. "edited:
+   *  body, is_active") or "Restored from vN" for restore rows. */
+  change_summary: string | null;
+  created_by: number | null;
+  created_at: string;
+}

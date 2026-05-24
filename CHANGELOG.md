@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented here. The WordPress.org–canonical history lives in **`readme.txt`** under **Changelog**; this file mirrors recent releases for GitHub and tooling.
 
+## [3.0.5] — 2026-05-24
+
+- **Capability registry foundation:** new `user_has_cap` filter at priority 7 in `AdminServiceProvider::bootstrapMenuCapability()`. Reads the `yatra_team_role_enforcement_active` filter signal — when truthy (Pro Team module enabled, OR module disabled but the operator opted in to "keep access"), caps resolve normally; when falsy (Pro deactivated, or module off without opt-in), non-admin `yatra_*` caps are stripped so stored role assignments become inert. WP administrators always pass via the admin fallback first.
+- **Cap-string consistency sweep:** every React page that gated UI on `manage_yatra` now references the canonical registered cap (`yatra_manage_settings`, `yatra_manage_emails`, `yatra_access_admin`). New caps registered: `yatra_view_reviews`, `yatra_edit_reviews`, `yatra_delete_reviews`, `yatra_manage_reviews`. Inline cap checks inside `TripController::restore_revision` and `SingleTripController` draft-preview gain `manage_options` fallback so site owners never fail.
+- **`isWpAdmin` always injected:** `AdminAssetsProvider` now always injects `isWpAdmin` and mirrors `manage_options` into `window.yatraAdmin.capabilities` (was previously only set by the Pro Team module). Fixes regression where Reviews + Email Templates didn't load data for admins on free-only or Team-disabled installs. React `usePermissions.can()` gets a triple admin-fallback (`isWpAdmin` → `roles.administrator` → `capabilities.manage_options`).
+- **Customer + Availability controllers:** `CustomerController::checkAdminPermission`, `AvailabilitySpecificDatesController::checkPermission`, and `AvailabilityRecurringRulesController::checkPermission` now accept the registered Team caps (`yatra_edit_customers`, `yatra_edit_trips`) in addition to the legacy `manage_options` and pre-existing legacy caps (kept as OR-arms for back-compat with any hand-grant filter).
+- **Transactional email types are now extensible:** `TransactionalEmailTemplateService::typeToSettingsKeys()` exposes the `yatra_transactional_email_type_to_keys` filter so Pro modules can register their own type → settings-keys mapping. Default subject/body lookups expose `yatra_transactional_email_default_subject` and `yatra_transactional_email_default_body`. Powers the new Team module's customizable invitation email template.
+- **Try Yatra Pro pill:** subtle amber pill appears next to the page title on every admin page when the Pro plugin is NOT active. Links to `https://try.wpyatra.com/try-yatra-pro/` (no credit card required). Hidden as soon as Pro is active. Uses the same `Tooltip` component as the rest of the admin.
+- **UX polish:**
+  - `SharedTable` action-menu dropdown shadow reduced from `shadow-2xl` to `shadow-md`.
+  - Modal-body data loaders replaced with `Skeleton` blocks (Team page, MemberEditDrawer, RoleEditDrawer, AddMemberModal candidate picker).
+  - Departure save/cancel redirect now returns to the Departures page instead of the Trips page.
+  - Email page tabs (Delivery, Templates, Sequences, Logs) persist in the URL.
+- **Layout sidebar:** Reviews entry now gates on `yatra_view_reviews` (was `yatra_view_trips`). `useEmailSettingsManager` gates on `yatra_manage_emails` (was the unregistered `manage_yatra`).
+- Safe to update from 3.0.4. Pair with **Yatra Pro 3.0.3** for the Team & Access module.
+
 ## [3.0.4] — 2026-05-12
 
 - **Unicode / Cyrillic slugs (end-to-end):** `SlugHelper::generate()` rawurldecodes percent-encoded UTF-8 + `mb_strtolower` + `\pL\pN` regex; validators (`ActivityValidator`, `DestinationValidator`, `TripValidator`) and `PrettyRouteMatcher` updated so Cyrillic / CJK slugs round-trip through pretty permalinks.

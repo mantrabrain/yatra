@@ -46,7 +46,7 @@ class EnquiryController extends BaseController
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'getEnquiries'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanView'],
             ],
             [
                 'methods' => \WP_REST_Server::CREATABLE,
@@ -55,59 +55,91 @@ class EnquiryController extends BaseController
             ],
         ]);
 
-        // Single enquiry operations
+        // Single enquiry operations — read uses view, write uses respond,
+        // delete uses the dedicated delete cap (high sensitivity).
         register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'getEnquiry'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanView'],
             ],
             [
                 'methods' => \WP_REST_Server::EDITABLE,
                 'callback' => [$this, 'updateEnquiry'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanRespond'],
             ],
             [
                 'methods' => \WP_REST_Server::DELETABLE,
                 'callback' => [$this, 'deleteEnquiry'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanDelete'],
             ],
         ]);
 
-        // Bulk actions
+        // Bulk actions — operations include status change, mark-read,
+        // delete, etc. Gate on respond (the broadest mutation cap
+        // short of delete). Bulk-delete callers should re-check
+        // delete-cap inside the handler when the action is "delete".
         register_rest_route($namespace, '/' . $base . '/bulk', [
             [
                 'methods' => \WP_REST_Server::EDITABLE,
                 'callback' => [$this, 'bulkAction'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanRespond'],
             ],
         ]);
 
-        // Stats endpoint
+        // Stats endpoint — read-only aggregation, view cap is enough.
         register_rest_route($namespace, '/' . $base . '/stats', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'getStats'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanView'],
             ],
         ]);
 
-        // Respond to enquiry
+        // Respond to enquiry — explicit respond-cap.
         register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/respond', [
             [
                 'methods' => \WP_REST_Server::CREATABLE,
                 'callback' => [$this, 'respondToEnquiry'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanRespond'],
             ],
         ]);
     }
 
     /**
-     * Check admin permission
+     * Granular permission checks — one per operation so role bundles
+     * (Sales Agent, Front Desk, etc.) can actually use the parts of
+     * the enquiry surface their role grants. WP administrators pass
+     * every cap automatically via the Team module's admin-fallback
+     * filter, so `manage_options` doesn't need an explicit check
+     * here — it's covered by the cap.
+     */
+    public function checkCanView(): bool
+    {
+        return current_user_can('yatra_view_enquiries');
+    }
+
+    public function checkCanRespond(): bool
+    {
+        return current_user_can('yatra_respond_to_enquiries');
+    }
+
+    public function checkCanDelete(): bool
+    {
+        return current_user_can('yatra_delete_enquiries');
+    }
+
+    /**
+     * @deprecated Kept for any external code (custom snippet, third-
+     * party integration) that hooked the old method name. New code
+     * should use checkCanView/Respond/Delete. Routes the call to
+     * the view-only cap so behaviour is at-least-as-strict as before
+     * for non-admin callers, and admin users keep passing via the
+     * admin-fallback layer.
      */
     public function checkAdminPermission(): bool
     {
-        return current_user_can('manage_options');
+        return $this->checkCanView();
     }
 
     /**

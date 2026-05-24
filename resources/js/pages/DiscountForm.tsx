@@ -188,7 +188,7 @@ const DiscountForm: React.FC = () => {
         throw error;
       }
     },
-    enabled: (isEditMode || isDuplicateMode) && can("yatra_view_bookings"),
+    enabled: (isEditMode || isDuplicateMode) && can("yatra_manage_discounts"),
   });
 
   // Load discount data into form when editing or duplicating
@@ -1047,7 +1047,7 @@ const DiscountForm: React.FC = () => {
         }
       />
 
-      <ConditionalRender capability="yatra_edit_bookings">
+      <ConditionalRender capability="yatra_manage_discounts">
         {/* Discount Information Card */}
         <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
           <CardContent className="p-4">

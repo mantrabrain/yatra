@@ -37,12 +37,12 @@ class AvailabilityController extends BaseController
         $namespace = 'yatra/v1';
         $base = 'availability';
 
-        // Collection routes
+        // Collection routes — view cap for reads, edit cap for writes.
         register_rest_route($namespace, '/' . $base, [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_items'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
                 'args' => [
                     'trip_id' => [
                         'required' => true,
@@ -83,12 +83,16 @@ class AvailabilityController extends BaseController
             ],
         ]);
 
-        // Single item routes
+        // Single item routes — view cap for read, edit cap for the
+        // mutations. Delete uses edit as well — there's no separate
+        // "delete availability date" cap in the registry because
+        // removing a date is functionally part of trip availability
+        // editing, not a destructive operation in its own right.
         register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_item'],
-                'permission_callback' => [$this, 'check_permission'],
+                'permission_callback' => [$this, 'check_view_permission'],
             ],
             [
                 'methods' => \WP_REST_Server::EDITABLE,
@@ -432,9 +436,25 @@ class AvailabilityController extends BaseController
     /**
      * Check permission
      */
+    /**
+     * Write permission — trip-edits cap. Adding, updating, deleting,
+     * and duplicating availability dates all mutate trip data, so the
+     * registered `yatra_edit_trips` cap is the right gate. WP admins
+     * pass via the Team module's admin-fallback filter.
+     */
     public function check_permission(?WP_REST_Request $request = null): bool
     {
-        return current_user_can('manage_options');
+        return current_user_can('yatra_edit_trips');
+    }
+
+    /**
+     * Read permission — view-trips cap. Listing availability dates is
+     * a read-only operation against trip data; Sales Agent / Front
+     * Desk / Guide / Accountant / Auditor roles all hold this.
+     */
+    public function check_view_permission(?WP_REST_Request $request = null): bool
+    {
+        return current_user_can('yatra_view_trips');
     }
 }
 

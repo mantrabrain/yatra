@@ -45,12 +45,13 @@ class ReviewController extends BaseController
         // ADMIN ROUTES
         // =====================
         
-        // List reviews + create review (admin)
+        // List reviews + create review (admin). View cap for list,
+        // edit cap for create.
         register_rest_route($namespace, '/' . $base, [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'getReviews'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanView'],
             ],
             [
                 // The admin "Add New Review" form (resources/js/pages/ReviewForm.tsx)
@@ -61,53 +62,56 @@ class ReviewController extends BaseController
                 // and stamps `created_by` with the current admin user id.
                 'methods' => \WP_REST_Server::CREATABLE,
                 'callback' => [$this, 'createReview'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanEdit'],
             ],
         ]);
 
-        // Bulk actions
+        // Bulk actions — moderation operations. Manage cap covers
+        // approval workflows; delete actions inside the bulk handler
+        // should re-check the delete cap.
         register_rest_route($namespace, '/' . $base . '/bulk', [
             [
                 'methods'  => \WP_REST_Server::EDITABLE,
                 'callback' => [$this, 'bulkAction'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanManage'],
             ],
         ]);
 
-        // Get single review
+        // Single review — read / update / delete with distinct caps.
         register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'getReview'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanView'],
             ],
             [
                 'methods' => \WP_REST_Server::EDITABLE,
                 'callback' => [$this, 'updateReview'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanEdit'],
             ],
             [
                 'methods' => \WP_REST_Server::DELETABLE,
                 'callback' => [$this, 'deleteReview'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanDelete'],
             ],
         ]);
 
-        // Update review status
+        // Update review status — moderation action. Manage cap (held
+        // by Owner, Manager, Marketing).
         register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/status', [
             [
                 'methods' => \WP_REST_Server::EDITABLE,
                 'callback' => [$this, 'updateStatus'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanManage'],
             ],
         ]);
 
-        // Stats
+        // Stats — view cap.
         register_rest_route($namespace, '/' . $base . '/stats', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'getStats'],
-                'permission_callback' => [$this, 'checkAdminPermission'],
+                'permission_callback' => [$this, 'checkCanView'],
             ],
         ]);
 
@@ -153,11 +157,44 @@ class ReviewController extends BaseController
     }
 
     /**
-     * Check admin permission
+     * Granular admin-side permission checks. WP administrators pass
+     * every cap via the Team module's admin-fallback filter, so an
+     * explicit `manage_options` check isn't needed here.
+     */
+    public function checkCanView(): bool
+    {
+        return current_user_can('yatra_view_reviews');
+    }
+
+    public function checkCanEdit(): bool
+    {
+        return current_user_can('yatra_edit_reviews');
+    }
+
+    public function checkCanManage(): bool
+    {
+        // Moderation cap — approve / spam / trash. Distinct from
+        // edit so a Marketing role can moderate without being able
+        // to edit the review body itself.
+        return current_user_can('yatra_manage_reviews');
+    }
+
+    public function checkCanDelete(): bool
+    {
+        return current_user_can('yatra_delete_reviews');
+    }
+
+    /**
+     * @deprecated Kept for any external code referencing the old
+     * method name. Old implementation only checked `manage_options`,
+     * so non-admin Yatra-role users were locked out of every
+     * endpoint. New behaviour routes to the view cap which is more
+     * permissive for legitimate team members; admin users still pass
+     * via the admin-fallback layer.
      */
     public function checkAdminPermission(): bool
     {
-        return current_user_can('manage_options');
+        return $this->checkCanView();
     }
 
     /**

@@ -575,7 +575,10 @@ class AvailabilitySpecificDatesController
      */
     public function checkPermission(\WP_REST_Request $request): bool
     {
-        // Check if user has capability to manage trips
-        return current_user_can('manage_yatra_trips') || current_user_can('manage_options');
+        // Trip-writes cap covers every endpoint on this controller —
+        // managing specific override dates, price overrides, and booking
+        // counts all mutate trip availability. WP admins pass via the
+        // Team module's admin-fallback filter.
+        return current_user_can('yatra_edit_trips');
     }
 }

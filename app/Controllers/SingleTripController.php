@@ -101,8 +101,15 @@ class SingleTripController
                 )
             );
             
-            // If trip exists but admin is not logged in, return null to show "not found"
-            if ($existingTrip && !current_user_can('yatra_edit_trips')) {
+            // If trip exists but viewer can't preview drafts, hide it.
+            // Admin fallback so site owners always see drafts even when
+            // the Team module isn't active and yatra_edit_trips isn't
+            // on the admin role.
+            if (
+                $existingTrip
+                && !current_user_can('manage_options')
+                && !current_user_can('yatra_edit_trips')
+            ) {
                 return null;
             }
         }

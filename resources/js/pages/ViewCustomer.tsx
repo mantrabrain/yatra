@@ -134,7 +134,7 @@ const ViewCustomer: React.FC = () => {
           null,
       } as Customer;
     },
-    enabled: !!customerId && can("yatra_view_bookings"),
+    enabled: !!customerId && can("yatra_view_customers"),
   });
 
   // Fetch customer bookings
@@ -400,7 +400,7 @@ const ViewCustomer: React.FC = () => {
         description={__("View complete customer information", "yatra")}
         actions={
           <div className="flex gap-2">
-            <ConditionalRender capability="yatra_edit_bookings">
+            <ConditionalRender capability="yatra_edit_customers">
               <Button onClick={handleEdit} className="flex items-center gap-2">
                 <Edit className="w-4 h-4" />
                 {__("Edit Customer", "yatra")}
@@ -418,7 +418,7 @@ const ViewCustomer: React.FC = () => {
         }
       />
 
-      <ConditionalRender capability="yatra_view_bookings">
+      <ConditionalRender capability="yatra_view_customers">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-3">

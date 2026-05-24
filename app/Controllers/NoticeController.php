@@ -18,9 +18,17 @@ final class NoticeController extends BaseController
      */
     protected string $rest_base = 'notices';
 
+    /**
+     * Admin-notice dismissal — gated on the umbrella admin-access
+     * cap so any team member who can see the Yatra admin can dismiss
+     * the notices they see. The legacy `manage_yatra` cap was never
+     * registered anywhere, so the previous OR-arm did nothing in
+     * practice. WP admins pass via the Team module's admin-fallback
+     * filter.
+     */
     public function check_permission(?\WP_REST_Request $request = null): bool
     {
-        return current_user_can('manage_options') || current_user_can('manage_yatra');
+        return current_user_can('yatra_access_admin');
     }
 
     public function register_routes(): void

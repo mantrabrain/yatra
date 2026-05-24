@@ -167,7 +167,7 @@ const Enquiries: React.FC = () => {
     queryFn: async () => {
       return await apiService.getEnquiriesStats();
     },
-    enabled: can("yatra_view_bookings"),
+    enabled: can("yatra_view_enquiries"),
   });
 
   const statusCounts = {
@@ -262,16 +262,21 @@ const Enquiries: React.FC = () => {
       label: __("View", "yatra"),
       icon: <Eye className="w-4 h-4" />,
       onClick: (enquiry: Enquiry) => handleView(enquiry),
-      condition: () => can("yatra_view_bookings"),
+      condition: () => can("yatra_view_enquiries"),
     },
     {
       key: "respond",
       label: __("Respond", "yatra"),
       icon: <Send className="w-4 h-4" />,
       onClick: (enquiry: Enquiry) => handleRespond(enquiry),
-      // Only allow respond on active enquiries (not closed, spam, trash, or archived)
+      // Respond cap matches the backend gate on EnquiryController's
+      // PUT /enquiries/{id} + POST /enquiries/{id}/respond endpoints.
+      // Front Desk role holds this cap without holding edit-bookings,
+      // so checking the wrong cap would have hidden the action from
+      // them while still showing 403-failing buttons to bookings-only
+      // roles.
       condition: (enquiry: Enquiry) =>
-        can("yatra_edit_bookings") &&
+        can("yatra_respond_to_enquiries") &&
         !["closed", "spam", "trash", "archived"].includes(enquiry.status),
     },
     {
@@ -279,7 +284,9 @@ const Enquiries: React.FC = () => {
       label: __("Edit", "yatra"),
       icon: <Edit className="w-4 h-4" />,
       onClick: (enquiry: Enquiry) => handleEdit(enquiry),
-      condition: () => can("yatra_edit_bookings"),
+      // Editing an enquiry status / notes goes through the same
+      // PUT endpoint that respond does, gated on respond cap.
+      condition: () => can("yatra_respond_to_enquiries"),
     },
     {
       key: "delete",
@@ -287,7 +294,9 @@ const Enquiries: React.FC = () => {
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (enquiry: Enquiry) => handleDelete(enquiry),
       variant: "destructive" as const,
-      condition: () => can("yatra_delete_bookings"),
+      // High-sensitivity cap, distinct from respond. Only Owner /
+      // Manager hold it by default.
+      condition: () => can("yatra_delete_enquiries"),
     },
   ];
 
@@ -319,7 +328,7 @@ const Enquiries: React.FC = () => {
         per_page: response.meta?.per_page || response.per_page || 10,
       };
     },
-    enabled: can("yatra_view_bookings"),
+    enabled: can("yatra_view_enquiries"),
   });
 
   // Delete mutation
@@ -770,7 +779,7 @@ const Enquiries: React.FC = () => {
               enquiries.length > 0 && selectedIds.length === enquiries.length
             }
             getItemId={(enquiry: Enquiry) => enquiry.id}
-            capability="yatra_view_bookings"
+            capability="yatra_view_enquiries"
             skeletonRows={5}
           />
         </CardContent>

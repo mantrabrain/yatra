@@ -164,6 +164,12 @@ export const useToggleModule = () => {
         window.yatraAdmin.webhooksEnabled = enabledModules.some(
           (m) => m.slug === "webhooks",
         );
+        // Team & Access — Agency-only sidebar menu. Also drives the
+        // teamEnabled flag that <Can/> reads to decide whether the
+        // capability gates apply (vs admin fallback).
+        window.yatraAdmin.teamEnabled = enabledModules.some(
+          (m) => m.slug === "team",
+        );
         // Add flags for Pro feature modules
         window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(
           (m) => m.slug === "mailchimp",
@@ -303,6 +309,12 @@ export const useBulkToggleModules = () => {
         // Webhooks — Agency-only sidebar menu, same instant-toggle pattern.
         window.yatraAdmin.webhooksEnabled = enabledModules.some(
           (m) => m.slug === "webhooks",
+        );
+        // Team & Access — Agency-only sidebar menu. Also drives the
+        // teamEnabled flag that <Can/> reads to decide whether the
+        // capability gates apply (vs admin fallback).
+        window.yatraAdmin.teamEnabled = enabledModules.some(
+          (m) => m.slug === "team",
         );
         // Add flags for Pro feature modules
         window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(

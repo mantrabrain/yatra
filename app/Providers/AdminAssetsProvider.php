@@ -28,8 +28,16 @@ class AdminAssetsProvider
         if ($current_user->ID > 0) {
             $user_caps = $current_user->allcaps;
             foreach ($user_caps as $cap => $has_cap) {
-                if ($has_cap && strpos((string) $cap, 'yatra_') === 0) {
-                    $capabilities[$cap] = true;
+                if (!$has_cap) continue;
+                // Mirror every `yatra_*` cap into the JS-side map (these
+                // are what React's `can()` checks against). Also
+                // explicitly include `manage_options` so the React-side
+                // admin fallback has a server-confirmed signal even on
+                // exotic installs where `isWpAdmin` or `roles` were
+                // filtered out by a third-party plugin.
+                $capStr = (string) $cap;
+                if (strpos($capStr, 'yatra_') === 0 || $capStr === 'manage_options') {
+                    $capabilities[$capStr] = true;
                 }
             }
         }
@@ -71,6 +79,19 @@ class AdminAssetsProvider
             'bookingBase' => \Yatra\Services\SettingsService::getBookingBase(),
             'capabilities' => $capabilities,
             'roles' => $current_user->roles,
+            // Cap-gating fallback flag. ALWAYS injected (not just by the
+            // Team module) because the React `usePermissions.can()` helper
+            // uses it as the last-resort allow for site owners: anyone
+            // with `manage_options` passes any cap check, mirroring the
+            // server-side admin fallback in Team's Capabilities filter.
+            //
+            // Without this, free-plugin installs (or Pro installs where
+            // Team is off) silently fail every `can("yatra_*")` check —
+            // even for site owners — because the cap isn't on the
+            // administrator role record. The Team module overwrites
+            // this same key when active; semantics are identical, so
+            // the overwrite is safe.
+            'isWpAdmin' => current_user_can('manage_options'),
             'isPro' => defined('YATRA_PRO_VERSION'),
             // Agency-tier flag — drives the sidebar's White Label entry visibility
             // and any other Agency-only UI affordances. Pro registers the filter
@@ -94,6 +115,21 @@ class AdminAssetsProvider
                 : false,
             'webhooksEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
                 ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('webhooks')
+                : false,
+            // Settings → Pricing (Discount Stacking) drives off these
+            // two. Setting them here (free plugin, AdminAssetsProvider)
+            // matches the pattern used by every other Pro-module flag
+            // above and decouples the React UI from Pro module boot
+            // timing — Pro's init.php is conditionally loaded by
+            // ProModuleManager only when the module is enabled, so any
+            // filter-based exposure could fail silently if boot order
+            // shifts. Reading from the canonical ModuleManager here is
+            // the source of truth.
+            'dynamicPricingEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
+                ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('dynamic_pricing')
+                : false,
+            'advancedDiscountEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
+                ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('advanced_discount')
                 : false,
             // Single source of truth for every country dropdown in the
             // React admin. Pulled from the canonical FormatHelper —

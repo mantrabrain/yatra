@@ -172,7 +172,7 @@ class TransactionalEmailTemplateService
      */
     private static function typeToSettingsKeys(): array
     {
-        return [
+        $defaults = [
             self::TYPE_BOOKING_CONFIRMATION => [
                 'flag' => 'email_template_booking',
                 'subject' => 'email_tpl_booking_subject',
@@ -294,6 +294,22 @@ class TransactionalEmailTemplateService
                 'body' => 'email_tpl_abandoned_booking_recovery_final_body',
             ],
         ];
+
+        /**
+         * Allow Pro modules (Team & Access, etc.) to register additional
+         * transactional template types — each entry must be an array with
+         * `flag`, `subject`, `body` keys matching the option-name pattern
+         * used above. Once registered, the type participates in:
+         *   - sendIfEnabled() (flag gate + send)
+         *   - render() / renderWithStringTemplates() (templated subject/body)
+         *   - the Email → Templates UI (auto-discovered via the same map)
+         *
+         * Modules also need to hook `yatra_transactional_email_default_subject`
+         * and `..._default_body` to supply baseline copy for their type.
+         *
+         * @param array<string, array{flag:string,subject:string,body:string}> $defaults
+         */
+        return (array) apply_filters('yatra_transactional_email_type_to_keys', $defaults);
     }
 
     /**
@@ -615,6 +631,20 @@ class TransactionalEmailTemplateService
                 return sprintf(__('⚠️ [%s] Final reminder: complete your booking', 'yatra'), $site);
 
             default:
+                // Pro modules register their own types via
+                // `yatra_transactional_email_type_to_keys` — they
+                // supply default copy through this filter. Returning
+                // empty string means "no extension claimed this type"
+                // and we fall back to the generic notification line.
+                $custom = (string) apply_filters(
+                    'yatra_transactional_email_default_subject',
+                    '',
+                    $type,
+                    $v
+                );
+                if ($custom !== '') {
+                    return $custom;
+                }
                 /* translators: %s: site name. */
                 return sprintf(__('✉️ [%s] Notification', 'yatra'), $site);
         }
@@ -706,6 +736,20 @@ class TransactionalEmailTemplateService
                 return EmailTemplateDefaults::fallbackTransactionalAbandonedBookingRecoveryFinal($v);
 
             default:
+                // Pro modules register their own types via
+                // `yatra_transactional_email_type_to_keys` — they
+                // supply default body markup through this filter.
+                // Returning empty string falls back to the generic
+                // notification block.
+                $custom = (string) apply_filters(
+                    'yatra_transactional_email_default_body',
+                    '',
+                    $type,
+                    $v
+                );
+                if ($custom !== '') {
+                    return $custom;
+                }
                 return EmailTemplateLayout::customer(
                     '✉️',
                     __('Notification', 'yatra'),

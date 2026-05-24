@@ -402,31 +402,26 @@ class DiscountController extends BaseController
         return '';
     }
 
+    /**
+     * Discount management — gated on the dedicated `yatra_manage_discounts`
+     * cap. Held by Owner, Manager, and Marketing roles by default.
+     *
+     * The previous implementation gated on `yatra_view_bookings` /
+     * `yatra_edit_bookings`, which meant the Marketing role (which has
+     * `yatra_manage_discounts` but NOT the booking caps) could not
+     * actually manage discounts despite holding the documented cap.
+     * Sales Agent / Front Desk (which DO have the booking caps but
+     * NOT `yatra_manage_discounts`) were incorrectly granted access
+     * to discount management.
+     *
+     * WP admins pass via the Team module's admin-fallback filter.
+     */
     public function check_permission(?WP_REST_Request $request = null): bool
     {
-        if ($request === null) {
-            return true;
-        }
-
         if (!is_user_logged_in()) {
             return false;
         }
-
-        if (current_user_can('manage_options')) {
-            return true;
-        }
-
-        switch ($request->get_method()) {
-            case 'GET':
-                return current_user_can('yatra_view_bookings');
-            case 'POST':
-            case 'PUT':
-            case 'PATCH':
-            case 'DELETE':
-                return current_user_can('yatra_edit_bookings');
-            default:
-                return current_user_can('manage_options');
-        }
+        return current_user_can('yatra_manage_discounts');
     }
 
     /**

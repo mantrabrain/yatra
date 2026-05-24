@@ -28,8 +28,10 @@ import {
   UserCircle,
   Webhook,
   Users,
+  History,
+  RotateCcw,
 } from "lucide-react";
-import { __ } from "../lib/i18n";
+import { __, sprintf } from "../lib/i18n";
 import { PageHeader } from "../components/common/PageHeader";
 import {
   Card,
@@ -55,12 +57,15 @@ import {
 import { Pagination } from "../components/shared/Pagination";
 import { useToast } from "../components/ui/toast";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
+import { Modal } from "../components/ui/modal";
+import { Alert } from "../components/ui/alert";
 import {
   whatsappApi,
   type WhatsappMeta,
   type WhatsappSettings,
   type WhatsappSettingsResponse,
   type WhatsappTemplate,
+  type WhatsappTemplateVersion,
   type WhatsappEvent,
   type WhatsappWidgetSettings,
 } from "../api/whatsapp-api";
@@ -1026,6 +1031,9 @@ const TemplatesList: React.FC<{
   // Confirm-before-delete state, replaces native window.confirm()
   // for visual + accessibility consistency with the rest of the admin.
   const [pendingDelete, setPendingDelete] = useState<{ id: number; name: string } | null>(null);
+  // Version-history dialog state. Holds the template the operator
+  // clicked "History" on; null = dialog closed.
+  const [historyFor, setHistoryFor] = useState<{ id: number; name: string; isSystem: boolean } | null>(null);
 
   const deleteTpl = useMutation({
     mutationFn: (id: number) => whatsappApi.deleteTemplate(id),
@@ -1199,6 +1207,21 @@ const TemplatesList: React.FC<{
                             <Pencil className="mr-1.5 h-3.5 w-3.5" />
                             {__("Edit", "yatra")}
                           </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              setHistoryFor({
+                                id: tpl.id,
+                                name: tpl.name,
+                                isSystem: tpl.is_system,
+                              })
+                            }
+                            aria-label={__("Version history", "yatra")}
+                            title={__("Version history", "yatra")}
+                          >
+                            <History className="h-3.5 w-3.5" />
+                          </Button>
                           {!tpl.is_system && (
                             <Button
                               variant="outline"
@@ -1245,7 +1268,218 @@ const TemplatesList: React.FC<{
         variant="danger"
         isLoading={deleteTpl.isPending}
       />
+
+      <TemplateHistoryDialog
+        template={historyFor}
+        onClose={() => setHistoryFor(null)}
+      />
     </div>
+  );
+};
+
+/* -------------------------------------------------------------------------- */
+/*  Template version-history dialog                                           */
+/*                                                                            */
+/*  Lists every prior snapshot of a template newest-first. Each row shows     */
+/*  the version number, who edited, when, and a short summary of what they   */
+/*  changed. Clicking a row expands its body so the operator can compare      */
+/*  before/after at a glance. "Restore this version" rewrites the live row    */
+/*  with the snapshot's fields (honoring the system-row immutability rule —   */
+/*  for system templates only `is_active` restores).                          */
+/* -------------------------------------------------------------------------- */
+
+const TemplateHistoryDialog: React.FC<{
+  template: { id: number; name: string; isSystem: boolean } | null;
+  onClose: () => void;
+}> = ({ template, onClose }) => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [pendingRestore, setPendingRestore] = useState<WhatsappTemplateVersion | null>(null);
+
+  const enabled = template !== null;
+  const { data, isLoading } = useQuery({
+    queryKey: ["whatsapp-template-versions", template?.id],
+    queryFn: () => whatsappApi.listTemplateVersions(template!.id),
+    enabled,
+  });
+
+  const restore = useMutation({
+    mutationFn: (versionId: number) =>
+      whatsappApi.restoreTemplateVersion(template!.id, versionId),
+    onSuccess: (r) => {
+      showToast(r.message, "success");
+      void queryClient.invalidateQueries({ queryKey: ["whatsapp-templates"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["whatsapp-template-versions", template!.id],
+      });
+      setPendingRestore(null);
+    },
+    onError: (e: any) => {
+      showToast(extractError(e), "error");
+      setPendingRestore(null);
+    },
+  });
+
+  if (!template) return null;
+  const versions = data?.data ?? [];
+
+  return (
+    <Modal
+      isOpen
+      onClose={onClose}
+      title={sprintf(
+        /* translators: %s: template name */
+        __("Version history — %s", "yatra"),
+        template.name,
+      )}
+      size="xl"
+    >
+      <div className="space-y-3">
+        {template.isSystem && (
+          <Alert variant="info">
+            {__(
+              "Restoring a system template only resets its Active/Disabled toggle. Body, event binding, and recipient type are managed by the plugin and can't be reverted from history.",
+              "yatra",
+            )}
+          </Alert>
+        )}
+
+        {isLoading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          </div>
+        ) : versions.length === 0 ? (
+          <div className="text-center py-10">
+            <Clock className="w-10 h-10 text-gray-400 mx-auto" />
+            <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+              {__("No prior versions yet. Make an edit and history starts building from the next save.", "yatra")}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+            {versions.map((v) => {
+              const isExpanded = expandedId === v.id;
+              return (
+                <div
+                  key={v.id}
+                  className="rounded-md border border-gray-200 dark:border-gray-700"
+                >
+                  <button
+                    type="button"
+                    className="w-full flex items-start gap-3 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-800/40"
+                    onClick={() => setExpandedId(isExpanded ? null : v.id)}
+                  >
+                    <Badge className="bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 mt-0.5">
+                      v{v.version_number}
+                    </Badge>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm text-gray-900 dark:text-white">
+                        {v.change_summary || __("(no diff captured)", "yatra")}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-0.5">
+                        {v.created_at}
+                        {v.created_by !== null && (
+                          <span>
+                            {" · "}
+                            {sprintf(
+                              /* translators: %d: WP user id of the editor */
+                              __("by user #%d", "yatra"),
+                              v.created_by,
+                            )}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <ChevronDown
+                      className={`h-4 w-4 text-gray-400 mt-1 transition-transform ${
+                        isExpanded ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                  {isExpanded && (
+                    <div className="border-t border-gray-200 dark:border-gray-700 p-3 space-y-2 text-xs">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-gray-600 dark:text-gray-300">
+                        <div>
+                          <div className="font-medium text-gray-500">
+                            {__("Name", "yatra")}
+                          </div>
+                          <div>{v.snapshot.name || "—"}</div>
+                        </div>
+                        <div>
+                          <div className="font-medium text-gray-500">
+                            {__("Event", "yatra")}
+                          </div>
+                          <div className="font-mono">
+                            {v.snapshot.event_key || "—"}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="font-medium text-gray-500">
+                            {__("Recipient", "yatra")}
+                          </div>
+                          <div>{v.snapshot.recipient_type || "—"}</div>
+                        </div>
+                        <div>
+                          <div className="font-medium text-gray-500">
+                            {__("Active", "yatra")}
+                          </div>
+                          <div>
+                            {v.snapshot.is_active
+                              ? __("Yes", "yatra")
+                              : __("No", "yatra")}
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-medium text-gray-500">
+                          {__("Body", "yatra")}
+                        </div>
+                        <pre className="mt-1 whitespace-pre-wrap rounded bg-gray-50 dark:bg-gray-800/50 p-2 font-mono text-[11px] max-h-48 overflow-y-auto">
+                          {v.snapshot.body || "—"}
+                        </pre>
+                      </div>
+                      <div className="flex justify-end pt-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setPendingRestore(v)}
+                        >
+                          <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                          {__("Restore this version", "yatra")}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      <ConfirmationDialog
+        isOpen={pendingRestore !== null}
+        onClose={() => {
+          if (!restore.isPending) setPendingRestore(null);
+        }}
+        onConfirm={() => {
+          if (pendingRestore) restore.mutate(pendingRestore.id);
+        }}
+        title={__("Restore this version?", "yatra")}
+        description={
+          pendingRestore
+            ? sprintf(
+                __("This rewrites the live template with v%d's contents. The current state is saved as a new version first so you can roll back this restore later.", "yatra"),
+                pendingRestore.version_number,
+              )
+            : ""
+        }
+        confirmText={__("Restore version", "yatra")}
+        cancelText={__("Cancel", "yatra")}
+        isLoading={restore.isPending}
+      />
+    </Modal>
   );
 };
 

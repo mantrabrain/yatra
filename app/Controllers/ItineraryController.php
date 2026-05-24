@@ -93,6 +93,34 @@ class ItineraryController extends BaseController
     }
 
     /**
+     * Itinerary endpoints are bound to a trip. Reads use the view-trips
+     * cap (Sales Agent / Front Desk / Guide / Auditor all hold this);
+     * writes use the edit-trips cap. WP admins pass via the Team
+     * module's admin-fallback filter. Overrides BaseController's default
+     * which was the coarse `manage_options` check.
+     */
+    public function check_permission(?WP_REST_Request $request = null): bool
+    {
+        if ($request === null) {
+            return true;
+        }
+        if (!is_user_logged_in()) {
+            return false;
+        }
+        switch ($request->get_method()) {
+            case 'GET':
+                return current_user_can('yatra_view_trips');
+            case 'POST':
+            case 'PUT':
+            case 'PATCH':
+            case 'DELETE':
+                return current_user_can('yatra_edit_trips');
+            default:
+                return current_user_can('yatra_view_trips');
+        }
+    }
+
+    /**
      * Get items by trip ID
      */
     public function get_items_by_trip(WP_REST_Request $request)

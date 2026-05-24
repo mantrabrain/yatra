@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel-agency, wordpress-trav
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 3.0.4
+Stable tag: 3.0.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -88,6 +88,7 @@ WordPress travel booking plugin for tour operators. Trips, departures, payments,
 
 * [Channel Manager](https://wpyatra.com/features/channel-manager/) — sell on Viator + GetYourGuide from one WordPress dashboard. Signed webhooks, anti-overbooking locks, real-time inventory sync.
 * [White Label](https://wpyatra.com/features/white-label/) — rebrand the admin, emails, PDFs and frontend. Full agency theming.
+* [Team & Access](https://wpyatra.com/features/team-access/) — granular roles + capability-based access for multi-staff agencies. 8 built-in roles, custom role builder, magic-link invitations, time-windowed access for contractors, scope filtering (per-destination / per-trip), append-only audit log. Defense-in-depth: every action gated on the server, UI mirrors via cap-aware controls.
 
 **Lifetime plans** also available: Personal $499 · Growth $999 · Agency $1,999 — pay once, own it forever.
 
@@ -261,6 +262,18 @@ Pricing starts at **$99/yr** (Personal, sale) and goes up to **$499/yr** (Agency
 6. Traveler account — bookings, payments and documents
 
 == Changelog ==
+
+= 3.0.5 =
+* **Capability registry foundation:** the free plugin now ships a `user_has_cap` filter at priority 7 (`AdminServiceProvider::bootstrapMenuCapability()`) that reads the `yatra_team_role_enforcement_active` filter signal to decide whether non-admin `yatra_*` caps resolve normally or get stripped. When the Pro Team & Access module is enabled (or its "keep access on disable" setting is on), the signal returns true and caps resolve. When Pro is deactivated or the module is off without that opt-in, non-admin yatra_* caps are stripped so existing role assignments become inert — re-activating restores everything. WP administrators always pass via the admin fallback regardless.
+* **Cap-string consistency sweep:** every React page that gated UI on `manage_yatra` now references the canonical registered cap (`yatra_manage_settings`, `yatra_manage_emails`, `yatra_access_admin`). New caps registered: `yatra_view_reviews`, `yatra_edit_reviews`, `yatra_delete_reviews`, `yatra_manage_reviews`. Inline cap checks inside `TripController::restore_revision` and `SingleTripController` draft-preview gain `manage_options` fallback so site owners never fail.
+* **`isWpAdmin` always injected:** `AdminAssetsProvider` now always injects `isWpAdmin` and `manage_options` into `window.yatraAdmin.capabilities` (was previously only set by the Pro Team module). Fixes the regression where Reviews + Email Templates didn't load data for admins on free-only or Team-disabled installs. React `usePermissions.can()` gets a triple admin-fallback (isWpAdmin → roles.administrator → capabilities.manage_options) so admins always pass regardless of injection edge cases.
+* **Customer + Availability controllers:** `CustomerController::checkAdminPermission`, `AvailabilitySpecificDatesController::checkPermission`, and `AvailabilityRecurringRulesController::checkPermission` now accept the registered Team caps (`yatra_edit_customers`, `yatra_edit_trips`) in addition to the legacy `manage_options` and pre-existing legacy caps (kept as OR-arms for back-compat with any hand-grant filter).
+* **Transactional email types are now extensible:** `TransactionalEmailTemplateService::typeToSettingsKeys()` exposes the `yatra_transactional_email_type_to_keys` filter so Pro modules can register their own type → settings-keys mapping. Default subject/body lookups expose `yatra_transactional_email_default_subject` and `yatra_transactional_email_default_body` so modules can supply baseline copy. Powers the new Team module's customizable invitation email surface.
+* **Try Yatra Pro pill:** subtle amber pill appears next to the page title on every admin page when the Pro plugin is NOT active. Links to `https://try.wpyatra.com/try-yatra-pro/` (no credit card required). Hidden as soon as Pro is active.
+* **UX polish:** `SharedTable` action-menu dropdown shadow reduced from `shadow-2xl` to `shadow-md` (matches the rest of the admin design); modal-body data loaders replaced with Skeleton blocks (Team page, MemberEditDrawer, RoleEditDrawer, AddMemberModal candidate picker); Departure save/cancel redirect now returns to the Departures page instead of the Trips page; Email page tabs (Delivery, Templates, Sequences, Logs) persist in the URL so direct links and reload work.
+* **Reviews + Email registry:** `Layout.tsx` sidebar entry for Reviews now gates on `yatra_view_reviews` (was `yatra_view_trips`); `useEmailSettingsManager` gates on `yatra_manage_emails` (was the unregistered `manage_yatra`).
+* **Version:** Yatra free **3.0.5**. Pair with **Yatra Pro 3.0.3** for the Team & Access module.
+* Safe to update from 3.0.4.
 
 = 3.0.4 =
 * **Unicode / Cyrillic slugs (end-to-end):** `SlugHelper::generate()` now rawurldecodes percent-encoded UTF-8 and uses `mb_strtolower` with a Unicode-aware regex (`\pL\pN`), so Cyrillic / CJK trip, destination, activity, and category slugs round-trip cleanly through validators and pretty-permalink routing. `ActivityValidator`, `DestinationValidator`, and `TripValidator` now route raw user input through `SlugHelper` instead of `sanitize_title` (which stripped non-ASCII characters down to a single dash). `PrettyRouteMatcher` decodes captured slugs the same way before lookup, so a URL like `/trip/токио/` resolves correctly.

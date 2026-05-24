@@ -30,7 +30,7 @@ import {
   Power,
   PowerOff,
 } from "lucide-react";
-import { __ } from "../lib/i18n";
+import { __, sprintf } from "../lib/i18n";
 import { PageHeader } from "../components/common/PageHeader";
 import {
   Card,
@@ -72,12 +72,18 @@ import {
  *   - Logs:     audit of every push/pull/webhook event
  */
 
-type CmTab = "channels" | "mappings" | "bookings" | "logs";
+type CmTab = "channels" | "mappings" | "bookings" | "logs" | "reconciliation" | "latency";
 
 function getInitialTab(): CmTab {
   if (typeof window === "undefined") return "channels";
   const tab = new URLSearchParams(window.location.search).get("tab");
-  if (tab === "mappings" || tab === "bookings" || tab === "logs") return tab;
+  if (
+    tab === "mappings"
+    || tab === "bookings"
+    || tab === "logs"
+    || tab === "reconciliation"
+    || tab === "latency"
+  ) return tab;
   return "channels";
 }
 
@@ -128,6 +134,12 @@ const ChannelManager: React.FC = () => {
     { key: "mappings", label: __("Trip mappings", "yatra"), icon: LinkIcon },
     { key: "bookings", label: __("Bookings inbox", "yatra"), icon: Inbox },
     { key: "logs", label: __("Sync activity", "yatra"), icon: Clock },
+    // Reconciliation answers "where do I have unfinished business?" —
+    // stale mappings, pending booking promotions, breaker states.
+    { key: "reconciliation", label: __("Reconciliation", "yatra"), icon: AlertTriangle },
+    // Latency answers "are my OTAs slow today?" — p50/p95/p99 of
+    // sync durations across 24h + 7d windows.
+    { key: "latency", label: __("Latency", "yatra"), icon: Activity },
   ];
 
   return (
@@ -174,6 +186,10 @@ const ChannelManager: React.FC = () => {
             <MappingsSection />
           ) : activeTab === "bookings" ? (
             <BookingsSection />
+          ) : activeTab === "reconciliation" ? (
+            <ReconciliationSection />
+          ) : activeTab === "latency" ? (
+            <LatencySection />
           ) : (
             <LogsSection />
           )}
@@ -657,6 +673,12 @@ const ChannelEditForm: React.FC<{
     existing?.commission_percent ?? 0,
   );
   const [buffer, setBuffer] = useState<number>(existing?.inventory_buffer ?? 0);
+  // Per-channel IP allowlist for the inbound webhook receiver. Stored
+  // in the channel's `settings` JSON under `allowed_ips`. Empty = no
+  // restriction (default). Comma- and/or newline-separated CIDR list.
+  const [allowedIps, setAllowedIps] = useState<string>(
+    ((existing?.settings as Record<string, unknown> | undefined)?.allowed_ips as string) ?? "",
+  );
 
   const typeDef = useMemo(
     () => meta.channel_types.find((t) => t.type === channelType) ?? null,
@@ -675,6 +697,13 @@ const ChannelEditForm: React.FC<{
         default_offset_percent: defaultOffset,
         commission_percent: commission,
         inventory_buffer: buffer,
+        // Merge into existing settings so unrelated keys (per-provider
+        // overrides, custom fields a future feature might add) are
+        // preserved on update.
+        settings: {
+          ...((existing?.settings as Record<string, unknown> | undefined) ?? {}),
+          allowed_ips: allowedIps,
+        },
       };
       return isCreate
         ? channelManagerApi.createChannel(payload)
@@ -1005,6 +1034,23 @@ const ChannelEditForm: React.FC<{
               />
             </FormField>
           </div>
+
+          {!isCreate && (
+            <FormField
+              label={__("Inbound webhook IP allowlist", "yatra")}
+              description={__(
+                "Optional defense-in-depth on top of the signature secret. Comma- or newline-separated CIDRs. Empty = no restriction (default). When set, inbound webhook deliveries from any source outside the list are dropped BEFORE signature verification.",
+                "yatra",
+              )}
+            >
+              <textarea
+                className="w-full font-mono text-xs px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 min-h-[80px]"
+                value={allowedIps}
+                onChange={(e) => setAllowedIps(e.target.value)}
+                placeholder={"203.0.113.0/24\n198.51.100.42"}
+              />
+            </FormField>
+          )}
         </CardContent>
       </Card>
 
@@ -2254,6 +2300,457 @@ const BookingsSection: React.FC = () => {
     </div>
   );
 };
+
+/* -------------------------------------------------------------------------- */
+/*  Reconciliation tab                                                        */
+/*                                                                            */
+/*  Cross-channel "where do I have unfinished business?" view. Pre-aggregated */
+/*  on the server so this is one HTTP call, not channel-by-channel polling.   */
+/*  Drives the "needs_attention" badges on each channel card.                 */
+/* -------------------------------------------------------------------------- */
+
+const ReconciliationSection: React.FC = () => {
+  const { data, isLoading, refetch, isFetching } = useQuery({
+    queryKey: ["cm-reconciliation"],
+    queryFn: () => channelManagerApi.getReconciliation(),
+    refetchOnWindowFocus: false,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+  const report = data?.data;
+  if (!report) return null;
+  const t = report.totals;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            {__("Reconciliation report", "yatra")}
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {__(
+              "Generated on demand from the sync log + mapping + booking tables. Refresh to recompute.",
+              "yatra",
+            )}
+          </p>
+          <p className="text-xs text-gray-400 mt-0.5">
+            {sprintf(
+              /* translators: %s: timestamp */
+              __("Generated at %s", "yatra"),
+              report.generated_at,
+            )}
+          </p>
+        </div>
+        <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
+          <RefreshCw className={`h-4 w-4 mr-1 ${isFetching ? "animate-spin" : ""}`} />
+          {__("Refresh", "yatra")}
+        </Button>
+      </div>
+
+      {/* Global totals */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <KpiCard
+          label={__("Channels enabled", "yatra")}
+          value={`${t.channels.enabled} / ${t.channels.total}`}
+          icon={<Network className="h-4 w-4 text-blue-500" />}
+        />
+        <KpiCard
+          label={__("Active mappings", "yatra")}
+          value={t.mappings_active}
+          icon={<LinkIcon className="h-4 w-4 text-indigo-500" />}
+        />
+        <KpiCard
+          label={__("Stale mappings", "yatra")}
+          value={t.inventory_stale}
+          icon={<AlertTriangle className="h-4 w-4 text-amber-500" />}
+          tone={t.inventory_stale > 0 ? "warn" : "ok"}
+        />
+        <KpiCard
+          label={__("Open breakers", "yatra")}
+          value={t.breakers_open}
+          icon={<PowerOff className="h-4 w-4 text-red-500" />}
+          tone={t.breakers_open > 0 ? "bad" : "ok"}
+        />
+        <KpiCard
+          label={__("Pending booking promotions", "yatra")}
+          value={t.bookings_pending}
+          icon={<Inbox className="h-4 w-4 text-purple-500" />}
+          tone={t.bookings_pending > 0 ? "warn" : "ok"}
+        />
+        <KpiCard
+          label={__("Failed booking promotions (7d)", "yatra")}
+          value={t.bookings_failed_7d}
+          icon={<AlertTriangle className="h-4 w-4 text-red-500" />}
+          tone={t.bookings_failed_7d > 0 ? "bad" : "ok"}
+        />
+        <KpiCard
+          label={__("Syncs OK (24h)", "yatra")}
+          value={t.syncs_24h.success}
+          icon={<CheckCircle2 className="h-4 w-4 text-green-500" />}
+        />
+        <KpiCard
+          label={__("Syncs failed (24h)", "yatra")}
+          value={t.syncs_24h.failed}
+          icon={<AlertTriangle className="h-4 w-4 text-amber-500" />}
+          tone={t.syncs_24h.failed > 0 ? "warn" : "ok"}
+        />
+      </div>
+
+      {/* Per-channel breakdown */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{__("Per channel", "yatra")}</CardTitle>
+          <CardDescription>
+            {__(
+              "Channels marked “Needs attention” have stale mappings, pending bookings, recent failures, or a tripped breaker.",
+              "yatra",
+            )}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-50 dark:bg-gray-800/40 border-b border-gray-200 dark:border-gray-700">
+                <tr>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                    {__("Channel", "yatra")}
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                    {__("Mappings", "yatra")}
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                    {__("Bookings", "yatra")}
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                    {__("Syncs (24h)", "yatra")}
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                    {__("Breaker", "yatra")}
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                    {__("Latest failure", "yatra")}
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                    {__("Status", "yatra")}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {report.channels.map((c) => (
+                  <tr
+                    key={c.channel.id}
+                    className={
+                      c.needs_attention
+                        ? "bg-amber-50/40 dark:bg-amber-900/10"
+                        : ""
+                    }
+                  >
+                    <td className="px-3 py-2">
+                      <div className="font-medium text-gray-900 dark:text-white">
+                        {c.channel.display_name || `#${c.channel.id}`}
+                      </div>
+                      <div className="text-xs text-gray-500 font-mono">
+                        {c.channel.type}
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 text-xs">
+                      {sprintf(__("%d active", "yatra"), c.mappings.active)}
+                      {c.mappings.stale > 0 && (
+                        <div className="text-amber-600 dark:text-amber-400 mt-0.5">
+                          {sprintf(__("%d stale", "yatra"), c.mappings.stale)}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 text-xs">
+                      {c.bookings.pending > 0 ? (
+                        <div className="text-amber-600 dark:text-amber-400">
+                          {sprintf(__("%d pending", "yatra"), c.bookings.pending)}
+                        </div>
+                      ) : (
+                        <span className="text-gray-400">—</span>
+                      )}
+                      {c.bookings.failed_7d > 0 && (
+                        <div className="text-red-600 dark:text-red-400">
+                          {sprintf(__("%d failed (7d)", "yatra"), c.bookings.failed_7d)}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 text-xs">
+                      <span className="text-green-700 dark:text-green-400">
+                        {c.syncs.success_24h} OK
+                      </span>
+                      {c.syncs.failed_24h > 0 && (
+                        <>
+                          {" / "}
+                          <span className="text-red-700 dark:text-red-400">
+                            {c.syncs.failed_24h} fail
+                          </span>
+                        </>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 text-xs">
+                      <Badge
+                        className={
+                          c.breaker.state === "closed"
+                            ? "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                            : "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                        }
+                      >
+                        {c.breaker.state}
+                      </Badge>
+                    </td>
+                    <td className="px-3 py-2 text-xs text-gray-600 dark:text-gray-300 max-w-sm">
+                      {c.latest_failure ? (
+                        <>
+                          <div className="font-mono">
+                            {c.latest_failure.operation}
+                            {c.latest_failure.http_status !== null
+                              ? ` (${c.latest_failure.http_status})`
+                              : ""}
+                          </div>
+                          <div className="text-gray-500 truncate">
+                            {c.latest_failure.error_message}
+                          </div>
+                          <div className="text-gray-400 text-[10px] mt-0.5">
+                            {c.latest_failure.occurred_at}
+                          </div>
+                        </>
+                      ) : (
+                        <span className="text-gray-400">—</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2">
+                      {c.needs_attention ? (
+                        <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                          <AlertTriangle className="h-3 w-3 mr-1" />
+                          {__("Needs attention", "yatra")}
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                          <CheckCircle2 className="h-3 w-3 mr-1" />
+                          {__("Healthy", "yatra")}
+                        </Badge>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+const KpiCard: React.FC<{
+  label: string;
+  value: string | number;
+  icon: React.ReactNode;
+  tone?: "ok" | "warn" | "bad";
+}> = ({ label, value, icon, tone = "ok" }) => {
+  const ring =
+    tone === "bad"
+      ? "border-red-200 dark:border-red-800"
+      : tone === "warn"
+        ? "border-amber-200 dark:border-amber-800"
+        : "border-gray-200 dark:border-gray-700";
+  return (
+    <div className={`rounded-md border ${ring} bg-white dark:bg-gray-900 p-3`}>
+      <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+        {icon}
+        {label}
+      </div>
+      <div className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+        {value}
+      </div>
+    </div>
+  );
+};
+
+/* -------------------------------------------------------------------------- */
+/*  Latency tab — avg / p50 / p95 / p99 across windows                        */
+/* -------------------------------------------------------------------------- */
+
+const LatencySection: React.FC = () => {
+  const { data, isLoading, refetch, isFetching } = useQuery({
+    queryKey: ["cm-latency"],
+    queryFn: () => channelManagerApi.getLatency(),
+    refetchOnWindowFocus: false,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+  const report = data?.data;
+  if (!report) return null;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            {__("Sync latency", "yatra")}
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {__(
+              "Percentiles over the duration_ms column of the sync log. Nearest-rank percentiles capped at ",
+              "yatra",
+            )}
+            {report.sample_cap}{" "}
+            {__("recent samples per channel per window.", "yatra")}
+          </p>
+        </div>
+        <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
+          <RefreshCw className={`h-4 w-4 mr-1 ${isFetching ? "animate-spin" : ""}`} />
+          {__("Refresh", "yatra")}
+        </Button>
+      </div>
+
+      <LatencyTable
+        title={__("Global", "yatra")}
+        rows={[
+          {
+            label: __("Last 24h", "yatra"),
+            window: report.global.last_24h,
+          },
+          {
+            label: __("Last 7d", "yatra"),
+            window: report.global.last_7d,
+          },
+        ]}
+      />
+
+      <LatencyTable
+        title={__("Per provider", "yatra")}
+        rows={report.per_provider.flatMap((p) => [
+          { label: `${p.provider} · ${__("24h", "yatra")}`, window: p.last_24h },
+          { label: `${p.provider} · ${__("7d", "yatra")}`, window: p.last_7d },
+        ])}
+      />
+
+      <LatencyTable
+        title={__("Per channel", "yatra")}
+        rows={report.per_channel.flatMap((c) => [
+          {
+            label: `${c.channel.display_name || `#${c.channel.id}`} · ${__("24h", "yatra")}`,
+            window: c.last_24h,
+          },
+          {
+            label: `${c.channel.display_name || `#${c.channel.id}`} · ${__("7d", "yatra")}`,
+            window: c.last_7d,
+          },
+        ])}
+      />
+    </div>
+  );
+};
+
+const LatencyTable: React.FC<{
+  title: string;
+  rows: Array<{
+    label: string;
+    window: {
+      samples: number;
+      avg_ms: number | null;
+      p50_ms: number | null;
+      p95_ms: number | null;
+      p99_ms: number | null;
+      success_count: number;
+      fail_count: number;
+    };
+  }>;
+}> = ({ title, rows }) => {
+  if (rows.length === 0) return null;
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gray-50 dark:bg-gray-800/40 border-b border-gray-200 dark:border-gray-700">
+              <tr>
+                <th className="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                  {__("Scope", "yatra")}
+                </th>
+                <th className="px-3 py-2 text-right font-medium text-gray-700 dark:text-gray-300">
+                  {__("Samples", "yatra")}
+                </th>
+                <th className="px-3 py-2 text-right font-medium text-gray-700 dark:text-gray-300">
+                  {__("Avg", "yatra")}
+                </th>
+                <th className="px-3 py-2 text-right font-medium text-gray-700 dark:text-gray-300">
+                  p50
+                </th>
+                <th className="px-3 py-2 text-right font-medium text-gray-700 dark:text-gray-300">
+                  p95
+                </th>
+                <th className="px-3 py-2 text-right font-medium text-gray-700 dark:text-gray-300">
+                  p99
+                </th>
+                <th className="px-3 py-2 text-right font-medium text-gray-700 dark:text-gray-300">
+                  {__("OK / Fail", "yatra")}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              {rows.map((r, idx) => (
+                <tr key={`${r.label}-${idx}`}>
+                  <td className="px-3 py-2 text-gray-900 dark:text-white">
+                    {r.label}
+                  </td>
+                  <td className="px-3 py-2 text-right tabular-nums">
+                    {r.window.samples}
+                  </td>
+                  <td className="px-3 py-2 text-right tabular-nums">
+                    {fmtMs(r.window.avg_ms)}
+                  </td>
+                  <td className="px-3 py-2 text-right tabular-nums">
+                    {fmtMs(r.window.p50_ms)}
+                  </td>
+                  <td className="px-3 py-2 text-right tabular-nums">
+                    {fmtMs(r.window.p95_ms)}
+                  </td>
+                  <td className="px-3 py-2 text-right tabular-nums">
+                    {fmtMs(r.window.p99_ms)}
+                  </td>
+                  <td className="px-3 py-2 text-right text-xs">
+                    <span className="text-green-700 dark:text-green-400">
+                      {r.window.success_count}
+                    </span>
+                    {" / "}
+                    <span className="text-red-700 dark:text-red-400">
+                      {r.window.fail_count}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+function fmtMs(v: number | null): string {
+  if (v === null || v === undefined) return "—";
+  if (v >= 1000) return `${(v / 1000).toFixed(2)}s`;
+  return `${v} ms`;
+}
 
 /* -------------------------------------------------------------------------- */
 /*  Logs tab                                                                  */

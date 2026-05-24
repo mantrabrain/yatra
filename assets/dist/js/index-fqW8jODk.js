@@ -1,4 +1,4 @@
-import { $ as getDefaultExportFromCjs, r as reactExports, j as jsxRuntimeExports, au as X, aD as Info, O as AlertTriangle, ax as AlertCircle, aB as CheckCircle2 } from "./react-vendor-Cos5mGlP.js";
+import { a0 as getDefaultExportFromCjs, r as reactExports, j as jsxRuntimeExports, ax as X, aF as Info, Q as AlertTriangle, az as AlertCircle, aD as CheckCircle2 } from "./react-vendor-CqkbFEvK.js";
 function memize(fn, options) {
   var size = 0;
   var head;
@@ -904,6 +904,11 @@ function sprintf(format, ...args) {
     format,
     ...args
   );
+}
+function brandName() {
+  var _a;
+  if (typeof window === "undefined") return "Yatra";
+  return ((_a = window.yatraAdmin) == null ? void 0 : _a.brandName) || "Yatra";
 }
 const _n = (single, plural, number) => {
   return number === 1 ? __(single) : __(plural);
@@ -2178,17 +2183,18 @@ export {
   __ as _,
   apiClient as a,
   apiService as b,
-  __$1 as c,
-  getCurrencyOptions as d,
-  ajaxService as e,
+  brandName as c,
+  ajaxService as d,
+  applyCurrencyPosition as e,
   formatYatraMoney as f,
   getCurrencySymbol as g,
-  applyCurrencyPosition as h,
-  _n as i,
+  _n as h,
+  getCurrencyOptions as i,
+  __$1 as j,
   normalizeCurrencyPosition as n,
   readYatraCurrencyPositionFromWindow as r,
   sprintf as s,
   useToast as u,
   wpService as w
 };
-//# sourceMappingURL=index-PSYjntAM.js.map
+//# sourceMappingURL=index-fqW8jODk.js.map

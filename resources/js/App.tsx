@@ -1,8 +1,48 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, Suspense, lazy } from "react";
 import Layout from "./components/Layout";
+import { Skeleton } from "./components/ui/skeleton";
+
+/*
+ * Page-loading strategy.
+ *
+ * Pages >1500 lines are split into separate chunks via React.lazy so they
+ * land in the JS bundle on demand instead of inflating the initial paint.
+ * Vite picks these up automatically as separate output files — operators
+ * who never visit the Whatsapp tab never download its ~80KB of code.
+ *
+ * Pages that ship eagerly:
+ *   - Dashboard: the default landing route, almost always rendered first
+ *   - Smaller list pages (Trips, Bookings, Customers, etc.) where the
+ *     lazy-chunk overhead (extra HTTP round-trip on first nav) outweighs
+ *     the bytes saved on initial paint
+ *
+ * Pages that ship lazily (in line-count order, biggest savings first):
+ *   - TripForm        (9.6k loc)
+ *   - Settings        (8.6k loc)
+ *   - Team            (3.5k loc)
+ *   - Reports         (3.1k loc)
+ *   - DiscountForm    (2.7k loc)
+ *   - Itinerary       (2.7k loc)
+ *   - RecurringRuleForm (2.6k loc)
+ *   - Whatsapp        (2.6k loc)
+ *   - ChannelManager  (2.5k loc)
+ *   - Webhooks        (2.5k loc)
+ *   - TripConsentForm (2.1k loc)
+ *   - BookingForm     (1.8k loc)
+ *   - DynamicPricing  (1.8k loc)
+ *   - AvailabilityForm (1.7k loc)
+ *   - AiAssistant     (1.6k loc)
+ *   - AbandonedRecovery (1.6k loc)
+ *   - WhiteLabel      (1.6k loc)
+ *   - DynamicPricingRuleForm (1.5k loc)
+ *   - ViewBooking     (1.5k loc)
+ *
+ * If you add a new heavy page, lazy-import it here too; cheap to add and
+ * the only thing to remember is that lazy components must be rendered
+ * inside a <Suspense> boundary (we wrap the whole renderPage() output).
+ */
 import Dashboard from "./pages/Dashboard";
 import Trips from "./pages/Trips";
-import TripForm from "./pages/TripForm";
 import Activities from "./pages/Activities";
 import ActivityForm from "./pages/ActivityForm";
 import Destinations from "./pages/Destinations";
@@ -12,33 +52,25 @@ import CategoryForm from "./pages/CategoryForm";
 import DifficultyLevels from "./pages/DifficultyLevels";
 import DifficultyLevelForm from "./pages/DifficultyLevelForm";
 import Bookings from "./pages/Bookings";
-import BookingForm from "./pages/BookingForm";
-import ViewBooking from "./pages/ViewBooking";
 import Customers from "./pages/Customers";
 import CustomerForm from "./pages/CustomerForm";
 import ViewCustomer from "./pages/ViewCustomer";
 import Reviews from "./pages/Reviews";
 import ReviewForm from "./pages/ReviewForm";
 import ViewReview from "./pages/ViewReview";
-import Reports from "./pages/Reports";
 import Tools from "./components/Tools";
-import Settings from "./pages/Settings";
 import ItemTypes from "./pages/ItemTypes";
 import ItemTypeForm from "./pages/ItemTypeForm";
 import Items from "./pages/Items";
 import ItemForm from "./pages/ItemForm";
-import Itinerary from "./pages/Itinerary";
 import ItineraryForm from "./pages/ItineraryForm";
 import Discounts from "./pages/Discounts";
-import DiscountForm from "./pages/DiscountForm";
 import Payments from "./pages/Payments";
 import PaymentForm from "./pages/PaymentForm";
 import ViewPayment from "./pages/ViewPayment";
 import TravelerCategories from "./pages/TravelerCategories";
 import TravelerCategoryForm from "./pages/TravelerCategoryForm";
 import Availability from "./pages/Availability";
-import AvailabilityForm from "./pages/AvailabilityForm";
-import RecurringRuleForm from "./pages/RecurringRuleForm";
 import Departures from "./pages/Departures";
 import DepartureForm from "./pages/DepartureForm";
 import ViewDeparture from "./pages/ViewDeparture";
@@ -51,21 +83,49 @@ import GoogleCalendar from "./pages/GoogleCalendar";
 import AdditionalServices from "./pages/AdditionalServices";
 import AdditionalServicesForm from "./pages/AdditionalServicesForm";
 import TripConsent from "./pages/TripConsent";
-import TripConsentForm from "./pages/TripConsentForm";
 import EmailAutomation from "./pages/EmailAutomation";
 import EmailTemplateForm from "./pages/EmailTemplateForm";
 import EmailSequenceForm from "./pages/EmailSequenceForm";
-import AbandonedRecovery from "./pages/AbandonedRecovery";
-import DynamicPricing from "./pages/DynamicPricing";
-import DynamicPricingRuleForm from "./pages/DynamicPricingRuleForm";
 import Attributes from "./pages/Attributes";
 import AttributeForm from "./pages/AttributeForm";
 import License from "./pages/License";
-import WhiteLabel from "./pages/WhiteLabel";
-import AiAssistant from "./pages/AiAssistant";
-import Whatsapp from "./pages/Whatsapp";
-import ChannelManager from "./pages/ChannelManager";
-import Webhooks from "./pages/Webhooks";
+
+// Lazy-loaded heavy pages — each becomes its own JS chunk.
+const TripForm = lazy(() => import("./pages/TripForm"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Team = lazy(() => import("./pages/Team"));
+const Reports = lazy(() => import("./pages/Reports"));
+const DiscountForm = lazy(() => import("./pages/DiscountForm"));
+const Itinerary = lazy(() => import("./pages/Itinerary"));
+const RecurringRuleForm = lazy(() => import("./pages/RecurringRuleForm"));
+const Whatsapp = lazy(() => import("./pages/Whatsapp"));
+const ChannelManager = lazy(() => import("./pages/ChannelManager"));
+const Webhooks = lazy(() => import("./pages/Webhooks"));
+const TripConsentForm = lazy(() => import("./pages/TripConsentForm"));
+const BookingForm = lazy(() => import("./pages/BookingForm"));
+const ViewBooking = lazy(() => import("./pages/ViewBooking"));
+const AvailabilityForm = lazy(() => import("./pages/AvailabilityForm"));
+const DynamicPricing = lazy(() => import("./pages/DynamicPricing"));
+const DynamicPricingRuleForm = lazy(() => import("./pages/DynamicPricingRuleForm"));
+const AiAssistant = lazy(() => import("./pages/AiAssistant"));
+const AbandonedRecovery = lazy(() => import("./pages/AbandonedRecovery"));
+const WhiteLabel = lazy(() => import("./pages/WhiteLabel"));
+
+/**
+ * Suspense fallback used between an old route unmounting and the new
+ * lazy chunk's JS arriving. Stays compact — a skeleton matching the
+ * common page-header / table shape so layout doesn't jump.
+ */
+const PageLoadingFallback: React.FC = () => (
+  <div className="space-y-6">
+    <div className="space-y-2">
+      <Skeleton className="h-6 w-1/3" />
+      <Skeleton className="h-4 w-2/3" />
+    </div>
+    <Skeleton className="h-12 w-full" />
+    <Skeleton className="h-64 w-full" />
+  </div>
+);
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -332,13 +392,19 @@ const App: React.FC = () => {
         return <ChannelManager />;
       case "webhooks":
         return <Webhooks />;
+      case "team":
+        return <Team />;
       case "dashboard":
       default:
         return <Dashboard />;
     }
   };
 
-  return <Layout>{renderPage()}</Layout>;
+  return (
+    <Layout>
+      <Suspense fallback={<PageLoadingFallback />}>{renderPage()}</Suspense>
+    </Layout>
+  );
 };
 
 export default App;

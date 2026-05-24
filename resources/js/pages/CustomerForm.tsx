@@ -311,7 +311,7 @@ const CustomerForm: React.FC = () => {
         }
       />
 
-      <ConditionalRender capability="yatra_edit_bookings">
+      <ConditionalRender capability="yatra_edit_customers">
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
             {/* Main Form Fields */}

@@ -328,6 +328,22 @@ class ModuleManager
                 'requires_agency' => true,
                 'settings_page' => 'webhooks',
             ],
+            [
+                'slug' => 'team',
+                'name' => __('Team & Access', 'yatra'),
+                'description' => __('Granular roles + capability-based access control for multi-staff agencies. Eight shipped roles (Owner, Manager, Sales Agent, Front Desk, Guide, Accountant, Marketing, Auditor) plus custom role builder. Per-user capability grants/revokes, row-level scope assignment (destination / activity / trip), magic-link invitations, append-only audit log with 180-day retention, and 2FA enforcement per role. Defense-in-depth: every REST route enforces capabilities server-side; the React UI mirrors via <Can/> for UX only.', 'yatra'),
+                'category' => __('Team', 'yatra'),
+                'docs_url' => 'https://docs.yatra.com/modules/team',
+                'is_premium' => true,
+                'purchase_url' => 'https://wpyatra.com/pricing?module=team',
+                'is_core' => false,
+                'enabled' => false,
+                'tags' => ['team', 'access', 'roles', 'permissions', 'rbac', 'audit-log', 'agency', 'sso', 'invitations'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
+                'requires_pro' => true,
+                'requires_agency' => true,
+                'settings_page' => 'team',
+            ],
         ];
         
         return apply_filters('yatra_default_modules', $modules);

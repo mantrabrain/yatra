@@ -265,7 +265,14 @@ export function useEmailSettingsManager() {
         throw error;
       }
     },
-    enabled: can("manage_yatra"),
+    // Was `manage_yatra` — that's not a registered Yatra cap, so the
+    // check returned false for everyone except admins-via-fallback,
+    // which silently broke the Email page on installs where the
+    // admin fallback wasn't yet wired (free, or Pro pre-Team). The
+    // canonical cap for the Email hub is `yatra_manage_emails`,
+    // registered in the Team module's CapabilityRegistry and held
+    // by Marketing role + Owner / Manager.
+    enabled: can("yatra_manage_emails"),
   });
 
   const serverSlice = useMemo(

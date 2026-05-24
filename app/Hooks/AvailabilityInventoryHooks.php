@@ -190,9 +190,18 @@ class AvailabilityInventoryHooks
             return;
         }
 
+        // booked_count is sourced from the actual bookings table — it
+        // is the truth. Reflect it to the departure row WITHOUT
+        // clamping to max_capacity. Clamping previously hid oversells
+        // from operators: if direct + OTA bookings legitimately
+        // exceeded capacity (always an OTA-side acceptance — Yatra's
+        // direct checkout enforces capacity), the departure showed
+        // "full" instead of "oversold by N", and operators had no way
+        // to spot the situation needing reconciliation. Allowing the
+        // overshow makes the problem visible so it can be addressed.
         $updated = [
             'max_capacity' => $seatsTotal,
-            'booked_count' => min($seatsTotal, max(0, $bookedCount)),
+            'booked_count' => max(0, $bookedCount),
         ];
 
         $departureRepo->update((int) $departure->id, $updated);

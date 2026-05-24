@@ -35,6 +35,13 @@ export interface WebhookEndpoint {
    *  show data for THIS event only — multi-event endpoints would make
    *  field selection ambiguous. */
   event: string;
+  /** Outbound HTTP verb. POST is the universal webhook default;
+   *  PUT/PATCH suit upsert/partial-update receivers; DELETE for
+   *  object-removal mirrors; GET moves the payload to a
+   *  `?payload=<json>` query parameter and the body becomes empty
+   *  (so the HMAC signature is then over `timestamp + '.'` — i.e.
+   *  empty body). Defaults to POST. */
+  http_method: "POST" | "PUT" | "PATCH" | "DELETE" | "GET";
   /** Static custom HTTP headers POSTed alongside Yatra's signed headers.
    *  Reserved header names (`X-Yatra-*`, Content-Length, Host, Cookie)
    *  are blocked server-side. */
@@ -233,6 +240,87 @@ export const webhooksApi = {
   /** Re-queues a delivery for a fresh attempt. Attempt counter preserved. */
   replayDelivery: (id: number) =>
     apiClient.post(`/webhooks/deliveries/${id}/replay`, {}) as Promise<{
+      message: string;
+    }>,
+
+  /**
+   * Bulk replay. Accepts either explicit ids[] (cap 200) or a filter
+   * descriptor (cap 500). Rows whose endpoint is inactive or deleted
+   * are skipped and counted separately so the UI can show a partial-
+   * success summary.
+   */
+  bulkReplayDeliveries: (input: {
+    ids?: number[];
+    filter?: {
+      endpoint_id?: number;
+      event_key?: string;
+      status?: "failed" | "permanent_failure" | "delivered";
+      before?: string;
+      after?: string;
+    };
+  }) =>
+    apiClient.post("/webhooks/deliveries/bulk-replay", input) as Promise<{
+      requeued: number;
+      skipped: number;
+      skipped_inactive_endpoint?: number;
+      skipped_missing?: number;
+      /** When the filter matched more than the 500-row cap, this is
+       *  the total match count so the UI can suggest a narrower filter. */
+      capped_total: number | null;
+      message: string;
+    }>,
+
+  /**
+   * Aggregated buried-deliveries snapshot. Pairs with bulkReplay above
+   * — operators triage from this summary, then bulk-replay either by
+   * explicit ids picked from `recent[]` or by filter (e.g. "every
+   * permanent_failure for endpoint 7 from the last 24h").
+   */
+  getDeadLetterSummary: () =>
+    apiClient.get("/webhooks/deliveries/dead-letter") as Promise<{
+      data: {
+        total: number;
+        by_endpoint: Array<{ endpoint_id: number; count: number }>;
+        by_event: Array<{ event_key: string; count: number }>;
+        /** Error-message prefix grouping — clusters HTTP 503 / timeout
+         *  variants so the operator sees the pattern, not 1000 rows. */
+        by_error: Array<{ fingerprint: string; count: number }>;
+        recent: WebhookDeliveryRow[];
+      };
+    }>,
+
+  /* ----------------------------- mTLS ------------------------------ */
+  /** Per-endpoint client-cert state. Returns `configured: false` when
+   *  nothing's been uploaded. Never returns the key/cert PEM — only
+   *  fingerprint + expiry hint. */
+  getMtlsHint: (id: number) =>
+    apiClient.get(`/webhooks/endpoints/${id}/mtls`) as Promise<{
+      data: {
+        configured: boolean;
+        fingerprint: string;
+        expires_at: string | null;
+      };
+    }>,
+
+  /** Upload a PEM cert + private key (+ optional passphrase). The
+   *  server validates the pair matches with openssl_x509_check_private_key
+   *  before persisting, so a mismatched-pair mistake is caught at save
+   *  time rather than at delivery time. */
+  setMtls: (
+    id: number,
+    payload: { cert: string; key: string; passphrase?: string },
+  ) =>
+    apiClient.post(`/webhooks/endpoints/${id}/mtls`, payload) as Promise<{
+      data: {
+        configured: boolean;
+        fingerprint: string;
+        expires_at: string | null;
+      };
+      message: string;
+    }>,
+
+  clearMtls: (id: number) =>
+    apiClient.delete(`/webhooks/endpoints/${id}/mtls`) as Promise<{
       message: string;
     }>,
 };

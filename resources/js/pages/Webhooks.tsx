@@ -23,7 +23,7 @@ import {
   ChevronDown,
   Filter,
 } from "lucide-react";
-import { __ } from "../lib/i18n";
+import { __, sprintf } from "../lib/i18n";
 import { PageHeader } from "../components/common/PageHeader";
 import {
   Card,
@@ -167,12 +167,13 @@ const KeyValueEditor: React.FC<{
   );
 };
 
-type WebhookTab = "endpoints" | "deliveries";
+type WebhookTab = "endpoints" | "deliveries" | "buried";
 
 function getInitialTab(): WebhookTab {
   if (typeof window === "undefined") return "endpoints";
   const tab = new URLSearchParams(window.location.search).get("tab");
   if (tab === "deliveries" || tab === "logs") return "deliveries";
+  if (tab === "buried" || tab === "dead-letter" || tab === "dlq") return "buried";
   return "endpoints";
 }
 
@@ -234,6 +235,10 @@ const Webhooks: React.FC = () => {
   const tabs: Array<{ key: WebhookTab; label: string; icon: any }> = [
     { key: "endpoints", label: __("Endpoints", "yatra"), icon: Webhook },
     { key: "deliveries", label: __("Deliveries", "yatra"), icon: Clock },
+    // "Buried" surfaces every delivery that exhausted retries +
+    // landed in permanent_failure. Bulk-replay lives here so operators
+    // triage from the summary instead of paging through deliveries.
+    { key: "buried", label: __("Buried", "yatra"), icon: AlertTriangle },
   ];
 
   return (
@@ -273,6 +278,7 @@ const Webhooks: React.FC = () => {
         <CardContent className="p-6">
           {activeTab === "endpoints" && <EndpointsTab />}
           {activeTab === "deliveries" && <DeliveriesTab />}
+          {activeTab === "buried" && <BuriedTab />}
         </CardContent>
       </Card>
     </div>
@@ -387,6 +393,9 @@ const EndpointsTab: React.FC = () => {
   // After a Ping, open the delivery inspector immediately — operators
   // shouldn't have to tab-switch to find out whether the test worked.
   const [pingInspectId, setPingInspectId] = useState<number | null>(null);
+  // mTLS client-cert dialog state. Holds the endpoint we're editing
+  // the cert for; null = dialog closed.
+  const [mtlsEndpoint, setMtlsEndpoint] = useState<WebhookEndpoint | null>(null);
 
   const { data: endpointsData, isLoading } = useQuery({
     queryKey: ["webhooks-endpoints"],
@@ -601,6 +610,12 @@ const EndpointsTab: React.FC = () => {
                   regenerateSecret.mutate(ep.id),
               },
               {
+                key: "mtls",
+                label: __("Client certificate (mTLS)", "yatra"),
+                icon: <ShieldCheck className="w-4 h-4" />,
+                onClick: (ep: WebhookEndpoint) => setMtlsEndpoint(ep),
+              },
+              {
                 key: "delete",
                 label: __("Delete endpoint", "yatra"),
                 icon: <Trash2 className="w-4 h-4" />,
@@ -615,7 +630,6 @@ const EndpointsTab: React.FC = () => {
               "yatra",
             )}
             onCreateClick={() => setEditing("new")}
-            capability="manage_options"
           />
         </CardContent>
       </Card>
@@ -658,6 +672,11 @@ const EndpointsTab: React.FC = () => {
           onClose={() => setPingInspectId(null)}
         />
       )}
+
+      <MtlsDialog
+        endpoint={mtlsEndpoint}
+        onClose={() => setMtlsEndpoint(null)}
+      />
     </div>
   );
 };
@@ -1268,6 +1287,13 @@ const EndpointEditForm: React.FC<{
   // so binding multiple events here would make field selection ambiguous.
   const [eventKey, setEventKey] = useState<string>(existing?.event ?? "");
   const [showEventDropdown, setShowEventDropdown] = useState(false);
+  // Outbound HTTP verb. POST default matches the universal webhook
+  // convention; operators with non-POST receivers (PUT for upsert,
+  // PATCH for partial, DELETE for object-removed mirrors, GET for
+  // legacy polling-callback patterns) pick from the dropdown.
+  const [httpMethod, setHttpMethod] = useState<WebhookEndpoint["http_method"]>(
+    existing?.http_method ?? "POST",
+  );
   const [isActive, setIsActive] = useState(existing?.is_active ?? true);
   const [logDeliveries, setLogDeliveries] = useState(
     existing?.log_deliveries ?? true,
@@ -1304,6 +1330,7 @@ const EndpointEditForm: React.FC<{
       url,
       description,
       event: eventKey,
+      http_method: httpMethod,
       headers: rowsToObject(headerRows),
       additional_payload_fields: rowsToObject(extraRows),
       // Empty list = "send everything"; the server keeps null in DB.
@@ -1456,6 +1483,41 @@ const EndpointEditForm: React.FC<{
               placeholder={__("Internal CRM ingest — sales team", "yatra")}
               className="mt-1"
             />
+          </div>
+          <div>
+            <Label htmlFor="webhook-method">{__("HTTP method", "yatra")}</Label>
+            <Select
+              id="webhook-method"
+              value={httpMethod}
+              onChange={(e) =>
+                setHttpMethod(e.target.value as WebhookEndpoint["http_method"])
+              }
+              className="mt-1"
+            >
+              <option value="POST">POST {__("(default — recommended)", "yatra")}</option>
+              <option value="PUT">PUT</option>
+              <option value="PATCH">PATCH</option>
+              <option value="DELETE">DELETE</option>
+              <option value="GET">GET</option>
+            </Select>
+            {httpMethod === "GET" ? (
+              <div className="mt-1 flex items-start gap-1.5 text-xs text-amber-700 dark:text-amber-400">
+                <AlertTriangle className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
+                <span>
+                  {__(
+                    "GET deliveries send the payload as a ?payload=<json> query parameter (URL-encoded). The HMAC signature is then computed over an empty body — receivers should reconstruct the signed string as `timestamp + '.' + ''`. Only use GET when the receiver explicitly requires it.",
+                    "yatra",
+                  )}
+                </span>
+              </div>
+            ) : (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {__(
+                  "POST is the universal webhook convention. PUT / PATCH / DELETE are for receivers that explicitly require them (upsert, partial update, object-removal mirrors).",
+                  "yatra",
+                )}
+              </p>
+            )}
           </div>
           <div className="flex items-center justify-between gap-3 rounded-md border border-gray-200 dark:border-gray-700 p-3">
             <Label htmlFor="webhook-is-active" className="font-normal cursor-pointer">
@@ -2217,7 +2279,6 @@ const DeliveriesTab: React.FC = () => {
                     "yatra",
                   )
             }
-            capability="manage_options"
           />
           {rows.length > 0 && totalPages > 1 && (
             <div className="border-t border-gray-200 px-4 py-3 dark:border-gray-700">
@@ -2231,6 +2292,560 @@ const DeliveriesTab: React.FC = () => {
               />
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      <DeliveryInspectDialog id={inspectId} onClose={() => setInspectId(null)} />
+    </div>
+  );
+};
+
+/* -------------------------------------------------------------------------- */
+/*  mTLS dialog — upload / inspect / remove client cert per endpoint          */
+/*                                                                            */
+/*  Three states:                                                             */
+/*    - configured=false: empty form (paste cert + key + optional passphrase) */
+/*    - configured=true:  fingerprint + expiry hint + "Replace" / "Remove"    */
+/*    - mid-mutation: spinner                                                 */
+/*                                                                            */
+/*  The cert+key never leave the server roundtrip — we paste, POST, then      */
+/*  drop the strings from React state. Read-back only returns the hint.       */
+/* -------------------------------------------------------------------------- */
+
+const MtlsDialog: React.FC<{
+  endpoint: WebhookEndpoint | null;
+  onClose: () => void;
+}> = ({ endpoint, onClose }) => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+  const [cert, setCert] = useState("");
+  const [keyPem, setKeyPem] = useState("");
+  const [passphrase, setPassphrase] = useState("");
+  const [mode, setMode] = useState<"view" | "edit">("view");
+
+  const enabled = endpoint !== null;
+  const { data, isLoading } = useQuery({
+    queryKey: ["webhook-mtls", endpoint?.id],
+    queryFn: () => webhooksApi.getMtlsHint(endpoint!.id),
+    enabled,
+  });
+  const hint = data?.data;
+
+  // Reset form whenever the dialog opens for a new endpoint.
+  React.useEffect(() => {
+    if (endpoint) {
+      setCert("");
+      setKeyPem("");
+      setPassphrase("");
+      setMode(hint?.configured ? "view" : "edit");
+    }
+  }, [endpoint?.id, hint?.configured]);
+
+  const save = useMutation({
+    mutationFn: () =>
+      webhooksApi.setMtls(endpoint!.id, { cert, key: keyPem, passphrase }),
+    onSuccess: (r) => {
+      showToast(r.message, "success");
+      setCert("");
+      setKeyPem("");
+      setPassphrase("");
+      setMode("view");
+      void queryClient.invalidateQueries({ queryKey: ["webhook-mtls", endpoint!.id] });
+    },
+    onError: (e: any) => showToast(extractError(e), "error"),
+  });
+
+  const clear = useMutation({
+    mutationFn: () => webhooksApi.clearMtls(endpoint!.id),
+    onSuccess: (r) => {
+      showToast(r.message, "success");
+      void queryClient.invalidateQueries({ queryKey: ["webhook-mtls", endpoint!.id] });
+      onClose();
+    },
+    onError: (e: any) => showToast(extractError(e), "error"),
+  });
+
+  if (!endpoint) return null;
+
+  return (
+    <Modal
+      isOpen
+      onClose={onClose}
+      title={__("Client certificate (mTLS)", "yatra")}
+      size="xl"
+    >
+      <div className="space-y-4">
+        <Alert variant="info">
+          {__(
+            "Optional. Some receivers require Yatra to authenticate at the TLS handshake with a client certificate, in addition to the HMAC signature on the body. Paste your PEM-encoded cert and private key below. The pair is encrypted at rest and used only at delivery time.",
+            "yatra",
+          )}
+        </Alert>
+
+        {isLoading ? (
+          <div className="flex justify-center py-6">
+            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          </div>
+        ) : mode === "view" && hint?.configured ? (
+          <div className="rounded-md border border-gray-200 dark:border-gray-700 p-4 space-y-3">
+            <div className="flex items-center gap-2 text-sm">
+              <CheckCircle2 className="h-4 w-4 text-green-500" />
+              <span className="font-medium text-gray-900 dark:text-white">
+                {__("Client certificate configured", "yatra")}
+              </span>
+            </div>
+            <div className="space-y-1 text-xs">
+              <div className="flex gap-2">
+                <span className="text-gray-500 w-24 flex-shrink-0">
+                  {__("Fingerprint", "yatra")}
+                </span>
+                <code className="font-mono break-all text-gray-700 dark:text-gray-300">
+                  {hint.fingerprint || __("(unavailable)", "yatra")}
+                </code>
+              </div>
+              <div className="flex gap-2">
+                <span className="text-gray-500 w-24 flex-shrink-0">
+                  {__("Expires", "yatra")}
+                </span>
+                <span className="text-gray-700 dark:text-gray-300">
+                  {hint.expires_at
+                    ? new Date(hint.expires_at).toLocaleString()
+                    : __("(unknown)", "yatra")}
+                </span>
+              </div>
+            </div>
+            <div className="flex gap-2 pt-1">
+              <Button variant="outline" onClick={() => setMode("edit")}>
+                {__("Replace certificate", "yatra")}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => clear.mutate()}
+                disabled={clear.isPending}
+              >
+                {clear.isPending ? (
+                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4 mr-1" />
+                )}
+                {__("Remove certificate", "yatra")}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="mtls-cert">
+                {__("Certificate (PEM)", "yatra")}
+              </Label>
+              <textarea
+                id="mtls-cert"
+                className="mt-1 w-full font-mono text-xs px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 min-h-[140px]"
+                value={cert}
+                onChange={(e) => setCert(e.target.value)}
+                placeholder="-----BEGIN CERTIFICATE-----&#10;...&#10;-----END CERTIFICATE-----"
+              />
+            </div>
+            <div>
+              <Label htmlFor="mtls-key">
+                {__("Private key (PEM)", "yatra")}
+              </Label>
+              <textarea
+                id="mtls-key"
+                className="mt-1 w-full font-mono text-xs px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 min-h-[140px]"
+                value={keyPem}
+                onChange={(e) => setKeyPem(e.target.value)}
+                placeholder="-----BEGIN PRIVATE KEY-----&#10;...&#10;-----END PRIVATE KEY-----"
+              />
+            </div>
+            <div>
+              <Label htmlFor="mtls-pass">
+                {__("Key passphrase (optional)", "yatra")}
+              </Label>
+              <Input
+                id="mtls-pass"
+                type="password"
+                value={passphrase}
+                onChange={(e) => setPassphrase(e.target.value)}
+                placeholder={__("Leave blank if the key is unencrypted", "yatra")}
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              {hint?.configured && (
+                <Button variant="outline" onClick={() => setMode("view")}>
+                  {__("Cancel", "yatra")}
+                </Button>
+              )}
+              <Button
+                onClick={() => save.mutate()}
+                disabled={!cert || !keyPem || save.isPending}
+              >
+                {save.isPending && (
+                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                )}
+                {__("Save certificate", "yatra")}
+              </Button>
+            </div>
+            <p className="text-xs text-gray-500">
+              {__(
+                "The certificate and key are validated together before storage — if they don't match, the save is rejected. Stored encrypted with libsodium / OpenSSL AES-256-GCM.",
+                "yatra",
+              )}
+            </p>
+          </div>
+        )}
+      </div>
+    </Modal>
+  );
+};
+
+/* -------------------------------------------------------------------------- */
+/*  Buried (dead-letter) tab                                                  */
+/*                                                                            */
+/*  Read+write surface for every delivery in `permanent_failure`. The         */
+/*  backend returns a pre-aggregated summary (top 10 by endpoint / event /    */
+/*  error fingerprint) so the operator triages "what's broken right now"     */
+/*  before deciding what to replay. Three replay paths:                       */
+/*    1. By endpoint: "re-fire everything buried for endpoint X"              */
+/*    2. By error: "re-fire everything matching this error pattern"           */
+/*    3. By explicit ids: pick rows from the recent list                      */
+/*                                                                            */
+/*  All three converge on POST /webhooks/deliveries/bulk-replay — the         */
+/*  server caps at 200 ids / 500 filtered, skips inactive endpoints, and      */
+/*  returns per-category counts the UI surfaces as a toast.                   */
+/* -------------------------------------------------------------------------- */
+
+const BuriedTab: React.FC = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [inspectId, setInspectId] = useState<number | null>(null);
+
+  const { data, isLoading, refetch, isFetching } = useQuery({
+    queryKey: ["webhook-dead-letter"],
+    queryFn: () => webhooksApi.getDeadLetterSummary(),
+    refetchOnWindowFocus: false,
+  });
+
+  // Endpoint id → name lookup so summary cards can show real names
+  // instead of bare ids.
+  const { data: endpoints } = useQuery({
+    queryKey: ["webhook-endpoints"],
+    queryFn: () => webhooksApi.listEndpoints(),
+  });
+  const endpointNameById = useMemo(() => {
+    const map = new Map<number, string>();
+    endpoints?.data?.forEach((e) => map.set(e.id, e.name));
+    return map;
+  }, [endpoints]);
+
+  const bulkReplay = useMutation({
+    mutationFn: (input: Parameters<typeof webhooksApi.bulkReplayDeliveries>[0]) =>
+      webhooksApi.bulkReplayDeliveries(input),
+    onSuccess: (r) => {
+      showToast(r.message, "success");
+      setSelectedIds(new Set());
+      void queryClient.invalidateQueries({ queryKey: ["webhook-dead-letter"] });
+      void queryClient.invalidateQueries({ queryKey: ["webhook-deliveries"] });
+    },
+    onError: (e) => showToast(extractError(e), "error"),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+  const summary = data?.data;
+  const total = summary?.total ?? 0;
+
+  if (total === 0) {
+    return (
+      <div className="text-center py-16">
+        <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto" />
+        <h3 className="mt-4 text-base font-semibold text-gray-900 dark:text-white">
+          {__("Nothing buried", "yatra")}
+        </h3>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+          {__(
+            "Every delivery either succeeded or is still mid-retry. Permanent failures will show up here so you can replay or investigate.",
+            "yatra",
+          )}
+        </p>
+        <Button variant="outline" className="mt-4" onClick={() => refetch()}>
+          <RefreshCw className={`h-4 w-4 mr-1 ${isFetching ? "animate-spin" : ""}`} />
+          {__("Refresh", "yatra")}
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header strip — total count + global refresh */}
+      <div className="flex items-start gap-3 rounded-md border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30 p-4">
+        <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold text-red-900 dark:text-red-100">
+            {sprintf(
+              /* translators: %d: number of buried deliveries */
+              __("%d delivery(ies) reached permanent failure", "yatra"),
+              total,
+            )}
+          </h3>
+          <p className="text-sm text-red-800 dark:text-red-200/90 mt-0.5">
+            {__(
+              "These exhausted automatic retries. Group by endpoint or error pattern below and bulk-replay once the downstream issue is fixed.",
+              "yatra",
+            )}
+          </p>
+        </div>
+        <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
+          <RefreshCw className={`h-4 w-4 mr-1 ${isFetching ? "animate-spin" : ""}`} />
+          {__("Refresh", "yatra")}
+        </Button>
+      </div>
+
+      {/* Three grouping cards: by endpoint / by event / by error */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">{__("By endpoint", "yatra")}</CardTitle>
+            <CardDescription>
+              {__("Top receivers accumulating failures.", "yatra")}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {summary!.by_endpoint.length === 0 && (
+              <p className="text-xs text-gray-500">{__("None.", "yatra")}</p>
+            )}
+            {summary!.by_endpoint.map((row) => (
+              <div
+                key={row.endpoint_id}
+                className="flex items-center justify-between gap-2 rounded border border-gray-200 dark:border-gray-700 px-3 py-2"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {endpointNameById.get(row.endpoint_id) ??
+                      `Endpoint #${row.endpoint_id}`}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {sprintf(__("%d buried", "yatra"), row.count)}
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() =>
+                    bulkReplay.mutate({
+                      filter: {
+                        endpoint_id: row.endpoint_id,
+                        status: "permanent_failure",
+                      },
+                    })
+                  }
+                  disabled={bulkReplay.isPending}
+                >
+                  <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                  {__("Replay all", "yatra")}
+                </Button>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">{__("By event", "yatra")}</CardTitle>
+            <CardDescription>
+              {__("Event types failing most.", "yatra")}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {summary!.by_event.length === 0 && (
+              <p className="text-xs text-gray-500">{__("None.", "yatra")}</p>
+            )}
+            {summary!.by_event.map((row) => (
+              <div
+                key={row.event_key}
+                className="flex items-center justify-between gap-2 rounded border border-gray-200 dark:border-gray-700 px-3 py-2"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-mono text-gray-900 dark:text-white truncate">
+                    {row.event_key || __("(unknown)", "yatra")}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {sprintf(__("%d buried", "yatra"), row.count)}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">{__("By error", "yatra")}</CardTitle>
+            <CardDescription>
+              {__("Grouped by error-message prefix.", "yatra")}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {summary!.by_error.length === 0 && (
+              <p className="text-xs text-gray-500">{__("None.", "yatra")}</p>
+            )}
+            {summary!.by_error.map((row, idx) => (
+              <div
+                key={`${row.fingerprint}-${idx}`}
+                className="rounded border border-gray-200 dark:border-gray-700 px-3 py-2"
+              >
+                <div className="text-xs text-gray-700 dark:text-gray-300 break-words">
+                  {row.fingerprint}
+                </div>
+                <div className="text-xs text-gray-500 mt-0.5">
+                  {sprintf(__("%d buried", "yatra"), row.count)}
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent buried — selectable, with per-row Inspect + Replay */}
+      <Card>
+        <CardHeader>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <CardTitle className="text-base">{__("Recent buried", "yatra")}</CardTitle>
+              <CardDescription>
+                {sprintf(
+                  /* translators: %d: number of recent rows shown */
+                  __("Last %d deliveries in permanent failure.", "yatra"),
+                  summary!.recent.length,
+                )}
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              {selectedIds.size > 0 && (
+                <span className="text-sm text-gray-500">
+                  {sprintf(
+                    /* translators: %d: number selected */
+                    __("%d selected", "yatra"),
+                    selectedIds.size,
+                  )}
+                </span>
+              )}
+              <Button
+                onClick={() =>
+                  bulkReplay.mutate({ ids: Array.from(selectedIds) })
+                }
+                disabled={selectedIds.size === 0 || bulkReplay.isPending}
+              >
+                <RotateCcw className="h-4 w-4 mr-1" />
+                {__("Replay selected", "yatra")}
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-50 dark:bg-gray-800/40 border-b border-gray-200 dark:border-gray-700">
+                <tr>
+                  <th className="px-3 py-2 text-left w-10">
+                    <input
+                      type="checkbox"
+                      checked={
+                        selectedIds.size > 0 &&
+                        selectedIds.size === summary!.recent.length
+                      }
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedIds(new Set(summary!.recent.map((r) => r.id)));
+                        } else {
+                          setSelectedIds(new Set());
+                        }
+                      }}
+                    />
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                    {__("Event", "yatra")}
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                    {__("Endpoint", "yatra")}
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                    {__("Attempts", "yatra")}
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                    {__("Error", "yatra")}
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                    {__("When", "yatra")}
+                  </th>
+                  <th className="px-3 py-2 w-32 text-right font-medium text-gray-700 dark:text-gray-300">
+                    {__("Actions", "yatra")}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {summary!.recent.map((row) => (
+                  <tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/40">
+                    <td className="px-3 py-2">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(row.id)}
+                        onChange={(e) => {
+                          const next = new Set(selectedIds);
+                          if (e.target.checked) next.add(row.id);
+                          else next.delete(row.id);
+                          setSelectedIds(next);
+                        }}
+                      />
+                    </td>
+                    <td className="px-3 py-2 font-mono text-xs text-gray-900 dark:text-white">
+                      {row.event_key}
+                    </td>
+                    <td className="px-3 py-2 text-gray-700 dark:text-gray-300">
+                      {endpointNameById.get(row.endpoint_id) ?? `#${row.endpoint_id}`}
+                    </td>
+                    <td className="px-3 py-2 text-gray-700 dark:text-gray-300">
+                      {row.attempts}
+                    </td>
+                    <td className="px-3 py-2 text-xs text-gray-600 dark:text-gray-400 max-w-md truncate">
+                      <Tooltip content={row.error_message ?? ""}>
+                        <span>{row.error_message ?? __("—", "yatra")}</span>
+                      </Tooltip>
+                    </td>
+                    <td className="px-3 py-2 text-xs text-gray-500 whitespace-nowrap">
+                      {row.created_at}
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <div className="inline-flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setInspectId(row.id)}
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => bulkReplay.mutate({ ids: [row.id] })}
+                          disabled={bulkReplay.isPending}
+                        >
+                          <RotateCcw className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
 
