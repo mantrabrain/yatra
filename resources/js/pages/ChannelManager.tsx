@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Network,
@@ -29,7 +29,12 @@ import {
   Activity,
   Power,
   PowerOff,
+  Search,
+  Check,
+  ChevronDown,
+  X,
 } from "lucide-react";
+import { apiClient } from "../lib/api-client";
 import { __, sprintf } from "../lib/i18n";
 import { PageHeader } from "../components/common/PageHeader";
 import {
@@ -1444,10 +1449,17 @@ const MappingsSection: React.FC = () => {
             </span>
           </p>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-nowrap">
+          {/* The shared Select renders w-full by default so its
+              flex item stretches to fill the row and pushes the
+              Add button onto a second line. Constraining it to a
+              fixed pixel width keeps the filter dropdown and the
+              Add button on the same row at every viewport size
+              the Mappings toolbar is used at. */}
           <Select
             value={String(filterChannel)}
             onChange={(e) => setFilterChannel(Number(e.target.value))}
+            className="w-56 flex-shrink-0"
           >
             <option value="0">{__("All channels", "yatra")}</option>
             {channels.map((c) => (
@@ -1459,6 +1471,7 @@ const MappingsSection: React.FC = () => {
           <Button
             onClick={() => setShowAdd(true)}
             disabled={channels.length === 0}
+            className="flex-shrink-0"
             title={
               channels.length === 0
                 ? __(
@@ -1737,6 +1750,229 @@ const MappingsSection: React.FC = () => {
   );
 };
 
+/**
+ * Searchable single-trip picker for the New Mapping form.
+ *
+ * Replaces a numeric "Trip ID" input (which required operators to
+ * find the database id from the trip-edit URL bar) with a typeahead
+ * that hits /trips?search=… and lets them pick by title. Same shape
+ * as the multi-trip picker in ApplicableTripSelector but trimmed to
+ * the single-select case the mapping form needs.
+ *
+ * Keeps the trip id as the underlying value (the only thing the
+ * mapping API cares about) so the surrounding form code is
+ * unchanged: setTrip(id) is the only output.
+ */
+type TripOption = { id: number; title: string };
+
+const TripPicker: React.FC<{
+  value: number;
+  onChange: (id: number, label?: string) => void;
+  placeholder?: string;
+}> = ({ value, onChange, placeholder }) => {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [debounced, setDebounced] = useState("");
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Debounce search so we don't spam /trips on every keystroke.
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(search.trim()), 250);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  // Close the dropdown when the operator clicks outside the picker.
+  useEffect(() => {
+    if (!open) return;
+    const onDocClick = (e: MouseEvent) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [open]);
+
+  // Auto-focus the search field when the dropdown opens so the
+  // operator can start typing immediately.
+  useEffect(() => {
+    if (open && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [open]);
+
+  // Result list: search hits /trips?search=. When no search term yet,
+  // surface the first page so the operator always has something to
+  // pick on first open instead of an empty box.
+  const { data: results = [], isFetching } = useQuery<TripOption[]>({
+    queryKey: ["channel-manager-trip-picker", debounced],
+    queryFn: async () => {
+      const params: Record<string, any> = { per_page: 25 };
+      if (debounced) params.search = debounced;
+      const res: any = await apiClient.get("/trips", { params });
+      const items = res?.data?.data || res?.data || res || [];
+      if (!Array.isArray(items)) return [];
+      return items
+        .map((t: any) => ({
+          id: Number(t?.id || 0),
+          title: String(t?.title || t?.name || `Trip #${t?.id}`),
+        }))
+        .filter((t: TripOption) => t.id > 0);
+    },
+    enabled: open,
+    staleTime: 60_000,
+  });
+
+  // When `value` is set (editing an existing draft or after a pick),
+  // look up the matching label so the closed button shows the title
+  // rather than just "#42". One-shot lookup; cached by id.
+  const { data: selectedTrip } = useQuery<TripOption | null>({
+    queryKey: ["channel-manager-trip-picker:resolve", value],
+    queryFn: async () => {
+      if (!value) return null;
+      try {
+        const res: any = await apiClient.get(`/trips/${value}`);
+        const t = res?.data?.data || res?.data || res || null;
+        if (!t || !t.id) return null;
+        return {
+          id: Number(t.id),
+          title: String(t.title || t.name || `Trip #${t.id}`),
+        };
+      } catch {
+        return null;
+      }
+    },
+    enabled: value > 0,
+    staleTime: 5 * 60_000,
+  });
+
+  return (
+    <div ref={wrapperRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex h-12 w-full items-center justify-between rounded-md border-2 border-gray-300 bg-white px-4 text-left text-base text-gray-900 transition-colors hover:border-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:border-gray-500"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span className="flex min-w-0 items-center gap-2">
+          {value > 0 ? (
+            <>
+              <span className="truncate font-medium">
+                {selectedTrip?.title || `Trip #${value}`}
+              </span>
+              <span className="flex-shrink-0 rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                #{value}
+              </span>
+            </>
+          ) : (
+            <span className="text-gray-500 dark:text-gray-400">
+              {placeholder || __("Search and select a trip…", "yatra")}
+            </span>
+          )}
+        </span>
+        <span className="flex flex-shrink-0 items-center gap-1">
+          {value > 0 && (
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange(0);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onChange(0);
+                }
+              }}
+              className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700"
+              aria-label={__("Clear selection", "yatra")}
+            >
+              <X className="h-3.5 w-3.5" />
+            </span>
+          )}
+          <ChevronDown
+            className={`h-4 w-4 text-gray-400 transition-transform ${
+              open ? "rotate-180" : ""
+            }`}
+          />
+        </span>
+      </button>
+
+      {open && (
+        <div className="absolute z-30 mt-1 w-full overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
+          <div className="border-b border-gray-100 p-2 dark:border-gray-700">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={__("Type to search trips by title…", "yatra")}
+                className="w-full rounded border border-gray-200 bg-white py-1.5 pl-8 pr-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900"
+              />
+            </div>
+          </div>
+          <div className="max-h-72 overflow-auto">
+            {isFetching ? (
+              <div className="flex items-center justify-center p-6 text-sm text-gray-500">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {__("Searching…", "yatra")}
+              </div>
+            ) : results.length === 0 ? (
+              <div className="p-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                {debounced
+                  ? __("No trips match that search.", "yatra")
+                  : __("No trips found.", "yatra")}
+              </div>
+            ) : (
+              <ul role="listbox" className="py-1">
+                {results.map((t) => {
+                  const isSelected = t.id === value;
+                  return (
+                    <li key={t.id} role="option" aria-selected={isSelected}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onChange(t.id, t.title);
+                          setOpen(false);
+                          setSearch("");
+                        }}
+                        className={`flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 ${
+                          isSelected
+                            ? "bg-blue-50 text-blue-900 dark:bg-blue-950/40 dark:text-blue-200"
+                            : ""
+                        }`}
+                      >
+                        <span className="flex min-w-0 items-center gap-2">
+                          <span className="truncate">{t.title}</span>
+                          <span className="flex-shrink-0 rounded bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                            #{t.id}
+                          </span>
+                        </span>
+                        {isSelected && (
+                          <Check className="h-4 w-4 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+                        )}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const MappingAddForm: React.FC<{
   channels: ChannelRow[];
   defaultChannelId: number;
@@ -1805,17 +2041,16 @@ const MappingAddForm: React.FC<{
           </FormField>
 
           <FormField
-            label={__("Trip ID", "yatra")}
+            label={__("Trip", "yatra")}
             description={__(
-              "Numeric ID of the trip in this site's trip list. Find it in the URL when editing the trip (the ?id= or post=… value).",
+              "Pick the Yatra trip this mapping pushes to the channel. Start typing the trip title — the list filters as you type.",
               "yatra",
             )}
           >
-            <Input
-              type="number"
-              value={tripId || ""}
-              onChange={(e) => setTripId(Number(e.target.value) || 0)}
-              placeholder="e.g. 42"
+            <TripPicker
+              value={tripId}
+              onChange={(id) => setTripId(id)}
+              placeholder={__("Search and select a trip…", "yatra")}
             />
           </FormField>
 
