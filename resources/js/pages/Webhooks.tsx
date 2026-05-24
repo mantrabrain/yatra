@@ -39,6 +39,7 @@ import { Label } from "../components/ui/label";
 import { Select } from "../components/ui/select";
 import { Badge } from "../components/ui/badge";
 import { Modal } from "../components/ui/modal";
+import { ModulePageSkeleton } from "../components/ui/module-skeleton";
 import { Switch } from "../components/ui/switch";
 import { Tooltip } from "../components/ui/tooltip";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
@@ -195,11 +196,7 @@ const Webhooks: React.FC = () => {
   });
 
   if (metaLoading) {
-    return (
-      <div className="flex justify-center py-16">
-        <Loader2 className="h-10 w-10 animate-spin text-gray-400" />
-      </div>
-    );
+    return <ModulePageSkeleton variant="tabs" />;
   }
   if (!meta) return null;
 
@@ -1144,8 +1141,13 @@ const FieldSelectorCard: React.FC<{
             </div>
 
             {isLoading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-96 overflow-y-auto pr-1 animate-pulse">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-9 rounded bg-gray-200 dark:bg-gray-700"
+                  />
+                ))}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-96 overflow-y-auto pr-1">

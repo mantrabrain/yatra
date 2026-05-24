@@ -26,6 +26,7 @@ import { useToast } from "../components/ui/toast";
 import { useWordPressMedia } from "../hooks/useWordPressMedia";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import { ModulePageSkeleton } from "../components/ui/module-skeleton";
 import { Label } from "../components/ui/label";
 import { IconPicker } from "../components/ui/icon-picker";
 import type { IconPickerValue } from "../lib/icon-picker-types";
@@ -913,11 +914,7 @@ const WhiteLabel: React.FC = () => {
   /* ------------------------------- Renderers ------------------------------ */
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-      </div>
-    );
+    return <ModulePageSkeleton variant="form" />;
   }
 
   if (!isAgency) {

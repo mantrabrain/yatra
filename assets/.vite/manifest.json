@@ -49,6 +49,14 @@
       "admin/dist/css/index.css"
     ]
   },
+  "_module-skeleton-DUioukJc.js": {
+    "file": "dist/js/module-skeleton-DUioukJc.js",
+    "name": "module-skeleton",
+    "imports": [
+      "_react-vendor-CqkbFEvK.js",
+      "resources/js/main.tsx"
+    ]
+  },
   "_react-vendor-!~{001}~.js": {
     "file": "admin/dist/css/react-vendor.css",
     "src": "_react-vendor-!~{001}~.js"
@@ -121,14 +129,15 @@
     ]
   },
   "resources/js/pages/AiAssistant.tsx": {
-    "file": "dist/js/AiAssistant-VeAV1-ZJ.js",
+    "file": "dist/js/AiAssistant-EMZqiuYU.js",
     "name": "AiAssistant",
     "src": "resources/js/pages/AiAssistant.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_react-vendor-CqkbFEvK.js",
       "_index-fqW8jODk.js",
-      "resources/js/main.tsx"
+      "resources/js/main.tsx",
+      "_module-skeleton-DUioukJc.js"
     ]
   },
   "resources/js/pages/AvailabilityForm.tsx": {
@@ -154,14 +163,15 @@
     ]
   },
   "resources/js/pages/ChannelManager.tsx": {
-    "file": "dist/js/ChannelManager-nfXmfHgv.js",
+    "file": "dist/js/ChannelManager-BCK8vDZe.js",
     "name": "ChannelManager",
     "src": "resources/js/pages/ChannelManager.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_react-vendor-CqkbFEvK.js",
       "_index-fqW8jODk.js",
-      "resources/js/main.tsx"
+      "resources/js/main.tsx",
+      "_module-skeleton-DUioukJc.js"
     ]
   },
   "resources/js/pages/DiscountForm.tsx": {
@@ -295,14 +305,15 @@
     ]
   },
   "resources/js/pages/Webhooks.tsx": {
-    "file": "dist/js/Webhooks-CfSK2Q_0.js",
+    "file": "dist/js/Webhooks-DuXOC6S9.js",
     "name": "Webhooks",
     "src": "resources/js/pages/Webhooks.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_react-vendor-CqkbFEvK.js",
       "_index-fqW8jODk.js",
-      "resources/js/main.tsx"
+      "resources/js/main.tsx",
+      "_module-skeleton-DUioukJc.js"
     ]
   },
   "resources/js/pages/Whatsapp.tsx": {
@@ -313,18 +324,20 @@
     "imports": [
       "_react-vendor-CqkbFEvK.js",
       "_index-fqW8jODk.js",
-      "resources/js/main.tsx"
+      "resources/js/main.tsx",
+      "_module-skeleton-DUioukJc.js"
     ]
   },
   "resources/js/pages/WhiteLabel.tsx": {
-    "file": "dist/js/WhiteLabel-BfMEIFA3.js",
+    "file": "dist/js/WhiteLabel-Bf9a35U8.js",
     "name": "WhiteLabel",
     "src": "resources/js/pages/WhiteLabel.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_react-vendor-CqkbFEvK.js",
       "_index-fqW8jODk.js",
-      "resources/js/main.tsx"
+      "resources/js/main.tsx",
+      "_module-skeleton-DUioukJc.js"
     ]
   }
 }

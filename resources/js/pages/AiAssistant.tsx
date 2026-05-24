@@ -29,6 +29,11 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Select } from "../components/ui/select";
+import {
+  ModulePageSkeleton,
+  ModuleStatGridSkeleton,
+  ModuleSectionSkeleton,
+} from "../components/ui/module-skeleton";
 import { PageHeader } from "../components/common/PageHeader";
 import {
   Card,
@@ -393,11 +398,7 @@ const AiAssistant: React.FC = () => {
   /* --------------------------- early-out states --------------------------- */
 
   if (metaLoading) {
-    return (
-      <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-      </div>
-    );
+    return <ModulePageSkeleton variant="tabs" />;
   }
 
   if (!meta || !meta.is_ai_eligible) {
@@ -1116,9 +1117,7 @@ const AiAssistant: React.FC = () => {
         </CardHeader>
         <CardContent>
           {!usage ? (
-            <div className="flex items-center justify-center p-6">
-              <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-            </div>
+            <ModuleStatGridSkeleton tiles={3} />
           ) : (
             <>
               <div className="mb-4 grid grid-cols-3 gap-3">
@@ -1265,9 +1264,7 @@ const AiAssistant: React.FC = () => {
         </CardHeader>
         <CardContent>
           {promptsLoading ? (
-            <div className="flex items-center justify-center p-6">
-              <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-            </div>
+            <ModuleSectionSkeleton lines={5} />
           ) : rows.length === 0 ? (
             <p className="text-sm text-gray-500">
               {__("No prompts available.", "yatra")}

@@ -43,6 +43,10 @@ import {
 } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import {
+  ModulePageSkeleton,
+  ModuleFormSkeleton,
+} from "../components/ui/module-skeleton";
 import { Label } from "../components/ui/label";
 import { Select } from "../components/ui/select";
 import { Badge } from "../components/ui/badge";
@@ -141,11 +145,7 @@ const Whatsapp: React.FC = () => {
   });
 
   if (metaLoading) {
-    return (
-      <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-      </div>
-    );
+    return <ModulePageSkeleton variant="tabs" />;
   }
 
   if (!meta || !meta.is_eligible) {
@@ -212,9 +212,7 @@ const Whatsapp: React.FC = () => {
               {!automationReady ? (
                 <WhatsappModulePrompt />
               ) : !cfg ? (
-                <div className="flex justify-center py-16">
-                  <Loader2 className="h-10 w-10 animate-spin text-gray-400" />
-                </div>
+                <ModuleFormSkeleton rows={5} />
               ) : (
                 <DeliverySection
                   cfg={cfg}
@@ -240,9 +238,7 @@ const Whatsapp: React.FC = () => {
               {!automationReady ? (
                 <WhatsappModulePrompt />
               ) : !cfg ? (
-                <div className="flex justify-center py-16">
-                  <Loader2 className="h-10 w-10 animate-spin text-gray-400" />
-                </div>
+                <ModuleFormSkeleton rows={5} />
               ) : (
                 <WidgetSection
                   settings={cfg.settings}

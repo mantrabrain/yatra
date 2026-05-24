@@ -1,6 +1,7 @@
-import { t as useQueryClient, r as reactExports, u as useQuery, v as useMutation, j as jsxRuntimeExports, D as Loader2, bh as Send, k as FileText, M as MessageCircle, U as Users, V as ExternalLink, bq as Settings2, a5 as React, aF as Info, bQ as KeyRound, g as CircleUser, by as ShieldCheck, ar as Clock, aV as Save, aD as CheckCircle2, b6 as XCircle, bt as EyeOff, aQ as Eye, w as Webhook, aA as Check, aG as Copy, z as ArrowLeft, Z as Zap, x as ChevronDown, br as Code, aw as Plus, bA as Pencil, bF as History, aN as Trash2, R as RotateCcw } from "../../../dist/js/react-vendor-CqkbFEvK.js";
+import { t as useQueryClient, r as reactExports, u as useQuery, v as useMutation, j as jsxRuntimeExports, bh as Send, k as FileText, M as MessageCircle, U as Users, V as ExternalLink, bq as Settings2, a5 as React, aF as Info, bQ as KeyRound, g as CircleUser, by as ShieldCheck, ar as Clock, D as Loader2, aV as Save, aD as CheckCircle2, b6 as XCircle, bt as EyeOff, aQ as Eye, w as Webhook, aA as Check, aG as Copy, z as ArrowLeft, Z as Zap, x as ChevronDown, br as Code, aw as Plus, bA as Pencil, bF as History, aN as Trash2, R as RotateCcw } from "../../../dist/js/react-vendor-CqkbFEvK.js";
 import { a as apiClient, u as useToast, _ as __, s as sprintf } from "../../../dist/js/index-fqW8jODk.js";
 import { P as PageHeader, C as Card, d as CardContent, f as CardHeader, g as CardTitle, h as CardDescription, B as Button, w as Label, I as Input, t as CardFooter, S as Select, a5 as Table, a6 as TableHeader, a7 as TableRow, a8 as TableHead, a9 as TableBody, aa as TableCell, e as Badge, W as Pagination, k as ConfirmationDialog, M as Modal, A as Alert } from "./app.js";
+import { M as ModulePageSkeleton, a as ModuleFormSkeleton } from "../../../dist/js/module-skeleton-DUioukJc.js";
 const whatsappApi = {
   getMeta: () => apiClient.get("/whatsapp/meta"),
   getSettings: () => apiClient.get("/whatsapp/settings"),
@@ -100,7 +101,7 @@ const Whatsapp = () => {
     onError: (e) => showToast(extractError(e), "error")
   });
   if (metaLoading) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center p-12", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "h-6 w-6 animate-spin text-gray-400" }) });
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(ModulePageSkeleton, { variant: "tabs" });
   }
   if (!meta || !meta.is_eligible) {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
@@ -153,7 +154,7 @@ const Whatsapp = () => {
         );
       }) }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6", children: [
-        activeTab === "delivery" && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: !automationReady ? /* @__PURE__ */ jsxRuntimeExports.jsx(WhatsappModulePrompt, {}) : !cfg ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-center py-16", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "h-10 w-10 animate-spin text-gray-400" }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+        activeTab === "delivery" && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: !automationReady ? /* @__PURE__ */ jsxRuntimeExports.jsx(WhatsappModulePrompt, {}) : !cfg ? /* @__PURE__ */ jsxRuntimeExports.jsx(ModuleFormSkeleton, { rows: 5 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
           DeliverySection,
           {
             cfg,
@@ -164,7 +165,7 @@ const Whatsapp = () => {
           }
         ) }),
         activeTab === "templates" && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: !automationReady ? /* @__PURE__ */ jsxRuntimeExports.jsx(WhatsappModulePrompt, {}) : /* @__PURE__ */ jsxRuntimeExports.jsx(TemplatesTab, {}) }),
-        activeTab === "widget" && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: !automationReady ? /* @__PURE__ */ jsxRuntimeExports.jsx(WhatsappModulePrompt, {}) : !cfg ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-center py-16", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "h-10 w-10 animate-spin text-gray-400" }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+        activeTab === "widget" && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: !automationReady ? /* @__PURE__ */ jsxRuntimeExports.jsx(WhatsappModulePrompt, {}) : !cfg ? /* @__PURE__ */ jsxRuntimeExports.jsx(ModuleFormSkeleton, { rows: 5 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
           WidgetSection,
           {
             settings: cfg.settings,
