@@ -181,7 +181,7 @@ class BookingRepository extends BaseRepository
      */
     public function findByReference(string $reference): ?object
     {
-        $table = $this->getResolvedBookingsTable();
+        $table = $this->getTableName();
 
         $query = $this->wpdb->prepare(
             "SELECT * FROM {$table} WHERE reference = %s",
@@ -226,7 +226,7 @@ class BookingRepository extends BaseRepository
      */
     public function findByReferenceWithTrip(string $reference): ?object
     {
-        $table = $this->getResolvedBookingsTable();
+        $table = $this->getTableName();
 
         // Use TripRepository for trips table
         $tripRepository = new \Yatra\Repositories\TripRepository();
