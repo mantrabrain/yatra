@@ -88,7 +88,6 @@ const EXCLUDED_DYNAMIC_FIELDS = [
   "id",
 ];
 
-
 const Travelers: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();

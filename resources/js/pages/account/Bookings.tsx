@@ -452,9 +452,10 @@ const Bookings: React.FC<BookingsProps> = ({
                           // Read `travelers_count` first — `travelers` is an
                           // array on the booking-detail endpoint and would
                           // coerce to NaN. See Booking interface comments.
-                          const n = Number(
-                            booking.travelers_count ?? booking.travelers ?? 0,
-                          ) || 0;
+                          const n =
+                            Number(
+                              booking.travelers_count ?? booking.travelers ?? 0,
+                            ) || 0;
                           return sprintf(
                             // translators: %d: number of travelers on this booking.
                             _n("%d traveler", "%d travelers", n, "yatra"),

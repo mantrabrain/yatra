@@ -128,7 +128,10 @@ export function ClassificationMultiSelect({
         className="yatra-block-taxonomy-field"
         style={{ margin: "0 0 16px", border: "none", padding: 0 }}
       >
-        <legend className="components-base-control__label" style={{ padding: 0 }}>
+        <legend
+          className="components-base-control__label"
+          style={{ padding: 0 }}
+        >
           {label}
         </legend>
         <Spinner />
@@ -196,7 +199,10 @@ export function ClassificationMultiSelect({
             __nextHasNoMarginBottom
           />
           {value.length > 0 && (
-            <p className="components-base-control__help" style={{ marginTop: 4 }}>
+            <p
+              className="components-base-control__help"
+              style={{ marginTop: 4 }}
+            >
               {sprintf(
                 /* translators: %d = number of selected taxonomy items */
                 __("%d selected", "yatra"),
@@ -218,16 +224,11 @@ export function ClassificationMultiSelect({
                 filteredItems.map((item) => {
                   const cid = Number(item.id);
                   return (
-                    <div
-                      key={cid}
-                      style={{ padding: "2px 8px" }}
-                    >
+                    <div key={cid} style={{ padding: "2px 8px" }}>
                       <CheckboxControl
                         label={`${item.name} (${cid})`}
                         checked={selectedSet.has(cid)}
-                        onChange={(checked) =>
-                          toggleId(cid, checked === true)
-                        }
+                        onChange={(checked) => toggleId(cid, checked === true)}
                         __nextHasNoMarginBottom
                       />
                     </div>

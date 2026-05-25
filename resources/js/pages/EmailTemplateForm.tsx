@@ -27,10 +27,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { AiEmailTemplateModal } from "../components/ai/AiEmailTemplateModal";
-import {
-  isAiEligible,
-  isAiModuleEnabled,
-} from "../lib/ai-availability";
+import { isAiEligible, isAiModuleEnabled } from "../lib/ai-availability";
 import { Switch } from "../components/ui/switch";
 import {
   getCatalogEntryByTemplateKey,
@@ -1281,11 +1278,9 @@ const EmailTemplateForm: React.FC = () => {
           coreTemplateSlug || formData.event_key || "custom_template"
         }
         templateName={coreDef?.name || formData.name || formData.event_key}
-        templateDescription={
-          coreDef?.description || formData.description
-        }
+        templateDescription={coreDef?.description || formData.description}
         recipientType={
-          (catalogEntryForCore?.recipientType as "customer" | "admin") ||
+          (catalogEntryForCore?.recipient_type as "customer" | "admin") ||
           "customer"
         }
         mergeTags={(() => {
@@ -1309,7 +1304,12 @@ const EmailTemplateForm: React.FC = () => {
           }
           return raw
             .split(",")
-            .map((s) => s.trim().replace(/^\{\{|\}\}$/g, "").trim())
+            .map((s) =>
+              s
+                .trim()
+                .replace(/^\{\{|\}\}$/g, "")
+                .trim(),
+            )
             .filter(Boolean);
         })()}
         currentSubject={formData.subject}

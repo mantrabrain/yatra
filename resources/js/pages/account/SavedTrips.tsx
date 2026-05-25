@@ -249,7 +249,12 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
                       <span className="yatra-reviews-count">
                         {sprintf(
                           // translators: %d: number of reviews for the trip
-                          _n("(%d review)", "(%d reviews)", reviewCount, "yatra"),
+                          _n(
+                            "(%d review)",
+                            "(%d reviews)",
+                            reviewCount,
+                            "yatra",
+                          ),
                           reviewCount,
                         )}
                       </span>

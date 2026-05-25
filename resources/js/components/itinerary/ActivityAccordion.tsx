@@ -125,9 +125,7 @@ export const ActivityAccordion: React.FC<ActivityAccordionProps> = ({
                 className={`mt-3 transition-shadow ${
                   isDragging ? "opacity-60" : ""
                 } ${
-                  isDropTarget
-                    ? "ring-2 ring-blue-400 dark:ring-blue-500"
-                    : ""
+                  isDropTarget ? "ring-2 ring-blue-400 dark:ring-blue-500" : ""
                 }`}
                 draggable={reorderEnabled}
                 onDragStart={handleDragStart(index)}
@@ -151,10 +149,7 @@ export const ActivityAccordion: React.FC<ActivityAccordionProps> = ({
                         // card is the drop zone; this is just the affordance.
                         <span
                           className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 shrink-0"
-                          title={__(
-                            "Drag to reorder this activity",
-                            "yatra",
-                          )}
+                          title={__("Drag to reorder this activity", "yatra")}
                           aria-label={__(
                             "Drag to reorder this activity",
                             "yatra",
@@ -163,7 +158,10 @@ export const ActivityAccordion: React.FC<ActivityAccordionProps> = ({
                           <GripVertical className="w-4 h-4" />
                         </span>
                       )}
-                      <span className="truncate" title={(activityForm.data.title || "").trim()}>
+                      <span
+                        className="truncate"
+                        title={(activityForm.data.title || "").trim()}
+                      >
                         {(activityForm.data.title || "").trim() ||
                           `${__("Activity", "yatra")} #${index + 1}`}
                       </span>
@@ -219,10 +217,8 @@ export const ActivityAccordion: React.FC<ActivityAccordionProps> = ({
                         cost_per_person:
                           activityForm.data.cost_per_person !== false,
                         notes: activityForm.data.notes || "",
-                        included_items:
-                          activityForm.data.included_items || [],
-                        excluded_items:
-                          activityForm.data.excluded_items || [],
+                        included_items: activityForm.data.included_items || [],
+                        excluded_items: activityForm.data.excluded_items || [],
                       }}
                       errors={errors}
                       itemTypes={itemTypes}

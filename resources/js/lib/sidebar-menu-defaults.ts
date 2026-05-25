@@ -79,26 +79,102 @@ export const DEFAULT_MENU_ITEMS: MenuItemDefault[] = [
     label: "Trips",
     iconName: "MapPin",
     submenu: [
-      { key: "trips.all", parentSlug: "trips", tab: "all", label: "All Trips", iconName: "List" },
-      { key: "trips.activities", parentSlug: "trips", tab: "activities", label: "Activities", iconName: "Activity" },
-      { key: "trips.destinations", parentSlug: "trips", tab: "destinations", label: "Destinations", iconName: "Route" },
-      { key: "trips.categories", parentSlug: "trips", tab: "categories", label: "Categories", iconName: "FolderTree" },
-      { key: "trips.difficulty-levels", parentSlug: "trips", tab: "difficulty-levels", label: "Difficulty Levels", iconName: "TrendingUp" },
-      { key: "trips.availability", parentSlug: "trips", tab: "availability", label: "Availability", iconName: "CalendarDays" },
-      { key: "trips.attributes", parentSlug: "trips", tab: "attributes", label: "Attributes", iconName: "Tag" },
-      { key: "trips.additional-services", parentSlug: "trips", tab: "additional-services", label: "Additional Services", iconName: "Package" },
-      { key: "trips.trip-consent", parentSlug: "trips", tab: "trip-consent", label: "Trip Consent", iconName: "FileSignature" },
+      {
+        key: "trips.all",
+        parentSlug: "trips",
+        tab: "all",
+        label: "All Trips",
+        iconName: "List",
+      },
+      {
+        key: "trips.activities",
+        parentSlug: "trips",
+        tab: "activities",
+        label: "Activities",
+        iconName: "Activity",
+      },
+      {
+        key: "trips.destinations",
+        parentSlug: "trips",
+        tab: "destinations",
+        label: "Destinations",
+        iconName: "Route",
+      },
+      {
+        key: "trips.categories",
+        parentSlug: "trips",
+        tab: "categories",
+        label: "Categories",
+        iconName: "FolderTree",
+      },
+      {
+        key: "trips.difficulty-levels",
+        parentSlug: "trips",
+        tab: "difficulty-levels",
+        label: "Difficulty Levels",
+        iconName: "TrendingUp",
+      },
+      {
+        key: "trips.availability",
+        parentSlug: "trips",
+        tab: "availability",
+        label: "Availability",
+        iconName: "CalendarDays",
+      },
+      {
+        key: "trips.attributes",
+        parentSlug: "trips",
+        tab: "attributes",
+        label: "Attributes",
+        iconName: "Tag",
+      },
+      {
+        key: "trips.additional-services",
+        parentSlug: "trips",
+        tab: "additional-services",
+        label: "Additional Services",
+        iconName: "Package",
+      },
+      {
+        key: "trips.trip-consent",
+        parentSlug: "trips",
+        tab: "trip-consent",
+        label: "Trip Consent",
+        iconName: "FileSignature",
+      },
     ],
   },
-  { slug: "traveler-categories", label: "Traveler Categories", iconName: "Users" },
+  {
+    slug: "traveler-categories",
+    label: "Traveler Categories",
+    iconName: "Users",
+  },
   {
     slug: "itinerary",
     label: "Itinerary",
     iconName: "Route",
     submenu: [
-      { key: "itinerary.item-types", parentSlug: "itinerary", tab: "item-types", label: "Item Types", iconName: "Tag" },
-      { key: "itinerary.items", parentSlug: "itinerary", tab: "items", label: "Items", iconName: "Route" },
-      { key: "itinerary.itinerary", parentSlug: "itinerary", tab: "itinerary", label: "Itinerary", iconName: "FileText" },
+      {
+        key: "itinerary.item-types",
+        parentSlug: "itinerary",
+        tab: "item-types",
+        label: "Item Types",
+        iconName: "Tag",
+      },
+      {
+        key: "itinerary.items",
+        parentSlug: "itinerary",
+        tab: "items",
+        label: "Items",
+        iconName: "Route",
+      },
+      {
+        key: "itinerary.itinerary",
+        parentSlug: "itinerary",
+        tab: "itinerary",
+        label: "Itinerary",
+        iconName: "FileText",
+      },
     ],
   },
   { slug: "departures", label: "Departures", iconName: "Calendar" },
@@ -111,7 +187,11 @@ export const DEFAULT_MENU_ITEMS: MenuItemDefault[] = [
   { slug: "reviews", label: "Reviews", iconName: "Star" },
   { slug: "reports", label: "Reports", iconName: "BarChart3" },
   { slug: "email-automation", label: "Email", iconName: "Mail" },
-  { slug: "abandoned-recovery", label: "Abandoned Recovery", iconName: "RotateCcw" },
+  {
+    slug: "abandoned-recovery",
+    label: "Abandoned Recovery",
+    iconName: "RotateCcw",
+  },
   { slug: "dynamic-pricing", label: "Dynamic Pricing", iconName: "TrendingUp" },
   { slug: "modules", label: "Modules", iconName: "Puzzle" },
   { slug: "white-label", label: "White Label", iconName: "Crown" },
@@ -221,8 +301,17 @@ export function effectiveIconName(
   item: MenuItemDefault,
   overrides: MenuOverrides,
 ): string {
+  // MenuIconValue is `string | IconPickerValue` — only treat the
+  // string variant as a candidate override. IconPickerValue (object
+  // form) is the picker payload, not the legacy lucide-string name
+  // we resolve from a `<MenuIcon name="…" />` mapping table — the
+  // picker form is handled elsewhere via toPickerValue() and isn't
+  // a substitute for the iconName here.
   const override = overrides[item.slug]?.icon;
-  return override && override.trim() !== "" ? override : item.iconName;
+  if (typeof override === "string" && override.trim() !== "") {
+    return override;
+  }
+  return item.iconName;
 }
 
 export function isHidden(slug: string, overrides: MenuOverrides): boolean {

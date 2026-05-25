@@ -88,9 +88,7 @@ export const ModuleTabsSkeleton: React.FC<{
             <div
               key={i}
               className={`px-4 py-2.5 ${
-                i === 0
-                  ? "border-b-2 border-gray-300 dark:border-gray-600"
-                  : ""
+                i === 0 ? "border-b-2 border-gray-300 dark:border-gray-600" : ""
               }`}
             >
               <Bar className="h-4 w-20" />

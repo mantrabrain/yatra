@@ -234,7 +234,6 @@ const ViewBooking: React.FC = () => {
       zeroAsUnknown: false,
     });
 
-
   const getBookingStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {
       confirmed: {

@@ -627,10 +627,7 @@ const Trips: React.FC = () => {
     }
     if (!/^[\p{L}\p{N}-]+$/u.test(slug)) {
       setCreateTripError(
-        __(
-          "Slug can only contain letters, numbers, and hyphens",
-          "yatra",
-        ),
+        __("Slug can only contain letters, numbers, and hyphens", "yatra"),
       );
       return;
     }

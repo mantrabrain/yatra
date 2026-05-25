@@ -285,11 +285,12 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                     // back to `travelers.length` covers the array case if
                     // the count was missing from the payload.
                     const t: any = (booking as any).travelers;
-                    const n = Number(
-                      (booking as any).travelers_count ??
-                        (Array.isArray(t) ? t.length : t) ??
-                        0,
-                    ) || 0;
+                    const n =
+                      Number(
+                        (booking as any).travelers_count ??
+                          (Array.isArray(t) ? t.length : t) ??
+                          0,
+                      ) || 0;
                     return sprintf(
                       // translators: %d: number of travelers on this booking
                       _n("%d Traveler", "%d Travelers", n, "yatra"),

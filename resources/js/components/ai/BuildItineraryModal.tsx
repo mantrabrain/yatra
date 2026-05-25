@@ -192,11 +192,7 @@ export const BuildItineraryModal: React.FC<BuildItineraryModalProps> = ({
     if (arrivalNotes.trim())
       structured.push(`Arrival/departure logistics: ${arrivalNotes.trim()}`);
 
-    return [
-      structured.join("\n"),
-      extraContext.trim(),
-      extraSuffix.trim(),
-    ]
+    return [structured.join("\n"), extraContext.trim(), extraSuffix.trim()]
       .filter((s) => s !== "")
       .join("\n\n");
   };
@@ -324,7 +320,10 @@ export const BuildItineraryModal: React.FC<BuildItineraryModalProps> = ({
                     <strong>
                       {tripDurationDays} {__("days", "yatra")}
                     </strong>{" "}
-                    {__("of itinerary, matching this trip's duration.", "yatra")}
+                    {__(
+                      "of itinerary, matching this trip's duration.",
+                      "yatra",
+                    )}
                   </span>
                 </div>
               ) : (
@@ -348,9 +347,7 @@ export const BuildItineraryModal: React.FC<BuildItineraryModalProps> = ({
                   <select
                     className="w-full rounded-md border border-gray-300 bg-white p-2 text-sm dark:border-gray-600 dark:bg-gray-800"
                     value={pace}
-                    onChange={(e) =>
-                      setPace(e.target.value as typeof pace)
-                    }
+                    onChange={(e) => setPace(e.target.value as typeof pace)}
                   >
                     <option value="relaxed">{__("Relaxed", "yatra")}</option>
                     <option value="balanced">{__("Balanced", "yatra")}</option>
@@ -367,12 +364,20 @@ export const BuildItineraryModal: React.FC<BuildItineraryModalProps> = ({
                     onChange={(e) => setStyle(e.target.value)}
                   >
                     <option value="cultural">{__("Cultural", "yatra")}</option>
-                    <option value="adventure">{__("Adventure", "yatra")}</option>
+                    <option value="adventure">
+                      {__("Adventure", "yatra")}
+                    </option>
                     <option value="luxury">{__("Luxury", "yatra")}</option>
                     <option value="budget">{__("Budget", "yatra")}</option>
-                    <option value="family-friendly">{__("Family-friendly", "yatra")}</option>
-                    <option value="food-focused">{__("Food-focused", "yatra")}</option>
-                    <option value="photography">{__("Photography", "yatra")}</option>
+                    <option value="family-friendly">
+                      {__("Family-friendly", "yatra")}
+                    </option>
+                    <option value="food-focused">
+                      {__("Food-focused", "yatra")}
+                    </option>
+                    <option value="photography">
+                      {__("Photography", "yatra")}
+                    </option>
                     <option value="wildlife">{__("Wildlife", "yatra")}</option>
                   </select>
                 </div>
@@ -386,10 +391,14 @@ export const BuildItineraryModal: React.FC<BuildItineraryModalProps> = ({
                     onChange={(e) => setAccommodationTier(e.target.value)}
                   >
                     <option value="budget">{__("Budget", "yatra")}</option>
-                    <option value="mid-range">{__("Mid-range", "yatra")}</option>
+                    <option value="mid-range">
+                      {__("Mid-range", "yatra")}
+                    </option>
                     <option value="boutique">{__("Boutique", "yatra")}</option>
                     <option value="luxury">{__("Luxury", "yatra")}</option>
-                    <option value="homestay">{__("Homestay / local", "yatra")}</option>
+                    <option value="homestay">
+                      {__("Homestay / local", "yatra")}
+                    </option>
                   </select>
                 </div>
               </div>
@@ -526,17 +535,12 @@ export const BuildItineraryModal: React.FC<BuildItineraryModalProps> = ({
             <div className="space-y-3">
               <div className="flex items-center justify-between rounded-md border border-blue-200 bg-blue-50/60 px-3 py-2 dark:border-blue-500/40 dark:bg-blue-900/20">
                 <div className="text-sm text-blue-900 dark:text-blue-200">
-                  {__("Drafted", "yatra")}{" "}
-                  <strong>{days.length}</strong>{" "}
+                  {__("Drafted", "yatra")} <strong>{days.length}</strong>{" "}
                   {__("days. Review before applying.", "yatra")}
                   {trip && days.length !== trip.duration_days && (
                     <div className="mt-1 text-xs text-amber-700 dark:text-amber-300">
                       <AlertCircle className="mr-1 inline h-3 w-3" />
-                      {__(
-                        "Trip duration is",
-                        "yatra",
-                      )}{" "}
-                      {trip.duration_days}{" "}
+                      {__("Trip duration is", "yatra")} {trip.duration_days}{" "}
                       {__("days — itinerary may need adjustment.", "yatra")}
                     </div>
                   )}
@@ -785,7 +789,11 @@ function paceHint(p: "relaxed" | "balanced" | "packed"): string {
 function extractError(e: any): string {
   if (!e) return "Request failed.";
   const data = e?.response?.data ?? e?.data ?? null;
-  if (data && typeof data === "object" && typeof (data as any).message === "string") {
+  if (
+    data &&
+    typeof data === "object" &&
+    typeof (data as any).message === "string"
+  ) {
     return (data as any).message;
   }
   return e?.message || "Request failed.";

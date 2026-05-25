@@ -364,233 +364,319 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     // render time. Wrapping is the WordPress-canonical way; the
     // pre_load_script_translations filter then delivers the locale
     // data to wp.i18n on every admin page load.
-    () => [
-      { subpage: "dashboard", label: __("Dashboard", "yatra"), icon: LayoutDashboard, cap: "yatra_access_admin" },
-      {
-        subpage: "trips",
-        label: __("Trips", "yatra"),
-        icon: MapPin,
-        cap: "yatra_view_trips",
-        submenu: [
-          { tab: "all", label: __("All Trips", "yatra"), icon: List },
-          { tab: "activities", label: __("Activities", "yatra"), icon: Activity },
-          { tab: "destinations", label: __("Destinations", "yatra"), icon: Route },
-          { tab: "categories", label: __("Categories", "yatra"), icon: FolderTree },
-          {
-            tab: "difficulty-levels",
-            label: __("Difficulty Levels", "yatra"),
-            icon: TrendingUp,
-          },
-          // Availability - FREE feature, always show
-          { tab: "availability", label: __("Availability", "yatra"), icon: CalendarDays },
-          // Attributes - FREE feature, always show
-          { tab: "attributes", label: __("Attributes", "yatra"), icon: Tag },
-          // Additional Services - show only if Pro plugin is active and module is enabled
-          ...(isProPluginActive() && isModuleActive("additional_services")
-            ? [
-                {
-                  tab: "additional-services",
-                  label: __("Additional Services", "yatra"),
-                  icon: Package,
-                  isPremium: true,
-                },
-              ]
-            : []),
-          // Trip Consent - show only if Pro plugin is active and module is enabled
-          ...(isProPluginActive() && isModuleActive("trip_consent")
-            ? [
-                {
-                  tab: "trip-consent",
-                  label: __("Trip Consent", "yatra"),
-                  icon: FileSignature,
-                  isPremium: true,
-                },
-              ]
-            : []),
-        ],
-      },
-      {
-        subpage: "traveler-categories",
-        label: __("Traveler Categories", "yatra"),
-        icon: UserCircle,
-        cap: "yatra_manage_trip_taxonomies",
-      },
-      {
-        subpage: "itinerary",
-        label: __("Itinerary", "yatra"),
-        icon: FileText,
-        cap: "yatra_edit_trips",
-        submenu: [
-          { tab: "item-types", label: __("Item Types", "yatra"), icon: Tag },
-          { tab: "items", label: __("Items", "yatra"), icon: Route },
-          { tab: "itinerary", label: __("Itinerary", "yatra"), icon: FileText },
-        ],
-      },
-      // Departures - FREE feature, always show
-      { subpage: "departures", label: __("Departures", "yatra"), icon: Calendar, cap: "yatra_view_departures" },
-      { subpage: "discounts", label: __("Discounts", "yatra"), icon: BadgePercent, cap: "yatra_manage_discounts" },
-      { subpage: "payments", label: __("Payments", "yatra"), icon: CreditCard, cap: "yatra_view_financial_reports" },
-      { subpage: "bookings", label: __("Bookings", "yatra"), icon: Calendar, cap: "yatra_view_bookings" },
-      { subpage: "customers", label: __("Customers", "yatra"), icon: UserCircle, cap: "yatra_view_customers" },
-      { subpage: "travelers", label: __("Travelers", "yatra"), icon: Plane, cap: "yatra_view_customers" },
-      { subpage: "enquiries", label: __("Enquiries", "yatra"), icon: MessageSquare, cap: "yatra_view_enquiries" },
-      { subpage: "reviews", label: __("Reviews", "yatra"), icon: Star, cap: "yatra_view_reviews" },
-      { subpage: "reports", label: __("Reports", "yatra"), icon: BarChart3, cap: "yatra_view_operational_reports" },
-      // Email — SMTP & transactional for all; Pro adds automation tabs on the same screen
-      {
-        subpage: "email-automation",
-        label: __("Email", "yatra"),
-        icon: Mail,
-        isPremium: false,
-        cap: "yatra_manage_emails",
-      },
-      // Abandoned Booking Recovery - show only if Pro plugin is active and module is enabled
-      ...(isProPluginActive() && isModuleActive("abandoned_booking_recovery")
-        ? [
+    () =>
+      [
+        {
+          subpage: "dashboard",
+          label: __("Dashboard", "yatra"),
+          icon: LayoutDashboard,
+          cap: "yatra_access_admin",
+        },
+        {
+          subpage: "trips",
+          label: __("Trips", "yatra"),
+          icon: MapPin,
+          cap: "yatra_view_trips",
+          submenu: [
+            { tab: "all", label: __("All Trips", "yatra"), icon: List },
             {
-              subpage: "abandoned-recovery",
-              label: __("Abandoned Recovery", "yatra"),
-              icon: RotateCcw,
-              isPremium: true,
-              cap: "yatra_manage_email_automation",
+              tab: "activities",
+              label: __("Activities", "yatra"),
+              icon: Activity,
             },
-          ]
-        : []),
-      // Dynamic Pricing - show only if Pro plugin is active and module is enabled
-      ...(isProPluginActive() && isModuleActive("dynamic_pricing")
-        ? [
             {
-              subpage: "dynamic-pricing",
-              label: __("Dynamic Pricing", "yatra"),
+              tab: "destinations",
+              label: __("Destinations", "yatra"),
+              icon: Route,
+            },
+            {
+              tab: "categories",
+              label: __("Categories", "yatra"),
+              icon: FolderTree,
+            },
+            {
+              tab: "difficulty-levels",
+              label: __("Difficulty Levels", "yatra"),
               icon: TrendingUp,
-              isPremium: true,
-              cap: "yatra_edit_trips",
             },
-          ]
-        : []),
-      { subpage: "modules", label: __("Modules", "yatra"), icon: Puzzle, cap: "yatra_manage_modules" },
-      // White Label — only when the Agency-tier module is actually enabled.
-      // (Agency license alone is not enough; the module toggle must be on,
-      // otherwise users would see a link to a disabled feature. To get
-      // here for the first time, an Agency admin enables the module from
-      // Yatra → Modules.) The `whiteLabelEnabled` flag from
-      // AdminAssetsProvider already implies Agency-active.
-      // White Label — needs Agency-tier license AND module toggle on.
-      // Mirrors the AI Assistant gate below so both menus appear /
-      // disappear instantly when their module toggles, while staying
-      // license-safe if the client-side `whiteLabelEnabled` flag is
-      // ever stale or over-eager. AdminAssetsProvider seeds both
-      // `isAgency` and `whiteLabelEnabled`; useModules.ts updates the
-      // latter on toggle and fires `yatra-modules-updated` which bumps
-      // navRefreshKey → this memo recomputes → menu appears.
-      ...((window as any).yatraAdmin?.isAgency &&
-      (window as any).yatraAdmin?.whiteLabelEnabled
-        ? [
+            // Availability - FREE feature, always show
             {
-              subpage: "white-label",
-              label: __("White Label", "yatra"),
-              icon: Crown,
-              isPremium: true,
-              cap: "yatra_manage_white_label",
+              tab: "availability",
+              label: __("Availability", "yatra"),
+              icon: CalendarDays,
             },
-          ]
-        : []),
-      // AI Assistant — only when BOTH the license tier qualifies
-      // (Growth or Agency) AND the module toggle is on. Operators who
-      // disable the module shouldn't keep seeing the menu item — it
-      // would lead to a settings page they've explicitly opted out of.
-      // The toggle handler in useModules.ts updates
-      // window.yatraAdmin.aiAssistantEnabled and fires
-      // `yatra-modules-updated`, which bumps navRefreshKey so this
-      // memo recomputes immediately without a page reload.
-      ...((window as any).yatraAdmin?.isAiEligible &&
-      (window as any).yatraAdmin?.aiAssistantEnabled
-        ? [
+            // Attributes - FREE feature, always show
+            { tab: "attributes", label: __("Attributes", "yatra"), icon: Tag },
+            // Additional Services - show only if Pro plugin is active and module is enabled
+            ...(isProPluginActive() && isModuleActive("additional_services")
+              ? [
+                  {
+                    tab: "additional-services",
+                    label: __("Additional Services", "yatra"),
+                    icon: Package,
+                    isPremium: true,
+                  },
+                ]
+              : []),
+            // Trip Consent - show only if Pro plugin is active and module is enabled
+            ...(isProPluginActive() && isModuleActive("trip_consent")
+              ? [
+                  {
+                    tab: "trip-consent",
+                    label: __("Trip Consent", "yatra"),
+                    icon: FileSignature,
+                    isPremium: true,
+                  },
+                ]
+              : []),
+          ],
+        },
+        {
+          subpage: "traveler-categories",
+          label: __("Traveler Categories", "yatra"),
+          icon: UserCircle,
+          cap: "yatra_manage_trip_taxonomies",
+        },
+        {
+          subpage: "itinerary",
+          label: __("Itinerary", "yatra"),
+          icon: FileText,
+          cap: "yatra_edit_trips",
+          submenu: [
+            { tab: "item-types", label: __("Item Types", "yatra"), icon: Tag },
+            { tab: "items", label: __("Items", "yatra"), icon: Route },
             {
-              subpage: "ai-assistant",
-              label: __("AI Assistant", "yatra"),
-              icon: Sparkles,
-              isPremium: true,
-              cap: "yatra_manage_ai",
+              tab: "itinerary",
+              label: __("Itinerary", "yatra"),
+              icon: FileText,
             },
-          ]
-        : []),
-      // WhatsApp Notifications — Growth/Agency module. Same gate
-      // pattern as AI Assistant: needs the AI-eligibility flag (which
-      // is the Growth-or-Agency tier check) AND the module toggle on.
-      // useModules.ts updates `whatsappEnabled` on toggle + fires
-      // `yatra-modules-updated` so this menu appears instantly without
-      // a page reload.
-      ...((window as any).yatraAdmin?.isAiEligible &&
-      (window as any).yatraAdmin?.whatsappEnabled
-        ? [
-            {
-              subpage: "whatsapp",
-              label: __("WhatsApp", "yatra"),
-              icon: MessageCircle,
-              isPremium: true,
-              cap: "yatra_manage_whatsapp",
-            },
-          ]
-        : []),
-      // Channel Manager — Agency-tier OTA distribution hub. Same gate
-      // pattern as White Label: needs the Agency license AND the module
-      // toggle on. useModules.ts updates `channelManagerEnabled` on
-      // toggle + fires `yatra-modules-updated` so this menu appears
-      // instantly without a page reload.
-      ...((window as any).yatraAdmin?.isAgency &&
-      (window as any).yatraAdmin?.channelManagerEnabled
-        ? [
-            {
-              subpage: "channel-manager",
-              label: __("Channel Manager", "yatra"),
-              icon: Network,
-              isPremium: true,
-              cap: "yatra_manage_channel_manager",
-            },
-          ]
-        : []),
-      // Webhooks — Agency-tier outbound integration hub. Same gate
-      // as Channel Manager / White Label: Agency license + module on.
-      ...((window as any).yatraAdmin?.isAgency &&
-      (window as any).yatraAdmin?.webhooksEnabled
-        ? [
-            {
-              subpage: "webhooks",
-              label: __("Webhooks", "yatra"),
-              icon: Webhook,
-              isPremium: true,
-              cap: "yatra_manage_webhooks",
-            },
-          ]
-        : []),
-      // Team & Access — Agency-tier granular roles + capability-level
-      // access + audit log. Gate matches Webhooks: Agency license +
-      // module on. The page itself is also cap-gated server-side; the
-      // sidebar entry is just UX.
-      ...((window as any).yatraAdmin?.isAgency &&
-      (window as any).yatraAdmin?.teamEnabled
-        ? [
-            {
-              subpage: "team",
-              label: __("Team & Access", "yatra"),
-              icon: Users,
-              isPremium: true,
-              cap: "yatra_manage_team",
-            },
-          ]
-        : []),
-      { subpage: "license", label: __("License", "yatra"), icon: Key, cap: "yatra_manage_settings" },
-      { subpage: "settings", label: __("Settings", "yatra"), icon: Settings, cap: "yatra_manage_settings" },
-    ]
-      // Cap-gate every entry. canCap() returns true for WP admins and
-      // when the Team module isn't enabled (= admin-only mode), so this
-      // is a no-op on every site without team management. With team
-      // management active, non-admin team members only see the menus
-      // their role's caps permit.
-      //
-      // Items without a `cap` field are always shown (default-allow).
-      .filter((item: any) => !item.cap || canCap(item.cap)),
+          ],
+        },
+        // Departures - FREE feature, always show
+        {
+          subpage: "departures",
+          label: __("Departures", "yatra"),
+          icon: Calendar,
+          cap: "yatra_view_departures",
+        },
+        {
+          subpage: "discounts",
+          label: __("Discounts", "yatra"),
+          icon: BadgePercent,
+          cap: "yatra_manage_discounts",
+        },
+        {
+          subpage: "payments",
+          label: __("Payments", "yatra"),
+          icon: CreditCard,
+          cap: "yatra_view_financial_reports",
+        },
+        {
+          subpage: "bookings",
+          label: __("Bookings", "yatra"),
+          icon: Calendar,
+          cap: "yatra_view_bookings",
+        },
+        {
+          subpage: "customers",
+          label: __("Customers", "yatra"),
+          icon: UserCircle,
+          cap: "yatra_view_customers",
+        },
+        {
+          subpage: "travelers",
+          label: __("Travelers", "yatra"),
+          icon: Plane,
+          cap: "yatra_view_customers",
+        },
+        {
+          subpage: "enquiries",
+          label: __("Enquiries", "yatra"),
+          icon: MessageSquare,
+          cap: "yatra_view_enquiries",
+        },
+        {
+          subpage: "reviews",
+          label: __("Reviews", "yatra"),
+          icon: Star,
+          cap: "yatra_view_reviews",
+        },
+        {
+          subpage: "reports",
+          label: __("Reports", "yatra"),
+          icon: BarChart3,
+          cap: "yatra_view_operational_reports",
+        },
+        // Email — SMTP & transactional for all; Pro adds automation tabs on the same screen
+        {
+          subpage: "email-automation",
+          label: __("Email", "yatra"),
+          icon: Mail,
+          isPremium: false,
+          cap: "yatra_manage_emails",
+        },
+        // Abandoned Booking Recovery - show only if Pro plugin is active and module is enabled
+        ...(isProPluginActive() && isModuleActive("abandoned_booking_recovery")
+          ? [
+              {
+                subpage: "abandoned-recovery",
+                label: __("Abandoned Recovery", "yatra"),
+                icon: RotateCcw,
+                isPremium: true,
+                cap: "yatra_manage_email_automation",
+              },
+            ]
+          : []),
+        // Dynamic Pricing - show only if Pro plugin is active and module is enabled
+        ...(isProPluginActive() && isModuleActive("dynamic_pricing")
+          ? [
+              {
+                subpage: "dynamic-pricing",
+                label: __("Dynamic Pricing", "yatra"),
+                icon: TrendingUp,
+                isPremium: true,
+                cap: "yatra_edit_trips",
+              },
+            ]
+          : []),
+        {
+          subpage: "modules",
+          label: __("Modules", "yatra"),
+          icon: Puzzle,
+          cap: "yatra_manage_modules",
+        },
+        // White Label — only when the Agency-tier module is actually enabled.
+        // (Agency license alone is not enough; the module toggle must be on,
+        // otherwise users would see a link to a disabled feature. To get
+        // here for the first time, an Agency admin enables the module from
+        // Yatra → Modules.) The `whiteLabelEnabled` flag from
+        // AdminAssetsProvider already implies Agency-active.
+        // White Label — needs Agency-tier license AND module toggle on.
+        // Mirrors the AI Assistant gate below so both menus appear /
+        // disappear instantly when their module toggles, while staying
+        // license-safe if the client-side `whiteLabelEnabled` flag is
+        // ever stale or over-eager. AdminAssetsProvider seeds both
+        // `isAgency` and `whiteLabelEnabled`; useModules.ts updates the
+        // latter on toggle and fires `yatra-modules-updated` which bumps
+        // navRefreshKey → this memo recomputes → menu appears.
+        ...((window as any).yatraAdmin?.isAgency &&
+        (window as any).yatraAdmin?.whiteLabelEnabled
+          ? [
+              {
+                subpage: "white-label",
+                label: __("White Label", "yatra"),
+                icon: Crown,
+                isPremium: true,
+                cap: "yatra_manage_white_label",
+              },
+            ]
+          : []),
+        // AI Assistant — only when BOTH the license tier qualifies
+        // (Growth or Agency) AND the module toggle is on. Operators who
+        // disable the module shouldn't keep seeing the menu item — it
+        // would lead to a settings page they've explicitly opted out of.
+        // The toggle handler in useModules.ts updates
+        // window.yatraAdmin.aiAssistantEnabled and fires
+        // `yatra-modules-updated`, which bumps navRefreshKey so this
+        // memo recomputes immediately without a page reload.
+        ...((window as any).yatraAdmin?.isAiEligible &&
+        (window as any).yatraAdmin?.aiAssistantEnabled
+          ? [
+              {
+                subpage: "ai-assistant",
+                label: __("AI Assistant", "yatra"),
+                icon: Sparkles,
+                isPremium: true,
+                cap: "yatra_manage_ai",
+              },
+            ]
+          : []),
+        // WhatsApp Notifications — Growth/Agency module. Same gate
+        // pattern as AI Assistant: needs the AI-eligibility flag (which
+        // is the Growth-or-Agency tier check) AND the module toggle on.
+        // useModules.ts updates `whatsappEnabled` on toggle + fires
+        // `yatra-modules-updated` so this menu appears instantly without
+        // a page reload.
+        ...((window as any).yatraAdmin?.isAiEligible &&
+        (window as any).yatraAdmin?.whatsappEnabled
+          ? [
+              {
+                subpage: "whatsapp",
+                label: __("WhatsApp", "yatra"),
+                icon: MessageCircle,
+                isPremium: true,
+                cap: "yatra_manage_whatsapp",
+              },
+            ]
+          : []),
+        // Channel Manager — Agency-tier OTA distribution hub. Same gate
+        // pattern as White Label: needs the Agency license AND the module
+        // toggle on. useModules.ts updates `channelManagerEnabled` on
+        // toggle + fires `yatra-modules-updated` so this menu appears
+        // instantly without a page reload.
+        ...((window as any).yatraAdmin?.isAgency &&
+        (window as any).yatraAdmin?.channelManagerEnabled
+          ? [
+              {
+                subpage: "channel-manager",
+                label: __("Channel Manager", "yatra"),
+                icon: Network,
+                isPremium: true,
+                cap: "yatra_manage_channel_manager",
+              },
+            ]
+          : []),
+        // Webhooks — Agency-tier outbound integration hub. Same gate
+        // as Channel Manager / White Label: Agency license + module on.
+        ...((window as any).yatraAdmin?.isAgency &&
+        (window as any).yatraAdmin?.webhooksEnabled
+          ? [
+              {
+                subpage: "webhooks",
+                label: __("Webhooks", "yatra"),
+                icon: Webhook,
+                isPremium: true,
+                cap: "yatra_manage_webhooks",
+              },
+            ]
+          : []),
+        // Team & Access — Agency-tier granular roles + capability-level
+        // access + audit log. Gate matches Webhooks: Agency license +
+        // module on. The page itself is also cap-gated server-side; the
+        // sidebar entry is just UX.
+        ...((window as any).yatraAdmin?.isAgency &&
+        (window as any).yatraAdmin?.teamEnabled
+          ? [
+              {
+                subpage: "team",
+                label: __("Team & Access", "yatra"),
+                icon: Users,
+                isPremium: true,
+                cap: "yatra_manage_team",
+              },
+            ]
+          : []),
+        {
+          subpage: "license",
+          label: __("License", "yatra"),
+          icon: Key,
+          cap: "yatra_manage_settings",
+        },
+        {
+          subpage: "settings",
+          label: __("Settings", "yatra"),
+          icon: Settings,
+          cap: "yatra_manage_settings",
+        },
+      ]
+        // Cap-gate every entry. canCap() returns true for WP admins and
+        // when the Team module isn't enabled (= admin-only mode), so this
+        // is a no-op on every site without team management. With team
+        // management active, non-admin team members only see the menus
+        // their role's caps permit.
+        //
+        // Items without a `cap` field are always shown (default-allow).
+        .filter((item: any) => !item.cap || canCap(item.cap)),
     [navRefreshKey],
   ); // Re-calculate when navRefreshKey changes
 
@@ -881,11 +967,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 key={`${navSubpage}.${navTab ?? ""}`}
                                 href={getUrl(navSubpage, navTab)}
                                 onClick={(e) =>
-                                  handleMenuNavClick(
-                                    e,
-                                    navSubpage,
-                                    navTab,
-                                  )
+                                  handleMenuNavClick(e, navSubpage, navTab)
                                 }
                                 className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors relative ${
                                   subActive

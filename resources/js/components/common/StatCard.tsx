@@ -109,7 +109,8 @@ export const StatCard: React.FC<StatCardProps> = ({
                     : "text-red-600 dark:text-red-400"
                 }`}
               >
-                {trend.isPositive ? "↑" : "↓"} {Math.abs(trend.value).toFixed(1)}%
+                {trend.isPositive ? "↑" : "↓"}{" "}
+                {Math.abs(trend.value).toFixed(1)}%
               </span>
               <span className="text-xs text-gray-400 dark:text-gray-500">
                 {trend.label || "vs prev. period"}

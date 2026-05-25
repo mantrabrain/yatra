@@ -356,7 +356,9 @@ export const teamApi = {
    * history is documented.
    */
   clearAuditLog: () =>
-    apiClient.delete("/team/audit-log", { data: { confirm: true } }) as Promise<{
+    apiClient.delete("/team/audit-log", {
+      data: { confirm: true },
+    }) as Promise<{
       data: { rows_deleted: number };
       message: string;
     }>,

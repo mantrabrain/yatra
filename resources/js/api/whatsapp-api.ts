@@ -132,7 +132,11 @@ export const whatsappApi = {
     }>,
 
   updateCredential: (provider: string, field: string, value: string) =>
-    apiClient.put("/whatsapp/credentials", { provider, field, value }) as Promise<{
+    apiClient.put("/whatsapp/credentials", {
+      provider,
+      field,
+      value,
+    }) as Promise<{
       credentials: Record<string, Record<string, WhatsappCredentialStatus>>;
       message: string;
     }>,
@@ -141,10 +145,14 @@ export const whatsappApi = {
     apiClient.get("/whatsapp/events") as Promise<{ data: WhatsappEvent[] }>,
 
   listTemplates: () =>
-    apiClient.get("/whatsapp/templates") as Promise<{ data: WhatsappTemplate[] }>,
+    apiClient.get("/whatsapp/templates") as Promise<{
+      data: WhatsappTemplate[];
+    }>,
 
   getTemplate: (id: number) =>
-    apiClient.get(`/whatsapp/templates/${id}`) as Promise<{ data: WhatsappTemplate }>,
+    apiClient.get(`/whatsapp/templates/${id}`) as Promise<{
+      data: WhatsappTemplate;
+    }>,
 
   createTemplate: (payload: Partial<WhatsappTemplate>) =>
     apiClient.post("/whatsapp/templates", payload) as Promise<{
@@ -159,7 +167,9 @@ export const whatsappApi = {
     }>,
 
   deleteTemplate: (id: number) =>
-    apiClient.delete(`/whatsapp/templates/${id}`) as Promise<{ message: string }>,
+    apiClient.delete(`/whatsapp/templates/${id}`) as Promise<{
+      message: string;
+    }>,
 
   /**
    * Re-seed the bundled defaults. Useful when the operator has missed
@@ -172,7 +182,10 @@ export const whatsappApi = {
       message: string;
     }>,
 
-  testSendTemplate: (id: number, params: { phone?: string; booking_id?: number }) =>
+  testSendTemplate: (
+    id: number,
+    params: { phone?: string; booking_id?: number },
+  ) =>
     apiClient.post(
       `/whatsapp/templates/${id}/test-send`,
       params,
@@ -182,7 +195,14 @@ export const whatsappApi = {
    * Paginated message log. Returns `total` so the UI can render correct
    * page counts without local slicing. `page` is 1-indexed.
    */
-  listMessages: (params: { page?: number; per_page?: number; status?: string; phone?: string } = {}) =>
+  listMessages: (
+    params: {
+      page?: number;
+      per_page?: number;
+      status?: string;
+      phone?: string;
+    } = {},
+  ) =>
     apiClient.get("/whatsapp/messages", {
       params: {
         page: params.page ?? 1,

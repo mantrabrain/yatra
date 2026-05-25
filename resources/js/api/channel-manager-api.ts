@@ -113,7 +113,9 @@ export const channelManagerApi = {
     apiClient.get("/channel-manager/meta") as Promise<ChannelManagerMeta>,
 
   listChannels: () =>
-    apiClient.get("/channel-manager/channels") as Promise<{ data: ChannelRow[] }>,
+    apiClient.get("/channel-manager/channels") as Promise<{
+      data: ChannelRow[];
+    }>,
 
   createChannel: (payload: Partial<ChannelRow> & { channel_type: string }) =>
     apiClient.post("/channel-manager/channels", payload) as Promise<{
@@ -128,7 +130,9 @@ export const channelManagerApi = {
     }>,
 
   deleteChannel: (id: number) =>
-    apiClient.delete(`/channel-manager/channels/${id}`) as Promise<{ message: string }>,
+    apiClient.delete(`/channel-manager/channels/${id}`) as Promise<{
+      message: string;
+    }>,
 
   updateCredential: (id: number, field: string, value: string) =>
     apiClient.put(`/channel-manager/channels/${id}/credential`, {
@@ -140,7 +144,10 @@ export const channelManagerApi = {
     }>,
 
   testConnection: (id: number) =>
-    apiClient.post(`/channel-manager/channels/${id}/test-connection`, {}) as Promise<{
+    apiClient.post(
+      `/channel-manager/channels/${id}/test-connection`,
+      {},
+    ) as Promise<{
       ok: boolean;
       http_status: number | null;
       error: string;
@@ -160,7 +167,10 @@ export const channelManagerApi = {
     }>,
 
   testWebhook: (id: number) =>
-    apiClient.post(`/channel-manager/channels/${id}/test-webhook`, {}) as Promise<{
+    apiClient.post(
+      `/channel-manager/channels/${id}/test-webhook`,
+      {},
+    ) as Promise<{
       ok: boolean;
       http_status: number;
       response: Record<string, unknown>;
@@ -168,8 +178,14 @@ export const channelManagerApi = {
       error?: string;
     }>,
 
-  bulkMappings: (action: "sync" | "enable" | "disable" | "delete", ids: number[]) =>
-    apiClient.post("/channel-manager/mappings/bulk", { action, ids }) as Promise<{
+  bulkMappings: (
+    action: "sync" | "enable" | "disable" | "delete",
+    ids: number[],
+  ) =>
+    apiClient.post("/channel-manager/mappings/bulk", {
+      action,
+      ids,
+    }) as Promise<{
       ok: boolean;
       action: string;
       succeeded: number;
@@ -196,7 +212,9 @@ export const channelManagerApi = {
     }>,
 
   deleteMapping: (id: number) =>
-    apiClient.delete(`/channel-manager/mappings/${id}`) as Promise<{ message: string }>,
+    apiClient.delete(`/channel-manager/mappings/${id}`) as Promise<{
+      message: string;
+    }>,
 
   syncMapping: (id: number) =>
     apiClient.post(`/channel-manager/mappings/${id}/sync`, {}) as Promise<{
@@ -205,21 +223,25 @@ export const channelManagerApi = {
       error: string;
     }>,
 
-  listBookings: (filters: {
-    channel_id?: number;
-    processing_status?: string;
-    per_page?: number;
-  } = {}) =>
+  listBookings: (
+    filters: {
+      channel_id?: number;
+      processing_status?: string;
+      per_page?: number;
+    } = {},
+  ) =>
     apiClient.get("/channel-manager/bookings", { params: filters }) as Promise<{
       data: ChannelBookingRow[];
     }>,
 
-  listLogs: (filters: {
-    channel_id?: number;
-    operation?: string;
-    status?: string;
-    per_page?: number;
-  } = {}) =>
+  listLogs: (
+    filters: {
+      channel_id?: number;
+      operation?: string;
+      status?: string;
+      per_page?: number;
+    } = {},
+  ) =>
     apiClient.get("/channel-manager/logs", { params: filters }) as Promise<{
       data: SyncLogRow[];
     }>,

@@ -13,7 +13,11 @@ import {
 } from "lucide-react";
 import { __ } from "../../lib/i18n";
 import { aiApi, type AiGenerateResponse } from "../../api/ai-api";
-import { isAiReady, isAiEligible, isAiModuleEnabled } from "../../lib/ai-availability";
+import {
+  isAiReady,
+  isAiEligible,
+  isAiModuleEnabled,
+} from "../../lib/ai-availability";
 
 interface AiFieldAffordanceProps {
   /**
@@ -88,7 +92,10 @@ export const AiFieldAffordance: React.FC<AiFieldAffordanceProps> = ({
   useEffect(() => {
     if (!open) return;
     const onDoc = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
         setShowImprove(false);
       }
@@ -195,9 +202,7 @@ export const AiFieldAffordance: React.FC<AiFieldAffordanceProps> = ({
           >
             <Wand2 className="h-4 w-4 text-blue-500" />
             <span className="flex-1">
-              {hasValue
-                ? __("Regenerate", "yatra")
-                : __("Generate", "yatra")}{" "}
+              {hasValue ? __("Regenerate", "yatra") : __("Generate", "yatra")}{" "}
               <span className="text-gray-400">— {label}</span>
             </span>
           </button>
@@ -311,7 +316,9 @@ function extractError(e: any): string {
   if (data && typeof data === "object") {
     if (typeof (data as any).message === "string") return (data as any).message;
     if (Array.isArray((data as any).errors)) {
-      return (data as any).errors.map((x: any) => x?.message ?? String(x)).join("; ");
+      return (data as any).errors
+        .map((x: any) => x?.message ?? String(x))
+        .join("; ");
     }
   }
   if (typeof e?.message === "string") return e.message;

@@ -935,10 +935,7 @@ const DynamicPricingPage: React.FC = () => {
                               ...prev,
                               isLoading: false,
                             }));
-                            showToast(
-                              __("Failed to delete rule"),
-                              "error",
-                            );
+                            showToast(__("Failed to delete rule"), "error");
                           }
                         },
                       });

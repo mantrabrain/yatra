@@ -259,19 +259,18 @@ export const AiEmailTemplateModal: React.FC<Props> = ({
             </div>
           )}
 
-          {draft && (
-            <DraftEditor
-              draft={draft}
-              onChange={(d) => setDraft(d)}
-            />
-          )}
+          {draft && <DraftEditor draft={draft} onChange={(d) => setDraft(d)} />}
         </div>
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-2 border-t border-gray-200 px-6 py-3 dark:border-gray-700">
           {!draft && (
             <>
-              <Button variant="outline" onClick={onClose} disabled={isGenerating}>
+              <Button
+                variant="outline"
+                onClick={onClose}
+                disabled={isGenerating}
+              >
                 {__("Cancel", "yatra")}
               </Button>
               <Button onClick={generate} disabled={isGenerating}>

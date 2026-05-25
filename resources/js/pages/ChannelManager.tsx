@@ -82,18 +82,25 @@ import {
  *   - Logs:     audit of every push/pull/webhook event
  */
 
-type CmTab = "channels" | "mappings" | "bookings" | "logs" | "reconciliation" | "latency";
+type CmTab =
+  | "channels"
+  | "mappings"
+  | "bookings"
+  | "logs"
+  | "reconciliation"
+  | "latency";
 
 function getInitialTab(): CmTab {
   if (typeof window === "undefined") return "channels";
   const tab = new URLSearchParams(window.location.search).get("tab");
   if (
-    tab === "mappings"
-    || tab === "bookings"
-    || tab === "logs"
-    || tab === "reconciliation"
-    || tab === "latency"
-  ) return tab;
+    tab === "mappings" ||
+    tab === "bookings" ||
+    tab === "logs" ||
+    tab === "reconciliation" ||
+    tab === "latency"
+  )
+    return tab;
   return "channels";
 }
 
@@ -142,7 +149,11 @@ const ChannelManager: React.FC = () => {
     { key: "logs", label: __("Sync activity", "yatra"), icon: Clock },
     // Reconciliation answers "where do I have unfinished business?" —
     // stale mappings, pending booking promotions, breaker states.
-    { key: "reconciliation", label: __("Reconciliation", "yatra"), icon: AlertTriangle },
+    {
+      key: "reconciliation",
+      label: __("Reconciliation", "yatra"),
+      icon: AlertTriangle,
+    },
     // Latency answers "are my OTAs slow today?" — p50/p95/p99 of
     // sync durations across 24h + 7d windows.
     { key: "latency", label: __("Latency", "yatra"), icon: Activity },
@@ -264,22 +275,34 @@ const AboutCard: React.FC = () => (
         <ValueCallout
           icon={Globe}
           title={__("Reach new customers", "yatra")}
-          body={__("OTAs market your trips to millions of travelers worldwide.", "yatra")}
+          body={__(
+            "OTAs market your trips to millions of travelers worldwide.",
+            "yatra",
+          )}
         />
         <ValueCallout
           icon={ShieldCheck}
           title={__("No overbooking", "yatra")}
-          body={__("Real-time inventory keeps stock in sync across every channel.", "yatra")}
+          body={__(
+            "Real-time inventory keeps stock in sync across every channel.",
+            "yatra",
+          )}
         />
         <ValueCallout
           icon={TrendingUp}
           title={__("Smart pricing", "yatra")}
-          body={__("Per-channel offsets cover commission while keeping margins.", "yatra")}
+          body={__(
+            "Per-channel offsets cover commission while keeping margins.",
+            "yatra",
+          )}
         />
         <ValueCallout
           icon={Layers}
           title={__("Bring your own credentials", "yatra")}
-          body={__("Connections go direct to the OTA. No proxying, no markup.", "yatra")}
+          body={__(
+            "Connections go direct to the OTA. No proxying, no markup.",
+            "yatra",
+          )}
         />
       </div>
     </CardContent>
@@ -433,7 +456,7 @@ const ChannelsSection: React.FC<{ meta: ChannelManagerMeta }> = ({ meta }) => {
     const channel =
       editing === "new"
         ? null
-        : data?.data.find((c) => c.id === editing) ?? null;
+        : (data?.data.find((c) => c.id === editing) ?? null);
     return (
       <ChannelEditForm
         meta={meta}
@@ -595,7 +618,8 @@ const ChannelsSection: React.FC<{ meta: ChannelManagerMeta }> = ({ meta }) => {
           if (!deleteChannel.isPending) setPendingDeleteChannel(null);
         }}
         onConfirm={() => {
-          if (pendingDeleteChannel) deleteChannel.mutate(pendingDeleteChannel.id);
+          if (pendingDeleteChannel)
+            deleteChannel.mutate(pendingDeleteChannel.id);
         }}
         title={__("Delete channel?", "yatra")}
         description={
@@ -679,7 +703,8 @@ const ChannelEditForm: React.FC<{
   // in the channel's `settings` JSON under `allowed_ips`. Empty = no
   // restriction (default). Comma- and/or newline-separated CIDR list.
   const [allowedIps, setAllowedIps] = useState<string>(
-    ((existing?.settings as Record<string, unknown> | undefined)?.allowed_ips as string) ?? "",
+    ((existing?.settings as Record<string, unknown> | undefined)
+      ?.allowed_ips as string) ?? "",
   );
 
   const typeDef = useMemo(
@@ -703,7 +728,8 @@ const ChannelEditForm: React.FC<{
         // overrides, custom fields a future feature might add) are
         // preserved on update.
         settings: {
-          ...((existing?.settings as Record<string, unknown> | undefined) ?? {}),
+          ...((existing?.settings as Record<string, unknown> | undefined) ??
+            {}),
           allowed_ips: allowedIps,
         },
       };
@@ -997,9 +1023,7 @@ const ChannelEditForm: React.FC<{
                 type="number"
                 step="0.01"
                 value={defaultOffset}
-                onChange={(e) =>
-                  setDefaultOffset(Number(e.target.value) || 0)
-                }
+                onChange={(e) => setDefaultOffset(Number(e.target.value) || 0)}
                 placeholder="0"
               />
             </FormField>
@@ -1322,9 +1346,7 @@ const MappingsSection: React.FC = () => {
   // Unified pending-delete state. `kind` differentiates a single-row
   // delete from a bulk delete so one <ConfirmationDialog> can serve both.
   const [pendingDelete, setPendingDelete] = useState<
-    | { kind: "one"; id: number }
-    | { kind: "bulk"; ids: number[] }
-    | null
+    { kind: "one"; id: number } | { kind: "bulk"; ids: number[] } | null
   >(null);
 
   const { data: channelsData } = useQuery({
@@ -1333,8 +1355,7 @@ const MappingsSection: React.FC = () => {
   });
   const { data: mappingsData, isLoading } = useQuery({
     queryKey: ["channel-manager-mappings", filterChannel],
-    queryFn: () =>
-      channelManagerApi.listMappings(filterChannel || undefined),
+    queryFn: () => channelManagerApi.listMappings(filterChannel || undefined),
   });
 
   const syncMapping = useMutation({
@@ -1526,10 +1547,7 @@ const MappingsSection: React.FC = () => {
             disabled={channels.length === 0}
             title={
               channels.length === 0
-                ? __(
-                    "Add at least one channel first.",
-                    "yatra",
-                  )
+                ? __("Add at least one channel first.", "yatra")
                 : undefined
             }
           >
@@ -1689,7 +1707,10 @@ const MappingsSection: React.FC = () => {
                                     {title}
                                   </a>
                                 ) : (
-                                  <span className="truncate font-medium" title={title}>
+                                  <span
+                                    className="truncate font-medium"
+                                    title={title}
+                                  >
                                     {title}
                                   </span>
                                 )}
@@ -1755,7 +1776,10 @@ const MappingsSection: React.FC = () => {
                               size="sm"
                               onClick={() => syncMapping.mutate(m.id)}
                               disabled={syncMapping.isPending}
-                              title={__("Push inventory + pricing now", "yatra")}
+                              title={__(
+                                "Push inventory + pricing now",
+                                "yatra",
+                              )}
                             >
                               <RefreshCw className="h-3.5 w-3.5" />
                             </Button>
@@ -2097,10 +2121,7 @@ const MappingAddForm: React.FC<{
         <div className="grid gap-5 md:grid-cols-2">
           <FormField
             label={__("Channel", "yatra")}
-            description={__(
-              "Which channel this mapping pushes to.",
-              "yatra",
-            )}
+            description={__("Which channel this mapping pushes to.", "yatra")}
           >
             <Select
               value={String(channelId)}
@@ -2253,7 +2274,9 @@ const MappingEditForm: React.FC<{
   const [syncInventory, setSyncInventory] = useState<boolean>(
     existing.sync_inventory,
   );
-  const [syncPricing, setSyncPricing] = useState<boolean>(existing.sync_pricing);
+  const [syncPricing, setSyncPricing] = useState<boolean>(
+    existing.sync_pricing,
+  );
 
   const channel = channels.find((c) => c.id === existing.channel_id);
 
@@ -2279,7 +2302,9 @@ const MappingEditForm: React.FC<{
     mutationFn: () => channelManagerApi.syncMapping(existing.id),
     onSuccess: (res) =>
       showToast(
-        res.ok ? __("Synced.", "yatra") : res.error || __("Sync failed.", "yatra"),
+        res.ok
+          ? __("Synced.", "yatra")
+          : res.error || __("Sync failed.", "yatra"),
         res.ok ? "success" : "error",
       ),
     onError: (e: any) => showToast(extractError(e), "error"),
@@ -2357,10 +2382,7 @@ const MappingEditForm: React.FC<{
 
             <FormField
               label={__("Trip ID", "yatra")}
-              description={__(
-                "Immutable. One trip per channel.",
-                "yatra",
-              )}
+              description={__("Immutable. One trip per channel.", "yatra")}
             >
               <Input value={`#${existing.trip_id}`} disabled />
             </FormField>
@@ -2490,18 +2512,12 @@ const BookingsSection: React.FC = () => {
           <StatusLegend
             color="blue"
             label={__("received", "yatra")}
-            description={__(
-              "staged — not yet a real booking",
-              "yatra",
-            )}
+            description={__("staged — not yet a real booking", "yatra")}
           />
           <StatusLegend
             color="green"
             label={__("promoted", "yatra")}
-            description={__(
-              "live booking, visible everywhere",
-              "yatra",
-            )}
+            description={__("live booking, visible everywhere", "yatra")}
           />
           <StatusLegend
             color="red"
@@ -2565,9 +2581,7 @@ const BookingsSection: React.FC = () => {
                       <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
                         {b.departure_date || "—"}
                       </td>
-                      <td className="px-4 py-3 text-sm">
-                        {b.travelers_total}
-                      </td>
+                      <td className="px-4 py-3 text-sm">{b.travelers_total}</td>
                       <td className="px-4 py-3 text-sm">
                         {b.currency} {Number(b.total_amount).toFixed(2)}
                       </td>
@@ -2654,8 +2668,14 @@ const ReconciliationSection: React.FC = () => {
             )}
           </p>
         </div>
-        <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
-          <RefreshCw className={`h-4 w-4 mr-1 ${isFetching ? "animate-spin" : ""}`} />
+        <Button
+          variant="outline"
+          onClick={() => refetch()}
+          disabled={isFetching}
+        >
+          <RefreshCw
+            className={`h-4 w-4 mr-1 ${isFetching ? "animate-spin" : ""}`}
+          />
           {__("Refresh", "yatra")}
         </Button>
       </div>
@@ -2712,7 +2732,9 @@ const ReconciliationSection: React.FC = () => {
       {/* Per-channel breakdown */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">{__("Per channel", "yatra")}</CardTitle>
+          <CardTitle className="text-base">
+            {__("Per channel", "yatra")}
+          </CardTitle>
           <CardDescription>
             {__(
               "Channels marked “Needs attention” have stale mappings, pending bookings, recent failures, or a tripped breaker.",
@@ -2777,14 +2799,20 @@ const ReconciliationSection: React.FC = () => {
                     <td className="px-3 py-2 text-xs">
                       {c.bookings.pending > 0 ? (
                         <div className="text-amber-600 dark:text-amber-400">
-                          {sprintf(__("%d pending", "yatra"), c.bookings.pending)}
+                          {sprintf(
+                            __("%d pending", "yatra"),
+                            c.bookings.pending,
+                          )}
                         </div>
                       ) : (
                         <span className="text-gray-400">—</span>
                       )}
                       {c.bookings.failed_7d > 0 && (
                         <div className="text-red-600 dark:text-red-400">
-                          {sprintf(__("%d failed (7d)", "yatra"), c.bookings.failed_7d)}
+                          {sprintf(
+                            __("%d failed (7d)", "yatra"),
+                            c.bookings.failed_7d,
+                          )}
                         </div>
                       )}
                     </td>
@@ -2918,8 +2946,14 @@ const LatencySection: React.FC = () => {
             {__("recent samples per channel per window.", "yatra")}
           </p>
         </div>
-        <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
-          <RefreshCw className={`h-4 w-4 mr-1 ${isFetching ? "animate-spin" : ""}`} />
+        <Button
+          variant="outline"
+          onClick={() => refetch()}
+          disabled={isFetching}
+        >
+          <RefreshCw
+            className={`h-4 w-4 mr-1 ${isFetching ? "animate-spin" : ""}`}
+          />
           {__("Refresh", "yatra")}
         </Button>
       </div>
@@ -2941,7 +2975,10 @@ const LatencySection: React.FC = () => {
       <LatencyTable
         title={__("Per provider", "yatra")}
         rows={report.per_provider.flatMap((p) => [
-          { label: `${p.provider} · ${__("24h", "yatra")}`, window: p.last_24h },
+          {
+            label: `${p.provider} · ${__("24h", "yatra")}`,
+            window: p.last_24h,
+          },
           { label: `${p.provider} · ${__("7d", "yatra")}`, window: p.last_7d },
         ])}
       />
@@ -3152,9 +3189,7 @@ const LogsSection: React.FC = () => {
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">
-                        {row.duration_ms != null
-                          ? `${row.duration_ms}ms`
-                          : "—"}
+                        {row.duration_ms != null ? `${row.duration_ms}ms` : "—"}
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-700 dark:text-gray-200 max-w-md">
                         <div className="truncate">
@@ -3270,9 +3305,7 @@ const Th: React.FC<{
  */
 const HealthBadge: React.FC<{ health?: ChannelHealth }> = ({ health }) => {
   if (!health) {
-    return (
-      <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
-    );
+    return <span className="text-xs text-gray-400 dark:text-gray-500">—</span>;
   }
   const { status, breaker, recent } = health;
   const cls =

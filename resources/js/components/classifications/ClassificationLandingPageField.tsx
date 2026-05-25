@@ -37,14 +37,13 @@ export function parseLandingPageIdFromMetadata(
   if (raw == null || raw === "") {
     return null;
   }
-  const n =
-    typeof raw === "number" ? raw : parseInt(String(raw).trim(), 10);
+  const n = typeof raw === "number" ? raw : parseInt(String(raw).trim(), 10);
   return Number.isFinite(n) && n > 0 ? n : null;
 }
 
-export async function fetchPublishedPagePermalink(pageId: number): Promise<
-  string | null
-> {
+export async function fetchPublishedPagePermalink(
+  pageId: number,
+): Promise<string | null> {
   if (!pageId) {
     return null;
   }
@@ -94,9 +93,7 @@ async function fetchPublishedPagesFirstPage(): Promise<{
   const items = Array.isArray(data) ? data : [];
   const totalRaw = res.headers.get("X-WP-Total");
   const total =
-    totalRaw !== null && totalRaw !== ""
-      ? parseInt(totalRaw, 10)
-      : null;
+    totalRaw !== null && totalRaw !== "" ? parseInt(totalRaw, 10) : null;
 
   return { items, total: Number.isFinite(total) ? total : null };
 }
@@ -105,16 +102,13 @@ async function fetchSinglePublishedPage(
   pageId: number,
 ): Promise<WpPageSearchItem | null> {
   const nonce = window.yatraAdmin?.nonce || "";
-  const res = await fetch(
-    `${restRoot()}wp/v2/pages/${pageId}?context=embed`,
-    {
-      credentials: "same-origin",
-      headers: {
-        "X-WP-Nonce": nonce,
-        Accept: "application/json",
-      },
+  const res = await fetch(`${restRoot()}wp/v2/pages/${pageId}?context=embed`, {
+    credentials: "same-origin",
+    headers: {
+      "X-WP-Nonce": nonce,
+      Accept: "application/json",
     },
-  );
+  });
   if (!res.ok) {
     return null;
   }
@@ -163,7 +157,7 @@ export function ClassificationLandingPageField({
 }: ClassificationLandingPageFieldProps) {
   const moduleOn = Boolean(
     typeof window !== "undefined" &&
-      window.yatraAdmin?.customLandingPagesModuleEnabled,
+    window.yatraAdmin?.customLandingPagesModuleEnabled,
   );
 
   const [pages, setPages] = useState<WpPageSearchItem[]>([]);
@@ -289,8 +283,7 @@ export function ClassificationLandingPageField({
               </option>
               {pages.map((p) => {
                 const id = Number(p.id);
-                const label =
-                  parsePageTitle(p) || __("(no title)", "yatra");
+                const label = parsePageTitle(p) || __("(no title)", "yatra");
 
                 return (
                   <option key={id} value={String(id)}>

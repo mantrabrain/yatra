@@ -526,7 +526,9 @@ const Itinerary: React.FC = () => {
               excluded_items: entry.excluded_items ?? [],
               status: entry.status || "active",
               created_at: entry.created_at || entry.createdAt || "",
-              order: Number.isFinite(Number(entry.order)) ? Number(entry.order) : 0,
+              order: Number.isFinite(Number(entry.order))
+                ? Number(entry.order)
+                : 0,
               time_type: entry.time_type || "exact",
             };
 
@@ -2192,7 +2194,8 @@ const Itinerary: React.FC = () => {
                                   {entry.time_type === "flexible"
                                     ? __("Flexible", "yatra")
                                     : entry.time_type === "duration"
-                                      ? entry.duration || __("Duration", "yatra")
+                                      ? entry.duration ||
+                                        __("Duration", "yatra")
                                       : entry.start_time
                                         ? entry.end_time
                                           ? `${formatTime(entry.start_time)} - ${formatTime(entry.end_time)}`
@@ -2636,9 +2639,9 @@ const Itinerary: React.FC = () => {
               onClose={() => setAiModalOpen(false)}
               tripId={Number(tripFilter)}
               tripName={
-                ((selectedTrip?.title as string) ||
-                  (selectedTrip?.name as string) ||
-                  __("Selected trip", "yatra"))
+                (selectedTrip?.title as string) ||
+                (selectedTrip?.name as string) ||
+                __("Selected trip", "yatra")
               }
               tripDurationDays={Number.isFinite(duration) ? duration : 0}
               onApplied={({ message }) => {

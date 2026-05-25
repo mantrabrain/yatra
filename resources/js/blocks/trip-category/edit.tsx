@@ -50,7 +50,10 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 
     let ids = normalizeIds(attributes.categoryIds);
     if (ids.length === 0) {
-      ids = migrateNumericCsvPairToIds(attributes.category_ids, attributes.category);
+      ids = migrateNumericCsvPairToIds(
+        attributes.category_ids,
+        attributes.category,
+      );
     }
     if (ids.length === 0) {
       return;

@@ -81,7 +81,8 @@ import { navigateMenu } from "../hooks/useNavigate";
  */
 function getPrimaryRoleLabel(): { slug: string; label: string } {
   const roles = (window.yatraAdmin as { roles?: string[] } | undefined)?.roles;
-  if (!Array.isArray(roles)) return { slug: "", label: __("Team member", "yatra") };
+  if (!Array.isArray(roles))
+    return { slug: "", label: __("Team member", "yatra") };
 
   // Yatra system roles, in priority order — first match wins. Display
   // labels mirror RoleProvisioner::roleLabels() so the front-end UX
@@ -121,18 +122,18 @@ const RoleDashboard: React.FC = () => {
     (window as { yatraAdmin?: { currency?: string } })?.yatraAdmin?.currency ||
     "USD";
   const currencyPosition = readYatraCurrencyPositionFromWindow();
-  const currencyDecimalsRaw = (
-    window.yatraAdmin as
-      | { decimalPlaces?: number; currency_decimals?: number }
-      | undefined
-  );
+  const currencyDecimalsRaw = window.yatraAdmin as
+    | { decimalPlaces?: number; currency_decimals?: number }
+    | undefined;
   const currencyDecimals = Number.isFinite(
     Number(
-      currencyDecimalsRaw?.decimalPlaces ?? currencyDecimalsRaw?.currency_decimals,
+      currencyDecimalsRaw?.decimalPlaces ??
+        currencyDecimalsRaw?.currency_decimals,
     ),
   )
     ? Number(
-        currencyDecimalsRaw?.decimalPlaces ?? currencyDecimalsRaw?.currency_decimals,
+        currencyDecimalsRaw?.decimalPlaces ??
+          currencyDecimalsRaw?.currency_decimals,
       )
     : 2;
 
@@ -356,7 +357,9 @@ const RoleDashboard: React.FC = () => {
           {showBookingsCount && (
             <StatCard
               title={__("Bookings", "yatra")}
-              value={(bookingStats as { total?: number } | undefined)?.total ?? 0}
+              value={
+                (bookingStats as { total?: number } | undefined)?.total ?? 0
+              }
               icon={Calendar}
               color="green"
               loading={bookingStatsLoading}
@@ -401,8 +404,11 @@ const RoleDashboard: React.FC = () => {
             <StatCard
               title={__("Conversion", "yatra")}
               value={`${Number(
-                (reportData as { booking_stats?: { conversionRate?: number } } | undefined)
-                  ?.booking_stats?.conversionRate || 0,
+                (
+                  reportData as
+                    | { booking_stats?: { conversionRate?: number } }
+                    | undefined
+                )?.booking_stats?.conversionRate || 0,
               ).toFixed(1)}%`}
               icon={TrendingUp}
               color="blue"
@@ -416,8 +422,11 @@ const RoleDashboard: React.FC = () => {
             <StatCard
               title={__("Occupancy", "yatra")}
               value={`${Number(
-                (reportData as { operational_stats?: { occupancyRate?: number } } | undefined)
-                  ?.operational_stats?.occupancyRate || 0,
+                (
+                  reportData as
+                    | { operational_stats?: { occupancyRate?: number } }
+                    | undefined
+                )?.operational_stats?.occupancyRate || 0,
               ).toFixed(1)}%`}
               icon={CheckCircle}
               color="orange"
@@ -456,16 +465,10 @@ const RoleDashboard: React.FC = () => {
 
         <div className="space-y-3 lg:col-span-5">
           {canCap("yatra_view_departures") && (
-            <UpcomingDepartures
-              departures={departures || []}
-              loading={false}
-            />
+            <UpcomingDepartures departures={departures || []} loading={false} />
           )}
           {canCap("yatra_view_financial_reports") && (
-            <PendingPayments
-              payments={pendingPayments || []}
-              loading={false}
-            />
+            <PendingPayments payments={pendingPayments || []} loading={false} />
           )}
         </div>
       </div>

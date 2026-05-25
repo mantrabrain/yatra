@@ -160,15 +160,37 @@ export interface EnquiryReplyOptions {
 
 export const aiApi = {
   meta: () => apiClient.get("/ai/meta") as Promise<AiMeta>,
-  generate: (task: string, context: Record<string, unknown>, options: Record<string, unknown> = {}) =>
-    apiClient.post("/ai/generate", { task, context, options }) as Promise<AiGenerateResponse>,
-  improve: (task: string, currentValue: string, options: Record<string, unknown> = {}) =>
-    apiClient.post("/ai/improve", { task, current_value: currentValue, options }) as Promise<AiGenerateResponse>,
-  getBrandVoice: () => apiClient.get("/ai/brand-voice") as Promise<{ data: AiBrandVoice }>,
+  generate: (
+    task: string,
+    context: Record<string, unknown>,
+    options: Record<string, unknown> = {},
+  ) =>
+    apiClient.post("/ai/generate", {
+      task,
+      context,
+      options,
+    }) as Promise<AiGenerateResponse>,
+  improve: (
+    task: string,
+    currentValue: string,
+    options: Record<string, unknown> = {},
+  ) =>
+    apiClient.post("/ai/improve", {
+      task,
+      current_value: currentValue,
+      options,
+    }) as Promise<AiGenerateResponse>,
+  getBrandVoice: () =>
+    apiClient.get("/ai/brand-voice") as Promise<{ data: AiBrandVoice }>,
   saveBrandVoice: (data: AiBrandVoice) =>
-    apiClient.put("/ai/brand-voice", data) as Promise<{ data: AiBrandVoice; message: string }>,
+    apiClient.put("/ai/brand-voice", data) as Promise<{
+      data: AiBrandVoice;
+      message: string;
+    }>,
   setKey: (provider: string, apiKey: string) =>
-    apiClient.post(`/ai/keys/${encodeURIComponent(provider)}`, { api_key: apiKey }) as Promise<{
+    apiClient.post(`/ai/keys/${encodeURIComponent(provider)}`, {
+      api_key: apiKey,
+    }) as Promise<{
       keys: Record<string, AiKeyStatus>;
       message: string;
     }>,
@@ -178,11 +200,15 @@ export const aiApi = {
       message: string;
     }>,
   testKey: (provider: string) =>
-    apiClient.post(`/ai/keys/${encodeURIComponent(provider)}/test`, {}) as Promise<{
+    apiClient.post(
+      `/ai/keys/${encodeURIComponent(provider)}/test`,
+      {},
+    ) as Promise<{
       ok: boolean;
       message: string;
     }>,
-  getUsage: () => apiClient.get("/ai/usage") as Promise<{ data: AiUsageSummary }>,
+  getUsage: () =>
+    apiClient.get("/ai/usage") as Promise<{ data: AiUsageSummary }>,
 
   // Operations AI
   draftEnquiryReply: (enquiryId: number, opts: EnquiryReplyOptions = {}) =>
@@ -215,12 +241,18 @@ export const aiApi = {
       };
     }>,
   refreshDashboardDigest: () =>
-    apiClient.post("/ai/dashboard/digest/refresh", {}) as Promise<{ data: AiDigest }>,
+    apiClient.post("/ai/dashboard/digest/refresh", {}) as Promise<{
+      data: AiDigest;
+    }>,
 
   // Prompt overrides
-  listPrompts: () => apiClient.get("/ai/prompts") as Promise<{ data: AiPromptRow[] }>,
+  listPrompts: () =>
+    apiClient.get("/ai/prompts") as Promise<{ data: AiPromptRow[] }>,
   savePromptOverride: (task: string, override: AiPromptOverridePayload) =>
-    apiClient.put(`/ai/prompts/${encodeURIComponent(task)}`, override) as Promise<{
+    apiClient.put(
+      `/ai/prompts/${encodeURIComponent(task)}`,
+      override,
+    ) as Promise<{
       task: string;
       override: AiPromptOverridePayload;
       has_override: boolean;
@@ -375,10 +407,13 @@ export const aiApi = {
     }>,
     replace: boolean,
   ) =>
-    apiClient.post(`/ai/itinerary/${encodeURIComponent(String(tripId))}/apply`, {
-      days,
-      replace,
-    }) as Promise<{
+    apiClient.post(
+      `/ai/itinerary/${encodeURIComponent(String(tripId))}/apply`,
+      {
+        days,
+        replace,
+      },
+    ) as Promise<{
       created: Array<{ id: number; day: number; day_title: string }>;
       count: number;
       message: string;

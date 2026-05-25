@@ -80,16 +80,15 @@ interface ItineraryDay {
 function plainTextToHtml(text: string): string {
   if (!text) return "";
   const escape = (s: string) =>
-    s
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const paragraphs = text
     .replace(/\r\n?/g, "\n")
     .split(/\n{2,}/)
     .map((p) => p.trim())
     .filter((p) => p !== "");
-  return paragraphs.map((p) => `<p>${escape(p).replace(/\n/g, "<br>")}</p>`).join("");
+  return paragraphs
+    .map((p) => `<p>${escape(p).replace(/\n/g, "<br>")}</p>`)
+    .join("");
 }
 
 function decodeAmenityList(text: string): AmenityItem[] {
@@ -167,9 +166,7 @@ const ALL_TASKS: TaskSpec[] = [
         .map((l) => l.replace(/^[\s\-\*•·●]+/, "").trim())
         .filter((l) => l !== ""),
     preview: (v) =>
-      Array.isArray(v)
-        ? (v as string[]).map((s) => `• ${s}`).join("\n")
-        : "",
+      Array.isArray(v) ? (v as string[]).map((s) => `• ${s}`).join("\n") : "",
   },
   {
     key: "included_items",
@@ -279,9 +276,7 @@ export const AutoFillTripModal: React.FC<AutoFillTripModalProps> = ({
   );
 
   const [rows, setRows] = useState<TaskRow[]>(initialRows);
-  const [phase, setPhase] = useState<"setup" | "running" | "preview">(
-    "setup",
-  );
+  const [phase, setPhase] = useState<"setup" | "running" | "preview">("setup");
   // Free-text context the operator types into the modal. Gets passed to
   // every selected task as `{{extra_context}}`, so a brand-new trip
   // with only a title still produces useful output instead of the LLM
@@ -302,13 +297,7 @@ export const AutoFillTripModal: React.FC<AutoFillTripModalProps> = ({
 
   if (!isAiReady()) {
     return (
-      <Modal
-        isOpen={open}
-        onClose={onClose}
-        size="md"
-        hideHeader
-        hideFooter
-      >
+      <Modal isOpen={open} onClose={onClose} size="md" hideHeader hideFooter>
         <div className="p-6 max-w-md">
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
@@ -345,12 +334,14 @@ export const AutoFillTripModal: React.FC<AutoFillTripModalProps> = ({
   const needsContextCount = rows.filter(
     (r) => r.status === "needs_context",
   ).length;
-  const allDone = rows.filter((r) => r.selected).every(
-    (r) =>
-      r.status === "done" ||
-      r.status === "failed" ||
-      r.status === "needs_context",
-  );
+  const allDone = rows
+    .filter((r) => r.selected)
+    .every(
+      (r) =>
+        r.status === "done" ||
+        r.status === "failed" ||
+        r.status === "needs_context",
+    );
 
   const toggle = (key: string) =>
     setRows((prev) =>
@@ -658,10 +649,7 @@ export const AutoFillTripModal: React.FC<AutoFillTripModalProps> = ({
               {__("Cancel", "yatra")}
             </Button>
             {phase === "setup" && (
-              <Button
-                onClick={runGenerations}
-                disabled={selectedCount === 0}
-              >
+              <Button onClick={runGenerations} disabled={selectedCount === 0}>
                 <Sparkles className="mr-2 h-4 w-4" />
                 {__("Generate", "yatra")}
               </Button>
@@ -808,7 +796,11 @@ const StatusBadge: React.FC<{ status: TaskStatus }> = ({ status }) => {
 function extractError(e: any): string {
   if (!e) return "Generation failed.";
   const data = e?.response?.data ?? e?.data ?? null;
-  if (data && typeof data === "object" && typeof (data as any).message === "string") {
+  if (
+    data &&
+    typeof data === "object" &&
+    typeof (data as any).message === "string"
+  ) {
     return (data as any).message;
   }
   return e?.message || "Generation failed.";

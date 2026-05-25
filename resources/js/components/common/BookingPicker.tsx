@@ -123,9 +123,7 @@ export const BookingPicker: React.FC<BookingPickerProps> = ({
       })
       .catch((err: any) => {
         if (reqId !== requestIdRef.current) return;
-        setLoadError(
-          err?.message || __("Failed to load bookings.", "yatra"),
-        );
+        setLoadError(err?.message || __("Failed to load bookings.", "yatra"));
         setResults([]);
       })
       .finally(() => {

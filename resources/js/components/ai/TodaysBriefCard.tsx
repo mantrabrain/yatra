@@ -160,10 +160,17 @@ export const TodaysBriefCard: React.FC = () => {
       {/* Brief body */}
       <div className="border-t border-blue-100 bg-white/40 px-5 py-3 dark:border-blue-500/30 dark:bg-gray-900/30">
         {isError && (
-          <BriefError onRetry={() => refresh.mutate()} retrying={refresh.isPending} />
+          <BriefError
+            onRetry={() => refresh.mutate()}
+            retrying={refresh.isPending}
+          />
         )}
         {!isError && (
-          <BriefBody digest={digest} onRetry={() => refresh.mutate()} retrying={refresh.isPending} />
+          <BriefBody
+            digest={digest}
+            onRetry={() => refresh.mutate()}
+            retrying={refresh.isPending}
+          />
         )}
       </div>
     </div>
@@ -182,7 +189,11 @@ const BriefBody: React.FC<{
   if (digest.state === "all_caught_up") {
     return (
       <p className="text-sm text-emerald-700 dark:text-emerald-300">
-        ✓ {__("You're caught up. Nothing urgent needs attention right now.", "yatra")}
+        ✓{" "}
+        {__(
+          "You're caught up. Nothing urgent needs attention right now.",
+          "yatra",
+        )}
       </p>
     );
   }

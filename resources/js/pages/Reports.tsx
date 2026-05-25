@@ -385,9 +385,7 @@ const DetailedBreakdownChart: React.FC<{
       : "bg-blue-500";
 
   const valueLabel = (v: number) =>
-    isRevenue
-      ? formatCurrencyAmount(v)
-      : v.toLocaleString();
+    isRevenue ? formatCurrencyAmount(v) : v.toLocaleString();
 
   return (
     <div className="space-y-4">
@@ -407,7 +405,10 @@ const DetailedBreakdownChart: React.FC<{
           rest into invisibility. */}
       <div className="space-y-2">
         {bucketed.map((item, index) => (
-          <div key={`${item.date}-${index}`} className="flex items-center gap-2">
+          <div
+            key={`${item.date}-${index}`}
+            className="flex items-center gap-2"
+          >
             <div className="w-20 shrink-0 text-right text-xs text-gray-600 dark:text-gray-400">
               {item.label}
             </div>
@@ -547,9 +548,10 @@ const DetailedBreakdownTable: React.FC<{
     const oc = occCapacityBucketed.find((p) => p.label === bRow.label);
     const bookedSeats = ob?.value ?? 0;
     const capacitySeats = oc?.value ?? 0;
-    const occRate = capacitySeats > 0
-      ? Math.round((bookedSeats / capacitySeats) * 1000) / 10
-      : 0;
+    const occRate =
+      capacitySeats > 0
+        ? Math.round((bookedSeats / capacitySeats) * 1000) / 10
+        : 0;
     return {
       period: bRow.label,
       fullDate: bRow.date,
@@ -833,16 +835,18 @@ const DetailedBreakdownTable: React.FC<{
                   <div
                     className="bg-green-500 h-2 rounded-full"
                     style={{
-                      width: row.capacity > 0
-                        ? `${Math.round((row.booked / row.capacity) * 100)}%`
-                        : "0%",
+                      width:
+                        row.capacity > 0
+                          ? `${Math.round((row.booked / row.capacity) * 100)}%`
+                          : "0%",
                     }}
                   ></div>
                 </div>
                 <span className="text-xs font-medium">
                   {row.capacity > 0
                     ? Math.round((row.booked / row.capacity) * 100)
-                    : 0}%
+                    : 0}
+                  %
                 </span>
               </div>
             </td>
@@ -2216,9 +2220,7 @@ const TravelBookingReports: React.FC = () => {
     // Top KPI summary first — operators paste this into the email
     // before the detail table.
     rows.push(["Yatra Reports — Summary"]);
-    rows.push([
-      `Date range: ${params.start} to ${params.end}`,
-    ]);
+    rows.push([`Date range: ${params.start} to ${params.end}`]);
     rows.push([]);
     rows.push(["Metric", "Value"]);
     rows.push(["Total bookings", travelKPIs.totalBookings]);
@@ -2827,24 +2829,22 @@ const TravelBookingReports: React.FC = () => {
                       )}
                     </p>
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-                      {reportData.payment_methods
-                        .slice(0, 6)
-                        .map((m: any) => (
-                          <div
-                            key={m.method}
-                            className="rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800"
-                          >
-                            <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                              {m.method}
-                            </p>
-                            <p className="mt-1 text-lg font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">
-                              {formatCurrencyAmount(m.revenue)}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {m.count} {__("bookings", "yatra")}
-                            </p>
-                          </div>
-                        ))}
+                      {reportData.payment_methods.slice(0, 6).map((m: any) => (
+                        <div
+                          key={m.method}
+                          className="rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800"
+                        >
+                          <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                            {m.method}
+                          </p>
+                          <p className="mt-1 text-lg font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">
+                            {formatCurrencyAmount(m.revenue)}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {m.count} {__("bookings", "yatra")}
+                          </p>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -2918,49 +2918,47 @@ const TravelBookingReports: React.FC = () => {
                         "yatra",
                       )}{" "}
                       <span className="font-medium text-gray-700 dark:text-gray-200">
-                        {Number(reportData.lead_time.averageDays || 0).toFixed(1)}{" "}
+                        {Number(reportData.lead_time.averageDays || 0).toFixed(
+                          1,
+                        )}{" "}
                         {__("days", "yatra")}
                       </span>{" "}
                       ({reportData.lead_time.sampleSize}{" "}
                       {__("bookings sampled", "yatra")})
                     </p>
                     <div className="space-y-2">
-                      {(reportData.lead_time.buckets || []).map(
-                        (b: any) => {
-                          const total = (
-                            reportData.lead_time.buckets || []
-                          ).reduce((s: number, x: any) => s + x.value, 0);
-                          const pct =
-                            total > 0
-                              ? Math.round((b.value / total) * 100)
-                              : 0;
-                          return (
-                            <div
-                              key={b.label}
-                              className="flex items-center gap-3"
-                            >
-                              <div className="w-44 truncate text-sm text-gray-700 dark:text-gray-200">
-                                {b.label}
-                              </div>
-                              <div className="relative h-3 flex-1 rounded-full bg-gray-100 dark:bg-gray-700">
-                                <div
-                                  className="h-3 rounded-full"
-                                  style={{
-                                    width: `${Math.max(2, pct)}%`,
-                                    background: b.color || "#3b82f6",
-                                  }}
-                                />
-                              </div>
-                              <div className="w-16 text-right text-sm tabular-nums text-gray-700 dark:text-gray-200">
-                                {b.value}
-                              </div>
-                              <div className="w-12 text-right text-xs text-gray-500 dark:text-gray-400">
-                                {pct}%
-                              </div>
+                      {(reportData.lead_time.buckets || []).map((b: any) => {
+                        const total = (
+                          reportData.lead_time.buckets || []
+                        ).reduce((s: number, x: any) => s + x.value, 0);
+                        const pct =
+                          total > 0 ? Math.round((b.value / total) * 100) : 0;
+                        return (
+                          <div
+                            key={b.label}
+                            className="flex items-center gap-3"
+                          >
+                            <div className="w-44 truncate text-sm text-gray-700 dark:text-gray-200">
+                              {b.label}
                             </div>
-                          );
-                        },
-                      )}
+                            <div className="relative h-3 flex-1 rounded-full bg-gray-100 dark:bg-gray-700">
+                              <div
+                                className="h-3 rounded-full"
+                                style={{
+                                  width: `${Math.max(2, pct)}%`,
+                                  background: b.color || "#3b82f6",
+                                }}
+                              />
+                            </div>
+                            <div className="w-16 text-right text-sm tabular-nums text-gray-700 dark:text-gray-200">
+                              {b.value}
+                            </div>
+                            <div className="w-12 text-right text-xs text-gray-500 dark:text-gray-400">
+                              {pct}%
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

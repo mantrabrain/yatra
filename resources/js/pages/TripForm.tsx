@@ -2269,9 +2269,9 @@ const TripForm: React.FC = () => {
       // JS treats "0" as truthy, so a plain `value || false` would leave the
       // checkbox stuck on after the user un-checked + saved. Coerce explicitly.
       has_default_time_slots:
-        tripData.has_default_time_slots === true
-        || tripData.has_default_time_slots === 1
-        || tripData.has_default_time_slots === "1",
+        tripData.has_default_time_slots === true ||
+        tripData.has_default_time_slots === 1 ||
+        tripData.has_default_time_slots === "1",
       default_time_slots: Array.isArray(tripData.default_time_slots)
         ? tripData.default_time_slots
         : tripData.default_time_slots
@@ -4402,9 +4402,7 @@ const TripForm: React.FC = () => {
                       onAccept={(raw) => {
                         const list = raw
                           .split(/\r?\n/)
-                          .map((l) =>
-                            l.replace(/^[\s\-\*•·●]+/, "").trim(),
-                          )
+                          .map((l) => l.replace(/^[\s\-\*•·●]+/, "").trim())
                           .filter((l) => l !== "");
                         handleFieldChange("highlights", list as any);
                       }}
@@ -8101,10 +8099,7 @@ const TripForm: React.FC = () => {
                         label={__("Meta Title", "yatra")}
                         value={formData.meta_title}
                         onAccept={(v) =>
-                          handleFieldChange(
-                            "meta_title",
-                            v.slice(0, 60),
-                          )
+                          handleFieldChange("meta_title", v.slice(0, 60))
                         }
                         buildContext={() => buildTripAiContext(formData)}
                       />
@@ -8140,10 +8135,7 @@ const TripForm: React.FC = () => {
                         label={__("Meta Description", "yatra")}
                         value={formData.meta_description}
                         onAccept={(v) =>
-                          handleFieldChange(
-                            "meta_description",
-                            v.slice(0, 160),
-                          )
+                          handleFieldChange("meta_description", v.slice(0, 160))
                         }
                         buildContext={() => buildTripAiContext(formData)}
                       />
@@ -8264,7 +8256,9 @@ const TripForm: React.FC = () => {
                         question: string;
                         answer: string;
                       }> = [];
-                      const blocks = raw.replace(/\r\n?/g, "\n").split(/\n{2,}/);
+                      const blocks = raw
+                        .replace(/\r\n?/g, "\n")
+                        .split(/\n{2,}/);
                       for (const block of blocks) {
                         const q = block.match(/^\s*Q[:\.\-]\s*(.+)/im);
                         const a = block.match(/A[:\.\-]\s*([\s\S]+)/im);

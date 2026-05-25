@@ -8,12 +8,7 @@ import {
   isAiModuleEnabled,
   isAiReady,
 } from "../../lib/ai-availability";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 
 /**

@@ -49,7 +49,10 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 
     let ids = normalizeIds(attributes.activityIds);
     if (ids.length === 0) {
-      ids = migrateNumericCsvPairToIds(attributes.activity_ids, attributes.activity);
+      ids = migrateNumericCsvPairToIds(
+        attributes.activity_ids,
+        attributes.activity,
+      );
     }
     if (ids.length === 0) {
       return;
@@ -117,7 +120,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             taxonomy="activity"
             label={__("Activities to show", "yatra")}
             help={__(
-              "Use \"All published\" or narrow with search and checkboxes.",
+              'Use "All published" or narrow with search and checkboxes.',
               "yatra",
             )}
             value={activityIds}
@@ -143,9 +146,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
           <ToggleControl
             label={__("Show image", "yatra")}
             checked={attributes.show_image}
-            onChange={(value: boolean) =>
-              setAttributes({ show_image: value })
-            }
+            onChange={(value: boolean) => setAttributes({ show_image: value })}
           />
           <ToggleControl
             label={__("Hide empty activities", "yatra")}
@@ -154,9 +155,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
               "yatra",
             )}
             checked={attributes.hide_empty}
-            onChange={(value: boolean) =>
-              setAttributes({ hide_empty: value })
-            }
+            onChange={(value: boolean) => setAttributes({ hide_empty: value })}
           />
         </PanelBody>
       </InspectorControls>

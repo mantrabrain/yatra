@@ -44,9 +44,10 @@ export async function fetchEmailTemplate(
 export async function fetchEmailTemplateVariables(
   eventKey?: string,
 ): Promise<EmailTemplateVariableMap> {
-  const url = eventKey && eventKey.trim() !== ""
-    ? `${API_ENDPOINTS.EMAIL_TEMPLATE_VARIABLES}?event_key=${encodeURIComponent(eventKey.trim())}`
-    : API_ENDPOINTS.EMAIL_TEMPLATE_VARIABLES;
+  const url =
+    eventKey && eventKey.trim() !== ""
+      ? `${API_ENDPOINTS.EMAIL_TEMPLATE_VARIABLES}?event_key=${encodeURIComponent(eventKey.trim())}`
+      : API_ENDPOINTS.EMAIL_TEMPLATE_VARIABLES;
   return unwrapApiPayload<EmailTemplateVariableMap>(await apiClient.get(url));
 }
 

@@ -5317,10 +5317,7 @@ const Settings: React.FC = () => {
                     htmlFor="date_picker_as_dropdown"
                     className="font-medium cursor-pointer inline-flex items-center"
                   >
-                    {__(
-                      "Show available dates as a dropdown",
-                      "yatra",
-                    )}
+                    {__("Show available dates as a dropdown", "yatra")}
                     <ProBadge
                       isProActive={!!(window as any).yatraAdmin?.isPro}
                     />
@@ -5408,7 +5405,8 @@ const Settings: React.FC = () => {
         // === true would always be false for an enabled module,
         // which was why every operator saw the "not active" banner
         // even on a correctly-configured site.
-        const adEnabled = !!(window as any)?.yatraAdmin?.advancedDiscountEnabled;
+        const adEnabled = !!(window as any)?.yatraAdmin
+          ?.advancedDiscountEnabled;
         const dpEnabled = !!(window as any)?.yatraAdmin?.dynamicPricingEnabled;
         const bothActive = adEnabled && dpEnabled;
         return (
@@ -5429,9 +5427,7 @@ const Settings: React.FC = () => {
                 <div className="flex items-start gap-2">
                   <Check className="mt-0.5 h-4 w-4 flex-shrink-0" />
                   <div>
-                    <div className="font-medium">
-                      {__("Active", "yatra")}
-                    </div>
+                    <div className="font-medium">{__("Active", "yatra")}</div>
                     <div className="mt-0.5">
                       {__(
                         "Advanced Discount and Dynamic Pricing are both enabled. Your stacking choice below is being applied to every new booking calculation.",
@@ -7064,12 +7060,12 @@ const Settings: React.FC = () => {
                   </span>
                 </CardTitle>
                 {(() => {
-                  const ga4HasId = Boolean(
-                    formData.ga4_measurement_id?.trim(),
-                  );
+                  const ga4HasId = Boolean(formData.ga4_measurement_id?.trim());
                   const ga4Connected =
                     ga4HasId ||
-                    Boolean((window as any).yatraAdmin?.googleAnalytics?.connected);
+                    Boolean(
+                      (window as any).yatraAdmin?.googleAnalytics?.connected,
+                    );
                   return ga4Connected ? (
                     <div className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-medium text-green-800 dark:border-green-800 dark:bg-green-950/40 dark:text-green-300">
                       <CheckCircle className="w-3.5 h-3.5 shrink-0" />
@@ -7131,10 +7127,7 @@ const Settings: React.FC = () => {
                             </p>
                             <details className="text-sm">
                               <summary className="cursor-pointer font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
-                                {__(
-                                  "How to get your Measurement ID:",
-                                  "yatra",
-                                )}
+                                {__("How to get your Measurement ID:", "yatra")}
                               </summary>
                               <ol className="mt-2 ml-4 list-decimal space-y-1 text-gray-600 dark:text-gray-400">
                                 <li>
@@ -7402,7 +7395,10 @@ const Settings: React.FC = () => {
                                 htmlFor="ga4_debug_mode"
                                 className="cursor-pointer text-sm font-medium text-amber-950 dark:text-amber-100"
                               >
-                                {__("Validation mode (debug endpoint)", "yatra")}
+                                {__(
+                                  "Validation mode (debug endpoint)",
+                                  "yatra",
+                                )}
                               </Label>
                               <p className="mt-0.5 text-xs text-amber-900/90 dark:text-amber-200/90">
                                 {__(
@@ -7415,7 +7411,10 @@ const Settings: React.FC = () => {
 
                           <FormField
                             id="ga4_api_secret"
-                            label={__("Measurement Protocol API secret", "yatra")}
+                            label={__(
+                              "Measurement Protocol API secret",
+                              "yatra",
+                            )}
                             description={
                               <div className="space-y-2">
                                 <p>
@@ -7426,10 +7425,7 @@ const Settings: React.FC = () => {
                                 </p>
                                 <details className="text-sm">
                                   <summary className="cursor-pointer font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
-                                    {__(
-                                      "How to get your API secret:",
-                                      "yatra",
-                                    )}
+                                    {__("How to get your API secret:", "yatra")}
                                   </summary>
                                   <ol className="mt-2 ml-4 list-decimal space-y-1 text-gray-600 dark:text-gray-400">
                                     <li>

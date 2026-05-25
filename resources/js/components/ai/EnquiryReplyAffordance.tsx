@@ -13,7 +13,11 @@ import {
 } from "lucide-react";
 import { __ } from "../../lib/i18n";
 import { aiApi, type EnquiryReplyVariant } from "../../api/ai-api";
-import { isAiEligible, isAiModuleEnabled, isAiReady } from "../../lib/ai-availability";
+import {
+  isAiEligible,
+  isAiModuleEnabled,
+  isAiReady,
+} from "../../lib/ai-availability";
 
 /**
  * Sparkle affordance for the enquiry "Response notes" textarea. Unlike
@@ -47,9 +51,7 @@ interface EnquiryReplyAffordanceProps {
   className?: string;
 }
 
-export const EnquiryReplyAffordance: React.FC<
-  EnquiryReplyAffordanceProps
-> = ({
+export const EnquiryReplyAffordance: React.FC<EnquiryReplyAffordanceProps> = ({
   enquiryId,
   value,
   onAccept,
@@ -78,7 +80,10 @@ export const EnquiryReplyAffordance: React.FC<
   useEffect(() => {
     if (!menuOpen) return;
     const onDoc = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
         setMenuOpen(false);
       }
     };
@@ -149,10 +154,7 @@ export const EnquiryReplyAffordance: React.FC<
         onClick={() => {
           if (!ready) {
             setError(
-              __(
-                "Add an API key in Yatra → AI Assistant first.",
-                "yatra",
-              ),
+              __("Add an API key in Yatra → AI Assistant first.", "yatra"),
             );
             return;
           }
@@ -308,7 +310,11 @@ export const EnquiryReplyAffordance: React.FC<
 function extractError(e: any): string {
   if (!e) return "AI request failed.";
   const data = e?.response?.data ?? e?.data ?? null;
-  if (data && typeof data === "object" && typeof (data as any).message === "string") {
+  if (
+    data &&
+    typeof data === "object" &&
+    typeof (data as any).message === "string"
+  ) {
     return (data as any).message;
   }
   if (typeof e?.message === "string") return e.message;

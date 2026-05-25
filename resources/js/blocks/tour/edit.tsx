@@ -74,7 +74,10 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 
     let actIds = normalizeIds(attributes.activityIds);
     if (actIds.length === 0) {
-      actIds = migrateNumericCsvPairToIds(attributes.activity_ids, attributes.activity);
+      actIds = migrateNumericCsvPairToIds(
+        attributes.activity_ids,
+        attributes.activity,
+      );
       if (actIds.length) {
         clears.activity = "";
         clears.activity_ids = "";
@@ -124,8 +127,9 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
     }
 
     const touched =
-      Object.keys(next).filter((key) => next[key as keyof typeof next] !== undefined)
-        .length > 0;
+      Object.keys(next).filter(
+        (key) => next[key as keyof typeof next] !== undefined,
+      ).length > 0;
     if (touched) {
       setAttributes(next);
     }
@@ -209,7 +213,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             taxonomy="destination"
             label={__("Destinations", "yatra")}
             help={__(
-              "Choose \"All published\" or restrict the grid to destinations you tick. Other filters narrow results further.",
+              'Choose "All published" or restrict the grid to destinations you tick. Other filters narrow results further.',
               "yatra",
             )}
             value={destinationIds}

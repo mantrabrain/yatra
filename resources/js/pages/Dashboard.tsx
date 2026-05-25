@@ -317,11 +317,31 @@ const Dashboard: React.FC = () => {
       return Number.isNaN(n) ? 0 : n;
     };
     return [
-      { label: __("Pending", "yatra"), value: getCount("pending"), color: "#f59e0b" },
-      { label: __("Confirmed", "yatra"), value: getCount("confirmed"), color: "#10b981" },
-      { label: __("Completed", "yatra"), value: getCount("completed"), color: "#3b82f6" },
-      { label: __("Cancelled", "yatra"), value: getCount("cancelled"), color: "#ef4444" },
-      { label: __("Refunded", "yatra"), value: getCount("refunded"), color: "#a855f7" },
+      {
+        label: __("Pending", "yatra"),
+        value: getCount("pending"),
+        color: "#f59e0b",
+      },
+      {
+        label: __("Confirmed", "yatra"),
+        value: getCount("confirmed"),
+        color: "#10b981",
+      },
+      {
+        label: __("Completed", "yatra"),
+        value: getCount("completed"),
+        color: "#3b82f6",
+      },
+      {
+        label: __("Cancelled", "yatra"),
+        value: getCount("cancelled"),
+        color: "#ef4444",
+      },
+      {
+        label: __("Refunded", "yatra"),
+        value: getCount("refunded"),
+        color: "#a855f7",
+      },
     ];
   }, [bookingStats]);
 
@@ -330,7 +350,9 @@ const Dashboard: React.FC = () => {
   const { data: destinationsData } = useQuery({
     queryKey: ["dashboard-destinations"],
     queryFn: async () => {
-      const response = await apiClient.get("/trips", { params: { per_page: 50 } });
+      const response = await apiClient.get("/trips", {
+        params: { per_page: 50 },
+      });
       const trips = response?.data || [];
       const counts: Record<string, number> = {};
       trips.forEach((trip: any) => {
@@ -341,7 +363,14 @@ const Dashboard: React.FC = () => {
           counts[name] = (counts[name] || 0) + 1;
         });
       });
-      const palette = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#6366f1", "#14b8a6"];
+      const palette = [
+        "#3b82f6",
+        "#10b981",
+        "#f59e0b",
+        "#ef4444",
+        "#6366f1",
+        "#14b8a6",
+      ];
       return Object.entries(counts)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 6)
@@ -413,7 +442,9 @@ const Dashboard: React.FC = () => {
   const { data: recentBookings } = useQuery({
     queryKey: ["dashboard-recent-bookings"],
     queryFn: async () => {
-      const response = await apiClient.get("/bookings", { params: { per_page: 5 } });
+      const response = await apiClient.get("/bookings", {
+        params: { per_page: 5 },
+      });
       const items = response?.data || [];
       return items.map((b: any) => ({
         id: b.id,
@@ -437,7 +468,9 @@ const Dashboard: React.FC = () => {
   // window, not "all time").
   const trendLabel = `vs prev. ${range === "today" ? "day" : range === "this_year" ? "year" : range.replace("last_", "").replace("_", " ")}`;
   const revenueChange = Number((reportData as any)?.revenue_stats?.change ?? 0);
-  const totalChange = Number((reportData as any)?.booking_stats?.totalChange ?? 0);
+  const totalChange = Number(
+    (reportData as any)?.booking_stats?.totalChange ?? 0,
+  );
   const conversionChange = Number(
     (reportData as any)?.booking_stats?.conversionRateChange ?? 0,
   );

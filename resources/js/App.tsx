@@ -106,7 +106,9 @@ const BookingForm = lazy(() => import("./pages/BookingForm"));
 const ViewBooking = lazy(() => import("./pages/ViewBooking"));
 const AvailabilityForm = lazy(() => import("./pages/AvailabilityForm"));
 const DynamicPricing = lazy(() => import("./pages/DynamicPricing"));
-const DynamicPricingRuleForm = lazy(() => import("./pages/DynamicPricingRuleForm"));
+const DynamicPricingRuleForm = lazy(
+  () => import("./pages/DynamicPricingRuleForm"),
+);
 const AiAssistant = lazy(() => import("./pages/AiAssistant"));
 const AbandonedRecovery = lazy(() => import("./pages/AbandonedRecovery"));
 const WhiteLabel = lazy(() => import("./pages/WhiteLabel"));

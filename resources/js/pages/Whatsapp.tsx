@@ -100,7 +100,9 @@ function getInitialTab(): WhatsappTab {
 const Whatsapp: React.FC = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
-  const [activeTab, setActiveTab] = useState<WhatsappTab>(() => getInitialTab());
+  const [activeTab, setActiveTab] = useState<WhatsappTab>(() =>
+    getInitialTab(),
+  );
 
   const switchTab = (next: WhatsappTab) => {
     setActiveTab(next);
@@ -167,7 +169,11 @@ const Whatsapp: React.FC = () => {
   const tabs: Array<{ key: WhatsappTab; label: string; icon: any }> = [
     { key: "delivery", label: __("Delivery", "yatra"), icon: Send },
     { key: "templates", label: __("Templates", "yatra"), icon: FileText },
-    { key: "widget", label: __("Frontend widget", "yatra"), icon: MessageCircle },
+    {
+      key: "widget",
+      label: __("Frontend widget", "yatra"),
+      icon: MessageCircle,
+    },
     { key: "logs", label: __("Message logs", "yatra"), icon: MessageCircle },
     { key: "opt-ins", label: __("Opt-ins", "yatra"), icon: Users },
   ];
@@ -418,7 +424,10 @@ const DeliverySection: React.FC<{
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            {__("Before you start — getting WhatsApp Cloud API access", "yatra")}
+            {__(
+              "Before you start — getting WhatsApp Cloud API access",
+              "yatra",
+            )}
           </CardTitle>
           <CardDescription className="mt-2">
             {__(
@@ -659,9 +668,7 @@ const DeliverySection: React.FC<{
                 min={1}
                 max={168}
                 value={reminderBefore}
-                onChange={(e) =>
-                  setReminderBefore(Number(e.target.value) || 0)
-                }
+                onChange={(e) => setReminderBefore(Number(e.target.value) || 0)}
               />
             </div>
             <div className="space-y-2">
@@ -762,7 +769,10 @@ const WebhookSetupCard: React.FC<{ meta: WhatsappMeta }> = ({ meta }) => {
       <CardContent className="space-y-4">
         {/* Callback URL */}
         <div>
-          <Label htmlFor="whatsapp-webhook-url" className="text-xs text-gray-500 dark:text-gray-400">
+          <Label
+            htmlFor="whatsapp-webhook-url"
+            className="text-xs text-gray-500 dark:text-gray-400"
+          >
             {__("Callback URL", "yatra")}
           </Label>
           <div className="mt-1 flex gap-2">
@@ -798,7 +808,10 @@ const WebhookSetupCard: React.FC<{ meta: WhatsappMeta }> = ({ meta }) => {
 
         {/* Verify token */}
         <div>
-          <Label htmlFor="whatsapp-verify-token" className="text-xs text-gray-500 dark:text-gray-400">
+          <Label
+            htmlFor="whatsapp-verify-token"
+            className="text-xs text-gray-500 dark:text-gray-400"
+          >
             {__("Verify token", "yatra")}
           </Label>
           <div className="mt-1 flex gap-2">
@@ -808,7 +821,10 @@ const WebhookSetupCard: React.FC<{ meta: WhatsappMeta }> = ({ meta }) => {
               value={webhook?.verify_token || ""}
               placeholder={
                 tokenMissing
-                  ? __("Will be generated when you save settings for the first time.", "yatra")
+                  ? __(
+                      "Will be generated when you save settings for the first time.",
+                      "yatra",
+                    )
                   : ""
               }
               className="font-mono text-sm"
@@ -940,7 +956,11 @@ const CredentialField: React.FC<{
           onClick={onToggle}
           className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
         >
-          {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          {visible ? (
+            <EyeOff className="h-4 w-4" />
+          ) : (
+            <Eye className="h-4 w-4" />
+          )}
         </button>
       </div>
       <Button onClick={onSave} disabled={saving || value.trim() === ""}>
@@ -993,7 +1013,7 @@ const TemplatesTab: React.FC = () => {
     const existing =
       editingId === "new"
         ? null
-        : templates.find((t) => t.id === editingId) ?? null;
+        : (templates.find((t) => t.id === editingId) ?? null);
     return (
       <TemplateEditForm
         existing={existing}
@@ -1026,10 +1046,17 @@ const TemplatesList: React.FC<{
 
   // Confirm-before-delete state, replaces native window.confirm()
   // for visual + accessibility consistency with the rest of the admin.
-  const [pendingDelete, setPendingDelete] = useState<{ id: number; name: string } | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
   // Version-history dialog state. Holds the template the operator
   // clicked "History" on; null = dialog closed.
-  const [historyFor, setHistoryFor] = useState<{ id: number; name: string; isSystem: boolean } | null>(null);
+  const [historyFor, setHistoryFor] = useState<{
+    id: number;
+    name: string;
+    isSystem: boolean;
+  } | null>(null);
 
   const deleteTpl = useMutation({
     mutationFn: (id: number) => whatsappApi.deleteTemplate(id),
@@ -1128,7 +1155,10 @@ const TemplatesList: React.FC<{
                       colSpan={6}
                       className="p-8 text-center text-gray-500 dark:text-gray-400"
                     >
-                      {__("No templates yet — click Add custom template.", "yatra")}
+                      {__(
+                        "No templates yet — click Add custom template.",
+                        "yatra",
+                      )}
                     </td>
                   </tr>
                 ) : (
@@ -1291,7 +1321,8 @@ const TemplateHistoryDialog: React.FC<{
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [pendingRestore, setPendingRestore] = useState<WhatsappTemplateVersion | null>(null);
+  const [pendingRestore, setPendingRestore] =
+    useState<WhatsappTemplateVersion | null>(null);
 
   const enabled = template !== null;
   const { data, isLoading } = useQuery({
@@ -1349,7 +1380,10 @@ const TemplateHistoryDialog: React.FC<{
           <div className="text-center py-10">
             <Clock className="w-10 h-10 text-gray-400 mx-auto" />
             <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
-              {__("No prior versions yet. Make an edit and history starts building from the next save.", "yatra")}
+              {__(
+                "No prior versions yet. Make an edit and history starts building from the next save.",
+                "yatra",
+              )}
             </p>
           </div>
         ) : (
@@ -1466,7 +1500,10 @@ const TemplateHistoryDialog: React.FC<{
         description={
           pendingRestore
             ? sprintf(
-                __("This rewrites the live template with v%d's contents. The current state is saved as a new version first so you can roll back this restore later.", "yatra"),
+                __(
+                  "This rewrites the live template with v%d's contents. The current state is saved as a new version first so you can roll back this restore later.",
+                  "yatra",
+                ),
                 pendingRestore.version_number,
               )
             : ""
@@ -1591,9 +1628,7 @@ const TemplateEditForm: React.FC<{
           <div>
             <h2 className="flex items-center gap-2 text-xl font-semibold text-gray-900 dark:text-white">
               <FileText className="h-5 w-5 text-blue-500" />
-              {isCreate
-                ? __("Add custom template", "yatra")
-                : existing!.name}
+              {isCreate ? __("Add custom template", "yatra") : existing!.name}
               {isSystem && (
                 <Badge className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
                   {__("System", "yatra")}
@@ -1768,9 +1803,7 @@ const TemplateEditForm: React.FC<{
                                 <div className="flex items-start gap-2">
                                   <Zap
                                     className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
-                                      active
-                                        ? "text-blue-500"
-                                        : "text-gray-400"
+                                      active ? "text-blue-500" : "text-gray-400"
                                     }`}
                                   />
                                   <div className="flex-1 min-w-0">
@@ -2037,9 +2070,7 @@ const TemplateTestSendCard: React.FC<{
         ok: res.ok,
         message: res.ok
           ? __("Sent — check your WhatsApp.", "yatra") +
-            (res.provider_message_id
-              ? ` (id: ${res.provider_message_id})`
-              : "")
+            (res.provider_message_id ? ` (id: ${res.provider_message_id})` : "")
           : res.error || __("Send failed.", "yatra"),
       });
     } catch (e: any) {
@@ -2062,10 +2093,7 @@ const TemplateTestSendCard: React.FC<{
                 "Admin-recipient templates send to the admin phone in Delivery settings.",
                 "yatra",
               )
-            : __(
-                "Sends this template to the phone you enter below.",
-                "yatra",
-              )}
+            : __("Sends this template to the phone you enter below.", "yatra")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -2131,7 +2159,9 @@ const WidgetSection: React.FC<{
   const [enabled, setEnabled] = useState(w.enabled);
   const [contactPhone, setContactPhone] = useState(w.contact_phone);
   const [prefilled, setPrefilled] = useState(w.prefilled_message);
-  const [displayOn, setDisplayOn] = useState<"all" | "trips_only">(w.display_on);
+  const [displayOn, setDisplayOn] = useState<"all" | "trips_only">(
+    w.display_on,
+  );
   const [position, setPosition] = useState<"bottom-right" | "bottom-left">(
     w.position,
   );
@@ -2407,7 +2437,10 @@ const LogsList: React.FC = () => {
   const perPage = 20;
 
   React.useEffect(() => {
-    const t = window.setTimeout(() => setPhoneFilterApplied(phoneFilter.trim()), 350);
+    const t = window.setTimeout(
+      () => setPhoneFilterApplied(phoneFilter.trim()),
+      350,
+    );
     return () => window.clearTimeout(t);
   }, [phoneFilter]);
 
@@ -2417,7 +2450,13 @@ const LogsList: React.FC = () => {
   }, [statusFilter, phoneFilterApplied]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["whatsapp-messages", page, perPage, statusFilter, phoneFilterApplied],
+    queryKey: [
+      "whatsapp-messages",
+      page,
+      perPage,
+      statusFilter,
+      phoneFilterApplied,
+    ],
     queryFn: () =>
       whatsappApi.listMessages({
         page,
@@ -2486,7 +2525,9 @@ const LogsList: React.FC = () => {
               <option value="delivered">{__("Delivered", "yatra")}</option>
               <option value="read">{__("Read", "yatra")}</option>
               <option value="failed">{__("Failed", "yatra")}</option>
-              <option value="received">{__("Received (inbound)", "yatra")}</option>
+              <option value="received">
+                {__("Received (inbound)", "yatra")}
+              </option>
             </Select>
             {hasFilters && (
               <Button
@@ -2517,11 +2558,17 @@ const LogsList: React.FC = () => {
             <Table>
               <TableHeader className="bg-gray-50 dark:bg-gray-800/50">
                 <TableRow>
-                  <TableHead className="w-28">{__("Direction", "yatra")}</TableHead>
+                  <TableHead className="w-28">
+                    {__("Direction", "yatra")}
+                  </TableHead>
                   <TableHead className="w-44">{__("Phone", "yatra")}</TableHead>
                   <TableHead>{__("Body / Error", "yatra")}</TableHead>
-                  <TableHead className="w-48">{__("Template", "yatra")}</TableHead>
-                  <TableHead className="w-28">{__("Status", "yatra")}</TableHead>
+                  <TableHead className="w-48">
+                    {__("Template", "yatra")}
+                  </TableHead>
+                  <TableHead className="w-28">
+                    {__("Status", "yatra")}
+                  </TableHead>
                   <TableHead className="w-44 whitespace-nowrap">
                     {__("Sent", "yatra")}
                   </TableHead>
@@ -2545,12 +2592,18 @@ const LogsList: React.FC = () => {
                       {row.phone}
                     </TableCell>
                     <TableCell className="text-gray-700 dark:text-gray-200">
-                      <div className="max-w-md truncate" title={row.error_message || row.body || ""}>
+                      <div
+                        className="max-w-md truncate"
+                        title={row.error_message || row.body || ""}
+                      >
                         {row.error_message || row.body || "—"}
                       </div>
                     </TableCell>
                     <TableCell className="text-gray-500 dark:text-gray-400">
-                      <span className="truncate block max-w-[12rem]" title={row.template_key || ""}>
+                      <span
+                        className="truncate block max-w-[12rem]"
+                        title={row.template_key || ""}
+                      >
                         {row.template_key || "—"}
                       </span>
                     </TableCell>
@@ -2629,7 +2682,8 @@ const OptInsList: React.FC = () => {
         if (
           !r.phone.toLowerCase().includes(needle) &&
           !r.source.toLowerCase().includes(needle)
-        ) return false;
+        )
+          return false;
       }
       return true;
     });
@@ -2714,13 +2768,21 @@ const OptInsList: React.FC = () => {
             </div>
             <Select
               value={filter}
-              onChange={(e) => setFilter(e.target.value as "all" | "in" | "out")}
+              onChange={(e) =>
+                setFilter(e.target.value as "all" | "in" | "out")
+              }
               aria-label={__("Filter opt-in status", "yatra")}
               className="w-full lg:w-56 lg:flex-none"
             >
-              <option value="all">{__("All", "yatra")} ({rows.length})</option>
-              <option value="in">{__("Opted in", "yatra")} ({inCount})</option>
-              <option value="out">{__("Opted out", "yatra")} ({outCount})</option>
+              <option value="all">
+                {__("All", "yatra")} ({rows.length})
+              </option>
+              <option value="in">
+                {__("Opted in", "yatra")} ({inCount})
+              </option>
+              <option value="out">
+                {__("Opted out", "yatra")} ({outCount})
+              </option>
             </Select>
             {(search || filter !== "all") && (
               <Button
@@ -2755,7 +2817,9 @@ const OptInsList: React.FC = () => {
               <TableHeader className="bg-gray-50 dark:bg-gray-800/50">
                 <TableRow>
                   <TableHead className="w-44">{__("Phone", "yatra")}</TableHead>
-                  <TableHead className="w-32">{__("Status", "yatra")}</TableHead>
+                  <TableHead className="w-32">
+                    {__("Status", "yatra")}
+                  </TableHead>
                   <TableHead>{__("Source", "yatra")}</TableHead>
                   <TableHead className="w-44 whitespace-nowrap">
                     {__("Updated", "yatra")}

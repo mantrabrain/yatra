@@ -213,24 +213,21 @@ const DynamicPricingRuleForm: React.FC = () => {
     setPreviewLoading(true);
     setPreviewError(null);
     try {
-      const response = await apiClient.post(
-        "/dynamic-pricing/simulate-rule",
-        {
-          rule_type: formData.rule_type,
-          adjustment_type: formData.adjustment_type,
-          adjustment_value: formData.adjustment_value,
-          min_days_before: formData.min_days_before,
-          max_days_before: formData.max_days_before,
-          min_inventory: formData.min_inventory,
-          max_inventory: formData.max_inventory,
-          start_date: formData.start_date || null,
-          end_date: formData.end_date || null,
-          weekend_days: formData.weekend_days || [],
-          demand_threshold_low: formData.demand_threshold_low,
-          demand_threshold_high: formData.demand_threshold_high,
-          base_price: previewBasePrice > 0 ? previewBasePrice : 100,
-        },
-      );
+      const response = await apiClient.post("/dynamic-pricing/simulate-rule", {
+        rule_type: formData.rule_type,
+        adjustment_type: formData.adjustment_type,
+        adjustment_value: formData.adjustment_value,
+        min_days_before: formData.min_days_before,
+        max_days_before: formData.max_days_before,
+        min_inventory: formData.min_inventory,
+        max_inventory: formData.max_inventory,
+        start_date: formData.start_date || null,
+        end_date: formData.end_date || null,
+        weekend_days: formData.weekend_days || [],
+        demand_threshold_low: formData.demand_threshold_low,
+        demand_threshold_high: formData.demand_threshold_high,
+        base_price: previewBasePrice > 0 ? previewBasePrice : 100,
+      });
       // Controller returns { success: true, data: {...scenarios...} } — checking
       // .success on .data would always be undefined and throw a false negative.
       const envelope = response as any;
@@ -1428,8 +1425,8 @@ const DynamicPricingRuleForm: React.FC = () => {
                                         : "text-orange-700 dark:text-orange-400"
                                     }
                                   >
-                                    {s.adjustment > 0 ? "+" : ""}
-                                    ${s.adjustment.toFixed(2)} (
+                                    {s.adjustment > 0 ? "+" : ""}$
+                                    {s.adjustment.toFixed(2)} (
                                     {s.adjustment_percent > 0 ? "+" : ""}
                                     {s.adjustment_percent.toFixed(2)}%)
                                   </span>

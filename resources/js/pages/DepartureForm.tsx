@@ -110,10 +110,10 @@ const DepartureForm: React.FC = () => {
         "success",
       );
       // Return to the standalone Departures page (where the user came
-       // from). Previously this sent operators to the Trips page with a
-       // departures-tab query string, which surprised anyone who reached
-       // the form via the Departures sidebar entry — the table they
-       // expected to see post-save was nowhere on the trip page.
+      // from). Previously this sent operators to the Trips page with a
+      // departures-tab query string, which surprised anyone who reached
+      // the form via the Departures sidebar entry — the table they
+      // expected to see post-save was nowhere on the trip page.
       window.location.href = `?page=yatra&subpage=departures${tripId ? `&trip_id=${tripId}` : ""}`;
     },
     onError: (error: any) => {

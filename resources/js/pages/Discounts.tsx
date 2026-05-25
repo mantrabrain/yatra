@@ -1219,7 +1219,9 @@ const Discounts: React.FC = () => {
                       )
                 }
                 onCreateClick={
-                  can("yatra_manage_discounts") ? handleCreateDiscount : undefined
+                  can("yatra_manage_discounts")
+                    ? handleCreateDiscount
+                    : undefined
                 }
                 onSort={handleSort}
                 getSortIcon={getSortIcon}

@@ -56,7 +56,9 @@ import { ICON_MAP } from "../lib/icon-map";
  * starts blank, which is the expected behavior since IconPicker doesn't
  * know about Lucide.
  */
-function toPickerValue(icon: MenuIconValue | undefined): IconPickerValue | null {
+function toPickerValue(
+  icon: MenuIconValue | undefined,
+): IconPickerValue | null {
   if (!icon) return null;
   if (typeof icon === "string") return null;
   return icon;
@@ -200,7 +202,8 @@ const SECTIONS: SectionDef[] = [
     id: "menu",
     label: "Sidebar Menu",
     icon: PanelLeft,
-    description: "Reorder, rename, re-icon, or hide entries in the Yatra sidebar.",
+    description:
+      "Reorder, rename, re-icon, or hide entries in the Yatra sidebar.",
   },
   {
     id: "chrome",
@@ -384,80 +387,78 @@ const MenuRow: React.FC<MenuRowProps> = ({
                 : "border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
         }`}
       >
-      {draggable ? (
+        {draggable ? (
+          <button
+            type="button"
+            className="cursor-grab touch-none text-gray-400 hover:text-gray-600 active:cursor-grabbing dark:hover:text-gray-200"
+            aria-label={__("Drag to reorder", "yatra")}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <GripVertical className="h-4 w-4" />
+          </button>
+        ) : (
+          <span className="inline-block w-4" aria-hidden="true" />
+        )}
+
+        <MenuIcon
+          icon={override.icon}
+          fallback={FallbackIcon}
+          className="h-4 w-4 text-gray-500"
+        />
+
+        <div className="min-w-[140px]">
+          <div className="text-sm font-medium text-gray-900 dark:text-white">
+            {defaultLabel}
+          </div>
+          <div className="text-[10px] uppercase tracking-wide text-gray-400">
+            {slug}
+          </div>
+        </div>
+
+        <Input
+          value={override.label ?? ""}
+          placeholder={defaultLabel}
+          disabled={hidden}
+          className="max-w-[180px]"
+          onChange={(e) => onPatch({ label: e.target.value })}
+        />
+
+        <div className="min-w-[180px]">
+          <IconPicker
+            value={toPickerValue(override.icon)}
+            onChange={(val) => onPatch({ icon: val ?? undefined })}
+            size="sm"
+            allowImageUpload
+            allowIconSelection
+          />
+        </div>
+
         <button
           type="button"
-          className="cursor-grab touch-none text-gray-400 hover:text-gray-600 active:cursor-grabbing dark:hover:text-gray-200"
-          aria-label={__("Drag to reorder", "yatra")}
-          onMouseDown={(e) => e.stopPropagation()}
-        >
-          <GripVertical className="h-4 w-4" />
-        </button>
-      ) : (
-        <span className="inline-block w-4" aria-hidden="true" />
-      )}
-
-      <MenuIcon
-        icon={override.icon}
-        fallback={FallbackIcon}
-        className="h-4 w-4 text-gray-500"
-      />
-
-      <div className="min-w-[140px]">
-        <div className="text-sm font-medium text-gray-900 dark:text-white">
-          {defaultLabel}
-        </div>
-        <div className="text-[10px] uppercase tracking-wide text-gray-400">
-          {slug}
-        </div>
-      </div>
-
-      <Input
-        value={override.label ?? ""}
-        placeholder={defaultLabel}
-        disabled={hidden}
-        className="max-w-[180px]"
-        onChange={(e) => onPatch({ label: e.target.value })}
-      />
-
-      <div className="min-w-[180px]">
-        <IconPicker
-          value={toPickerValue(override.icon)}
-          onChange={(val) =>
-            onPatch({ icon: val ?? undefined })
+          onClick={() => onPatch({ hidden: !hidden })}
+          className={`ml-auto inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium ${
+            hidden
+              ? "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+              : "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+          }`}
+          aria-label={
+            hidden
+              ? __("Show this menu item", "yatra")
+              : __("Hide this menu item", "yatra")
           }
-          size="sm"
-          allowImageUpload
-          allowIconSelection
-        />
-      </div>
-
-      <button
-        type="button"
-        onClick={() => onPatch({ hidden: !hidden })}
-        className={`ml-auto inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium ${
-          hidden
-            ? "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300"
-            : "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300"
-        }`}
-        aria-label={
-          hidden
-            ? __("Show this menu item", "yatra")
-            : __("Hide this menu item", "yatra")
-        }
-      >
-        {hidden ? (
-          <>
-            <EyeOff className="h-3 w-3" />
-            {__("Hidden", "yatra")}
-          </>
-        ) : (
-          <>
-            <Eye className="h-3 w-3" />
-            {__("Visible", "yatra")}
-          </>
-        )}
-      </button>
+        >
+          {hidden ? (
+            <>
+              <EyeOff className="h-3 w-3" />
+              {__("Hidden", "yatra")}
+            </>
+          ) : (
+            <>
+              <Eye className="h-3 w-3" />
+              {__("Visible", "yatra")}
+            </>
+          )}
+        </button>
       </div>
     </div>
   );
@@ -488,7 +489,8 @@ const WhiteLabel: React.FC = () => {
   // Start with every parent expanded so users see / can manage children
   // without an extra interaction. Collapsing remains on a per-row click.
   const [expandedSubmenus, setExpandedSubmenus] = useState<Set<string>>(
-    () => new Set(DEFAULT_MENU_ITEMS.filter((m) => m.submenu).map((m) => m.slug)),
+    () =>
+      new Set(DEFAULT_MENU_ITEMS.filter((m) => m.submenu).map((m) => m.slug)),
   );
 
   const { openMediaLibrary } = useWordPressMedia({
@@ -568,20 +570,17 @@ const WhiteLabel: React.FC = () => {
     [],
   );
 
-  const toggleUiChrome = useCallback(
-    (key: keyof UiChromeFlags) => {
-      setForm((prev) => {
-        const next = { ...(prev.ui_chrome ?? {}) };
-        if (next[key]) {
-          delete next[key];
-        } else {
-          next[key] = true;
-        }
-        return { ...prev, ui_chrome: next };
-      });
-    },
-    [],
-  );
+  const toggleUiChrome = useCallback((key: keyof UiChromeFlags) => {
+    setForm((prev) => {
+      const next = { ...(prev.ui_chrome ?? {}) };
+      if (next[key]) {
+        delete next[key];
+      } else {
+        next[key] = true;
+      }
+      return { ...prev, ui_chrome: next };
+    });
+  }, []);
 
   const handlePickLogo = useCallback(() => {
     openMediaLibrary((attachment) => {
@@ -632,10 +631,7 @@ const WhiteLabel: React.FC = () => {
     return list;
   }, []);
 
-  const atomMap = useMemo(
-    () => new Map(atoms.map((a) => [a.key, a])),
-    [atoms],
-  );
+  const atomMap = useMemo(() => new Map(atoms.map((a) => [a.key, a])), [atoms]);
 
   /** Effective parent for an atom (override.parent wins, else default). */
   const effectiveParent = useCallback(
@@ -693,7 +689,8 @@ const WhiteLabel: React.FC = () => {
       if (expandedSubmenus.has(topKey)) {
         for (const childKey of orderGroup(topKey, groups.get(topKey) ?? [])) {
           const childAtom = atomMap.get(childKey);
-          if (childAtom) rows.push({ atom: childAtom, depth: 1, parent: topKey });
+          if (childAtom)
+            rows.push({ atom: childAtom, depth: 1, parent: topKey });
         }
       }
     }
@@ -822,7 +819,8 @@ const WhiteLabel: React.FC = () => {
       if (newParent === src) return;
       // Block making a top-level parent a child of one of its own
       // descendants (cycle prevention).
-      const parentEffective = newParent === "" ? "" : effectiveParent(newParent);
+      const parentEffective =
+        newParent === "" ? "" : effectiveParent(newParent);
       if (parentEffective === src) return;
 
       setForm((prev) => {
@@ -938,10 +936,7 @@ const WhiteLabel: React.FC = () => {
       <CardHeader>
         <CardTitle>{__("Brand identity", "yatra")}</CardTitle>
         <CardDescription>
-          {__(
-            "Shown in the admin menu, plugin list, and PDFs.",
-            "yatra",
-          )}
+          {__("Shown in the admin menu, plugin list, and PDFs.", "yatra")}
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 md:grid-cols-2">
@@ -955,7 +950,9 @@ const WhiteLabel: React.FC = () => {
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="company_name">{__("Company / Author", "yatra")}</Label>
+          <Label htmlFor="company_name">
+            {__("Company / Author", "yatra")}
+          </Label>
           <Input
             id="company_name"
             value={form.company_name}
@@ -1050,10 +1047,7 @@ const WhiteLabel: React.FC = () => {
   );
 
   const renderTheme = () => {
-    const updateSurface = (
-      key: keyof ThemeSurfaces,
-      value: string,
-    ) => {
+    const updateSurface = (key: keyof ThemeSurfaces, value: string) => {
       setForm((prev) => {
         const next = { ...(prev.theme_surfaces ?? {}) };
         if (value === "") {
@@ -1074,10 +1068,26 @@ const WhiteLabel: React.FC = () => {
       label: string;
       fallback: string;
     }> = [
-      { key: "sidebar_bg", label: __("Sidebar background", "yatra"), fallback: "#ffffff" },
-      { key: "sidebar_text", label: __("Sidebar text", "yatra"), fallback: "#374151" },
-      { key: "topbar_bg", label: __("Top bar background", "yatra"), fallback: "#ffffff" },
-      { key: "topbar_text", label: __("Top bar text", "yatra"), fallback: "#111827" },
+      {
+        key: "sidebar_bg",
+        label: __("Sidebar background", "yatra"),
+        fallback: "#ffffff",
+      },
+      {
+        key: "sidebar_text",
+        label: __("Sidebar text", "yatra"),
+        fallback: "#374151",
+      },
+      {
+        key: "topbar_bg",
+        label: __("Top bar background", "yatra"),
+        fallback: "#ffffff",
+      },
+      {
+        key: "topbar_text",
+        label: __("Top bar text", "yatra"),
+        fallback: "#111827",
+      },
     ];
 
     const hasAnySurface = Object.values(form.theme_surfaces ?? {}).some(
@@ -1105,18 +1115,14 @@ const WhiteLabel: React.FC = () => {
               <input
                 type="color"
                 value={form.primary_color || "#2563eb"}
-                onChange={(e) =>
-                  updateField("primary_color", e.target.value)
-                }
+                onChange={(e) => updateField("primary_color", e.target.value)}
                 className="h-10 w-12 cursor-pointer rounded border border-gray-300 bg-white p-1 dark:border-gray-700 dark:bg-gray-800"
                 aria-label={__("Pick brand accent color", "yatra")}
               />
               <Input
                 value={form.primary_color}
                 placeholder="#2563eb"
-                onChange={(e) =>
-                  updateField("primary_color", e.target.value)
-                }
+                onChange={(e) => updateField("primary_color", e.target.value)}
                 className="max-w-[200px]"
               />
               {form.primary_color && (
@@ -1306,13 +1312,11 @@ const WhiteLabel: React.FC = () => {
                         isSubmenu={row.depth > 0}
                         draggable
                         isDragging={draggingSlug === row.atom.key}
-                        dropPosition={isDropTarget ? dropTarget!.position : null}
-                        onDragStart={(e) =>
-                          handleDragStart(row.atom.key, e)
+                        dropPosition={
+                          isDropTarget ? dropTarget!.position : null
                         }
-                        onDragOver={(e) =>
-                          handleRowDragOver(row.atom.key, e)
-                        }
+                        onDragStart={(e) => handleDragStart(row.atom.key, e)}
+                        onDragOver={(e) => handleRowDragOver(row.atom.key, e)}
                         onDragEnd={handleDragEnd}
                         onDragLeave={handleRowDragLeave}
                         onDrop={(e) => handleRowDrop(row.atom.key, e)}
@@ -1385,13 +1389,13 @@ const WhiteLabel: React.FC = () => {
         key: "hideVersion",
         label: __("Hide version number", "yatra"),
         description: __(
-          "Removes the small \"v3.0.4\" tag shown next to the brand name in the sidebar header.",
+          'Removes the small "v3.0.4" tag shown next to the brand name in the sidebar header.',
           "yatra",
         ),
       },
       {
         key: "hideBackToWp",
-        label: __("Hide \"Back to WordPress\" link", "yatra"),
+        label: __('Hide "Back to WordPress" link', "yatra"),
         description: __(
           "Removes the link from the top bar AND the sidebar footer so clients don't see the wp-admin escape hatch.",
           "yatra",
@@ -1399,7 +1403,7 @@ const WhiteLabel: React.FC = () => {
       },
       {
         key: "hideJoinCommunity",
-        label: __("Hide \"Join Community\" link", "yatra"),
+        label: __('Hide "Join Community" link', "yatra"),
         description: __(
           "Removes the Facebook community button from the top bar.",
           "yatra",

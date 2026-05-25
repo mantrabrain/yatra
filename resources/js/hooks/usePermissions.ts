@@ -68,8 +68,9 @@ export const usePermissions = (): UsePermissionsReturn => {
       }
 
       // 2) Team module's enriched userCaps list.
-      const userCaps = (window.yatraAdmin as { userCaps?: string[] } | undefined)
-        ?.userCaps;
+      const userCaps = (
+        window.yatraAdmin as { userCaps?: string[] } | undefined
+      )?.userCaps;
       if (Array.isArray(userCaps) && userCaps.includes(capability)) {
         return true;
       }
@@ -99,7 +100,11 @@ export const usePermissions = (): UsePermissionsReturn => {
           }
         | undefined;
       if (adm) {
-        if (adm.isWpAdmin === true || adm.isWpAdmin === "1" || adm.isWpAdmin === 1) {
+        if (
+          adm.isWpAdmin === true ||
+          adm.isWpAdmin === "1" ||
+          adm.isWpAdmin === 1
+        ) {
           return true;
         }
         if (Array.isArray(adm.roles) && adm.roles.includes("administrator")) {

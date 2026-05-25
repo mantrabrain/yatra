@@ -128,7 +128,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                 {sprintf(
                   // translators: %s: customer first name (or "Traveler" fallback).
                   __("Welcome back, %s!", "yatra"),
-                  displayProfile?.name?.split(" ")[0] || __("Traveler", "yatra"),
+                  displayProfile?.name?.split(" ")[0] ||
+                    __("Traveler", "yatra"),
                 )}
               </h2>
               <p className="text-sm mb-4 text-white/90">
@@ -279,74 +280,70 @@ const Dashboard: React.FC<DashboardProps> = ({
                     }
                   };
                   return (
-                  <div
-                    key={booking.id}
-                    role="button"
-                    tabIndex={0}
-                    onClick={openBooking}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        openBooking();
-                      }
-                    }}
-                    className="yatra-booking-card yatra-booking-card-upcoming group relative border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:shadow-md transition-all cursor-pointer bg-gradient-to-r from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-800/50"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0">
-                        <div className="w-12 h-12 bg-gradient-to-br from-yatra-primary to-yatra-primary-darker rounded-lg flex items-center justify-center shadow-sm">
-                          <MapPin className="w-6 h-6 text-white" />
+                    <div
+                      key={booking.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={openBooking}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          openBooking();
+                        }
+                      }}
+                      className="yatra-booking-card yatra-booking-card-upcoming group relative border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-yatra-border-hover dark:hover:border-yatra-border-hover-dark hover:shadow-md transition-all cursor-pointer bg-gradient-to-r from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-800/50"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0">
+                          <div className="w-12 h-12 bg-gradient-to-br from-yatra-primary to-yatra-primary-darker rounded-lg flex items-center justify-center shadow-sm">
+                            <MapPin className="w-6 h-6 text-white" />
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark transition-colors">
-                            {booking.trip_title}
-                          </h4>
-                          <span className={getBadge(booking.booking_status)}>
-                            {getStatusLabel(booking.booking_status)}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
-                          <MapPin className="w-4 h-4" />
-                          {booking.destination ||
-                            __("Multiple destinations", "yatra")}
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3.5 h-3.5" />
-                            {formatTravelDateRange(
-                              booking.travel_date,
-                              booking.end_date,
-                            )}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <User className="w-3.5 h-3.5" />
-                            {(() => {
-                              // Use `travelers_count` for the count — see
-                              // Booking interface comment in types.ts.
-                              const n = Number(
-                                booking.travelers_count ??
-                                  booking.travelers ??
-                                  0,
-                              ) || 0;
-                              return sprintf(
-                                // translators: %d: number of travelers on this booking
-                                _n(
-                                  "%d Traveler",
-                                  "%d Travelers",
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <h4 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark transition-colors">
+                              {booking.trip_title}
+                            </h4>
+                            <span className={getBadge(booking.booking_status)}>
+                              {getStatusLabel(booking.booking_status)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+                            <MapPin className="w-4 h-4" />
+                            {booking.destination ||
+                              __("Multiple destinations", "yatra")}
+                          </p>
+                          <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3.5 h-3.5" />
+                              {formatTravelDateRange(
+                                booking.travel_date,
+                                booking.end_date,
+                              )}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <User className="w-3.5 h-3.5" />
+                              {(() => {
+                                // Use `travelers_count` for the count — see
+                                // Booking interface comment in types.ts.
+                                const n =
+                                  Number(
+                                    booking.travelers_count ??
+                                      booking.travelers ??
+                                      0,
+                                  ) || 0;
+                                return sprintf(
+                                  // translators: %d: number of travelers on this booking
+                                  _n("%d Traveler", "%d Travelers", n, "yatra"),
                                   n,
-                                  "yatra",
-                                ),
-                                n,
-                              );
-                            })()}
-                          </span>
+                                );
+                              })()}
+                            </span>
+                          </div>
                         </div>
+                        <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark transition-colors flex-shrink-0" />
                       </div>
-                      <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-yatra-primary dark:group-hover:text-yatra-on-dark transition-colors flex-shrink-0" />
                     </div>
-                  </div>
                   );
                 })}
               </div>

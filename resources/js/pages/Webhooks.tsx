@@ -174,7 +174,8 @@ function getInitialTab(): WebhookTab {
   if (typeof window === "undefined") return "endpoints";
   const tab = new URLSearchParams(window.location.search).get("tab");
   if (tab === "deliveries" || tab === "logs") return "deliveries";
-  if (tab === "buried" || tab === "dead-letter" || tab === "dlq") return "buried";
+  if (tab === "buried" || tab === "dead-letter" || tab === "dlq")
+    return "buried";
   return "endpoints";
 }
 
@@ -324,7 +325,10 @@ const UpgradeCard: React.FC<{ meta: WebhooksMeta }> = ({ meta }) => (
             __("Every payload preserved for 90 days.", "yatra"),
           ],
         ].map(([title, sub]) => (
-          <div key={title} className="rounded-md border border-gray-200 dark:border-gray-700 p-3">
+          <div
+            key={title}
+            className="rounded-md border border-gray-200 dark:border-gray-700 p-3"
+          >
             <div className="flex items-start gap-2">
               <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
               <div>
@@ -383,16 +387,23 @@ const EndpointsTab: React.FC = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [editing, setEditing] = useState<WebhookEndpoint | "new" | null>(null);
-  const [pendingDelete, setPendingDelete] = useState<WebhookEndpoint | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<WebhookEndpoint | null>(
+    null,
+  );
   // The plaintext secret only ever lives in memory — we show it once
   // in a copy-only modal then drop it. Stripe-style.
-  const [revealSecret, setRevealSecret] = useState<{ secret: string; endpointName: string } | null>(null);
+  const [revealSecret, setRevealSecret] = useState<{
+    secret: string;
+    endpointName: string;
+  } | null>(null);
   // After a Ping, open the delivery inspector immediately — operators
   // shouldn't have to tab-switch to find out whether the test worked.
   const [pingInspectId, setPingInspectId] = useState<number | null>(null);
   // mTLS client-cert dialog state. Holds the endpoint we're editing
   // the cert for; null = dialog closed.
-  const [mtlsEndpoint, setMtlsEndpoint] = useState<WebhookEndpoint | null>(null);
+  const [mtlsEndpoint, setMtlsEndpoint] = useState<WebhookEndpoint | null>(
+    null,
+  );
 
   const { data: endpointsData, isLoading } = useQuery({
     queryKey: ["webhooks-endpoints"],
@@ -724,7 +735,12 @@ function applyFieldFilter(
 
   const filteredData: Record<string, unknown> = {};
   for (const path of paths) {
-    extractInto(data as Record<string, unknown>, path.split("."), 0, filteredData);
+    extractInto(
+      data as Record<string, unknown>,
+      path.split("."),
+      0,
+      filteredData,
+    );
   }
   out.data = filteredData;
   return out;
@@ -756,7 +772,12 @@ function extractInto(
     nested = {};
     out[key] = nested;
   }
-  extractInto(child as Record<string, unknown>, parts, depth + 1, nested as Record<string, unknown>);
+  extractInto(
+    child as Record<string, unknown>,
+    parts,
+    depth + 1,
+    nested as Record<string, unknown>,
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -769,7 +790,9 @@ const HealthCell: React.FC<{
   health: WebhookEndpoint["health"];
 }> = ({ health }) => {
   if (!health || health.total === 0) {
-    return <span className="text-xs text-gray-400">{__("No data", "yatra")}</span>;
+    return (
+      <span className="text-xs text-gray-400">{__("No data", "yatra")}</span>
+    );
   }
   const rate = health.success_rate ?? 0;
   const cls =
@@ -844,7 +867,8 @@ const FieldSelectorCard: React.FC<{
     queryKey: ["webhooks-listen", eventKey],
     queryFn: () => webhooksApi.getListenStatus(eventKey),
     enabled: eventKey !== "",
-    refetchInterval: (q) => ((q.state.data as ListenStatus | undefined)?.armed ? 3000 : false),
+    refetchInterval: (q) =>
+      (q.state.data as ListenStatus | undefined)?.armed ? 3000 : false,
   });
   const armed = listenQuery.data?.armed ?? false;
   const expiresAt = listenQuery.data?.expires_at ?? null;
@@ -852,15 +876,21 @@ const FieldSelectorCard: React.FC<{
   const armMutation = useMutation({
     mutationFn: () => webhooksApi.startListen(eventKey),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["webhooks-listen", eventKey] });
+      queryClient.invalidateQueries({
+        queryKey: ["webhooks-listen", eventKey],
+      });
     },
     onError: (e: any) => showToast(extractError(e), "error"),
   });
   const disarmMutation = useMutation({
     mutationFn: (forget: boolean) => webhooksApi.stopListen(eventKey, forget),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["webhooks-listen", eventKey] });
-      queryClient.invalidateQueries({ queryKey: ["webhooks-event-sample", eventKey] });
+      queryClient.invalidateQueries({
+        queryKey: ["webhooks-listen", eventKey],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["webhooks-event-sample", eventKey],
+      });
     },
     onError: (e: any) => showToast(extractError(e), "error"),
   });
@@ -869,7 +899,9 @@ const FieldSelectorCard: React.FC<{
   // dot-path list updates without a manual reload.
   React.useEffect(() => {
     if (listenQuery.data?.captured) {
-      queryClient.invalidateQueries({ queryKey: ["webhooks-event-sample", eventKey] });
+      queryClient.invalidateQueries({
+        queryKey: ["webhooks-event-sample", eventKey],
+      });
     }
   }, [listenQuery.data?.captured?.captured_at, eventKey, queryClient]);
 
@@ -877,7 +909,8 @@ const FieldSelectorCard: React.FC<{
     if (val === null || val === undefined) return "null";
     if (typeof val === "string") return val === "" ? '""' : val;
     if (typeof val === "number" || typeof val === "boolean") return String(val);
-    if (Array.isArray(val) || typeof val === "object") return JSON.stringify(val);
+    if (Array.isArray(val) || typeof val === "object")
+      return JSON.stringify(val);
     return String(val);
   };
 
@@ -885,11 +918,16 @@ const FieldSelectorCard: React.FC<{
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
   React.useEffect(() => {
     if (!armed) return;
-    const t = window.setInterval(() => setNow(Math.floor(Date.now() / 1000)), 1000);
+    const t = window.setInterval(
+      () => setNow(Math.floor(Date.now() / 1000)),
+      1000,
+    );
     return () => window.clearInterval(t);
   }, [armed]);
   const remaining = armed && expiresAt ? Math.max(0, expiresAt - now) : 0;
-  const mm = Math.floor(remaining / 60).toString().padStart(2, "0");
+  const mm = Math.floor(remaining / 60)
+    .toString()
+    .padStart(2, "0");
   const ss = (remaining % 60).toString().padStart(2, "0");
 
   const sourceLabel: Record<"captured" | "delivery_log", string> = {
@@ -1218,7 +1256,10 @@ const FieldSelectorCard: React.FC<{
               <CopyButton
                 text={JSON.stringify(
                   payloadView === "output"
-                    ? applyFieldFilter(samplePayload, sendAll ? [] : selectedFields)
+                    ? applyFieldFilter(
+                        samplePayload,
+                        sendAll ? [] : selectedFields,
+                      )
                     : samplePayload,
                   null,
                   2,
@@ -1229,7 +1270,10 @@ const FieldSelectorCard: React.FC<{
             <pre className="text-xs font-mono bg-gray-900 text-gray-100 dark:bg-black rounded-md p-3 max-h-80 overflow-auto whitespace-pre-wrap">
               {JSON.stringify(
                 payloadView === "output"
-                  ? applyFieldFilter(samplePayload, sendAll ? [] : selectedFields)
+                  ? applyFieldFilter(
+                      samplePayload,
+                      sendAll ? [] : selectedFields,
+                    )
                   : samplePayload,
                 null,
                 2,
@@ -1395,7 +1439,8 @@ const EndpointEditForm: React.FC<{
     setSelectedFields(samplePaths.map((p) => p.path));
   const clearAllFields = () => setSelectedFields([]);
 
-  const customSecretValid = !useCustomSecret || customSecret.trim().length >= 24;
+  const customSecretValid =
+    !useCustomSecret || customSecret.trim().length >= 24;
   // UX trap: if the operator picked "Send only selected fields" but
   // ticked zero, the server would silently treat it as "send
   // everything" — counter-intuitive. Block save until they either
@@ -1414,7 +1459,9 @@ const EndpointEditForm: React.FC<{
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          {isCreate ? __("Add endpoint", "yatra") : __("Edit endpoint", "yatra")}
+          {isCreate
+            ? __("Add endpoint", "yatra")
+            : __("Edit endpoint", "yatra")}
         </h3>
         <Button variant="outline" onClick={onClose}>
           {__("Cancel", "yatra")}
@@ -1496,7 +1543,9 @@ const EndpointEditForm: React.FC<{
               }
               className="mt-1"
             >
-              <option value="POST">POST {__("(default — recommended)", "yatra")}</option>
+              <option value="POST">
+                POST {__("(default — recommended)", "yatra")}
+              </option>
               <option value="PUT">PUT</option>
               <option value="PATCH">PATCH</option>
               <option value="DELETE">DELETE</option>
@@ -1522,12 +1571,18 @@ const EndpointEditForm: React.FC<{
             )}
           </div>
           <div className="flex items-center justify-between gap-3 rounded-md border border-gray-200 dark:border-gray-700 p-3">
-            <Label htmlFor="webhook-is-active" className="font-normal cursor-pointer">
+            <Label
+              htmlFor="webhook-is-active"
+              className="font-normal cursor-pointer"
+            >
               <span className="block text-sm font-medium text-gray-900 dark:text-white">
                 {__("Active", "yatra")}
               </span>
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                {__("Start delivering events as soon as this is saved.", "yatra")}
+                {__(
+                  "Start delivering events as soon as this is saved.",
+                  "yatra",
+                )}
               </span>
             </Label>
             <Switch
@@ -1542,7 +1597,10 @@ const EndpointEditForm: React.FC<{
            *  duration, attempts still recorded so health metrics
            *  + retry semantics stay intact. */}
           <div className="flex items-center justify-between gap-3 rounded-md border border-gray-200 dark:border-gray-700 p-3">
-            <Label htmlFor="webhook-log-deliveries" className="font-normal cursor-pointer">
+            <Label
+              htmlFor="webhook-log-deliveries"
+              className="font-normal cursor-pointer"
+            >
               <span className="block text-sm font-medium text-gray-900 dark:text-white">
                 {__("Log delivery payloads", "yatra")}
               </span>
@@ -1750,7 +1808,7 @@ const EndpointEditForm: React.FC<{
           <CardTitle>{__("Additional payload fields", "yatra")}</CardTitle>
           <CardDescription>
             {__(
-              'Static fields merged into every payload\'s "data" block. Use this to tag events with operator-specific metadata (tenant_id, environment, region, source_app) without writing a server-side filter. Operator fields never overwrite Yatra\'s canonical entity fields.',
+              "Static fields merged into every payload's \"data\" block. Use this to tag events with operator-specific metadata (tenant_id, environment, region, source_app) without writing a server-side filter. Operator fields never overwrite Yatra's canonical entity fields.",
               "yatra",
             )}
           </CardDescription>
@@ -1789,7 +1847,10 @@ const EndpointEditForm: React.FC<{
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center justify-between gap-3 rounded-md border border-gray-200 dark:border-gray-700 p-3">
-            <Label htmlFor="webhook-use-custom-secret" className="font-normal cursor-pointer">
+            <Label
+              htmlFor="webhook-use-custom-secret"
+              className="font-normal cursor-pointer"
+            >
               <span className="block text-sm font-medium text-gray-900 dark:text-white">
                 {isCreate
                   ? __("Use my own signing secret", "yatra")
@@ -1797,8 +1858,14 @@ const EndpointEditForm: React.FC<{
               </span>
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 {isCreate
-                  ? __("Provide a 24+ character secret instead of letting Yatra auto-generate one.", "yatra")
-                  : __("Replaces the current secret. Receivers using the old one will start failing signature verification.", "yatra")}
+                  ? __(
+                      "Provide a 24+ character secret instead of letting Yatra auto-generate one.",
+                      "yatra",
+                    )
+                  : __(
+                      "Replaces the current secret. Receivers using the old one will start failing signature verification.",
+                      "yatra",
+                    )}
               </span>
             </Label>
             <Switch
@@ -1817,18 +1884,27 @@ const EndpointEditForm: React.FC<{
                 type="password"
                 value={customSecret}
                 onChange={(e) => setCustomSecret(e.target.value)}
-                placeholder={__("Paste your signing secret (min 24 chars)", "yatra")}
+                placeholder={__(
+                  "Paste your signing secret (min 24 chars)",
+                  "yatra",
+                )}
                 className="font-mono text-sm"
                 aria-describedby="webhook-custom-secret-help"
               />
-              <p id="webhook-custom-secret-help" className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p
+                id="webhook-custom-secret-help"
+                className="mt-1 text-xs text-gray-500 dark:text-gray-400"
+              >
                 {customSecret.length > 0 && customSecret.length < 24 ? (
                   <span className="text-amber-600 dark:text-amber-400">
-                    {__("Too short — need at least 24 characters.", "yatra")}{" "}
-                    ({customSecret.length}/24)
+                    {__("Too short — need at least 24 characters.", "yatra")} (
+                    {customSecret.length}/24)
                   </span>
                 ) : (
-                  __("Stored encrypted at rest. Treat it like a password.", "yatra")
+                  __(
+                    "Stored encrypted at rest. Treat it like a password.",
+                    "yatra",
+                  )
                 )}
               </p>
             </div>
@@ -1842,7 +1918,9 @@ const EndpointEditForm: React.FC<{
         </Button>
         <Button
           disabled={!canSave}
-          onClick={() => (isCreate ? createMutation.mutate() : updateMutation.mutate())}
+          onClick={() =>
+            isCreate ? createMutation.mutate() : updateMutation.mutate()
+          }
         >
           {createMutation.isPending || updateMutation.isPending ? (
             <>
@@ -1870,7 +1948,9 @@ const SecretRevealDialog: React.FC<{
   onClose: () => void;
 }> = ({ secret, endpointName, onClose }) => {
   const [copied, setCopied] = useState(false);
-  const [snippetLang, setSnippetLang] = useState<"php" | "node" | "python">("php");
+  const [snippetLang, setSnippetLang] = useState<"php" | "node" | "python">(
+    "php",
+  );
 
   const doCopy = async () => {
     if (!secret) return;
@@ -1959,17 +2039,13 @@ def webhook():
       hideFooter={false}
       footer={
         <div className="flex justify-end gap-2">
-          <Button onClick={onClose}>
-            {__("I've saved it", "yatra")}
-          </Button>
+          <Button onClick={onClose}>{__("I've saved it", "yatra")}</Button>
         </div>
       }
     >
       <div className="space-y-4">
         <p className="text-sm text-gray-700 dark:text-gray-200">
-          {__(
-            "Below is the signing secret for ", "yatra",
-          )}
+          {__("Below is the signing secret for ", "yatra")}
           <strong>{endpointName}</strong>.{" "}
           {__(
             "It will not be shown again — copy it now and store it in your receiver's configuration. If you lose it, you'll need to regenerate (which invalidates the old one).",
@@ -2063,7 +2139,14 @@ const DeliveriesTab: React.FC = () => {
   }, [statusFilter, endpointFilter, eventFilter]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["webhooks-deliveries", page, perPage, statusFilter, endpointFilter, eventFilter],
+    queryKey: [
+      "webhooks-deliveries",
+      page,
+      perPage,
+      statusFilter,
+      endpointFilter,
+      eventFilter,
+    ],
     queryFn: () =>
       webhooksApi.listDeliveries({
         page,
@@ -2155,7 +2238,9 @@ const DeliveriesTab: React.FC = () => {
               <option value="delivering">{__("Delivering", "yatra")}</option>
               <option value="delivered">{__("Delivered", "yatra")}</option>
               <option value="failed">{__("Failed (retrying)", "yatra")}</option>
-              <option value="permanent_failure">{__("Permanent failure", "yatra")}</option>
+              <option value="permanent_failure">
+                {__("Permanent failure", "yatra")}
+              </option>
             </Select>
             {hasFilters && (
               <Button
@@ -2258,8 +2343,7 @@ const DeliveriesTab: React.FC = () => {
                 key: "replay",
                 label: __("Replay delivery", "yatra"),
                 icon: <RotateCcw className="w-4 h-4" />,
-                onClick: (d: WebhookDeliveryRow) =>
-                  replayMutation.mutate(d.id),
+                onClick: (d: WebhookDeliveryRow) => replayMutation.mutate(d.id),
                 condition: (d: WebhookDeliveryRow) =>
                   d.status === "failed" || d.status === "permanent_failure",
               },
@@ -2276,10 +2360,7 @@ const DeliveriesTab: React.FC = () => {
                     "Deliveries appear here once an event fires. Use the Ping button on an endpoint to fire a test event.",
                     "yatra",
                   )
-                : __(
-                    "Try adjusting your filters to see more results.",
-                    "yatra",
-                  )
+                : __("Try adjusting your filters to see more results.", "yatra")
             }
           />
           {rows.length > 0 && totalPages > 1 && (
@@ -2297,7 +2378,10 @@ const DeliveriesTab: React.FC = () => {
         </CardContent>
       </Card>
 
-      <DeliveryInspectDialog id={inspectId} onClose={() => setInspectId(null)} />
+      <DeliveryInspectDialog
+        id={inspectId}
+        onClose={() => setInspectId(null)}
+      />
     </div>
   );
 };
@@ -2352,7 +2436,9 @@ const MtlsDialog: React.FC<{
       setKeyPem("");
       setPassphrase("");
       setMode("view");
-      void queryClient.invalidateQueries({ queryKey: ["webhook-mtls", endpoint!.id] });
+      void queryClient.invalidateQueries({
+        queryKey: ["webhook-mtls", endpoint!.id],
+      });
     },
     onError: (e: any) => showToast(extractError(e), "error"),
   });
@@ -2361,7 +2447,9 @@ const MtlsDialog: React.FC<{
     mutationFn: () => webhooksApi.clearMtls(endpoint!.id),
     onSuccess: (r) => {
       showToast(r.message, "success");
-      void queryClient.invalidateQueries({ queryKey: ["webhook-mtls", endpoint!.id] });
+      void queryClient.invalidateQueries({
+        queryKey: ["webhook-mtls", endpoint!.id],
+      });
       onClose();
     },
     onError: (e: any) => showToast(extractError(e), "error"),
@@ -2469,7 +2557,10 @@ const MtlsDialog: React.FC<{
                 type="password"
                 value={passphrase}
                 onChange={(e) => setPassphrase(e.target.value)}
-                placeholder={__("Leave blank if the key is unencrypted", "yatra")}
+                placeholder={__(
+                  "Leave blank if the key is unencrypted",
+                  "yatra",
+                )}
               />
             </div>
             <div className="flex justify-end gap-2 pt-2">
@@ -2542,8 +2633,9 @@ const BuriedTab: React.FC = () => {
   }, [endpoints]);
 
   const bulkReplay = useMutation({
-    mutationFn: (input: Parameters<typeof webhooksApi.bulkReplayDeliveries>[0]) =>
-      webhooksApi.bulkReplayDeliveries(input),
+    mutationFn: (
+      input: Parameters<typeof webhooksApi.bulkReplayDeliveries>[0],
+    ) => webhooksApi.bulkReplayDeliveries(input),
     onSuccess: (r) => {
       showToast(r.message, "success");
       setSelectedIds(new Set());
@@ -2577,7 +2669,9 @@ const BuriedTab: React.FC = () => {
           )}
         </p>
         <Button variant="outline" className="mt-4" onClick={() => refetch()}>
-          <RefreshCw className={`h-4 w-4 mr-1 ${isFetching ? "animate-spin" : ""}`} />
+          <RefreshCw
+            className={`h-4 w-4 mr-1 ${isFetching ? "animate-spin" : ""}`}
+          />
           {__("Refresh", "yatra")}
         </Button>
       </div>
@@ -2604,8 +2698,14 @@ const BuriedTab: React.FC = () => {
             )}
           </p>
         </div>
-        <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
-          <RefreshCw className={`h-4 w-4 mr-1 ${isFetching ? "animate-spin" : ""}`} />
+        <Button
+          variant="outline"
+          onClick={() => refetch()}
+          disabled={isFetching}
+        >
+          <RefreshCw
+            className={`h-4 w-4 mr-1 ${isFetching ? "animate-spin" : ""}`}
+          />
           {__("Refresh", "yatra")}
         </Button>
       </div>
@@ -2614,7 +2714,9 @@ const BuriedTab: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{__("By endpoint", "yatra")}</CardTitle>
+            <CardTitle className="text-base">
+              {__("By endpoint", "yatra")}
+            </CardTitle>
             <CardDescription>
               {__("Top receivers accumulating failures.", "yatra")}
             </CardDescription>
@@ -2660,7 +2762,9 @@ const BuriedTab: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{__("By event", "yatra")}</CardTitle>
+            <CardTitle className="text-base">
+              {__("By event", "yatra")}
+            </CardTitle>
             <CardDescription>
               {__("Event types failing most.", "yatra")}
             </CardDescription>
@@ -2689,7 +2793,9 @@ const BuriedTab: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{__("By error", "yatra")}</CardTitle>
+            <CardTitle className="text-base">
+              {__("By error", "yatra")}
+            </CardTitle>
             <CardDescription>
               {__("Grouped by error-message prefix.", "yatra")}
             </CardDescription>
@@ -2720,7 +2826,9 @@ const BuriedTab: React.FC = () => {
         <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <CardTitle className="text-base">{__("Recent buried", "yatra")}</CardTitle>
+              <CardTitle className="text-base">
+                {__("Recent buried", "yatra")}
+              </CardTitle>
               <CardDescription>
                 {sprintf(
                   /* translators: %d: number of recent rows shown */
@@ -2765,7 +2873,9 @@ const BuriedTab: React.FC = () => {
                       }
                       onChange={(e) => {
                         if (e.target.checked) {
-                          setSelectedIds(new Set(summary!.recent.map((r) => r.id)));
+                          setSelectedIds(
+                            new Set(summary!.recent.map((r) => r.id)),
+                          );
                         } else {
                           setSelectedIds(new Set());
                         }
@@ -2794,7 +2904,10 @@ const BuriedTab: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {summary!.recent.map((row) => (
-                  <tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/40">
+                  <tr
+                    key={row.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800/40"
+                  >
                     <td className="px-3 py-2">
                       <input
                         type="checkbox"
@@ -2811,7 +2924,8 @@ const BuriedTab: React.FC = () => {
                       {row.event_key}
                     </td>
                     <td className="px-3 py-2 text-gray-700 dark:text-gray-300">
-                      {endpointNameById.get(row.endpoint_id) ?? `#${row.endpoint_id}`}
+                      {endpointNameById.get(row.endpoint_id) ??
+                        `#${row.endpoint_id}`}
                     </td>
                     <td className="px-3 py-2 text-gray-700 dark:text-gray-300">
                       {row.attempts}
@@ -2851,7 +2965,10 @@ const BuriedTab: React.FC = () => {
         </CardContent>
       </Card>
 
-      <DeliveryInspectDialog id={inspectId} onClose={() => setInspectId(null)} />
+      <DeliveryInspectDialog
+        id={inspectId}
+        onClose={() => setInspectId(null)}
+      />
     </div>
   );
 };
@@ -2913,7 +3030,9 @@ const DeliveryInspectDialog: React.FC<{
     // Ensures the inspector reflects "queued → delivering → delivered"
     // live, which matters most right after a Ping click.
     refetchInterval: (q) => {
-      const status = (q.state.data as { data?: { status?: string } } | undefined)?.data?.status;
+      const status = (
+        q.state.data as { data?: { status?: string } } | undefined
+      )?.data?.status;
       const terminal = status === "delivered" || status === "permanent_failure";
       return terminal ? false : 2000;
     },
@@ -2932,9 +3051,7 @@ const DeliveryInspectDialog: React.FC<{
   if (id === null) return null;
 
   const delivery = data?.data;
-  const payloadJson = delivery
-    ? JSON.stringify(delivery.payload, null, 2)
-    : "";
+  const payloadJson = delivery ? JSON.stringify(delivery.payload, null, 2) : "";
 
   return (
     <Modal
@@ -2954,7 +3071,8 @@ const DeliveryInspectDialog: React.FC<{
             {__("Close", "yatra")}
           </Button>
           {delivery &&
-            (delivery.status === "failed" || delivery.status === "permanent_failure") && (
+            (delivery.status === "failed" ||
+              delivery.status === "permanent_failure") && (
               <Button
                 onClick={() => replay.mutate(delivery.id)}
                 disabled={replay.isPending}
@@ -2983,13 +3101,29 @@ const DeliveryInspectDialog: React.FC<{
         <div className="space-y-4">
           {/* Metadata grid */}
           <div className="grid grid-cols-2 gap-3 text-sm">
-            <Field label={__("Event", "yatra")} value={delivery.event_key} mono />
-            <Field label={__("Delivery ID", "yatra")} value={delivery.delivery_id} mono />
+            <Field
+              label={__("Event", "yatra")}
+              value={delivery.event_key}
+              mono
+            />
+            <Field
+              label={__("Delivery ID", "yatra")}
+              value={delivery.delivery_id}
+              mono
+            />
             <Field
               label={__("Status", "yatra")}
-              raw={<StatusBadge status={delivery.status} httpStatus={delivery.http_status} />}
+              raw={
+                <StatusBadge
+                  status={delivery.status}
+                  httpStatus={delivery.http_status}
+                />
+              }
             />
-            <Field label={__("Attempts", "yatra")} value={String(delivery.attempts)} />
+            <Field
+              label={__("Attempts", "yatra")}
+              value={String(delivery.attempts)}
+            />
             <Field
               label={__("Created", "yatra")}
               value={new Date(delivery.created_at).toLocaleString()}
@@ -3113,7 +3247,11 @@ const CopyButton: React.FC<{ text: string }> = ({ text }) => {
 function extractError(e: any): string {
   if (!e) return "Request failed.";
   const data = e?.response?.data ?? e?.data ?? null;
-  if (data && typeof data === "object" && typeof (data as any).message === "string") {
+  if (
+    data &&
+    typeof data === "object" &&
+    typeof (data as any).message === "string"
+  ) {
     return (data as any).message;
   }
   return e?.message || "Request failed.";

@@ -142,18 +142,13 @@ export const PremiumUpgradeDialog: React.FC<PremiumUpgradeDialogProps> = ({
               "This feature is included on every Pro plan. Upgrade to unlock it.",
               "yatra",
             )
-          : __(
-              "Upgrade to Yatra Pro and unlock this feature today",
-              "yatra",
-            );
+          : __("Upgrade to Yatra Pro and unlock this feature today", "yatra");
 
   // Module-specific bullets first; fall back to tier-appropriate
   // defaults; finally fall back to the very generic Pro bullets so
   // the section never renders empty.
-  const features: string[] =
-    (moduleSlug && MODULE_FEATURES[moduleSlug]) ||
-    (requiredPlan && TIER_DEFAULT_FEATURES[requiredPlan]) ||
-    [
+  const features: string[] = (moduleSlug && MODULE_FEATURES[moduleSlug]) ||
+    (requiredPlan && TIER_DEFAULT_FEATURES[requiredPlan]) || [
       __("Advanced analytics and reporting", "yatra"),
       __("Automated workflows and notifications", "yatra"),
       __("Enhanced customer management tools", "yatra"),

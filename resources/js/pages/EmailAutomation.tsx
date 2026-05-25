@@ -495,7 +495,10 @@ const EmailLogsList: React.FC = () => {
       </CardContent>
 
       {viewingLog && (
-        <EmailLogDetailsModal log={viewingLog} onClose={() => setViewingLog(null)} />
+        <EmailLogDetailsModal
+          log={viewingLog}
+          onClose={() => setViewingLog(null)}
+        />
       )}
     </Card>
   );
@@ -540,7 +543,8 @@ const EmailLogDetailsModal: React.FC<{
   // longtext, but some code paths may deliver it as a parsed object.
   const metadata: Record<string, unknown> | null = useMemo(() => {
     if (!log.metadata) return null;
-    if (typeof log.metadata === "object") return log.metadata as Record<string, unknown>;
+    if (typeof log.metadata === "object")
+      return log.metadata as Record<string, unknown>;
     try {
       const parsed = JSON.parse(String(log.metadata));
       return typeof parsed === "object" && parsed !== null ? parsed : null;

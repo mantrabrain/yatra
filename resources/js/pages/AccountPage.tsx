@@ -148,9 +148,7 @@ const AccountPage: React.FC = () => {
   // booking detail screen — click on the dashboard card sets this id
   // AND switches to the "bookings" section; the Bookings component
   // honours `initialBookingId` on mount/update to open the detail view.
-  const [pendingBookingId, setPendingBookingId] = useState<number | null>(
-    null,
-  );
+  const [pendingBookingId, setPendingBookingId] = useState<number | null>(null);
 
   // Update section when URL changes
   React.useEffect(() => {

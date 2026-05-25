@@ -47,6 +47,16 @@ declare global {
       showFacebookPixelSettingsUI?: boolean;
       showGoogleAnalyticsSettingsUI?: boolean;
       flexiblePaymentsEnabled?: boolean;
+      // Growth + Agency tier modules — set by their respective Pro
+      // modules via yatra_admin_localized_data filter, OR by the
+      // free plugin's AdminAssetsProvider (canonical source via
+      // ModuleManager::isModuleEnabled). useModules() also writes
+      // these at runtime once /modules resolves.
+      aiAssistantEnabled?: boolean;
+      whiteLabelEnabled?: boolean;
+      whatsappEnabled?: boolean;
+      channelManagerEnabled?: boolean;
+      webhooksEnabled?: boolean;
       currency?: string;
       date_format?: string;
       time_format?: string;
@@ -223,8 +233,18 @@ export { __, _x, sprintf, brandName };
  * @param single - Single form
  * @param plural - Plural form
  * @param number - Number to determine form
+ * @param textDomain - Optional text domain; accepted for API parity with
+ *                    WordPress's own `_n()` so call sites that already pass
+ *                    `"yatra"` as a fourth arg type-check. Currently
+ *                    unused — `__()` does its own domain resolution via
+ *                    the translations map injected on `window.yatraAdmin`.
  * @returns Translated string
  */
-export const _n = (single: string, plural: string, number: number): string => {
+export const _n = (
+  single: string,
+  plural: string,
+  number: number,
+  _textDomain?: string,
+): string => {
   return number === 1 ? __(single) : __(plural);
 };

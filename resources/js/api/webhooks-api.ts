@@ -143,7 +143,9 @@ export const webhooksApi = {
    *  captured via {@link startListen} or pulled from a prior delivery.
    *  `payload` is null if no sample exists yet (UI prompts to Listen). */
   getEventSample: (key: string) =>
-    apiClient.get(`/webhooks/events/${encodeURIComponent(key)}/sample`) as Promise<{
+    apiClient.get(
+      `/webhooks/events/${encodeURIComponent(key)}/sample`,
+    ) as Promise<{
       event: WebhookEvent;
       payload: Record<string, unknown> | null;
       paths: Array<{ path: string; sample: unknown }>;
@@ -156,10 +158,15 @@ export const webhooksApi = {
    *  arm a capture, the next firing of the event records its real
    *  payload, the UI polls until it shows up. Zero guesswork. */
   startListen: (key: string) =>
-    apiClient.post(`/webhooks/events/${encodeURIComponent(key)}/listen`, {}) as Promise<ListenStatus>,
+    apiClient.post(
+      `/webhooks/events/${encodeURIComponent(key)}/listen`,
+      {},
+    ) as Promise<ListenStatus>,
 
   getListenStatus: (key: string) =>
-    apiClient.get(`/webhooks/events/${encodeURIComponent(key)}/listen`) as Promise<ListenStatus>,
+    apiClient.get(
+      `/webhooks/events/${encodeURIComponent(key)}/listen`,
+    ) as Promise<ListenStatus>,
 
   /** Cancel an active capture. Pass forget=true to also discard the
    *  previously-captured sample (gives a clean slate). */
@@ -201,7 +208,10 @@ export const webhooksApi = {
 
   /** Generates a fresh secret — shown ONCE. Invalidates the previous one. */
   regenerateSecret: (id: number) =>
-    apiClient.post(`/webhooks/endpoints/${id}/regenerate-secret`, {}) as Promise<{
+    apiClient.post(
+      `/webhooks/endpoints/${id}/regenerate-secret`,
+      {},
+    ) as Promise<{
       secret: string;
       message: string;
     }>,

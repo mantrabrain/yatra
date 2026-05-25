@@ -124,7 +124,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             taxonomy="destination"
             label={__("Destinations to show", "yatra")}
             help={__(
-              "Pick \"All published\" for the full catalog; otherwise search and tick specific destinations.",
+              'Pick "All published" for the full catalog; otherwise search and tick specific destinations.',
               "yatra",
             )}
             value={destinationIds}
@@ -150,9 +150,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
           <ToggleControl
             label={__("Show image", "yatra")}
             checked={attributes.show_image}
-            onChange={(value: boolean) =>
-              setAttributes({ show_image: value })
-            }
+            onChange={(value: boolean) => setAttributes({ show_image: value })}
           />
           <ToggleControl
             label={__("Hide empty destinations", "yatra")}
@@ -161,9 +159,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
               "yatra",
             )}
             checked={attributes.hide_empty}
-            onChange={(value: boolean) =>
-              setAttributes({ hide_empty: value })
-            }
+            onChange={(value: boolean) => setAttributes({ hide_empty: value })}
           />
           <ToggleControl
             label={__("Featured only (filter list)", "yatra")}

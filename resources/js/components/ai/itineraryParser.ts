@@ -42,7 +42,8 @@ export interface ParsedDay {
  * silently rejected every line and the wizard reported "0 days
  * drafted" even though the prose was perfectly valid.
  */
-const DAY_HEAD = /^\s*(?:#+\s*)?(?:\*+\s*)?day\s+(\d+)\s*(?:[:\-–—]\s*)?(.*?)\s*\**?\s*$/i;
+const DAY_HEAD =
+  /^\s*(?:#+\s*)?(?:\*+\s*)?day\s+(\d+)\s*(?:[:\-–—]\s*)?(.*?)\s*\**?\s*$/i;
 
 export function parseItineraryText(text: string): ParsedDay[] {
   if (!text) return [];

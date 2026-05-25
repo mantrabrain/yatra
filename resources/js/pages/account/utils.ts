@@ -4,7 +4,9 @@ import {
   formatYatraMoney,
 } from "../../lib/currency-display";
 
-function toBrowserLocaleTag(locale: string | undefined | null): string | undefined {
+function toBrowserLocaleTag(
+  locale: string | undefined | null,
+): string | undefined {
   const raw = String(locale || "").trim();
   if (!raw) return undefined;
   // WP locales are often like "en_US"; Intl expects BCP47 like "en-US".

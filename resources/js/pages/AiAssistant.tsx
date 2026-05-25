@@ -252,7 +252,10 @@ const AiAssistant: React.FC = () => {
   const testKeyMutation = useMutation({
     mutationFn: (provider: string) => aiApi.testKey(provider),
     onSuccess: (resp) => {
-      showToast(resp.message || __("Connection successful.", "yatra"), "success");
+      showToast(
+        resp.message || __("Connection successful.", "yatra"),
+        "success",
+      );
     },
     onError: (e: any) => showToast(extractError(e), "error"),
   });
@@ -294,7 +297,8 @@ const AiAssistant: React.FC = () => {
   }, [meta?.trip_chat_limits]);
 
   const tripChatLimitsMutation = useMutation({
-    mutationFn: (patch: Partial<AiChatLimits>) => aiApi.setTripChatLimits(patch),
+    mutationFn: (patch: Partial<AiChatLimits>) =>
+      aiApi.setTripChatLimits(patch),
     onSuccess: (resp) => {
       showToast(resp.message, "success");
       queryClient.invalidateQueries({ queryKey: ["ai-meta"] });
@@ -449,7 +453,12 @@ const AiAssistant: React.FC = () => {
   // truth: each provider's published docs.
   const providerDocs: Record<
     string,
-    { whyDescription: string; whereToFind: string; docsUrl: string; pricingUrl: string }
+    {
+      whyDescription: string;
+      whereToFind: string;
+      docsUrl: string;
+      pricingUrl: string;
+    }
   > = {
     openai: {
       whyDescription: __(
@@ -499,10 +508,7 @@ const AiAssistant: React.FC = () => {
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
             <div className="space-y-2 text-blue-900 dark:text-blue-200">
               <div className="font-medium">
-                {__(
-                  "How AI Assistant billing works",
-                  "yatra",
-                )}
+                {__("How AI Assistant billing works", "yatra")}
               </div>
               <p className="text-xs">
                 {__(
@@ -512,7 +518,7 @@ const AiAssistant: React.FC = () => {
               </p>
               <p className="text-[11px] opacity-80">
                 {__(
-                  "Click \"Where to find this\" next to a provider for the exact steps in their dashboard.",
+                  'Click "Where to find this" next to a provider for the exact steps in their dashboard.',
                   "yatra",
                 )}
               </p>
@@ -649,9 +655,7 @@ const AiAssistant: React.FC = () => {
                   onClick={() =>
                     setKeyMutation.mutate({ provider: p.id, key: draft })
                   }
-                  disabled={
-                    draft.trim() === "" || setKeyMutation.isPending
-                  }
+                  disabled={draft.trim() === "" || setKeyMutation.isPending}
                 >
                   <Save className="mr-2 h-4 w-4" />
                   {__("Save", "yatra")}
@@ -717,7 +721,7 @@ const AiAssistant: React.FC = () => {
                 </div>
                 <div className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                   {__(
-                    "Adds a \"Chat with AI about this trip\" button below the Send Enquiry button on every single-trip page. Visitors can ask trip-specific questions. Rate-limited per IP/session/trip/day so a hostile visitor can't burn your provider budget.",
+                    'Adds a "Chat with AI about this trip" button below the Send Enquiry button on every single-trip page. Visitors can ask trip-specific questions. Rate-limited per IP/session/trip/day so a hostile visitor can\'t burn your provider budget.',
                     "yatra",
                   )}
                 </div>
@@ -727,9 +731,7 @@ const AiAssistant: React.FC = () => {
               type="button"
               role="switch"
               aria-checked={Boolean(meta.trip_chat_enabled)}
-              onClick={() =>
-                tripChatMutation.mutate(!meta.trip_chat_enabled)
-              }
+              onClick={() => tripChatMutation.mutate(!meta.trip_chat_enabled)}
               disabled={tripChatMutation.isPending || !moduleEnabled}
               className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors ${
                 meta.trip_chat_enabled
@@ -788,7 +790,10 @@ const AiAssistant: React.FC = () => {
                 />
                 <LimitField
                   label={__("Per IP · per hour", "yatra")}
-                  hint={__("Max messages from one visitor IP per hour.", "yatra")}
+                  hint={__(
+                    "Max messages from one visitor IP per hour.",
+                    "yatra",
+                  )}
                   field="per_ip_hour"
                   draft={chatLimitsDraft}
                   setDraft={setChatLimitsDraft}
@@ -796,7 +801,10 @@ const AiAssistant: React.FC = () => {
                 />
                 <LimitField
                   label={__("Per session (info)", "yatra")}
-                  hint={__("Cap when visitor is just asking questions.", "yatra")}
+                  hint={__(
+                    "Cap when visitor is just asking questions.",
+                    "yatra",
+                  )}
                   field="per_session"
                   draft={chatLimitsDraft}
                   setDraft={setChatLimitsDraft}
@@ -804,7 +812,10 @@ const AiAssistant: React.FC = () => {
                 />
                 <LimitField
                   label={__("Per session (booking)", "yatra")}
-                  hint={__("Higher cap once visitor signals booking intent.", "yatra")}
+                  hint={__(
+                    "Higher cap once visitor signals booking intent.",
+                    "yatra",
+                  )}
                   field="per_session_booking"
                   draft={chatLimitsDraft}
                   setDraft={setChatLimitsDraft}
@@ -812,7 +823,10 @@ const AiAssistant: React.FC = () => {
                 />
                 <LimitField
                   label={__("Max message length", "yatra")}
-                  hint={__("Max characters in a single visitor message.", "yatra")}
+                  hint={__(
+                    "Max characters in a single visitor message.",
+                    "yatra",
+                  )}
                   field="max_message_chars"
                   draft={chatLimitsDraft}
                   setDraft={setChatLimitsDraft}
@@ -820,7 +834,10 @@ const AiAssistant: React.FC = () => {
                 />
                 <LimitField
                   label={__("History turns sent", "yatra")}
-                  hint={__("How many recent turns the AI sees for context.", "yatra")}
+                  hint={__(
+                    "How many recent turns the AI sees for context.",
+                    "yatra",
+                  )}
                   field="history_turns"
                   draft={chatLimitsDraft}
                   setDraft={setChatLimitsDraft}
@@ -970,7 +987,7 @@ const AiAssistant: React.FC = () => {
               </Label>
               <p className="mb-1.5 text-xs text-gray-500 dark:text-gray-400">
                 {__(
-                  "Words AI must never use. Common entries: \"unforgettable\", \"once in a lifetime\", \"breathtaking\", \"world-class\", or any competitor name. One per line — AI treats these as a hard blocklist.",
+                  'Words AI must never use. Common entries: "unforgettable", "once in a lifetime", "breathtaking", "world-class", or any competitor name. One per line — AI treats these as a hard blocklist.',
                   "yatra",
                 )}
               </p>
@@ -992,7 +1009,7 @@ const AiAssistant: React.FC = () => {
               </Label>
               <p className="mb-1.5 text-xs text-gray-500 dark:text-gray-400">
                 {__(
-                  "Things AI should weave in WHEN RELEVANT — never forced. Examples: \"local guides\", \"small group sizes\", \"sustainable practices\", \"our 24/7 support\". One per line. AI mentions these only when they fit the context naturally.",
+                  'Things AI should weave in WHEN RELEVANT — never forced. Examples: "local guides", "small group sizes", "sustainable practices", "our 24/7 support". One per line. AI mentions these only when they fit the context naturally.',
                   "yatra",
                 )}
               </p>
@@ -1012,9 +1029,7 @@ const AiAssistant: React.FC = () => {
 
           <div className="grid gap-4 md:grid-cols-3">
             <div>
-              <Label htmlFor="bv-lang">
-                {__("Default language", "yatra")}
-              </Label>
+              <Label htmlFor="bv-lang">{__("Default language", "yatra")}</Label>
               <p className="mb-1.5 text-xs text-gray-500 dark:text-gray-400">
                 {__(
                   "BCP-47 code. AI writes in this language unless overridden by per-prompt context (e.g. enquiry replies match the customer's preferred language when known).",
@@ -1041,9 +1056,7 @@ const AiAssistant: React.FC = () => {
               <Select
                 id="bv-provider"
                 value={bv.default_provider}
-                onChange={(e) =>
-                  updateBv("default_provider", e.target.value)
-                }
+                onChange={(e) => updateBv("default_provider", e.target.value)}
               >
                 {meta.providers.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -1053,9 +1066,7 @@ const AiAssistant: React.FC = () => {
               </Select>
             </div>
             <div>
-              <Label htmlFor="bv-model">
-                {__("Default model", "yatra")}
-              </Label>
+              <Label htmlFor="bv-model">{__("Default model", "yatra")}</Label>
               <p className="mb-1.5 text-xs text-gray-500 dark:text-gray-400">
                 {__(
                   "Specific model within the provider. Smaller / faster models (gpt-4o-mini, Claude Haiku) are cheaper and ~good enough for most generations. Larger models are slower + costlier but produce richer output for trip descriptions.",
@@ -1067,9 +1078,7 @@ const AiAssistant: React.FC = () => {
                 value={bv.default_model}
                 onChange={(e) => updateBv("default_model", e.target.value)}
               >
-                <option value="">
-                  {__("(Provider default)", "yatra")}
-                </option>
+                <option value="">{__("(Provider default)", "yatra")}</option>
                 {(
                   meta.providers.find((p) => p.id === bv.default_provider)
                     ?.models ?? []
@@ -1121,7 +1130,10 @@ const AiAssistant: React.FC = () => {
           ) : (
             <>
               <div className="mb-4 grid grid-cols-3 gap-3">
-                <Stat label={__("Total calls", "yatra")} value={usage.totals.calls.toLocaleString()} />
+                <Stat
+                  label={__("Total calls", "yatra")}
+                  value={usage.totals.calls.toLocaleString()}
+                />
                 <Stat
                   label={__("Prompt tokens", "yatra")}
                   value={usage.totals.prompt.toLocaleString()}
@@ -1164,8 +1176,7 @@ const AiAssistant: React.FC = () => {
                           {bucket.calls} {__("calls", "yatra")}
                         </div>
                         <div>
-                          {bucket.prompt.toLocaleString()}{" "}
-                          {__("in", "yatra")}
+                          {bucket.prompt.toLocaleString()} {__("in", "yatra")}
                         </div>
                         <div>
                           {bucket.completion.toLocaleString()}{" "}
@@ -1212,9 +1223,7 @@ const AiAssistant: React.FC = () => {
 
       const usrTrim = draft.user.trim();
       override.user =
-        usrTrim === "" || usrTrim === row.default.user.trim()
-          ? ""
-          : draft.user;
+        usrTrim === "" || usrTrim === row.default.user.trim() ? "" : draft.user;
 
       const mt = parseInt(draft.max_tokens, 10);
       override.max_tokens =
@@ -1289,13 +1298,12 @@ const AiAssistant: React.FC = () => {
                   <div className="space-y-2">
                     {grouped[cat].map((row) => {
                       const isOpen = expandedPrompt === row.task;
-                      const draft =
-                        promptDrafts[row.task] ?? {
-                          system: row.default.system,
-                          user: row.default.user,
-                          max_tokens: String(row.default.max_tokens),
-                          temperature: String(row.default.temperature),
-                        };
+                      const draft = promptDrafts[row.task] ?? {
+                        system: row.default.system,
+                        user: row.default.user,
+                        max_tokens: String(row.default.max_tokens),
+                        temperature: String(row.default.temperature),
+                      };
                       const saving =
                         savePromptMutation.isPending &&
                         (savePromptMutation.variables as any)?.task ===
@@ -1588,7 +1596,10 @@ const LimitField: React.FC<{
   setDraft: React.Dispatch<
     React.SetStateAction<Record<keyof AiChatLimits, string>>
   >;
-  schema: Record<keyof AiChatLimits, { default: number; min: number; max: number }>;
+  schema: Record<
+    keyof AiChatLimits,
+    { default: number; min: number; max: number }
+  >;
 }> = ({ label, hint, field, draft, setDraft, schema }) => {
   const range = schema[field];
   return (
@@ -1632,7 +1643,11 @@ const Stat: React.FC<{ label: string; value: string }> = ({ label, value }) => (
 
 function extractError(e: any): string {
   const data = e?.response?.data ?? e?.data ?? null;
-  if (data && typeof data === "object" && typeof (data as any).message === "string") {
+  if (
+    data &&
+    typeof data === "object" &&
+    typeof (data as any).message === "string"
+  ) {
     return (data as any).message;
   }
   return e?.message || "AI request failed.";

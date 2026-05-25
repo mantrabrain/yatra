@@ -71,7 +71,7 @@ const ImageOverride: React.FC<{ value: string; className: string }> = ({
     value.startsWith("https://") ||
     value.startsWith("/")
       ? value
-      : attachmentUrlCache.get(value) ?? "";
+      : (attachmentUrlCache.get(value) ?? "");
 
   const [resolved, setResolved] = useState<string>(initial);
 

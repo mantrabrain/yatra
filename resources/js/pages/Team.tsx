@@ -68,18 +68,23 @@ import {
 type TeamTab = "members" | "roles" | "invitations" | "audit" | "settings";
 
 const extractError = (e: any): string => {
-  return e?.response?.data?.message || e?.message || __("Something went wrong.", "yatra");
+  return (
+    e?.response?.data?.message ||
+    e?.message ||
+    __("Something went wrong.", "yatra")
+  );
 };
 
 const getInitialTab = (): TeamTab => {
   if (typeof window === "undefined") return "members";
   const tab = new URLSearchParams(window.location.search).get("tab");
   if (
-    tab === "roles"
-    || tab === "invitations"
-    || tab === "audit"
-    || tab === "settings"
-  ) return tab;
+    tab === "roles" ||
+    tab === "invitations" ||
+    tab === "audit" ||
+    tab === "settings"
+  )
+    return tab;
   return "members";
 };
 
@@ -222,7 +227,10 @@ const Team: React.FC = () => {
           <Lock className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
             <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-              {__("Your team will keep access if you ever turn off this module", "yatra")}
+              {__(
+                "Your team will keep access if you ever turn off this module",
+                "yatra",
+              )}
             </h3>
             <p className="text-sm text-blue-800 dark:text-blue-200/90 mt-0.5">
               {__(
@@ -247,7 +255,10 @@ const Team: React.FC = () => {
           <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
             <h3 className="text-sm font-semibold text-red-900 dark:text-red-100">
-              {__("Heads up — turning off this module will revoke all team access", "yatra")}
+              {__(
+                "Heads up — turning off this module will revoke all team access",
+                "yatra",
+              )}
             </h3>
             <p className="text-sm text-red-800 dark:text-red-200/90 mt-0.5">
               {__(
@@ -333,7 +344,10 @@ const UpgradeCard: React.FC<{ meta: TeamMeta }> = ({ meta }) => (
         {[
           [
             __("8 shipped roles + custom builder", "yatra"),
-            __("Owner, Manager, Sales Agent, Front Desk, Guide, Accountant, Marketing, Auditor.", "yatra"),
+            __(
+              "Owner, Manager, Sales Agent, Front Desk, Guide, Accountant, Marketing, Auditor.",
+              "yatra",
+            ),
           ],
           [
             __("Per-user scope assignment", "yatra"),
@@ -348,7 +362,10 @@ const UpgradeCard: React.FC<{ meta: TeamMeta }> = ({ meta }) => (
             __("Every sensitive action recorded, exportable to CSV.", "yatra"),
           ],
         ].map(([title, sub]) => (
-          <div key={title} className="rounded-md border border-gray-200 dark:border-gray-700 p-3">
+          <div
+            key={title}
+            className="rounded-md border border-gray-200 dark:border-gray-700 p-3"
+          >
             <div className="flex items-start gap-2">
               <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
               <div>
@@ -443,7 +460,9 @@ const unixToLocalInputValue = (unixSec: number): string => {
  */
 const AccessExpiryCell: React.FC<{ user: TeamUser }> = ({ user }) => {
   if (!user.expires_at || user.expires_at <= 0) {
-    return <span className="text-xs text-gray-400">{__("Permanent", "yatra")}</span>;
+    return (
+      <span className="text-xs text-gray-400">{__("Permanent", "yatra")}</span>
+    );
   }
   const now = Math.floor(Date.now() / 1000);
   const secondsRemaining = user.expires_at - now;
@@ -491,7 +510,9 @@ const AccessExpiryCell: React.FC<{ user: TeamUser }> = ({ user }) => {
  * Ticks once per minute. We don't tick per-second because the picker's
  * resolution is one minute — sub-minute updates are visual noise.
  */
-const ExpiryNowHint: React.FC<{ expiresLocal: string }> = ({ expiresLocal }) => {
+const ExpiryNowHint: React.FC<{ expiresLocal: string }> = ({
+  expiresLocal,
+}) => {
   const [now, setNow] = useState(() => new Date());
   React.useEffect(() => {
     const id = window.setInterval(() => setNow(new Date()), 60_000);
@@ -566,13 +587,10 @@ const MembersTab: React.FC = () => {
   /* `selectedIds` holds the *checked* user ids. `pendingBulk` holds the   */
   /* confirmation-modal state — null when no modal is open.                */
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-  const [pendingBulk, setPendingBulk] = useState<
-    | null
-    | {
-        action: "change_role" | "remove" | "force_logout";
-        roleSlug?: string;
-      }
-  >(null);
+  const [pendingBulk, setPendingBulk] = useState<null | {
+    action: "change_role" | "remove" | "force_logout";
+    roleSlug?: string;
+  }>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["team-users"],
@@ -598,7 +616,8 @@ const MembersTab: React.FC = () => {
 
   const forceLogoutMutation = useMutation({
     mutationFn: (id: number) => teamApi.forceLogout(id),
-    onSuccess: () => showToast(__("All sessions invalidated.", "yatra"), "success"),
+    onSuccess: () =>
+      showToast(__("All sessions invalidated.", "yatra"), "success"),
     onError: (e: any) => showToast(extractError(e), "error"),
   });
 
@@ -624,7 +643,10 @@ const MembersTab: React.FC = () => {
           "warning",
         );
       } else {
-        showToast(res.message || __("Bulk action complete.", "yatra"), "success");
+        showToast(
+          res.message || __("Bulk action complete.", "yatra"),
+          "success",
+        );
       }
     },
     onError: (e: any) => {
@@ -773,7 +795,9 @@ const MembersTab: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
                       <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
-                        {(u.display_name || u.user_login).charAt(0).toUpperCase()}
+                        {(u.display_name || u.user_login)
+                          .charAt(0)
+                          .toUpperCase()}
                       </span>
                     </div>
                     <div className="min-w-0">
@@ -905,7 +929,9 @@ const MembersTab: React.FC = () => {
       <ConfirmationDialog
         isOpen={pendingRemove !== null}
         onClose={() => !removeMutation.isPending && setPendingRemove(null)}
-        onConfirm={() => pendingRemove && removeMutation.mutate(pendingRemove.id)}
+        onConfirm={() =>
+          pendingRemove && removeMutation.mutate(pendingRemove.id)
+        }
         title={sprintf(
           /* translators: %s: brand name */
           __("Remove member from %s?", "yatra"),
@@ -1010,7 +1036,7 @@ const MembersTab: React.FC = () => {
               : __("Force logout", "yatra")
         }
         cancelText={__("Cancel", "yatra")}
-        variant={pendingBulk?.action === "remove" ? "danger" : "default"}
+        variant={pendingBulk?.action === "remove" ? "danger" : "info"}
         isLoading={bulkMutation.isPending}
       />
     </div>
@@ -1203,8 +1229,7 @@ const AddMemberModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           >
             {(rolesData?.data ?? []).map((r) => (
               <option key={r.slug} value={r.slug}>
-                {r.display_name} ({r.capability_count}{" "}
-                {__("caps", "yatra")})
+                {r.display_name} ({r.capability_count} {__("caps", "yatra")})
               </option>
             ))}
           </Select>
@@ -1309,11 +1334,14 @@ const CreateUserModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       }
     >
       <div className="space-y-4">
-        <Alert variant="info" title={__("Creates a new WordPress user", "yatra")}>
+        <Alert
+          variant="info"
+          title={__("Creates a new WordPress user", "yatra")}
+        >
           {sprintf(
             /* translators: %s: brand name */
             __(
-              "This provisions a brand-new WP account and attaches the chosen %s role in one step. For people who already have a WP user, use \"Add existing WP user\" instead. To send a magic-link invite via email (account is created on accept), use the Invitations tab.",
+              'This provisions a brand-new WP account and attaches the chosen %s role in one step. For people who already have a WP user, use "Add existing WP user" instead. To send a magic-link invite via email (account is created on accept), use the Invitations tab.',
               "yatra",
             ),
             brandName(),
@@ -1360,7 +1388,9 @@ const CreateUserModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         </div>
 
         <div>
-          <Label htmlFor="cu-username">{__("Username (optional)", "yatra")}</Label>
+          <Label htmlFor="cu-username">
+            {__("Username (optional)", "yatra")}
+          </Label>
           <Input
             id="cu-username"
             value={username}
@@ -1400,7 +1430,9 @@ const CreateUserModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         </div>
 
         <div className="rounded-md border border-gray-200 dark:border-gray-700 p-3">
-          <Label className="text-sm font-medium">{__("Password", "yatra")}</Label>
+          <Label className="text-sm font-medium">
+            {__("Password", "yatra")}
+          </Label>
           <div className="mt-2 space-y-2">
             <label className="flex items-start gap-2 cursor-pointer">
               <input
@@ -1557,19 +1589,19 @@ const MemberEditDrawer: React.FC<{
           {/* persist (role / caps / scopes / expiry are all no-ops    */}
           {/* against the admin fallback and the server would 409).    */}
           {!user?.is_wp_admin && (
-          <Button
-            disabled={updateMutation.isPending}
-            onClick={() => updateMutation.mutate()}
-          >
-            {updateMutation.isPending ? (
-              <>
-                <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                {__("Saving…", "yatra")}
-              </>
-            ) : (
-              __("Save changes", "yatra")
-            )}
-          </Button>
+            <Button
+              disabled={updateMutation.isPending}
+              onClick={() => updateMutation.mutate()}
+            >
+              {updateMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                  {__("Saving…", "yatra")}
+                </>
+              ) : (
+                __("Save changes", "yatra")
+              )}
+            </Button>
           )}
         </div>
       }
@@ -1587,7 +1619,10 @@ const MemberEditDrawer: React.FC<{
           </div>
           <div className="space-y-2">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="rounded-md border border-gray-200 dark:border-gray-700 p-3 space-y-2">
+              <div
+                key={i}
+                className="rounded-md border border-gray-200 dark:border-gray-700 p-3 space-y-2"
+              >
                 <Skeleton className="h-4 w-32" />
                 <div className="grid grid-cols-2 gap-2">
                   <Skeleton className="h-6 w-full" />
@@ -1609,7 +1644,10 @@ const MemberEditDrawer: React.FC<{
             // editable form controls, and the server rejects any write
             // attempts with `yatra_team_admin_locked` (409) as a defense-
             // in-depth check.
-            <Alert variant="info" title={__("WordPress administrator", "yatra")}>
+            <Alert
+              variant="info"
+              title={__("WordPress administrator", "yatra")}
+            >
               <p className="text-sm">
                 {sprintf(
                   /* translators: %s: brand name */
@@ -1655,100 +1693,108 @@ const MemberEditDrawer: React.FC<{
             </Alert>
           ) : (
             <>
-          <div>
-            <Label>
-              {sprintf(
-                /* translators: %s: brand name */
-                __("%s role", "yatra"),
-                brandName(),
-              )}
-            </Label>
-            <Select
-              value={roleSlug}
-              onChange={(e) => setRoleSlug(e.target.value)}
-              className="mt-1"
-              aria-label={__("Role", "yatra")}
-            >
-              <option value="">
-                {sprintf(
-                  /* translators: %s: brand name */
-                  __("No %s role", "yatra"),
-                  brandName(),
-                )}
-              </option>
-              {(rolesData?.data ?? []).map((r) => (
-                <option key={r.slug} value={r.slug}>
-                  {r.display_name} ({r.capability_count}{" "}
-                  {__("caps", "yatra")})
-                </option>
-              ))}
-            </Select>
-          </div>
-
-          {/* Time-windowed access. Hidden when:                              */
-          /*   - operator is editing themselves (server blocks self-expiry)   */
-          /*   - target is a WP admin (admin fallback makes expiry a no-op)   */}
-          {!isSelfEdit && !user.is_wp_admin && (
-            <div className="rounded-md border border-gray-200 dark:border-gray-700 p-3 space-y-2">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <Label htmlFor="member-expires-at" className="text-sm font-medium">
-                    {__("Access expires on (optional)", "yatra")}
-                  </Label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__(
-                      "Time-windowed access: caps are revoked automatically once this passes. Useful for contractors, seasonal staff, or temporary vendor access. Leave blank for permanent access.",
-                      "yatra",
+              <div>
+                <Label>
+                  {sprintf(
+                    /* translators: %s: brand name */
+                    __("%s role", "yatra"),
+                    brandName(),
+                  )}
+                </Label>
+                <Select
+                  value={roleSlug}
+                  onChange={(e) => setRoleSlug(e.target.value)}
+                  className="mt-1"
+                  aria-label={__("Role", "yatra")}
+                >
+                  <option value="">
+                    {sprintf(
+                      /* translators: %s: brand name */
+                      __("No %s role", "yatra"),
+                      brandName(),
                     )}
-                  </p>
-                </div>
-                {expiresLocal && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setExpiresLocal("");
+                  </option>
+                  {(rolesData?.data ?? []).map((r) => (
+                    <option key={r.slug} value={r.slug}>
+                      {r.display_name} ({r.capability_count}{" "}
+                      {__("caps", "yatra")})
+                    </option>
+                  ))}
+                </Select>
+              </div>
+
+              {/* Time-windowed access. Hidden when:                              */
+              /*   - operator is editing themselves (server blocks self-expiry)   */
+              /*   - target is a WP admin (admin fallback makes expiry a no-op)   */}
+              {!isSelfEdit && !user.is_wp_admin && (
+                <div className="rounded-md border border-gray-200 dark:border-gray-700 p-3 space-y-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <Label
+                        htmlFor="member-expires-at"
+                        className="text-sm font-medium"
+                      >
+                        {__("Access expires on (optional)", "yatra")}
+                      </Label>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        {__(
+                          "Time-windowed access: caps are revoked automatically once this passes. Useful for contractors, seasonal staff, or temporary vendor access. Leave blank for permanent access.",
+                          "yatra",
+                        )}
+                      </p>
+                    </div>
+                    {expiresLocal && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setExpiresLocal("");
+                          setExpiryDirty(true);
+                        }}
+                      >
+                        {__("Clear expiry", "yatra")}
+                      </Button>
+                    )}
+                  </div>
+                  <Input
+                    id="member-expires-at"
+                    type="datetime-local"
+                    value={expiresLocal}
+                    min={unixToLocalInputValue(
+                      Math.floor(Date.now() / 1000) + 60,
+                    )}
+                    onChange={(e) => {
+                      setExpiresLocal(e.target.value);
                       setExpiryDirty(true);
                     }}
-                  >
-                    {__("Clear expiry", "yatra")}
-                  </Button>
-                )}
-              </div>
-              <Input
-                id="member-expires-at"
-                type="datetime-local"
-                value={expiresLocal}
-                min={unixToLocalInputValue(Math.floor(Date.now() / 1000) + 60)}
-                onChange={(e) => {
-                  setExpiresLocal(e.target.value);
-                  setExpiryDirty(true);
-                }}
-                className="w-full"
-              />
-              <ExpiryNowHint expiresLocal={expiresLocal} />
-              {user.is_expired && (
-                <Alert variant="warning" title={__("Access has already expired", "yatra")}>
-                  {__(
-                    "This member is past their expiry and currently has no access. The next hourly sweep will fully strip their role + grants. Set a new date above to extend access — or clear the expiry to make it permanent.",
-                    "yatra",
+                    className="w-full"
+                  />
+                  <ExpiryNowHint expiresLocal={expiresLocal} />
+                  {user.is_expired && (
+                    <Alert
+                      variant="warning"
+                      title={__("Access has already expired", "yatra")}
+                    >
+                      {__(
+                        "This member is past their expiry and currently has no access. The next hourly sweep will fully strip their role + grants. Set a new date above to extend access — or clear the expiry to make it permanent.",
+                        "yatra",
+                      )}
+                    </Alert>
                   )}
-                </Alert>
+                </div>
               )}
-            </div>
-          )}
 
-          {capsData && (
-            <CapabilityOverridesEditor
-              registry={capsData.capabilities}
-              effective={user.effective_caps}
-              grants={extraGrants}
-              revokes={extraRevokes}
-              onChangeGrants={setExtraGrants}
-              onChangeRevokes={setExtraRevokes}
-            />
-          )}
+              {capsData && (
+                <CapabilityOverridesEditor
+                  registry={capsData.capabilities}
+                  effective={user.effective_caps}
+                  grants={extraGrants}
+                  revokes={extraRevokes}
+                  onChangeGrants={setExtraGrants}
+                  onChangeRevokes={setExtraRevokes}
+                />
+              )}
             </>
           )}
         </div>
@@ -1764,7 +1810,14 @@ const CapabilityOverridesEditor: React.FC<{
   revokes: string[];
   onChangeGrants: (next: string[]) => void;
   onChangeRevokes: (next: string[]) => void;
-}> = ({ registry, effective, grants, revokes, onChangeGrants, onChangeRevokes }) => {
+}> = ({
+  registry,
+  effective,
+  grants,
+  revokes,
+  onChangeGrants,
+  onChangeRevokes,
+}) => {
   const byCategory = useMemo(() => {
     const map: Record<string, Array<[string, CapabilityDef]>> = {};
     Object.entries(registry).forEach(([cap, def]) => {
@@ -1775,9 +1828,12 @@ const CapabilityOverridesEditor: React.FC<{
   }, [registry]);
 
   const sensColor = (s: string): string => {
-    if (s === "critical") return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300";
-    if (s === "high") return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300";
-    if (s === "medium") return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300";
+    if (s === "critical")
+      return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300";
+    if (s === "high")
+      return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300";
+    if (s === "medium")
+      return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300";
     return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
   };
 
@@ -1812,7 +1868,9 @@ const CapabilityOverridesEditor: React.FC<{
                       <span className="text-sm text-gray-900 dark:text-white">
                         {def.label}
                       </span>
-                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${sensColor(def.sensitivity)}`}>
+                      <span
+                        className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${sensColor(def.sensitivity)}`}
+                      >
                         {def.sensitivity}
                       </span>
                     </div>
@@ -1826,7 +1884,9 @@ const CapabilityOverridesEditor: React.FC<{
                         {__("via role", "yatra")}
                       </Badge>
                     )}
-                    <Tooltip content={__("Grant this cap on top of the role", "yatra")}>
+                    <Tooltip
+                      content={__("Grant this cap on top of the role", "yatra")}
+                    >
                       <button
                         type="button"
                         onClick={() => {
@@ -1846,7 +1906,12 @@ const CapabilityOverridesEditor: React.FC<{
                         {__("Grant", "yatra")}
                       </button>
                     </Tooltip>
-                    <Tooltip content={__("Deny this cap even if the role allows", "yatra")}>
+                    <Tooltip
+                      content={__(
+                        "Deny this cap even if the role allows",
+                        "yatra",
+                      )}
+                    >
                       <button
                         type="button"
                         onClick={() => {
@@ -1991,9 +2056,7 @@ const RolesTab: React.FC = () => {
                 key: "member_count",
                 label: __("Members", "yatra"),
                 render: (r: TeamRole) => (
-                  <Badge variant="outline">
-                    {r.member_count}
-                  </Badge>
+                  <Badge variant="outline">{r.member_count}</Badge>
                 ),
               },
             ]}
@@ -2042,7 +2105,9 @@ const RolesTab: React.FC = () => {
 
       {createSeed !== null && (
         <RoleCreateDrawer
-          seedSlug={createSeed.startsWith("clone:") ? createSeed.slice(6) : null}
+          seedSlug={
+            createSeed.startsWith("clone:") ? createSeed.slice(6) : null
+          }
           onClose={() => setCreateSeed(null)}
         />
       )}
@@ -2050,7 +2115,9 @@ const RolesTab: React.FC = () => {
       <ConfirmationDialog
         isOpen={pendingDelete !== null}
         onClose={() => !deleteMutation.isPending && setPendingDelete(null)}
-        onConfirm={() => pendingDelete && deleteMutation.mutate(pendingDelete.slug)}
+        onConfirm={() =>
+          pendingDelete && deleteMutation.mutate(pendingDelete.slug)
+        }
         title={__("Delete custom role?", "yatra")}
         description={
           pendingDelete
@@ -2174,7 +2241,10 @@ const RoleEditDrawer: React.FC<{
           <Skeleton className="h-9 w-full" />
           <div className="space-y-2">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="rounded-md border border-gray-200 dark:border-gray-700 p-3 space-y-2">
+              <div
+                key={i}
+                className="rounded-md border border-gray-200 dark:border-gray-700 p-3 space-y-2"
+              >
                 <Skeleton className="h-4 w-28" />
                 <div className="grid grid-cols-2 gap-2">
                   <Skeleton className="h-6 w-full" />
@@ -2212,8 +2282,8 @@ const RoleEditDrawer: React.FC<{
               className="mt-1"
             />
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              <code className="font-mono">{role.slug}</code>{" "}
-              · {role.member_count}{" "}
+              <code className="font-mono">{role.slug}</code> ·{" "}
+              {role.member_count}{" "}
               {role.member_count === 1
                 ? __("member", "yatra")
                 : __("members", "yatra")}
@@ -2266,7 +2336,9 @@ const RoleCreateDrawer: React.FC<{
 
   const [displayName, setDisplayName] = useState("");
   const [selectedCaps, setSelectedCaps] = useState<string[]>([]);
-  const [appliedTemplateId, setAppliedTemplateId] = useState<string | null>(null);
+  const [appliedTemplateId, setAppliedTemplateId] = useState<string | null>(
+    null,
+  );
 
   React.useEffect(() => {
     if (seedData?.data) {
@@ -2285,7 +2357,9 @@ const RoleCreateDrawer: React.FC<{
   const applyTemplate = (templateId: string) => {
     const tpl = (templatesData?.data ?? []).find((t) => t.id === templateId);
     if (!tpl) return;
-    const caps = Array.from(new Set([...tpl.capabilities, "yatra_access_admin"]));
+    const caps = Array.from(
+      new Set([...tpl.capabilities, "yatra_access_admin"]),
+    );
     setSelectedCaps(caps);
     setAppliedTemplateId(templateId);
     if (displayName.trim() === "") {
@@ -2327,10 +2401,7 @@ const RoleCreateDrawer: React.FC<{
           <Button variant="outline" onClick={onClose}>
             {__("Cancel", "yatra")}
           </Button>
-          <Button
-            disabled={!canSave}
-            onClick={() => createMutation.mutate()}
-          >
+          <Button disabled={!canSave} onClick={() => createMutation.mutate()}>
             {createMutation.isPending ? (
               <>
                 <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
@@ -2548,11 +2619,7 @@ const CapabilityMatrix: React.FC<{
                       disabled
                         ? "cursor-default"
                         : "cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50"
-                    } ${
-                      isChecked
-                        ? "bg-blue-50/40 dark:bg-blue-900/10"
-                        : ""
-                    }`}
+                    } ${isChecked ? "bg-blue-50/40 dark:bg-blue-900/10" : ""}`}
                   >
                     <input
                       id={`cap-${cap}`}
@@ -2600,11 +2667,15 @@ const InvitationsTab: React.FC = () => {
   // Revoke flow uses a confirmation dialog so the operator can opt
   // in to also purging the record. A simple one-click revoke would
   // leave a stale `revoked` row in the table forever.
-  const [pendingRevoke, setPendingRevoke] = useState<TeamInvitation | null>(null);
+  const [pendingRevoke, setPendingRevoke] = useState<TeamInvitation | null>(
+    null,
+  );
   const [revokeAlsoDelete, setRevokeAlsoDelete] = useState(true);
   // Standalone delete for non-pending rows (revoked / accepted / expired).
   // Confirms before purging so cleanup is intentional.
-  const [pendingDelete, setPendingDelete] = useState<TeamInvitation | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<TeamInvitation | null>(
+    null,
+  );
 
   const { data, isLoading } = useQuery({
     queryKey: ["team-invitations"],
@@ -2686,16 +2757,16 @@ const InvitationsTab: React.FC = () => {
                 label: __("Status", "yatra"),
                 render: (i: TeamInvitation) => {
                   const cls: Record<string, string> = {
-                    pending: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-                    accepted: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
-                    revoked: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
-                    expired: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+                    pending:
+                      "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+                    accepted:
+                      "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+                    revoked:
+                      "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
+                    expired:
+                      "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
                   };
-                  return (
-                    <Badge className={cls[i.status]}>
-                      {i.status}
-                    </Badge>
-                  );
+                  return <Badge className={cls[i.status]}>{i.status}</Badge>;
                 },
               },
               {
@@ -2778,7 +2849,10 @@ const InvitationsTab: React.FC = () => {
             <p className="text-sm text-gray-700 dark:text-gray-300">
               {sprintf(
                 /* translators: %s: invited email address */
-                __("The magic-link sent to %s will stop working immediately. Anyone who already clicked the link before now has already accepted (you can confirm in the audit log).", "yatra"),
+                __(
+                  "The magic-link sent to %s will stop working immediately. Anyone who already clicked the link before now has already accepted (you can confirm in the audit log).",
+                  "yatra",
+                ),
                 pendingRevoke.email,
               )}
             </p>
@@ -2795,7 +2869,10 @@ const InvitationsTab: React.FC = () => {
                   {__("Also delete the invitation record", "yatra")}
                 </span>
                 <span className="block text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  {__("Removes the row from this list. The audit log keeps a permanent trail of who was invited, by whom, and when — that's preserved separately.", "yatra")}
+                  {__(
+                    "Removes the row from this list. The audit log keeps a permanent trail of who was invited, by whom, and when — that's preserved separately.",
+                    "yatra",
+                  )}
                 </span>
               </span>
             </label>
@@ -2845,7 +2922,10 @@ const InvitationsTab: React.FC = () => {
           pendingDelete
             ? sprintf(
                 /* translators: 1: invited email address, 2: current status */
-                __("Permanently remove the %1$s invitation (status: %2$s) from this list. The audit log entry stays, so you can still see who was invited and when — only the live record is removed.", "yatra"),
+                __(
+                  "Permanently remove the %1$s invitation (status: %2$s) from this list. The audit log entry stays, so you can still see who was invited and when — only the live record is removed.",
+                  "yatra",
+                ),
                 pendingDelete.email,
                 pendingDelete.status,
               )
@@ -2948,7 +3028,9 @@ const InvitationModal: React.FC<{
         </div>
 
         <div>
-          <Label htmlFor="invite-expiry">{__("Link expires in", "yatra")}</Label>
+          <Label htmlFor="invite-expiry">
+            {__("Link expires in", "yatra")}
+          </Label>
           <Select
             id="invite-expiry"
             value={String(expiresIn)}
@@ -2956,7 +3038,9 @@ const InvitationModal: React.FC<{
             className="mt-1"
           >
             <option value="86400">{__("24 hours", "yatra")}</option>
-            <option value="259200">{__("72 hours (recommended)", "yatra")}</option>
+            <option value="259200">
+              {__("72 hours (recommended)", "yatra")}
+            </option>
             <option value="604800">{__("7 days", "yatra")}</option>
           </Select>
         </div>
@@ -3034,7 +3118,10 @@ const AcceptUrlRevealDialog: React.FC<{
             )}
           </Button>
         </div>
-        <Alert variant="warning" title={__("Treat this link like a password", "yatra")}>
+        <Alert
+          variant="warning"
+          title={__("Treat this link like a password", "yatra")}
+        >
           {__(
             "Anyone with this URL can claim the invited role until it expires.",
             "yatra",
@@ -3065,7 +3152,13 @@ const AuditLogTab: React.FC = () => {
   const perPage = 50;
 
   const { data, isLoading } = useQuery({
-    queryKey: ["team-audit-log", page, actionFilter, entityFilter, resultFilter],
+    queryKey: [
+      "team-audit-log",
+      page,
+      actionFilter,
+      entityFilter,
+      resultFilter,
+    ],
     queryFn: () =>
       teamApi.listAuditLog({
         page,
@@ -3398,9 +3491,7 @@ const AuditLogTab: React.FC = () => {
       <ConfirmationDialog
         isOpen={confirmBulk}
         onClose={() => !bulkDeleteMutation.isPending && setConfirmBulk(false)}
-        onConfirm={() =>
-          bulkDeleteMutation.mutate(Array.from(selectedIds))
-        }
+        onConfirm={() => bulkDeleteMutation.mutate(Array.from(selectedIds))}
         title={sprintf(
           /* translators: %d: count of selected audit-log entries */
           __("Delete %d audit-log entries?", "yatra"),
@@ -3528,7 +3619,10 @@ const SettingsTab: React.FC = () => {
       ) : (
         <Alert
           variant="info"
-          title={__("On the default — team access is revoked when the module is off", "yatra")}
+          title={__(
+            "On the default — team access is revoked when the module is off",
+            "yatra",
+          )}
         >
           {__(
             "This toggle is OFF, which is the default. If you ever turn off the Team & Access module, every Yatra role on your site (Owner, Manager, Sales Agent, and any custom roles you built) will be removed, and your team members will lose all Yatra access. Re-enabling the module brings back the 8 built-in roles, but your custom roles and the original assignments do NOT come back. Flip this toggle ON if you'd rather keep your team's access when the module is off.",
@@ -3550,7 +3644,10 @@ const SettingsTab: React.FC = () => {
               )}
               <div className="min-w-0">
                 <Label className="text-base font-medium text-gray-900 dark:text-white block">
-                  {__("Keep team access running when this module is turned off", "yatra")}
+                  {__(
+                    "Keep team access running when this module is turned off",
+                    "yatra",
+                  )}
                   <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
                     {__("(off by default)", "yatra")}
                   </span>
@@ -3598,10 +3695,16 @@ const SettingsTab: React.FC = () => {
                   {__("Team members see only what their role allows.", "yatra")}
                 </li>
                 <li>
-                  {__("Customers and other users see nothing in the admin.", "yatra")}
+                  {__(
+                    "Customers and other users see nothing in the admin.",
+                    "yatra",
+                  )}
                 </li>
                 <li className="text-gray-400 italic">
-                  {__("This setting doesn't apply yet — it kicks in only if you turn the module off.", "yatra")}
+                  {__(
+                    "This setting doesn't apply yet — it kicks in only if you turn the module off.",
+                    "yatra",
+                  )}
                 </li>
               </ul>
             </div>
@@ -3627,22 +3730,34 @@ const SettingsTab: React.FC = () => {
                 {keepAccess ? (
                   <>
                     <li className="text-green-700 dark:text-green-300 font-medium">
-                      {__("Team members keep their access — based on their assigned role.", "yatra")}
+                      {__(
+                        "Team members keep their access — based on their assigned role.",
+                        "yatra",
+                      )}
                     </li>
                     <li>
-                      {__("Advanced features (expiry, per-user grants, scopes, audit log) pause until you turn the module back on.", "yatra")}
+                      {__(
+                        "Advanced features (expiry, per-user grants, scopes, audit log) pause until you turn the module back on.",
+                        "yatra",
+                      )}
                     </li>
                   </>
                 ) : (
                   <>
                     <li className="text-red-700 dark:text-red-300 font-medium">
-                      {__("All Yatra roles are deleted (Owner, Manager, custom roles you built — everything except the Yatra Customer role).", "yatra")}
+                      {__(
+                        "All Yatra roles are deleted (Owner, Manager, custom roles you built — everything except the Yatra Customer role).",
+                        "yatra",
+                      )}
                     </li>
                     <li className="text-red-700 dark:text-red-300 font-medium">
                       {__("Team members lose all their Yatra access.", "yatra")}
                     </li>
                     <li>
-                      {__("Re-enabling the module brings back the 8 built-in roles. Custom roles and the original member assignments don't come back automatically.", "yatra")}
+                      {__(
+                        "Re-enabling the module brings back the 8 built-in roles. Custom roles and the original member assignments don't come back automatically.",
+                        "yatra",
+                      )}
                     </li>
                   </>
                 )}
@@ -3687,11 +3802,15 @@ const SettingsTab: React.FC = () => {
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {serverAllowlist.trim() === ""
-                ? __("Currently no restriction — every authenticated staff member can sign in from anywhere.", "yatra")
+                ? __(
+                    "Currently no restriction — every authenticated staff member can sign in from anywhere.",
+                    "yatra",
+                  )
                 : sprintf(
                     /* translators: %d: number of CIDR entries currently active */
                     __("%d source IP rule(s) active.", "yatra"),
-                    serverAllowlist.split(",").filter((s) => s.trim() !== "").length,
+                    serverAllowlist.split(",").filter((s) => s.trim() !== "")
+                      .length,
                   )}
             </p>
             <div className="flex items-center gap-2">

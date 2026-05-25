@@ -201,10 +201,12 @@ const RecurringRuleForm: React.FC = () => {
           // pricing type from `price_types` when present so the Rules UI reflects
           // real trip configuration.
           const rawPriceTypes = trip.price_types;
-          const hasTravelerPricing =
-            Array.isArray(rawPriceTypes) ? rawPriceTypes.length > 0 : false;
-          const effectivePricingType =
-            hasTravelerPricing ? "traveler_based" : trip.pricing_type || "regular";
+          const hasTravelerPricing = Array.isArray(rawPriceTypes)
+            ? rawPriceTypes.length > 0
+            : false;
+          const effectivePricingType = hasTravelerPricing
+            ? "traveler_based"
+            : trip.pricing_type || "regular";
 
           return {
             id: Number(trip.id) || 0,
@@ -321,7 +323,9 @@ const RecurringRuleForm: React.FC = () => {
       // Prefer the *trip's effective* pricing type over any stale rule.pricing_type.
       // Trips can be traveler-based simply by having price_types configured, even if
       // trip.pricing_type is still "regular".
-      const tripRow = tripsData.trips.find((t) => t.id === Number(existingRule.trip_id));
+      const tripRow = tripsData.trips.find(
+        (t) => t.id === Number(existingRule.trip_id),
+      );
       const effectivePricingType =
         tripRow?.pricing_type ||
         ((tripForLocations as any)?.price_types &&
@@ -376,10 +380,14 @@ const RecurringRuleForm: React.FC = () => {
     if (!isEditing && !existingRule) {
       const inferred = (() => {
         const priceTypes = (tripForLocations as any)?.price_types;
-        const hasTravelerPricing = Array.isArray(priceTypes) && priceTypes.length > 0;
-        return (hasTravelerPricing
-          ? "traveler_based"
-          : (selectedTrip?.pricing_type || (tripForLocations as Trip)?.pricing_type || "regular")
+        const hasTravelerPricing =
+          Array.isArray(priceTypes) && priceTypes.length > 0;
+        return (
+          hasTravelerPricing
+            ? "traveler_based"
+            : selectedTrip?.pricing_type ||
+              (tripForLocations as Trip)?.pricing_type ||
+              "regular"
         ) as "regular" | "traveler_based";
       })();
 
@@ -2007,7 +2015,9 @@ const RecurringRuleForm: React.FC = () => {
                                                           const newSlots = [
                                                             ...prev.time_slots,
                                                           ];
-                                                          if (!newSlots[index]) {
+                                                          if (
+                                                            !newSlots[index]
+                                                          ) {
                                                             return prev;
                                                           }
                                                           newSlots[index] = {
@@ -2024,7 +2034,8 @@ const RecurringRuleForm: React.FC = () => {
                                                           };
                                                           return {
                                                             ...prev,
-                                                            time_slots: newSlots,
+                                                            time_slots:
+                                                              newSlots,
                                                           };
                                                         });
                                                       }}

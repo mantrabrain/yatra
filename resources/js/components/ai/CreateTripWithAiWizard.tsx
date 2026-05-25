@@ -726,21 +726,23 @@ export const CreateTripWithAiWizard: React.FC<CreateTripWithAiWizardProps> = ({
       const itinerarySt = sections.itinerary;
       let itineraryWarning = "";
       if (itinerarySt.status === "done" && Array.isArray(itinerarySt.decoded)) {
-        const days = (itinerarySt.decoded as Array<{
-          day: number;
-          day_title: string;
-          description: string;
-          activities?: Array<{
-            title: string;
-            description?: string;
-            item_type?: string;
-            item_name?: string;
-            start_time?: string;
-            end_time?: string;
-            duration?: string;
-            location?: string;
-          }>;
-        }>).map((d) => ({
+        const days = (
+          itinerarySt.decoded as Array<{
+            day: number;
+            day_title: string;
+            description: string;
+            activities?: Array<{
+              title: string;
+              description?: string;
+              item_type?: string;
+              item_name?: string;
+              start_time?: string;
+              end_time?: string;
+              duration?: string;
+              location?: string;
+            }>;
+          }>
+        ).map((d) => ({
           day: d.day,
           day_title: d.day_title,
           description: d.description,
@@ -759,7 +761,6 @@ export const CreateTripWithAiWizard: React.FC<CreateTripWithAiWizardProps> = ({
             // of silently dropping it so they know to re-run from the
             // Itinerary page if they want days.
             itineraryWarning = extractError(e);
-            // eslint-disable-next-line no-console
             console.warn("Itinerary apply failed:", e);
           }
         }
@@ -773,7 +774,6 @@ export const CreateTripWithAiWizard: React.FC<CreateTripWithAiWizardProps> = ({
         );
       }
       if (itineraryWarning) {
-        // eslint-disable-next-line no-console
         console.warn("Wizard itinerary warning:", itineraryWarning);
       }
 
@@ -938,7 +938,8 @@ export const CreateTripWithAiWizard: React.FC<CreateTripWithAiWizardProps> = ({
             )}
             {phase === "review" && (
               <>
-                {sectionsDone}/{sectionsTotal} {__("sections accepted", "yatra")}
+                {sectionsDone}/{sectionsTotal}{" "}
+                {__("sections accepted", "yatra")}
                 {sectionsNeedContext > 0 && (
                   <span className="ml-2 text-amber-600 dark:text-amber-300">
                     {sectionsNeedContext} {__("waiting for input", "yatra")}
@@ -1211,10 +1212,7 @@ const SetupStep: React.FC<{
           so the operator provides them up front. Trip saves with $0
           if both are left blank. */}
       <div className="grid gap-3 md:grid-cols-3">
-        <Field
-          label={__("Price per person", "yatra")}
-          hint={`(${currency})`}
-        >
+        <Field label={__("Price per person", "yatra")} hint={`(${currency})`}>
           <Input
             type="number"
             min={0}
@@ -1512,7 +1510,10 @@ function summarize(id: SectionId, state: SectionState): string {
   if (id === "highlights" && Array.isArray(d)) {
     return `${d.length} ${d.length === 1 ? "highlight" : "highlights"}`;
   }
-  if ((id === "included_items" || id === "excluded_items") && Array.isArray(d)) {
+  if (
+    (id === "included_items" || id === "excluded_items") &&
+    Array.isArray(d)
+  ) {
     return `${d.length} ${d.length === 1 ? "item" : "items"}`;
   }
   if (id === "faqs" && Array.isArray(d)) {
@@ -1573,7 +1574,9 @@ function plainTextToHtml(text: string): string {
     .join("");
 }
 
-function decodeAmenityList(text: string): Array<{ title: string; description: string }> {
+function decodeAmenityList(
+  text: string,
+): Array<{ title: string; description: string }> {
   return text
     .split(/\r?\n/)
     .map((line) => line.replace(/^[\s\-\*••]+/, "").trim())
