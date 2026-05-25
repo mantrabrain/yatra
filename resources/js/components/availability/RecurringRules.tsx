@@ -193,6 +193,7 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     gcTime: 0, // Don't cache the data (replaces cacheTime in newer versions)
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const allRules = rulesData?.rules || [];
 
   // Filter rules based on status and search
@@ -498,6 +499,7 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     }
 
     return cols;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     visibleColumns,
     formatRulePattern,

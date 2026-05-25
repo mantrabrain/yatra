@@ -64,6 +64,11 @@ const isModuleAvailable = (): boolean => {
 
 // Main Component
 const DynamicPricingPage: React.FC = () => {
+  // Pro gate is a stable, server-injected flag — but we compute it once
+  // at the top so every hook below can read it and the early return can
+  // live below all hook calls (rules-of-hooks).
+  const moduleAvailable = isModuleAvailable();
+
   const [activeTab, setActiveTab] = useState("rules");
   const [showRuleTypeModal, setShowRuleTypeModal] = useState(false);
   const [settings, setSettings] = useState({
@@ -145,9 +150,6 @@ const DynamicPricingPage: React.FC = () => {
     window.location.href = `${baseUrl}&action=create-pricing-rule&rule_type=${ruleType}`;
   };
 
-  // Show premium upgrade content if module is not available
-  if (!isModuleAvailable()) return <PremiumUpgradeCard />;
-
   // Fetch settings from backend
   const { data: settingsData } = useQuery({
     queryKey: ["dynamic-pricing-settings"],
@@ -157,6 +159,7 @@ const DynamicPricingPage: React.FC = () => {
       const payload = (body as any)?.data ?? body;
       return payload && typeof payload === "object" ? payload : {};
     },
+    enabled: moduleAvailable,
   });
 
   // Update settings state when data is loaded
@@ -181,6 +184,7 @@ const DynamicPricingPage: React.FC = () => {
 
       return response;
     },
+    enabled: moduleAvailable,
   });
 
   // Fetch statistics
@@ -195,6 +199,7 @@ const DynamicPricingPage: React.FC = () => {
 
       return response;
     },
+    enabled: moduleAvailable,
   });
 
   // The API client returns the decoded JSON body.
@@ -204,6 +209,7 @@ const DynamicPricingPage: React.FC = () => {
   const statsPayload =
     (statsData as any)?.data?.data ?? (statsData as any)?.data ?? {};
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const rules = rulesPayload || [];
   const stats = statsPayload || {};
 
@@ -341,6 +347,9 @@ const DynamicPricingPage: React.FC = () => {
     }
     bulkMutation.mutate({ action: bulkAction, ids: selectedIds });
   };
+
+  // Gate after every hook is registered so hook order stays consistent.
+  if (!moduleAvailable) return <PremiumUpgradeCard />;
 
   return (
     <div className="space-y-6">

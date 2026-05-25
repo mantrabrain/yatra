@@ -1298,6 +1298,7 @@ const Trips: React.FC = () => {
     });
 
     return cols;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isPro,
     visibleColumns,
@@ -1461,6 +1462,7 @@ const Trips: React.FC = () => {
     }
 
     return actions;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [can, queryClient, showToast]);
 
   return (

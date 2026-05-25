@@ -215,6 +215,7 @@ export const PopoverContent: React.FC<{
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("scroll", handleScroll, true);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, align, side]);
 
   React.useEffect(() => {
@@ -238,6 +239,7 @@ export const PopoverContent: React.FC<{
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, setOpen]);
 
   if (!open) return null;

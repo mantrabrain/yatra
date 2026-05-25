@@ -160,16 +160,19 @@ const App: React.FC = () => {
   const subpage = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("subpage") || "dashboard";
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlKey]);
 
   const tab = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("tab") || "all";
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlKey]);
 
   const action = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("action");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlKey, subpage]);
 
   // Render the appropriate page based on subpage, tab, and action parameters

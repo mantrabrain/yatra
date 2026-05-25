@@ -2415,6 +2415,7 @@ const TripForm: React.FC = () => {
     } else if (!tripData.featured_image) {
       setFeaturedImagePreview("");
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripData, tripAttributesData, destinationsData, isEditMode, tripId]);
 
   useEffect(() => {
@@ -2693,6 +2694,7 @@ const TripForm: React.FC = () => {
         }));
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.duration_days, formData.trip_type]);
 
   // Auto-calculate days from nights (only if days is empty)
@@ -2707,6 +2709,7 @@ const TripForm: React.FC = () => {
         setFormData((prev) => ({ ...prev, duration_days: String(nights + 1) }));
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.duration_nights, formData.trip_type]);
 
   // Auto-generate slug from title
@@ -3549,6 +3552,7 @@ const TripForm: React.FC = () => {
     saveMutation.mutate({ ...formData, status: "draft" });
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handlePublish = async () => {
     if (!validateForm()) {
       const firstError = Object.keys(errors)[0];

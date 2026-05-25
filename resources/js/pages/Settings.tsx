@@ -276,6 +276,7 @@ const GoogleCalendarIntegrationSection: React.FC<{
   // Update formData when any setting changes
   useEffect(() => {
     syncSettingsToFormData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientId, clientSecret]);
 
   const handleConnect = async () => {
@@ -3106,6 +3107,7 @@ const Settings: React.FC = () => {
       setFormData(defaultSettings);
       isInitializedRef.current = true;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings, isLoading]);
 
   // Fetch SEO image URL when image ID changes with performance optimization

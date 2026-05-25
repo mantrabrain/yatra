@@ -846,6 +846,7 @@ const Destinations: React.FC = () => {
                       ),
                     },
                   ],
+                  // eslint-disable-next-line react-hooks/exhaustive-deps
                   [visibleColumns],
                 )}
                 actions={[

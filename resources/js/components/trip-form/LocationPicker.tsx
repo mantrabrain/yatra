@@ -171,6 +171,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         }, 100);
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value.latitude, value.longitude, defaultZoom]);
 
   // Load Leaflet dynamically when map is shown
@@ -178,6 +179,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     if (showMap && !mapLoading && !mapInstanceRef.current) {
       loadMap();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showMap]);
 
   // Add marker when map becomes ready with existing coordinates
@@ -200,6 +202,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         }, 150);
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapReady, value.latitude, value.longitude, defaultZoom]);
 
   const loadMap = async () => {

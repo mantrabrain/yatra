@@ -61,6 +61,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
         }, duration);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 

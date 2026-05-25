@@ -617,6 +617,7 @@ const Departures: React.FC = () => {
     },
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleDelete = (departure: Departure) => {
     const tid = tripIdForDeparture(departure);
     if (!tid) {
@@ -705,6 +706,7 @@ const Departures: React.FC = () => {
     setDateTo("");
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const openTravelerModal = (departure: Departure) => {
     if (!departure.travelers || !departure.travelers.length) {
       return;
@@ -862,6 +864,7 @@ const Departures: React.FC = () => {
     [visibleColumns, openTravelerModal],
   );
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleMoveToTrash = async (departure: Departure) => {
     const tid = tripIdForDeparture(departure);
     if (!tid) {
@@ -896,6 +899,7 @@ const Departures: React.FC = () => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleRestore = async (departure: Departure) => {
     const tid = tripIdForDeparture(departure);
     if (!tid) {

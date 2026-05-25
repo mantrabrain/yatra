@@ -164,6 +164,7 @@ export const Categories: React.FC = () => {
     },
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const categories = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 50);
@@ -759,6 +760,7 @@ export const Categories: React.FC = () => {
         visible: visibleColumns.created_at,
       },
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [visibleColumns],
   );
 

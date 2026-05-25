@@ -33,8 +33,10 @@ const QUERY_KEY = ["ai-dashboard-digest"];
 export const TodaysBriefCard: React.FC = () => {
   const queryClient = useQueryClient();
 
-  // Skip rendering entirely when the operator can't or hasn't enabled
-  // AI. Two gates, both must pass:
+  // Hooks must be called unconditionally on every render — see
+  // rules-of-hooks. The gate that previously sat above these hook
+  // calls (isAiEligible + isAiModuleEnabled) now runs AFTER all
+  // hooks. Two gates, both must pass to render the card:
   //
   //   1. `isAiEligible()` — license tier unlocks AI at all. If false,
   //      the card would just redirect to an upgrade page and is noise
@@ -47,14 +49,17 @@ export const TodaysBriefCard: React.FC = () => {
   //      decided not to enable AI. Hide it entirely instead — the
   //      Modules page itself is the right entry point for "I want to
   //      turn this on", not the dashboard.
-  if (!isAiEligible() || !isAiModuleEnabled()) {
-    return null;
-  }
+  //
+  // Cost of always calling these hooks: the useQuery fires even on
+  // sites without AI eligibility — but with `enabled` gating
+  // baked into useQuery we don't actually issue the network call.
+  const aiAvailable = isAiEligible() && isAiModuleEnabled();
 
   const { data, isLoading, isError } = useQuery<{ data: AiDigest }>({
     queryKey: QUERY_KEY,
     queryFn: () => aiApi.getDashboardDigest(),
     staleTime: 15 * 60 * 1000, // matches server-side 30m cache; client refresh
+    enabled: aiAvailable,
   });
 
   const refresh = useMutation({
@@ -63,6 +68,10 @@ export const TodaysBriefCard: React.FC = () => {
       queryClient.setQueryData(QUERY_KEY, resp);
     },
   });
+
+  if (!aiAvailable) {
+    return null;
+  }
 
   if (isLoading) {
     return <SkeletonCard />;

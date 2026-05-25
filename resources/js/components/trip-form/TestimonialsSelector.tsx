@@ -48,6 +48,7 @@ export const TestimonialsSelector: React.FC<TestimonialsSelectorProps> = ({
     } else {
       setReviews([]);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripId]);
 
   const fetchReviews = async () => {

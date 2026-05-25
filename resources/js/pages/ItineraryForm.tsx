@@ -459,6 +459,7 @@ const ItineraryForm: React.FC = () => {
       // Check if we need to reset - this will be handled by user interaction
       // We don't auto-reset here to allow the form to work properly
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.item_type_id]);
 
   // Get day title from trip data
@@ -581,6 +582,7 @@ const ItineraryForm: React.FC = () => {
       dayManuallyEditedRef.current = false;
       lastTripIdRef.current = null;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isAddDayMode,
     isEditMode,

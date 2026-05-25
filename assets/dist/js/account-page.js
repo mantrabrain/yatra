@@ -1,5 +1,5 @@
 import { j as jsxRuntimeExports, p as Calendar, k as FileText, b as Plane, at as ArrowRight, q as MapPin, I as User, y as ChevronRight, S as Sparkles, h as Package, i as CreditCard, bx as LifeBuoy, be as Bell, az as AlertCircle, aD as CheckCircle2, ar as Clock, V as ExternalLink, U as Users, d as Mail, aW as Phone, b4 as Download, r as reactExports, a5 as React, u as useQuery, av as CheckCircle, as as DollarSign, aQ as Eye, aJ as PenSquare, b6 as XCircle, by as ShieldCheck, bf as Heart, s as LayoutDashboard, bz as LogOut, bu as QueryClient, bv as client, bw as QueryClientProvider } from "./react-vendor-CqkbFEvK.js";
-import { f as formatYatraMoney, _ as __, e as applyCurrencyPosition, s as sprintf, h as _n, a as apiClient, A as API_ENDPOINTS, u as useToast, T as ToastProvider } from "./index-fqW8jODk.js";
+import { f as formatYatraMoney, _ as __, e as applyCurrencyPosition, s as sprintf, h as _n, a as apiClient, A as API_ENDPOINTS, u as useToast, T as ToastProvider } from "./index-DRAt5dnR.js";
 function toBrowserLocaleTag(locale) {
   const raw = String(locale || "").trim();
   if (!raw) return void 0;
@@ -458,11 +458,7 @@ const Dashboard = ({
                         ) || 0;
                         return sprintf(
                           // translators: %d: number of travelers on this booking
-                          _n(
-                            "%d Traveler",
-                            "%d Travelers",
-                            n
-                          ),
+                          _n("%d Traveler", "%d Travelers", n),
                           n
                         );
                       })()
@@ -2892,7 +2888,11 @@ const SavedTrips = ({ savedTrips, isLoading }) => {
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "yatra-reviews-count", children: sprintf(
                   // translators: %d: number of reviews for the trip
-                  _n("(%d review)", "(%d reviews)", reviewCount),
+                  _n(
+                    "(%d review)",
+                    "(%d reviews)",
+                    reviewCount
+                  ),
                   reviewCount
                 ) })
               ] }),
@@ -2992,9 +2992,7 @@ const AccountPage = () => {
     return "dashboard";
   };
   const [section, setSection] = reactExports.useState(getSectionFromUrl);
-  const [pendingBookingId, setPendingBookingId] = reactExports.useState(
-    null
-  );
+  const [pendingBookingId, setPendingBookingId] = reactExports.useState(null);
   React.useEffect(() => {
     const newSection = getSectionFromUrl();
     setSection(newSection);

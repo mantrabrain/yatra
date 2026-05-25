@@ -32,21 +32,24 @@ export const CustomerSummaryCard: React.FC<Props> = ({ customerId }) => {
   const [includeSensitive, setIncludeSensitive] = useState(false);
   const [summary, setSummary] = useState<string | null>(null);
 
-  // Hard gate — don't render the card at all for non-eligible
-  // tiers / unconfigured installs. Saves a visible empty section
-  // on every customer page in the free / Personal tier.
-  if (!isAiEligible() || !isAiModuleEnabled()) {
-    return null;
-  }
-
-  const ready = isAiReady();
-
   const mutation = useMutation({
     mutationFn: () => aiApi.getCustomerSummary(customerId, includeSensitive),
     onSuccess: (resp) => {
       setSummary(String(resp.data?.text ?? "").trim());
     },
   });
+
+  // Hard gate — don't render the card at all for non-eligible
+  // tiers / unconfigured installs. Saves a visible empty section
+  // on every customer page in the free / Personal tier.
+  // Note: early return MUST come after every hook above, otherwise
+  // the hook-count changes between renders and React's internal
+  // state machine breaks (rules-of-hooks).
+  if (!isAiEligible() || !isAiModuleEnabled()) {
+    return null;
+  }
+
+  const ready = isAiReady();
 
   return (
     <Card>

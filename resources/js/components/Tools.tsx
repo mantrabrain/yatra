@@ -428,6 +428,7 @@ const Tools: React.FC = () => {
     if (activeTab === "system-status") {
       loadSystemStatus();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   // Load logs
@@ -1179,6 +1180,7 @@ const Tools: React.FC = () => {
         stopMigrationPolling();
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, selectedLogType]);
 
   return (

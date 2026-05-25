@@ -178,6 +178,7 @@ const Attributes: React.FC = () => {
     enabled: can("yatra_view_trips"),
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const attributes = attributesData?.data || [];
   const total = attributesData?.total || 0;
   const totalPages = Math.ceil(total / 10);

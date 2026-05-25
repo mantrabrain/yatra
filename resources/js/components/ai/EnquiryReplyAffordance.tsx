@@ -71,9 +71,9 @@ export const EnquiryReplyAffordance: React.FC<EnquiryReplyAffordanceProps> = ({
   const autoDraftedRef = useRef(false);
 
   // Hard gate — same logic as AiFieldAffordance for consistent behaviour.
-  if (!isAiEligible() || !isAiModuleEnabled()) {
-    return null;
-  }
+  // Computed early so hooks below can reference it via dep arrays, but
+  // the actual early-return must run AFTER every hook below (rules-of-hooks).
+  const gateBlocks = !isAiEligible() || !isAiModuleEnabled();
   const ready = isAiReady();
 
   // Close on outside click.
@@ -146,6 +146,11 @@ export const EnquiryReplyAffordance: React.FC<EnquiryReplyAffordanceProps> = ({
   };
 
   const hasValue = value.trim() !== "";
+
+  // Gate render after every hook has been called above. See top-of-file note.
+  if (gateBlocks) {
+    return null;
+  }
 
   return (
     <div ref={wrapperRef} className={`relative inline-block ${className}`}>

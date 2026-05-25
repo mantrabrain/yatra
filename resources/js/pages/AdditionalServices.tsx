@@ -84,12 +84,10 @@ const isModuleAvailable = (): boolean => {
 
 // Main Component
 const AdditionalServices: React.FC = () => {
+  // Module-availability gate. Evaluated up front; the actual early
+  // return runs AFTER every hook below so React's hook-order
+  // invariant holds (rules-of-hooks).
   const moduleAvailable = isModuleAvailable();
-
-  // Show premium upgrade content if module is not available
-  if (!moduleAvailable) {
-    return <PremiumUpgradeCard />;
-  }
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -180,6 +178,7 @@ const AdditionalServices: React.FC = () => {
     enabled: isModuleAvailable(),
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const services = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
@@ -326,6 +325,13 @@ const AdditionalServices: React.FC = () => {
     { key: "draft", label: __("Draft"), count: statusCounts.draft ?? 0 },
     { key: "trash", label: __("Trash"), count: statusCounts.trash ?? 0 },
   ];
+
+  // Module-availability gate runs here so every hook above runs on
+  // every render — see rules-of-hooks. The PremiumUpgradeCard render
+  // matches what used to be above the hooks.
+  if (!moduleAvailable) {
+    return <PremiumUpgradeCard />;
+  }
 
   return (
     <div className="space-y-3">

@@ -120,6 +120,7 @@ const EmailSequenceForm: React.FC = () => {
   >(null);
 
   // Get events from window.yatraAdmin (passed from PHP)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const events = (window as any).yatraAdmin?.emailEvents || [];
 
   // Fetch sequence data if editing
@@ -135,6 +136,7 @@ const EmailSequenceForm: React.FC = () => {
     queryFn: () => fetchEmailTemplates(),
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const templates: EmailTemplate[] = Array.isArray(templatesData)
     ? (templatesData as EmailTemplate[])
     : [];

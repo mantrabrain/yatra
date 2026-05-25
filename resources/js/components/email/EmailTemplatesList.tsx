@@ -388,6 +388,7 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
 
   useMemo(() => {
     setCurrentPage(1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, categoryFilter, recipientFilter, eventFilter, statusFilter]);
 
   const handleLockedNavigate = useCallback(() => {

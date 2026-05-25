@@ -86,7 +86,14 @@
           className: "yatra-block-taxonomy-field",
           style: { margin: "0 0 16px", border: "none", padding: 0 }
         },
-        /* @__PURE__ */ element.createElement("legend", { className: "components-base-control__label", style: { padding: 0 } }, label),
+        /* @__PURE__ */ element.createElement(
+          "legend",
+          {
+            className: "components-base-control__label",
+            style: { padding: 0 }
+          },
+          label
+        ),
         /* @__PURE__ */ element.createElement(components.Spinner, null)
       );
     }
@@ -145,28 +152,28 @@
           onChange: (s) => setSearch(s),
           __nextHasNoMarginBottom: true
         }
-      ), value.length > 0 && /* @__PURE__ */ element.createElement("p", { className: "components-base-control__help", style: { marginTop: 4 } }, i18n.sprintf(
-        /* translators: %d = number of selected taxonomy items */
-        i18n.__("%d selected", "yatra"),
-        value.length
-      )), items.length === 0 && !loadError ? /* @__PURE__ */ element.createElement("p", { className: "components-base-control__help" }, i18n.__("No published items of this type yet.", "yatra")) : /* @__PURE__ */ element.createElement("div", { role: "group", "aria-label": label, style: listWrapStyle }, filteredItems.length === 0 ? /* @__PURE__ */ element.createElement("p", { style: { padding: "8px 12px", margin: 0, fontSize: 12 } }, i18n.__("No matching items.", "yatra")) : filteredItems.map((item) => {
+      ), value.length > 0 && /* @__PURE__ */ element.createElement(
+        "p",
+        {
+          className: "components-base-control__help",
+          style: { marginTop: 4 }
+        },
+        i18n.sprintf(
+          /* translators: %d = number of selected taxonomy items */
+          i18n.__("%d selected", "yatra"),
+          value.length
+        )
+      ), items.length === 0 && !loadError ? /* @__PURE__ */ element.createElement("p", { className: "components-base-control__help" }, i18n.__("No published items of this type yet.", "yatra")) : /* @__PURE__ */ element.createElement("div", { role: "group", "aria-label": label, style: listWrapStyle }, filteredItems.length === 0 ? /* @__PURE__ */ element.createElement("p", { style: { padding: "8px 12px", margin: 0, fontSize: 12 } }, i18n.__("No matching items.", "yatra")) : filteredItems.map((item) => {
         const cid = Number(item.id);
-        return /* @__PURE__ */ element.createElement(
-          "div",
+        return /* @__PURE__ */ element.createElement("div", { key: cid, style: { padding: "2px 8px" } }, /* @__PURE__ */ element.createElement(
+          components.CheckboxControl,
           {
-            key: cid,
-            style: { padding: "2px 8px" }
-          },
-          /* @__PURE__ */ element.createElement(
-            components.CheckboxControl,
-            {
-              label: `${item.name} (${cid})`,
-              checked: selectedSet.has(cid),
-              onChange: (checked) => toggleId(cid, checked === true),
-              __nextHasNoMarginBottom: true
-            }
-          )
-        );
+            label: `${item.name} (${cid})`,
+            checked: selectedSet.has(cid),
+            onChange: (checked) => toggleId(cid, checked === true),
+            __nextHasNoMarginBottom: true
+          }
+        ));
       })), value.length > 0 && /* @__PURE__ */ element.createElement(
         components.Button,
         {
@@ -213,7 +220,10 @@
       migratedOnce.current = true;
       let ids = normalizeIds(attributes2.categoryIds);
       if (ids.length === 0) {
-        ids = migrateNumericCsvPairToIds(attributes2.category_ids, attributes2.category);
+        ids = migrateNumericCsvPairToIds(
+          attributes2.category_ids,
+          attributes2.category
+        );
       }
       if (ids.length === 0) {
         return;

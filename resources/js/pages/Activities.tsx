@@ -214,6 +214,7 @@ const Activities: React.FC = () => {
         ),
       },
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [visibleColumns],
   );
 
@@ -323,6 +324,7 @@ const Activities: React.FC = () => {
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const activities = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);

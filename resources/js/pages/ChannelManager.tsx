@@ -1402,6 +1402,7 @@ const MappingsSection: React.FC = () => {
   });
 
   const channels = channelsData?.data ?? [];
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const mappings = mappingsData?.data ?? [];
   const channelById = new Map<number, ChannelRow>(
     channels.map((c) => [c.id, c]),

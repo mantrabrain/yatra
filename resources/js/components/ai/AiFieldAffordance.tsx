@@ -82,10 +82,13 @@ export const AiFieldAffordance: React.FC<AiFieldAffordanceProps> = ({
 
   // Hard gate — completely skip rendering when the operator can't use AI.
   // Cheap to evaluate; keeps editors clean for free / Personal tier users.
-  if (disabled || !isAiEligible() || !isAiModuleEnabled()) {
-    return null;
-  }
-
+  // Computed early so hooks below can reference it via dep arrays, but
+  // the actual early-return runs only AFTER every hook below — see
+  // rules-of-hooks. The trade-off is the useEffect listener registers
+  // even on disabled instances; the listener body itself is a no-op
+  // until `open` is true, so the cost is just one addEventListener +
+  // removeEventListener per mount.
+  const gateBlocks = disabled || !isAiEligible() || !isAiModuleEnabled();
   const ready = isAiReady();
 
   // Close menu on outside click.
@@ -156,6 +159,11 @@ export const AiFieldAffordance: React.FC<AiFieldAffordanceProps> = ({
   };
 
   const hasValue = value.trim() !== "";
+
+  // Gate render after every hook has been called. See top-of-file note.
+  if (gateBlocks) {
+    return null;
+  }
 
   return (
     <div ref={wrapperRef} className={`relative inline-block ${className}`}>

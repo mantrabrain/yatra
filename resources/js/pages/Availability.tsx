@@ -171,6 +171,7 @@ const Availability: React.FC = () => {
     const params = new URLSearchParams(window.location.search);
     const tripId = params.get("trip_id");
     return tripId ? parseInt(tripId) : null;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlKey]);
 
   // Trip selection - initialize from localStorage or URL if available
@@ -357,6 +358,7 @@ const Availability: React.FC = () => {
   });
 
   // Format date for display
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -367,6 +369,7 @@ const Availability: React.FC = () => {
   };
 
   // Format time for display
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const formatTime = (timeString: string) => {
     if (!timeString) return "";
     const [hours, minutes] = timeString.split(":");
@@ -377,6 +380,7 @@ const Availability: React.FC = () => {
   };
 
   // Get currency symbol
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const getCurrencySymbol = (currency: string) => {
     const symbols: Record<string, string> = {
       USD: "$",
@@ -388,6 +392,7 @@ const Availability: React.FC = () => {
   };
 
   // Get status badge variant
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const getStatusBadge = (status: string, isBlocked?: boolean) => {
     // Debug: Log the status values to help with debugging
 

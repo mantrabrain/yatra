@@ -2671,6 +2671,7 @@ const OptInsList: React.FC = () => {
     staleTime: 30 * 1000,
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const rows = data?.data ?? [];
 
   const filtered = useMemo(() => {

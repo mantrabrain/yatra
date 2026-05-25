@@ -1184,7 +1184,32 @@ const ItemFormContent: React.FC<ItemFormContentProps> = ({
   onSuccess,
   onCancel,
 }) => {
-  // Check if item type is selected
+  // Hooks must run unconditionally on every render. The
+  // "Item Type Required" gate that used to sit above these was
+  // moved below so React's hook-order invariant holds even when
+  // the gate flips between renders (e.g. parent selects a type
+  // after the modal has mounted with no selection).
+  const [formData, setFormData] = useState({
+    name: "",
+    slug: "",
+    description: "",
+    type_id: "",
+    status: "publish",
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Update formData when selectedTypeId changes
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      type_id: selectedTypeId || "",
+    }));
+  }, [selectedTypeId]);
+
+  // Check if item type is selected (moved here from before the hook
+  // calls above — see rules-of-hooks. The "Item Type Required" empty
+  // state still renders the same UI).
   if (!selectedTypeId) {
     return (
       <div className="p-6 text-center">
@@ -1206,24 +1231,6 @@ const ItemFormContent: React.FC<ItemFormContentProps> = ({
       </div>
     );
   }
-
-  const [formData, setFormData] = useState({
-    name: "",
-    slug: "",
-    description: "",
-    type_id: "",
-    status: "publish",
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Update formData when selectedTypeId changes
-  useEffect(() => {
-    setFormData((prev) => ({
-      ...prev,
-      type_id: selectedTypeId || "",
-    }));
-  }, [selectedTypeId]);
 
   // Auto-generate slug from name (same as main form)
   const handleNameChange = (value: string) => {

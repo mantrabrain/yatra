@@ -1,12 +1,16 @@
 import { t as useQueryClient, r as reactExports, u as useQuery, v as useMutation, j as jsxRuntimeExports, bh as Send, k as FileText, M as MessageCircle, U as Users, V as ExternalLink, bq as Settings2, a5 as React, aF as Info, bQ as KeyRound, g as CircleUser, by as ShieldCheck, ar as Clock, D as Loader2, aV as Save, aD as CheckCircle2, b6 as XCircle, bt as EyeOff, aQ as Eye, w as Webhook, aA as Check, aG as Copy, z as ArrowLeft, Z as Zap, x as ChevronDown, br as Code, aw as Plus, bA as Pencil, bF as History, aN as Trash2, R as RotateCcw } from "../../../dist/js/react-vendor-CqkbFEvK.js";
-import { a as apiClient, u as useToast, _ as __, s as sprintf } from "../../../dist/js/index-fqW8jODk.js";
+import { a as apiClient, u as useToast, _ as __, s as sprintf } from "../../../dist/js/index-DRAt5dnR.js";
 import { P as PageHeader, C as Card, d as CardContent, f as CardHeader, g as CardTitle, h as CardDescription, B as Button, w as Label, I as Input, t as CardFooter, S as Select, a5 as Table, a6 as TableHeader, a7 as TableRow, a8 as TableHead, a9 as TableBody, aa as TableCell, e as Badge, W as Pagination, k as ConfirmationDialog, M as Modal, A as Alert } from "./app.js";
 import { M as ModulePageSkeleton, a as ModuleFormSkeleton } from "../../../dist/js/module-skeleton-DUioukJc.js";
 const whatsappApi = {
   getMeta: () => apiClient.get("/whatsapp/meta"),
   getSettings: () => apiClient.get("/whatsapp/settings"),
   updateSettings: (patch) => apiClient.put("/whatsapp/settings", { settings: patch }),
-  updateCredential: (provider, field, value) => apiClient.put("/whatsapp/credentials", { provider, field, value }),
+  updateCredential: (provider, field, value) => apiClient.put("/whatsapp/credentials", {
+    provider,
+    field,
+    value
+  }),
   listEvents: () => apiClient.get("/whatsapp/events"),
   listTemplates: () => apiClient.get("/whatsapp/templates"),
   getTemplate: (id) => apiClient.get(`/whatsapp/templates/${id}`),
@@ -64,7 +68,9 @@ function getInitialTab() {
 const Whatsapp = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
-  const [activeTab, setActiveTab] = reactExports.useState(() => getInitialTab());
+  const [activeTab, setActiveTab] = reactExports.useState(
+    () => getInitialTab()
+  );
   const switchTab = (next) => {
     setActiveTab(next);
     if (typeof window !== "undefined") {
@@ -121,7 +127,11 @@ const Whatsapp = () => {
   const tabs = [
     { key: "delivery", label: __("Delivery", "yatra"), icon: Send },
     { key: "templates", label: __("Templates", "yatra"), icon: FileText },
-    { key: "widget", label: __("Frontend widget", "yatra"), icon: MessageCircle },
+    {
+      key: "widget",
+      label: __("Frontend widget", "yatra"),
+      icon: MessageCircle
+    },
     { key: "logs", label: __("Message logs", "yatra"), icon: MessageCircle },
     { key: "opt-ins", label: __("Opt-ins", "yatra"), icon: Users }
   ];
@@ -283,7 +293,10 @@ const DeliverySection = ({ cfg, meta, onSaveCredential, onSaveSettings, saving }
       /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "flex items-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "h-5 w-5 text-blue-600 dark:text-blue-400" }),
-          __("Before you start — getting WhatsApp Cloud API access", "yatra")
+          __(
+            "Before you start — getting WhatsApp Cloud API access",
+            "yatra"
+          )
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "mt-2", children: __(
           "All values below come from Meta's WhatsApp Business Platform. Bring your own credentials — messages are billed directly by Meta, no markup from the plugin.",
@@ -600,7 +613,14 @@ const WebhookSetupCard = ({ meta }) => {
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "whatsapp-webhook-url", className: "text-xs text-gray-500 dark:text-gray-400", children: __("Callback URL", "yatra") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Label,
+          {
+            htmlFor: "whatsapp-webhook-url",
+            className: "text-xs text-gray-500 dark:text-gray-400",
+            children: __("Callback URL", "yatra")
+          }
+        ),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-1 flex gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Input,
@@ -633,7 +653,14 @@ const WebhookSetupCard = ({ meta }) => {
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "whatsapp-verify-token", className: "text-xs text-gray-500 dark:text-gray-400", children: __("Verify token", "yatra") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Label,
+          {
+            htmlFor: "whatsapp-verify-token",
+            className: "text-xs text-gray-500 dark:text-gray-400",
+            children: __("Verify token", "yatra")
+          }
+        ),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-1 flex gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Input,
@@ -641,7 +668,10 @@ const WebhookSetupCard = ({ meta }) => {
               id: "whatsapp-verify-token",
               readOnly: true,
               value: (webhook == null ? void 0 : webhook.verify_token) || "",
-              placeholder: tokenMissing ? __("Will be generated when you save settings for the first time.", "yatra") : "",
+              placeholder: tokenMissing ? __(
+                "Will be generated when you save settings for the first time.",
+                "yatra"
+              ) : "",
               className: "font-mono text-sm",
               onFocus: (e) => e.currentTarget.select()
             }
@@ -864,7 +894,10 @@ const TemplatesList = ({ templates, events, onEdit, onCreate }) => {
         {
           colSpan: 6,
           className: "p-8 text-center text-gray-500 dark:text-gray-400",
-          children: __("No templates yet — click Add custom template.", "yatra")
+          children: __(
+            "No templates yet — click Add custom template.",
+            "yatra"
+          )
         }
       ) }) : templates.map((tpl) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "tr",
@@ -1026,7 +1059,10 @@ const TemplateHistoryDialog = ({ template, onClose }) => {
           ) }),
           isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-center py-8", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "h-6 w-6 animate-spin text-gray-400" }) }) : versions.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-10", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-10 h-10 text-gray-400 mx-auto" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm text-gray-600 dark:text-gray-400", children: __("No prior versions yet. Make an edit and history starts building from the next save.", "yatra") })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm text-gray-600 dark:text-gray-400", children: __(
+              "No prior versions yet. Make an edit and history starts building from the next save.",
+              "yatra"
+            ) })
           ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2 max-h-[60vh] overflow-y-auto", children: versions.map((v) => {
             const isExpanded = expandedId === v.id;
             return /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -1122,7 +1158,10 @@ const TemplateHistoryDialog = ({ template, onClose }) => {
             },
             title: __("Restore this version?", "yatra"),
             description: pendingRestore ? sprintf(
-              __("This rewrites the live template with v%d's contents. The current state is saved as a new version first so you can roll back this restore later.", "yatra"),
+              __(
+                "This rewrites the live template with v%d's contents. The current state is saved as a new version first so you can roll back this restore later.",
+                "yatra"
+              ),
               pendingRestore.version_number
             ) : "",
             confirmText: __("Restore version", "yatra"),
@@ -1574,10 +1613,7 @@ const TemplateTestSendCard = ({ templateId, recipient }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: recipient === "admin" ? __(
         "Admin-recipient templates send to the admin phone in Delivery settings.",
         "yatra"
-      ) : __(
-        "Sends this template to the phone you enter below.",
-        "yatra"
-      ) })
+      ) : __("Sends this template to the phone you enter below.", "yatra") })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
       recipient === "customer" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
@@ -1613,7 +1649,9 @@ const WidgetSection = ({ settings, onSave, saving }) => {
   const [enabled, setEnabled] = reactExports.useState(w.enabled);
   const [contactPhone, setContactPhone] = reactExports.useState(w.contact_phone);
   const [prefilled, setPrefilled] = reactExports.useState(w.prefilled_message);
-  const [displayOn, setDisplayOn] = reactExports.useState(w.display_on);
+  const [displayOn, setDisplayOn] = reactExports.useState(
+    w.display_on
+  );
   const [position, setPosition] = reactExports.useState(
     w.position
   );
@@ -1844,14 +1882,23 @@ const LogsList = () => {
   const [phoneFilterApplied, setPhoneFilterApplied] = reactExports.useState("");
   const perPage = 20;
   React.useEffect(() => {
-    const t = window.setTimeout(() => setPhoneFilterApplied(phoneFilter.trim()), 350);
+    const t = window.setTimeout(
+      () => setPhoneFilterApplied(phoneFilter.trim()),
+      350
+    );
     return () => window.clearTimeout(t);
   }, [phoneFilter]);
   React.useEffect(() => {
     setPage(1);
   }, [statusFilter, phoneFilterApplied]);
   const { data, isLoading } = useQuery({
-    queryKey: ["whatsapp-messages", page, perPage, statusFilter, phoneFilterApplied],
+    queryKey: [
+      "whatsapp-messages",
+      page,
+      perPage,
+      statusFilter,
+      phoneFilterApplied
+    ],
     queryFn: () => whatsappApi.listMessages({
       page,
       per_page: perPage,
@@ -1943,8 +1990,22 @@ const LogsList = () => {
             }
           ) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-mono text-gray-900 dark:text-white whitespace-nowrap", children: row.phone }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-700 dark:text-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-md truncate", title: row.error_message || row.body || "", children: row.error_message || row.body || "—" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate block max-w-[12rem]", title: row.template_key || "", children: row.template_key || "—" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-700 dark:text-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              className: "max-w-md truncate",
+              title: row.error_message || row.body || "",
+              children: row.error_message || row.body || "—"
+            }
+          ) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "span",
+            {
+              className: "truncate block max-w-[12rem]",
+              title: row.template_key || "",
+              children: row.template_key || "—"
+            }
+          ) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             Badge,
             {
@@ -1984,7 +2045,8 @@ const OptInsList = () => {
       if (filter === "out" && r.opted_in) return false;
       if (search.trim() !== "") {
         const needle = search.trim().toLowerCase();
-        if (!r.phone.toLowerCase().includes(needle) && !r.source.toLowerCase().includes(needle)) return false;
+        if (!r.phone.toLowerCase().includes(needle) && !r.source.toLowerCase().includes(needle))
+          return false;
       }
       return true;
     });

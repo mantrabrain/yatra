@@ -153,14 +153,19 @@ const Dashboard: React.FC = () => {
   // is built for site owners/managers. Non-admin team members (Sales,
   // Accountant, Guide, etc.) see a focused, cap-filtered RoleDashboard
   // instead — they shouldn't see KPI cards or charts they can't read.
-  // The branch is intentionally before any hooks because `isWpAdmin` is
-  // a stable, server-injected flag — the component never flips between
-  // dashboards within a single mount, so hook order stays consistent.
-  const isWpAdmin = (window.yatraAdmin as { isWpAdmin?: boolean } | undefined)
-    ?.isWpAdmin;
-  if (!isWpAdmin) {
-    return <RoleDashboard />;
-  }
+  //
+  // Earlier this gate sat BEFORE any hooks because `isWpAdmin` is a
+  // stable server-injected flag and the component never flips between
+  // dashboards within a single mount — so hook order WAS consistent in
+  // practice. ESLint can't statically prove that, so it (correctly,
+  // defensively) flagged every subsequent hook as conditional. Moved
+  // below the hook calls; every useQuery now reads `enabled: isWpAdmin`
+  // so non-admin renders don't fire the admin-only endpoints, and the
+  // RoleDashboard branch returns immediately after all hooks are
+  // registered.
+  const isWpAdmin = !!(
+    window.yatraAdmin as { isWpAdmin?: boolean } | undefined
+  )?.isWpAdmin;
 
   const { can } = usePermissions();
 
@@ -218,6 +223,7 @@ const Dashboard: React.FC = () => {
       const response = await apiClient.get("/bookings/stats");
       return response?.data ?? response ?? {};
     },
+    enabled: isWpAdmin,
   });
 
   const { data: tripsSummary } = useQuery({
@@ -228,7 +234,7 @@ const Dashboard: React.FC = () => {
       });
       return { total: response?.total ?? 0 };
     },
-    enabled: can("yatra_view_trips"),
+    enabled: isWpAdmin && can("yatra_view_trips"),
   });
 
   const { data: customersSummary } = useQuery({
@@ -239,7 +245,7 @@ const Dashboard: React.FC = () => {
       });
       return { total: response?.total ?? 0 };
     },
-    enabled: can("yatra_view_bookings"),
+    enabled: isWpAdmin && can("yatra_view_bookings"),
   });
 
   // Period-aware metrics via /reports. Only kicks in when the operator
@@ -255,7 +261,7 @@ const Dashboard: React.FC = () => {
       });
       return response?.data ?? response ?? {};
     },
-    enabled: !!dateBounds.from && !!dateBounds.to,
+    enabled: isWpAdmin && !!dateBounds.from && !!dateBounds.to,
     staleTime: 60_000,
   });
 
@@ -303,7 +309,7 @@ const Dashboard: React.FC = () => {
 
       return months;
     },
-    enabled: can("yatra_view_bookings") && range === "all_time",
+    enabled: isWpAdmin && can("yatra_view_bookings") && range === "all_time",
   });
 
   // Status breakdown — same /bookings/stats source.
@@ -380,7 +386,7 @@ const Dashboard: React.FC = () => {
           color: palette[index % palette.length],
         }));
     },
-    enabled: can("yatra_view_trips"),
+    enabled: isWpAdmin && can("yatra_view_trips"),
   });
 
   const { data: departures } = useQuery({
@@ -425,7 +431,7 @@ const Dashboard: React.FC = () => {
         };
       });
     },
-    enabled: can("yatra_view_trips"),
+    enabled: isWpAdmin && can("yatra_view_trips"),
   });
 
   const { data: pendingPayments } = useQuery({
@@ -436,7 +442,7 @@ const Dashboard: React.FC = () => {
       });
       return response?.data || [];
     },
-    enabled: can("yatra_view_bookings"),
+    enabled: isWpAdmin && can("yatra_view_bookings"),
   });
 
   const { data: recentBookings } = useQuery({
@@ -460,7 +466,7 @@ const Dashboard: React.FC = () => {
           | "completed",
       }));
     },
-    enabled: can("yatra_view_bookings"),
+    enabled: isWpAdmin && can("yatra_view_bookings"),
   });
 
   // Build trend props for KPI cards. Only present when a real range is
@@ -485,6 +491,13 @@ const Dashboard: React.FC = () => {
       .join("");
     window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=${subpage}${qs}`;
   };
+
+  // Non-admin team members get the focused, role-filtered dashboard.
+  // Placed after every hook call above so hook order stays stable
+  // across renders (see header comment).
+  if (!isWpAdmin) {
+    return <RoleDashboard />;
+  }
 
   if (bookingStatsLoading) {
     return (

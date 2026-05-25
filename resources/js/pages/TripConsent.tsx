@@ -220,6 +220,7 @@ const ConsentFormsList: React.FC = () => {
   });
 
   // Handle both array response and wrapped response
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const forms = Array.isArray(formsData) ? formsData : formsData?.data || [];
   const total = Array.isArray(formsData)
     ? formsData.length

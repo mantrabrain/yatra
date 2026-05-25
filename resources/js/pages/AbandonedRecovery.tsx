@@ -172,10 +172,12 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
     window.location.href = `admin.php?page=yatra&subpage=email-automation&tab=template&action=edit&core_template=${coreTemplate}`;
   };
 
-  // Check if module is available
-  if (!isModuleAvailable()) {
-    return <PremiumUpgradeCard />;
-  }
+  // Module-availability gate. Evaluated up front; the actual early
+  // return runs after every hook below so React's hook-order
+  // invariant holds even when the gate flips (e.g. operator enables
+  // the module from another tab and the boolean re-evaluates true
+  // on the next render).
+  const moduleAvailable = isModuleAvailable();
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -870,6 +872,14 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
         </div>
       </div>
     );
+  }
+
+  // Module-availability gate. Lives here (not at the top of the
+  // component) because every hook above must run on every render —
+  // moving this gate earlier reintroduces the rules-of-hooks
+  // violations the lint just flagged.
+  if (!moduleAvailable) {
+    return <PremiumUpgradeCard />;
   }
 
   return (

@@ -1,9 +1,9 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-CkmldwVZ.js","../../../dist/js/react-vendor-CqkbFEvK.js","../css/react-vendor.css","../../../dist/js/index-fqW8jODk.js","../css/index.css","../../../dist/js/BuildItineraryModal-InmD-zW9.js","../../../dist/js/ProFeature-DOjx9JBO.js","../../../dist/js/Settings-B3Sb8Uip.js","../../../dist/js/Team-B33OHuvh.js","../../../dist/js/Reports-CGgBML0b.js","../../../dist/js/DiscountForm-DI2mQNDT.js","../../../dist/js/ApplicableTripSelector-Ca2ZTa4y.js","../../../dist/js/Itinerary-DJJn7tV9.js","../../../dist/js/RecurringRuleForm-BDTYzQEK.js","./Whatsapp.js","../../../dist/js/module-skeleton-DUioukJc.js","../../../dist/js/ChannelManager-Cdkei_O2.js","../../../dist/js/Webhooks-DuXOC6S9.js","../../../dist/js/TripConsentForm-D3m7x_N8.js","../../../dist/js/BookingForm-mbTm4SQn.js","../../../dist/js/ViewBooking-CNadvEdJ.js","../../../dist/js/AvailabilityForm-BBIbDTIR.js","../../../dist/js/DynamicPricing-CzwLxmBD.js","../../../dist/js/RuleTypeSelectionModal-BpEgGbfR.js","../../../dist/js/toggle-C9qtIVLs.js","../../../dist/js/DynamicPricingRuleForm-9WgVSTPH.js","../../../dist/js/AiAssistant-EMZqiuYU.js","../../../dist/js/AbandonedRecovery-DVkAJ0OV.js","../../../dist/js/WhiteLabel-Bf9a35U8.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-tFMoMuMs.js","../../../dist/js/react-vendor-CqkbFEvK.js","../css/react-vendor.css","../../../dist/js/index-DRAt5dnR.js","../css/index.css","../../../dist/js/BuildItineraryModal-Dq10SB7H.js","../../../dist/js/ProFeature-DHa4Wgkh.js","../../../dist/js/Settings-DZPiAnb3.js","../../../dist/js/Team-COJ6Sjod.js","../../../dist/js/Reports-sGU73NQH.js","../../../dist/js/DiscountForm-CWIQB0xy.js","../../../dist/js/ApplicableTripSelector-BQ_5SGb1.js","../../../dist/js/Itinerary-Ap1hthK0.js","../../../dist/js/RecurringRuleForm-qprdlB53.js","./Whatsapp.js","../../../dist/js/module-skeleton-DUioukJc.js","../../../dist/js/ChannelManager-CU9rfQOo.js","../../../dist/js/Webhooks-BYHU7T9O.js","../../../dist/js/TripConsentForm-DeH_xgzl.js","../../../dist/js/BookingForm-DFFoFfQO.js","../../../dist/js/ViewBooking-D0U0ZXpB.js","../../../dist/js/AvailabilityForm-BPWy1f1h.js","../../../dist/js/DynamicPricing-DTdy3svi.js","../../../dist/js/RuleTypeSelectionModal-CjAmWcQE.js","../../../dist/js/toggle-C9qtIVLs.js","../../../dist/js/DynamicPricingRuleForm-wUY86s8E.js","../../../dist/js/AiAssistant-BNn2WXa-.js","../../../dist/js/AbandonedRecovery-BXWfwama.js","../../../dist/js/WhiteLabel-8i10Kntk.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
 import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as Calendar$1, q as MapPin, s as LayoutDashboard, u as useQuery, t as useQueryClient, v as useMutation, Z as Zap, w as Webhook, x as ChevronDown, y as ChevronRight, z as ArrowLeft, G as Gift, D as Loader2, E as Sun, H as Moon, I as User, J as RefreshCw, O as Inbox, Q as AlertTriangle, V as ExternalLink, X as isObjectLike_1, _ as _baseGetTag, Y as isArray_1, $ as _MapCache, a0 as getDefaultExportFromCjs, a1 as _Symbol, a2 as isObject$5, a3 as isFunction, a4 as reactIsExports, a5 as React, a6 as _Stack, a7 as _baseIsEqual, a8 as isObject_1, a9 as keys_1, aa as isLength_1, ab as _isIndex, ac as isArguments_1, ad as _Set, ae as _setToArray, af as _SetCache, ag as _cacheHas, ah as _arrayPush, ai as isArrayLike_1, aj as _baseUnary, ak as _getNative, al as eq_1, am as _root, an as isEqual, ao as Animate, ap as _overArg, aq as _arraySome, ar as Clock, as as DollarSign, at as ArrowRight, au as Shield, av as CheckCircle, aw as Plus, ax as X, ay as reactDomExports, az as AlertCircle, aA as Check, aB as Wand2, aC as ChevronLeft, aD as CheckCircle2, aE as HelpCircle, aF as Info, aG as Copy, aH as MoreVertical, aI as Columns, aJ as PenSquare, aK as ArrowUp, aL as ArrowDown, aM as Archive, aN as Trash2, aO as Search, aP as ArrowUpDown, aQ as Eye, aR as Upload, aS as Image, aT as ReactQuill, aU as Pen, aV as Save, aW as Phone, aX as PauseCircle, aY as ShieldX, aZ as ShieldOff, a_ as Globe, a$ as Award, b0 as Database, b1 as Folder, b2 as Mountain, b3 as UserCheck, b4 as Download, b5 as Server, b6 as XCircle, b7 as Video, b8 as Lock, b9 as GripVertical, ba as ChevronUp, bb as Play, bc as ClipboardCopy, bd as Ban, be as Bell, bf as Heart, bg as Scissors, bh as Send, bi as Filter, bj as ClipboardCheck, bk as PenTool, bl as Camera, bm as BarChart$1, bn as Megaphone, bo as GitBranch, bp as Pause, bq as Settings2, br as Code, bs as Bug, bt as EyeOff, bu as QueryClient, bv as client, bw as QueryClientProvider } from "../../../dist/js/react-vendor-CqkbFEvK.js";
-import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, g as getCurrencySymbol, d as ajaxService, T as ToastProvider } from "../../../dist/js/index-fqW8jODk.js";
+import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, g as getCurrencySymbol, d as ajaxService, T as ToastProvider } from "../../../dist/js/index-DRAt5dnR.js";
 const scriptRel = "modulepreload";
 const assetsURL = function(dep, importerUrl) {
   return new URL(dep, importerUrl).href;
@@ -77,7 +77,14 @@ const __vitePreload = function preload(baseModule, deps, importerUrl) {
   });
 };
 const Button = reactExports.forwardRef(
-  ({ className = "", variant = "default", size = "default", ...props }, ref) => {
+  ({
+    className = "",
+    variant = "default",
+    size = "default",
+    asChild = false,
+    children,
+    ...props
+  }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
     const variantClasses = {
       default: "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600",
@@ -91,14 +98,16 @@ const Button = reactExports.forwardRef(
       lg: "h-11 rounded-md px-8",
       icon: "h-10 w-10"
     };
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(
-      "button",
-      {
-        className: `${baseClasses} ${variantClasses[variant]} ${sizeClasses2[size]} ${className}`,
-        ref,
-        ...props
-      }
-    );
+    const mergedClassName = `${baseClasses} ${variantClasses[variant]} ${sizeClasses2[size]} ${className}`;
+    if (asChild && reactExports.isValidElement(children)) {
+      const child = children;
+      const childClassName = child.props.className;
+      return reactExports.cloneElement(child, {
+        ...props,
+        className: `${mergedClassName}${childClassName ? ` ${childClassName}` : ""}`
+      });
+    }
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: mergedClassName, ref, ...props, children });
   }
 );
 Button.displayName = "Button";
@@ -296,26 +305,102 @@ const DEFAULT_MENU_ITEMS = [
     label: "Trips",
     iconName: "MapPin",
     submenu: [
-      { key: "trips.all", parentSlug: "trips", tab: "all", label: "All Trips", iconName: "List" },
-      { key: "trips.activities", parentSlug: "trips", tab: "activities", label: "Activities", iconName: "Activity" },
-      { key: "trips.destinations", parentSlug: "trips", tab: "destinations", label: "Destinations", iconName: "Route" },
-      { key: "trips.categories", parentSlug: "trips", tab: "categories", label: "Categories", iconName: "FolderTree" },
-      { key: "trips.difficulty-levels", parentSlug: "trips", tab: "difficulty-levels", label: "Difficulty Levels", iconName: "TrendingUp" },
-      { key: "trips.availability", parentSlug: "trips", tab: "availability", label: "Availability", iconName: "CalendarDays" },
-      { key: "trips.attributes", parentSlug: "trips", tab: "attributes", label: "Attributes", iconName: "Tag" },
-      { key: "trips.additional-services", parentSlug: "trips", tab: "additional-services", label: "Additional Services", iconName: "Package" },
-      { key: "trips.trip-consent", parentSlug: "trips", tab: "trip-consent", label: "Trip Consent", iconName: "FileSignature" }
+      {
+        key: "trips.all",
+        parentSlug: "trips",
+        tab: "all",
+        label: "All Trips",
+        iconName: "List"
+      },
+      {
+        key: "trips.activities",
+        parentSlug: "trips",
+        tab: "activities",
+        label: "Activities",
+        iconName: "Activity"
+      },
+      {
+        key: "trips.destinations",
+        parentSlug: "trips",
+        tab: "destinations",
+        label: "Destinations",
+        iconName: "Route"
+      },
+      {
+        key: "trips.categories",
+        parentSlug: "trips",
+        tab: "categories",
+        label: "Categories",
+        iconName: "FolderTree"
+      },
+      {
+        key: "trips.difficulty-levels",
+        parentSlug: "trips",
+        tab: "difficulty-levels",
+        label: "Difficulty Levels",
+        iconName: "TrendingUp"
+      },
+      {
+        key: "trips.availability",
+        parentSlug: "trips",
+        tab: "availability",
+        label: "Availability",
+        iconName: "CalendarDays"
+      },
+      {
+        key: "trips.attributes",
+        parentSlug: "trips",
+        tab: "attributes",
+        label: "Attributes",
+        iconName: "Tag"
+      },
+      {
+        key: "trips.additional-services",
+        parentSlug: "trips",
+        tab: "additional-services",
+        label: "Additional Services",
+        iconName: "Package"
+      },
+      {
+        key: "trips.trip-consent",
+        parentSlug: "trips",
+        tab: "trip-consent",
+        label: "Trip Consent",
+        iconName: "FileSignature"
+      }
     ]
   },
-  { slug: "traveler-categories", label: "Traveler Categories", iconName: "Users" },
+  {
+    slug: "traveler-categories",
+    label: "Traveler Categories",
+    iconName: "Users"
+  },
   {
     slug: "itinerary",
     label: "Itinerary",
     iconName: "Route",
     submenu: [
-      { key: "itinerary.item-types", parentSlug: "itinerary", tab: "item-types", label: "Item Types", iconName: "Tag" },
-      { key: "itinerary.items", parentSlug: "itinerary", tab: "items", label: "Items", iconName: "Route" },
-      { key: "itinerary.itinerary", parentSlug: "itinerary", tab: "itinerary", label: "Itinerary", iconName: "FileText" }
+      {
+        key: "itinerary.item-types",
+        parentSlug: "itinerary",
+        tab: "item-types",
+        label: "Item Types",
+        iconName: "Tag"
+      },
+      {
+        key: "itinerary.items",
+        parentSlug: "itinerary",
+        tab: "items",
+        label: "Items",
+        iconName: "Route"
+      },
+      {
+        key: "itinerary.itinerary",
+        parentSlug: "itinerary",
+        tab: "itinerary",
+        label: "Itinerary",
+        iconName: "FileText"
+      }
     ]
   },
   { slug: "departures", label: "Departures", iconName: "Calendar" },
@@ -328,7 +413,11 @@ const DEFAULT_MENU_ITEMS = [
   { slug: "reviews", label: "Reviews", iconName: "Star" },
   { slug: "reports", label: "Reports", iconName: "BarChart3" },
   { slug: "email-automation", label: "Email", iconName: "Mail" },
-  { slug: "abandoned-recovery", label: "Abandoned Recovery", iconName: "RotateCcw" },
+  {
+    slug: "abandoned-recovery",
+    label: "Abandoned Recovery",
+    iconName: "RotateCcw"
+  },
   { slug: "dynamic-pricing", label: "Dynamic Pricing", iconName: "TrendingUp" },
   { slug: "modules", label: "Modules", iconName: "Puzzle" },
   { slug: "white-label", label: "White Label", iconName: "Crown" },
@@ -3846,7 +3935,7 @@ const isModuleActive = (moduleName) => {
   return isActive;
 };
 const isEmailAutomationModuleEnabled = () => isModuleActive("email_automation");
-function navigateMenu(subpage, tab) {
+function navigateMenu(subpage, tabOrParams) {
   const pathname = window.location.pathname;
   const page = new URLSearchParams(window.location.search).get("page") || "yatra";
   const sp = new URLSearchParams();
@@ -3854,8 +3943,15 @@ function navigateMenu(subpage, tab) {
   if (subpage === "dashboard") ;
   else {
     sp.set("subpage", subpage);
-    if (tab !== void 0 && tab !== null && tab !== "") {
-      sp.set("tab", tab);
+    if (typeof tabOrParams === "string") {
+      if (tabOrParams !== "") {
+        sp.set("tab", tabOrParams);
+      }
+    } else if (tabOrParams && typeof tabOrParams === "object") {
+      Object.entries(tabOrParams).forEach(([key2, value]) => {
+        if (value === void 0 || value === null || value === "") return;
+        sp.set(key2, String(value));
+      });
     }
   }
   const newUrl = `${pathname}?${sp.toString()}`;
@@ -4267,7 +4363,12 @@ const Layout = ({ children }) => {
     () => {
       var _a2, _b2, _c2, _d2, _e2, _f2, _g2, _h2, _i2, _j2, _k2, _l2;
       return [
-        { subpage: "dashboard", label: __("Dashboard", "yatra"), icon: LayoutDashboard, cap: "yatra_access_admin" },
+        {
+          subpage: "dashboard",
+          label: __("Dashboard", "yatra"),
+          icon: LayoutDashboard,
+          cap: "yatra_access_admin"
+        },
         {
           subpage: "trips",
           label: __("Trips", "yatra"),
@@ -4275,16 +4376,32 @@ const Layout = ({ children }) => {
           cap: "yatra_view_trips",
           submenu: [
             { tab: "all", label: __("All Trips", "yatra"), icon: List },
-            { tab: "activities", label: __("Activities", "yatra"), icon: Activity },
-            { tab: "destinations", label: __("Destinations", "yatra"), icon: Route },
-            { tab: "categories", label: __("Categories", "yatra"), icon: FolderTree },
+            {
+              tab: "activities",
+              label: __("Activities", "yatra"),
+              icon: Activity
+            },
+            {
+              tab: "destinations",
+              label: __("Destinations", "yatra"),
+              icon: Route
+            },
+            {
+              tab: "categories",
+              label: __("Categories", "yatra"),
+              icon: FolderTree
+            },
             {
               tab: "difficulty-levels",
               label: __("Difficulty Levels", "yatra"),
               icon: TrendingUp
             },
             // Availability - FREE feature, always show
-            { tab: "availability", label: __("Availability", "yatra"), icon: CalendarDays },
+            {
+              tab: "availability",
+              label: __("Availability", "yatra"),
+              icon: CalendarDays
+            },
             // Attributes - FREE feature, always show
             { tab: "attributes", label: __("Attributes", "yatra"), icon: Tag },
             // Additional Services - show only if Pro plugin is active and module is enabled
@@ -4321,19 +4438,68 @@ const Layout = ({ children }) => {
           submenu: [
             { tab: "item-types", label: __("Item Types", "yatra"), icon: Tag },
             { tab: "items", label: __("Items", "yatra"), icon: Route },
-            { tab: "itinerary", label: __("Itinerary", "yatra"), icon: FileText }
+            {
+              tab: "itinerary",
+              label: __("Itinerary", "yatra"),
+              icon: FileText
+            }
           ]
         },
         // Departures - FREE feature, always show
-        { subpage: "departures", label: __("Departures", "yatra"), icon: Calendar$1, cap: "yatra_view_departures" },
-        { subpage: "discounts", label: __("Discounts", "yatra"), icon: BadgePercent, cap: "yatra_manage_discounts" },
-        { subpage: "payments", label: __("Payments", "yatra"), icon: CreditCard, cap: "yatra_view_financial_reports" },
-        { subpage: "bookings", label: __("Bookings", "yatra"), icon: Calendar$1, cap: "yatra_view_bookings" },
-        { subpage: "customers", label: __("Customers", "yatra"), icon: CircleUser, cap: "yatra_view_customers" },
-        { subpage: "travelers", label: __("Travelers", "yatra"), icon: Plane, cap: "yatra_view_customers" },
-        { subpage: "enquiries", label: __("Enquiries", "yatra"), icon: MessageSquare, cap: "yatra_view_enquiries" },
-        { subpage: "reviews", label: __("Reviews", "yatra"), icon: Star, cap: "yatra_view_reviews" },
-        { subpage: "reports", label: __("Reports", "yatra"), icon: BarChart3, cap: "yatra_view_operational_reports" },
+        {
+          subpage: "departures",
+          label: __("Departures", "yatra"),
+          icon: Calendar$1,
+          cap: "yatra_view_departures"
+        },
+        {
+          subpage: "discounts",
+          label: __("Discounts", "yatra"),
+          icon: BadgePercent,
+          cap: "yatra_manage_discounts"
+        },
+        {
+          subpage: "payments",
+          label: __("Payments", "yatra"),
+          icon: CreditCard,
+          cap: "yatra_view_financial_reports"
+        },
+        {
+          subpage: "bookings",
+          label: __("Bookings", "yatra"),
+          icon: Calendar$1,
+          cap: "yatra_view_bookings"
+        },
+        {
+          subpage: "customers",
+          label: __("Customers", "yatra"),
+          icon: CircleUser,
+          cap: "yatra_view_customers"
+        },
+        {
+          subpage: "travelers",
+          label: __("Travelers", "yatra"),
+          icon: Plane,
+          cap: "yatra_view_customers"
+        },
+        {
+          subpage: "enquiries",
+          label: __("Enquiries", "yatra"),
+          icon: MessageSquare,
+          cap: "yatra_view_enquiries"
+        },
+        {
+          subpage: "reviews",
+          label: __("Reviews", "yatra"),
+          icon: Star,
+          cap: "yatra_view_reviews"
+        },
+        {
+          subpage: "reports",
+          label: __("Reports", "yatra"),
+          icon: BarChart3,
+          cap: "yatra_view_operational_reports"
+        },
         // Email — SMTP & transactional for all; Pro adds automation tabs on the same screen
         {
           subpage: "email-automation",
@@ -4362,7 +4528,12 @@ const Layout = ({ children }) => {
             cap: "yatra_edit_trips"
           }
         ] : [],
-        { subpage: "modules", label: __("Modules", "yatra"), icon: Puzzle, cap: "yatra_manage_modules" },
+        {
+          subpage: "modules",
+          label: __("Modules", "yatra"),
+          icon: Puzzle,
+          cap: "yatra_manage_modules"
+        },
         // White Label — only when the Agency-tier module is actually enabled.
         // (Agency license alone is not enough; the module toggle must be on,
         // otherwise users would see a link to a disabled feature. To get
@@ -4456,10 +4627,21 @@ const Layout = ({ children }) => {
             cap: "yatra_manage_team"
           }
         ] : [],
-        { subpage: "license", label: __("License", "yatra"), icon: Key, cap: "yatra_manage_settings" },
-        { subpage: "settings", label: __("Settings", "yatra"), icon: Settings$1, cap: "yatra_manage_settings" }
+        {
+          subpage: "license",
+          label: __("License", "yatra"),
+          icon: Key,
+          cap: "yatra_manage_settings"
+        },
+        {
+          subpage: "settings",
+          label: __("Settings", "yatra"),
+          icon: Settings$1,
+          cap: "yatra_manage_settings"
+        }
       ].filter((item) => !item.cap || canCap(item.cap));
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [navRefreshKey]
   );
   const brandedMenuItems = reactExports.useMemo(() => {
@@ -4661,11 +4843,7 @@ const Layout = ({ children }) => {
                   "a",
                   {
                     href: getUrl(navSubpage, navTab),
-                    onClick: (e) => handleMenuNavClick(
-                      e,
-                      navSubpage,
-                      navTab
-                    ),
+                    onClick: (e) => handleMenuNavClick(e, navSubpage, navTab),
                     className: `flex items-center gap-3 px-4 py-2 rounded-lg transition-colors relative ${subActive ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium" : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"}`,
                     children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
@@ -5159,13 +5337,26 @@ const Skeleton = ({ className = "" }) => {
 };
 const aiApi = {
   meta: () => apiClient.get("/ai/meta"),
-  generate: (task, context, options2 = {}) => apiClient.post("/ai/generate", { task, context, options: options2 }),
-  improve: (task, currentValue, options2 = {}) => apiClient.post("/ai/improve", { task, current_value: currentValue, options: options2 }),
+  generate: (task, context, options2 = {}) => apiClient.post("/ai/generate", {
+    task,
+    context,
+    options: options2
+  }),
+  improve: (task, currentValue, options2 = {}) => apiClient.post("/ai/improve", {
+    task,
+    current_value: currentValue,
+    options: options2
+  }),
   getBrandVoice: () => apiClient.get("/ai/brand-voice"),
   saveBrandVoice: (data) => apiClient.put("/ai/brand-voice", data),
-  setKey: (provider, apiKey) => apiClient.post(`/ai/keys/${encodeURIComponent(provider)}`, { api_key: apiKey }),
+  setKey: (provider, apiKey) => apiClient.post(`/ai/keys/${encodeURIComponent(provider)}`, {
+    api_key: apiKey
+  }),
   deleteKey: (provider) => apiClient.delete(`/ai/keys/${encodeURIComponent(provider)}`),
-  testKey: (provider) => apiClient.post(`/ai/keys/${encodeURIComponent(provider)}/test`, {}),
+  testKey: (provider) => apiClient.post(
+    `/ai/keys/${encodeURIComponent(provider)}/test`,
+    {}
+  ),
   getUsage: () => apiClient.get("/ai/usage"),
   // Operations AI
   draftEnquiryReply: (enquiryId, opts = {}) => apiClient.post(
@@ -5190,7 +5381,10 @@ const aiApi = {
   refreshDashboardDigest: () => apiClient.post("/ai/dashboard/digest/refresh", {}),
   // Prompt overrides
   listPrompts: () => apiClient.get("/ai/prompts"),
-  savePromptOverride: (task, override) => apiClient.put(`/ai/prompts/${encodeURIComponent(task)}`, override),
+  savePromptOverride: (task, override) => apiClient.put(
+    `/ai/prompts/${encodeURIComponent(task)}`,
+    override
+  ),
   resetPrompt: (task) => apiClient.delete(`/ai/prompts/${encodeURIComponent(task)}`),
   resetAllPrompts: () => apiClient.delete("/ai/prompts"),
   // Public chat toggle
@@ -5232,10 +5426,13 @@ const aiApi = {
     `/ai/itinerary/${encodeURIComponent(String(tripId))}/draft`,
     typeof extraContextOrSetup === "string" ? { extra_context: extraContextOrSetup } : { setup: extraContextOrSetup }
   ),
-  applyItinerary: (tripId, days, replace) => apiClient.post(`/ai/itinerary/${encodeURIComponent(String(tripId))}/apply`, {
-    days,
-    replace
-  })
+  applyItinerary: (tripId, days, replace) => apiClient.post(
+    `/ai/itinerary/${encodeURIComponent(String(tripId))}/apply`,
+    {
+      days,
+      replace
+    }
+  )
 };
 function readAdmin() {
   return window.yatraAdmin ?? {};
@@ -5255,14 +5452,13 @@ function isAiModuleEnabled() {
 const QUERY_KEY = ["ai-dashboard-digest"];
 const TodaysBriefCard = () => {
   const queryClient2 = useQueryClient();
-  if (!isAiEligible() || !isAiModuleEnabled()) {
-    return null;
-  }
+  const aiAvailable = isAiEligible() && isAiModuleEnabled();
   const { data, isLoading, isError } = useQuery({
     queryKey: QUERY_KEY,
     queryFn: () => aiApi.getDashboardDigest(),
-    staleTime: 15 * 60 * 1e3
+    staleTime: 15 * 60 * 1e3,
     // matches server-side 30m cache; client refresh
+    enabled: aiAvailable
   });
   const refresh = useMutation({
     mutationFn: () => aiApi.refreshDashboardDigest(),
@@ -5270,6 +5466,9 @@ const TodaysBriefCard = () => {
       queryClient2.setQueryData(QUERY_KEY, resp);
     }
   });
+  if (!aiAvailable) {
+    return null;
+  }
   if (isLoading) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx(SkeletonCard, {});
   }
@@ -5364,16 +5563,33 @@ const TodaysBriefCard = () => {
       )
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-t border-blue-100 bg-white/40 px-5 py-3 dark:border-blue-500/30 dark:bg-gray-900/30", children: [
-      isError && /* @__PURE__ */ jsxRuntimeExports.jsx(BriefError, { onRetry: () => refresh.mutate(), retrying: refresh.isPending }),
-      !isError && /* @__PURE__ */ jsxRuntimeExports.jsx(BriefBody, { digest, onRetry: () => refresh.mutate(), retrying: refresh.isPending })
+      isError && /* @__PURE__ */ jsxRuntimeExports.jsx(
+        BriefError,
+        {
+          onRetry: () => refresh.mutate(),
+          retrying: refresh.isPending
+        }
+      ),
+      !isError && /* @__PURE__ */ jsxRuntimeExports.jsx(
+        BriefBody,
+        {
+          digest,
+          onRetry: () => refresh.mutate(),
+          retrying: refresh.isPending
+        }
+      )
     ] })
   ] });
 };
 const BriefBody = ({ digest, onRetry, retrying }) => {
   if (digest.state === "all_caught_up") {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-emerald-700 dark:text-emerald-300", children: [
-      "✓ ",
-      __("You're caught up. Nothing urgent needs attention right now.", "yatra")
+      "✓",
+      " ",
+      __(
+        "You're caught up. Nothing urgent needs attention right now.",
+        "yatra"
+      )
     ] });
   }
   if (digest.state === "upgrade_required") {
@@ -26139,7 +26355,8 @@ const RecentBookings = ({
 function getPrimaryRoleLabel() {
   var _a;
   const roles = (_a = window.yatraAdmin) == null ? void 0 : _a.roles;
-  if (!Array.isArray(roles)) return { slug: "", label: __("Team member", "yatra") };
+  if (!Array.isArray(roles))
+    return { slug: "", label: __("Team member", "yatra") };
   const systemRoles = [
     { slug: "yatra_owner", label: __("Owner", "yatra") },
     { slug: "yatra_manager", label: __("Manager", "yatra") },
@@ -26419,20 +26636,8 @@ const RoleDashboard = () => {
         }
       )) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3 lg:col-span-5", children: [
-        canCap("yatra_view_departures") && /* @__PURE__ */ jsxRuntimeExports.jsx(
-          UpcomingDepartures,
-          {
-            departures: departures || [],
-            loading: false
-          }
-        ),
-        canCap("yatra_view_financial_reports") && /* @__PURE__ */ jsxRuntimeExports.jsx(
-          PendingPayments,
-          {
-            payments: pendingPayments || [],
-            loading: false
-          }
-        )
+        canCap("yatra_view_departures") && /* @__PURE__ */ jsxRuntimeExports.jsx(UpcomingDepartures, { departures: departures || [], loading: false }),
+        canCap("yatra_view_financial_reports") && /* @__PURE__ */ jsxRuntimeExports.jsx(PendingPayments, { payments: pendingPayments || [], loading: false })
       ] })
     ] }),
     visibleActions.length === 0 && !showBookingsCount && !showBookedRevenue && !showConversion && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "border-dashed", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-8 text-center", children: [
@@ -26491,10 +26696,7 @@ const SkeletonStatCard = () => /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { chi
 const WELCOME_DISMISSED_KEY = "yatra:dashboard:welcome-dismissed:v1";
 const Dashboard = () => {
   var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
-  const isWpAdmin = (_a = window.yatraAdmin) == null ? void 0 : _a.isWpAdmin;
-  if (!isWpAdmin) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(RoleDashboard, {});
-  }
+  const isWpAdmin = !!((_a = window.yatraAdmin) == null ? void 0 : _a.isWpAdmin);
   const { can } = usePermissions();
   const [range3, setRange] = reactExports.useState("all_time");
   const dateBounds = reactExports.useMemo(() => getDateBounds(range3), [range3]);
@@ -26524,7 +26726,8 @@ const Dashboard = () => {
     queryFn: async () => {
       const response = await apiClient.get("/bookings/stats");
       return (response == null ? void 0 : response.data) ?? response ?? {};
-    }
+    },
+    enabled: isWpAdmin
   });
   const { data: tripsSummary } = useQuery({
     queryKey: ["dashboard-trips-total"],
@@ -26534,7 +26737,7 @@ const Dashboard = () => {
       });
       return { total: (response == null ? void 0 : response.total) ?? 0 };
     },
-    enabled: can("yatra_view_trips")
+    enabled: isWpAdmin && can("yatra_view_trips")
   });
   const { data: customersSummary } = useQuery({
     queryKey: ["dashboard-customers-total"],
@@ -26544,7 +26747,7 @@ const Dashboard = () => {
       });
       return { total: (response == null ? void 0 : response.total) ?? 0 };
     },
-    enabled: can("yatra_view_bookings")
+    enabled: isWpAdmin && can("yatra_view_bookings")
   });
   const { data: reportData } = useQuery({
     queryKey: ["dashboard-reports", dateBounds.from, dateBounds.to],
@@ -26557,7 +26760,7 @@ const Dashboard = () => {
       });
       return (response == null ? void 0 : response.data) ?? response ?? {};
     },
-    enabled: !!dateBounds.from && !!dateBounds.to,
+    enabled: isWpAdmin && !!dateBounds.from && !!dateBounds.to,
     staleTime: 6e4
   });
   const { data: bookingsChartData } = useQuery({
@@ -26596,7 +26799,7 @@ const Dashboard = () => {
       }
       return months;
     },
-    enabled: can("yatra_view_bookings") && range3 === "all_time"
+    enabled: isWpAdmin && can("yatra_view_bookings") && range3 === "all_time"
   });
   const statusData = reactExports.useMemo(() => {
     const byStatus = (bookingStats == null ? void 0 : bookingStats.by_status) || {};
@@ -26608,17 +26811,39 @@ const Dashboard = () => {
       return Number.isNaN(n) ? 0 : n;
     };
     return [
-      { label: __("Pending", "yatra"), value: getCount("pending"), color: "#f59e0b" },
-      { label: __("Confirmed", "yatra"), value: getCount("confirmed"), color: "#10b981" },
-      { label: __("Completed", "yatra"), value: getCount("completed"), color: "#3b82f6" },
-      { label: __("Cancelled", "yatra"), value: getCount("cancelled"), color: "#ef4444" },
-      { label: __("Refunded", "yatra"), value: getCount("refunded"), color: "#a855f7" }
+      {
+        label: __("Pending", "yatra"),
+        value: getCount("pending"),
+        color: "#f59e0b"
+      },
+      {
+        label: __("Confirmed", "yatra"),
+        value: getCount("confirmed"),
+        color: "#10b981"
+      },
+      {
+        label: __("Completed", "yatra"),
+        value: getCount("completed"),
+        color: "#3b82f6"
+      },
+      {
+        label: __("Cancelled", "yatra"),
+        value: getCount("cancelled"),
+        color: "#ef4444"
+      },
+      {
+        label: __("Refunded", "yatra"),
+        value: getCount("refunded"),
+        color: "#a855f7"
+      }
     ];
   }, [bookingStats]);
   const { data: destinationsData } = useQuery({
     queryKey: ["dashboard-destinations"],
     queryFn: async () => {
-      const response = await apiClient.get("/trips", { params: { per_page: 50 } });
+      const response = await apiClient.get("/trips", {
+        params: { per_page: 50 }
+      });
       const trips = (response == null ? void 0 : response.data) || [];
       const counts = {};
       trips.forEach((trip) => {
@@ -26629,14 +26854,21 @@ const Dashboard = () => {
           counts[name] = (counts[name] || 0) + 1;
         });
       });
-      const palette2 = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#6366f1", "#14b8a6"];
+      const palette2 = [
+        "#3b82f6",
+        "#10b981",
+        "#f59e0b",
+        "#ef4444",
+        "#6366f1",
+        "#14b8a6"
+      ];
       return Object.entries(counts).sort((a2, b) => b[1] - a2[1]).slice(0, 6).map(([name, value], index) => ({
         label: name,
         value,
         color: palette2[index % palette2.length]
       }));
     },
-    enabled: can("yatra_view_trips")
+    enabled: isWpAdmin && can("yatra_view_trips")
   });
   const { data: departures } = useQuery({
     queryKey: ["dashboard-upcoming-departures"],
@@ -26669,7 +26901,7 @@ const Dashboard = () => {
         };
       });
     },
-    enabled: can("yatra_view_trips")
+    enabled: isWpAdmin && can("yatra_view_trips")
   });
   const { data: pendingPayments } = useQuery({
     queryKey: ["dashboard-pending-payments"],
@@ -26679,12 +26911,14 @@ const Dashboard = () => {
       });
       return (response == null ? void 0 : response.data) || [];
     },
-    enabled: can("yatra_view_bookings")
+    enabled: isWpAdmin && can("yatra_view_bookings")
   });
   const { data: recentBookings } = useQuery({
     queryKey: ["dashboard-recent-bookings"],
     queryFn: async () => {
-      const response = await apiClient.get("/bookings", { params: { per_page: 5 } });
+      const response = await apiClient.get("/bookings", {
+        params: { per_page: 5 }
+      });
       const items = (response == null ? void 0 : response.data) || [];
       return items.map((b) => ({
         id: b.id,
@@ -26696,11 +26930,13 @@ const Dashboard = () => {
         status: b.status || "pending"
       }));
     },
-    enabled: can("yatra_view_bookings")
+    enabled: isWpAdmin && can("yatra_view_bookings")
   });
   const trendLabel = `vs prev. ${range3 === "today" ? "day" : range3 === "this_year" ? "year" : range3.replace("last_", "").replace("_", " ")}`;
   const revenueChange = Number(((_h = reportData == null ? void 0 : reportData.revenue_stats) == null ? void 0 : _h.change) ?? 0);
-  const totalChange = Number(((_i = reportData == null ? void 0 : reportData.booking_stats) == null ? void 0 : _i.totalChange) ?? 0);
+  const totalChange = Number(
+    ((_i = reportData == null ? void 0 : reportData.booking_stats) == null ? void 0 : _i.totalChange) ?? 0
+  );
   const conversionChange = Number(
     ((_j = reportData == null ? void 0 : reportData.booking_stats) == null ? void 0 : _j.conversionRateChange) ?? 0
   );
@@ -26711,6 +26947,9 @@ const Dashboard = () => {
     const qs = Object.entries(extras).map(([k2, v]) => `&${k2}=${encodeURIComponent(v)}`).join("");
     window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=${subpage}${qs}`;
   };
+  if (!isWpAdmin) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(RoleDashboard, {});
+  }
   if (bookingStatsLoading) {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3", children: Array.from({ length: 5 }).map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsx(SkeletonStatCard, {}, i)) }),
@@ -27981,24 +28220,17 @@ const SetupStep = ({ setup, onChange }) => {
       ) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-3 md:grid-cols-3", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Field$1,
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Field$1, { label: __("Price per person", "yatra"), hint: `(${currency})`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Input,
         {
-          label: __("Price per person", "yatra"),
-          hint: `(${currency})`,
-          children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Input,
-            {
-              type: "number",
-              min: 0,
-              step: "0.01",
-              value: setup.price,
-              placeholder: __("e.g. 1499", "yatra"),
-              onChange: (e) => onChange({ price: e.target.value })
-            }
-          )
+          type: "number",
+          min: 0,
+          step: "0.01",
+          value: setup.price,
+          placeholder: __("e.g. 1499", "yatra"),
+          onChange: (e) => onChange({ price: e.target.value })
         }
-      ),
+      ) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         Field$1,
         {
@@ -29847,10 +30079,7 @@ const Trips = () => {
     }
     if (!/^[\p{L}\p{N}-]+$/u.test(slug)) {
       setCreateTripError(
-        __(
-          "Slug can only contain letters, numbers, and hyphens",
-          "yatra"
-        )
+        __("Slug can only contain letters, numbers, and hyphens", "yatra")
       );
       return;
     }
@@ -31096,6 +31325,7 @@ const Activities = () => {
         Cell: ({ row }) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500", children: row.original.updated_by_name || "" })
       }
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [visibleColumns]
   );
   const toggleColumn = (columnKey) => {
@@ -32589,16 +32819,13 @@ async function fetchPublishedPagesFirstPage() {
 async function fetchSinglePublishedPage(pageId) {
   var _a;
   const nonce = ((_a = window.yatraAdmin) == null ? void 0 : _a.nonce) || "";
-  const res = await fetch(
-    `${restRoot()}wp/v2/pages/${pageId}?context=embed`,
-    {
-      credentials: "same-origin",
-      headers: {
-        "X-WP-Nonce": nonce,
-        Accept: "application/json"
-      }
+  const res = await fetch(`${restRoot()}wp/v2/pages/${pageId}?context=embed`, {
+    credentials: "same-origin",
+    headers: {
+      "X-WP-Nonce": nonce,
+      Accept: "application/json"
     }
-  );
+  });
   if (!res.ok) {
     return null;
   }
@@ -33949,6 +34176,7 @@ const Destinations = () => {
               )
             }
           ],
+          // eslint-disable-next-line react-hooks/exhaustive-deps
           [visibleColumns]
         ),
         actions: [
@@ -35174,6 +35402,7 @@ const Categories = () => {
         visible: visibleColumns.created_at
       }
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [visibleColumns]
   );
   const statusMutation = useMutation({
@@ -43463,10 +43692,6 @@ const CustomerSummaryCard = ({ customerId }) => {
   var _a, _b, _c, _d;
   const [includeSensitive, setIncludeSensitive] = reactExports.useState(false);
   const [summary, setSummary] = reactExports.useState(null);
-  if (!isAiEligible() || !isAiModuleEnabled()) {
-    return null;
-  }
-  const ready = isAiReady();
   const mutation = useMutation({
     mutationFn: () => aiApi.getCustomerSummary(customerId, includeSensitive),
     onSuccess: (resp) => {
@@ -43474,6 +43699,10 @@ const CustomerSummaryCard = ({ customerId }) => {
       setSummary(String(((_a2 = resp.data) == null ? void 0 : _a2.text) ?? "").trim());
     }
   });
+  if (!isAiEligible() || !isAiModuleEnabled()) {
+    return null;
+  }
+  const ready = isAiReady();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -52668,17 +52897,6 @@ const ItemFormContent = ({
   onSuccess,
   onCancel
 }) => {
-  if (!selectedTypeId) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6 text-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-12 h-12 text-yellow-500 mx-auto" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white mb-2", children: __("Item Type Required", "yatra") }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400 mb-4", children: __(
-        "Please select an Item Type first before creating an Item.",
-        "yatra"
-      ) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "button", variant: "outline", onClick: onCancel, children: __("Close", "yatra") })
-    ] });
-  }
   const [formData, setFormData] = reactExports.useState({
     name: "",
     slug: "",
@@ -52694,6 +52912,17 @@ const ItemFormContent = ({
       type_id: selectedTypeId || ""
     }));
   }, [selectedTypeId]);
+  if (!selectedTypeId) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6 text-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-12 h-12 text-yellow-500 mx-auto" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white mb-2", children: __("Item Type Required", "yatra") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400 mb-4", children: __(
+        "Please select an Item Type first before creating an Item.",
+        "yatra"
+      ) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "button", variant: "outline", onClick: onCancel, children: __("Close", "yatra") })
+    ] });
+  }
   const handleNameChange = (value) => {
     const slug = value.toLowerCase().replace(/[^\p{L}\p{N}-]+/gu, "-").replace(/-+/g, "-").replace(/^-+|-+$/g, "");
     setFormData((prev) => ({
@@ -53716,10 +53945,7 @@ const ActivityAccordion = ({
                   "span",
                   {
                     className: "cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 shrink-0",
-                    title: __(
-                      "Drag to reorder this activity",
-                      "yatra"
-                    ),
+                    title: __("Drag to reorder this activity", "yatra"),
                     "aria-label": __(
                       "Drag to reorder this activity",
                       "yatra"
@@ -53727,7 +53953,14 @@ const ActivityAccordion = ({
                     children: /* @__PURE__ */ jsxRuntimeExports.jsx(GripVertical, { className: "w-4 h-4" })
                   }
                 ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate", title: (activityForm.data.title || "").trim(), children: (activityForm.data.title || "").trim() || `${__("Activity", "yatra")} #${index + 1}` })
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "span",
+                  {
+                    className: "truncate",
+                    title: (activityForm.data.title || "").trim(),
+                    children: (activityForm.data.title || "").trim() || `${__("Activity", "yatra")} #${index + 1}`
+                  }
+                )
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -54886,10 +55119,7 @@ const PremiumUpgradeDialog = ({
   ) : requiredPlan === "personal" ? __(
     "This feature is included on every Pro plan. Upgrade to unlock it.",
     "yatra"
-  ) : __(
-    "Upgrade to Yatra Pro and unlock this feature today",
-    "yatra"
-  );
+  ) : __("Upgrade to Yatra Pro and unlock this feature today", "yatra");
   const features = moduleSlug && MODULE_FEATURES[moduleSlug] || requiredPlan && TIER_DEFAULT_FEATURES[requiredPlan] || [
     __("Advanced analytics and reporting", "yatra"),
     __("Automated workflows and notifications", "yatra"),
@@ -56920,9 +57150,7 @@ const BookingPicker = ({
       setResults(list);
     }).catch((err) => {
       if (reqId !== requestIdRef.current) return;
-      setLoadError(
-        (err == null ? void 0 : err.message) || __("Failed to load bookings.", "yatra")
-      );
+      setLoadError((err == null ? void 0 : err.message) || __("Failed to load bookings.", "yatra"));
       setResults([]);
     }).finally(() => {
       if (reqId === requestIdRef.current) {
@@ -63987,9 +64215,7 @@ const EnquiryReplyAffordance = ({
   const [includeSensitive, setIncludeSensitive] = reactExports.useState(false);
   const wrapperRef = reactExports.useRef(null);
   const autoDraftedRef = reactExports.useRef(false);
-  if (!isAiEligible() || !isAiModuleEnabled()) {
-    return null;
-  }
+  const gateBlocks = !isAiEligible() || !isAiModuleEnabled();
   const ready = isAiReady();
   reactExports.useEffect(() => {
     if (!menuOpen) return;
@@ -64050,6 +64276,9 @@ const EnquiryReplyAffordance = ({
     runDraft(preview.variant);
   };
   const hasValue = value.trim() !== "";
+  if (gateBlocks) {
+    return null;
+  }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: wrapperRef, className: `relative inline-block ${className}`, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs(
       "button",
@@ -64058,10 +64287,7 @@ const EnquiryReplyAffordance = ({
         onClick: () => {
           if (!ready) {
             setError(
-              __(
-                "Add an API key in Yatra → AI Assistant first.",
-                "yatra"
-              )
+              __("Add an API key in Yatra → AI Assistant first.", "yatra")
             );
             return;
           }
@@ -67292,9 +67518,6 @@ const isModuleAvailable$2 = () => {
 };
 const AdditionalServices = () => {
   const moduleAvailable = isModuleAvailable$2();
-  if (!moduleAvailable) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(AdditionalServicesPremium, {});
-  }
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [sortBy2, setSortBy] = reactExports.useState("name");
@@ -67483,6 +67706,9 @@ const AdditionalServices = () => {
     { key: "draft", label: __("Draft"), count: statusCounts.draft ?? 0 },
     { key: "trash", label: __("Trash"), count: statusCounts.trash ?? 0 }
   ];
+  if (!moduleAvailable) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(AdditionalServicesPremium, {});
+  }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
@@ -72105,7 +72331,13 @@ const EmailLogsList = () => {
         }
       ) })
     ] }),
-    viewingLog && /* @__PURE__ */ jsxRuntimeExports.jsx(EmailLogDetailsModal, { log: viewingLog, onClose: () => setViewingLog(null) })
+    viewingLog && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      EmailLogDetailsModal,
+      {
+        log: viewingLog,
+        onClose: () => setViewingLog(null)
+      }
+    )
   ] });
 };
 const EmailLogDetailsModal = ({ log: log2, onClose }) => {
@@ -72122,7 +72354,8 @@ const EmailLogDetailsModal = ({ log: log2, onClose }) => {
   };
   const metadata = reactExports.useMemo(() => {
     if (!log2.metadata) return null;
-    if (typeof log2.metadata === "object") return log2.metadata;
+    if (typeof log2.metadata === "object")
+      return log2.metadata;
     try {
       const parsed = JSON.parse(String(log2.metadata));
       return typeof parsed === "object" && parsed !== null ? parsed : null;
@@ -72552,17 +72785,19 @@ const AiEmailTemplateModal = ({
         ] })
       ] }),
       error && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-900/20 dark:text-red-300", children: error }),
-      draft && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        DraftEditor,
-        {
-          draft,
-          onChange: (d) => setDraft(d)
-        }
-      )
+      draft && /* @__PURE__ */ jsxRuntimeExports.jsx(DraftEditor, { draft, onChange: (d) => setDraft(d) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2 border-t border-gray-200 px-6 py-3 dark:border-gray-700", children: [
       !draft && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "outline", onClick: onClose, disabled: isGenerating, children: __("Cancel", "yatra") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            variant: "outline",
+            onClick: onClose,
+            disabled: isGenerating,
+            children: __("Cancel", "yatra")
+          }
+        ),
         /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: generate, disabled: isGenerating, children: isGenerating ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "mr-2 h-4 w-4 animate-spin" }),
           __("Generating…", "yatra")
@@ -73560,7 +73795,7 @@ const EmailTemplateForm = () => {
         templateKey: coreTemplateSlug || formData.event_key || "custom_template",
         templateName: (coreDef == null ? void 0 : coreDef.name) || formData.name || formData.event_key,
         templateDescription: (coreDef == null ? void 0 : coreDef.description) || formData.description,
-        recipientType: (catalogEntryForCore == null ? void 0 : catalogEntryForCore.recipientType) || "customer",
+        recipientType: (catalogEntryForCore == null ? void 0 : catalogEntryForCore.recipient_type) || "customer",
         mergeTags: (() => {
           const raw = (catalogEntryForCore == null ? void 0 : catalogEntryForCore.mergeTags) ?? "";
           if (!raw) {
@@ -73576,7 +73811,9 @@ const EmailTemplateForm = () => {
               "currency"
             ];
           }
-          return raw.split(",").map((s2) => s2.trim().replace(/^\{\{|\}\}$/g, "").trim()).filter(Boolean);
+          return raw.split(",").map(
+            (s2) => s2.trim().replace(/^\{\{|\}\}$/g, "").trim()
+          ).filter(Boolean);
         })(),
         currentSubject: formData.subject,
         currentBody: formData.body,
@@ -76768,25 +77005,27 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-CkmldwVZ.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-B3Sb8Uip.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
-const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-B33OHuvh.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
-const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-CGgBML0b.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
-const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-DI2mQNDT.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
-const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-DJJn7tV9.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
-const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-BDTYzQEK.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-tFMoMuMs.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-DZPiAnb3.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-COJ6Sjod.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
+const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-sGU73NQH.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
+const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-CWIQB0xy.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
+const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-Ap1hthK0.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
+const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-qprdlB53.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
 const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.js"), true ? __vite__mapDeps([14,1,2,3,4,15]) : void 0, import.meta.url));
-const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-Cdkei_O2.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
-const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-DuXOC6S9.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
-const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-D3m7x_N8.js"), true ? __vite__mapDeps([18,1,2,11,3,4]) : void 0, import.meta.url));
-const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-mbTm4SQn.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
-const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-CNadvEdJ.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-BBIbDTIR.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
-const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-CzwLxmBD.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
-const DynamicPricingRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-9WgVSTPH.js"), true ? __vite__mapDeps([25,1,2,23,3,4]) : void 0, import.meta.url));
-const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-EMZqiuYU.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
-const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-DVkAJ0OV.js"), true ? __vite__mapDeps([27,1,2,24,3,4]) : void 0, import.meta.url));
-const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-Bf9a35U8.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
+const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-CU9rfQOo.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
+const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-BYHU7T9O.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
+const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-DeH_xgzl.js"), true ? __vite__mapDeps([18,1,2,11,3,4]) : void 0, import.meta.url));
+const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-DFFoFfQO.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
+const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-D0U0ZXpB.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-BPWy1f1h.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
+const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-DTdy3svi.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
+const DynamicPricingRuleForm = reactExports.lazy(
+  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-wUY86s8E.js"), true ? __vite__mapDeps([25,1,2,23,3,4]) : void 0, import.meta.url)
+);
+const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-BNn2WXa-.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
+const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-BXWfwama.js"), true ? __vite__mapDeps([27,1,2,24,3,4]) : void 0, import.meta.url));
+const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-8i10Kntk.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
 const PageLoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-1/3" }),

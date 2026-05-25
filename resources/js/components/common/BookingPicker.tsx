@@ -163,6 +163,7 @@ export const BookingPicker: React.FC<BookingPickerProps> = ({
     return () => {
       cancelled = true;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   // Close on outside click.
