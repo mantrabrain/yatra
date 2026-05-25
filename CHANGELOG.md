@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here. The WordPress.org–canonical history lives in **`readme.txt`** under **Changelog**; this file mirrors recent releases for GitHub and tooling.
 
+## [3.0.5.1] — 2026-05-25
+
+- **Hotfix — admin 403 on REST routes.** Administrators on a free-only install hit `rest_forbidden` on Settings (and any other surface whose REST controller gates on a granular `yatra_*` cap). The capability filters that grant `yatra_*` caps to users with `manage_options` were only installed from `AdminServiceProvider::registerAdminMenu()` — hooked on `admin_menu`, which does not fire during REST requests. The admin SPA loads data via REST, so the admin fallback never ran for those calls. Fix: install the filters from `AppServiceProvider::register()` (always-loaded core path) so they're present for every entry point — admin, REST, AJAX, frontend, CLI. Added a `$capabilityFiltersInstalled` static guard so the two call sites don't double-register. Filter logic, priorities, and the team-module-disabled strip branch are unchanged — this is a registration-timing fix, not a semantics change. Safe to update from 3.0.5. Pair with **Yatra Pro 3.0.4**.
+
 ## [3.0.5] — 2026-05-24
 
 - **Capability registry foundation:** new `user_has_cap` filter at priority 7 in `AdminServiceProvider::bootstrapMenuCapability()`. Reads the `yatra_team_role_enforcement_active` filter signal — when truthy (Pro Team module enabled, OR module disabled but the operator opted in to "keep access"), caps resolve normally; when falsy (Pro deactivated, or module off without opt-in), non-admin `yatra_*` caps are stripped so stored role assignments become inert. WP administrators always pass via the admin fallback first.

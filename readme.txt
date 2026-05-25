@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel, travel agency
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 3.0.5
+Stable tag: 3.0.5.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -264,6 +264,10 @@ Pricing starts at **$99/yr** (Personal, sale) and goes up to **$499/yr** (Agency
 6. Traveler account — bookings, payments and documents
 
 == Changelog ==
+
+= 3.0.5.1 =
+* **Hotfix — admin 403 on REST routes:** site administrators on a free-only install were hitting `rest_forbidden` on Settings (and any other surface whose REST controller gates on a granular `yatra_*` cap). Root cause: the `user_has_cap` filter installer (`AdminServiceProvider::bootstrapMenuCapability()`) was only called from `registerAdminMenu()` — hooked on `admin_menu`, which doesn't fire during REST requests. The admin SPA loads everything via REST, so the admin fallback that grants `yatra_*` caps to users with `manage_options` never ran for those calls. Fix: the installer is now also invoked from `AppServiceProvider::register()` (always-loaded core path), so the filters install for every entry point — admin pageviews, REST, AJAX, frontend, CLI. An idempotency guard prevents double-registration. Filter logic, priorities, and the team-module-disabled strip branch are unchanged — this is a registration-timing fix, not a semantics change. Pair with **Yatra Pro 3.0.4** (Team & Access).
+* Safe to update from 3.0.5. No database changes, no settings reset.
 
 = 3.0.5 =
 * **Capability registry foundation:** the free plugin now ships a `user_has_cap` filter at priority 7 (`AdminServiceProvider::bootstrapMenuCapability()`) that reads the `yatra_team_role_enforcement_active` filter signal to decide whether non-admin `yatra_*` caps resolve normally or get stripped. When the Pro Team & Access module is enabled (or its "keep access on disable" setting is on), the signal returns true and caps resolve. When Pro is deactivated or the module is off without that opt-in, non-admin yatra_* caps are stripped so existing role assignments become inert — re-activating restores everything. WP administrators always pass via the admin fallback regardless.
