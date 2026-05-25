@@ -1058,8 +1058,12 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
       );
       return module?.enabled === true && module?.is_available === true;
     }
-    // Fallback to yatraAdmin if modules API hasn't loaded yet
-    return window.yatraAdmin?.dynamicFormFieldEnabled === true;
+    // Fallback to yatraAdmin if modules API hasn't loaded yet.
+    // Truthy check (not `=== true`) because wp_localize_script
+    // serialises every scalar to a string before exposing it to JS —
+    // true becomes "1", false becomes "". Same gotcha that bit the
+    // Discount Stacking tab visibility earlier this session.
+    return !!window.yatraAdmin?.dynamicFormFieldEnabled;
   }, [modulesData]);
 
   // Save sub-tab to localStorage when it changes
