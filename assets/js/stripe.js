@@ -894,12 +894,28 @@ class YatraStripe {
     }
 
     async prepareStripePayment(bookingData, formElement) {
+        // /booking/create requires BOTH the standard WP REST nonce
+        // (X-WP-Nonce) AND a booking-scoped action nonce
+        // (X-Yatra-Booking-Nonce). The booking-scoped one is what
+        // gates the actual write; the endpoint's public
+        // permission_callback intentionally bypasses WP's default
+        // cookie/nonce check so guest checkouts work, and falls back
+        // to the booking-scoped nonce as the real CSRF defence.
+        // Missing it returns { code: 'invalid_nonce' } 403.
+        const bookingNonce =
+            (typeof window !== 'undefined' && window.yatraBookingData && window.yatraBookingData.bookingNonce)
+            || (typeof document !== 'undefined'
+                ? (document.querySelector('input[name="yatra_booking_nonce"]') || {}).value
+                : '')
+            || '';
+
         // Always call the same endpoint - server decides based on session type
         const bookingResponse = await fetch(`${this.apiUrl}/booking/create`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-WP-Nonce': this.nonce
+                'X-WP-Nonce': this.nonce,
+                'X-Yatra-Booking-Nonce': bookingNonce
             },
             body: JSON.stringify(bookingData)
         });
