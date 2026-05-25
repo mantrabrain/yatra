@@ -174,7 +174,11 @@ do_action('yatra_booking_confirmation_header', $booking);
         <?php endif; ?>
 
         <?php
-        // Resolve featured image URL (handle attachment ID or direct URL)
+        // Resolve featured image URL (handle attachment ID or direct URL).
+        // Falls back to the bundled trip-placeholder.svg so the confirmation
+        // card always renders with a visual on the left — never an empty
+        // text-only block, regardless of whether the operator set a featured
+        // image for the trip.
         $featured_image_url = '';
         if (!empty($booking->featured_image)) {
             if (is_numeric($booking->featured_image)) {
@@ -183,17 +187,24 @@ do_action('yatra_booking_confirmation_header', $booking);
                 $featured_image_url = $booking->featured_image;
             }
         }
+        if ($featured_image_url === '') {
+            $featured_image_url = YATRA_PLUGIN_URL . 'assets/images/trip-placeholder.svg';
+            $featured_image_is_placeholder = true;
+        } else {
+            $featured_image_is_placeholder = false;
+        }
         ?>
 
         <div class="yatra-confirmation-content">
             <!-- Trip Summary Card -->
             <div class="yatra-confirmation-card yatra-trip-summary-card">
                 <div class="yatra-trip-summary">
-                    <?php if (!empty($featured_image_url)) : ?>
-                    <div class="yatra-trip-image">
-                        <img src="<?php echo esc_url($featured_image_url); ?>" alt="<?php echo esc_attr($booking->trip_title); ?>">
+                    <div class="yatra-trip-image<?php echo $featured_image_is_placeholder ? ' yatra-trip-image--placeholder' : ''; ?>">
+                        <img src="<?php echo esc_url($featured_image_url); ?>"
+                             alt="<?php echo esc_attr($booking->trip_title); ?>"
+                             loading="lazy"
+                             onerror="this.onerror=null;this.src='<?php echo esc_url(YATRA_PLUGIN_URL . 'assets/images/trip-placeholder.svg'); ?>';this.parentNode.classList.add('yatra-trip-image--placeholder');">
                     </div>
-                    <?php endif; ?>
                     
                     <div class="yatra-trip-info">
                         <h2 class="yatra-trip-name"><?php echo esc_html($booking->trip_title); ?></h2>

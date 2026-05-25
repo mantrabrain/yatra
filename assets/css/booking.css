@@ -574,6 +574,22 @@
     display: block;
 }
 
+/* Placeholder variant — used when the trip has no featured image
+   (or the image URL fails to load). The bundled trip-placeholder.svg
+   is an outline illustration, not a photograph, so contain it on a
+   neutral background instead of cover-cropping. Keeps the
+   confirmation card looking intentional rather than broken. */
+.yatra-trip-image--placeholder {
+    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+    box-shadow: 0 12px 24px rgba(99, 102, 241, 0.12);
+}
+
+.yatra-trip-image--placeholder img {
+    object-fit: contain;
+    padding: 16px;
+    opacity: 0.7;
+}
+
 .yatra-trip-info {
     flex: 1;
 }
