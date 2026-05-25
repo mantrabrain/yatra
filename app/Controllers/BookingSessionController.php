@@ -3696,6 +3696,12 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
             'dynamic_pricing' => $pricing['dynamic_pricing'] ?? null,
             'unit_price_before_dp' => $pricing['unit_price_before_dp'] ?? null,
             'dp_total_adjustment' => $pricing['dp_total_adjustment'] ?? 0,
+            // Authoritative post-DP per-category map. Checkout::getCategoryBreakdown
+            // prefers this over the session's $pt->effective_price (which can be
+            // pre-DP after a stored availability row's price_types come in
+            // pre-baked), so forwarding it here is what keeps the AJAX-rendered
+            // "Adult x N ($X x N)" row in sync with the actual Trip Subtotal.
+            'category_prices_post_dp' => $pricing['category_prices_post_dp'] ?? [],
             // Currency for consistent formatting
             'currency' => $pricing['currency'] ?? \Yatra\Services\SettingsService::getCurrency(),
         ]);
@@ -3812,6 +3818,12 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
             'dynamic_pricing'     => $data['dynamic_pricing'] ?? null,
             'unit_price_before_dp' => $data['unit_price_before_dp'] ?? null,
             'dp_total_adjustment' => $data['dp_total_adjustment'] ?? 0,
+            // Authoritative post-DP per-category prices. Checkout::getCategoryBreakdown
+            // keys off this to override the (potentially stale / pre-DP)
+            // $pt->effective_price coming from session price_types — without
+            // it, the AJAX recompute renders pre-DP rows while the rest of
+            // the summary uses the post-DP base amount.
+            'category_prices_post_dp' => $data['category_prices_post_dp'] ?? [],
             'currency' => $data['currency'] ?? null,
         ];
         
