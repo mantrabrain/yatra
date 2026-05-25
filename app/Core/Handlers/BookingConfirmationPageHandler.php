@@ -47,11 +47,30 @@ class BookingConfirmationPageHandler extends BasePageHandler
                 $method = $reflection->getMethod('getTripAttributes');
                 $method->setAccessible(true);
                 $attributes = $method->invoke($singleTripController, (int) $booking->trip_id);
-                
-                // Create a simple list of attribute names for tag display
-                $booking->trip_attributes_list = array_map(function($attr) {
-                    return $attr['name'];
-                }, $attributes);
+
+                // Render each attribute as "Name: Value" so the
+                // Features block on the confirmation page actually
+                // tells the customer something useful. The previous
+                // version mapped to $attr['name'] only, which produced
+                // a meaningless list of category labels like
+                // "Group Size Age Restriction Fitness Level …" with
+                // no values — looks like a broken render.
+                //
+                // Attributes with an empty value (operator added the
+                // category but never filled it in for this trip) are
+                // dropped entirely so we don't show "Group Size:" with
+                // a dangling colon.
+                $booking->trip_attributes_list = [];
+                foreach ($attributes as $attr) {
+                    $name  = isset($attr['name']) ? trim((string) $attr['name']) : '';
+                    $value = isset($attr['value']) ? trim((string) $attr['value']) : '';
+                    if ($value === '') {
+                        continue;
+                    }
+                    $booking->trip_attributes_list[] = $name !== ''
+                        ? $name . ': ' . $value
+                        : $value;
+                }
             } catch (\Throwable $e) {
                 $booking->trip_attributes_list = [];
             }
