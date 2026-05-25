@@ -334,16 +334,6 @@ do_action('yatra_booking_confirmation_header', $booking);
                         </div>
                         <?php endif; ?>
 
-                        <?php if (!empty($booking->trip_attributes_list)) : ?>
-                        <div class="yatra-trip-tags">
-                            <span class="yatra-tag-label"><?php esc_html_e('Features:', 'yatra'); ?></span>
-                            <div class="yatra-tag-group">
-                                <?php foreach ($booking->trip_attributes_list as $attribute) : ?>
-                                    <span class="yatra-tag-item yatra-attribute-tag"><?php echo esc_html($attribute); ?></span>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                        <?php endif; ?>
                     </div>
                 </div>
             </div>
