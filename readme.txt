@@ -101,9 +101,9 @@ Considering Yatra against a SaaS booking platform or another WordPress travel pl
 
 * 🔄 **[Yatra vs Rezdy](https://wpyatra.com/yatra-vs-rezdy/)** — Sell on Viator + GetYourGuide without the $99–$499 / month Rezdy SaaS bill. Lifetime license · GPL · your data, your gateway.
 * 🔄 **[Yatra vs Bokun](https://wpyatra.com/yatra-vs-bokun/)** — Skip the per-OTA-booking fee Bokun charges (typically 2.5% per booking). Independent open-source alternative to Tripadvisor-owned Bokun.
-* 🔄 **[Yatra vs WP Travel Engine](https://wpyatra.com/yatra-vs-wp-travel-engine/)** — Same WordPress philosophy, modern architecture, broader Pro modules. Custom database tables for performance vs. WPTE's custom post types.
+* 🔄 **[Yatra vs WP Travel Engine](https://wpyatra.com/yatra-vs-wp-travel-engine/)** — Same WordPress philosophy, modern architecture, broader Pro modules. Custom database tables for performance vs. WP Travel Engine's custom post types.
 
-Each page covers the feature matrix, pricing math, migration steps and FAQ — written without overpromising. Read the verdict, then [try Yatra Pro free](https://try.new/plugins/yatra) before you commit.
+Each page covers the feature matrix, pricing math, migration steps and FAQ — written without overpromising. Read the verdict, then [try Yatra Pro free](https://try.wpyatra.com/try-yatra-pro/) before you commit.
 
 = 🌐 Native integrations =
 
@@ -115,7 +115,7 @@ Yatra ships with bring-your-own-credential integrations — no proxy, no markup,
 * **Analytics & Marketing**: Google Analytics 4 · Meta / Facebook Pixel
 * **Calendars & Scheduling**: Google Calendar
 * **AI Providers**: OpenAI · Anthropic Claude
-* **WordPress Ecosystem**: Gutenberg blocks (4 native) · Elementor (via Shortcode widget) · WooCommerce (coexistence) · Loco Translate
+* **WordPress Ecosystem**: Gutenberg blocks (4 native) · Elementor (via Shortcode) · WooCommerce (coexistence) · Loco Translate
 
 = 🧩 Blocks and shortcodes =
 
@@ -172,8 +172,9 @@ Yatra works with most well-coded block themes, classic themes and major page bui
 
 = 🚀 Try Yatra risk-free =
 
-* 🧪 **[Try Yatra in WordPress Playground](https://try.new/plugins/yatra)** — spin up a temporary WordPress with Yatra pre-installed; no local setup required
-* 💰 **14-day refund** on every paid Yatra Pro plan — see [pricing page](https://wpyatra.com/pricing/) for the refund window terms
+* 🧪 **[Try the free Yatra plugin in WordPress Playground](https://try.new/plugins/yatra)** — spin up a temporary WordPress site with the free Yatra plugin pre-installed. No local setup, no signup, no credit card.
+* 🎁 **[Try Yatra Pro free](https://try.wpyatra.com/try-yatra-pro/)** — full Pro trial environment with every module enabled. No credit card required.
+* 💰 **14-day refund** on every paid Yatra Pro plan — see the [pricing page](https://wpyatra.com/pricing/) for the refund window terms.
 
 == Installation ==
 
