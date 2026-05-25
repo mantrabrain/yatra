@@ -252,7 +252,7 @@ $yatra_normalize_list = static function ($value): array {
                (page 1 already has its own tall brand banner in body
                content, so a second header up top would duplicate it).
 
-         Coordinates are in Dompdf's point system (72pt = 1 inch).
+         Coordinates are in Dompdf's point grid — 72pt equals 1 inch.
          A4 portrait is 595 × 842 pt. The 45pt left/right offsets
          match the 16mm @page side margin set in CSS above. -->
     <?php
