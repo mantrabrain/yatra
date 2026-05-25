@@ -12,7 +12,7 @@ WordPress travel booking plugin for tour operators. Trips, departures, payments,
 
 == Description ==
 
-**✈️ Yatra** is the **WordPress travel booking plugin** built for **tour operators, activity providers, travel agencies and adventure businesses** that need real trip inventory — not a generic shop. The free version is a full booking office: trips, availability, checkout, customer records and essential emails. **[Yatra Pro](https://wpyatra.com/pricing/)** unlocks [premium payment gateways](https://wpyatra.com/pricing/) plus a suite of [18 Pro modules](https://wpyatra.com/features/) you can switch on as your business grows — from [Channel Manager (Viator + GetYourGuide)](https://wpyatra.com/features/channel-manager/) to [AI Assistant](https://wpyatra.com/features/ai-assistant/), [White Label](https://wpyatra.com/features/white-label/) and [WhatsApp Notifications](https://wpyatra.com/features/whatsapp/).
+**✈️ Yatra** is the **WordPress travel booking plugin** built for **tour operators, activity providers, travel agencies and adventure businesses** that need real trip inventory — not a generic shop. The free version is a full booking office: trips, availability, checkout, customer records and essential emails. **[Yatra Pro](https://wpyatra.com/pricing/)** unlocks [premium payment gateways](https://wpyatra.com/pricing/) plus a suite of [20 Pro modules](https://wpyatra.com/features/) you can switch on as your business grows — from [Channel Manager (Viator + GetYourGuide)](https://wpyatra.com/features/channel-manager/) to [AI Assistant](https://wpyatra.com/features/ai-assistant/), [White Label](https://wpyatra.com/features/white-label/) and [WhatsApp Notifications](https://wpyatra.com/features/whatsapp/).
 
 **Official site:** 🌐 [wpyatra.com](https://wpyatra.com/) · 📖 [docs.wpyatra.com](https://docs.wpyatra.com) · 💳 [Pricing](https://wpyatra.com/pricing/) · ✨ [All 29 features](https://wpyatra.com/features/) · 🎯 [Live demo](https://demo.wpyatra.com/) · 💬 [Support forum](https://wordpress.org/support/plugin/yatra/)
 
@@ -57,7 +57,7 @@ WordPress travel booking plugin for tour operators. Trips, departures, payments,
 * PHP 7.4 or newer, structured codebase, hooks and filters, template overrides
 * REST-oriented flows for booking and account experiences
 
-= 💎 Yatra Pro — 18 modules across 3 tiers =
+= 💎 Yatra Pro — 20 modules across 3 tiers =
 
 **[Compare plans and buy Yatra Pro](https://wpyatra.com/pricing/)** — three plans (Personal · Growth · Agency), each available yearly or lifetime.
 
@@ -89,6 +89,7 @@ WordPress travel booking plugin for tour operators. Trips, departures, payments,
 * [Channel Manager](https://wpyatra.com/features/channel-manager/) — sell on Viator + GetYourGuide from one WordPress dashboard. Signed webhooks, anti-overbooking locks, real-time inventory sync.
 * [White Label](https://wpyatra.com/features/white-label/) — rebrand the admin, emails, PDFs and frontend. Full agency theming.
 * [Team & Access](https://wpyatra.com/features/team-access/) — granular roles + capability-based access for multi-staff agencies. 8 built-in roles, custom role builder, magic-link invitations, time-windowed access for contractors, scope filtering (per-destination / per-trip), append-only audit log. Defense-in-depth: every action gated on the server, UI mirrors via cap-aware controls.
+* [Webhooks](https://wpyatra.com/features/webhooks/) — outbound HTTP delivery on booking / payment / customer events. HMAC-signed payloads, retry queue with exponential backoff, dead-letter queue, certificate pinning. Wire Yatra into Zapier, Make, n8n, or your own internal systems.
 
 **Lifetime plans** also available: Personal $499 · Growth $999 · Agency $1,999 — pay once, own it forever.
 
@@ -192,7 +193,7 @@ Yatra is the only **WordPress travel booking plugin** built around the operation
 
 = Is Yatra free? =
 
-Yes. The plugin on WordPress.org is free and includes the core booking stack for many tour operators. **[Yatra Pro](https://wpyatra.com/pricing/)** is a paid upgrade for [premium gateways](https://wpyatra.com/pricing/) and [18 Pro modules](https://wpyatra.com/features/).
+Yes. The plugin on WordPress.org is free and includes the core booking stack for many tour operators. **[Yatra Pro](https://wpyatra.com/pricing/)** is a paid upgrade for [premium gateways](https://wpyatra.com/pricing/) and [20 Pro modules](https://wpyatra.com/features/).
 
 = Do I need code skills to use Yatra? =
 
@@ -274,6 +275,16 @@ Pricing starts at **$99/yr** (Personal, sale) and goes up to **$499/yr** (Agency
 * **Reviews + Email registry:** `Layout.tsx` sidebar entry for Reviews now gates on `yatra_view_reviews` (was `yatra_view_trips`); `useEmailSettingsManager` gates on `yatra_manage_emails` (was the unregistered `manage_yatra`).
 * **Version:** Yatra free **3.0.5**. Pair with **Yatra Pro 3.0.3** for the Team & Access module.
 * Safe to update from 3.0.4.
+* **NEW — Discount Stacking setting:** Settings → Pricing tab with four modes (Both apply / Best for the customer / Discount only / Dynamic Pricing only). Only renders when both Advanced Discount and Dynamic Pricing modules are enabled. Default `both` preserves legacy behaviour — zero change for existing sites unless an operator opts in.
+* **NEW — `yatra_pricing_after_discount_stack` filter** in `CalculationService` lets premium modules rewrite the discount/DP combination per operator policy. `pre_dp_base_amount` ships in the snapshot so listeners detect DP-active without re-running rules. `calculateBaseAmount()` and `calculateGroupDiscount()` made public; new `computeBaseAmountWithoutDynamicPricing()` helper for the discount-only re-walk.
+* **NEW — Channel Manager UI:** searchable TripPicker on the New Mapping form (replaces the numeric Trip ID input); Mappings list shows trip name with link instead of `#42`; All-channels filter + Add Mapping button stay on one row.
+* **NEW — Module-page skeletons:** Webhooks, Channel Manager, AI Assistant, WhatsApp, WhiteLabel, Team now render shape-aware skeletons (not bare spinners) on initial load. New `ModulePageSkeleton` + variants component.
+* **Booking confirmation:** Features tag row removed; featured-image always renders with a bundled placeholder fallback (no more lopsided text-only cards on trips without an image set).
+* **Booking sidebar consistency:** per-category price (Adult × N) now always matches Trip Subtotal across JSON response, server-rendered HTML, and the React renderer — reconciled against CalculationService's authoritative `category_prices_post_dp` map.
+* **Stripe / AuthorizeNet / Square checkout fix:** all three premium-gateway flows now forward `X-Yatra-Booking-Nonce` on `/booking/create`, fixing the `invalid_nonce` 403 that blocked card payments.
+* **Booking confirmation fatal fix:** `BookingRepository::getResolvedBookingsTable()` → `getTableName()` (post-3.0.5 dangling refactor that crashed the confirmation page).
+* **Booking-Form sub-tab gate:** truthy check on `yatraAdmin.dynamicFormFieldEnabled` so the sub-tab actually renders (wp_localize_script string-coercion bug — `true` arrives as `"1"`, strict-equality silently failed).
+* **Repo housekeeping:** `BookingForm.tsx.backup` removed (71 KB orphan file).
 
 = 3.0.4 =
 * **Unicode / Cyrillic slugs (end-to-end):** `SlugHelper::generate()` now rawurldecodes percent-encoded UTF-8 and uses `mb_strtolower` with a Unicode-aware regex (`\pL\pN`), so Cyrillic / CJK trip, destination, activity, and category slugs round-trip cleanly through validators and pretty-permalink routing. `ActivityValidator`, `DestinationValidator`, and `TripValidator` now route raw user input through `SlugHelper` instead of `sanitize_title` (which stripped non-ASCII characters down to a single dash). `PrettyRouteMatcher` decodes captured slugs the same way before lookup, so a URL like `/trip/токио/` resolves correctly.
