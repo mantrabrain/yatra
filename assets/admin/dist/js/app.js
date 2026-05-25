@@ -66400,26 +66400,20 @@ const Modules = () => {
                     /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-lg flex items-center gap-2 flex-wrap", children: [
                       module.name,
                       module.is_core && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", children: __("Core", "yatra") }),
-                      module.plan === "agency" && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      module.plan === "agency" && /* @__PURE__ */ jsxRuntimeExports.jsx(
                         Badge,
                         {
                           variant: "outline",
-                          className: "flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-500 border-purple-700 text-white shadow-sm dark:from-purple-500 dark:to-indigo-400 dark:border-purple-400 dark:text-white",
-                          children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-3 h-3" }),
-                            __("Agency", "yatra")
-                          ]
+                          className: "px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-500 border-purple-700 text-white shadow-sm dark:from-purple-500 dark:to-indigo-400 dark:border-purple-400 dark:text-white",
+                          children: __("Agency", "yatra")
                         }
                       ),
-                      module.plan === "growth" && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      module.plan === "growth" && /* @__PURE__ */ jsxRuntimeExports.jsx(
                         Badge,
                         {
                           variant: "outline",
-                          className: "flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-600 text-white shadow-sm dark:from-emerald-500 dark:to-teal-400 dark:border-emerald-400 dark:text-white",
-                          children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(Sparkles, { className: "w-3 h-3" }),
-                            __("Growth", "yatra")
-                          ]
+                          className: "px-2 py-0.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-600 text-white shadow-sm dark:from-emerald-500 dark:to-teal-400 dark:border-emerald-400 dark:text-white",
+                          children: __("Growth", "yatra")
                         }
                       ),
                       module.plan === "personal" && /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -66428,17 +66422,6 @@ const Modules = () => {
                           variant: "outline",
                           className: "flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-500/40 dark:text-blue-200",
                           children: __("Personal", "yatra")
-                        }
-                      ),
-                      module.is_premium && !module.is_available && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                        Badge,
-                        {
-                          variant: "outline",
-                          className: "flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 border-orange-600 text-white shadow-sm dark:bg-orange-600/60 dark:border-orange-500 dark:text-orange-50",
-                          children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-3 h-3" }),
-                            __("Premium", "yatra")
-                          ]
                         }
                       )
                     ] }),
