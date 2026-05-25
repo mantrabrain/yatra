@@ -3478,17 +3478,55 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
         ]);
         
         $pricing = $calculationService->calculateFromSession(
-            $calculation_params['session_data'], 
-            $calculation_params['coupon_code'], 
+            $calculation_params['session_data'],
+            $calculation_params['coupon_code'],
             $calculation_params['payment_method']
         );
-        
+
         $total_amount = $pricing['final_total'];
         $amount_due = $pricing['amount_due'];
         $tax_calculation = $pricing['tax_calculation'];
         $total_tax_amount = $pricing['tax_calculation']['total_tax_amount'];
         $tax_inclusive = $pricing['tax_calculation']['tax_inclusive'];
         $tax_breakdown = $pricing['tax_calculation']['tax_breakdown'];
+
+        // ── Reconcile per-category display prices with CalculationService ─
+        //
+        // The $category_breakdown computed above (~line 3358) used a SEPARATE
+        // DP filter pass (~line 3290) that's gated on yatra_dynamic_pricing_enabled.
+        // In certain AJAX-recompute contexts (e.g. switching payment_method)
+        // that loop could miss DP — for example when a stored availability
+        // row's price_types already had a pre-DP effective_price baked in,
+        // or when a date-sensitive DP rule didn't fire because the request
+        // didn't carry the same departure_date context.
+        //
+        // CalculationService is the single source of truth for booking math;
+        // it already computed the correct post-DP per-category prices and
+        // returned them as `category_prices_post_dp` (keyed by string
+        // category_id). Reconcile the display breakdown against that map so
+        // "Adult x 8 ($131.12 x 8)" can never disagree with the Trip
+        // Subtotal the rest of the page is built from.
+        if (!empty($category_breakdown) && !empty($pricing['category_prices_post_dp']) && is_array($pricing['category_prices_post_dp'])) {
+            $catPricesPostDp = $pricing['category_prices_post_dp'];
+            $reconciledSubtotal = 0.0;
+            foreach ($category_breakdown as &$cat) {
+                $cid = isset($cat['category_id']) ? (string) $cat['category_id'] : '';
+                if ($cid !== '' && array_key_exists($cid, $catPricesPostDp)) {
+                    $authoritativePrice = (float) $catPricesPostDp[$cid];
+                    $count = (int) ($cat['count'] ?? 0);
+                    $cat['price'] = $authoritativePrice;
+                    $cat['subtotal'] = $authoritativePrice * $count;
+                }
+                $reconciledSubtotal += (float) ($cat['subtotal'] ?? 0);
+            }
+            unset($cat);
+            // Keep the top-level $subtotal in sync with the reconciled
+            // breakdown so any downstream renderers that read it (instead
+            // of $pricing['base_amount']) still see consistent numbers.
+            if ($reconciledSubtotal > 0) {
+                $subtotal = $reconciledSubtotal;
+            }
+        }
         
         /**
          * Filter: Get additional services for this trip
