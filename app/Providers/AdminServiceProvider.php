@@ -17,6 +17,16 @@ class AdminServiceProvider extends ServiceProvider
     private const UPGRADE_TO_PRO_URL = 'https://wpyatra.com/pricing';
 
     /**
+     * Guard so bootstrapMenuCapability() is idempotent across the two
+     * call sites (AppServiceProvider::register() — always-loaded path —
+     * and registerAdminMenu() — admin-only). add_filter() with anonymous
+     * closures does NOT dedupe, because each call creates a new closure
+     * with a distinct object identity, so without this guard the filters
+     * would run twice per cap check on admin pageviews.
+     */
+    private static bool $capabilityFiltersInstalled = false;
+
+    /**
      * Register services
      */
     public function register(): void
@@ -484,6 +494,11 @@ class AdminServiceProvider extends ServiceProvider
      */
     public static function bootstrapMenuCapability(): void
     {
+        if (self::$capabilityFiltersInstalled) {
+            return;
+        }
+        self::$capabilityFiltersInstalled = true;
+
         add_filter('user_has_cap', static function (array $allcaps, array $caps, array $args, \WP_User $user): array {
             if (empty($allcaps['manage_options'])) return $allcaps;
             // Only set if the cap was asked-about (avoids polluting

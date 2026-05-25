@@ -15,7 +15,23 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-   
+        // Capability filters MUST install for every request type (admin,
+        // REST, AJAX, frontend, CLI). Previously they were only installed
+        // from AdminServiceProvider::registerAdminMenu(), which is hooked
+        // on `admin_menu` — a hook that DOES NOT fire during REST API
+        // requests. The admin SPA loads all data via REST, so the admin
+        // fallback that grants every yatra_* cap to users with
+        // manage_options never ran for those requests → site admins hit
+        // 403 "REST forbidden" on Settings, Bookings, Trips, etc.
+        //
+        // AdminServiceProvider itself is gated behind is_admin() in
+        // Bootstrap, which is false during pure REST requests, so even
+        // calling the static from there isn't enough. AppServiceProvider
+        // is in the always-loaded providers list, so calling the
+        // installer here guarantees the filters exist for every entry
+        // point. add_filter is idempotent — the AdminServiceProvider
+        // call stays in place for defence-in-depth.
+        \Yatra\Providers\AdminServiceProvider::bootstrapMenuCapability();
 
         // Activation hook
         register_activation_hook(YATRA_PLUGIN_FILE, [$this, 'activate']);
