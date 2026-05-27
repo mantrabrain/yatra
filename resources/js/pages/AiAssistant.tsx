@@ -117,7 +117,7 @@ const PlanBadge: React.FC<{ tier: "growth" | "agency" }> = ({ tier }) => {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-purple-600 to-indigo-500 px-2.5 py-1 text-xs font-medium text-white shadow-sm">
         <Crown className="h-3 w-3" />
-        {__("Agency plan", "yatra")}
+        {__("Scale plan", "yatra")}
       </span>
     );
   }
@@ -153,7 +153,7 @@ const UpgradeCard: React.FC<{ meta?: AiMeta }> = ({ meta }) => {
             </div>
             <CardDescription className="mt-1">
               {__(
-                "AI Assistant unlocks on the Growth plan (or Agency). Bring your own OpenAI or Anthropic key — costs are paid directly to your provider, no per-call markup from the plugin.",
+                "AI Assistant unlocks on the Growth plan (or Scale). Bring your own OpenAI or Anthropic key — costs are paid directly to your provider, no per-call markup from the plugin.",
                 "yatra",
               )}
             </CardDescription>

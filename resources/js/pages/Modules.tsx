@@ -68,11 +68,14 @@ const Modules: React.FC = () => {
     return order.filter((tier) => set.has(tier));
   }, [modules]);
 
+  // 2026 plan rename: display labels changed (Personal→Starter, Agency→Scale)
+  // but the plan *slugs* ('personal'/'agency') stay — they mirror the Pro
+  // internal tier slugs and keep existing-user feature gating intact.
   const planLabels: Record<ModulePlan, string> = {
     free: __("Free", "yatra"),
-    personal: __("Personal", "yatra"),
+    personal: __("Starter", "yatra"),
     growth: __("Growth", "yatra"),
-    agency: __("Agency", "yatra"),
+    agency: __("Scale", "yatra"),
   };
 
   const filteredModules = useMemo(() => {
@@ -525,15 +528,16 @@ const Modules: React.FC = () => {
                         {module.is_core && (
                           <Badge variant="outline">{__("Core", "yatra")}</Badge>
                         )}
-                        {/* Plan badge — Personal for any Pro module, Agency
+                        {/* Plan badge — Starter for any Pro module, Scale
                             for white-label-tier modules. Always visible so
-                            customers know which plan unlocks the module. */}
+                            customers know which plan unlocks the module.
+                            (Slug stays 'agency'; label is the new "Scale".) */}
                         {module.plan === "agency" && (
                           <Badge
                             variant="outline"
                             className="px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-500 border-purple-700 text-white shadow-sm dark:from-purple-500 dark:to-indigo-400 dark:border-purple-400 dark:text-white"
                           >
-                            {__("Agency", "yatra")}
+                            {__("Scale", "yatra")}
                           </Badge>
                         )}
                         {/* Growth tier — AI Assistant + any future module
@@ -554,7 +558,7 @@ const Modules: React.FC = () => {
                             variant="outline"
                             className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-500/40 dark:text-blue-200"
                           >
-                            {__("Personal", "yatra")}
+                            {__("Starter", "yatra")}
                           </Badge>
                         )}
                       </CardTitle>

@@ -251,8 +251,8 @@ class ModuleManager
             [
                 'slug' => 'white_label',
                 'name' => __('White Label', 'yatra'),
-                'description' => __('Fully rebrand Yatra as your own product. Replace the plugin name, logo, author, support URL, and email/PDF branding shown to clients. Available exclusively on the Agency plan.', 'yatra'),
-                'category' => __('Agency', 'yatra'),
+                'description' => __('Fully rebrand Yatra as your own product. Replace the plugin name, logo, author, support URL, and email/PDF branding shown to clients. Available exclusively on the Scale plan.', 'yatra'),
+                'category' => __('Branding', 'yatra'),
                 'docs_url' => 'https://docs.yatra.com/modules/white-label',
                 'is_premium' => true,
                 'purchase_url' => 'https://wpyatra.com/pricing?module=white-label',

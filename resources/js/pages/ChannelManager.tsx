@@ -359,10 +359,10 @@ const UpgradeCard: React.FC<{ meta?: ChannelManagerMeta }> = ({ meta }) => (
           <Crown className="h-5 w-5" />
         </div>
         <div className="flex-1">
-          <CardTitle>{__("Channel Manager — Agency plan", "yatra")}</CardTitle>
+          <CardTitle>{__("Channel Manager — Scale plan", "yatra")}</CardTitle>
           <CardDescription className="mt-1">
             {__(
-              "Available on the Agency plan. Standalone channel managers charge $99–299/month for the same capability — it's included here at no extra cost.",
+              "Available on the Scale plan. Standalone channel managers charge $99–299/month for the same capability — it's included here at no extra cost.",
               "yatra",
             )}
           </CardDescription>
@@ -379,7 +379,7 @@ const UpgradeCard: React.FC<{ meta?: ChannelManagerMeta }> = ({ meta }) => (
           target="_blank"
           rel="noopener noreferrer"
         >
-          {__("Upgrade to Agency", "yatra")}
+          {__("Upgrade to Scale", "yatra")}
           <ExternalLink className="ml-2 h-4 w-4" />
         </a>
       </Button>

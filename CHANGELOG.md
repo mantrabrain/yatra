@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The WordPress.org–canonical history lives in **`readme.txt`** under **Changelog**; this file mirrors recent releases for GitHub and tooling.
 
+## [3.0.6] — 2026-05-27
+
+- **Pricing plans renamed (display-only):** Personal → **Starter**, Agency → **Scale** (Growth unchanged). Updated the Modules page tier badges, `PremiumUpgradeDialog`, the `planLabels` map, the License-page tier badge, and the REST gate messages in `ModuleController` to read Starter / Growth / Scale. The internal capability slugs (`personal`/`growth`/`agency`) and the `requires_agency` / `requires_growth_or_agency` module flags are **unchanged**, so feature gating is byte-for-byte equivalent and existing Pro licenses keep identical access.
+- **Scale 1-site / 15-site:** the Scale tier is offered as a 1-site or 15-site license; identical feature set, only activation count differs.
+- **UX:** White Label module re-categorised "Agency" → "Branding"; removed the leading icon before the plan name in the upgrade-dialog badge.
+- No DB changes, no migration. Safe to update from 3.0.5.x in any order relative to Pro. Pair with **Yatra Pro 3.0.4**.
+
 ## [3.0.5.1] — 2026-05-25
 
 - **Hotfix — admin 403 on REST routes.** Administrators on a free-only install hit `rest_forbidden` on Settings (and any other surface whose REST controller gates on a granular `yatra_*` cap). The capability filters that grant `yatra_*` caps to users with `manage_options` were only installed from `AdminServiceProvider::registerAdminMenu()` — hooked on `admin_menu`, which does not fire during REST requests. The admin SPA loads data via REST, so the admin fallback never ran for those calls. Fix: install the filters from `AppServiceProvider::register()` (always-loaded core path) so they're present for every entry point — admin, REST, AJAX, frontend, CLI. Added a `$capabilityFiltersInstalled` static guard so the two call sites don't double-register. Filter logic, priorities, and the team-module-disabled strip branch are unchanged — this is a registration-timing fix, not a semantics change. Safe to update from 3.0.5. Pair with **Yatra Pro 3.0.4**.

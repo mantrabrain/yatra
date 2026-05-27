@@ -197,7 +197,7 @@ const UpgradeCard = ({ meta }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: __("WhatsApp Notifications", "yatra") }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "mt-1", children: __(
-          "Available on the Growth plan (or Agency). Send booking + payment + reminder messages — bring your own Meta Cloud API credentials.",
+          "Available on the Growth plan (or Scale). Send booking + payment + reminder messages — bring your own Meta Cloud API credentials.",
           "yatra"
         ) })
       ] })

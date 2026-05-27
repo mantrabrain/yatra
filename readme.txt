@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel, travel agency
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 3.0.5.1
+Stable tag: 3.0.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -59,9 +59,9 @@ WordPress travel booking plugin for tour operators. Trips, departures, payments,
 
 = 💎 Yatra Pro — 20 modules across 3 tiers =
 
-**[Compare plans and buy Yatra Pro](https://wpyatra.com/pricing/)** — three plans (Personal · Growth · Agency), each available yearly or lifetime.
+**[Compare plans and buy Yatra Pro](https://wpyatra.com/pricing/)** — three plans (Starter · Growth · Scale), each available yearly or lifetime.
 
-**Personal — $99/yr (sale, regular $149)** · everything below included
+**Starter — $99/yr (sale, regular $149)** · 1 site license · everything below included
 
 * [Dynamic Pricing](https://wpyatra.com/features/dynamic-pricing/) — seasonality, demand, early bird, last-minute, inventory rules
 * [Flexible Payments](https://wpyatra.com/features/flexible-payments/) — deposits and partial payments
@@ -79,19 +79,19 @@ WordPress travel booking plugin for tour operators. Trips, departures, payments,
 * [Trip Consent](https://wpyatra.com/features/trip-consent/) — digital waivers and signatures
 * **Premium payment gateways**: Stripe · Razorpay · Mollie · Paystack · Square · Authorize.Net · Bank Transfer
 
-**Growth — $199/yr (sale, regular $299)** · everything in Personal, plus
+**Growth — $149/yr (sale, regular $199)** · 1 site license · everything in Starter, plus
 
 * [AI Assistant](https://wpyatra.com/features/ai-assistant/) — generate itineraries, draft descriptions, suggest replies (bring your own OpenAI or Anthropic key)
 * [WhatsApp Notifications](https://wpyatra.com/features/whatsapp/) — booking confirmations, payment receipts and departure reminders over WhatsApp (Meta Cloud API)
 
-**Agency — $499/yr (sale, regular $699)** · everything in Growth, plus
+**Scale — from $349/yr (sale)** · 1-site $349/yr (regular $449) or 15-site $599/yr (regular $749) · everything in Growth, plus
 
 * [Channel Manager](https://wpyatra.com/features/channel-manager/) — sell on Viator + GetYourGuide from one WordPress dashboard. Signed webhooks, anti-overbooking locks, real-time inventory sync.
 * [White Label](https://wpyatra.com/features/white-label/) — rebrand the admin, emails, PDFs and frontend. Full agency theming.
 * [Team & Access](https://wpyatra.com/features/team-access/) — granular roles + capability-based access for multi-staff agencies. 8 built-in roles, custom role builder, magic-link invitations, time-windowed access for contractors, scope filtering (per-destination / per-trip), append-only audit log. Defense-in-depth: every action gated on the server, UI mirrors via cap-aware controls.
 * [Webhooks](https://wpyatra.com/features/webhooks/) — outbound HTTP delivery on booking / payment / customer events. HMAC-signed payloads, retry queue with exponential backoff, dead-letter queue, certificate pinning. Wire Yatra into Zapier, Make, n8n, or your own internal systems.
 
-**Lifetime plans** also available: Personal $499 · Growth $999 · Agency $1,999 — pay once, own it forever.
+**Lifetime plans** also available: Starter $499 · Growth $699 · Scale $1,299 (1 site) / $1,999 (15 sites) — pay once, own it forever.
 
 [See full plan comparison and pricing →](https://wpyatra.com/pricing/)
 
@@ -154,7 +154,7 @@ Yatra works with most well-coded block themes, classic themes and major page bui
 = 🔗 Quick links =
 
 * 🏠 **[wpyatra.com](https://wpyatra.com/)** — official site
-* 💳 **[Pricing](https://wpyatra.com/pricing/)** — Personal · Growth · Agency · Lifetime plans
+* 💳 **[Pricing](https://wpyatra.com/pricing/)** — Starter · Growth · Scale · Lifetime plans
 * ✨ **[All features](https://wpyatra.com/features/)** — full Free + Pro capability list
 * 🌐 **[Integrations](https://wpyatra.com/integrations/)** — every native partner
 * 🥊 **[Yatra vs alternatives](https://wpyatra.com/yatra-vs-rezdy/)** — head-to-head comparisons
@@ -190,7 +190,7 @@ Yatra works with most well-coded block themes, classic themes and major page bui
 
 = What is the best WordPress travel booking plugin for tour operators? =
 
-Yatra is the **WordPress travel booking plugin** built around the operational reality of selling tours — scheduled departures, capacity, traveler categories, OTA distribution, dynamic pricing and deposit handling. The free plugin covers the entire booking lifecycle (trips, availability, customer accounts, reviews, reports, PDFs, transactional emails, PayPal + Pay Later); [Yatra Pro](https://wpyatra.com/pricing/) adds 20 modules across Personal, Growth and Agency tiers. Read the [head-to-head comparison vs WP Travel Engine](https://wpyatra.com/yatra-vs-wp-travel-engine/) or [vs Rezdy SaaS](https://wpyatra.com/yatra-vs-rezdy/).
+Yatra is the **WordPress travel booking plugin** built around the operational reality of selling tours — scheduled departures, capacity, traveler categories, OTA distribution, dynamic pricing and deposit handling. The free plugin covers the entire booking lifecycle (trips, availability, customer accounts, reviews, reports, PDFs, transactional emails, PayPal + Pay Later); [Yatra Pro](https://wpyatra.com/pricing/) adds 20 modules across Starter, Growth and Scale tiers. Read the [head-to-head comparison vs WP Travel Engine](https://wpyatra.com/yatra-vs-wp-travel-engine/) or [vs Rezdy SaaS](https://wpyatra.com/yatra-vs-rezdy/).
 
 = Is Yatra free? =
 
@@ -210,7 +210,7 @@ Yes. Use **Pay Later** for offline confirmation, invoices, or pay-on-arrival flo
 
 = Can I distribute my tours on Viator, GetYourGuide and other OTAs? =
 
-Yes — the [Channel Manager module](https://wpyatra.com/features/channel-manager/) (Agency tier) connects Yatra directly to **Viator** and **GetYourGuide** via their official APIs. Signed webhooks pull bookings back in real time; anti-overbooking locks prevent two channels selling the same seat. Other OTAs (Klook, TripAdvisor Experiences, Booking.com Experiences, Airbnb Experiences) are available by request.
+Yes — the [Channel Manager module](https://wpyatra.com/features/channel-manager/) (Scale tier) connects Yatra directly to **Viator** and **GetYourGuide** via their official APIs. Signed webhooks pull bookings back in real time; anti-overbooking locks prevent two channels selling the same seat. Other OTAs (Klook, TripAdvisor Experiences, Booking.com Experiences, Airbnb Experiences) are available by request.
 
 = Does Yatra work with WooCommerce? =
 
@@ -250,7 +250,7 @@ See **🧩 Blocks and shortcodes** in the description above. Full walkthroughs (
 
 = What does Yatra Pro cost? =
 
-Pricing starts at **$99/yr** (Personal, sale) and goes up to **$499/yr** (Agency, sale). Lifetime plans available from **$499** one-time. Every Pro tier includes a **14-day refund** window. See the **[full pricing breakdown](https://wpyatra.com/pricing/)**.
+Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 15-site, sale). Lifetime plans available from **$499** one-time. Every Pro tier includes a **14-day refund** window. See the **[full pricing breakdown](https://wpyatra.com/pricing/)**.
 
 == Screenshots ==
 
@@ -264,6 +264,12 @@ Pricing starts at **$99/yr** (Personal, sale) and goes up to **$499/yr** (Agency
 6. Traveler account — bookings, payments and documents
 
 == Changelog ==
+
+= 3.0.6 =
+* **Pricing plans renamed:** Personal → **Starter**, Agency → **Scale** (Growth unchanged). Display-only rename across the admin — the Modules page tier badges, the premium-upgrade dialog, and the REST gate messages now read Starter / Growth / Scale. The internal capability slugs are **unchanged**, so existing Pro licenses keep the exact same feature access; only the visible plan name changed.
+* **Scale 1-site / 15-site:** the Scale (formerly Agency) tier is now offered as a 1-site or 15-site license. Feature set is identical between the two — only the activation count differs.
+* **UX:** White Label module re-categorised under "Branding" (was "Agency"); removed the leading icon before the plan name in the upgrade dialog badge.
+* Safe to update from 3.0.5.x. No database changes, no migration, no gating-logic change — existing Growth/Agency (now Scale) licenses are unaffected. Pair with **Yatra Pro 3.0.4**.
 
 = 3.0.5.1 =
 * **Hotfix — admin 403 on REST routes:** site administrators on a free-only install were hitting `rest_forbidden` on Settings (and any other surface whose REST controller gates on a granular `yatra_*` cap). Root cause: the `user_has_cap` filter installer (`AdminServiceProvider::bootstrapMenuCapability()`) was only called from `registerAdminMenu()` — hooked on `admin_menu`, which doesn't fire during REST requests. The admin SPA loads everything via REST, so the admin fallback that grants `yatra_*` caps to users with `manage_options` never ran for those calls. Fix: the installer is now also invoked from `AppServiceProvider::register()` (always-loaded core path), so the filters install for every entry point — admin pageviews, REST, AJAX, frontend, CLI. An idempotency guard prevents double-registration. Filter logic, priorities, and the team-module-disabled strip branch are unchanged — this is a registration-timing fix, not a semantics change. Pair with **Yatra Pro 3.0.4** (Team & Access).

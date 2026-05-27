@@ -211,7 +211,7 @@ const BriefBody: React.FC<{
     return (
       <CtaLine
         message={__(
-          "Today's Brief is part of the AI Assistant module — available on Growth and Agency plans.",
+          "Today's Brief is part of the AI Assistant module — available on Growth and Scale plans.",
           "yatra",
         )}
         href="admin.php?page=yatra&subpage=license"

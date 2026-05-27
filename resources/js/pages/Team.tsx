@@ -332,7 +332,7 @@ const UpgradeCard: React.FC<{ meta: TeamMeta }> = ({ meta }) => (
           <CardTitle>{__("Team & Access", "yatra")}</CardTitle>
           <CardDescription className="mt-1">
             {__(
-              "Available on the Agency plan. Add staff with role-appropriate access — front desk doesn't see refund history, guides see only their destinations, accountants get financial reports without booking edits.",
+              "Available on the Scale plan. Add staff with role-appropriate access — front desk doesn't see refund history, guides see only their destinations, accountants get financial reports without booking edits.",
               "yatra",
             )}
           </CardDescription>
@@ -383,7 +383,7 @@ const UpgradeCard: React.FC<{ meta: TeamMeta }> = ({ meta }) => (
       <div className="flex gap-2 pt-2">
         <Button asChild>
           <a href={meta.upgrade_url} target="_blank" rel="noopener noreferrer">
-            {__("Upgrade to Agency", "yatra")}
+            {__("Upgrade to Scale", "yatra")}
             <ExternalLink className="ml-1.5 h-4 w-4" />
           </a>
         </Button>

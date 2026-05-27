@@ -77,10 +77,10 @@ const MODULE_FEATURES: Record<string, string[]> = {
  */
 const TIER_DEFAULT_FEATURES: Record<string, string[]> = {
   agency: [
-    "Unlocks every premium module — Agency-tier and below",
+    "Unlocks every premium module — Scale-tier and below",
     "Full white-label rebranding capability",
     "Priority support with faster response times",
-    "All future Agency-tier features included",
+    "All future Scale-tier features included",
   ],
   growth: [
     "Advanced operator-productivity features",
@@ -92,7 +92,7 @@ const TIER_DEFAULT_FEATURES: Record<string, string[]> = {
     "Premium booking-system extensions",
     "Email automation + abandoned-recovery workflows",
     "Dynamic pricing + advanced discount tools",
-    "All future Personal-tier features included",
+    "All future Starter-tier features included",
   ],
 };
 
@@ -112,29 +112,29 @@ export const PremiumUpgradeDialog: React.FC<PremiumUpgradeDialogProps> = ({
   // sees one consistent answer to "which plan do I need?".
   const planLabel =
     requiredPlan === "agency"
-      ? __("Agency plan", "yatra")
+      ? __("Scale plan", "yatra")
       : requiredPlan === "growth"
         ? __("Growth plan", "yatra")
         : requiredPlan === "personal"
-          ? __("Personal plan", "yatra")
+          ? __("Starter plan", "yatra")
           : null;
   const planCtaLabel =
     requiredPlan === "agency"
-      ? __("Upgrade to Agency", "yatra")
+      ? __("Upgrade to Scale", "yatra")
       : requiredPlan === "growth"
         ? __("Upgrade to Growth", "yatra")
         : requiredPlan === "personal"
-          ? __("Upgrade to Personal", "yatra")
+          ? __("Upgrade to Starter", "yatra")
           : __("Upgrade to Pro", "yatra");
   const planFooterCopy =
     requiredPlan === "agency"
       ? __(
-          "This feature is exclusive to the Agency plan. Upgrade to unlock it.",
+          "This feature is exclusive to the Scale plan. Upgrade to unlock it.",
           "yatra",
         )
       : requiredPlan === "growth"
         ? __(
-            "This feature unlocks on the Growth plan (or Agency). Upgrade to enable it.",
+            "This feature unlocks on the Growth plan (or Scale). Upgrade to enable it.",
             "yatra",
           )
         : requiredPlan === "personal"
@@ -189,7 +189,7 @@ export const PremiumUpgradeDialog: React.FC<PremiumUpgradeDialogProps> = ({
                     {/* Plan-tier badge so the operator immediately
                         knows which license unlocks this. Without it the
                         generic "Premium Feature" copy was ambiguous —
-                        Growth and Agency are both premium but cost
+                        Growth and Scale are both premium but cost
                         different amounts. */}
                     {planLabel && (
                       <span
@@ -202,11 +202,6 @@ export const PremiumUpgradeDialog: React.FC<PremiumUpgradeDialogProps> = ({
                               : "bg-gradient-to-r from-blue-500 to-blue-600")
                         }
                       >
-                        {requiredPlan === "growth" ? (
-                          <Sparkles className="h-3 w-3" />
-                        ) : (
-                          <Crown className="h-3 w-3" />
-                        )}
                         {planLabel}
                       </span>
                     )}

@@ -1,4 +1,4 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-tFMoMuMs.js","../../../dist/js/react-vendor-CqkbFEvK.js","../css/react-vendor.css","../../../dist/js/index-DRAt5dnR.js","../css/index.css","../../../dist/js/BuildItineraryModal-Dq10SB7H.js","../../../dist/js/ProFeature-DHa4Wgkh.js","../../../dist/js/Settings-DZPiAnb3.js","../../../dist/js/Team-COJ6Sjod.js","../../../dist/js/Reports-sGU73NQH.js","../../../dist/js/DiscountForm-CWIQB0xy.js","../../../dist/js/ApplicableTripSelector-BQ_5SGb1.js","../../../dist/js/Itinerary-Ap1hthK0.js","../../../dist/js/RecurringRuleForm-qprdlB53.js","./Whatsapp.js","../../../dist/js/module-skeleton-DUioukJc.js","../../../dist/js/ChannelManager-CU9rfQOo.js","../../../dist/js/Webhooks-BYHU7T9O.js","../../../dist/js/TripConsentForm-DeH_xgzl.js","../../../dist/js/BookingForm-DFFoFfQO.js","../../../dist/js/ViewBooking-D0U0ZXpB.js","../../../dist/js/AvailabilityForm-BPWy1f1h.js","../../../dist/js/DynamicPricing-DTdy3svi.js","../../../dist/js/RuleTypeSelectionModal-CjAmWcQE.js","../../../dist/js/toggle-C9qtIVLs.js","../../../dist/js/DynamicPricingRuleForm-wUY86s8E.js","../../../dist/js/AiAssistant-BNn2WXa-.js","../../../dist/js/AbandonedRecovery-BXWfwama.js","../../../dist/js/WhiteLabel-8i10Kntk.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-tFMoMuMs.js","../../../dist/js/react-vendor-CqkbFEvK.js","../css/react-vendor.css","../../../dist/js/index-DRAt5dnR.js","../css/index.css","../../../dist/js/BuildItineraryModal-Dq10SB7H.js","../../../dist/js/ProFeature-DHa4Wgkh.js","../../../dist/js/Settings-DZPiAnb3.js","../../../dist/js/Team-CFV2Lcc6.js","../../../dist/js/Reports-sGU73NQH.js","../../../dist/js/DiscountForm-CWIQB0xy.js","../../../dist/js/ApplicableTripSelector-BQ_5SGb1.js","../../../dist/js/Itinerary-Ap1hthK0.js","../../../dist/js/RecurringRuleForm-qprdlB53.js","./Whatsapp.js","../../../dist/js/module-skeleton-DUioukJc.js","../../../dist/js/ChannelManager-BumsBhiQ.js","../../../dist/js/Webhooks-BmhRcymQ.js","../../../dist/js/TripConsentForm-DeH_xgzl.js","../../../dist/js/BookingForm-DFFoFfQO.js","../../../dist/js/ViewBooking-D0U0ZXpB.js","../../../dist/js/AvailabilityForm-BPWy1f1h.js","../../../dist/js/DynamicPricing-DTdy3svi.js","../../../dist/js/RuleTypeSelectionModal-CjAmWcQE.js","../../../dist/js/toggle-C9qtIVLs.js","../../../dist/js/DynamicPricingRuleForm-wUY86s8E.js","../../../dist/js/AiAssistant-2YNozU84.js","../../../dist/js/AbandonedRecovery-BXWfwama.js","../../../dist/js/WhiteLabel-DoUclAt1.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
@@ -5597,7 +5597,7 @@ const BriefBody = ({ digest, onRetry, retrying }) => {
       CtaLine,
       {
         message: __(
-          "Today's Brief is part of the AI Assistant module — available on Growth and Agency plans.",
+          "Today's Brief is part of the AI Assistant module — available on Growth and Scale plans.",
           "yatra"
         ),
         href: "admin.php?page=yatra&subpage=license",
@@ -55080,10 +55080,10 @@ const MODULE_FEATURES = {
 };
 const TIER_DEFAULT_FEATURES = {
   agency: [
-    "Unlocks every premium module — Agency-tier and below",
+    "Unlocks every premium module — Scale-tier and below",
     "Full white-label rebranding capability",
     "Priority support with faster response times",
-    "All future Agency-tier features included"
+    "All future Scale-tier features included"
   ],
   growth: [
     "Advanced operator-productivity features",
@@ -55095,7 +55095,7 @@ const TIER_DEFAULT_FEATURES = {
     "Premium booking-system extensions",
     "Email automation + abandoned-recovery workflows",
     "Dynamic pricing + advanced discount tools",
-    "All future Personal-tier features included"
+    "All future Starter-tier features included"
   ]
 };
 const PremiumUpgradeDialog = ({
@@ -55108,13 +55108,13 @@ const PremiumUpgradeDialog = ({
   requiredPlan
 }) => {
   if (!open) return null;
-  const planLabel = requiredPlan === "agency" ? __("Agency plan", "yatra") : requiredPlan === "growth" ? __("Growth plan", "yatra") : requiredPlan === "personal" ? __("Personal plan", "yatra") : null;
-  const planCtaLabel = requiredPlan === "agency" ? __("Upgrade to Agency", "yatra") : requiredPlan === "growth" ? __("Upgrade to Growth", "yatra") : requiredPlan === "personal" ? __("Upgrade to Personal", "yatra") : __("Upgrade to Pro", "yatra");
+  const planLabel = requiredPlan === "agency" ? __("Scale plan", "yatra") : requiredPlan === "growth" ? __("Growth plan", "yatra") : requiredPlan === "personal" ? __("Starter plan", "yatra") : null;
+  const planCtaLabel = requiredPlan === "agency" ? __("Upgrade to Scale", "yatra") : requiredPlan === "growth" ? __("Upgrade to Growth", "yatra") : requiredPlan === "personal" ? __("Upgrade to Starter", "yatra") : __("Upgrade to Pro", "yatra");
   const planFooterCopy = requiredPlan === "agency" ? __(
-    "This feature is exclusive to the Agency plan. Upgrade to unlock it.",
+    "This feature is exclusive to the Scale plan. Upgrade to unlock it.",
     "yatra"
   ) : requiredPlan === "growth" ? __(
-    "This feature unlocks on the Growth plan (or Agency). Upgrade to enable it.",
+    "This feature unlocks on the Growth plan (or Scale). Upgrade to enable it.",
     "yatra"
   ) : requiredPlan === "personal" ? __(
     "This feature is included on every Pro plan. Upgrade to unlock it.",
@@ -55149,14 +55149,11 @@ const PremiumUpgradeDialog = ({
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-xl font-bold text-gray-900 dark:text-white", children: moduleName || __("Premium Feature", "yatra") }),
-                    planLabel && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    planLabel && /* @__PURE__ */ jsxRuntimeExports.jsx(
                       "span",
                       {
                         className: "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium text-white shadow-sm " + (requiredPlan === "agency" ? "bg-gradient-to-r from-purple-600 to-indigo-500" : requiredPlan === "growth" ? "bg-gradient-to-r from-emerald-500 to-teal-500" : "bg-gradient-to-r from-blue-500 to-blue-600"),
-                        children: [
-                          requiredPlan === "growth" ? /* @__PURE__ */ jsxRuntimeExports.jsx(Sparkles, { className: "h-3 w-3" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "h-3 w-3" }),
-                          planLabel
-                        ]
+                        children: planLabel
                       }
                     )
                   ] }),
@@ -66045,9 +66042,9 @@ const Modules = () => {
   }, [modules]);
   const planLabels = {
     free: __("Free", "yatra"),
-    personal: __("Personal", "yatra"),
+    personal: __("Starter", "yatra"),
     growth: __("Growth", "yatra"),
-    agency: __("Agency", "yatra")
+    agency: __("Scale", "yatra")
   };
   const filteredModules = reactExports.useMemo(() => {
     let list = modules;
@@ -66405,7 +66402,7 @@ const Modules = () => {
                         {
                           variant: "outline",
                           className: "px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-500 border-purple-700 text-white shadow-sm dark:from-purple-500 dark:to-indigo-400 dark:border-purple-400 dark:text-white",
-                          children: __("Agency", "yatra")
+                          children: __("Scale", "yatra")
                         }
                       ),
                       module.plan === "growth" && /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -66421,7 +66418,7 @@ const Modules = () => {
                         {
                           variant: "outline",
                           className: "flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-500/40 dark:text-blue-200",
-                          children: __("Personal", "yatra")
+                          children: __("Starter", "yatra")
                         }
                       )
                     ] }),
@@ -76531,7 +76528,7 @@ const License = () => {
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: licenseInfo.plan.name }),
                 licenseInfo.plan.is_agency && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gradient-to-r from-purple-600 to-indigo-500 text-white", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-3 h-3" }),
-                  __("Agency", "yatra")
+                  __("Scale", "yatra")
                 ] }),
                 licenseInfo.plan.is_growth && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-600 text-white", children: __("Growth", "yatra") }),
                 licenseInfo.plan.is_lifetime && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gradient-to-r from-amber-500 to-orange-500 text-white", children: __("Lifetime", "yatra") })
@@ -76541,7 +76538,7 @@ const License = () => {
                 "yatra"
               ) }),
               licenseInfo.plan.matched_by === "fallback" && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-[11px] text-amber-600 dark:text-amber-400", children: __(
-                "Could not match price ID or label — defaulted to Personal. Contact support if your subscription is Growth or Agency.",
+                "Could not match price ID or label — defaulted to Starter. Contact support if your subscription is Growth or Scale.",
                 "yatra"
               ) })
             ] }),
@@ -76990,14 +76987,14 @@ const License = () => {
 };
 const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-tFMoMuMs.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
 const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-DZPiAnb3.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
-const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-COJ6Sjod.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
+const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-CFV2Lcc6.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
 const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-sGU73NQH.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
 const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-CWIQB0xy.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
 const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-Ap1hthK0.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
 const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-qprdlB53.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
 const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.js"), true ? __vite__mapDeps([14,1,2,3,4,15]) : void 0, import.meta.url));
-const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-CU9rfQOo.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
-const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-BYHU7T9O.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
+const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-BumsBhiQ.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
+const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-BmhRcymQ.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
 const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-DeH_xgzl.js"), true ? __vite__mapDeps([18,1,2,11,3,4]) : void 0, import.meta.url));
 const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-DFFoFfQO.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
 const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-D0U0ZXpB.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
@@ -77006,9 +77003,9 @@ const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../..
 const DynamicPricingRuleForm = reactExports.lazy(
   () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-wUY86s8E.js"), true ? __vite__mapDeps([25,1,2,23,3,4]) : void 0, import.meta.url)
 );
-const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-BNn2WXa-.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
+const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-2YNozU84.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
 const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-BXWfwama.js"), true ? __vite__mapDeps([27,1,2,24,3,4]) : void 0, import.meta.url));
-const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-8i10Kntk.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
+const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-DoUclAt1.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
 const PageLoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-1/3" }),

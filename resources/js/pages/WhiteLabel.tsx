@@ -248,7 +248,7 @@ function toOrderMap(raw: MenuOrderMap | string[] | undefined): MenuOrderMap {
 const PlanBadge: React.FC = () => (
   <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-purple-600 to-indigo-500 px-2.5 py-1 text-xs font-medium text-white shadow-sm">
     <Crown className="h-3 w-3" />
-    {__("Agency plan", "yatra")}
+    {__("Scale plan", "yatra")}
   </span>
 );
 
@@ -276,7 +276,7 @@ const UpgradeCard: React.FC<{ meta?: WhiteLabelMeta }> = ({ meta }) => {
             </div>
             <CardDescription className="mt-1">
               {__(
-                "White Label is exclusive to the Agency plan (Yearly or Lifetime). Upgrade to remove all Yatra / MantraBrain references from your clients' admin.",
+                "White Label is exclusive to the Scale plan (Yearly or Lifetime). Upgrade to remove all Yatra / MantraBrain references from your clients' admin.",
                 "yatra",
               )}
             </CardDescription>
@@ -294,8 +294,8 @@ const UpgradeCard: React.FC<{ meta?: WhiteLabelMeta }> = ({ meta }) => {
           <Button asChild>
             <a href={upgradeUrl} target="_blank" rel="noopener noreferrer">
               {meta?.is_pro_active
-                ? __("Upgrade to Agency", "yatra")
-                : __("Get Yatra Pro Agency", "yatra")}
+                ? __("Upgrade to Scale", "yatra")
+                : __("Get Yatra Pro Scale", "yatra")}
               <ExternalLink className="ml-2 h-4 w-4" />
             </a>
           </Button>
@@ -1492,7 +1492,7 @@ const WhiteLabel: React.FC = () => {
               <p className="font-medium">{__("Module disabled", "yatra")}</p>
               <p className="text-gray-600 dark:text-gray-300">
                 {__(
-                  "Your Agency license is active, but the White Label module is not enabled yet. Enable it from the Modules page so branding overrides take effect.",
+                  "Your Scale license is active, but the White Label module is not enabled yet. Enable it from the Modules page so branding overrides take effect.",
                   "yatra",
                 )}
               </p>

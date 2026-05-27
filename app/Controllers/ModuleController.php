@@ -136,7 +136,7 @@ class ModuleController extends BaseController
                 return $this->error_response(
                     sprintf(
                         /* translators: %s: module name. */
-                        __('%s is available on the Yatra Pro Agency plan only. Upgrade your license to enable it.', 'yatra'),
+                        __('%s is available on the Yatra Pro Scale plan only. Upgrade your license to enable it.', 'yatra'),
                         $target_module['name']
                     ),
                     403
@@ -150,7 +150,7 @@ class ModuleController extends BaseController
                 return $this->error_response(
                     sprintf(
                         /* translators: %s: module name. */
-                        __('%s requires a Growth or Agency license. Upgrade your plan to enable it.', 'yatra'),
+                        __('%s requires a Growth or Scale license. Upgrade your plan to enable it.', 'yatra'),
                         $target_module['name']
                     ),
                     403

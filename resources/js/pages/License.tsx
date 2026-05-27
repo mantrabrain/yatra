@@ -594,7 +594,7 @@ const License: React.FC = () => {
                       {licenseInfo.plan.is_agency && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gradient-to-r from-purple-600 to-indigo-500 text-white">
                           <Crown className="w-3 h-3" />
-                          {__("Agency", "yatra")}
+                          {__("Scale", "yatra")}
                         </span>
                       )}
                       {licenseInfo.plan.is_growth && (
@@ -619,7 +619,7 @@ const License: React.FC = () => {
                     {licenseInfo.plan.matched_by === "fallback" && (
                       <p className="mt-2 text-[11px] text-amber-600 dark:text-amber-400">
                         {__(
-                          "Could not match price ID or label — defaulted to Personal. Contact support if your subscription is Growth or Agency.",
+                          "Could not match price ID or label — defaulted to Starter. Contact support if your subscription is Growth or Scale.",
                           "yatra",
                         )}
                       </p>

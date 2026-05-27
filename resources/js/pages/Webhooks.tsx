@@ -298,7 +298,7 @@ const UpgradeCard: React.FC<{ meta: WebhooksMeta }> = ({ meta }) => (
           <CardTitle>{__("Webhooks", "yatra")}</CardTitle>
           <CardDescription className="mt-1">
             {__(
-              "Available on the Agency plan. The integration backbone for agencies wiring Yatra into a custom tech stack — sync bookings to CRMs, post revenue events to accounting tools, trigger Zapier workflows, ping Slack on VIP bookings.",
+              "Available on the Scale plan. The integration backbone for agencies wiring Yatra into a custom tech stack — sync bookings to CRMs, post revenue events to accounting tools, trigger Zapier workflows, ping Slack on VIP bookings.",
               "yatra",
             )}
           </CardDescription>
@@ -346,7 +346,7 @@ const UpgradeCard: React.FC<{ meta: WebhooksMeta }> = ({ meta }) => (
       <div className="flex gap-2 pt-2">
         <Button asChild>
           <a href={meta.upgrade_url} target="_blank" rel="noopener noreferrer">
-            {__("Upgrade to Agency", "yatra")}
+            {__("Upgrade to Scale", "yatra")}
             <ExternalLink className="ml-1.5 h-4 w-4" />
           </a>
         </Button>

@@ -284,7 +284,7 @@ const UpgradeCard: React.FC<{ meta?: WhatsappMeta }> = ({ meta }) => {
             <CardTitle>{__("WhatsApp Notifications", "yatra")}</CardTitle>
             <CardDescription className="mt-1">
               {__(
-                "Available on the Growth plan (or Agency). Send booking + payment + reminder messages — bring your own Meta Cloud API credentials.",
+                "Available on the Growth plan (or Scale). Send booking + payment + reminder messages — bring your own Meta Cloud API credentials.",
                 "yatra",
               )}
             </CardDescription>
