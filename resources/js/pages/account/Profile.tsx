@@ -7,8 +7,13 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { __ } from "../../lib/i18n";
-import { formatDate, currency } from "./utils";
+import { currency } from "./utils";
+import { getCountryName, getCountryOptions } from "../../lib/countries";
+import { apiClient } from "../../lib/api-client";
+import { API_ENDPOINTS } from "../../lib/api-endpoints";
+import { useToast } from "../../components/ui/toast";
 import type { CustomerProfile } from "./types";
 
 interface ProfileProps {
@@ -53,13 +58,87 @@ const Profile: React.FC<ProfileProps> = ({
     }
   }, [profile, isEditing]);
 
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSavingPassword, setIsSavingPassword] = useState(false);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
-    // TODO: Implement save functionality
-    setIsEditing(false);
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      // The form has a single "Name" field; the backend stores first/last
+      // separately. Split on whitespace (first token = first name, rest = last).
+      const parts = formData.name.trim().split(/\s+/).filter(Boolean);
+      const firstName = parts.shift() || "";
+      const lastName = parts.join(" ");
+
+      // Email is intentionally NOT sent — it is the account login and is
+      // locked (the backend also strips it defensively).
+      const payload: Record<string, string> = {
+        first_name: firstName,
+        phone: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        country: formData.country,
+      };
+      // Only send last_name when present (backend rejects an empty last_name).
+      if (lastName) {
+        payload.last_name = lastName;
+      }
+
+      await apiClient.put(API_ENDPOINTS.CUSTOMER_ME, payload);
+
+      // Refetch the parent's profile query so the saved values are reflected.
+      await queryClient.invalidateQueries({ queryKey: ["account-profile"] });
+
+      showToast(__("Profile updated successfully.", "yatra"), "success");
+      setIsEditing(false);
+    } catch (error: any) {
+      showToast(
+        error?.message || __("Failed to update profile.", "yatra"),
+        "error",
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      showToast(__("Passwords do not match.", "yatra"), "error");
+      return;
+    }
+
+    setIsSavingPassword(true);
+    try {
+      await apiClient.post(API_ENDPOINTS.CUSTOMER_CHANGE_PASSWORD, {
+        current_password: passwordData.currentPassword,
+        new_password: passwordData.newPassword,
+      });
+
+      showToast(__("Password changed successfully.", "yatra"), "success");
+      setIsChangingPassword(false);
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      // Changing the password rotates the WP auth cookie + REST nonce, so the
+      // current page's nonce is now stale. Reload to pick up a fresh one and
+      // avoid 403s on subsequent actions.
+      setTimeout(() => window.location.reload(), 1200);
+    } catch (error: any) {
+      showToast(
+        error?.message || __("Failed to change password.", "yatra"),
+        "error",
+      );
+    } finally {
+      setIsSavingPassword(false);
+    }
   };
 
   const handleCancel = () => {
@@ -134,22 +213,13 @@ const Profile: React.FC<ProfileProps> = ({
 
             <div className="yatra-profile-field">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {__("Email Address", "yatra")}{" "}
-                <span className="text-red-500">*</span>
+                {__("Email Address", "yatra")}
               </label>
-              {isEditing ? (
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
-                  placeholder={__("Enter your email address", "yatra")}
-                />
-              ) : (
-                <p className="text-sm font-medium text-gray-900 dark:text-white py-2">
-                  {formData.email || __("Not set", "yatra")}
-                </p>
-              )}
+              {/* Email is the account login and is never editable here —
+                  always shown as static text, even in edit mode. */}
+              <p className="text-sm font-medium text-gray-900 dark:text-white py-2">
+                {formData.email || __("Not set", "yatra")}
+              </p>
             </div>
 
             <div className="yatra-profile-field">
@@ -167,6 +237,31 @@ const Profile: React.FC<ProfileProps> = ({
               ) : (
                 <p className="text-sm font-medium text-gray-900 dark:text-white py-2">
                   {formData.phone || __("Not set", "yatra")}
+                </p>
+              )}
+            </div>
+
+            {/* Logical order: Country → City → Address (broad to specific). */}
+            <div className="yatra-profile-field">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {__("Country", "yatra")}
+              </label>
+              {isEditing ? (
+                <select
+                  value={formData.country}
+                  onChange={(e) => handleInputChange("country", e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
+                >
+                  <option value="">{__("Select your country", "yatra")}</option>
+                  {getCountryOptions().map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <p className="text-sm font-medium text-gray-900 dark:text-white py-2">
+                  {getCountryName(formData.country) || __("Not set", "yatra")}
                 </p>
               )}
             </div>
@@ -208,25 +303,6 @@ const Profile: React.FC<ProfileProps> = ({
                 </p>
               )}
             </div>
-
-            <div className="yatra-profile-field">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {__("Country", "yatra")}
-              </label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={formData.country}
-                  onChange={(e) => handleInputChange("country", e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
-                  placeholder={__("Enter your country", "yatra")}
-                />
-              ) : (
-                <p className="text-sm font-medium text-gray-900 dark:text-white py-2">
-                  {formData.country || __("Not set", "yatra")}
-                </p>
-              )}
-            </div>
           </div>
 
           {isEditing && (
@@ -234,10 +310,11 @@ const Profile: React.FC<ProfileProps> = ({
               <button
                 type="button"
                 onClick={handleSave}
-                className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium"
+                disabled={isSaving}
+                className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <CheckCircle className="w-4 h-4" />
-                {__("Save Changes", "yatra")}
+                {isSaving ? __("Saving…", "yatra") : __("Save Changes", "yatra")}
               </button>
               <div
                 role="button"
@@ -347,21 +424,9 @@ const Profile: React.FC<ProfileProps> = ({
             <div className="yatra-password-actions flex flex-wrap gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
               <button
                 type="button"
-                onClick={() => {
-                  // TODO: Implement password change functionality
-                  if (
-                    passwordData.newPassword !== passwordData.confirmPassword
-                  ) {
-                    return;
-                  }
-                  setIsChangingPassword(false);
-                  setPasswordData({
-                    currentPassword: "",
-                    newPassword: "",
-                    confirmPassword: "",
-                  });
-                }}
+                onClick={handleChangePassword}
                 disabled={
+                  isSavingPassword ||
                   !passwordData.currentPassword ||
                   !passwordData.newPassword ||
                   !passwordData.confirmPassword ||
@@ -370,7 +435,9 @@ const Profile: React.FC<ProfileProps> = ({
                 className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <CheckCircle className="w-4 h-4" />
-                {__("Update Password", "yatra")}
+                {isSavingPassword
+                  ? __("Updating…", "yatra")
+                  : __("Update Password", "yatra")}
               </button>
               <div
                 role="button"
@@ -419,9 +486,11 @@ const Profile: React.FC<ProfileProps> = ({
                       <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                         {trip.trip_title || trip.title}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {formatDate(trip.next_departure)}
-                      </p>
+                      {(trip.location || trip.duration) && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          {trip.location || trip.duration}
+                        </p>
+                      )}
                     </div>
                     <div className="text-right ml-4 flex-shrink-0">
                       <p className="text-xs text-gray-500 dark:text-gray-400">

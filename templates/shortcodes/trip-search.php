@@ -88,12 +88,25 @@ if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_
         (int) $dmDur[2]
     );
 }
+
+// Per-field visibility (Settings → Search & Listing). Defaults are true, so an
+// existing site shows every field exactly as before until the owner hides one.
+$show_keyword     = \Yatra\Services\SettingsService::isEnabled('search_show_keyword');
+$show_destination = \Yatra\Services\SettingsService::isEnabled('search_show_destination');
+$show_activities  = \Yatra\Services\SettingsService::isEnabled('search_show_activities');
+$show_duration    = \Yatra\Services\SettingsService::isEnabled('search_show_duration');
+$show_budget      = \Yatra\Services\SettingsService::isEnabled('search_show_budget');
+
+// Tracks whether a field has been rendered yet, so a divider is only emitted
+// BETWEEN visible fields (no leading/trailing/double dividers when some are off).
+$yatra_search_rendered = false;
 ?>
 
 <div class="yatra-trip-search-shortcode" data-listing-url="<?php echo esc_url($listing_url); ?>">
     <div class="yatra-horizontal-search">
         <div class="yatra-horizontal-search-container">
             <div class="yatra-search-bar">
+                <?php if ($show_keyword) : ?>
                 <div class="yatra-search-keyword-segment">
                     <label class="screen-reader-text" for="yatra-trip-search-s"><?php esc_html_e('Search trips', 'yatra'); ?></label>
                     <div class="yatra-search-keyword-inner">
@@ -114,9 +127,10 @@ if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_
                         </div>
                     </div>
                 </div>
+                <?php $yatra_search_rendered = true; endif; ?>
 
-                <div class="yatra-search-divider"></div>
-
+                <?php if ($show_destination) : ?>
+                <?php if ($yatra_search_rendered) : ?><div class="yatra-search-divider"></div><?php endif; ?>
                 <div class="yatra-search-dropdown" data-dropdown="destination">
                     <div class="yatra-dropdown-trigger">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,9 +175,10 @@ if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_
                         </div>
                     </div>
                 </div>
+                <?php $yatra_search_rendered = true; endif; ?>
 
-                <div class="yatra-search-divider"></div>
-
+                <?php if ($show_activities) : ?>
+                <?php if ($yatra_search_rendered) : ?><div class="yatra-search-divider"></div><?php endif; ?>
                 <div class="yatra-search-dropdown" data-dropdown="activities">
                     <div class="yatra-dropdown-trigger">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -207,9 +222,10 @@ if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_
                         </div>
                     </div>
                 </div>
+                <?php $yatra_search_rendered = true; endif; ?>
 
-                <div class="yatra-search-divider"></div>
-
+                <?php if ($show_duration) : ?>
+                <?php if ($yatra_search_rendered) : ?><div class="yatra-search-divider"></div><?php endif; ?>
                 <div class="yatra-search-dropdown" data-dropdown="duration" data-duration-min="<?php echo esc_attr((string) $dmin); ?>" data-duration-max="<?php echo esc_attr((string) $dmax); ?>">
                     <div class="yatra-dropdown-trigger">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -242,9 +258,10 @@ if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_
                         </div>
                     </div>
                 </div>
+                <?php $yatra_search_rendered = true; endif; ?>
 
-                <div class="yatra-search-divider"></div>
-
+                <?php if ($show_budget) : ?>
+                <?php if ($yatra_search_rendered) : ?><div class="yatra-search-divider"></div><?php endif; ?>
                 <div class="yatra-search-dropdown" data-dropdown="budget">
                     <div class="yatra-dropdown-trigger">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -271,6 +288,7 @@ if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_
                         <?php endif; ?>
                     </div>
                 </div>
+                <?php $yatra_search_rendered = true; endif; ?>
 
                 <div class="yatra-search-button-container">
                     <button type="button" class="yatra-search-main-btn">

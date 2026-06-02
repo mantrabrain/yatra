@@ -86,10 +86,24 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
   toasts,
   onRemove,
 }) => {
+  // Sit below the WordPress admin bar (and above it in stacking order) so
+  // toasts aren't hidden behind it on the front-end account page. The admin
+  // bar is 46px on small screens (<=782px) and 32px otherwise; +16px gap.
+  const topOffset = React.useMemo(() => {
+    if (typeof document === "undefined") return 16;
+    if (!document.body.classList.contains("admin-bar")) return 16;
+    const small = typeof window !== "undefined" && window.innerWidth <= 782;
+    return (small ? 46 : 32) + 16;
+  }, []);
+
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none">
+    <div
+      style={{ top: topOffset }}
+      // z-index above the WP admin bar (99999) so it never hides the toast.
+      className="fixed right-4 z-[100000] flex flex-col gap-2 pointer-events-none"
+    >
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onRemove={onRemove} />
       ))}

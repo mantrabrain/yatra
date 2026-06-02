@@ -206,32 +206,96 @@ class BookingSessionController extends BaseController
      */
     public function complete_gateway_payment(WP_REST_Request $request): WP_REST_Response
     {
-        $gateway_id = $request->get_param('gateway');
+        $gateway_id = sanitize_key((string) $request->get_param('gateway'));
         $data = $request->get_json_params();
-        
-        $booking_id = $data['booking_id'] ?? 0;
-        $source_id = $data['source_id'] ?? '';
-        $amount = $data['amount'] ?? 0;
-        $currency = $data['currency'] ?? 'USD';
-        
-        if (empty($booking_id) || empty($source_id)) {
+        if (!is_array($data)) {
+            $data = [];
+        }
+
+        $booking_id      = (int) ($data['booking_id'] ?? 0);
+        $source_id       = sanitize_text_field((string) ($data['source_id'] ?? ''));
+        $client_amount   = (float) ($data['amount'] ?? 0);
+        $client_currency = sanitize_text_field((string) ($data['currency'] ?? 'USD'));
+
+        if ($booking_id <= 0 || $source_id === '') {
             return new WP_REST_Response([
                 'success' => false,
                 'message' => __('Missing required payment data.', 'yatra'),
             ], 400);
         }
-        
+
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        $booking = $bookingRepository->find($booking_id);
+
+        // Resolve the guest booking-session token (body first, then ?booking_token=),
+        // exactly as the other booking-session endpoints do.
+        $booking_token = '';
+        if (!empty($data['booking_token']) && is_string($data['booking_token'])) {
+            $booking_token = sanitize_text_field((string) $data['booking_token']);
+        } elseif (isset($_GET['booking_token']) && is_string($_GET['booking_token'])) {
+            $booking_token = sanitize_text_field((string) wp_unslash($_GET['booking_token']));
+        }
+
+        // H-1: ownership gate (monitor-first). An honest caller either owns the
+        // booking (logged-in user / admin) or carries the booking_token bound to
+        // it; only a stranger targeting someone else's booking_id is rejected.
+        // In monitor mode this just logs and proceeds (zero behaviour change).
+        if (!$this->requesterOwnsBooking($booking_id, $booking, $booking_token)) {
+            if (\Yatra\Security\Guard::denied('payment_complete_ownership', [
+                'booking_id' => $booking_id,
+                'user'       => get_current_user_id(),
+                'gateway'    => $gateway_id,
+            ])) {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => __('You are not allowed to complete this payment.', 'yatra'),
+                ], 403);
+            }
+        }
+
+        // H-1: server-authoritative amount/currency. Honest clients already send
+        // the booking's due amount, so this is invisible to them; it removes the
+        // ability to tamper the charged amount. Override only when enforcing.
+        $amount   = $client_amount;
+        $currency = $client_currency;
+        if ($booking) {
+            $server_amount = (float) ($booking->amount_due ?? 0);
+            if ($server_amount <= 0) {
+                $server_amount = (float) ($booking->total_amount ?? 0);
+            }
+            $server_currency = (string) ($booking->currency ?? $client_currency);
+
+            if ($server_amount > 0) {
+                $mismatch = abs($server_amount - $client_amount) > 0.001
+                    || ($client_currency !== '' && $server_currency !== ''
+                        && strcasecmp($client_currency, $server_currency) !== 0);
+
+                if ($mismatch) {
+                    \Yatra\Security\Guard::flag('payment_complete_amount_mismatch', [
+                        'booking_id'    => $booking_id,
+                        'client_amount' => $client_amount,
+                        'server_amount' => $server_amount,
+                    ]);
+                }
+
+                if (\Yatra\Security\Guard::enforcing()) {
+                    $amount   = $server_amount;
+                    $currency = $server_currency;
+                }
+            }
+        }
+
         // Get the gateway
         $registry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
         $gateway = $registry->get($gateway_id);
-        
+
         if (!$gateway) {
             return new WP_REST_Response([
                 'success' => false,
                 'message' => __('Invalid payment gateway.', 'yatra'),
             ], 400);
         }
-        
+
         // Check if gateway has createPayment method
         if (!method_exists($gateway, 'createPayment')) {
             return new WP_REST_Response([
@@ -239,7 +303,7 @@ class BookingSessionController extends BaseController
                 'message' => __('Gateway does not support this payment method.', 'yatra'),
             ], 400);
         }
-        
+
         // Create the payment
         $result = $gateway->createPayment([
             'source_id' => $source_id,
@@ -247,54 +311,105 @@ class BookingSessionController extends BaseController
             'amount' => $amount,
             'currency' => $currency,
         ]);
-        
+
         if (!$result['success']) {
             return new WP_REST_Response([
                 'success' => false,
                 'message' => $result['error'] ?? __('Payment failed.', 'yatra'),
             ], 400);
         }
-        
+
+        $transaction_id = (string) ($result['transaction_id'] ?? '');
+
         // Update booking payment status
-        $bookingRepository = new \Yatra\Repositories\BookingRepository();
-        $booking = $bookingRepository->find($booking_id);
-        
         if ($booking) {
-            // Record the payment using PaymentRepository
             $paymentRepository = new \Yatra\Repositories\PaymentRepository();
-            $paymentRepository->create([
-                'booking_id' => $booking_id,
-                'amount' => $amount,
-                'currency' => $currency,
-                'gateway' => $gateway_id,
-                'transaction_id' => $result['transaction_id'] ?? '',
-                'status' => ($result['status'] ?? 'completed') === 'completed' ? 'completed' : 'pending',
-            ]);
-            
-            // Update booking status if payment is complete
-            if (($result['status'] ?? 'completed') === 'completed') {
-                // Get total paid amount
-                $total_paid = $paymentRepository->getTotalPaidForBooking($booking_id);
-                $total_amount = (float) $booking->total_amount;
-                
-                if ($total_paid >= $total_amount) {
-                    $prevStatus = (string) ($booking->status ?? 'pending');
-                    $bookingRepository->update($booking_id, ['status' => 'confirmed', 'payment_status' => 'paid']);
-                    \yatra_trigger_booking_confirmed((int) $booking_id, $prevStatus);
-                } else {
-                    $bookingRepository->update($booking_id, ['payment_status' => 'partial']);
+
+            // Idempotency guard: never double-record the same gateway transaction
+            // for the same booking (e.g. a retried submit or a webhook racing this
+            // call). Safe always-on — only blocks a duplicate, never a first payment.
+            $alreadyRecorded = false;
+            if ($transaction_id !== '' && method_exists($paymentRepository, 'findByTransactionId')) {
+                $existing = $paymentRepository->findByTransactionId($transaction_id);
+                $alreadyRecorded = $existing && (int) ($existing->booking_id ?? 0) === $booking_id;
+            }
+
+            if (!$alreadyRecorded) {
+                // Record the payment using PaymentRepository
+                $paymentRepository->create([
+                    'booking_id' => $booking_id,
+                    'amount' => $amount,
+                    'currency' => $currency,
+                    'gateway' => $gateway_id,
+                    'transaction_id' => $transaction_id,
+                    'status' => ($result['status'] ?? 'completed') === 'completed' ? 'completed' : 'pending',
+                ]);
+
+                // Update booking status if payment is complete
+                if (($result['status'] ?? 'completed') === 'completed') {
+                    // Get total paid amount
+                    $total_paid = $paymentRepository->getTotalPaidForBooking($booking_id);
+                    $total_amount = (float) $booking->total_amount;
+
+                    if ($total_paid >= $total_amount) {
+                        $prevStatus = (string) ($booking->status ?? 'pending');
+                        $bookingRepository->update($booking_id, ['status' => 'confirmed', 'payment_status' => 'paid']);
+                        \yatra_trigger_booking_confirmed((int) $booking_id, $prevStatus);
+                    } else {
+                        $bookingRepository->update($booking_id, ['payment_status' => 'partial']);
+                    }
                 }
             }
         }
-        
+
         return new WP_REST_Response([
             'success' => true,
             'message' => __('Payment completed successfully.', 'yatra'),
             'data' => [
-                'transaction_id' => $result['transaction_id'] ?? '',
+                'transaction_id' => $transaction_id,
                 'status' => $result['status'] ?? 'completed',
             ],
         ]);
+    }
+
+    /**
+     * Ownership check for booking-session mutations (H-1 / M-2).
+     *
+     * Mirrors {@see \Yatra\Controllers\PaymentGatewayController::get_payment_status()}:
+     *  - admins always pass;
+     *  - a registered-user booking requires the owning user;
+     *  - a guest booking (user_id NULL/0) requires the short-lived booking_token
+     *    transient whose stored `booking_id` matches — i.e. the same browser that
+     *    started this checkout. Honest guests always carry that token in the URL.
+     *
+     * @param object|null $booking Booking row, or null when not found.
+     */
+    private function requesterOwnsBooking(int $bookingId, $booking, string $bookingToken): bool
+    {
+        if (current_user_can('manage_options')) {
+            return true;
+        }
+
+        if (!$booking) {
+            return false;
+        }
+
+        $bookingUserId = (int) ($booking->user_id ?? 0);
+        $currentUserId = (int) get_current_user_id();
+
+        if ($bookingUserId > 0) {
+            return $currentUserId === $bookingUserId;
+        }
+
+        // Guest booking: prove possession of the booking-session token bound to it.
+        if ($bookingToken !== '') {
+            $session = get_transient($bookingToken);
+            if (is_array($session) && (int) ($session['booking_id'] ?? 0) === $bookingId) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -305,8 +420,13 @@ class BookingSessionController extends BaseController
     {
         // Ensure session is started for REST API requests
         yatra_start_session();
-        
+
         $data = $request->get_json_params();
+
+        // M-2: restore CSRF protection stripped by public_permission_callback.
+        if (($blocked = $this->guardPublicBookingMutation($request, $data)) !== null) {
+            return $blocked;
+        }
 
         // Check if this is a partial update (updating travelers or services in existing session)
         $existing_session = yatra_get_booking_session();
@@ -726,6 +846,11 @@ class BookingSessionController extends BaseController
      */
     public function clear_session(WP_REST_Request $request): WP_REST_Response
     {
+        // M-2: restore CSRF protection stripped by public_permission_callback.
+        if (($blocked = $this->guardPublicBookingMutation($request)) !== null) {
+            return $blocked;
+        }
+
         yatra_clear_booking_session();
 
         return new WP_REST_Response([
@@ -811,6 +936,195 @@ class BookingSessionController extends BaseController
             return false;
         }
         return (bool) wp_verify_nonce($nonce, 'yatra_booking_action');
+    }
+
+    /**
+     * CSRF guard for the public booking-session mutations (M-2).
+     *
+     * `public_permission_callback` strips WP's REST cookie-nonce so guests can
+     * reach these routes, which would otherwise leave them open to cross-site
+     * forgery of a visitor's session. This restores protection by requiring at
+     * least one signal that an honest same-origin checkout always carries:
+     *   - the booking-scoped nonce (`X-Yatra-Booking-Nonce`), or
+     *   - a valid WP REST nonce (`X-WP-Nonce`, the one that was stripped), or
+     *   - a booking_token transient, or
+     *   - an active PHP booking session.
+     * A blind cross-site POST has none of these.
+     *
+     * Monitor-first: returns a 403 response ONLY when the guard is enforcing;
+     * in monitor mode it logs and returns null so behaviour is unchanged.
+     *
+     * @param array<string, mixed>|null $data decoded JSON body (decoded here if null)
+     * @return WP_REST_Response|null 403 response to short-circuit with, or null to proceed
+     */
+    private function guardPublicBookingMutation(WP_REST_Request $request, $data = null): ?WP_REST_Response
+    {
+        if ($data === null) {
+            $data = $request->get_json_params();
+        }
+
+        // 1) booking-scoped nonce, or 2) the stripped WP REST nonce.
+        if ($this->verifyBookingNonce($request, $data)) {
+            return null;
+        }
+        $restNonce = (string) $request->get_header('X-WP-Nonce');
+        if ($restNonce !== '' && wp_verify_nonce($restNonce, 'wp_rest')) {
+            return null;
+        }
+
+        // 3) a booking-session token (body first, then ?booking_token=).
+        $token = '';
+        if (is_array($data) && !empty($data['booking_token']) && is_string($data['booking_token'])) {
+            $token = sanitize_text_field((string) $data['booking_token']);
+        } elseif (isset($_GET['booking_token']) && is_string($_GET['booking_token'])) {
+            $token = sanitize_text_field((string) wp_unslash($_GET['booking_token']));
+        }
+        if ($token !== '' && is_array(get_transient($token))) {
+            return null;
+        }
+
+        // 4) an active server-side booking session.
+        if (function_exists('yatra_get_booking_session')) {
+            $session = yatra_get_booking_session();
+            if (!empty($session) && !empty($session['trip_id'])) {
+                return null;
+            }
+        }
+
+        if (\Yatra\Security\Guard::denied('public_booking_csrf', [
+            'route' => $request->get_route(),
+        ])) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Your session could not be verified. Please refresh the page and try again.', 'yatra'),
+            ], 403);
+        }
+
+        return null;
+    }
+
+    /**
+     * IDs of enabled email-type fields in a single form section.
+     *
+     * "Email type" follows the same rule as the admin form-builder's
+     * "form captures email" notice: a field with type === 'email' OR the
+     * conventional id === 'email'. Used so the booking email can be resolved
+     * from a CUSTOM email field (e.g. id 'work_email') and not only the locked
+     * core `email` field. On a default/un-customised form this returns
+     * ['email'] for the contact section and [] for the traveler section, so
+     * the downstream resolution collapses to the original behaviour.
+     *
+     * @param array<string,mixed> $section
+     * @return array<int,string>
+     */
+    private function emailFieldIds(array $section): array
+    {
+        if (empty($section['fields']) || !is_array($section['fields'])) {
+            return [];
+        }
+        $ids = [];
+        foreach ($section['fields'] as $field) {
+            if (!is_array($field)) {
+                continue;
+            }
+            $enabled  = !isset($field['enabled']) || (bool) $field['enabled'];
+            $is_email = (($field['type'] ?? '') === 'email') || (($field['id'] ?? '') === 'email');
+            if ($enabled && $is_email && !empty($field['id'])) {
+                $ids[] = (string) $field['id'];
+            }
+        }
+        return $ids;
+    }
+
+    /**
+     * Enforce required booking-form fields server-side (Dynamic Form module).
+     *
+     * Mirrors the frontend's required rules so a crafted request can't omit a
+     * required field (built-in or CUSTOM). Only enabled+required fields in
+     * enabled sections are checked, honouring the operator's saved config.
+     * `email` and contact `phone` are skipped — they have dedicated handling
+     * (email resolution + the contact-phone check). Returns an error message,
+     * or null when everything required is present.
+     *
+     * @param array<string,mixed>      $form_config
+     * @param array<string,mixed>      $data
+     * @param array<int,mixed>         $travelers
+     */
+    private function validateRequiredFormFields(
+        array $form_config,
+        array $data,
+        array $travelers,
+        bool $contact_enabled,
+        bool $traveler_enabled
+    ): ?string {
+        $is_missing = static function ($value): bool {
+            return !is_scalar($value) || trim((string) $value) === '';
+        };
+
+        // --- Contact section (flat contact_<id> keys) ---
+        if ($contact_enabled && !empty($form_config['contact_form']['fields']) && is_array($form_config['contact_form']['fields'])) {
+            foreach ($form_config['contact_form']['fields'] as $field) {
+                if (!is_array($field) || empty($field['enabled']) || empty($field['required']) || empty($field['id'])) {
+                    continue;
+                }
+                $id = (string) $field['id'];
+                if ($id === 'email' || $id === 'phone') {
+                    continue; // handled by the email resolution + contact-phone check
+                }
+                if ($is_missing($data['contact_' . $id] ?? null)) {
+                    /* translators: %s: form field label. */
+                    return sprintf(__('%s is required.', 'yatra'), (string) ($field['label'] ?? $id));
+                }
+            }
+        }
+
+        // --- Emergency section (flat emergency_<id> keys) ---
+        $emergency = $form_config['emergency_contact_form'] ?? null;
+        $emergency_enabled = is_array($emergency) && (!isset($emergency['enabled']) || (bool) $emergency['enabled']);
+        if ($emergency_enabled && !empty($emergency['fields']) && is_array($emergency['fields'])) {
+            foreach ($emergency['fields'] as $field) {
+                if (!is_array($field) || empty($field['enabled']) || empty($field['required']) || empty($field['id'])) {
+                    continue;
+                }
+                $id = (string) $field['id'];
+                if ($is_missing($data['emergency_' . $id] ?? null)) {
+                    /* translators: %s: emergency contact field label. */
+                    return sprintf(__('Emergency contact: %s is required.', 'yatra'), (string) ($field['label'] ?? $id));
+                }
+            }
+        }
+
+        // --- Traveler section (per-traveler travelers[i][<id>]) ---
+        // Skipped when the section is off (book-by-count synthesises travelers).
+        if ($traveler_enabled && !empty($form_config['traveler_form']['fields']) && is_array($form_config['traveler_form']['fields'])) {
+            $required_traveler_fields = [];
+            foreach ($form_config['traveler_form']['fields'] as $field) {
+                if (is_array($field) && !empty($field['enabled']) && !empty($field['required']) && !empty($field['id'])) {
+                    $required_traveler_fields[(string) $field['id']] = (string) ($field['label'] ?? $field['id']);
+                }
+            }
+            if (!empty($required_traveler_fields)) {
+                $traveler_index = 0;
+                foreach ($travelers as $traveler) {
+                    if (!is_array($traveler)) {
+                        continue;
+                    }
+                    // Only real travelers; skip any contact/emergency pseudo-entries.
+                    if (isset($traveler['type']) && $traveler['type'] !== 'traveler') {
+                        continue;
+                    }
+                    $traveler_index++;
+                    foreach ($required_traveler_fields as $fid => $flabel) {
+                        if ($is_missing($traveler[$fid] ?? null)) {
+                            /* translators: 1: traveler number, 2: field label. */
+                            return sprintf(__('Traveler %1$d: %2$s is required.', 'yatra'), $traveler_index, $flabel);
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     public function create_booking(WP_REST_Request $request): WP_REST_Response
@@ -959,47 +1273,152 @@ class BookingSessionController extends BaseController
             ], 400);
         }
 
+        // Which booking-form sections are enabled (Pro Dynamic Form module).
+        // The default config has every section enabled, so on existing/un-customised
+        // sites $contact_enabled and $traveler_enabled are both true and the logic
+        // below behaves exactly as before — only disabled sections change anything.
+        $form_config      = function_exists('yatra_get_booking_form_config') ? yatra_get_booking_form_config() : [];
+        $contact_enabled  = !isset($form_config['contact_form']['enabled']) || (bool) $form_config['contact_form']['enabled'];
+        $traveler_enabled = !isset($form_config['traveler_form']['enabled']) || (bool) $form_config['traveler_form']['enabled'];
+
         // Get contact email - handle both flat and nested formats
-        $contact_email = $data['contact_email'] ?? '';
+        $contact_email = trim((string) ($data['contact_email'] ?? ''));
         $contact_phone = $data['contact_phone'] ?? '';
         $contact_first_name = $data['contact_first_name'] ?? '';
         $contact_last_name = $data['contact_last_name'] ?? '';
         $contact_country = $data['contact_country'] ?? '';
-        
-                $contact_nationality = $data['contact_nationality'] ?? '';
+
+        $contact_nationality = $data['contact_nationality'] ?? '';
         $contact_address = $data['contact_address'] ?? '';
-        
+
         // Emergency contact
         $emergency_name = $data['emergency_name'] ?? '';
         $emergency_phone = $data['emergency_phone'] ?? '';
         $emergency_relationship = $data['emergency_relationship'] ?? '';
-        
+
         // Travel details
         $travel_date = $data['travel_date'] ?? ($session['travel_date'] ?? '');
         $travelers = $data['travelers'] ?? [];
-        
-        // Validate required fields
-        if (empty($contact_email)) {
+
+        // EMAIL RESOLUTION: prefer the Contact email. When it's missing — the
+        // Contact section is off, or the operator collects email through a
+        // CUSTOM email-type field rather than the locked core `email` field —
+        // resolve it from the form config instead, mirroring the admin
+        // "form captures email" notice (contact + traveler sections). At least
+        // one enabled form must capture an email; the form builder warns the
+        // operator about this too. On a default form the core `email` field
+        // already populated $contact_email, so none of the fallbacks run.
+
+        // (a) Custom email-type field in the Contact section (submitted as
+        // contact_<id>). The core `email` field is already read above, so skip
+        // it here.
+        if ($contact_email === '' && $contact_enabled) {
+            foreach ($this->emailFieldIds($form_config['contact_form'] ?? []) as $fid) {
+                if ($fid === 'email') {
+                    continue;
+                }
+                $val = trim((string) ($data['contact_' . $fid] ?? ''));
+                if ($val !== '' && is_email($val)) {
+                    $contact_email = $val;
+                    break;
+                }
+            }
+        }
+
+        // (b) Fall back to a traveler email — the conventional `email` key OR
+        // any traveler email-type field — adopting the lead traveler's
+        // name/phone as the contact when the Contact section is off, so the
+        // booking/customer isn't nameless. On a default form this checks only
+        // $t['email'], identical to the original behaviour.
+        if ($contact_email === '' && is_array($travelers)) {
+            $traveler_email_ids = $traveler_enabled
+                ? $this->emailFieldIds($form_config['traveler_form'] ?? [])
+                : [];
+            if (!in_array('email', $traveler_email_ids, true)) {
+                $traveler_email_ids[] = 'email';
+            }
+            foreach ($travelers as $t) {
+                if (!is_array($t)) {
+                    continue;
+                }
+                $found = '';
+                foreach ($traveler_email_ids as $fid) {
+                    if (!empty($t[$fid]) && is_email((string) $t[$fid])) {
+                        $found = trim((string) $t[$fid]);
+                        break;
+                    }
+                }
+                if ($found !== '') {
+                    $contact_email = $found;
+                    if ($contact_first_name === '') { $contact_first_name = (string) ($t['first_name'] ?? ''); }
+                    if ($contact_last_name === '')  { $contact_last_name  = (string) ($t['last_name'] ?? ''); }
+                    if (empty($contact_phone) && !empty($t['phone'])) { $contact_phone = (string) $t['phone']; }
+                    break;
+                }
+            }
+        }
+
+        // When the Traveler form is disabled there are no per-traveler fields, so
+        // build traveler rows from the selected count and use the lead contact as
+        // traveler 1 (book-by-count). Only runs when the section is off.
+        if (!$traveler_enabled && (empty($travelers) || !is_array($travelers))) {
+            $synth_count = (int) ($data['travelers_count']
+                ?? $session['travelers']
+                ?? (is_array($session['traveler_counts'] ?? null) ? array_sum(array_map('intval', $session['traveler_counts'])) : 0));
+            $synth_count = max(1, $synth_count);
+            $travelers = [];
+            for ($i = 1; $i <= $synth_count; $i++) {
+                $travelers[] = [
+                    'type'       => 'traveler',
+                    'first_name' => $i === 1 ? $contact_first_name : '',
+                    'last_name'  => $i === 1 ? $contact_last_name : '',
+                    'email'      => $i === 1 ? $contact_email : '',
+                ];
+            }
+        }
+
+        // Validate required fields — email is always required (resolved above).
+        if ($contact_email === '' || !is_email($contact_email)) {
             return new WP_REST_Response([
                 'success' => false,
-                'message' => __('Email address is required.', 'yatra'),
+                'message' => __('A valid email address is required to complete this booking.', 'yatra'),
             ], 400);
         }
-        
-        if (empty($contact_phone)) {
+
+        // Phone belongs to the Contact section. Require it only when that section
+        // is enabled AND the phone field is itself enabled+required in the config,
+        // so an operator who made phone optional (or disabled it) via the Dynamic
+        // Form module isn't blocked on a field the customer never saw. On a
+        // default form phone is locked+required, so this is unchanged for
+        // existing Free/Pro users.
+        $contact_phone_required = false;
+        if ($contact_enabled && !empty($form_config['contact_form']['fields']) && is_array($form_config['contact_form']['fields'])) {
+            foreach ($form_config['contact_form']['fields'] as $cf) {
+                if (is_array($cf) && ($cf['id'] ?? '') === 'phone') {
+                    $cf_enabled = !isset($cf['enabled']) || (bool) $cf['enabled'];
+                    $contact_phone_required = $cf_enabled && !empty($cf['required']);
+                    break;
+                }
+            }
+        } elseif ($contact_enabled) {
+            // No field metadata available (legacy/edge): preserve the original
+            // "require phone when contact is on" behaviour.
+            $contact_phone_required = true;
+        }
+        if ($contact_phone_required && empty($contact_phone)) {
             return new WP_REST_Response([
                 'success' => false,
                 'message' => __('Phone number is required.', 'yatra'),
             ], 400);
         }
-        
+
         if (empty($travel_date)) {
             return new WP_REST_Response([
                 'success' => false,
                 'message' => __('Travel date is required.', 'yatra'),
             ], 400);
         }
-        
+
         if (empty($travelers) || !is_array($travelers)) {
             return new WP_REST_Response([
                 'success' => false,
@@ -1007,12 +1426,25 @@ class BookingSessionController extends BaseController
             ], 400);
         }
 
-        // Validate email
-        if (!is_email($contact_email)) {
-            return new WP_REST_Response([
-                'success' => false,
-                'message' => __('Invalid email address.', 'yatra'),
-            ], 400);
+        // Server-side enforcement of required form fields (incl. CUSTOM fields).
+        // Gated on the Dynamic Form Field module: free/default installs keep their
+        // existing validation untouched. Mirrors the frontend's required rules so
+        // a crafted request can't bypass them; respects the operator's config
+        // (only enabled+required fields in enabled sections are checked).
+        if (function_exists('apply_filters') && apply_filters('yatra_dynamic_form_field_enabled', false)) {
+            $required_error = $this->validateRequiredFormFields(
+                is_array($form_config) ? $form_config : [],
+                $data,
+                $travelers,
+                $contact_enabled,
+                $traveler_enabled
+            );
+            if ($required_error !== null) {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => $required_error,
+                ], 400);
+            }
         }
 
         // Get trip data
@@ -1247,13 +1679,33 @@ class BookingSessionController extends BaseController
             'nationality' => sanitize_text_field($contact_nationality),
             'address' => sanitize_text_field($contact_address),
         ];
-        
+        // Persist every submitted contact_* field (incl. CUSTOM fields the
+        // operator added to the form) so the data isn't lost and is usable as
+        // {{contact_<id>}} email variables. Built-in keys above are not overwritten.
+        foreach ($data as $field_key => $field_value) {
+            if (is_string($field_key) && strpos($field_key, 'contact_') === 0 && is_scalar($field_value)) {
+                $field_id = substr($field_key, strlen('contact_'));
+                if ($field_id !== '' && $field_id !== 'data' && !isset($contact_data[$field_id])) {
+                    $contact_data[$field_id] = sanitize_text_field((string) $field_value);
+                }
+            }
+        }
+
         // Prepare emergency contact data
         $emergency_data = [
             'name' => sanitize_text_field($emergency_name),
             'phone' => sanitize_text_field($emergency_phone),
             'relationship' => sanitize_text_field($emergency_relationship),
         ];
+        // Same dynamic capture for emergency_* custom fields.
+        foreach ($data as $field_key => $field_value) {
+            if (is_string($field_key) && strpos($field_key, 'emergency_') === 0 && is_scalar($field_value)) {
+                $field_id = substr($field_key, strlen('emergency_'));
+                if ($field_id !== '' && $field_id !== 'contact' && !isset($emergency_data[$field_id])) {
+                    $emergency_data[$field_id] = sanitize_text_field((string) $field_value);
+                }
+            }
+        }
         
         // Sanitize travelers data
         $sanitized_travelers = [];
@@ -2695,7 +3147,23 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
         <?php
         $details_html = ob_get_clean();
 
-        $vars = [
+        // Seed from the canonical booking variables FIRST so every dynamic
+        // merge tag — {{contact_*}} / {{emergency_*}} custom fields,
+        // {{traveler_custom_fields_html}}, {{balance_due}}, payment/schedule
+        // tags, etc. — resolves on this offline / pay-later path exactly like
+        // the online-gateway path (BookingService::sendBookingConfirmationEmail).
+        // Previously this method hand-built only ~18 core keys, so an operator
+        // who customised the Booking Confirmation template with a custom-field
+        // variable saw it render empty on offline bookings. The hand-built keys
+        // below (the self-rendered details_html, intro, footer) intentionally
+        // take precedence via array_merge ordering.
+        $base_vars = [];
+        $saved_booking = $this->bookingRepository->find($booking_id);
+        if ($saved_booking) {
+            $base_vars = TransactionalEmailTemplateService::variablesFromBooking($saved_booking);
+        }
+
+        $vars = array_merge($base_vars, [
             'customer_name' => $customer_name,
             'customer_first_name' => (string) ($contact['first_name'] ?? ''),
             'customer_last_name' => (string) ($contact['last_name'] ?? ''),
@@ -2716,7 +3184,7 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
             /* translators: %s: site name. */
             'footer_note' => sprintf(__('— %s', 'yatra'), get_bloginfo('name')),
             'transactional_context' => 'booking_created',
-        ];
+        ]);
 
         TransactionalEmailTemplateService::sendIfEnabled(
             TransactionalEmailTemplateService::TYPE_BOOKING_CONFIRMATION,
@@ -2736,6 +3204,12 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
         yatra_start_session();
 
         $data = $request->get_json_params() ?? [];
+
+        // M-2: restore CSRF protection stripped by public_permission_callback.
+        if (($blocked = $this->guardPublicBookingMutation($request, $data)) !== null) {
+            return $blocked;
+        }
+
         $code = isset($data['code']) ? strtoupper(sanitize_text_field($data['code'])) : '';
 
         if (empty($code)) {
@@ -3117,6 +3591,11 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
         yatra_start_session();
         $session = yatra_get_booking_session();
         $data = $request->get_json_params() ?? [];
+
+        // M-2: restore CSRF protection stripped by public_permission_callback.
+        if (($blocked = $this->guardPublicBookingMutation($request, $data)) !== null) {
+            return $blocked;
+        }
 
         // Same REST-context session-rehydration fallback as set_session() /
         // create_booking(): when PHPSESSID isn't propagated to the REST API
@@ -3875,6 +4354,12 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
         yatra_start_session();
 
         $data = $request->get_json_params() ?? [];
+
+        // M-2: restore CSRF protection stripped by public_permission_callback.
+        if (($blocked = $this->guardPublicBookingMutation($request, $data)) !== null) {
+            return $blocked;
+        }
+
         $session = yatra_get_booking_session();
 
         // Same booking_token rehydration as apply_coupon — handle REST

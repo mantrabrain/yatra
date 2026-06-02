@@ -186,6 +186,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
   };
 
   const emergencyContact = normalizeRecord((booking as any).emergency_contact);
+  const contactData = normalizeRecord((booking as any).contact_data);
 
   return (
     <div className="space-y-6">
@@ -588,9 +589,59 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                           </a>
                         </div>
                       )}
-                      {country && <div>{country}</div>}
+                      {country && <div>{getCountryName(country)}</div>}
                     </div>
                   </div>
+
+                  {/* Custom / extra contact fields (nationality, address, and
+                      any Dynamic Form custom contact field), pulled from the
+                      contact_data JSON. Core fields above are excluded. */}
+                  {(() => {
+                    const CORE = [
+                      "first_name",
+                      "last_name",
+                      "email",
+                      "phone",
+                      "country",
+                    ];
+                    const extras = contactData
+                      ? Object.entries(contactData).filter(
+                          ([k, v]) =>
+                            !CORE.includes(k) &&
+                            v != null &&
+                            String(v).trim() !== "",
+                        )
+                      : [];
+                    if (extras.length === 0) return null;
+                    return (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                        {extras.map(([fieldId, value]) => {
+                          const label = fieldId
+                            .replace(/_/g, " ")
+                            .replace(/\b\w/g, (l) => l.toUpperCase());
+                          let displayValue = String(value);
+                          if (
+                            (fieldId === "nationality" ||
+                              fieldId === "country") &&
+                            typeof value === "string" &&
+                            value.length === 2
+                          ) {
+                            displayValue = getCountryName(value);
+                          }
+                          return (
+                            <div key={fieldId}>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+                                {label}
+                              </div>
+                              <div className="text-sm text-gray-900 dark:text-white">
+                                {displayValue}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
                 </div>
               );
             })()}

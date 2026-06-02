@@ -647,10 +647,29 @@ do_action('yatra_booking_confirmation_header', $booking);
                             <?php endif; ?>
 
                             <?php if ($amount_due > 0): ?>
+                            <?php
+                            // Label the "due now" amount by payment type so a
+                            // deposit/partial reads clearly instead of just "Due Now".
+                            $payment_method_type = (string) ($booking->payment_method ?? 'full');
+                            $remaining_balance   = max(0.0, $total_amount - $amount_paid - $amount_due);
+                            if ($payment_method_type === 'deposit') {
+                                $due_now_label = __('Deposit Due Now', 'yatra');
+                            } elseif ($payment_method_type === 'partial') {
+                                $due_now_label = __('Partial Payment Due Now', 'yatra');
+                            } else {
+                                $due_now_label = __('Due Now', 'yatra');
+                            }
+                            ?>
                             <div class="yatra-payment-row yatra-due-row">
-                                <span><strong><?php esc_html_e('Due Now', 'yatra'); ?></strong></span>
+                                <span><strong><?php echo esc_html($due_now_label); ?></strong></span>
                                 <span><strong><?php echo esc_html(yatra_format_price($amount_due, $booking->currency)); ?></strong></span>
                             </div>
+                            <?php if ($payment_method_type !== 'full' && $remaining_balance > 0.01): ?>
+                            <div class="yatra-payment-row" style="margin-top: 6px;">
+                                <span><?php esc_html_e('Remaining Balance', 'yatra'); ?></span>
+                                <span><?php echo esc_html(yatra_format_price($remaining_balance, $booking->currency)); ?></span>
+                            </div>
+                            <?php endif; ?>
                             <?php endif; ?>
                         </div>
                         

@@ -584,7 +584,7 @@ abstract class BaseService implements ServiceInterface
                 $existingMetrics = array_slice($existingMetrics, -1000);
             }
             
-            update_option('yatra_cache_metrics', $existingMetrics);
+            update_option('yatra_cache_metrics', $existingMetrics, false); // autoload=false: metrics, read on demand
             
         } catch (\Exception $e) {
             // Don't let metrics storage failures break the main functionality

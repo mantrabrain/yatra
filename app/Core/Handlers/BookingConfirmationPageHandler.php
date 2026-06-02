@@ -47,6 +47,16 @@ class BookingConfirmationPageHandler extends BasePageHandler
             'yatra_booking' => $booking,
         ]);
 
+        // Ensure the payment gateways are registered before the template renders.
+        // Gateways attach their confirmation-page hooks (e.g. Bank Transfer's
+        // `yatra_booking_confirmation_after_details` renderer) in their
+        // constructors, which only run once the registry is built. Without this,
+        // the confirmation page fires the hook with no gateway listening, so the
+        // bank-transfer account details never appear.
+        if (class_exists('\\Yatra\\PaymentGateways\\PaymentGatewayRegistry')) {
+            \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
+        }
+
         return $this->selectTemplate('booking-confirmation', null, 'booking-confirmation');
     }
 }

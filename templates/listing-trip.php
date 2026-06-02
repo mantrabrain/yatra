@@ -135,7 +135,7 @@ yatra_get_header();
 
             <div class="yatra-listing-layout">
                 <!-- Filter Sidebar - Comprehensive Filters -->
-                <aside class="yatra-filter-sidebar">
+                <aside class="yatra-filter-sidebar"<?php echo \Yatra\Services\SettingsService::isEnabled('collapse_filters_on_mobile') ? ' data-yatra-collapse-mobile="1"' : ''; ?>>
                     <div class="yatra-filter-header">
                         <h2><?php esc_html_e('Filters', 'yatra'); ?></h2>
                         <button type="button" class="yatra-clear-filters"><?php esc_html_e('Clear all', 'yatra'); ?></button>

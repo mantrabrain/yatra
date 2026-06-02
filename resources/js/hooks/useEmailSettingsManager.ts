@@ -123,8 +123,8 @@ const BOOL_KEYS = new Set<keyof EmailSettingsValues>([
 ]);
 
 export const EMAIL_SETTINGS_DEFAULTS: EmailSettingsValues = {
-  admin_email: "admin@yatra.com",
-  from_email: "noreply@yatra.com",
+  admin_email: "admin@wpyatra.com",
+  from_email: "noreply@wpyatra.com",
   from_name: "Yatra Travel",
   email_template_booking: true,
   email_template_confirmation: true,

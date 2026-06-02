@@ -5,6 +5,7 @@ import {
   Filter,
   ArrowUpDown,
   ExternalLink,
+  ArrowUpRight,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { PageHeader } from "../components/common/PageHeader";
@@ -28,6 +29,23 @@ import {
 } from "../hooks/useModules";
 import { usePermissions } from "../hooks/usePermissions";
 import { PremiumUpgradeDialog } from "../components/modules/PremiumUpgradeDialog";
+
+/**
+ * Build the "Learn more" link to a module's dedicated feature page on
+ * wpyatra.com (e.g. https://wpyatra.com/features/dynamic-pricing/), tagged with
+ * UTM params. The feature-page slug matches the docs slug, so we derive it from
+ * the module's docs_url last segment (defined once per module on the backend).
+ * Returns null when there's no docs_url to derive a slug from.
+ */
+const featureUrlFromDocs = (docsUrl?: string): string | null => {
+  if (!docsUrl) return null;
+  const slug = docsUrl.replace(/\/+$/, "").split("/").pop();
+  if (!slug) return null;
+  const params =
+    "utm_source=plugin&utm_medium=modules&utm_campaign=learn-more&utm_content=" +
+    encodeURIComponent(slug);
+  return `https://wpyatra.com/features/${slug}/?${params}`;
+};
 
 const Modules: React.FC = () => {
   const { can } = usePermissions();
@@ -577,7 +595,10 @@ const Modules: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                <div className="flex items-center gap-2">
+                <div
+                  className="flex items-center gap-2"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   {module.video_url && (
                     <a
                       href={module.video_url}
@@ -601,7 +622,10 @@ const Modules: React.FC = () => {
                     </a>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div
+                  className="flex items-center gap-2"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   {module.slug === "dynamic_form_field" && module.enabled && (
                     <a
                       href={`${window.location.origin}/wp-admin/admin.php?page=yatra&subpage=settings`}
@@ -621,6 +645,19 @@ const Modules: React.FC = () => {
                         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                       </svg>
                       {__("Settings", "yatra")}
+                    </a>
+                  )}
+                  {featureUrlFromDocs(module.docs_url) && (
+                    <a
+                      href={featureUrlFromDocs(module.docs_url) as string}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-xs font-medium"
+                      title={__("Learn more about this feature", "yatra")}
+                    >
+                      <ArrowUpRight className="w-3 h-3" />
+                      {__("Learn more", "yatra")}
                     </a>
                   )}
                   {module.docs_url && (

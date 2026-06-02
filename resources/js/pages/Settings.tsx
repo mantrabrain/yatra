@@ -15,6 +15,7 @@ import {
   DollarSign,
   Mail,
   MapPin,
+  SlidersHorizontal,
   Users,
   Star,
   Receipt,
@@ -637,6 +638,7 @@ type SettingsSection =
   | "payment"
   | "pricing"
   | "trip"
+  | "search"
   | "customer"
   | "review"
   | "tax"
@@ -753,6 +755,14 @@ interface SettingsData {
   google_calendar_connected?: boolean;
   google_calendar_last_sync?: string | null;
   google_calendar_enabled?: boolean;
+
+  // Search & Listing storefront UX
+  search_show_keyword: boolean;
+  search_show_destination: boolean;
+  search_show_activities: boolean;
+  search_show_duration: boolean;
+  search_show_budget: boolean;
+  collapse_filters_on_mobile: boolean;
 
   // Booking Settings
   booking_confirmation: boolean;
@@ -1179,6 +1189,25 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
     );
   };
 
+  // Booking confirmation, the customer account and the voucher all need an email.
+  // Warn the operator when neither the Contact nor the Traveler form will capture
+  // one (section disabled, or its email field disabled) — checkout enforces the
+  // same rule (lead-traveler email is used as a fallback when Contact is off).
+  const bookingFormCapturesEmail = (() => {
+    const cfg = formData?.booking_form_config;
+    if (!cfg) return true;
+    const sectionHasEnabledEmail = (section?: FormSectionConfig): boolean => {
+      if (!section || section.enabled === false) return false;
+      return (section.fields || []).some(
+        (f) => (f.type === "email" || f.id === "email") && f.enabled !== false,
+      );
+    };
+    return (
+      sectionHasEnabledEmail(cfg.contact_form) ||
+      sectionHasEnabledEmail(cfg.traveler_form)
+    );
+  })();
+
   const updateFormConfig = (updates: Partial<FormSectionConfig>) => {
     setFormData((prev) => {
       if (!prev) return prev;
@@ -1385,6 +1414,19 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
             ))}
           </nav>
         </div>
+
+        {/* No-email warning — booking confirmation/account/voucher all need one */}
+        {!bookingFormCapturesEmail && (
+          <div className="flex items-start gap-2 p-3 rounded-md border border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-900/20 text-sm text-red-800 dark:text-red-300">
+            <span className="font-semibold">⚠</span>
+            <span>
+              {__(
+                "No form is set to collect an email address. An email is required for booking confirmation, the customer account and the voucher. Please enable an email field on the Contact or Traveler form — otherwise customers can't complete checkout.",
+                "yatra",
+              )}
+            </span>
+          </div>
+        )}
 
         {/* Form Section Settings */}
         <Card>
@@ -2270,20 +2312,28 @@ const Settings: React.FC = () => {
   const defaultSettings: SettingsData = useMemo<SettingsData>(
     () => ({
       company_name: "Yatra Travel Agency",
-      company_email: "info@yatra.com",
+      company_email: "info@wpyatra.com",
       company_phone: "+1-234-567-8900",
       company_address: "123 Travel Street",
       company_city: "Kathmandu",
       company_state: "Bagmati",
       company_country: "Nepal",
       company_zip: "44600",
-      company_website: "https://yatra.com",
+      company_website: "https://wpyatra.com",
       company_logo: "",
       timezone: "Asia/Kathmandu",
       date_format: "Y-m-d",
       time_format: "H:i",
       frontend_primary_color: "#3b82f6",
       frontend_container_max_width: "",
+      // Search & Listing — defaults match current behaviour (all fields shown,
+      // mobile filters expanded) so existing sites are unchanged.
+      search_show_keyword: true,
+      search_show_destination: true,
+      search_show_activities: true,
+      search_show_duration: true,
+      search_show_budget: true,
+      collapse_filters_on_mobile: false,
       booking_confirmation: true,
       auto_confirm_bookings: false,
       require_login: false,
@@ -2390,8 +2440,8 @@ const Settings: React.FC = () => {
         "esewa",
         "khalti",
       ],
-      admin_email: "admin@yatra.com",
-      from_email: "noreply@yatra.com",
+      admin_email: "admin@wpyatra.com",
+      from_email: "noreply@wpyatra.com",
       from_name: "Yatra Travel",
       email_template_booking: true,
       email_template_confirmation: true,
@@ -3586,6 +3636,11 @@ const Settings: React.FC = () => {
       id: "booking_form" as SettingsSection,
       label: __("Booking Form", "yatra"),
       icon: ClipboardList,
+    },
+    {
+      id: "search" as SettingsSection,
+      label: __("Search & Listing", "yatra"),
+      icon: SlidersHorizontal,
     },
     {
       id: "payment" as SettingsSection,
@@ -5105,6 +5160,128 @@ const Settings: React.FC = () => {
               </div>
             </div>
           </>
+        );
+
+      case "search":
+        return (
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                {__("Search Bar Fields", "yatra")}
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                {__(
+                  "Choose which fields appear in the trip search bar. Turn off the ones you don't need for a cleaner search.",
+                  "yatra",
+                )}
+              </p>
+              <div className="space-y-4">
+                {[
+                  {
+                    key: "search_show_keyword" as const,
+                    label: __("Keyword search", "yatra"),
+                    description: __(
+                      "Free-text field to search by trip name or keyword.",
+                      "yatra",
+                    ),
+                  },
+                  {
+                    key: "search_show_destination" as const,
+                    label: __("Destination", "yatra"),
+                    description: __(
+                      "Dropdown to filter trips by destination.",
+                      "yatra",
+                    ),
+                  },
+                  {
+                    key: "search_show_activities" as const,
+                    label: __("Activities", "yatra"),
+                    description: __(
+                      "Dropdown to filter trips by activity.",
+                      "yatra",
+                    ),
+                  },
+                  {
+                    key: "search_show_duration" as const,
+                    label: __("Duration", "yatra"),
+                    description: __(
+                      "Range slider to filter trips by number of days.",
+                      "yatra",
+                    ),
+                  },
+                  {
+                    key: "search_show_budget" as const,
+                    label: __("Budget", "yatra"),
+                    description: __(
+                      "Dropdown to filter trips by price range.",
+                      "yatra",
+                    ),
+                  },
+                ].map((row) => (
+                  <div
+                    key={row.key}
+                    className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md"
+                  >
+                    <input
+                      type="checkbox"
+                      id={row.key}
+                      checked={!!formData[row.key]}
+                      name={row.key}
+                      onChange={handleFieldChange}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <div className="flex-1">
+                      <Label
+                        htmlFor={row.key}
+                        className="font-medium cursor-pointer"
+                      >
+                        {row.label}
+                      </Label>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        {row.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                {__("Mobile Filters", "yatra")}
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                {__(
+                  "Controls the filter sidebar on the trip listing page on mobile devices.",
+                  "yatra",
+                )}
+              </p>
+              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                <input
+                  type="checkbox"
+                  id="collapse_filters_on_mobile"
+                  checked={!!formData.collapse_filters_on_mobile}
+                  name="collapse_filters_on_mobile"
+                  onChange={handleFieldChange}
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <div className="flex-1">
+                  <Label
+                    htmlFor="collapse_filters_on_mobile"
+                    className="font-medium cursor-pointer"
+                  >
+                    {__("Collapse filters by default on mobile", "yatra")}
+                  </Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {__(
+                      "On mobile, show filter sections collapsed so trip listings are visible right away. Visitors tap a section to expand it. Desktop is unaffected.",
+                      "yatra",
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         );
 
       // Continue with other sections... (I'll add the most important ones)

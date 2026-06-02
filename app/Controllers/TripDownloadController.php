@@ -329,7 +329,25 @@ class TripDownloadController extends BaseController
             if (isset($booking->status) && !in_array($booking->status, ['confirmed', 'paid', 'completed'])) {
                 return new WP_Error('booking_invalid', __('Booking must be confirmed to access downloads.', 'yatra'), ['status' => 403]);
             }
-            
+
+            // H-2: bind the signed URL to a requester who actually owns this booking.
+            // Without this, any logged-in user could mint a download URL for another
+            // customer's confirmed booking on the same trip. Monitor-first: in monitor
+            // mode this only logs and proceeds (no broken downloads for anyone).
+            if (!$this->requesterOwnsBooking($bookingId, $booking)) {
+                if (\Yatra\Security\Guard::denied('download_url_ownership', [
+                    'booking_id'  => $bookingId,
+                    'download_id' => $downloadId,
+                    'user'        => get_current_user_id(),
+                ])) {
+                    return new WP_Error(
+                        'forbidden',
+                        __('You do not have permission to download this file.', 'yatra'),
+                        ['status' => 403]
+                    );
+                }
+            }
+
             $requiredBookingId = $bookingId;
         }
 
@@ -348,6 +366,46 @@ class TripDownloadController extends BaseController
             'visibility' => $visibility,
             'title' => $download->title ?? '',
         ], 200);
+    }
+
+    /**
+     * Does the current requester own this booking? (H-2)
+     *
+     * Admins pass; a registered-user booking requires the owning user; a guest
+     * booking (user_id NULL/0) requires the booking-session token bound to it.
+     * Same rule used across the booking-session/payment endpoints.
+     *
+     * @param object|null $booking Booking row, or null when not found.
+     */
+    private function requesterOwnsBooking(int $bookingId, $booking): bool
+    {
+        if (current_user_can('manage_options')) {
+            return true;
+        }
+
+        if (!$booking) {
+            return false;
+        }
+
+        $bookingUserId = (int) ($booking->user_id ?? 0);
+        $currentUserId = (int) get_current_user_id();
+
+        if ($bookingUserId > 0) {
+            return $currentUserId === $bookingUserId;
+        }
+
+        // Guest booking: accept a matching short-lived booking-session token.
+        $token = (isset($_GET['booking_token']) && is_string($_GET['booking_token']))
+            ? sanitize_text_field((string) wp_unslash($_GET['booking_token']))
+            : '';
+        if ($token !== '') {
+            $session = get_transient($token);
+            if (is_array($session) && (int) ($session['booking_id'] ?? 0) === $bookingId) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

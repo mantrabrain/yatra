@@ -60,7 +60,7 @@ $destination = (string) ($destination ?? '');
 
         .details { width: 100%; border-collapse: collapse; }
         .details td { padding: 1.5mm 0; vertical-align: top; }
-        .details .k { width: 20mm; white-space: nowrap; font-weight: 700; }
+        .details .k { width: 20mm; white-space: nowrap; font-weight: 700; padding-right: 3mm; }
         .details .v { white-space: nowrap; }
         .details .v-wrap { white-space: normal; }
 

@@ -42,11 +42,18 @@ const FALLBACK_COUNTRIES: CountryMap = {
  * payload first; falls back to the minimal set when missing.
  */
 export function getCountryMap(): CountryMap {
-  const raw = (window as any)?.yatraAdmin?.countries;
-  if (raw && typeof raw === "object" && !Array.isArray(raw)) {
-    const map = raw as CountryMap;
-    // Guard against an accidentally-empty object from the server.
-    if (Object.keys(map).length > 0) return map;
+  // Admin app localizes onto `yatraAdmin`; the front-end account page localizes
+  // onto `yatraAccountPage`. Read whichever is present so the same helper works
+  // in both contexts (otherwise the account page silently fell back to a tiny
+  // 6-country list and rendered ISO codes like "BH" instead of "Bahrain").
+  const w = window as any;
+  const sources = [w?.yatraAdmin?.countries, w?.yatraAccountPage?.countries];
+  for (const raw of sources) {
+    if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+      const map = raw as CountryMap;
+      // Guard against an accidentally-empty object from the server.
+      if (Object.keys(map).length > 0) return map;
+    }
   }
   return FALLBACK_COUNTRIES;
 }

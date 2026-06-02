@@ -336,7 +336,7 @@ const GoogleCalendar: React.FC = () => {
         </CardHeader>
         <CardContent>
           <a
-            href="https://docs.yatra.com/modules/google-calendar"
+            href="https://docs.wpyatra.com/modules/google-calendar"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"

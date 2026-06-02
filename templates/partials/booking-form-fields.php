@@ -90,7 +90,7 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
     <div class="yatra-form-group <?php echo esc_attr($width_class); ?> <?php echo $field_type === 'checkbox' ? 'yatra-form-group--checkbox' : ''; ?>">
         <?php if ($field_type !== 'checkbox') : ?>
         <label for="<?php echo $field_id; ?>">
-            <?php echo esc_html($field['label']); ?> <?php echo $required_star; ?>
+            <?php echo esc_html(yatra_translate_form_string($field['label'])); ?> <?php echo $required_star; ?>
         </label>
         <?php endif; ?>
         <?php
@@ -107,18 +107,18 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
                         <?php checked($is_checked, true, false); ?>
                         <?php echo $required_attr; ?>
                     />
-                    <span><?php echo esc_html($field['label']); ?><?php echo $required_star; ?></span>
+                    <span><?php echo esc_html(yatra_translate_form_string($field['label'])); ?><?php echo $required_star; ?></span>
                 </label>
                 <?php
                 break;
             case 'select':
                 ?>
                 <select id="<?php echo $field_id; ?>" name="<?php echo $field_name; ?>" <?php echo $required_attr; ?>>
-                    <option value=""><?php echo esc_html($field['placeholder'] ?? __('Select...', 'yatra')); ?></option>
+                    <option value=""><?php echo esc_html(yatra_translate_form_string($field['placeholder'] ?? '') ?: __('Select...', 'yatra')); ?></option>
                     <?php if (!empty($field['options'])) : ?>
                         <?php foreach ($field['options'] as $option) : ?>
                             <option value="<?php echo esc_attr($option['value']); ?>" <?php echo selected($prefill_value, (string) ($option['value'] ?? ''), false); ?>>
-                                <?php echo esc_html($option['label']); ?>
+                                <?php echo esc_html(yatra_translate_form_string($option['label'] ?? '')); ?>
                             </option>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -129,7 +129,7 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
             case 'country':
                 ?>
                 <select id="<?php echo $field_id; ?>" name="<?php echo $field_name; ?>" <?php echo $required_attr; ?>>
-                    <option value=""><?php echo esc_html($field['placeholder'] ?? __('Select Country', 'yatra')); ?></option>
+                    <option value=""><?php echo esc_html(yatra_translate_form_string($field['placeholder'] ?? '') ?: __('Select Country', 'yatra')); ?></option>
                     <?php foreach ($countries as $code => $name) : ?>
                         <option value="<?php echo esc_attr($code); ?>" <?php echo selected($prefill_value, (string) $code, false); ?>>
                             <?php echo esc_html($name); ?>
@@ -144,7 +144,7 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
                 <textarea 
                     id="<?php echo $field_id; ?>" 
                     name="<?php echo $field_name; ?>" 
-                    placeholder="<?php echo esc_attr($field['placeholder'] ?? ''); ?>"
+                    placeholder="<?php echo esc_attr(yatra_translate_form_string($field['placeholder'] ?? '')); ?>"
                     <?php echo $required_attr; ?>
                     rows="3"
                 ><?php echo esc_textarea($prefill_value); ?></textarea>
@@ -171,7 +171,7 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
                     type="<?php echo esc_attr($field['type']); ?>" 
                     id="<?php echo $field_id; ?>" 
                     name="<?php echo $field_name; ?>" 
-                    placeholder="<?php echo esc_attr($field['placeholder'] ?? ''); ?>"
+                    placeholder="<?php echo esc_attr(yatra_translate_form_string($field['placeholder'] ?? '')); ?>"
                     <?php echo $required_attr; ?>
                     value="<?php echo esc_attr($prefill_value); ?>"
                 >
@@ -215,9 +215,9 @@ function yatra_render_form_section($section_config, $prefix = '', $countries = [
     }
     ?>
     <div class="yatra-booking-section">
-        <h2 class="yatra-section-title"><?php echo esc_html($section_config['title'] ?? ''); ?></h2>
+        <h2 class="yatra-section-title"><?php echo esc_html(yatra_translate_form_string($section_config['title'] ?? '')); ?></h2>
         <?php if (!empty($section_config['description'])) : ?>
-            <p class="yatra-section-description"><?php echo esc_html($section_config['description']); ?></p>
+            <p class="yatra-section-description"><?php echo esc_html(yatra_translate_form_string($section_config['description'])); ?></p>
         <?php endif; ?>
         
         <?php foreach ($grouped_fields as $section_key => $section_fields) : ?>
@@ -446,11 +446,17 @@ $initial_due_amount = $initial_total_amount;
 
 ?>
 
-<?php if (!empty($traveler_config) && !$is_remaining_payment) : ?>
+<?php
+// Honour the Traveler section's enable flag (Pro Dynamic Form module), mirroring
+// the Contact/Emergency sections. The default config has no `enabled` key, so an
+// un-customised/Free site treats the section as enabled and renders as before.
+$traveler_section_enabled = !isset($traveler_config['enabled']) || (bool) $traveler_config['enabled'];
+?>
+<?php if (!empty($traveler_config) && $traveler_section_enabled && !$is_remaining_payment) : ?>
 <div class="yatra-booking-section">
-    <h2 class="yatra-section-title"><?php echo esc_html($traveler_config['title'] ?? __('Traveler Information', 'yatra')); ?></h2>
+    <h2 class="yatra-section-title"><?php echo esc_html(yatra_translate_form_string($traveler_config['title'] ?? '') ?: __('Traveler Information', 'yatra')); ?></h2>
     <?php if (!empty($traveler_config['description'])) : ?>
-        <p class="yatra-section-description"><?php echo esc_html($traveler_config['description']); ?></p>
+        <p class="yatra-section-description"><?php echo esc_html(yatra_translate_form_string($traveler_config['description'])); ?></p>
     <?php endif; ?>
     
     <div id="yatra-travelers-container">

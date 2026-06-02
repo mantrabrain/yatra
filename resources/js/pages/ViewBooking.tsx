@@ -106,6 +106,15 @@ const ViewBooking: React.FC = () => {
       .sort((a, b) => a.order - b.order);
   }, [formConfig]);
 
+  // Get enabled contact (lead traveler) fields — used to label and format the
+  // country / nationality / address / custom contact fields in the summary.
+  const contactFields = useMemo(() => {
+    if (!formConfig?.contact_form?.fields) return [];
+    return formConfig.contact_form.fields
+      .filter((field) => field.enabled)
+      .sort((a, b) => a.order - b.order);
+  }, [formConfig]);
+
   // Helper to get field label by ID
   const getFieldLabel = (
     fieldId: string,
@@ -902,6 +911,62 @@ const ViewBooking: React.FC = () => {
                     )}
                   </div>
                 </div>
+
+                {/* Country + dynamic/custom contact fields (nationality,
+                    address, and any custom contact field). Mirrors the
+                    Emergency/Traveler dynamic-field display. */}
+                {(() => {
+                  const cd =
+                    booking.contact_data &&
+                    typeof booking.contact_data === "object"
+                      ? (booking.contact_data as Record<string, unknown>)
+                      : {};
+                  const CORE = ["first_name", "last_name", "email", "phone"];
+                  const extras = Object.entries(cd).filter(
+                    ([k, v]) =>
+                      !CORE.includes(k) &&
+                      k !== "country" &&
+                      v != null &&
+                      String(v).trim() !== "",
+                  );
+                  const countryCode =
+                    booking.customer_country ||
+                    (cd.country ? String(cd.country) : "");
+                  if (!countryCode && extras.length === 0) return null;
+                  return (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 border-t border-gray-100 dark:border-gray-700">
+                      {countryCode && (
+                        <div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+                            {getFieldLabel("country", contactFields)}
+                          </div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {getCountryName(countryCode)}
+                          </div>
+                        </div>
+                      )}
+                      {extras.map(([fieldId, value]) => {
+                        const field = contactFields.find(
+                          (f) => f.id === fieldId,
+                        );
+                        const display =
+                          field?.type === "country"
+                            ? getCountryName(String(value))
+                            : String(value);
+                        return (
+                          <div key={fieldId}>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+                              {getFieldLabel(fieldId, contactFields)}
+                            </div>
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">
+                              {display}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
               </CardContent>
             </Card>
 

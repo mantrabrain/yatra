@@ -425,7 +425,7 @@ class MigrationProgress
             $progress[$dataType]['completed_at'] = $completedAt;
         }
         
-        update_option('yatra_migration_progress', $progress);
+        update_option('yatra_migration_progress', $progress, false);
     }
     
     /**
@@ -575,7 +575,7 @@ class MigrationProgress
             ];
         }
 
-        update_option('yatra_migration_progress', $progress);
+        update_option('yatra_migration_progress', $progress, false);
         update_option('yatra_migration_started_at', current_time('mysql'));
         delete_option('yatra_migration_rewrite_flushed_for_started_at');
     }
@@ -671,7 +671,7 @@ class MigrationProgress
         }
 
         if ($updated) {
-            update_option('yatra_migration_progress', $progress);
+            update_option('yatra_migration_progress', $progress, false);
         }
 
         Logger::info('Migration cancelled', ['source' => 'migration']);
@@ -746,7 +746,7 @@ class MigrationProgress
         }
 
         if ($progressChanged) {
-            update_option('yatra_migration_progress', $progress);
+            update_option('yatra_migration_progress', $progress, false);
         }
 
         if ($allComplete && !empty($progress)) {
@@ -986,7 +986,7 @@ class MigrationProgress
             'timestamp' => current_time('mysql'),
         ];
         
-        update_option('yatra_migration_log', $log);
+        update_option('yatra_migration_log', $log, false); // autoload=false: migration-time only
     }
     
     private function getMigrationLog(): array
@@ -1024,7 +1024,7 @@ class MigrationProgress
 
         [$progress, $zeroChanged] = $this->applyZeroCountAutoComplete($progress);
         if ($zeroChanged) {
-            update_option('yatra_migration_progress', $progress);
+            update_option('yatra_migration_progress', $progress, false);
         }
 
         foreach ($progress as $status) {

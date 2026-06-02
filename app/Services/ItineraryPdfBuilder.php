@@ -77,10 +77,10 @@ class ItineraryPdfBuilder
         $travelDate   = $travelRaw !== '' ? date_i18n(get_option('date_format'), strtotime($travelRaw)) : '';
 
         $returnDate = '';
-        if ($travelRaw !== '' && $trip && !empty($trip->duration)) {
+        if ($travelRaw !== '' && $trip && !empty($trip->duration_days)) {
             $returnDate = date_i18n(
                 get_option('date_format'),
-                strtotime($travelRaw . ' +' . (int) $trip->duration . ' days')
+                strtotime($travelRaw . ' +' . (int) $trip->duration_days . ' days')
             );
         }
 
@@ -115,8 +115,10 @@ class ItineraryPdfBuilder
             'status_class'    => $statusClass,
             'trip_title'      => $trip ? ((string) ($trip->title ?? $tripFallbackTitle)) : $tripFallbackTitle,
             'trip_description'=> $trip ? (string) ($trip->description ?? $trip->content ?? '') : '',
-            /* translators: %d: trip duration in days. */
-            'trip_duration'   => ($trip && !empty($trip->duration)) ? sprintf(__('%d days', 'yatra'), (int) $trip->duration) : '',
+            // Duration is duration_days/duration_nights (no `duration` column).
+            'trip_duration'   => $trip
+                ? yatra_format_duration((int) ($trip->duration_days ?? 0), isset($trip->duration_nights) ? (int) $trip->duration_nights : null)
+                : '',
             'trip_difficulty' => $trip ? (string) ($trip->difficulty_name ?? '') : '',
             'trip_highlights' => $trip ? ($trip->highlights ?? $trip->trip_highlights ?? '') : '',
             'trip_includes'   => $trip ? ($trip->includes ?? $trip->trip_includes ?? '') : '',

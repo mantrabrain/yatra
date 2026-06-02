@@ -467,15 +467,29 @@ class CustomerService
             }
         }
 
-        // Unserialise the travelers payload here so both the legacy
-        // `travelers` key AND the React-side `travelers_data` alias
-        // share the same in-memory value — otherwise we'd unserialise
-        // twice and drift if one consumer mutates the array.
-        $travelersList = isset($booking->travelers) ? maybe_unserialize($booking->travelers) : null;
-        if (is_string($travelersList)) {
-            $decoded = json_decode($travelersList, true);
-            if (is_array($decoded)) {
-                $travelersList = $decoded;
+        // Load travellers from the normalized meta tables — the SAME source the
+        // admin booking screens use (TravellerRepository::getByBookingId, each
+        // row carrying its dynamic `fields`). The previous code read
+        // `$booking->travelers`, a column that does NOT exist (the schema only
+        // has `travelers_count`), so `travelers_data` was ALWAYS empty and the
+        // account-page "Travelers Information" card never rendered. Returns []
+        // for older bookings with no normalized rows (card simply hidden), so
+        // this is safe for existing bookings.
+        $travellerRepository = new \Yatra\Repositories\TravellerRepository();
+        $travelersList = $travellerRepository->getByBookingId($bookingId);
+        if (!is_array($travelersList)) {
+            $travelersList = [];
+        }
+
+        // contact_data is stored as JSON; decode to an array so the account
+        // page can read custom contact fields (matches emergency_contact above
+        // and BookingService::formatBookingWithDetails). maybe_unserialize is a
+        // no-op on a JSON string, so a fallback json_decode is required.
+        $contactData = isset($booking->contact_data) ? maybe_unserialize($booking->contact_data) : null;
+        if (is_string($contactData)) {
+            $decodedContact = json_decode($contactData, true);
+            if (is_array($decodedContact)) {
+                $contactData = $decodedContact;
             }
         }
 
@@ -522,7 +536,7 @@ class CustomerService
             'customer_phone' => $booking->contact_phone ?? null,
             'special_requests' => $booking->special_requests ?? null,
             'emergency_contact' => $emergencyContact,
-            'contact_data' => isset($booking->contact_data) ? maybe_unserialize($booking->contact_data) : null,
+            'contact_data' => $contactData,
             'travelers' => $travelersList,
             // React's BookingDetails reads `travelers_data` (same name
             // the admin ViewBooking screen uses); alias it here so the
@@ -895,6 +909,10 @@ class CustomerService
             'phone' => $customer->phone ?? '',
             'country' => $customer->country ?? '',
             'city' => $customer->city ?? '',
+            // Address belongs to the account profile too. Without it here the
+            // account page never received the saved value — which is exactly why
+            // city/country updated but address didn't.
+            'address' => $customer->address ?? '',
             'status' => $customer->status ?? 'active',
             'total_bookings' => (int) ($customer->total_bookings ?? 0),
             'total_spent' => (float) ($customer->total_spent ?? 0),

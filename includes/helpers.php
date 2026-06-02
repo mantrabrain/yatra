@@ -73,6 +73,33 @@ function yatra_get_booking_form_config(): array
 }
 
 /**
+ * Translate a booking-form display string (label / title / description /
+ * placeholder / option label) at render time.
+ *
+ * The default booking-form strings are registered for translation in
+ * SettingsService::getDefaultBookingFormConfig() (literal __() calls, so they
+ * land in the .pot for Loco Translate). This runtime pass additionally lets a
+ * SAVED or CUSTOM label (Pro Dynamic Form module) resolve against the active
+ * locale when a matching translation exists, and returns the original string
+ * unchanged otherwise. Safe for empty/non-string input.
+ *
+ * @param mixed $string
+ * @return string
+ */
+function yatra_translate_form_string($string): string
+{
+    $string = is_scalar($string) ? (string) $string : '';
+    if ($string === '') {
+        return '';
+    }
+
+    // Dynamic gettext: the literal source strings are registered for extraction
+    // in SettingsService; this resolves them (and any matching custom label) at
+    // runtime against the loaded 'yatra' text domain.
+    return __($string, 'yatra'); // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText, WordPress.WP.I18n.NonSingularStringLiteralDomain
+}
+
+/**
  * Check if user can leave a review for a trip
  * 
  * @param int      $trip_id Trip ID

@@ -238,11 +238,30 @@ body .yatra-trip-search-shortcode .yatra-search-keyword-input::-webkit-search-ca
    ------------------------------------------------------------------------- */
 body .yatra-trip-search-shortcode .yatra-search-dropdown {
     position: relative !important;
+    /* display:flex + align-items:stretch makes the trigger fill the full bar
+       height (same mechanism as the keyword segment), so the trigger's own
+       align-items:center can vertically centre the icon + label/value within
+       the bar. As a plain block the trigger sat at the top, leaving the labels
+       higher than the Search field. The absolutely-positioned menu is out of
+       flow, so it's unaffected. */
+    display: flex !important;
+    align-items: stretch !important;
     flex: 1 1 auto !important;
     min-width: 180px !important;
     margin: 0 !important;
     padding: 0 !important;
     isolation: isolate;
+}
+
+/* When a dropdown is open, lift its whole (isolated) stacking context above the
+   sibling dropdowns that follow it in the DOM. `isolation: isolate` above makes
+   each dropdown its own stacking context, so without this the open dropdown's
+   absolutely-positioned menu is painted UNDER later siblings. Most visible on
+   mobile, where the bar stacks vertically and the open Destination menu
+   overlaps the Activity / Duration / Budget rows below it (their labels bled
+   through). Applies on every viewport, so it also hardens desktop. */
+body .yatra-trip-search-shortcode .yatra-search-dropdown.open {
+    z-index: var(--yatra-ts-z-dropdown) !important;
 }
 
 body .yatra-trip-search-shortcode .yatra-dropdown-trigger {
@@ -576,17 +595,41 @@ body .yatra-trip-search-shortcode .yatra-slider-range {
     box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3) !important;
 }
 
+/* Range inputs centred on the track (top:50%), matching the Price Range
+   filter slider. The previous top:37% left the thumbs floating above the
+   track. Inputs are click-through; only their thumbs capture pointer events. */
 body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range'] {
     position: absolute !important;
+    left: 0 !important;
     width: 100% !important;
     height: 6px !important;
-    top: 37% !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
     margin: 0 !important;
     padding: 0 !important;
+    border: 0 !important;
     background: transparent !important;
     -webkit-appearance: none !important;
     appearance: none !important;
-    pointer-events: none;
+    pointer-events: none !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+}
+
+/* Max thumb above min so an overlapping max handle stays grabbable (same as
+   the price slider). z-index intentionally NOT !important. */
+body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range'].yatra-range-min {
+    z-index: 3;
+}
+
+body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range'].yatra-range-max {
+    z-index: 4;
+}
+
+body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range']::-webkit-slider-runnable-track {
+    height: 6px !important;
+    background: transparent !important;
+    border-radius: 3px !important;
 }
 
 body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range']::-webkit-slider-thumb {
@@ -597,10 +640,25 @@ body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range']::
     border-radius: 50% !important;
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
     border: 3px solid var(--yatra-primary, #3b82f6) !important;
-    cursor: pointer !important;
+    cursor: grab !important;
     pointer-events: all !important;
-    z-index: 3 !important;
     box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3), 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    margin-top: -7px !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range']::-webkit-slider-thumb:hover {
+    transform: scale(1.06) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35) !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range']::-webkit-slider-thumb:active {
+    cursor: grabbing !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range']::-moz-range-track {
+    height: 6px !important;
+    background: transparent !important;
+    border-radius: 3px !important;
 }
 
 body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range']::-moz-range-thumb {
@@ -609,10 +667,13 @@ body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range']::
     border-radius: 50% !important;
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
     border: 3px solid var(--yatra-primary, #3b82f6) !important;
-    cursor: pointer !important;
+    cursor: grab !important;
     pointer-events: all !important;
-    z-index: 3 !important;
     box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3), 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-dual-range-slider input[type='range']::-moz-range-thumb:hover {
+    transform: scale(1.06) !important;
 }
 
 /* -------------------------------------------------------------------------

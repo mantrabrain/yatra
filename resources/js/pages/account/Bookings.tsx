@@ -6,6 +6,7 @@ import {
   Clock,
   DollarSign,
   MapPin,
+  Plane,
 } from "lucide-react";
 import { __, _n, sprintf } from "../../lib/i18n";
 import {
@@ -361,8 +362,6 @@ const Bookings: React.FC<BookingsProps> = ({
         <div className="space-y-4">
           {filteredDisplayBookings.map((booking) => {
             const bookingId = Number(booking.id);
-            const isUpcoming = new Date(booking.travel_date) > new Date();
-            const isCompleted = booking.booking_status === "completed";
             const paidNumeric =
               typeof booking.amount_paid === "number"
                 ? booking.amount_paid
@@ -386,24 +385,11 @@ const Bookings: React.FC<BookingsProps> = ({
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <div
-                          className={`p-2 rounded-lg ${
-                            isUpcoming
-                              ? "bg-emerald-50 dark:bg-emerald-900/20"
-                              : isCompleted
-                                ? "bg-gray-50 dark:bg-gray-700"
-                                : "bg-amber-50 dark:bg-amber-900/20"
-                          }`}
-                        >
-                          <MapPin
-                            className={`w-5 h-5 ${
-                              isUpcoming
-                                ? "text-emerald-600 dark:text-emerald-400"
-                                : isCompleted
-                                  ? "text-gray-400"
-                                  : "text-amber-600 dark:text-amber-400"
-                            }`}
-                          />
+                        {/* Trip icon — distinct from the destination pin below,
+                            and a single consistent brand colour (booking status
+                            is already shown by the badges on the right). */}
+                        <div className="p-2 rounded-lg bg-yatra-soft dark:bg-yatra-surface-dark-muted">
+                          <Plane className="w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" />
                         </div>
                         <div className="flex-1">
                           <p className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium mb-1">

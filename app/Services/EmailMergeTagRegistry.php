@@ -819,6 +819,12 @@ final class EmailMergeTagRegistry
             ],
         ];
 
+        // Dynamically expose every enabled Contact/Emergency booking-form field —
+        // including custom fields an operator adds — so they're discoverable and
+        // usable as email variables. Values are resolved at send time by
+        // BookingEmailRichMergeTags (contact_/emergency_ prefixes).
+        $catalog = array_merge($catalog, self::bookingFormFieldDefinitions($bookingContextEvents));
+
         /**
          * Filter the email merge-tag catalogue so integrations (Channel
          * Manager, WhatsApp, custom modules) can append their own tags.
@@ -828,6 +834,71 @@ final class EmailMergeTagRegistry
         return function_exists('apply_filters')
             ? (array) apply_filters('yatra_email_merge_tag_definitions', $catalog)
             : $catalog;
+    }
+
+    /**
+     * Build merge-tag definitions from the live booking-form config so dynamic
+     * (and custom) Contact/Emergency fields surface in the email editor. Only
+     * enabled fields in enabled sections are included; existing canonical tags
+     * are never overwritten.
+     *
+     * @param array<int,string> $events
+     * @return array<string, array<string,mixed>>
+     */
+    private static function bookingFormFieldDefinitions(array $events): array
+    {
+        // Custom/dynamic booking-form fields are a Pro-module feature. When the
+        // Dynamic Form Field module is off the form is fixed, so we don't surface
+        // these extra tags — free installs keep their existing tag list unchanged.
+        if (!function_exists('apply_filters') || !apply_filters('yatra_dynamic_form_field_enabled', false)) {
+            return [];
+        }
+        if (!function_exists('yatra_get_booking_form_config')) {
+            return [];
+        }
+
+        $config = yatra_get_booking_form_config();
+        if (!is_array($config)) {
+            return [];
+        }
+
+        $sections = [
+            'contact_form'           => ['prefix' => 'contact_',   'category' => self::CATEGORY_CUSTOMER],
+            'emergency_contact_form' => ['prefix' => 'emergency_', 'category' => self::CATEGORY_BOOKING],
+        ];
+
+        $defs = [];
+        foreach ($sections as $sectionKey => $meta) {
+            $section = $config[$sectionKey] ?? null;
+            if (!is_array($section) || (isset($section['enabled']) && !$section['enabled'])) {
+                continue;
+            }
+            foreach (($section['fields'] ?? []) as $field) {
+                if (empty($field['enabled']) || empty($field['id'])) {
+                    continue;
+                }
+                $id = sanitize_key((string) $field['id']);
+                if ($id === '') {
+                    continue;
+                }
+                $tagKey = $meta['prefix'] . $id;
+                if (isset($defs[$tagKey])) {
+                    continue;
+                }
+                $label = (string) ($field['label'] ?? ucwords(str_replace('_', ' ', $id)));
+                $defs[$tagKey] = [
+                    'key'         => $tagKey,
+                    'label'       => $label,
+                    /* translators: %s: booking form field label. */
+                    'description' => sprintf(__('Booking form field: %s', 'yatra'), $label),
+                    'category'    => $meta['category'],
+                    'sample'      => '',
+                    'events'      => $events,
+                ];
+            }
+        }
+
+        return $defs;
     }
 
     /**

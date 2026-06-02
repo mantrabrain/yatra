@@ -62,6 +62,15 @@ class CustomerController extends BaseController
             ],
         ]);
 
+        // Change current customer's account password
+        register_rest_route($namespace, '/' . $base . '/me/password', [
+            [
+                'methods' => \WP_REST_Server::EDITABLE,
+                'callback' => [$this, 'updateMyPassword'],
+                'permission_callback' => [$this, 'checkCustomerPermission'],
+            ],
+        ]);
+
         // Current customer's bookings
         register_rest_route($namespace, '/' . $base . '/my-bookings', [
             [
@@ -252,13 +261,45 @@ class CustomerController extends BaseController
             $userId = get_current_user_id();
             $data = $request->get_json_params();
 
+            // Email is the account login and is intentionally NOT editable from
+            // the account profile. Strip it server-side so it can never be
+            // changed via this endpoint, regardless of what the client sends.
+            if (is_array($data)) {
+                unset($data['email'], $data['user_email']);
+            }
+
             Logger::apiRequest('/customers/me', 'PUT', $data);
 
             $customer = $this->customerService->getCustomerByUserId($userId);
 
             if (!$customer) {
-                Logger::warning("Customer profile not found for user", ['user_id' => $userId]);
-                return $this->not_found(__('Customer profile not found', 'yatra'));
+                // No customer record yet (e.g. registered but never booked).
+                // Create one linked to this user so the profile persists instead
+                // of failing. Email stays the account login (never client-set).
+                $wpUser = get_user_by('id', $userId);
+                if (!$wpUser) {
+                    return $this->not_found(__('Customer profile not found', 'yatra'));
+                }
+
+                $createData = CustomerValidator::sanitize($data);
+                $createData['user_id'] = $userId;
+                $createData['email']   = $wpUser->user_email;
+                if (empty($createData['first_name'])) {
+                    $createData['first_name'] = $wpUser->first_name !== ''
+                        ? $wpUser->first_name
+                        : ($wpUser->display_name !== '' ? $wpUser->display_name : $wpUser->user_login);
+                }
+                if (empty($createData['last_name'])) {
+                    $createData['last_name'] = (string) $wpUser->last_name;
+                }
+
+                $createResult = $this->customerService->createCustomer($createData);
+                if (empty($createResult['success'])) {
+                    Logger::warning('Could not create customer profile on update', ['user_id' => $userId, 'result' => $createResult]);
+                    return $this->error_response($createResult['message'] ?? __('Failed to save profile.', 'yatra'), 400);
+                }
+
+                return $this->success_response($this->customerService->getAccountProfileForUser($userId));
             }
 
             $customerId = (int) $customer['id'];
@@ -275,12 +316,57 @@ class CustomerController extends BaseController
             }
 
             Logger::info("Customer profile updated successfully", ['customer_id' => $customerId, 'user_id' => $userId]);
-            return $this->success_response($result['data']);
+
+            // updateCustomer() returns success/message only — return the fresh
+            // profile so the response carries the updated values (and avoids an
+            // "undefined key data" warning).
+            return $this->success_response(
+                $this->customerService->getAccountProfileForUser($userId)
+            );
             
         } catch (\Exception $e) {
             Logger::error("Failed to update customer profile", ['user_id' => $userId ?? 0, 'data' => $data ?? [], 'error' => $e->getMessage()]);
             return $this->handle_exception($e);
         }
+    }
+
+    /**
+     * PUT /customers/me/password - Change the current customer's account password.
+     *
+     * Requires the correct current password, then sets the new one and refreshes
+     * the auth cookie so the customer stays logged in (wp_set_password otherwise
+     * invalidates the current session).
+     */
+    public function updateMyPassword(WP_REST_Request $request)
+    {
+        $userId = get_current_user_id();
+        if ($userId <= 0) {
+            return $this->error_response(__('Authentication required.', 'yatra'), 401);
+        }
+
+        $data        = $request->get_json_params();
+        $current     = isset($data['current_password']) ? (string) $data['current_password'] : '';
+        $newPassword = isset($data['new_password']) ? (string) $data['new_password'] : '';
+
+        if ($current === '' || $newPassword === '') {
+            return $this->error_response(__('Current and new password are required.', 'yatra'), 400);
+        }
+
+        $user = get_user_by('id', $userId);
+        if (!$user || !wp_check_password($current, $user->user_pass, $userId)) {
+            return $this->error_response(__('Your current password is incorrect.', 'yatra'), 400);
+        }
+
+        wp_set_password($newPassword, $userId);
+
+        // wp_set_password() invalidates the session token / logs the user out.
+        // Re-establish the current session so the account page stays authenticated.
+        wp_set_current_user($userId);
+        wp_set_auth_cookie($userId, true);
+
+        Logger::info('Customer changed account password', ['user_id' => $userId]);
+
+        return $this->success_response(['updated' => true]);
     }
 
     /**

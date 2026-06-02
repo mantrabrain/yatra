@@ -1,5 +1,5 @@
-import { j as jsxRuntimeExports, p as Calendar, k as FileText, b as Plane, at as ArrowRight, q as MapPin, I as User, y as ChevronRight, S as Sparkles, h as Package, i as CreditCard, bx as LifeBuoy, be as Bell, az as AlertCircle, aD as CheckCircle2, ar as Clock, V as ExternalLink, U as Users, d as Mail, aW as Phone, b4 as Download, r as reactExports, a5 as React, u as useQuery, av as CheckCircle, as as DollarSign, aQ as Eye, aJ as PenSquare, b6 as XCircle, by as ShieldCheck, bf as Heart, s as LayoutDashboard, bz as LogOut, bu as QueryClient, bv as client, bw as QueryClientProvider } from "./react-vendor-CqkbFEvK.js";
-import { f as formatYatraMoney, _ as __, e as applyCurrencyPosition, s as sprintf, h as _n, a as apiClient, A as API_ENDPOINTS, u as useToast, T as ToastProvider } from "./index-DRAt5dnR.js";
+import { j as jsxRuntimeExports, p as Calendar, k as FileText, b as Plane, at as ArrowRight, q as MapPin, I as User, y as ChevronRight, S as Sparkles, h as Package, i as CreditCard, by as LifeBuoy, be as Bell, az as AlertCircle, aD as CheckCircle2, ar as Clock, V as ExternalLink, U as Users, d as Mail, aW as Phone, b4 as Download, r as reactExports, a5 as React, u as useQuery, av as CheckCircle, as as DollarSign, aQ as Eye, t as useQueryClient, aJ as PenSquare, b6 as XCircle, bz as ShieldCheck, bf as Heart, s as LayoutDashboard, bA as LogOut, bv as QueryClient, bw as client, bx as QueryClientProvider } from "./react-vendor-zODANjVp.js";
+import { f as formatYatraMoney, _ as __, h as applyCurrencyPosition, s as sprintf, i as _n, a as apiClient, A as API_ENDPOINTS, u as useToast, j as getCountryOptions, d as getCountryName$1, T as ToastProvider } from "./index-CG-QHfTA.js";
 function toBrowserLocaleTag(locale) {
   const raw = String(locale || "").trim();
   if (!raw) return void 0;
@@ -1107,6 +1107,7 @@ const BookingDetails = ({
     return null;
   };
   const emergencyContact = normalizeRecord(booking.emergency_contact);
+  const contactData = normalizeRecord(booking.contact_data);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -1332,34 +1333,60 @@ const BookingDetails = ({
             if (!hasAny) {
               return /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("No customer information recorded.", "yatra") });
             }
-            return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              fullName && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white mb-1", children: fullName }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400", children: [
-                email && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-4 h-4" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "a",
-                    {
-                      href: `mailto:${email}`,
-                      className: "hover:text-yatra-primary dark:hover:text-yatra-on-dark",
-                      children: email
-                    }
-                  )
-                ] }),
-                phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-4 h-4" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "a",
-                    {
-                      href: `tel:${String(phone).replace(/\s+/g, "")}`,
-                      className: "hover:text-yatra-primary dark:hover:text-yatra-on-dark",
-                      children: phone
-                    }
-                  )
-                ] }),
-                country && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: country })
-              ] })
-            ] }) });
+            return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                fullName && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white mb-1", children: fullName }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400", children: [
+                  email && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-4 h-4" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "a",
+                      {
+                        href: `mailto:${email}`,
+                        className: "hover:text-yatra-primary dark:hover:text-yatra-on-dark",
+                        children: email
+                      }
+                    )
+                  ] }),
+                  phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-4 h-4" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "a",
+                      {
+                        href: `tel:${String(phone).replace(/\s+/g, "")}`,
+                        className: "hover:text-yatra-primary dark:hover:text-yatra-on-dark",
+                        children: phone
+                      }
+                    )
+                  ] }),
+                  country && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: getCountryName(country) })
+                ] })
+              ] }),
+              (() => {
+                const CORE = [
+                  "first_name",
+                  "last_name",
+                  "email",
+                  "phone",
+                  "country"
+                ];
+                const extras = contactData ? Object.entries(contactData).filter(
+                  ([k, v]) => !CORE.includes(k) && v != null && String(v).trim() !== ""
+                ) : [];
+                if (extras.length === 0) return null;
+                return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 md:grid-cols-3 gap-3 pt-3 border-t border-gray-100 dark:border-gray-700", children: extras.map(([fieldId, value]) => {
+                  const label = fieldId.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+                  let displayValue = String(value);
+                  if ((fieldId === "nationality" || fieldId === "country") && typeof value === "string" && value.length === 2) {
+                    displayValue = getCountryName(value);
+                  }
+                  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: label }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: displayValue })
+                  ] }, fieldId);
+                }) });
+              })()
+            ] });
           })()
         ] }),
         booking.travelers_data && booking.travelers_data.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6", children: [
@@ -1761,8 +1788,6 @@ const Bookings = ({
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-400 dark:text-gray-500", children: __("Try adjusting your filters or check back later.", "yatra") })
     ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: filteredDisplayBookings.map((booking) => {
       const bookingId = Number(booking.id);
-      const isUpcoming = new Date(booking.travel_date) > /* @__PURE__ */ new Date();
-      const isCompleted = booking.booking_status === "completed";
       const paidNumeric = typeof booking.amount_paid === "number" ? booking.amount_paid : parseFloat(booking.amount_paid || "0");
       const totalNumeric = typeof booking.total_amount === "number" ? booking.total_amount : parseFloat(booking.total_amount || "0");
       const totalPaid = paidNumeric;
@@ -1775,18 +1800,7 @@ const Bookings = ({
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 mb-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "div",
-                  {
-                    className: `p-2 rounded-lg ${isUpcoming ? "bg-emerald-50 dark:bg-emerald-900/20" : isCompleted ? "bg-gray-50 dark:bg-gray-700" : "bg-amber-50 dark:bg-amber-900/20"}`,
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      MapPin,
-                      {
-                        className: `w-5 h-5 ${isUpcoming ? "text-emerald-600 dark:text-emerald-400" : isCompleted ? "text-gray-400" : "text-amber-600 dark:text-amber-400"}`
-                      }
-                    )
-                  }
-                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 rounded-lg bg-yatra-soft dark:bg-yatra-surface-dark-muted", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Plane, { className: "w-5 h-5 text-yatra-primary dark:text-yatra-on-dark" }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium mb-1", children: booking.booking_number }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-bold text-gray-900 dark:text-white mb-1", children: booking.trip_title }),
@@ -2413,11 +2427,69 @@ const Profile = ({
       });
     }
   }, [profile, isEditing]);
+  const queryClient2 = useQueryClient();
+  const { showToast } = useToast();
+  const [isSaving, setIsSaving] = reactExports.useState(false);
+  const [isSavingPassword, setIsSavingPassword] = reactExports.useState(false);
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
-  const handleSave = () => {
-    setIsEditing(false);
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const parts = formData.name.trim().split(/\s+/).filter(Boolean);
+      const firstName = parts.shift() || "";
+      const lastName = parts.join(" ");
+      const payload = {
+        first_name: firstName,
+        phone: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        country: formData.country
+      };
+      if (lastName) {
+        payload.last_name = lastName;
+      }
+      await apiClient.put(API_ENDPOINTS.CUSTOMER_ME, payload);
+      await queryClient2.invalidateQueries({ queryKey: ["account-profile"] });
+      showToast(__("Profile updated successfully.", "yatra"), "success");
+      setIsEditing(false);
+    } catch (error) {
+      showToast(
+        (error == null ? void 0 : error.message) || __("Failed to update profile.", "yatra"),
+        "error"
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+  const handleChangePassword = async () => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      showToast(__("Passwords do not match.", "yatra"), "error");
+      return;
+    }
+    setIsSavingPassword(true);
+    try {
+      await apiClient.post(API_ENDPOINTS.CUSTOMER_CHANGE_PASSWORD, {
+        current_password: passwordData.currentPassword,
+        new_password: passwordData.newPassword
+      });
+      showToast(__("Password changed successfully.", "yatra"), "success");
+      setIsChangingPassword(false);
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+      });
+      setTimeout(() => window.location.reload(), 1200);
+    } catch (error) {
+      showToast(
+        (error == null ? void 0 : error.message) || __("Failed to change password.", "yatra"),
+        "error"
+      );
+    } finally {
+      setIsSavingPassword(false);
+    }
   };
   const handleCancel = () => {
     setIsEditing(false);
@@ -2479,21 +2551,8 @@ const Profile = ({
           ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.name || __("Not set", "yatra") })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-field", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: [
-            __("Email Address", "yatra"),
-            " ",
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
-          ] }),
-          isEditing ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "input",
-            {
-              type: "email",
-              value: formData.email,
-              onChange: (e) => handleInputChange("email", e.target.value),
-              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent",
-              placeholder: __("Enter your email address", "yatra")
-            }
-          ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.email || __("Not set", "yatra") })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Email Address", "yatra") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.email || __("Not set", "yatra") })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-field", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Phone Number", "yatra") }),
@@ -2507,6 +2566,21 @@ const Profile = ({
               placeholder: __("Enter your phone number", "yatra")
             }
           ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.phone || __("Not set", "yatra") })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-field", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Country", "yatra") }),
+          isEditing ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "select",
+            {
+              value: formData.country,
+              onChange: (e) => handleInputChange("country", e.target.value),
+              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Select your country", "yatra") }),
+                getCountryOptions().map((c) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: c.code, children: c.name }, c.code))
+              ]
+            }
+          ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: getCountryName$1(formData.country) || __("Not set", "yatra") })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-field", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("City", "yatra") }),
@@ -2533,19 +2607,6 @@ const Profile = ({
               placeholder: __("Enter your address", "yatra")
             }
           ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.address || __("Not set", "yatra") })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-field", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Country", "yatra") }),
-          isEditing ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "input",
-            {
-              type: "text",
-              value: formData.country,
-              onChange: (e) => handleInputChange("country", e.target.value),
-              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent",
-              placeholder: __("Enter your country", "yatra")
-            }
-          ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.country || __("Not set", "yatra") })
         ] })
       ] }),
       isEditing && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-actions flex flex-wrap gap-3 pt-4 border-t border-gray-200 dark:border-gray-700", children: [
@@ -2554,10 +2615,11 @@ const Profile = ({
           {
             type: "button",
             onClick: handleSave,
-            className: "inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium",
+            disabled: isSaving,
+            className: "inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4" }),
-              __("Save Changes", "yatra")
+              isSaving ? __("Saving…", "yatra") : __("Save Changes", "yatra")
             ]
           }
         ),
@@ -2666,22 +2728,12 @@ const Profile = ({
             "button",
             {
               type: "button",
-              onClick: () => {
-                if (passwordData.newPassword !== passwordData.confirmPassword) {
-                  return;
-                }
-                setIsChangingPassword(false);
-                setPasswordData({
-                  currentPassword: "",
-                  newPassword: "",
-                  confirmPassword: ""
-                });
-              },
-              disabled: !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword || passwordData.newPassword !== passwordData.confirmPassword,
+              onClick: handleChangePassword,
+              disabled: isSavingPassword || !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword || passwordData.newPassword !== passwordData.confirmPassword,
               className: "inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed",
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4" }),
-                __("Update Password", "yatra")
+                isSavingPassword ? __("Updating…", "yatra") : __("Update Password", "yatra")
               ]
             }
           ),
@@ -2720,7 +2772,7 @@ const Profile = ({
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white truncate", children: trip.trip_title || trip.title }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: formatDate(trip.next_departure) })
+              (trip.location || trip.duration) && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: trip.location || trip.duration })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-right ml-4 flex-shrink-0", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("From", "yatra") }),

@@ -748,6 +748,9 @@ video {
 .z-50 {
   z-index: 50;
 }
+.z-\[100000\] {
+  z-index: 100000;
+}
 .z-\[9998\] {
   z-index: 9998;
 }
@@ -1037,6 +1040,9 @@ video {
 }
 .h-\[140px\] {
   height: 140px;
+}
+.h-\[18px\] {
+  height: 18px;
 }
 .h-\[480px\] {
   height: 480px;
@@ -1349,6 +1355,9 @@ video {
 }
 .min-w-\[180px\] {
   min-width: 180px;
+}
+.min-w-\[18px\] {
+  min-width: 18px;
 }
 .min-w-\[200px\] {
   min-width: 200px;

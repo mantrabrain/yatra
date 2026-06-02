@@ -180,7 +180,11 @@ class PaymentRepository extends BaseRepository
                     b.amount_paid as booking_amount_paid,
                     b.amount_due as booking_amount_due,
                     b.travel_date as travel_date,
-                    t.title as trip_title
+                    b.trip_id as trip_id,
+                    b.payment_method as payment_method,
+                    t.title as trip_title,
+                    t.duration_days as trip_duration_days,
+                    t.duration_nights as trip_duration_nights
              FROM {$table} p
              LEFT JOIN {$bookings_table} b ON p.booking_id = b.id
              LEFT JOIN {$trips_table} t ON b.trip_id = t.id

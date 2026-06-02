@@ -96,7 +96,7 @@ class LoggingService
             $logs = array_slice($logs, -1000);
         }
         
-        update_option('yatra_logs', $logs);
+        update_option('yatra_logs', $logs, false); // autoload=false: grows; read on demand only
     }
     
     /**

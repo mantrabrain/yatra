@@ -99,6 +99,10 @@ interface BookingFormData {
 // (admin + public booking + Pro modules) picks it up.
 const countryList = getCountryOptions();
 
+// Core contact fields rendered explicitly (name/email/phone/country); everything
+// else in the contact form is treated as an "extra/custom" field.
+const CORE_CONTACT_IDS = ["first_name", "last_name", "email", "phone", "country"];
+
 // Normalize ISO/date-like string to formatted date using shared date library
 const normalizeDateInput = (value?: string | null) => {
   if (!value) return "";
@@ -135,6 +139,12 @@ const BookingForm: React.FC = () => {
   const [travelersData, setTravelersData] = useState<TravelerData[]>([{}]);
   const [expandedTravelers, setExpandedTravelers] = useState<number[]>([0]);
   const [emergencyContactData, setEmergencyContactData] = useState<
+    Record<string, string>
+  >({});
+  // Extra/custom contact fields (everything beyond the core name/email/phone/
+  // country handled by formData), keyed by field id — kept in sync with the
+  // booking's contact_data JSON so admins can edit custom contact fields.
+  const [contactExtraData, setContactExtraData] = useState<
     Record<string, string>
   >({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -185,6 +195,16 @@ const BookingForm: React.FC = () => {
     if (!formConfig?.emergency_contact_form?.fields) return [];
     return formConfig.emergency_contact_form.fields
       .filter((field) => field.enabled)
+      .sort((a, b) => a.order - b.order);
+  }, [formConfig]);
+
+  // Contact fields beyond the core ones already rendered above (name/email/
+  // phone/country) — i.e. nationality, address, and any CUSTOM contact fields.
+  const contactExtraFields = useMemo(() => {
+    if (!formConfig?.contact_form?.fields) return [];
+    if (formConfig.contact_form.enabled === false) return [];
+    return formConfig.contact_form.fields
+      .filter((field) => field.enabled && !CORE_CONTACT_IDS.includes(field.id))
       .sort((a, b) => a.order - b.order);
   }, [formConfig]);
 
@@ -363,6 +383,7 @@ const BookingForm: React.FC = () => {
           payment_method: booking.payment_method || "",
           notes: booking.notes || "",
           emergency_contact: emergencyContact,
+          contact_data: (booking as any).contact_data || null,
         };
 
         return mappedData;
@@ -427,6 +448,19 @@ const BookingForm: React.FC = () => {
         setEmergencyContactData(bookingData.emergency_contact);
       }
 
+      // Set extra/custom contact fields from the booking's contact_data JSON
+      // (everything beyond the core name/email/phone/country handled above).
+      const cd = (bookingData as any).contact_data;
+      if (cd && typeof cd === "object") {
+        const extras: Record<string, string> = {};
+        Object.entries(cd).forEach(([k, v]) => {
+          if (!CORE_CONTACT_IDS.includes(k)) {
+            extras[k] = v == null ? "" : String(v);
+          }
+        });
+        setContactExtraData(extras);
+      }
+
       setIsDataLoaded(true);
     }
   }, [bookingData, isEditMode]);
@@ -480,6 +514,91 @@ const BookingForm: React.FC = () => {
   // Emergency contact change handler
   const handleEmergencyContactChange = (field: string, value: string) => {
     setEmergencyContactData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleContactExtraChange = (field: string, value: string) => {
+    setContactExtraData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Shared renderer for a dynamic form field's input (matches the checkout
+  // field types). Used for the extra/custom contact fields.
+  const renderDynamicInput = (
+    field: FormFieldConfig,
+    value: string,
+    onChange: (v: string) => void,
+    idPrefix: string,
+  ) => {
+    const id = `${idPrefix}-${field.id}`;
+    if (field.type === "select") {
+      return (
+        <Select id={id} value={value} onChange={(e) => onChange(e.target.value)}>
+          <option value="">
+            {field.placeholder || `Select ${field.label}`}
+          </option>
+          {field.options?.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </Select>
+      );
+    }
+    if (field.type === "country") {
+      return (
+        <Select id={id} value={value} onChange={(e) => onChange(e.target.value)}>
+          <option value="">{field.placeholder || "Select Country"}</option>
+          {countryList.map((c) => (
+            <option key={c.code} value={c.code}>
+              {c.name}
+            </option>
+          ))}
+        </Select>
+      );
+    }
+    if (field.type === "textarea") {
+      return (
+        <textarea
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={field.placeholder}
+          rows={2}
+          className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:placeholder:text-gray-400 resize-none"
+        />
+      );
+    }
+    if (field.type === "checkbox") {
+      return (
+        <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+          <input
+            type="checkbox"
+            className="rounded border-gray-300"
+            checked={value === "1" || value === "true"}
+            onChange={(e) => onChange(e.target.checked ? "1" : "")}
+          />
+          <span>{field.placeholder || field.label}</span>
+        </label>
+      );
+    }
+    return (
+      <Input
+        id={id}
+        type={
+          field.type === "email"
+            ? "email"
+            : field.type === "tel"
+              ? "tel"
+              : field.type === "date"
+                ? "date"
+                : field.type === "number"
+                  ? "number"
+                  : "text"
+        }
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={field.placeholder}
+      />
+    );
   };
 
   // Traveler management functions
@@ -579,6 +698,8 @@ const BookingForm: React.FC = () => {
         contact_last_name: lastName,
         contact_email: data.customer_email.trim(),
         contact_phone: data.customer_phone.trim(),
+        // contact_country column (previously not submitted, so edits were lost).
+        contact_country: data.customer_country || "",
         trip_id: parseInt(data.trip_id),
         travel_date: data.travel_date,
         travelers_count: travelersData.length,
@@ -591,6 +712,16 @@ const BookingForm: React.FC = () => {
         travelers: travelersData,
         // Include emergency contact data
         emergency_contact: emergencyContactData,
+        // Full contact_data JSON: core fields + every extra/custom contact field,
+        // so admin edits round-trip and feed the {{contact_*}} email variables.
+        contact_data: {
+          first_name: firstName,
+          last_name: lastName,
+          email: data.customer_email.trim(),
+          phone: data.customer_phone.trim(),
+          country: data.customer_country || "",
+          ...contactExtraData,
+        },
       };
 
       return isEditMode
@@ -878,6 +1009,31 @@ const BookingForm: React.FC = () => {
                       ))}
                     </select>
                   </div>
+
+                  {/* Extra / custom contact fields (nationality, address, and
+                      any fields the operator added via the Dynamic Form module). */}
+                  {contactExtraFields.map((field) => (
+                    <div
+                      key={field.id}
+                      className={field.width === "full" ? "md:col-span-2" : ""}
+                    >
+                      <label
+                        htmlFor={`contact-${field.id}`}
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                      >
+                        {field.label}
+                        {field.required && (
+                          <span className="text-red-500 ml-1">*</span>
+                        )}
+                      </label>
+                      {renderDynamicInput(
+                        field,
+                        contactExtraData[field.id] || "",
+                        (v) => handleContactExtraChange(field.id, v),
+                        "contact",
+                      )}
+                    </div>
+                  ))}
                 </CardContent>
               </Card>
 

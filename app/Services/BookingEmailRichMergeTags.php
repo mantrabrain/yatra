@@ -34,7 +34,7 @@ final class BookingEmailRichMergeTags
 
         $special = trim((string) ($booking->special_requests ?? ''));
 
-        return [
+        return array_merge([
             'payment_gateway' => $gatewaySlug,
             'payment_gateway_label' => self::gatewayLabel($gatewaySlug),
             'payment_schedule' => $scheduleRaw,
@@ -45,7 +45,70 @@ final class BookingEmailRichMergeTags
             'booking_custom_fields_html' => self::buildBookingCustomFieldsHtml($booking),
             'special_requests' => $special,
             'special_requests_html' => $special !== '' ? nl2br(esc_html($special)) : '',
-        ];
+        ], self::contactAndEmergencyTags($booking));
+    }
+
+    /**
+     * Expose EVERY contact + emergency form field as a merge tag — DYNAMICALLY,
+     * so custom fields an operator adds to those forms are usable in emails
+     * automatically (e.g. {{emergency_name}}, {{contact_passport_no}}). Values
+     * come from the booking's contact_data / emergency_contact JSON, keyed by the
+     * field id with a `contact_` / `emergency_` prefix.
+     *
+     * @return array<string, string>
+     */
+    private static function contactAndEmergencyTags(object $booking): array
+    {
+        $tags = [];
+
+        // contact_data JSON → contact_<field_id> for every scalar field.
+        foreach (self::decodeJsonObject($booking->contact_data ?? null) as $key => $value) {
+            $k = sanitize_key((string) $key);
+            if ($k !== '' && is_scalar($value)) {
+                $tags['contact_' . $k] = (string) $value;
+            }
+        }
+        // Canonical booking column wins for country if present.
+        if (!empty($booking->contact_country)) {
+            $tags['contact_country'] = (string) $booking->contact_country;
+        }
+
+        // emergency_contact JSON → emergency_<field_id> for every scalar field.
+        foreach (self::decodeJsonObject($booking->emergency_contact ?? null) as $key => $value) {
+            $k = sanitize_key((string) $key);
+            if ($k !== '' && is_scalar($value)) {
+                $tags['emergency_' . $k] = (string) $value;
+            }
+        }
+
+        return $tags;
+    }
+
+    /**
+     * Decode a JSON object column into an associative array (empty on failure).
+     *
+     * @param mixed $raw
+     * @return array<string, mixed>
+     */
+    private static function decodeJsonObject($raw): array
+    {
+        if (empty($raw)) {
+            return [];
+        }
+        if (is_array($raw)) {
+            return $raw;
+        }
+        // Canonical storage is JSON, but tolerate legacy PHP-serialized values
+        // from very old bookings too — matching BookingService::formatBookingWithDetails
+        // and CustomerService — so {{contact_*}} / {{emergency_*}} merge tags
+        // resolve for those rows instead of silently rendering empty.
+        $value = maybe_unserialize($raw);
+        if (is_array($value)) {
+            return $value;
+        }
+        $decoded = json_decode((string) $value, true);
+
+        return is_array($decoded) ? $decoded : [];
     }
 
     /**
@@ -64,6 +127,12 @@ final class BookingEmailRichMergeTags
             'booking_custom_fields_html' => '',
             'special_requests' => '',
             'special_requests_html' => '',
+            'contact_country' => '',
+            'contact_address' => '',
+            'contact_nationality' => '',
+            'emergency_name' => '',
+            'emergency_phone' => '',
+            'emergency_relationship' => '',
         ];
     }
 

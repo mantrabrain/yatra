@@ -202,7 +202,18 @@ class SettingsController extends BaseController
         'booking_base' => 'book',
         // Wishlist (Pro) — stored in free options; active only when Pro + setting on
         'enable_wishlist' => false,
-        
+
+        // Search & Listing storefront UX. Defaults preserve current behaviour:
+        // every search field shown (true) and mobile filters expanded (false),
+        // so existing installs are unchanged until the owner opts in. Booleans
+        // are auto-sanitized from the default type.
+        'search_show_keyword' => true,
+        'search_show_destination' => true,
+        'search_show_activities' => true,
+        'search_show_duration' => true,
+        'search_show_budget' => true,
+        'collapse_filters_on_mobile' => false,
+
         // Booking Page Settings
         'use_booking_page' => false,
         'booking_page_id' => 0,

@@ -26,6 +26,7 @@ export const API_ENDPOINTS = {
   CUSTOMER_STATS: "/customers/stats",
   CUSTOMER_BOOKINGS: (id: string | number) => `/customers/${id}/bookings`,
   CUSTOMER_ME: "/customers/me",
+  CUSTOMER_CHANGE_PASSWORD: "/customers/me/password",
   CUSTOMER_MY_BOOKINGS: "/customers/my-bookings",
   CUSTOMER_MY_PAYMENTS: "/customers/my-payments",
   CUSTOMER_MY_DOCUMENTS: "/customers/my-documents",

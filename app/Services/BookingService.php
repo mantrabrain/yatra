@@ -365,8 +365,24 @@ class BookingService
             // Apply tax calculation to booking data
             $data = BookingTaxService::applyTaxToBooking($data);
 
-            // Calculate amounts (recalculated after tax)
-            $data['amount_due'] = (float) ($data['total_amount'] ?? 0) - (float) ($data['amount_paid'] ?? 0);
+            // Calculate amount due (recalculated after tax). Honor the selected
+            // payment method via Pro FlexiblePayments so a deposit/partial
+            // booking stores the reduced amount due now — not the full total.
+            // For 'full' (and when Pro is inactive) the filter returns
+            // total − paid unchanged, so full-payment bookings are unaffected.
+            // After the deposit is paid, payment completion resets amount_due to
+            // the remaining balance (total − amount_paid).
+            $bs_total          = (float) ($data['total_amount'] ?? 0);
+            $bs_paid           = (float) ($data['amount_paid'] ?? 0);
+            $bs_payment_method = strtolower(trim((string) ($data['payment_method'] ?? 'full')));
+            $bs_due_now        = (float) apply_filters(
+                'yatra_calculate_amount_due',
+                $bs_total - $bs_paid,
+                $bs_total,
+                $bs_payment_method,
+                ['trip_id' => (int) ($data['trip_id'] ?? 0)]
+            );
+            $data['amount_due'] = max(0.0, round($bs_due_now, 2));
 
             // Create booking
             $bookingId = $this->bookingRepository->create($data);
@@ -952,9 +968,25 @@ class BookingService
      */
     private function saveTravelers(int $bookingId, array $travelers): void
     {
-        foreach ($travelers as $index => $travelerData) {
+        // Re-index defensively so traveller_index / is_lead are positional and
+        // contiguous regardless of the incoming keys.
+        $index = 0;
+        foreach ($travelers as $travelerData) {
+            if (!is_array($travelerData)) {
+                continue;
+            }
             $isLead = $index === 0;
-            $this->travellerRepository->createTraveller($bookingId, $index, $isLead, $travelerData);
+            // Accept both shapes: a nested { fields: {...} } (repository format)
+            // or a flat field map (admin BookingForm). Drop non-field meta keys.
+            $fields = isset($travelerData['fields']) && is_array($travelerData['fields'])
+                ? $travelerData['fields']
+                : $travelerData;
+            unset($fields['is_lead'], $fields['traveller_index'], $fields['id'], $fields['booking_id']);
+            // create() is the real repository method (createTraveller() never existed);
+            // it inserts the traveller row and writes every field to the meta table —
+            // the same method the checkout flow uses.
+            $this->travellerRepository->create($bookingId, $index, $isLead, $fields);
+            $index++;
         }
     }
 

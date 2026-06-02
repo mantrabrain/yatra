@@ -487,6 +487,36 @@
      * Clicks on `.yatra-clear-section` (the "clear this filter" X)
      * are explicitly excluded so they don't ALSO trigger a toggle.
      */
+    var YATRA_OPEN_SECTIONS_KEY = 'yatraOpenFilterSections';
+
+    // Stable per-section key — the filter title's unique data-toggle value
+    // (price, trip-type, rating, …).
+    function yatraSectionKey(section) {
+        var title = section.querySelector('.yatra-filter-title');
+        return title ? (title.getAttribute('data-toggle') || '') : '';
+    }
+
+    // Remember which sections are currently open (used only in mobile-collapse
+    // mode) so a filter change — which reloads the page — can re-open them.
+    function yatraSaveOpenSections() {
+        try {
+            var open = [];
+            document.querySelectorAll('.yatra-filter-section.open').forEach(function(s) {
+                var k = yatraSectionKey(s);
+                if (k) { open.push(k); }
+            });
+            window.sessionStorage.setItem(YATRA_OPEN_SECTIONS_KEY, JSON.stringify(open));
+        } catch (e) { /* sessionStorage blocked/full — non-fatal */ }
+    }
+
+    function yatraGetSavedOpenSections() {
+        try {
+            var raw = window.sessionStorage.getItem(YATRA_OPEN_SECTIONS_KEY);
+            var arr = raw ? JSON.parse(raw) : [];
+            return Array.isArray(arr) ? arr : [];
+        } catch (e) { return []; }
+    }
+
     function initializeFilterToggle() {
         document.addEventListener('click', function(e) {
             // Skip clicks on the clear-section button (and any of its
@@ -504,14 +534,54 @@
             var section = title.closest('.yatra-filter-section');
             if (section) {
                 section.classList.toggle('open');
+                // In mobile-collapse mode, persist the open set so the next
+                // (filter-triggered) reload can restore it.
+                if (shouldCollapseFiltersOnMobile()) {
+                    yatraSaveOpenSections();
+                }
             }
         });
 
-        // Open all sections by default on first render. Subsequent
-        // re-renders inherit whatever state the new HTML ships with.
-        document.querySelectorAll('.yatra-filter-section').forEach(function(section) {
-            section.classList.add('open');
-        });
+        // Open all sections by default — EXCEPT when the owner enabled
+        // "Collapse filters on mobile" (the [data-yatra-collapse-mobile] marker
+        // is printed on the sidebar) AND we're on a mobile viewport. In that
+        // case sections stay collapsed so trip listings are visible immediately;
+        // visitors tap a title to expand (the delegated handler above).
+        //
+        // With NO marker — i.e. every existing free/pro site that hasn't opted
+        // in — this branch always runs and opens all sections on every viewport,
+        // identical to the previous behaviour. Desktop is never collapsed here.
+        // Filter changes do a full page reload (window.location), so this runs
+        // fresh on every load.
+        if (!shouldCollapseFiltersOnMobile()) {
+            document.querySelectorAll('.yatra-filter-section').forEach(function(section) {
+                section.classList.add('open');
+            });
+        } else {
+            // Mobile + collapse enabled: start collapsed, but RE-OPEN any
+            // sections the visitor had open before the reload (e.g. the one they
+            // just applied a filter in) so it doesn't snap shut on them. First
+            // visit (nothing saved) → everything stays collapsed.
+            var saved = yatraGetSavedOpenSections();
+            if (saved.length) {
+                document.querySelectorAll('.yatra-filter-section').forEach(function(section) {
+                    if (saved.indexOf(yatraSectionKey(section)) !== -1) {
+                        section.classList.add('open');
+                    } else {
+                        section.classList.remove('open');
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * True only when the owner opted into collapsed mobile filters AND the
+     * current viewport is mobile (≤768px, matching the listing CSS breakpoint).
+     */
+    function shouldCollapseFiltersOnMobile() {
+        return !!document.querySelector('[data-yatra-collapse-mobile="1"]')
+            && window.matchMedia('(max-width: 768px)').matches;
     }
 
     /**

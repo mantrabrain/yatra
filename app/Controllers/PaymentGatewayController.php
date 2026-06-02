@@ -1023,10 +1023,11 @@ class PaymentGatewayController extends BaseController
         $bookingDate = !empty($payment->created_at) ? date_i18n(get_option('date_format'), strtotime($payment->created_at)) : '';
         $travelDate = !empty($payment->travel_date) ? date_i18n(get_option('date_format'), strtotime($payment->travel_date)) : '';
         
-        // Calculate return date if duration is available
+        // Calculate return date if duration is available (duration_days column).
         $returnDate = '';
-        if (!empty($payment->travel_date) && !empty($trip->duration ?? 0)) {
-            $returnTimestamp = strtotime($payment->travel_date . ' +' . (int) ($trip->duration ?? 0) . ' days');
+        $durationDaysForReturn = (int) ($payment->trip_duration_days ?? ($trip->duration_days ?? 0));
+        if (!empty($payment->travel_date) && $durationDaysForReturn > 0) {
+            $returnTimestamp = strtotime($payment->travel_date . ' +' . $durationDaysForReturn . ' days');
             $returnDate = date_i18n(get_option('date_format'), $returnTimestamp);
         }
 
@@ -1055,8 +1056,15 @@ class PaymentGatewayController extends BaseController
             'status_class' => in_array(strtolower((string) ($payment->status ?? '')), ['confirmed', 'completed', 'success'], true) ? 'confirmed' : 
                            (in_array(strtolower((string) ($payment->status ?? '')), ['cancelled'], true) ? 'cancelled' : 'pending'),
             'trip_title' => $trip ? ($trip->title ?? $payment->trip_title ?? __('Trip Booking', 'yatra')) : ($payment->trip_title ?? __('Trip Booking', 'yatra')),
-            /* translators: %d: trip duration in days. */
-            'trip_duration' => $trip && $trip->duration ? sprintf(__('%d days', 'yatra'), (int) $trip->duration) : '',
+            // Trip duration: prefer the duration columns joined onto the payment
+            // row (always present, even if the trip was later soft-deleted),
+            // falling back to the loaded trip. There is no `duration` column.
+            'trip_duration' => yatra_format_duration(
+                (int) ($payment->trip_duration_days ?? ($trip->duration_days ?? 0)),
+                isset($payment->trip_duration_nights)
+                    ? (int) $payment->trip_duration_nights
+                    : (isset($trip->duration_nights) ? (int) $trip->duration_nights : null)
+            ),
             'trip_difficulty' => $trip ? ($trip->difficulty_name ?? '') : '',
             'departure_location' => $trip ? ($trip->departure_location ?? '') : '',
             'destination' => $trip ? ($trip->destination ?? $payment->destination ?? '') : ($payment->destination ?? ''),

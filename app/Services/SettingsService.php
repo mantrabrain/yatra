@@ -167,7 +167,21 @@ class SettingsService
         'enable_wishlist' => false,
         'enable_comparison' => false,
         'show_sold_out' => true,
-        
+
+        // Search & Listing storefront UX.
+        // Search-bar field visibility — default true so the bar renders every
+        // field exactly as before for existing free/pro installs. Owners can
+        // hide individual fields from Settings → Search & Listing.
+        'search_show_keyword' => true,
+        'search_show_destination' => true,
+        'search_show_activities' => true,
+        'search_show_duration' => true,
+        'search_show_budget' => true,
+        // Collapse the listing filter sidebar sections on mobile. Default false
+        // = today's behaviour (all sections expanded on every viewport), so an
+        // existing site sees no change on update until the owner opts in.
+        'collapse_filters_on_mobile' => false,
+
         // Customer
         'enable_customer_accounts' => true,
         'enable_customer_registration' => true,
@@ -218,61 +232,68 @@ class SettingsService
      */
     public static function getDefaultBookingFormConfig(): array
     {
+        // User-facing strings (titles, descriptions, labels, placeholders,
+        // option labels) are wrapped in __() so they are (a) extracted into the
+        // .pot for Loco Translate and (b) translated to the active locale when
+        // the config is built — e.g. on a Dutch storefront the default booking
+        // form renders in Dutch. Structural values (id/type/order/width/etc.)
+        // stay literal. Saved/custom labels are additionally translated at
+        // render time (see yatra_translate_form_string()).
         return [
             'contact_form' => [
-                'title' => 'Lead Traveler / Contact Information',
-                'description' => 'Primary contact person for this booking',
+                'title' => __('Lead Traveler / Contact Information', 'yatra'),
+                'description' => __('Primary contact person for this booking', 'yatra'),
                 'fields' => [
-                    ['id' => 'first_name', 'type' => 'text', 'label' => 'First Name', 'placeholder' => 'Enter first name', 'required' => true, 'enabled' => true, 'order' => 1, 'width' => 'half', 'locked' => true],
-                    ['id' => 'last_name', 'type' => 'text', 'label' => 'Last Name', 'placeholder' => 'Enter last name', 'required' => true, 'enabled' => true, 'order' => 2, 'width' => 'half', 'locked' => true],
-                    ['id' => 'email', 'type' => 'email', 'label' => 'Email Address', 'placeholder' => 'your@email.com', 'required' => true, 'enabled' => true, 'order' => 3, 'width' => 'half', 'locked' => true],
-                    ['id' => 'phone', 'type' => 'tel', 'label' => 'Phone Number', 'placeholder' => '+1 234 567 8900', 'required' => true, 'enabled' => true, 'order' => 4, 'width' => 'half', 'locked' => true],
-                    ['id' => 'country', 'type' => 'country', 'label' => 'Country', 'placeholder' => 'Select Country', 'required' => true, 'enabled' => true, 'order' => 5, 'width' => 'half', 'locked' => true],
-                    ['id' => 'nationality', 'type' => 'country', 'label' => 'Nationality', 'placeholder' => 'Select Nationality', 'required' => false, 'enabled' => true, 'order' => 6, 'width' => 'half'],
-                    ['id' => 'address', 'type' => 'text', 'label' => 'Address', 'placeholder' => 'Street address (optional)', 'required' => false, 'enabled' => true, 'order' => 7, 'width' => 'full'],
+                    ['id' => 'first_name', 'type' => 'text', 'label' => __('First Name', 'yatra'), 'placeholder' => __('Enter first name', 'yatra'), 'required' => true, 'enabled' => true, 'order' => 1, 'width' => 'half', 'locked' => true],
+                    ['id' => 'last_name', 'type' => 'text', 'label' => __('Last Name', 'yatra'), 'placeholder' => __('Enter last name', 'yatra'), 'required' => true, 'enabled' => true, 'order' => 2, 'width' => 'half', 'locked' => true],
+                    ['id' => 'email', 'type' => 'email', 'label' => __('Email Address', 'yatra'), 'placeholder' => 'your@email.com', 'required' => true, 'enabled' => true, 'order' => 3, 'width' => 'half', 'locked' => true],
+                    ['id' => 'phone', 'type' => 'tel', 'label' => __('Phone Number', 'yatra'), 'placeholder' => '+1 234 567 8900', 'required' => true, 'enabled' => true, 'order' => 4, 'width' => 'half', 'locked' => true],
+                    ['id' => 'country', 'type' => 'country', 'label' => __('Country', 'yatra'), 'placeholder' => __('Select Country', 'yatra'), 'required' => true, 'enabled' => true, 'order' => 5, 'width' => 'half', 'locked' => true],
+                    ['id' => 'nationality', 'type' => 'country', 'label' => __('Nationality', 'yatra'), 'placeholder' => __('Select Nationality', 'yatra'), 'required' => false, 'enabled' => true, 'order' => 6, 'width' => 'half'],
+                    ['id' => 'address', 'type' => 'text', 'label' => __('Address', 'yatra'), 'placeholder' => __('Street address (optional)', 'yatra'), 'required' => false, 'enabled' => true, 'order' => 7, 'width' => 'full'],
                 ],
             ],
             'emergency_contact_form' => [
-                'title' => 'Emergency Contact',
-                'description' => 'Person to contact in case of emergency',
+                'title' => __('Emergency Contact', 'yatra'),
+                'description' => __('Person to contact in case of emergency', 'yatra'),
                 'enabled' => true,
                 'fields' => [
-                    ['id' => 'name', 'type' => 'text', 'label' => 'Contact Name', 'placeholder' => 'Full name', 'required' => true, 'enabled' => true, 'order' => 1, 'width' => 'half'],
-                    ['id' => 'phone', 'type' => 'tel', 'label' => 'Contact Phone', 'placeholder' => '+1 234 567 8900', 'required' => true, 'enabled' => true, 'order' => 2, 'width' => 'half'],
-                    ['id' => 'relationship', 'type' => 'select', 'label' => 'Relationship', 'placeholder' => 'Select Relationship', 'required' => false, 'enabled' => true, 'order' => 3, 'width' => 'full', 'options' => [
-                        ['value' => 'spouse', 'label' => 'Spouse/Partner'],
-                        ['value' => 'parent', 'label' => 'Parent'],
-                        ['value' => 'sibling', 'label' => 'Sibling'],
-                        ['value' => 'child', 'label' => 'Child'],
-                        ['value' => 'friend', 'label' => 'Friend'],
-                        ['value' => 'other', 'label' => 'Other'],
+                    ['id' => 'name', 'type' => 'text', 'label' => __('Contact Name', 'yatra'), 'placeholder' => __('Full name', 'yatra'), 'required' => true, 'enabled' => true, 'order' => 1, 'width' => 'half'],
+                    ['id' => 'phone', 'type' => 'tel', 'label' => __('Contact Phone', 'yatra'), 'placeholder' => '+1 234 567 8900', 'required' => true, 'enabled' => true, 'order' => 2, 'width' => 'half'],
+                    ['id' => 'relationship', 'type' => 'select', 'label' => __('Relationship', 'yatra'), 'placeholder' => __('Select Relationship', 'yatra'), 'required' => false, 'enabled' => true, 'order' => 3, 'width' => 'full', 'options' => [
+                        ['value' => 'spouse', 'label' => __('Spouse/Partner', 'yatra')],
+                        ['value' => 'parent', 'label' => __('Parent', 'yatra')],
+                        ['value' => 'sibling', 'label' => __('Sibling', 'yatra')],
+                        ['value' => 'child', 'label' => __('Child', 'yatra')],
+                        ['value' => 'friend', 'label' => __('Friend', 'yatra')],
+                        ['value' => 'other', 'label' => __('Other', 'yatra')],
                     ]],
                 ],
             ],
             'traveler_form' => [
-                'title' => 'Traveler Information',
-                'description' => 'Please provide details for each traveler',
+                'title' => __('Traveler Information', 'yatra'),
+                'description' => __('Please provide details for each traveler', 'yatra'),
                 'fields' => [
-                    ['id' => 'first_name', 'type' => 'text', 'label' => 'First Name', 'placeholder' => 'Legal first name', 'required' => true, 'enabled' => true, 'order' => 1, 'width' => 'half'],
-                    ['id' => 'last_name', 'type' => 'text', 'label' => 'Last Name', 'placeholder' => 'Legal last name', 'required' => true, 'enabled' => true, 'order' => 2, 'width' => 'half'],
-                    ['id' => 'date_of_birth', 'type' => 'date', 'label' => 'Date of Birth', 'placeholder' => '', 'required' => true, 'enabled' => true, 'order' => 3, 'width' => 'half'],
-                    ['id' => 'gender', 'type' => 'select', 'label' => 'Gender', 'placeholder' => 'Select Gender', 'required' => true, 'enabled' => true, 'order' => 4, 'width' => 'half', 'options' => [
-                        ['value' => 'male', 'label' => 'Male'],
-                        ['value' => 'female', 'label' => 'Female'],
-                        ['value' => 'other', 'label' => 'Other'],
+                    ['id' => 'first_name', 'type' => 'text', 'label' => __('First Name', 'yatra'), 'placeholder' => __('Legal first name', 'yatra'), 'required' => true, 'enabled' => true, 'order' => 1, 'width' => 'half'],
+                    ['id' => 'last_name', 'type' => 'text', 'label' => __('Last Name', 'yatra'), 'placeholder' => __('Legal last name', 'yatra'), 'required' => true, 'enabled' => true, 'order' => 2, 'width' => 'half'],
+                    ['id' => 'date_of_birth', 'type' => 'date', 'label' => __('Date of Birth', 'yatra'), 'placeholder' => '', 'required' => true, 'enabled' => true, 'order' => 3, 'width' => 'half'],
+                    ['id' => 'gender', 'type' => 'select', 'label' => __('Gender', 'yatra'), 'placeholder' => __('Select Gender', 'yatra'), 'required' => true, 'enabled' => true, 'order' => 4, 'width' => 'half', 'options' => [
+                        ['value' => 'male', 'label' => __('Male', 'yatra')],
+                        ['value' => 'female', 'label' => __('Female', 'yatra')],
+                        ['value' => 'other', 'label' => __('Other', 'yatra')],
                     ]],
-                    ['id' => 'nationality', 'type' => 'country', 'label' => 'Nationality', 'placeholder' => 'Select Nationality', 'required' => true, 'enabled' => true, 'order' => 5, 'width' => 'full'],
-                    ['id' => 'dietary', 'type' => 'select', 'label' => 'Dietary Requirements', 'placeholder' => 'Select', 'required' => false, 'enabled' => true, 'order' => 6, 'width' => 'half', 'section' => 'dietary_medical', 'options' => [
-                        ['value' => 'none', 'label' => 'No special requirements'],
-                        ['value' => 'vegetarian', 'label' => 'Vegetarian'],
-                        ['value' => 'vegan', 'label' => 'Vegan'],
-                        ['value' => 'halal', 'label' => 'Halal'],
-                        ['value' => 'kosher', 'label' => 'Kosher'],
-                        ['value' => 'gluten_free', 'label' => 'Gluten Free'],
-                        ['value' => 'lactose_free', 'label' => 'Lactose Free'],
-                        ['value' => 'other', 'label' => 'Other (specify in notes)'],
+                    ['id' => 'nationality', 'type' => 'country', 'label' => __('Nationality', 'yatra'), 'placeholder' => __('Select Nationality', 'yatra'), 'required' => true, 'enabled' => true, 'order' => 5, 'width' => 'full'],
+                    ['id' => 'dietary', 'type' => 'select', 'label' => __('Dietary Requirements', 'yatra'), 'placeholder' => __('Select', 'yatra'), 'required' => false, 'enabled' => true, 'order' => 6, 'width' => 'half', 'section' => 'dietary_medical', 'options' => [
+                        ['value' => 'none', 'label' => __('No special requirements', 'yatra')],
+                        ['value' => 'vegetarian', 'label' => __('Vegetarian', 'yatra')],
+                        ['value' => 'vegan', 'label' => __('Vegan', 'yatra')],
+                        ['value' => 'halal', 'label' => __('Halal', 'yatra')],
+                        ['value' => 'kosher', 'label' => __('Kosher', 'yatra')],
+                        ['value' => 'gluten_free', 'label' => __('Gluten Free', 'yatra')],
+                        ['value' => 'lactose_free', 'label' => __('Lactose Free', 'yatra')],
+                        ['value' => 'other', 'label' => __('Other (specify in notes)', 'yatra')],
                     ]],
-                    ['id' => 'medical', 'type' => 'text', 'label' => 'Medical Conditions / Allergies', 'placeholder' => 'Any allergies or conditions we should know', 'required' => false, 'enabled' => true, 'order' => 7, 'width' => 'half', 'section' => 'dietary_medical'],
+                    ['id' => 'medical', 'type' => 'text', 'label' => __('Medical Conditions / Allergies', 'yatra'), 'placeholder' => __('Any allergies or conditions we should know', 'yatra'), 'required' => false, 'enabled' => true, 'order' => 7, 'width' => 'half', 'section' => 'dietary_medical'],
                 ],
             ],
         ];
@@ -292,35 +313,90 @@ class SettingsService
         if (empty($saved_config)) {
             return apply_filters('yatra_booking_form_config', $default_config);
         }
-        
-        // Build a map of locked field IDs from defaults
-        $locked_fields = [];
-        foreach ($default_config as $form_type => $form_config) {
-            if (!empty($form_config['fields'])) {
-                foreach ($form_config['fields'] as $field) {
-                    if (!empty($field['locked'])) {
-                        $locked_fields[$form_type][$field['id']] = true;
-                    }
+
+        // Merge saved over defaults. IMPORTANT: `fields` is a positional list,
+        // so a naive array_replace_recursive() merges field-by-INDEX — which
+        // resurrects a deleted default field (saved list is shorter, the tail
+        // default leaks back) and duplicates fields after a middle deletion.
+        // We therefore merge each section's fields BY `id`, treating the saved
+        // config as the authoritative list (order, props, and deletions), while
+        // guaranteeing that locked core fields always exist and stay
+        // locked+required.
+        $merged = [];
+        foreach ($default_config as $form_type => $default_section) {
+            $saved_section = is_array($saved_config[$form_type] ?? null)
+                ? $saved_config[$form_type]
+                : null;
+
+            if ($saved_section === null) {
+                // Section absent from saved config → use the default verbatim.
+                $merged[$form_type] = $default_section;
+                continue;
+            }
+
+            // Section-level scalars (title/description/enabled) come from saved,
+            // falling back to default.
+            $section = array_merge($default_section, $saved_section);
+
+            // Index default fields by id + collect the locked ids for this section.
+            $default_fields_by_id = [];
+            $locked_ids = [];
+            foreach (($default_section['fields'] ?? []) as $df) {
+                if (empty($df['id'])) {
+                    continue;
+                }
+                $default_fields_by_id[$df['id']] = $df;
+                if (!empty($df['locked'])) {
+                    $locked_ids[$df['id']] = true;
                 }
             }
-        }
-        
-        // Merge saved with defaults
-        $merged = array_replace_recursive($default_config, $saved_config);
-        
-        // Ensure locked status is preserved from defaults (locked cannot be overridden)
-        foreach ($merged as $form_type => &$form_config) {
-            if (!empty($form_config['fields']) && is_array($form_config['fields'])) {
-                foreach ($form_config['fields'] as &$field) {
-                    // If this field ID is in the locked list, force locked=true and required=true
-                    if (isset($locked_fields[$form_type][$field['id']])) {
-                        $field['locked'] = true;
-                        $field['required'] = true;
-                    }
+
+            // Rebuild the field list from the saved order, de-duplicated by id.
+            $result_fields = [];
+            $seen = [];
+            $saved_fields = is_array($saved_section['fields'] ?? null)
+                ? $saved_section['fields']
+                : ($default_section['fields'] ?? []);
+            foreach ($saved_fields as $sf) {
+                $id = is_array($sf) ? ($sf['id'] ?? '') : '';
+                if ($id === '' || isset($seen[$id])) {
+                    continue; // drop malformed / duplicate field entries
+                }
+                $seen[$id] = true;
+                // Known default field → default props as the base, saved wins.
+                $field = isset($default_fields_by_id[$id])
+                    ? array_merge($default_fields_by_id[$id], $sf)
+                    : $sf;
+                if (isset($locked_ids[$id])) {
+                    $field['locked'] = true;
+                    $field['required'] = true;
+                }
+                $result_fields[] = $field;
+            }
+
+            // Locked core fields can never be legitimately removed — re-add any
+            // that the saved config dropped, so checkout/admin always have them.
+            foreach ($locked_ids as $id => $_) {
+                if (!isset($seen[$id])) {
+                    $field = $default_fields_by_id[$id];
+                    $field['locked'] = true;
+                    $field['required'] = true;
+                    $result_fields[] = $field;
                 }
             }
+
+            $section['fields'] = $result_fields;
+            $merged[$form_type] = $section;
         }
-        
+
+        // Preserve any saved sections that aren't part of the defaults
+        // (future-proofing for Pro-introduced sections).
+        foreach ($saved_config as $form_type => $saved_section) {
+            if (!isset($merged[$form_type])) {
+                $merged[$form_type] = $saved_section;
+            }
+        }
+
         return apply_filters('yatra_booking_form_config', $merged);
     }
 

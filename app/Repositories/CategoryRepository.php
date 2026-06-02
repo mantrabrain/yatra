@@ -106,41 +106,73 @@ class CategoryRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         $search = sanitize_text_field($search);
-        
+
         $where = ["type = %s"];
         $where[] = "(name LIKE %s OR slug LIKE %s OR description LIKE %s)";
-        $searchTerm = '%' . $wpdb->esc_like($search) . '%';
+        $searchTerm = '%' . $this->wpdb->esc_like($search) . '%';
 
-        // Add additional where conditions
+        // Build params alongside the WHERE clause (single pass — the previous
+        // version touched $params before it was initialised).
+        $params = [ClassificationTypes::CATEGORY, $searchTerm, $searchTerm, $searchTerm];
+
+        // Additional WHERE conditions. Column names are attacker-reachable map
+        // keys, so strip them to [A-Za-z0-9_] (same rule as BaseRepository);
+        // values stay parameterised.
         if (isset($args['where']) && is_array($args['where'])) {
             foreach ($args['where'] as $field => $value) {
+                $column = preg_replace('/[^a-zA-Z0-9_]/', '', (string) $field);
+                if ($column === '') {
+                    continue;
+                }
                 if (is_array($value)) {
+                    if (empty($value)) {
+                        continue;
+                    }
                     $placeholders = implode(',', array_fill(0, count($value), '%s'));
-                    $where[] = "{$field} IN ({$placeholders})";
-                    $params = array_merge($params, $value);
+                    $where[] = "`{$column}` IN ({$placeholders})";
+                    $params = array_merge($params, array_values($value));
                 } else {
-                    $where[] = "{$field} = %s";
+                    $where[] = "`{$column}` = %s";
                     $params[] = $value;
                 }
             }
         }
 
         $whereClause = implode(' AND ', $where);
-        $order = isset($args['order']) ? $args['order'] : 'name ASC';
-        $limit = isset($args['limit']) ? "LIMIT {$args['limit']}" : '';
 
-        $query = "SELECT * FROM `{$table}` WHERE {$whereClause} ORDER BY {$order} {$limit}";
-        
-        $params = [ClassificationTypes::CATEGORY, $searchTerm, $searchTerm, $searchTerm];
-        if (isset($args['where']) && is_array($args['where'])) {
-            foreach ($args['where'] as $field => $value) {
-                if (is_array($value)) {
-                    $params = array_merge($params, $value);
-                } else {
-                    $params[] = $value;
+        // ORDER BY — was raw interpolation of $args['order']. Sanitize the
+        // column to [A-Za-z0-9_] and whitelist the direction. Default unchanged.
+        $orderBy  = 'name';
+        $orderDir = 'ASC';
+        if (isset($args['order']) && is_string($args['order']) && $args['order'] !== '') {
+            $parts = preg_split('/\s+/', trim($args['order']));
+            $col   = preg_replace('/[^a-zA-Z0-9_]/', '', (string) ($parts[0] ?? ''));
+            if ($col !== '') {
+                $orderBy = $col;
+            }
+            $dir = strtoupper((string) ($parts[1] ?? 'ASC'));
+            $orderDir = in_array($dir, ['ASC', 'DESC'], true) ? $dir : 'ASC';
+        }
+        $orderClause = "ORDER BY `{$orderBy}` {$orderDir}";
+
+        // LIMIT — was raw interpolation. Cast to int; still support a legacy
+        // "offset, count" string form if any caller passes one.
+        $limitClause = '';
+        if (isset($args['limit'])) {
+            if (is_string($args['limit']) && strpos($args['limit'], ',') !== false) {
+                [$off, $cnt] = array_map('intval', explode(',', $args['limit'], 2));
+                if ($cnt > 0) {
+                    $limitClause = "LIMIT {$off}, {$cnt}";
+                }
+            } else {
+                $limitVal = (int) $args['limit'];
+                if ($limitVal > 0) {
+                    $limitClause = "LIMIT {$limitVal}";
                 }
             }
         }
+
+        $query = "SELECT * FROM `{$table}` WHERE {$whereClause} {$orderClause} {$limitClause}";
 
         $results = $this->wpdb->get_results($this->wpdb->prepare($query, $params));
         return $results ?: [];

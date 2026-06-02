@@ -493,9 +493,20 @@
             // Validate all required fields
             $form.find('input[required], select[required], textarea[required]').each(function() {
                 const $field = $(this);
-                const value = $field.val();
-                
-                if (!value || value.trim() === '') {
+                const type = ($field.attr('type') || '').toLowerCase();
+
+                // Checkbox/radio: .val() returns the value attribute regardless of
+                // checked state, so an unchecked required box would wrongly pass.
+                // Test the checked state instead.
+                let invalid;
+                if (type === 'checkbox' || type === 'radio') {
+                    invalid = !$field.is(':checked');
+                } else {
+                    const value = $field.val();
+                    invalid = !value || value.trim() === '';
+                }
+
+                if (invalid) {
                     isValid = false;
                     $field.addClass('error');
                     const label = $field.closest('.yatra-form-group').find('label').text().replace('*', '').trim();

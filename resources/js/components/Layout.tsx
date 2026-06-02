@@ -101,6 +101,10 @@ import {
 import { isProPluginActive, isModuleActive } from "../lib/plugin-utils";
 import { navigateMenu } from "../hooks/useNavigate";
 import { canCap } from "../hooks/useCapabilities";
+import {
+  useNotificationCounts,
+  SUBPAGE_TO_SECTION,
+} from "../hooks/useNotificationCounts";
 import { InlineNotices } from "./notices/InlineNotices";
 
 interface LayoutProps {
@@ -288,6 +292,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return params.get("subpage") || "dashboard";
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlKey]);
+
+  // "New since last seen" counts for the sidebar badges (Bookings / Payments /
+  // Abandoned Recovery). Read-only — if the request fails, no badge is shown.
+  const { data: newCounts } = useNotificationCounts();
+  const getNewCount = (subpage: string): number => {
+    const section = SUBPAGE_TO_SECTION[subpage];
+    if (!section) return 0;
+    const value = newCounts?.[section];
+    return typeof value === "number" && value > 0 ? value : 0;
+  };
 
   const currentTab = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
@@ -1026,6 +1040,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         />
                         <span>{item.label}</span>
                       </div>
+                      {/* New-since-last-seen badge (Bookings / Payments /
+                          Abandoned Recovery). Hidden while viewing that page. */}
+                      {!active && getNewCount(item.subpage) > 0 && (
+                        <span
+                          className="ml-auto inline-flex items-center justify-center min-w-[18px] h-[18px] px-1.5 rounded-full bg-red-500 text-white text-[10px] font-semibold leading-none"
+                          aria-label={`${getNewCount(item.subpage)} ${__("new", "yatra")}`}
+                        >
+                          {getNewCount(item.subpage) > 99
+                            ? "99+"
+                            : getNewCount(item.subpage)}
+                        </span>
+                      )}
                       {item.isPremium && !isProPluginActive() && (
                         <div className="absolute inset-y-0 right-2 flex items-center justify-center">
                           <div className="w-4 h-4 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-center">

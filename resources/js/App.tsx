@@ -1,6 +1,10 @@
 import React, { useMemo, useState, useEffect, Suspense, lazy } from "react";
 import Layout from "./components/Layout";
 import { Skeleton } from "./components/ui/skeleton";
+import {
+  useMarkSectionSeen,
+  SUBPAGE_TO_SECTION,
+} from "./hooks/useNotificationCounts";
 
 /*
  * Page-loading strategy.
@@ -162,6 +166,18 @@ const App: React.FC = () => {
     return params.get("subpage") || "dashboard";
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlKey]);
+
+  // Mark a badged section seen when its page is opened, so the sidebar badge
+  // clears (bumps the wp_options marker server-side, then the shared counts
+  // query refreshes). Fires once per navigation into the page.
+  const markSectionSeen = useMarkSectionSeen();
+  useEffect(() => {
+    const section = SUBPAGE_TO_SECTION[subpage.toLowerCase()];
+    if (section) {
+      markSectionSeen.mutate(section);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subpage]);
 
   const tab = useMemo(() => {
     const params = new URLSearchParams(window.location.search);

@@ -351,11 +351,37 @@ class BookingValidator
         if (isset($data['contact_country'])) {
             $sanitized['contact_country'] = sanitize_text_field($data['contact_country']);
         }
+        // contact_data / emergency_contact arrive either as an already-encoded
+        // JSON string (some internal callers) or — from the admin BookingForm —
+        // as a plain object/array. Sanitise the array form per-value (the
+        // checkout path already sanitises its captures), and pass an
+        // already-encoded string through untouched.
         if (isset($data['contact_data'])) {
-            $sanitized['contact_data'] = $data['contact_data']; // Already JSON encoded
+            $sanitized['contact_data'] = is_array($data['contact_data'])
+                ? self::sanitizeFieldMap($data['contact_data'])
+                : $data['contact_data'];
         }
         if (isset($data['emergency_contact'])) {
-            $sanitized['emergency_contact'] = $data['emergency_contact']; // Already JSON encoded
+            $sanitized['emergency_contact'] = is_array($data['emergency_contact'])
+                ? self::sanitizeFieldMap($data['emergency_contact'])
+                : $data['emergency_contact'];
+        }
+        // Travelers: array of flat field maps (field_id => value), incl. CUSTOM
+        // fields from the Pro Dynamic Form module. Previously omitted from the
+        // allowlist, which silently dropped admin traveller edits before they
+        // reached BookingService::saveTravelers(). Keys are normalised with
+        // sanitize_key (the same shape the form builder produces); scalar values
+        // only. Checkout does NOT pass a `travelers` key (it persists travellers
+        // through a separate path), so this is additive for the admin flow only.
+        if (isset($data['travelers']) && is_array($data['travelers'])) {
+            $sanitized_travelers = [];
+            foreach ($data['travelers'] as $traveler) {
+                if (!is_array($traveler)) {
+                    continue;
+                }
+                $sanitized_travelers[] = self::sanitizeFieldMap($traveler);
+            }
+            $sanitized['travelers'] = $sanitized_travelers;
         }
         if (isset($data['availability_id'])) {
             $sanitized['availability_id'] = !empty($data['availability_id']) ? (int)$data['availability_id'] : null;
@@ -392,6 +418,31 @@ class BookingValidator
         }
 
         return $sanitized;
+    }
+
+    /**
+     * Sanitise a flat field map (field_id => value), e.g. contact_data or
+     * emergency_contact submitted as an object by the admin BookingForm.
+     * Keys are normalised with sanitize_key (matching the form-builder /
+     * merge-tag key shape) and scalar values run through sanitize_text_field.
+     * Non-scalar values are dropped.
+     *
+     * @param array<string,mixed> $map
+     * @return array<string,string>
+     */
+    private static function sanitizeFieldMap(array $map): array
+    {
+        $clean = [];
+        foreach ($map as $key => $value) {
+            if (!is_scalar($value)) {
+                continue;
+            }
+            $clean_key = sanitize_key((string) $key);
+            if ($clean_key !== '') {
+                $clean[$clean_key] = sanitize_text_field((string) $value);
+            }
+        }
+        return $clean;
     }
 
     /**

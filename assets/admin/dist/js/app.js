@@ -1,9 +1,9 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-tFMoMuMs.js","../../../dist/js/react-vendor-CqkbFEvK.js","../css/react-vendor.css","../../../dist/js/index-DRAt5dnR.js","../css/index.css","../../../dist/js/BuildItineraryModal-Dq10SB7H.js","../../../dist/js/ProFeature-DHa4Wgkh.js","../../../dist/js/Settings-DZPiAnb3.js","../../../dist/js/Team-CFV2Lcc6.js","../../../dist/js/Reports-sGU73NQH.js","../../../dist/js/DiscountForm-CWIQB0xy.js","../../../dist/js/ApplicableTripSelector-BQ_5SGb1.js","../../../dist/js/Itinerary-Ap1hthK0.js","../../../dist/js/RecurringRuleForm-qprdlB53.js","./Whatsapp.js","../../../dist/js/module-skeleton-DUioukJc.js","../../../dist/js/ChannelManager-BumsBhiQ.js","../../../dist/js/Webhooks-BmhRcymQ.js","../../../dist/js/TripConsentForm-DeH_xgzl.js","../../../dist/js/BookingForm-DFFoFfQO.js","../../../dist/js/ViewBooking-D0U0ZXpB.js","../../../dist/js/AvailabilityForm-BPWy1f1h.js","../../../dist/js/DynamicPricing-DTdy3svi.js","../../../dist/js/RuleTypeSelectionModal-CjAmWcQE.js","../../../dist/js/toggle-C9qtIVLs.js","../../../dist/js/DynamicPricingRuleForm-wUY86s8E.js","../../../dist/js/AiAssistant-2YNozU84.js","../../../dist/js/AbandonedRecovery-BXWfwama.js","../../../dist/js/WhiteLabel-DoUclAt1.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-C5Ot3_1C.js","../../../dist/js/react-vendor-zODANjVp.js","../css/react-vendor.css","../../../dist/js/index-CG-QHfTA.js","../css/index.css","../../../dist/js/BuildItineraryModal-gSCSj4w_.js","../../../dist/js/ProFeature-DIvM5TT9.js","../../../dist/js/Settings-BGYbCRhz.js","../../../dist/js/Team-RzG_IDJ-.js","../../../dist/js/Reports-CVAaHFMo.js","../../../dist/js/DiscountForm-0WfPB7fw.js","../../../dist/js/ApplicableTripSelector-DUM9NsLJ.js","../../../dist/js/Itinerary-DNOIqgQs.js","../../../dist/js/RecurringRuleForm-Br1CaikQ.js","./Whatsapp.js","../../../dist/js/module-skeleton-7zwRYol6.js","../../../dist/js/ChannelManager-BETup8ak.js","../../../dist/js/Webhooks-ceBebI2r.js","../../../dist/js/TripConsentForm-DizjGVHr.js","../../../dist/js/BookingForm-Bwi6DlLE.js","../../../dist/js/ViewBooking-CXY74f8q.js","../../../dist/js/AvailabilityForm-GnANQWzT.js","../../../dist/js/DynamicPricing-zsuKe7RI.js","../../../dist/js/RuleTypeSelectionModal-BF-fTaP-.js","../../../dist/js/toggle-B0m9K-Pk.js","../../../dist/js/DynamicPricingRuleForm-CYSFlnJY.js","../../../dist/js/AiAssistant-CNRwSFTp.js","../../../dist/js/AbandonedRecovery-vwRAyndZ.js","../../../dist/js/WhiteLabel-BFMKS7l0.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
-import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as Calendar$1, q as MapPin, s as LayoutDashboard, u as useQuery, t as useQueryClient, v as useMutation, Z as Zap, w as Webhook, x as ChevronDown, y as ChevronRight, z as ArrowLeft, G as Gift, D as Loader2, E as Sun, H as Moon, I as User, J as RefreshCw, O as Inbox, Q as AlertTriangle, V as ExternalLink, X as isObjectLike_1, _ as _baseGetTag, Y as isArray_1, $ as _MapCache, a0 as getDefaultExportFromCjs, a1 as _Symbol, a2 as isObject$5, a3 as isFunction, a4 as reactIsExports, a5 as React, a6 as _Stack, a7 as _baseIsEqual, a8 as isObject_1, a9 as keys_1, aa as isLength_1, ab as _isIndex, ac as isArguments_1, ad as _Set, ae as _setToArray, af as _SetCache, ag as _cacheHas, ah as _arrayPush, ai as isArrayLike_1, aj as _baseUnary, ak as _getNative, al as eq_1, am as _root, an as isEqual, ao as Animate, ap as _overArg, aq as _arraySome, ar as Clock, as as DollarSign, at as ArrowRight, au as Shield, av as CheckCircle, aw as Plus, ax as X, ay as reactDomExports, az as AlertCircle, aA as Check, aB as Wand2, aC as ChevronLeft, aD as CheckCircle2, aE as HelpCircle, aF as Info, aG as Copy, aH as MoreVertical, aI as Columns, aJ as PenSquare, aK as ArrowUp, aL as ArrowDown, aM as Archive, aN as Trash2, aO as Search, aP as ArrowUpDown, aQ as Eye, aR as Upload, aS as Image, aT as ReactQuill, aU as Pen, aV as Save, aW as Phone, aX as PauseCircle, aY as ShieldX, aZ as ShieldOff, a_ as Globe, a$ as Award, b0 as Database, b1 as Folder, b2 as Mountain, b3 as UserCheck, b4 as Download, b5 as Server, b6 as XCircle, b7 as Video, b8 as Lock, b9 as GripVertical, ba as ChevronUp, bb as Play, bc as ClipboardCopy, bd as Ban, be as Bell, bf as Heart, bg as Scissors, bh as Send, bi as Filter, bj as ClipboardCheck, bk as PenTool, bl as Camera, bm as BarChart$1, bn as Megaphone, bo as GitBranch, bp as Pause, bq as Settings2, br as Code, bs as Bug, bt as EyeOff, bu as QueryClient, bv as client, bw as QueryClientProvider } from "../../../dist/js/react-vendor-CqkbFEvK.js";
-import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, g as getCurrencySymbol, d as ajaxService, T as ToastProvider } from "../../../dist/js/index-DRAt5dnR.js";
+import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as Calendar$1, q as MapPin, s as LayoutDashboard, u as useQuery, t as useQueryClient, v as useMutation, Z as Zap, w as Webhook, x as ChevronDown, y as ChevronRight, z as ArrowLeft, G as Gift, D as Loader2, E as Sun, H as Moon, I as User, J as RefreshCw, O as Inbox, Q as AlertTriangle, V as ExternalLink, X as isObjectLike_1, _ as _baseGetTag, Y as isArray_1, $ as _MapCache, a0 as getDefaultExportFromCjs, a1 as _Symbol, a2 as isObject$5, a3 as isFunction, a4 as reactIsExports, a5 as React, a6 as _Stack, a7 as _baseIsEqual, a8 as isObject_1, a9 as keys_1, aa as isLength_1, ab as _isIndex, ac as isArguments_1, ad as _Set, ae as _setToArray, af as _SetCache, ag as _cacheHas, ah as _arrayPush, ai as isArrayLike_1, aj as _baseUnary, ak as _getNative, al as eq_1, am as _root, an as isEqual, ao as Animate, ap as _overArg, aq as _arraySome, ar as Clock, as as DollarSign, at as ArrowRight, au as Shield, av as CheckCircle, aw as Plus, ax as X, ay as reactDomExports, az as AlertCircle, aA as Check, aB as Wand2, aC as ChevronLeft, aD as CheckCircle2, aE as HelpCircle, aF as Info, aG as Copy, aH as MoreVertical, aI as Columns, aJ as PenSquare, aK as ArrowUp, aL as ArrowDown, aM as Archive, aN as Trash2, aO as Search, aP as ArrowUpDown, aQ as Eye, aR as Upload, aS as Image, aT as ReactQuill, aU as Pen, aV as Save, aW as Phone, aX as PauseCircle, aY as ShieldX, aZ as ShieldOff, a_ as Globe, a$ as Award, b0 as Database, b1 as Folder, b2 as Mountain, b3 as UserCheck, b4 as Download, b5 as Server, b6 as XCircle, b7 as Video, b8 as Lock, b9 as GripVertical, ba as ChevronUp, bb as Play, bc as ClipboardCopy, bd as Ban, be as Bell, bf as Heart, bg as Scissors, bh as Send, bi as Filter, bj as ArrowUpRight, bk as ClipboardCheck, bl as PenTool, bm as Camera, bn as BarChart$1, bo as Megaphone, bp as GitBranch, bq as Pause, br as Settings2, bs as Code, bt as Bug, bu as EyeOff, bv as QueryClient, bw as client, bx as QueryClientProvider } from "../../../dist/js/react-vendor-zODANjVp.js";
+import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, g as getCurrencySymbol, d as getCountryName, e as ajaxService, T as ToastProvider } from "../../../dist/js/index-CG-QHfTA.js";
 const scriptRel = "modulepreload";
 const assetsURL = function(dep, importerUrl) {
   return new URL(dep, importerUrl).href;
@@ -4015,6 +4015,41 @@ function evaluateCap(snapshot, cap) {
   if (!Array.isArray(caps)) return true;
   return caps.includes(cap);
 }
+const SUBPAGE_TO_SECTION = {
+  bookings: "bookings",
+  payments: "payments",
+  enquiries: "enquiries",
+  reviews: "reviews",
+  "abandoned-recovery": "abandoned"
+};
+const NEW_COUNTS_QUERY_KEY = ["yatra", "admin", "new-counts"];
+function useNotificationCounts() {
+  return useQuery({
+    queryKey: NEW_COUNTS_QUERY_KEY,
+    queryFn: async () => {
+      const res = await apiClient.get("/admin/new-counts");
+      return (res == null ? void 0 : res.counts) ?? {};
+    },
+    // Pick up new orders/payments while the admin sits on another page,
+    // without hammering the server.
+    staleTime: 3e4,
+    refetchInterval: 6e4,
+    refetchOnWindowFocus: true,
+    // A failed counts call must never break the admin UI — just render no badge.
+    retry: 1
+  });
+}
+function useMarkSectionSeen() {
+  const queryClient2 = useQueryClient();
+  return useMutation({
+    mutationFn: async (section) => {
+      return apiClient.post("/admin/mark-seen", { section });
+    },
+    onSuccess: () => {
+      queryClient2.invalidateQueries({ queryKey: NEW_COUNTS_QUERY_KEY });
+    }
+  });
+}
 const InlineNotices = () => {
   const [notices, setNotices] = reactExports.useState([]);
   const load = reactExports.useCallback(async () => {
@@ -4308,6 +4343,13 @@ const Layout = ({ children }) => {
     const params = new URLSearchParams(window.location.search);
     return params.get("subpage") || "dashboard";
   }, [urlKey]);
+  const { data: newCounts } = useNotificationCounts();
+  const getNewCount = (subpage) => {
+    const section = SUBPAGE_TO_SECTION[subpage];
+    if (!section) return 0;
+    const value = newCounts == null ? void 0 : newCounts[section];
+    return typeof value === "number" && value > 0 ? value : 0;
+  };
   const currentTab = reactExports.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("tab") || "all";
@@ -4881,6 +4923,14 @@ const Layout = ({ children }) => {
                     ),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: item.label })
                   ] }),
+                  !active && getNewCount(item.subpage) > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "span",
+                    {
+                      className: "ml-auto inline-flex items-center justify-center min-w-[18px] h-[18px] px-1.5 rounded-full bg-red-500 text-white text-[10px] font-semibold leading-none",
+                      "aria-label": `${getNewCount(item.subpage)} ${__("new", "yatra")}`,
+                      children: getNewCount(item.subpage) > 99 ? "99+" : getNewCount(item.subpage)
+                    }
+                  ),
                   item.isPremium && !isProPluginActive() && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-y-0 right-2 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-2.5 h-2.5" }) }) }),
                   item.subpage === "license" && isProPluginActive() && licenseStatus && /* @__PURE__ */ jsxRuntimeExports.jsx(
                     Badge,
@@ -66011,6 +66061,13 @@ const EnquiryForm = () => {
     ] }) })
   ] });
 };
+const featureUrlFromDocs = (docsUrl) => {
+  if (!docsUrl) return null;
+  const slug = docsUrl.replace(/\/+$/, "").split("/").pop();
+  if (!slug) return null;
+  const params = "utm_source=plugin&utm_medium=modules&utm_campaign=learn-more&utm_content=" + encodeURIComponent(slug);
+  return `https://wpyatra.com/features/${slug}/?${params}`;
+};
 const Modules = () => {
   var _a, _b, _c, _d, _e, _f, _g;
   const { can } = usePermissions();
@@ -66434,74 +66491,103 @@ const Modules = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center", children: renderToggle(module) })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "flex items-center justify-between text-xs text-gray-500 dark:text-gray-400", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-2", children: module.video_url && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "a",
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
               {
-                href: module.video_url,
-                target: "_blank",
-                rel: "noreferrer",
-                className: "flex items-center gap-1 text-red-600 hover:text-red-500 dark:text-red-400 text-xs font-medium",
-                title: __("Watch video tutorial", "yatra"),
+                className: "flex items-center gap-2",
+                onClick: (e) => e.stopPropagation(),
+                children: module.video_url && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "a",
+                  {
+                    href: module.video_url,
+                    target: "_blank",
+                    rel: "noreferrer",
+                    className: "flex items-center gap-1 text-red-600 hover:text-red-500 dark:text-red-400 text-xs font-medium",
+                    title: __("Watch video tutorial", "yatra"),
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "svg",
+                        {
+                          className: "w-3 h-3",
+                          fill: "none",
+                          stroke: "currentColor",
+                          strokeWidth: "2",
+                          strokeLinecap: "round",
+                          strokeLinejoin: "round",
+                          viewBox: "0 0 24 24",
+                          children: /* @__PURE__ */ jsxRuntimeExports.jsx("polygon", { points: "5 3 19 12 5 21 5 3" })
+                        }
+                      ),
+                      __("Video", "yatra")
+                    ]
+                  }
+                )
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                className: "flex items-center gap-2",
+                onClick: (e) => e.stopPropagation(),
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "svg",
+                  module.slug === "dynamic_form_field" && module.enabled && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "a",
                     {
-                      className: "w-3 h-3",
-                      fill: "none",
-                      stroke: "currentColor",
-                      strokeWidth: "2",
-                      strokeLinecap: "round",
-                      strokeLinejoin: "round",
-                      viewBox: "0 0 24 24",
-                      children: /* @__PURE__ */ jsxRuntimeExports.jsx("polygon", { points: "5 3 19 12 5 21 5 3" })
+                      href: `${window.location.origin}/wp-admin/admin.php?page=yatra&subpage=settings`,
+                      className: "flex items-center gap-1 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 text-xs font-medium",
+                      title: __("Settings", "yatra"),
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          "svg",
+                          {
+                            className: "w-3 h-3",
+                            fill: "none",
+                            stroke: "currentColor",
+                            strokeWidth: "2",
+                            strokeLinecap: "round",
+                            strokeLinejoin: "round",
+                            viewBox: "0 0 24 24",
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx("circle", { cx: "12", cy: "12", r: "3" }),
+                              /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" })
+                            ]
+                          }
+                        ),
+                        __("Settings", "yatra")
+                      ]
                     }
                   ),
-                  __("Video", "yatra")
+                  featureUrlFromDocs(module.docs_url) && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "a",
+                    {
+                      href: featureUrlFromDocs(module.docs_url),
+                      target: "_blank",
+                      rel: "noopener noreferrer",
+                      onClick: (e) => e.stopPropagation(),
+                      className: "flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-xs font-medium",
+                      title: __("Learn more about this feature", "yatra"),
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUpRight, { className: "w-3 h-3" }),
+                        __("Learn more", "yatra")
+                      ]
+                    }
+                  ),
+                  module.docs_url && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "a",
+                    {
+                      href: module.docs_url,
+                      target: "_blank",
+                      rel: "noreferrer",
+                      className: "flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-xs font-medium",
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-3 h-3" }),
+                        __("Docs", "yatra")
+                      ]
+                    }
+                  )
                 ]
               }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-              module.slug === "dynamic_form_field" && module.enabled && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                "a",
-                {
-                  href: `${window.location.origin}/wp-admin/admin.php?page=yatra&subpage=settings`,
-                  className: "flex items-center gap-1 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 text-xs font-medium",
-                  title: __("Settings", "yatra"),
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                      "svg",
-                      {
-                        className: "w-3 h-3",
-                        fill: "none",
-                        stroke: "currentColor",
-                        strokeWidth: "2",
-                        strokeLinecap: "round",
-                        strokeLinejoin: "round",
-                        viewBox: "0 0 24 24",
-                        children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("circle", { cx: "12", cy: "12", r: "3" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" })
-                        ]
-                      }
-                    ),
-                    __("Settings", "yatra")
-                  ]
-                }
-              ),
-              module.docs_url && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                "a",
-                {
-                  href: module.docs_url,
-                  target: "_blank",
-                  rel: "noreferrer",
-                  className: "flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-xs font-medium",
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-3 h-3" }),
-                    __("Docs", "yatra")
-                  ]
-                }
-              )
-            ] })
+            )
           ] })
         ]
       },
@@ -66521,32 +66607,6 @@ const Modules = () => {
     )
   ] });
 };
-const FALLBACK_COUNTRIES = {
-  US: "United States",
-  GB: "United Kingdom",
-  CA: "Canada",
-  AU: "Australia",
-  IN: "India",
-  NP: "Nepal"
-};
-function getCountryMap() {
-  var _a;
-  const raw = (_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.countries;
-  if (raw && typeof raw === "object" && !Array.isArray(raw)) {
-    const map2 = raw;
-    if (Object.keys(map2).length > 0) return map2;
-  }
-  return FALLBACK_COUNTRIES;
-}
-function getCountryOptions() {
-  const map2 = getCountryMap();
-  return Object.entries(map2).map(([code, name]) => ({ code, name }));
-}
-function getCountryName(code) {
-  if (!code) return "";
-  const map2 = getCountryMap();
-  return map2[code.toUpperCase()] ?? code;
-}
 const EXCLUDED_DYNAMIC_FIELDS = [
   "first_name",
   "last_name",
@@ -67259,7 +67319,7 @@ const GoogleCalendar = () => {
       /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "a",
         {
-          href: "https://docs.yatra.com/modules/google-calendar",
+          href: "https://docs.wpyatra.com/modules/google-calendar",
           target: "_blank",
           rel: "noopener noreferrer",
           className: "inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300",
@@ -70288,8 +70348,8 @@ const BOOL_KEYS = /* @__PURE__ */ new Set([
   "smtp_enabled"
 ]);
 const EMAIL_SETTINGS_DEFAULTS = {
-  admin_email: "admin@yatra.com",
-  from_email: "noreply@yatra.com",
+  admin_email: "admin@wpyatra.com",
+  from_email: "noreply@wpyatra.com",
   from_name: "Yatra Travel",
   email_template_booking: true,
   email_template_confirmation: true,
@@ -76985,27 +77045,27 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-tFMoMuMs.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-DZPiAnb3.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
-const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-CFV2Lcc6.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
-const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-sGU73NQH.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
-const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-CWIQB0xy.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
-const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-Ap1hthK0.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
-const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-qprdlB53.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-C5Ot3_1C.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-BGYbCRhz.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-RzG_IDJ-.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
+const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-CVAaHFMo.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
+const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-0WfPB7fw.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
+const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-DNOIqgQs.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
+const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-Br1CaikQ.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
 const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.js"), true ? __vite__mapDeps([14,1,2,3,4,15]) : void 0, import.meta.url));
-const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-BumsBhiQ.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
-const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-BmhRcymQ.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
-const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-DeH_xgzl.js"), true ? __vite__mapDeps([18,1,2,11,3,4]) : void 0, import.meta.url));
-const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-DFFoFfQO.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
-const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-D0U0ZXpB.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-BPWy1f1h.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
-const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-DTdy3svi.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
+const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-BETup8ak.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
+const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-ceBebI2r.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
+const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-DizjGVHr.js"), true ? __vite__mapDeps([18,1,2,11,3,4]) : void 0, import.meta.url));
+const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-Bwi6DlLE.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
+const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-CXY74f8q.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-GnANQWzT.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
+const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-zsuKe7RI.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
-  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-wUY86s8E.js"), true ? __vite__mapDeps([25,1,2,23,3,4]) : void 0, import.meta.url)
+  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-CYSFlnJY.js"), true ? __vite__mapDeps([25,1,2,23,3,4]) : void 0, import.meta.url)
 );
-const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-2YNozU84.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
-const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-BXWfwama.js"), true ? __vite__mapDeps([27,1,2,24,3,4]) : void 0, import.meta.url));
-const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-DoUclAt1.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
+const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-CNRwSFTp.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
+const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-vwRAyndZ.js"), true ? __vite__mapDeps([27,1,2,24,3,4]) : void 0, import.meta.url));
+const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-BFMKS7l0.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
 const PageLoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-1/3" }),
@@ -77037,6 +77097,13 @@ const App = () => {
     const params = new URLSearchParams(window.location.search);
     return params.get("subpage") || "dashboard";
   }, [urlKey]);
+  const markSectionSeen = useMarkSectionSeen();
+  reactExports.useEffect(() => {
+    const section = SUBPAGE_TO_SECTION[subpage.toLowerCase()];
+    if (section) {
+      markSectionSeen.mutate(section);
+    }
+  }, [subpage]);
   const tab = reactExports.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("tab") || "all";
@@ -77312,38 +77379,36 @@ export {
   TableRow as a7,
   TableHead as a8,
   TableBody as a9,
-  CartesianGrid as aA,
-  Tooltip as aB,
-  DEFAULT_MENU_ITEMS as aC,
-  useWordPressMedia as aD,
-  MenuIcon as aE,
-  ICON_MAP as aF,
+  DEFAULT_MENU_ITEMS as aA,
+  useWordPressMedia as aB,
+  MenuIcon as aC,
+  ICON_MAP as aD,
   TableCell as aa,
   formatDateForInput as ab,
-  getCountryOptions as ac,
-  getCountryName as ad,
-  formatDate$1 as ae,
-  clsx as af,
-  Dot as ag,
-  findAllByType as ah,
-  ErrorBar as ai,
-  Layer as aj,
-  filterProps as ak,
-  Curve as al,
-  interpolateNumber$2 as am,
-  isNil$1 as an,
-  hasClipDot as ao,
-  LabelList as ap,
-  getValueByDataKey as aq,
-  uniqueId as ar,
-  Global as as,
-  getCateCoordinateOfLine as at,
-  generateCategoricalChart as au,
-  XAxis as av,
-  YAxis as aw,
-  formatAxisMap as ax,
-  SearchFilterToolbar as ay,
-  ResponsiveContainer as az,
+  formatDate$1 as ac,
+  clsx as ad,
+  Dot as ae,
+  findAllByType as af,
+  ErrorBar as ag,
+  Layer as ah,
+  filterProps as ai,
+  Curve as aj,
+  interpolateNumber$2 as ak,
+  isNil$1 as al,
+  hasClipDot as am,
+  LabelList as an,
+  getValueByDataKey as ao,
+  uniqueId as ap,
+  Global as aq,
+  getCateCoordinateOfLine as ar,
+  generateCategoricalChart as as,
+  XAxis as at,
+  YAxis as au,
+  formatAxisMap as av,
+  SearchFilterToolbar as aw,
+  ResponsiveContainer as ax,
+  CartesianGrid as ay,
+  Tooltip as az,
   isAiReady as b,
   aiApi as c,
   CardContent as d,

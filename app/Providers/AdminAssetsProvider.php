@@ -450,18 +450,21 @@ class AdminAssetsProvider
      */
     private function isViteDevServerRunning(string $url): bool
     {
-        // Check the actual asset URL, not the root
+        // Check the actual asset URL, not the root. Uses the WP HTTP API
+        // (not raw cURL) per WP.org guidelines. Only ever called in dev mode
+        // (WP_DEBUG && YATRA_DEV_MODE), so it never runs on production loads.
         $assetUrl = $url . '/assets/admin/dist/js/app.js';
-        $ch = curl_init($assetUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 2); // 2 second timeout
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1); // 1 second connection timeout
-        curl_setopt($ch, CURLOPT_NOBODY, true); // HEAD request only
-        curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        
-        return $httpCode === 200;
+
+        $response = wp_remote_head($assetUrl, [
+            'timeout'     => 2,
+            'redirection' => 0,
+        ]);
+
+        if (is_wp_error($response)) {
+            return false;
+        }
+
+        return (int) wp_remote_retrieve_response_code($response) === 200;
     }
 
     /**

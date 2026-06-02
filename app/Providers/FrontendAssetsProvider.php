@@ -714,6 +714,12 @@ class FrontendAssetsProvider
             'thousandSeparator' => \Yatra\Services\SettingsService::getString('thousand_separator', ','),
             'decimalSeparator' => \Yatra\Services\SettingsService::getString('decimal_separator', '.'),
             'locale' => get_locale(),
+            // Full ISO country map (code => name) so the account profile can show
+            // full country names and render the country dropdown. Mirrors the
+            // admin (`yatraAdmin.countries`); honours the `yatra_countries_list` filter.
+            'countries' => class_exists('\\Yatra\\Helpers\\FormatHelper')
+                ? \Yatra\Helpers\FormatHelper::getCountries()
+                : [],
             'translations' => $this->getFrontendTranslations(),
             'wishlistEnabled' => \Yatra\Services\SettingsService::wishlistEnabled(),
         ]);

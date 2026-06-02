@@ -780,8 +780,8 @@ class BookingsController extends BaseController
         $travelDate = !empty($travelDateRaw) ? date_i18n(get_option('date_format'), strtotime((string) $travelDateRaw)) : '';
 
         $returnDate = '';
-        if (!empty($travelDateRaw) && $trip && !empty($trip->duration)) {
-            $returnTimestamp = strtotime((string) $travelDateRaw . ' +' . (int) $trip->duration . ' days');
+        if (!empty($travelDateRaw) && $trip && !empty($trip->duration_days)) {
+            $returnTimestamp = strtotime((string) $travelDateRaw . ' +' . (int) $trip->duration_days . ' days');
             $returnDate = date_i18n(get_option('date_format'), $returnTimestamp);
         }
 
@@ -806,8 +806,11 @@ class BookingsController extends BaseController
             'status_class' => in_array(strtolower($statusRaw), ['confirmed', 'completed', 'success'], true) ? 'confirmed' :
                 (in_array(strtolower($statusRaw), ['cancelled'], true) ? 'cancelled' : 'pending'),
             'trip_title' => $trip ? ($trip->title ?? $booking['trip_title'] ?? __('Trip Booking', 'yatra')) : ($booking['trip_title'] ?? __('Trip Booking', 'yatra')),
-            /* translators: %d: trip duration in days. */
-            'trip_duration' => $trip && $trip->duration ? sprintf(__('%d days', 'yatra'), (int) $trip->duration) : '',
+            // Trip duration comes from duration_days/duration_nights (there is no
+            // `duration` column — accessing it caused a blank value + PHP notice).
+            'trip_duration' => $trip
+                ? yatra_format_duration((int) ($trip->duration_days ?? 0), isset($trip->duration_nights) ? (int) $trip->duration_nights : null)
+                : '',
             'trip_difficulty' => $trip ? ($trip->difficulty_name ?? '') : '',
             'departure_location' => $trip ? ($trip->departure_location ?? '') : '',
             'destination' => $trip ? ($trip->destination ?? '') : '',

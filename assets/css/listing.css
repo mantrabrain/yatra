@@ -732,7 +732,7 @@
         flex-direction: row;
         flex-wrap: wrap;
         align-items: center;
-        justify-content: end
+        justify-content: flex-end;
         gap: 10px 12px;
     }
 
@@ -957,9 +957,9 @@
 }
 
 .yatra-filter-section {
-    margin-bottom: 24px;
+    margin-bottom: 14px;
     border-bottom: 1px solid #f3f4f6;
-    padding-bottom: 20px;
+    padding-bottom: 14px;
     /* visible: range slider thumbs must not clip at section edges */
     overflow: visible;
     width: 100%;
@@ -980,9 +980,9 @@
     font-size: 15px;
     font-weight: 600;
     color: #111827;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
     user-select: none;
-    padding: 4px 0;
+    padding: 2px 0;
     transition: color 0.2s;
 }
 

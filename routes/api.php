@@ -90,6 +90,7 @@ $controllers = [
     \Yatra\Controllers\SampleDataController::class,
     \Yatra\Controllers\UsageTrackingController::class,
     \Yatra\Controllers\NoticeController::class,
+    \Yatra\Controllers\NotificationCountsController::class, // Sidebar "new since last seen" badges
 
 ];
 
