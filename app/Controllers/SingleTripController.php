@@ -467,6 +467,7 @@ class SingleTripController
                     'age_max'      => isset($meta['age_max']) ? (int) $meta['age_max'] : null,
                     'min_pax'      => isset($meta['min_pax']) ? (int) $meta['min_pax'] : null,
                     'max_pax'      => isset($meta['max_pax']) ? (int) $meta['max_pax'] : null,
+                    'group_overflow' => isset($meta['group_overflow']) && in_array($meta['group_overflow'], ['block', 'per_block'], true) ? $meta['group_overflow'] : 'block',
                     'max_quantity'  => isset($meta['max_quantity']) ? (int) $meta['max_quantity'] : null,
                     'description'  => $meta['description'] ?? '',
                 ];
@@ -498,6 +499,7 @@ class SingleTripController
                 'age_max'          => $cat ? $cat->age_max : null,
                 'min_pax'          => $cat ? $cat->min_pax : null,
                 'max_pax'          => $cat ? $cat->max_pax : null,
+                'group_overflow'   => $cat ? $cat->group_overflow : ($pt['group_overflow'] ?? 'block'),
                 'max_quantity'     => $cat ? $cat->max_quantity : null,
                 'description'      => $cat ? $cat->description : ($pt['description'] ?? ''),
             ];
@@ -1885,6 +1887,14 @@ class SingleTripController
                 $input_id = 'traveler_' . $price_type->category_id;
                 $max_travelers = is_object($trip) && method_exists($trip, 'getMaxTravelers') ? $trip->getMaxTravelers() : ($trip->max_travelers ?? 20);
                 $pt_max_qty = (int) ($price_type->max_quantity ?: $max_travelers);
+                // A per-group category in "block" overflow mode caps the party at
+                // the max group size. In "per_block" mode the party may exceed it
+                // (it just buys additional group blocks), so we keep the trip's
+                // normal cap there.
+                if ($is_per_group && !empty($price_type->max_pax)
+                    && (($price_type->group_overflow ?? 'block') !== 'per_block')) {
+                    $pt_max_qty = (int) $price_type->max_pax;
+                }
                 $pt_value = ($index === $default_index) ? 1 : 0;
 
                 $traveler_rows[] = [
@@ -1895,6 +1905,8 @@ class SingleTripController
                         'data-category-id' => $price_type->category_id,
                         'data-price' => $price_type->effective_price,
                         'data-pricing-mode' => $pricing_mode,
+                        'data-group-overflow' => $price_type->group_overflow ?? 'block',
+                        'data-max-pax' => $price_type->max_pax ?? '',
                     ],
                     'minus_disabled' => ($index !== $default_index),
                     'plus_disabled' => false,
@@ -1918,6 +1930,8 @@ class SingleTripController
                         'data-category-label' => $price_type->category_label,
                         'data-price' => $price_type->effective_price,
                         'data-pricing-mode' => $pricing_mode,
+                        'data-group-overflow' => $price_type->group_overflow ?? 'block',
+                        'data-max-pax' => $price_type->max_pax ?? '',
                     ],
                 ];
             }
@@ -2094,7 +2108,13 @@ class SingleTripController
                 $pt_max_qty = (int) min($seats_available, $max_travelers);
                 $pt_pricing_mode = $pt->pricing_mode ?? 'per_person';
                 $pt_is_per_group = ($pt_pricing_mode === 'per_group');
-                
+                // Cap a per-group "block" category at its max group size (still
+                // bounded by seats). "per_block" mode may exceed it, so skip.
+                if ($pt_is_per_group && !empty($pt->max_pax)
+                    && (($pt->group_overflow ?? 'block') !== 'per_block')) {
+                    $pt_max_qty = (int) min($pt_max_qty, (int) $pt->max_pax);
+                }
+
                 // Build pricing label
                 $pricing_label = '';
                 if ($pt_is_per_group) {
@@ -2127,6 +2147,8 @@ class SingleTripController
                         'data-category-id' => $pt_category_id,
                         'data-price' => $pt_price,
                         'data-pricing-mode' => $pt_pricing_mode,
+                        'data-group-overflow' => $pt->group_overflow ?? 'block',
+                        'data-max-pax' => $pt->max_pax ?? '',
                     ],
                     'minus_disabled' => ($pt_default <= 0),
                     'plus_disabled' => false,
@@ -2145,6 +2167,8 @@ class SingleTripController
                         'data-category' => $pt_category_id,
                         'data-price' => $pt_price,
                         'data-pricing-mode' => $pt_pricing_mode,
+                        'data-group-overflow' => $pt->group_overflow ?? 'block',
+                        'data-max-pax' => $pt->max_pax ?? '',
                         'value' => $pt_default,
                         'min' => $pt_min_qty,
                         'max' => $pt_max_qty,

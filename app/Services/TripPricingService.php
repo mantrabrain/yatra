@@ -368,7 +368,136 @@ class TripPricingService
             ];
         }
 
+        // The trip's stored price_types JSON does not persist pricing_mode, so
+        // the literal 'per_person' above is only a placeholder — resolve the
+        // authoritative value (and group-size limits) from the TravelerCategory.
+        $normalized = self::applyCategoryPricingMeta($normalized);
+
         return (array) apply_filters('yatra_resolve_price_types', $normalized, $trip);
+    }
+
+    /**
+     * Request-level cache of per-category pricing metadata, keyed by category id.
+     * A `null` entry records a category that has no classification row (e.g. it
+     * was deleted) so we never re-query it.
+     *
+     * @var array<int, array{pricing_mode:string, min_pax:?int, max_pax:?int}|null>
+     */
+    private static array $categoryPricingMetaCache = [];
+
+    /**
+     * Backfill pricing_mode / min_pax / max_pax onto a price_types array from the
+     * authoritative TravelerCategory classification.
+     *
+     * The trip's stored price_types JSON has never persisted pricing_mode, and
+     * older resolvers baked in a literal 'per_person' default. That silently
+     * turned a per-group category into per-person pricing at availability and
+     * checkout time (charging price × headcount instead of a flat group price).
+     * The category is the single source of truth, so we read it back and
+     * override here. For per-person categories this resolves to 'per_person',
+     * i.e. a no-op — every existing trip keeps its exact pricing. Entries with
+     * no matching category (or a regular-pricing trip with no categories) are
+     * returned untouched. Accepts and preserves array or object entries.
+     *
+     * @param array<int, mixed> $priceTypes
+     * @return array<int, mixed>
+     */
+    public static function applyCategoryPricingMeta(array $priceTypes): array
+    {
+        if (empty($priceTypes)) {
+            return $priceTypes;
+        }
+
+        // Load any category ids we haven't already cached this request.
+        $needed = [];
+        foreach ($priceTypes as $pt) {
+            $arr = (array) $pt;
+            $cid = !empty($arr['category_id']) ? (int) $arr['category_id'] : 0;
+            if ($cid && !array_key_exists($cid, self::$categoryPricingMetaCache)) {
+                $needed[$cid] = $cid;
+            }
+        }
+
+        if (!empty($needed)) {
+            $meta = (new \Yatra\Repositories\TravelerCategoryRepository())
+                ->getMetadataByIds(array_values($needed));
+            foreach ($needed as $cid) {
+                $m = $meta[$cid] ?? null;
+                self::$categoryPricingMetaCache[$cid] = is_array($m)
+                    ? [
+                        'pricing_mode' => in_array(($m['pricing_mode'] ?? 'per_person'), ['per_person', 'per_group'], true)
+                            ? $m['pricing_mode']
+                            : 'per_person',
+                        'min_pax' => (isset($m['min_pax']) && $m['min_pax'] !== '' && $m['min_pax'] !== null) ? (int) $m['min_pax'] : null,
+                        'max_pax' => (isset($m['max_pax']) && $m['max_pax'] !== '' && $m['max_pax'] !== null) ? (int) $m['max_pax'] : null,
+                        'group_overflow' => in_array(($m['group_overflow'] ?? 'block'), ['block', 'per_block'], true)
+                            ? $m['group_overflow']
+                            : 'block',
+                    ]
+                    : null;
+            }
+        }
+
+        foreach ($priceTypes as &$pt) {
+            $isObject = is_object($pt);
+            $arr = (array) $pt;
+            $cid = !empty($arr['category_id']) ? (int) $arr['category_id'] : 0;
+            $m = $cid ? (self::$categoryPricingMetaCache[$cid] ?? null) : null;
+            if ($m !== null) {
+                $arr['pricing_mode'] = $m['pricing_mode'];
+                if ($m['min_pax'] !== null) {
+                    $arr['min_pax'] = $m['min_pax'];
+                }
+                if ($m['max_pax'] !== null) {
+                    $arr['max_pax'] = $m['max_pax'];
+                }
+                $arr['group_overflow'] = $m['group_overflow'] ?? 'block';
+                $pt = $isObject ? (object) $arr : $arr;
+            }
+        }
+        unset($pt);
+
+        return $priceTypes;
+    }
+
+    /**
+     * Effective subtotal for a single traveler-category line — the ONE place
+     * the per-group vs per-person money rule lives, so every caller (charge,
+     * checkout breakdown, discount base, initial total) agrees.
+     *
+     *  - per_person            : price × count
+     *  - per_group (block)     : one flat price for the whole group  [default]
+     *  - per_group (per_block) : price × ceil(count / max_pax)        [multiple group blocks]
+     *
+     * group_overflow defaults to 'block', and a missing/zero max_pax also falls
+     * back to a single flat price, so existing per-group categories are
+     * byte-identical until an owner opts into per-block pricing.
+     *
+     * @param array|object $pt    Price-type entry (carries pricing_mode/max_pax/group_overflow).
+     * @param int          $count Selected headcount for this category.
+     * @param float        $price Effective per-unit (per-person) or per-group price.
+     */
+    public static function categoryLineSubtotal($pt, int $count, float $price): float
+    {
+        if ($count <= 0) {
+            return 0.0;
+        }
+
+        $pt = (array) $pt;
+
+        if (($pt['pricing_mode'] ?? 'per_person') !== 'per_group') {
+            return $price * $count;
+        }
+
+        $overflow = ($pt['group_overflow'] ?? 'block') === 'per_block' ? 'per_block' : 'block';
+        $maxPax = (isset($pt['max_pax']) && $pt['max_pax'] !== '' && $pt['max_pax'] !== null) ? (int) $pt['max_pax'] : 0;
+
+        if ($overflow === 'per_block' && $maxPax > 0) {
+            return $price * (int) ceil($count / $maxPax);
+        }
+
+        // Single flat group price.
+        return $price;
     }
 
     /**

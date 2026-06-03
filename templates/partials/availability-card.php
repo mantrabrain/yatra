@@ -324,6 +324,13 @@ $initial_total_price = $display_sale_price;
                             $pt_default = $pt_index === 0 ? 1 : 0;
                             $pt_min_qty = 0;
                             $pt_max_qty = (int) min($seats_available, $max_travelers);
+                            // Cap a per-group "block" category at its max group
+                            // size (still bounded by seats). "per_block" mode may
+                            // exceed it (additional group blocks), so skip.
+                            if ($pt_is_per_group && !empty($pt->max_pax)
+                                && (($pt->group_overflow ?? 'block') !== 'per_block')) {
+                                $pt_max_qty = (int) min($pt_max_qty, (int) $pt->max_pax);
+                            }
 
                             // Determine price with fallback chain
                             $pt_price = 0;
@@ -407,6 +414,8 @@ $initial_total_price = $display_sale_price;
                                     'data-category-id' => $pt_category_id,
                                     'data-price' => $pt_price,
                                     'data-pricing-mode' => $pt_pricing_mode,
+                                    'data-group-overflow' => $pt->group_overflow ?? 'block',
+                                    'data-max-pax' => $pt->max_pax ?? '',
                                 ],
                                 'minus_disabled' => $pt_default <= $pt_min_qty,
                                 'plus_disabled' => $pt_default >= $pt_max_qty,
@@ -435,6 +444,8 @@ $initial_total_price = $display_sale_price;
                                     'data-category-label' => $pt_label,
                                     'data-price' => $pt_price,
                                     'data-pricing-mode' => $pt_pricing_mode,
+                                    'data-group-overflow' => $pt->group_overflow ?? 'block',
+                                    'data-max-pax' => $pt->max_pax ?? '',
                                 ],
                             ];
 

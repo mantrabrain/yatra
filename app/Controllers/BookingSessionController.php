@@ -731,6 +731,12 @@ class BookingSessionController extends BaseController
             'payment_method'    => 'full',
         ]);
 
+        // Resolve pricing_mode / group-size limits authoritatively from the
+        // TravelerCategory before persisting, so the checkout breakdown (which
+        // reads these session price_types) renders a per-group category as a
+        // flat charge. Per-person categories are unchanged.
+        $price_types = \Yatra\Services\TripPricingService::applyCategoryPricingMeta($price_types);
+
         // Prepare session data - essential trip data (pricing fetched from database on-demand)
         $session_data = [
             'trip_id' => (int) $trip->id,
@@ -1121,6 +1127,64 @@ class BookingSessionController extends BaseController
                         }
                     }
                 }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Enforce per-group category size limits at booking time.
+     *
+     * A traveler category priced "per group" (pricing_mode === 'per_group')
+     * charges one flat price for the whole group, bounded by an optional group
+     * size range (min_pax / max_pax) configured on the category. This validates
+     * the selected headcount for each such category against that range.
+     *
+     * It is a strict no-op for per-person categories and for per-group
+     * categories that have no limit configured, so existing trips are
+     * unaffected. Categories that aren't selected (count 0) are skipped.
+     *
+     * @param array<int, mixed>        $price_types     Resolved price types (carry pricing_mode/min_pax/max_pax).
+     * @param array<int|string, mixed> $traveler_counts Selected count keyed by category id.
+     * @return string|null Error message when a limit is violated, otherwise null.
+     */
+    private function validateGroupSizeLimits(array $price_types, array $traveler_counts): ?string
+    {
+        foreach ($price_types as $pt) {
+            $pt = (array) $pt;
+
+            if (($pt['pricing_mode'] ?? 'per_person') !== 'per_group') {
+                continue;
+            }
+
+            $cid = $pt['category_id'] ?? null;
+            if ($cid === null) {
+                continue;
+            }
+
+            // traveler_counts may be keyed by int or string category id.
+            $count = (int) ($traveler_counts[(int) $cid]
+                ?? $traveler_counts[(string) $cid]
+                ?? 0);
+            if ($count <= 0) {
+                continue; // category not selected — nothing to validate
+            }
+
+            $label    = $pt['category_label'] ?? ($pt['label'] ?? __('group', 'yatra'));
+            $min      = (isset($pt['min_pax']) && $pt['min_pax'] !== null && $pt['min_pax'] !== '') ? (int) $pt['min_pax'] : null;
+            $max      = (isset($pt['max_pax']) && $pt['max_pax'] !== null && $pt['max_pax'] !== '') ? (int) $pt['max_pax'] : null;
+            $overflow = ($pt['group_overflow'] ?? 'block') === 'per_block' ? 'per_block' : 'block';
+
+            if ($min !== null && $min > 0 && $count < $min) {
+                /* translators: 1: category label, 2: minimum group size. */
+                return sprintf(__('%1$s requires at least %2$d people.', 'yatra'), $label, $min);
+            }
+            // In "per_block" mode a party may exceed the max group size — it just
+            // buys additional group blocks — so only enforce the max for "block".
+            if ($overflow !== 'per_block' && $max !== null && $max > 0 && $count > $max) {
+                /* translators: 1: category label, 2: maximum group size. */
+                return sprintf(__('%1$s allows a maximum of %2$d people.', 'yatra'), $label, $max);
             }
         }
 
@@ -1579,6 +1643,18 @@ class BookingSessionController extends BaseController
             } catch (\Throwable $e) {
                 // Keep $pricing as-is; downstream guard will surface a clean error.
             }
+        }
+
+        // Enforce per-group category size limits (min_pax / max_pax). A per-group
+        // category charges one flat price for a group within the configured
+        // range, so a selection outside that range must be rejected before we
+        // charge. No-op for per-person categories and categories with no limits.
+        $group_size_error = $this->validateGroupSizeLimits($pricing['price_types'] ?? [], $traveler_counts);
+        if ($group_size_error !== null) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => $group_size_error,
+            ], 400);
         }
 
         // Extract pricing results
@@ -3719,6 +3795,13 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
             $resolved_pricing_type = 'traveler_based';
         }
 
+        // Resolve pricing_mode / group-size limits authoritatively from the
+        // TravelerCategory so the summary breakdown treats a per-group category
+        // as a flat charge. No-op for per-person categories.
+        if (!empty($price_types)) {
+            $price_types = \Yatra\Services\TripPricingService::applyCategoryPricingMeta($price_types);
+        }
+
         // Enrich availability price_types with category labels if missing
         if (!empty($price_types)) {
             $missing_label_category_ids = [];
@@ -3838,13 +3921,21 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
                 $category_id = $pt->category_id;
                 $count = (int) ($normalized_traveler_counts[(int) $category_id] ?? ($normalized_traveler_counts[(string) $category_id] ?? 0));
                 if ($count > 0) {
-                    $category_subtotal = (float) $pt->effective_price * $count;
+                    // Single source of truth for the line amount (per-person ×
+                    // count, flat per-group, or per-block group pricing).
+                    $pt_pricing_mode = $pt->pricing_mode ?? 'per_person';
+                    $category_subtotal = \Yatra\Services\TripPricingService::categoryLineSubtotal($pt, $count, (float) $pt->effective_price);
                     $category_breakdown[] = [
                         'category_id' => $category_id,
                         'label' => $pt->category_label ?? __('Traveler', 'yatra'),
                         'count' => $count,
                         'price' => (float) $pt->effective_price,
                         'subtotal' => $category_subtotal,
+                        'pricing_mode' => $pt_pricing_mode,
+                        // Carry the group-size knobs so the reconciliation pass
+                        // below can re-derive the same per-block/flat subtotal.
+                        'max_pax' => isset($pt->max_pax) && $pt->max_pax !== null && $pt->max_pax !== '' ? (int) $pt->max_pax : null,
+                        'group_overflow' => $pt->group_overflow ?? 'block',
                     ];
                     $subtotal += $category_subtotal;
                     $total_travelers += $count;
@@ -3879,11 +3970,12 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
         $priceTypesForDiscount = [];
         if ($is_traveler_based) {
             foreach ($price_types as $pt) {
-                $pt = (object) $pt;
-                $priceTypesForDiscount[] = [
-                    'category_id' => $pt->category_id ?? null,
-                    'effective_price' => $pt->effective_price ?? \Yatra\Services\TripPricingService::resolveCategoryEffectivePrice((array) $pt),
-                ];
+                $pt = (array) $pt;
+                // Keep pricing_mode / max_pax / group_overflow so the group
+                // discount base honours flat and per-block group pricing
+                // (not just category_id + effective_price).
+                $pt['effective_price'] = $pt['effective_price'] ?? \Yatra\Services\TripPricingService::resolveCategoryEffectivePrice($pt);
+                $priceTypesForDiscount[] = $pt;
             }
         } else {
             $priceTypesForDiscount[] = [
@@ -3994,7 +4086,10 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
                     $authoritativePrice = (float) $catPricesPostDp[$cid];
                     $count = (int) ($cat['count'] ?? 0);
                     $cat['price'] = $authoritativePrice;
-                    $cat['subtotal'] = $authoritativePrice * $count;
+                    // Re-derive the line amount from the authoritative post-DP
+                    // price using the same rule as the charge (flat per-group,
+                    // per-block, or per-person × count).
+                    $cat['subtotal'] = \Yatra\Services\TripPricingService::categoryLineSubtotal($cat, $count, $authoritativePrice);
                 }
                 $reconciledSubtotal += (float) ($cat['subtotal'] ?? 0);
             }

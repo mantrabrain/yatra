@@ -17,6 +17,7 @@ import {
   RefreshCw,
   Settings,
   ExternalLink,
+  ArrowLeft,
 } from "lucide-react";
 import { apiService } from "../lib/api-client";
 
@@ -38,6 +39,10 @@ const GoogleCalendar: React.FC = () => {
   const [connecting, setConnecting] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const { showToast } = useToast();
+  // This dashboard lives under Settings → Integration; the Back button returns
+  // there (and deep-links the Integration section via ?section=integration).
+  const adminUrl = (window as any).yatraAdmin?.adminUrl || "admin.php";
+  const settingsIntegrationUrl = `${adminUrl}?page=yatra&subpage=settings&section=integration`;
 
   const __ = (text: string) => text;
 
@@ -129,6 +134,15 @@ const GoogleCalendar: React.FC = () => {
 
   return (
     <div className="space-y-6 p-6">
+      {/* Back to Settings → Integration */}
+      <a
+        href={settingsIntegrationUrl}
+        className="inline-flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        {__("Back to Settings → Integration")}
+      </a>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

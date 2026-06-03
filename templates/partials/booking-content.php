@@ -350,6 +350,8 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                         'data-category-id' => $category_id,
                                         'data-price' => $category_price,
                                         'data-pricing-mode' => $pricing_mode,
+                                        'data-group-overflow' => $pt->group_overflow ?? 'block',
+                                        'data-max-pax' => $pt->max_pax ?? '',
                                     ],
                                     'minus_disabled' => ($index !== 0 && $count <= 0),
                                     'plus_disabled' => false,
@@ -372,6 +374,8 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                         'data-category-label' => $category_label,
                                         'data-price' => $category_price,
                                         'data-pricing-mode' => $pricing_mode,
+                                        'data-group-overflow' => $pt->group_overflow ?? 'block',
+                                        'data-max-pax' => $pt->max_pax ?? '',
                                     ],
                                 ];
                             }

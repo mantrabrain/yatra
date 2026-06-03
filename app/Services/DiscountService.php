@@ -899,15 +899,28 @@ class DiscountService extends BaseService
 
         $totalTravelers = array_sum(array_map('intval', $travelerCounts));
         
-        // Build price lookup by category_id
+        // Build price + price-type lookup by category_id
         $priceByCategory = [];
+        $ptByCategory = [];
         foreach ($priceTypes as $pt) {
-            $pt = (object) $pt;
-            $categoryId = $pt->category_id ?? null;
+            $pt = (array) $pt;
+            $categoryId = $pt['category_id'] ?? null;
             if ($categoryId !== null) {
-                $priceByCategory[$categoryId] = (float) ($pt->effective_price ?? $pt->sale_price ?? $pt->original_price ?? 0);
+                $priceByCategory[$categoryId] = (float) ($pt['effective_price'] ?? $pt['sale_price'] ?? $pt['original_price'] ?? 0);
+                $ptByCategory[$categoryId] = $pt;
             }
         }
+
+        // Effective subtotal for a category — delegate to the single source of
+        // truth so the discount base ALWAYS matches CalculationService's charge
+        // (per-person × count, flat per-group, or per-block group pricing).
+        $catSubtotal = function ($categoryId, $count) use ($priceByCategory, $ptByCategory): float {
+            return \Yatra\Services\TripPricingService::categoryLineSubtotal(
+                $ptByCategory[$categoryId] ?? [],
+                (int) $count,
+                (float) ($priceByCategory[$categoryId] ?? 0)
+            );
+        };
 
 
         foreach ($groupDiscounts as $discount) {
@@ -941,8 +954,8 @@ class DiscountService extends BaseService
                                 $discountValue = (float) ($range->discount_amount ?? 0);
                                 
                                 // Calculate discount for this category's subtotal only
-                                $categoryPrice = $priceByCategory[$categoryId] ?? 0;
-                                $categorySubtotal = $categoryPrice * $categoryCount;
+                                // (flat for per-group, price × count for per-person).
+                                $categorySubtotal = $catSubtotal($categoryId, $categoryCount);
                                 
                                 if ($discountType === 'percentage') {
                                     $categoryDiscount = $categorySubtotal * ($discountValue / 100);
@@ -1005,8 +1018,7 @@ class DiscountService extends BaseService
                         // Calculate total subtotal from all categories
                         $totalSubtotal = 0;
                         foreach ($travelerCounts as $catId => $count) {
-                            $categoryPrice = $priceByCategory[$catId] ?? 0;
-                            $totalSubtotal += $categoryPrice * $count;
+                            $totalSubtotal += $catSubtotal($catId, $count);
                         }
                         
                         // Calculate the actual discount amount
@@ -1048,8 +1060,7 @@ class DiscountService extends BaseService
                     // Calculate total subtotal from all categories
                     $totalSubtotal = 0;
                     foreach ($travelerCounts as $catId => $count) {
-                        $categoryPrice = $priceByCategory[$catId] ?? 0;
-                        $totalSubtotal += $categoryPrice * $count;
+                        $totalSubtotal += $catSubtotal($catId, $count);
                     }
                     
                     // Calculate the actual discount amount

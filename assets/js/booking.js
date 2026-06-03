@@ -154,12 +154,18 @@
             $('.yatra-qty-input[data-category-id]').each(function() {
                 const count = parseInt($(this).val()) || 0;
                 const price = parseFloat($(this).data('price')) || 0;
-                const pricingMode = $(this).data('pricing-mode') || $(this).closest('.yatra-quantity-row').data('pricing-mode') || 'per_person';
-                
+                const $row = $(this).closest('.yatra-quantity-row');
+                const pricingMode = $(this).data('pricing-mode') || $row.data('pricing-mode') || 'per_person';
+                const groupOverflow = $(this).data('group-overflow') || $row.data('group-overflow') || 'block';
+                const maxPax = parseInt($(this).data('max-pax') || $row.data('max-pax')) || 0;
+
                 if (pricingMode === 'per_group') {
-                    // Per group: charge flat price once if any travelers in this category
+                    // Per group: one flat price for the whole group, or one flat
+                    // price per block of maxPax people when overflow is "per_block".
                     if (count > 0) {
-                        total += price;
+                        total += (groupOverflow === 'per_block' && maxPax > 0)
+                            ? price * Math.ceil(count / maxPax)
+                            : price;
                     }
                 } else {
                     // Per person: charge per traveler

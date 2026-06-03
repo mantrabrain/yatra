@@ -442,13 +442,7 @@ class CalculationService
                     $category_prices_post_dp[(string) $category_id] = $post_dp_price;
                 }
 
-                if ($pricing_mode === 'per_group') {
-                    if ($count > 0) {
-                        $pre_dp_base += $pre_dp_price;
-                    }
-                } else {
-                    $pre_dp_base += $pre_dp_price * $count;
-                }
+                $pre_dp_base += TripPricingService::categoryLineSubtotal($pt_arr, $count, $pre_dp_price);
             }
             $dp_total_adjustment = $dp_was_suppressed ? 0.0 : ($base_amount - $pre_dp_base);
         }
@@ -604,35 +598,15 @@ class CalculationService
             return [];
         }
         
-        // Enrich with pricing_mode from category metadata if missing
-        $needs_enrichment = false;
-        foreach ($types as $pt) {
-            $pt = (array) $pt;
-            if (empty($pt['pricing_mode'])) {
-                $needs_enrichment = true;
-                break;
-            }
-        }
-        
-        if ($needs_enrichment) {
-            $category_ids = array_filter(array_map(function($pt) {
-                $pt = (array) $pt;
-                return isset($pt['category_id']) ? (int) $pt['category_id'] : null;
-            }, $types));
-            
-            if (!empty($category_ids)) {
-                $category_meta = $this->getCategoryMetadata($category_ids);
-                foreach ($types as &$pt) {
-                    if (is_object($pt)) $pt = (array) $pt;
-                    $cat_id = isset($pt['category_id']) ? (int) $pt['category_id'] : null;
-                    if ($cat_id && isset($category_meta[$cat_id]) && empty($pt['pricing_mode'])) {
-                        $pt['pricing_mode'] = $category_meta[$cat_id]['pricing_mode'] ?? 'per_person';
-                    }
-                }
-                unset($pt);
-            }
-        }
-        
+        // Resolve pricing_mode / group-size limits authoritatively from the
+        // TravelerCategory. This must OVERRIDE (not just fill-when-empty): the
+        // price_types coming from a stored availability row or session can carry
+        // a literal 'per_person' placeholder that an empty() check would skip,
+        // which silently charged a per-group category by headcount. For
+        // per-person categories this resolves back to 'per_person' (a no-op), so
+        // the booking total for every existing trip is unchanged.
+        $types = TripPricingService::applyCategoryPricingMeta($types);
+
         return $types;
     }
     
@@ -722,13 +696,7 @@ class CalculationService
                 $category_price = (float) TripPricingService::resolveCategoryEffectivePrice($pt);
                 $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : 0;
 
-                if ($pricing_mode === 'per_group') {
-                    if ($count > 0) {
-                        $base_amount += $category_price;
-                    }
-                } else {
-                    $base_amount += $category_price * $count;
-                }
+                $base_amount += TripPricingService::categoryLineSubtotal($pt, $count, $category_price);
             }
             return round($base_amount, 2);
         }
@@ -778,20 +746,14 @@ class CalculationService
                 
                 $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : 0;
                 
-                if ($pricing_mode === 'per_group') {
-                    // Per group: charge flat price once if any travelers in this category
-                    if ($count > 0) {
-                        $base_amount += $category_price;
-                    }
-                } else {
-                    // Per person: charge per traveler
-                    $base_amount += $category_price * $count;
-                }
+                // Single source of truth for the per-category line amount
+                // (per-person × count, flat per-group, or per-block group pricing).
+                $base_amount += TripPricingService::categoryLineSubtotal($pt, $count, $category_price);
             }
-            
+
             return round($base_amount, 2);
         }
-        
+
         // Regular pricing
         return round($unit_price * $travelers_count, 2);
     }

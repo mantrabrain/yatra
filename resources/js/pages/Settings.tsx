@@ -228,6 +228,9 @@ const GoogleCalendarIntegrationSection: React.FC<{
   const yatraAdmin = (window as any).yatraAdmin || {};
   const gcSettings = yatraAdmin.googleCalendar || {};
   const siteUrl = yatraAdmin.siteUrl || "";
+  // Full URL to the dedicated Google Calendar dashboard subpage so the user can
+  // reach it from the UI (not just via the OAuth redirect / a direct link).
+  const gcDashboardUrl = `${yatraAdmin.adminUrl || "admin.php"}?page=yatra&subpage=google-calendar`;
 
   // Use state from parent formData if available, otherwise use from yatraAdmin
   const [clientId, setClientId] = useState(
@@ -247,6 +250,7 @@ const GoogleCalendarIntegrationSection: React.FC<{
   );
   const [connecting, setConnecting] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const { showToast } = useToast();
 
   const redirectUri =
     yatraAdmin.googleCalendarRedirectUri ||
@@ -312,19 +316,36 @@ const GoogleCalendarIntegrationSection: React.FC<{
       setConnected(false);
       setCalendarId("");
       setCalendarName("");
+      showToast(__("Disconnected from Google Calendar.", "yatra"), "success");
     } catch (error) {
-      console.error("Failed to disconnect:", error);
+      showToast(
+        __("Failed to disconnect. Please try again.", "yatra"),
+        "error",
+      );
     }
   };
 
   const handleSync = async () => {
     setSyncing(true);
     try {
-      await apiClient.post("/google-calendar/sync-all");
-      // No need to update lastSync state directly as it's derived from formData
-      // The API response will be handled by the backend and reflected in the next load
+      const res: any = await apiClient.post("/google-calendar/sync-all");
+      if (res && res.success === false) {
+        showToast(
+          res.message || __("Failed to sync bookings.", "yatra"),
+          "error",
+        );
+      } else {
+        showToast(
+          (res && res.message) ||
+            __("Bookings synced to Google Calendar.", "yatra"),
+          "success",
+        );
+      }
     } catch (error) {
-      console.error("Failed to sync:", error);
+      showToast(
+        __("Failed to sync bookings. Please try again.", "yatra"),
+        "error",
+      );
     } finally {
       setSyncing(false);
     }
@@ -509,7 +530,7 @@ const GoogleCalendarIntegrationSection: React.FC<{
                 <CheckCircle className="w-4 h-4" />
                 {__("Connected Calendar", "yatra")}
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:items-end">
                 <FormField
                   id="gc_calendar_id"
                   label={__("Calendar ID", "yatra")}
@@ -553,24 +574,40 @@ const GoogleCalendarIntegrationSection: React.FC<{
                     __("Never synced", "yatra")
                   )}
                 </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSync}
-                  disabled={syncing}
-                  className="flex items-center gap-2"
-                >
-                  <RefreshCw
-                    className={`w-4 h-4 ${syncing ? "animate-spin" : ""}`}
-                  />
-                  {__("Sync Now", "yatra")}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={gcDashboardUrl}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-green-300 dark:border-green-700 text-green-800 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/40"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    {__("Open dashboard", "yatra")}
+                  </a>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSync}
+                    disabled={syncing}
+                    className="flex items-center gap-2"
+                  >
+                    <RefreshCw
+                      className={`w-4 h-4 ${syncing ? "animate-spin" : ""}`}
+                    />
+                    {__("Sync Now", "yatra")}
+                  </Button>
+                </div>
               </div>
             </div>
           )}
 
           <div className="flex flex-wrap justify-between items-center gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex flex-wrap gap-3">
+              <a
+                href={gcDashboardUrl}
+                className="flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-sm font-medium"
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                {__("Open Google Calendar dashboard", "yatra")}
+              </a>
               <a
                 href="https://console.cloud.google.com/apis/credentials"
                 target="_blank"
@@ -2174,7 +2211,31 @@ const Settings: React.FC = () => {
 
   // Get active section from localStorage or default to 'general'
   const getInitialActiveSection = (): SettingsSection => {
+    const VALID_SECTIONS = [
+      "general",
+      "design",
+      "booking",
+      "booking_form",
+      "payment",
+      "trip",
+      "customer",
+      "review",
+      "tax",
+      "currency",
+      "integration",
+      "permalink",
+      "seo",
+      "advanced",
+    ];
     if (typeof window !== "undefined") {
+      // Allow deep-linking a section via ?section=… (e.g. the Google Calendar
+      // dashboard's "Back to Settings → Integration" link).
+      const fromUrl = new URLSearchParams(window.location.search).get(
+        "section",
+      );
+      if (fromUrl && VALID_SECTIONS.includes(fromUrl)) {
+        return fromUrl as SettingsSection;
+      }
       const saved = localStorage.getItem("yatra_settings_active_section");
       if (saved === "email" || saved === "notification") {
         return "general";

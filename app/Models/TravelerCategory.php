@@ -56,6 +56,13 @@ class TravelerCategory
     public ?int $max_pax;
 
     /**
+     * @var string How a party larger than max_pax is handled when pricing per
+     *             group: 'block' (cap at max, default) or 'per_block' (charge
+     *             one flat price per block of max_pax people).
+     */
+    public string $group_overflow = 'block';
+
+    /**
      * @var array|null Icon data (type and value)
      */
     public ?array $icon;
@@ -103,6 +110,9 @@ class TravelerCategory
             : 'per_person';
         $category->min_pax = isset($data['min_pax']) && $data['min_pax'] !== '' ? (int) $data['min_pax'] : null;
         $category->max_pax = isset($data['max_pax']) && $data['max_pax'] !== '' ? (int) $data['max_pax'] : null;
+        $category->group_overflow = isset($data['group_overflow']) && in_array($data['group_overflow'], ['block', 'per_block'], true)
+            ? $data['group_overflow']
+            : 'block';
         $category->icon = isset($data['icon']) ? (is_array($data['icon']) ? $data['icon'] : maybe_unserialize($data['icon'])) : null;
         $category->status = $data['status'] ?? 'draft';
         $category->created_at = $data['created_at'] ?? '';
@@ -128,6 +138,7 @@ class TravelerCategory
             'pricing_mode' => $this->pricing_mode,
             'min_pax' => $this->min_pax,
             'max_pax' => $this->max_pax,
+            'group_overflow' => $this->group_overflow,
             'icon' => $this->icon,
             'status' => $this->status,
             'created_at' => $this->created_at,

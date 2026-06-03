@@ -1836,6 +1836,7 @@ class TripController extends BaseController
                     'age_max'      => isset($meta['age_max']) ? (int) $meta['age_max'] : null,
                     'min_pax'      => isset($meta['min_pax']) ? (int) $meta['min_pax'] : null,
                     'max_pax'      => isset($meta['max_pax']) ? (int) $meta['max_pax'] : null,
+                    'group_overflow' => isset($meta['group_overflow']) && in_array($meta['group_overflow'], ['block', 'per_block'], true) ? $meta['group_overflow'] : 'block',
                 ];
             }
         }
@@ -1887,6 +1888,7 @@ class TripController extends BaseController
                     if (!isset($pt['age_max'])) $pt['age_max'] = $meta['age_max'];
                     if (!isset($pt['min_pax'])) $pt['min_pax'] = $meta['min_pax'];
                     if (!isset($pt['max_pax'])) $pt['max_pax'] = $meta['max_pax'];
+                    $pt['group_overflow'] = $meta['group_overflow'] ?? 'block';
                 }
 
                 // Payable amount (honors price / sale_price / discounted_price like TripPricingService)

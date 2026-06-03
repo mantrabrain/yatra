@@ -383,11 +383,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 const count = parseInt(input.value) || 0;
                 const price = parseFloat(input.dataset.price) || 0;
                 const pricingMode = input.dataset.pricingMode || 'per_person';
-                
+                const groupOverflow = input.dataset.groupOverflow || 'block';
+                const maxPax = parseInt(input.dataset.maxPax) || 0;
+
                 if (pricingMode === 'per_group') {
-                    // Per group: charge flat price once if any travelers
+                    // Per group: one flat price, or per block of maxPax people
+                    // when overflow is "per_block".
                     if (count > 0) {
-                        subtotal += price;
+                        subtotal += (groupOverflow === 'per_block' && maxPax > 0)
+                            ? price * Math.ceil(count / maxPax)
+                            : price;
                     }
                 } else {
                     // Per person: charge per traveler

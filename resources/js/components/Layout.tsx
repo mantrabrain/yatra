@@ -847,6 +847,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const uiChrome = useMemo(() => readUiChrome(), []);
 
   const isActive = (subpage: string, tab?: string) => {
+    // The Google Calendar dashboard is reached from Settings → Integration, so
+    // keep the Settings menu item highlighted while that page is open.
+    if (subpage === "settings" && currentSubpage === "google-calendar") {
+      return true;
+    }
     if (tab) {
       return currentSubpage === subpage && currentTab === tab;
     }

@@ -90,6 +90,8 @@ $dropdown_attrs = (isset($dropdown_attrs) && is_array($dropdown_attrs)) ? $dropd
                        data-category="<?php echo isset($input_attrs['data-category']) ? esc_attr($input_attrs['data-category']) : ''; ?>"
                        data-price="<?php echo isset($input_attrs['data-price']) ? esc_attr($input_attrs['data-price']) : ''; ?>"
                        data-pricing-mode="<?php echo isset($input_attrs['data-pricing-mode']) ? esc_attr($input_attrs['data-pricing-mode']) : ''; ?>"
+                       data-group-overflow="<?php echo isset($input_attrs['data-group-overflow']) ? esc_attr($input_attrs['data-group-overflow']) : 'block'; ?>"
+                       data-max-pax="<?php echo isset($input_attrs['data-max-pax']) ? esc_attr($input_attrs['data-max-pax']) : ''; ?>"
                        data-category-label="<?php echo isset($input_attrs['data-category-label']) ? esc_attr($input_attrs['data-category-label']) : ''; ?>">
 
                 <button type="button" class="yatra-quantity-btn yatra-quantity-plus yatra-qty-btn yatra-qty-plus"<?php echo $plus_disabled ? ' disabled' : ''; ?><?php echo $render_attrs($plus_attrs); ?>>

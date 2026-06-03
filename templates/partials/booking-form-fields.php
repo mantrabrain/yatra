@@ -397,7 +397,11 @@ if ($pricing_type === 'traveler_based' && !empty($price_types)) {
         $category_label = $pt->category_label ?? __('Traveler', 'yatra');
         $category_price = isset($pt->effective_price) ? (float) $pt->effective_price : ($pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
         $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : ($index === 0 ? 1 : 0);
-        $subtotal = $category_price * $count;
+        // Single source of truth for the line amount (per-person × count, flat
+        // per-group, or per-block group pricing). Defaults to the prior flat/
+        // multiply behaviour when group_overflow is absent.
+        $pt_pricing_mode = $pt->pricing_mode ?? 'per_person';
+        $subtotal = \Yatra\Services\TripPricingService::categoryLineSubtotal($pt, $count, $category_price);
 
         $age_info = '';
         if (isset($pt->age_min) || isset($pt->age_max)) {
@@ -419,6 +423,7 @@ if ($pricing_type === 'traveler_based' && !empty($price_types)) {
             'category_price' => $category_price,
             'count' => $count,
             'subtotal' => $subtotal,
+            'pricing_mode' => $pt_pricing_mode,
             'age_info' => $age_info,
         ];
 

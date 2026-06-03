@@ -1,4 +1,4 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-C5Ot3_1C.js","../../../dist/js/react-vendor-zODANjVp.js","../css/react-vendor.css","../../../dist/js/index-CG-QHfTA.js","../css/index.css","../../../dist/js/BuildItineraryModal-gSCSj4w_.js","../../../dist/js/ProFeature-DIvM5TT9.js","../../../dist/js/Settings-BGYbCRhz.js","../../../dist/js/Team-RzG_IDJ-.js","../../../dist/js/Reports-CVAaHFMo.js","../../../dist/js/DiscountForm-0WfPB7fw.js","../../../dist/js/ApplicableTripSelector-DUM9NsLJ.js","../../../dist/js/Itinerary-DNOIqgQs.js","../../../dist/js/RecurringRuleForm-Br1CaikQ.js","./Whatsapp.js","../../../dist/js/module-skeleton-7zwRYol6.js","../../../dist/js/ChannelManager-BETup8ak.js","../../../dist/js/Webhooks-ceBebI2r.js","../../../dist/js/TripConsentForm-DizjGVHr.js","../../../dist/js/BookingForm-Bwi6DlLE.js","../../../dist/js/ViewBooking-CXY74f8q.js","../../../dist/js/AvailabilityForm-GnANQWzT.js","../../../dist/js/DynamicPricing-zsuKe7RI.js","../../../dist/js/RuleTypeSelectionModal-BF-fTaP-.js","../../../dist/js/toggle-B0m9K-Pk.js","../../../dist/js/DynamicPricingRuleForm-CYSFlnJY.js","../../../dist/js/AiAssistant-CNRwSFTp.js","../../../dist/js/AbandonedRecovery-vwRAyndZ.js","../../../dist/js/WhiteLabel-BFMKS7l0.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-C5Ot3_1C.js","../../../dist/js/react-vendor-zODANjVp.js","../css/react-vendor.css","../../../dist/js/index-CG-QHfTA.js","../css/index.css","../../../dist/js/BuildItineraryModal-gSCSj4w_.js","../../../dist/js/ProFeature-DIvM5TT9.js","../../../dist/js/Settings-Czcylgof.js","../../../dist/js/Team-RzG_IDJ-.js","../../../dist/js/Reports-CVAaHFMo.js","../../../dist/js/DiscountForm-0WfPB7fw.js","../../../dist/js/ApplicableTripSelector-DUM9NsLJ.js","../../../dist/js/Itinerary-DNOIqgQs.js","../../../dist/js/RecurringRuleForm-Br1CaikQ.js","./Whatsapp.js","../../../dist/js/module-skeleton-7zwRYol6.js","../../../dist/js/ChannelManager-BETup8ak.js","../../../dist/js/Webhooks-ceBebI2r.js","../../../dist/js/TripConsentForm-DizjGVHr.js","../../../dist/js/BookingForm-Bwi6DlLE.js","../../../dist/js/ViewBooking-CXY74f8q.js","../../../dist/js/AvailabilityForm-GnANQWzT.js","../../../dist/js/DynamicPricing-zsuKe7RI.js","../../../dist/js/RuleTypeSelectionModal-BF-fTaP-.js","../../../dist/js/toggle-B0m9K-Pk.js","../../../dist/js/DynamicPricingRuleForm-CYSFlnJY.js","../../../dist/js/AiAssistant-CNRwSFTp.js","../../../dist/js/AbandonedRecovery-vwRAyndZ.js","../../../dist/js/WhiteLabel-BFMKS7l0.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
@@ -4784,6 +4784,9 @@ const Layout = ({ children }) => {
   }, [menuItems, baseUrl]);
   const uiChrome = reactExports.useMemo(() => readUiChrome(), []);
   const isActive = (subpage, tab) => {
+    if (subpage === "settings" && currentSubpage === "google-calendar") {
+      return true;
+    }
     if (tab) {
       return currentSubpage === subpage && currentTab === tab;
     }
@@ -58944,7 +58947,8 @@ const TravelerCategoryForm = () => {
     status: "publish",
     pricing_mode: "per_person",
     min_pax: "",
-    max_pax: ""
+    max_pax: "",
+    group_overflow: "block"
   });
   const [errors, setErrors] = reactExports.useState({});
   const [isSubmitting, setIsSubmitting] = reactExports.useState(false);
@@ -58990,7 +58994,8 @@ const TravelerCategoryForm = () => {
         status: categoryData.status || "draft",
         pricing_mode: categoryData.pricing_mode || "per_person",
         min_pax: categoryData.min_pax !== void 0 && categoryData.min_pax !== null ? categoryData.min_pax.toString() : "",
-        max_pax: categoryData.max_pax !== void 0 && categoryData.max_pax !== null ? categoryData.max_pax.toString() : ""
+        max_pax: categoryData.max_pax !== void 0 && categoryData.max_pax !== null ? categoryData.max_pax.toString() : "",
+        group_overflow: categoryData.group_overflow === "per_block" ? "per_block" : "block"
       });
     }
   }, [categoryData, isEditMode]);
@@ -59080,6 +59085,12 @@ const TravelerCategoryForm = () => {
           "yatra"
         );
       }
+      if (formData.group_overflow === "per_block" && (!formData.max_pax || formData.max_pax.trim() === "" || isNaN(parseInt(formData.max_pax)) || parseInt(formData.max_pax) < 1)) {
+        newErrors.max_pax = __(
+          "Set a maximum group size to charge for additional groups.",
+          "yatra"
+        );
+      }
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -59115,9 +59126,11 @@ const TravelerCategoryForm = () => {
         } else {
           payload.max_pax = null;
         }
+        payload.group_overflow = data.group_overflow === "per_block" ? "per_block" : "block";
       } else {
         payload.min_pax = null;
         payload.max_pax = null;
+        payload.group_overflow = "block";
       }
       if (isEditMode && isSlugEditable) {
         payload.preserve_slug = true;
@@ -59526,6 +59539,50 @@ const TravelerCategoryForm = () => {
                     errors.max_pax
                   ] })
                 ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "label",
+                  {
+                    htmlFor: "group_overflow",
+                    className: "block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5",
+                    children: __(
+                      "If a booking has more people than the maximum group size",
+                      "yatra"
+                    )
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  Select,
+                  {
+                    id: "group_overflow",
+                    value: formData.group_overflow,
+                    onChange: (e) => handleFieldChange(
+                      "group_overflow",
+                      e.target.value
+                    ),
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "block", children: __(
+                        "Don’t allow it — the maximum is a strict limit",
+                        "yatra"
+                      ) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "per_block", children: __(
+                        "Allow it — charge for additional groups",
+                        "yatra"
+                      ) })
+                    ]
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  HelpText,
+                  {
+                    text: __(
+                      "What happens when a party is bigger than the maximum group size. “Don’t allow it” caps every booking at the maximum. “Charge for additional groups” lets larger parties book and charges the group price once per group — for example, with a maximum of 5, a party of 7 needs 2 groups and pays 2× the group price.",
+                      "yatra"
+                    ),
+                    className: "mt-1"
+                  }
+                )
               ] })
             ] })
           ] })
@@ -67089,11 +67146,14 @@ const Switch = ({
   );
 };
 const GoogleCalendar = () => {
+  var _a;
   const [settings2, setSettings] = reactExports.useState(null);
   const [loading, setLoading] = reactExports.useState(true);
   const [connecting, setConnecting] = reactExports.useState(false);
   const [syncing, setSyncing] = reactExports.useState(false);
   const { showToast } = useToast();
+  const adminUrl = ((_a = window.yatraAdmin) == null ? void 0 : _a.adminUrl) || "admin.php";
+  const settingsIntegrationUrl = `${adminUrl}?page=yatra&subpage=settings&section=integration`;
   const __2 = (text) => text;
   reactExports.useEffect(() => {
     fetchSettings2();
@@ -67164,6 +67224,17 @@ const GoogleCalendar = () => {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-64", children: /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-8 h-8 animate-spin text-blue-600" }) });
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6 p-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "a",
+      {
+        href: settingsIntegrationUrl,
+        className: "inline-flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-4 h-4" }),
+          __2("Back to Settings → Integration")
+        ]
+      }
+    ),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-between", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h1", { className: "text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-8 h-8 text-blue-600" }),
@@ -77046,7 +77117,7 @@ const License = () => {
   ] });
 };
 const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-C5Ot3_1C.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-BGYbCRhz.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-Czcylgof.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
 const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-RzG_IDJ-.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
 const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-CVAaHFMo.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
 const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-0WfPB7fw.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));

@@ -161,9 +161,10 @@ class TravelerCategoryRepository extends BaseRepository
         foreach ($rows as $row) {
             $meta = !empty($row->metadata) ? json_decode($row->metadata, true) : [];
             $result[(int) $row->id] = [
-                'pricing_mode' => $meta['pricing_mode'] ?? 'per_person',
-                'min_pax'      => $meta['min_pax'] ?? null,
-                'max_pax'      => $meta['max_pax'] ?? null,
+                'pricing_mode'   => $meta['pricing_mode'] ?? 'per_person',
+                'min_pax'        => $meta['min_pax'] ?? null,
+                'max_pax'        => $meta['max_pax'] ?? null,
+                'group_overflow' => $meta['group_overflow'] ?? 'block',
             ];
         }
         

@@ -150,7 +150,10 @@ class Checkout
                     // wants to highlight savings — but the default render is
                     // the post-DP price baked in here.
                     'catalog_price' => $catalogPrice,
-                    'subtotal' => $categoryPrice * $count,
+                    // Single source of truth for the line amount: per-person ×
+                    // count, flat per-group, or per-block group pricing. Keeps
+                    // the breakdown row in lock-step with the charged total.
+                    'subtotal' => \Yatra\Services\TripPricingService::categoryLineSubtotal($pt, $count, $categoryPrice),
                     'pricing_mode' => $pt->pricing_mode ?? 'per_person',
                 ];
             }

@@ -2448,11 +2448,15 @@
           const price = parseFloat(row.getAttribute('data-price')) || 0;
           const count = parseInt(input?.value) || 0;
           const pricingMode = row.getAttribute('data-pricing-mode') || (input ? input.getAttribute('data-pricing-mode') : '') || 'per_person';
-          
+          const groupOverflow = row.getAttribute('data-group-overflow') || (input ? input.getAttribute('data-group-overflow') : '') || 'block';
+          const maxPax = parseInt(row.getAttribute('data-max-pax') || (input ? input.getAttribute('data-max-pax') : '')) || 0;
+
           if (pricingMode === 'per_group') {
-            // Per group: charge flat price once if any travelers
+            // Per group: one flat price, or per block of maxPax when "per_block".
             if (count > 0) {
-              total += price;
+              total += (groupOverflow === 'per_block' && maxPax > 0)
+                ? price * Math.ceil(count / maxPax)
+                : price;
             }
           } else {
             // Per person: charge per traveler
@@ -3861,10 +3865,14 @@
           const row = input.closest('.yatra-quantity-row');
           const price = row ? parseFloat(row.getAttribute('data-price')) || 0 : 0;
           const pricingMode = (row ? row.getAttribute('data-pricing-mode') : null) || input.getAttribute('data-pricing-mode') || 'per_person';
-          
+          const groupOverflow = (row ? row.getAttribute('data-group-overflow') : null) || input.getAttribute('data-group-overflow') || 'block';
+          const maxPax = parseInt((row ? row.getAttribute('data-max-pax') : null) || input.getAttribute('data-max-pax')) || 0;
+
           if (pricingMode === 'per_group') {
             if (quantity > 0) {
-              totalPrice += price;
+              totalPrice += (groupOverflow === 'per_block' && maxPax > 0)
+                ? price * Math.ceil(quantity / maxPax)
+                : price;
             }
           } else {
             totalPrice += quantity * price;

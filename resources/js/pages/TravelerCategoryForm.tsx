@@ -40,6 +40,7 @@ interface TravelerCategoryFormData {
   pricing_mode: "per_person" | "per_group";
   min_pax: string;
   max_pax: string;
+  group_overflow: "block" | "per_block";
 }
 
 const TravelerCategoryForm: React.FC = () => {
@@ -57,6 +58,7 @@ const TravelerCategoryForm: React.FC = () => {
     pricing_mode: "per_person",
     min_pax: "",
     max_pax: "",
+    group_overflow: "block",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -118,6 +120,8 @@ const TravelerCategoryForm: React.FC = () => {
           categoryData.max_pax !== undefined && categoryData.max_pax !== null
             ? categoryData.max_pax.toString()
             : "",
+        group_overflow:
+          categoryData.group_overflow === "per_block" ? "per_block" : "block",
       });
     }
   }, [categoryData, isEditMode]);
@@ -235,6 +239,20 @@ const TravelerCategoryForm: React.FC = () => {
           "yatra",
         );
       }
+      // "Charge for additional groups" needs a maximum group size to know how
+      // big one group is.
+      if (
+        formData.group_overflow === "per_block" &&
+        (!formData.max_pax ||
+          formData.max_pax.trim() === "" ||
+          isNaN(parseInt(formData.max_pax)) ||
+          parseInt(formData.max_pax) < 1)
+      ) {
+        newErrors.max_pax = __(
+          "Set a maximum group size to charge for additional groups.",
+          "yatra",
+        );
+      }
     }
 
     setErrors(newErrors);
@@ -281,9 +299,13 @@ const TravelerCategoryForm: React.FC = () => {
         } else {
           payload.max_pax = null;
         }
+
+        payload.group_overflow =
+          data.group_overflow === "per_block" ? "per_block" : "block";
       } else {
         payload.min_pax = null;
         payload.max_pax = null;
+        payload.group_overflow = "block";
       }
 
       // If slug was manually edited, add flag to preserve it
@@ -728,6 +750,49 @@ const TravelerCategoryForm: React.FC = () => {
                               </p>
                             )}
                           </div>
+                        </div>
+
+                        {/* How a party larger than the max group size is handled */}
+                        <div className="mt-3">
+                          <label
+                            htmlFor="group_overflow"
+                            className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5"
+                          >
+                            {__(
+                              "If a booking has more people than the maximum group size",
+                              "yatra",
+                            )}
+                          </label>
+                          <Select
+                            id="group_overflow"
+                            value={formData.group_overflow}
+                            onChange={(e) =>
+                              handleFieldChange(
+                                "group_overflow",
+                                e.target.value as "block" | "per_block",
+                              )
+                            }
+                          >
+                            <option value="block">
+                              {__(
+                                "Don’t allow it — the maximum is a strict limit",
+                                "yatra",
+                              )}
+                            </option>
+                            <option value="per_block">
+                              {__(
+                                "Allow it — charge for additional groups",
+                                "yatra",
+                              )}
+                            </option>
+                          </Select>
+                          <HelpText
+                            text={__(
+                              "What happens when a party is bigger than the maximum group size. “Don’t allow it” caps every booking at the maximum. “Charge for additional groups” lets larger parties book and charges the group price once per group — for example, with a maximum of 5, a party of 7 needs 2 groups and pays 2× the group price.",
+                              "yatra",
+                            )}
+                            className="mt-1"
+                          />
                         </div>
                       </div>
                     )}

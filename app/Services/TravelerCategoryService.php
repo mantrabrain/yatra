@@ -145,6 +145,15 @@ class TravelerCategoryService extends BaseService
                     throw new \InvalidArgumentException('Maximum group size must be greater than or equal to minimum group size');
                 }
             }
+
+            // "Charge for additional groups" needs a maximum group size to know
+            // how big one group (one priced block) is.
+            if (
+                ($data['group_overflow'] ?? 'block') === 'per_block' &&
+                (!isset($data['max_pax']) || $data['max_pax'] === '' || $data['max_pax'] === null || (int) $data['max_pax'] <= 0)
+            ) {
+                throw new \InvalidArgumentException('Maximum group size is required to charge for additional groups');
+            }
         }
     }
 
@@ -213,14 +222,20 @@ class TravelerCategoryService extends BaseService
             $metadata['max_pax'] = (int) $data['max_pax'];
         }
 
+        if (isset($data['group_overflow'])) {
+            $metadata['group_overflow'] = in_array($data['group_overflow'], ['block', 'per_block'], true)
+                ? $data['group_overflow']
+                : 'block';
+        }
+
         // Set the type for traveler categories
         $data['type'] = 'traveler_type';
-        
+
         // Store metadata as JSON
         $data['metadata'] = wp_json_encode($metadata);
 
         // Remove old field names that don't exist in ClassificationsTable
-        unset($data['age_min'], $data['age_max'], $data['pricing_mode'], $data['min_pax'], $data['max_pax']);
+        unset($data['age_min'], $data['age_max'], $data['pricing_mode'], $data['min_pax'], $data['max_pax'], $data['group_overflow']);
 
         // Set created_by and updated_by to current user
         $current_user_id = get_current_user_id();
@@ -345,11 +360,18 @@ class TravelerCategoryService extends BaseService
             }
         }
 
-        // Store updated metadata as JSON
+        if (isset($data['group_overflow'])) {
+            $metadata['group_overflow'] = in_array($data['group_overflow'], ['block', 'per_block'], true)
+                ? $data['group_overflow']
+                : 'block';
+        }
+
+        // Store updated metadata as JSON (existing metadata read above, so
+        // untouched keys are preserved — only the keys present in $data change).
         $data['metadata'] = wp_json_encode($metadata);
 
         // Remove old field names that don't exist in ClassificationsTable
-        unset($data['age_min'], $data['age_max'], $data['pricing_mode'], $data['min_pax'], $data['max_pax']);
+        unset($data['age_min'], $data['age_max'], $data['pricing_mode'], $data['min_pax'], $data['max_pax'], $data['group_overflow']);
 
         // Sanitize and serialize icon if it's an array
         if (isset($data['icon'])) {

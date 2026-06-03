@@ -585,7 +585,21 @@ class FrontendAssetsProvider
                 true
             );
         }
-        
+
+        // Load each available gateway's own client scripts on the checkout page
+        // (e.g. Square Web Payments SDK + square.js, Authorize.Net Accept.js +
+        // its handler, Razorpay SDK + its handler). Every gateway's
+        // enqueueScripts() self-guards on isAvailable(), so only enabled +
+        // configured gateways load anything. This call was previously missing,
+        // so Pro gateways that render an inline card form shipped no JS to
+        // checkout and clicking "Pay" just span the button forever. It is
+        // additive and safe for the others: Stripe's enqueueScripts() is a
+        // no-op (Stripe is loaded via enqueueCommonJs), and PayPal/Pay Later
+        // have no client scripts.
+        if (class_exists(\Yatra\PaymentGateways\PaymentGatewayRegistry::class)) {
+            \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance()->enqueueScripts();
+        }
+
         // Localize booking data for booking.js
         $permalink_structure = get_option('permalink_structure') ?: '';
         $is_plain = empty($permalink_structure);
@@ -630,7 +644,7 @@ class FrontendAssetsProvider
             'thousandSeparator' => \Yatra\Services\SettingsService::getString('thousand_separator', ','),
             'decimalSeparator' => \Yatra\Services\SettingsService::getString('decimal_separator', '.'),
             // Payment gateways data
-            'paymentGateways' => apply_filters('yatra_payment_gateways', \Yatra\Services\SettingsService::get('payment_gateways', [])),
+            'paymentGateways' => $this->sanitizeGatewayConfigsForFrontend(apply_filters('yatra_payment_gateways', \Yatra\Services\SettingsService::get('payment_gateways', []))),
             'paymentMethods' => \Yatra\Services\SettingsService::get('payment_methods', []),
             'paymentTestMode' => \Yatra\Services\SettingsService::get('payment_test_mode', false),
             'partialPayment' => \Yatra\Services\SettingsService::get('partial_payment', false),
@@ -644,8 +658,8 @@ class FrontendAssetsProvider
             'autoConfirmPayLater' => \Yatra\Services\SettingsService::get('auto_confirm_pay_later', true),
             'allowWaitlist' => \Yatra\Services\SettingsService::isEnabled('allow_waitlist'),
             'waitlistAutoConfirm' => \Yatra\Services\SettingsService::isEnabled('waitlist_auto_confirm'),
-            'gateways' => apply_filters('yatra_payment_gateways', \Yatra\Services\SettingsService::get('payment_gateways', [])),
-            'enabledGateways' => \Yatra\Services\SettingsService::get('payment_gateways', []),
+            'gateways' => $this->sanitizeGatewayConfigsForFrontend(apply_filters('yatra_payment_gateways', \Yatra\Services\SettingsService::get('payment_gateways', []))),
+            'enabledGateways' => $this->sanitizeGatewayConfigsForFrontend(\Yatra\Services\SettingsService::get('payment_gateways', [])),
         ];
 
         $bookingData = array_merge($bookingData, $this->getStripeFrontendBookingPayload());
@@ -962,6 +976,55 @@ class FrontendAssetsProvider
         $basePath = $type === 'css' ? 'assets/css/' : 'assets/js/';
         $fullPath = YATRA_PLUGIN_PATH . $basePath . $path;
         return file_exists($fullPath);
+    }
+
+    /**
+     * Strip secret credentials from per-gateway config before it is localized
+     * into the page (yatraBookingData). The stored payment_gateways option
+     * holds private keys / access tokens that must NEVER reach the browser; the
+     * checkout scripts only ever read public values (publishable keys, Square
+     * application/location IDs, Authorize.Net public client key, the enabled
+     * flag, etc.). This removes the known secret keys while preserving the
+     * structure and every public field, so existing gateways/consumers are
+     * unaffected — only secrets are dropped.
+     *
+     * @param mixed $gateways
+     * @return array<string, mixed>
+     */
+    private function sanitizeGatewayConfigsForFrontend($gateways): array
+    {
+        if (!is_array($gateways)) {
+            return [];
+        }
+
+        // Credential fields that are private to the server.
+        $secretKeys = [
+            'access_token',
+            'api_key',
+            'api_secret',
+            'secret_key',
+            'key_secret',
+            'client_secret',
+            'transaction_key',
+            'webhook_secret',
+            'webhook_signing_secret',
+            'signing_secret',
+            'private_key',
+            'password',
+            'secret',
+        ];
+
+        $clean = [];
+        foreach ($gateways as $id => $config) {
+            if (is_array($config)) {
+                foreach ($secretKeys as $secret) {
+                    unset($config[$secret]);
+                }
+            }
+            $clean[$id] = $config;
+        }
+
+        return $clean;
     }
 
     /**
