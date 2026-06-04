@@ -658,7 +658,7 @@ class FrontendAssetsProvider
             'autoConfirmPayLater' => \Yatra\Services\SettingsService::get('auto_confirm_pay_later', true),
             'allowWaitlist' => \Yatra\Services\SettingsService::isEnabled('allow_waitlist'),
             'waitlistAutoConfirm' => \Yatra\Services\SettingsService::isEnabled('waitlist_auto_confirm'),
-            'gateways' => $this->sanitizeGatewayConfigsForFrontend(apply_filters('yatra_payment_gateways', \Yatra\Services\SettingsService::get('payment_gateways', []))),
+            'gateways' => $this->getGatewayFrontendConfigs(),
             'enabledGateways' => $this->sanitizeGatewayConfigsForFrontend(\Yatra\Services\SettingsService::get('payment_gateways', [])),
         ];
 
@@ -991,6 +991,49 @@ class FrontendAssetsProvider
      * @param mixed $gateways
      * @return array<string, mixed>
      */
+    /**
+     * Per-gateway PUBLIC config for the booking page, keyed by gateway id
+     * (window.yatraBookingData.gateways.<id>). Checkout scripts read their public
+     * settings from here — e.g. square.js → gateways.square.application_id /
+     * location_id, authorizenet.js → gateways.authorize_net.public_client_key /
+     * api_login_id.
+     *
+     * Source of truth is each ENABLED gateway's own getFrontendData(), i.e. an
+     * allowlist the gateway itself declares. This is deliberately NOT a denylist
+     * over the raw stored config: a denylist would leak any secret whose key we
+     * forgot (e.g. Stripe live_secret_key / test_secret_key, Bank Transfer
+     * account_number / routing_code). Gateways without a getFrontendData()
+     * (Bank Transfer, PayPal, Pay Later, …) contribute nothing, so their stored
+     * details never reach the browser. Disabled gateways are excluded.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function getGatewayFrontendConfigs(): array
+    {
+        if (!class_exists(\Yatra\PaymentGateways\PaymentGatewayRegistry::class)) {
+            return [];
+        }
+
+        $out = [];
+        try {
+            $registry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
+            foreach ($registry->getEnabledGateways() as $id => $gateway) {
+                if (!is_object($gateway) || !method_exists($gateway, 'getFrontendData')) {
+                    continue;
+                }
+                $data = $gateway->getFrontendData();
+                if (is_array($data) && $data !== []) {
+                    $data['enabled'] = true;
+                    $out[(string) $id] = $data;
+                }
+            }
+        } catch (\Throwable $e) {
+            return [];
+        }
+
+        return $out;
+    }
+
     private function sanitizeGatewayConfigsForFrontend($gateways): array
     {
         if (!is_array($gateways)) {

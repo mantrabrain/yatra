@@ -29,6 +29,15 @@ class AvailabilityRepository extends BaseRepository
     }
 
     /**
+     * Clamp an alert threshold to the column's range (smallint unsigned: 0–65535)
+     * so out-of-range input can't abort the write under MySQL strict mode.
+     */
+    private function clampAlertThreshold($value): int
+    {
+        return max(0, min(65535, (int) $value));
+    }
+
+    /**
      * Get table name
      */
     protected function getTableName(): string
@@ -318,16 +327,20 @@ class AvailabilityRepository extends BaseRepository
             'special_notes' => !empty($data['special_notes']) ? sanitize_textarea_field($data['special_notes']) : null,
             'cutoff_date' => !empty($data['cutoff_date']) ? sanitize_text_field($data['cutoff_date']) : null,
             'cutoff_hours' => (int) ($data['cutoff_hours'] ?? 24),
+            'is_blocked' => !empty($data['is_blocked']) ? 1 : 0,
+            'block_reason' => !empty($data['block_reason']) ? mb_substr(sanitize_textarea_field($data['block_reason']), 0, 255) : null,
+            'alert_threshold' => (isset($data['alert_threshold']) && $data['alert_threshold'] !== '' && $data['alert_threshold'] !== null) ? $this->clampAlertThreshold($data['alert_threshold']) : null,
         ];
-        
+
         // Calculate discount percentage if not provided
         if (!empty($insertData['original_price']) && !empty($insertData['discounted_price']) && empty($data['discount_percentage'])) {
             $insertData['discount_percentage'] = round((($insertData['original_price'] - $insertData['discounted_price']) / $insertData['original_price']) * 100, 2);
         }
-        
+
         $this->wpdb->insert($table, $insertData, [
             '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d',
             '%s', '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d',
+            '%d', '%s', '%d',
         ]);
         
         return $this->wpdb->insert_id;
@@ -375,7 +388,13 @@ class AvailabilityRepository extends BaseRepository
         if (isset($data['special_notes'])) $updateData['special_notes'] = !empty($data['special_notes']) ? sanitize_textarea_field($data['special_notes']) : null;
         if (isset($data['cutoff_date'])) $updateData['cutoff_date'] = !empty($data['cutoff_date']) ? sanitize_text_field($data['cutoff_date']) : null;
         if (isset($data['cutoff_hours'])) $updateData['cutoff_hours'] = (int) $data['cutoff_hours'];
-        
+        // array_key_exists (not isset) so an explicit null from the form — e.g.
+        // clearing the block reason / threshold when a date is unblocked — is
+        // honored instead of silently skipped (isset(null) === false).
+        if (array_key_exists('is_blocked', $data)) $updateData['is_blocked'] = !empty($data['is_blocked']) ? 1 : 0;
+        if (array_key_exists('block_reason', $data)) $updateData['block_reason'] = !empty($data['block_reason']) ? mb_substr(sanitize_textarea_field($data['block_reason']), 0, 255) : null;
+        if (array_key_exists('alert_threshold', $data)) $updateData['alert_threshold'] = ($data['alert_threshold'] !== '' && $data['alert_threshold'] !== null) ? $this->clampAlertThreshold($data['alert_threshold']) : null;
+
         // Calculate discount percentage if not provided
         if (!empty($updateData['original_price']) && !empty($updateData['discounted_price']) && empty($updateData['discount_percentage'])) {
             $updateData['discount_percentage'] = round((($updateData['original_price'] - $updateData['discounted_price']) / $updateData['original_price']) * 100, 2);

@@ -1,5 +1,5 @@
 import { t as useQueryClient, r as reactExports, u as useQuery, v as useMutation, j as jsxRuntimeExports, bh as Send, k as FileText, M as MessageCircle, U as Users, V as ExternalLink, br as Settings2, a5 as React, aF as Info, bS as KeyRound, g as CircleUser, bz as ShieldCheck, ar as Clock, D as Loader2, aV as Save, aD as CheckCircle2, b6 as XCircle, bu as EyeOff, aQ as Eye, w as Webhook, aA as Check, aG as Copy, z as ArrowLeft, Z as Zap, x as ChevronDown, bs as Code, aw as Plus, bB as Pencil, bG as History, aN as Trash2, R as RotateCcw } from "../../../dist/js/react-vendor-zODANjVp.js";
-import { a as apiClient, u as useToast, _ as __, s as sprintf } from "../../../dist/js/index-CG-QHfTA.js";
+import { a as apiClient, u as useToast, _ as __, s as sprintf } from "../../../dist/js/index-zauBMzvd.js";
 import { P as PageHeader, C as Card, d as CardContent, f as CardHeader, g as CardTitle, h as CardDescription, B as Button, w as Label, I as Input, t as CardFooter, S as Select, a5 as Table, a6 as TableHeader, a7 as TableRow, a8 as TableHead, a9 as TableBody, aa as TableCell, e as Badge, W as Pagination, k as ConfirmationDialog, M as Modal, A as Alert } from "./app.js";
 import { M as ModulePageSkeleton, a as ModuleFormSkeleton } from "../../../dist/js/module-skeleton-7zwRYol6.js";
 const whatsappApi = {

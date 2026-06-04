@@ -21,7 +21,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { getCurrencySymbol } from "../data/currencies";
-import { __ } from "../lib/i18n";
+import { __, sprintf } from "../lib/i18n";
 import { usePermissions } from "../hooks/usePermissions";
 import { apiClient } from "../lib/api-client";
 import { useToast } from "../components/ui/toast";
@@ -680,9 +680,12 @@ const Itinerary: React.FC = () => {
 
   // Bulk delete mutation
   const bulkDeleteMutation = useMutation({
-    mutationFn: async (ids: number[]) => {
+    mutationFn: async (payload: { ids: number[]; day_ids: number[] }) => {
+      // Days and activities are sent in separate buckets so the server never
+      // has to guess which table an id belongs to (day ids and activity ids
+      // live in different tables and can collide numerically).
       const response = await apiClient.delete("/itinerary", {
-        data: { ids },
+        data: { ids: payload.ids, day_ids: payload.day_ids },
       });
       return response?.data || response;
     },
@@ -693,15 +696,29 @@ const Itinerary: React.FC = () => {
       if (deleted > 0) {
         showToast(
           failed > 0
-            ? `${deleted} item(s) deleted successfully. ${failed} item(s) failed to delete.`
-            : `${deleted} item(s) deleted successfully.`,
+            ? sprintf(
+                __(
+                  "%1$d item(s) deleted successfully. %2$d item(s) failed to delete.",
+                  "yatra",
+                ),
+                deleted,
+                failed,
+              )
+            : sprintf(
+                __("%d item(s) deleted successfully.", "yatra"),
+                deleted,
+              ),
           "success",
         );
       } else {
-        showToast("Failed to delete items. Please try again.", "error");
+        showToast(
+          __("Failed to delete items. Please try again.", "yatra"),
+          "error",
+        );
       }
 
       setSelectedEntries(new Set());
+      setSelectedEmptyDays(new Set());
       queryClient.invalidateQueries({ queryKey: ["itinerary"] });
       queryClient.invalidateQueries({ queryKey: ["trips"] });
       queryClient.invalidateQueries({ queryKey: ["trips-simple"] });
@@ -709,7 +726,8 @@ const Itinerary: React.FC = () => {
     },
     onError: (error: any) => {
       showToast(
-        error?.message || "Failed to delete items. Please try again.",
+        error?.message ||
+          __("Failed to delete items. Please try again.", "yatra"),
         "error",
       );
     },
@@ -1104,11 +1122,13 @@ const Itinerary: React.FC = () => {
       return;
     }
 
-    // Resolve day_entry IDs for selected empty days
-    const resolveDayEntryIds = async (): Promise<number[]> => {
+    // Resolve day-table ids for a set of "trip-day" keys (one lookup per day).
+    const resolveDayEntryIds = async (
+      keys: Iterable<string>,
+    ): Promise<number[]> => {
       const dayEntryIds: number[] = [];
 
-      for (const key of combinedDayKeys) {
+      for (const key of keys) {
         const [tripIdStr, dayStr] = key.split("-");
         const tripIdNum = parseInt(tripIdStr, 10);
         const dayNum = parseInt(dayStr, 10);
@@ -1148,7 +1168,57 @@ const Itinerary: React.FC = () => {
       return dayEntryIds;
     };
 
-    const dayEntryIds = await resolveDayEntryIds();
+    // Delete permanently (uses dedicated bulk delete endpoint).
+    if (bulkAction === "delete") {
+      // A day is removed as a whole unit (day row + all its activities) ONLY
+      // when it's an explicitly-selected empty day, or when EVERY one of its
+      // visible activities is selected. A day with only SOME activities ticked
+      // keeps the day and deletes just those activities. Days and standalone
+      // activities go in separate buckets so the server never has to guess
+      // which table an id belongs to (day ids and activity ids can collide).
+      const fullDayKeys = new Set<string>(emptyDayKeys);
+      const activityIdsToDelete: number[] = [];
+
+      filteredDayGroups.forEach((dg) => {
+        const selectedInDay = dg.entries.filter((e) =>
+          selectedEntries.has(e.id),
+        );
+        if (selectedInDay.length === 0) {
+          return;
+        }
+        if (
+          dg.entries.length > 0 &&
+          selectedInDay.length === dg.entries.length
+        ) {
+          // All activities of this day are selected → delete the whole day.
+          fullDayKeys.add(`${dg.trip_id}-${dg.day}`);
+        } else {
+          // Partial selection → delete only the ticked activities.
+          for (const e of selectedInDay) {
+            activityIdsToDelete.push(e.id);
+          }
+        }
+      });
+
+      const dayIdsToDelete = await resolveDayEntryIds(fullDayKeys);
+
+      if (activityIdsToDelete.length === 0 && dayIdsToDelete.length === 0) {
+        showToast(
+          __("No valid entries or days found to apply this action.", "yatra"),
+          "error",
+        );
+        return;
+      }
+
+      bulkDeleteMutation.mutate({
+        ids: activityIdsToDelete,
+        day_ids: dayIdsToDelete,
+      });
+      return;
+    }
+
+    // Status changes escalate any day with a selected entry (unchanged behavior).
+    const dayEntryIds = await resolveDayEntryIds(combinedDayKeys);
     const allIdsForAction = [...ids, ...dayEntryIds];
 
     if (allIdsForAction.length === 0) {
@@ -1156,12 +1226,6 @@ const Itinerary: React.FC = () => {
         __("No valid entries or days found to apply this action.", "yatra"),
         "error",
       );
-      return;
-    }
-
-    // Delete permanently (uses dedicated bulk delete endpoint)
-    if (bulkAction === "delete") {
-      bulkDeleteMutation.mutate(allIdsForAction);
       return;
     }
 

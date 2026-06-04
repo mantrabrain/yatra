@@ -2803,28 +2803,69 @@ class BookingSessionController extends BaseController
             $amount = (float) ($params['amount'] ?? 0);
             $currency = $params['currency'] ?? 'USD';
             $transactionId = $result['transaction_id'] ?? '';
-            
+
             // Get booking
             $booking = $this->bookingRepository->find($bookingId);
-            if (!$booking || $booking->payment_status === 'paid') {
+            if (!$booking) {
                 return;
             }
-            
-            // Record the payment using PaymentRepository
+
+            // Already settled in full — never apply another charge to it. A fresh
+            // booking is never already paid, so in practice this only guards a
+            // stray/duplicate completion call (with a different transaction id)
+            // against over-applying the ledger.
+            if (($booking->payment_status ?? '') === 'paid') {
+                return;
+            }
+
             $paymentRepository = new \Yatra\Repositories\PaymentRepository();
-            $payment_id = $paymentRepository->create([
+
+            // Idempotency guard: skip if this gateway transaction is already
+            // recorded for this booking. Prevents duplicate ledger rows when a
+            // payment is submitted twice (the gateway uses a fresh idempotency
+            // key per call, so it won't dedupe a true retry). Mirrors
+            // PaymentGatewayController::handle_successful_payment().
+            if ($transactionId !== '') {
+                $existing = $paymentRepository->findByTransactionId($transactionId);
+                if ($existing && (int) ($existing->booking_id ?? 0) === $bookingId) {
+                    return;
+                }
+            }
+
+            // Record the payment
+            $paymentRepository->create([
                 'booking_id' => $bookingId,
                 'amount' => $amount,
                 'currency' => $currency,
                 'gateway' => $gatewayId,
                 'transaction_id' => $transactionId,
                 'status' => 'completed',
+                'customer_id' => $booking->customer_id ? (int) $booking->customer_id : null,
                 'created_at' => current_time('mysql'),
             ]);
-            
-            // Calculate total paid
-            $paymentRepository = new \Yatra\Repositories\PaymentRepository();
-            
+
+            // Update the booking ledger + status. The synchronous gateways
+            // (Square, Authorize.Net) reach this generic path but previously left
+            // the booking at pending/pending — only the payment row was written.
+            // This now matches handle_successful_payment(): accumulate amount_paid,
+            // recompute amount_due, set payment_status (paid vs partial), and
+            // confirm the booking (a deposit confirms too, consistent with Stripe).
+            $newAmountPaid = (float) ($booking->amount_paid ?? 0) + $amount;
+            $newAmountDue = max(0.0, (float) ($booking->total_amount ?? 0) - $newAmountPaid);
+            $paymentStatus = $newAmountDue > 0.0 ? 'partial' : 'paid';
+            $previousStatus = (string) ($booking->status ?? 'pending');
+
+            $this->bookingRepository->update($bookingId, [
+                'amount_paid' => $newAmountPaid,
+                'amount_due' => $newAmountDue,
+                'payment_status' => $paymentStatus,
+                'status' => 'confirmed',
+            ]);
+
+            if (function_exists('yatra_trigger_booking_confirmed')) {
+                \yatra_trigger_booking_confirmed($bookingId, $previousStatus);
+            }
+
             // Fire payment completed action
             do_action('yatra_payment_completed', [
                 'booking_id' => $bookingId,
@@ -2833,9 +2874,10 @@ class BookingSessionController extends BaseController
                 'currency' => $currency,
                 'gateway' => $gatewayId,
             ]);
-            
-            } catch (\Exception $e) {
-            }
+        } catch (\Throwable $e) {
+            // Best-effort: the charge is already recorded; a confirmation-page
+            // reload / status reconciliation can recover if this update fails.
+        }
     }
     
     /**

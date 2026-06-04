@@ -1,5 +1,5 @@
 import { j as jsxRuntimeExports, p as Calendar, k as FileText, b as Plane, at as ArrowRight, q as MapPin, I as User, y as ChevronRight, S as Sparkles, h as Package, i as CreditCard, by as LifeBuoy, be as Bell, az as AlertCircle, aD as CheckCircle2, ar as Clock, V as ExternalLink, U as Users, d as Mail, aW as Phone, b4 as Download, r as reactExports, a5 as React, u as useQuery, av as CheckCircle, as as DollarSign, aQ as Eye, t as useQueryClient, aJ as PenSquare, b6 as XCircle, bz as ShieldCheck, bf as Heart, s as LayoutDashboard, bA as LogOut, bv as QueryClient, bw as client, bx as QueryClientProvider } from "./react-vendor-zODANjVp.js";
-import { f as formatYatraMoney, _ as __, h as applyCurrencyPosition, s as sprintf, i as _n, a as apiClient, A as API_ENDPOINTS, u as useToast, j as getCountryOptions, d as getCountryName$1, T as ToastProvider } from "./index-CG-QHfTA.js";
+import { f as formatYatraMoney, _ as __, h as applyCurrencyPosition, s as sprintf, i as _n, a as apiClient, A as API_ENDPOINTS, u as useToast, j as getCountryOptions, d as getCountryName$1, T as ToastProvider, E as ErrorBoundary } from "./index-zauBMzvd.js";
 function toBrowserLocaleTag(locale) {
   const raw = String(locale || "").trim();
   if (!raw) return void 0;
@@ -3413,10 +3413,12 @@ const queryClient = new QueryClient({
 });
 const rootElement = document.getElementById("yatra-account-page-root");
 if (rootElement) {
+  rootElement.setAttribute("translate", "no");
+  rootElement.classList.add("notranslate");
   try {
     const root = client.createRoot(rootElement);
     root.render(
-      /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx(ToastProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(AccountPage, {}) }) }) })
+      /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx(ToastProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(ErrorBoundary, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(AccountPage, {}) }) }) }) })
     );
   } catch (error) {
     console.error("Error rendering account page:", error);

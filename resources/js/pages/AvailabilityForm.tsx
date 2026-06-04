@@ -538,6 +538,11 @@ const AvailabilityForm: React.FC = () => {
         to_longitude: data.to_longitude?.trim() || null,
         special_notes: null,
         cutoff_hours: 24,
+        alert_threshold: data.alert_threshold
+          ? parseInt(data.alert_threshold)
+          : null,
+        is_blocked: data.is_blocked,
+        block_reason: data.is_blocked ? data.block_reason || null : null,
       };
 
       if (isEditMode && availabilityId) {
@@ -1583,6 +1588,7 @@ const AvailabilityForm: React.FC = () => {
                   </label>
                   <Input
                     type="text"
+                    maxLength={255}
                     value={formData.block_reason}
                     onChange={(e) =>
                       handleFieldChange("block_reason", e.target.value)

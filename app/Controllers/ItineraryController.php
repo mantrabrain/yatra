@@ -293,12 +293,16 @@ class ItineraryController extends BaseController
         try {
             $data = $request->get_json_params();
             $ids = $data['ids'] ?? [];
+            $dayIds = $data['day_ids'] ?? [];
 
-            if (empty($ids) || !is_array($ids)) {
+            $ids = is_array($ids) ? $ids : [];
+            $dayIds = is_array($dayIds) ? $dayIds : [];
+
+            if (empty($ids) && empty($dayIds)) {
                 return $this->error_response('No IDs provided for bulk delete', 400);
             }
 
-            $result = $this->service->bulkDelete($ids);
+            $result = $this->service->bulkDelete($ids, $dayIds);
 
             return $this->success_response([
                 'deleted' => $result['deleted'],

@@ -884,6 +884,14 @@ class ItineraryRepository extends BaseRepository
             return $result !== false;
         }
 
+        // Explicit 'day' mode must never fall through to delete an activity.
+        // Day ids and activity ids come from different tables and can collide
+        // numerically; if the day no longer exists (e.g. already removed in
+        // another tab), bail rather than silently deleting a same-id activity.
+        if ($mode === 'day') {
+            return false;
+        }
+
         // Check if this is an activity entry ID (from entries table)
         $activityEntry = $wpdb->get_row(
             $wpdb->prepare("SELECT * FROM `{$tableEntries}` WHERE id = %d", $id)
@@ -904,98 +912,56 @@ class ItineraryRepository extends BaseRepository
     }
 
     /**
-     * Bulk delete entries
-     * @param array $ids Array of entry IDs to delete
+     * Bulk delete itinerary days and/or activity entries.
+     *
+     * Days and activities live in two different tables with independent
+     * auto-increment id spaces, so a single flat list of ids is ambiguous
+     * (the same number can be a valid day id *and* a valid activity id). The
+     * caller therefore tells us which is which: `$dayIds` are day-table ids
+     * (deleting one removes the day row and all of its activities) and `$ids`
+     * are activity-entry ids. Each id is routed through the single-item
+     * {@see self::delete()} with an explicit mode so the correct table is
+     * always used.
+     *
+     * @param array $ids    Activity entry ids (day_entry table)
+     * @param array $dayIds Day ids (days table); the day and its activities are removed
      * @return array ['deleted' => count, 'failed' => count]
      */
-    public function bulkDelete(array $ids): array
+    public function bulkDelete(array $ids, array $dayIds = []): array
     {
-        global $wpdb;
-        $tableEntries = $this->getTableName();
-        
-        $tableDays = TripItineraryDaysTable::getTableName();
-
-        if (empty($ids)) {
-            return ['deleted' => 0, 'failed' => 0];
-        }
-
-        // Sanitize IDs
-        $ids = array_map('intval', $ids);
-        $ids = array_filter($ids, function($id) {
-            return $id > 0;
-        });
-
-        if (empty($ids)) {
-            return ['deleted' => 0, 'failed' => 0];
-        }
-
         $deleted = 0;
         $failed = 0;
-        $processedDayIds = []; // Track days we've already processed
 
-        foreach ($ids as $id) {
+        // Delete whole days first — this also removes every activity that
+        // belongs to the day, so any of those activity ids that also appear in
+        // $ids become harmless no-ops below.
+        $dayIds = array_unique(array_filter(array_map('intval', $dayIds), static function ($id) {
+            return $id > 0;
+        }));
+        foreach ($dayIds as $dayId) {
             try {
-                // Get the entry to check if it's a day entry
-                $entry = $wpdb->get_row(
-                    $wpdb->prepare("SELECT day_id, item_type_id, item_id FROM `{$tableEntries}` WHERE id = %d", $id)
-                );
-
-                if (!$entry) {
-                    $failed++;
-                    continue;
-                }
-
-                $dayId = (int) $entry->day_id;
-                $isDayEntry = ($entry->item_type_id === null || $entry->item_type_id === 0) && 
-                              ($entry->item_id === null || $entry->item_id === 0);
-
-                // If this is a day entry, delete all entries for this day
-                if ($isDayEntry) {
-                    // Skip if we've already processed this day
-                    if (in_array($dayId, $processedDayIds)) {
-                        continue;
-                    }
-
-                    $processedDayIds[] = $dayId;
-
-                    // Get all entry IDs for this day
-                    $dayEntryIds = $wpdb->get_col(
-                        $wpdb->prepare("SELECT id FROM `{$tableEntries}` WHERE day_id = %d", $dayId)
-                    );
-
-                    if (!empty($dayEntryIds)) {
-                        // Delete images for all entries
-                        $placeholders = implode(',', array_fill(0, count($dayEntryIds), '%d'));
-                        $wpdb->query(
-                            $wpdb->prepare(
-                                "DELETE FROM `{$tableImages}` WHERE entry_id IN ($placeholders)",
-                                ...$dayEntryIds
-                            )
-                        );
-
-                        // Delete all entries for this day
-                        $wpdb->delete($tableEntries, ['day_id' => $dayId], ['%d']);
-
-                        // Delete the day itself
-                        $wpdb->delete($tableDays, ['id' => $dayId], ['%d']);
-                    }
-
+                if ($this->delete($dayId, 'day')) {
                     $deleted++;
                 } else {
-                    // For activity entries, just delete the entry and its images
-                    // Delete related images
-                    $wpdb->delete($tableImages, ['entry_id' => $id], ['%d']);
-
-                    // Delete entry
-                    $result = $wpdb->delete($tableEntries, ['id' => $id], ['%d']);
-
-                    if ($result !== false) {
-                        $deleted++;
-                    } else {
-                        $failed++;
-                    }
+                    $failed++;
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
+                $failed++;
+            }
+        }
+
+        // Delete standalone activity entries.
+        $ids = array_unique(array_filter(array_map('intval', $ids), static function ($id) {
+            return $id > 0;
+        }));
+        foreach ($ids as $id) {
+            try {
+                if ($this->delete($id, 'activity')) {
+                    $deleted++;
+                } else {
+                    $failed++;
+                }
+            } catch (\Throwable $e) {
                 $failed++;
             }
         }

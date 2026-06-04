@@ -282,23 +282,22 @@ class ItineraryService
      * @param array $ids Array of entry IDs to delete
      * @return array ['deleted' => count, 'failed' => count]
      */
-    public function bulkDelete(array $ids): array
+    public function bulkDelete(array $ids, array $dayIds = []): array
     {
-        if (empty($ids)) {
-            return ['deleted' => 0, 'failed' => 0];
-        }
-
-        // Validate all IDs are integers
-        $ids = array_map('intval', $ids);
-        $ids = array_filter($ids, function($id) {
+        // Activity entry ids and day ids are validated independently — see
+        // ItineraryRepository::bulkDelete() for why they must stay separate.
+        $ids = array_values(array_filter(array_map('intval', $ids), function ($id) {
             return $id > 0;
-        });
+        }));
+        $dayIds = array_values(array_filter(array_map('intval', $dayIds), function ($id) {
+            return $id > 0;
+        }));
 
-        if (empty($ids)) {
+        if (empty($ids) && empty($dayIds)) {
             return ['deleted' => 0, 'failed' => 0];
         }
 
-        return $this->repository->bulkDelete($ids);
+        return $this->repository->bulkDelete($ids, $dayIds);
     }
 
     /**

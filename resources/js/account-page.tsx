@@ -8,6 +8,7 @@ import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AccountPage from "./pages/AccountPage";
 import { ToastProvider } from "./components/ui/toast";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { __ } from "./lib/i18n";
 import "./css/index.css";
 
@@ -26,6 +27,11 @@ const queryClient = new QueryClient({
 const rootElement = document.getElementById("yatra-account-page-root");
 
 if (rootElement) {
+  // Opt out of browser auto-translation so it never rewrites React-managed
+  // text nodes (which otherwise causes "removeChild" reconciliation crashes).
+  rootElement.setAttribute("translate", "no");
+  rootElement.classList.add("notranslate");
+
   try {
     const root = ReactDOM.createRoot(rootElement);
 
@@ -33,7 +39,9 @@ if (rootElement) {
       <React.StrictMode>
         <QueryClientProvider client={queryClient}>
           <ToastProvider>
-            <AccountPage />
+            <ErrorBoundary>
+              <AccountPage />
+            </ErrorBoundary>
           </ToastProvider>
         </QueryClientProvider>
       </React.StrictMode>,

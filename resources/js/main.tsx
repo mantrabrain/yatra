@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./App";
 import { ToastProvider } from "./components/ui/toast";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import "./css/index.css";
 
 // Create React Query client with proper configuration
@@ -24,10 +25,33 @@ try {
   queryClient = new QueryClient();
 }
 
+// When a lazily-loaded page chunk fails to load — almost always because a new
+// build replaced the content-hashed chunk while this tab still holds an old
+// reference — Vite fires `vite:preloadError`. Reload once to fetch the current
+// bundle instead of crashing with "Failed to fetch dynamically imported module".
+// The time-based guard prevents a reload loop if the chunk is genuinely missing.
+window.addEventListener("vite:preloadError", () => {
+  const KEY = "yatra-last-chunk-reload";
+  const last = Number(window.sessionStorage.getItem(KEY) || 0);
+  const now = Date.now();
+  if (now - last > 10000) {
+    window.sessionStorage.setItem(KEY, String(now));
+    window.location.reload();
+  }
+});
+
 // Get mount point
 const rootElement = document.getElementById("yatra-app-root");
 
 if (rootElement) {
+  // Tell browser translation engines (Google Translate, Edge, etc.) not to
+  // rewrite React-managed text nodes. When they do, the DOM no longer matches
+  // React's fiber tree and unmounting a subtree throws
+  // "Failed to execute 'removeChild' on 'Node'". Opting out here keeps
+  // reconciliation safe without changing any behaviour.
+  rootElement.setAttribute("translate", "no");
+  rootElement.classList.add("notranslate");
+
   try {
     const root = ReactDOM.createRoot(rootElement);
 
@@ -35,7 +59,9 @@ if (rootElement) {
       <React.StrictMode>
         <QueryClientProvider client={queryClient}>
           <ToastProvider>
-            <App />
+            <ErrorBoundary>
+              <App />
+            </ErrorBoundary>
           </ToastProvider>
         </QueryClientProvider>
       </React.StrictMode>,

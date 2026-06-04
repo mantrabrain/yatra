@@ -834,6 +834,9 @@ video {
 .mb-4 {
   margin-bottom: 1rem;
 }
+.mb-5 {
+  margin-bottom: 1.25rem;
+}
 .mb-6 {
   margin-bottom: 1.5rem;
 }
@@ -1161,6 +1164,9 @@ video {
 }
 .min-h-\[480px\] {
   min-height: 480px;
+}
+.min-h-\[50vh\] {
+  min-height: 50vh;
 }
 .min-h-\[80px\] {
   min-height: 80px;
