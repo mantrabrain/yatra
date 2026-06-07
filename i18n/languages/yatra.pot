@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-04T08:45:45+00:00\n"
+"POT-Creation-Date: 2026-06-07T11:59:23+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -26,9 +26,9 @@ msgstr ""
 msgid " (Single Day)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7275
+# Source: resources/js/pages/Settings.tsx:7317
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6090
+#: assets/dist/js/Settings-CU7EUfsS.js:6128
 msgid " → Facebook Pixel tab."
 msgstr ""
 
@@ -253,10 +253,10 @@ msgstr ""
 msgid "(empty)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5704, resources/js/pages/Settings.tsx:5717
+# Source: resources/js/pages/Settings.tsx:5746, resources/js/pages/Settings.tsx:5759
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4632
-#: assets/dist/js/Settings-WStf1Cfq.js:4640
+#: assets/dist/js/Settings-CU7EUfsS.js:4670
+#: assets/dist/js/Settings-CU7EUfsS.js:4678
 msgid "(enabled)"
 msgstr ""
 
@@ -275,7 +275,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1901
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:1248
+#: assets/dist/js/Settings-CU7EUfsS.js:1248
 msgid "(locked)"
 msgstr ""
 
@@ -297,10 +297,10 @@ msgstr ""
 msgid "(no title)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5705, resources/js/pages/Settings.tsx:5718
+# Source: resources/js/pages/Settings.tsx:5747, resources/js/pages/Settings.tsx:5760
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4632
-#: assets/dist/js/Settings-WStf1Cfq.js:4640
+#: assets/dist/js/Settings-CU7EUfsS.js:4670
+#: assets/dist/js/Settings-CU7EUfsS.js:4678
 msgid "(not enabled)"
 msgstr ""
 
@@ -365,7 +365,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3834
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2908
+#: assets/dist/js/Settings-CU7EUfsS.js:2908
 msgid "+1-234-567-8900"
 msgstr ""
 
@@ -390,7 +390,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:400
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:253
+#: assets/dist/js/Settings-CU7EUfsS.js:253
 msgid ", then paste the OAuth 2.0 Client ID here."
 msgstr ""
 
@@ -408,16 +408,16 @@ msgstr ""
 msgid "-- Select a Trip --"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8199
+# Source: resources/js/pages/Settings.tsx:8241
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6957
+#: assets/dist/js/Settings-CU7EUfsS.js:6995
 msgid "-- Select a page --"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:432, resources/js/pages/Settings.tsx:463
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:291
-#: assets/dist/js/Settings-WStf1Cfq.js:329
+#: assets/dist/js/Settings-CU7EUfsS.js:291
+#: assets/dist/js/Settings-CU7EUfsS.js:329
 msgid "."
 msgstr ""
 
@@ -466,13 +466,13 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4075
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3189
+#: assets/dist/js/Settings-CU7EUfsS.js:3189
 msgid "12-hour or 24-hour format"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3849
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2927
+#: assets/dist/js/Settings-CU7EUfsS.js:2927
 msgid "123 Main Street"
 msgstr ""
 
@@ -638,7 +638,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:552
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:431
+#: assets/dist/js/Settings-CU7EUfsS.js:431
 msgid "A friendly name for this calendar connection (for your reference only)."
 msgstr ""
 
@@ -803,9 +803,9 @@ msgstr ""
 msgid "AI: draft a reply"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6456
+# Source: resources/js/pages/Settings.tsx:6498
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5392
+#: assets/dist/js/Settings-CU7EUfsS.js:5430
 msgid "API Key"
 msgstr ""
 
@@ -823,13 +823,13 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3087
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2287
+#: assets/dist/js/Settings-CU7EUfsS.js:2287
 msgid "API Secret validated successfully!"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3090
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2290
+#: assets/dist/js/Settings-CU7EUfsS.js:2290
 msgid "API Secret validation failed."
 msgstr ""
 
@@ -857,9 +857,9 @@ msgstr ""
 msgid "API key cleared."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6540
+# Source: resources/js/pages/Settings.tsx:6582
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5464
+#: assets/dist/js/Settings-CU7EUfsS.js:5502
 msgid "API key entered. Click 'Validate' to test connection."
 msgstr ""
 
@@ -946,9 +946,9 @@ msgstr ""
 msgid "Access"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7053
+# Source: resources/js/pages/Settings.tsx:7095
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5916
+#: assets/dist/js/Settings-CU7EUfsS.js:5954
 msgid "Access Token"
 msgstr ""
 
@@ -970,9 +970,9 @@ msgstr ""
 msgid "Access has already expired"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7216
+# Source: resources/js/pages/Settings.tsx:7258
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6037
+#: assets/dist/js/Settings-CU7EUfsS.js:6075
 msgid "Access token is valid!"
 msgstr ""
 
@@ -1048,7 +1048,7 @@ msgstr ""
 msgid "Activate module"
 msgstr ""
 
-# Source: resources/js/components/availability/RecurringRules.tsx:342, resources/js/components/availability/RecurringRules.tsx:710, resources/js/components/availability/RecurringRules.tsx:744, resources/js/components/email/EmailTemplatesList.tsx:857, resources/js/components/trips/TripsFilters.tsx:53, resources/js/components/trips/TripsTable.tsx:80, resources/js/pages/AbandonedRecoveryEmailForm.tsx:183, resources/js/pages/ChannelManager.tsx:1756, resources/js/pages/ChannelManager.tsx:2447, resources/js/pages/CustomerForm.tsx:800, resources/js/pages/Customers.tsx:215, resources/js/pages/Customers.tsx:442, resources/js/pages/Customers.tsx:793, resources/js/pages/DepartureRecurringRuleForm.tsx:403, resources/js/pages/DynamicPricing.tsx:509, resources/js/pages/DynamicPricing.tsx:559, resources/js/pages/DynamicPricingRuleForm.tsx:1154, resources/js/pages/EmailAutomation.tsx:177, resources/js/pages/EmailSequenceForm.tsx:432, resources/js/pages/EmailSequenceForm.tsx:896, resources/js/pages/EmailTemplateForm.tsx:606, resources/js/pages/RecurringRuleForm.tsx:2514, resources/js/pages/RecurringRulesPage.tsx:280, resources/js/pages/RecurringRulesPage.tsx:543, resources/js/pages/Settings.tsx:4658, resources/js/pages/Settings.tsx:5670, resources/js/pages/ViewCustomer.tsx:176, resources/js/pages/ViewDeparture.tsx:720, resources/js/pages/Webhooks.tsx:540, resources/js/pages/Webhooks.tsx:1580, resources/js/pages/Whatsapp.tsx:1222, resources/js/pages/Whatsapp.tsx:1455, resources/js/pages/Whatsapp.tsx:1684
+# Source: resources/js/components/availability/RecurringRules.tsx:342, resources/js/components/availability/RecurringRules.tsx:710, resources/js/components/availability/RecurringRules.tsx:744, resources/js/components/email/EmailTemplatesList.tsx:857, resources/js/components/trips/TripsFilters.tsx:53, resources/js/components/trips/TripsTable.tsx:80, resources/js/pages/AbandonedRecoveryEmailForm.tsx:183, resources/js/pages/ChannelManager.tsx:1756, resources/js/pages/ChannelManager.tsx:2447, resources/js/pages/CustomerForm.tsx:800, resources/js/pages/Customers.tsx:215, resources/js/pages/Customers.tsx:442, resources/js/pages/Customers.tsx:793, resources/js/pages/DepartureRecurringRuleForm.tsx:403, resources/js/pages/DynamicPricing.tsx:509, resources/js/pages/DynamicPricing.tsx:559, resources/js/pages/DynamicPricingRuleForm.tsx:1154, resources/js/pages/EmailAutomation.tsx:177, resources/js/pages/EmailSequenceForm.tsx:432, resources/js/pages/EmailSequenceForm.tsx:896, resources/js/pages/EmailTemplateForm.tsx:606, resources/js/pages/RecurringRuleForm.tsx:2514, resources/js/pages/RecurringRulesPage.tsx:280, resources/js/pages/RecurringRulesPage.tsx:543, resources/js/pages/Settings.tsx:4658, resources/js/pages/Settings.tsx:5712, resources/js/pages/ViewCustomer.tsx:176, resources/js/pages/ViewDeparture.tsx:720, resources/js/pages/Webhooks.tsx:540, resources/js/pages/Webhooks.tsx:1580, resources/js/pages/Whatsapp.tsx:1222, resources/js/pages/Whatsapp.tsx:1455, resources/js/pages/Whatsapp.tsx:1684
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:43621
 #: assets/admin/dist/js/app.js:43897
@@ -1062,8 +1062,8 @@ msgstr ""
 #: assets/dist/js/ChannelManager-CSJ4tokj.js:1403
 #: assets/dist/js/ChannelManager-CSJ4tokj.js:1985
 #: assets/dist/js/RecurringRuleForm-DURXaxk5.js:2048
-#: assets/dist/js/Settings-WStf1Cfq.js:3760
-#: assets/dist/js/Settings-WStf1Cfq.js:4612
+#: assets/dist/js/Settings-CU7EUfsS.js:3760
+#: assets/dist/js/Settings-CU7EUfsS.js:4650
 #: assets/dist/js/Webhooks-dctsJarL.js:425
 #: assets/dist/js/Webhooks-dctsJarL.js:1216
 msgid "Active"
@@ -1086,7 +1086,7 @@ msgstr ""
 msgid "Active mappings"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:403, resources/js/components/trip-form/sections/ItinerarySection.tsx:82, resources/js/pages/Activities.tsx:604, resources/js/pages/Settings.tsx:5259
+# Source: resources/js/components/Layout.tsx:403, resources/js/components/trip-form/sections/ItinerarySection.tsx:82, resources/js/pages/Activities.tsx:604, resources/js/pages/Settings.tsx:5301
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:894
 #: templates/listing-trip.php:424
@@ -1096,7 +1096,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:4423
 #: assets/admin/dist/js/app.js:31683
 #: assets/dist/blocks/tour.js:374
-#: assets/dist/js/Settings-WStf1Cfq.js:4233
+#: assets/dist/js/Settings-CU7EUfsS.js:4271
 msgid "Activities"
 msgstr ""
 
@@ -1120,9 +1120,9 @@ msgstr ""
 msgid "Activity"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8032
+# Source: resources/js/pages/Settings.tsx:8074
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6777
+#: assets/dist/js/Settings-CU7EUfsS.js:6815
 msgid "Activity Base"
 msgstr ""
 
@@ -1250,8 +1250,8 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1538, resources/js/pages/Settings.tsx:1755
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:928
-#: assets/dist/js/Settings-WStf1Cfq.js:1138
+#: assets/dist/js/Settings-CU7EUfsS.js:928
+#: assets/dist/js/Settings-CU7EUfsS.js:1138
 msgid "Add Field"
 msgstr ""
 
@@ -1366,7 +1366,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1546
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:935
+#: assets/dist/js/Settings-CU7EUfsS.js:935
 msgid "Add New Field"
 msgstr ""
 
@@ -1419,8 +1419,8 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1660, resources/js/pages/Settings.tsx:1929, resources/js/pages/TripConsentForm.tsx:1303
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:1039
-#: assets/dist/js/Settings-WStf1Cfq.js:1271
+#: assets/dist/js/Settings-CU7EUfsS.js:1039
+#: assets/dist/js/Settings-CU7EUfsS.js:1271
 msgid "Add Option"
 msgstr ""
 
@@ -1455,15 +1455,15 @@ msgstr ""
 msgid "Add Rule"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8560
+# Source: resources/js/pages/Settings.tsx:8602
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7257
+#: assets/dist/js/Settings-CU7EUfsS.js:7295
 msgid "Add SEO Image"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8264
+# Source: resources/js/pages/Settings.tsx:8306
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7009
+#: assets/dist/js/Settings-CU7EUfsS.js:7047
 msgid "Add Shortcode Automatically"
 msgstr ""
 
@@ -1507,9 +1507,9 @@ msgstr ""
 msgid "Add Trip"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6753
+# Source: resources/js/pages/Settings.tsx:6795
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5640
+#: assets/dist/js/Settings-CU7EUfsS.js:5678
 msgid "Add Trip Tags"
 msgstr ""
 
@@ -1744,9 +1744,9 @@ msgstr ""
 msgid "Add multiple time slots for tours throughout the day (e.g., morning, afternoon, evening)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6214
+# Source: resources/js/pages/Settings.tsx:6256
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5151
+#: assets/dist/js/Settings-CU7EUfsS.js:5189
 msgid "Add new Tax"
 msgstr ""
 
@@ -1814,15 +1814,15 @@ msgstr ""
 msgid "Add steps with delays and email templates"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6126
+# Source: resources/js/pages/Settings.tsx:6168
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5074
+#: assets/dist/js/Settings-CU7EUfsS.js:5112
 msgid "Add tax to booking prices"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:451
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:314
+#: assets/dist/js/Settings-CU7EUfsS.js:314
 msgid "Add this to your OAuth client under \"Authorized redirect URIs\" in"
 msgstr ""
 
@@ -1831,9 +1831,9 @@ msgstr ""
 msgid "Add to Gallery"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7520
+# Source: resources/js/pages/Settings.tsx:7562
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6300
+#: assets/dist/js/Settings-CU7EUfsS.js:6338
 msgid "Add to cart"
 msgstr ""
 
@@ -1877,9 +1877,9 @@ msgstr ""
 msgid "Add your first endpoint to start receiving events. Common targets: Zapier catch hooks, Make scenarios, internal CRM ingest URLs, Slack webhook URLs."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8261
+# Source: resources/js/pages/Settings.tsx:8303
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7008
+#: assets/dist/js/Settings-CU7EUfsS.js:7046
 msgid "Adding..."
 msgstr ""
 
@@ -2090,7 +2090,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3763, resources/js/pages/TripForm.tsx:8842
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2838
+#: assets/dist/js/Settings-CU7EUfsS.js:2838
 msgid "Advanced"
 msgstr ""
 
@@ -2100,15 +2100,15 @@ msgstr ""
 msgid "Advanced Booking Management"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5672
+# Source: resources/js/pages/Settings.tsx:5714
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4613
+#: assets/dist/js/Settings-CU7EUfsS.js:4651
 msgid "Advanced Discount and Dynamic Pricing are both enabled. Your stacking choice below is being applied to every new booking calculation."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5702
+# Source: resources/js/pages/Settings.tsx:5744
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4630
+#: assets/dist/js/Settings-CU7EUfsS.js:4668
 msgid "Advanced Discount module"
 msgstr ""
 
@@ -2137,13 +2137,13 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4331
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3443
+#: assets/dist/js/Settings-CU7EUfsS.js:3443
 msgid "After a deposit or partial payment, automatically schedule the remaining balance with your gateway (Stripe invoices or subscription schedules). Requires a gateway customer and payment method from checkout."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8312
+# Source: resources/js/pages/Settings.tsx:8354
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7055
+#: assets/dist/js/Settings-CU7EUfsS.js:7093
 msgid "After changing permalink settings, you must flush rewrite rules for the changes to take effect."
 msgstr ""
 
@@ -2432,39 +2432,39 @@ msgstr ""
 msgid "All values below come from Meta's WhatsApp Business Platform. Bring your own credentials — messages are billed directly by Meta, no markup from the plugin."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5442
+# Source: resources/js/pages/Settings.tsx:5484
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4424
+#: assets/dist/js/Settings-CU7EUfsS.js:4462
 msgid "Allow Guest Checkout"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4711
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3793
+#: assets/dist/js/Settings-CU7EUfsS.js:3793
 msgid "Allow customers to book now and pay later. Payment must be completed before the trip date."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5445
+# Source: resources/js/pages/Settings.tsx:5487
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4427
+#: assets/dist/js/Settings-CU7EUfsS.js:4465
 msgid "Allow customers to book without creating an account"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5839
+# Source: resources/js/pages/Settings.tsx:5881
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4759
+#: assets/dist/js/Settings-CU7EUfsS.js:4797
 msgid "Allow customers to create accounts on your website"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5975
+# Source: resources/js/pages/Settings.tsx:6017
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4896
+#: assets/dist/js/Settings-CU7EUfsS.js:4934
 msgid "Allow customers to leave reviews and ratings"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4238
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3350
+#: assets/dist/js/Settings-CU7EUfsS.js:3350
 msgid "Allow customers to pay a portion now and the rest later"
 msgstr ""
 
@@ -2479,9 +2479,9 @@ msgstr ""
 msgid "Allow it — charge for additional groups"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5504
+# Source: resources/js/pages/Settings.tsx:5546
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4479
+#: assets/dist/js/Settings-CU7EUfsS.js:4517
 msgid "Allow waitlist when a date is full"
 msgstr ""
 
@@ -2709,13 +2709,13 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4951
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3996
+#: assets/dist/js/Settings-CU7EUfsS.js:3996
 msgid "Apple Pay (Payment Request Button)"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4991
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4035
+#: assets/dist/js/Settings-CU7EUfsS.js:4035
 msgid "Apple Pay requires domain verification inside your Stripe Dashboard."
 msgstr ""
 
@@ -3081,7 +3081,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:304
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:171
+#: assets/dist/js/Settings-CU7EUfsS.js:171
 msgid "Are you sure you want to disconnect from Google Calendar?"
 msgstr ""
 
@@ -3433,9 +3433,9 @@ msgstr ""
 msgid "Audience"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6552
+# Source: resources/js/pages/Settings.tsx:6594
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5478
+#: assets/dist/js/Settings-CU7EUfsS.js:5516
 msgid "Audience/List"
 msgstr ""
 
@@ -3498,15 +3498,15 @@ msgstr ""
 msgid "Auto Sync"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6024
+# Source: resources/js/pages/Settings.tsx:6066
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4948
+#: assets/dist/js/Settings-CU7EUfsS.js:4986
 msgid "Auto-Approve Reviews"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5392
+# Source: resources/js/pages/Settings.tsx:5434
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4370
+#: assets/dist/js/Settings-CU7EUfsS.js:4408
 msgid "Auto-Confirm Bookings"
 msgstr ""
 
@@ -3534,13 +3534,13 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4503
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3633
+#: assets/dist/js/Settings-CU7EUfsS.js:3633
 msgid "Auto-confirm \"Pay Later\" Bookings"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5529
+# Source: resources/js/pages/Settings.tsx:5571
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4506
+#: assets/dist/js/Settings-CU7EUfsS.js:4544
 msgid "Auto-confirm promoted waitlist bookings"
 msgstr ""
 
@@ -3626,21 +3626,21 @@ msgstr ""
 msgid "Automatic retry with backoff"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6603
+# Source: resources/js/pages/Settings.tsx:6645
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5522
+#: assets/dist/js/Settings-CU7EUfsS.js:5560
 msgid "Automatically add customers to Mailchimp when they make a booking"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4506
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3636
+#: assets/dist/js/Settings-CU7EUfsS.js:3636
 msgid "Automatically confirm bookings when \"Book Now, Pay Later\" is selected. If disabled, bookings will remain pending until payment is received."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5395
+# Source: resources/js/pages/Settings.tsx:5437
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4373
+#: assets/dist/js/Settings-CU7EUfsS.js:4411
 msgid "Automatically confirm bookings without manual approval"
 msgstr ""
 
@@ -3665,9 +3665,9 @@ msgstr ""
 msgid "Automatically publish or unpublish your trip on specific dates"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6027
+# Source: resources/js/pages/Settings.tsx:6069
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4951
+#: assets/dist/js/Settings-CU7EUfsS.js:4989
 msgid "Automatically publish reviews without moderation"
 msgstr ""
 
@@ -3676,9 +3676,9 @@ msgstr ""
 msgid "Automatically send consent forms to customers via email for electronic signing."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6437
+# Source: resources/js/pages/Settings.tsx:6479
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5374
+#: assets/dist/js/Settings-CU7EUfsS.js:5412
 msgid "Automatically sync customers to Mailchimp lists when they book. Add tags based on trips booked and build targeted email campaigns."
 msgstr ""
 
@@ -3692,9 +3692,9 @@ msgstr ""
 msgid "Automatically sync your bookings and departures to Google Calendar"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6756
+# Source: resources/js/pages/Settings.tsx:6798
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5643
+#: assets/dist/js/Settings-CU7EUfsS.js:5681
 msgid "Automatically tag subscribers with the trip name they booked"
 msgstr ""
 
@@ -4104,9 +4104,9 @@ msgstr ""
 msgid "Before you start — getting WhatsApp Cloud API access"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7544
+# Source: resources/js/pages/Settings.tsx:7586
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6327
+#: assets/dist/js/Settings-CU7EUfsS.js:6365
 msgid "Begin checkout"
 msgstr ""
 
@@ -4121,15 +4121,15 @@ msgstr ""
 msgid "Best for search engines: 50-60 characters. Include main keywords."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5789
+# Source: resources/js/pages/Settings.tsx:5831
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4709
+#: assets/dist/js/Settings-CU7EUfsS.js:4747
 msgid "Best for the customer"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5757
+# Source: resources/js/pages/Settings.tsx:5799
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4680
+#: assets/dist/js/Settings-CU7EUfsS.js:4718
 msgid "Best for the customer — pick whichever single mechanism gives the larger reduction"
 msgstr ""
 
@@ -4281,7 +4281,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:66855
 #: assets/admin/dist/js/app.js:67075
 #: assets/dist/js/account-page.js:2095
-#: assets/dist/js/Settings-WStf1Cfq.js:2770
+#: assets/dist/js/Settings-CU7EUfsS.js:2770
 msgid "Booking"
 msgstr ""
 
@@ -4363,21 +4363,21 @@ msgstr ""
 msgid "Booking Efficiency"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5596
+# Source: resources/js/pages/Settings.tsx:5638
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4552
+#: assets/dist/js/Settings-CU7EUfsS.js:4590
 msgid "Booking Expiry & Reminders"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5601
+# Source: resources/js/pages/Settings.tsx:5643
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4558
+#: assets/dist/js/Settings-CU7EUfsS.js:4596
 msgid "Booking Expiry Hours"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3698
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2775
+#: assets/dist/js/Settings-CU7EUfsS.js:2775
 msgid "Booking Form"
 msgstr ""
 
@@ -4429,9 +4429,9 @@ msgstr ""
 msgid "Booking Overview"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8110
+# Source: resources/js/pages/Settings.tsx:8152
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6869
+#: assets/dist/js/Settings-CU7EUfsS.js:6907
 msgid "Booking Page Settings"
 msgstr ""
 
@@ -4440,9 +4440,9 @@ msgstr ""
 msgid "Booking Policies"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5619
+# Source: resources/js/pages/Settings.tsx:5661
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4580
+#: assets/dist/js/Settings-CU7EUfsS.js:4618
 msgid "Booking Reminder Days"
 msgstr ""
 
@@ -4461,9 +4461,9 @@ msgstr ""
 msgid "Booking Status Distribution"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8215
+# Source: resources/js/pages/Settings.tsx:8257
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6965
+#: assets/dist/js/Settings-CU7EUfsS.js:7003
 msgid "Booking URL:"
 msgstr ""
 
@@ -4472,9 +4472,9 @@ msgstr ""
 msgid "Booking Window (Days in Advance)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8157
+# Source: resources/js/pages/Settings.tsx:8199
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6919
+#: assets/dist/js/Settings-CU7EUfsS.js:6957
 msgid "Booking confirmation base (pageless, same slug as above):"
 msgstr ""
 
@@ -4507,9 +4507,9 @@ msgstr ""
 msgid "Booking expired (customer)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8140
+# Source: resources/js/pages/Settings.tsx:8182
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6899
+#: assets/dist/js/Settings-CU7EUfsS.js:6937
 msgid "Booking hub URL:"
 msgstr ""
 
@@ -4527,7 +4527,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3622
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2711
+#: assets/dist/js/Settings-CU7EUfsS.js:2711
 msgid "Booking page selected successfully"
 msgstr ""
 
@@ -4602,7 +4602,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:340
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:202
+#: assets/dist/js/Settings-CU7EUfsS.js:202
 msgid "Bookings synced to Google Calendar."
 msgstr ""
 
@@ -4623,15 +4623,15 @@ msgstr ""
 msgid "Boost your revenue by offering optional add-ons like airport transfers, travel insurance, equipment rental, and meals during trip booking."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5781
+# Source: resources/js/pages/Settings.tsx:5823
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4701
+#: assets/dist/js/Settings-CU7EUfsS.js:4739
 msgid "Both apply"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5751
+# Source: resources/js/pages/Settings.tsx:5793
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4676
+#: assets/dist/js/Settings-CU7EUfsS.js:4714
 msgid "Both apply (legacy) — Dynamic Pricing and Discount stack"
 msgstr ""
 
@@ -4751,13 +4751,13 @@ msgstr ""
 msgid "Browse Trips"
 msgstr ""
 
-# Source: resources/js/components/ai/BuildItineraryModal.tsx:371, resources/js/components/ai/BuildItineraryModal.tsx:393, resources/js/pages/Settings.tsx:5275
+# Source: resources/js/components/ai/BuildItineraryModal.tsx:371, resources/js/components/ai/BuildItineraryModal.tsx:393, resources/js/pages/Settings.tsx:5317
 #: assets/admin/dist/js/app.js
 #: templates/shortcodes/trip-search.php:68
 #: templates/shortcodes/trip-search.php:271
 #: assets/dist/js/BuildItineraryModal-Db1LZgrN.js:284
 #: assets/dist/js/BuildItineraryModal-Db1LZgrN.js:302
-#: assets/dist/js/Settings-WStf1Cfq.js:4249
+#: assets/dist/js/Settings-CU7EUfsS.js:4287
 msgid "Budget"
 msgstr ""
 
@@ -4883,7 +4883,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4105
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3219
+#: assets/dist/js/Settings-CU7EUfsS.js:3219
 msgid "Buttons, links, and highlights. Default is the standard Yatra blue; choose a hex color that matches your brand or theme accent."
 msgstr ""
 
@@ -4935,19 +4935,19 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:627
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:522
+#: assets/dist/js/Settings-CU7EUfsS.js:522
 msgid "Calendar API"
 msgstr ""
 
 # Source: resources/js/pages/GoogleCalendar.tsx:195, resources/js/pages/Settings.tsx:536
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:410
+#: assets/dist/js/Settings-CU7EUfsS.js:410
 msgid "Calendar ID"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:551
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:430
+#: assets/dist/js/Settings-CU7EUfsS.js:430
 msgid "Calendar Name"
 msgstr ""
 
@@ -5047,8 +5047,8 @@ msgstr ""
 #: assets/dist/js/ChannelManager-CSJ4tokj.js:1797
 #: assets/dist/js/DiscountForm-DGCNdiR2.js:2013
 #: assets/dist/js/RecurringRuleForm-DURXaxk5.js:2131
-#: assets/dist/js/Settings-WStf1Cfq.js:1129
-#: assets/dist/js/Settings-WStf1Cfq.js:1448
+#: assets/dist/js/Settings-CU7EUfsS.js:1129
+#: assets/dist/js/Settings-CU7EUfsS.js:1448
 #: assets/dist/js/Team-Dm30DLtU.js:710
 #: assets/dist/js/Team-Dm30DLtU.js:786
 #: assets/dist/js/Team-Dm30DLtU.js:834
@@ -5226,7 +5226,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4937
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3982
+#: assets/dist/js/Settings-CU7EUfsS.js:3982
 msgid "Card (Stripe Elements)"
 msgstr ""
 
@@ -5381,10 +5381,10 @@ msgstr ""
 msgid "Change File"
 msgstr ""
 
-# Source: resources/js/components/ui/icon-picker.tsx:511, resources/js/pages/Settings.tsx:8549
+# Source: resources/js/components/ui/icon-picker.tsx:511, resources/js/pages/Settings.tsx:8591
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:32667
-#: assets/dist/js/Settings-WStf1Cfq.js:7251
+#: assets/dist/js/Settings-CU7EUfsS.js:7289
 msgid "Change Image"
 msgstr ""
 
@@ -5506,15 +5506,15 @@ msgstr ""
 msgid "Channels marked “Needs attention” have stale mappings, pending bookings, recent failures, or a tripped breaker."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6377
+# Source: resources/js/pages/Settings.tsx:6419
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5320
+#: assets/dist/js/Settings-CU7EUfsS.js:5358
 msgid "Character used to separate decimal part (e.g., period for 99.99)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6337
+# Source: resources/js/pages/Settings.tsx:6379
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5273
+#: assets/dist/js/Settings-CU7EUfsS.js:5311
 msgid "Character used to separate thousands (e.g., comma for 1,000)"
 msgstr ""
 
@@ -5619,9 +5619,9 @@ msgstr ""
 msgid "Choose how to apply the group discount: Total discount on entire booking, or category-based rates per traveler type."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7110
+# Source: resources/js/pages/Settings.tsx:7152
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5951
+#: assets/dist/js/Settings-CU7EUfsS.js:5989
 msgid "Choose permissions: 'ads_management' and 'business_management'"
 msgstr ""
 
@@ -5656,15 +5656,15 @@ msgstr ""
 msgid "Choose whether this discount applies to all trips or specific ones."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5234
+# Source: resources/js/pages/Settings.tsx:5276
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4210
+#: assets/dist/js/Settings-CU7EUfsS.js:4248
 msgid "Choose which fields appear in the trip search bar. Turn off the ones you don't need for a cleaner search."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7475
+# Source: resources/js/pages/Settings.tsx:7517
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6249
+#: assets/dist/js/Settings-CU7EUfsS.js:6287
 msgid "Choose which standard ecommerce events Yatra should emit to GA4 on the storefront and booking flow."
 msgstr ""
 
@@ -5678,8 +5678,8 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:43361
 #: assets/dist/js/account-page.js:2586
-#: assets/dist/js/Settings-WStf1Cfq.js:2933
-#: assets/dist/js/Settings-WStf1Cfq.js:2940
+#: assets/dist/js/Settings-CU7EUfsS.js:2933
+#: assets/dist/js/Settings-CU7EUfsS.js:2940
 msgid "City"
 msgstr ""
 
@@ -5778,7 +5778,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1717
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:1100
+#: assets/dist/js/Settings-CU7EUfsS.js:1100
 msgid "Click \"Add Option\" to add dropdown choices."
 msgstr ""
 
@@ -5811,57 +5811,57 @@ msgstr ""
 msgid "Click \"Where to find this\" next to a provider for the exact steps in their dashboard."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6876
+# Source: resources/js/pages/Settings.tsx:6918
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5743
+#: assets/dist/js/Settings-CU7EUfsS.js:5781
 msgid "Click 'Add Pixel' if you don't have one"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7077
+# Source: resources/js/pages/Settings.tsx:7119
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5930
+#: assets/dist/js/Settings-CU7EUfsS.js:5968
 msgid "Click 'All tools' and select 'Events Manager'"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6870
+# Source: resources/js/pages/Settings.tsx:6912
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5739
+#: assets/dist/js/Settings-CU7EUfsS.js:5777
 msgid "Click 'All tools' and select 'Pixels'"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6887
+# Source: resources/js/pages/Settings.tsx:6929
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5751
+#: assets/dist/js/Settings-CU7EUfsS.js:5789
 msgid "Click 'Create Pixel'"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7107
+# Source: resources/js/pages/Settings.tsx:7149
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5950
+#: assets/dist/js/Settings-CU7EUfsS.js:5988
 msgid "Click 'Generate access token'"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7115
+# Source: resources/js/pages/Settings.tsx:7157
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5955
+#: assets/dist/js/Settings-CU7EUfsS.js:5993
 msgid "Click 'Generate token'"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7095
+# Source: resources/js/pages/Settings.tsx:7137
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5942
+#: assets/dist/js/Settings-CU7EUfsS.js:5980
 msgid "Click 'Settings' (gear icon ⚙️) in the top right"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6970
+# Source: resources/js/pages/Settings.tsx:7012
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5816
+#: assets/dist/js/Settings-CU7EUfsS.js:5854
 msgid "Click 'Validate' to test Pixel ID."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7230
+# Source: resources/js/pages/Settings.tsx:7272
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6043
+#: assets/dist/js/Settings-CU7EUfsS.js:6081
 msgid "Click 'Validate' to test access token."
 msgstr ""
 
@@ -5877,15 +5877,15 @@ msgstr ""
 msgid "Click a variable on the right to copy, double-click to insert at the cursor."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7089
+# Source: resources/js/pages/Settings.tsx:7131
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5938
+#: assets/dist/js/Settings-CU7EUfsS.js:5976
 msgid "Click on your Pixel name to open its settings"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7684
+# Source: resources/js/pages/Settings.tsx:7726
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6455
+#: assets/dist/js/Settings-CU7EUfsS.js:6493
 msgid "Click the gear icon (Admin) in the bottom-left corner."
 msgstr ""
 
@@ -5924,23 +5924,23 @@ msgstr ""
 msgid "Click to watch demo video"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7398
+# Source: resources/js/pages/Settings.tsx:7440
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6187
+#: assets/dist/js/Settings-CU7EUfsS.js:6225
 msgid "Click your existing Web stream — or click Add stream → Web, enter your site URL and a stream name, then Create stream."
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:388
 #: assets/admin/dist/js/app.js
 #: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:50
-#: assets/dist/js/Settings-WStf1Cfq.js:239
+#: assets/dist/js/Settings-CU7EUfsS.js:239
 msgid "Client ID"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:417
 #: assets/admin/dist/js/app.js
 #: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:62
-#: assets/dist/js/Settings-WStf1Cfq.js:274
+#: assets/dist/js/Settings-CU7EUfsS.js:274
 msgid "Client Secret"
 msgstr ""
 
@@ -6045,9 +6045,9 @@ msgstr ""
 msgid "Collapse all"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5334
+# Source: resources/js/pages/Settings.tsx:5376
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4311
+#: assets/dist/js/Settings-CU7EUfsS.js:4349
 msgid "Collapse filters by default on mobile"
 msgstr ""
 
@@ -6111,9 +6111,9 @@ msgstr ""
 msgid "Comma-separated days before trip to send reminders (e.g., 3,1 for 3 days and 1 day before)."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8418
+# Source: resources/js/pages/Settings.tsx:8460
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7151
+#: assets/dist/js/Settings-CU7EUfsS.js:7189
 msgid "Comma-separated keywords for the trip archive page. Include relevant travel and booking keywords."
 msgstr ""
 
@@ -6130,9 +6130,9 @@ msgstr ""
 msgid "Comma-separated keywords. Use {name} as placeholder."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6767
+# Source: resources/js/pages/Settings.tsx:6809
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5654
+#: assets/dist/js/Settings-CU7EUfsS.js:5692
 msgid "Comma-separated tags to add to all synced subscribers (e.g., \"yatra, booking\")"
 msgstr ""
 
@@ -6150,25 +6150,25 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3810
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2879
+#: assets/dist/js/Settings-CU7EUfsS.js:2879
 msgid "Company Email"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3786
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2850
+#: assets/dist/js/Settings-CU7EUfsS.js:2850
 msgid "Company Information"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3791
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2856
+#: assets/dist/js/Settings-CU7EUfsS.js:2856
 msgid "Company Name"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3826
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2899
+#: assets/dist/js/Settings-CU7EUfsS.js:2899
 msgid "Company Phone"
 msgstr ""
 
@@ -6264,15 +6264,15 @@ msgstr ""
 msgid "Configure Google Analytics 4"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8352
+# Source: resources/js/pages/Settings.tsx:8394
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7084
+#: assets/dist/js/Settings-CU7EUfsS.js:7122
 msgid "Configure SEO meta tags for the trip archive page (/trip/). These meta tags will be used for the main trip listing page."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7946
+# Source: resources/js/pages/Settings.tsx:7988
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6673
+#: assets/dist/js/Settings-CU7EUfsS.js:6711
 msgid "Configure URL slugs for your Yatra content types. These settings control how your trips, destinations, and activities appear in URLs."
 msgstr ""
 
@@ -6318,15 +6318,15 @@ msgstr ""
 msgid "Configure intelligent timing for recovery emails based on customer behavior."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6136
+# Source: resources/js/pages/Settings.tsx:6178
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5083
+#: assets/dist/js/Settings-CU7EUfsS.js:5121
 msgid "Configure taxes to apply to bookings"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8113
+# Source: resources/js/pages/Settings.tsx:8155
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6870
+#: assets/dist/js/Settings-CU7EUfsS.js:6908
 msgid "Configure the booking page URL. By default, bookings use /book/{trip-slug}. You can customize the URL base or use a custom WordPress page."
 msgstr ""
 
@@ -6352,9 +6352,9 @@ msgstr ""
 msgid "Configure your Google Analytics 4 in Settings to start tracking conversion events."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8988
+# Source: resources/js/pages/Settings.tsx:9030
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7632
+#: assets/dist/js/Settings-CU7EUfsS.js:7670
 msgid "Configure your travel booking plugin settings"
 msgstr ""
 
@@ -6430,9 +6430,9 @@ msgstr ""
 msgid "Confirmed Bookings"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7324
+# Source: resources/js/pages/Settings.tsx:7366
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6133
+#: assets/dist/js/Settings-CU7EUfsS.js:6171
 msgid "Connect GA4 for ecommerce events (view item, add to cart, checkout, purchase). Optional Measurement Protocol sends verified server-side events for more reliable attribution."
 msgstr ""
 
@@ -6455,13 +6455,13 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:660
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:559
+#: assets/dist/js/Settings-CU7EUfsS.js:559
 msgid "Connect to Google Calendar"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:379
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:230
+#: assets/dist/js/Settings-CU7EUfsS.js:230
 msgid "Connect your Google Calendar to automatically sync bookings and departures. Events will be created for each booking with trip details, traveler information, and departure dates."
 msgstr ""
 
@@ -6476,25 +6476,25 @@ msgstr ""
 msgid "Connect your first OTA to start distributing trips. You'll need API credentials from that OTA's partner portal — there's a help link inside the form."
 msgstr ""
 
-# Source: resources/js/pages/GoogleCalendar.tsx:169, resources/js/pages/Reports.tsx:1127, resources/js/pages/Reports.tsx:1717, resources/js/pages/Settings.tsx:367, resources/js/pages/Settings.tsx:6426, resources/js/pages/Settings.tsx:6813
+# Source: resources/js/pages/GoogleCalendar.tsx:169, resources/js/pages/Reports.tsx:1127, resources/js/pages/Reports.tsx:1717, resources/js/pages/Settings.tsx:367, resources/js/pages/Settings.tsx:6468, resources/js/pages/Settings.tsx:6855
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/Reports-CxPdZPoa.js:867
 #: assets/dist/js/Reports-CxPdZPoa.js:1377
-#: assets/dist/js/Settings-WStf1Cfq.js:223
-#: assets/dist/js/Settings-WStf1Cfq.js:5367
-#: assets/dist/js/Settings-WStf1Cfq.js:5697
+#: assets/dist/js/Settings-CU7EUfsS.js:223
+#: assets/dist/js/Settings-CU7EUfsS.js:5405
+#: assets/dist/js/Settings-CU7EUfsS.js:5735
 msgid "Connected"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:531
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:403
+#: assets/dist/js/Settings-CU7EUfsS.js:403
 msgid "Connected Calendar"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6526
+# Source: resources/js/pages/Settings.tsx:6568
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5458
+#: assets/dist/js/Settings-CU7EUfsS.js:5496
 msgid "Connected successfully!"
 msgstr ""
 
@@ -6503,10 +6503,10 @@ msgstr ""
 msgid "Connecting..."
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:925, resources/js/pages/Settings.tsx:7348
+# Source: resources/js/pages/ChannelManager.tsx:925, resources/js/pages/Settings.tsx:7390
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/ChannelManager-CSJ4tokj.js:682
-#: assets/dist/js/Settings-WStf1Cfq.js:6152
+#: assets/dist/js/Settings-CU7EUfsS.js:6190
 msgid "Connection"
 msgstr ""
 
@@ -6610,7 +6610,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1185
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:646
+#: assets/dist/js/Settings-CU7EUfsS.js:646
 msgid "Contact Form"
 msgstr ""
 
@@ -6660,7 +6660,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4165
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3280
+#: assets/dist/js/Settings-CU7EUfsS.js:3280
 msgid "Container max width"
 msgstr ""
 
@@ -6682,7 +6682,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4096
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3209
+#: assets/dist/js/Settings-CU7EUfsS.js:3209
 msgid "Control how Yatra looks on the public site (trip pages, booking, listings, and shortcodes). These options complement your WordPress theme."
 msgstr ""
 
@@ -6691,15 +6691,15 @@ msgstr ""
 msgid "Control whether this applies to all trips or only selected trips."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5315
+# Source: resources/js/pages/Settings.tsx:5357
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4289
+#: assets/dist/js/Settings-CU7EUfsS.js:4327
 msgid "Controls the filter sidebar on the trip listing page on mobile devices."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5655
+# Source: resources/js/pages/Settings.tsx:5697
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4605
+#: assets/dist/js/Settings-CU7EUfsS.js:4643
 msgid "Controls what happens when both a Discount (coupon or group discount) and a Dynamic Pricing rule could apply to the same booking. The control only takes effect when both the Advanced Discount and Dynamic Pricing modules are turned on."
 msgstr ""
 
@@ -6761,14 +6761,15 @@ msgstr ""
 msgid "Copied!"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:1318, resources/js/pages/EmailAutomation.tsx:699, resources/js/pages/Itinerary.tsx:1783, resources/js/pages/Settings.tsx:488, resources/js/pages/Team.tsx:3116, resources/js/pages/Webhooks.tsx:2073, resources/js/pages/Webhooks.tsx:3242, resources/js/pages/Whatsapp.tsx:802, resources/js/pages/Whatsapp.tsx:849
+# Source: resources/js/pages/ChannelManager.tsx:1318, resources/js/pages/EmailAutomation.tsx:699, resources/js/pages/Itinerary.tsx:1783, resources/js/pages/Settings.tsx:488, resources/js/pages/Settings.tsx:5164, resources/js/pages/Team.tsx:3116, resources/js/pages/Webhooks.tsx:2073, resources/js/pages/Webhooks.tsx:3242, resources/js/pages/Whatsapp.tsx:802, resources/js/pages/Whatsapp.tsx:849
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:72562
 #: assets/admin/dist/js/Whatsapp.js:649
 #: assets/admin/dist/js/Whatsapp.js:693
 #: assets/dist/js/ChannelManager-CSJ4tokj.js:1052
 #: assets/dist/js/Itinerary-EhU3Ovi1.js:1229
-#: assets/dist/js/Settings-WStf1Cfq.js:362
+#: assets/dist/js/Settings-CU7EUfsS.js:362
+#: assets/dist/js/Settings-CU7EUfsS.js:4174
 #: assets/dist/js/Team-Dm30DLtU.js:2458
 #: assets/dist/js/Webhooks-dctsJarL.js:1617
 #: assets/dist/js/Webhooks-dctsJarL.js:2529
@@ -6801,25 +6802,25 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:420
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:276
+#: assets/dist/js/Settings-CU7EUfsS.js:276
 msgid "Copy the Client Secret from the same OAuth client in"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7708
+# Source: resources/js/pages/Settings.tsx:7750
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6471
+#: assets/dist/js/Settings-CU7EUfsS.js:6509
 msgid "Copy the Secret value (not the nickname) and paste it in the field above."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7117
+# Source: resources/js/pages/Settings.tsx:7159
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5956
+#: assets/dist/js/Settings-CU7EUfsS.js:5994
 msgid "Copy the generated access token"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6895
+# Source: resources/js/pages/Settings.tsx:6937
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5756
+#: assets/dist/js/Settings-CU7EUfsS.js:5794
 msgid "Copy this Pixel ID and paste it in the field above"
 msgstr ""
 
@@ -6872,9 +6873,9 @@ msgstr ""
 msgid "Could not load pages. Check that you are logged in and try again."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8800
+# Source: resources/js/pages/Settings.tsx:8842
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7475
+#: assets/dist/js/Settings-CU7EUfsS.js:7513
 msgid "Could not load this section. You may need permission to manage Yatra."
 msgstr ""
 
@@ -6902,9 +6903,9 @@ msgstr ""
 msgid "Could not resolve invoice link."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8837
+# Source: resources/js/pages/Settings.tsx:8879
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7504
+#: assets/dist/js/Settings-CU7EUfsS.js:7542
 msgid "Could not save your preference."
 msgstr ""
 
@@ -6946,8 +6947,8 @@ msgstr ""
 #: assets/admin/dist/js/app.js:44173
 #: assets/dist/js/account-page.js:2571
 #: assets/dist/js/BookingForm-CP7wussJ.js:973
-#: assets/dist/js/Settings-WStf1Cfq.js:2966
-#: assets/dist/js/Settings-WStf1Cfq.js:2974
+#: assets/dist/js/Settings-CU7EUfsS.js:2966
+#: assets/dist/js/Settings-CU7EUfsS.js:2974
 msgid "Country"
 msgstr ""
 
@@ -7305,7 +7306,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:391
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:241
+#: assets/dist/js/Settings-CU7EUfsS.js:241
 msgid "Create an OAuth client in"
 msgstr ""
 
@@ -7595,7 +7596,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:618
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:509
+#: assets/dist/js/Settings-CU7EUfsS.js:509
 msgid "Credentials"
 msgstr ""
 
@@ -7617,20 +7618,20 @@ msgstr ""
 #: app/Controllers/SetupWizardController.php:93
 #: templates/setup-wizard/currency.php:45
 #: assets/dist/js/ChannelManager-CSJ4tokj.js:747
-#: assets/dist/js/Settings-WStf1Cfq.js:2818
+#: assets/dist/js/Settings-CU7EUfsS.js:2818
 msgid "Currency"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6313
+# Source: resources/js/pages/Settings.tsx:6355
 #: assets/admin/dist/js/app.js
 #: templates/setup-wizard/currency.php:68
-#: assets/dist/js/Settings-WStf1Cfq.js:5246
+#: assets/dist/js/Settings-CU7EUfsS.js:5284
 msgid "Currency Position"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6281
+# Source: resources/js/pages/Settings.tsx:6323
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5214
+#: assets/dist/js/Settings-CU7EUfsS.js:5252
 msgid "Currency Settings"
 msgstr ""
 
@@ -7782,13 +7783,13 @@ msgstr ""
 #: assets/admin/dist/js/Whatsapp.js:922
 #: assets/admin/dist/js/Whatsapp.js:1440
 #: assets/dist/js/ChannelManager-CSJ4tokj.js:2082
-#: assets/dist/js/Settings-WStf1Cfq.js:2807
+#: assets/dist/js/Settings-CU7EUfsS.js:2807
 msgid "Customer"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5849
+# Source: resources/js/pages/Settings.tsx:5891
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4769
+#: assets/dist/js/Settings-CU7EUfsS.js:4807
 msgid "Customer Account Page"
 msgstr ""
 
@@ -7931,21 +7932,21 @@ msgstr ""
 msgid "Customers and other users see nothing in the admin."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5507
+# Source: resources/js/pages/Settings.tsx:5549
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4482
+#: assets/dist/js/Settings-CU7EUfsS.js:4520
 msgid "Customers can join a waitlist instead of being blocked when seats are gone (per-trip caps still apply)."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5420
+# Source: resources/js/pages/Settings.tsx:5462
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4400
+#: assets/dist/js/Settings-CU7EUfsS.js:4438
 msgid "Customers must create an account to make bookings"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5937
+# Source: resources/js/pages/Settings.tsx:5979
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4861
+#: assets/dist/js/Settings-CU7EUfsS.js:4899
 msgid "Customers must verify their email before account activation"
 msgstr ""
 
@@ -8028,7 +8029,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3987
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3082
+#: assets/dist/js/Settings-CU7EUfsS.js:3082
 msgid "Date Format"
 msgstr ""
 
@@ -8233,7 +8234,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4443
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3565
+#: assets/dist/js/Settings-CU7EUfsS.js:3565
 msgid "Days between installments"
 msgstr ""
 
@@ -8245,7 +8246,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4402
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3516
+#: assets/dist/js/Settings-CU7EUfsS.js:3516
 msgid "Days until first charge"
 msgstr ""
 
@@ -8261,9 +8262,9 @@ msgstr ""
 msgid "Debug View"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8663
+# Source: resources/js/pages/Settings.tsx:8705
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7350
+#: assets/dist/js/Settings-CU7EUfsS.js:7388
 msgid "Debug mode"
 msgstr ""
 
@@ -8273,29 +8274,29 @@ msgstr ""
 msgid "December"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6357
+# Source: resources/js/pages/Settings.tsx:6399
 #: assets/admin/dist/js/app.js
 #: templates/setup-wizard/currency.php:92
-#: assets/dist/js/Settings-WStf1Cfq.js:5296
+#: assets/dist/js/Settings-CU7EUfsS.js:5334
 msgid "Decimal Places"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6376
+# Source: resources/js/pages/Settings.tsx:6418
 #: assets/admin/dist/js/app.js
 #: templates/setup-wizard/currency.php:86
-#: assets/dist/js/Settings-WStf1Cfq.js:5319
+#: assets/dist/js/Settings-CU7EUfsS.js:5357
 msgid "Decimal Separator"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8122
+# Source: resources/js/pages/Settings.tsx:8164
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6879
+#: assets/dist/js/Settings-CU7EUfsS.js:6917
 msgid "Default Booking URL Base"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6290
+# Source: resources/js/pages/Settings.tsx:6332
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5221
+#: assets/dist/js/Settings-CU7EUfsS.js:5259
 msgid "Default Currency"
 msgstr ""
 
@@ -8316,9 +8317,9 @@ msgstr ""
 msgid "Default Start Time"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6766
+# Source: resources/js/pages/Settings.tsx:6808
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5653
+#: assets/dist/js/Settings-CU7EUfsS.js:5691
 msgid "Default Tags"
 msgstr ""
 
@@ -8448,7 +8449,7 @@ msgstr ""
 #: assets/dist/js/ChannelManager-CSJ4tokj.js:1296
 #: assets/dist/js/Itinerary-EhU3Ovi1.js:1829
 #: assets/dist/js/Itinerary-EhU3Ovi1.js:1881
-#: assets/dist/js/Settings-WStf1Cfq.js:1447
+#: assets/dist/js/Settings-CU7EUfsS.js:1447
 msgid "Delete"
 msgstr ""
 
@@ -8549,7 +8550,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:2135
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:1445
+#: assets/dist/js/Settings-CU7EUfsS.js:1445
 msgid "Delete Field"
 msgstr ""
 
@@ -9062,7 +9063,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4298, resources/js/pages/TripForm.tsx:7871
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3411
+#: assets/dist/js/Settings-CU7EUfsS.js:3411
 msgid "Deposit Percentage"
 msgstr ""
 
@@ -9181,7 +9182,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4797
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3872
+#: assets/dist/js/Settings-CU7EUfsS.js:3872
 msgid "Description displayed below the title on the booking page"
 msgstr ""
 
@@ -9201,11 +9202,11 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3688
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2765
+#: assets/dist/js/Settings-CU7EUfsS.js:2765
 msgid "Design"
 msgstr ""
 
-# Source: resources/js/pages/Destinations.tsx:495, resources/js/pages/Destinations.tsx:567, resources/js/pages/Settings.tsx:5251, resources/js/pages/Webhooks.tsx:1474
+# Source: resources/js/pages/Destinations.tsx:495, resources/js/pages/Destinations.tsx:567, resources/js/pages/Settings.tsx:5293, resources/js/pages/Webhooks.tsx:1474
 #: assets/admin/dist/js/app.js
 #: app/Blocks/DestinationBlock.php:91
 #: templates/pdf/itinerary.php:341
@@ -9215,7 +9216,7 @@ msgstr ""
 #: templates/single-taxonomy.php:70
 #: assets/admin/dist/js/app.js:33947
 #: assets/admin/dist/js/app.js:34015
-#: assets/dist/js/Settings-WStf1Cfq.js:4225
+#: assets/dist/js/Settings-CU7EUfsS.js:4263
 #: assets/dist/js/Webhooks-dctsJarL.js:1115
 msgid "Destination"
 msgstr ""
@@ -9226,9 +9227,9 @@ msgstr ""
 msgid "Destination #%s"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7992
+# Source: resources/js/pages/Settings.tsx:8034
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6728
+#: assets/dist/js/Settings-CU7EUfsS.js:6766
 msgid "Destination Base"
 msgstr ""
 
@@ -9492,13 +9493,13 @@ msgstr ""
 
 # Source: resources/js/pages/GoogleCalendar.tsx:230, resources/js/pages/Settings.tsx:647
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:548
+#: assets/dist/js/Settings-CU7EUfsS.js:548
 msgid "Disconnect"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:319
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:183
+#: assets/dist/js/Settings-CU7EUfsS.js:183
 msgid "Disconnected from Google Calendar."
 msgstr ""
 
@@ -9553,9 +9554,9 @@ msgstr ""
 msgid "Discount Ranges"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5737
+# Source: resources/js/pages/Settings.tsx:5779
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4662
+#: assets/dist/js/Settings-CU7EUfsS.js:4700
 msgid "Discount Stacking"
 msgstr ""
 
@@ -9607,15 +9608,15 @@ msgstr ""
 msgid "Discount moved to trash"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5797
+# Source: resources/js/pages/Settings.tsx:5839
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4717
+#: assets/dist/js/Settings-CU7EUfsS.js:4755
 msgid "Discount only"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5763
+# Source: resources/js/pages/Settings.tsx:5805
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4684
+#: assets/dist/js/Settings-CU7EUfsS.js:4722
 msgid "Discount only — if a coupon or group discount applies, ignore Dynamic Pricing"
 msgstr ""
 
@@ -9739,9 +9740,9 @@ msgstr ""
 msgid "Distribute your tours on global OTAs from one dashboard. Push inventory and pricing automatically, receive bookings back into a unified inbox."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6707
+# Source: resources/js/pages/Settings.tsx:6749
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5603
+#: assets/dist/js/Settings-CU7EUfsS.js:5641
 msgid "Do not sync"
 msgstr ""
 
@@ -9787,9 +9788,9 @@ msgstr ""
 msgid "Don’t allow it — the maximum is a strict limit"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6625
+# Source: resources/js/pages/Settings.tsx:6667
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5546
+#: assets/dist/js/Settings-CU7EUfsS.js:5584
 msgid "Double Opt-in"
 msgstr ""
 
@@ -9941,7 +9942,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4551
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3675
+#: assets/dist/js/Settings-CU7EUfsS.js:3675
 msgid "Drag and drop to reorder gateways. Use arrows for precise positioning."
 msgstr ""
 
@@ -9982,26 +9983,26 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1641, resources/js/pages/Settings.tsx:1911
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:1019
-#: assets/dist/js/Settings-WStf1Cfq.js:1252
+#: assets/dist/js/Settings-CU7EUfsS.js:1019
+#: assets/dist/js/Settings-CU7EUfsS.js:1252
 msgid "Dropdown Options"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5260
+# Source: resources/js/pages/Settings.tsx:5302
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4234
+#: assets/dist/js/Settings-CU7EUfsS.js:4272
 msgid "Dropdown to filter trips by activity."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5252
+# Source: resources/js/pages/Settings.tsx:5294
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4226
+#: assets/dist/js/Settings-CU7EUfsS.js:4264
 msgid "Dropdown to filter trips by destination."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5276
+# Source: resources/js/pages/Settings.tsx:5318
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4250
+#: assets/dist/js/Settings-CU7EUfsS.js:4288
 msgid "Dropdown to filter trips by price range."
 msgstr ""
 
@@ -10065,7 +10066,7 @@ msgstr ""
 msgid "Duplicating..."
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:667, resources/js/pages/ChannelManager.tsx:3160, resources/js/pages/Itinerary.tsx:2264, resources/js/pages/Settings.tsx:5267, resources/js/pages/Trips.tsx:758, resources/js/pages/Trips.tsx:1120, resources/js/pages/ViewDeparture.tsx:516, resources/js/pages/ViewDeparture.tsx:644, resources/js/pages/Webhooks.tsx:2314, resources/js/pages/Webhooks.tsx:3143
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:667, resources/js/pages/ChannelManager.tsx:3160, resources/js/pages/Itinerary.tsx:2264, resources/js/pages/Settings.tsx:5309, resources/js/pages/Trips.tsx:758, resources/js/pages/Trips.tsx:1120, resources/js/pages/ViewDeparture.tsx:516, resources/js/pages/ViewDeparture.tsx:644, resources/js/pages/Webhooks.tsx:2314, resources/js/pages/Webhooks.tsx:3143
 #: assets/admin/dist/js/app.js
 #: app/Controllers/BookingSessionController.php:3210
 #: app/Providers/FrontendAssetsProvider.php:886
@@ -10083,7 +10084,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:64049
 #: assets/dist/js/ChannelManager-CSJ4tokj.js:2497
 #: assets/dist/js/Itinerary-EhU3Ovi1.js:1615
-#: assets/dist/js/Settings-WStf1Cfq.js:4241
+#: assets/dist/js/Settings-CU7EUfsS.js:4279
 #: assets/dist/js/Webhooks-dctsJarL.js:1824
 #: assets/dist/js/Webhooks-dctsJarL.js:2464
 msgid "Duration"
@@ -10114,7 +10115,7 @@ msgstr ""
 # Source: resources/js/pages/Settings.tsx:1426
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:104
-#: assets/dist/js/Settings-WStf1Cfq.js:837
+#: assets/dist/js/Settings-CU7EUfsS.js:837
 msgid "Dynamic Form Field"
 msgstr ""
 
@@ -10133,21 +10134,21 @@ msgstr ""
 msgid "Dynamic Pricing is a premium module. Upgrade to Yatra Pro to unlock intelligent pricing automation."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5715
+# Source: resources/js/pages/Settings.tsx:5757
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4638
+#: assets/dist/js/Settings-CU7EUfsS.js:4676
 msgid "Dynamic Pricing module"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5805
+# Source: resources/js/pages/Settings.tsx:5847
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4725
+#: assets/dist/js/Settings-CU7EUfsS.js:4763
 msgid "Dynamic Pricing only"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5769
+# Source: resources/js/pages/Settings.tsx:5811
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4688
+#: assets/dist/js/Settings-CU7EUfsS.js:4726
 msgid "Dynamic Pricing only — if a Dynamic Pricing rule fires, ignore the discount"
 msgstr ""
 
@@ -10377,9 +10378,9 @@ msgstr ""
 msgid "Edit Itinerary Entry"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8284
+# Source: resources/js/pages/Settings.tsx:8326
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7031
+#: assets/dist/js/Settings-CU7EUfsS.js:7069
 msgid "Edit Page Manually"
 msgstr ""
 
@@ -10713,7 +10714,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:44191
 #: assets/dist/js/account-page.js:1480
 #: assets/dist/js/BookingForm-CP7wussJ.js:1317
-#: assets/dist/js/Settings-WStf1Cfq.js:651
+#: assets/dist/js/Settings-CU7EUfsS.js:651
 #: assets/dist/js/ViewBooking-U9wDb7nz.js:758
 msgid "Emergency Contact"
 msgstr ""
@@ -10739,15 +10740,15 @@ msgstr ""
 msgid "Enable"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8688
+# Source: resources/js/pages/Settings.tsx:8730
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7377
+#: assets/dist/js/Settings-CU7EUfsS.js:7415
 msgid "Enable Cache"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5836
+# Source: resources/js/pages/Settings.tsx:5878
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4756
+#: assets/dist/js/Settings-CU7EUfsS.js:4794
 msgid "Enable Customer Registration"
 msgstr ""
 
@@ -10757,15 +10758,15 @@ msgstr ""
 msgid "Enable Group Discount"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8638
+# Source: resources/js/pages/Settings.tsx:8680
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7323
+#: assets/dist/js/Settings-CU7EUfsS.js:7361
 msgid "Enable Logging"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7611
+# Source: resources/js/pages/Settings.tsx:7653
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6391
+#: assets/dist/js/Settings-CU7EUfsS.js:6429
 msgid "Enable Measurement Protocol"
 msgstr ""
 
@@ -10776,19 +10777,19 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4235
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3347
+#: assets/dist/js/Settings-CU7EUfsS.js:3347
 msgid "Enable Partial Payment"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6049
+# Source: resources/js/pages/Settings.tsx:6091
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4975
+#: assets/dist/js/Settings-CU7EUfsS.js:5013
 msgid "Enable Review Moderation"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5972
+# Source: resources/js/pages/Settings.tsx:6014
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4893
+#: assets/dist/js/Settings-CU7EUfsS.js:4931
 msgid "Enable Reviews"
 msgstr ""
 
@@ -10804,9 +10805,9 @@ msgstr ""
 msgid "Enable Selected"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6123
+# Source: resources/js/pages/Settings.tsx:6165
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5071
+#: assets/dist/js/Settings-CU7EUfsS.js:5109
 msgid "Enable Tax"
 msgstr ""
 
@@ -10817,7 +10818,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4201
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3312
+#: assets/dist/js/Settings-CU7EUfsS.js:3312
 msgid "Enable deposit and partial payment options for bookings. Allow customers to pay a percentage upfront and the rest later."
 msgstr ""
 
@@ -10828,15 +10829,15 @@ msgstr ""
 msgid "Enable module"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7874
+# Source: resources/js/pages/Settings.tsx:7916
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6609
+#: assets/dist/js/Settings-CU7EUfsS.js:6647
 msgid "Enable reCAPTCHA"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4364
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3478
+#: assets/dist/js/Settings-CU7EUfsS.js:3478
 msgid "Enable scheduled balance payments"
 msgstr ""
 
@@ -10847,7 +10848,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4536
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3666
+#: assets/dist/js/Settings-CU7EUfsS.js:3666
 msgid "Enable test/sandbox mode for all payment gateways. Use test API keys for development and testing. Disable this for live payments."
 msgstr ""
 
@@ -10907,7 +10908,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1490
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:882
+#: assets/dist/js/Settings-CU7EUfsS.js:882
 msgid "Enable this form section"
 msgstr ""
 
@@ -10922,9 +10923,9 @@ msgstr ""
 msgid "Enable widget"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5901
+# Source: resources/js/pages/Settings.tsx:5943
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4828
+#: assets/dist/js/Settings-CU7EUfsS.js:4866
 msgid "Enable wishlist (saved trips)"
 msgstr ""
 
@@ -11132,15 +11133,15 @@ msgstr ""
 msgid "Enter SMTP password"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6268
+# Source: resources/js/pages/Settings.tsx:6310
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5205
+#: assets/dist/js/Settings-CU7EUfsS.js:5243
 msgid "Enter VAT number"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6882
+# Source: resources/js/pages/Settings.tsx:6924
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5747
+#: assets/dist/js/Settings-CU7EUfsS.js:5785
 msgid "Enter a Pixel name and enter your website URL"
 msgstr ""
 
@@ -11217,7 +11218,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3803
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2869
+#: assets/dist/js/Settings-CU7EUfsS.js:2869
 msgid "Enter company name"
 msgstr ""
 
@@ -11280,19 +11281,19 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4817
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3885
+#: assets/dist/js/Settings-CU7EUfsS.js:3885
 msgid "Enter gateway description"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4789
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3862
+#: assets/dist/js/Settings-CU7EUfsS.js:3862
 msgid "Enter gateway title"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4748
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3822
+#: assets/dist/js/Settings-CU7EUfsS.js:3822
 msgid "Enter icon URL or leave empty to use default"
 msgstr ""
 
@@ -11348,15 +11349,15 @@ msgstr ""
 msgid "Enter review title"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7912
+# Source: resources/js/pages/Settings.tsx:7954
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6651
+#: assets/dist/js/Settings-CU7EUfsS.js:6689
 msgid "Enter secret key"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7894
+# Source: resources/js/pages/Settings.tsx:7936
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6629
+#: assets/dist/js/Settings-CU7EUfsS.js:6667
 msgid "Enter site key"
 msgstr ""
 
@@ -11722,7 +11723,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3518
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2637
+#: assets/dist/js/Settings-CU7EUfsS.js:2637
 msgid "Error saving settings"
 msgstr ""
 
@@ -11784,9 +11785,9 @@ msgstr ""
 msgid "Event types failing most."
 msgstr ""
 
-# Source: resources/js/pages/DynamicPricing.tsx:1231, resources/js/pages/DynamicPricing.tsx:1338, resources/js/pages/DynamicPricing.tsx:1368, resources/js/pages/Settings.tsx:7472
+# Source: resources/js/pages/DynamicPricing.tsx:1231, resources/js/pages/DynamicPricing.tsx:1338, resources/js/pages/DynamicPricing.tsx:1368, resources/js/pages/Settings.tsx:7514
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6248
+#: assets/dist/js/Settings-CU7EUfsS.js:6286
 msgid "Events"
 msgstr ""
 
@@ -11896,7 +11897,7 @@ msgstr ""
 
 # Source: resources/js/pages/DynamicPricingRuleForm.tsx:607, resources/js/pages/Settings.tsx:401
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:255
+#: assets/dist/js/Settings-CU7EUfsS.js:255
 msgid "Example:"
 msgstr ""
 
@@ -12049,9 +12050,9 @@ msgstr ""
 msgid "External product"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8666
+# Source: resources/js/pages/Settings.tsx:8708
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7353
+#: assets/dist/js/Settings-CU7EUfsS.js:7391
 msgid "Extra plugin-side diagnostics. When on, Yatra object cache is bypassed (same as when WP_DEBUG is true in wp-config)."
 msgstr ""
 
@@ -12067,18 +12068,18 @@ msgstr ""
 msgid "Facebook Events Manager"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6795, resources/js/pages/Settings.tsx:6806, resources/js/pages/Settings.tsx:6831
+# Source: resources/js/pages/Settings.tsx:6837, resources/js/pages/Settings.tsx:6848, resources/js/pages/Settings.tsx:6873
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:148
-#: assets/dist/js/Settings-WStf1Cfq.js:5679
-#: assets/dist/js/Settings-WStf1Cfq.js:5692
-#: assets/dist/js/Settings-WStf1Cfq.js:5711
+#: assets/dist/js/Settings-CU7EUfsS.js:5717
+#: assets/dist/js/Settings-CU7EUfsS.js:5730
+#: assets/dist/js/Settings-CU7EUfsS.js:5749
 msgid "Facebook Pixel"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7262
+# Source: resources/js/pages/Settings.tsx:7304
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6076
+#: assets/dist/js/Settings-CU7EUfsS.js:6114
 msgid "Facebook Pixel Monitoring:"
 msgstr ""
 
@@ -12129,7 +12130,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3580
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2681
+#: assets/dist/js/Settings-CU7EUfsS.js:2681
 msgid "Failed to add shortcode"
 msgstr ""
 
@@ -12147,7 +12148,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3629
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2717
+#: assets/dist/js/Settings-CU7EUfsS.js:2717
 msgid "Failed to check page"
 msgstr ""
 
@@ -12372,7 +12373,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:322
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:186
+#: assets/dist/js/Settings-CU7EUfsS.js:186
 msgid "Failed to disconnect. Please try again."
 msgstr ""
 
@@ -12426,7 +12427,7 @@ msgstr ""
 # Source: resources/js/components/Layout.tsx:151, resources/js/pages/Settings.tsx:3533
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:4239
-#: assets/dist/js/Settings-WStf1Cfq.js:2650
+#: assets/dist/js/Settings-CU7EUfsS.js:2650
 msgid "Failed to flush rewrite rules"
 msgstr ""
 
@@ -12577,7 +12578,7 @@ msgstr ""
 # Source: resources/js/hooks/useEmailSettingsManager.ts:263, resources/js/pages/Settings.tsx:2306
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:70541
-#: assets/dist/js/Settings-WStf1Cfq.js:1578
+#: assets/dist/js/Settings-CU7EUfsS.js:1578
 msgid "Failed to load settings"
 msgstr ""
 
@@ -12622,7 +12623,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:2359
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:1619
+#: assets/dist/js/Settings-CU7EUfsS.js:1619
 msgid "Failed to load usage tracking status"
 msgstr ""
 
@@ -12844,7 +12845,7 @@ msgstr ""
 # Source: resources/js/hooks/useEmailSettingsManager.ts:349, resources/js/pages/AbandonedRecovery.tsx:521, resources/js/pages/Settings.tsx:3502
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:70610
-#: assets/dist/js/Settings-WStf1Cfq.js:2622
+#: assets/dist/js/Settings-CU7EUfsS.js:2622
 msgid "Failed to save settings"
 msgstr ""
 
@@ -12894,13 +12895,13 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:334
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:197
+#: assets/dist/js/Settings-CU7EUfsS.js:197
 msgid "Failed to sync bookings."
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:346
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:208
+#: assets/dist/js/Settings-CU7EUfsS.js:208
 msgid "Failed to sync bookings. Please try again."
 msgstr ""
 
@@ -12994,13 +12995,13 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3096
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2296
+#: assets/dist/js/Settings-CU7EUfsS.js:2296
 msgid "Failed to validate API Secret."
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3068
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2271
+#: assets/dist/js/Settings-CU7EUfsS.js:2271
 msgid "Failed to validate Measurement ID."
 msgstr ""
 
@@ -13076,19 +13077,19 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1583
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:969
+#: assets/dist/js/Settings-CU7EUfsS.js:969
 msgid "Field ID"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1879
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:1230
+#: assets/dist/js/Settings-CU7EUfsS.js:1230
 msgid "Field ID:"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6642
+# Source: resources/js/pages/Settings.tsx:6684
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5558
+#: assets/dist/js/Settings-CU7EUfsS.js:5596
 msgid "Field Mapping"
 msgstr ""
 
@@ -13105,7 +13106,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:75106
 #: assets/admin/dist/js/app.js:75143
 #: assets/admin/dist/js/app.js:75890
-#: assets/dist/js/Settings-WStf1Cfq.js:938
+#: assets/dist/js/Settings-CU7EUfsS.js:938
 msgid "Field Type"
 msgstr ""
 
@@ -13256,9 +13257,9 @@ msgstr ""
 msgid "Find a user"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7083
+# Source: resources/js/pages/Settings.tsx:7125
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5934
+#: assets/dist/js/Settings-CU7EUfsS.js:5972
 msgid "Find your Pixel ID in the data sources list (it should match the Pixel ID you entered above)"
 msgstr ""
 
@@ -13355,8 +13356,8 @@ msgstr ""
 # Source: resources/js/pages/Settings.tsx:4197, resources/js/pages/Settings.tsx:4208
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:178
-#: assets/dist/js/Settings-WStf1Cfq.js:3309
-#: assets/dist/js/Settings-WStf1Cfq.js:3319
+#: assets/dist/js/Settings-CU7EUfsS.js:3309
+#: assets/dist/js/Settings-CU7EUfsS.js:3319
 msgid "Flexible Payments"
 msgstr ""
 
@@ -13365,9 +13366,9 @@ msgstr ""
 msgid "Flexible Pricing"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8333
+# Source: resources/js/pages/Settings.tsx:8375
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7073
+#: assets/dist/js/Settings-CU7EUfsS.js:7111
 msgid "Flush Rewrite Rules"
 msgstr ""
 
@@ -13384,10 +13385,10 @@ msgstr ""
 msgid "Flushing rewrite rules"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1238, resources/js/pages/Settings.tsx:8328
+# Source: resources/js/components/Layout.tsx:1238, resources/js/pages/Settings.tsx:8370
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:5066
-#: assets/dist/js/Settings-WStf1Cfq.js:7070
+#: assets/dist/js/Settings-CU7EUfsS.js:7108
 msgid "Flushing..."
 msgstr ""
 
@@ -13411,9 +13412,9 @@ msgstr ""
 msgid "Food-focused"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8618
+# Source: resources/js/pages/Settings.tsx:8660
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7301
+#: assets/dist/js/Settings-CU7EUfsS.js:7339
 msgid "For PHP-level debug output, use WordPress wp-config.php (WP_DEBUG). The options below are implemented by the plugin."
 msgstr ""
 
@@ -13493,7 +13494,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1529, resources/js/pages/TripConsentForm.tsx:914, resources/js/pages/TripConsentForm.tsx:1074
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:918
+#: assets/dist/js/Settings-CU7EUfsS.js:918
 msgid "Form Fields"
 msgstr ""
 
@@ -13515,7 +13516,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1472
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:864
+#: assets/dist/js/Settings-CU7EUfsS.js:864
 msgid "Form Section Settings"
 msgstr ""
 
@@ -13536,9 +13537,9 @@ msgstr ""
 msgid "Free"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5244
+# Source: resources/js/pages/Settings.tsx:5286
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4218
+#: assets/dist/js/Settings-CU7EUfsS.js:4256
 msgid "Free-text field to search by trip name or keyword."
 msgstr ""
 
@@ -13647,7 +13648,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4726
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3801
+#: assets/dist/js/Settings-CU7EUfsS.js:3801
 msgid "Frontend Display Settings"
 msgstr ""
 
@@ -13722,19 +13723,19 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4796
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3871
+#: assets/dist/js/Settings-CU7EUfsS.js:3871
 msgid "Gateway Description"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4731
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3806
+#: assets/dist/js/Settings-CU7EUfsS.js:3806
 msgid "Gateway Icon"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4771
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3847
+#: assets/dist/js/Settings-CU7EUfsS.js:3847
 msgid "Gateway Title"
 msgstr ""
 
@@ -13749,7 +13750,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:66176
 #: assets/admin/dist/js/app.js:66542
-#: assets/dist/js/Settings-WStf1Cfq.js:2760
+#: assets/dist/js/Settings-CU7EUfsS.js:2760
 msgid "General"
 msgstr ""
 
@@ -13969,15 +13970,15 @@ msgstr ""
 msgid "Get started by recording your first payment."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6459
+# Source: resources/js/pages/Settings.tsx:6501
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5394
+#: assets/dist/js/Settings-CU7EUfsS.js:5432
 msgid "Get your API key from"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7702
+# Source: resources/js/pages/Settings.tsx:7744
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6467
+#: assets/dist/js/Settings-CU7EUfsS.js:6505
 msgid "Give the secret a nickname (e.g. “Yatra server”) and click Create."
 msgstr ""
 
@@ -13993,17 +13994,17 @@ msgstr ""
 msgid "Global"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6861, resources/js/pages/Settings.tsx:7068
+# Source: resources/js/pages/Settings.tsx:6903, resources/js/pages/Settings.tsx:7110
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5734
-#: assets/dist/js/Settings-WStf1Cfq.js:5925
+#: assets/dist/js/Settings-CU7EUfsS.js:5772
+#: assets/dist/js/Settings-CU7EUfsS.js:5963
 msgid "Go to Facebook Business Manager: business.facebook.com"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7374, resources/js/pages/Settings.tsx:7672
+# Source: resources/js/pages/Settings.tsx:7416, resources/js/pages/Settings.tsx:7714
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6171
-#: assets/dist/js/Settings-WStf1Cfq.js:6447
+#: assets/dist/js/Settings-CU7EUfsS.js:6209
+#: assets/dist/js/Settings-CU7EUfsS.js:6485
 msgid "Go to Google Analytics: analytics.google.com"
 msgstr ""
 
@@ -14024,12 +14025,12 @@ msgstr ""
 msgid "Gold"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7286, resources/js/pages/Settings.tsx:7298, resources/js/pages/Settings.tsx:7331
+# Source: resources/js/pages/Settings.tsx:7328, resources/js/pages/Settings.tsx:7340, resources/js/pages/Settings.tsx:7373
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:163
-#: assets/dist/js/Settings-WStf1Cfq.js:6099
-#: assets/dist/js/Settings-WStf1Cfq.js:6113
-#: assets/dist/js/Settings-WStf1Cfq.js:6140
+#: assets/dist/js/Settings-CU7EUfsS.js:6137
+#: assets/dist/js/Settings-CU7EUfsS.js:6151
+#: assets/dist/js/Settings-CU7EUfsS.js:6178
 msgid "Google Analytics 4 Enhanced"
 msgstr ""
 
@@ -14039,9 +14040,9 @@ msgstr ""
 msgid "Google Analytics 4 Not Configured"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7819
+# Source: resources/js/pages/Settings.tsx:7861
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6564
+#: assets/dist/js/Settings-CU7EUfsS.js:6602
 msgid "Google Analytics 4."
 msgstr ""
 
@@ -14053,20 +14054,20 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:470
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:340
+#: assets/dist/js/Settings-CU7EUfsS.js:340
 msgid "Google Calendar API"
 msgstr ""
 
-# Source: resources/js/pages/GoogleCalendar.tsx:151, resources/js/pages/Settings.tsx:6404
+# Source: resources/js/pages/GoogleCalendar.tsx:151, resources/js/pages/Settings.tsx:6446
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:44
-#: assets/dist/js/Settings-WStf1Cfq.js:5346
+#: assets/dist/js/Settings-CU7EUfsS.js:5384
 msgid "Google Calendar Integration"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:361
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:219
+#: assets/dist/js/Settings-CU7EUfsS.js:219
 msgid "Google Calendar Settings"
 msgstr ""
 
@@ -14079,15 +14080,15 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:398, resources/js/pages/Settings.tsx:430, resources/js/pages/Settings.tsx:461
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:250
-#: assets/dist/js/Settings-WStf1Cfq.js:288
-#: assets/dist/js/Settings-WStf1Cfq.js:326
+#: assets/dist/js/Settings-CU7EUfsS.js:250
+#: assets/dist/js/Settings-CU7EUfsS.js:288
+#: assets/dist/js/Settings-CU7EUfsS.js:326
 msgid "Google Cloud Credentials"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4944
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3989
+#: assets/dist/js/Settings-CU7EUfsS.js:3989
 msgid "Google Pay (Payment Request Button)"
 msgstr ""
 
@@ -14365,16 +14366,16 @@ msgstr ""
 msgid "Hello,"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8763
+# Source: resources/js/pages/Settings.tsx:8805
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7437
+#: assets/dist/js/Settings-CU7EUfsS.js:7475
 msgid "Help us improve Yatra"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8851
+# Source: resources/js/pages/Settings.tsx:8893
 #: assets/admin/dist/js/app.js
 #: templates/setup-wizard/welcome.php:63
-#: assets/dist/js/Settings-WStf1Cfq.js:7520
+#: assets/dist/js/Settings-CU7EUfsS.js:7558
 msgid "Help us improve the product by sharing non-sensitive data"
 msgstr ""
 
@@ -14434,9 +14435,9 @@ msgstr ""
 msgid "Hide payload preview"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7778
+# Source: resources/js/pages/Settings.tsx:7820
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6531
+#: assets/dist/js/Settings-CU7EUfsS.js:6569
 msgid "Hide secret"
 msgstr ""
 
@@ -14512,9 +14513,9 @@ msgstr ""
 msgid "History turns sent"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5482
+# Source: resources/js/pages/Settings.tsx:5524
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4455
+#: assets/dist/js/Settings-CU7EUfsS.js:4493
 msgid "Hold guest bookings until the customer clicks a magic link sent to their email. Stops typo'd addresses and form-spam bots. Only applies when guest checkout is allowed and login isn't required — logged-in customers are already verified."
 msgstr ""
 
@@ -14529,9 +14530,9 @@ msgstr ""
 msgid "Hours"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5602
+# Source: resources/js/pages/Settings.tsx:5644
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4559
+#: assets/dist/js/Settings-CU7EUfsS.js:4597
 msgid "Hours before unpaid bookings expire and are cancelled"
 msgstr ""
 
@@ -14587,7 +14588,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3988
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3083
+#: assets/dist/js/Settings-CU7EUfsS.js:3083
 msgid "How dates are displayed"
 msgstr ""
 
@@ -14622,7 +14623,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4403
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3517
+#: assets/dist/js/Settings-CU7EUfsS.js:3517
 msgid "How many days after the initial payment to schedule the first balance collection."
 msgstr ""
 
@@ -14703,27 +14704,27 @@ msgstr ""
 msgid "How to combine matching rules. Caps below still apply afterwards. Per-rule numeric Priority is used as a tie-breaker when multiple rules tie for largest / best."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7064
+# Source: resources/js/pages/Settings.tsx:7106
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5923
+#: assets/dist/js/Settings-CU7EUfsS.js:5961
 msgid "How to get Access Token:"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7668
+# Source: resources/js/pages/Settings.tsx:7710
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6445
+#: assets/dist/js/Settings-CU7EUfsS.js:6483
 msgid "How to get your API secret:"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7370
+# Source: resources/js/pages/Settings.tsx:7412
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6169
+#: assets/dist/js/Settings-CU7EUfsS.js:6207
 msgid "How to get your Measurement ID:"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6857
+# Source: resources/js/pages/Settings.tsx:6899
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5732
+#: assets/dist/js/Settings-CU7EUfsS.js:5770
 msgid "How to get your Pixel ID:"
 msgstr ""
 
@@ -14791,7 +14792,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4732
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3807
+#: assets/dist/js/Settings-CU7EUfsS.js:3807
 msgid "Icon URL or path displayed on the booking page"
 msgstr ""
 
@@ -14824,9 +14825,9 @@ msgstr ""
 msgid "If enabled, only customers who have never made a booking before can use this coupon."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8751
+# Source: resources/js/pages/Settings.tsx:8793
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7427
+#: assets/dist/js/Settings-CU7EUfsS.js:7465
 msgid "If not set here, WordPress Settings → Privacy will be used when available."
 msgstr ""
 
@@ -14842,9 +14843,9 @@ msgstr ""
 msgid "If you ever turn this module OFF"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7129
+# Source: resources/js/pages/Settings.tsx:7171
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5965
+#: assets/dist/js/Settings-CU7EUfsS.js:6003
 msgid "If you have multiple Pixels, look for the one that matches the Pixel ID you entered above. The Pixel ID is displayed next to each Pixel name in the list."
 msgstr ""
 
@@ -14859,9 +14860,9 @@ msgstr ""
 msgid "If your site is behind a firewall or VPN, make sure this URL is reachable from the public internet — otherwise the OTA's webhook deliveries will time out and you'll only get bookings on the next hourly cron tick."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8445
+# Source: resources/js/pages/Settings.tsx:8487
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7178
+#: assets/dist/js/Settings-CU7EUfsS.js:7216
 msgid "Image for social media sharing and SEO. Recommended size: 1200x630 pixels. This image will appear when the trip archive page is shared on Facebook, Twitter, and other platforms."
 msgstr ""
 
@@ -14910,9 +14911,9 @@ msgstr ""
 msgid "Important Info"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8309
+# Source: resources/js/pages/Settings.tsx:8351
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7054
+#: assets/dist/js/Settings-CU7EUfsS.js:7092
 msgid "Important:"
 msgstr ""
 
@@ -14921,21 +14922,21 @@ msgstr ""
 msgid "Improve this"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7690
+# Source: resources/js/pages/Settings.tsx:7732
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6459
+#: assets/dist/js/Settings-CU7EUfsS.js:6497
 msgid "In the Property column click Data Streams, then click your Web stream."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7392
+# Source: resources/js/pages/Settings.tsx:7434
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6183
+#: assets/dist/js/Settings-CU7EUfsS.js:6221
 msgid "In the Property column click Data Streams."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7386
+# Source: resources/js/pages/Settings.tsx:7428
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6179
+#: assets/dist/js/Settings-CU7EUfsS.js:6217
 msgid "In the bottom-left corner click the gear icon (Admin)."
 msgstr ""
 
@@ -15096,7 +15097,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3748
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2823
+#: assets/dist/js/Settings-CU7EUfsS.js:2823
 msgid "Integration"
 msgstr ""
 
@@ -15189,20 +15190,20 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:2956, resources/js/pages/Settings.tsx:2967
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2179
-#: assets/dist/js/Settings-WStf1Cfq.js:2187
+#: assets/dist/js/Settings-CU7EUfsS.js:2179
+#: assets/dist/js/Settings-CU7EUfsS.js:2187
 msgid "Invalid API key"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3138
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2330
+#: assets/dist/js/Settings-CU7EUfsS.js:2330
 msgid "Invalid Pixel ID"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3185
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2368
+#: assets/dist/js/Settings-CU7EUfsS.js:2368
 msgid "Invalid access token"
 msgstr ""
 
@@ -15702,7 +15703,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:432
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:293
+#: assets/dist/js/Settings-CU7EUfsS.js:293
 msgid "Keep this private."
 msgstr ""
 
@@ -15751,9 +15752,9 @@ msgstr ""
 msgid "Keys are encrypted at rest with libsodium and never sent to the browser. Generation requests are made from your server directly to your chosen provider — no third-party proxy is involved."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5243
+# Source: resources/js/pages/Settings.tsx:5285
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4217
+#: assets/dist/js/Settings-CU7EUfsS.js:4255
 msgid "Keyword search"
 msgstr ""
 
@@ -15767,7 +15768,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:58772
 #: assets/admin/dist/js/app.js:75968
-#: assets/dist/js/Settings-WStf1Cfq.js:954
+#: assets/dist/js/Settings-CU7EUfsS.js:954
 msgid "Label"
 msgstr ""
 
@@ -15908,7 +15909,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:570
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:449
+#: assets/dist/js/Settings-CU7EUfsS.js:449
 msgid "Last sync:"
 msgstr ""
 
@@ -16032,10 +16033,10 @@ msgstr ""
 msgid "Learn more about this feature"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5010, resources/js/pages/Settings.tsx:5188
+# Source: resources/js/pages/Settings.tsx:5010, resources/js/pages/Settings.tsx:5230
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4046
-#: assets/dist/js/Settings-WStf1Cfq.js:4180
+#: assets/dist/js/Settings-CU7EUfsS.js:4046
+#: assets/dist/js/Settings-CU7EUfsS.js:4218
 msgid "Learn more →"
 msgstr ""
 
@@ -16119,9 +16120,9 @@ msgstr ""
 msgid "Legal compliance"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8702
+# Source: resources/js/pages/Settings.tsx:8744
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7388
+#: assets/dist/js/Settings-CU7EUfsS.js:7426
 msgid "Legal pages (Booking UI)"
 msgstr ""
 
@@ -16265,12 +16266,12 @@ msgstr ""
 msgid "Listening for"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7973, resources/js/pages/Settings.tsx:8009, resources/js/pages/Settings.tsx:8049, resources/js/pages/Settings.tsx:8085
+# Source: resources/js/pages/Settings.tsx:8015, resources/js/pages/Settings.tsx:8051, resources/js/pages/Settings.tsx:8091, resources/js/pages/Settings.tsx:8127
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6702
-#: assets/dist/js/Settings-WStf1Cfq.js:6747
-#: assets/dist/js/Settings-WStf1Cfq.js:6796
-#: assets/dist/js/Settings-WStf1Cfq.js:6841
+#: assets/dist/js/Settings-CU7EUfsS.js:6740
+#: assets/dist/js/Settings-CU7EUfsS.js:6785
+#: assets/dist/js/Settings-CU7EUfsS.js:6834
+#: assets/dist/js/Settings-CU7EUfsS.js:6879
 msgid "Listing URL:"
 msgstr ""
 
@@ -16319,9 +16320,9 @@ msgstr ""
 msgid "Loading pages…"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5218
+# Source: resources/js/pages/Settings.tsx:5260
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4202
+#: assets/dist/js/Settings-CU7EUfsS.js:4240
 msgid "Loading payment gateways..."
 msgstr ""
 
@@ -16363,9 +16364,9 @@ msgstr ""
 msgid "Loading..."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8793, resources/js/pages/Team.tsx:1578, resources/js/pages/Team.tsx:2197
+# Source: resources/js/pages/Settings.tsx:8835, resources/js/pages/Team.tsx:1578, resources/js/pages/Team.tsx:2197
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7472
+#: assets/dist/js/Settings-CU7EUfsS.js:7510
 #: assets/dist/js/Team-Dm30DLtU.js:1224
 #: assets/dist/js/Team-Dm30DLtU.js:1724
 msgid "Loading…"
@@ -16430,9 +16431,9 @@ msgstr ""
 msgid "Log delivery payloads"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8641
+# Source: resources/js/pages/Settings.tsx:8683
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7326
+#: assets/dist/js/Settings-CU7EUfsS.js:7364
 msgid "Log system events and errors for troubleshooting"
 msgstr ""
 
@@ -16516,13 +16517,13 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1597
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:984
+#: assets/dist/js/Settings-CU7EUfsS.js:984
 msgid "Lowercase, no spaces"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6063
+# Source: resources/js/pages/Settings.tsx:6105
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4989
+#: assets/dist/js/Settings-CU7EUfsS.js:5027
 msgid "Lowest rating value allowed (1-5 stars)"
 msgstr ""
 
@@ -16564,23 +16565,23 @@ msgstr ""
 msgid "Magic-link invitations expire after 72 hours by default. Tokens are stored hashed; the link is only shown once."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6419, resources/js/pages/Settings.tsx:6444
+# Source: resources/js/pages/Settings.tsx:6461, resources/js/pages/Settings.tsx:6486
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5362
-#: assets/dist/js/Settings-WStf1Cfq.js:5381
+#: assets/dist/js/Settings-CU7EUfsS.js:5400
+#: assets/dist/js/Settings-CU7EUfsS.js:5419
 msgid "Mailchimp"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6466
+# Source: resources/js/pages/Settings.tsx:6508
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5403
+#: assets/dist/js/Settings-CU7EUfsS.js:5441
 msgid "Mailchimp Account Settings"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6414
+# Source: resources/js/pages/Settings.tsx:6456
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:133
-#: assets/dist/js/Settings-WStf1Cfq.js:5357
+#: assets/dist/js/Settings-CU7EUfsS.js:5395
 msgid "Mailchimp Integration"
 msgstr ""
 
@@ -16622,7 +16623,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:463
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:331
+#: assets/dist/js/Settings-CU7EUfsS.js:331
 msgid "Make sure the"
 msgstr ""
 
@@ -16834,9 +16835,9 @@ msgstr ""
 msgid "Manual/automated"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6052
+# Source: resources/js/pages/Settings.tsx:6094
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4978
+#: assets/dist/js/Settings-CU7EUfsS.js:5016
 msgid "Manually approve reviews before they are published"
 msgstr ""
 
@@ -16851,9 +16852,9 @@ msgstr ""
 msgid "Manually editing slug. Click X to cancel and regenerate from name."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6645
+# Source: resources/js/pages/Settings.tsx:6687
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5560
+#: assets/dist/js/Settings-CU7EUfsS.js:5598
 msgid "Map Yatra customer fields to Mailchimp merge fields. This controls what data is synced when a customer is added to your list."
 msgstr ""
 
@@ -16905,15 +16906,15 @@ msgstr ""
 msgid "Mappings"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7828
+# Source: resources/js/pages/Settings.tsx:7870
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6570
+#: assets/dist/js/Settings-CU7EUfsS.js:6608
 msgid "Maps"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7847
+# Source: resources/js/pages/Settings.tsx:7889
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6583
+#: assets/dist/js/Settings-CU7EUfsS.js:6621
 msgid "Maps are powered by OpenStreetMap - a free, open-source mapping service. No API key required! Maps will automatically display trip starting locations with custom markers."
 msgstr ""
 
@@ -17277,28 +17278,28 @@ msgstr ""
 msgid "Mean revenue per booking in this period. A rising AOV with stable booking count is the cleanest growth signal."
 msgstr ""
 
-# Source: resources/js/pages/Reports.tsx:1713, resources/js/pages/Settings.tsx:7359
+# Source: resources/js/pages/Reports.tsx:1713, resources/js/pages/Settings.tsx:7401
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/Reports-CxPdZPoa.js:1376
-#: assets/dist/js/Settings-WStf1Cfq.js:6162
+#: assets/dist/js/Settings-CU7EUfsS.js:6200
 msgid "Measurement ID"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7312
+# Source: resources/js/pages/Settings.tsx:7354
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6125
+#: assets/dist/js/Settings-CU7EUfsS.js:6163
 msgid "Measurement ID set"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3057
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2260
+#: assets/dist/js/Settings-CU7EUfsS.js:2260
 msgid "Measurement ID validated successfully!"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3062
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2265
+#: assets/dist/js/Settings-CU7EUfsS.js:2265
 msgid "Measurement ID validation failed."
 msgstr ""
 
@@ -17308,9 +17309,9 @@ msgstr ""
 msgid "Measurement Protocol"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7654
+# Source: resources/js/pages/Settings.tsx:7696
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6435
+#: assets/dist/js/Settings-CU7EUfsS.js:6473
 msgid "Measurement Protocol API secret"
 msgstr ""
 
@@ -17462,9 +17463,9 @@ msgstr ""
 msgid "Meta Title"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8388
+# Source: resources/js/pages/Settings.tsx:8430
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7121
+#: assets/dist/js/Settings-CU7EUfsS.js:7159
 msgid "Meta description for the trip archive page. Should be 150-160 characters for best SEO results."
 msgstr ""
 
@@ -17474,9 +17475,9 @@ msgstr ""
 msgid "Meta template name"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8361
+# Source: resources/js/pages/Settings.tsx:8403
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7094
+#: assets/dist/js/Settings-CU7EUfsS.js:7132
 msgid "Meta title for the trip archive page. This will appear in search engine results for /trip/ page."
 msgstr ""
 
@@ -17565,9 +17566,9 @@ msgstr ""
 msgid "Minimum Group Size"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6062
+# Source: resources/js/pages/Settings.tsx:6104
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4988
+#: assets/dist/js/Settings-CU7EUfsS.js:5026
 msgid "Minimum Rating"
 msgstr ""
 
@@ -17641,9 +17642,9 @@ msgstr ""
 msgid "Missing security token. Reload the account page and try again."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5312
+# Source: resources/js/pages/Settings.tsx:5354
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4288
+#: assets/dist/js/Settings-CU7EUfsS.js:4326
 msgid "Mobile Filters"
 msgstr ""
 
@@ -17739,7 +17740,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4613, resources/js/pages/TripForm.tsx:6953, resources/js/pages/TripForm.tsx:8737
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3720
+#: assets/dist/js/Settings-CU7EUfsS.js:3720
 msgid "Move down"
 msgstr ""
 
@@ -17795,7 +17796,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4604, resources/js/pages/TripForm.tsx:6938, resources/js/pages/TripForm.tsx:8724
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3709
+#: assets/dist/js/Settings-CU7EUfsS.js:3709
 msgid "Move up"
 msgstr ""
 
@@ -17837,7 +17838,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4395
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3506
+#: assets/dist/js/Settings-CU7EUfsS.js:3506
 msgid "Multiple installments"
 msgstr ""
 
@@ -17854,7 +17855,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:561
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:441
+#: assets/dist/js/Settings-CU7EUfsS.js:441
 msgid "My Booking Calendar"
 msgstr ""
 
@@ -17987,7 +17988,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:574
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:452
+#: assets/dist/js/Settings-CU7EUfsS.js:452
 msgid "Never synced"
 msgstr ""
 
@@ -18451,7 +18452,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1765
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:1143
+#: assets/dist/js/Settings-CU7EUfsS.js:1143
 msgid "No fields configured. Click \"Add Field\" to get started."
 msgstr ""
 
@@ -18467,7 +18468,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1460
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:858
+#: assets/dist/js/Settings-CU7EUfsS.js:858
 msgid "No form is set to collect an email address. An email is required for booking confirmation, the customer account and the voucher. Please enable an email field on the Contact or Traveler form — otherwise customers can't complete checkout."
 msgstr ""
 
@@ -18554,9 +18555,9 @@ msgstr ""
 msgid "No media items yet. Click 'Add Media' to get started."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6723
+# Source: resources/js/pages/Settings.tsx:6765
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5615
+#: assets/dist/js/Settings-CU7EUfsS.js:5653
 msgid "No merge fields available. Please select a list first."
 msgstr ""
 
@@ -18605,7 +18606,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1993
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:1342
+#: assets/dist/js/Settings-CU7EUfsS.js:1342
 msgid "No options. Click \"Add Option\" to add dropdown choices."
 msgstr ""
 
@@ -18925,13 +18926,13 @@ msgstr ""
 msgid "Not Available"
 msgstr ""
 
-# Source: resources/js/pages/GoogleCalendar.tsx:174, resources/js/pages/Reports.tsx:1128, resources/js/pages/Reports.tsx:1718, resources/js/pages/Settings.tsx:372, resources/js/pages/Settings.tsx:6431, resources/js/pages/Settings.tsx:6818
+# Source: resources/js/pages/GoogleCalendar.tsx:174, resources/js/pages/Reports.tsx:1128, resources/js/pages/Reports.tsx:1718, resources/js/pages/Settings.tsx:372, resources/js/pages/Settings.tsx:6473, resources/js/pages/Settings.tsx:6860
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/Reports-CxPdZPoa.js:867
 #: assets/dist/js/Reports-CxPdZPoa.js:1377
-#: assets/dist/js/Settings-WStf1Cfq.js:226
-#: assets/dist/js/Settings-WStf1Cfq.js:5370
-#: assets/dist/js/Settings-WStf1Cfq.js:5700
+#: assets/dist/js/Settings-CU7EUfsS.js:226
+#: assets/dist/js/Settings-CU7EUfsS.js:5408
+#: assets/dist/js/Settings-CU7EUfsS.js:5738
 msgid "Not Connected"
 msgstr ""
 
@@ -18941,9 +18942,9 @@ msgstr ""
 msgid "Not Set"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5686
+# Source: resources/js/pages/Settings.tsx:5728
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4621
+#: assets/dist/js/Settings-CU7EUfsS.js:4659
 msgid "Not active yet"
 msgstr ""
 
@@ -18954,10 +18955,10 @@ msgstr ""
 msgid "Not available"
 msgstr ""
 
-# Source: resources/js/pages/AiAssistant.tsx:552, resources/js/pages/Settings.tsx:7317
+# Source: resources/js/pages/AiAssistant.tsx:552, resources/js/pages/Settings.tsx:7359
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/AiAssistant-C5CqVP9I.js:328
-#: assets/dist/js/Settings-WStf1Cfq.js:6128
+#: assets/dist/js/Settings-CU7EUfsS.js:6166
 msgid "Not configured"
 msgstr ""
 
@@ -19057,15 +19058,15 @@ msgstr ""
 msgid "Number of days to analyze for demand trends"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6358
+# Source: resources/js/pages/Settings.tsx:6400
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5297
+#: assets/dist/js/Settings-CU7EUfsS.js:5335
 msgid "Number of decimal places to show in prices"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4424
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3541
+#: assets/dist/js/Settings-CU7EUfsS.js:3541
 msgid "Number of installments"
 msgstr ""
 
@@ -19083,19 +19084,19 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:636
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:535
+#: assets/dist/js/Settings-CU7EUfsS.js:535
 msgid "OAuth Consent"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:507
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:384
+#: assets/dist/js/Settings-CU7EUfsS.js:384
 msgid "OAuth Consent Screen"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:497
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:372
+#: assets/dist/js/Settings-CU7EUfsS.js:372
 msgid "OAuth scopes required (add these on the Google OAuth consent screen):"
 msgstr ""
 
@@ -19219,9 +19220,9 @@ msgstr ""
 msgid "On hold"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5337
+# Source: resources/js/pages/Settings.tsx:5379
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4314
+#: assets/dist/js/Settings-CU7EUfsS.js:4352
 msgid "On mobile, show filter sections collapsed so trip listings are visible right away. Visitors tap a section to expand it. Desktop is unaffected."
 msgstr ""
 
@@ -19236,9 +19237,9 @@ msgstr ""
 msgid "On the default — team access is revoked when the module is off"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7404
+# Source: resources/js/pages/Settings.tsx:7446
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6191
+#: assets/dist/js/Settings-CU7EUfsS.js:6229
 msgid "On the stream details panel, copy the Measurement ID at the top right (format G-XXXXXXXXXX)."
 msgstr ""
 
@@ -19287,9 +19288,9 @@ msgstr ""
 msgid "Only active rules will generate departure dates"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6002
+# Source: resources/js/pages/Settings.tsx:6044
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4924
+#: assets/dist/js/Settings-CU7EUfsS.js:4962
 msgid "Only customers who have booked can leave reviews"
 msgstr ""
 
@@ -19364,39 +19365,39 @@ msgstr ""
 msgid "Open API keys page"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7151
+# Source: resources/js/pages/Settings.tsx:7193
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5982
+#: assets/dist/js/Settings-CU7EUfsS.js:6020
 msgid "Open Conversions API Settings →"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6909
+# Source: resources/js/pages/Settings.tsx:6951
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5769
+#: assets/dist/js/Settings-CU7EUfsS.js:5807
 msgid "Open Facebook Events Manager →"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7424, resources/js/pages/Settings.tsx:7722
+# Source: resources/js/pages/Settings.tsx:7466, resources/js/pages/Settings.tsx:7764
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6208
-#: assets/dist/js/Settings-WStf1Cfq.js:6484
+#: assets/dist/js/Settings-CU7EUfsS.js:6246
+#: assets/dist/js/Settings-CU7EUfsS.js:6522
 msgid "Open Google Analytics →"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:609
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:496
+#: assets/dist/js/Settings-CU7EUfsS.js:496
 msgid "Open Google Calendar dashboard"
 msgstr ""
 
-# Source: resources/js/pages/ChannelManager.tsx:410, resources/js/pages/EmailAutomation.tsx:795, resources/js/pages/Reports.tsx:1044, resources/js/pages/Reports.tsx:1634, resources/js/pages/Settings.tsx:5727, resources/js/pages/Whatsapp.tsx:330
+# Source: resources/js/pages/ChannelManager.tsx:410, resources/js/pages/EmailAutomation.tsx:795, resources/js/pages/Reports.tsx:1044, resources/js/pages/Reports.tsx:1634, resources/js/pages/Settings.tsx:5769, resources/js/pages/Whatsapp.tsx:330
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:72622
 #: assets/admin/dist/js/Whatsapp.js:229
 #: assets/dist/js/ChannelManager-CSJ4tokj.js:296
 #: assets/dist/js/Reports-CxPdZPoa.js:785
 #: assets/dist/js/Reports-CxPdZPoa.js:1295
-#: assets/dist/js/Settings-WStf1Cfq.js:4651
+#: assets/dist/js/Settings-CU7EUfsS.js:4689
 msgid "Open Modules"
 msgstr ""
 
@@ -19421,13 +19422,13 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:583
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:461
+#: assets/dist/js/Settings-CU7EUfsS.js:461
 msgid "Open dashboard"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7844
+# Source: resources/js/pages/Settings.tsx:7886
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6582
+#: assets/dist/js/Settings-CU7EUfsS.js:6620
 msgid "OpenStreetMap Integration"
 msgstr ""
 
@@ -19605,7 +19606,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4166
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3281
+#: assets/dist/js/Settings-CU7EUfsS.js:3281
 msgid "Optional. CSS width for trip listings, booking flow, and shortcode layouts (e.g. 1200px, 72rem, min(100%,80rem)). Leave empty to use your block theme layout (theme.json) or theme content width."
 msgstr ""
 
@@ -19901,7 +19902,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4249
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3360
+#: assets/dist/js/Settings-CU7EUfsS.js:3360
 msgid "Partial Payment Percentage"
 msgstr ""
 
@@ -19978,21 +19979,21 @@ msgstr ""
 msgid "Paste 3-5 paragraphs from your existing trips/emails that sound like you. AI uses these as few-shot examples."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7123
+# Source: resources/js/pages/Settings.tsx:7165
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5960
+#: assets/dist/js/Settings-CU7EUfsS.js:5998
 msgid "Paste it in the field above"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7410
+# Source: resources/js/pages/Settings.tsx:7452
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6195
+#: assets/dist/js/Settings-CU7EUfsS.js:6233
 msgid "Paste it in the field above and click Validate."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7761
+# Source: resources/js/pages/Settings.tsx:7803
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6515
+#: assets/dist/js/Settings-CU7EUfsS.js:6553
 msgid "Paste secret from GA4"
 msgstr ""
 
@@ -20107,7 +20108,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:56706
 #: assets/admin/dist/js/app.js:56739
 #: assets/dist/js/account-page.js:1887
-#: assets/dist/js/Settings-WStf1Cfq.js:2785
+#: assets/dist/js/Settings-CU7EUfsS.js:2785
 msgid "Payment"
 msgstr ""
 
@@ -20137,7 +20138,7 @@ msgstr ""
 # Source: resources/js/pages/Settings.tsx:4516
 #: assets/admin/dist/js/app.js
 #: core/Premium.php:421
-#: assets/dist/js/Settings-WStf1Cfq.js:3644
+#: assets/dist/js/Settings-CU7EUfsS.js:3644
 msgid "Payment Gateways"
 msgstr ""
 
@@ -20303,7 +20304,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4465
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3590
+#: assets/dist/js/Settings-CU7EUfsS.js:3590
 msgid "Payment reminder (days before)"
 msgstr ""
 
@@ -20565,13 +20566,13 @@ msgstr ""
 # Source: resources/js/pages/Settings.tsx:4299
 #: assets/admin/dist/js/app.js
 #: app/PaymentGateways/Gateways/PayLater/PayLaterGateway.php:52
-#: assets/dist/js/Settings-WStf1Cfq.js:3412
+#: assets/dist/js/Settings-CU7EUfsS.js:3412
 msgid "Percentage of total amount required as deposit"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4250
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3361
+#: assets/dist/js/Settings-CU7EUfsS.js:3361
 msgid "Percentage of total amount required for partial payment"
 msgstr ""
 
@@ -20601,13 +20602,13 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3753
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2828
+#: assets/dist/js/Settings-CU7EUfsS.js:2828
 msgid "Permalink"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7943
+# Source: resources/js/pages/Settings.tsx:7985
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6672
+#: assets/dist/js/Settings-CU7EUfsS.js:6710
 msgid "Permalink Settings"
 msgstr ""
 
@@ -20771,15 +20772,15 @@ msgstr ""
 msgid "Pick from the real fields below — these are the exact paths your receiver will see."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5738
+# Source: resources/js/pages/Settings.tsx:5780
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4663
+#: assets/dist/js/Settings-CU7EUfsS.js:4701
 msgid "Pick how Discounts and Dynamic Pricing combine on the same booking."
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4114
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3229
+#: assets/dist/js/Settings-CU7EUfsS.js:3229
 msgid "Pick primary color"
 msgstr ""
 
@@ -20829,16 +20830,16 @@ msgstr ""
 msgid "Pixel Connection"
 msgstr ""
 
-# Source: resources/js/pages/Reports.tsx:1233, resources/js/pages/Settings.tsx:6846
+# Source: resources/js/pages/Reports.tsx:1233, resources/js/pages/Settings.tsx:6888
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/Reports-CxPdZPoa.js:968
-#: assets/dist/js/Settings-WStf1Cfq.js:5725
+#: assets/dist/js/Settings-CU7EUfsS.js:5763
 msgid "Pixel ID"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6956
+# Source: resources/js/pages/Settings.tsx:6998
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5810
+#: assets/dist/js/Settings-CU7EUfsS.js:5848
 msgid "Pixel ID is valid!"
 msgstr ""
 
@@ -20851,7 +20852,7 @@ msgstr ""
 # Source: resources/js/pages/AttributeForm.tsx:1007, resources/js/pages/Settings.tsx:1602, resources/js/pages/TripConsentForm.tsx:1166
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:76074
-#: assets/dist/js/Settings-WStf1Cfq.js:987
+#: assets/dist/js/Settings-CU7EUfsS.js:987
 msgid "Placeholder"
 msgstr ""
 
@@ -21022,9 +21023,9 @@ msgstr ""
 msgid "Please select templates and an action"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6571
+# Source: resources/js/pages/Settings.tsx:6613
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5492
+#: assets/dist/js/Settings-CU7EUfsS.js:5530
 msgid "Please validate API key first"
 msgstr ""
 
@@ -21107,10 +21108,10 @@ msgstr ""
 msgid "Prefer not to say"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8831
+# Source: resources/js/pages/Settings.tsx:8873
 #: assets/admin/dist/js/app.js
 #: app/Controllers/UsageTrackingController.php:126
-#: assets/dist/js/Settings-WStf1Cfq.js:7499
+#: assets/dist/js/Settings-CU7EUfsS.js:7537
 msgid "Preference saved."
 msgstr ""
 
@@ -21168,7 +21169,7 @@ msgstr ""
 #: assets/dist/js/account-page.js:2388
 #: assets/dist/js/account-page.js:2390
 #: assets/dist/js/RecurringRuleForm-DURXaxk5.js:2058
-#: assets/dist/js/Settings-WStf1Cfq.js:1453
+#: assets/dist/js/Settings-CU7EUfsS.js:1453
 #: assets/js/trip.js:5351
 msgid "Preview"
 msgstr ""
@@ -21350,7 +21351,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:58621
 #: assets/admin/dist/js/app.js:58840
 #: assets/dist/js/AiAssistant-C5CqVP9I.js:372
-#: assets/dist/js/Settings-WStf1Cfq.js:2801
+#: assets/dist/js/Settings-CU7EUfsS.js:2801
 msgid "Pricing"
 msgstr ""
 
@@ -21471,25 +21472,25 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4104
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3218
+#: assets/dist/js/Settings-CU7EUfsS.js:3218
 msgid "Primary brand color"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3811
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2880
+#: assets/dist/js/Settings-CU7EUfsS.js:2880
 msgid "Primary contact email address"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3827
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2900
+#: assets/dist/js/Settings-CU7EUfsS.js:2900
 msgid "Primary contact phone number"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6291
+# Source: resources/js/pages/Settings.tsx:6333
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5222
+#: assets/dist/js/Settings-CU7EUfsS.js:5260
 msgid "Primary currency for all transactions"
 msgstr ""
 
@@ -21509,15 +21510,15 @@ msgstr ""
 msgid "Privacy Policies"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8734
+# Source: resources/js/pages/Settings.tsx:8776
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7412
+#: assets/dist/js/Settings-CU7EUfsS.js:7450
 msgid "Privacy Policy page"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8786
+# Source: resources/js/pages/Settings.tsx:8828
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7466
+#: assets/dist/js/Settings-CU7EUfsS.js:7504
 msgid "Privacy policy"
 msgstr ""
 
@@ -21666,9 +21667,9 @@ msgstr ""
 msgid "Prompts"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7877
+# Source: resources/js/pages/Settings.tsx:7919
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6612
+#: assets/dist/js/Settings-CU7EUfsS.js:6650
 msgid "Protect forms from spam and bots"
 msgstr ""
 
@@ -21812,9 +21813,9 @@ msgstr ""
 msgid "Pulled from the most recent successful delivery for this event."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7568
+# Source: resources/js/pages/Settings.tsx:7610
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6354
+#: assets/dist/js/Settings-CU7EUfsS.js:6392
 msgid "Purchase"
 msgstr ""
 
@@ -21935,16 +21936,16 @@ msgstr ""
 msgid "Range"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5268
+# Source: resources/js/pages/Settings.tsx:5310
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4242
+#: assets/dist/js/Settings-CU7EUfsS.js:4280
 msgid "Range slider to filter trips by number of days."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:165, resources/js/pages/Settings.tsx:6173
+# Source: resources/js/pages/Settings.tsx:165, resources/js/pages/Settings.tsx:6215
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:75
-#: assets/dist/js/Settings-WStf1Cfq.js:5122
+#: assets/dist/js/Settings-CU7EUfsS.js:75
+#: assets/dist/js/Settings-CU7EUfsS.js:5160
 msgid "Rate"
 msgstr ""
 
@@ -22156,9 +22157,9 @@ msgstr ""
 msgid "Recommended"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8507
+# Source: resources/js/pages/Settings.tsx:8549
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7218
+#: assets/dist/js/Settings-CU7EUfsS.js:7256
 msgid "Recommended size: 1200x630 pixels for optimal social media display."
 msgstr ""
 
@@ -22294,7 +22295,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:448
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:312
+#: assets/dist/js/Settings-CU7EUfsS.js:312
 msgid "Redirect URI (OAuth Callback URL)"
 msgstr ""
 
@@ -22431,7 +22432,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3923
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3018
+#: assets/dist/js/Settings-CU7EUfsS.js:3018
 msgid "Regional Settings"
 msgstr ""
 
@@ -22581,9 +22582,9 @@ msgstr ""
 msgid "Remove from team"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8500, resources/js/pages/TripForm.tsx:4328
+# Source: resources/js/pages/Settings.tsx:8542, resources/js/pages/TripForm.tsx:4328
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7213
+#: assets/dist/js/Settings-CU7EUfsS.js:7251
 msgid "Remove image"
 msgstr ""
 
@@ -22678,9 +22679,9 @@ msgstr ""
 msgid "Replace existing"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5566
+# Source: resources/js/pages/Settings.tsx:5608
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4545
+#: assets/dist/js/Settings-CU7EUfsS.js:4583
 msgid "Replace the calendar date picker with a dropdown listing every available departure date on the single-trip sidebar and the mobile sticky bar. Best for trips with a small set of fixed departures."
 msgstr ""
 
@@ -22739,23 +22740,23 @@ msgstr ""
 msgid "Report sections"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:525, resources/js/pages/RoleDashboard.tsx:235, resources/js/pages/Settings.tsx:7816
+# Source: resources/js/components/Layout.tsx:525, resources/js/pages/RoleDashboard.tsx:235, resources/js/pages/Settings.tsx:7858
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:4541
 #: assets/admin/dist/js/app.js:26519
-#: assets/dist/js/Settings-WStf1Cfq.js:6560
+#: assets/dist/js/Settings-CU7EUfsS.js:6598
 msgid "Reports"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7805
+# Source: resources/js/pages/Settings.tsx:7847
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6548
+#: assets/dist/js/Settings-CU7EUfsS.js:6586
 msgid "Reports & event log"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7273
+# Source: resources/js/pages/Settings.tsx:7315
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6087
+#: assets/dist/js/Settings-CU7EUfsS.js:6125
 msgid "Reports page"
 msgstr ""
 
@@ -22771,45 +22772,45 @@ msgstr ""
 msgid "Request failed"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5999
+# Source: resources/js/pages/Settings.tsx:6041
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4921
+#: assets/dist/js/Settings-CU7EUfsS.js:4959
 msgid "Require Booking to Review"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4287
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3401
+#: assets/dist/js/Settings-CU7EUfsS.js:3401
 msgid "Require Deposit"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5934
+# Source: resources/js/pages/Settings.tsx:5976
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4858
+#: assets/dist/js/Settings-CU7EUfsS.js:4896
 msgid "Require Email Verification"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5479
+# Source: resources/js/pages/Settings.tsx:5521
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4452
+#: assets/dist/js/Settings-CU7EUfsS.js:4490
 msgid "Require Guest Email Verification"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5417
+# Source: resources/js/pages/Settings.tsx:5459
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4397
+#: assets/dist/js/Settings-CU7EUfsS.js:4435
 msgid "Require Login for Booking"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4290
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3404
+#: assets/dist/js/Settings-CU7EUfsS.js:3404
 msgid "Require a deposit to confirm bookings"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6628
+# Source: resources/js/pages/Settings.tsx:6670
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5549
+#: assets/dist/js/Settings-CU7EUfsS.js:5587
 msgid "Require email confirmation before adding to list (recommended for GDPR)"
 msgstr ""
 
@@ -22834,8 +22835,8 @@ msgstr ""
 #: templates/partials/pricing-summary.php:114
 #: assets/admin/dist/js/app.js:74833
 #: assets/admin/dist/js/app.js:75148
-#: assets/dist/js/Settings-WStf1Cfq.js:1120
-#: assets/dist/js/Settings-WStf1Cfq.js:1360
+#: assets/dist/js/Settings-CU7EUfsS.js:1120
+#: assets/dist/js/Settings-CU7EUfsS.js:1360
 msgid "Required"
 msgstr ""
 
@@ -22850,9 +22851,9 @@ msgstr ""
 msgid "Required Service"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7057
+# Source: resources/js/pages/Settings.tsx:7099
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5918
+#: assets/dist/js/Settings-CU7EUfsS.js:5956
 msgid "Required for Conversions API. Enables server-side tracking for better accuracy."
 msgstr ""
 
@@ -22880,9 +22881,9 @@ msgstr ""
 msgid "Required — sync will fail without this."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7614
+# Source: resources/js/pages/Settings.tsx:7656
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6394
+#: assets/dist/js/Settings-CU7EUfsS.js:6432
 msgid "Requires an API secret from the same GA4 data stream."
 msgstr ""
 
@@ -22931,7 +22932,7 @@ msgstr ""
 # Source: resources/js/pages/AiAssistant.tsx:1512, resources/js/pages/Settings.tsx:4158, resources/js/pages/WhiteLabel.tsx:1134
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/AiAssistant-C5CqVP9I.js:1134
-#: assets/dist/js/Settings-WStf1Cfq.js:3270
+#: assets/dist/js/Settings-CU7EUfsS.js:3270
 #: assets/dist/js/WhiteLabel-BGHzZX3U.js:790
 msgid "Reset to default"
 msgstr ""
@@ -23214,7 +23215,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:44609
 #: assets/admin/dist/js/app.js:44896
 #: assets/admin/dist/js/app.js:44964
-#: assets/dist/js/Settings-WStf1Cfq.js:2812
+#: assets/dist/js/Settings-CU7EUfsS.js:2812
 msgid "Review"
 msgid_plural "Reviews"
 msgstr[0] ""
@@ -23247,9 +23248,9 @@ msgstr ""
 msgid "Review Overview"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6084
+# Source: resources/js/pages/Settings.tsx:6126
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5030
+#: assets/dist/js/Settings-CU7EUfsS.js:5068
 msgid "Review Reminder Days"
 msgstr ""
 
@@ -23279,9 +23280,9 @@ msgstr ""
 msgid "Review comment is required"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7808
+# Source: resources/js/pages/Settings.tsx:7850
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6550
+#: assets/dist/js/Settings-CU7EUfsS.js:6588
 msgid "Review connection status and recent Measurement Protocol activity under"
 msgstr ""
 
@@ -23376,7 +23377,7 @@ msgstr ""
 # Source: resources/js/components/Layout.tsx:147, resources/js/pages/Settings.tsx:3529
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:4235
-#: assets/dist/js/Settings-WStf1Cfq.js:2646
+#: assets/dist/js/Settings-CU7EUfsS.js:2646
 msgid "Rewrite rules flushed successfully"
 msgstr ""
 
@@ -23518,7 +23519,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3758
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2833
+#: assets/dist/js/Settings-CU7EUfsS.js:2833
 msgid "SEO"
 msgstr ""
 
@@ -23539,9 +23540,9 @@ msgstr ""
 msgid "SEO Description"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8487
+# Source: resources/js/pages/Settings.tsx:8529
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7202
+#: assets/dist/js/Settings-CU7EUfsS.js:7240
 msgid "SEO Image"
 msgstr ""
 
@@ -23697,7 +23698,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4670
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3769
+#: assets/dist/js/Settings-CU7EUfsS.js:3769
 msgid "Sandbox Docs →"
 msgstr ""
 
@@ -23767,10 +23768,10 @@ msgstr ""
 msgid "Save Rule"
 msgstr ""
 
-# Source: resources/js/pages/AbandonedRecovery.tsx:1396, resources/js/pages/DynamicPricing.tsx:1739, resources/js/pages/Settings.tsx:9006, resources/js/pages/Settings.tsx:9079
+# Source: resources/js/pages/AbandonedRecovery.tsx:1396, resources/js/pages/DynamicPricing.tsx:1739, resources/js/pages/Settings.tsx:9048, resources/js/pages/Settings.tsx:9121
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7647
-#: assets/dist/js/Settings-WStf1Cfq.js:7693
+#: assets/dist/js/Settings-CU7EUfsS.js:7685
+#: assets/dist/js/Settings-CU7EUfsS.js:7731
 msgid "Save Settings"
 msgstr ""
 
@@ -23915,7 +23916,7 @@ msgstr ""
 msgid "Saving your AI-generated trip…"
 msgstr ""
 
-# Source: resources/js/pages/AbandonedRecovery.tsx:1396, resources/js/pages/AbandonedRecoveryEmailForm.tsx:344, resources/js/pages/ActivityForm.tsx:665, resources/js/pages/AdditionalServicesForm.tsx:804, resources/js/pages/AttributeForm.tsx:1163, resources/js/pages/AvailabilityForm.tsx:1680, resources/js/pages/BookingForm.tsx:1972, resources/js/pages/CategoryForm.tsx:809, resources/js/pages/CustomerForm.tsx:924, resources/js/pages/DepartureForm.tsx:320, resources/js/pages/DepartureRecurringRuleForm.tsx:423, resources/js/pages/DestinationForm.tsx:671, resources/js/pages/DifficultyLevelForm.tsx:507, resources/js/pages/DiscountForm.tsx:2661, resources/js/pages/DynamicPricing.tsx:1734, resources/js/pages/DynamicPricingRuleForm.tsx:1470, resources/js/pages/DynamicPricingRuleForm.tsx:1505, resources/js/pages/EnquiryForm.tsx:251, resources/js/pages/ItemForm.tsx:474, resources/js/pages/ItemTypeForm.tsx:560, resources/js/pages/ItineraryForm.tsx:1144, resources/js/pages/PaymentForm.tsx:573, resources/js/pages/ReviewForm.tsx:541, resources/js/pages/Settings.tsx:9001, resources/js/pages/Settings.tsx:9074, resources/js/pages/TravelerCategoryForm.tsx:882
+# Source: resources/js/pages/AbandonedRecovery.tsx:1396, resources/js/pages/AbandonedRecoveryEmailForm.tsx:344, resources/js/pages/ActivityForm.tsx:665, resources/js/pages/AdditionalServicesForm.tsx:804, resources/js/pages/AttributeForm.tsx:1163, resources/js/pages/AvailabilityForm.tsx:1680, resources/js/pages/BookingForm.tsx:1972, resources/js/pages/CategoryForm.tsx:809, resources/js/pages/CustomerForm.tsx:924, resources/js/pages/DepartureForm.tsx:320, resources/js/pages/DepartureRecurringRuleForm.tsx:423, resources/js/pages/DestinationForm.tsx:671, resources/js/pages/DifficultyLevelForm.tsx:507, resources/js/pages/DiscountForm.tsx:2661, resources/js/pages/DynamicPricing.tsx:1734, resources/js/pages/DynamicPricingRuleForm.tsx:1470, resources/js/pages/DynamicPricingRuleForm.tsx:1505, resources/js/pages/EnquiryForm.tsx:251, resources/js/pages/ItemForm.tsx:474, resources/js/pages/ItemTypeForm.tsx:560, resources/js/pages/ItineraryForm.tsx:1144, resources/js/pages/PaymentForm.tsx:573, resources/js/pages/ReviewForm.tsx:541, resources/js/pages/Settings.tsx:9043, resources/js/pages/Settings.tsx:9116, resources/js/pages/TravelerCategoryForm.tsx:882
 #: assets/admin/dist/js/app.js
 #: app/Controllers/SetupWizardController.php:210
 #: assets/admin/dist/js/app.js:33560
@@ -23935,8 +23936,8 @@ msgstr ""
 #: assets/dist/js/AvailabilityForm-mmPwwWCb.js:1384
 #: assets/dist/js/BookingForm-CP7wussJ.js:1732
 #: assets/dist/js/DiscountForm-DGCNdiR2.js:1999
-#: assets/dist/js/Settings-WStf1Cfq.js:7644
-#: assets/dist/js/Settings-WStf1Cfq.js:7690
+#: assets/dist/js/Settings-CU7EUfsS.js:7682
+#: assets/dist/js/Settings-CU7EUfsS.js:7728
 msgid "Saving..."
 msgstr ""
 
@@ -24003,14 +24004,14 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4379
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3492
+#: assets/dist/js/Settings-CU7EUfsS.js:3492
 msgid "Schedule type"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4337
 #: assets/admin/dist/js/app.js
 #: app/Core/Modules/ModuleManager.php:193
-#: assets/dist/js/Settings-WStf1Cfq.js:3450
+#: assets/dist/js/Settings-CU7EUfsS.js:3450
 msgid "Scheduled Payments"
 msgstr ""
 
@@ -24021,7 +24022,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4327
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3440
+#: assets/dist/js/Settings-CU7EUfsS.js:3440
 msgid "Scheduled balance payments"
 msgstr ""
 
@@ -24069,15 +24070,15 @@ msgstr ""
 msgid "Score above 70 → markup; below 30 → discount. Magnitude scales with how far the score is outside the band."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7101
+# Source: resources/js/pages/Settings.tsx:7143
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5946
+#: assets/dist/js/Settings-CU7EUfsS.js:5984
 msgid "Scroll down to 'Conversions API' section"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7696
+# Source: resources/js/pages/Settings.tsx:7738
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6463
+#: assets/dist/js/Settings-CU7EUfsS.js:6501
 msgid "Scroll to Events → Measurement Protocol API secrets → Create."
 msgstr ""
 
@@ -24099,13 +24100,13 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3703
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2780
+#: assets/dist/js/Settings-CU7EUfsS.js:2780
 msgid "Search & Listing"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5231
+# Source: resources/js/pages/Settings.tsx:5273
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4209
+#: assets/dist/js/Settings-CU7EUfsS.js:4247
 msgid "Search Bar Fields"
 msgstr ""
 
@@ -24154,7 +24155,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3975
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3067
+#: assets/dist/js/Settings-CU7EUfsS.js:3067
 msgid "Search by city, region, or code…"
 msgstr ""
 
@@ -24247,9 +24248,9 @@ msgstr ""
 msgid "Search consent forms..."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6306
+# Source: resources/js/pages/Settings.tsx:6348
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5236
+#: assets/dist/js/Settings-CU7EUfsS.js:5274
 msgid "Search currencies..."
 msgstr ""
 
@@ -24466,21 +24467,21 @@ msgstr ""
 msgid "Secondary Phone"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7900
+# Source: resources/js/pages/Settings.tsx:7942
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6638
+#: assets/dist/js/Settings-CU7EUfsS.js:6676
 msgid "Secret Key"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1509
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:901
+#: assets/dist/js/Settings-CU7EUfsS.js:901
 msgid "Section Description"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1497
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:888
+#: assets/dist/js/Settings-CU7EUfsS.js:888
 msgid "Section Title"
 msgstr ""
 
@@ -24512,9 +24513,9 @@ msgstr ""
 msgid "Select All"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8181
+# Source: resources/js/pages/Settings.tsx:8223
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6940
+#: assets/dist/js/Settings-CU7EUfsS.js:6978
 msgid "Select Booking Page"
 msgstr ""
 
@@ -24544,9 +24545,9 @@ msgstr ""
 msgid "Select Icon or Upload Image"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8602
+# Source: resources/js/pages/Settings.tsx:8644
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7289
+#: assets/dist/js/Settings-CU7EUfsS.js:7327
 msgid "Select Image"
 msgstr ""
 
@@ -24556,10 +24557,10 @@ msgstr ""
 msgid "Select Media"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8518, resources/js/pages/Settings.tsx:8574
+# Source: resources/js/pages/Settings.tsx:8560, resources/js/pages/Settings.tsx:8616
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7229
-#: assets/dist/js/Settings-WStf1Cfq.js:7269
+#: assets/dist/js/Settings-CU7EUfsS.js:7267
+#: assets/dist/js/Settings-CU7EUfsS.js:7307
 msgid "Select SEO Image"
 msgstr ""
 
@@ -24706,9 +24707,9 @@ msgstr ""
 msgid "Select all items"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6572
+# Source: resources/js/pages/Settings.tsx:6614
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5492
+#: assets/dist/js/Settings-CU7EUfsS.js:5530
 msgid "Select an audience"
 msgstr ""
 
@@ -24858,9 +24859,9 @@ msgstr ""
 msgid "Select country"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6305
+# Source: resources/js/pages/Settings.tsx:6347
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5235
+#: assets/dist/js/Settings-CU7EUfsS.js:5273
 msgid "Select currency..."
 msgstr ""
 
@@ -24979,7 +24980,7 @@ msgstr ""
 # Source: resources/js/components/ui/multi-select.tsx:26, resources/js/pages/Settings.tsx:5070
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/ProFeature-Bq-2isy8.js:8
-#: assets/dist/js/Settings-WStf1Cfq.js:4090
+#: assets/dist/js/Settings-CU7EUfsS.js:4090
 msgid "Select options..."
 msgstr ""
 
@@ -25003,7 +25004,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4984
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4026
+#: assets/dist/js/Settings-CU7EUfsS.js:4026
 msgid "Select payment methods..."
 msgstr ""
 
@@ -25024,9 +25025,9 @@ msgstr ""
 msgid "Select start date"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6553
+# Source: resources/js/pages/Settings.tsx:6595
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5479
+#: assets/dist/js/Settings-CU7EUfsS.js:5517
 msgid "Select the Mailchimp audience to sync subscribers to."
 msgstr ""
 
@@ -25048,9 +25049,9 @@ msgstr ""
 msgid "Select the new departure date. Arrival/return will be shifted automatically."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8705
+# Source: resources/js/pages/Settings.tsx:8747
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7389
+#: assets/dist/js/Settings-CU7EUfsS.js:7427
 msgid "Select the pages that will be linked from the booking Terms and Privacy consent checkboxes."
 msgstr ""
 
@@ -25086,7 +25087,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3979
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3071
+#: assets/dist/js/Settings-CU7EUfsS.js:3071
 msgid "Select timezone…"
 msgstr ""
 
@@ -25119,10 +25120,10 @@ msgstr ""
 msgid "Select which days of the week departures should be generated"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6867, resources/js/pages/Settings.tsx:7074
+# Source: resources/js/pages/Settings.tsx:6909, resources/js/pages/Settings.tsx:7116
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5738
-#: assets/dist/js/Settings-WStf1Cfq.js:5929
+#: assets/dist/js/Settings-CU7EUfsS.js:5776
+#: assets/dist/js/Settings-CU7EUfsS.js:5967
 msgid "Select your Business Account"
 msgstr ""
 
@@ -25289,9 +25290,9 @@ msgstr ""
 msgid "Send After (Hours)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5367
+# Source: resources/js/pages/Settings.tsx:5409
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4343
+#: assets/dist/js/Settings-CU7EUfsS.js:4381
 msgid "Send Booking Confirmation Email"
 msgstr ""
 
@@ -25305,9 +25306,9 @@ msgstr ""
 msgid "Send Invitations"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7644
+# Source: resources/js/pages/Settings.tsx:7686
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6425
+#: assets/dist/js/Settings-CU7EUfsS.js:6463
 msgid "Send Measurement Protocol hits to Google’s validation URL for troubleshooting. Events won’t appear in standard reports."
 msgstr ""
 
@@ -25334,9 +25335,9 @@ msgstr ""
 msgid "Send Test Email"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5370
+# Source: resources/js/pages/Settings.tsx:5412
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4346
+#: assets/dist/js/Settings-CU7EUfsS.js:4384
 msgid "Send a confirmation email to the customer immediately after a successful booking. The post-checkout page is always shown; this toggle only controls the email."
 msgstr ""
 
@@ -25394,9 +25395,9 @@ msgstr ""
 msgid "Send consent form to"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7588
+# Source: resources/js/pages/Settings.tsx:7630
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6368
+#: assets/dist/js/Settings-CU7EUfsS.js:6406
 msgid "Send duplicate events from your server with an API secret—useful when ad blockers affect the browser tag or for reconciliation."
 msgstr ""
 
@@ -25406,10 +25407,10 @@ msgstr ""
 msgid "Send failed"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8891, resources/js/pages/Whatsapp.tsx:2074
+# Source: resources/js/pages/Settings.tsx:8933, resources/js/pages/Whatsapp.tsx:2074
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/Whatsapp.js:1599
-#: assets/dist/js/Settings-WStf1Cfq.js:7567
+#: assets/dist/js/Settings-CU7EUfsS.js:7605
 msgid "Send failed."
 msgstr ""
 
@@ -25451,9 +25452,9 @@ msgstr ""
 msgid "Send multiple follow-up emails with increasing urgency."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8900
+# Source: resources/js/pages/Settings.tsx:8942
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7576
+#: assets/dist/js/Settings-CU7EUfsS.js:7614
 msgid "Send now"
 msgstr ""
 
@@ -25463,9 +25464,9 @@ msgstr ""
 msgid "Send only selected fields"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5620
+# Source: resources/js/pages/Settings.tsx:5662
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4581
+#: assets/dist/js/Settings-CU7EUfsS.js:4619
 msgid "Send reminder emails this many days before departure"
 msgstr ""
 
@@ -25475,9 +25476,9 @@ msgstr ""
 msgid "Send reset-password email (recommended)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6085
+# Source: resources/js/pages/Settings.tsx:6127
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5031
+#: assets/dist/js/Settings-CU7EUfsS.js:5069
 msgid "Send review reminder email this many days after trip completion"
 msgstr ""
 
@@ -25512,7 +25513,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4466
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3591
+#: assets/dist/js/Settings-CU7EUfsS.js:3591
 msgid "Send the scheduled payment reminder email this many days before the due date (0 to disable reminders)."
 msgstr ""
 
@@ -25586,16 +25587,16 @@ msgstr ""
 msgid "Sent before an installment or gateway-scheduled charge when Scheduled payments is enabled in settings."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8857
+# Source: resources/js/pages/Settings.tsx:8899
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7527
+#: assets/dist/js/Settings-CU7EUfsS.js:7565
 msgid "Sent periodically while enabled. Learn more: "
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8886
+# Source: resources/js/pages/Settings.tsx:8928
 #: assets/admin/dist/js/app.js
 #: app/Controllers/UsageTrackingController.php:156
-#: assets/dist/js/Settings-WStf1Cfq.js:7562
+#: assets/dist/js/Settings-CU7EUfsS.js:7600
 msgid "Sent successfully."
 msgstr ""
 
@@ -25735,9 +25736,9 @@ msgstr ""
 msgid "Sequences"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7585
+# Source: resources/js/pages/Settings.tsx:7627
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6367
+#: assets/dist/js/Settings-CU7EUfsS.js:6405
 msgid "Server-side (Measurement Protocol)"
 msgstr ""
 
@@ -25913,13 +25914,13 @@ msgstr ""
 msgid "Sets the role to \"%1$s\" on %2$d member(s). Existing per-user grants and scopes are preserved. The last team administrator cannot be demoted — failures are reported per-id."
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:686, resources/js/components/dashboard/QuickActions.tsx:61, resources/js/pages/AbandonedRecovery.tsx:933, resources/js/pages/DynamicPricing.tsx:398, resources/js/pages/Modules.tsx:633, resources/js/pages/Modules.tsx:647, resources/js/pages/Settings.tsx:8987, resources/js/pages/Settings.tsx:9056, resources/js/pages/Team.tsx:206, resources/js/pages/TripConsentForm.tsx:916
+# Source: resources/js/components/Layout.tsx:686, resources/js/components/dashboard/QuickActions.tsx:61, resources/js/pages/AbandonedRecovery.tsx:933, resources/js/pages/DynamicPricing.tsx:398, resources/js/pages/Modules.tsx:633, resources/js/pages/Modules.tsx:647, resources/js/pages/Settings.tsx:9029, resources/js/pages/Settings.tsx:9098, resources/js/pages/Team.tsx:206, resources/js/pages/TripConsentForm.tsx:916
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:4680
 #: assets/admin/dist/js/app.js:66595
 #: assets/admin/dist/js/app.js:66613
-#: assets/dist/js/Settings-WStf1Cfq.js:7631
-#: assets/dist/js/Settings-WStf1Cfq.js:7678
+#: assets/dist/js/Settings-CU7EUfsS.js:7669
+#: assets/dist/js/Settings-CU7EUfsS.js:7716
 #: assets/dist/js/Team-Dm30DLtU.js:179
 msgid "Settings"
 msgstr ""
@@ -25933,13 +25934,13 @@ msgstr ""
 
 # Source: resources/js/pages/AbandonedRecovery.tsx:514, resources/js/pages/DynamicPricing.tsx:139, resources/js/pages/Settings.tsx:3510
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2630
+#: assets/dist/js/Settings-CU7EUfsS.js:2630
 msgid "Settings saved successfully"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8912
+# Source: resources/js/pages/Settings.tsx:8954
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7584
+#: assets/dist/js/Settings-CU7EUfsS.js:7622
 msgid "Settings section coming soon"
 msgstr ""
 
@@ -25960,9 +25961,9 @@ msgstr ""
 msgid "Setup guide"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8766
+# Source: resources/js/pages/Settings.tsx:8808
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7440
+#: assets/dist/js/Settings-CU7EUfsS.js:7478
 msgid "Share non-sensitive technical details so we can make Yatra better. You can turn this off anytime. See what we collect on our site:"
 msgstr ""
 
@@ -26000,15 +26001,15 @@ msgstr ""
 msgid "Short description shown in the template list"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8233
+# Source: resources/js/pages/Settings.tsx:8275
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6977
+#: assets/dist/js/Settings-CU7EUfsS.js:7015
 msgid "Shortcode Required"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3575
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2676
+#: assets/dist/js/Settings-CU7EUfsS.js:2676
 msgid "Shortcode added successfully"
 msgstr ""
 
@@ -26044,9 +26045,9 @@ msgstr ""
 msgid "Show Urgency Messages"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5560
+# Source: resources/js/pages/Settings.tsx:5602
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4535
+#: assets/dist/js/Settings-CU7EUfsS.js:4573
 msgid "Show available dates as a dropdown"
 msgstr ""
 
@@ -26074,9 +26075,9 @@ msgstr ""
 msgid "Show on Frontend"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7779
+# Source: resources/js/pages/Settings.tsx:7821
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6531
+#: assets/dist/js/Settings-CU7EUfsS.js:6569
 msgid "Show secret"
 msgstr ""
 
@@ -26130,9 +26131,9 @@ msgstr ""
 msgid "Shows a “Featured” badge on Trip Category blocks and the [yatra_trip_category] shortcode cards."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5904
+# Source: resources/js/pages/Settings.tsx:5946
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4831
+#: assets/dist/js/Settings-CU7EUfsS.js:4869
 msgid "Shows the heart control on trip cards and single trips, and the Saved Trips area in the customer account. Requires Yatra Pro."
 msgstr ""
 
@@ -26154,15 +26155,15 @@ msgstr ""
 msgid "Sidebar text"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7380
+# Source: resources/js/pages/Settings.tsx:7422
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6175
+#: assets/dist/js/Settings-CU7EUfsS.js:6213
 msgid "Sign in and select the property you want to track this site with (or create one: Admin → Create → Property → choose your business details)."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7678
+# Source: resources/js/pages/Settings.tsx:7720
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6451
+#: assets/dist/js/Settings-CU7EUfsS.js:6489
 msgid "Sign in and select the same property you used for the Measurement ID above."
 msgstr ""
 
@@ -26299,7 +26300,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4392
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3505
+#: assets/dist/js/Settings-CU7EUfsS.js:3505
 msgid "Single balance payment"
 msgstr ""
 
@@ -26328,7 +26329,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4380
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3493
+#: assets/dist/js/Settings-CU7EUfsS.js:3493
 msgid "Single final charge on a date, or multiple installments."
 msgstr ""
 
@@ -26345,15 +26346,15 @@ msgstr ""
 msgid "Single-Day Trip"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7886
+# Source: resources/js/pages/Settings.tsx:7928
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6620
+#: assets/dist/js/Settings-CU7EUfsS.js:6658
 msgid "Site Key"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8297
+# Source: resources/js/pages/Settings.tsx:8339
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7046
+#: assets/dist/js/Settings-CU7EUfsS.js:7084
 msgid "Skip for now"
 msgstr ""
 
@@ -26511,7 +26512,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4444
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3566
+#: assets/dist/js/Settings-CU7EUfsS.js:3566
 msgid "Spacing between installment charges when using multiple installments."
 msgstr ""
 
@@ -26624,21 +26625,21 @@ msgstr ""
 msgid "Standard liability waiver and consent form for trip participants"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6074
+# Source: resources/js/pages/Settings.tsx:6116
 #: assets/admin/dist/js/app.js
 #: app/Services/TripListingService.php:696
-#: assets/dist/js/Settings-WStf1Cfq.js:5003
+#: assets/dist/js/Settings-CU7EUfsS.js:5041
 msgid "Star"
 msgid_plural "Stars"
 msgstr[0] ""
 msgstr[1] ""
 
-# Source: resources/js/pages/Settings.tsx:6075, resources/js/pages/Settings.tsx:6076, resources/js/pages/Settings.tsx:6077, resources/js/pages/Settings.tsx:6078
+# Source: resources/js/pages/Settings.tsx:6117, resources/js/pages/Settings.tsx:6118, resources/js/pages/Settings.tsx:6119, resources/js/pages/Settings.tsx:6120
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5007
-#: assets/dist/js/Settings-WStf1Cfq.js:5011
-#: assets/dist/js/Settings-WStf1Cfq.js:5015
-#: assets/dist/js/Settings-WStf1Cfq.js:5019
+#: assets/dist/js/Settings-CU7EUfsS.js:5045
+#: assets/dist/js/Settings-CU7EUfsS.js:5049
+#: assets/dist/js/Settings-CU7EUfsS.js:5053
+#: assets/dist/js/Settings-CU7EUfsS.js:5057
 msgid "Stars"
 msgstr ""
 
@@ -26746,14 +26747,14 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3873
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2955
+#: assets/dist/js/Settings-CU7EUfsS.js:2955
 msgid "State or Province"
 msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:557, resources/js/pages/Settings.tsx:3866
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:43381
-#: assets/dist/js/Settings-WStf1Cfq.js:2947
+#: assets/dist/js/Settings-CU7EUfsS.js:2947
 msgid "State/Province"
 msgstr ""
 
@@ -26966,9 +26967,9 @@ msgstr ""
 msgid "Stored value (optional)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8691
+# Source: resources/js/pages/Settings.tsx:8733
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7380
+#: assets/dist/js/Settings-CU7EUfsS.js:7418
 msgid "Stores frequently used data for faster loads. Stays off while WP_DEBUG or Debug mode (above) is on."
 msgstr ""
 
@@ -26986,13 +26987,13 @@ msgstr ""
 # Source: resources/js/pages/CustomerForm.tsx:518, resources/js/pages/Settings.tsx:3841
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:43340
-#: assets/dist/js/Settings-WStf1Cfq.js:2918
+#: assets/dist/js/Settings-CU7EUfsS.js:2918
 msgid "Street Address"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3842
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2919
+#: assets/dist/js/Settings-CU7EUfsS.js:2919
 msgid "Street address of your company"
 msgstr ""
 
@@ -27199,7 +27200,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:595
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:480
+#: assets/dist/js/Settings-CU7EUfsS.js:480
 msgid "Sync Now"
 msgstr ""
 
@@ -27264,9 +27265,9 @@ msgstr ""
 msgid "Sync now"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6600
+# Source: resources/js/pages/Settings.tsx:6642
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5519
+#: assets/dist/js/Settings-CU7EUfsS.js:5557
 msgid "Sync on Booking"
 msgstr ""
 
@@ -27400,7 +27401,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4544
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3671
+#: assets/dist/js/Settings-CU7EUfsS.js:3671
 msgid "TEST"
 msgstr ""
 
@@ -27453,8 +27454,8 @@ msgstr ""
 #: templates/partials/pricing-summary.php:309
 #: assets/dist/js/account-page.js:1298
 #: assets/dist/js/BookingForm-CP7wussJ.js:1229
-#: assets/dist/js/Settings-WStf1Cfq.js:1858
-#: assets/dist/js/Settings-WStf1Cfq.js:2815
+#: assets/dist/js/Settings-CU7EUfsS.js:1858
+#: assets/dist/js/Settings-CU7EUfsS.js:2815
 #: assets/dist/js/ViewBooking-U9wDb7nz.js:412
 #: assets/dist/js/ViewBooking-U9wDb7nz.js:543
 msgid "Tax"
@@ -27469,22 +27470,22 @@ msgstr ""
 msgid "Tax Incl."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6247
+# Source: resources/js/pages/Settings.tsx:6289
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5183
+#: assets/dist/js/Settings-CU7EUfsS.js:5221
 msgid "Tax Inclusive Pricing"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6250
+# Source: resources/js/pages/Settings.tsx:6292
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5186
+#: assets/dist/js/Settings-CU7EUfsS.js:5224
 msgid "Tax is included in displayed prices"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:150, resources/js/pages/Settings.tsx:6157
+# Source: resources/js/pages/Settings.tsx:150, resources/js/pages/Settings.tsx:6199
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:61
-#: assets/dist/js/Settings-WStf1Cfq.js:5105
+#: assets/dist/js/Settings-CU7EUfsS.js:61
+#: assets/dist/js/Settings-CU7EUfsS.js:5143
 msgid "Tax name (e.g., VAT, GST)"
 msgstr ""
 
@@ -27495,10 +27496,10 @@ msgstr ""
 msgid "Taxable Amount"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6135
+# Source: resources/js/pages/Settings.tsx:6177
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/ai-chat-widget.php:550
-#: assets/dist/js/Settings-WStf1Cfq.js:5082
+#: assets/dist/js/Settings-CU7EUfsS.js:5120
 msgid "Taxes"
 msgstr ""
 
@@ -27691,9 +27692,9 @@ msgstr ""
 msgid "Templates: Abandoned booking recovery (First / Second / Final)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8714
+# Source: resources/js/pages/Settings.tsx:8756
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7395
+#: assets/dist/js/Settings-CU7EUfsS.js:7433
 msgid "Terms & Conditions page"
 msgstr ""
 
@@ -27710,7 +27711,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4533
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3663
+#: assets/dist/js/Settings-CU7EUfsS.js:3663
 msgid "Test Mode"
 msgstr ""
 
@@ -27740,7 +27741,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:537
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:411
+#: assets/dist/js/Settings-CU7EUfsS.js:411
 msgid "The ID of the Google Calendar to sync events to. Use \"primary\" for your main calendar, or enter a specific calendar ID."
 msgstr ""
 
@@ -27815,9 +27816,9 @@ msgstr ""
 msgid "The name of this traveler category (e.g., Adult, Child, Senior, Student)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8237
+# Source: resources/js/pages/Settings.tsx:8279
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6980
+#: assets/dist/js/Settings-CU7EUfsS.js:7018
 msgid "The page"
 msgstr ""
 
@@ -27886,9 +27887,9 @@ msgstr ""
 msgid "These exhausted automatic retries. Group by endpoint or error pattern below and bulk-replay once the downstream issue is fixed."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5952
+# Source: resources/js/pages/Settings.tsx:5994
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4870
+#: assets/dist/js/Settings-CU7EUfsS.js:4908
 msgid "These options apply to trip review forms on the frontend (who may review, moderation, minimum stars, and reminder scheduling)."
 msgstr ""
 
@@ -27995,7 +27996,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4715
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3796
+#: assets/dist/js/Settings-CU7EUfsS.js:3796
 msgid "This is an offline payment method. Customers will be shown these details after booking."
 msgstr ""
 
@@ -28096,9 +28097,9 @@ msgstr ""
 msgid "This setting doesn't apply yet — it kicks in only if you turn the module off."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5689
+# Source: resources/js/pages/Settings.tsx:5731
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4622
+#: assets/dist/js/Settings-CU7EUfsS.js:4660
 msgid "This setting only applies when BOTH modules below are enabled. Without both, bookings calculate exactly as they do today (no stacking control)."
 msgstr ""
 
@@ -28197,10 +28198,10 @@ msgstr ""
 msgid "This year"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6336
+# Source: resources/js/pages/Settings.tsx:6378
 #: assets/admin/dist/js/app.js
 #: templates/setup-wizard/currency.php:80
-#: assets/dist/js/Settings-WStf1Cfq.js:5272
+#: assets/dist/js/Settings-CU7EUfsS.js:5310
 msgid "Thousand Separator"
 msgstr ""
 
@@ -28229,7 +28230,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4074
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3188
+#: assets/dist/js/Settings-CU7EUfsS.js:3188
 msgid "Time Format"
 msgstr ""
 
@@ -28290,7 +28291,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3929
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3024
+#: assets/dist/js/Settings-CU7EUfsS.js:3024
 msgid "Timezone"
 msgstr ""
 
@@ -28320,7 +28321,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4772
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3848
+#: assets/dist/js/Settings-CU7EUfsS.js:3848
 msgid "Title displayed on the booking page"
 msgstr ""
 
@@ -28587,9 +28588,9 @@ msgstr ""
 msgid "Total Spent"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6223
+# Source: resources/js/pages/Settings.tsx:6265
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5157
+#: assets/dist/js/Settings-CU7EUfsS.js:5195
 msgid "Total Tax Rate:"
 msgstr ""
 
@@ -28643,7 +28644,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4425
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3542
+#: assets/dist/js/Settings-CU7EUfsS.js:3542
 msgid "Total installments including the scheduled balance (Stripe subscription schedule)."
 msgstr ""
 
@@ -28659,21 +28660,21 @@ msgstr ""
 msgid "Total value of confirmed bookings — the gross revenue you're entitled to. Not yet net of cancellations or refunds."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7011
+# Source: resources/js/pages/Settings.tsx:7053
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5865
+#: assets/dist/js/Settings-CU7EUfsS.js:5903
 msgid "Track InitiateCheckout"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7028
+# Source: resources/js/pages/Settings.tsx:7070
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5886
+#: assets/dist/js/Settings-CU7EUfsS.js:5924
 msgid "Track Purchase"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6994
+# Source: resources/js/pages/Settings.tsx:7036
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5844
+#: assets/dist/js/Settings-CU7EUfsS.js:5882
 msgid "Track ViewContent"
 msgstr ""
 
@@ -28682,9 +28683,9 @@ msgstr ""
 msgid "Track and recover abandoned bookings with automated email campaigns"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6824
+# Source: resources/js/pages/Settings.tsx:6866
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5704
+#: assets/dist/js/Settings-CU7EUfsS.js:5742
 msgid "Track booking conversions with Facebook Pixel. Retarget visitors who viewed trips and optimize ad campaigns with accurate conversion data."
 msgstr ""
 
@@ -28949,7 +28950,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1195
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:656
+#: assets/dist/js/Settings-CU7EUfsS.js:656
 msgid "Traveler Form"
 msgstr ""
 
@@ -29046,9 +29047,9 @@ msgstr ""
 msgid "Travelers for"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7661
+# Source: resources/js/pages/Settings.tsx:7703
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6440
+#: assets/dist/js/Settings-CU7EUfsS.js:6478
 msgid "Treat this like a password — anyone with it can send fake events to your GA4 property. Restrict who can view Yatra settings."
 msgstr ""
 
@@ -29141,33 +29142,33 @@ msgid_plural "Trips"
 msgstr[0] ""
 msgstr[1] ""
 
-# Source: resources/js/pages/Settings.tsx:8387
+# Source: resources/js/pages/Settings.tsx:8429
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7120
+#: assets/dist/js/Settings-CU7EUfsS.js:7158
 msgid "Trip Archive Meta Description"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8417
+# Source: resources/js/pages/Settings.tsx:8459
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7150
+#: assets/dist/js/Settings-CU7EUfsS.js:7188
 msgid "Trip Archive Meta Keywords"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8360
+# Source: resources/js/pages/Settings.tsx:8402
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7093
+#: assets/dist/js/Settings-CU7EUfsS.js:7131
 msgid "Trip Archive Meta Title"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8444
+# Source: resources/js/pages/Settings.tsx:8486
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7177
+#: assets/dist/js/Settings-CU7EUfsS.js:7215
 msgid "Trip Archive SEO Image"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8349
+# Source: resources/js/pages/Settings.tsx:8391
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7083
+#: assets/dist/js/Settings-CU7EUfsS.js:7121
 msgid "Trip Archive SEO Settings"
 msgstr ""
 
@@ -29176,9 +29177,9 @@ msgstr ""
 msgid "Trip Assignment"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7956
+# Source: resources/js/pages/Settings.tsx:7998
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6683
+#: assets/dist/js/Settings-CU7EUfsS.js:6721
 msgid "Trip Base"
 msgstr ""
 
@@ -29208,9 +29209,9 @@ msgstr ""
 msgid "Trip Categories"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8068
+# Source: resources/js/pages/Settings.tsx:8110
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6822
+#: assets/dist/js/Settings-CU7EUfsS.js:6860
 msgid "Trip Category Base"
 msgstr ""
 
@@ -29422,9 +29423,9 @@ msgstr ""
 msgid "Trip description"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7499
+# Source: resources/js/pages/Settings.tsx:7541
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6276
+#: assets/dist/js/Settings-CU7EUfsS.js:6314
 msgid "Trip detail pages (recommended for remarketing)."
 msgstr ""
 
@@ -29753,39 +29754,39 @@ msgstr ""
 msgid "URL copied to clipboard"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5850
+# Source: resources/js/pages/Settings.tsx:5892
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4770
+#: assets/dist/js/Settings-CU7EUfsS.js:4808
 msgid "URL path segment for the account area (e.g. my-account → /my-account/dashboard). Must match your frontend routes."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8033
+# Source: resources/js/pages/Settings.tsx:8075
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6778
+#: assets/dist/js/Settings-CU7EUfsS.js:6816
 msgid "URL slug for activity archive pages (e.g., \"activity\" will create URLs like /activity/trekking)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7993
+# Source: resources/js/pages/Settings.tsx:8035
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6729
+#: assets/dist/js/Settings-CU7EUfsS.js:6767
 msgid "URL slug for destination archive pages (e.g., \"destination\" will create URLs like /destination/nepal)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8123
+# Source: resources/js/pages/Settings.tsx:8165
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6880
+#: assets/dist/js/Settings-CU7EUfsS.js:6918
 msgid "URL slug for the booking page (e.g., \"book\" will create URLs like /book/trip-name)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8069
+# Source: resources/js/pages/Settings.tsx:8111
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6823
+#: assets/dist/js/Settings-CU7EUfsS.js:6861
 msgid "URL slug for trip category archive pages (e.g., \"trip-category\" will create URLs like /trip-category/adventure)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7957
+# Source: resources/js/pages/Settings.tsx:7999
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6684
+#: assets/dist/js/Settings-CU7EUfsS.js:6722
 msgid "URL slug for trip single pages (e.g., \"trip\" will create URLs like /trip/everest-base-camp)"
 msgstr ""
 
@@ -30336,9 +30337,9 @@ msgstr ""
 msgid "Upload Image"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8563
+# Source: resources/js/pages/Settings.tsx:8605
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7258
+#: assets/dist/js/Settings-CU7EUfsS.js:7296
 msgid "Upload an image that will appear when your trip archive page is shared on social media. Recommended size: 1200x630 pixels."
 msgstr ""
 
@@ -30388,9 +30389,9 @@ msgstr ""
 msgid "Usage limit must be a positive number or 0 for unlimited"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7045
+# Source: resources/js/pages/Settings.tsx:7087
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5907
+#: assets/dist/js/Settings-CU7EUfsS.js:5945
 msgid "Use Conversions API"
 msgstr ""
 
@@ -30418,7 +30419,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3955
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3048
+#: assets/dist/js/Settings-CU7EUfsS.js:3048
 msgid "Use WordPress site timezone"
 msgstr ""
 
@@ -30480,11 +30481,11 @@ msgstr ""
 msgid "Use this file"
 msgstr ""
 
-# Source: resources/js/components/ui/icon-picker.tsx:112, resources/js/pages/Settings.tsx:8520, resources/js/pages/Settings.tsx:8575, resources/js/pages/TripForm.tsx:4341, resources/js/pages/WhiteLabel.tsx:498
+# Source: resources/js/components/ui/icon-picker.tsx:112, resources/js/pages/Settings.tsx:8562, resources/js/pages/Settings.tsx:8617, resources/js/pages/TripForm.tsx:4341, resources/js/pages/WhiteLabel.tsx:498
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:32344
-#: assets/dist/js/Settings-WStf1Cfq.js:7231
-#: assets/dist/js/Settings-WStf1Cfq.js:7270
+#: assets/dist/js/Settings-CU7EUfsS.js:7269
+#: assets/dist/js/Settings-CU7EUfsS.js:7308
 #: assets/dist/js/WhiteLabel-BGHzZX3U.js:272
 msgid "Use this image"
 msgstr ""
@@ -30495,9 +30496,9 @@ msgstr ""
 msgid "Use this reply"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7351
+# Source: resources/js/pages/Settings.tsx:7393
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6153
+#: assets/dist/js/Settings-CU7EUfsS.js:6191
 msgid "Use your GA4 web data stream Measurement ID (format G-XXXXXXXXXX). Find it under Admin → Data streams → your stream."
 msgstr ""
 
@@ -30526,7 +30527,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3930
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3025
+#: assets/dist/js/Settings-CU7EUfsS.js:3025
 msgid "Used for booking logic, emails, and date display. Search the full IANA list (same identifiers PHP uses)."
 msgstr ""
 
@@ -30596,9 +30597,9 @@ msgstr ""
 msgid "Utilization Rate"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6257
+# Source: resources/js/pages/Settings.tsx:6299
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5193
+#: assets/dist/js/Settings-CU7EUfsS.js:5231
 msgid "VAT Number"
 msgstr ""
 
@@ -30626,29 +30627,29 @@ msgstr ""
 msgid "Valid booking ID is required"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6513, resources/js/pages/Settings.tsx:6943, resources/js/pages/Settings.tsx:7203, resources/js/pages/Settings.tsx:7449, resources/js/pages/Settings.tsx:7748
+# Source: resources/js/pages/Settings.tsx:6555, resources/js/pages/Settings.tsx:6985, resources/js/pages/Settings.tsx:7245, resources/js/pages/Settings.tsx:7491, resources/js/pages/Settings.tsx:7790
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5447
-#: assets/dist/js/Settings-WStf1Cfq.js:5799
-#: assets/dist/js/Settings-WStf1Cfq.js:6026
-#: assets/dist/js/Settings-WStf1Cfq.js:6226
-#: assets/dist/js/Settings-WStf1Cfq.js:6502
+#: assets/dist/js/Settings-CU7EUfsS.js:5485
+#: assets/dist/js/Settings-CU7EUfsS.js:5837
+#: assets/dist/js/Settings-CU7EUfsS.js:6064
+#: assets/dist/js/Settings-CU7EUfsS.js:6264
+#: assets/dist/js/Settings-CU7EUfsS.js:6540
 msgid "Validate"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6508, resources/js/pages/Settings.tsx:6938, resources/js/pages/Settings.tsx:7198, resources/js/pages/Settings.tsx:7444, resources/js/pages/Settings.tsx:7743
+# Source: resources/js/pages/Settings.tsx:6550, resources/js/pages/Settings.tsx:6980, resources/js/pages/Settings.tsx:7240, resources/js/pages/Settings.tsx:7486, resources/js/pages/Settings.tsx:7785
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5444
-#: assets/dist/js/Settings-WStf1Cfq.js:5796
-#: assets/dist/js/Settings-WStf1Cfq.js:6023
-#: assets/dist/js/Settings-WStf1Cfq.js:6223
-#: assets/dist/js/Settings-WStf1Cfq.js:6499
+#: assets/dist/js/Settings-CU7EUfsS.js:5482
+#: assets/dist/js/Settings-CU7EUfsS.js:5834
+#: assets/dist/js/Settings-CU7EUfsS.js:6061
+#: assets/dist/js/Settings-CU7EUfsS.js:6261
+#: assets/dist/js/Settings-CU7EUfsS.js:6537
 msgid "Validating..."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7638
+# Source: resources/js/pages/Settings.tsx:7680
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6419
+#: assets/dist/js/Settings-CU7EUfsS.js:6457
 msgid "Validation mode (debug endpoint)"
 msgstr ""
 
@@ -30756,7 +30757,7 @@ msgstr ""
 msgid "Video URL"
 msgstr ""
 
-# Source: resources/js/components/availability/AvailabilityCalendar.tsx:467, resources/js/components/dashboard/PendingPayments.tsx:133, resources/js/pages/Activities.tsx:1024, resources/js/pages/Bookings.tsx:679, resources/js/pages/Customers.tsx:586, resources/js/pages/Departures.tsx:938, resources/js/pages/Destinations.tsx:855, resources/js/pages/Enquiries.tsx:262, resources/js/pages/Payments.tsx:600, resources/js/pages/Reviews.tsx:398, resources/js/pages/Settings.tsx:7984, resources/js/pages/Settings.tsx:8024, resources/js/pages/Settings.tsx:8060, resources/js/pages/Settings.tsx:8100, resources/js/pages/Settings.tsx:8152, resources/js/pages/TripForm.tsx:7086, resources/js/pages/ViewCustomer.tsx:648, resources/js/pages/account/Support.tsx:262
+# Source: resources/js/components/availability/AvailabilityCalendar.tsx:467, resources/js/components/dashboard/PendingPayments.tsx:133, resources/js/pages/Activities.tsx:1024, resources/js/pages/Bookings.tsx:679, resources/js/pages/Customers.tsx:586, resources/js/pages/Departures.tsx:938, resources/js/pages/Destinations.tsx:855, resources/js/pages/Enquiries.tsx:262, resources/js/pages/Payments.tsx:600, resources/js/pages/Reviews.tsx:398, resources/js/pages/Settings.tsx:8026, resources/js/pages/Settings.tsx:8066, resources/js/pages/Settings.tsx:8102, resources/js/pages/Settings.tsx:8142, resources/js/pages/Settings.tsx:8194, resources/js/pages/TripForm.tsx:7086, resources/js/pages/ViewCustomer.tsx:648, resources/js/pages/account/Support.tsx:262
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:26306
 #: assets/admin/dist/js/app.js:32041
@@ -30767,11 +30768,11 @@ msgstr ""
 #: assets/admin/dist/js/app.js:59997
 #: assets/admin/dist/js/app.js:62961
 #: assets/admin/dist/js/app.js:64724
-#: assets/dist/js/Settings-WStf1Cfq.js:6716
-#: assets/dist/js/Settings-WStf1Cfq.js:6765
-#: assets/dist/js/Settings-WStf1Cfq.js:6810
-#: assets/dist/js/Settings-WStf1Cfq.js:6859
-#: assets/dist/js/Settings-WStf1Cfq.js:6913
+#: assets/dist/js/Settings-CU7EUfsS.js:6754
+#: assets/dist/js/Settings-CU7EUfsS.js:6803
+#: assets/dist/js/Settings-CU7EUfsS.js:6848
+#: assets/dist/js/Settings-CU7EUfsS.js:6897
+#: assets/dist/js/Settings-CU7EUfsS.js:6951
 msgid "View"
 msgstr ""
 
@@ -30841,9 +30842,9 @@ msgstr ""
 msgid "View Documentation"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5879
+# Source: resources/js/pages/Settings.tsx:5921
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4801
+#: assets/dist/js/Settings-CU7EUfsS.js:4839
 msgid "View Page"
 msgstr ""
 
@@ -30964,9 +30965,9 @@ msgstr ""
 msgid "View email template"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7265
+# Source: resources/js/pages/Settings.tsx:7307
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6078
+#: assets/dist/js/Settings-CU7EUfsS.js:6116
 msgid "View event statistics and activity in the "
 msgstr ""
 
@@ -30975,9 +30976,9 @@ msgstr ""
 msgid "View file"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7496
+# Source: resources/js/pages/Settings.tsx:7538
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6273
+#: assets/dist/js/Settings-CU7EUfsS.js:6311
 msgid "View item"
 msgstr ""
 
@@ -31158,7 +31159,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3908, resources/js/pages/WhiteLabel.tsx:964
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3001
+#: assets/dist/js/Settings-CU7EUfsS.js:3001
 #: assets/dist/js/WhiteLabel-BGHzZX3U.js:620
 msgid "Website URL"
 msgstr ""
@@ -31241,9 +31242,9 @@ msgstr ""
 msgid "What This Module Does"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5778
+# Source: resources/js/pages/Settings.tsx:5820
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4698
+#: assets/dist/js/Settings-CU7EUfsS.js:4736
 msgid "What each mode does:"
 msgstr ""
 
@@ -31276,11 +31277,11 @@ msgstr ""
 msgid "What type of pricing rule do you want to create?"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8776, resources/js/pages/Settings.tsx:8867
+# Source: resources/js/pages/Settings.tsx:8818, resources/js/pages/Settings.tsx:8909
 #: assets/admin/dist/js/app.js
 #: templates/setup-wizard/welcome.php:66
-#: assets/dist/js/Settings-WStf1Cfq.js:7453
-#: assets/dist/js/Settings-WStf1Cfq.js:7539
+#: assets/dist/js/Settings-CU7EUfsS.js:7491
+#: assets/dist/js/Settings-CU7EUfsS.js:7577
 msgid "What we collect"
 msgstr ""
 
@@ -31361,27 +31362,27 @@ msgstr ""
 msgid "When"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7547
+# Source: resources/js/pages/Settings.tsx:7589
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6330
+#: assets/dist/js/Settings-CU7EUfsS.js:6368
 msgid "When a booking is created (checkout started)."
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4367
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3481
+#: assets/dist/js/Settings-CU7EUfsS.js:3481
 msgid "When a booking still has an amount due after checkout, create gateway-side schedules using the rules below."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5532
+# Source: resources/js/pages/Settings.tsx:5574
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4509
+#: assets/dist/js/Settings-CU7EUfsS.js:4547
 msgid "When a spot opens, move the next waitlisted booking to confirmed; otherwise it becomes pending for staff review."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7523
+# Source: resources/js/pages/Settings.tsx:7565
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6303
+#: assets/dist/js/Settings-CU7EUfsS.js:6341
 msgid "When a trip is added to the booking session / checkout."
 msgstr ""
 
@@ -31442,9 +31443,9 @@ msgstr ""
 msgid "When off, this mapping won't push inventory or pricing, and bookings received for it are still ingested (so cancellations of pre-existing bookings keep working)."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7571
+# Source: resources/js/pages/Settings.tsx:7613
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6357
+#: assets/dist/js/Settings-CU7EUfsS.js:6395
 msgid "When payment completes (and on confirmation page)."
 msgstr ""
 
@@ -31513,9 +31514,9 @@ msgstr ""
 msgid "Where the journey concludes"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6314
+# Source: resources/js/pages/Settings.tsx:6356
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5247
+#: assets/dist/js/Settings-CU7EUfsS.js:5285
 msgid "Where to display currency symbol relative to amount"
 msgstr ""
 
@@ -31590,7 +31591,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1617
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:1002
+#: assets/dist/js/Settings-CU7EUfsS.js:1002
 msgid "Width"
 msgstr ""
 
@@ -31606,9 +31607,9 @@ msgstr ""
 msgid "Will be generated when you save settings for the first time."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5913
+# Source: resources/js/pages/Settings.tsx:5955
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4836
+#: assets/dist/js/Settings-CU7EUfsS.js:4874
 msgid "Wishlist / saved trips are a Yatra Pro feature. Install Yatra Pro to enable them and turn them on in Customer settings."
 msgstr ""
 
@@ -31643,9 +31644,9 @@ msgstr ""
 msgid "Working…"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8246
+# Source: resources/js/pages/Settings.tsx:8288
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6994
+#: assets/dist/js/Settings-CU7EUfsS.js:7032
 msgid "Would you like to add it automatically, or edit the page manually to place it where you want?"
 msgstr ""
 
@@ -31802,15 +31803,15 @@ msgstr ""
 msgid "You've opted in to preserve team access when the module is disabled. Turning off Team & Access in Yatra → Modules will pause its advanced features (expiry, scopes, audit log) but your team members keep their roles and current access. You can change this in Settings."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6850
+# Source: resources/js/pages/Settings.tsx:6892
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5727
+#: assets/dist/js/Settings-CU7EUfsS.js:5765
 msgid "Your Facebook Pixel ID (e.g., 123456789012345)."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7363
+# Source: resources/js/pages/Settings.tsx:7405
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6164
+#: assets/dist/js/Settings-CU7EUfsS.js:6202
 msgid "Your GA4 web data stream Measurement ID (format G-XXXXXXXXXX). The Validate button checks the format only — confirm the stream is live in your GA4 Admin."
 msgstr ""
 
@@ -31819,9 +31820,9 @@ msgstr ""
 msgid "Your Google Calendar is connected and ready to sync"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6889
+# Source: resources/js/pages/Settings.tsx:6931
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5752
+#: assets/dist/js/Settings-CU7EUfsS.js:5790
 msgid "Your Pixel ID will be displayed (e.g., 123456789012345)"
 msgstr ""
 
@@ -31860,15 +31861,15 @@ msgstr ""
 msgid "Your Support Tickets"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6258
+# Source: resources/js/pages/Settings.tsx:6300
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5194
+#: assets/dist/js/Settings-CU7EUfsS.js:5232
 msgid "Your company VAT or tax identification number"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3909
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3002
+#: assets/dist/js/Settings-CU7EUfsS.js:3002
 msgid "Your company website address"
 msgstr ""
 
@@ -31913,15 +31914,15 @@ msgstr ""
 msgid "Your next adventures"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7901
+# Source: resources/js/pages/Settings.tsx:7943
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6639
+#: assets/dist/js/Settings-CU7EUfsS.js:6677
 msgid "Your reCAPTCHA secret key (keep this secure)"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7887
+# Source: resources/js/pages/Settings.tsx:7929
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6621
+#: assets/dist/js/Settings-CU7EUfsS.js:6659
 msgid "Your reCAPTCHA site key"
 msgstr ""
 
@@ -31945,7 +31946,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3792
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2857
+#: assets/dist/js/Settings-CU7EUfsS.js:2857
 msgid "Your travel agency or company name"
 msgstr ""
 
@@ -31957,13 +31958,13 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3901
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2991
+#: assets/dist/js/Settings-CU7EUfsS.js:2991
 msgid "ZIP Code"
 msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3894
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2983
+#: assets/dist/js/Settings-CU7EUfsS.js:2983
 msgid "ZIP/Postal Code"
 msgstr ""
 
@@ -31973,15 +31974,15 @@ msgstr ""
 msgid "Zapier — booking sync"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6832
+# Source: resources/js/pages/Settings.tsx:6874
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5712
+#: assets/dist/js/Settings-CU7EUfsS.js:5750
 msgid "access advanced conversion tracking features"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7332
+# Source: resources/js/pages/Settings.tsx:7374
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6141
+#: assets/dist/js/Settings-CU7EUfsS.js:6179
 msgid "access enhanced e-commerce tracking features"
 msgstr ""
 
@@ -32027,9 +32028,9 @@ msgstr ""
 msgid "and"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8167
+# Source: resources/js/pages/Settings.tsx:8209
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6927
+#: assets/dist/js/Settings-CU7EUfsS.js:6965
 msgid "append booking reference after checkout"
 msgstr ""
 
@@ -32052,9 +32053,9 @@ msgstr ""
 msgid "attributes"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:6445
+# Source: resources/js/pages/Settings.tsx:6487
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5382
+#: assets/dist/js/Settings-CU7EUfsS.js:5420
 msgid "automatically sync your customers"
 msgstr ""
 
@@ -32117,9 +32118,9 @@ msgstr ""
 msgid "by user #%d"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5791
+# Source: resources/js/pages/Settings.tsx:5833
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4711
+#: assets/dist/js/Settings-CU7EUfsS.js:4749
 msgid "calculates both scenarios and picks the cheaper one for the customer. Never combines."
 msgstr ""
 
@@ -32174,7 +32175,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3820
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:2890
+#: assets/dist/js/Settings-CU7EUfsS.js:2890
 msgid "company@example.com"
 msgstr ""
 
@@ -32222,7 +32223,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:1427
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:838
+#: assets/dist/js/Settings-CU7EUfsS.js:838
 msgid "customize your booking forms with drag-and-drop field builder"
 msgstr ""
 
@@ -32304,9 +32305,9 @@ msgstr ""
 msgid "default"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5783
+# Source: resources/js/pages/Settings.tsx:5825
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4703
+#: assets/dist/js/Settings-CU7EUfsS.js:4741
 msgid "default and matches the original behavior. A coupon stacks on top of the Dynamic Pricing-adjusted price."
 msgstr ""
 
@@ -32614,9 +32615,9 @@ msgstr ""
 msgid "e.g., Bali Beach Retreat - 7 Days"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8377
+# Source: resources/js/pages/Settings.tsx:8419
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7107
+#: assets/dist/js/Settings-CU7EUfsS.js:7145
 msgid "e.g., Browse All Trips - Find Your Perfect Adventure | Your Travel Agency"
 msgstr ""
 
@@ -32648,9 +32649,9 @@ msgstr ""
 msgid "e.g., Eiffel Tower, Central Park, Grand Canyon"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8406
+# Source: resources/js/pages/Settings.tsx:8448
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7136
+#: assets/dist/js/Settings-CU7EUfsS.js:7174
 msgid "e.g., Explore our complete collection of amazing trips and adventures. Find and book your perfect journey with us."
 msgstr ""
 
@@ -32825,9 +32826,9 @@ msgstr ""
 msgid "e.g., support@yoursite.com"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8434
+# Source: resources/js/pages/Settings.tsx:8476
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7164
+#: assets/dist/js/Settings-CU7EUfsS.js:7202
 msgid "e.g., travel, trips, adventure, booking, tours, destinations, holidays"
 msgstr ""
 
@@ -32922,7 +32923,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:3917
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3011
+#: assets/dist/js/Settings-CU7EUfsS.js:3011
 msgid "https://example.com"
 msgstr ""
 
@@ -32982,7 +32983,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:472
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:344
+#: assets/dist/js/Settings-CU7EUfsS.js:344
 msgid "is enabled."
 msgstr ""
 
@@ -33143,7 +33144,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4209
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3320
+#: assets/dist/js/Settings-CU7EUfsS.js:3320
 msgid "offer deposit and partial payment options to your customers"
 msgstr ""
 
@@ -33252,9 +33253,9 @@ msgstr ""
 msgid "promotion failed — check the error column"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7857
+# Source: resources/js/pages/Settings.tsx:7899
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6589
+#: assets/dist/js/Settings-CU7EUfsS.js:6627
 msgid "reCAPTCHA Settings"
 msgstr ""
 
@@ -33301,7 +33302,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4338
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:3451
+#: assets/dist/js/Settings-CU7EUfsS.js:3451
 msgid "schedule the remaining balance after partial or deposit payments"
 msgstr ""
 
@@ -33334,9 +33335,9 @@ msgstr ""
 msgid "services"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8243
+# Source: resources/js/pages/Settings.tsx:8285
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:6992
+#: assets/dist/js/Settings-CU7EUfsS.js:7030
 msgid "shortcode."
 msgstr ""
 
@@ -33463,15 +33464,15 @@ msgstr ""
 msgid "waiting for input"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5807
+# Source: resources/js/pages/Settings.tsx:5849
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4727
+#: assets/dist/js/Settings-CU7EUfsS.js:4765
 msgid "when a Dynamic Pricing rule reduced the price, discount codes and group discounts are ignored for that booking."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5799
+# Source: resources/js/pages/Settings.tsx:5841
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:4719
+#: assets/dist/js/Settings-CU7EUfsS.js:4757
 msgid "when a discount is valid, Dynamic Pricing is skipped for that booking."
 msgstr ""
 
@@ -33536,16 +33537,16 @@ msgstr ""
 msgid "— Default Yatra URL (no custom page) —"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:8723, resources/js/pages/Settings.tsx:8743
+# Source: resources/js/pages/Settings.tsx:8765, resources/js/pages/Settings.tsx:8785
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:7405
-#: assets/dist/js/Settings-WStf1Cfq.js:7422
+#: assets/dist/js/Settings-CU7EUfsS.js:7443
+#: assets/dist/js/Settings-CU7EUfsS.js:7460
 msgid "— Select —"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7137
+# Source: resources/js/pages/Settings.tsx:7179
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5970
+#: assets/dist/js/Settings-CU7EUfsS.js:6008
 msgid "⚠️ Keep your access token secure and never share it publicly."
 msgstr ""
 
@@ -33604,9 +33605,9 @@ msgstr ""
 msgid "💡 This is automatically created from your title. You usually don't need to change it unless you want a custom web address."
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:7128
+# Source: resources/js/pages/Settings.tsx:7170
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/Settings-WStf1Cfq.js:5963
+#: assets/dist/js/Settings-CU7EUfsS.js:6001
 msgid "💡 Tip:"
 msgstr ""
 
@@ -35897,37 +35898,61 @@ msgstr ""
 msgid "Get Client Secret from the same PayPal app you created"
 msgstr ""
 
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:75
+msgid "Webhook URL"
+msgstr ""
+
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:76
+msgid "Add this URL as a webhook in your PayPal app"
+msgstr ""
+
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:78
+msgid "In your PayPal app, add this as a webhook and subscribe to the \"Payment capture completed\" event. This is a reliable backup that confirms bookings even if the customer closes the browser after paying."
+msgstr ""
+
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:84
+msgid "Webhook ID"
+msgstr ""
+
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:85
+msgid "Webhook ID from your PayPal app"
+msgstr ""
+
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:88
+msgid "Paste the Webhook ID of the webhook you created above. This enables signed verification of incoming PayPal webhooks."
+msgstr ""
+
 #. translators: %s: booking reference.
-#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:158
-#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:229
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:178
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:249
 #, php-format
 msgid "Booking #%s"
 msgstr ""
 
-#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:212
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:232
 msgid "Failed to authenticate with PayPal. Please check your API credentials."
 msgstr ""
 
-#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:274
-#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:402
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:294
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:422
 msgid "Failed to create PayPal order"
 msgstr ""
 
-#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:293
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:313
 msgid "PayPal order created but redirect URL not found"
 msgstr ""
 
-#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:320
-#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:364
-#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:465
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:340
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:384
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:485
 msgid "Failed to authenticate with PayPal"
 msgstr ""
 
-#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:344
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:364
 msgid "Vault ID is required"
 msgstr ""
 
-#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:444
+#: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php:464
 msgid "Payment capture failed"
 msgstr ""
 

@@ -5132,6 +5132,48 @@ const Settings: React.FC = () => {
                                       );
                                     }
 
+                                    // Read-only display field (e.g. PayPal webhook URL): show the
+                                    // value with a Copy button; not editable, never saved.
+                                    if (field.readonly) {
+                                      const roValue = String(
+                                        config[field.id] ?? field.default ?? "",
+                                      );
+                                      return (
+                                        <div key={field.id} className="space-y-2">
+                                          <FormField
+                                            id={`${gatewayId}_${field.id}`}
+                                            label={field.label}
+                                            description={field.description}
+                                          >
+                                            <div className="flex items-center gap-2">
+                                              <Input
+                                                id={`${gatewayId}_${field.id}`}
+                                                value={roValue}
+                                                readOnly
+                                                className="bg-gray-50 dark:bg-gray-900 font-mono text-sm"
+                                              />
+                                              <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() =>
+                                                  navigator.clipboard.writeText(
+                                                    roValue,
+                                                  )
+                                                }
+                                              >
+                                                {__("Copy", "yatra")}
+                                              </Button>
+                                            </div>
+                                          </FormField>
+                                          {field.help_text && (
+                                            <p className="text-xs text-blue-600 dark:text-blue-400">
+                                              {field.help_text}
+                                            </p>
+                                          )}
+                                        </div>
+                                      );
+                                    }
+
                                     // Render text, password, number, email inputs
                                     return (
                                       <div key={field.id} className="space-y-2">

@@ -68,6 +68,26 @@ class PayPalGateway extends AbstractPaymentGateway
                 'help_text' => __('Get Client Secret from the same PayPal app you created', 'yatra'),
                 'show_when' => ['mode' => 'advanced'],
             ],
+            [
+                'id' => 'webhook_url',
+                'type' => 'text',
+                'readonly' => true,
+                'label' => __('Webhook URL', 'yatra'),
+                'description' => __('Add this URL as a webhook in your PayPal app', 'yatra'),
+                'default' => rest_url('yatra/v1/payment/webhook/paypal'),
+                'help_text' => __('In your PayPal app, add this as a webhook and subscribe to the "Payment capture completed" event. This is a reliable backup that confirms bookings even if the customer closes the browser after paying.', 'yatra'),
+                'show_when' => ['mode' => 'advanced'],
+            ],
+            [
+                'id' => 'webhook_id',
+                'type' => 'text',
+                'label' => __('Webhook ID', 'yatra'),
+                'description' => __('Webhook ID from your PayPal app', 'yatra'),
+                'placeholder' => 'WH-...',
+                'default' => '',
+                'help_text' => __('Paste the Webhook ID of the webhook you created above. This enables signed verification of incoming PayPal webhooks.', 'yatra'),
+                'show_when' => ['mode' => 'advanced'],
+            ],
         ];
     }
 
@@ -587,19 +607,97 @@ class PayPalGateway extends AbstractPaymentGateway
 
         switch ($eventType) {
             case 'PAYMENT.CAPTURE.COMPLETED':
-                do_action('yatra_paypal_payment_completed', $event['resource'] ?? []);
+                $resource = $event['resource'] ?? [];
+
+                // Only confirm from a webhook whose signature we can verify against
+                // the configured Webhook ID. Unverified events are ignored for
+                // confirmation (the return-capture path is authoritative); the
+                // informational action still fires for any custom listeners.
+                if ($this->verifyWebhookSignature($data['headers'] ?? [], $body, $event)) {
+                    $bookingId = (int) ($resource['custom_id'] ?? 0);
+                    $transactionId = (string) ($resource['id'] ?? '');
+                    if ($bookingId > 0 && $transactionId !== '') {
+                        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+                        $booking = $bookingRepository->find($bookingId);
+                        if ($booking) {
+                            $this->completePayment($booking, $bookingRepository, $transactionId, [
+                                'amount' => (float) ($resource['amount']['value'] ?? 0),
+                                'currency' => (string) ($resource['amount']['currency_code'] ?? 'USD'),
+                            ]);
+                        }
+                    }
+                } else {
+                    $this->log('PayPal webhook not verified — confirmation skipped (set Webhook ID to enable)', [
+                        'event_type' => $eventType,
+                    ]);
+                }
+
+                do_action('yatra_paypal_payment_completed', $resource);
                 break;
-                
+
             case 'PAYMENT.CAPTURE.REFUNDED':
                 do_action('yatra_paypal_payment_refunded', $event['resource'] ?? []);
                 break;
-                
+
             case 'VAULT.PAYMENT-TOKEN.CREATED':
                 do_action('yatra_paypal_token_created', $event['resource'] ?? []);
                 break;
         }
 
         return ['success' => true, 'event_type' => $eventType];
+    }
+
+    /**
+     * Verify an Advanced-mode REST webhook against the configured Webhook ID
+     * using PayPal's verify-webhook-signature API. Returns false when no
+     * Webhook ID is configured, so unverified events are never trusted.
+     */
+    private function verifyWebhookSignature(array $headers, string $rawBody, array $event): bool
+    {
+        $webhookId = trim((string) ($this->config['webhook_id'] ?? ''));
+        if ($webhookId === '') {
+            return false;
+        }
+
+        $accessToken = $this->getAccessToken();
+        if (!$accessToken) {
+            return false;
+        }
+
+        $header = static function (string $name) use ($headers): string {
+            // WP REST normalises header keys to lowercase, with dashes or underscores.
+            foreach ([$name, str_replace('-', '_', $name)] as $key) {
+                if (isset($headers[$key])) {
+                    return (string) (is_array($headers[$key]) ? ($headers[$key][0] ?? '') : $headers[$key]);
+                }
+            }
+            return '';
+        };
+
+        $payload = [
+            'auth_algo' => $header('paypal-auth-algo'),
+            'cert_url' => $header('paypal-cert-url'),
+            'transmission_id' => $header('paypal-transmission-id'),
+            'transmission_sig' => $header('paypal-transmission-sig'),
+            'transmission_time' => $header('paypal-transmission-time'),
+            'webhook_id' => $webhookId,
+            'webhook_event' => $event,
+        ];
+
+        if ($payload['transmission_id'] === '' || $payload['transmission_sig'] === '') {
+            return false;
+        }
+
+        $response = $this->makeRequest($this->getBaseUrl() . '/v1/notifications/verify-webhook-signature', [
+            'method' => 'POST',
+            'headers' => [
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type' => 'application/json',
+            ],
+            'body' => wp_json_encode($payload),
+        ]);
+
+        return ($response['body']['verification_status'] ?? '') === 'SUCCESS';
     }
     
     /**
@@ -644,22 +742,24 @@ class PayPalGateway extends AbstractPaymentGateway
         $currency = $ipnData['mc_currency'] ?? 'USD';
         
         if ($paymentStatus === 'Completed' && $bookingId > 0) {
-            // Fire action for payment completed
-            do_action('yatra_payment_completed', [
-                'booking_id' => $bookingId,
-                'transaction_id' => $transactionId,
-                'amount' => $amount,
-                'currency' => $currency,
-                'gateway' => 'paypal',
-                'mode' => 'simple',
-            ]);
-            
+            // Record the payment + confirm the booking. completePayment is
+            // idempotent (and fires `yatra_payment_completed` itself), so a
+            // re-sent IPN won't double-record.
+            $bookingRepository = new \Yatra\Repositories\BookingRepository();
+            $booking = $bookingRepository->find((int) $bookingId);
+            if ($booking) {
+                $this->completePayment($booking, $bookingRepository, $transactionId, [
+                    'amount' => $amount,
+                    'currency' => $currency,
+                ]);
+            }
+
             $this->log('PayPal IPN payment completed', [
                 'booking_id' => $bookingId,
                 'transaction_id' => $transactionId,
                 'amount' => $amount,
             ]);
-            
+
             return ['success' => true, 'status' => 'completed', 'booking_id' => $bookingId];
         }
         
@@ -717,22 +817,53 @@ class PayPalGateway extends AbstractPaymentGateway
     /**
      * Complete the payment and update booking status
      */
-    private function completePayment($booking, $bookingRepository, string $transactionId): void
+    private function completePayment($booking, $bookingRepository, string $transactionId, array $paymentData = []): void
     {
         global $wpdb;
-        
+
+        // Already settled in full — never apply another charge to it.
+        if (($booking->payment_status ?? '') === 'paid') {
+            return;
+        }
+
         $bookingId = (int) $booking->id;
+        $payments_table = BookingPaymentsTable::getTableName();
+
+        // Idempotency: bail if this gateway transaction is already recorded for
+        // this booking. Prevents duplicate rows when the confirmation-page return
+        // and the webhook both fire for the same capture. Mirrors StripeGateway.
+        if ($transactionId !== '') {
+            $alreadyRecorded = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT id FROM {$payments_table} WHERE booking_id = %d AND transaction_id = %s LIMIT 1",
+                    $bookingId,
+                    $transactionId
+                )
+            );
+            if ($alreadyRecorded) {
+                return;
+            }
+        }
+
         $amountDue = (float) ($booking->amount_due ?? ($booking->total_amount - $booking->amount_paid));
+        $amount = (float) ($paymentData['amount'] ?? $amountDue);
+        $currency = $paymentData['currency'] ?? ($booking->currency ?? 'USD');
         $previousBookingStatus = (string) ($booking->status ?? 'pending');
+
+        // Accumulate paid amount so deposit/partial flows don't get force-marked fully paid.
+        $totalAmount = (float) ($booking->total_amount ?? 0);
+        $newAmountPaid = (float) ($booking->amount_paid ?? 0) + $amount;
+        $newAmountDue = max(0.0, $totalAmount - $newAmountPaid);
+        $paymentStatus = $newAmountDue <= 0.01 ? 'paid' : 'partial';
 
         // Update booking payment status
         $bookings_table = BookingsTable::getTableName();
         $wpdb->update(
             $bookings_table,
             [
-                'payment_status' => 'paid',
-                'amount_paid' => $booking->total_amount,
-                'amount_due' => 0,
+                'payment_status' => $paymentStatus,
+                'amount_paid' => $newAmountPaid,
+                'amount_due' => $newAmountDue,
                 'status' => 'confirmed',
                 'confirmed_at' => current_time('mysql'),
             ],
@@ -740,27 +871,27 @@ class PayPalGateway extends AbstractPaymentGateway
             ['%s', '%f', '%f', '%s', '%s'],
             ['%d']
         );
-        
-        // Record the payment
-        $payments_table = BookingPaymentsTable::getTableName();
+
+        // Record the payment (note: column is `gateway`, not `payment_gateway`).
         $wpdb->insert(
             $payments_table,
             [
                 'booking_id' => $bookingId,
-                'amount' => $amountDue,
-                'currency' => $booking->currency ?? 'USD',
-                'payment_gateway' => 'paypal',
+                'amount' => $amount,
+                'currency' => $currency,
+                'gateway' => 'paypal',
                 'transaction_id' => $transactionId,
                 'status' => 'completed',
                 'created_at' => current_time('mysql'),
             ],
             ['%d', '%f', '%s', '%s', '%s', '%s', '%s']
         );
-        
+
         $this->log('PayPal payment completed', [
             'booking_id' => $bookingId,
             'transaction_id' => $transactionId,
-            'amount' => $amountDue,
+            'amount' => $amount,
+            'payment_status' => $paymentStatus,
         ]);
 
         \yatra_trigger_booking_confirmed($bookingId, $previousBookingStatus);
@@ -769,8 +900,8 @@ class PayPalGateway extends AbstractPaymentGateway
         do_action('yatra_payment_completed', [
             'booking_id' => $bookingId,
             'transaction_id' => $transactionId,
-            'amount' => $amountDue,
-            'currency' => $booking->currency ?? 'USD',
+            'amount' => $amount,
+            'currency' => $currency,
             'gateway' => 'paypal',
         ]);
     }

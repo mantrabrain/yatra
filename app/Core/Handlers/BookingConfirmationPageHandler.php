@@ -57,6 +57,33 @@ class BookingConfirmationPageHandler extends BasePageHandler
             \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
         }
 
+        // Process a PayPal return before the template renders. PayPal redirects
+        // the buyer back here with `?paypal=success` (a param only PayPal sets),
+        // so this runs only on a genuine PayPal return and affects nothing else.
+        // For Advanced mode it captures the approved order and confirms the
+        // booking; for Simple mode it is a no-op (the IPN webhook confirms).
+        // Idempotency is guaranteed by the gateway (paid-guard + transaction-id).
+        if (isset($_GET['paypal']) && sanitize_key((string) $_GET['paypal']) === 'success'
+            && class_exists('\\Yatra\\PaymentGateways\\PaymentGatewayRegistry')) {
+            $paypal = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance()->get('paypal');
+            if ($paypal && method_exists($paypal, 'handlePaymentReturn')) {
+                try {
+                    $paypal->handlePaymentReturn($booking, $bookingRepo);
+                    $reloaded = $bookingRepo->findByConfirmationSegment($confirmation_id);
+                    if ($reloaded) {
+                        $booking = $reloaded;
+                        $this->setGlobal('yatra_booking', $booking);
+                        $this->setQueryVars([
+                            'yatra_booking_confirmation' => $confirmation_id,
+                            'yatra_booking' => $booking,
+                        ]);
+                    }
+                } catch (\Throwable $e) {
+                    // Best-effort: the page still renders; the webhook can reconcile.
+                }
+            }
+        }
+
         return $this->selectTemplate('booking-confirmation', null, 'booking-confirmation');
     }
 }

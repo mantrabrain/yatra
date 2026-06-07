@@ -4142,6 +4142,44 @@ const Settings = () => {
                               field.id
                             );
                           }
+                          if (field.readonly) {
+                            const roValue = String(
+                              config[field.id] ?? field.default ?? ""
+                            );
+                            return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                FormField,
+                                {
+                                  id: `${gatewayId}_${field.id}`,
+                                  label: field.label,
+                                  description: field.description,
+                                  children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                      Input,
+                                      {
+                                        id: `${gatewayId}_${field.id}`,
+                                        value: roValue,
+                                        readOnly: true,
+                                        className: "bg-gray-50 dark:bg-gray-900 font-mono text-sm"
+                                      }
+                                    ),
+                                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                      Button,
+                                      {
+                                        variant: "outline",
+                                        size: "sm",
+                                        onClick: () => navigator.clipboard.writeText(
+                                          roValue
+                                        ),
+                                        children: __("Copy", "yatra")
+                                      }
+                                    )
+                                  ] })
+                                }
+                              ),
+                              field.help_text && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-blue-600 dark:text-blue-400", children: field.help_text })
+                            ] }, field.id);
+                          }
                           return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                             /* @__PURE__ */ jsxRuntimeExports.jsx(
                               FormField,
@@ -7711,4 +7749,4 @@ const Settings = () => {
 export {
   Settings as default
 };
-//# sourceMappingURL=Settings-WStf1Cfq.js.map
+//# sourceMappingURL=Settings-CU7EUfsS.js.map
