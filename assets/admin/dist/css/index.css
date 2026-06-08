@@ -1422,6 +1422,9 @@ video {
 .max-w-\[150px\] {
   max-width: 150px;
 }
+.max-w-\[16rem\] {
+  max-width: 16rem;
+}
 .max-w-\[180px\] {
   max-width: 180px;
 }
@@ -1862,6 +1865,9 @@ video {
 }
 .whitespace-nowrap {
   white-space: nowrap;
+}
+.whitespace-pre-line {
+  white-space: pre-line;
 }
 .whitespace-pre-wrap {
   white-space: pre-wrap;

@@ -54,7 +54,25 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
     if (empty($field['enabled'])) {
         return;
     }
-    
+
+    // Display-only text block: render admin-authored content (safe HTML) at this
+    // position between fields. It is NOT an input — no label, name, value or
+    // required handling — so it submits nothing and is never validated.
+    if (($field['type'] ?? '') === 'text_block') {
+        $tb_width = 'yatra-field-full';
+        if (($field['width'] ?? '') === 'half') {
+            $tb_width = 'yatra-field-half';
+        } elseif (($field['width'] ?? '') === 'third') {
+            $tb_width = 'yatra-field-third';
+        }
+        ?>
+        <div class="yatra-form-group yatra-form-text-block <?php echo esc_attr($tb_width); ?>">
+            <?php echo wpautop(wp_kses_post(yatra_translate_form_string($field['content'] ?? ''))); ?>
+        </div>
+        <?php
+        return;
+    }
+
     $field_id = $custom_id ? esc_attr($custom_id) : esc_attr($prefix . $field['id']);
     $field_name = $custom_name ? esc_attr($custom_name) : esc_attr($prefix . $field['id']);
     $required = !empty($field['required']);

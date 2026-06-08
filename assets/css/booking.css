@@ -930,6 +930,21 @@
     min-width: 150px;
 }
 
+/* Display-only text block placed between form fields */
+.yatra-form-text-block p {
+    margin: 0 0 8px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.yatra-form-text-block p:last-child {
+    margin-bottom: 0;
+}
+
+.yatra-form-text-block a {
+    text-decoration: underline;
+}
+
 .yatra-form-group label {
     display: block;
     font-size: 14px;

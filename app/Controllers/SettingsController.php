@@ -1082,7 +1082,7 @@ class SettingsController extends BaseController
     {
         $sanitized = [];
         $allowed_form_types = ['contact_form', 'emergency_contact_form', 'traveler_form'];
-        $allowed_field_types = ['text', 'email', 'tel', 'date', 'select', 'country', 'textarea', 'checkbox', 'number'];
+        $allowed_field_types = ['text', 'email', 'tel', 'date', 'select', 'country', 'textarea', 'checkbox', 'number', 'text_block'];
         $allowed_widths = ['full', 'half', 'third'];
         
         foreach ($config as $form_type => $form_config) {
@@ -1132,7 +1132,14 @@ class SettingsController extends BaseController
                             }
                         }
                     }
-                    
+
+                    // A text block is display-only content placed between fields:
+                    // keep its (safe-HTML) content, and it can never be required.
+                    if ($sanitized_field['type'] === 'text_block') {
+                        $sanitized_field['content'] = isset($field['content']) ? wp_kses_post($field['content']) : '';
+                        $sanitized_field['required'] = false;
+                    }
+
                     $sanitized[$form_type]['fields'][] = $sanitized_field;
                 }
                 

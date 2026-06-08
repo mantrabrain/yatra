@@ -697,7 +697,8 @@ interface FormFieldConfig {
     | "country"
     | "textarea"
     | "checkbox"
-    | "number";
+    | "number"
+    | "text_block";
   label: string;
   placeholder: string;
   required: boolean;
@@ -706,6 +707,7 @@ interface FormFieldConfig {
   width: "full" | "half" | "third";
   section?: string;
   options?: { value: string; label: string }[];
+  content?: string; // For text_block: the display-only content (safe HTML)
   locked?: boolean; // If true, field cannot be deleted and required cannot be changed
 }
 
@@ -1207,6 +1209,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
     { value: "textarea", label: "Text Area" },
     { value: "number", label: "Number" },
     { value: "checkbox", label: "Checkbox" },
+    { value: "text_block", label: "Text Block (display only)" },
   ];
 
   const widthOptions = [
@@ -1368,10 +1371,21 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
   };
 
   const addNewField = () => {
-    if (!newField.label || !newField.id) return;
-
+    const isTextBlock = newField.type === "text_block";
     const currentConfig = getCurrentFormConfig();
-    const fieldId = sanitizeId(newField.id);
+
+    let fieldId: string;
+    if (isTextBlock) {
+      // Display-only block: the admin supplies only content — no label or id.
+      // Generate a unique internal id so it can be ordered/stored like any field.
+      if (!newField.content || !newField.content.trim()) return;
+      let n = 1;
+      while (currentConfig.fields.some((f) => f.id === `text_block_${n}`)) n++;
+      fieldId = `text_block_${n}`;
+    } else {
+      if (!newField.label || !newField.id) return;
+      fieldId = sanitizeId(newField.id);
+    }
 
     // Check if ID already exists
     if (currentConfig.fields.some((f) => f.id === fieldId)) {
@@ -1404,6 +1418,12 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
       );
     }
 
+    // Text block: keep its display content; it can never be a required input.
+    if (isTextBlock) {
+      newFieldConfig.content = newField.content || "";
+      newFieldConfig.required = false;
+    }
+
     updateFormConfig({ fields: [...currentConfig.fields, newFieldConfig] });
     setNewField({
       id: "",
@@ -1414,6 +1434,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
       enabled: true,
       width: "full",
       options: [],
+      content: "",
     });
     setShowAddField(false);
   };
@@ -1567,52 +1588,60 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                       ))}
                     </Select>
                   </div>
-                  <div>
-                    <Label className="text-xs">{__("Label", "yatra")} *</Label>
-                    <Input
-                      value={newField.label || ""}
-                      onChange={(e) =>
-                        handleNewFieldLabelChange(e.target.value)
-                      }
-                      placeholder="Field label"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs">
-                      {__("Field ID", "yatra")} *
-                    </Label>
-                    <Input
-                      value={newField.id || ""}
-                      onChange={(e) =>
-                        setNewField((prev) => ({
-                          ...prev,
-                          id: sanitizeId(e.target.value),
-                        }))
-                      }
-                      placeholder="field_id"
-                      className="mt-1 font-mono text-xs"
-                    />
-                    <p className="text-[10px] text-gray-400 mt-0.5">
-                      {__("Lowercase, no spaces", "yatra")}
-                    </p>
-                  </div>
-                  <div>
-                    <Label className="text-xs">
-                      {__("Placeholder", "yatra")}
-                    </Label>
-                    <Input
-                      value={newField.placeholder || ""}
-                      onChange={(e) =>
-                        setNewField((prev) => ({
-                          ...prev,
-                          placeholder: e.target.value,
-                        }))
-                      }
-                      placeholder="Placeholder text"
-                      className="mt-1"
-                    />
-                  </div>
+                  {newField.type !== "text_block" && (
+                    <div>
+                      <Label className="text-xs">
+                        {__("Label", "yatra")} *
+                      </Label>
+                      <Input
+                        value={newField.label || ""}
+                        onChange={(e) =>
+                          handleNewFieldLabelChange(e.target.value)
+                        }
+                        placeholder="Field label"
+                        className="mt-1"
+                      />
+                    </div>
+                  )}
+                  {newField.type !== "text_block" && (
+                    <div>
+                      <Label className="text-xs">
+                        {__("Field ID", "yatra")} *
+                      </Label>
+                      <Input
+                        value={newField.id || ""}
+                        onChange={(e) =>
+                          setNewField((prev) => ({
+                            ...prev,
+                            id: sanitizeId(e.target.value),
+                          }))
+                        }
+                        placeholder="field_id"
+                        className="mt-1 font-mono text-xs"
+                      />
+                      <p className="text-[10px] text-gray-400 mt-0.5">
+                        {__("Lowercase, no spaces", "yatra")}
+                      </p>
+                    </div>
+                  )}
+                  {newField.type !== "text_block" && (
+                    <div>
+                      <Label className="text-xs">
+                        {__("Placeholder", "yatra")}
+                      </Label>
+                      <Input
+                        value={newField.placeholder || ""}
+                        onChange={(e) =>
+                          setNewField((prev) => ({
+                            ...prev,
+                            placeholder: e.target.value,
+                          }))
+                        }
+                        placeholder="Placeholder text"
+                        className="mt-1"
+                      />
+                    </div>
+                  )}
                   <div>
                     <Label className="text-xs">{__("Width", "yatra")}</Label>
                     <Select
@@ -1633,6 +1662,36 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                     </Select>
                   </div>
                 </div>
+                {/* Content editor for text blocks (display-only) */}
+                {newField.type === "text_block" && (
+                  <div className="mt-3">
+                    <Label className="text-xs font-medium">
+                      {__("Content", "yatra")}
+                    </Label>
+                    <textarea
+                      value={newField.content || ""}
+                      onChange={(e) =>
+                        setNewField((prev) => ({
+                          ...prev,
+                          content: e.target.value,
+                        }))
+                      }
+                      rows={4}
+                      placeholder={__(
+                        "Text shown to customers between fields. Basic HTML (bold, links, lists) is allowed.",
+                        "yatra",
+                      )}
+                      className="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm"
+                    />
+                    <p className="text-[10px] text-gray-400 mt-0.5">
+                      {__(
+                        "Display only — this is not an input and is not submitted by the customer.",
+                        "yatra",
+                      )}
+                    </p>
+                  </div>
+                )}
+
                 {/* Options editor for select fields */}
                 {newField.type === "select" && (
                   <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-100 dark:border-blue-900">
@@ -1725,20 +1784,22 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                 )}
 
                 <div className="flex items-center gap-4 mt-3">
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={newField.required || false}
-                      onChange={(e) =>
-                        setNewField((prev) => ({
-                          ...prev,
-                          required: e.target.checked,
-                        }))
-                      }
-                      className="w-4 h-4 rounded border-gray-300 text-blue-600"
-                    />
-                    {__("Required", "yatra")}
-                  </label>
+                  {newField.type !== "text_block" && (
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={newField.required || false}
+                        onChange={(e) =>
+                          setNewField((prev) => ({
+                            ...prev,
+                            required: e.target.checked,
+                          }))
+                        }
+                        className="w-4 h-4 rounded border-gray-300 text-blue-600"
+                      />
+                      {__("Required", "yatra")}
+                    </label>
+                  )}
                   <div className="flex-1"></div>
                   <Button
                     variant="ghost"
@@ -1750,7 +1811,11 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                   <Button
                     size="sm"
                     onClick={addNewField}
-                    disabled={!newField.label || !newField.id}
+                    disabled={
+                      newField.type === "text_block"
+                        ? !newField.content || !newField.content.trim()
+                        : !newField.id || !newField.label
+                    }
                   >
                     {__("Add Field", "yatra")}
                   </Button>
@@ -1821,31 +1886,44 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                       {editingField === field.id ? (
                         <div className="space-y-3">
                           <div className="grid grid-cols-4 gap-2">
-                            <Input
-                              value={field.label}
-                              onChange={(e) =>
-                                updateField(field.id, { label: e.target.value })
-                              }
-                              placeholder="Label"
-                              className="text-sm"
-                            />
-                            <Input
-                              value={field.placeholder}
-                              onChange={(e) =>
-                                updateField(field.id, {
-                                  placeholder: e.target.value,
-                                })
-                              }
-                              placeholder="Placeholder"
-                              className="text-sm"
-                            />
+                            {field.type !== "text_block" && (
+                              <>
+                                <Input
+                                  value={field.label}
+                                  onChange={(e) =>
+                                    updateField(field.id, {
+                                      label: e.target.value,
+                                    })
+                                  }
+                                  placeholder="Label"
+                                  className="text-sm"
+                                />
+                                <Input
+                                  value={field.placeholder}
+                                  onChange={(e) =>
+                                    updateField(field.id, {
+                                      placeholder: e.target.value,
+                                    })
+                                  }
+                                  placeholder="Placeholder"
+                                  className="text-sm"
+                                />
+                              </>
+                            )}
                             <Select
                               value={field.type}
                               onChange={(e) =>
+                                !field.locked &&
                                 updateField(field.id, {
                                   type: e.target
                                     .value as FormFieldConfig["type"],
                                 })
+                              }
+                              disabled={field.locked}
+                              title={
+                                field.locked
+                                  ? "Locked fields cannot change type"
+                                  : undefined
                               }
                               className="text-sm"
                             >
@@ -1873,35 +1951,66 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                             </Select>
                           </div>
 
-                          {/* Field ID - Below other fields */}
-                          <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded">
-                            <Label className="text-xs text-gray-500 whitespace-nowrap">
-                              {__("Field ID:", "yatra")}
-                            </Label>
-                            <Input
-                              value={field.id}
-                              onChange={(e) => {
-                                if (!field.locked) {
+                          {/* Content editor for text blocks (display-only) */}
+                          {field.type === "text_block" && (
+                            <div>
+                              <Label className="text-xs font-medium">
+                                {__("Content", "yatra")}
+                              </Label>
+                              <textarea
+                                value={field.content || ""}
+                                onChange={(e) =>
                                   updateField(field.id, {
-                                    id: sanitizeId(e.target.value),
-                                  });
+                                    content: e.target.value,
+                                  })
                                 }
-                              }}
-                              placeholder="field_id"
-                              className="text-sm font-mono flex-1 max-w-xs"
-                              disabled={field.locked}
-                              title={
-                                field.locked
-                                  ? "Locked fields cannot change ID"
-                                  : "Field ID (lowercase, no spaces)"
-                              }
-                            />
-                            {field.locked && (
-                              <span className="text-xs text-amber-600">
-                                {__("(locked)", "yatra")}
-                              </span>
-                            )}
-                          </div>
+                                rows={4}
+                                placeholder={__(
+                                  "Text shown to customers between fields. Basic HTML (bold, links, lists) is allowed.",
+                                  "yatra",
+                                )}
+                                className="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm"
+                              />
+                              <p className="text-[10px] text-gray-400 mt-0.5">
+                                {__(
+                                  "Display only — this is not an input and is not submitted by the customer.",
+                                  "yatra",
+                                )}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Field ID - Below other fields (input fields only) */}
+                          {field.type !== "text_block" && (
+                            <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded">
+                              <Label className="text-xs text-gray-500 whitespace-nowrap">
+                                {__("Field ID:", "yatra")}
+                              </Label>
+                              <Input
+                                value={field.id}
+                                onChange={(e) => {
+                                  if (!field.locked) {
+                                    updateField(field.id, {
+                                      id: sanitizeId(e.target.value),
+                                    });
+                                  }
+                                }}
+                                placeholder="field_id"
+                                className="text-sm font-mono flex-1 max-w-xs"
+                                disabled={field.locked}
+                                title={
+                                  field.locked
+                                    ? "Locked fields cannot change ID"
+                                    : "Field ID (lowercase, no spaces)"
+                                }
+                              />
+                              {field.locked && (
+                                <span className="text-xs text-amber-600">
+                                  {__("(locked)", "yatra")}
+                                </span>
+                              )}
+                            </div>
+                          )}
 
                           {/* Dropdown Options Editor */}
                           {field.type === "select" && (
@@ -2003,11 +2112,15 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                       ) : (
                         <div className="flex items-center gap-3 flex-wrap">
                           <span className="font-medium text-sm">
-                            {field.label}
+                            {field.type === "text_block"
+                              ? __("Text Block", "yatra")
+                              : field.label}
                           </span>
-                          <code className="text-xs text-gray-500 dark:text-gray-400 px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded font-mono">
-                            {field.id}
-                          </code>
+                          {field.type !== "text_block" && (
+                            <code className="text-xs text-gray-500 dark:text-gray-400 px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded font-mono">
+                              {field.id}
+                            </code>
+                          )}
                           <span className="text-xs text-gray-400 dark:text-gray-500 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded">
                             {fieldTypes.find((t) => t.value === field.type)
                               ?.label || field.type}
@@ -2016,6 +2129,12 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                             {widthOptions.find((w) => w.value === field.width)
                               ?.label || "Full"}
                           </span>
+                          {field.type === "text_block" && field.content && (
+                            <span className="text-xs text-gray-500 dark:text-gray-400 italic truncate max-w-[16rem]">
+                              "{field.content.replace(/<[^>]*>/g, "").slice(0, 60)}
+                              "
+                            </span>
+                          )}
                           {field.type === "select" &&
                             field.options &&
                             field.options.length > 0 && (
@@ -2047,26 +2166,28 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
 
                     {/* Actions */}
                     <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          !field.locked && toggleFieldRequired(field.id)
-                        }
-                        disabled={field.locked}
-                        className={`p-1.5 rounded ${field.locked ? "cursor-not-allowed opacity-50" : ""} ${field.required ? "text-red-500 bg-red-50 dark:bg-red-900/20" : "text-gray-400 hover:text-gray-600"}`}
-                        title={
-                          field.locked
-                            ? "This field is required and cannot be changed"
-                            : field.required
-                              ? "Make optional"
-                              : "Make required"
-                        }
-                      >
-                        <Star
-                          className="w-4 h-4"
-                          fill={field.required ? "currentColor" : "none"}
-                        />
-                      </button>
+                      {field.type !== "text_block" && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            !field.locked && toggleFieldRequired(field.id)
+                          }
+                          disabled={field.locked}
+                          className={`p-1.5 rounded ${field.locked ? "cursor-not-allowed opacity-50" : ""} ${field.required ? "text-red-500 bg-red-50 dark:bg-red-900/20" : "text-gray-400 hover:text-gray-600"}`}
+                          title={
+                            field.locked
+                              ? "This field is required and cannot be changed"
+                              : field.required
+                                ? "Make optional"
+                                : "Make required"
+                          }
+                        >
+                          <Star
+                            className="w-4 h-4"
+                            fill={field.required ? "currentColor" : "none"}
+                          />
+                        </button>
+                      )}
                       {/* Show enable/disable toggle only for non-locked fields */}
                       {!field.locked && (
                         <button
@@ -2168,30 +2289,41 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                             : "col-span-1"
                       }
                     >
-                      <Label className="text-sm">
-                        {field.label}
-                        {field.required && (
-                          <span className="text-red-500 ml-1">*</span>
-                        )}
-                      </Label>
-                      {field.type === "select" || field.type === "country" ? (
-                        <Select disabled className="mt-1 w-full">
-                          <option>{field.placeholder || "Select..."}</option>
-                        </Select>
-                      ) : field.type === "textarea" ? (
-                        <textarea
-                          disabled
-                          placeholder={field.placeholder}
-                          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-gray-700 text-sm"
-                          rows={2}
-                        />
+                      {field.type === "text_block" ? (
+                        <div className="yatra-form-text-block text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">
+                          {(field.content || "").replace(/<[^>]*>/g, "")}
+                        </div>
                       ) : (
-                        <Input
-                          disabled
-                          type={field.type}
-                          placeholder={field.placeholder}
-                          className="mt-1"
-                        />
+                        <>
+                          <Label className="text-sm">
+                            {field.label}
+                            {field.required && (
+                              <span className="text-red-500 ml-1">*</span>
+                            )}
+                          </Label>
+                          {field.type === "select" ||
+                          field.type === "country" ? (
+                            <Select disabled className="mt-1 w-full">
+                              <option>
+                                {field.placeholder || "Select..."}
+                              </option>
+                            </Select>
+                          ) : field.type === "textarea" ? (
+                            <textarea
+                              disabled
+                              placeholder={field.placeholder}
+                              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-gray-700 text-sm"
+                              rows={2}
+                            />
+                          ) : (
+                            <Input
+                              disabled
+                              type={field.type}
+                              placeholder={field.placeholder}
+                              className="mt-1"
+                            />
+                          )}
+                        </>
                       )}
                     </div>
                   ))}

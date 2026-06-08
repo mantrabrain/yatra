@@ -877,6 +877,11 @@ final class EmailMergeTagRegistry
                 if (empty($field['enabled']) || empty($field['id'])) {
                     continue;
                 }
+                // Text blocks are display-only content, not inputs — they hold no
+                // booking value, so they must not become email merge tags.
+                if (($field['type'] ?? '') === 'text_block') {
+                    continue;
+                }
                 $id = sanitize_key((string) $field['id']);
                 if ($id === '') {
                     continue;

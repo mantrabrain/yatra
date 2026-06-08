@@ -1070,7 +1070,7 @@ class BookingSessionController extends BaseController
         // --- Contact section (flat contact_<id> keys) ---
         if ($contact_enabled && !empty($form_config['contact_form']['fields']) && is_array($form_config['contact_form']['fields'])) {
             foreach ($form_config['contact_form']['fields'] as $field) {
-                if (!is_array($field) || empty($field['enabled']) || empty($field['required']) || empty($field['id'])) {
+                if (!is_array($field) || empty($field['enabled']) || empty($field['required']) || empty($field['id']) || ($field['type'] ?? '') === 'text_block') {
                     continue;
                 }
                 $id = (string) $field['id'];
@@ -1089,7 +1089,7 @@ class BookingSessionController extends BaseController
         $emergency_enabled = is_array($emergency) && (!isset($emergency['enabled']) || (bool) $emergency['enabled']);
         if ($emergency_enabled && !empty($emergency['fields']) && is_array($emergency['fields'])) {
             foreach ($emergency['fields'] as $field) {
-                if (!is_array($field) || empty($field['enabled']) || empty($field['required']) || empty($field['id'])) {
+                if (!is_array($field) || empty($field['enabled']) || empty($field['required']) || empty($field['id']) || ($field['type'] ?? '') === 'text_block') {
                     continue;
                 }
                 $id = (string) $field['id'];
@@ -1105,7 +1105,7 @@ class BookingSessionController extends BaseController
         if ($traveler_enabled && !empty($form_config['traveler_form']['fields']) && is_array($form_config['traveler_form']['fields'])) {
             $required_traveler_fields = [];
             foreach ($form_config['traveler_form']['fields'] as $field) {
-                if (is_array($field) && !empty($field['enabled']) && !empty($field['required']) && !empty($field['id'])) {
+                if (is_array($field) && !empty($field['enabled']) && !empty($field['required']) && !empty($field['id']) && ($field['type'] ?? '') !== 'text_block') {
                     $required_traveler_fields[(string) $field['id']] = (string) ($field['label'] ?? $field['id']);
                 }
             }

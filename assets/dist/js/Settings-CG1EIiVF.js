@@ -666,7 +666,8 @@ const BookingFormBuilder = ({
     { value: "country", label: "Country Selector" },
     { value: "textarea", label: "Text Area" },
     { value: "number", label: "Number" },
-    { value: "checkbox", label: "Checkbox" }
+    { value: "checkbox", label: "Checkbox" },
+    { value: "text_block", label: "Text Block (display only)" }
   ];
   const widthOptions = [
     { value: "full", label: "Full Width" },
@@ -793,9 +794,18 @@ const BookingFormBuilder = ({
     setDeleteConfirm({ isOpen: false, fieldId: null, fieldLabel: "" });
   };
   const addNewField = () => {
-    if (!newField.label || !newField.id) return;
+    const isTextBlock = newField.type === "text_block";
     const currentConfig2 = getCurrentFormConfig();
-    const fieldId = sanitizeId(newField.id);
+    let fieldId;
+    if (isTextBlock) {
+      if (!newField.content || !newField.content.trim()) return;
+      let n = 1;
+      while (currentConfig2.fields.some((f) => f.id === `text_block_${n}`)) n++;
+      fieldId = `text_block_${n}`;
+    } else {
+      if (!newField.label || !newField.id) return;
+      fieldId = sanitizeId(newField.id);
+    }
     if (currentConfig2.fields.some((f) => f.id === fieldId)) {
       window.alert(
         "A field with this ID already exists. Please use a different ID."
@@ -817,6 +827,10 @@ const BookingFormBuilder = ({
         (opt) => opt.value && opt.label
       );
     }
+    if (isTextBlock) {
+      newFieldConfig.content = newField.content || "";
+      newFieldConfig.required = false;
+    }
     updateFormConfig({ fields: [...currentConfig2.fields, newFieldConfig] });
     setNewField({
       id: "",
@@ -826,7 +840,8 @@ const BookingFormBuilder = ({
       required: false,
       enabled: true,
       width: "full",
-      options: []
+      options: [],
+      content: ""
     });
     setShowAddField(false);
   };
@@ -949,7 +964,7 @@ const BookingFormBuilder = ({
                     }
                   )
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                newField.type !== "text_block" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs(Label, { className: "text-xs", children: [
                     __("Label", "yatra"),
                     " *"
@@ -964,7 +979,7 @@ const BookingFormBuilder = ({
                     }
                   )
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                newField.type !== "text_block" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs(Label, { className: "text-xs", children: [
                     __("Field ID", "yatra"),
                     " *"
@@ -983,7 +998,7 @@ const BookingFormBuilder = ({
                   ),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[10px] text-gray-400 mt-0.5", children: __("Lowercase, no spaces", "yatra") })
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                newField.type !== "text_block" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { className: "text-xs", children: __("Placeholder", "yatra") }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
                     Input,
@@ -1013,6 +1028,29 @@ const BookingFormBuilder = ({
                     }
                   )
                 ] })
+              ] }),
+              newField.type === "text_block" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { className: "text-xs font-medium", children: __("Content", "yatra") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "textarea",
+                  {
+                    value: newField.content || "",
+                    onChange: (e) => setNewField((prev) => ({
+                      ...prev,
+                      content: e.target.value
+                    })),
+                    rows: 4,
+                    placeholder: __(
+                      "Text shown to customers between fields. Basic HTML (bold, links, lists) is allowed.",
+                      "yatra"
+                    ),
+                    className: "mt-1 w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[10px] text-gray-400 mt-0.5", children: __(
+                  "Display only — this is not an input and is not submitted by the customer.",
+                  "yatra"
+                ) })
               ] }),
               newField.type === "select" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-100 dark:border-blue-900", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
@@ -1104,7 +1142,7 @@ const BookingFormBuilder = ({
                 ] })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 mt-3", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 text-sm", children: [
+                newField.type !== "text_block" && /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 text-sm", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
                     "input",
                     {
@@ -1134,7 +1172,7 @@ const BookingFormBuilder = ({
                   {
                     size: "sm",
                     onClick: addNewField,
-                    disabled: !newField.label || !newField.id,
+                    disabled: newField.type === "text_block" ? !newField.content || !newField.content.trim() : !newField.id || !newField.label,
                     children: __("Add Field", "yatra")
                   }
                 )
@@ -1183,33 +1221,39 @@ const BookingFormBuilder = ({
                     ] }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 min-w-0", children: editingField === field.id ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-4 gap-2", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          Input,
-                          {
-                            value: field.label,
-                            onChange: (e) => updateField(field.id, { label: e.target.value }),
-                            placeholder: "Label",
-                            className: "text-sm"
-                          }
-                        ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          Input,
-                          {
-                            value: field.placeholder,
-                            onChange: (e) => updateField(field.id, {
-                              placeholder: e.target.value
-                            }),
-                            placeholder: "Placeholder",
-                            className: "text-sm"
-                          }
-                        ),
+                        field.type !== "text_block" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Input,
+                            {
+                              value: field.label,
+                              onChange: (e) => updateField(field.id, {
+                                label: e.target.value
+                              }),
+                              placeholder: "Label",
+                              className: "text-sm"
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Input,
+                            {
+                              value: field.placeholder,
+                              onChange: (e) => updateField(field.id, {
+                                placeholder: e.target.value
+                              }),
+                              placeholder: "Placeholder",
+                              className: "text-sm"
+                            }
+                          )
+                        ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx(
                           Select,
                           {
                             value: field.type,
-                            onChange: (e) => updateField(field.id, {
+                            onChange: (e) => !field.locked && updateField(field.id, {
                               type: e.target.value
                             }),
+                            disabled: field.locked,
+                            title: field.locked ? "Locked fields cannot change type" : void 0,
                             className: "text-sm",
                             children: fieldTypes.map((type) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: type.value, children: type.label }, type.value))
                           }
@@ -1226,7 +1270,29 @@ const BookingFormBuilder = ({
                           }
                         )
                       ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded", children: [
+                      field.type === "text_block" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { className: "text-xs font-medium", children: __("Content", "yatra") }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "textarea",
+                          {
+                            value: field.content || "",
+                            onChange: (e) => updateField(field.id, {
+                              content: e.target.value
+                            }),
+                            rows: 4,
+                            placeholder: __(
+                              "Text shown to customers between fields. Basic HTML (bold, links, lists) is allowed.",
+                              "yatra"
+                            ),
+                            className: "mt-1 w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm"
+                          }
+                        ),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[10px] text-gray-400 mt-0.5", children: __(
+                          "Display only — this is not an input and is not submitted by the customer.",
+                          "yatra"
+                        ) })
+                      ] }),
+                      field.type !== "text_block" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded", children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { className: "text-xs text-gray-500 whitespace-nowrap", children: __("Field ID:", "yatra") }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx(
                           Input,
@@ -1346,10 +1412,15 @@ const BookingFormBuilder = ({
                         ] })
                       ] })
                     ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 flex-wrap", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-sm", children: field.label }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "text-xs text-gray-500 dark:text-gray-400 px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded font-mono", children: field.id }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-sm", children: field.type === "text_block" ? __("Text Block", "yatra") : field.label }),
+                      field.type !== "text_block" && /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "text-xs text-gray-500 dark:text-gray-400 px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded font-mono", children: field.id }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-400 dark:text-gray-500 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded", children: ((_a2 = fieldTypes.find((t) => t.value === field.type)) == null ? void 0 : _a2.label) || field.type }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-400 dark:text-gray-500", children: ((_b2 = widthOptions.find((w) => w.value === field.width)) == null ? void 0 : _b2.label) || "Full" }),
+                      field.type === "text_block" && field.content && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-gray-500 dark:text-gray-400 italic truncate max-w-[16rem]", children: [
+                        '"',
+                        field.content.replace(/<[^>]*>/g, "").slice(0, 60),
+                        '"'
+                      ] }),
                       field.type === "select" && field.options && field.options.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-blue-500 dark:text-blue-400", children: [
                         "(",
                         field.options.length,
@@ -1371,7 +1442,7 @@ const BookingFormBuilder = ({
                       )
                     ] }) }),
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      field.type !== "text_block" && /* @__PURE__ */ jsxRuntimeExports.jsx(
                         "button",
                         {
                           type: "button",
@@ -1454,11 +1525,11 @@ const BookingFormBuilder = ({
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 bg-gray-50 dark:bg-gray-800 rounded-lg", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-lg mb-1", children: currentConfig.title || "Form Section" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mb-4", children: currentConfig.description }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 gap-4", children: (_d = currentConfig.fields) == null ? void 0 : _d.filter((f) => f.enabled).map((field) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 gap-4", children: (_d = currentConfig.fields) == null ? void 0 : _d.filter((f) => f.enabled).map((field) => /* @__PURE__ */ jsxRuntimeExports.jsx(
               "div",
               {
                 className: field.width === "full" ? "col-span-2" : field.width === "third" ? "col-span-1" : "col-span-1",
-                children: [
+                children: field.type === "text_block" ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "yatra-form-text-block text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line", children: (field.content || "").replace(/<[^>]*>/g, "") }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs(Label, { className: "text-sm", children: [
                     field.label,
                     field.required && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500 ml-1", children: "*" })
@@ -1480,7 +1551,7 @@ const BookingFormBuilder = ({
                       className: "mt-1"
                     }
                   )
-                ]
+                ] })
               },
               field.id
             )) })
@@ -7749,4 +7820,4 @@ const Settings = () => {
 export {
   Settings as default
 };
-//# sourceMappingURL=Settings-CU7EUfsS.js.map
+//# sourceMappingURL=Settings-CG1EIiVF.js.map

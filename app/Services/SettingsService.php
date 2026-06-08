@@ -370,6 +370,12 @@ class SettingsService
                 if (isset($locked_ids[$id])) {
                     $field['locked'] = true;
                     $field['required'] = true;
+                    // Locked core fields must keep their original input type — a
+                    // saved config can't repurpose them (e.g. to a display-only
+                    // text_block), which would drop the real input from checkout.
+                    if (isset($default_fields_by_id[$id]['type'])) {
+                        $field['type'] = $default_fields_by_id[$id]['type'];
+                    }
                 }
                 $result_fields[] = $field;
             }
