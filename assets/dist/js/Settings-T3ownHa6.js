@@ -658,16 +658,16 @@ const BookingFormBuilder = ({
     }
   ];
   const fieldTypes = [
-    { value: "text", label: "Text" },
-    { value: "email", label: "Email" },
-    { value: "tel", label: "Phone" },
-    { value: "date", label: "Date" },
-    { value: "select", label: "Dropdown" },
-    { value: "country", label: "Country Selector" },
-    { value: "textarea", label: "Text Area" },
-    { value: "number", label: "Number" },
-    { value: "checkbox", label: "Checkbox" },
-    { value: "text_block", label: "Text Block (display only)" }
+    { value: "text", label: __("Text", "yatra") },
+    { value: "email", label: __("Email", "yatra") },
+    { value: "tel", label: __("Phone", "yatra") },
+    { value: "date", label: __("Date", "yatra") },
+    { value: "select", label: __("Dropdown", "yatra") },
+    { value: "country", label: __("Country Selector", "yatra") },
+    { value: "textarea", label: __("Text Area", "yatra") },
+    { value: "number", label: __("Number", "yatra") },
+    { value: "checkbox", label: __("Checkbox", "yatra") },
+    { value: "text_block", label: __("Text Block (display only)", "yatra") }
   ];
   const widthOptions = [
     { value: "full", label: "Full Width" },
@@ -7820,4 +7820,4 @@ const Settings = () => {
 export {
   Settings as default
 };
-//# sourceMappingURL=Settings-CG1EIiVF.js.map
+//# sourceMappingURL=Settings-T3ownHa6.js.map

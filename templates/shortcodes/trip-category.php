@@ -85,7 +85,7 @@ $column_class = 'yatra-destination-grid-' . min(max($columns, 1), 6);
                                         <div class="category-stat price">
                                             <span class="category-stat-icon">$</span>
                                             <span class="category-stat-value">
-                                                <?php esc_html_e('From', 'yatra'); ?> <?php echo esc_html(yatra_get_currency_symbol(get_option('yatra_currency', 'USD')) . number_format($category_row['min_price'], 2)); ?>
+                                                <?php esc_html_e('From', 'yatra'); ?> <?php echo esc_html(yatra_format_price((float) $category_row['min_price'])); ?>
                                             </span>
                                         </div>
                                     <?php endif; ?>

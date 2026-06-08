@@ -89,13 +89,18 @@ if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_
     );
 }
 
-// Per-field visibility (Settings → Search & Listing). Defaults are true, so an
-// existing site shows every field exactly as before until the owner hides one.
-$show_keyword     = \Yatra\Services\SettingsService::isEnabled('search_show_keyword');
-$show_destination = \Yatra\Services\SettingsService::isEnabled('search_show_destination');
-$show_activities  = \Yatra\Services\SettingsService::isEnabled('search_show_activities');
-$show_duration    = \Yatra\Services\SettingsService::isEnabled('search_show_duration');
-$show_budget      = \Yatra\Services\SettingsService::isEnabled('search_show_budget');
+// Per-field visibility is owned entirely by the SearchShortcode: for each field
+// an explicit shortcode attribute (e.g. [yatra_search budget="no"]) wins, and
+// when omitted it inherits the global Settings → Search & Listing toggle. The
+// resolved result is handed to this template in $field_visibility. This template
+// is purely presentational — it never reads the settings itself. Missing keys
+// default to visible, so the bar still renders if loaded without the shortcode.
+$field_visibility = (isset($field_visibility) && is_array($field_visibility)) ? $field_visibility : [];
+$show_keyword     = (bool) ($field_visibility['keyword']     ?? true);
+$show_destination = (bool) ($field_visibility['destination'] ?? true);
+$show_activities  = (bool) ($field_visibility['activities']  ?? true);
+$show_duration    = (bool) ($field_visibility['duration']    ?? true);
+$show_budget      = (bool) ($field_visibility['budget']      ?? true);
 
 // Tracks whether a field has been rendered yet, so a divider is only emitted
 // BETWEEN visible fields (no leading/trailing/double dividers when some are off).

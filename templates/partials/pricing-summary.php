@@ -225,16 +225,17 @@ $has_dp = !empty($dynamic_pricing) && !empty($dynamic_pricing['rules']);
                         $total_cost = $unit_price * $quantity;
                         ?>
                         <span class="yatra-price-tooltip" title="<?php 
-                            // Build tooltip data with proper escaping and currency symbol
-                            $currency_symbol = $checkout->getCurrencySymbol();
-                            $unit_price_formatted = number_format($unit_price, 2);
-                            $total_cost_formatted = number_format($total_cost, 2);
-                            $tooltip_text = sprintf('%s%s × %d travelers = %s%s', 
-                                $currency_symbol, 
-                                $unit_price_formatted, 
-                                (int) $quantity, 
-                                $currency_symbol,
-                                $total_cost_formatted
+                            // Tooltip: unit price × travelers = line total. Formatted
+                            // through the canonical formatter so decimals, separators
+                            // and currency symbol match the rest of the site (single
+                            // source of truth). zero_is_unknown=false so a 0 line
+                            // renders as a number, not "Contact for pricing".
+                            $tooltip_text = sprintf(
+                                /* translators: 1: formatted unit price, 2: number of travelers, 3: formatted line total */
+                                __('%1$s × %2$d travelers = %3$s', 'yatra'),
+                                yatra_format_price($unit_price, null, false),
+                                (int) $quantity,
+                                yatra_format_price($total_cost, null, false)
                             );
                             echo esc_attr($tooltip_text);
                         ?>">

@@ -24,7 +24,16 @@ class SearchShortcode extends BaseShortcode
             'show_duration' => 'yes',
             'show_difficulty' => 'yes',
             'placeholder' => 'Search for tours...',
-            'button_text' => 'Search Tours'
+            'button_text' => 'Search Tours',
+            // Per-field visibility overrides. Empty string = inherit the global
+            // Settings → Search & Listing toggle (so [yatra_search] is unchanged).
+            // Pass yes/no (or true/false, on/off, 1/0) to force a field on/off for
+            // this one placement, e.g. [yatra_search budget="no" keyword="yes"].
+            'keyword' => '',
+            'destination' => '',
+            'activities' => '',
+            'duration' => '',
+            'budget' => '',
         ]);
 
         // [yatra_search] may appear in posts, widgets, builders, FSE templates, or do_shortcode()
@@ -111,6 +120,45 @@ class SearchShortcode extends BaseShortcode
             'listing_url' => $listing_url,
             'duration_bounds' => $tripRepository->getDurationDaysBounds(),
             'budget_presets' => $tripListingService->getSearchBudgetPresets(),
+            'field_visibility' => $this->resolveFieldVisibility($atts),
         ]);
+    }
+
+    /**
+     * Resolve which search fields are visible for THIS shortcode instance.
+     *
+     * Each field follows the rule: an explicit shortcode attribute wins; when the
+     * attribute is omitted (empty), inherit the global Settings → Search & Listing
+     * toggle. This keeps a bare [yatra_search] identical to before while allowing
+     * per-placement overrides like [yatra_search budget="no"].
+     *
+     * @param array<string,mixed> $atts Resolved shortcode attributes.
+     * @return array<string,bool>  Keyed by field: keyword/destination/activities/duration/budget.
+     */
+    private function resolveFieldVisibility(array $atts): array
+    {
+        $resolve = static function ($attr_value, string $setting_key): bool {
+            $value = strtolower(trim((string) $attr_value));
+            if ($value === '') {
+                // No override → inherit the global toggle (defaults to true).
+                return \Yatra\Services\SettingsService::isEnabled($setting_key);
+            }
+            if (\in_array($value, ['1', 'yes', 'true', 'on', 'show'], true)) {
+                return true;
+            }
+            if (\in_array($value, ['0', 'no', 'false', 'off', 'hide'], true)) {
+                return false;
+            }
+            // Unrecognised value → fall back to the global toggle, never guess.
+            return \Yatra\Services\SettingsService::isEnabled($setting_key);
+        };
+
+        return [
+            'keyword'     => $resolve($atts['keyword'] ?? '', 'search_show_keyword'),
+            'destination' => $resolve($atts['destination'] ?? '', 'search_show_destination'),
+            'activities'  => $resolve($atts['activities'] ?? '', 'search_show_activities'),
+            'duration'    => $resolve($atts['duration'] ?? '', 'search_show_duration'),
+            'budget'      => $resolve($atts['budget'] ?? '', 'search_show_budget'),
+        ];
     }
 }

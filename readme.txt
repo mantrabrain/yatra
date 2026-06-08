@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel, travel agency
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 3.0.6
+Stable tag: 3.0.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,7 +134,7 @@ Use the **block editor** or **classic shortcodes** to drop catalog widgets, sear
 * **`[yatra_activity]`** — Activity listing cards.
 * **`[yatra_destination]`** — Destination showcase.
 * **`[yatra_trip_category]`** — Trip category cards.
-* **`[yatra_search]`** — Advanced trip search form.
+* **`[yatra_search]`** — Advanced trip search form. Per-field visibility attributes — `keyword`, `destination`, `activities`, `duration`, `budget` — each `yes` / `no`. Omit one to inherit its **Settings → Search & Listing** toggle; pass a value to force it on/off for that placement. Example: `[yatra_search budget="no" duration="no"]`. (The built-in listing page sets these automatically from your settings.)
 * **`[yatra_login]`** — Customer login form.
 * **`[yatra_my_account]`** — Account dashboard for logged-in users.
 * **`[yatra_discount_and_deals]`** — Discounted trips.
@@ -264,6 +264,20 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 6. Traveler account — bookings, payments and documents
 
 == Changelog ==
+
+= 3.0.7 =
+* **Booking Form — Text Block field:** new display-only field type to place instructions, notes or a divider **between** booking-form fields in any section (contact, emergency, traveler). It is not an input — never validated, stored, or shown in emails — and supports safe basic HTML; the admin only sets content + width. Hardening: locked core fields (name/email/phone/country) can no longer be retyped, so their inputs can never be dropped from checkout. The builder is gated behind the Pro Dynamic Form Field module.
+* **PayPal — bookings now actually confirm (Simple + Advanced):** Simple/IPN now records the payment and confirms the booking; Advanced captures the approved order on return **and** via a signature-verified webhook (configurable Webhook URL + Webhook ID in the admin). Deposits and partial payments settle correctly. Change is contained to PayPal — no shared recorder or other gateway is touched.
+* **Square / Authorize.Net:** fixed "not configured properly" on checkout (the frontend gateway config is now built from each gateway's public data, so no gateway secret ever reaches the browser) and bookings now confirm after a synchronous charge, with deposit / partial / remaining-balance amounts settling correctly.
+* **Decimals — single source of truth:** the **Number of decimals** setting now controls **every** price consistently — PHP-rendered (single trip page, destination/category/activity showcases, listings, booking confirmation, pricing summaries) and JS-rendered totals alike. Previously PHP prices ignored the setting and always showed two decimals. Backward compatible; existing Setup-Wizard choices are preserved.
+* **Search & Listing:** new Settings tab to show/hide search-bar fields (keyword, destination, activities, duration, budget). The `[yatra_search]` shortcode honors those toggles and adds per-placement attributes — e.g. `[yatra_search budget="no"]` — while the trip listing page wires the settings to the shortcode automatically.
+* **Itinerary:** fixed bulk delete for single-day trips and partial activity selection (only the ticked activities are removed); translated the action toasts.
+* **Availability:** Alert Threshold, Block Reason and Block status now save and reflect on the edit form (clamped/capped to avoid strict-mode write failures).
+* **Dynamic Form Field module:** robust contact/emergency/traveler handling at checkout (email-field resolution, traveler synthesis, server-side required-field validation), admin booking-edit round-trip, and dynamic `{{contact_*}}` / `{{emergency_*}}` email merge tags.
+* **Admin UI hardening:** added an app-level ErrorBoundary, opted the React roots out of browser auto-translation, and auto-reload once on stale chunk loads — preventing white-screen DOM reconciliation crashes.
+* **Internationalization:** translatable booking-form labels/placeholders and new strings throughout; regenerated the translation template (`yatra.pot`).
+* **Other:** Google Calendar fixes; account page renders travelers + custom contact fields; email total/balance placeholder fixes; per-module "Learn more" links; wpyatra.com domain updates.
+* Safe to update from 3.0.6 — no database changes and no migrations. Pair with **Yatra Pro 3.0.5**.
 
 = 3.0.6 =
 * **Pricing plans renamed:** Personal → **Starter**, Agency → **Scale** (Growth unchanged). Display-only rename across the admin — the Modules page tier badges, the premium-upgrade dialog, and the REST gate messages now read Starter / Growth / Scale. The internal capability slugs are **unchanged**, so existing Pro licenses keep the exact same feature access; only the visible plan name changed.

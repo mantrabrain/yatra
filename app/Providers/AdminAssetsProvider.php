@@ -154,7 +154,7 @@ class AdminAssetsProvider
             'currency' => \Yatra\Services\SettingsService::getCurrency(),
             'currencyPosition' => \Yatra\Services\SettingsService::getString('currency_position', 'left'),
             'currency_position' => \Yatra\Services\SettingsService::getString('currency_position', 'left'),
-            'decimalPlaces' => (int) \Yatra\Services\SettingsService::getString('currency_decimals', '2'),
+            'decimalPlaces' => \Yatra\Services\SettingsService::getPriceDecimals(),
             'thousandSeparator' => \Yatra\Services\SettingsService::getString('thousand_separator', ','),
             'decimalSeparator' => \Yatra\Services\SettingsService::getString('decimal_separator', '.'),
             'date_format' => \Yatra\Services\SettingsService::get('date_format', 'Y-m-d'),

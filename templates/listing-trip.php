@@ -60,7 +60,28 @@ yatra_get_header();
 <div class="yatra-listing-page yatra-trip-listing" id="yatra-trip-listing-root">
     <!-- Trip Search Shortcode - replaces hardcoded search UI -->
     <div class="yatra-trip-listing-search-wrap">
-        <?php echo do_shortcode('[yatra_search]'); ?>
+        <?php
+        // Build the [yatra_search] arguments from the Search & Listing toggles so
+        // the listing bar reflects the operator's settings explicitly at the call
+        // site. Each field becomes a yes/no argument the shortcode honours, so
+        // turning a field off in Settings → Search & Listing hides it here.
+        $yatra_search_field_settings = [
+            'keyword'     => 'search_show_keyword',
+            'destination' => 'search_show_destination',
+            'activities'  => 'search_show_activities',
+            'duration'    => 'search_show_duration',
+            'budget'      => 'search_show_budget',
+        ];
+        $yatra_search_atts = '';
+        foreach ($yatra_search_field_settings as $yatra_arg => $yatra_setting_key) {
+            $yatra_search_atts .= sprintf(
+                ' %s="%s"',
+                $yatra_arg,
+                \Yatra\Services\SettingsService::isEnabled($yatra_setting_key) ? 'yes' : 'no'
+            );
+        }
+        echo do_shortcode('[yatra_search' . $yatra_search_atts . ']');
+        ?>
     </div>
 
     <div class="yatra-listing-wrapper yatra-listing-wrapper--overlay-host">

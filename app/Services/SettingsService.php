@@ -740,6 +740,50 @@ class SettingsService
     }
 
     /**
+     * Single source of truth for the number of decimals shown in prices.
+     *
+     * Historically two unsynced options existed:
+     *  - `currency_decimals` — the admin "Number of decimals" field, also handed
+     *    to the frontend JS as `decimalPlaces`. Written only when settings are saved.
+     *  - `decimal_places`    — legacy, written by the installer (default 2) and the
+     *    Setup Wizard, and read by {@see yatra_format_price()}.
+     *
+     * They drifted, so PHP-rendered prices (single trip, showcase, listings) and
+     * JS-rendered prices could disagree, and the admin field had no effect on PHP.
+     * This resolver collapses both into ONE value that every reader uses:
+     *  1. the admin field when it has been changed from the default (authoritative);
+     *  2. otherwise a non-default legacy value (preserves Setup-Wizard choices);
+     *  3. otherwise whichever is present, else the default.
+     *
+     * Result is clamped to 0–4. It can never silently regress a site that was
+     * already showing the correct decimals — it only aligns the two readers.
+     */
+    public static function getPriceDecimals(): int
+    {
+        $default = 2;
+
+        $cdRaw = get_option('yatra_currency_decimals', null); // admin field + JS
+        $dpRaw = get_option('yatra_decimal_places', null);    // legacy / yatra_format_price
+
+        $cd = ($cdRaw === null || $cdRaw === '') ? null : (int) $cdRaw;
+        $dp = ($dpRaw === null || $dpRaw === '') ? null : (int) $dpRaw;
+
+        if ($cd !== null && $cd !== $default) {
+            $value = $cd;            // admin explicitly changed → wins
+        } elseif ($dp !== null && $dp !== $default) {
+            $value = $dp;            // legacy Setup-Wizard value → preserved
+        } elseif ($cd !== null) {
+            $value = $cd;            // admin field present at default
+        } elseif ($dp !== null) {
+            $value = $dp;
+        } else {
+            $value = $default;
+        }
+
+        return max(0, min(4, $value));
+    }
+
+    /**
      * Sanitize a single URL path segment used in Yatra rewrites (alphanumeric, underscore, hyphen).
      */
     private static function sanitizePermalinkSlug(string $value, string $fallback): string
