@@ -255,11 +255,29 @@
                 .replace(/__THOUSAND__/g, thousandSeparator)
                 .replace(/__DECIMAL__/g, decimalSeparator);
             
-            // Position currency based on settings (before or after)
-            if (currencyPosition === 'right' || currencyPosition === 'after') {
+            // Placement must match PHP yatra_format_price() exactly: the Settings
+            // UI uses left / right / left_space / right_space; legacy values are
+            // before (= left_space) and after (= right_space). Only *_space adds a
+            // space, so a "left" setting renders "$208.35", not "$ 208.35".
+            let pos = String(currencyPosition || '').toLowerCase().trim();
+            if (pos === 'before') {
+                pos = 'left_space';
+            } else if (pos === 'after') {
+                pos = 'right_space';
+            }
+            if (['left', 'right', 'left_space', 'right_space'].indexOf(pos) === -1) {
+                pos = 'left_space';
+            }
+
+            if (pos === 'right') {
+                return formattedAmount + symbol;
+            }
+            if (pos === 'right_space') {
                 return formattedAmount + ' ' + symbol;
             }
-            
+            if (pos === 'left') {
+                return symbol + formattedAmount;
+            }
             return symbol + ' ' + formattedAmount;
         }
 
@@ -338,7 +356,7 @@
             const flexDue = paymentMethod === 'deposit' || paymentMethod === 'partial';
 
             if (isOffline) {
-                $buttonText.text(__('Complete Booking', 'yatra'));
+                $buttonText.text(window.yatraBookingData?.i18n?.complete_booking || __('Complete Booking', 'yatra'));
                 const showAmount = flexDue ? due : totalSafe;
                 if (showAmount > 0) {
                     $payAmount.text(formatCurrency(showAmount, currency)).show();
@@ -346,7 +364,7 @@
                     $payAmount.hide();
                 }
             } else {
-                $buttonText.text(__('Pay Now', 'yatra'));
+                $buttonText.text(window.yatraBookingData?.i18n?.pay_now || __('Pay Now', 'yatra'));
                 const payVal = flexDue && due > 0 ? due : totalSafe;
                 if (payVal > 0) {
                     $payAmount.text(formatCurrency(payVal, currency)).show();
@@ -368,7 +386,13 @@
             
             // Clone the first traveler form
             const $newTraveler = $firstTraveler.clone();
-            
+
+            // Additional travelers are never the lead, so drop any fields the
+            // operator marked "Lead traveler only" (data-applies-to="lead").
+            // Traveler 1 is rendered server-side with these; clones must not
+            // carry them. ('all'/unset fields stay.)
+            $newTraveler.find('[data-applies-to="lead"]').remove();
+
             // Update index references
             $newTraveler.attr('data-traveler-index', index);
             $newTraveler.find('.yatra-traveler-title').text(
@@ -1870,6 +1894,69 @@
             $btnLoading.hide();
         });
     });
+
+    // ---------------------------------------------------------------------
+    // Date field picker upgrade (fast year navigation for Date of Birth)
+    // ---------------------------------------------------------------------
+    // A native <input type="date"> popup only steps one month at a time, so
+    // reaching a birth year like 1990 takes many clicks. Where flatpickr is
+    // available (and on non-touch devices, since mobile native pickers already
+    // have good year wheels) we upgrade `.yatra-js-date` inputs to a flatpickr
+    // whose header year is directly typeable/scrollable. Fully guarded: with no
+    // flatpickr, or on mobile, the native input is left untouched and working.
+    var yatraIsMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || '');
+
+    function yatraUpgradeDateField(input) {
+        if (!input || input.dataset.yatraFp === '1') return;
+        if (typeof window.flatpickr === 'undefined') return;
+        if (yatraIsMobile) return; // native mobile date wheels already navigate years well
+        input.dataset.yatraFp = '1';
+        var isDob = input.getAttribute('data-yatra-dob') === '1';
+        // Turn off the native date UI so flatpickr is the only picker; the
+        // submitted value stays ISO (Y-m-d) so FormData/back-end are unchanged.
+        try { input.type = 'text'; } catch (e) {}
+        window.flatpickr(input, {
+            dateFormat: 'Y-m-d',
+            allowInput: true,
+            maxDate: isDob ? 'today' : null,
+            defaultDate: input.value || null
+        });
+    }
+
+    function yatraUpgradeDateFields(root) {
+        var scope = (root && root.querySelectorAll) ? root : document;
+        var list = scope.querySelectorAll('input.yatra-js-date');
+        for (var i = 0; i < list.length; i++) {
+            yatraUpgradeDateField(list[i]);
+        }
+    }
+
+    function yatraInitDatePickers() {
+        yatraUpgradeDateFields(document);
+        // The traveler form is injected via AJAX, so watch for inserted inputs.
+        if (typeof MutationObserver === 'undefined' || !document.body) return;
+        var obs = new MutationObserver(function (mutations) {
+            for (var m = 0; m < mutations.length; m++) {
+                var added = mutations[m].addedNodes;
+                for (var n = 0; n < added.length; n++) {
+                    var node = added[n];
+                    if (!node || node.nodeType !== 1) continue;
+                    if (node.matches && node.matches('input.yatra-js-date')) {
+                        yatraUpgradeDateField(node);
+                    } else if (node.querySelectorAll) {
+                        yatraUpgradeDateFields(node);
+                    }
+                }
+            }
+        });
+        obs.observe(document.body, { childList: true, subtree: true });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', yatraInitDatePickers);
+    } else {
+        yatraInitDatePickers();
+    }
 
     // End of document ready
 })(jQuery);

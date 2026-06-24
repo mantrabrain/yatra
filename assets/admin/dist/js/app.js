@@ -1,4 +1,4 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-Chwu2RqA.js","../../../dist/js/react-vendor-zODANjVp.js","../css/react-vendor.css","../../../dist/js/index-zauBMzvd.js","../css/index.css","../../../dist/js/BuildItineraryModal-Db1LZgrN.js","../../../dist/js/ProFeature-Bq-2isy8.js","../../../dist/js/Settings-T3ownHa6.js","../../../dist/js/Team-Dm30DLtU.js","../../../dist/js/Reports-CxPdZPoa.js","../../../dist/js/DiscountForm-DGCNdiR2.js","../../../dist/js/ApplicableTripSelector-BLXjvZVD.js","../../../dist/js/Itinerary-EhU3Ovi1.js","../../../dist/js/RecurringRuleForm-DURXaxk5.js","./Whatsapp.js","../../../dist/js/module-skeleton-7zwRYol6.js","../../../dist/js/ChannelManager-CSJ4tokj.js","../../../dist/js/Webhooks-dctsJarL.js","../../../dist/js/TripConsentForm-Dwxjmjsv.js","../../../dist/js/BookingForm-CP7wussJ.js","../../../dist/js/ViewBooking-U9wDb7nz.js","../../../dist/js/AvailabilityForm-mmPwwWCb.js","../../../dist/js/DynamicPricing-CuBOJ9c3.js","../../../dist/js/RuleTypeSelectionModal-DjVhCqpG.js","../../../dist/js/toggle-B0m9K-Pk.js","../../../dist/js/DynamicPricingRuleForm-Dl4rYeK3.js","../../../dist/js/AiAssistant-C5CqVP9I.js","../../../dist/js/AbandonedRecovery-Cx9wCpOi.js","../../../dist/js/WhiteLabel-BGHzZX3U.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-B_Dl6Uaf.js","../../../dist/js/react-vendor-zODANjVp.js","../css/react-vendor.css","../../../dist/js/index-zauBMzvd.js","../css/index.css","../../../dist/js/BuildItineraryModal-Db1LZgrN.js","../../../dist/js/ProFeature-Bq-2isy8.js","../../../dist/js/Settings-DmDJbSAB.js","../../../dist/js/Team-Dm30DLtU.js","../../../dist/js/Reports-CxPdZPoa.js","../../../dist/js/DiscountForm-DGCNdiR2.js","../../../dist/js/ApplicableTripSelector-BLXjvZVD.js","../../../dist/js/Itinerary-EhU3Ovi1.js","../../../dist/js/RecurringRuleForm-DURXaxk5.js","./Whatsapp.js","../../../dist/js/module-skeleton-7zwRYol6.js","../../../dist/js/ChannelManager-CSJ4tokj.js","../../../dist/js/Webhooks-dctsJarL.js","../../../dist/js/TripConsentForm-Dwxjmjsv.js","../../../dist/js/BookingForm-Bmd-CVD8.js","../../../dist/js/ViewBooking-U9wDb7nz.js","../../../dist/js/AvailabilityForm-CkgvCjzn.js","../../../dist/js/DynamicPricing-CuBOJ9c3.js","../../../dist/js/RuleTypeSelectionModal-DjVhCqpG.js","../../../dist/js/toggle-B0m9K-Pk.js","../../../dist/js/DynamicPricingRuleForm-Dl4rYeK3.js","../../../dist/js/AiAssistant-C5CqVP9I.js","../../../dist/js/AbandonedRecovery-Cx9wCpOi.js","../../../dist/js/WhiteLabel-BGHzZX3U.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
@@ -40706,12 +40706,27 @@ function cleanEscapedString$1(input) {
   }
   return matched[1].replace(doubleQuoteRegExp$1, "'");
 }
+function getDaysInMonth(date2, options2) {
+  const _date = toDate(date2, options2 == null ? void 0 : options2.in);
+  const year = _date.getFullYear();
+  const monthIndex = _date.getMonth();
+  const lastDayOfMonth = constructFrom(_date, 0);
+  lastDayOfMonth.setFullYear(year, monthIndex + 1, 0);
+  lastDayOfMonth.setHours(0, 0, 0, 0);
+  return lastDayOfMonth.getDate();
+}
 function getDefaultOptions() {
   return Object.assign({}, getDefaultOptions$1());
 }
 function getISODay(date2, options2) {
   const day = toDate(date2, options2 == null ? void 0 : options2.in).getDay();
   return day === 0 ? 7 : day;
+}
+function getMonth(date2, options2) {
+  return toDate(date2, options2 == null ? void 0 : options2.in).getMonth();
+}
+function getYear(date2, options2) {
+  return toDate(date2, options2 == null ? void 0 : options2.in).getFullYear();
 }
 function transpose(date2, constructor) {
   const date_ = isConstructor(constructor) ? new constructor(0) : constructFrom(constructor, 0);
@@ -42603,9 +42618,40 @@ function validateTime(hours, minutes, seconds) {
 function validateTimezone(_hours, minutes) {
   return minutes >= 0 && minutes <= 59;
 }
+function setMonth(date2, month, options2) {
+  const _date = toDate(date2, options2 == null ? void 0 : options2.in);
+  const year = _date.getFullYear();
+  const day = _date.getDate();
+  const midMonth = constructFrom(date2, 0);
+  midMonth.setFullYear(year, month, 15);
+  midMonth.setHours(0, 0, 0, 0);
+  const daysInMonth = getDaysInMonth(midMonth);
+  _date.setMonth(month, Math.min(day, daysInMonth));
+  return _date;
+}
+function setYear(date2, year, options2) {
+  const date_ = toDate(date2, options2 == null ? void 0 : options2.in);
+  if (isNaN(+date_)) return constructFrom(date2, NaN);
+  date_.setFullYear(year);
+  return date_;
+}
 function subMonths(date2, amount, options2) {
   return addMonths(date2, -1, options2);
 }
+const MONTH_LABELS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
+];
 const Calendar = ({
   selected,
   onSelect,
@@ -42614,7 +42660,25 @@ const Calendar = ({
   maxDate,
   className = ""
 }) => {
-  const [currentMonth, setCurrentMonth] = reactExports.useState(/* @__PURE__ */ new Date());
+  const [currentMonth, setCurrentMonth] = reactExports.useState(
+    () => selected ?? /* @__PURE__ */ new Date()
+  );
+  reactExports.useEffect(() => {
+    if (selected) setCurrentMonth(selected);
+  }, [selected]);
+  const today = /* @__PURE__ */ new Date();
+  const fromYear = minDate ? getYear(minDate) : getYear(today) - 120;
+  const toYear = maxDate ? getYear(maxDate) : getYear(today) + 10;
+  const years = [];
+  for (let y2 = toYear; y2 >= fromYear; y2--) {
+    years.push(y2);
+  }
+  const handleMonthSelect = (monthIndex) => {
+    setCurrentMonth(setMonth(currentMonth, monthIndex));
+  };
+  const handleYearSelect = (year) => {
+    setCurrentMonth(setYear(currentMonth, year));
+  };
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
@@ -42638,23 +42702,46 @@ const Calendar = ({
   };
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `p-3 ${className}`, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-1 mb-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
         {
           type: "button",
           onClick: previousMonth,
-          className: "p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors",
+          "aria-label": "Previous month",
+          className: "p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors shrink-0",
           children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronLeft, { className: "w-4 h-4" })
         }
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: format(currentMonth, "MMMM yyyy") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "select",
+          {
+            value: getMonth(currentMonth),
+            onChange: (e) => handleMonthSelect(Number(e.target.value)),
+            "aria-label": "Month",
+            className: "text-sm font-semibold text-gray-900 dark:text-white bg-transparent border border-transparent hover:border-gray-300 dark:hover:border-gray-600 focus:border-blue-500 rounded-md px-1 py-0.5 cursor-pointer focus:outline-none dark:bg-gray-800",
+            children: MONTH_LABELS.map((label, index) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: index, children: label }, label))
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "select",
+          {
+            value: getYear(currentMonth),
+            onChange: (e) => handleYearSelect(Number(e.target.value)),
+            "aria-label": "Year",
+            className: "text-sm font-semibold text-gray-900 dark:text-white bg-transparent border border-transparent hover:border-gray-300 dark:hover:border-gray-600 focus:border-blue-500 rounded-md px-1 py-0.5 cursor-pointer focus:outline-none dark:bg-gray-800",
+            children: years.map((year) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: year, children: year }, year))
+          }
+        )
+      ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
         {
           type: "button",
           onClick: nextMonth,
-          className: "p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors",
+          "aria-label": "Next month",
+          className: "p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors shrink-0",
           children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4" })
         }
       )
@@ -60343,13 +60430,27 @@ const RecurringRules = ({
         key: "price",
         label: __("Price", "yatra"),
         visible: visibleColumns.price,
-        render: (rule) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: rule.sale_price ? formatYatraMoney(Number(rule.sale_price) || 0, adminCurrency, {
-          zeroAsUnknown: false
-        }) : rule.original_price ? formatYatraMoney(
-          Number(rule.original_price) || 0,
-          adminCurrency,
-          { zeroAsUnknown: false }
-        ) : formatYatraMoney(0, adminCurrency, { zeroAsUnknown: false }) })
+        render: (rule) => {
+          const tp = Array.isArray(rule.traveler_pricing) ? rule.traveler_pricing : [];
+          const travelerPrices = tp.map((p) => Number(p.sale_price ?? p.original_price) || 0).filter((n) => n > 0);
+          let display;
+          if (travelerPrices.length > 0) {
+            const min2 = Math.min(...travelerPrices);
+            const max2 = Math.max(...travelerPrices);
+            display = min2 === max2 ? formatYatraMoney(min2, adminCurrency, { zeroAsUnknown: false }) : `${formatYatraMoney(min2, adminCurrency, {
+              zeroAsUnknown: false
+            })} – ${formatYatraMoney(max2, adminCurrency, {
+              zeroAsUnknown: false
+            })}`;
+          } else {
+            const sale = Number(rule.sale_price) || 0;
+            const original = Number(rule.original_price) || 0;
+            display = formatYatraMoney(sale > 0 ? sale : original, adminCurrency, {
+              zeroAsUnknown: false
+            });
+          }
+          return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: display });
+        }
       });
     }
     if (visibleColumns.status) {
@@ -60893,6 +60994,9 @@ const Availability = () => {
             original_price: ((_a = date2.original_price) == null ? void 0 : _a.toString()) || "0",
             discounted_price: ((_b = date2.discounted_price) == null ? void 0 : _b.toString()) || ((_c = date2.original_price) == null ? void 0 : _c.toString()) || "0",
             discount_percentage: ((_d = date2.discount_percentage) == null ? void 0 : _d.toString()) || "0",
+            // Carry per-category pricing through so the Price column can show the
+            // real (traveler-based) price; otherwise it falls back to "0".
+            price_types: Array.isArray(date2.price_types) ? date2.price_types : [],
             status: date2.status || "available",
             is_blocked: date2.is_blocked || date2.status === "blocked",
             block_reason: date2.block_reason,
@@ -61263,26 +61367,38 @@ const Availability = () => {
       key: "price",
       label: __("Price", "yatra"),
       visible: visibleColumns.price,
-      render: (date2) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-1", children: date2.discounted_price && parseFloat(date2.discounted_price) < parseFloat(date2.original_price) ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm line-through text-gray-400", children: [
+      render: (date2) => {
+        const pts = Array.isArray(date2.price_types) ? date2.price_types : [];
+        const travelerPrices = pts.map(
+          (pt) => Number(pt.sale_price ?? pt.discounted_price ?? pt.original_price) || 0
+        ).filter((n) => n > 0);
+        if (travelerPrices.length > 0) {
+          const sym = getCurrencySymbol2((selectedTrip == null ? void 0 : selectedTrip.currency) || "USD");
+          const min2 = Math.min(...travelerPrices);
+          const max2 = Math.max(...travelerPrices);
+          return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-semibold", children: min2 === max2 ? `${sym}${min2.toLocaleString()}` : `${sym}${min2.toLocaleString()} – ${sym}${max2.toLocaleString()}` });
+        }
+        return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-1", children: date2.discounted_price && parseFloat(date2.discounted_price) < parseFloat(date2.original_price) ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm line-through text-gray-400", children: [
+            getCurrencySymbol2((selectedTrip == null ? void 0 : selectedTrip.currency) || "USD"),
+            parseFloat(date2.original_price).toLocaleString()
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: [
+              getCurrencySymbol2((selectedTrip == null ? void 0 : selectedTrip.currency) || "USD"),
+              parseFloat(date2.discounted_price).toLocaleString()
+            ] }),
+            date2.discount_percentage && parseFloat(date2.discount_percentage) > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "error", className: "text-xs", children: [
+              date2.discount_percentage,
+              "% ",
+              __("OFF", "yatra")
+            ] })
+          ] })
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-semibold", children: [
           getCurrencySymbol2((selectedTrip == null ? void 0 : selectedTrip.currency) || "USD"),
           parseFloat(date2.original_price).toLocaleString()
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: [
-            getCurrencySymbol2((selectedTrip == null ? void 0 : selectedTrip.currency) || "USD"),
-            parseFloat(date2.discounted_price).toLocaleString()
-          ] }),
-          date2.discount_percentage && parseFloat(date2.discount_percentage) > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "error", className: "text-xs", children: [
-            date2.discount_percentage,
-            "% ",
-            __("OFF", "yatra")
-          ] })
-        ] })
-      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-semibold", children: [
-        getCurrencySymbol2((selectedTrip == null ? void 0 : selectedTrip.currency) || "USD"),
-        parseFloat(date2.original_price).toLocaleString()
-      ] }) })
+        ] }) });
+      }
     });
     cols.push({
       key: "status",
@@ -61627,7 +61743,11 @@ const Availability = () => {
                 subpage: "trips",
                 tab: "availability",
                 action: "create",
-                trip_id: selectedTripId.toString()
+                trip_id: selectedTripId.toString(),
+                // Clear any stale `id` left in the URL from a prior edit so
+                // the form opens cleanly in create mode (navigate() merges
+                // params; an undefined value deletes the key).
+                id: void 0
               }),
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
@@ -68624,6 +68744,11 @@ const AdditionalServicesForm = () => {
                   {
                     value: formData.price_per,
                     onChange: (e) => handleFieldChange("price_per", e.target.value),
+                    disabled: formData.price_type === "percentage",
+                    title: formData.price_type === "percentage" ? __(
+                      "Price Per does not apply to percentage services — they are always a percentage of the whole trip price."
+                    ) : void 0,
+                    className: formData.price_type === "percentage" ? "opacity-60 cursor-not-allowed" : "",
                     children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "person", children: __("Per Person") }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "booking", children: __("Per Booking") }),
@@ -70325,6 +70450,7 @@ const EMAIL_KEYS = [
   "email_template_admin_cancellation",
   "email_template_trip_consent",
   "email_template_customer_verification",
+  "email_template_guest_verification",
   "smtp_enabled",
   "smtp_host",
   "smtp_port",
@@ -70349,6 +70475,8 @@ const EMAIL_KEYS = [
   "email_tpl_trip_consent_body",
   "email_tpl_customer_verification_subject",
   "email_tpl_customer_verification_body",
+  "email_tpl_guest_verification_subject",
+  "email_tpl_guest_verification_body",
   "email_template_booking_completed",
   "email_template_booking_expired_customer",
   "email_template_admin_booking_expired",
@@ -70402,6 +70530,7 @@ const BOOL_KEYS = /* @__PURE__ */ new Set([
   "email_template_admin_cancellation",
   "email_template_trip_consent",
   "email_template_customer_verification",
+  "email_template_guest_verification",
   "email_template_booking_completed",
   "email_template_booking_expired_customer",
   "email_template_admin_booking_expired",
@@ -70431,6 +70560,7 @@ const EMAIL_SETTINGS_DEFAULTS = {
   email_template_admin_cancellation: true,
   email_template_trip_consent: true,
   email_template_customer_verification: true,
+  email_template_guest_verification: true,
   email_template_booking_completed: true,
   email_template_booking_expired_customer: true,
   email_template_admin_booking_expired: true,
@@ -70469,6 +70599,8 @@ const EMAIL_SETTINGS_DEFAULTS = {
   email_tpl_trip_consent_body: "",
   email_tpl_customer_verification_subject: "",
   email_tpl_customer_verification_body: "",
+  email_tpl_guest_verification_subject: "",
+  email_tpl_guest_verification_body: "",
   email_tpl_booking_completed_subject: "",
   email_tpl_booking_completed_body: "",
   email_tpl_booking_expired_customer_subject: "",
@@ -70857,6 +70989,7 @@ const CORE_FREE_TEMPLATE_KEYS = [
   "trip_reminder",
   "trip_consent_request",
   "customer_email_verification",
+  "guest_email_verification",
   "booking_completed",
   "booking_expired_customer",
   "admin_booking_expired",
@@ -70974,6 +71107,23 @@ const EMAIL_TEMPLATES_CATALOG = [
     settingsFlag: "email_template_customer_verification",
     settingsSubject: "email_tpl_customer_verification_subject",
     settingsBody: "email_tpl_customer_verification_body",
+    mergeTags: "{{site_name}}, {{site_url}}, {{customer_first_name}}, {{customer_name}}, {{verification_link}}, {{intro_paragraph}}, {{expiry_notice_html}}, {{footer_note}}"
+  },
+  {
+    template_key: "guest_email_verification",
+    event_key: "account.email_verification",
+    name: __("Guest email verification (checkout)", "yatra"),
+    description: __(
+      "Sent to a guest at checkout who must verify their email before the booking is finalized (when 'Require guest email verification' is enabled). Distinct from the account-registration verification above.",
+      "yatra"
+    ),
+    category: "account",
+    recipient_type: "customer",
+    to_email: "{customer_email}",
+    isCoreFree: true,
+    settingsFlag: "email_template_guest_verification",
+    settingsSubject: "email_tpl_guest_verification_subject",
+    settingsBody: "email_tpl_guest_verification_body",
     mergeTags: "{{site_name}}, {{site_url}}, {{customer_first_name}}, {{customer_name}}, {{verification_link}}, {{intro_paragraph}}, {{expiry_notice_html}}, {{footer_note}}"
   },
   {
@@ -77116,8 +77266,8 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-Chwu2RqA.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-T3ownHa6.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-B_Dl6Uaf.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-DmDJbSAB.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
 const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-Dm30DLtU.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
 const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-CxPdZPoa.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
 const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-DGCNdiR2.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
@@ -77127,9 +77277,9 @@ const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.
 const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-CSJ4tokj.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
 const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-dctsJarL.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
 const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-Dwxjmjsv.js"), true ? __vite__mapDeps([18,1,2,11,3,4]) : void 0, import.meta.url));
-const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-CP7wussJ.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
+const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-Bmd-CVD8.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
 const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-U9wDb7nz.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-mmPwwWCb.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-CkgvCjzn.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
 const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-CuBOJ9c3.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
   () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-Dl4rYeK3.js"), true ? __vite__mapDeps([25,1,2,23,3,4]) : void 0, import.meta.url)

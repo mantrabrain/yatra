@@ -665,17 +665,29 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                 $service_description = (string) ($service['description'] ?? '');
                                 $service_price = (float) $service['price'];
                                 $service_price_per = $service['price_per'] ?? 'person';
+                                $service_price_type = $service['price_type'] ?? 'fixed';
                                 $is_required = isset($service['is_required']) && ($service['is_required'] === true || $service['is_required'] === 1 || $service['is_required'] === '1');
                                 $is_included = isset($service['is_included']) && ($service['is_included'] === true || $service['is_included'] === 1 || $service['is_included'] === '1');
                                 $is_selected = in_array($service_id, $selected_service_ids, false);
 
-                                $price_label = yatra_format_price($service_price);
-                                if ($service_price_per === 'person') {
-                                    $price_label .= ' ' . __('per person', 'yatra');
-                                } elseif ($service_price_per === 'day') {
-                                    $price_label .= ' ' . __('per day', 'yatra');
+                                // Percentage services show "X% of trip price" (the actual
+                                // dollar amount is rendered in the price-breakdown summary).
+                                // Price Per does NOT apply to percentage (it's a % of the
+                                // whole trip), so no per-person/day/booking suffix is added.
+                                // Fixed services show the formatted amount plus the suffix.
+                                if ($service_price_type === 'percentage') {
+                                    $pct_display = rtrim(rtrim(number_format($service_price, 2), '0'), '.');
+                                    /* translators: %s: percentage value, e.g. "17" */
+                                    $price_label = sprintf(__('%s%% of trip price', 'yatra'), $pct_display);
                                 } else {
-                                    $price_label .= ' ' . __('per booking', 'yatra');
+                                    $price_label = yatra_format_price($service_price);
+                                    if ($service_price_per === 'person') {
+                                        $price_label .= ' ' . __('per person', 'yatra');
+                                    } elseif ($service_price_per === 'day') {
+                                        $price_label .= ' ' . __('per day', 'yatra');
+                                    } else {
+                                        $price_label .= ' ' . __('per booking', 'yatra');
+                                    }
                                 }
                                 if ($is_included) {
                                     $price_label = __('Included', 'yatra');

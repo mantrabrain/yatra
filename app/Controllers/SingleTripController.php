@@ -1095,7 +1095,11 @@ class SingleTripController
             '/youtube\.com\/watch\?v=([^&]+)/',
             '/youtube\.com\/embed\/([^?]+)/',
             '/youtu\.be\/([^?]+)/',
-            '/youtube\.com\/v\/([^?]+)/'
+            '/youtube\.com\/v\/([^?]+)/',
+            // Shorts + live URLs (e.g. youtube.com/shorts/XFR9Ti-4RbM?si=...).
+            // ID stops at ?, & or / so trailing query params are excluded.
+            '/youtube\.com\/shorts\/([^?&\/]+)/',
+            '/youtube\.com\/live\/([^?&\/]+)/'
         ];
         
         foreach ($patterns as $pattern) {

@@ -709,6 +709,12 @@ interface FormFieldConfig {
   options?: { value: string; label: string }[];
   content?: string; // For text_block: the display-only content (safe HTML)
   locked?: boolean; // If true, field cannot be deleted and required cannot be changed
+  /**
+   * Traveler-section only: which travelers this field is shown to.
+   * "all" (default) = every traveler; "lead" = the lead traveler (Traveler 1) only.
+   * Absent is treated as "all" for backward compatibility.
+   */
+  applies_to?: "all" | "lead";
 }
 
 interface FormSectionConfig {
@@ -858,6 +864,7 @@ interface SettingsData {
   email_template_admin_cancellation: boolean;
   email_template_trip_consent: boolean;
   email_template_customer_verification: boolean;
+  email_template_guest_verification: boolean;
   email_template_booking_completed: boolean;
   email_template_booking_expired_customer: boolean;
   email_template_admin_booking_expired: boolean;
@@ -897,6 +904,8 @@ interface SettingsData {
   email_tpl_trip_consent_body: string;
   email_tpl_customer_verification_subject: string;
   email_tpl_customer_verification_body: string;
+  email_tpl_guest_verification_subject: string;
+  email_tpl_guest_verification_body: string;
   email_tpl_booking_completed_subject: string;
   email_tpl_booking_completed_body: string;
   email_tpl_booking_expired_customer_subject: string;
@@ -1134,7 +1143,14 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
     enabled: true,
     width: "full",
     options: [],
+    applies_to: "all",
   });
+
+  // Traveler-section "Applies to" choices (only shown on the Traveler tab).
+  const appliesToOptions: { value: "all" | "lead"; label: string }[] = [
+    { value: "all", label: __("All travelers", "yatra") },
+    { value: "lead", label: __("Lead traveler only", "yatra") },
+  ];
 
   // Delete confirmation state
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -1405,6 +1421,10 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
       enabled: true,
       order: currentConfig.fields.length + 1,
       width: (newField.width as FormFieldConfig["width"]) || "full",
+      // Per-traveler targeting only applies to the Traveler section.
+      ...(activeFormTab === "traveler_form"
+        ? { applies_to: newField.applies_to || "all" }
+        : {}),
     };
 
     // Add options if field type is select
@@ -1661,6 +1681,30 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                       ))}
                     </Select>
                   </div>
+                  {activeFormTab === "traveler_form" && (
+                    <div>
+                      <Label className="text-xs">
+                        {__("Applies to", "yatra")}
+                      </Label>
+                      <Select
+                        value={newField.applies_to || "all"}
+                        onChange={(e) =>
+                          setNewField((prev) => ({
+                            ...prev,
+                            applies_to: e.target
+                              .value as FormFieldConfig["applies_to"],
+                          }))
+                        }
+                        className="mt-1"
+                      >
+                        {appliesToOptions.map((a) => (
+                          <option key={a.value} value={a.value}>
+                            {a.label}
+                          </option>
+                        ))}
+                      </Select>
+                    </div>
+                  )}
                 </div>
                 {/* Content editor for text blocks (display-only) */}
                 {newField.type === "text_block" && (
@@ -1949,6 +1993,28 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                                 </option>
                               ))}
                             </Select>
+                            {activeFormTab === "traveler_form" && (
+                              <Select
+                                value={field.applies_to || "all"}
+                                onChange={(e) =>
+                                  updateField(field.id, {
+                                    applies_to: e.target
+                                      .value as FormFieldConfig["applies_to"],
+                                  })
+                                }
+                                className="text-sm"
+                                title={__(
+                                  "Which travelers see this field",
+                                  "yatra",
+                                )}
+                              >
+                                {appliesToOptions.map((a) => (
+                                  <option key={a.value} value={a.value}>
+                                    {a.label}
+                                  </option>
+                                ))}
+                              </Select>
+                            )}
                           </div>
 
                           {/* Content editor for text blocks (display-only) */}
@@ -2151,6 +2217,12 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                               {__("Required", "yatra")}
                             </span>
                           )}
+                          {activeFormTab === "traveler_form" &&
+                            field.applies_to === "lead" && (
+                              <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 font-medium">
+                                {__("Lead only", "yatra")}
+                              </span>
+                            )}
                           {field.locked && (
                             <span
                               className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 px-1.5 py-0.5 bg-amber-50 dark:bg-amber-900/20 rounded"
@@ -2645,6 +2717,7 @@ const Settings: React.FC = () => {
       email_template_admin_cancellation: true,
       email_template_trip_consent: true,
       email_template_customer_verification: true,
+      email_template_guest_verification: true,
       email_template_booking_completed: true,
       email_template_booking_expired_customer: true,
       email_template_admin_booking_expired: true,
@@ -2683,6 +2756,8 @@ const Settings: React.FC = () => {
       email_tpl_trip_consent_body: "",
       email_tpl_customer_verification_subject: "",
       email_tpl_customer_verification_body: "",
+      email_tpl_guest_verification_subject: "",
+      email_tpl_guest_verification_body: "",
       email_tpl_booking_completed_subject: "",
       email_tpl_booking_completed_body: "",
       email_tpl_booking_expired_customer_subject: "",

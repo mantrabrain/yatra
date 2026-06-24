@@ -141,7 +141,7 @@
     ]
   },
   "resources/js/pages/AvailabilityForm.tsx": {
-    "file": "dist/js/AvailabilityForm-mmPwwWCb.js",
+    "file": "dist/js/AvailabilityForm-CkgvCjzn.js",
     "name": "AvailabilityForm",
     "src": "resources/js/pages/AvailabilityForm.tsx",
     "isDynamicEntry": true,
@@ -152,7 +152,7 @@
     ]
   },
   "resources/js/pages/BookingForm.tsx": {
-    "file": "dist/js/BookingForm-CP7wussJ.js",
+    "file": "dist/js/BookingForm-Bmd-CVD8.js",
     "name": "BookingForm",
     "src": "resources/js/pages/BookingForm.tsx",
     "isDynamicEntry": true,
@@ -246,7 +246,7 @@
     ]
   },
   "resources/js/pages/Settings.tsx": {
-    "file": "dist/js/Settings-T3ownHa6.js",
+    "file": "dist/js/Settings-DmDJbSAB.js",
     "name": "Settings",
     "src": "resources/js/pages/Settings.tsx",
     "isDynamicEntry": true,
@@ -281,7 +281,7 @@
     ]
   },
   "resources/js/pages/TripForm.tsx": {
-    "file": "dist/js/TripForm-Chwu2RqA.js",
+    "file": "dist/js/TripForm-B_Dl6Uaf.js",
     "name": "TripForm",
     "src": "resources/js/pages/TripForm.tsx",
     "isDynamicEntry": true,

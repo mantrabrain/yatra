@@ -1119,6 +1119,16 @@ class SettingsController extends BaseController
                     if (!empty($field['section'])) {
                         $sanitized_field['section'] = sanitize_key($field['section']);
                     }
+
+                    // Per-traveler targeting — Traveler section only. Whitelist
+                    // the allowed values; only persist the non-default "lead" so
+                    // other sections and existing configs stay byte-identical.
+                    if (
+                        $form_type === 'traveler_form'
+                        && ($field['applies_to'] ?? 'all') === 'lead'
+                    ) {
+                        $sanitized_field['applies_to'] = 'lead';
+                    }
                     
                     // Handle options for select fields
                     if ($sanitized_field['type'] === 'select' && !empty($field['options']) && is_array($field['options'])) {

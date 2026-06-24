@@ -66,7 +66,7 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
             $tb_width = 'yatra-field-third';
         }
         ?>
-        <div class="yatra-form-group yatra-form-text-block <?php echo esc_attr($tb_width); ?>">
+        <div class="yatra-form-group yatra-form-text-block <?php echo esc_attr($tb_width); ?>" data-applies-to="<?php echo esc_attr($field['applies_to'] ?? 'all'); ?>">
             <?php echo wpautop(wp_kses_post(yatra_translate_form_string($field['content'] ?? ''))); ?>
         </div>
         <?php
@@ -105,7 +105,7 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
     }
     $field_type = $field['type'] ?? 'text';
     ?>
-    <div class="yatra-form-group <?php echo esc_attr($width_class); ?> <?php echo $field_type === 'checkbox' ? 'yatra-form-group--checkbox' : ''; ?>">
+    <div class="yatra-form-group <?php echo esc_attr($width_class); ?> <?php echo $field_type === 'checkbox' ? 'yatra-form-group--checkbox' : ''; ?>" data-applies-to="<?php echo esc_attr($field['applies_to'] ?? 'all'); ?>">
         <?php if ($field_type !== 'checkbox') : ?>
         <label for="<?php echo $field_id; ?>">
             <?php echo esc_html(yatra_translate_form_string($field['label'])); ?> <?php echo $required_star; ?>
@@ -171,12 +171,31 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
                 
             case 'date':
                 $min_attr = '';
+                // Date-of-birth-style fields are bounded to today and flagged so
+                // booking.js can upgrade them to a picker with fast year jumping
+                // (a native date popup steps one month at a time). The class is
+                // the JS hook; if JS/flatpickr is unavailable the input stays a
+                // working native <input type="date">.
+                $is_dob = (stripos($field_id, 'birth') !== false || stripos($field_id, 'dob') !== false
+                    || stripos($field_name, 'birth') !== false || stripos($field_name, 'dob') !== false);
+                $dob_attr = $is_dob ? ' data-yatra-dob="1" max="' . esc_attr(date('Y-m-d')) . '"' : '';
+                // Native date inputs ignore the placeholder, but once booking.js
+                // upgrades the field to a flatpickr text input the placeholder is
+                // what keeps it visually consistent with the other text fields
+                // (otherwise it renders blank). Use the field's own placeholder
+                // when set, else a format hint matching flatpickr's Y-m-d output.
+                $date_placeholder = !empty($field['placeholder'])
+                    ? yatra_translate_form_string($field['placeholder'])
+                    : 'YYYY-MM-DD';
                 ?>
-                <input 
-                    type="date" 
-                    id="<?php echo $field_id; ?>" 
+                <input
+                    type="date"
+                    class="yatra-js-date"
+                    id="<?php echo $field_id; ?>"
                     name="<?php echo $field_name; ?>"
+                    placeholder="<?php echo esc_attr($date_placeholder); ?>"
                     <?php echo $min_attr; ?>
+                    <?php echo $dob_attr; ?>
                     <?php echo $required_attr; ?>
                     value="<?php echo esc_attr($prefill_value); ?>"
                 >
@@ -516,6 +535,20 @@ $traveler_section_enabled = !isset($traveler_config['enabled']) || (bool) $trave
             /* translators: %d: traveler sequence number. */
             $traveler_label = ($i === 1) ? __('Traveler 1 (Lead Traveler)', 'yatra') : sprintf(__('Traveler %d', 'yatra'), $i);
             }
+
+            // Fields targeted at the lead traveler (applies_to === 'lead') render
+            // only for Traveler 1; everything else ('all' / unset) renders for
+            // every traveler. Empty subsections are dropped so additional
+            // travelers don't get an orphan heading.
+            $traveler_grouped_fields = [];
+            foreach ($grouped_traveler_fields as $sk => $sf) {
+                $applicable = array_values(array_filter($sf, function ($f) use ($i) {
+                    return ($f['applies_to'] ?? 'all') !== 'lead' || $i === 1;
+                }));
+                if (!empty($applicable)) {
+                    $traveler_grouped_fields[$sk] = $applicable;
+                }
+            }
         ?>
         <div class="yatra-traveler-form" data-traveler-index="<?php echo esc_attr($i); ?>" <?php if (!empty($traveler_category_map[$i])): ?>data-category-id="<?php echo esc_attr($traveler_category_map[$i]['category_id']); ?>" data-category-label="<?php echo esc_attr($traveler_category_map[$i]['category_label']); ?>"<?php endif; ?>>
             <div class="yatra-traveler-header">
@@ -525,7 +558,7 @@ $traveler_section_enabled = !isset($traveler_config['enabled']) || (bool) $trave
                 <?php endif; ?>
             </div>
             
-            <?php foreach ($grouped_traveler_fields as $section_key => $section_fields) : ?>
+            <?php foreach ($traveler_grouped_fields as $section_key => $section_fields) : ?>
                 <?php if ($section_key !== 'main') : ?>
                     <div class="yatra-traveler-subsection">
                         <h4 class="yatra-subsection-title">
@@ -682,18 +715,26 @@ if (class_exists('Yatra\PaymentGateways\PaymentGatewayRegistry')) {
 <?php endif; ?>
 
 <!-- Account Creation Section (only for guests) -->
-<?php 
+<?php
 $allow_guest_checkout = \Yatra\Services\SettingsService::isEnabled('allow_guest_checkout');
 $require_login = \Yatra\Services\SettingsService::isEnabled('require_login');
+// Account CREATION is gated by the same setting the backend enforces
+// (AuthController rejects registration when this is off). When registration is
+// disabled we never offer account-creation UI.
+$registration_enabled = \Yatra\Services\SettingsService::isEnabled('customer_registration');
 
-// Show account section if user is not logged in
-if (!is_user_logged_in() && !$is_remaining_payment) : 
+// Show the account section only when it has something to render: login is
+// required, guest checkout is off (must authenticate), or registration is on
+// (optional/required account creation). When registration is OFF and guests are
+// allowed, there is nothing to show — proceed as a pure guest.
+if (!is_user_logged_in() && !$is_remaining_payment
+    && ($require_login || !$allow_guest_checkout || $registration_enabled)) :
 ?>
 <div class="yatra-booking-section yatra-account-section">
     <h2 class="yatra-section-title"><?php esc_html_e('Account', 'yatra'); ?></h2>
     
-    <?php if ($require_login) : ?>
-        <!-- Login Required Message -->
+    <?php if ($require_login || (!$allow_guest_checkout && !$registration_enabled)) : ?>
+        <!-- Login Required Message (login required, OR guests off with registration disabled) -->
         <div class="yatra-login-required-notice" style="background: #fef3c7; border: 1px solid #f59e0b; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
             <div style="display: flex; align-items: flex-start; gap: 12px;">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" style="flex-shrink: 0;">
@@ -704,7 +745,9 @@ if (!is_user_logged_in() && !$is_remaining_payment) :
                 <div>
                     <p style="font-weight: 600; color: #92400e; margin: 0 0 8px 0;"><?php esc_html_e('Login Required', 'yatra'); ?></p>
                     <p style="color: #a16207; margin: 0 0 12px 0; font-size: 14px;">
-                        <?php esc_html_e('You must be logged in to complete this booking. Please log in or create an account.', 'yatra'); ?>
+                        <?php echo $registration_enabled
+                            ? esc_html__('You must be logged in to complete this booking. Please log in or create an account.', 'yatra')
+                            : esc_html__('You must be logged in to complete this booking. Please log in to continue.', 'yatra'); ?>
                     </p>
                     <a href="<?php echo esc_url(wp_login_url(get_permalink())); ?>" class="yatra-login-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #3b82f6; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 14px;">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -714,17 +757,19 @@ if (!is_user_logged_in() && !$is_remaining_payment) :
                         </svg>
                         <?php esc_html_e('Log In', 'yatra'); ?>
                     </a>
+                    <?php if ($registration_enabled) : ?>
                     <span style="margin: 0 12px; color: #a16207;"><?php esc_html_e('or', 'yatra'); ?></span>
                     <a href="<?php echo esc_url(wp_registration_url()); ?>" style="color: #3b82f6; text-decoration: none; font-weight: 500;">
                         <?php esc_html_e('Create an Account', 'yatra'); ?>
                     </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
         <input type="hidden" name="login_required" value="1">
         
-    <?php elseif (!$allow_guest_checkout) : ?>
-        <!-- Account Required - Must Create Account -->
+    <?php elseif (!$allow_guest_checkout && $registration_enabled) : ?>
+        <!-- Account Required - Must Create Account (registration enabled) -->
         <p class="yatra-section-description" style="margin-bottom: 16px;">
             <?php esc_html_e('Please create an account to complete your booking. This allows you to manage your bookings and receive important updates.', 'yatra'); ?>
         </p>
@@ -755,8 +800,8 @@ if (!is_user_logged_in() && !$is_remaining_payment) :
         </p>
         <input type="hidden" name="create_account" value="1">
         
-    <?php else : ?>
-        <!-- Guest Checkout Allowed - Optional Account Creation -->
+    <?php elseif ($registration_enabled) : ?>
+        <!-- Guest Checkout Allowed - Optional Account Creation (registration enabled) -->
         <p class="yatra-section-description" style="margin-bottom: 16px;">
             <?php esc_html_e('Create an account to easily manage your bookings and receive travel updates.', 'yatra'); ?>
         </p>

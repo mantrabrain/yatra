@@ -471,21 +471,46 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
         key: "price",
         label: __("Price", "yatra"),
         visible: visibleColumns.price,
-        render: (rule: RecurringRule) => (
-          <div className="text-sm font-semibold text-gray-900 dark:text-white">
-            {rule.sale_price
-              ? formatYatraMoney(Number(rule.sale_price) || 0, adminCurrency, {
-                  zeroAsUnknown: false,
-                })
-              : rule.original_price
-                ? formatYatraMoney(
-                    Number(rule.original_price) || 0,
-                    adminCurrency,
-                    { zeroAsUnknown: false },
-                  )
-                : formatYatraMoney(0, adminCurrency, { zeroAsUnknown: false })}
-          </div>
-        ),
+        render: (rule: RecurringRule) => {
+          // Traveler-based rules store prices per category in traveler_pricing,
+          // leaving the top-level sale_price/original_price columns NULL. Derive
+          // a price (or min–max range) from the per-category data in that case.
+          const tp = Array.isArray(rule.traveler_pricing)
+            ? rule.traveler_pricing
+            : [];
+          const travelerPrices = tp
+            .map((p) => Number(p.sale_price ?? p.original_price) || 0)
+            .filter((n) => n > 0);
+
+          let display: string;
+          if (travelerPrices.length > 0) {
+            const min = Math.min(...travelerPrices);
+            const max = Math.max(...travelerPrices);
+            display =
+              min === max
+                ? formatYatraMoney(min, adminCurrency, { zeroAsUnknown: false })
+                : `${formatYatraMoney(min, adminCurrency, {
+                    zeroAsUnknown: false,
+                  })} – ${formatYatraMoney(max, adminCurrency, {
+                    zeroAsUnknown: false,
+                  })}`;
+          } else {
+            // Regular rules: prefer sale price, fall back to original.
+            // Use Number(...) > 0 (not truthiness) so a "0.00" string from the
+            // DB doesn't mask a real original_price.
+            const sale = Number(rule.sale_price) || 0;
+            const original = Number(rule.original_price) || 0;
+            display = formatYatraMoney(sale > 0 ? sale : original, adminCurrency, {
+              zeroAsUnknown: false,
+            });
+          }
+
+          return (
+            <div className="text-sm font-semibold text-gray-900 dark:text-white">
+              {display}
+            </div>
+          );
+        },
       });
     }
 

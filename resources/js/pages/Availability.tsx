@@ -77,6 +77,15 @@ interface AvailabilityDate {
   original_price: string;
   discounted_price: string;
   discount_percentage: string;
+  // Per-category pricing for traveler-based trips (adult/child/senior, etc.).
+  // When present, the single original/discounted columns are NULL.
+  price_types?: Array<{
+    category_id: number;
+    category_label?: string;
+    original_price: number;
+    discounted_price?: number | null;
+    sale_price?: number | null;
+  }>;
   status:
     | "available"
     | "sold_out"
@@ -320,6 +329,9 @@ const Availability: React.FC = () => {
             date.original_price?.toString() ||
             "0",
           discount_percentage: date.discount_percentage?.toString() || "0",
+          // Carry per-category pricing through so the Price column can show the
+          // real (traveler-based) price; otherwise it falls back to "0".
+          price_types: Array.isArray(date.price_types) ? date.price_types : [],
           status: date.status || "available",
           is_blocked: date.is_blocked || date.status === "blocked",
           block_reason: date.block_reason,
@@ -862,7 +874,30 @@ const Availability: React.FC = () => {
       key: "price",
       label: __("Price", "yatra"),
       visible: visibleColumns.price,
-      render: (date) => (
+      render: (date) => {
+        // Traveler-based dates carry per-category prices in price_types and leave
+        // original_price/discounted_price NULL. Show a price (or min–max range).
+        const pts = Array.isArray(date.price_types) ? date.price_types : [];
+        const travelerPrices = pts
+          .map(
+            (pt) =>
+              Number(pt.sale_price ?? pt.discounted_price ?? pt.original_price) ||
+              0,
+          )
+          .filter((n) => n > 0);
+        if (travelerPrices.length > 0) {
+          const sym = getCurrencySymbol(selectedTrip?.currency || "USD");
+          const min = Math.min(...travelerPrices);
+          const max = Math.max(...travelerPrices);
+          return (
+            <span className="text-sm font-semibold">
+              {min === max
+                ? `${sym}${min.toLocaleString()}`
+                : `${sym}${min.toLocaleString()} – ${sym}${max.toLocaleString()}`}
+            </span>
+          );
+        }
+        return (
         <div className="flex flex-col gap-1">
           {date.discounted_price &&
           parseFloat(date.discounted_price) <
@@ -892,7 +927,8 @@ const Availability: React.FC = () => {
             </span>
           )}
         </div>
-      ),
+        );
+      },
     });
 
     // Status
@@ -1299,6 +1335,10 @@ const Availability: React.FC = () => {
                         tab: "availability",
                         action: "create",
                         trip_id: selectedTripId.toString(),
+                        // Clear any stale `id` left in the URL from a prior edit so
+                        // the form opens cleanly in create mode (navigate() merges
+                        // params; an undefined value deletes the key).
+                        id: undefined,
                       })
                     }
                   >

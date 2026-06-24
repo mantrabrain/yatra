@@ -1106,7 +1106,12 @@ class BookingSessionController extends BaseController
             $required_traveler_fields = [];
             foreach ($form_config['traveler_form']['fields'] as $field) {
                 if (is_array($field) && !empty($field['enabled']) && !empty($field['required']) && !empty($field['id']) && ($field['type'] ?? '') !== 'text_block') {
-                    $required_traveler_fields[(string) $field['id']] = (string) ($field['label'] ?? $field['id']);
+                    $required_traveler_fields[(string) $field['id']] = [
+                        'label'      => (string) ($field['label'] ?? $field['id']),
+                        // "lead" fields are only required on the lead traveler;
+                        // absent/"all" is required on every traveler (legacy).
+                        'applies_to' => ($field['applies_to'] ?? 'all'),
+                    ];
                 }
             }
             if (!empty($required_traveler_fields)) {
@@ -1120,10 +1125,14 @@ class BookingSessionController extends BaseController
                         continue;
                     }
                     $traveler_index++;
-                    foreach ($required_traveler_fields as $fid => $flabel) {
+                    foreach ($required_traveler_fields as $fid => $meta) {
+                        // Lead-only required fields apply to Traveler 1 only.
+                        if (($meta['applies_to'] ?? 'all') === 'lead' && $traveler_index !== 1) {
+                            continue;
+                        }
                         if ($is_missing($traveler[$fid] ?? null)) {
                             /* translators: 1: traveler number, 2: field label. */
-                            return sprintf(__('Traveler %1$d: %2$s is required.', 'yatra'), $traveler_index, $flabel);
+                            return sprintf(__('Traveler %1$d: %2$s is required.', 'yatra'), $traveler_index, $meta['label']);
                         }
                     }
                 }
@@ -1984,8 +1993,18 @@ class BookingSessionController extends BaseController
         if ($isWaitlistCheckout && $resolvedAvailabilityForWaitlist) {
             $booking_data['availability_id'] = (int) $resolvedAvailabilityForWaitlist->id;
             $booking_data['status'] = 'waitlist';
-            $booking_data['payment_gateway'] = 'pay_later';
-            $booking_data['payment_method'] = 'full';
+            // Preserve the customer's real OFFLINE gateway + deposit/partial
+            // choice (Bank Transfer / Pay Later). No charge is taken for a
+            // waitlisted slot regardless, and waitlist promotion only flips the
+            // status — it never restores the selection — so pinning to
+            // pay_later/full here would permanently drop the chosen gateway AND
+            // wipe the deposit (BookingService recomputes amount_due from
+            // payment_method). Online gateways stay deferred to pay_later/full
+            // since a card can't be charged for a non-guaranteed slot.
+            if (!$is_offline_gateway) {
+                $booking_data['payment_gateway'] = 'pay_later';
+                $booking_data['payment_method'] = 'full';
+            }
         }
 
         // Hold the booking in `pending_verification` until the guest
@@ -1999,8 +2018,19 @@ class BookingSessionController extends BaseController
         // resumes.
         if ($needs_email_verification && !$isWaitlistCheckout) {
             $booking_data['status'] = 'pending_verification';
-            $booking_data['payment_gateway'] = 'pay_later';
-            $booking_data['payment_method'] = 'full';
+            // Defer the gateway choice ONLY for online gateways: a real charge
+            // would otherwise lock the customer into a gateway before they have
+            // confirmed their email. For OFFLINE gateways (Bank Transfer / Pay
+            // Later) there is no charge to defer, and the verify-email endpoint
+            // does not restore the selection afterwards — so pinning to
+            // pay_later/full here would permanently drop the customer's chosen
+            // gateway AND their deposit/partial amount (BookingService recomputes
+            // amount_due from payment_method, so 'full' wipes the deposit).
+            // Preserve the real selection for offline gateways.
+            if (!$is_offline_gateway) {
+                $booking_data['payment_gateway'] = 'pay_later';
+                $booking_data['payment_method'] = 'full';
+            }
         }
 
         try {
@@ -2057,6 +2087,12 @@ class BookingSessionController extends BaseController
          * @param array $data The booking request data (contains selected_services)
          * @param int $travelers_count Total number of travelers
          * @param int $duration_days Trip duration in days
+         * @param float $base_amount Trip base price (pre-services, pre-discount) —
+         *        the authoritative base used by the pricing engine for this
+         *        booking. Listeners persisting percentage-type services price
+         *        them against this exact value so the saved line-items reconcile
+         *        with the charged total. Added in a backward-compatible way:
+         *        existing 5-arg listeners simply ignore it.
          * @since 3.0.0
          */
         // Normalise: Pro module reads $data['selected_services'], frontend sends $data['additional_services']
@@ -2069,7 +2105,7 @@ class BookingSessionController extends BaseController
             $data['selected_services'] = [];
         }
         $data['selected_services'] = array_map('intval', $data['selected_services']);
-        do_action('yatra_booking_save_services', $booking_id, $trip_id, $data, $travelers_count, (int) ($trip->duration_days ?? 1));
+        do_action('yatra_booking_save_services', $booking_id, $trip_id, $data, $travelers_count, (int) ($trip->duration_days ?? 1), (float) ($pricing['base_amount'] ?? 0));
 
         // ========================================
         // SAVE TRAVELLERS TO NORMALIZED TABLES

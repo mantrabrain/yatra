@@ -234,6 +234,15 @@ class Trip
     public array $included_items = [];
     public array $excluded_items = [];
     public array $gallery_images = [];
+    // Media arrays computed in SingleTripController::prepareTrip(). These MUST be
+    // declared so Trip::fromStdClass() (which only copies declared properties via
+    // property_exists) carries them onto the model — otherwise the single-trip
+    // hero media switcher reads empty arrays and the Video / 360° / Documents
+    // buttons never render even when video_url / virtual_tour_url are set.
+    public array $videos = [];
+    public array $youtube_videos = [];
+    public array $virtual_tours = [];
+    public array $documents = [];
     public array $price_types = [];
     public array $itinerary_days = [];
     public array $faqs = [];

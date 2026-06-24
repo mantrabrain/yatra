@@ -91,7 +91,12 @@ const AvailabilityForm: React.FC = () => {
   const tripIdFromUrl = urlParams.get("trip_id")
     ? parseInt(urlParams.get("trip_id")!)
     : null;
-  const availabilityId = urlParams.get("id") || null;
+  // Create vs edit is driven by the `action` param, NOT merely the presence of
+  // an `id`. navigate() merges URL params, so a stale `id` from a prior edit can
+  // linger when the user clicks "Add" (action=create); without this guard the
+  // form would wrongly PUT to that dead id ("Availability date not found").
+  const availabilityId =
+    urlParams.get("action") === "create" ? null : urlParams.get("id") || null;
   const isEditMode = !!availabilityId;
 
   // In edit mode, trip_id can come from availability data, so we'll use state

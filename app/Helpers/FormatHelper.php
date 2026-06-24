@@ -23,88 +23,105 @@ class FormatHelper
     /**
      * Country codes to names mapping
      */
-    private const COUNTRY_NAMES = [
-        'AF' => 'Afghanistan', 'AL' => 'Albania', 'DZ' => 'Algeria', 'AD' => 'Andorra',
-        'AO' => 'Angola', 'AG' => 'Antigua and Barbuda', 'AR' => 'Argentina', 'AM' => 'Armenia',
-        'AU' => 'Australia', 'AT' => 'Austria', 'AZ' => 'Azerbaijan', 'BS' => 'Bahamas',
-        'BH' => 'Bahrain', 'BD' => 'Bangladesh', 'BB' => 'Barbados', 'BY' => 'Belarus',
-        'BE' => 'Belgium', 'BZ' => 'Belize', 'BJ' => 'Benin', 'BT' => 'Bhutan',
-        'BO' => 'Bolivia', 'BA' => 'Bosnia and Herzegovina', 'BW' => 'Botswana', 'BR' => 'Brazil',
-        'BN' => 'Brunei', 'BG' => 'Bulgaria', 'BF' => 'Burkina Faso', 'BI' => 'Burundi',
-        'KH' => 'Cambodia', 'CM' => 'Cameroon', 'CA' => 'Canada', 'CV' => 'Cape Verde',
-        'CF' => 'Central African Republic', 'TD' => 'Chad', 'CL' => 'Chile', 'CN' => 'China',
-        'CO' => 'Colombia', 'KM' => 'Comoros', 'CG' => 'Congo', 'CD' => 'DR Congo',
-        'CR' => 'Costa Rica', 'CI' => 'Ivory Coast', 'HR' => 'Croatia', 'CU' => 'Cuba',
-        'CY' => 'Cyprus', 'CZ' => 'Czech Republic', 'DK' => 'Denmark', 'DJ' => 'Djibouti',
-        'DM' => 'Dominica', 'DO' => 'Dominican Republic', 'EC' => 'Ecuador', 'EG' => 'Egypt',
-        'SV' => 'El Salvador', 'GQ' => 'Equatorial Guinea', 'ER' => 'Eritrea', 'EE' => 'Estonia',
-        'SZ' => 'Eswatini', 'ET' => 'Ethiopia', 'FJ' => 'Fiji', 'FI' => 'Finland',
-        'FR' => 'France', 'GA' => 'Gabon', 'GM' => 'Gambia', 'GE' => 'Georgia',
-        'DE' => 'Germany', 'GH' => 'Ghana', 'GR' => 'Greece', 'GD' => 'Grenada',
-        'GT' => 'Guatemala', 'GN' => 'Guinea', 'GW' => 'Guinea-Bissau', 'GY' => 'Guyana',
-        'HT' => 'Haiti', 'HN' => 'Honduras', 'HU' => 'Hungary', 'IS' => 'Iceland',
-        'IN' => 'India', 'ID' => 'Indonesia', 'IR' => 'Iran', 'IQ' => 'Iraq',
-        'IE' => 'Ireland', 'IL' => 'Israel', 'IT' => 'Italy', 'JM' => 'Jamaica',
-        'JP' => 'Japan', 'JO' => 'Jordan', 'KZ' => 'Kazakhstan', 'KE' => 'Kenya',
-        'KI' => 'Kiribati', 'KP' => 'North Korea', 'KR' => 'South Korea', 'KW' => 'Kuwait',
-        'KG' => 'Kyrgyzstan', 'LA' => 'Laos', 'LV' => 'Latvia', 'LB' => 'Lebanon',
-        'LS' => 'Lesotho', 'LR' => 'Liberia', 'LY' => 'Libya', 'LI' => 'Liechtenstein',
-        'LT' => 'Lithuania', 'LU' => 'Luxembourg', 'MG' => 'Madagascar', 'MW' => 'Malawi',
-        'MY' => 'Malaysia', 'MV' => 'Maldives', 'ML' => 'Mali', 'MT' => 'Malta',
-        'MH' => 'Marshall Islands', 'MR' => 'Mauritania', 'MU' => 'Mauritius', 'MX' => 'Mexico',
-        'FM' => 'Micronesia', 'MD' => 'Moldova', 'MC' => 'Monaco', 'MN' => 'Mongolia',
-        'ME' => 'Montenegro', 'MA' => 'Morocco', 'MZ' => 'Mozambique', 'MM' => 'Myanmar',
-        'NA' => 'Namibia', 'NR' => 'Nauru', 'NP' => 'Nepal', 'NL' => 'Netherlands',
-        'NZ' => 'New Zealand', 'NI' => 'Nicaragua', 'NE' => 'Niger', 'NG' => 'Nigeria',
-        'MK' => 'North Macedonia', 'NO' => 'Norway', 'OM' => 'Oman', 'PK' => 'Pakistan',
-        'PW' => 'Palau', 'PS' => 'Palestine', 'PA' => 'Panama', 'PG' => 'Papua New Guinea',
-        'PY' => 'Paraguay', 'PE' => 'Peru', 'PH' => 'Philippines', 'PL' => 'Poland',
-        'PT' => 'Portugal', 'QA' => 'Qatar', 'RO' => 'Romania', 'RU' => 'Russia',
-        'RW' => 'Rwanda', 'KN' => 'Saint Kitts and Nevis', 'LC' => 'Saint Lucia',
-        'VC' => 'Saint Vincent and the Grenadines', 'WS' => 'Samoa', 'SM' => 'San Marino',
-        'ST' => 'Sao Tome and Principe', 'SA' => 'Saudi Arabia', 'SN' => 'Senegal',
-        'RS' => 'Serbia', 'SC' => 'Seychelles', 'SL' => 'Sierra Leone', 'SG' => 'Singapore',
-        'SK' => 'Slovakia', 'SI' => 'Slovenia', 'SB' => 'Solomon Islands', 'SO' => 'Somalia',
-        'ZA' => 'South Africa', 'SS' => 'South Sudan', 'ES' => 'Spain', 'LK' => 'Sri Lanka',
-        'SD' => 'Sudan', 'SR' => 'Suriname', 'SE' => 'Sweden', 'CH' => 'Switzerland',
-        'SY' => 'Syria', 'TW' => 'Taiwan', 'TJ' => 'Tajikistan', 'TZ' => 'Tanzania',
-        'TH' => 'Thailand', 'TL' => 'Timor-Leste', 'TG' => 'Togo', 'TO' => 'Tonga',
-        'TT' => 'Trinidad and Tobago', 'TN' => 'Tunisia', 'TR' => 'Turkey', 'TM' => 'Turkmenistan',
-        'TV' => 'Tuvalu', 'UG' => 'Uganda', 'UA' => 'Ukraine', 'AE' => 'United Arab Emirates',
-        'GB' => 'United Kingdom', 'US' => 'United States', 'UY' => 'Uruguay', 'UZ' => 'Uzbekistan',
-        'VU' => 'Vanuatu', 'VA' => 'Vatican City', 'VE' => 'Venezuela', 'VN' => 'Vietnam',
-        'YE' => 'Yemen', 'ZM' => 'Zambia', 'ZW' => 'Zimbabwe',
+    /**
+     * Country code => translated display name.
+     *
+     * Names are wrapped in __() at the definition so every consumer (booking
+     * form, admin, confirmation) shows localized names, and so all of them are
+     * extractable into the translation catalog. Cached per request.
+     */
+    private static ?array $countryNamesCache = null;
+
+    private static function countryNames(): array
+    {
+        if (self::$countryNamesCache !== null) {
+            return self::$countryNamesCache;
+        }
+
+        return self::$countryNamesCache = [
+
+        'AF' => __('Afghanistan', 'yatra'), 'AL' => __('Albania', 'yatra'), 'DZ' => __('Algeria', 'yatra'), 'AD' => __('Andorra', 'yatra'),
+        'AO' => __('Angola', 'yatra'), 'AG' => __('Antigua and Barbuda', 'yatra'), 'AR' => __('Argentina', 'yatra'), 'AM' => __('Armenia', 'yatra'),
+        'AU' => __('Australia', 'yatra'), 'AT' => __('Austria', 'yatra'), 'AZ' => __('Azerbaijan', 'yatra'), 'BS' => __('Bahamas', 'yatra'),
+        'BH' => __('Bahrain', 'yatra'), 'BD' => __('Bangladesh', 'yatra'), 'BB' => __('Barbados', 'yatra'), 'BY' => __('Belarus', 'yatra'),
+        'BE' => __('Belgium', 'yatra'), 'BZ' => __('Belize', 'yatra'), 'BJ' => __('Benin', 'yatra'), 'BT' => __('Bhutan', 'yatra'),
+        'BO' => __('Bolivia', 'yatra'), 'BA' => __('Bosnia and Herzegovina', 'yatra'), 'BW' => __('Botswana', 'yatra'), 'BR' => __('Brazil', 'yatra'),
+        'BN' => __('Brunei', 'yatra'), 'BG' => __('Bulgaria', 'yatra'), 'BF' => __('Burkina Faso', 'yatra'), 'BI' => __('Burundi', 'yatra'),
+        'KH' => __('Cambodia', 'yatra'), 'CM' => __('Cameroon', 'yatra'), 'CA' => __('Canada', 'yatra'), 'CV' => __('Cape Verde', 'yatra'),
+        'CF' => __('Central African Republic', 'yatra'), 'TD' => __('Chad', 'yatra'), 'CL' => __('Chile', 'yatra'), 'CN' => __('China', 'yatra'),
+        'CO' => __('Colombia', 'yatra'), 'KM' => __('Comoros', 'yatra'), 'CG' => __('Congo', 'yatra'), 'CD' => __('DR Congo', 'yatra'),
+        'CR' => __('Costa Rica', 'yatra'), 'CI' => __('Ivory Coast', 'yatra'), 'HR' => __('Croatia', 'yatra'), 'CU' => __('Cuba', 'yatra'),
+        'CY' => __('Cyprus', 'yatra'), 'CZ' => __('Czech Republic', 'yatra'), 'DK' => __('Denmark', 'yatra'), 'DJ' => __('Djibouti', 'yatra'),
+        'DM' => __('Dominica', 'yatra'), 'DO' => __('Dominican Republic', 'yatra'), 'EC' => __('Ecuador', 'yatra'), 'EG' => __('Egypt', 'yatra'),
+        'SV' => __('El Salvador', 'yatra'), 'GQ' => __('Equatorial Guinea', 'yatra'), 'ER' => __('Eritrea', 'yatra'), 'EE' => __('Estonia', 'yatra'),
+        'SZ' => __('Eswatini', 'yatra'), 'ET' => __('Ethiopia', 'yatra'), 'FJ' => __('Fiji', 'yatra'), 'FI' => __('Finland', 'yatra'),
+        'FR' => __('France', 'yatra'), 'GA' => __('Gabon', 'yatra'), 'GM' => __('Gambia', 'yatra'), 'GE' => __('Georgia', 'yatra'),
+        'DE' => __('Germany', 'yatra'), 'GH' => __('Ghana', 'yatra'), 'GR' => __('Greece', 'yatra'), 'GD' => __('Grenada', 'yatra'),
+        'GT' => __('Guatemala', 'yatra'), 'GN' => __('Guinea', 'yatra'), 'GW' => __('Guinea-Bissau', 'yatra'), 'GY' => __('Guyana', 'yatra'),
+        'HT' => __('Haiti', 'yatra'), 'HN' => __('Honduras', 'yatra'), 'HU' => __('Hungary', 'yatra'), 'IS' => __('Iceland', 'yatra'),
+        'IN' => __('India', 'yatra'), 'ID' => __('Indonesia', 'yatra'), 'IR' => __('Iran', 'yatra'), 'IQ' => __('Iraq', 'yatra'),
+        'IE' => __('Ireland', 'yatra'), 'IL' => __('Israel', 'yatra'), 'IT' => __('Italy', 'yatra'), 'JM' => __('Jamaica', 'yatra'),
+        'JP' => __('Japan', 'yatra'), 'JO' => __('Jordan', 'yatra'), 'KZ' => __('Kazakhstan', 'yatra'), 'KE' => __('Kenya', 'yatra'),
+        'KI' => __('Kiribati', 'yatra'), 'KP' => __('North Korea', 'yatra'), 'KR' => __('South Korea', 'yatra'), 'KW' => __('Kuwait', 'yatra'),
+        'KG' => __('Kyrgyzstan', 'yatra'), 'LA' => __('Laos', 'yatra'), 'LV' => __('Latvia', 'yatra'), 'LB' => __('Lebanon', 'yatra'),
+        'LS' => __('Lesotho', 'yatra'), 'LR' => __('Liberia', 'yatra'), 'LY' => __('Libya', 'yatra'), 'LI' => __('Liechtenstein', 'yatra'),
+        'LT' => __('Lithuania', 'yatra'), 'LU' => __('Luxembourg', 'yatra'), 'MG' => __('Madagascar', 'yatra'), 'MW' => __('Malawi', 'yatra'),
+        'MY' => __('Malaysia', 'yatra'), 'MV' => __('Maldives', 'yatra'), 'ML' => __('Mali', 'yatra'), 'MT' => __('Malta', 'yatra'),
+        'MH' => __('Marshall Islands', 'yatra'), 'MR' => __('Mauritania', 'yatra'), 'MU' => __('Mauritius', 'yatra'), 'MX' => __('Mexico', 'yatra'),
+        'FM' => __('Micronesia', 'yatra'), 'MD' => __('Moldova', 'yatra'), 'MC' => __('Monaco', 'yatra'), 'MN' => __('Mongolia', 'yatra'),
+        'ME' => __('Montenegro', 'yatra'), 'MA' => __('Morocco', 'yatra'), 'MZ' => __('Mozambique', 'yatra'), 'MM' => __('Myanmar', 'yatra'),
+        'NA' => __('Namibia', 'yatra'), 'NR' => __('Nauru', 'yatra'), 'NP' => __('Nepal', 'yatra'), 'NL' => __('Netherlands', 'yatra'),
+        'NZ' => __('New Zealand', 'yatra'), 'NI' => __('Nicaragua', 'yatra'), 'NE' => __('Niger', 'yatra'), 'NG' => __('Nigeria', 'yatra'),
+        'MK' => __('North Macedonia', 'yatra'), 'NO' => __('Norway', 'yatra'), 'OM' => __('Oman', 'yatra'), 'PK' => __('Pakistan', 'yatra'),
+        'PW' => __('Palau', 'yatra'), 'PS' => __('Palestine', 'yatra'), 'PA' => __('Panama', 'yatra'), 'PG' => __('Papua New Guinea', 'yatra'),
+        'PY' => __('Paraguay', 'yatra'), 'PE' => __('Peru', 'yatra'), 'PH' => __('Philippines', 'yatra'), 'PL' => __('Poland', 'yatra'),
+        'PT' => __('Portugal', 'yatra'), 'QA' => __('Qatar', 'yatra'), 'RO' => __('Romania', 'yatra'), 'RU' => __('Russia', 'yatra'),
+        'RW' => __('Rwanda', 'yatra'), 'KN' => __('Saint Kitts and Nevis', 'yatra'), 'LC' => __('Saint Lucia', 'yatra'),
+        'VC' => __('Saint Vincent and the Grenadines', 'yatra'), 'WS' => __('Samoa', 'yatra'), 'SM' => __('San Marino', 'yatra'),
+        'ST' => __('Sao Tome and Principe', 'yatra'), 'SA' => __('Saudi Arabia', 'yatra'), 'SN' => __('Senegal', 'yatra'),
+        'RS' => __('Serbia', 'yatra'), 'SC' => __('Seychelles', 'yatra'), 'SL' => __('Sierra Leone', 'yatra'), 'SG' => __('Singapore', 'yatra'),
+        'SK' => __('Slovakia', 'yatra'), 'SI' => __('Slovenia', 'yatra'), 'SB' => __('Solomon Islands', 'yatra'), 'SO' => __('Somalia', 'yatra'),
+        'ZA' => __('South Africa', 'yatra'), 'SS' => __('South Sudan', 'yatra'), 'ES' => __('Spain', 'yatra'), 'LK' => __('Sri Lanka', 'yatra'),
+        'SD' => __('Sudan', 'yatra'), 'SR' => __('Suriname', 'yatra'), 'SE' => __('Sweden', 'yatra'), 'CH' => __('Switzerland', 'yatra'),
+        'SY' => __('Syria', 'yatra'), 'TW' => __('Taiwan', 'yatra'), 'TJ' => __('Tajikistan', 'yatra'), 'TZ' => __('Tanzania', 'yatra'),
+        'TH' => __('Thailand', 'yatra'), 'TL' => __('Timor-Leste', 'yatra'), 'TG' => __('Togo', 'yatra'), 'TO' => __('Tonga', 'yatra'),
+        'TT' => __('Trinidad and Tobago', 'yatra'), 'TN' => __('Tunisia', 'yatra'), 'TR' => __('Turkey', 'yatra'), 'TM' => __('Turkmenistan', 'yatra'),
+        'TV' => __('Tuvalu', 'yatra'), 'UG' => __('Uganda', 'yatra'), 'UA' => __('Ukraine', 'yatra'), 'AE' => __('United Arab Emirates', 'yatra'),
+        'GB' => __('United Kingdom', 'yatra'), 'US' => __('United States', 'yatra'), 'UY' => __('Uruguay', 'yatra'), 'UZ' => __('Uzbekistan', 'yatra'),
+        'VU' => __('Vanuatu', 'yatra'), 'VA' => __('Vatican City', 'yatra'), 'VE' => __('Venezuela', 'yatra'), 'VN' => __('Vietnam', 'yatra'),
+        'YE' => __('Yemen', 'yatra'), 'ZM' => __('Zambia', 'yatra'), 'ZW' => __('Zimbabwe', 'yatra'),
         // ISO-3166-1 territories and special regions added so customers
         // from common tourism markets (Hong Kong, Puerto Rico, Greenland,
         // Gibraltar, Faroe Islands, etc.) can select their location.
-        'HK' => 'Hong Kong', 'MO' => 'Macao', 'PR' => 'Puerto Rico',
-        'GI' => 'Gibraltar', 'GL' => 'Greenland', 'FO' => 'Faroe Islands',
-        'GG' => 'Guernsey', 'IM' => 'Isle of Man', 'JE' => 'Jersey',
-        'AX' => 'Aland Islands', 'SJ' => 'Svalbard and Jan Mayen',
-        'BM' => 'Bermuda', 'KY' => 'Cayman Islands', 'AI' => 'Anguilla',
-        'AW' => 'Aruba', 'CW' => 'Curacao', 'SX' => 'Sint Maarten',
-        'BQ' => 'Bonaire, Sint Eustatius and Saba',
-        'MS' => 'Montserrat', 'VG' => 'British Virgin Islands',
-        'TC' => 'Turks and Caicos Islands',
-        'BL' => 'Saint Barthelemy', 'MF' => 'Saint Martin (French)',
-        'PM' => 'Saint Pierre and Miquelon',
-        'SH' => 'Saint Helena, Ascension and Tristan da Cunha',
-        'FK' => 'Falkland Islands',
-        'GS' => 'South Georgia and the South Sandwich Islands',
-        'PF' => 'French Polynesia', 'NC' => 'New Caledonia',
-        'WF' => 'Wallis and Futuna', 'CK' => 'Cook Islands',
-        'NU' => 'Niue', 'TK' => 'Tokelau',
-        'GP' => 'Guadeloupe', 'MQ' => 'Martinique',
-        'RE' => 'Reunion', 'YT' => 'Mayotte',
-        'AS' => 'American Samoa', 'GU' => 'Guam',
-        'MP' => 'Northern Mariana Islands', 'VI' => 'U.S. Virgin Islands',
-        'UM' => 'U.S. Minor Outlying Islands',
-        'TF' => 'French Southern Territories',
-        'IO' => 'British Indian Ocean Territory', 'BV' => 'Bouvet Island',
-        'HM' => 'Heard Island and McDonald Islands',
-        'AQ' => 'Antarctica', 'PN' => 'Pitcairn',
-        'EH' => 'Western Sahara', 'XK' => 'Kosovo',
-    ];
+        'HK' => __('Hong Kong', 'yatra'), 'MO' => __('Macao', 'yatra'), 'PR' => __('Puerto Rico', 'yatra'),
+        'GI' => __('Gibraltar', 'yatra'), 'GL' => __('Greenland', 'yatra'), 'FO' => __('Faroe Islands', 'yatra'),
+        'GG' => __('Guernsey', 'yatra'), 'IM' => __('Isle of Man', 'yatra'), 'JE' => __('Jersey', 'yatra'),
+        'AX' => __('Aland Islands', 'yatra'), 'SJ' => __('Svalbard and Jan Mayen', 'yatra'),
+        'BM' => __('Bermuda', 'yatra'), 'KY' => __('Cayman Islands', 'yatra'), 'AI' => __('Anguilla', 'yatra'),
+        'AW' => __('Aruba', 'yatra'), 'CW' => __('Curacao', 'yatra'), 'SX' => __('Sint Maarten', 'yatra'),
+        'BQ' => __('Bonaire, Sint Eustatius and Saba', 'yatra'),
+        'MS' => __('Montserrat', 'yatra'), 'VG' => __('British Virgin Islands', 'yatra'),
+        'TC' => __('Turks and Caicos Islands', 'yatra'),
+        'BL' => __('Saint Barthelemy', 'yatra'), 'MF' => __('Saint Martin (French)', 'yatra'),
+        'PM' => __('Saint Pierre and Miquelon', 'yatra'),
+        'SH' => __('Saint Helena, Ascension and Tristan da Cunha', 'yatra'),
+        'FK' => __('Falkland Islands', 'yatra'),
+        'GS' => __('South Georgia and the South Sandwich Islands', 'yatra'),
+        'PF' => __('French Polynesia', 'yatra'), 'NC' => __('New Caledonia', 'yatra'),
+        'WF' => __('Wallis and Futuna', 'yatra'), 'CK' => __('Cook Islands', 'yatra'),
+        'NU' => __('Niue', 'yatra'), 'TK' => __('Tokelau', 'yatra'),
+        'GP' => __('Guadeloupe', 'yatra'), 'MQ' => __('Martinique', 'yatra'),
+        'RE' => __('Reunion', 'yatra'), 'YT' => __('Mayotte', 'yatra'),
+        'AS' => __('American Samoa', 'yatra'), 'GU' => __('Guam', 'yatra'),
+        'MP' => __('Northern Mariana Islands', 'yatra'), 'VI' => __('U.S. Virgin Islands', 'yatra'),
+        'UM' => __('U.S. Minor Outlying Islands', 'yatra'),
+        'TF' => __('French Southern Territories', 'yatra'),
+        'IO' => __('British Indian Ocean Territory', 'yatra'), 'BV' => __('Bouvet Island', 'yatra'),
+        'HM' => __('Heard Island and McDonald Islands', 'yatra'),
+        'AQ' => __('Antarctica', 'yatra'), 'PN' => __('Pitcairn', 'yatra'),
+        'EH' => __('Western Sahara', 'yatra'), 'XK' => __('Kosovo', 'yatra'),
+        ];
+    }
 
     /**
      * Format price with currency
@@ -284,7 +301,7 @@ class FormatHelper
     public static function getCountryName(string $code): string
     {
         $code = strtoupper($code);
-        return self::COUNTRY_NAMES[$code] ?? $code;
+        return self::countryNames()[$code] ?? $code;
     }
 
     /**
@@ -307,7 +324,7 @@ class FormatHelper
      */
     public static function getCountries(): array
     {
-        $countries = self::COUNTRY_NAMES;
+        $countries = self::countryNames();
 
         // Stable alphabetical sort by display name. Operators expect
         // "Argentina" before "Australia" before "Austria" — code-order

@@ -3539,7 +3539,7 @@
           num_items: sessionPayload.travelers || 1
         });
         
-        console.log('[Facebook Pixel] InitiateCheckout tracked for trip:', sessionPayload.trip_id);
+        window.YATRA_DEBUG && console.log('[Facebook Pixel] InitiateCheckout tracked for trip:', sessionPayload.trip_id);
       }
       
       // Track Book Now click as begin_checkout (Google Analytics 4)
@@ -3559,7 +3559,7 @@
           }]
         });
         
-        console.log('[Google Analytics] begin_checkout tracked for trip:', sessionPayload.trip_id);
+        window.YATRA_DEBUG && console.log('[Google Analytics] begin_checkout tracked for trip:', sessionPayload.trip_id);
       }
       
       // Set booking session via REST API
@@ -5196,7 +5196,7 @@ class ItineraryVideoHandler {
         let videoId = '';
         if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
           // YouTube video ID extraction
-          const matches = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/);
+          const matches = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([^&\n?#\/]+)/);
           videoId = matches ? matches[1] : '';
         } else if (videoUrl.includes('vimeo.com')) {
           // Vimeo video ID extraction

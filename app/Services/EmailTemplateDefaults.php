@@ -36,6 +36,14 @@ final class EmailTemplateDefaults
             'email_tpl_trip_consent_body' => self::htmlTripConsentRequest(),
             'email_tpl_customer_verification_subject' => '✉️ [{{site_name}}] Verify your email address',
             'email_tpl_customer_verification_body' => self::htmlCustomerEmailVerification(),
+            // Guest-checkout verification (distinct from account registration above).
+            // Subject mirrors the render's hardcoded fallback; body reuses the
+            // customer-verification HTML so the email is identical until an operator
+            // customizes it. Registering these keys here is required so the settings
+            // save accepts them (SettingsController whitelists by default_settings)
+            // and the admin template editor pre-fills them.
+            'email_tpl_guest_verification_subject' => '✉️ [{{site_name}}] Verify your email to complete your booking',
+            'email_tpl_guest_verification_body' => self::htmlCustomerEmailVerification(),
             'email_tpl_booking_completed_subject' => '🌟 [{{site_name}}] Thanks for traveling · {{booking_reference}}',
             'email_tpl_booking_completed_body' => self::htmlTripCompleted(),
             'email_tpl_booking_expired_customer_subject' => '⏱️ [{{site_name}}] Booking expired · {{booking_reference}}',
@@ -582,7 +590,7 @@ final class EmailTemplateDefaults
             ['label' => __('Trip', 'yatra'), 'value' => esc_html($v['trip_name'] ?? '')],
             ['label' => __('Travel date', 'yatra'), 'value' => esc_html($v['travel_date'] ?? '')],
             ['label' => __('Travelers', 'yatra'), 'value' => esc_html($v['travelers_count'] ?? '')],
-            ['label' => __('Total', 'yatra'), 'value' => trim(esc_html($v['total_amount_formatted'] ?? '') . ' ' . esc_html($v['currency'] ?? ''))],
+            ['label' => __('Total', 'yatra'), 'value' => esc_html($v['total_amount_formatted'] ?? '')],
             ['label' => __('Booking status', 'yatra'), 'value' => esc_html($v['booking_status'] ?? '')],
             ['label' => __('Payment status', 'yatra'), 'value' => esc_html($v['payment_status'] ?? '')],
         ], static function (array $row): bool {
@@ -729,7 +737,7 @@ final class EmailTemplateDefaults
                 ['label' => 'Trip', 'value' => '{{trip_name}}'],
                 ['label' => 'Travel date', 'value' => '{{travel_date}}'],
                 ['label' => 'Travelers', 'value' => '{{travelers_count}}'],
-                ['label' => 'Total', 'value' => '{{total_amount_formatted}} {{currency}}'],
+                ['label' => 'Total', 'value' => '{{total_amount_formatted}}'],
                 ['label' => 'Booking status', 'value' => '{{booking_status}}'],
                 ['label' => 'Payment status', 'value' => '{{payment_status}}'],
             ])

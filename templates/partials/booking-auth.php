@@ -13,6 +13,14 @@ if (!defined('ABSPATH')) {
 
 global $booking;
 $trip = $booking->trip ?? null;
+
+// Account registration is gated by the same setting the backend enforces
+// (AuthController rejects registration when this is off). When it's disabled we
+// hide the Register tab/form and the "Register now" switch so customers only
+// see the Login option.
+$registration_enabled = class_exists('\\Yatra\\Services\\SettingsService')
+    ? \Yatra\Services\SettingsService::isEnabled('customer_registration')
+    : true;
 ?>
 
 <div class="yatra-booking-auth">
@@ -24,12 +32,14 @@ $trip = $booking->trip ?? null;
             </svg>
             <?php esc_html_e('Login', 'yatra'); ?>
         </button>
+        <?php if ($registration_enabled) : ?>
         <button type="button" class="yatra-auth-tab" data-tab="register">
             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
             </svg>
             <?php esc_html_e('Register', 'yatra'); ?>
         </button>
+        <?php endif; ?>
     </div>
 
     <!-- Login Form -->
@@ -106,13 +116,16 @@ $trip = $booking->trip ?? null;
             </button>
         </form>
 
+        <?php if ($registration_enabled) : ?>
         <div class="yatra-auth-footer">
-            <p><?php esc_html_e("Don't have an account?", 'yatra'); ?> 
+            <p><?php esc_html_e("Don't have an account?", 'yatra'); ?>
                 <button type="button" class="yatra-switch-tab" data-tab="register"><?php esc_html_e('Register now', 'yatra'); ?></button>
             </p>
         </div>
+        <?php endif; ?>
     </div>
 
+    <?php if ($registration_enabled) : ?>
     <!-- Registration Form -->
     <div class="yatra-auth-content" id="yatra-auth-register" style="display:none;">
         <div class="yatra-auth-header">
@@ -250,9 +263,10 @@ $trip = $booking->trip ?? null;
         </form>
 
         <div class="yatra-auth-footer">
-            <p><?php esc_html_e('Already have an account?', 'yatra'); ?> 
+            <p><?php esc_html_e('Already have an account?', 'yatra'); ?>
                 <button type="button" class="yatra-switch-tab" data-tab="login"><?php esc_html_e('Login here', 'yatra'); ?></button>
             </p>
         </div>
     </div>
+    <?php endif; ?>
 </div>

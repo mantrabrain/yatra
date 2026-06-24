@@ -151,7 +151,7 @@ function installAndActivateTheme(themeSlug) {
             nonce: '<?php echo wp_create_nonce('yatra_theme_actions'); ?>'
         },
         success: function(response) {
-            console.log('Raw installation response:', response); // Debug log
+            window.YATRA_DEBUG && console.log('Raw installation response:', response); // Debug log
             
             // Handle case where HTML is mixed with JSON
             let jsonResponse = response;
@@ -184,7 +184,7 @@ function installAndActivateTheme(themeSlug) {
                         nonce: '<?php echo wp_create_nonce('yatra_theme_actions'); ?>'
                     },
                     success: function(activateResponse) {
-                        console.log('Activation response:', activateResponse); // Debug log
+                        window.YATRA_DEBUG && console.log('Activation response:', activateResponse); // Debug log
                         if (activateResponse && activateResponse.success) {
                             // Update UI dynamically to show activated state
                             updateThemeCardToActivated();
@@ -195,7 +195,7 @@ function installAndActivateTheme(themeSlug) {
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.log('Activation AJAX error:', {xhr: xhr, status: status, error: error}); // Debug log
+                        window.YATRA_DEBUG && console.log('Activation AJAX error:', {xhr: xhr, status: status, error: error}); // Debug log
                         resetButtonState(button, originalContent);
                         alert(yatraThemeWizardI18n.activationRequestFailed);
                     }
@@ -248,7 +248,7 @@ function activateTheme(themeSlug) {
             nonce: '<?php echo wp_create_nonce('yatra_theme_actions'); ?>'
         },
         success: function(response) {
-            console.log('Activation response:', response); // Debug log
+            window.YATRA_DEBUG && console.log('Activation response:', response); // Debug log
             if (response && response.success) {
                 // Update UI dynamically to show activated state
                 updateThemeCardToActivated();
@@ -259,7 +259,7 @@ function activateTheme(themeSlug) {
             }
         },
         error: function(xhr, status, error) {
-            console.log('Activation AJAX error:', {xhr: xhr, status: status, error: error}); // Debug log
+            window.YATRA_DEBUG && console.log('Activation AJAX error:', {xhr: xhr, status: status, error: error}); // Debug log
             resetButtonState(button, originalContent);
             alert(yatraThemeWizardI18n.activationRequestFailed);
         }

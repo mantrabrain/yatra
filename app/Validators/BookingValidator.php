@@ -37,6 +37,56 @@ class BookingValidator
     ];
 
     /**
+     * Normalize a locale-formatted numeric string to a PHP-parseable form.
+     *
+     * Russian / European locales format money as "1 200,50" (space thousands +
+     * comma decimal), and some browsers/inputs submit that raw string. PHP's
+     * is_numeric() rejects it and (float) silently truncates it ("200,50" → 200),
+     * which surfaced to users as a generic "Booking validation failed" with no
+     * indication of the real cause. Normalize before validating/casting so we
+     * accept "1 200,50", "1.200,50" (EU), "1,200.50" (US) and "200,50" alike.
+     *
+     * @param mixed $value
+     * @return mixed Normalized string for numeric input, original value otherwise.
+     */
+    private static function normalizeNumeric($value)
+    {
+        if (is_int($value) || is_float($value)) {
+            return $value;
+        }
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        $v = trim($value);
+        if ($v === '') {
+            return $v;
+        }
+
+        // Strip currency symbols and all whitespace used as thousands separators
+        // (regular space, NBSP U+00A0, narrow NBSP U+202F, thin space U+2009).
+        $v = preg_replace('/[\s\x{00A0}\x{202F}\x{2009}]/u', '', $v);
+
+        $lastComma = strrpos($v, ',');
+        $lastDot   = strrpos($v, '.');
+
+        if ($lastComma !== false && $lastDot !== false) {
+            // Both present → the right-most one is the decimal separator.
+            if ($lastComma > $lastDot) {
+                $v = str_replace('.', '', $v);   // dots are thousands
+                $v = str_replace(',', '.', $v);  // comma is decimal
+            } else {
+                $v = str_replace(',', '', $v);   // commas are thousands
+            }
+        } elseif ($lastComma !== false) {
+            // Only a comma → treat it as the decimal separator.
+            $v = str_replace(',', '.', $v);
+        }
+
+        return $v;
+    }
+
+    /**
      * Validate booking creation data
      */
     public static function validateCreate(array $data): void
@@ -74,15 +124,17 @@ class BookingValidator
             }
         }
 
-        // Validate pricing
+        // Validate pricing (locale-tolerant: accept "1 200,50" / "1.200,50" etc.)
         if (isset($data['total_amount'])) {
-            if (!is_numeric($data['total_amount']) || (float)$data['total_amount'] < 0) {
+            $totalAmount = self::normalizeNumeric($data['total_amount']);
+            if (!is_numeric($totalAmount) || (float)$totalAmount < 0) {
                 $errors['total_amount'][] = __('Total amount must be a valid positive number', 'yatra');
             }
         }
 
         if (isset($data['paid_amount'])) {
-            if (!is_numeric($data['paid_amount']) || (float)$data['paid_amount'] < 0) {
+            $paidAmount = self::normalizeNumeric($data['paid_amount']);
+            if (!is_numeric($paidAmount) || (float)$paidAmount < 0) {
                 $errors['paid_amount'][] = __('Paid amount must be a valid positive number', 'yatra');
             }
         }
@@ -174,11 +226,11 @@ class BookingValidator
             }
         }
 
-        if (isset($data['total_amount']) && (!is_numeric($data['total_amount']) || (float)$data['total_amount'] < 0)) {
+        if (isset($data['total_amount']) && (!is_numeric(self::normalizeNumeric($data['total_amount'])) || (float)self::normalizeNumeric($data['total_amount']) < 0)) {
             $errors['total_amount'][] = __('Total amount must be a valid positive number', 'yatra');
         }
 
-        if (isset($data['paid_amount']) && (!is_numeric($data['paid_amount']) || (float)$data['paid_amount'] < 0)) {
+        if (isset($data['paid_amount']) && (!is_numeric(self::normalizeNumeric($data['paid_amount'])) || (float)self::normalizeNumeric($data['paid_amount']) < 0)) {
             $errors['paid_amount'][] = __('Paid amount must be a valid positive number', 'yatra');
         }
 
@@ -225,13 +277,14 @@ class BookingValidator
             $sanitized['travelers_count'] = (int)$data['travelers_count'];
         }
 
-        // Float fields
+        // Float fields (normalize locale formatting so "200,50" stores as 200.50,
+        // not silently truncated to 200 by a bare (float) cast).
         if (isset($data['total_amount'])) {
-            $sanitized['total_amount'] = (float)$data['total_amount'];
+            $sanitized['total_amount'] = (float)self::normalizeNumeric($data['total_amount']);
         }
 
         if (isset($data['paid_amount'])) {
-            $sanitized['paid_amount'] = (float)$data['paid_amount'];
+            $sanitized['paid_amount'] = (float)self::normalizeNumeric($data['paid_amount']);
         }
 
         // Date fields
@@ -302,13 +355,13 @@ class BookingValidator
 
         // Tax fields
         if (isset($data['subtotal'])) {
-            $sanitized['subtotal'] = (float)$data['subtotal'];
+            $sanitized['subtotal'] = (float)self::normalizeNumeric($data['subtotal']);
         }
         if (isset($data['tax_amount'])) {
-            $sanitized['tax_amount'] = (float)$data['tax_amount'];
+            $sanitized['tax_amount'] = (float)self::normalizeNumeric($data['tax_amount']);
         }
         if (isset($data['tax_rate'])) {
-            $sanitized['tax_rate'] = (float)$data['tax_rate'];
+            $sanitized['tax_rate'] = (float)self::normalizeNumeric($data['tax_rate']);
         }
         if (isset($data['tax_inclusive'])) {
             $sanitized['tax_inclusive'] = (bool)$data['tax_inclusive'];
@@ -322,13 +375,13 @@ class BookingValidator
             $sanitized['currency'] = sanitize_text_field($data['currency']);
         }
         if (isset($data['amount_due'])) {
-            $sanitized['amount_due'] = (float)$data['amount_due'];
+            $sanitized['amount_due'] = (float)self::normalizeNumeric($data['amount_due']);
         }
         if (isset($data['amount_paid'])) {
-            $sanitized['amount_paid'] = (float)$data['amount_paid'];
+            $sanitized['amount_paid'] = (float)self::normalizeNumeric($data['amount_paid']);
         }
         if (isset($data['discount_amount'])) {
-            $sanitized['discount_amount'] = (float)$data['discount_amount'];
+            $sanitized['discount_amount'] = (float)self::normalizeNumeric($data['discount_amount']);
         }
         if (isset($data['discount_code'])) {
             $sanitized['discount_code'] = sanitize_text_field($data['discount_code']);
@@ -410,7 +463,7 @@ class BookingValidator
             $sanitized['itinerary_costs'] = $data['itinerary_costs']; // Already JSON encoded
         }
         if (isset($data['itinerary_costs_total'])) {
-            $sanitized['itinerary_costs_total'] = (float)$data['itinerary_costs_total'];
+            $sanitized['itinerary_costs_total'] = (float)self::normalizeNumeric($data['itinerary_costs_total']);
         }
         if (isset($data['departure_time'])) {
             $t = trim((string) $data['departure_time']);

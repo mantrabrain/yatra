@@ -1765,6 +1765,26 @@ class TripRepository extends BaseRepository
     public function savePriceTypes(int $tripId, array $priceTypes): void
     {
         if (empty($priceTypes)) {
+            // Explicitly clear stored per-category pricing so that deleting all
+            // rows (even the last one) persists. Previously this early-returned,
+            // leaving the old price_types JSON in place — the deletion silently
+            // reverted on reload. Only the JSON is always cleared; the derived
+            // scalar columns (original/discounted/sale) are reset solely for
+            // traveler-based trips, because for regular pricing those columns
+            // hold the actual price and must not be wiped.
+            $table = TripsTable::getTableName();
+            $pricingType = $this->wpdb->get_var(
+                $this->wpdb->prepare("SELECT pricing_type FROM `{$table}` WHERE id = %d", $tripId)
+            );
+
+            $data = ['price_types' => null];
+            if ($pricingType === 'traveler_based') {
+                $data['original_price']   = null;
+                $data['discounted_price'] = null;
+                $data['sale_price']       = null;
+            }
+
+            $this->wpdb->update($table, $data, ['id' => $tripId]);
             return;
         }
 

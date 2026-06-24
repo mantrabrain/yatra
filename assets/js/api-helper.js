@@ -15,7 +15,7 @@ window.YatraApiHelper = {
         const usesPrettyPermalinks = this.detectPrettyPermalinks(currentUrl);
         
         if (window.yatraConfig?.debug) {
-            console.log('Yatra API Helper - Using permalinks:', usesPrettyPermalinks ? 'Pretty' : 'Plain');
+            window.YATRA_DEBUG && console.log('Yatra API Helper - Using permalinks:', usesPrettyPermalinks ? 'Pretty' : 'Plain');
         }
         
         if (usesPrettyPermalinks) {
@@ -36,7 +36,7 @@ window.YatraApiHelper = {
         if (yatraData.permalinkStructure !== undefined) {
             const isPlain = yatraData.permalinkStructure === 'plain';
             if (window.yatraConfig?.debug) {
-                console.log('Yatra API Helper - WordPress permalink structure:', yatraData.permalinkStructure, 'isPlain:', isPlain);
+                window.YATRA_DEBUG && console.log('Yatra API Helper - WordPress permalink structure:', yatraData.permalinkStructure, 'isPlain:', isPlain);
             }
             return !isPlain; // Return true if NOT plain (i.e., pretty)
         }
@@ -47,7 +47,7 @@ window.YatraApiHelper = {
             // If root ends with /wp-json/, pretty permalinks are working
             const usesPretty = wpApiSettings.root.includes('/wp-json/');
             if (window.yatraConfig?.debug) {
-                console.log('Yatra API Helper - WP API settings root:', wpApiSettings.root, 'usesPretty:', usesPretty);
+                window.YATRA_DEBUG && console.log('Yatra API Helper - WP API settings root:', wpApiSettings.root, 'usesPretty:', usesPretty);
             }
             return usesPretty;
         }
@@ -60,12 +60,12 @@ window.YatraApiHelper = {
             (url.includes('/') && !url.includes('?') && !url.includes('='));
             
         if (window.yatraConfig?.debug) {
-            console.log('Yatra API Helper - URL structure analysis:', hasPrettyStructure);
+            window.YATRA_DEBUG && console.log('Yatra API Helper - URL structure analysis:', hasPrettyStructure);
         }
         
         // Method 4: Default to plain since we know pretty permalinks aren't working
         if (window.yatraConfig?.debug) {
-            console.log('Yatra API Helper - Defaulting to plain permalinks (fallback)');
+            window.YATRA_DEBUG && console.log('Yatra API Helper - Defaulting to plain permalinks (fallback)');
         }
         return false;
     },
@@ -88,7 +88,7 @@ window.YatraApiHelper = {
         for (const nonce of sources) {
             if (nonce && nonce !== '') {
                 if (window.yatraConfig?.debug) {
-                    console.log('Yatra API Helper - Using nonce from source:', sources.indexOf(nonce));
+                    window.YATRA_DEBUG && console.log('Yatra API Helper - Using nonce from source:', sources.indexOf(nonce));
                 }
                 return nonce;
             }
@@ -145,7 +145,7 @@ window.YatraApiHelper = {
         
         const shouldUse = isLoggedIn || hasUserData;
         if (window.yatraConfig?.debug) {
-            console.log('Yatra API Helper - User logged in:', shouldUse);
+            window.YATRA_DEBUG && console.log('Yatra API Helper - User logged in:', shouldUse);
         }
         return shouldUse;
     },
@@ -179,8 +179,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // API Helper is ready for use
     // Debug logging can be enabled by setting window.yatraConfig.debug = true
     if (window.yatraConfig?.debug) {
-        console.log('Yatra API Helper - Initialized');
+        window.YATRA_DEBUG && console.log('Yatra API Helper - Initialized');
         const detectedStructure = window.YatraApiHelper.detectPrettyPermalinks(window.location.href);
-        console.log('Yatra API Helper - Permalink structure:', detectedStructure ? 'Pretty' : 'Plain');
+        window.YATRA_DEBUG && console.log('Yatra API Helper - Permalink structure:', detectedStructure ? 'Pretty' : 'Plain');
     }
 });

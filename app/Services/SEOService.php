@@ -234,6 +234,28 @@ class SEOService
     }
 
     /**
+     * Expand SEO meta placeholders for taxonomy terms.
+     *
+     * The destination / activity / category meta forms tell the operator to
+     * "Use {name} as placeholder" in the meta title, description and keywords.
+     * Those values are stored verbatim (the term may be renamed later), so the
+     * token must be substituted here, at render time, with the term's name.
+     * No-op when the value contains no token, so plain values are untouched.
+     *
+     * @param string $value Stored meta value, possibly containing {name}
+     * @param string $name  Term name to substitute
+     * @return string Value with {name} replaced
+     */
+    private function expandTermTokens(string $value, string $name): string
+    {
+        if ($value === '' || strpos($value, '{') === false) {
+            return $value;
+        }
+
+        return str_replace(['{name}', '{Name}'], $name, $value);
+    }
+
+    /**
      * Validate and sanitize URL
      * 
      * @param string $url URL to validate
@@ -414,11 +436,13 @@ class SEOService
             }
         }
 
+        $name = (string) ($destination->name ?? '');
         $title = $metadata['seo_title'] ?? $destination->name ?? '';
-        $this->seoData['title'] = $this->sanitizeText((string) $title);
+        $this->seoData['title'] = $this->sanitizeText($this->expandTermTokens((string) $title, $name));
         $descRaw = $metadata['seo_description'] ?? $destination->description ?? '';
-        $this->seoData['description'] = $this->sanitizeText(\wp_trim_words(\wp_strip_all_tags((string) $descRaw), 45, '…'));
-        $this->seoData['keywords'] = $this->sanitizeText((string) ($metadata['seo_keywords'] ?? ''));
+        $descRaw = $this->expandTermTokens((string) $descRaw, $name);
+        $this->seoData['description'] = $this->sanitizeText(\wp_trim_words(\wp_strip_all_tags($descRaw), 45, '…'));
+        $this->seoData['keywords'] = $this->sanitizeText($this->expandTermTokens((string) ($metadata['seo_keywords'] ?? ''), $name));
         
         // Get featured image or gallery image
         $this->seoData['image'] = $destination->featured_image_url ?? 
@@ -453,10 +477,12 @@ class SEOService
             }
         }
 
-        $this->seoData['title'] = $this->sanitizeText((string) ($metadata['seo_title'] ?? $activity->name ?? ''));
+        $name = (string) ($activity->name ?? '');
+        $this->seoData['title'] = $this->sanitizeText($this->expandTermTokens((string) ($metadata['seo_title'] ?? $activity->name ?? ''), $name));
         $descRaw = $metadata['seo_description'] ?? $activity->description ?? '';
-        $this->seoData['description'] = $this->sanitizeText(\wp_trim_words(\wp_strip_all_tags((string) $descRaw), 45, '…'));
-        $this->seoData['keywords'] = $this->sanitizeText((string) ($metadata['seo_keywords'] ?? ''));
+        $descRaw = $this->expandTermTokens((string) $descRaw, $name);
+        $this->seoData['description'] = $this->sanitizeText(\wp_trim_words(\wp_strip_all_tags($descRaw), 45, '…'));
+        $this->seoData['keywords'] = $this->sanitizeText($this->expandTermTokens((string) ($metadata['seo_keywords'] ?? ''), $name));
         
         // Get featured image or gallery image
         $this->seoData['image'] = $activity->featured_image_url ?? 
@@ -491,10 +517,12 @@ class SEOService
             }
         }
 
-        $this->seoData['title'] = $this->sanitizeText((string) ($metadata['seo_title'] ?? $category->name ?? ''));
+        $name = (string) ($category->name ?? '');
+        $this->seoData['title'] = $this->sanitizeText($this->expandTermTokens((string) ($metadata['seo_title'] ?? $category->name ?? ''), $name));
         $descRaw = $metadata['seo_description'] ?? $category->description ?? '';
-        $this->seoData['description'] = $this->sanitizeText(\wp_trim_words(\wp_strip_all_tags((string) $descRaw), 45, '…'));
-        $this->seoData['keywords'] = $this->sanitizeText((string) ($metadata['seo_keywords'] ?? ''));
+        $descRaw = $this->expandTermTokens((string) $descRaw, $name);
+        $this->seoData['description'] = $this->sanitizeText(\wp_trim_words(\wp_strip_all_tags($descRaw), 45, '…'));
+        $this->seoData['keywords'] = $this->sanitizeText($this->expandTermTokens((string) ($metadata['seo_keywords'] ?? ''), $name));
         
         // Get featured image or gallery image
         $this->seoData['image'] = $category->featured_image_url ?? 

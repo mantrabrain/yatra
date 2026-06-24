@@ -283,7 +283,7 @@ if (!defined('ABSPATH')) {
                                             // Extract video ID and thumbnail
                                             if (strpos($video_url, 'youtube.com') !== false || strpos($video_url, 'youtu.be') !== false) {
                                                 // YouTube thumbnail extraction
-                                                preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/', $video_url, $matches);
+                                                preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([^&\n?#\/]+)/', $video_url, $matches);
                                                 $video_id = $matches[1] ?? '';
                                                 $thumbnail_url = "https://img.youtube.com/vi/{$video_id}/maxresdefault.jpg";
                                             } elseif (strpos($video_url, 'vimeo.com') !== false) {

@@ -62,6 +62,17 @@ class AvailabilityResolutionService
             throw new \Exception('Trip not found');
         }
 
+        // Priority 0: A non-bookable specific row (blocked/closed/cancelled) must win
+        // over everything so the booking guard rejects it. The standard lookup below
+        // hides those rows by design (status IN available/limited), which would let
+        // the resolver fall through to a recurring rule / trip default = "available"
+        // and silently allow the booking. We therefore look the row up including any
+        // status and short-circuit on the guard's reject statuses.
+        $anyStatusRow = $this->availabilityRepository->findByTripIdAndDateTime($tripId, $date, $departureTime, true);
+        if ($anyStatusRow && (\in_array(($anyStatusRow->status ?? ''), ['blocked', 'closed', 'cancelled'], true) || !empty($anyStatusRow->is_blocked))) {
+            return $this->buildAvailabilityObject($trip, $anyStatusRow, 'availability_date');
+        }
+
         // Priority 1: Specific availability rows (sold_out, seats, blocks, price overrides)
         $availabilityDate = $this->availabilityRepository->findByTripIdAndDateTime($tripId, $date, $departureTime);
         if ($availabilityDate) {
@@ -134,9 +145,21 @@ class AvailabilityResolutionService
             $dateMap = $this->generateDefaultAvailability($trip, $fromDate, $toDate);
         }
 
+        // Step 4: Drop non-bookable dates (blocked/closed/cancelled). A blocked
+        // specific row was kept in Step 1 so it overrides its recurring rule
+        // (preventing the rule from resurrecting the date); we remove it here so the
+        // resolved list represents only bookable departures. This feeds the
+        // single-trip count + calendar and the admin date-picker. (sold_out is kept
+        // so it can render as "sold out" / drive waitlist.)
+        foreach ($dateMap as $key => $obj) {
+            if (\is_object($obj) && (\in_array(($obj->status ?? ''), ['blocked', 'closed', 'cancelled'], true) || !empty($obj->is_blocked))) {
+                unset($dateMap[$key]);
+            }
+        }
+
         // Sort by date
         ksort($dateMap);
-        
+
         return array_values($dateMap);
     }
 
@@ -372,6 +395,7 @@ class AvailabilityResolutionService
                 if ($avail->seats_available <= 0) {
                     $avail->status = 'sold_out';
                 }
+                $avail->is_blocked = false;
                 $avail->is_recurring = true;
                 $avail->rule_id = $ruleId;
                 $avail->source = 'recurring_rule';
@@ -485,6 +509,14 @@ class AvailabilityResolutionService
                 $avail->seats_available = (int) ($source->seats_available ?? 0);
                 $avail->seats_reserved = (int) ($source->seats_reserved ?? 0);
                 $avail->status = $source->status ?? 'available';
+                $avail->is_blocked = !empty($source->is_blocked) || (($avail->status ?? '') === 'blocked');
+                // A blocked date is never bookable or waitlistable. Normalize the
+                // status so the list filter drops it and the booking guard rejects
+                // it as 'blocked' even if the row stored a different status (e.g. an
+                // update recalculated it to 'sold_out' alongside is_blocked=1).
+                if ($avail->is_blocked) {
+                    $avail->status = 'blocked';
+                }
                 $avail->is_recurring = false;
                 $avail->source = 'availability_date';
                 $avail->from_location = isset($source->from_location) ? $source->from_location : null;
@@ -569,6 +601,7 @@ class AvailabilityResolutionService
                 $avail->original_price = $trip_original_price;
                 $avail->discounted_price = $trip_discounted_price;
                 $avail->status = 'available';
+                $avail->is_blocked = false;
                 $avail->is_recurring = false;
                 $avail->source = 'trip_default';
                 

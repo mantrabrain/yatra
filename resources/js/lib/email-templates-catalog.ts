@@ -46,6 +46,7 @@ export const CORE_FREE_TEMPLATE_KEYS = [
   "trip_reminder",
   "trip_consent_request",
   "customer_email_verification",
+  "guest_email_verification",
   "booking_completed",
   "booking_expired_customer",
   "admin_booking_expired",
@@ -180,6 +181,24 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsFlag: "email_template_customer_verification",
     settingsSubject: "email_tpl_customer_verification_subject",
     settingsBody: "email_tpl_customer_verification_body",
+    mergeTags:
+      "{{site_name}}, {{site_url}}, {{customer_first_name}}, {{customer_name}}, {{verification_link}}, {{intro_paragraph}}, {{expiry_notice_html}}, {{footer_note}}",
+  },
+  {
+    template_key: "guest_email_verification",
+    event_key: "account.email_verification",
+    name: __("Guest email verification (checkout)", "yatra"),
+    description: __(
+      "Sent to a guest at checkout who must verify their email before the booking is finalized (when 'Require guest email verification' is enabled). Distinct from the account-registration verification above.",
+      "yatra",
+    ),
+    category: "account",
+    recipient_type: "customer",
+    to_email: "{customer_email}",
+    isCoreFree: true,
+    settingsFlag: "email_template_guest_verification",
+    settingsSubject: "email_tpl_guest_verification_subject",
+    settingsBody: "email_tpl_guest_verification_body",
     mergeTags:
       "{{site_name}}, {{site_url}}, {{customer_first_name}}, {{customer_name}}, {{verification_link}}, {{intro_paragraph}}, {{expiry_notice_html}}, {{footer_note}}",
   },

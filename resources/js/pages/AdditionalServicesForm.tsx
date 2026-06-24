@@ -524,6 +524,19 @@ const AdditionalServicesForm: React.FC = () => {
                       onChange={(e) =>
                         handleFieldChange("price_per", e.target.value)
                       }
+                      disabled={formData.price_type === "percentage"}
+                      title={
+                        formData.price_type === "percentage"
+                          ? __(
+                              "Price Per does not apply to percentage services — they are always a percentage of the whole trip price.",
+                            )
+                          : undefined
+                      }
+                      className={
+                        formData.price_type === "percentage"
+                          ? "opacity-60 cursor-not-allowed"
+                          : ""
+                      }
                     >
                       <option value="person">{__("Per Person")}</option>
                       <option value="booking">{__("Per Booking")}</option>

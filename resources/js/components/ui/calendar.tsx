@@ -11,6 +11,10 @@ import {
   isSameDay,
   addMonths,
   subMonths,
+  setMonth,
+  setYear,
+  getMonth,
+  getYear,
   isToday,
 } from "date-fns";
 
@@ -23,6 +27,21 @@ export interface CalendarProps {
   className?: string;
 }
 
+const MONTH_LABELS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 export const Calendar: React.FC<CalendarProps> = ({
   selected,
   onSelect,
@@ -31,7 +50,36 @@ export const Calendar: React.FC<CalendarProps> = ({
   maxDate,
   className = "",
 }) => {
-  const [currentMonth, setCurrentMonth] = React.useState(new Date());
+  // Open on the selected date (e.g. a saved date of birth lands on its own
+  // year), falling back to today for a blank field.
+  const [currentMonth, setCurrentMonth] = React.useState<Date>(
+    () => selected ?? new Date(),
+  );
+
+  // When the bound value changes (popover reopened with an existing value),
+  // jump the grid to that month so the user isn't stranded on today.
+  React.useEffect(() => {
+    if (selected) setCurrentMonth(selected);
+  }, [selected]);
+
+  // Year range for the dropdown: honour min/max when provided, else a wide
+  // span that comfortably covers dates of birth (back ~120 years) and future
+  // trip dates (~10 years ahead). Listed newest-first.
+  const today = new Date();
+  const fromYear = minDate ? getYear(minDate) : getYear(today) - 120;
+  const toYear = maxDate ? getYear(maxDate) : getYear(today) + 10;
+  const years: number[] = [];
+  for (let y = toYear; y >= fromYear; y--) {
+    years.push(y);
+  }
+
+  const handleMonthSelect = (monthIndex: number) => {
+    setCurrentMonth(setMonth(currentMonth, monthIndex));
+  };
+
+  const handleYearSelect = (year: number) => {
+    setCurrentMonth(setYear(currentMonth, year));
+  };
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -63,21 +111,51 @@ export const Calendar: React.FC<CalendarProps> = ({
 
   return (
     <div className={`p-3 ${className}`}>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between gap-1 mb-4">
         <button
           type="button"
           onClick={previousMonth}
-          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+          aria-label="Previous month"
+          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors shrink-0"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-          {format(currentMonth, "MMMM yyyy")}
-        </h3>
+
+        <div className="flex items-center gap-1">
+          {/* Month dropdown — jump to any month in one click */}
+          <select
+            value={getMonth(currentMonth)}
+            onChange={(e) => handleMonthSelect(Number(e.target.value))}
+            aria-label="Month"
+            className="text-sm font-semibold text-gray-900 dark:text-white bg-transparent border border-transparent hover:border-gray-300 dark:hover:border-gray-600 focus:border-blue-500 rounded-md px-1 py-0.5 cursor-pointer focus:outline-none dark:bg-gray-800"
+          >
+            {MONTH_LABELS.map((label, index) => (
+              <option key={label} value={index}>
+                {label}
+              </option>
+            ))}
+          </select>
+
+          {/* Year dropdown — jump straight to e.g. 1990 without month-stepping */}
+          <select
+            value={getYear(currentMonth)}
+            onChange={(e) => handleYearSelect(Number(e.target.value))}
+            aria-label="Year"
+            className="text-sm font-semibold text-gray-900 dark:text-white bg-transparent border border-transparent hover:border-gray-300 dark:hover:border-gray-600 focus:border-blue-500 rounded-md px-1 py-0.5 cursor-pointer focus:outline-none dark:bg-gray-800"
+          >
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <button
           type="button"
           onClick={nextMonth}
-          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+          aria-label="Next month"
+          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors shrink-0"
         >
           <ChevronRight className="w-4 h-4" />
         </button>

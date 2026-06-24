@@ -58,6 +58,8 @@ interface FormFieldConfig {
   width?: string;
   options?: { value: string; label: string }[];
   section?: string;
+  /** Traveler section: "lead" shows only for the lead traveler; "all"/absent = every traveler. */
+  applies_to?: "all" | "lead";
 }
 
 interface FormSectionConfig {
@@ -734,10 +736,31 @@ const BookingForm: React.FC = () => {
       window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=bookings`;
     },
     onError: (error: any) => {
+      // The REST API returns field-level reasons under
+      // response.data.data.validation_errors (WP_Error shape). The generic
+      // "Booking validation failed" message alone hid which field was at fault
+      // (e.g. a locale-formatted amount), so surface the specific reasons.
+      const validationErrors =
+        error?.response?.data?.data?.validation_errors ||
+        error?.response?.data?.validation_errors;
+
+      const fieldErrors: Record<string, string> = {};
+      let detail = "";
+      if (validationErrors && typeof validationErrors === "object") {
+        for (const [field, messages] of Object.entries(validationErrors)) {
+          const msg = Array.isArray(messages)
+            ? String(messages[0])
+            : String(messages);
+          fieldErrors[field] = msg;
+          detail = detail ? `${detail} ${msg}` : msg;
+        }
+      }
+
       const errorMessage =
+        detail ||
         error?.message ||
         __("An error occurred while saving the booking", "yatra");
-      setErrors({ submit: errorMessage });
+      setErrors({ ...fieldErrors, submit: errorMessage });
       setIsSubmitting(false);
     },
   });
@@ -1677,7 +1700,13 @@ const BookingForm: React.FC = () => {
                           {expandedTravelers.includes(travelerIndex) && (
                             <div className="p-3 pt-0 border-t border-gray-100 dark:border-gray-700/50">
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-                                {travelerFields.map((field) => (
+                                {travelerFields
+                                  .filter(
+                                    (field) =>
+                                      (field.applies_to ?? "all") !== "lead" ||
+                                      travelerIndex === 0,
+                                  )
+                                  .map((field) => (
                                   <div
                                     key={field.id}
                                     className={

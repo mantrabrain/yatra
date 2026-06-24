@@ -332,13 +332,21 @@ class TripValidator
             $sanitized['meta_keywords'] = sanitize_text_field($data['meta_keywords']);
         }
 
-        // Numeric fields
-        if (isset($data['original_price'])) {
-            $sanitized['original_price'] = (float)$data['original_price'];
+        // Numeric fields.
+        // Use array_key_exists (not isset) so an explicitly-sent null/empty
+        // price is written as SQL NULL — letting admins CLEAR a price. With
+        // isset(), a null was dropped and the old value lingered, so prices
+        // could never be emptied from the UI.
+        if (array_key_exists('original_price', $data)) {
+            $sanitized['original_price'] = ($data['original_price'] === null || $data['original_price'] === '')
+                ? null
+                : (float)$data['original_price'];
         }
 
-        if (isset($data['discounted_price'])) {
-            $sanitized['discounted_price'] = (float)$data['discounted_price'];
+        if (array_key_exists('discounted_price', $data)) {
+            $sanitized['discounted_price'] = ($data['discounted_price'] === null || $data['discounted_price'] === '')
+                ? null
+                : (float)$data['discounted_price'];
         }
 
         if (isset($data['duration_days'])) {

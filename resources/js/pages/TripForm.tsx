@@ -3371,7 +3371,7 @@ const TripForm: React.FC = () => {
                 is_default: Boolean((pt as any).is_default),
                 original_price: pt.original_price
                   ? parseFloat(pt.original_price)
-                  : 0,
+                  : null,
                 discounted_price: pt.discounted_price
                   ? parseFloat(pt.discounted_price)
                   : null,
@@ -7280,7 +7280,8 @@ const TripForm: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                        {__("Original Price", "yatra")}
+                        {__("Original Price", "yatra")} ({__("Optional", "yatra")}
+                        )
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
@@ -7610,7 +7611,8 @@ const TripForm: React.FC = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                   <div>
                                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                      {__("Original Price", "yatra")}
+                                      {__("Original Price", "yatra")} (
+                                      {__("Optional", "yatra")})
                                     </label>
                                     <div className="relative">
                                       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">

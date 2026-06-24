@@ -5683,7 +5683,6 @@ input.yatra-datepicker,
 }
 
 .flatpickr-input {
-    border: none !important;
     outline: none !important;
     box-shadow: none !important;
 }

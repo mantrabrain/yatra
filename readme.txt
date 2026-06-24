@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel, travel agency
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 3.0.7
+Stable tag: 3.0.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -264,6 +264,19 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 6. Traveler account — bookings, payments and documents
 
 == Changelog ==
+
+= 3.0.8 =
+* **Additional Services — percentage pricing fixed:** a service priced as a *percentage* now correctly charges that percent of the trip price instead of a flat amount. The displayed line-item, the live popup total and the amount actually charged are all server-calculated from the same value, so they always agree. **Fixed-price services are unchanged to the cent.** Price is now validated server-side (no negative values; percentages capped at 100%).
+* **Translations:** the "Pay Now" / "Complete Booking" booking-button labels, the country dropdown (translated at the country definition), the bank-transfer details on the confirmation page, and all payment-gateway labels are now translatable. Pro strings were corrected to the proper text domain. Regenerated the translation template (`yatra.pot`).
+* **Booking confirmation email:** stopped appending a stray currency code after the total (`{{currency}}` is the ISO code, not the formatted amount).
+* **Lead-traveler fields:** the traveler form can now carry fields that apply to the lead traveler only — required, saved, shown in admin/booking details and emails for Traveler 1 only.
+* **Settings gating:** when Customer Registration / sign-in are disabled, the account-creation and Sign In options no longer appear during booking; deposit and registration toggles are honored consistently.
+* **Deposit + offline gateways on guest / waitlist checkout:** when a customer chose an offline gateway (Bank Transfer or Pay Later) with a deposit/partial payment and the booking went through guest email-verification or the waitlist, the gateway was silently switched to "Pay Later" and the deposit replaced with the full amount. The chosen gateway and the deposit/partial amount are now preserved through verification and waitlist promotion; online gateways are unaffected.
+* **Reports:** Google Analytics and Facebook Pixel reports now enable as soon as their module is enabled and configured.
+* **Guest email verification** now uses the configured, editable email template.
+* **SEO:** the `{name}` placeholder in destination/activity/category meta title & description is now expanded correctly.
+* **Cleanup:** diagnostic `console.log` output on the frontend is now gated behind a debug flag (off in production), including form-input logging in Abandoned Booking Recovery.
+* Safe to update from 3.0.7 — no database changes and no migrations. Pair with **Yatra Pro 3.0.6**.
 
 = 3.0.7 =
 * **Booking Form — Text Block field:** new display-only field type to place instructions, notes or a divider **between** booking-form fields in any section (contact, emergency, traveler). It is not an input — never validated, stored, or shown in emails — and supports safe basic HTML; the admin only sets content + width. Hardening: locked core fields (name/email/phone/country) can no longer be retyped, so their inputs can never be dropped from checkout. The builder is gated behind the Pro Dynamic Form Field module.

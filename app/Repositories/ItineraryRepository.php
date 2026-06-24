@@ -34,6 +34,15 @@ class ItineraryRepository extends BaseRepository
      */
     public function getOrCreateDay(int $tripId, int $dayNumber, ?string $dayTitle = null, ?string $dayDescription = null, bool $allowExisting = true): int
     {
+        // The method body uses $wpdb and $tableDays directly for the day
+        // update/insert below. The cached-query closures declare their own copies,
+        // but the body never did — so $wpdb was null ("Call to a member function
+        // update() on null") and $tableDays was empty ("Incorrect table name '')".
+        // This broke saving an activity onto an existing, titled day and silently
+        // mis-created new days. Declare both here.
+        global $wpdb;
+        $tableDays = TripItineraryDaysTable::getTableName();
+
         // Use QueryCache for caching day existence checks
         $cacheKey = Cache::KEY_DAY_EXISTS . "_{$tripId}_day_{$dayNumber}";
         

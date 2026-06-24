@@ -14,6 +14,7 @@ export type EmailSettingsValues = {
   email_template_admin_cancellation: boolean;
   email_template_trip_consent: boolean;
   email_template_customer_verification: boolean;
+  email_template_guest_verification: boolean;
   email_template_booking_completed: boolean;
   email_template_booking_expired_customer: boolean;
   email_template_admin_booking_expired: boolean;
@@ -52,6 +53,8 @@ export type EmailSettingsValues = {
   email_tpl_trip_consent_body: string;
   email_tpl_customer_verification_subject: string;
   email_tpl_customer_verification_body: string;
+  email_tpl_guest_verification_subject: string;
+  email_tpl_guest_verification_body: string;
   email_tpl_booking_completed_subject: string;
   email_tpl_booking_completed_body: string;
   email_tpl_booking_expired_customer_subject: string;

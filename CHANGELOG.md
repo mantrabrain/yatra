@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here. The WordPress.org–canonical history lives in **`readme.txt`** under **Changelog**; this file mirrors recent releases for GitHub and tooling.
 
+## [3.0.8] — 2026-06-24
+
+- **Additional Services — percentage pricing fixed:** a percentage-priced service now charges that percent of the trip price (previously a flat amount), with no traveler/day double-counting. The displayed line-item, the live popup total and the charged amount are all server-calculated from one value so they agree. **Fixed-price services are unchanged to the cent.** Price is validated server-side (no negatives; percentages capped at 100%).
+- **Translations:** the "Pay Now" / "Complete Booking" button labels (localized from PHP for reliability), the country dropdown (translated at the country definition), the bank-transfer confirmation details and all payment-gateway labels are now translatable; Pro strings corrected to the proper text domain. Regenerated `yatra.pot`.
+- **Booking confirmation email:** no longer appends a stray currency code after the total.
+- **Lead-traveler fields:** the traveler form can carry fields that apply to the lead traveler (Traveler 1) only — required, saved, and shown in admin/booking details and emails for the lead only.
+- **Settings gating:** with Customer Registration / sign-in disabled, account-creation and Sign In no longer appear during booking; deposit/registration toggles honored consistently.
+- **Deposit + offline gateways on guest / waitlist checkout:** an offline gateway (Bank Transfer / Pay Later) chosen with a deposit/partial is no longer silently switched to Pay Later with the deposit replaced by the full amount when the booking goes through guest email-verification or the waitlist. The chosen gateway and deposit/partial are preserved through verification and waitlist promotion (`BookingSessionController`); online gateways unaffected. Verified across all 9 gateways.
+- **Reports:** Google Analytics & Facebook Pixel reports enable as soon as their module is enabled and configured.
+- **Guest email verification** uses the configured, editable template; **SEO** `{name}` token in destination/activity/category meta now expands.
+- **Cleanup:** frontend diagnostic `console.log` output gated behind a debug flag (off in production), including PII (form-input) logging in Abandoned Booking Recovery.
+- No DB changes, no migration. Safe to update from 3.0.7. Pair with **Yatra Pro 3.0.6**.
+
 ## [3.0.6] — 2026-05-27
 
 - **Pricing plans renamed (display-only):** Personal → **Starter**, Agency → **Scale** (Growth unchanged). Updated the Modules page tier badges, `PremiumUpgradeDialog`, the `planLabels` map, the License-page tier badge, and the REST gate messages in `ModuleController` to read Starter / Growth / Scale. The internal capability slugs (`personal`/`growth`/`agency`) and the `requires_agency` / `requires_growth_or_agency` module flags are **unchanged**, so feature gating is byte-for-byte equivalent and existing Pro licenses keep identical access.

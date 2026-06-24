@@ -574,13 +574,32 @@ class FrontendAssetsProvider
             );
         }
         
+        // Flatpickr — used by booking.js to upgrade Date-of-Birth (and other
+        // date) inputs to a picker with fast, typeable year navigation. The
+        // single-trip page already ships flatpickr (see single-trip.php); the
+        // dedicated booking page did not, so enqueue it here. booking.js
+        // self-guards on `typeof flatpickr`, so this is safe either way.
+        wp_enqueue_style(
+            'yatra-flatpickr',
+            'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
+            [],
+            YATRA_VERSION
+        );
+        wp_enqueue_script(
+            'yatra-flatpickr',
+            'https://cdn.jsdelivr.net/npm/flatpickr',
+            [],
+            YATRA_VERSION,
+            true
+        );
+
         // Enqueue booking-specific JavaScript
         $bookingJs = YATRA_PLUGIN_PATH . 'assets/js/booking.js';
         if (file_exists($bookingJs)) {
             wp_enqueue_script(
                 'yatra-booking',
                 YATRA_PLUGIN_URL . 'assets/js/booking.js',
-                ['jquery'],
+                ['jquery', 'yatra-flatpickr'],
                 YATRA_VERSION . '.' . filemtime($bookingJs),
                 true
             );
@@ -660,6 +679,13 @@ class FrontendAssetsProvider
             'waitlistAutoConfirm' => \Yatra\Services\SettingsService::isEnabled('waitlist_auto_confirm'),
             'gateways' => $this->getGatewayFrontendConfigs(),
             'enabledGateways' => $this->sanitizeGatewayConfigsForFrontend(\Yatra\Services\SettingsService::get('payment_gateways', [])),
+            // Server-side translated UI strings for booking.js. PHP __() resolves via .mo
+            // (reliable), so these stay translatable even when the JS-translation JSON
+            // chain (wp_set_script_translations) doesn't load on a given setup.
+            'i18n' => [
+                'complete_booking' => __('Complete Booking', 'yatra'),
+                'pay_now' => __('Pay Now', 'yatra'),
+            ],
         ];
 
         $bookingData = array_merge($bookingData, $this->getStripeFrontendBookingPayload());

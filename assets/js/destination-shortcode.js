@@ -18,7 +18,7 @@ jQuery(document).ready(function($) {
         $container.addClass('yatra-loading');
         
         // Debug: Log the data being sent
-        console.log('Loading destination page:', {
+        window.YATRA_DEBUG && console.log('Loading destination page:', {
             page: page,
             atts: atts
         });

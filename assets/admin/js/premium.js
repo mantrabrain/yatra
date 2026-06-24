@@ -534,7 +534,7 @@
 
         log(message) {
             if (console && console.log) {
-                console.log(`%c${message}`, 'color: #4f46e5; font-weight: bold;');
+                window.YATRA_DEBUG && console.log(`%c${message}`, 'color: #4f46e5; font-weight: bold;');
             }
         },
 

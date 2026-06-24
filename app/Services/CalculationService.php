@@ -300,20 +300,35 @@ class CalculationService
 
             $base_price = (float) ($svc['price'] ?? 0);
             $price_per = $svc['price_per'] ?? 'person';
-            switch ($price_per) {
-                case 'person':
-                    $calculated_price = $base_price * max(1, $travelers_count);
-                    break;
-                case 'day':
-                    $calculated_price = $base_price * max(1, $duration_days_for_services);
-                    break;
-                case 'booking':
-                default:
-                    $calculated_price = $base_price;
-                    break;
+            // This MUST stay identical to the Pro charge path
+            // (AdditionalServicesBookingHooks::calculateServicePrice) so the
+            // displayed line-item equals the amount folded into the subtotal.
+            if (($svc['price_type'] ?? 'fixed') === 'percentage') {
+                // Percentage = % of the WHOLE trip base price. `$base_amount`
+                // already accounts for travelers/categories, so Price Per is NOT
+                // applied (it would double-count). Matches the "Percentage of
+                // Trip Price" label and the free booking-services fallback.
+                $unit_price = round(($base_price / 100) * $base_amount, 2);
+                $calculated_price = $unit_price;
+            } else {
+                // Fixed: Price Per multiplies the entered flat amount.
+                $unit_price = $base_price;
+                switch ($price_per) {
+                    case 'person':
+                        $calculated_price = round($unit_price * max(1, $travelers_count), 2);
+                        break;
+                    case 'day':
+                        $calculated_price = round($unit_price * max(1, $duration_days_for_services), 2);
+                        break;
+                    case 'booking':
+                    default:
+                        $calculated_price = round($unit_price, 2);
+                        break;
+                }
             }
 
             $svc['selected'] = $is_selected;
+            $svc['unit_price'] = $unit_price;
             $svc['calculated_price'] = $calculated_price;
             $additional_services_resolved[] = $svc;
 

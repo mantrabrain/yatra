@@ -191,7 +191,7 @@
                 setTimeout(() => {
                     const entries = performance.getEntriesByType('navigation');
                     if (entries.length > 0) {
-                        console.log('Login form load time:', entries[0].loadEventEnd - entries[0].loadEventStart, 'ms');
+                        window.YATRA_DEBUG && console.log('Login form load time:', entries[0].loadEventEnd - entries[0].loadEventStart, 'ms');
                     }
                 }, 1000);
             }
