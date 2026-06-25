@@ -64,6 +64,9 @@ class AdminAssetsProvider
             'siteUrl' => home_url(),
             'adminUrl' => admin_url('admin.php'),
             'pluginUrl' => YATRA_PLUGIN_URL,
+            // Public URL of the Yatra sitemap (handles plain vs pretty
+            // permalinks), shown in the SEO settings tab.
+            'sitemapUrl' => \Yatra\Sitemap\SitemapRouter::sitemapUrl(),
             // Brand-name and brand-logo helpers are filter-backed (defaults
             // wired in includes/helpers.php). Pro's WhiteLabel module
             // overrides the filters when Agency white-label is active.

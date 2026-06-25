@@ -2234,7 +2234,8 @@ const Settings = () => {
       seo_trip_meta_title: "",
       seo_trip_meta_description: "",
       seo_trip_meta_keywords: "",
-      seo_trip_meta_image: 0
+      seo_trip_meta_image: 0,
+      enable_sitemap: true
     }),
     []
   );
@@ -2953,7 +2954,7 @@ const Settings = () => {
   ];
   const SectionDivider = ({ title }) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-t border-gray-200 dark:border-gray-700 pt-4 mt-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-gray-900 dark:text-white mb-4", children: title }) });
   const renderSettingsContent = () => {
-    var _a2, _b2, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N, _O, _P, _Q, _R, _S, _T, _U, _V, _W, _X, _Y, _Z, __2, _$, _aa, _ba, _ca, _da, _ea, _fa, _ga, _ha, _ia, _ja, _ka, _la, _ma, _na, _oa, _pa, _qa, _ra, _sa, _ta, _ua, _va, _wa, _xa, _ya, _za, _Aa, _Ba, _Ca, _Da, _Ea, _Fa, _Ga;
+    var _a2, _b2, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N, _O, _P, _Q, _R, _S, _T, _U, _V, _W, _X, _Y, _Z, __2, _$, _aa, _ba, _ca, _da, _ea, _fa, _ga, _ha, _ia, _ja, _ka, _la, _ma, _na, _oa, _pa, _qa, _ra, _sa, _ta, _ua, _va, _wa, _xa, _ya, _za, _Aa, _Ba, _Ca, _Da, _Ea, _Fa, _Ga, _Ha, _Ia;
     if (!formData) return null;
     switch (viewingSection) {
       case "general":
@@ -7229,147 +7230,188 @@ const Settings = () => {
         ] });
       }
       case "seo":
-        return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-gray-900 dark:text-white mb-4", children: __("Trip Archive SEO Settings", "yatra") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-4", children: __(
-            "Configure SEO meta tags for the trip archive page (/trip/). These meta tags will be used for the main trip listing page.",
-            "yatra"
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              FormField,
-              {
-                id: "seo_trip_meta_title",
-                label: __("Trip Archive Meta Title", "yatra"),
-                description: __(
-                  "Meta title for the trip archive page. This will appear in search engine results for /trip/ page.",
-                  "yatra"
-                ),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    id: "seo_trip_meta_title",
-                    type: "text",
-                    value: formData.seo_trip_meta_title,
-                    onChange: (e) => setFormData(
-                      (prev) => prev ? { ...prev, seo_trip_meta_title: e.target.value } : null
-                    ),
-                    placeholder: __(
-                      "e.g., Browse All Trips - Find Your Perfect Adventure | Your Travel Agency",
-                      "yatra"
-                    ),
-                    className: "w-full"
-                  }
-                )
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              FormField,
-              {
-                id: "seo_trip_meta_description",
-                label: __("Trip Archive Meta Description", "yatra"),
-                description: __(
-                  "Meta description for the trip archive page. Should be 150-160 characters for best SEO results.",
-                  "yatra"
-                ),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "textarea",
-                  {
-                    id: "seo_trip_meta_description",
-                    value: formData.seo_trip_meta_description,
-                    onChange: (e) => setFormData(
-                      (prev) => prev ? {
-                        ...prev,
-                        seo_trip_meta_description: e.target.value
-                      } : null
-                    ),
-                    placeholder: __(
-                      "e.g., Explore our complete collection of amazing trips and adventures. Find and book your perfect journey with us.",
-                      "yatra"
-                    ),
-                    rows: 3,
-                    className: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  }
-                )
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              FormField,
-              {
-                id: "seo_trip_meta_keywords",
-                label: __("Trip Archive Meta Keywords", "yatra"),
-                description: __(
-                  "Comma-separated keywords for the trip archive page. Include relevant travel and booking keywords.",
-                  "yatra"
-                ),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    id: "seo_trip_meta_keywords",
-                    type: "text",
-                    value: formData.seo_trip_meta_keywords,
-                    onChange: (e) => setFormData(
-                      (prev) => prev ? { ...prev, seo_trip_meta_keywords: e.target.value } : null
-                    ),
-                    placeholder: __(
-                      "e.g., travel, trips, adventure, booking, tours, destinations, holidays",
-                      "yatra"
-                    ),
-                    className: "w-full"
-                  }
-                )
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              FormField,
-              {
-                id: "seo_trip_meta_image",
-                label: __("Trip Archive SEO Image", "yatra"),
-                description: __(
-                  "Image for social media sharing and SEO. Recommended size: 1200x630 pixels. This image will appear when the trip archive page is shared on Facebook, Twitter, and other platforms.",
-                  "yatra"
-                ),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: formData.seo_trip_meta_image && formData.seo_trip_meta_image > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative group", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800/50", children: [
-                  seoImageLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-24 h-24 flex items-center justify-center border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-6 h-6 animate-spin text-gray-400" }) }) : seoImageUrl ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-24 h-24 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      "img",
-                      {
-                        src: seoImageUrl,
-                        alt: "SEO Preview",
-                        className: "w-full h-full object-cover"
-                      }
-                    ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" })
-                  ] }) : seoImageError ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-24 h-24 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-6 h-6 text-red-400 mb-1" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-red-500 dark:text-red-400 text-center px-1", children: seoImageError })
-                  ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-24 h-24 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Image, { className: "w-6 h-6 text-gray-400 mb-1" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400", children: "No image" })
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-medium text-gray-900 dark:text-white", children: __("SEO Image", "yatra") }),
-                      !seoImageLoading && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        "button",
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-gray-900 dark:text-white mb-4", children: __("Trip Archive SEO Settings", "yatra") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-4", children: __(
+              "Configure SEO meta tags for the trip archive page (/trip/). These meta tags will be used for the main trip listing page.",
+              "yatra"
+            ) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                FormField,
+                {
+                  id: "seo_trip_meta_title",
+                  label: __("Trip Archive Meta Title", "yatra"),
+                  description: __(
+                    "Meta title for the trip archive page. This will appear in search engine results for /trip/ page.",
+                    "yatra"
+                  ),
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      id: "seo_trip_meta_title",
+                      type: "text",
+                      value: formData.seo_trip_meta_title,
+                      onChange: (e) => setFormData(
+                        (prev) => prev ? { ...prev, seo_trip_meta_title: e.target.value } : null
+                      ),
+                      placeholder: __(
+                        "e.g., Browse All Trips - Find Your Perfect Adventure | Your Travel Agency",
+                        "yatra"
+                      ),
+                      className: "w-full"
+                    }
+                  )
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                FormField,
+                {
+                  id: "seo_trip_meta_description",
+                  label: __("Trip Archive Meta Description", "yatra"),
+                  description: __(
+                    "Meta description for the trip archive page. Should be 150-160 characters for best SEO results.",
+                    "yatra"
+                  ),
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "textarea",
+                    {
+                      id: "seo_trip_meta_description",
+                      value: formData.seo_trip_meta_description,
+                      onChange: (e) => setFormData(
+                        (prev) => prev ? {
+                          ...prev,
+                          seo_trip_meta_description: e.target.value
+                        } : null
+                      ),
+                      placeholder: __(
+                        "e.g., Explore our complete collection of amazing trips and adventures. Find and book your perfect journey with us.",
+                        "yatra"
+                      ),
+                      rows: 3,
+                      className: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    }
+                  )
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                FormField,
+                {
+                  id: "seo_trip_meta_keywords",
+                  label: __("Trip Archive Meta Keywords", "yatra"),
+                  description: __(
+                    "Comma-separated keywords for the trip archive page. Include relevant travel and booking keywords.",
+                    "yatra"
+                  ),
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      id: "seo_trip_meta_keywords",
+                      type: "text",
+                      value: formData.seo_trip_meta_keywords,
+                      onChange: (e) => setFormData(
+                        (prev) => prev ? { ...prev, seo_trip_meta_keywords: e.target.value } : null
+                      ),
+                      placeholder: __(
+                        "e.g., travel, trips, adventure, booking, tours, destinations, holidays",
+                        "yatra"
+                      ),
+                      className: "w-full"
+                    }
+                  )
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                FormField,
+                {
+                  id: "seo_trip_meta_image",
+                  label: __("Trip Archive SEO Image", "yatra"),
+                  description: __(
+                    "Image for social media sharing and SEO. Recommended size: 1200x630 pixels. This image will appear when the trip archive page is shared on Facebook, Twitter, and other platforms.",
+                    "yatra"
+                  ),
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: formData.seo_trip_meta_image && formData.seo_trip_meta_image > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative group", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800/50", children: [
+                    seoImageLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-24 h-24 flex items-center justify-center border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-6 h-6 animate-spin text-gray-400" }) }) : seoImageUrl ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-24 h-24 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "img",
+                        {
+                          src: seoImageUrl,
+                          alt: "SEO Preview",
+                          className: "w-full h-full object-cover"
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" })
+                    ] }) : seoImageError ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-24 h-24 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-6 h-6 text-red-400 mb-1" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-red-500 dark:text-red-400 text-center px-1", children: seoImageError })
+                    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-24 h-24 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Image, { className: "w-6 h-6 text-gray-400 mb-1" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400", children: "No image" })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-medium text-gray-900 dark:text-white", children: __("SEO Image", "yatra") }),
+                        !seoImageLoading && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "button",
+                          {
+                            type: "button",
+                            onClick: () => {
+                              setFormData(
+                                (prev) => prev ? { ...prev, seo_trip_meta_image: 0 } : null
+                              );
+                            },
+                            className: "opacity-0 group-hover:opacity-100 transition-opacity p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded",
+                            title: __("Remove image", "yatra"),
+                            children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" })
+                          }
+                        )
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-3", children: __(
+                        "Recommended size: 1200x630 pixels for optimal social media display.",
+                        "yatra"
+                      ) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Button,
                         {
                           type: "button",
                           onClick: () => {
-                            setFormData(
-                              (prev) => prev ? { ...prev, seo_trip_meta_image: 0 } : null
-                            );
+                            if (window.wp && window.wp.media) {
+                              const mediaUploader = window.wp.media({
+                                title: __("Select SEO Image", "yatra"),
+                                button: {
+                                  text: __("Use this image", "yatra")
+                                },
+                                multiple: false,
+                                library: { type: "image" }
+                              });
+                              mediaUploader.on("select", () => {
+                                const attachment = mediaUploader.state().get("selection").first().toJSON();
+                                setFormData(
+                                  (prev) => prev ? {
+                                    ...prev,
+                                    seo_trip_meta_image: attachment.id
+                                  } : null
+                                );
+                              });
+                              prepareWordPressMediaFrameOpen();
+                              mediaUploader.open();
+                            }
                           },
-                          className: "opacity-0 group-hover:opacity-100 transition-opacity p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded",
-                          title: __("Remove image", "yatra"),
-                          children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" })
+                          variant: "outline",
+                          size: "sm",
+                          children: __("Change Image", "yatra")
                         }
                       )
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-3", children: __(
-                      "Recommended size: 1200x630 pixels for optimal social media display.",
+                    ] })
+                  ] }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Image, { className: "w-8 h-8 text-gray-400" }) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-medium text-gray-900 dark:text-white mb-2", children: __("Add SEO Image", "yatra") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-4 max-w-sm mx-auto", children: __(
+                      "Upload an image that will appear when your trip archive page is shared on social media. Recommended size: 1200x630 pixels.",
                       "yatra"
                     ) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
                       Button,
                       {
                         type: "button",
@@ -7377,9 +7419,7 @@ const Settings = () => {
                           if (window.wp && window.wp.media) {
                             const mediaUploader = window.wp.media({
                               title: __("Select SEO Image", "yatra"),
-                              button: {
-                                text: __("Use this image", "yatra")
-                              },
+                              button: { text: __("Use this image", "yatra") },
                               multiple: false,
                               library: { type: "image" }
                             });
@@ -7396,55 +7436,87 @@ const Settings = () => {
                             mediaUploader.open();
                           }
                         },
-                        variant: "outline",
-                        size: "sm",
-                        children: __("Change Image", "yatra")
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
+                          __("Select Image", "yatra")
+                        ]
                       }
                     )
-                  ] })
-                ] }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Image, { className: "w-8 h-8 text-gray-400" }) }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-medium text-gray-900 dark:text-white mb-2", children: __("Add SEO Image", "yatra") }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-4 max-w-sm mx-auto", children: __(
-                    "Upload an image that will appear when your trip archive page is shared on social media. Recommended size: 1200x630 pixels.",
+                  ] }) })
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-gray-900 dark:text-white mb-4", children: __("Sitemap", "yatra") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-4", children: __(
+              "Yatra publishes one sitemap of all trips, destinations, activities and categories so search engines can find them. It is advertised in robots.txt and linked into Yoast, Rank Math, AIOSEO and WordPress core sitemaps automatically.",
+              "yatra"
+            ) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "input",
+                  {
+                    type: "checkbox",
+                    id: "enable_sitemap",
+                    checked: formData.enable_sitemap,
+                    name: "enable_sitemap",
+                    onChange: handleFieldChange,
+                    className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Label,
+                    {
+                      htmlFor: "enable_sitemap",
+                      className: "font-medium cursor-pointer",
+                      children: __("Enable Sitemap", "yatra")
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: __(
+                    "Generate /yatra-sitemap.xml and advertise it to search engines.",
                     "yatra"
-                  ) }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                    Button,
+                  ) })
+                ] })
+              ] }),
+              formData.enable_sitemap && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { className: "font-medium", children: __("Sitemap URL", "yatra") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 flex items-center gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "a",
+                    {
+                      href: ((_Ha = window.yatraAdmin) == null ? void 0 : _Ha.sitemapUrl) || "#",
+                      target: "_blank",
+                      rel: "noopener noreferrer",
+                      className: "flex-1 break-all text-sm text-blue-600 dark:text-blue-400 underline",
+                      children: ((_Ia = window.yatraAdmin) == null ? void 0 : _Ia.sitemapUrl) || ""
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "button",
                     {
                       type: "button",
                       onClick: () => {
-                        if (window.wp && window.wp.media) {
-                          const mediaUploader = window.wp.media({
-                            title: __("Select SEO Image", "yatra"),
-                            button: { text: __("Use this image", "yatra") },
-                            multiple: false,
-                            library: { type: "image" }
-                          });
-                          mediaUploader.on("select", () => {
-                            const attachment = mediaUploader.state().get("selection").first().toJSON();
-                            setFormData(
-                              (prev) => prev ? {
-                                ...prev,
-                                seo_trip_meta_image: attachment.id
-                              } : null
-                            );
-                          });
-                          prepareWordPressMediaFrameOpen();
-                          mediaUploader.open();
-                        }
+                        var _a3, _b3;
+                        return (_b3 = navigator.clipboard) == null ? void 0 : _b3.writeText(
+                          ((_a3 = window.yatraAdmin) == null ? void 0 : _a3.sitemapUrl) || ""
+                        );
                       },
-                      children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
-                        __("Select Image", "yatra")
-                      ]
+                      className: "px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700",
+                      children: __("Copy", "yatra")
                     }
                   )
-                ] }) })
-              }
-            )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-2", children: __(
+                  "Optional: submit this URL in Google Search Console or Bing Webmaster Tools. It is already listed in robots.txt, so search engines find it automatically.",
+                  "yatra"
+                ) })
+              ] })
+            ] })
           ] })
-        ] }) });
+        ] });
       case "advanced":
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
@@ -7861,4 +7933,4 @@ const Settings = () => {
 export {
   Settings as default
 };
-//# sourceMappingURL=Settings-DmDJbSAB.js.map
+//# sourceMappingURL=Settings-DAPGYQ8J.js.map

@@ -227,7 +227,8 @@ class SettingsController extends BaseController
         'seo_trip_meta_description' => '',
         'seo_trip_meta_keywords' => '',
         'seo_trip_meta_image' => 0,
-        
+        'enable_sitemap' => true,
+
         // Advanced Settings
         'debug_mode' => false,
         'enable_logging' => false,

@@ -276,6 +276,7 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 * **Guest email verification** now uses the configured, editable email template.
 * **SEO:** the `{name}` placeholder in destination/activity/category meta title & description is now expanded correctly.
 * **Cleanup:** diagnostic `console.log` output on the frontend is now gated behind a debug flag (off in production), including form-input logging in Abandoned Booking Recovery.
+* **XML Sitemap:** Yatra now publishes one sitemap of all trips, destinations, activities and categories at `/yatra-sitemap.xml` — trips/classifications live in custom tables, so they were previously invisible to every sitemap generator. It is advertised in `robots.txt` and integrated with WordPress core, Yoast, Rank Math and All in One SEO sitemaps automatically. A toggle and the sitemap URL are available under **Settings → SEO**.
 * Safe to update from 3.0.7 — no database changes and no migrations. Pair with **Yatra Pro 3.0.6**.
 
 = 3.0.7 =

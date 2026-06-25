@@ -1063,6 +1063,7 @@ interface SettingsData {
   seo_trip_meta_description: string;
   seo_trip_meta_keywords: string;
   seo_trip_meta_image: number;
+  enable_sitemap: boolean;
 }
 
 // Form Builder Component
@@ -3070,6 +3071,7 @@ const Settings: React.FC = () => {
       seo_trip_meta_description: "",
       seo_trip_meta_keywords: "",
       seo_trip_meta_image: 0,
+      enable_sitemap: true,
     }),
     [],
   );
@@ -8854,6 +8856,83 @@ const Settings: React.FC = () => {
                     )}
                   </div>
                 </FormField>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+                {__("Sitemap", "yatra")}
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                {__(
+                  "Yatra publishes one sitemap of all trips, destinations, activities and categories so search engines can find them. It is advertised in robots.txt and linked into Yoast, Rank Math, AIOSEO and WordPress core sitemaps automatically.",
+                  "yatra",
+                )}
+              </p>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                  <input
+                    type="checkbox"
+                    id="enable_sitemap"
+                    checked={formData.enable_sitemap}
+                    name="enable_sitemap"
+                    onChange={handleFieldChange}
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <div className="flex-1">
+                    <Label
+                      htmlFor="enable_sitemap"
+                      className="font-medium cursor-pointer"
+                    >
+                      {__("Enable Sitemap", "yatra")}
+                    </Label>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {__(
+                        "Generate /yatra-sitemap.xml and advertise it to search engines.",
+                        "yatra",
+                      )}
+                    </p>
+                  </div>
+                </div>
+                {formData.enable_sitemap && (
+                  <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                    <Label className="font-medium">
+                      {__("Sitemap URL", "yatra")}
+                    </Label>
+                    <div className="mt-2 flex items-center gap-2">
+                      <a
+                        href={
+                          (window as { yatraAdmin?: { sitemapUrl?: string } })
+                            .yatraAdmin?.sitemapUrl || "#"
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 break-all text-sm text-blue-600 dark:text-blue-400 underline"
+                      >
+                        {(window as { yatraAdmin?: { sitemapUrl?: string } })
+                          .yatraAdmin?.sitemapUrl || ""}
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigator.clipboard?.writeText(
+                            (window as { yatraAdmin?: { sitemapUrl?: string } })
+                              .yatraAdmin?.sitemapUrl || "",
+                          )
+                        }
+                        className="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        {__("Copy", "yatra")}
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                      {__(
+                        "Optional: submit this URL in Google Search Console or Bing Webmaster Tools. It is already listed in robots.txt, so search engines find it automatically.",
+                        "yatra",
+                      )}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -13,6 +13,7 @@ All notable changes to this project are documented here. The WordPress.org–can
 - **Reports:** Google Analytics & Facebook Pixel reports enable as soon as their module is enabled and configured.
 - **Guest email verification** uses the configured, editable template; **SEO** `{name}` token in destination/activity/category meta now expands.
 - **Cleanup:** frontend diagnostic `console.log` output gated behind a debug flag (off in production), including PII (form-input) logging in Abandoned Booking Recovery.
+- **XML Sitemap:** Yatra now publishes one consolidated sitemap of all trips, destinations, activities and categories at `/yatra-sitemap.xml` (its content lives in custom tables, invisible to sitemap generators until now). Advertised in `robots.txt` and integrated with WordPress core, Yoast, Rank Math and AIOSEO sitemaps; enable/disable toggle + URL under **Settings → SEO**. Capped at the 50,000-URL sitemap limit; cached (1h) with immediate refresh on trip changes.
 - No DB changes, no migration. Safe to update from 3.0.7. Pair with **Yatra Pro 3.0.6**.
 
 ## [3.0.6] — 2026-05-27

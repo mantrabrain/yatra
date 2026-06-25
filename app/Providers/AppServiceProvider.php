@@ -85,6 +85,11 @@ class AppServiceProvider extends ServiceProvider
         // Initialize cache hooks
         \Yatra\Hooks\CacheHooks::init();
 
+        // Publish Yatra trips/destinations/activities/categories to sitemaps
+        // (WP core, Yoast, Rank Math, AIOSEO) — Yatra content lives in custom
+        // tables, so no SEO generator can discover it without this.
+        \Yatra\Sitemap\SitemapManager::init();
+
         add_filter('yatra_require_email_verification', static function (): bool {
             return \Yatra\Services\SettingsService::isEnabled('require_email_verification');
         });

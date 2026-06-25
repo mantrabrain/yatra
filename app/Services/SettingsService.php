@@ -217,6 +217,9 @@ class SettingsService
         'activity_base' => 'activity',
         'trip_category_base' => 'trip-category',
         
+        // SEO
+        'enable_sitemap' => true,
+
         // Advanced
         'enable_debug_mode' => false,
         'delete_data_on_uninstall' => false,
