@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Yatra - Travel Booking & Management 3.0.8\n"
+"Project-Id-Version: Yatra - Travel Booking & Tour Operator Software 3.0.8\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/yatra\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-25T12:24:47+00:00\n"
+"POT-Creation-Date: 2026-06-26T07:14:53+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -1947,7 +1947,7 @@ msgstr ""
 
 # Source: resources/js/pages/ViewCustomer.tsx:492, resources/js/pages/account/Profile.tsx:290
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:253
+#: app/Services/SettingsService.php:256
 #: assets/admin/dist/js/app.js:44247
 #: assets/dist/js/account-page.js:2599
 msgid "Address"
@@ -6634,14 +6634,14 @@ msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:627
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:261
+#: app/Services/SettingsService.php:264
 #: assets/admin/dist/js/app.js:43536
 msgid "Contact Name"
 msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:644
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:262
+#: app/Services/SettingsService.php:265
 #: assets/admin/dist/js/app.js:43556
 msgid "Contact Phone"
 msgstr ""
@@ -6968,7 +6968,7 @@ msgstr ""
 
 # Source: resources/js/pages/BookingForm.tsx:1017, resources/js/pages/CustomerForm.tsx:578, resources/js/pages/Customers.tsx:451, resources/js/pages/Settings.tsx:4090, resources/js/pages/Settings.tsx:4097, resources/js/pages/ViewCustomer.tsx:508, resources/js/pages/account/Profile.tsx:247
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:251
+#: app/Services/SettingsService.php:254
 #: assets/admin/dist/js/app.js:43490
 #: assets/admin/dist/js/app.js:44260
 #: assets/dist/js/account-page.js:2571
@@ -8086,7 +8086,7 @@ msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:448, resources/js/pages/TripConsentForm.tsx:618, resources/js/pages/ViewCustomer.tsx:528
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:279
+#: app/Services/SettingsService.php:282
 #: assets/admin/dist/js/app.js:43358
 #: assets/admin/dist/js/app.js:44269
 msgid "Date of Birth"
@@ -9360,7 +9360,7 @@ msgstr ""
 # Source: resources/js/pages/CustomerForm.tsx:693, resources/js/pages/ViewCustomer.tsx:690
 #: assets/admin/dist/js/app.js
 #: app/Services/EmailTemplateSampleData.php:143
-#: app/Services/SettingsService.php:286
+#: app/Services/SettingsService.php:289
 #: assets/admin/dist/js/app.js:43604
 #: assets/admin/dist/js/app.js:44344
 msgid "Dietary Requirements"
@@ -10566,7 +10566,7 @@ msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:381, resources/js/pages/TripConsentForm.tsx:598, resources/js/pages/ViewCustomer.tsx:464, resources/js/pages/ViewReview.tsx:388, resources/js/pages/account/Profile.tsx:216
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:249
+#: app/Services/SettingsService.php:252
 #: templates/partials/booking-auth.php:157
 #: templates/partials/single-trip/enquiry-modal.php:36
 #: assets/admin/dist/js/app.js:43288
@@ -10755,7 +10755,7 @@ msgstr ""
 
 # Source: resources/js/pages/BookingForm.tsx:1444, resources/js/pages/CustomerForm.tsx:617, resources/js/pages/Settings.tsx:1209, resources/js/pages/ViewBooking.tsx:1155, resources/js/pages/ViewCustomer.tsx:545, resources/js/pages/account/BookingDetails.tsx:786
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:257
+#: app/Services/SettingsService.php:260
 #: templates/pdf/itinerary.php:782
 #: assets/admin/dist/js/app.js:43528
 #: assets/admin/dist/js/app.js:44278
@@ -11322,7 +11322,7 @@ msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:344
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:247
+#: app/Services/SettingsService.php:250
 #: assets/admin/dist/js/app.js:43253
 msgid "Enter first name"
 msgstr ""
@@ -11352,7 +11352,7 @@ msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:370
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:248
+#: app/Services/SettingsService.php:251
 #: assets/admin/dist/js/app.js:43276
 msgid "Enter last name"
 msgstr ""
@@ -13117,7 +13117,7 @@ msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:474
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:282
+#: app/Services/SettingsService.php:285
 #: assets/admin/dist/js/app.js:43388
 msgid "Female"
 msgstr ""
@@ -13344,8 +13344,8 @@ msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:334
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:247
-#: app/Services/SettingsService.php:277
+#: app/Services/SettingsService.php:250
+#: app/Services/SettingsService.php:280
 #: templates/partials/booking-auth.php:141
 #: assets/admin/dist/js/app.js:43240
 msgid "First Name"
@@ -13751,7 +13751,7 @@ msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:636
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:261
+#: app/Services/SettingsService.php:264
 #: assets/admin/dist/js/app.js:43546
 msgid "Full name"
 msgstr ""
@@ -13794,7 +13794,7 @@ msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:463
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:280
+#: app/Services/SettingsService.php:283
 #: assets/admin/dist/js/app.js:43376
 msgid "Gender"
 msgstr ""
@@ -15918,8 +15918,8 @@ msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:361
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:248
-#: app/Services/SettingsService.php:278
+#: app/Services/SettingsService.php:251
+#: app/Services/SettingsService.php:281
 #: templates/partials/booking-auth.php:148
 #: assets/admin/dist/js/app.js:43266
 msgid "Last Name"
@@ -16712,7 +16712,7 @@ msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:473
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:281
+#: app/Services/SettingsService.php:284
 #: assets/admin/dist/js/app.js:43387
 msgid "Male"
 msgstr ""
@@ -18030,8 +18030,8 @@ msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:489, resources/js/pages/ViewCustomer.tsx:518
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:252
-#: app/Services/SettingsService.php:285
+#: app/Services/SettingsService.php:255
+#: app/Services/SettingsService.php:288
 #: assets/admin/dist/js/app.js:43402
 #: assets/admin/dist/js/app.js:44265
 msgid "Nationality"
@@ -19807,8 +19807,8 @@ msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:475, resources/js/pages/PaymentForm.tsx:384
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:269
-#: app/Services/SettingsService.php:283
+#: app/Services/SettingsService.php:272
+#: app/Services/SettingsService.php:286
 #: assets/admin/dist/js/app.js:43389
 #: assets/admin/dist/js/app.js:57773
 msgid "Other"
@@ -20765,7 +20765,7 @@ msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:410, resources/js/pages/TripConsentForm.tsx:608, resources/js/pages/ViewCustomer.tsx:474, resources/js/pages/account/Profile.tsx:227
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:250
+#: app/Services/SettingsService.php:253
 #: templates/partials/booking-auth.php:170
 #: templates/partials/single-trip/enquiry-modal.php:41
 #: assets/admin/dist/js/app.js:43316
@@ -22576,7 +22576,7 @@ msgstr ""
 
 # Source: resources/js/pages/CustomerForm.tsx:661, resources/js/pages/ViewCustomer.tsx:571
 #: assets/admin/dist/js/app.js
-#: app/Services/SettingsService.php:263
+#: app/Services/SettingsService.php:266
 #: assets/admin/dist/js/app.js:43576
 #: assets/admin/dist/js/app.js:44290
 msgid "Relationship"
@@ -33802,7 +33802,7 @@ msgstr ""
 
 #. Plugin Name of the plugin
 #: yatra.php
-msgid "Yatra - Travel Booking & Management"
+msgid "Yatra - Travel Booking & Tour Operator Software"
 msgstr ""
 
 #. Plugin URI of the plugin
@@ -35045,7 +35045,7 @@ msgstr ""
 
 #: app/Controllers/ReportsController.php:689
 #: app/Controllers/SingleTripController.php:1982
-#: app/Services/SettingsService.php:267
+#: app/Services/SettingsService.php:270
 msgid "Child"
 msgstr ""
 
@@ -38238,7 +38238,7 @@ msgid "Traveler 1 — Alex Traveler"
 msgstr ""
 
 #: app/Services/EmailTemplateSampleData.php:144
-#: app/Services/SettingsService.php:288
+#: app/Services/SettingsService.php:291
 msgid "Vegetarian"
 msgstr ""
 
@@ -38606,112 +38606,112 @@ msgstr ""
 msgid "Browse trips by style or theme—adventure, family, luxury, and more."
 msgstr ""
 
-#: app/Services/SettingsService.php:244
+#: app/Services/SettingsService.php:247
 msgid "Lead Traveler / Contact Information"
 msgstr ""
 
-#: app/Services/SettingsService.php:245
+#: app/Services/SettingsService.php:248
 msgid "Primary contact person for this booking"
 msgstr ""
 
-#: app/Services/SettingsService.php:251
+#: app/Services/SettingsService.php:254
 #: templates/partials/booking-form-fields.php:150
 #: assets/js/booking.js:112
 msgid "Select Country"
 msgstr ""
 
-#: app/Services/SettingsService.php:252
-#: app/Services/SettingsService.php:285
+#: app/Services/SettingsService.php:255
+#: app/Services/SettingsService.php:288
 msgid "Select Nationality"
 msgstr ""
 
-#: app/Services/SettingsService.php:253
+#: app/Services/SettingsService.php:256
 msgid "Street address (optional)"
 msgstr ""
 
-#: app/Services/SettingsService.php:258
+#: app/Services/SettingsService.php:261
 msgid "Person to contact in case of emergency"
 msgstr ""
 
-#: app/Services/SettingsService.php:263
+#: app/Services/SettingsService.php:266
 msgid "Select Relationship"
 msgstr ""
 
-#: app/Services/SettingsService.php:264
+#: app/Services/SettingsService.php:267
 msgid "Spouse/Partner"
 msgstr ""
 
-#: app/Services/SettingsService.php:265
+#: app/Services/SettingsService.php:268
 msgid "Parent"
 msgstr ""
 
-#: app/Services/SettingsService.php:266
+#: app/Services/SettingsService.php:269
 msgid "Sibling"
 msgstr ""
 
-#: app/Services/SettingsService.php:268
+#: app/Services/SettingsService.php:271
 msgid "Friend"
 msgstr ""
 
-#: app/Services/SettingsService.php:274
+#: app/Services/SettingsService.php:277
 #: templates/partials/booking-form-fields.php:499
 #: templates/pdf/voucher.php:104
 msgid "Traveler Information"
 msgstr ""
 
-#: app/Services/SettingsService.php:275
+#: app/Services/SettingsService.php:278
 msgid "Please provide details for each traveler"
 msgstr ""
 
-#: app/Services/SettingsService.php:277
+#: app/Services/SettingsService.php:280
 msgid "Legal first name"
 msgstr ""
 
-#: app/Services/SettingsService.php:278
+#: app/Services/SettingsService.php:281
 msgid "Legal last name"
 msgstr ""
 
-#: app/Services/SettingsService.php:280
+#: app/Services/SettingsService.php:283
 msgid "Select Gender"
 msgstr ""
 
-#: app/Services/SettingsService.php:286
+#: app/Services/SettingsService.php:289
 msgid "Select"
 msgstr ""
 
-#: app/Services/SettingsService.php:287
+#: app/Services/SettingsService.php:290
 msgid "No special requirements"
 msgstr ""
 
-#: app/Services/SettingsService.php:289
+#: app/Services/SettingsService.php:292
 msgid "Vegan"
 msgstr ""
 
-#: app/Services/SettingsService.php:290
+#: app/Services/SettingsService.php:293
 msgid "Halal"
 msgstr ""
 
-#: app/Services/SettingsService.php:291
+#: app/Services/SettingsService.php:294
 msgid "Kosher"
 msgstr ""
 
-#: app/Services/SettingsService.php:292
+#: app/Services/SettingsService.php:295
 msgid "Gluten Free"
 msgstr ""
 
-#: app/Services/SettingsService.php:293
+#: app/Services/SettingsService.php:296
 msgid "Lactose Free"
 msgstr ""
 
-#: app/Services/SettingsService.php:294
+#: app/Services/SettingsService.php:297
 msgid "Other (specify in notes)"
 msgstr ""
 
-#: app/Services/SettingsService.php:296
+#: app/Services/SettingsService.php:299
 msgid "Medical Conditions / Allergies"
 msgstr ""
 
-#: app/Services/SettingsService.php:296
+#: app/Services/SettingsService.php:299
 msgid "Any allergies or conditions we should know"
 msgstr ""
 
