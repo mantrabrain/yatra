@@ -1112,7 +1112,7 @@ class SettingsController extends BaseController
                         'required' => isset($field['required']) ? (bool) $field['required'] : false,
                         'enabled' => isset($field['enabled']) ? (bool) $field['enabled'] : true,
                         'order' => isset($field['order']) ? (int) $field['order'] : 0,
-                        'width' => in_array($field['width'] ?? 'full', $allowed_widths, true) ? $field['width'] : 'full',
+                        'width' => in_array($field['width'] ?? 'full', $allowed_widths, true) ? ($field['width'] ?? 'full') : 'full',
                         'locked' => isset($field['locked']) ? (bool) $field['locked'] : false,
                     ];
                     
