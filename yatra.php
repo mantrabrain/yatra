@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Yatra - Travel Booking & Management
+ * Plugin Name: Yatra - Travel Booking & Tour Operator Software
  * Plugin URI: https://wpyatra.com/
  * Description: Tours and activities on WordPress — trips, bookings, PayPal and Pay Later, guest accounts, emails, reports. Yatra Pro adds premium gateways and modules.
  * Version: 3.0.8

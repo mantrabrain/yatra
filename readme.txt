@@ -1,6 +1,6 @@
-=== Yatra - Travel Booking & Tour Management ===
+=== Yatra - Travel Booking & Tour Operator Software ===
 Contributors: MantraBrain
-Tags: tour-booking, travel-booking, tour-operator, travel, travel agency
+Tags: tour-booking, travel-booking, tour-operator, travel, travel-agency
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
@@ -32,7 +32,7 @@ WordPress travel booking plugin for tour operators. Trips, departures, payments,
 
 = 🎁 What you get in the free Yatra plugin =
 
-**Trips and catalog (11 free features)**
+**Trips and catalog (free)**
 
 * [Trips & Itineraries](https://wpyatra.com/features/trips/) — unlimited trips with rich descriptions, gallery, difficulty, duration, meeting points, included / excluded lists, day-by-day itinerary builder, per-trip FAQs and custom attributes
 * [Departures & Availability](https://wpyatra.com/features/departures/) — scheduled departures, capacity, recurring availability rules
@@ -52,7 +52,7 @@ WordPress travel booking plugin for tour operators. Trips, departures, payments,
 **Front-end + extensibility**
 
 * Templates for trip listings, single trip, booking flow, checkout, and account
-* **4 Gutenberg blocks** + **6 shortcodes** to place trips, search, login and account on any page
+* **4 Gutenberg blocks** + **8 shortcodes** to place trips, search, login and account on any page
 * Compatible with most well-coded block themes, classic themes and major page builders
 * PHP 7.4 or newer, structured codebase, hooks and filters, template overrides
 * REST-oriented flows for booking and account experiences
@@ -116,6 +116,16 @@ Yatra ships with bring-your-own-credential integrations — no proxy, no markup,
 * **Calendars & Scheduling**: Google Calendar
 * **AI Providers**: OpenAI · Anthropic Claude
 * **WordPress Ecosystem**: Gutenberg blocks (4 native) · Elementor (via Shortcode) · WooCommerce (coexistence) · Loco Translate
+
+= 🔍 Built-in travel SEO =
+
+Yatra is built to rank — your trips, destinations and activities are search-engine ready out of the box, with no extra SEO plugin required:
+
+* 🧱 **Schema.org structured data** — automatic structured markup for trips and listing pages so search engines can surface rich results for your tours.
+* 🏷️ **Meta titles, descriptions & Open Graph / Twitter cards** — per-trip and per-archive, with `{name}`-style tokens, for clean search snippets and shareable social previews.
+* 🗺️ **XML sitemap** — Yatra publishes one sitemap of every trip, destination, activity and category at `/yatra-sitemap.xml`, advertised in `robots.txt` and integrated automatically with **WordPress core, Yoast, Rank Math and All in One SEO** sitemaps. (Yatra stores content in fast custom tables, so this is what keeps it fully discoverable.)
+* 🔗 **Clean, keyword-friendly permalinks** — `/trip/…`, `/destination/…`, `/activity/…` URL bases you control under Settings.
+* 🌍 **Translation-ready interface** — every label, button and email is translatable with standard `.po`/`.mo` files via **Loco Translate**, **WPML String Translation** or **Polylang** string translation.
 
 = 🧩 Blocks and shortcodes =
 
@@ -218,7 +228,11 @@ Yes. Yatra runs alongside WooCommerce on the same WordPress site — Yatra store
 
 = Does Yatra support multilingual and multi-currency travel sites? =
 
-Yes. Yatra ships translation-ready POT files and is compatible with **WPML**, **Polylang** and **TranslatePress**. Currency configuration is at the site level — set your default currency in Yatra → Settings. RTL stylesheets ship in the bundled [Resa WordPress travel theme](https://wpyatra.com/best-wordpress-travel-theme/).
+**Interface — yes.** Yatra is fully translation-ready: every label, button and email translates via standard POT / `.po` / `.mo` files using **Loco Translate**, **WPML String Translation** or **Polylang** string translation. RTL stylesheets ship in the [Resa travel theme](https://wpyatra.com/best-wordpress-travel-theme/).
+
+**Trip content — important to know.** Yatra stores trips and destinations in its own fast custom tables (not WordPress posts), so WPML and Polylang — which translate posts and taxonomies — cannot translate the trip *content* itself. For a fully multilingual catalogue today, run one site per language (WordPress Multisite, a subsite per language). Native per-language content translation is on our roadmap.
+
+**Currency.** Set your default currency in Yatra → Settings (site-level).
 
 = Does Yatra work with my theme? =
 
@@ -413,6 +427,9 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 * For 2.x changelog entries, see the plugin's GitHub releases or historical notes on the vendor site.
 
 == Upgrade Notice ==
+
+= 3.0.8 =
+Release **3.0.8** — new XML sitemap for trips, destinations, activities and categories (integrated with WordPress core, Yoast, Rank Math and All in One SEO, advertised in robots.txt), Additional Services percentage-pricing fix, Bank Transfer / deposit fix on guest and waitlist checkout, and broader translation coverage. No database changes — safe to update from 3.0.x.
 
 = 3.0.4 =
 Release **3.0.4** — Unicode / Cyrillic slug support end-to-end, pricing single-source-of-truth (sidebar = payment-gateway amount), pricing summary cleanup, services dedupe fix, Loco script-translation fallback so React surfaces (account page, admin) pick up `.json` translations from Loco's workspace, mobile sticky-bar JS extraction, FSE template support, and CI pipeline fixes. Safe to update from 3.0.3.
