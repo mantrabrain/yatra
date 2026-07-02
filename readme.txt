@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel, travel-agency
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 3.0.8
+Stable tag: 3.0.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -278,6 +278,16 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 6. Traveler account — bookings, payments and documents
 
 == Changelog ==
+
+= 3.0.9 =
+* **Price filter — highest trips are reachable again:** the trip-listing price filter now bounds its Min/Max on **every** price a customer can actually book. Previously the maximum only looked at the base trip price, so trips priced through a per-category (traveler-based) tier or an availability-date / recurring-rule / departure **override** could sit above the slider's top and become impossible to find. The slider can now also land exactly on the true maximum (the range step no longer stops short, e.g. capping €10,000 at €9,909). Bounds are computed only from published, non-deleted trips, so a draft/trashed override can't inflate them.
+* **Travel itinerary PDF — correct arrival & departure dates:** the travel-timeline section now shows the actual booked **start** date (arrival) and **end** date (departure) instead of repeating the same date twice. Falls back to the trip duration only when no stored end date exists, matching the booking's inclusive end-date calculation.
+* **Wishlist login goes to My Account:** the "Login" action in the wishlist popup (trip listing and single-trip pages) now sends guests to the configured **My Account** page (Settings → Permalink slug) instead of the raw WordPress login screen.
+* **Guest checkout / authentication:** "Logged in as…" no longer appears for guests during checkout; the "Sign In" secondary action on the email-verification / verified pages is shown only when an account is actually part of the flow (registration enabled and guest checkout off); and guest email verification uses the configured, editable email template.
+* **Admin fixes:** the Field ID input in the Booking Form builder no longer closes the editor after every keystroke; clearing a number in Payment Settings no longer snaps back to the previous value; the Email Template form shows a clear empty-state when no events are available.
+* **Translations:** account field labels (Traveler, Date of Birth, Email, Nationality), the PayPal redirect message, the "Processing…" button state, and the traveler-count / group-discount summary text are now translatable, with the JavaScript `sprintf` shim hardened so number placeholders (`%d`/`%s`) always resolve. Regenerated the translation template (`yatra.pot`).
+* **Build integrity:** added an asset-integrity check to the build and CI so a desynced/missing lazy-loaded admin chunk can never ship (the cause of a blank Settings page after an update).
+* Safe to update from 3.0.8 — no database changes and no migrations. Pair with **Yatra Pro 3.0.7**.
 
 = 3.0.8 =
 * **Additional Services — percentage pricing fixed:** a service priced as a *percentage* now correctly charges that percent of the trip price instead of a flat amount. The displayed line-item, the live popup total and the amount actually charged are all server-calculated from the same value, so they always agree. **Fixed-price services are unchanged to the cent.** Price is now validated server-side (no negative values; percentages capped at 100%).

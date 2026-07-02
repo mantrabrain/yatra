@@ -12,17 +12,27 @@
 // dependency in FrontendAssetsProvider). Falls back to the source string if
 // wp.i18n is unavailable so the page never breaks on older environments.
 (function () {
-    if (typeof window.__ === 'function') return;
-    if (window.wp && window.wp.i18n && typeof window.wp.i18n.__ === 'function') {
-        window.__ = function (text, domain) { return window.wp.i18n.__(text, domain || 'yatra'); };
-        window._n = function (s, p, n, domain) { return window.wp.i18n._n(s, p, n, domain || 'yatra'); };
-        window._x = function (text, ctx, domain) { return window.wp.i18n._x(text, ctx, domain || 'yatra'); };
-        window.sprintf = window.sprintf || (window.wp.i18n.sprintf || function (fmt) { return fmt; });
+    var i18n = (window.wp && window.wp.i18n) ? window.wp.i18n : null;
+    if (i18n && typeof i18n.__ === 'function') {
+        window.__ = function (text, domain) { return i18n.__(text, domain || 'yatra'); };
+        window._n = function (s, p, n, domain) { return i18n._n(s, p, n, domain || 'yatra'); };
+        window._x = function (text, ctx, domain) { return i18n._x(text, ctx, domain || 'yatra'); };
+        // Always bind WordPress's own sprintf (it substitutes %d/%s/%1$s).
+        // Do NOT defer to a pre-existing window.sprintf: a theme or other
+        // plugin can define an incompatible global that leaves placeholders
+        // unsubstituted (the cause of literal "%d"/"%s" in the UI).
+        if (typeof i18n.sprintf === 'function') {
+            window.sprintf = function () { return i18n.sprintf.apply(i18n, arguments); };
+        } else if (typeof window.sprintf !== 'function') {
+            window.sprintf = function (fmt) { return fmt; };
+        }
     } else {
-        window.__ = function (text) { return text; };
-        window._n = function (s, p, n) { return n === 1 ? s : p; };
-        window._x = function (text) { return text; };
-        window.sprintf = window.sprintf || function (fmt) { return fmt; };
+        // wp.i18n not present — install passthroughs only if nothing usable
+        // exists yet (don't clobber a real binding installed earlier).
+        if (typeof window.__ !== 'function') window.__ = function (text) { return text; };
+        if (typeof window._n !== 'function') window._n = function (s, p, n) { return n === 1 ? s : p; };
+        if (typeof window._x !== 'function') window._x = function (text) { return text; };
+        if (typeof window.sprintf !== 'function') window.sprintf = function (fmt) { return fmt; };
     }
 })();
 

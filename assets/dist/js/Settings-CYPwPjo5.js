@@ -607,6 +607,10 @@ const BookingFormBuilder = ({
     }
   };
   const [editingField, setEditingField] = reactExports.useState(null);
+  const [fieldIdDraft, setFieldIdDraft] = reactExports.useState(null);
+  reactExports.useEffect(() => {
+    setFieldIdDraft(null);
+  }, [editingField]);
   const [showAddField, setShowAddField] = reactExports.useState(false);
   const [newField, setNewField] = reactExports.useState({
     id: "",
@@ -1334,12 +1338,27 @@ const BookingFormBuilder = ({
                         /* @__PURE__ */ jsxRuntimeExports.jsx(
                           Input,
                           {
-                            value: field.id,
+                            value: fieldIdDraft !== null ? fieldIdDraft : field.id,
                             onChange: (e) => {
                               if (!field.locked) {
-                                updateField(field.id, {
-                                  id: sanitizeId(e.target.value)
-                                });
+                                setFieldIdDraft(sanitizeId(e.target.value));
+                              }
+                            },
+                            onBlur: () => {
+                              if (fieldIdDraft === null) return;
+                              const next = fieldIdDraft;
+                              setFieldIdDraft(null);
+                              if (!field.locked && next !== "" && next !== field.id) {
+                                updateField(field.id, { id: next });
+                                setEditingField(
+                                  (cur) => cur === field.id ? next : cur
+                                );
+                              }
+                            },
+                            onKeyDown: (e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                e.currentTarget.blur();
                               }
                             },
                             placeholder: "field_id",
@@ -2596,8 +2615,13 @@ const Settings = () => {
       if (e.target.type === "checkbox") {
         value = e.target.checked;
       } else if (e.target.type === "number") {
-        const numValue = parseFloat(e.target.value);
-        value = isNaN(numValue) ? 0 : numValue;
+        const raw = e.target.value;
+        if (raw === "") {
+          value = "";
+        } else {
+          const numValue = parseFloat(raw);
+          value = isNaN(numValue) ? 0 : numValue;
+        }
       } else {
         value = e.target.value;
       }
@@ -7933,4 +7957,4 @@ const Settings = () => {
 export {
   Settings as default
 };
-//# sourceMappingURL=Settings-DAPGYQ8J.js.map
+//# sourceMappingURL=Settings-CYPwPjo5.js.map

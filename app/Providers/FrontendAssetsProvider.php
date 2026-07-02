@@ -287,12 +287,20 @@ class FrontendAssetsProvider
                         YATRA_PLUGIN_PATH . 'i18n/languages'
                     );
                 }
+                // Wishlist "Login" should send guests to the configured
+                // My Account page (Settings → Permalink slug), not the raw
+                // wp-login.php screen. Fall back to wp_login_url() only when
+                // no account base is configured so the button never dead-ends.
+                $yatraAccountBase = \Yatra\Services\SettingsService::getAccountBase();
+                $yatraAccountLoginUrl = $yatraAccountBase !== ''
+                    ? home_url('/' . trim($yatraAccountBase, '/') . '/')
+                    : wp_login_url();
                 wp_localize_script('yatra-listing-wishlist', 'yatraWishlistConfig', [
                     'enabled' => true,
                     'restUrl' => rest_url('yatra/v1'),
                     'nonce' => wp_create_nonce('wp_rest'),
                     'isLoggedIn' => is_user_logged_in(),
-                    'loginUrl' => wp_login_url(),
+                    'loginUrl' => $yatraAccountLoginUrl,
                     'i18n' => [
                         'loginRequired' => __('Login Required', 'yatra'),
                         'loginPrompt'   => __('Please login to save trips to your wishlist.', 'yatra'),
@@ -438,6 +446,14 @@ class FrontendAssetsProvider
             'tripSlug' => $trip_slug,
             'wishlistEnabled' => \Yatra\Services\SettingsService::wishlistEnabled(),
             'isLoggedIn' => is_user_logged_in(),
+            // Wishlist "Login" (guest) → the configured My Account page
+            // (Settings → Permalink slug), NOT wp-login.php. Without this key
+            // trip.js falls back to a hardcoded '/wp-login.php'. Falls back to
+            // wp_login_url() only when no account base slug is configured.
+            'loginUrl' => (function () {
+                $base = \Yatra\Services\SettingsService::getAccountBase();
+                return $base !== '' ? home_url('/' . trim($base, '/') . '/') : wp_login_url();
+            })(),
             // Regional settings
             'timezone' => \Yatra\Services\SettingsService::getString('timezone', 'UTC'),
             'dateFormat' => \Yatra\Services\SettingsService::getString('date_format', 'Y-m-d'),
@@ -596,13 +612,27 @@ class FrontendAssetsProvider
         // Enqueue booking-specific JavaScript
         $bookingJs = YATRA_PLUGIN_PATH . 'assets/js/booking.js';
         if (file_exists($bookingJs)) {
+            // booking.js renders user-facing strings via wp.i18n.__() (the
+            // "Processing..." button label and the per-gateway info messages
+            // shown when a payment method is selected). It therefore needs
+            // wp-i18n as a dependency AND wp_set_script_translations so its
+            // Jed catalog loads — mirroring the trip-detail enqueue above.
+            // Without these, those strings stay English on the standalone
+            // booking page regardless of site locale.
             wp_enqueue_script(
                 'yatra-booking',
                 YATRA_PLUGIN_URL . 'assets/js/booking.js',
-                ['jquery', 'yatra-flatpickr'],
+                ['jquery', 'yatra-flatpickr', 'wp-i18n'],
                 YATRA_VERSION . '.' . filemtime($bookingJs),
                 true
             );
+            if (function_exists('wp_set_script_translations')) {
+                wp_set_script_translations(
+                    'yatra-booking',
+                    'yatra',
+                    YATRA_PLUGIN_PATH . 'i18n/languages'
+                );
+            }
         }
 
         // Load each available gateway's own client scripts on the checkout page
@@ -895,6 +925,32 @@ class FrontendAssetsProvider
             'Total Amount' => __('Total Amount', 'yatra'),
             'Payment Status' => __('Payment Status', 'yatra'),
             'View Details' => __('View Details', 'yatra'),
+
+            // Traveler / contact / emergency field labels on the account page.
+            // Keep in sync with the `fieldLabel()` map in account/BookingDetails.tsx.
+            'First Name' => __('First Name', 'yatra'),
+            'Last Name' => __('Last Name', 'yatra'),
+            'Full Name' => __('Full Name', 'yatra'),
+            'Name' => __('Name', 'yatra'),
+            'Email' => __('Email', 'yatra'),
+            'Phone' => __('Phone', 'yatra'),
+            'Mobile' => __('Mobile', 'yatra'),
+            'Date of Birth' => __('Date of Birth', 'yatra'),
+            'Gender' => __('Gender', 'yatra'),
+            'Nationality' => __('Nationality', 'yatra'),
+            'Country' => __('Country', 'yatra'),
+            'Address' => __('Address', 'yatra'),
+            'City' => __('City', 'yatra'),
+            'State' => __('State', 'yatra'),
+            'Postal Code' => __('Postal Code', 'yatra'),
+            'Zip Code' => __('Zip Code', 'yatra'),
+            'Passport' => __('Passport', 'yatra'),
+            'Passport Number' => __('Passport Number', 'yatra'),
+            'Passport Expiry' => __('Passport Expiry', 'yatra'),
+            'Dietary Requirements' => __('Dietary Requirements', 'yatra'),
+            'Special Requirements' => __('Special Requirements', 'yatra'),
+            'Relationship' => __('Relationship', 'yatra'),
+            'Company' => __('Company', 'yatra'),
 
             // Common
             'Loading...' => __('Loading...', 'yatra'),

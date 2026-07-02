@@ -18,6 +18,25 @@ class PayPalGateway extends AbstractPaymentGateway
     protected string $sandboxUrl = 'https://developer.paypal.com/tools/sandbox/';
     protected array $supports = ['paypal', 'credit_card', 'refunds', 'recurring', 'tokenization'];
 
+    /**
+     * Translatable display title. The raw `$title` property can't carry a
+     * `__()` call (PHP property defaults must be constant), so the customer-
+     * facing label is translated here. An admin-set custom title (via gateway
+     * config) still takes precedence in PaymentGatewayRegistry::getForCheckout().
+     */
+    public function getTitle(): string
+    {
+        return __('PayPal', 'yatra');
+    }
+
+    /**
+     * Translatable description shown under the gateway option at checkout.
+     */
+    public function getDescription(): string
+    {
+        return __('Accept PayPal and credit card payments', 'yatra');
+    }
+
     public function getConfigFields(): array
     {
         return [

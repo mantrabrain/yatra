@@ -812,6 +812,13 @@ const EmailTemplateForm: React.FC = () => {
                               </div>
                             </button>
                           ))}
+                          {events.length === 0 && (
+                            <div className="px-3 py-3 text-xs text-amber-600 dark:text-amber-400">
+                              {__(
+                                "No trigger events are available. Enable the Email Automation module under Yatra → Modules, then reload this page.",
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}

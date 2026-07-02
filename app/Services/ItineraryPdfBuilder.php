@@ -76,12 +76,29 @@ class ItineraryPdfBuilder
         $travelRaw    = (string) ($source['travel_date'] ?? '');
         $travelDate   = $travelRaw !== '' ? date_i18n(get_option('date_format'), strtotime($travelRaw)) : '';
 
+        // Departure / return date. The booking already stores the real
+        // trip end (`end_date`, written at booking time from the selected
+        // departure or start + duration), so prefer that authoritative
+        // value rather than re-deriving one — this is what keeps the
+        // travel timeline showing the ACTUAL booked end date instead of
+        // repeating the arrival date. Only when no stored end_date exists
+        // do we derive it, and then the SAME way
+        // BookingRepository::calculateEndDate does: start + (duration_days
+        // - 1). A 5-day trip therefore ends on day 5, not day 6 — the old
+        // "+ duration_days" was off by one and implied an extra night.
         $returnDate = '';
-        if ($travelRaw !== '' && $trip && !empty($trip->duration_days)) {
-            $returnDate = date_i18n(
-                get_option('date_format'),
-                strtotime($travelRaw . ' +' . (int) $trip->duration_days . ' days')
+        $endRaw = (string) ($source['end_date'] ?? '');
+        if ($endRaw === '' && $travelRaw !== '' && $trip && (int) ($trip->duration_days ?? 0) > 1) {
+            $endRaw = date(
+                'Y-m-d',
+                strtotime($travelRaw . ' +' . ((int) $trip->duration_days - 1) . ' days')
             );
+        }
+        // Expose a return date only when it genuinely differs from the
+        // arrival date. Single-day bookings store end_date == start_date,
+        // so the timeline renders one item instead of two identical dates.
+        if ($endRaw !== '' && $endRaw !== $travelRaw) {
+            $returnDate = date_i18n(get_option('date_format'), strtotime($endRaw));
         }
 
         $statusRaw = strtolower((string) ($source['booking_status'] ?? $source['status'] ?? ''));
@@ -178,6 +195,11 @@ class ItineraryPdfBuilder
             'booking_id'          => $payment->booking_id ?? 0,
             'created_at'          => $payment->created_at ?? null,
             'travel_date'         => $payment->travel_date ?? null,
+            // Actual booked trip range — used for the arrival/departure
+            // timeline. Null-safe: build() falls back to a correct
+            // derivation when the joined record doesn't carry these.
+            'start_date'          => $payment->start_date ?? null,
+            'end_date'            => $payment->end_date ?? null,
             // Use the BOOKING status, not the payment status. Payment
             // status can be "completed" while the booking itself is
             // still "pending" admin confirmation — the itinerary

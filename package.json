@@ -8,7 +8,7 @@
     "sync-icons": "node scripts/sync-lucide-icons-json.mjs",
     "sync-fa": "node scripts/sync-fontawesome-vendor.mjs && node scripts/sync-fa-icon-names.mjs",
     "clean": "rm -rf assets/admin/dist assets/dist",
-    "build:release": "npm run clean && npm run sync-fa && vite build && node scripts/build-blocks.mjs",
+    "build:release": "npm run clean && npm run sync-fa && vite build && node scripts/build-blocks.mjs && node scripts/verify-asset-integrity.mjs",
     "build": "npm run build:release && npm run makepot",
     "dev": "pkill -f 'vite dev' 2>/dev/null || true && sleep 1 && vite dev",
     "preview": "vite preview",
@@ -19,7 +19,8 @@
     "format:check": "node ./node_modules/prettier/bin/prettier.cjs --check \"resources/js/**/*.{ts,tsx,js,jsx}\"",
     "makepot": "node scripts/extract-js-pot.mjs && WP_MEMORY_LIMIT=1G php -d memory_limit=1G $(which wp) --allow-root i18n make-pot . i18n/languages/yatra.pot --include=\"app,includes,templates,resources/js\" --domain=yatra --location --headers='{\"Language-Team\":\"Yatra Development Team <mantrabrain@gmail.com>\",\"Last-Translator\":\"Yatra Dev <mantrabrain@gmail.com>\",\"Language\":\"en_US\",\"Plural-Forms\":\"nplurals=2; plural=(n != 1);\"}' && WP_MEMORY_LIMIT=1G php -d memory_limit=1G $(which wp) --allow-root i18n make-pot . i18n/languages/yatra.pot --merge=i18n/languages/yatra-js.pot && rm -f i18n/languages/yatra-js.pot && WP_MEMORY_LIMIT=1G php -d memory_limit=1G $(which wp) --allow-root i18n make-json i18n/languages --no-purge --pretty-print",
     "i18n": "npm run makepot",
-    "zip": "bash ./build.sh"
+    "zip": "bash ./build.sh",
+    "verify:assets": "node scripts/verify-asset-integrity.mjs"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",

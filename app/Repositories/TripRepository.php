@@ -2960,6 +2960,21 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
             }
         }
 
+        // Fold in per-date / per-rule / per-departure price overrides so the
+        // slider bounds span every price a customer can actually be charged,
+        // not just the trips-table base. See collectPriceOverridePoints().
+        foreach ($this->collectPriceOverridePoints() as $price) {
+            if ($price <= 0) {
+                continue;
+            }
+            if ($minPrice === null || $price < $minPrice) {
+                $minPrice = $price;
+            }
+            if ($maxPrice === null || $price > $maxPrice) {
+                $maxPrice = $price;
+            }
+        }
+
         return (object) [
             'min_price' => $minPrice,
             'max_price' => $maxPrice,
@@ -3007,6 +3022,109 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
                 if ($price > 0) {
                     $prices[] = $price;
                 }
+            }
+        }
+
+        return $prices;
+    }
+
+    /**
+     * Effective price points that OVERRIDE a trip's base price for specific
+     * dates, recurring rules, or individual departures.
+     *
+     * The price a customer actually sees, filters on, and pays is not always
+     * the trips-table base price: it can be overridden per
+     *   - specific availability date  (yatra_trip_availability_dates)
+     *   - recurring availability rule  (yatra_trip_availability_rules)
+     *   - individual departure         (yatra_trip_departures)
+     * each carrying its own original/discounted price and per-category
+     * (traveler-based) pricing JSON. The price-range slider bounds must span
+     * these too — otherwise a trip whose highest bookable price lives only on
+     * an override (e.g. a peak-season date priced €3,055 while the base is
+     * lower) is unreachable on the filter even though customers can book it.
+     *
+     * Effective-price semantics mirror the customer-facing display exactly by
+     * reusing collectTripDisplayPrices(): the discounted/sale price when set,
+     * otherwise the original — the same amount shown and charged. Non-bookable
+     * rows (blocked / cancelled / past dates, inactive rules) are excluded so
+     * they can't push the slider max beyond any price a customer can reach.
+     *
+     * @return array<int,float> Effective override prices (each > 0).
+     */
+    protected function collectPriceOverridePoints(): array
+    {
+        $prices = [];
+        $today = current_time('Y-m-d');
+
+        // Only overrides that belong to a genuinely available (published, not
+        // soft-deleted) trip may influence the bounds — otherwise a stray
+        // override on a draft/trashed trip leaks a phantom max that no
+        // customer-visible trip carries. Mirrors the trips-table filter the
+        // base bound uses.
+        $tripsTable = $this->getTableName();
+        $publishedJoin = "INNER JOIN {$tripsTable} t ON t.id = o.trip_id"
+            . " AND t.status IN ('publish', 'published')"
+            . " AND (t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')";
+
+        // 1) Specific availability dates — same column shape as a trip row, so
+        //    collectTripDisplayPrices() resolves them identically.
+        $datesTable = \Yatra\Database\Tables\TripAvailabilityDatesTable::getTableName();
+        $dateRows = $this->wpdb->get_results($this->wpdb->prepare(
+            "SELECT o.original_price, o.discounted_price, NULL AS sale_price, o.price_types
+             FROM {$datesTable} o
+             {$publishedJoin}
+             WHERE COALESCE(o.is_blocked, 0) = 0
+               AND o.status NOT IN ('cancelled', 'blocked', 'closed')
+               AND (o.departure_date IS NULL OR o.departure_date >= %s)",
+            $today
+        )) ?: [];
+        foreach ($dateRows as $row) {
+            foreach ($this->collectTripDisplayPrices($row) as $p) {
+                $prices[] = $p;
+            }
+        }
+
+        // 2) Recurring rules (active only — mirrors the `status = 'active'`
+        //    filter RecurringAvailabilityRepository uses when generating
+        //    availability). `traveler_pricing` holds the per-category JSON; a
+        //    fixed `price_override` is an absolute per-booking price. A
+        //    percentage override is a relative adjustment to the trip base —
+        //    already spanned by the base bound — so it adds no new absolute max.
+        $rulesTable = \Yatra\Database\Tables\TripAvailabilityRulesTable::getTableName();
+        $ruleRows = $this->wpdb->get_results(
+            "SELECT o.original_price, o.sale_price, NULL AS discounted_price,
+                    o.price_override, o.price_type, o.traveler_pricing AS price_types
+             FROM {$rulesTable} o
+             {$publishedJoin}
+             WHERE o.status = 'active'"
+        ) ?: [];
+        foreach ($ruleRows as $row) {
+            foreach ($this->collectTripDisplayPrices($row) as $p) {
+                $prices[] = $p;
+            }
+            if ($row->price_override !== null && (string) $row->price_type !== 'percentage') {
+                $po = (float) $row->price_override;
+                if ($po > 0) {
+                    $prices[] = $po;
+                }
+            }
+        }
+
+        // 3) Departures — `price_override` is an absolute price;
+        //    `price_by_traveler_type` is the per-category JSON.
+        $depTable = \Yatra\Database\Tables\DeparturesTable::getTableName();
+        $depRows = $this->wpdb->get_results($this->wpdb->prepare(
+            "SELECT o.price_override AS original_price, NULL AS discounted_price,
+                    NULL AS sale_price, o.price_by_traveler_type AS price_types
+             FROM {$depTable} o
+             {$publishedJoin}
+             WHERE o.status NOT IN ('cancelled')
+               AND (COALESCE(o.start_date, o.`date`) IS NULL OR COALESCE(o.start_date, o.`date`) >= %s)",
+            $today
+        )) ?: [];
+        foreach ($depRows as $row) {
+            foreach ($this->collectTripDisplayPrices($row) as $p) {
+                $prices[] = $p;
             }
         }
 
@@ -3177,33 +3295,76 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
      */
     public function getPriceStats(): ?object
     {
-        global $wpdb;
-        
         $table = $this->getTableName();
-        
-        $result = $wpdb->get_row("
-            SELECT 
-                MIN(sub.eff_price) as min_price,
-                MAX(sub.eff_price) as max_price,
-                AVG(sub.eff_price) as avg_price
-            FROM (
-                SELECT (CASE
-                    WHEN CAST(discounted_price AS DECIMAL(10,2)) > 0 THEN CAST(discounted_price AS DECIMAL(10,2))
-                    WHEN CAST(sale_price AS DECIMAL(10,2)) > 0 THEN CAST(sale_price AS DECIMAL(10,2))
-                    ELSE CAST(original_price AS DECIMAL(10,2))
-                END) AS eff_price
-                FROM {$table}
-                WHERE status IN ('publish', 'published')
-                  AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')
-            ) sub
-            WHERE sub.eff_price > 0
-        ");
-        
-        return $result ? (object) [
-            'min_price' => (float) $result->min_price,
-            'max_price' => (float) $result->max_price,
-            'avg_price' => (float) $result->avg_price
-        ] : null;
+
+        // Bounds must cover EVERY price a customer can actually filter on.
+        // The search filter matches a trip if its legacy effective price OR
+        // ANY per-category price in `price_types` falls in range (see the
+        // price clause in the listing query), so the slider's min/max have to
+        // span the same set — otherwise a traveler-based trip whose highest
+        // tier (eg. Adult €3,055) lives only in `price_types` becomes
+        // unreachable when the column-only max stops short (eg. €3,045).
+        //
+        // Reuse `collectTripDisplayPrices()` — the single source of truth also
+        // used by `getPriceRangeStats()` and the listing/single-trip DISPLAY —
+        // so bound == display == filter for both regular and traveler-based
+        // pricing.
+        $rows = $this->wpdb->get_results(
+            "SELECT id, original_price, discounted_price, sale_price, price_types
+             FROM {$table}
+             WHERE status IN ('publish', 'published')
+               AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')"
+        ) ?: [];
+
+        $minPrice = null;
+        $maxPrice = null;
+        $sum = 0.0;
+        $count = 0;
+
+        foreach ($rows as $row) {
+            foreach ($this->collectTripDisplayPrices($row) as $price) {
+                if ($price <= 0) {
+                    continue;
+                }
+                if ($minPrice === null || $price < $minPrice) {
+                    $minPrice = $price;
+                }
+                if ($maxPrice === null || $price > $maxPrice) {
+                    $maxPrice = $price;
+                }
+                $sum += $price;
+                $count++;
+            }
+        }
+
+        // Fold in per-date / per-rule / per-departure price overrides so the
+        // slider spans every price a customer can actually be charged (bounds
+        // only — the average stays a base-trip figure). See
+        // collectPriceOverridePoints().
+        foreach ($this->collectPriceOverridePoints() as $price) {
+            if ($price <= 0) {
+                continue;
+            }
+            if ($minPrice === null || $price < $minPrice) {
+                $minPrice = $price;
+            }
+            if ($maxPrice === null || $price > $maxPrice) {
+                $maxPrice = $price;
+            }
+        }
+
+        if ($minPrice === null || $maxPrice === null) {
+            return null;
+        }
+
+        // Widen to whole units so the template's `(int)` cast on the bounds
+        // can never truncate a fractional boundary out of range (eg. a
+        // €3,055.50 max would otherwise int-cast to 3055 and exclude it).
+        return (object) [
+            'min_price' => (float) floor($minPrice),
+            'max_price' => (float) ceil($maxPrice),
+            'avg_price' => $count > 0 ? (float) ($sum / $count) : 0.0,
+        ];
     }
 
     /**

@@ -270,6 +270,14 @@ jobs:
           fi
           echo "OK — no console.log calls." > consolelog-errors.txt
 
+      # Guards the "Settings page 404 after update" class of bug: the committed
+      # admin bundle (app.js) lazily imports hashed chunks (Settings-<hash>.js)
+      # that must be committed alongside it. This fails the build if any built
+      # JS references a chunk file that is not present in the committed tree.
+      - name: Built-asset integrity
+        if: always()
+        run: node scripts/verify-asset-integrity.mjs 2>&1 | tee asset-integrity.txt
+
       - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v4

@@ -147,6 +147,14 @@ final class EmailTemplateDefaults
                 'subject' => '✉️ [{{site_name}}] Verify your email address',
                 'body' => self::htmlCustomerEmailVerification(),
             ],
+            'guest_email_verification' => [
+                // Guest-checkout verification reuses the customer-verification
+                // body — the flow is identical (click a magic link to prove
+                // ownership) and the booking-specific copy is injected at
+                // send-time via {{intro_paragraph}} / {{footer_note}}.
+                'subject' => '✉️ [{{site_name}}] Verify your email to complete your booking',
+                'body' => self::htmlCustomerEmailVerification(),
+            ],
             'booking_expired_customer' => [
                 'subject' => '⏱️ [{{site_name}}] Booking expired · {{booking_reference}}',
                 'body' => self::htmlBookingExpiredCustomer(),

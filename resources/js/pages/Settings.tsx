@@ -1134,6 +1134,16 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
     }
   };
   const [editingField, setEditingField] = useState<string | null>(null);
+  // Draft for the Field ID input while editing an existing field. The field's
+  // `id` is its React key AND the value `editingField` tracks, so mutating it on
+  // every keystroke remounts the row (focus loss) and breaks the open-editor
+  // match (editor closes). We edit a local draft and commit once on blur/Enter.
+  const [fieldIdDraft, setFieldIdDraft] = useState<string | null>(null);
+  // Clear any pending Field ID draft whenever the edited field changes
+  // (open / close / switch) so a draft can never leak onto another field.
+  useEffect(() => {
+    setFieldIdDraft(null);
+  }, [editingField]);
   const [showAddField, setShowAddField] = useState(false);
   const [newField, setNewField] = useState<Partial<FormFieldConfig>>({
     id: "",
@@ -2054,12 +2064,39 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                                 {__("Field ID:", "yatra")}
                               </Label>
                               <Input
-                                value={field.id}
+                                value={
+                                  fieldIdDraft !== null
+                                    ? fieldIdDraft
+                                    : field.id
+                                }
                                 onChange={(e) => {
                                   if (!field.locked) {
-                                    updateField(field.id, {
-                                      id: sanitizeId(e.target.value),
-                                    });
+                                    // Local draft only — do NOT mutate field.id
+                                    // here, or the row remounts (focus loss) and
+                                    // the editor closes on every keystroke.
+                                    setFieldIdDraft(sanitizeId(e.target.value));
+                                  }
+                                }}
+                                onBlur={() => {
+                                  if (fieldIdDraft === null) return;
+                                  const next = fieldIdDraft;
+                                  setFieldIdDraft(null);
+                                  if (
+                                    !field.locked &&
+                                    next !== "" &&
+                                    next !== field.id
+                                  ) {
+                                    updateField(field.id, { id: next });
+                                    // Keep the editor open on the renamed field.
+                                    setEditingField((cur) =>
+                                      cur === field.id ? next : cur,
+                                    );
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    (e.currentTarget as HTMLInputElement).blur();
                                   }
                                 }}
                                 placeholder="field_id"
@@ -3542,8 +3579,17 @@ const Settings: React.FC = () => {
       if (e.target.type === "checkbox") {
         value = (e.target as HTMLInputElement).checked;
       } else if (e.target.type === "number") {
-        const numValue = parseFloat(e.target.value);
-        value = isNaN(numValue) ? 0 : numValue;
+        // Keep an empty field empty while editing so the user can clear the
+        // last character and retype. Previously empty coerced to 0, which
+        // "stuck" and blocked re-entry (deleting the last digit snapped a value
+        // back). The empty string is coerced to a number server-side on save.
+        const raw = e.target.value;
+        if (raw === "") {
+          value = "";
+        } else {
+          const numValue = parseFloat(raw);
+          value = isNaN(numValue) ? 0 : numValue;
+        }
       } else {
         value = e.target.value;
       }

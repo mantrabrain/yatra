@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here. The WordPress.org–canonical history lives in **`readme.txt`** under **Changelog**; this file mirrors recent releases for GitHub and tooling.
 
+## [3.0.9] — 2026-07-02
+
+- **Price filter — highest trips are reachable again:** the trip-listing price filter now bounds its Min/Max on every price a customer can actually book. The maximum previously looked only at the base trip price, so a per-category (traveler-based) tier or an availability-date / recurring-rule / departure **override** priced above it fell off the top of the slider and became unfindable. The slider can now also land exactly on the true maximum (the range step no longer stops short — e.g. it no longer caps €10,000 at €9,909). Bounds come only from published, non-deleted trips, so a draft/trashed override can't inflate them.
+- **Travel itinerary PDF — correct arrival & departure dates:** the travel-timeline now shows the booking's actual **start** (arrival) and **end** (departure) dates instead of repeating the same date twice; derives the end from trip duration only when no stored end date exists (matching the inclusive end-date calc).
+- **Wishlist login goes to My Account:** the "Login" action in the wishlist popup (listing + single-trip) now sends guests to the configured My Account page (Settings → Permalink slug), not the WordPress login screen.
+- **Guest checkout / auth:** "Logged in as…" no longer shows for guests during checkout; the "Sign In" secondary action on the email-verification / verified pages appears only when an account is genuinely part of the flow; guest email verification uses the configured, editable template.
+- **Admin fixes:** the Field ID input in the Booking Form builder no longer closes the editor per keystroke; clearing a number in Payment Settings no longer reverts; the Email Template form shows an empty-state when no events exist.
+- **Translations:** account field labels (Traveler, Date of Birth, Email, Nationality), the PayPal redirect message, the "Processing…" state and the traveler-count / group-discount summary are now translatable, with the JS `sprintf` shim hardened so `%d`/`%s` placeholders always resolve. Regenerated `yatra.pot`.
+- **Build integrity:** an asset-integrity check now runs in the build and CI so a desynced/missing lazy-loaded admin chunk can never ship.
+- No DB changes, no migration. Safe to update from 3.0.8. Pair with **Yatra Pro 3.0.7**.
+
 ## [3.0.8] — 2026-06-24
 
 - **Additional Services — percentage pricing fixed:** a percentage-priced service now charges that percent of the trip price (previously a flat amount), with no traveler/day double-counting. The displayed line-item, the live popup total and the charged amount are all server-calculated from one value so they agree. **Fixed-price services are unchanged to the cent.** Price is validated server-side (no negatives; percentages capped at 100%).

@@ -9,6 +9,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      # This deploy action ships the COMMITTED files (no rebuild). Verify that
+      # every built JS entry references chunk files that are actually committed,
+      # so an inconsistent dist (e.g. app.js referencing a Settings-<hash>.js
+      # that was not committed) can never reach users as a 404 / blank page.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Verify built asset integrity
+        run: node scripts/verify-asset-integrity.mjs
       - name: WordPress Plugin Deploy
         id: deploy
         uses: 10up/action-wordpress-plugin-deploy@stable

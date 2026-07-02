@@ -839,7 +839,7 @@ if (!is_user_logged_in() && !$is_remaining_payment
         </div>
     <?php endif; ?>
 </div>
-<?php elseif (!is_user_logged_in()) : ?>
+<?php elseif (is_user_logged_in()) : ?>
     <!-- User is logged in -->
     <div class="yatra-booking-section yatra-logged-in-notice">
         <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #ecfdf5; border: 1px solid #10b981; border-radius: 8px;">

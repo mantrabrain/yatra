@@ -44,6 +44,60 @@ const getCountryName = (code: string): string => {
   }
 };
 
+/**
+ * Human, translatable label for a traveler / contact / emergency field.
+ *
+ * Traveler data is stored keyed by field id (e.g. "date_of_birth"), so the
+ * account page previously derived labels by de-snake-casing the id. That left
+ * them permanently English. Map the known standard fields to translatable
+ * strings (resolved via the account-page translations catalog) and fall back
+ * to the prettified id for any custom field an operator may have added.
+ *
+ * Keep the English source strings here in sync with the `getFrontendTranslations()`
+ * map in FrontendAssetsProvider so they resolve on the account page.
+ */
+// Built once on first use (lazily, so __() runs after the account-page
+// translations catalog is in place), then cached for every subsequent field.
+let knownFieldLabels: Record<string, string> | null = null;
+const getKnownFieldLabels = (): Record<string, string> => {
+  if (knownFieldLabels === null) {
+    knownFieldLabels = {
+      first_name: __("First Name", "yatra"),
+      last_name: __("Last Name", "yatra"),
+      full_name: __("Full Name", "yatra"),
+      name: __("Name", "yatra"),
+      email: __("Email", "yatra"),
+      phone: __("Phone", "yatra"),
+      mobile: __("Mobile", "yatra"),
+      date_of_birth: __("Date of Birth", "yatra"),
+      gender: __("Gender", "yatra"),
+      nationality: __("Nationality", "yatra"),
+      country: __("Country", "yatra"),
+      address: __("Address", "yatra"),
+      city: __("City", "yatra"),
+      state: __("State", "yatra"),
+      postal_code: __("Postal Code", "yatra"),
+      zip_code: __("Zip Code", "yatra"),
+      passport: __("Passport", "yatra"),
+      passport_number: __("Passport Number", "yatra"),
+      passport_expiry: __("Passport Expiry", "yatra"),
+      dietary_requirements: __("Dietary Requirements", "yatra"),
+      special_requirements: __("Special Requirements", "yatra"),
+      relationship: __("Relationship", "yatra"),
+      company: __("Company", "yatra"),
+    };
+  }
+  return knownFieldLabels;
+};
+
+const fieldLabel = (fieldId: string): string => {
+  const known = getKnownFieldLabels();
+  if (Object.prototype.hasOwnProperty.call(known, fieldId)) {
+    return known[fieldId];
+  }
+  return fieldId.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+};
+
 interface BookingDetailsData {
   id: number;
   booking_number: string;
@@ -616,9 +670,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                     return (
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                         {extras.map(([fieldId, value]) => {
-                          const label = fieldId
-                            .replace(/_/g, " ")
-                            .replace(/\b\w/g, (l) => l.toUpperCase());
+                          const label = fieldLabel(fieldId);
                           let displayValue = String(value);
                           if (
                             (fieldId === "nationality" ||
@@ -729,9 +781,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                             fieldId === "last_name"
                           )
                             return null;
-                          const label = fieldId
-                            .replace(/_/g, " ")
-                            .replace(/\b\w/g, (l) => l.toUpperCase());
+                          const label = fieldLabel(fieldId);
                           let displayValue = String(fieldValue);
                           if (
                             fieldId.includes("date") ||
@@ -791,9 +841,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                       ([_, value]) => value && String(value).trim() !== "",
                     )
                     .map(([fieldId, fieldValue]) => {
-                      const label = fieldId
-                        .replace(/_/g, " ")
-                        .replace(/\b\w/g, (l) => l.toUpperCase());
+                      const label = fieldLabel(fieldId);
                       return (
                         <div key={fieldId}>
                           <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">

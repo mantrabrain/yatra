@@ -15,6 +15,25 @@ class PayLaterGateway extends AbstractPaymentGateway
     protected bool $isOffline = true;
     protected array $supports = ['pay_later', 'reservation'];
 
+    /**
+     * Translatable display title. The raw `$title` property can't carry a
+     * `__()` call (PHP property defaults must be constant), so the customer-
+     * facing label is translated here. An admin-set custom title (via gateway
+     * config) still takes precedence in PaymentGatewayRegistry::getForCheckout().
+     */
+    public function getTitle(): string
+    {
+        return __('Book Now, Pay Later', 'yatra');
+    }
+
+    /**
+     * Translatable description shown under the gateway option at checkout.
+     */
+    public function getDescription(): string
+    {
+        return __('Reserve now and pay before the trip', 'yatra');
+    }
+
     public function getConfigFields(): array
     {
         return [

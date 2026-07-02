@@ -29,9 +29,13 @@ class FilterService extends BaseService
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $price_stats = $tripRepository->getPriceRangeStats();
 
-        $min_price = $options['min_price'] ?? ($price_stats->min_price ?? 100);
-        $max_price = $options['max_price'] ?? ($price_stats->max_price ?? 5000);
-        $step = $options['step'] ?? max(1, ($max_price - $min_price) / 100);
+        $min_price = (int) floor((float) ($options['min_price'] ?? ($price_stats->min_price ?? 100)));
+        $max_price = (int) ceil((float) ($options['max_price'] ?? ($price_stats->max_price ?? 5000)));
+        // Step 1 so the range slider can reach the true max exactly. A coarser
+        // step only lets the thumb stop on min + N*step, capping the slider
+        // short of the real maximum when (max - min) isn't a whole multiple of
+        // that step (e.g. min 9 / max 10000 / step 100 stops at 9909).
+        $step = $options['step'] ?? 1;
 
         ob_start();
         ?>

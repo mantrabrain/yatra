@@ -548,13 +548,18 @@ $yatra_normalize_list = static function ($value): array {
                          customer saw the same start date repeated
                          twice for what should be two distinct events.
                          Now we render the actual booked travel range:
-                           * Trip Start  — `$travelDate` (booking start)
-                           * Trip End    — `$returnDate` (booking start
-                                            + duration), only when it
-                                            differs from the start
-                                            (single-day trips skip it)
-                         No more duplicate "arrival = departure date"
-                         confusion. -->
+                           * Trip Start  — `$travelDate` (booking's
+                                            stored start_date / arrival)
+                           * Trip End    — `$returnDate` (booking's
+                                            stored end_date / departure),
+                                            resolved in ItineraryPdfBuilder
+                                            and shown only when it differs
+                                            from the start (single-day
+                                            trips skip it)
+                         The dates come from the values the plugin already
+                         records at booking time, so arrival and departure
+                         reflect the real booked range — no more duplicate
+                         "arrival = departure date" confusion. -->
                     <?php
                     $startDate = $travelDate !== '' ? $travelDate : __('TBD', 'yatra');
                     $endDate   = $returnDate !== '' ? $returnDate : '';

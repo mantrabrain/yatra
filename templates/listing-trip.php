@@ -166,9 +166,16 @@ yatra_get_header();
                     <?php
                     $price_stats = $filter_data['price_stats'] ?? $tripListingService->getPriceStats();
 
-                    $min_price = $price_stats ? (int)$price_stats->min_price : 0;
-                    $max_price = $price_stats ? (int)$price_stats->max_price : 10000;
-                    $step = max(1, (int)($max_price / 100)); // Dynamic step based on price range
+                    $min_price = $price_stats ? (int) floor($price_stats->min_price) : 0;
+                    $max_price = $price_stats ? (int) ceil($price_stats->max_price) : 10000;
+                    // Step 1 so the range slider can land EXACTLY on the true
+                    // maximum price. A larger "dynamic" step (max/100) only lets
+                    // the thumb stop on min + N*step, so unless (max - min) is a
+                    // whole multiple of that step the slider caps short of the
+                    // real max — e.g. min 9 / max 10000 / step 100 stops at
+                    // 9909, hiding the most expensive trips from the filter.
+                    // An integer step also keeps submitted price bounds whole.
+                    $step = 1;
                     ?>
                     <div class="yatra-filter-section">
                         <div class="yatra-filter-title" data-toggle="price">

@@ -3657,6 +3657,20 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
             ? __('Go to My Account', 'yatra')
             : __('Sign in', 'yatra');
 
+        // Logged-in customers always get "Go to My Account". A guest is only
+        // offered "Sign in" when an account is genuinely part of the flow —
+        // registration is enabled AND guest checkout is not the operating mode.
+        // This is a guest email-verification page (guest checkout is normally
+        // on), so with guest checkout enabled OR registration disabled there is
+        // no account to sign into; the CTA is hidden rather than dangling to a
+        // login the guest can't use.
+        $registrationEnabled = \Yatra\Services\SettingsService::isEnabled('customer_registration');
+        $guestCheckoutEnabled = \Yatra\Services\SettingsService::isEnabled('allow_guest_checkout');
+        $showSecondaryCta = $isLoggedIn || ($registrationEnabled && !$guestCheckoutEnabled);
+        $secondaryCta = $showSecondaryCta
+            ? '<a class="btn btn-secondary" href="' . esc_url($secondaryUrl) . '">' . esc_html($secondaryLabel) . '</a>'
+            : '';
+
         $heading = $alreadyVerified
             ? __('Email Already Verified', 'yatra')
             : __('Email Verified', 'yatra');
@@ -3710,7 +3724,7 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
                 . '%5$s'
                 . '<div class="actions">'
                 . '<a class="btn btn-primary" href="%6$s">%7$s</a>'
-                . '<a class="btn btn-secondary" href="%8$s">%9$s</a>'
+                . '%8$s'
                 . '<a class="btn btn-tertiary" href="%10$s">%11$s</a>'
                 . '</div>'
                 . '</div></body></html>',
@@ -3721,8 +3735,11 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
             $referenceLine,
             esc_url($confirmationUrl),
             esc_html($primaryLabel),
-            esc_url($secondaryUrl),
-            esc_html($secondaryLabel),
+            // %8 is the fully-built secondary CTA (or '' when hidden — see
+            // $showSecondaryCta above). %9 is intentionally empty to keep the
+            // positional args aligned with %10/%11.
+            $secondaryCta,
+            '',
             esc_url(home_url('/')),
             esc_html($homeLabel)
         );
