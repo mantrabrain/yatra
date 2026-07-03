@@ -4332,7 +4332,14 @@ const Settings = () => {
                                     onChange: (e) => handleGatewayConfigChange(
                                       gatewayId,
                                       field.id,
-                                      field.type === "number" ? parseFloat(
+                                      // Keep an empty field empty while
+                                      // editing so the last character can
+                                      // be cleared and retyped. Coercing
+                                      // "" to 0 (parseFloat("") || 0) made
+                                      // the field snap back and blocked
+                                      // re-entry. Numbers are coerced on
+                                      // save; "" persists harmlessly.
+                                      field.type === "number" ? e.target.value === "" ? "" : parseFloat(
                                         e.target.value
                                       ) || 0 : e.target.value
                                     ),
@@ -7957,4 +7964,4 @@ const Settings = () => {
 export {
   Settings as default
 };
-//# sourceMappingURL=Settings-CbVFHnLm.js.map
+//# sourceMappingURL=Settings-DriHGdtf.js.map

@@ -5452,10 +5452,19 @@ const Settings: React.FC = () => {
                                               handleGatewayConfigChange(
                                                 gatewayId,
                                                 field.id,
+                                                // Keep an empty field empty while
+                                                // editing so the last character can
+                                                // be cleared and retyped. Coercing
+                                                // "" to 0 (parseFloat("") || 0) made
+                                                // the field snap back and blocked
+                                                // re-entry. Numbers are coerced on
+                                                // save; "" persists harmlessly.
                                                 field.type === "number"
-                                                  ? parseFloat(
-                                                      e.target.value,
-                                                    ) || 0
+                                                  ? e.target.value === ""
+                                                    ? ""
+                                                    : parseFloat(
+                                                        e.target.value,
+                                                      ) || 0
                                                   : e.target.value,
                                               )
                                             }
