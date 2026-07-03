@@ -2223,15 +2223,22 @@ class BookingSessionController extends BaseController
                 . esc_html__('This link expires in 48 hours.', 'yatra')
                 . '</strong>';
 
-            // Guest-checkout verification reuses the single customer email-
-            // verification template (same body/flow; the booking-specific copy
-            // is injected above via intro_paragraph / footer_note / expiry
-            // merge vars). Previously this used a separate
-            // guest_email_verification system template, which duplicated the
-            // customer one on the same event and couldn't be deleted. See the
-            // one-time cleanup in the Pro Email Automation module.
+            // Guest-checkout verification keeps its OWN transactional type on
+            // purpose. This email MUST carry the verification link (a guest
+            // can't complete the booking without it), so it must not depend on
+            // the *customer* verification template's content — an operator can
+            // (and on real sites does) customise that template and drop the
+            // {{verification_link}} tag, which would silently break guest
+            // checkout. TYPE_GUEST resolves to the deletable guest DB template
+            // when present, otherwise to the built-in default — both of which
+            // always include the link and the booking-specific subject. The
+            // booking copy is injected above via intro_paragraph / footer_note
+            // / expiry merge vars. (The redundant guest *system* template is
+            // demoted to a deletable user template by the Pro module, and is
+            // no longer seeded on new installs — guest verification then falls
+            // back to the built-in default, which still carries the link.)
             \Yatra\Services\TransactionalEmailTemplateService::sendIfEnabled(
-                \Yatra\Services\TransactionalEmailTemplateService::TYPE_CUSTOMER_EMAIL_VERIFICATION,
+                \Yatra\Services\TransactionalEmailTemplateService::TYPE_GUEST_EMAIL_VERIFICATION,
                 (string) $contact_data['email'],
                 $email_vars
             );
