@@ -7,6 +7,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import { __ } from "../lib/i18n";
+import { toDateValue } from "../lib/dateFormat";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
@@ -322,7 +323,7 @@ const DepartureRecurringRuleForm: React.FC = () => {
                 }
                 minDate={
                   formData.start_date
-                    ? new Date(formData.start_date)
+                    ? toDateValue(formData.start_date)
                     : undefined
                 }
               />

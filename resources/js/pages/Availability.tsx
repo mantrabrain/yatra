@@ -530,7 +530,7 @@ const Availability: React.FC = () => {
     if (monthFilter !== "all" && selectedTrip?.trip_type !== "single_day") {
       const [year, month] = monthFilter.split("-");
       filtered = filtered.filter((date) => {
-        const dateObj = new Date(date.departure_date);
+        const dateObj = toDateValue(date.departure_date);
         return (
           dateObj.getFullYear() === parseInt(year) &&
           dateObj.getMonth() === parseInt(month) - 1
@@ -548,7 +548,7 @@ const Availability: React.FC = () => {
 
     const months = new Set<string>();
     availabilityData.dates.forEach((date) => {
-      const dateObj = new Date(date.departure_date);
+      const dateObj = toDateValue(date.departure_date);
       const monthKey = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, "0")}`;
       months.add(monthKey);
     });

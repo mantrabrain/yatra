@@ -1622,7 +1622,7 @@ const DiscountForm: React.FC = () => {
                         placeholder={__("Select expiry date", "yatra")}
                         minDate={
                           formData.valid_from
-                            ? new Date(formData.valid_from)
+                            ? toDateValue(formData.valid_from)
                             : new Date()
                         }
                         error={!!errors.expiry_date}

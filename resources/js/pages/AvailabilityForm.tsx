@@ -16,6 +16,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
+import { toDateValue } from "../lib/dateFormat";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
@@ -778,7 +779,7 @@ const AvailabilityForm: React.FC = () => {
                     }
                     minDate={
                       formData.departure_date
-                        ? new Date(formData.departure_date)
+                        ? toDateValue(formData.departure_date)
                         : undefined
                     }
                     placeholder={__("Select arrival date", "yatra")}
@@ -794,6 +795,12 @@ const AvailabilityForm: React.FC = () => {
                     formData.arrival_date && (
                       <div className="mt-1.5">
                         {(() => {
+                          // Intentionally `new Date()` (UTC), NOT toDateValue():
+                          // this is a day-COUNT between two dates. UTC midnights
+                          // are DST-immune so the diff is a whole number of
+                          // days; parsing as local could make it off by the DST
+                          // hour and round the duration wrong. (Display of these
+                          // dates elsewhere uses the local-safe shared formatter.)
                           const departure = new Date(formData.departure_date);
                           const arrival = new Date(formData.arrival_date);
                           const selectedDays = Math.ceil(

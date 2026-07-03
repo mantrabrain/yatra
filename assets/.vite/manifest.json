@@ -141,7 +141,7 @@
     ]
   },
   "resources/js/pages/AvailabilityForm.tsx": {
-    "file": "dist/js/AvailabilityForm-DDnP64Ni.js",
+    "file": "dist/js/AvailabilityForm-pQTBAixF.js",
     "name": "AvailabilityForm",
     "src": "resources/js/pages/AvailabilityForm.tsx",
     "isDynamicEntry": true,
@@ -175,7 +175,7 @@
     ]
   },
   "resources/js/pages/DiscountForm.tsx": {
-    "file": "dist/js/DiscountForm-C8IKoTv4.js",
+    "file": "dist/js/DiscountForm-B6a2ZyAE.js",
     "name": "DiscountForm",
     "src": "resources/js/pages/DiscountForm.tsx",
     "isDynamicEntry": true,
@@ -224,7 +224,7 @@
     ]
   },
   "resources/js/pages/RecurringRuleForm.tsx": {
-    "file": "dist/js/RecurringRuleForm-B6CBF8ZA.js",
+    "file": "dist/js/RecurringRuleForm-DpDkKUxH.js",
     "name": "RecurringRuleForm",
     "src": "resources/js/pages/RecurringRuleForm.tsx",
     "isDynamicEntry": true,

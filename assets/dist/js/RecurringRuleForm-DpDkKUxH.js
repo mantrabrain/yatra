@@ -727,7 +727,7 @@ const RecurringRuleForm = () => {
                   {
                     value: formData.end_date || "",
                     onChange: (value) => setFormData((prev) => ({ ...prev, end_date: value })),
-                    minDate: formData.start_date ? new Date(formData.start_date) : void 0,
+                    minDate: formData.start_date ? toDateValue(formData.start_date) : void 0,
                     placeholder: __("Select end date (optional)", "yatra")
                   }
                 )
@@ -2146,4 +2146,4 @@ const RecurringRuleForm = () => {
 export {
   RecurringRuleForm as default
 };
-//# sourceMappingURL=RecurringRuleForm-B6CBF8ZA.js.map
+//# sourceMappingURL=RecurringRuleForm-DpDkKUxH.js.map

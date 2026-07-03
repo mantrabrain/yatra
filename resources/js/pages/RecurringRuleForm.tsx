@@ -838,7 +838,7 @@ const RecurringRuleForm: React.FC = () => {
                       }
                       minDate={
                         formData.start_date
-                          ? new Date(formData.start_date)
+                          ? toDateValue(formData.start_date)
                           : undefined
                       }
                       placeholder={__("Select end date (optional)", "yatra")}

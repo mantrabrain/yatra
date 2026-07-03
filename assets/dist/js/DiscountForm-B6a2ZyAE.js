@@ -1277,7 +1277,7 @@ const DiscountForm = () => {
                       value: formData.expiry_date,
                       onChange: (value) => handleFieldChange("expiry_date", value),
                       placeholder: __("Select expiry date", "yatra"),
-                      minDate: formData.valid_from ? new Date(formData.valid_from) : /* @__PURE__ */ new Date(),
+                      minDate: formData.valid_from ? toDateValue(formData.valid_from) : /* @__PURE__ */ new Date(),
                       error: !!errors.expiry_date,
                       className: errors.expiry_date ? "border-red-500" : ""
                     }
@@ -2036,4 +2036,4 @@ const DiscountForm = () => {
 export {
   DiscountForm as default
 };
-//# sourceMappingURL=DiscountForm-C8IKoTv4.js.map
+//# sourceMappingURL=DiscountForm-B6a2ZyAE.js.map

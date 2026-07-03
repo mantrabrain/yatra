@@ -1,6 +1,6 @@
 import { j as jsxRuntimeExports, t as useQueryClient, r as reactExports, u as useQuery, v as useMutation, az as AlertCircle, z as ArrowLeft, q as MapPin, aD as CheckCircle2, D as Loader2, aw as Plus, ax as X, aV as Save } from "./react-vendor-zODANjVp.js";
 import { C as Card, f as CardHeader, d as CardContent, A as Alert, P as PageHeader, B as Button, g as CardTitle, h as CardDescription, D as DatePicker, T as TimePicker, H as HelpText, L as LocationPicker, I as Input, S as Select, a4 as useNavigate } from "../../admin/dist/js/app.js";
-import { u as useToast, _ as __, a as apiClient } from "./index-C2r48y7c.js";
+import { u as useToast, _ as __, t as toDateValue, a as apiClient } from "./index-C2r48y7c.js";
 const AvailabilityFormSkeleton = () => {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-pulse", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
@@ -614,7 +614,7 @@ const AvailabilityForm = () => {
                   {
                     value: formData.arrival_date,
                     onChange: (value) => handleFieldChange("arrival_date", value),
-                    minDate: formData.departure_date ? new Date(formData.departure_date) : void 0,
+                    minDate: formData.departure_date ? toDateValue(formData.departure_date) : void 0,
                     placeholder: __("Select arrival date", "yatra"),
                     error: !!errors.arrival_date
                   }
@@ -1393,4 +1393,4 @@ const AvailabilityForm = () => {
 export {
   AvailabilityForm as default
 };
-//# sourceMappingURL=AvailabilityForm-DDnP64Ni.js.map
+//# sourceMappingURL=AvailabilityForm-pQTBAixF.js.map
