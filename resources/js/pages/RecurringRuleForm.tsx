@@ -19,6 +19,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
+import { toDateValue, todayYmd } from "../lib/dateFormat";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
@@ -157,7 +158,7 @@ const RecurringRuleForm: React.FC = () => {
     week_of_month: "first",
     day_of_week: 0,
     interval_days: 7,
-    start_date: new Date().toISOString().split("T")[0],
+    start_date: todayYmd(),
     end_date: "",
     excluded_dates: [],
     months: [], // Empty = all months, otherwise specific months (1-12)
@@ -344,7 +345,7 @@ const RecurringRuleForm: React.FC = () => {
         day_of_week: existingRule.day_of_week ?? 0,
         interval_days: existingRule.interval_days || 7,
         start_date:
-          existingRule.start_date || new Date().toISOString().split("T")[0],
+          existingRule.start_date || todayYmd(),
         end_date: existingRule.end_date || "",
         excluded_dates: Array.isArray(existingRule.excluded_dates)
           ? existingRule.excluded_dates
@@ -2561,7 +2562,7 @@ const RecurringRuleForm: React.FC = () => {
                             className="text-xs px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded flex justify-between"
                           >
                             <span>
-                              {new Date(date.departure_date).toLocaleDateString(
+                              {toDateValue(date.departure_date).toLocaleDateString(
                                 "en-US",
                                 {
                                   weekday: "short",

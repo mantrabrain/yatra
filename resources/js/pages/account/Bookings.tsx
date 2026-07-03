@@ -9,6 +9,7 @@ import {
   Plane,
 } from "lucide-react";
 import { __, sprintf } from "../../lib/i18n";
+import { toDateValue } from "../../lib/dateFormat";
 import {
   formatDate,
   formatTravelDateRange,
@@ -177,7 +178,7 @@ const Bookings: React.FC<BookingsProps> = ({
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Set to start of day for accurate comparison
     filteredDisplayBookings = filteredDisplayBookings.filter((b) => {
-      const travelDate = new Date(b.travel_date);
+      const travelDate = toDateValue(b.travel_date);
       return travelDate >= today;
     });
   } else if (bookingFilter === "pending") {
@@ -210,7 +211,7 @@ const Bookings: React.FC<BookingsProps> = ({
   const bookingStats = {
     total: displayBookings.length,
     upcoming: displayBookings.filter(
-      (b) => new Date(b.travel_date) >= new Date(),
+      (b) => toDateValue(b.travel_date) >= new Date(),
     ).length,
     pending: displayBookings.filter(
       (b) => b.payment_status === "pending" || b.booking_status === "pending",

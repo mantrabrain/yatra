@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Modal } from "./ui/modal";
 import { __ } from "../lib/i18n";
+import { todayYmd } from "../lib/dateFormat";
 import { apiService } from "../lib/api-client";
 import {
   Download,
@@ -608,7 +609,7 @@ const Tools: React.FC = () => {
       const a = document.createElement("a");
       a.style.display = "none";
       a.href = url;
-      a.download = `yatra-export-${new Date().toISOString().split("T")[0]}.json`;
+      a.download = `yatra-export-${todayYmd()}.json`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);

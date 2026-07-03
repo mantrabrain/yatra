@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "../lib/api-client";
 import { API_ENDPOINTS } from "../lib/api-endpoints";
 import { __ } from "../lib/i18n";
+import { toDateValue } from "../lib/dateFormat";
 import {
   LayoutDashboard,
   Calendar,
@@ -404,7 +405,7 @@ const AccountPage: React.FC = () => {
       .filter((p: Payment) => p.status === "pending")
       .reduce((sum: number, payment: Payment) => sum + payment.amount, 0);
     const upcoming = bookings.filter(
-      (b: Booking) => new Date(b.travel_date) > new Date(),
+      (b: Booking) => toDateValue(b.travel_date) > new Date(),
     ).length;
 
     // Calculate from real data

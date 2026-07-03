@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { apiClient, apiService } from "../lib/api-client";
 import { __ } from "../lib/i18n";
-import { formatDate as formatDateUtil } from "../lib/dateFormat";
+import { formatDate as formatDateUtil, toDateValue } from "../lib/dateFormat";
 import { usePermissions } from "../hooks/usePermissions";
 import { getCountryName } from "../lib/countries";
 import { Button } from "../components/ui/button";
@@ -1085,7 +1085,7 @@ const ViewBooking: React.FC = () => {
                                 fieldId.includes("expiry")
                               ) {
                                 try {
-                                  displayValue = new Date(
+                                  displayValue = toDateValue(
                                     fieldValue as string,
                                   ).toLocaleDateString();
                                 } catch {

@@ -18,6 +18,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
+import { toDateValue } from "../lib/dateFormat";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
@@ -231,7 +232,7 @@ const RecurringRulesPage: React.FC = () => {
   const formatDate = (dateString: string | null | undefined): string => {
     if (!dateString) return "--";
     try {
-      const date = new Date(dateString);
+      const date = toDateValue(dateString);
       return date.toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",

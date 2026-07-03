@@ -1,5 +1,5 @@
 import { j as jsxRuntimeExports, p as Calendar, k as FileText, b as Plane, at as ArrowRight, q as MapPin, I as User, y as ChevronRight, S as Sparkles, h as Package, i as CreditCard, by as LifeBuoy, be as Bell, az as AlertCircle, aD as CheckCircle2, ar as Clock, V as ExternalLink, U as Users, d as Mail, aW as Phone, b4 as Download, r as reactExports, a5 as React, u as useQuery, av as CheckCircle, as as DollarSign, aQ as Eye, t as useQueryClient, aJ as PenSquare, b6 as XCircle, bz as ShieldCheck, bf as Heart, s as LayoutDashboard, bA as LogOut, bv as QueryClient, bw as client, bx as QueryClientProvider } from "./react-vendor-zODANjVp.js";
-import { f as formatYatraMoney, _ as __, p as parseDate, d as formatDate$1, i as applyCurrencyPosition, s as sprintf, a as apiClient, A as API_ENDPOINTS, u as useToast, j as getCountryOptions, e as getCountryName$1, T as ToastProvider, E as ErrorBoundary } from "./index-BYYY4OWw.js";
+import { f as formatYatraMoney, _ as __, p as parseDate, e as formatDate$1, k as applyCurrencyPosition, s as sprintf, t as toDateValue, a as apiClient, A as API_ENDPOINTS, u as useToast, l as getCountryOptions, i as getCountryName$1, T as ToastProvider, E as ErrorBoundary } from "./index-C2r48y7c.js";
 function toBrowserLocaleTag(locale) {
   const raw = String(locale || "").trim();
   if (!raw) return void 0;
@@ -219,7 +219,7 @@ const Dashboard = ({
   var _a;
   const conciergeTel = phoneToTelHref(conciergePhone);
   const conciergeMail = String(conciergeEmail || "").trim();
-  const upcomingBookings = bookings.filter((b) => new Date(b.travel_date) > /* @__PURE__ */ new Date()).length > 0 ? bookings.filter((b) => new Date(b.travel_date) > /* @__PURE__ */ new Date()).slice(0, 3) : bookings.filter((b) => new Date(b.travel_date) > /* @__PURE__ */ new Date()).slice(0, 3);
+  const upcomingBookings = bookings.filter((b) => toDateValue(b.travel_date) > /* @__PURE__ */ new Date()).length > 0 ? bookings.filter((b) => toDateValue(b.travel_date) > /* @__PURE__ */ new Date()).slice(0, 3) : bookings.filter((b) => toDateValue(b.travel_date) > /* @__PURE__ */ new Date()).slice(0, 3);
   const recentBookings = bookings.length > 0 ? bookings.slice(0, 2) : [];
   const pendingPayments = payments.filter((p) => p.status === "pending").length > 0 ? payments.filter((p) => p.status === "pending").slice(0, 2) : [];
   const displayNotifications = notifications;
@@ -1703,7 +1703,7 @@ const Bookings = ({
     const today = /* @__PURE__ */ new Date();
     today.setHours(0, 0, 0, 0);
     filteredDisplayBookings = filteredDisplayBookings.filter((b) => {
-      const travelDate = new Date(b.travel_date);
+      const travelDate = toDateValue(b.travel_date);
       return travelDate >= today;
     });
   } else if (bookingFilter === "pending") {
@@ -1724,7 +1724,7 @@ const Bookings = ({
   const bookingStats = {
     total: displayBookings.length,
     upcoming: displayBookings.filter(
-      (b) => new Date(b.travel_date) >= /* @__PURE__ */ new Date()
+      (b) => toDateValue(b.travel_date) >= /* @__PURE__ */ new Date()
     ).length,
     pending: displayBookings.filter(
       (b) => b.payment_status === "pending" || b.booking_status === "pending"
@@ -3204,7 +3204,7 @@ const AccountPage = () => {
   const stats = reactExports.useMemo(() => {
     const outstanding = payments.filter((p) => p.status === "pending").reduce((sum, payment) => sum + payment.amount, 0);
     const upcoming = bookings.filter(
-      (b) => new Date(b.travel_date) > /* @__PURE__ */ new Date()
+      (b) => toDateValue(b.travel_date) > /* @__PURE__ */ new Date()
     ).length;
     const totalSpent = (displayProfile == null ? void 0 : displayProfile.total_spent) ?? 0;
     const totalBookings = bookings.length;

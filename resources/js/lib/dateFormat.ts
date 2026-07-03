@@ -68,7 +68,7 @@ export function getTimezone(): string {
  * calendar day regardless of timezone. Datetime strings (with a time part) and
  * Date objects are parsed/returned as before.
  */
-function toDateValue(value: string | Date): Date {
+export function toDateValue(value: string | Date): Date {
   if (typeof value !== "string") return value;
   const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
   if (dateOnly) {
@@ -354,6 +354,20 @@ export function parseDate(dateString: string | null | undefined): Date | null {
  * @param dateString - Date string
  * @returns Date in YYYY-MM-DD format for input fields
  */
+/**
+ * Today's date as a LOCAL "YYYY-MM-DD" string.
+ *
+ * Use this instead of `new Date().toISOString().split("T")[0]` for default/
+ * "today" date values: toISOString() yields the UTC date, which is the wrong
+ * calendar day for a user whose local date differs from UTC at that moment
+ * (e.g. late evening in a behind-UTC zone, or early morning ahead of UTC) —
+ * saving a payment/booking/rule date a day off. This reads the browser's local
+ * calendar day.
+ */
+export function todayYmd(): string {
+  return formatDateForInput(new Date());
+}
+
 export function formatDateForInput(
   dateString: string | Date | null | undefined,
 ): string {

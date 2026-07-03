@@ -7,6 +7,7 @@
 import React, { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { __ } from "../lib/i18n";
+import { formatDateForInput } from "../lib/dateFormat";
 import { apiClient, apiService } from "../lib/api-client";
 import { unwrapApiPayload } from "../lib/unwrap-api-payload";
 import { useToast } from "../components/ui/toast";
@@ -2176,8 +2177,8 @@ const TravelBookingReports: React.FC = () => {
     }
 
     return {
-      start: start.toISOString().split("T")[0],
-      end: today.toISOString().split("T")[0],
+      start: formatDateForInput(start),
+      end: formatDateForInput(today),
     };
   }
 

@@ -27,6 +27,7 @@ import {
   Settings,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
+import { toDateValue } from "../lib/dateFormat";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
@@ -372,7 +373,7 @@ const Availability: React.FC = () => {
   // Format date for display
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = toDateValue(dateString);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",

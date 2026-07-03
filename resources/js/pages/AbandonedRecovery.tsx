@@ -35,6 +35,7 @@ import {
 } from "../components/shared";
 import { useToast } from "../components/ui/toast";
 import { __ } from "../lib/i18n";
+import { toDateValue } from "../lib/dateFormat";
 import { apiService } from "../lib/api-client";
 import { formatYatraMoney } from "../lib/currency-display";
 import PremiumUpgradeCard from "./premium-pages/AbandonedRecovery";
@@ -710,7 +711,7 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
                         {__("Departure Date")}
                       </Label>
                       <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                        {new Date(booking.departure_date).toLocaleDateString()}
+                        {toDateValue(booking.departure_date).toLocaleDateString()}
                       </p>
                     </div>
                   )}

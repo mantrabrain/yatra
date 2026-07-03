@@ -362,8 +362,14 @@ document.addEventListener('DOMContentLoaded', function () {
             updatePricing();
         });
         
-        // Set today's date by default if available, otherwise use trip fallback pricing
-        const today = new Date().toISOString().split('T')[0];
+        // Set today's date by default if available, otherwise use trip fallback pricing.
+        // Build LOCAL YYYY-MM-DD, not toISOString() (which is UTC and can land on
+        // the wrong calendar day — mis-matching the availability's departure_date
+        // and pre-selecting the wrong date near midnight).
+        const _now = new Date();
+        const today = _now.getFullYear() + '-'
+            + String(_now.getMonth() + 1).padStart(2, '0') + '-'
+            + String(_now.getDate()).padStart(2, '0');
         if (!dateInput.value) {
             const availabilities = getSidebarAvailabilities();
             if (availabilities.length > 0) {

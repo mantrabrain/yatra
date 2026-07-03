@@ -22,6 +22,7 @@ import { __ } from "../lib/i18n";
 import {
   formatDate as formatDateUtil,
   formatDateForInput,
+  todayYmd,
 } from "../lib/dateFormat";
 import { getCountryOptions } from "../lib/countries";
 import { apiService } from "../lib/api-client";
@@ -126,7 +127,7 @@ const BookingForm: React.FC = () => {
     customer_phone: "",
     customer_country: "",
     trip_id: "",
-    booking_date: normalizeDateInput(new Date().toISOString()),
+    booking_date: todayYmd(),
     travel_date: "",
     travelers: "1",
     subtotal: "",
@@ -411,7 +412,7 @@ const BookingForm: React.FC = () => {
           "",
         trip_id: String(bookingData.trip_id || ""),
         booking_date:
-          bookingData.booking_date || new Date().toISOString().split("T")[0],
+          bookingData.booking_date || todayYmd(),
         travel_date: bookingData.travel_date || "",
         travelers: String(
           (bookingData as any).travelers_count ||

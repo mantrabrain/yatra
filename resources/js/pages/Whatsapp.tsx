@@ -32,6 +32,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { __, sprintf } from "../lib/i18n";
+import { todayYmd } from "../lib/dateFormat";
 import { PageHeader } from "../components/common/PageHeader";
 import {
   Card,
@@ -2710,7 +2711,7 @@ const OptInsList: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `whatsapp-opt-ins-${new Date().toISOString().split("T")[0]}.csv`;
+    a.download = `whatsapp-opt-ins-${todayYmd()}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

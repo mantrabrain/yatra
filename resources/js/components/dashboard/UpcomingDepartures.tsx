@@ -5,6 +5,7 @@
 
 import React from "react";
 import { __ } from "../../lib/i18n";
+import { toDateValue } from "../../lib/dateFormat";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Calendar, MapPin, Users } from "lucide-react";
@@ -35,7 +36,7 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
   onView,
 }) => {
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = toDateValue(dateString);
     return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -45,7 +46,7 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
 
   const getDaysUntil = (dateString: string) => {
     const today = new Date();
-    const departure = new Date(dateString);
+    const departure = toDateValue(dateString);
     const diffTime = departure.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;

@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Save, Loader2, Info } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { apiService } from "../lib/api-client";
+import { todayYmd } from "../lib/dateFormat";
 import { usePermissions } from "../hooks/usePermissions";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -43,7 +44,7 @@ const PaymentForm: React.FC = () => {
     amount: "",
     payment_method: "Credit Card",
     payment_status: "pending",
-    payment_date: new Date().toISOString().split("T")[0],
+    payment_date: todayYmd(),
     transaction_id: "",
     notes: "",
   });
@@ -84,7 +85,7 @@ const PaymentForm: React.FC = () => {
       const processedDate =
         typeof processedAt === "string" && processedAt.includes(" ")
           ? processedAt.split(" ")[0]
-          : new Date().toISOString().split("T")[0];
+          : todayYmd();
       return {
         id: data.id,
         booking_id: data.booking_id,
@@ -109,7 +110,7 @@ const PaymentForm: React.FC = () => {
         payment_status: (String(paymentData.payment_status || "pending") ||
           "pending") as PaymentFormData["payment_status"],
         payment_date: String(
-          paymentData.payment_date || new Date().toISOString().split("T")[0],
+          paymentData.payment_date || todayYmd(),
         ),
         transaction_id: String(paymentData.transaction_id ?? ""),
         notes: String(paymentData.notes ?? ""),

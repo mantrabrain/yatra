@@ -40,6 +40,7 @@ import {
   X,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
+import { formatDateForInput } from "../lib/dateFormat";
 import { usePermissions } from "../hooks/usePermissions";
 import { TodaysBriefCard } from "../components/ai/TodaysBriefCard";
 import { StatCard } from "../components/common/StatCard";
@@ -393,7 +394,7 @@ const Dashboard: React.FC = () => {
     queryKey: ["dashboard-upcoming-departures"],
     queryFn: async () => {
       const today = new Date();
-      const todayStr = today.toISOString().split("T")[0];
+      const todayStr = formatDateForInput(today);
       const response = await apiClient.get("/departures", {
         params: {
           status: "upcoming",

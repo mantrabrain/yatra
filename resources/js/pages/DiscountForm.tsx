@@ -15,6 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
+import { toDateValue } from "../lib/dateFormat";
 import { usePermissions } from "../hooks/usePermissions";
 import { useToast } from "../components/ui/toast";
 import { apiClient } from "../lib/api-client";
@@ -581,7 +582,7 @@ const DiscountForm: React.FC = () => {
     // No validation needed for valid_from date
 
     if (formData.expiry_date) {
-      const expiryDate = new Date(formData.expiry_date);
+      const expiryDate = toDateValue(formData.expiry_date);
       if (expiryDate < today) {
         newErrors.expiry_date = __(
           "Expiry date cannot be in the past",
@@ -592,8 +593,8 @@ const DiscountForm: React.FC = () => {
 
     // Check if expiry date is after valid from date
     if (formData.valid_from && formData.expiry_date) {
-      const validFrom = new Date(formData.valid_from);
-      const expiryDate = new Date(formData.expiry_date);
+      const validFrom = toDateValue(formData.valid_from);
+      const expiryDate = toDateValue(formData.expiry_date);
       if (expiryDate < validFrom) {
         newErrors.expiry_date = __(
           "Expiry date must be after the valid from date",

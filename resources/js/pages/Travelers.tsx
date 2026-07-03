@@ -16,6 +16,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
+import { toDateValue } from "../lib/dateFormat";
 import { apiService } from "../lib/api-client";
 import { usePermissions } from "../hooks/usePermissions";
 import { Input } from "../components/ui/input";
@@ -214,7 +215,7 @@ const Travelers: React.FC = () => {
   const formatDate = (dateString: string) => {
     if (!dateString) return "-";
     try {
-      return new Date(dateString).toLocaleDateString();
+      return toDateValue(dateString).toLocaleDateString();
     } catch {
       return dateString;
     }

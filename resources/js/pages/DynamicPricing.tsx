@@ -29,6 +29,7 @@ import { Table as SharedTable } from "../components/shared/Table";
 import { SearchFilterToolbar, BulkActionToolbar } from "../components/shared";
 import { apiClient } from "../lib/api-client";
 import { __ } from "../lib/i18n";
+import { toDateValue } from "../lib/dateFormat";
 import { formatYatraMoney } from "../lib/currency-display";
 import PremiumUpgradeCard from "./premium-pages/DynamicPricing";
 import {
@@ -224,7 +225,7 @@ const DynamicPricingPage: React.FC = () => {
   )
     ? (stats as any).pricing_history_trend_last_30_days.map((row: any) => {
         const day = String(row.day || "");
-        const dateLabel = day ? new Date(day).toLocaleDateString() : "";
+        const dateLabel = day ? toDateValue(day).toLocaleDateString() : "";
         return {
           day,
           dateLabel,
@@ -1317,7 +1318,7 @@ const DynamicPricingPage: React.FC = () => {
                           dataKey="day"
                           tick={{ fontSize: 12 }}
                           tickFormatter={(v: any) =>
-                            v ? new Date(String(v)).toLocaleDateString() : ""
+                            v ? toDateValue(String(v)).toLocaleDateString() : ""
                           }
                         />
                         <YAxis
@@ -1383,7 +1384,7 @@ const DynamicPricingPage: React.FC = () => {
                             >
                               <td className="py-3 px-4 text-gray-900 dark:text-white">
                                 {row.day
-                                  ? new Date(
+                                  ? toDateValue(
                                       String(row.day),
                                     ).toLocaleDateString()
                                   : ""}

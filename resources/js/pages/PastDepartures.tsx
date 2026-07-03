@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, Trash2, AlertCircle } from "lucide-react";
 import { __ } from "../lib/i18n";
+import { toDateValue } from "../lib/dateFormat";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { PageHeader } from "../components/common/PageHeader";
@@ -27,7 +28,7 @@ import { useToast } from "../components/ui/toast";
 const formatDate = (dateString: string): string => {
   if (!dateString) return "--";
   try {
-    const date = new Date(dateString);
+    const date = toDateValue(dateString);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
