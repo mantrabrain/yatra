@@ -779,12 +779,17 @@ class BookingsController extends BaseController
         $travelDateRaw = $booking['travel_date'] ?? '';
         $travelDate = !empty($travelDateRaw) ? date_i18n(get_option('date_format'), strtotime((string) $travelDateRaw)) : '';
 
+        // Return date. Prefer the booking's STORED end_date — the actual booked
+        // return (accounts for a flexible window or a trip duration changed after
+        // booking). Fall back to the trip duration only when no end is stored:
+        // duration_days is INCLUSIVE, so the return is travel_date + (days - 1)
+        // (matches BookingRepository::calculateEndDate; a bare "+ duration_days"
+        // was one day too far and implied an extra night — see ItineraryPdfBuilder).
         $returnDate = '';
-        if (!empty($travelDateRaw) && $trip && !empty($trip->duration_days)) {
-            // duration_days is INCLUSIVE (a 9-day trip departing Jun 25 returns
-            // Jul 3, not Jul 4), so the return date is travel_date + (days - 1).
-            // Matches BookingRepository::calculateEndDate; a bare "+ duration_days"
-            // was one day too far and implied an extra night (see ItineraryPdfBuilder).
+        $storedEnd = (string) ($booking['end_date'] ?? '');
+        if ($storedEnd !== '' && ($travelDateRaw === '' || $storedEnd >= $travelDateRaw)) {
+            $returnDate = date_i18n(get_option('date_format'), strtotime($storedEnd));
+        } elseif (!empty($travelDateRaw) && $trip && !empty($trip->duration_days)) {
             $returnOffset = max(0, (int) $trip->duration_days - 1);
             $returnTimestamp = strtotime((string) $travelDateRaw . ' +' . $returnOffset . ' days');
             $returnDate = date_i18n(get_option('date_format'), $returnTimestamp);

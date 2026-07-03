@@ -1023,16 +1023,25 @@ class PaymentGatewayController extends BaseController
         $bookingDate = !empty($payment->created_at) ? date_i18n(get_option('date_format'), strtotime($payment->created_at)) : '';
         $travelDate = !empty($payment->travel_date) ? date_i18n(get_option('date_format'), strtotime($payment->travel_date)) : '';
         
-        // Calculate return date if duration is available (duration_days column).
-        // duration_days is INCLUSIVE (a 9-day trip returns on travel_date + 8, not
-        // + 9), so the offset is (days - 1). Matches BookingRepository::calculateEndDate;
-        // a bare "+ duration_days" was one day too far (see ItineraryPdfBuilder).
+        // Return date. Prefer the booking's STORED end_date — that is the actual
+        // booked return (it already accounts for a flexible window or a trip
+        // duration that changed after the booking was made). Only when no end is
+        // stored do we derive it from the trip duration: duration_days is
+        // INCLUSIVE, so the offset is (days - 1) — matching
+        // BookingRepository::calculateEndDate. A bare "+ duration_days" was one
+        // day too far (see ItineraryPdfBuilder).
         $returnDate = '';
-        $durationDaysForReturn = (int) ($payment->trip_duration_days ?? ($trip->duration_days ?? 0));
-        if (!empty($payment->travel_date) && $durationDaysForReturn > 0) {
-            $returnOffset = max(0, $durationDaysForReturn - 1);
-            $returnTimestamp = strtotime($payment->travel_date . ' +' . $returnOffset . ' days');
-            $returnDate = date_i18n(get_option('date_format'), $returnTimestamp);
+        $storedEnd = isset($payment->booking_end_date) ? (string) $payment->booking_end_date : '';
+        $travelStart = (string) ($payment->travel_date ?? '');
+        if ($storedEnd !== '' && ($travelStart === '' || $storedEnd >= $travelStart)) {
+            $returnDate = date_i18n(get_option('date_format'), strtotime($storedEnd));
+        } else {
+            $durationDaysForReturn = (int) ($payment->trip_duration_days ?? ($trip->duration_days ?? 0));
+            if (!empty($payment->travel_date) && $durationDaysForReturn > 0) {
+                $returnOffset = max(0, $durationDaysForReturn - 1);
+                $returnTimestamp = strtotime($payment->travel_date . ' +' . $returnOffset . ' days');
+                $returnDate = date_i18n(get_option('date_format'), $returnTimestamp);
+            }
         }
 
         $bookingRef = (string) ($payment->booking_reference ?? $payment->booking_number ?? $payment->reference ?? (string) $paymentId);

@@ -180,6 +180,7 @@ class PaymentRepository extends BaseRepository
                     b.amount_paid as booking_amount_paid,
                     b.amount_due as booking_amount_due,
                     b.travel_date as travel_date,
+                    b.end_date as booking_end_date,
                     b.trip_id as trip_id,
                     b.payment_method as payment_method,
                     t.title as trip_title,
