@@ -39,6 +39,26 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
         return $this->description;
     }
 
+    /**
+     * The gateway's built-in (raw, untranslated) default title/description —
+     * the value of the `$title`/`$description` property before any `__()`
+     * override. Used to tell whether a stored gateway-config value is an
+     * operator customization or just the persisted default: if it equals the
+     * default, the checkout should prefer the translated getTitle()/
+     * getDescription() instead of the stored English string, so the label
+     * translates. (Subclasses override getTitle()/getDescription() to return
+     * a translated string, but the property stays the raw default.)
+     */
+    public function getDefaultTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function getDefaultDescription(): string
+    {
+        return $this->description;
+    }
+
     public function getIcon(): string
     {
         // If icon is a relative path (starts with /), convert to full URL

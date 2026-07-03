@@ -288,10 +288,24 @@ class PaymentGatewayRegistry
 
         foreach ($this->getEnabledGateways() as $id => $gateway) {
             $config = $gateway->getConfig();
+            // Prefer a stored title/description ONLY when the operator actually
+            // customized it. The gateway's default title/description gets
+            // persisted into the config at install time, and using that stored
+            // English string here shadowed the translatable getTitle()/
+            // getDescription() — so the checkout label never translated. When
+            // the stored value equals the gateway's built-in default, fall
+            // through to the translated getter; a genuine custom value (which
+            // is operator free-text, not translatable) is still honored.
+            $storedTitle = isset($config['title']) ? (string) $config['title'] : '';
+            $storedDescription = isset($config['description']) ? (string) $config['description'] : '';
             $checkoutGateways[] = [
                 'id' => $id,
-                'title' => !empty($config['title']) ? $config['title'] : $gateway->getTitle(),
-                'description' => !empty($config['description']) ? $config['description'] : $gateway->getDescription(),
+                'title' => ($storedTitle !== '' && $storedTitle !== $gateway->getDefaultTitle())
+                    ? $storedTitle
+                    : $gateway->getTitle(),
+                'description' => ($storedDescription !== '' && $storedDescription !== $gateway->getDefaultDescription())
+                    ? $storedDescription
+                    : $gateway->getDescription(),
                 'icon' => !empty($config['icon']) ? $config['icon'] : $gateway->getIcon(),
                 'is_offline' => $gateway->isOffline(),
                 'supports' => $gateway->getSupports(),

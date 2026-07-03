@@ -636,7 +636,12 @@
                 '<p style="font-size: 16px; color: #111827; font-weight: 600;">' + referenceText + '</p>' +
                 footerHtml +
                 '</div>');
-            
+
+            // The booking-form header ("Complete Your Booking" + subtitle) is a
+            // SIBLING of the form, not inside it — replacing the form alone left
+            // that header showing above the confirmation. Hide it so the success
+            // screen doesn't repeat the booking-form heading.
+            $form.siblings('.yatra-booking-header').hide();
             $form.html($success);
         }
 
