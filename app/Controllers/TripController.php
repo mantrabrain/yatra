@@ -2036,6 +2036,20 @@ class TripController extends BaseController
                     $to_label = __('Return', 'yatra');
                 }
                 
+                // Per-card duration: derive from THIS card's departure→return span
+                // so the displayed "X Days" always matches the departure/return
+                // dates shown on the same card. When no custom arrival is stored,
+                // $return_date is departure + (duration_days - 1), so the span
+                // equals the trip's duration_days (no visible change). Only when an
+                // operator stored an arrival that disagrees with the trip default
+                // does this diverge — and then the customer sees a self-consistent
+                // card (e.g. "10 Days" over a Jun 25 → Jul 04 span) instead of a
+                // "9 Days" badge contradicting the dates. round() (not floor())
+                // absorbs any ±1h DST drift between two local-midnight timestamps.
+                $card_duration_days = $is_single_day
+                    ? max(1, (int) ($trip_data->duration_days ?? 1))
+                    : max(1, (int) round(($return_date - $departure_date) / DAY_IN_SECONDS) + 1);
+
                 // Use month-based keys for filtering for both day trips and multi-day trips
                 $filter_key = strtolower(date('M-Y', $departure_date));
                 
@@ -2057,6 +2071,7 @@ class TripController extends BaseController
                     'to_date' => $to_display,
                     'to_location' => $to_location,
                     'date_display' => $date_display, // For day trips: "Saturday, 30 Nov 2025"
+                    'duration_days' => $card_duration_days, // Inclusive span of THIS card's dates
                     'date' => $avail->departure_date, // Raw date for dynamic pricing
                     'spots_remaining' => $seats, // For dynamic pricing
                     'seats' => $seats > 10 ? '10+' : (string) $seats,

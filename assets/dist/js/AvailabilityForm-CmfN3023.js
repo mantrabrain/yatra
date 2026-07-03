@@ -623,9 +623,9 @@ const AvailabilityForm = () => {
                 (tripData == null ? void 0 : tripData.duration_days) && formData.departure_date && formData.arrival_date && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1.5", children: (() => {
                   const departure = new Date(formData.departure_date);
                   const arrival = new Date(formData.arrival_date);
-                  const selectedDays = Math.ceil(
+                  const selectedDays = Math.round(
                     (arrival.getTime() - departure.getTime()) / (1e3 * 60 * 60 * 24)
-                  );
+                  ) + 1;
                   const expectedDays = tripData.duration_days;
                   const diff = selectedDays - expectedDays;
                   if (diff === 0) {
@@ -1393,4 +1393,4 @@ const AvailabilityForm = () => {
 export {
   AvailabilityForm as default
 };
-//# sourceMappingURL=AvailabilityForm-pQTBAixF.js.map
+//# sourceMappingURL=AvailabilityForm-CmfN3023.js.map

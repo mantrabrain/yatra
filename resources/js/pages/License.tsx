@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../lib/api-client";
+import { toDateValue } from "../lib/dateFormat";
 import { __ } from "../lib/i18n";
 import { useToast } from "../components/ui/toast";
 import {
@@ -658,7 +659,9 @@ const License: React.FC = () => {
                       <div className="font-medium text-gray-900 dark:text-white">
                         {(() => {
                           try {
-                            const date = new Date(
+                            // toDateValue: a date-only "expires" must not roll back a
+                            // day in behind-UTC zones (datetime values pass through).
+                            const date = toDateValue(
                               licenseInfo.server_response.expires,
                             );
                             return isNaN(date.getTime())

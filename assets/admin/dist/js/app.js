@@ -1,4 +1,4 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-Dt7DMLNy.js","../../../dist/js/react-vendor-zODANjVp.js","../css/react-vendor.css","../../../dist/js/index-C2r48y7c.js","../css/index.css","../../../dist/js/BuildItineraryModal-HUNcFNfg.js","../../../dist/js/ProFeature-DYw8nXQz.js","../../../dist/js/Settings-Dyc4BzcB.js","../../../dist/js/Team-B_KgxrXn.js","../../../dist/js/Reports-BDV_PeQi.js","../../../dist/js/DiscountForm-B6a2ZyAE.js","../../../dist/js/ApplicableTripSelector-FOUEp-g8.js","../../../dist/js/Itinerary-KETvoyJ5.js","../../../dist/js/RecurringRuleForm-DpDkKUxH.js","./Whatsapp.js","../../../dist/js/module-skeleton-7zwRYol6.js","../../../dist/js/ChannelManager-GHZSYZTZ.js","../../../dist/js/Webhooks-BqesOuT5.js","../../../dist/js/TripConsentForm-_25PIzZW.js","../../../dist/js/BookingForm-ByKX6xhm.js","../../../dist/js/ViewBooking-M_cDpNCN.js","../../../dist/js/AvailabilityForm-pQTBAixF.js","../../../dist/js/DynamicPricing-DM4TReVs.js","../../../dist/js/RuleTypeSelectionModal-BMCv4u1z.js","../../../dist/js/toggle-B0m9K-Pk.js","../../../dist/js/DynamicPricingRuleForm-UpRJRCgy.js","../../../dist/js/AiAssistant-CORYJUQp.js","../../../dist/js/AbandonedRecovery-DbG0ANh1.js","../../../dist/js/WhiteLabel-BQUlVdLk.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-Dt7DMLNy.js","../../../dist/js/react-vendor-zODANjVp.js","../css/react-vendor.css","../../../dist/js/index-C2r48y7c.js","../css/index.css","../../../dist/js/BuildItineraryModal-HUNcFNfg.js","../../../dist/js/ProFeature-DYw8nXQz.js","../../../dist/js/Settings-Dyc4BzcB.js","../../../dist/js/Team-B_KgxrXn.js","../../../dist/js/Reports-BDV_PeQi.js","../../../dist/js/DiscountForm-B6a2ZyAE.js","../../../dist/js/ApplicableTripSelector-FOUEp-g8.js","../../../dist/js/Itinerary-KETvoyJ5.js","../../../dist/js/RecurringRuleForm-DpDkKUxH.js","./Whatsapp.js","../../../dist/js/module-skeleton-7zwRYol6.js","../../../dist/js/ChannelManager-GHZSYZTZ.js","../../../dist/js/Webhooks-BqesOuT5.js","../../../dist/js/TripConsentForm-_25PIzZW.js","../../../dist/js/BookingForm-ByKX6xhm.js","../../../dist/js/ViewBooking-M_cDpNCN.js","../../../dist/js/AvailabilityForm-CmfN3023.js","../../../dist/js/DynamicPricing-DM4TReVs.js","../../../dist/js/RuleTypeSelectionModal-BMCv4u1z.js","../../../dist/js/toggle-B0m9K-Pk.js","../../../dist/js/DynamicPricingRuleForm-UpRJRCgy.js","../../../dist/js/AiAssistant-CORYJUQp.js","../../../dist/js/AbandonedRecovery-DbG0ANh1.js","../../../dist/js/WhiteLabel-BQUlVdLk.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
@@ -26248,7 +26248,7 @@ const PendingPayments = ({
     zeroAsUnknown: false
   });
   const formatDate2 = (dateString) => {
-    return new Date(dateString).toLocaleDateString();
+    return toDateValue(dateString).toLocaleDateString();
   };
   const totalPending = (payments == null ? void 0 : payments.reduce((sum, p) => sum + p.amount, 0)) || 0;
   if (loading) {
@@ -26332,7 +26332,7 @@ const RecentBookings = ({
 }) => {
   var _a;
   const formatDate2 = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return toDateValue(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric"
@@ -26829,7 +26829,7 @@ const Dashboard = () => {
       const amounts = {};
       items.forEach((b) => {
         const dateStr = b.created_at || b.travel_date;
-        const date2 = dateStr ? new Date(dateStr) : null;
+        const date2 = dateStr ? toDateValue(dateStr) : null;
         if (!date2 || Number.isNaN(date2.getTime())) return;
         const ym = `${date2.getFullYear()}-${pad2(date2.getMonth() + 1)}`;
         counts[ym] = (counts[ym] || 0) + 1;
@@ -55392,7 +55392,7 @@ const Discounts = () => {
   const formatDate2 = (dateString) => {
     if (!dateString) return __("N/A", "yatra");
     try {
-      const date2 = new Date(dateString);
+      const date2 = toDateValue(dateString);
       return date2.toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -65342,7 +65342,7 @@ const ViewEnquiry = () => {
     }
   });
   const formatDate2 = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return toDateValue(dateString).toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -76697,7 +76697,7 @@ const License = () => {
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400 mb-1", children: __("Expires", "yatra") }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: (() => {
                 try {
-                  const date2 = new Date(
+                  const date2 = toDateValue(
                     licenseInfo.server_response.expires
                   );
                   return isNaN(date2.getTime()) ? licenseInfo.server_response.expires : date2.toLocaleDateString(void 0, {
@@ -77141,7 +77141,7 @@ const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../di
 const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-_25PIzZW.js"), true ? __vite__mapDeps([18,1,2,11,3,4]) : void 0, import.meta.url));
 const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-ByKX6xhm.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
 const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-M_cDpNCN.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-pQTBAixF.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-CmfN3023.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
 const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-DM4TReVs.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
   () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-UpRJRCgy.js"), true ? __vite__mapDeps([25,1,2,23,3,4]) : void 0, import.meta.url)

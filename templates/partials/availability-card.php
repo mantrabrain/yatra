@@ -216,7 +216,9 @@ $initial_total_price = $display_sale_price;
                                 <div class="yatra-card-info-label"><?php esc_html_e('Duration', 'yatra'); ?></div>
                                 <div class="yatra-card-info-value">
                                     <?php
-                                    $duration_days = (int) ($trip_data->duration_days ?? 1);
+                                    // Prefer the per-card span (matches this card's departure/return
+                                    // dates); fall back to the trip default for sample cards.
+                                    $duration_days = (int) ($card['duration_days'] ?? $trip_data->duration_days ?? 1);
                                     echo esc_html($duration_days . ' ' . _n('Day', 'Days', $duration_days, 'yatra'));
                                     ?>
                                 </div>

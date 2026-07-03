@@ -19,6 +19,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
+import { toDateValue } from "../lib/dateFormat";
 import { apiService } from "../lib/api-client";
 import { usePermissions } from "../hooks/usePermissions";
 import { Button } from "../components/ui/button";
@@ -105,7 +106,9 @@ const ViewEnquiry: React.FC = () => {
   });
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    // toDateValue: a date-only travel_date must not roll back a day in a
+    // behind-UTC zone (datetime values like created_at pass through unchanged).
+    return toDateValue(dateString).toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",

@@ -40,7 +40,7 @@ import {
   X,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
-import { formatDateForInput } from "../lib/dateFormat";
+import { formatDateForInput, toDateValue } from "../lib/dateFormat";
 import { usePermissions } from "../hooks/usePermissions";
 import { TodaysBriefCard } from "../components/ai/TodaysBriefCard";
 import { StatCard } from "../components/common/StatCard";
@@ -164,9 +164,8 @@ const Dashboard: React.FC = () => {
   // so non-admin renders don't fire the admin-only endpoints, and the
   // RoleDashboard branch returns immediately after all hooks are
   // registered.
-  const isWpAdmin = !!(
-    window.yatraAdmin as { isWpAdmin?: boolean } | undefined
-  )?.isWpAdmin;
+  const isWpAdmin = !!(window.yatraAdmin as { isWpAdmin?: boolean } | undefined)
+    ?.isWpAdmin;
 
   const { can } = usePermissions();
 
@@ -285,7 +284,9 @@ const Dashboard: React.FC = () => {
 
       items.forEach((b) => {
         const dateStr = b.created_at || b.travel_date;
-        const date = dateStr ? new Date(dateStr) : null;
+        // toDateValue: a date-only travel_date fallback (e.g. "2026-08-01") must
+        // bucket in its LOCAL month, not roll back to July in a behind-UTC zone.
+        const date = dateStr ? toDateValue(dateStr) : null;
         if (!date || Number.isNaN(date.getTime())) return;
         const ym = `${date.getFullYear()}-${pad(date.getMonth() + 1)}`;
         counts[ym] = (counts[ym] || 0) + 1;

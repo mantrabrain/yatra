@@ -781,7 +781,12 @@ class BookingsController extends BaseController
 
         $returnDate = '';
         if (!empty($travelDateRaw) && $trip && !empty($trip->duration_days)) {
-            $returnTimestamp = strtotime((string) $travelDateRaw . ' +' . (int) $trip->duration_days . ' days');
+            // duration_days is INCLUSIVE (a 9-day trip departing Jun 25 returns
+            // Jul 3, not Jul 4), so the return date is travel_date + (days - 1).
+            // Matches BookingRepository::calculateEndDate; a bare "+ duration_days"
+            // was one day too far and implied an extra night (see ItineraryPdfBuilder).
+            $returnOffset = max(0, (int) $trip->duration_days - 1);
+            $returnTimestamp = strtotime((string) $travelDateRaw . ' +' . $returnOffset . ' days');
             $returnDate = date_i18n(get_option('date_format'), $returnTimestamp);
         }
 

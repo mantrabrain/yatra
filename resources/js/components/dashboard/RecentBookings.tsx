@@ -5,6 +5,7 @@
 
 import React from "react";
 import { __ } from "../../lib/i18n";
+import { toDateValue } from "../../lib/dateFormat";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Calendar, User, ArrowRight } from "lucide-react";
@@ -35,7 +36,8 @@ export const RecentBookings: React.FC<RecentBookingsProps> = ({
   onView,
 }) => {
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    // toDateValue: a date-only booking_date must not roll back a day in behind-UTC zones.
+    return toDateValue(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",

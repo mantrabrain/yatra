@@ -803,10 +803,17 @@ const AvailabilityForm: React.FC = () => {
                           // dates elsewhere uses the local-safe shared formatter.)
                           const departure = new Date(formData.departure_date);
                           const arrival = new Date(formData.arrival_date);
-                          const selectedDays = Math.ceil(
-                            (arrival.getTime() - departure.getTime()) /
-                              (1000 * 60 * 60 * 24),
-                          );
+                          // INCLUSIVE calendar-day span (both endpoints count):
+                          // Jun 25 → Jul 04 is 10 days, not 9. duration_days is
+                          // also inclusive (a 9-day trip ends on departure + 8;
+                          // see BookingRepository::calculateEndDate), so the two
+                          // are compared like-for-like. The bare date difference
+                          // was one day short.
+                          const selectedDays =
+                            Math.round(
+                              (arrival.getTime() - departure.getTime()) /
+                                (1000 * 60 * 60 * 24),
+                            ) + 1;
                           const expectedDays = tripData.duration_days;
                           const diff = selectedDays - expectedDays;
 

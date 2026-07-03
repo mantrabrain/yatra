@@ -26,6 +26,7 @@ import {
   Table as SharedTable,
 } from "../components/shared";
 import { __ } from "../lib/i18n";
+import { toDateValue } from "../lib/dateFormat";
 import { usePermissions } from "../hooks/usePermissions";
 import { useToast } from "../components/ui/toast";
 import { apiClient } from "../lib/api-client";
@@ -286,7 +287,8 @@ const Discounts: React.FC = () => {
   const formatDate = (dateString: string) => {
     if (!dateString) return __("N/A", "yatra");
     try {
-      const date = new Date(dateString);
+      // toDateValue: a date-only expiry_date must not roll back a day in behind-UTC zones.
+      const date = toDateValue(dateString);
       return date.toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",

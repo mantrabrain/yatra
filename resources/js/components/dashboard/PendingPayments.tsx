@@ -5,6 +5,7 @@
 
 import React from "react";
 import { __ } from "../../lib/i18n";
+import { toDateValue } from "../../lib/dateFormat";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -46,7 +47,8 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
     });
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
+    // toDateValue: a date-only due_date must not roll back a day in behind-UTC zones.
+    return toDateValue(dateString).toLocaleDateString();
   };
 
   const totalPending = payments?.reduce((sum, p) => sum + p.amount, 0) || 0;

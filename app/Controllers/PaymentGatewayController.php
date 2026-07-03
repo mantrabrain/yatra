@@ -1024,10 +1024,14 @@ class PaymentGatewayController extends BaseController
         $travelDate = !empty($payment->travel_date) ? date_i18n(get_option('date_format'), strtotime($payment->travel_date)) : '';
         
         // Calculate return date if duration is available (duration_days column).
+        // duration_days is INCLUSIVE (a 9-day trip returns on travel_date + 8, not
+        // + 9), so the offset is (days - 1). Matches BookingRepository::calculateEndDate;
+        // a bare "+ duration_days" was one day too far (see ItineraryPdfBuilder).
         $returnDate = '';
         $durationDaysForReturn = (int) ($payment->trip_duration_days ?? ($trip->duration_days ?? 0));
         if (!empty($payment->travel_date) && $durationDaysForReturn > 0) {
-            $returnTimestamp = strtotime($payment->travel_date . ' +' . $durationDaysForReturn . ' days');
+            $returnOffset = max(0, $durationDaysForReturn - 1);
+            $returnTimestamp = strtotime($payment->travel_date . ' +' . $returnOffset . ' days');
             $returnDate = date_i18n(get_option('date_format'), $returnTimestamp);
         }
 
