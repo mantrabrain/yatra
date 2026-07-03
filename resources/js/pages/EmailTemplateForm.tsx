@@ -48,6 +48,7 @@ import { EmailPreviewModal } from "../components/email/EmailPreviewModal";
 import {
   createEmailTemplate,
   fetchEmailTemplate,
+  fetchEmailTemplateEvents,
   fetchEmailTemplateVariables,
   previewEmailTemplate,
   sendEmailTemplateTest,
@@ -173,8 +174,20 @@ const EmailTemplateForm: React.FC = () => {
     enabled: !isCoreSettingsEdit && isEmailAutomationModuleEnabled(),
   });
 
-  // Get events from window.yatraAdmin (passed from PHP)
-  const events = (window as any).yatraAdmin?.emailEvents || [];
+  // Trigger events. Fetch them live rather than trusting only the one-time
+  // window.yatraAdmin.emailEvents localize snapshot: that snapshot is written
+  // by the Pro module at PHP render time, but the module-enabled flag is
+  // refreshed client-side (useModules), so the two can diverge — the form
+  // opens (flag says enabled) while emailEvents is still empty, leaving the
+  // dropdown with "No Event to select". The live fetch corrects that; the
+  // localize snapshot is used as an instant fallback while it loads.
+  const { data: fetchedEvents } = useQuery({
+    queryKey: ["email-template-events"],
+    queryFn: fetchEmailTemplateEvents,
+    enabled: !isCoreSettingsEdit && isEmailAutomationModuleEnabled(),
+  });
+  const events =
+    fetchedEvents ?? ((window as any).yatraAdmin?.emailEvents || []);
 
   useEffect(() => {
     if (!templateData || typeof templateData !== "object") return;

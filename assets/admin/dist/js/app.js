@@ -1,9 +1,9 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-Blzej-WY.js","../../../dist/js/react-vendor-zODANjVp.js","../css/react-vendor.css","../../../dist/js/index-CK1Q26Ph.js","../css/index.css","../../../dist/js/BuildItineraryModal-CBCQh0b1.js","../../../dist/js/ProFeature-DYVaRZK_.js","../../../dist/js/Settings-DriHGdtf.js","../../../dist/js/Team-uNxUJPKQ.js","../../../dist/js/Reports-BfFcC6KC.js","../../../dist/js/DiscountForm-BTfVAE7c.js","../../../dist/js/ApplicableTripSelector-Pq9dBaVG.js","../../../dist/js/Itinerary-BCEDQgw3.js","../../../dist/js/RecurringRuleForm-CrhV7Wdd.js","./Whatsapp.js","../../../dist/js/module-skeleton-7zwRYol6.js","../../../dist/js/ChannelManager-DLQvkH6f.js","../../../dist/js/Webhooks-DnVbxGxO.js","../../../dist/js/TripConsentForm-DC1v98al.js","../../../dist/js/BookingForm-C38GHGjD.js","../../../dist/js/ViewBooking-DxbmlGjF.js","../../../dist/js/AvailabilityForm-C-KpJ4dW.js","../../../dist/js/DynamicPricing-D6cPfPWa.js","../../../dist/js/RuleTypeSelectionModal-DHAP9cvp.js","../../../dist/js/toggle-B0m9K-Pk.js","../../../dist/js/DynamicPricingRuleForm-DkC5NuiS.js","../../../dist/js/AiAssistant-BUkyQkYB.js","../../../dist/js/AbandonedRecovery-D0i4QtQm.js","../../../dist/js/WhiteLabel-D9Cc6vb2.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-DxLPOeYq.js","../../../dist/js/react-vendor-zODANjVp.js","../css/react-vendor.css","../../../dist/js/index-BTULHGGc.js","../css/index.css","../../../dist/js/BuildItineraryModal-DmCx5Q11.js","../../../dist/js/ProFeature-DGAtQKd3.js","../../../dist/js/Settings-MW9PDyRn.js","../../../dist/js/Team-DTA6NDq7.js","../../../dist/js/Reports-BpoyHoqh.js","../../../dist/js/DiscountForm-D1iZqedH.js","../../../dist/js/ApplicableTripSelector-10Ad1AiN.js","../../../dist/js/Itinerary-sYRRLtkV.js","../../../dist/js/RecurringRuleForm-DRuJtx0I.js","./Whatsapp.js","../../../dist/js/module-skeleton-7zwRYol6.js","../../../dist/js/ChannelManager-C88YuWki.js","../../../dist/js/Webhooks-DRcuOIfo.js","../../../dist/js/TripConsentForm-DjG3dvDy.js","../../../dist/js/BookingForm-BVUrl1O0.js","../../../dist/js/ViewBooking-6EEKWDnw.js","../../../dist/js/AvailabilityForm-Bqh18ZD-.js","../../../dist/js/DynamicPricing-BlxyltRY.js","../../../dist/js/RuleTypeSelectionModal-R1qd26TS.js","../../../dist/js/toggle-B0m9K-Pk.js","../../../dist/js/DynamicPricingRuleForm-CDEf9hGg.js","../../../dist/js/AiAssistant-MkzT-2q3.js","../../../dist/js/AbandonedRecovery-CtxIMrN2.js","../../../dist/js/WhiteLabel-CKhKiVrv.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
 import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as Calendar$1, q as MapPin, s as LayoutDashboard, u as useQuery, t as useQueryClient, v as useMutation, Z as Zap, w as Webhook, x as ChevronDown, y as ChevronRight, z as ArrowLeft, G as Gift, D as Loader2, E as Sun, H as Moon, I as User, J as RefreshCw, O as Inbox, Q as AlertTriangle, V as ExternalLink, X as isObjectLike_1, _ as _baseGetTag, Y as isArray_1, $ as _MapCache, a0 as getDefaultExportFromCjs, a1 as _Symbol, a2 as isObject$5, a3 as isFunction, a4 as reactIsExports, a5 as React, a6 as _Stack, a7 as _baseIsEqual, a8 as isObject_1, a9 as keys_1, aa as isLength_1, ab as _isIndex, ac as isArguments_1, ad as _Set, ae as _setToArray, af as _SetCache, ag as _cacheHas, ah as _arrayPush, ai as isArrayLike_1, aj as _baseUnary, ak as _getNative, al as eq_1, am as _root, an as isEqual, ao as Animate, ap as _overArg, aq as _arraySome, ar as Clock, as as DollarSign, at as ArrowRight, au as Shield, av as CheckCircle, aw as Plus, ax as X, ay as reactDomExports, az as AlertCircle, aA as Check, aB as Wand2, aC as ChevronLeft, aD as CheckCircle2, aE as HelpCircle, aF as Info, aG as Copy, aH as MoreVertical, aI as Columns, aJ as PenSquare, aK as ArrowUp, aL as ArrowDown, aM as Archive, aN as Trash2, aO as Search, aP as ArrowUpDown, aQ as Eye, aR as Upload, aS as Image, aT as ReactQuill, aU as Pen, aV as Save, aW as Phone, aX as PauseCircle, aY as ShieldX, aZ as ShieldOff, a_ as Globe, a$ as Award, b0 as Database, b1 as Folder, b2 as Mountain, b3 as UserCheck, b4 as Download, b5 as Server, b6 as XCircle, b7 as Video, b8 as Lock, b9 as GripVertical, ba as ChevronUp, bb as Play, bc as ClipboardCopy, bd as Ban, be as Bell, bf as Heart, bg as Scissors, bh as Send, bi as Filter, bj as ArrowUpRight, bk as ClipboardCheck, bl as PenTool, bm as Camera, bn as BarChart$1, bo as Megaphone, bp as GitBranch, bq as Pause, br as Settings2, bs as Code, bt as Bug, bu as EyeOff, bv as QueryClient, bw as client, bx as QueryClientProvider } from "../../../dist/js/react-vendor-zODANjVp.js";
-import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, g as getCurrencySymbol, d as getCountryName, e as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-CK1Q26Ph.js";
+import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, g as getCurrencySymbol, d as getCountryName, e as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-BTULHGGc.js";
 const scriptRel = "modulepreload";
 const assetsURL = function(dep, importerUrl) {
   return new URL(dep, importerUrl).href;
@@ -70155,6 +70155,9 @@ async function fetchEmailTemplateVariables(eventKey) {
   const url = eventKey && eventKey.trim() !== "" ? `${API_ENDPOINTS.EMAIL_TEMPLATE_VARIABLES}?event_key=${encodeURIComponent(eventKey.trim())}` : API_ENDPOINTS.EMAIL_TEMPLATE_VARIABLES;
   return unwrapApiPayload(await apiClient.get(url));
 }
+async function fetchEmailTemplateEvents() {
+  return unwrapApiPayload(await apiClient.get(API_ENDPOINTS.EMAIL_TEMPLATE_EVENTS));
+}
 async function createEmailTemplate(data) {
   return apiClient.post(API_ENDPOINTS.EMAIL_TEMPLATES, data);
 }
@@ -73251,7 +73254,12 @@ const EmailTemplateForm = () => {
     queryFn: () => fetchEmailTemplateVariables(formData.event_key || ""),
     enabled: !isCoreSettingsEdit && isEmailAutomationModuleEnabled()
   });
-  const events = ((_a = window.yatraAdmin) == null ? void 0 : _a.emailEvents) || [];
+  const { data: fetchedEvents } = useQuery({
+    queryKey: ["email-template-events"],
+    queryFn: fetchEmailTemplateEvents,
+    enabled: !isCoreSettingsEdit && isEmailAutomationModuleEnabled()
+  });
+  const events = fetchedEvents ?? (((_a = window.yatraAdmin) == null ? void 0 : _a.emailEvents) || []);
   reactExports.useEffect(() => {
     if (!templateData || typeof templateData !== "object") return;
     const t = templateData;
@@ -77269,27 +77277,27 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-Blzej-WY.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-DriHGdtf.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
-const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-uNxUJPKQ.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
-const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-BfFcC6KC.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
-const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-BTfVAE7c.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
-const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-BCEDQgw3.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
-const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-CrhV7Wdd.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-DxLPOeYq.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-MW9PDyRn.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-DTA6NDq7.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
+const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-BpoyHoqh.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
+const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-D1iZqedH.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
+const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-sYRRLtkV.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
+const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-DRuJtx0I.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
 const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.js"), true ? __vite__mapDeps([14,1,2,3,4,15]) : void 0, import.meta.url));
-const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-DLQvkH6f.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
-const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-DnVbxGxO.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
-const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-DC1v98al.js"), true ? __vite__mapDeps([18,1,2,11,3,4]) : void 0, import.meta.url));
-const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-C38GHGjD.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
-const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-DxbmlGjF.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-C-KpJ4dW.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
-const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-D6cPfPWa.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
+const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-C88YuWki.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
+const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-DRcuOIfo.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
+const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-DjG3dvDy.js"), true ? __vite__mapDeps([18,1,2,11,3,4]) : void 0, import.meta.url));
+const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-BVUrl1O0.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
+const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-6EEKWDnw.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-Bqh18ZD-.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
+const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-BlxyltRY.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
-  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-DkC5NuiS.js"), true ? __vite__mapDeps([25,1,2,23,3,4]) : void 0, import.meta.url)
+  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-CDEf9hGg.js"), true ? __vite__mapDeps([25,1,2,23,3,4]) : void 0, import.meta.url)
 );
-const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-BUkyQkYB.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
-const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-D0i4QtQm.js"), true ? __vite__mapDeps([27,1,2,24,3,4]) : void 0, import.meta.url));
-const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-D9Cc6vb2.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
+const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-MkzT-2q3.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
+const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-CtxIMrN2.js"), true ? __vite__mapDeps([27,1,2,24,3,4]) : void 0, import.meta.url));
+const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-CKhKiVrv.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
 const PageLoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-1/3" }),

@@ -51,6 +51,24 @@ export async function fetchEmailTemplateVariables(
   return unwrapApiPayload<EmailTemplateVariableMap>(await apiClient.get(url));
 }
 
+/**
+ * Live list of trigger events (key/name/description) from the server.
+ *
+ * Fetched instead of relying only on the one-time `window.yatraAdmin.emailEvents`
+ * localize snapshot: that snapshot reflects the module state at PHP render time,
+ * while the module-enabled flag is refreshed client-side (useModules), so the two
+ * can diverge — leaving the event dropdown empty when a template is created right
+ * after enabling the module (no full reload). This endpoint always reflects the
+ * current state.
+ */
+export async function fetchEmailTemplateEvents(): Promise<
+  Array<{ key: string; name: string; description?: string }>
+> {
+  return unwrapApiPayload<
+    Array<{ key: string; name: string; description?: string }>
+  >(await apiClient.get(API_ENDPOINTS.EMAIL_TEMPLATE_EVENTS));
+}
+
 export async function createEmailTemplate(data: unknown): Promise<unknown> {
   return apiClient.post(API_ENDPOINTS.EMAIL_TEMPLATES, data);
 }

@@ -222,6 +222,7 @@ export const API_ENDPOINTS = {
   EMAIL_TEMPLATE_DUPLICATE: (id: string | number) =>
     `/email-templates/${id}/duplicate`,
   EMAIL_TEMPLATE_VARIABLES: "/email-templates/variables",
+  EMAIL_TEMPLATE_EVENTS: "/email-templates/events",
   EMAIL_SEQUENCES: "/email-sequences",
   EMAIL_SEQUENCE_GET: (id: string | number) => `/email-sequences/${id}`,
   EMAIL_LOGS: "/email-logs",
