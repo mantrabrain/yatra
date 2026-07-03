@@ -24,9 +24,12 @@
  * Get date format from Yatra settings
  */
 export function getDateFormat(): string {
+  const w = window as any;
   return (
-    (window as any)?.yatraAdmin?.date_format ||
-    (window as any)?.yatraAdmin?.dateFormat ||
+    w?.yatraAdmin?.date_format ||
+    w?.yatraAdmin?.dateFormat ||
+    // Customer account pages localize their settings under yatraAccountPage.
+    w?.yatraAccountPage?.date_format ||
     "Y-m-d"
   );
 }
@@ -35,9 +38,11 @@ export function getDateFormat(): string {
  * Get time format from Yatra settings
  */
 export function getTimeFormat(): string {
+  const w = window as any;
   return (
-    (window as any)?.yatraAdmin?.time_format ||
-    (window as any)?.yatraAdmin?.timeFormat ||
+    w?.yatraAdmin?.time_format ||
+    w?.yatraAdmin?.timeFormat ||
+    w?.yatraAccountPage?.time_format ||
     "H:i"
   );
 }
@@ -46,7 +51,34 @@ export function getTimeFormat(): string {
  * Get timezone from Yatra settings
  */
 export function getTimezone(): string {
-  return (window as any)?.yatraAdmin?.timezone || "UTC";
+  const w = window as any;
+  return (
+    w?.yatraAdmin?.timezone || w?.yatraAccountPage?.timezone || "UTC"
+  );
+}
+
+/**
+ * Parse a value into a Date, treating a date-only string ("YYYY-MM-DD") as a
+ * LOCAL calendar date.
+ *
+ * `new Date("2026-08-01")` parses as UTC midnight, but the formatters read it
+ * back with local getters (getDate/getMonth/…), so in any behind-UTC timezone
+ * the day rolls back (Aug 1 → Jul 31) — e.g. a booking's travel_date showing
+ * one day early. Building the Date from its parts pins it to the intended
+ * calendar day regardless of timezone. Datetime strings (with a time part) and
+ * Date objects are parsed/returned as before.
+ */
+function toDateValue(value: string | Date): Date {
+  if (typeof value !== "string") return value;
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+  if (dateOnly) {
+    return new Date(
+      Number(dateOnly[1]),
+      Number(dateOnly[2]) - 1,
+      Number(dateOnly[3]),
+    );
+  }
+  return new Date(value);
 }
 
 /**
@@ -62,8 +94,7 @@ export function formatDate(
   if (!dateString) return "-";
 
   try {
-    const date =
-      typeof dateString === "string" ? new Date(dateString) : dateString;
+    const date = toDateValue(dateString);
 
     if (isNaN(date.getTime())) {
       return String(dateString);
@@ -237,8 +268,7 @@ export function formatTime(
   if (!dateString) return "-";
 
   try {
-    const date =
-      typeof dateString === "string" ? new Date(dateString) : dateString;
+    const date = toDateValue(dateString);
 
     if (isNaN(date.getTime())) {
       // Try to parse as time only (HH:mm or HH:mm:ss)
@@ -271,8 +301,7 @@ export function formatRelativeTime(
   if (!dateString) return "-";
 
   try {
-    const date =
-      typeof dateString === "string" ? new Date(dateString) : dateString;
+    const date = toDateValue(dateString);
 
     if (isNaN(date.getTime())) {
       return String(dateString);
@@ -313,7 +342,7 @@ export function parseDate(dateString: string | null | undefined): Date | null {
   if (!dateString) return null;
 
   try {
-    const date = new Date(dateString);
+    const date = toDateValue(dateString);
     return isNaN(date.getTime()) ? null : date;
   } catch (e) {
     return null;
@@ -331,8 +360,7 @@ export function formatDateForInput(
   if (!dateString) return "";
 
   try {
-    const date =
-      typeof dateString === "string" ? new Date(dateString) : dateString;
+    const date = toDateValue(dateString);
 
     if (isNaN(date.getTime())) {
       return "";

@@ -784,6 +784,12 @@ class FrontendAssetsProvider
             'thousandSeparator' => \Yatra\Services\SettingsService::getString('thousand_separator', ','),
             'decimalSeparator' => \Yatra\Services\SettingsService::getString('decimal_separator', '.'),
             'locale' => get_locale(),
+            // Global date/time format so the customer account pages render dates
+            // in the operator's configured format (Settings → General), not a
+            // hardcoded browser style. Keys mirror what the admin app receives.
+            'date_format' => \Yatra\Services\SettingsService::getString('date_format', 'Y-m-d'),
+            'time_format' => \Yatra\Services\SettingsService::getString('time_format', 'H:i'),
+            'timezone' => \Yatra\Services\SettingsService::getString('timezone', 'UTC'),
             // Full ISO country map (code => name) so the account profile can show
             // full country names and render the country dropdown. Mirrors the
             // admin (`yatraAdmin.countries`); honours the `yatra_countries_list` filter.

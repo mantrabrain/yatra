@@ -3,6 +3,10 @@ import {
   applyCurrencyPosition,
   formatYatraMoney,
 } from "../../lib/currency-display";
+import {
+  formatDate as formatGlobalDate,
+  parseDate,
+} from "../../lib/dateFormat";
 
 function toBrowserLocaleTag(
   locale: string | undefined | null,
@@ -25,22 +29,15 @@ export const formatDate = (value: string | undefined | null) => {
     return __("N/A", "yatra");
   }
 
-  try {
-    const date = new Date(value);
-
-    // Check if date is valid
-    if (isNaN(date.getTime())) {
-      return __("Invalid date", "yatra");
-    }
-
-    return date.toLocaleDateString(getAccountLocale(), {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  } catch (error) {
+  // Render public account dates in the operator's configured global date
+  // format (Settings → General) via the shared formatter — not a hardcoded
+  // browser style. It also parses a date-only value (e.g. a booking's
+  // travel_date) in LOCAL time, so it no longer rolls back a day in behind-UTC
+  // timezones (Aug 1 → Jul 31).
+  if (!parseDate(value)) {
     return __("Invalid date", "yatra");
   }
+  return formatGlobalDate(value);
 };
 
 /** Leading Y-m-d from API datetime strings for stable range comparison. */
