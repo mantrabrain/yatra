@@ -2223,8 +2223,15 @@ class BookingSessionController extends BaseController
                 . esc_html__('This link expires in 48 hours.', 'yatra')
                 . '</strong>';
 
+            // Guest-checkout verification reuses the single customer email-
+            // verification template (same body/flow; the booking-specific copy
+            // is injected above via intro_paragraph / footer_note / expiry
+            // merge vars). Previously this used a separate
+            // guest_email_verification system template, which duplicated the
+            // customer one on the same event and couldn't be deleted. See the
+            // one-time cleanup in the Pro Email Automation module.
             \Yatra\Services\TransactionalEmailTemplateService::sendIfEnabled(
-                \Yatra\Services\TransactionalEmailTemplateService::TYPE_GUEST_EMAIL_VERIFICATION,
+                \Yatra\Services\TransactionalEmailTemplateService::TYPE_CUSTOMER_EMAIL_VERIFICATION,
                 (string) $contact_data['email'],
                 $email_vars
             );
