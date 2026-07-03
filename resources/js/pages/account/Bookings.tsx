@@ -8,7 +8,7 @@ import {
   MapPin,
   Plane,
 } from "lucide-react";
-import { __, _n, sprintf } from "../../lib/i18n";
+import { __, sprintf } from "../../lib/i18n";
 import {
   formatDate,
   formatTravelDateRange,
@@ -442,11 +442,11 @@ const Bookings: React.FC<BookingsProps> = ({
                             Number(
                               booking.travelers_count ?? booking.travelers ?? 0,
                             ) || 0;
-                          return sprintf(
-                            // translators: %d: number of travelers on this booking.
-                            _n("%d traveler", "%d travelers", n, "yatra"),
-                            n,
-                          );
+                          // __() (not _n): make-pot misses _n() in the
+                          // minified account bundle. See BookingDetails.
+                          return n === 1
+                            ? sprintf(__("%d traveler", "yatra"), n)
+                            : sprintf(__("%d travelers", "yatra"), n);
                         })()}
                       </p>
                     </div>

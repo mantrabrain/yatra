@@ -1,5 +1,5 @@
 import { j as jsxRuntimeExports, p as Calendar, k as FileText, b as Plane, at as ArrowRight, q as MapPin, I as User, y as ChevronRight, S as Sparkles, h as Package, i as CreditCard, by as LifeBuoy, be as Bell, az as AlertCircle, aD as CheckCircle2, ar as Clock, V as ExternalLink, U as Users, d as Mail, aW as Phone, b4 as Download, r as reactExports, a5 as React, u as useQuery, av as CheckCircle, as as DollarSign, aQ as Eye, t as useQueryClient, aJ as PenSquare, b6 as XCircle, bz as ShieldCheck, bf as Heart, s as LayoutDashboard, bA as LogOut, bv as QueryClient, bw as client, bx as QueryClientProvider } from "./react-vendor-zODANjVp.js";
-import { f as formatYatraMoney, _ as __, h as applyCurrencyPosition, s as sprintf, i as _n, a as apiClient, A as API_ENDPOINTS, u as useToast, j as getCountryOptions, d as getCountryName$1, T as ToastProvider, E as ErrorBoundary } from "./index-zauBMzvd.js";
+import { f as formatYatraMoney, _ as __, h as applyCurrencyPosition, s as sprintf, a as apiClient, A as API_ENDPOINTS, u as useToast, i as getCountryOptions, d as getCountryName$1, T as ToastProvider, E as ErrorBoundary } from "./index-CK1Q26Ph.js";
 function toBrowserLocaleTag(locale) {
   const raw = String(locale || "").trim();
   if (!raw) return void 0;
@@ -456,11 +456,7 @@ const Dashboard = ({
                         const n = Number(
                           booking.travelers_count ?? booking.travelers ?? 0
                         ) || 0;
-                        return sprintf(
-                          // translators: %d: number of travelers on this booking
-                          _n("%d Traveler", "%d Travelers", n),
-                          n
-                        );
+                        return n === 1 ? sprintf(__("%d Traveler", "yatra"), n) : sprintf(__("%d Travelers", "yatra"), n);
                       })()
                     ] })
                   ] })
@@ -1214,11 +1210,7 @@ const BookingDetails = ({
                 const n = Number(
                   booking.travelers_count ?? (Array.isArray(t) ? t.length : t) ?? 0
                 ) || 0;
-                return sprintf(
-                  // translators: %d: number of travelers on this booking
-                  _n("%d Traveler", "%d Travelers", n),
-                  n
-                );
+                return n === 1 ? sprintf(__("%d Traveler", "yatra"), n) : sprintf(__("%d Travelers", "yatra"), n);
               })() })
             ] })
           ] }),
@@ -1867,11 +1859,7 @@ const Bookings = ({
                   const n = Number(
                     booking.travelers_count ?? booking.travelers ?? 0
                   ) || 0;
-                  return sprintf(
-                    // translators: %d: number of travelers on this booking.
-                    _n("%d traveler", "%d travelers", n),
-                    n
-                  );
+                  return n === 1 ? sprintf(__("%d traveler", "yatra"), n) : sprintf(__("%d travelers", "yatra"), n);
                 })() })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -2976,15 +2964,7 @@ const SavedTrips = ({ savedTrips, isLoading }) => {
                   ),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "yatra-rating-value", children: avgRating.toFixed(1) })
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "yatra-reviews-count", children: sprintf(
-                  // translators: %d: number of reviews for the trip
-                  _n(
-                    "(%d review)",
-                    "(%d reviews)",
-                    reviewCount
-                  ),
-                  reviewCount
-                ) })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "yatra-reviews-count", children: reviewCount === 1 ? sprintf(__("(%d review)", "yatra"), reviewCount) : sprintf(__("(%d reviews)", "yatra"), reviewCount) })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-trip-footer mt-auto flex flex-row items-center justify-between gap-4 border-t border-gray-100 pt-4 dark:border-gray-700", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-trip-price flex min-w-0 flex-col items-start gap-1 text-left", children: [

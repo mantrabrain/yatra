@@ -12,7 +12,7 @@ import {
   ExternalLink,
   Download,
 } from "lucide-react";
-import { __, _n, sprintf } from "../../lib/i18n";
+import { __, sprintf } from "../../lib/i18n";
 import {
   formatDate,
   formatTravelDateRange,
@@ -346,11 +346,14 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                           (Array.isArray(t) ? t.length : t) ??
                           0,
                       ) || 0;
-                    return sprintf(
-                      // translators: %d: number of travelers on this booking
-                      _n("%d Traveler", "%d Travelers", n, "yatra"),
-                      n,
-                    );
+                    // Two __() strings instead of _n(): wp-cli make-pot's
+                    // scan of the MINIFIED account-page bundle extracts __()
+                    // calls but misses _n(), so a plural here never gets an
+                    // account-page.js catalog entry and stays English on the
+                    // frontend. Mirrors the traveler-list label below.
+                    return n === 1
+                      ? sprintf(__("%d Traveler", "yatra"), n)
+                      : sprintf(__("%d Travelers", "yatra"), n);
                   })()}
                 </div>
               </div>

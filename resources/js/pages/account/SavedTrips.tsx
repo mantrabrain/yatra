@@ -1,6 +1,6 @@
 import React from "react";
 import { Heart, MapPin as MapPinIcon } from "lucide-react";
-import { __, _n, sprintf } from "../../lib/i18n";
+import { __, sprintf } from "../../lib/i18n";
 import { formatPrice } from "./utils";
 import { apiClient } from "../../lib/api-client";
 import { useToast } from "../../components/ui/toast";
@@ -247,16 +247,11 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
                         </span>
                       </div>
                       <span className="yatra-reviews-count">
-                        {sprintf(
-                          // translators: %d: number of reviews for the trip
-                          _n(
-                            "(%d review)",
-                            "(%d reviews)",
-                            reviewCount,
-                            "yatra",
-                          ),
-                          reviewCount,
-                        )}
+                        {/* __() (not _n): make-pot misses _n() in the minified
+                            account bundle, so plurals stay English. See BookingDetails. */}
+                        {reviewCount === 1
+                          ? sprintf(__("(%d review)", "yatra"), reviewCount)
+                          : sprintf(__("(%d reviews)", "yatra"), reviewCount)}
                       </span>
                     </div>
                   )}

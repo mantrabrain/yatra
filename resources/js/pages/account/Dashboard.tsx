@@ -16,7 +16,7 @@ import {
   AlertCircle,
   Bell,
 } from "lucide-react";
-import { __, _n, sprintf } from "../../lib/i18n";
+import { __, sprintf } from "../../lib/i18n";
 import {
   formatDate,
   formatTravelDateRange,
@@ -332,11 +332,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                                       booking.travelers ??
                                       0,
                                   ) || 0;
-                                return sprintf(
-                                  // translators: %d: number of travelers on this booking
-                                  _n("%d Traveler", "%d Travelers", n, "yatra"),
-                                  n,
-                                );
+                                // __() (not _n): make-pot misses _n() in the
+                                // minified account bundle, so plurals stay
+                                // English on the frontend. See BookingDetails.
+                                return n === 1
+                                  ? sprintf(__("%d Traveler", "yatra"), n)
+                                  : sprintf(__("%d Travelers", "yatra"), n);
                               })()}
                             </span>
                           </div>
