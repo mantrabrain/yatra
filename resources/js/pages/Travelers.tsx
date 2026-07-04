@@ -16,7 +16,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
-import { toDateValue } from "../lib/dateFormat";
+import { formatDate as formatDateUtil } from "../lib/dateFormat";
 import { apiService } from "../lib/api-client";
 import { usePermissions } from "../hooks/usePermissions";
 import { Input } from "../components/ui/input";
@@ -212,13 +212,12 @@ const Travelers: React.FC = () => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${bookingId}`;
   };
 
+  // Use the shared formatter so traveler dates (Travel Date, Date of Birth)
+  // follow the global WP date-format setting — not the browser locale — and
+  // parse date-only values as local calendar days (no off-by-one).
   const formatDate = (dateString: string) => {
     if (!dateString) return "-";
-    try {
-      return toDateValue(dateString).toLocaleDateString();
-    } catch {
-      return dateString;
-    }
+    return formatDateUtil(dateString);
   };
 
   // Bulk delete travelers

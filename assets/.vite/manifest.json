@@ -246,7 +246,7 @@
     ]
   },
   "resources/js/pages/Settings.tsx": {
-    "file": "dist/js/Settings-Dyc4BzcB.js",
+    "file": "dist/js/Settings-D5L9IwFN.js",
     "name": "Settings",
     "src": "resources/js/pages/Settings.tsx",
     "isDynamicEntry": true,
@@ -294,7 +294,7 @@
     ]
   },
   "resources/js/pages/ViewBooking.tsx": {
-    "file": "dist/js/ViewBooking-M_cDpNCN.js",
+    "file": "dist/js/ViewBooking-3J9LLImi.js",
     "name": "ViewBooking",
     "src": "resources/js/pages/ViewBooking.tsx",
     "isDynamicEntry": true,

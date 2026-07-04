@@ -22,7 +22,8 @@ import {
 } from "lucide-react";
 import { apiClient, apiService } from "../lib/api-client";
 import { __ } from "../lib/i18n";
-import { formatDate as formatDateUtil, toDateValue } from "../lib/dateFormat";
+import { formatDate as formatDateUtil } from "../lib/dateFormat";
+import PhoneDisplay from "../components/common/PhoneDisplay";
 import { usePermissions } from "../hooks/usePermissions";
 import { getCountryName } from "../lib/countries";
 import { Button } from "../components/ui/button";
@@ -906,7 +907,7 @@ const ViewBooking: React.FC = () => {
                     {booking.customer_phone && (
                       <div className="flex items-center gap-1.5">
                         <Phone className="w-4 h-4" />
-                        {booking.customer_phone}
+                        <PhoneDisplay value={booking.customer_phone} />
                       </div>
                     )}
                   </div>
@@ -1077,20 +1078,18 @@ const ViewBooking: React.FC = () => {
                                 fieldConfig?.type === "textarea" ||
                                 String(fieldValue).length > 50;
 
-                              // Format date fields
+                              // Format date fields (e.g. Date of Birth) with the
+                              // global WP date-format setting via the shared
+                              // formatter — not the browser locale.
                               let displayValue = String(fieldValue);
                               if (
                                 fieldConfig?.type === "date" ||
                                 fieldId.includes("date") ||
+                                fieldId.includes("birth") ||
+                                fieldId.includes("dob") ||
                                 fieldId.includes("expiry")
                               ) {
-                                try {
-                                  displayValue = toDateValue(
-                                    fieldValue as string,
-                                  ).toLocaleDateString();
-                                } catch {
-                                  displayValue = String(fieldValue);
-                                }
+                                displayValue = formatDate(fieldValue as string);
                               }
 
                               // Format country/nationality fields - convert code to full name

@@ -1151,6 +1151,18 @@ class SettingsController extends BaseController
                         $sanitized_field['required'] = false;
                     }
 
+                    // Phone fields: the country-code selector is ON by default.
+                    // Only persist the non-default `false`, so existing configs
+                    // (which never carried this key) stay byte-identical and read
+                    // back as ON.
+                    if (
+                        $sanitized_field['type'] === 'tel'
+                        && array_key_exists('show_country_code', $field)
+                        && !$field['show_country_code']
+                    ) {
+                        $sanitized_field['show_country_code'] = false;
+                    }
+
                     $sanitized[$form_type]['fields'][] = $sanitized_field;
                 }
                 

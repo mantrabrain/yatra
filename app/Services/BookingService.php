@@ -540,6 +540,7 @@ class BookingService
         }
 
         $oldStatus = (string) ($booking->status ?? '');
+        $oldPaymentStatus = (string) ($booking->payment_status ?? '');
 
         // Update booking
         $updated = $this->bookingRepository->update($id, $data);
@@ -574,10 +575,53 @@ class BookingService
             $this->saveTravelers($id, $data['travelers']);
         }
 
+        // A manual payment-status change (e.g. an admin marking an offline
+        // bank-transfer booking as Paid) fired no notification and no hook before,
+        // so the customer was never told their payment was received. Detect the
+        // change and notify — without firing `yatra_payment_completed` (that means
+        // a real gateway charge and carries capture side effects).
+        $newPaymentStatus = isset($data['payment_status']) ? (string) $data['payment_status'] : null;
+        if ($newPaymentStatus !== null && $newPaymentStatus !== $oldPaymentStatus) {
+            $this->handlePaymentStatusChange($id, $oldPaymentStatus, $newPaymentStatus);
+        }
+
+        // Return the fresh booking so the REST controller's `$result['data']`
+        // is defined (previously absent → "Undefined array key data" warning).
         return [
             'success' => true,
             'message' => __('Booking updated successfully.', 'yatra'),
+            'data' => $this->bookingRepository->find($id),
         ];
+    }
+
+    /**
+     * React to a manual payment-status change (admin edits, e.g. bank transfer
+     * marked Paid). Sends the customer + admin payment emails when money is
+     * (fully or partially) received, and fires `yatra_payment_status_changed`
+     * so integrations can react. Intentionally separate from
+     * `yatra_payment_completed`, which represents a real gateway capture.
+     */
+    private function handlePaymentStatusChange(int $bookingId, string $oldStatus, string $newStatus): void
+    {
+        $booking = $this->bookingRepository->findWithTrip($bookingId);
+        if (!$booking) {
+            return;
+        }
+
+        do_action('yatra_payment_status_changed', $bookingId, $oldStatus, $newStatus, $booking);
+
+        if (in_array($newStatus, ['paid', 'partial'], true)) {
+            $paidAmount = (float) ($booking->amount_paid ?? 0);
+            if ($paidAmount <= 0) {
+                $paidAmount = (float) ($booking->total_amount ?? 0);
+            }
+            \Yatra\Services\NotificationService::sendPaymentCompletedNotification([
+                'booking_id' => $bookingId,
+                'amount' => $paidAmount,
+                'payment_method' => (string) ($booking->payment_method ?? ''),
+                'transaction_id' => '',
+            ]);
+        }
     }
 
     /**

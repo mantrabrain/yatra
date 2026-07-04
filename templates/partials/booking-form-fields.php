@@ -203,16 +203,79 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
                 break;
                 
             default: // text, email, tel, number
-                ?>
-                <input 
-                    type="<?php echo esc_attr($field['type']); ?>" 
-                    id="<?php echo $field_id; ?>" 
-                    name="<?php echo $field_name; ?>" 
-                    placeholder="<?php echo esc_attr(yatra_translate_form_string($field['placeholder'] ?? '')); ?>"
-                    <?php echo $required_attr; ?>
-                    value="<?php echo esc_attr($prefill_value); ?>"
-                >
-                <?php
+                // Phone (tel) fields get the international country-code widget
+                // UNLESS it has been explicitly disabled in the (Pro) form
+                // builder. A missing key means ON, so every existing form and
+                // customized field keeps the widget without needing a re-save.
+                $is_phone_widget = (($field['type'] ?? '') === 'tel')
+                    && (!array_key_exists('show_country_code', $field) || !empty($field['show_country_code']));
+
+                if ($is_phone_widget) {
+                    // Split the stored value for display: an international value
+                    // ("+9779806015400") is parsed into country + national part;
+                    // a legacy bare number is left in the number box under the
+                    // default country (never rewritten on display).
+                    $pv = (string) $prefill_value;
+                    $detected = \Yatra\Helpers\FormatHelper::detectPhoneCountry($pv);
+                    if ($detected !== null) {
+                        $p_iso = $detected['iso'];
+                        $p_dial = $detected['dial'];
+                        $p_national = $detected['national'];
+                    } else {
+                        $p_iso = \Yatra\Helpers\FormatHelper::getDefaultPhoneCountry();
+                        $p_dial = \Yatra\Helpers\FormatHelper::getDialingCode($p_iso);
+                        $p_national = $pv;
+                    }
+
+                    // Companion hidden field holding the chosen ISO. Array-style
+                    // names (travelers[0][phone]) become travelers[0][phone_country];
+                    // the server combines dial code + national number on submit.
+                    if (preg_match('/^(.*)\[([^\]]+)\]$/', $field_name, $mm)) {
+                        $companion_name = $mm[1] . '[' . $mm[2] . '_country]';
+                    } else {
+                        $companion_name = $field_name . '_country';
+                    }
+
+                    $flag_base = \defined('YATRA_PLUGIN_URL') ? YATRA_PLUGIN_URL . 'assets/img/flags/' : '';
+                    ?>
+                    <div class="yatra-phone-field" data-yatra-phone
+                         data-default-iso="<?php echo esc_attr($p_iso); ?>"
+                         data-flag-base="<?php echo esc_url($flag_base); ?>">
+                        <button type="button" class="yatra-phone-country" aria-haspopup="listbox" aria-expanded="false"
+                                aria-label="<?php esc_attr_e('Select country dialing code', 'yatra'); ?>">
+                            <img class="yatra-phone-flag" src="<?php echo esc_url($flag_base . strtolower($p_iso) . '.svg'); ?>"
+                                 alt="" width="22" height="16" loading="lazy">
+                            <span class="yatra-phone-dial">+<?php echo esc_html($p_dial); ?></span>
+                            <span class="yatra-phone-caret" aria-hidden="true"></span>
+                        </button>
+                        <input
+                            type="tel"
+                            class="yatra-phone-number"
+                            id="<?php echo $field_id; ?>"
+                            name="<?php echo $field_name; ?>"
+                            value="<?php echo esc_attr($p_national); ?>"
+                            placeholder="<?php echo esc_attr(yatra_translate_form_string($field['placeholder'] ?? '')); ?>"
+                            inputmode="tel"
+                            autocomplete="tel-national"
+                            <?php echo $required_attr; ?>
+                        >
+                        <input type="hidden" class="yatra-phone-iso"
+                               name="<?php echo esc_attr($companion_name); ?>"
+                               value="<?php echo esc_attr($p_iso); ?>">
+                    </div>
+                    <?php
+                } else {
+                    ?>
+                    <input
+                        type="<?php echo esc_attr($field['type']); ?>"
+                        id="<?php echo $field_id; ?>"
+                        name="<?php echo $field_name; ?>"
+                        placeholder="<?php echo esc_attr(yatra_translate_form_string($field['placeholder'] ?? '')); ?>"
+                        <?php echo $required_attr; ?>
+                        value="<?php echo esc_attr($prefill_value); ?>"
+                    >
+                    <?php
+                }
                 break;
         }
         ?>

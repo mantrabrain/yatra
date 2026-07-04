@@ -395,6 +395,10 @@ class FrontendAssetsProvider
             }
         }
 
+        // International phone-number widget (country flag + dial code) used by
+        // the booking form's tel fields.
+        $this->enqueuePhoneInputAssets();
+
         // Mobile sticky-sidebar + flatpickr init for the single-trip page. Lives in a
         // dedicated file rather than as inline <script> in the partial because
         // WordPress core's `convert_chars` filter (hooked to the_content) rewrites the
@@ -535,6 +539,53 @@ class FrontendAssetsProvider
     }
 
     /**
+     * Enqueue the international phone-number widget (assets/js/phone-input.js +
+     * assets/css/phone-input.css) and localize its country + dial-code dataset.
+     *
+     * Self-contained (reads its own `yatraPhoneData` global) and idempotent, so
+     * it can be called from every path that renders the booking form. Country
+     * data is the single source of truth in {@see FormatHelper}.
+     *
+     * @return void
+     */
+    private function enqueuePhoneInputAssets(): void
+    {
+        if (wp_script_is('yatra-phone-input', 'enqueued')) {
+            return;
+        }
+
+        $css = YATRA_PLUGIN_PATH . 'assets/css/phone-input.css';
+        if (file_exists($css)) {
+            wp_enqueue_style(
+                'yatra-phone-input',
+                YATRA_PLUGIN_URL . 'assets/css/phone-input.css',
+                [],
+                YATRA_VERSION . '.' . filemtime($css)
+            );
+        }
+
+        $js = YATRA_PLUGIN_PATH . 'assets/js/phone-input.js';
+        if (!file_exists($js)) {
+            return;
+        }
+        wp_enqueue_script(
+            'yatra-phone-input',
+            YATRA_PLUGIN_URL . 'assets/js/phone-input.js',
+            [],
+            YATRA_VERSION . '.' . filemtime($js),
+            true
+        );
+        wp_localize_script('yatra-phone-input', 'yatraPhoneData', [
+            'countries' => \Yatra\Helpers\FormatHelper::getPhoneCountries(),
+            'priority'  => \Yatra\Helpers\FormatHelper::getPhonePriority(),
+            'i18n'      => [
+                'search'    => __('Search country', 'yatra'),
+                'noResults' => __('No matches', 'yatra'),
+            ],
+        ]);
+    }
+
+    /**
      * Enqueue activity listing specific assets
      *
      * @return void
@@ -634,6 +685,9 @@ class FrontendAssetsProvider
                 );
             }
         }
+
+        // International phone-number widget (country flag + dial code).
+        $this->enqueuePhoneInputAssets();
 
         // Load each available gateway's own client scripts on the checkout page
         // (e.g. Square Web Payments SDK + square.js, Authorize.Net Accept.js +

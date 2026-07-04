@@ -360,7 +360,7 @@ class BookingsController extends BaseController
             }
 
             Logger::info("Booking updated successfully", ['booking_id' => $id]);
-            return $this->success_response($result['data']);
+            return $this->success_response($result['data'] ?? null);
             
         } catch (\Exception $e) {
             Logger::error("Failed to update booking", ['booking_id' => $id ?? 0, 'data' => $data ?? [], 'error' => $e->getMessage()]);

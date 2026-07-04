@@ -281,7 +281,7 @@ const GoogleCalendarIntegrationSection: React.FC<{
   // Update formData when any setting changes
   useEffect(() => {
     syncSettingsToFormData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientId, clientSecret]);
 
   const handleConnect = async () => {
@@ -715,6 +715,12 @@ interface FormFieldConfig {
    * Absent is treated as "all" for backward compatibility.
    */
   applies_to?: "all" | "lead";
+  /**
+   * Phone (tel) fields only: show the international country-code selector
+   * (flag + dial code) on the input. Absent is treated as `true` (on) for
+   * backward compatibility, so existing forms keep the widget without a re-save.
+   */
+  show_country_code?: boolean;
 }
 
 interface FormSectionConfig {
@@ -1436,6 +1442,10 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
       ...(activeFormTab === "traveler_form"
         ? { applies_to: newField.applies_to || "all" }
         : {}),
+      // Phone fields carry the country-code toggle (default on).
+      ...(newField.type === "tel"
+        ? { show_country_code: newField.show_country_code !== false }
+        : {}),
     };
 
     // Add options if field type is select
@@ -1855,6 +1865,22 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                       {__("Required", "yatra")}
                     </label>
                   )}
+                  {newField.type === "tel" && (
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={newField.show_country_code !== false}
+                        onChange={(e) =>
+                          setNewField((prev) => ({
+                            ...prev,
+                            show_country_code: e.target.checked,
+                          }))
+                        }
+                        className="w-4 h-4 rounded border-gray-300 text-blue-600"
+                      />
+                      {__("Show country code", "yatra")}
+                    </label>
+                  )}
                   <div className="flex-1"></div>
                   <Button
                     variant="ghost"
@@ -2026,6 +2052,27 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                                 ))}
                               </Select>
                             )}
+                            {field.type === "tel" && (
+                              <label
+                                className="flex items-center gap-2 text-sm whitespace-nowrap px-1"
+                                title={__(
+                                  "Show the international country flag + dial code selector on this phone field",
+                                  "yatra",
+                                )}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={field.show_country_code !== false}
+                                  onChange={(e) =>
+                                    updateField(field.id, {
+                                      show_country_code: e.target.checked,
+                                    })
+                                  }
+                                  className="w-4 h-4 rounded border-gray-300 text-blue-600"
+                                />
+                                {__("Show country code", "yatra")}
+                              </label>
+                            )}
                           </div>
 
                           {/* Content editor for text blocks (display-only) */}
@@ -2096,7 +2143,9 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                                 onKeyDown={(e) => {
                                   if (e.key === "Enter") {
                                     e.preventDefault();
-                                    (e.currentTarget as HTMLInputElement).blur();
+                                    (
+                                      e.currentTarget as HTMLInputElement
+                                    ).blur();
                                   }
                                 }}
                                 placeholder="field_id"
@@ -2235,7 +2284,10 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({
                           </span>
                           {field.type === "text_block" && field.content && (
                             <span className="text-xs text-gray-500 dark:text-gray-400 italic truncate max-w-[16rem]">
-                              "{field.content.replace(/<[^>]*>/g, "").slice(0, 60)}
+                              "
+                              {field.content
+                                .replace(/<[^>]*>/g, "")
+                                .slice(0, 60)}
                               "
                             </span>
                           )}
@@ -3464,7 +3516,7 @@ const Settings: React.FC = () => {
       setFormData(defaultSettings);
       isInitializedRef.current = true;
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings, isLoading]);
 
   // Fetch SEO image URL when image ID changes with performance optimization
@@ -5105,6 +5157,115 @@ const Settings: React.FC = () => {
                                       }
                                     }
 
+                                    // Read-only webhook endpoint URL for THIS
+                                    // site, with a copy button + setup steps.
+                                    // The operator pastes this into the gateway
+                                    // dashboard; it is display-only (never saved).
+                                    if (field.type === "webhook_url") {
+                                      const webhookUrl = String(
+                                        field.default || config[field.id] || "",
+                                      );
+                                      const stripeSetupUrl =
+                                        formData.payment_test_mode
+                                          ? field.help_url_test ||
+                                            field.help_url_live
+                                          : field.help_url_live ||
+                                            field.help_url_test;
+                                      return (
+                                        <FormField
+                                          key={field.id}
+                                          id={`${gatewayId}_${field.id}`}
+                                          label={field.label}
+                                        >
+                                          <div className="flex gap-2">
+                                            <Input
+                                              readOnly
+                                              value={webhookUrl}
+                                              onFocus={(e) =>
+                                                e.currentTarget.select()
+                                              }
+                                              className="font-mono text-xs"
+                                            />
+                                            <Button
+                                              type="button"
+                                              variant="outline"
+                                              size="sm"
+                                              onClick={(e) => {
+                                                const btn = e.currentTarget;
+                                                const input =
+                                                  btn.parentElement?.querySelector(
+                                                    "input",
+                                                  );
+                                                let copied = false;
+                                                // execCommand path works even on
+                                                // non-HTTPS admin origins where the
+                                                // async Clipboard API is unavailable.
+                                                try {
+                                                  if (input) {
+                                                    input.focus();
+                                                    input.select();
+                                                    input.setSelectionRange(
+                                                      0,
+                                                      webhookUrl.length,
+                                                    );
+                                                    copied =
+                                                      document.execCommand(
+                                                        "copy",
+                                                      );
+                                                  }
+                                                } catch {
+                                                  /* ignore */
+                                                }
+                                                if (
+                                                  navigator.clipboard?.writeText
+                                                ) {
+                                                  navigator.clipboard
+                                                    .writeText(webhookUrl)
+                                                    .catch(() => {});
+                                                  copied = true;
+                                                }
+                                                const orig = __(
+                                                  "Copy",
+                                                  "yatra",
+                                                );
+                                                btn.textContent = copied
+                                                  ? __("Copied!", "yatra")
+                                                  : __(
+                                                      "Select & copy",
+                                                      "yatra",
+                                                    );
+                                                window.setTimeout(() => {
+                                                  btn.textContent = orig;
+                                                }, 1500);
+                                              }}
+                                            >
+                                              {__("Copy", "yatra")}
+                                            </Button>
+                                          </div>
+                                          {field.description && (
+                                            <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                                              {field.description}
+                                            </p>
+                                          )}
+                                          {stripeSetupUrl && (
+                                            <a
+                                              href={stripeSetupUrl}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="mt-1.5 inline-block text-xs font-medium text-blue-600 dark:text-blue-400 border-b border-blue-600 dark:border-blue-400 hover:border-transparent"
+                                            >
+                                              {field.help_text ||
+                                                __(
+                                                  "Open Stripe → Webhooks",
+                                                  "yatra",
+                                                )}{" "}
+                                              →
+                                            </a>
+                                          )}
+                                        </FormField>
+                                      );
+                                    }
+
                                     // Render checkbox fields differently
                                     if (field.type === "checkbox") {
                                       return (
@@ -5394,7 +5555,10 @@ const Settings: React.FC = () => {
                                         config[field.id] ?? field.default ?? "",
                                       );
                                       return (
-                                        <div key={field.id} className="space-y-2">
+                                        <div
+                                          key={field.id}
+                                          className="space-y-2"
+                                        >
                                           <FormField
                                             id={`${gatewayId}_${field.id}`}
                                             label={field.label}

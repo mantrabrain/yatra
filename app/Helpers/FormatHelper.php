@@ -341,6 +341,244 @@ class FormatHelper
     }
 
     /**
+     * International dialing codes, keyed by ISO-3166-1 alpha-2 (digits only,
+     * no leading "+"). Aligned to the {@see countryNames()} set. Multiple
+     * countries legitimately share a code (all NANP countries use "1", RU/KZ
+     * use "7", GB/GG/IM/JE use "44") — {@see dialingCodePriority()} resolves
+     * which one an incoming "+code" auto-selects.
+     *
+     * @return array<string, string> [ISO code => dialing code]
+     */
+    private static function dialingCodes(): array
+    {
+        return [
+            'AF' => '93', 'AL' => '355', 'DZ' => '213', 'AD' => '376', 'AO' => '244', 'AI' => '1', 'AQ' => '672',
+            'AG' => '1', 'AR' => '54', 'AM' => '374', 'AW' => '297', 'AU' => '61', 'AT' => '43', 'AZ' => '994',
+            'BS' => '1', 'BH' => '973', 'BD' => '880', 'BB' => '1', 'BY' => '375', 'BE' => '32', 'BZ' => '501',
+            'BJ' => '229', 'BM' => '1', 'BT' => '975', 'BO' => '591', 'BQ' => '599', 'BA' => '387', 'BW' => '267',
+            'BR' => '55', 'IO' => '246', 'BN' => '673', 'BG' => '359', 'BF' => '226', 'BI' => '257', 'KH' => '855',
+            'CM' => '237', 'CA' => '1', 'CV' => '238', 'KY' => '1', 'CF' => '236', 'TD' => '235', 'CL' => '56',
+            'CN' => '86', 'CO' => '57', 'KM' => '269', 'CG' => '242', 'CD' => '243', 'CK' => '682', 'CR' => '506',
+            'CI' => '225', 'HR' => '385', 'CU' => '53', 'CW' => '599', 'CY' => '357', 'CZ' => '420', 'DK' => '45',
+            'DJ' => '253', 'DM' => '1', 'DO' => '1', 'EC' => '593', 'EG' => '20', 'SV' => '503', 'GQ' => '240',
+            'ER' => '291', 'EE' => '372', 'SZ' => '268', 'ET' => '251', 'FK' => '500', 'FO' => '298', 'FJ' => '679',
+            'FI' => '358', 'FR' => '33', 'GF' => '594', 'PF' => '689', 'GA' => '241', 'GM' => '220', 'GE' => '995',
+            'DE' => '49', 'GH' => '233', 'GI' => '350', 'GR' => '30', 'GL' => '299', 'GD' => '1', 'GP' => '590',
+            'GU' => '1', 'GT' => '502', 'GG' => '44', 'GN' => '224', 'GW' => '245', 'GY' => '592', 'HT' => '509',
+            'HN' => '504', 'HK' => '852', 'HU' => '36', 'IS' => '354', 'IN' => '91', 'ID' => '62', 'IR' => '98',
+            'IQ' => '964', 'IE' => '353', 'IM' => '44', 'IL' => '972', 'IT' => '39', 'JM' => '1', 'JP' => '81',
+            'JE' => '44', 'JO' => '962', 'KZ' => '7', 'KE' => '254', 'KI' => '686', 'KP' => '850', 'KR' => '82',
+            'KW' => '965', 'KG' => '996', 'LA' => '856', 'LV' => '371', 'LB' => '961', 'LS' => '266', 'LR' => '231',
+            'LY' => '218', 'LI' => '423', 'LT' => '370', 'LU' => '352', 'MO' => '853', 'MK' => '389', 'MG' => '261',
+            'MW' => '265', 'MY' => '60', 'MV' => '960', 'ML' => '223', 'MT' => '356', 'MH' => '692', 'MQ' => '596',
+            'MR' => '222', 'MU' => '230', 'YT' => '262', 'MX' => '52', 'FM' => '691', 'MD' => '373', 'MC' => '377',
+            'MN' => '976', 'ME' => '382', 'MS' => '1', 'MA' => '212', 'MZ' => '258', 'MM' => '95', 'NA' => '264',
+            'NR' => '674', 'NP' => '977', 'NL' => '31', 'NC' => '687', 'NZ' => '64', 'NI' => '505', 'NE' => '227',
+            'NG' => '234', 'NU' => '683', 'NF' => '672', 'MP' => '1', 'NO' => '47', 'OM' => '968', 'PK' => '92',
+            'PW' => '680', 'PS' => '970', 'PA' => '507', 'PG' => '675', 'PY' => '595', 'PE' => '51', 'PH' => '63',
+            'PN' => '64', 'PL' => '48', 'PT' => '351', 'PR' => '1', 'QA' => '974', 'RE' => '262', 'RO' => '40',
+            'RU' => '7', 'RW' => '250', 'BL' => '590', 'SH' => '290', 'KN' => '1', 'LC' => '1', 'MF' => '590',
+            'PM' => '508', 'VC' => '1', 'WS' => '685', 'SM' => '378', 'ST' => '239', 'SA' => '966', 'SN' => '221',
+            'RS' => '381', 'SC' => '248', 'SL' => '232', 'SG' => '65', 'SX' => '1', 'SK' => '421', 'SI' => '386',
+            'SB' => '677', 'SO' => '252', 'ZA' => '27', 'GS' => '500', 'SS' => '211', 'ES' => '34', 'LK' => '94',
+            'SD' => '249', 'SR' => '597', 'SJ' => '47', 'SE' => '46', 'CH' => '41', 'SY' => '963', 'TW' => '886',
+            'TJ' => '992', 'TZ' => '255', 'TH' => '66', 'TL' => '670', 'TG' => '228', 'TK' => '690', 'TO' => '676',
+            'TT' => '1', 'TN' => '216', 'TR' => '90', 'TM' => '993', 'TC' => '1', 'TV' => '688', 'UG' => '256',
+            'UA' => '380', 'AE' => '971', 'GB' => '44', 'US' => '1', 'UY' => '598', 'UZ' => '998', 'VU' => '678',
+            'VA' => '39', 'VE' => '58', 'VN' => '84', 'VG' => '1', 'VI' => '1', 'WF' => '681', 'EH' => '212',
+            'YE' => '967', 'ZM' => '260', 'ZW' => '263', 'XK' => '383', 'AS' => '1', 'AX' => '358',
+            'UM' => '1', 'CX' => '61', 'CC' => '61', 'TA' => '290',
+        ];
+    }
+
+    /**
+     * Preferred country for a dialing code that several countries share. When
+     * an operator types a raw "+<code><number>" we must pick one country to
+     * auto-select; this is the conventional primary (e.g. "1" => US, not one of
+     * the ~20 other NANP countries). Codes not listed here fall back to the
+     * first ISO that declares them.
+     *
+     * @return array<string, string> [dialing code => primary ISO]
+     */
+    private static function dialingCodePriority(): array
+    {
+        return [
+            '1' => 'US', '7' => 'RU', '39' => 'IT', '44' => 'GB', '47' => 'NO', '61' => 'AU',
+            '212' => 'MA', '262' => 'RE', '290' => 'SH', '358' => 'FI', '500' => 'FK',
+            '590' => 'GP', '599' => 'CW', '64' => 'NZ', '672' => 'AQ',
+        ];
+    }
+
+    /**
+     * Preferred ISO per shared dialing code (dial => ISO), for the front-end
+     * detector to resolve which country a "+code" auto-selects. Mirrors the
+     * server-side {@see dialingCodePriority()}.
+     *
+     * @return array<string, string>
+     */
+    public static function getPhonePriority(): array
+    {
+        return self::dialingCodePriority();
+    }
+
+    /**
+     * Dialing code (digits only, no "+") for one ISO code, or '' if unknown.
+     */
+    public static function getDialingCode(string $iso): string
+    {
+        $codes = self::dialingCodes();
+        return $codes[strtoupper($iso)] ?? '';
+    }
+
+    /**
+     * Country list for the phone-number field: ISO code, display name and
+     * dialing code, sorted by display name. Filterable via
+     * `yatra_phone_countries` (e.g. to pin popular countries to the top).
+     *
+     * @return array<int, array{iso:string, name:string, dial:string}>
+     */
+    public static function getPhoneCountries(): array
+    {
+        $names = self::getCountries();      // [iso => name], already sorted/filtered
+        $dial  = self::dialingCodes();
+        $out   = [];
+        foreach ($names as $iso => $name) {
+            $iso = strtoupper((string) $iso);
+            if (!isset($dial[$iso]) || $dial[$iso] === '') {
+                continue;
+            }
+            $out[] = ['iso' => $iso, 'name' => (string) $name, 'dial' => $dial[$iso]];
+        }
+        if (\function_exists('apply_filters')) {
+            $filtered = apply_filters('yatra_phone_countries', $out);
+            if (\is_array($filtered) && $filtered !== []) {
+                return $filtered;
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Detect the country/dialing-code from a raw phone value. Only a value that
+     * begins with "+" is treated as international; anything else returns null so
+     * an existing bare national number is left untouched (backward compatible).
+     *
+     * Uses longest-prefix matching so "+9779806015400" → NP (977), not a shorter
+     * false match, then applies {@see dialingCodePriority()} for shared codes.
+     *
+     * @return array{iso:string, dial:string, national:string}|null
+     */
+    public static function detectPhoneCountry(string $raw): ?array
+    {
+        $raw = trim($raw);
+        if ($raw === '' || $raw[0] !== '+') {
+            return null;
+        }
+        $digits = preg_replace('/\D+/', '', $raw);
+        if ($digits === '' || $digits === null) {
+            return null;
+        }
+        $codes    = self::dialingCodes();
+        $priority = self::dialingCodePriority();
+        $maxLen   = min(4, strlen($digits));
+        for ($len = $maxLen; $len >= 1; $len--) {
+            $prefix  = substr($digits, 0, $len);
+            $matches = array_keys($codes, $prefix, true);
+            if ($matches === []) {
+                continue;
+            }
+            $iso = $priority[$prefix] ?? (string) $matches[0];
+            return [
+                'iso'      => $iso,
+                'dial'     => $prefix,
+                'national' => substr($digits, $len),
+            ];
+        }
+        return null;
+    }
+
+    /**
+     * Default country pre-selected in the phone field. Priority: the
+     * `default_phone_country` setting → the site locale suffix (en_US → US,
+     * ne_NP → NP) → "US". Filterable via `yatra_default_phone_country`.
+     */
+    public static function getDefaultPhoneCountry(): string
+    {
+        $codes   = self::dialingCodes();
+        $default = '';
+
+        if (\class_exists(SettingsService::class)) {
+            $setting = strtoupper((string) SettingsService::getString('default_phone_country', ''));
+            if ($setting !== '' && isset($codes[$setting])) {
+                $default = $setting;
+            }
+        }
+        if ($default === '' && \function_exists('get_locale')) {
+            if (preg_match('/_([A-Z]{2})$/', (string) get_locale(), $m) && isset($codes[$m[1]])) {
+                $default = $m[1];
+            }
+        }
+        if ($default === '') {
+            $default = 'US';
+        }
+        if (\function_exists('apply_filters')) {
+            $default = (string) apply_filters('yatra_default_phone_country', $default);
+        }
+        return isset($codes[$default]) ? $default : 'US';
+    }
+
+    /**
+     * Combine a national number with a country (ISO) into the stored value.
+     *
+     * - Empty number → '' (nothing to store).
+     * - Already-international ("+...") → returned unchanged (a pasted full number
+     *   or the no-JS fallback where the customer typed the "+code" themselves).
+     * - National number + known ISO → "+<dial><digits>" (spaces/dashes stripped).
+     * - No/unknown ISO → the number left as typed (legacy behavior, backward
+     *   compatible — nothing is invented).
+     */
+    public static function combineInternationalPhone(string $number, string $iso): string
+    {
+        $number = trim($number);
+        if ($number === '') {
+            return '';
+        }
+        if ($number[0] === '+') {
+            return $number;
+        }
+        $iso  = strtoupper(trim($iso));
+        $dial = $iso !== '' ? self::getDialingCode($iso) : '';
+        if ($dial === '') {
+            return $number;
+        }
+        $digits = preg_replace('/\D+/', '', $number);
+        if ($digits === '' || $digits === null) {
+            return $number;
+        }
+        return '+' . $dial . $digits;
+    }
+
+    /**
+     * Format a stored phone value for human display. A value saved with a
+     * country code ("+9779806015400") is shown as "+977 9806015400"; a legacy
+     * bare value is returned unchanged (never corrupted). Optionally accepts a
+     * known ISO to disambiguate shared codes.
+     */
+    public static function formatPhoneForDisplay(string $stored, string $iso = ''): string
+    {
+        $stored = trim($stored);
+        if ($stored === '') {
+            return '';
+        }
+        $detected = self::detectPhoneCountry($stored);
+        if ($detected === null) {
+            return $stored; // legacy / national-only value — leave as-is
+        }
+        $national = $detected['national'] !== '' ? ' ' . $detected['national'] : '';
+        return '+' . $detected['dial'] . $national;
+    }
+
+    /**
      * Format phone number for display
      * 
      * @param string $phone Phone number

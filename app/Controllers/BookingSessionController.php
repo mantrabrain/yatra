@@ -1357,6 +1357,15 @@ class BookingSessionController extends BaseController
         // Get contact email - handle both flat and nested formats
         $contact_email = trim((string) ($data['contact_email'] ?? ''));
         $contact_phone = $data['contact_phone'] ?? '';
+        // International phone widget: fold the chosen country (companion
+        // *_country field carrying the ISO) into the number as "+<dial><digits>".
+        // A no-op for legacy submissions with no companion field, an already
+        // "+"-prefixed value, or an unknown ISO — so existing data is never
+        // altered and nothing is invented.
+        $contact_phone = \Yatra\Helpers\FormatHelper::combineInternationalPhone(
+            (string) $contact_phone,
+            (string) ($data['contact_phone_country'] ?? '')
+        );
         $contact_first_name = $data['contact_first_name'] ?? '';
         $contact_last_name = $data['contact_last_name'] ?? '';
         $contact_country = $data['contact_country'] ?? '';
@@ -1366,7 +1375,10 @@ class BookingSessionController extends BaseController
 
         // Emergency contact
         $emergency_name = $data['emergency_name'] ?? '';
-        $emergency_phone = $data['emergency_phone'] ?? '';
+        $emergency_phone = \Yatra\Helpers\FormatHelper::combineInternationalPhone(
+            (string) ($data['emergency_phone'] ?? ''),
+            (string) ($data['emergency_phone_country'] ?? '')
+        );
         $emergency_relationship = $data['emergency_relationship'] ?? '';
 
         // Travel details
@@ -1770,9 +1782,26 @@ class BookingSessionController extends BaseController
         foreach ($data as $field_key => $field_value) {
             if (is_string($field_key) && strpos($field_key, 'contact_') === 0 && is_scalar($field_value)) {
                 $field_id = substr($field_key, strlen('contact_'));
-                if ($field_id !== '' && $field_id !== 'data' && !isset($contact_data[$field_id])) {
-                    $contact_data[$field_id] = sanitize_text_field((string) $field_value);
+                if ($field_id === '' || $field_id === 'data') {
+                    continue;
                 }
+                // A phone widget's `<field>_country` companion is folded into the
+                // phone value below, not stored as its own field.
+                if (substr($field_id, -8) === '_country' && isset($data[substr($field_key, 0, -8)])) {
+                    continue;
+                }
+                if (isset($contact_data[$field_id])) {
+                    continue;
+                }
+                $field_string = (string) $field_value;
+                // Custom phone field: combine national number + country companion.
+                if (isset($data[$field_key . '_country'])) {
+                    $field_string = \Yatra\Helpers\FormatHelper::combineInternationalPhone(
+                        $field_string,
+                        (string) $data[$field_key . '_country']
+                    );
+                }
+                $contact_data[$field_id] = sanitize_text_field($field_string);
             }
         }
 
@@ -1786,9 +1815,23 @@ class BookingSessionController extends BaseController
         foreach ($data as $field_key => $field_value) {
             if (is_string($field_key) && strpos($field_key, 'emergency_') === 0 && is_scalar($field_value)) {
                 $field_id = substr($field_key, strlen('emergency_'));
-                if ($field_id !== '' && $field_id !== 'contact' && !isset($emergency_data[$field_id])) {
-                    $emergency_data[$field_id] = sanitize_text_field((string) $field_value);
+                if ($field_id === '' || $field_id === 'contact') {
+                    continue;
                 }
+                if (substr($field_id, -8) === '_country' && isset($data[substr($field_key, 0, -8)])) {
+                    continue;
+                }
+                if (isset($emergency_data[$field_id])) {
+                    continue;
+                }
+                $field_string = (string) $field_value;
+                if (isset($data[$field_key . '_country'])) {
+                    $field_string = \Yatra\Helpers\FormatHelper::combineInternationalPhone(
+                        $field_string,
+                        (string) $data[$field_key . '_country']
+                    );
+                }
+                $emergency_data[$field_id] = sanitize_text_field($field_string);
             }
         }
         
@@ -1799,12 +1842,28 @@ class BookingSessionController extends BaseController
                 $sanitized_traveler = [];
                 foreach ($traveler as $key => $value) {
                     $sk = sanitize_key((string) $key);
+                    // Skip a phone widget's `<field>_country` companion; it is
+                    // folded into the phone value in the pass below.
+                    if (substr($sk, -8) === '_country' && isset($traveler[substr((string) $key, 0, -8)])) {
+                        continue;
+                    }
                     if (is_array($value)) {
                         $sanitized_traveler[$sk] = array_map(static function ($v) {
                             return sanitize_text_field(is_scalar($v) ? (string) $v : '');
                         }, $value);
                     } else {
                         $sanitized_traveler[$sk] = sanitize_text_field((string) $value);
+                    }
+                }
+                // Combine each phone field with its country companion (national
+                // number + dial code → "+<dial><digits>").
+                foreach (array_keys($sanitized_traveler) as $tk) {
+                    $companion = $tk . '_country';
+                    if (isset($traveler[$companion]) && is_string($sanitized_traveler[$tk])) {
+                        $sanitized_traveler[$tk] = \Yatra\Helpers\FormatHelper::combineInternationalPhone(
+                            (string) $sanitized_traveler[$tk],
+                            (string) $traveler[$companion]
+                        );
                     }
                 }
                 $sanitized_travelers[] = $sanitized_traveler;
@@ -3540,6 +3599,26 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
                     (int) $verifiedBooking->id,
                     $verifiedBooking
                 );
+            }
+
+            // Guest email-verification defers the customer booking-confirmation
+            // email: the checkout flow returns at the verification gate, before
+            // its send-site (~line 2465), so the confirmation is never sent for a
+            // verified guest booking. Send it now that the email is proven and the
+            // booking is live — gated by the same `booking_confirmation` option the
+            // checkout paths use. Only in this fresh-verify branch, so a re-clicked
+            // link never re-sends. TYPE_BOOKING_CONFIRMATION is skipped by the Pro
+            // booking.created fan-out, so this is the single source of the email.
+            if ((bool) \Yatra\Services\SettingsService::get('booking_confirmation', true)) {
+                try {
+                    (new \Yatra\Services\BookingService())->sendNewBookingTransactionalConfirmation((int) $booking->id);
+                } catch (\Throwable $e) {
+                    // A mail failure must never break the customer's "verified" page.
+                    Logger::error('Post-verification booking confirmation email failed', [
+                        'booking_id' => (int) $booking->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
             }
         }
 

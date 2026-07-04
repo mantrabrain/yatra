@@ -435,6 +435,14 @@ class AdminAssetsProvider
                 // Localize script data
                 wp_localize_script('yatra-admin', 'yatraAdmin', $localized_data);
 
+                // Phone dataset for admin displays (flag + dial-code detection of
+                // stored "+<code><number>" values in booking details).
+                wp_localize_script('yatra-admin', 'yatraPhoneData', [
+                    'countries' => \Yatra\Helpers\FormatHelper::getPhoneCountries(),
+                    'priority'  => \Yatra\Helpers\FormatHelper::getPhonePriority(),
+                    'flagBase'  => YATRA_PLUGIN_URL . 'assets/img/flags/',
+                ]);
+
                 // Start fetching the ES module as early as possible (helps shorten white/splash time before React runs)
                 $app_js_url = YATRA_PLUGIN_URL . 'assets/admin/dist/js/app.js';
                 add_action('admin_head', static function () use ($app_js_url, $jsVersion): void {

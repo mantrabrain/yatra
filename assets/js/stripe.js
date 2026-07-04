@@ -236,7 +236,14 @@ class YatraStripe {
         container.style.display = stripePreselected ? 'block' : 'none';
 
         this.methodSwitcher = this.createMethodSwitcher();
-        container.appendChild(this.methodSwitcher);
+        // Show the "Payment methods" chooser only when there's an actual choice
+        // (Card + Apple/Google Pay). With Card as the only enabled method the
+        // chooser is redundant chrome, so present the card field directly.
+        if (this.hasMultipleMethods) {
+            container.appendChild(this.methodSwitcher);
+        } else {
+            container.classList.add('yatra-stripe-container--single-method');
+        }
 
         if (this.supportsPaymentRequest) {
             const requestWrapper = document.createElement('div');
@@ -637,6 +644,11 @@ class YatraStripe {
                 icon: this.getMethodIconMarkup('apple_pay')
             });
         }
+
+        // Only a real choice (Card + a wallet) warrants the chooser. With Card
+        // as the only enabled method, the render step drops this switcher and
+        // shows the card field on its own (no redundant "Payment methods" row).
+        this.hasMultipleMethods = availableButtons.length > 1;
 
         const buttons = document.createElement('div');
         buttons.className = 'yatra-method-switcher__buttons';

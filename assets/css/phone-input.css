@@ -1,0 +1,181 @@
+/**
+ * Yatra international phone input (paired with assets/js/phone-input.js and the
+ * markup from yatra_render_form_field). Left: country selector (flag + dial
+ * code). Right: national number. Dropdown: sticky search + scrollable list.
+ */
+
+.yatra-phone-field {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  overflow: visible;
+}
+
+.yatra-phone-field:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+/* Left: country button */
+.yatra-phone-country {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  margin: 0;
+  border: 0;
+  border-right: 1px solid #e5e7eb;
+  border-radius: 8px 0 0 8px;
+  background: #f9fafb;
+  cursor: pointer;
+  font: inherit;
+  color: #111827;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.yatra-phone-country:hover {
+  background: #f3f4f6;
+}
+
+.yatra-phone-flag {
+  display: block;
+  width: 22px;
+  height: 16px;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  flex: 0 0 auto;
+}
+
+.yatra-phone-dial {
+  font-size: 14px;
+  color: #374151;
+}
+
+.yatra-phone-caret {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #6b7280;
+  transition: transform 0.15s ease;
+}
+
+.yatra-phone-field.is-open .yatra-phone-caret {
+  transform: rotate(180deg);
+}
+
+/* Right: number input — flatten the native field so the wrapper is the control */
+.yatra-phone-field .yatra-phone-number {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent;
+  padding: 10px 12px;
+  font: inherit;
+  border-radius: 0 8px 8px 0;
+  margin: 0;
+  width: auto;
+}
+
+/* Dropdown panel */
+.yatra-phone-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: none;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  max-height: 280px;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.yatra-phone-field.is-open .yatra-phone-dropdown {
+  display: flex;
+}
+
+.yatra-phone-search-wrap {
+  padding: 8px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fff;
+}
+
+.yatra-phone-search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font: inherit;
+  outline: none;
+}
+
+.yatra-phone-search:focus {
+  border-color: #2563eb;
+}
+
+.yatra-phone-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  overflow-y: auto;
+  max-height: 220px;
+}
+
+.yatra-phone-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #111827;
+}
+
+.yatra-phone-option:hover,
+.yatra-phone-option.is-active {
+  background: #eff6ff;
+}
+
+.yatra-phone-option-name {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.yatra-phone-option-dial {
+  color: #6b7280;
+  font-size: 13px;
+  flex: 0 0 auto;
+}
+
+.yatra-phone-empty {
+  padding: 12px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 13px;
+  list-style: none;
+}
+
+/* Dark-mode friendliness when a theme opts in */
+@media (prefers-color-scheme: dark) {
+  .yatra-phone-field.yatra-phone-dark,
+  .yatra-phone-dark .yatra-phone-dropdown {
+    background: #1f2937;
+    border-color: #374151;
+    color: #f3f4f6;
+  }
+}
