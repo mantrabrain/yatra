@@ -2282,25 +2282,52 @@ class BookingSessionController extends BaseController
                 . esc_html__('This link expires in 48 hours.', 'yatra')
                 . '</strong>';
 
-            // Guest-checkout verification keeps its OWN transactional type on
-            // purpose. This email MUST carry the verification link (a guest
-            // can't complete the booking without it), so it must not depend on
-            // the *customer* verification template's content — an operator can
-            // (and on real sites does) customise that template and drop the
-            // {{verification_link}} tag, which would silently break guest
-            // checkout. TYPE_GUEST resolves to the deletable guest DB template
-            // when present, otherwise to the built-in default — both of which
-            // always include the link and the booking-specific subject. The
-            // booking copy is injected above via intro_paragraph / footer_note
-            // / expiry merge vars. (The redundant guest *system* template is
-            // demoted to a deletable user template by the Pro module, and is
-            // no longer seeded on new installs — guest verification then falls
-            // back to the built-in default, which still carries the link.)
-            \Yatra\Services\TransactionalEmailTemplateService::sendIfEnabled(
+            // Guest-checkout verification prefers the operator's CONFIGURED
+            // customer verification template so their customisation is honoured
+            // (the guest system template was consolidated away — using the guest
+            // type always fell back to the built-in default and ignored the
+            // configured one). This email MUST still carry the verification link
+            // — a guest can't complete the booking without it — so we only fall
+            // back to the built-in GUEST default when the effective customer
+            // template would omit {{verification_link}} (an operator can, and on
+            // real sites does, customise that template and drop the tag). The
+            // check respects Pro-owned DB templates too. Booking copy is injected
+            // above via intro_paragraph / footer_note / expiry merge vars.
+            //
+            // Keep the booking-specific SUBJECT line ("Verify your email to
+            // complete your booking") that guests saw before the guest template
+            // was consolidated away — reusing the customer template body must not
+            // drag along the account-oriented "Verify your email address"
+            // subject. This is honoured additively by the renderer / Pro sender
+            // via the reserved `_subject_override` var, so only this guest send
+            // is affected. Computed before it is stored, so the render below
+            // resolves the clean guest subject (no self-reference).
+            $email_vars['_subject_override'] = \Yatra\Services\TransactionalEmailTemplateService::render(
                 \Yatra\Services\TransactionalEmailTemplateService::TYPE_GUEST_EMAIL_VERIFICATION,
-                (string) $contact_data['email'],
                 $email_vars
-            );
+            )['subject'];
+            $verificationEmailSent = false;
+            if (\Yatra\Services\TransactionalEmailTemplateService::templateRendersVerificationLink(
+                \Yatra\Services\TransactionalEmailTemplateService::TYPE_CUSTOMER_EMAIL_VERIFICATION
+            )) {
+                $verificationEmailSent = \Yatra\Services\TransactionalEmailTemplateService::sendIfEnabled(
+                    \Yatra\Services\TransactionalEmailTemplateService::TYPE_CUSTOMER_EMAIL_VERIFICATION,
+                    (string) $contact_data['email'],
+                    $email_vars
+                );
+            }
+            // Guarantee a verification email even if the customer template would
+            // drop the link OR its per-type toggle is disabled — a guest can't
+            // complete checkout without it. The built-in GUEST default always
+            // carries the link. sendIfEnabled() returns whether it actually sent,
+            // so this only fires when the preferred send did not (no double send).
+            if (!$verificationEmailSent) {
+                \Yatra\Services\TransactionalEmailTemplateService::sendIfEnabled(
+                    \Yatra\Services\TransactionalEmailTemplateService::TYPE_GUEST_EMAIL_VERIFICATION,
+                    (string) $contact_data['email'],
+                    $email_vars
+                );
+            }
 
             return new WP_REST_Response([
                 'success' => true,

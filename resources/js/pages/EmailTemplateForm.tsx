@@ -186,8 +186,14 @@ const EmailTemplateForm: React.FC = () => {
     queryFn: fetchEmailTemplateEvents,
     enabled: !isCoreSettingsEdit && isEmailAutomationModuleEnabled(),
   });
+  // Prefer the live fetch, but only when it actually returned events — an empty
+  // array (transient error / not-yet-loaded edge) must NOT wipe out the working
+  // localize snapshot, or the "Trigger Event" dropdown ends up empty. `??` alone
+  // would keep an empty [] because [] is not nullish.
   const events =
-    fetchedEvents ?? ((window as any).yatraAdmin?.emailEvents || []);
+    Array.isArray(fetchedEvents) && fetchedEvents.length > 0
+      ? fetchedEvents
+      : (window as any).yatraAdmin?.emailEvents || [];
 
   useEffect(() => {
     if (!templateData || typeof templateData !== "object") return;

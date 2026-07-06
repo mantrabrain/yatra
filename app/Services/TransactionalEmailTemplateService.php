@@ -155,6 +155,21 @@ class TransactionalEmailTemplateService
             $subject = self::parseTemplate($subjectTpl, $variables);
         }
 
+        // Backward-compatible subject override. A caller may preserve a
+        // context-specific subject line while still reusing another type's
+        // body — e.g. guest checkout keeps its booking-specific "Verify your
+        // email to complete your booking" line even though the body now comes
+        // from the operator's customer verification template. Only applied when
+        // the reserved key is explicitly supplied and non-empty; every existing
+        // caller (which never sets it) is completely unaffected. The value is a
+        // pre-rendered final string, so it is used verbatim (no re-parsing).
+        if (isset($variables['_subject_override'])
+            && is_string($variables['_subject_override'])
+            && $variables['_subject_override'] !== ''
+        ) {
+            $subject = $variables['_subject_override'];
+        }
+
         if ($bodyTpl === '') {
             $body = self::defaultBody($type, $variables);
         } else {
@@ -383,6 +398,36 @@ class TransactionalEmailTemplateService
         $bodyTpl = SettingsService::getString($bodyKey, '');
 
         return self::renderWithStringTemplates($type, $subjectTpl, $bodyTpl, $variables);
+    }
+
+    /**
+     * Would the template that actually gets sent for $type render the
+     * verification link ({{verification_link}})? Guest checkout can't complete
+     * without it, so the checkout controller uses this to decide whether an
+     * operator's customised verification template is safe to use, or whether to
+     * fall back to the built-in default. Respects Pro ownership: a Pro DB
+     * template reports its raw body via `yatra_transactional_email_effective_body`;
+     * otherwise the core option body is checked, and an empty option means the
+     * built-in default (which always includes the link) is used.
+     */
+    public static function templateRendersVerificationLink(string $type): bool
+    {
+        $effective = apply_filters('yatra_transactional_email_effective_body', null, $type);
+        if (is_string($effective) && $effective !== '') {
+            return strpos($effective, 'verification_link') !== false;
+        }
+
+        $map = self::typeToSettingsKeys();
+        if (!isset($map[$type])) {
+            return false;
+        }
+
+        $body = SettingsService::getString($map[$type]['body'], '');
+        if (trim($body) === '') {
+            return true; // no custom body → built-in default is used, which always carries the link
+        }
+
+        return strpos($body, 'verification_link') !== false;
     }
 
     /**

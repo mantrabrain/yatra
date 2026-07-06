@@ -73106,7 +73106,7 @@ const EmailTemplateForm = () => {
     queryFn: fetchEmailTemplateEvents,
     enabled: !isCoreSettingsEdit && isEmailAutomationModuleEnabled()
   });
-  const events = fetchedEvents ?? (((_a = window.yatraAdmin) == null ? void 0 : _a.emailEvents) || []);
+  const events = Array.isArray(fetchedEvents) && fetchedEvents.length > 0 ? fetchedEvents : ((_a = window.yatraAdmin) == null ? void 0 : _a.emailEvents) || [];
   reactExports.useEffect(() => {
     if (!templateData || typeof templateData !== "object") return;
     const t = templateData;
