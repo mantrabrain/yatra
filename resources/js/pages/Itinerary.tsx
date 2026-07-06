@@ -675,7 +675,7 @@ const Itinerary: React.FC = () => {
         setExpandedDays(new Set([`${firstDay.trip_id}-${firstDay.day}`]));
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, dayParam, tripIdParam]);
 
   // Bulk delete mutation
@@ -704,10 +704,7 @@ const Itinerary: React.FC = () => {
                 deleted,
                 failed,
               )
-            : sprintf(
-                __("%d item(s) deleted successfully.", "yatra"),
-                deleted,
-              ),
+            : sprintf(__("%d item(s) deleted successfully.", "yatra"), deleted),
           "success",
         );
       } else {
@@ -1476,7 +1473,7 @@ const Itinerary: React.FC = () => {
     return groupsWithFilteredEntries.filter((dg) =>
       matchesStatusFilterForDay(dg, statusFilter),
     );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dayGroups, statusFilter]);
 
   const totalEntries = filteredDayGroups.reduce(

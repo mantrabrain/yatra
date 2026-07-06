@@ -66,7 +66,9 @@ const Dashboard: React.FC<DashboardProps> = ({
   const conciergeMail = String(conciergeEmail || "").trim();
   const upcomingBookings =
     bookings.filter((b) => toDateValue(b.travel_date) > new Date()).length > 0
-      ? bookings.filter((b) => toDateValue(b.travel_date) > new Date()).slice(0, 3)
+      ? bookings
+          .filter((b) => toDateValue(b.travel_date) > new Date())
+          .slice(0, 3)
       : bookings
           .filter((b) => toDateValue(b.travel_date) > new Date())
           .slice(0, 3);

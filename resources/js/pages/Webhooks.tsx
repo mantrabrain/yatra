@@ -903,7 +903,7 @@ const FieldSelectorCard: React.FC<{
         queryKey: ["webhooks-event-sample", eventKey],
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listenQuery.data?.captured?.captured_at, eventKey, queryClient]);
 
   const formatSample = (val: unknown): string => {
@@ -2426,7 +2426,7 @@ const MtlsDialog: React.FC<{
       setPassphrase("");
       setMode(hint?.configured ? "view" : "edit");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [endpoint?.id, hint?.configured]);
 
   const save = useMutation({

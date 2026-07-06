@@ -290,7 +290,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const currentSubpage = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("subpage") || "dashboard";
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlKey]);
 
   // "New since last seen" counts for the sidebar badges (Bookings / Payments /
@@ -306,13 +306,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const currentTab = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("tab") || "all";
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlKey]);
 
   const currentAction = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("action");
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlKey]);
 
   // Check if we're on the trip form page
@@ -322,7 +322,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       (currentTab === "all" || !currentTab) &&
       (currentAction === "create" || currentAction === "edit")
     );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSubpage, currentTab, currentAction, urlKey]);
 
   // Track expanded submenus - initialize based on current subpage

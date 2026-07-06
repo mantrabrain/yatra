@@ -34,7 +34,6 @@ export class ErrorBoundary extends React.Component<
 
   componentDidCatch(error: unknown, info: unknown): void {
     // Keep a console record for support/debugging; not shown to the user.
-    // eslint-disable-next-line no-console
     console.error("Yatra admin caught a rendering error:", error, info);
   }
 

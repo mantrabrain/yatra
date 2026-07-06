@@ -2415,7 +2415,7 @@ const TripForm: React.FC = () => {
     } else if (!tripData.featured_image) {
       setFeaturedImagePreview("");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripData, tripAttributesData, destinationsData, isEditMode, tripId]);
 
   useEffect(() => {
@@ -2694,7 +2694,7 @@ const TripForm: React.FC = () => {
         }));
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.duration_days, formData.trip_type]);
 
   // Auto-calculate days from nights (only if days is empty)
@@ -2709,7 +2709,7 @@ const TripForm: React.FC = () => {
         setFormData((prev) => ({ ...prev, duration_days: String(nights + 1) }));
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.duration_nights, formData.trip_type]);
 
   // Auto-generate slug from title
@@ -7280,8 +7280,8 @@ const TripForm: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                        {__("Original Price", "yatra")} ({__("Optional", "yatra")}
-                        )
+                        {__("Original Price", "yatra")} (
+                        {__("Optional", "yatra")})
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">

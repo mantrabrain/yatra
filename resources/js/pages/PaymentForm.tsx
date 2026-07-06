@@ -109,9 +109,7 @@ const PaymentForm: React.FC = () => {
         payment_method: String(paymentData.payment_method || "Credit Card"),
         payment_status: (String(paymentData.payment_status || "pending") ||
           "pending") as PaymentFormData["payment_status"],
-        payment_date: String(
-          paymentData.payment_date || todayYmd(),
-        ),
+        payment_date: String(paymentData.payment_date || todayYmd()),
         transaction_id: String(paymentData.transaction_id ?? ""),
         notes: String(paymentData.notes ?? ""),
       });

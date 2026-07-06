@@ -711,7 +711,9 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
                         {__("Departure Date")}
                       </Label>
                       <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                        {toDateValue(booking.departure_date).toLocaleDateString()}
+                        {toDateValue(
+                          booking.departure_date,
+                        ).toLocaleDateString()}
                       </p>
                     </div>
                   )}

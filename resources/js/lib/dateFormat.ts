@@ -52,9 +52,7 @@ export function getTimeFormat(): string {
  */
 export function getTimezone(): string {
   const w = window as any;
-  return (
-    w?.yatraAdmin?.timezone || w?.yatraAccountPage?.timezone || "UTC"
-  );
+  return w?.yatraAdmin?.timezone || w?.yatraAccountPage?.timezone || "UTC";
 }
 
 /**

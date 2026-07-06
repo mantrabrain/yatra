@@ -2085,15 +2085,14 @@ const RecurringRuleForm = () => {
                   {
                     className: "text-xs px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded flex justify-between",
                     children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: toDateValue(date.departure_date).toLocaleDateString(
-                        "en-US",
-                        {
-                          weekday: "short",
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric"
-                        }
-                      ) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: toDateValue(
+                        date.departure_date
+                      ).toLocaleDateString("en-US", {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric"
+                      }) }),
                       date.departure_time && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500", children: date.departure_time })
                     ]
                   },
@@ -2146,4 +2145,4 @@ const RecurringRuleForm = () => {
 export {
   RecurringRuleForm as default
 };
-//# sourceMappingURL=RecurringRuleForm-DpDkKUxH.js.map
+//# sourceMappingURL=RecurringRuleForm-BxJKMH38.js.map

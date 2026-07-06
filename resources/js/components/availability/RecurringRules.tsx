@@ -501,9 +501,13 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
             // DB doesn't mask a real original_price.
             const sale = Number(rule.sale_price) || 0;
             const original = Number(rule.original_price) || 0;
-            display = formatYatraMoney(sale > 0 ? sale : original, adminCurrency, {
-              zeroAsUnknown: false,
-            });
+            display = formatYatraMoney(
+              sale > 0 ? sale : original,
+              adminCurrency,
+              {
+                zeroAsUnknown: false,
+              },
+            );
           }
 
           return (
@@ -525,7 +529,7 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     }
 
     return cols;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     visibleColumns,
     formatRulePattern,

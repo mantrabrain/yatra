@@ -302,7 +302,13 @@ class TaxService {
 }
 const taxService = TaxService.getInstance();
 const countryList = getCountryOptions();
-const CORE_CONTACT_IDS = ["first_name", "last_name", "email", "phone", "country"];
+const CORE_CONTACT_IDS = [
+  "first_name",
+  "last_name",
+  "email",
+  "phone",
+  "country"
+];
 const normalizeDateInput = (value) => {
   if (!value) return "";
   return formatDateForInput(value) || value;
@@ -597,16 +603,32 @@ const BookingForm = () => {
     var _a2;
     const id = `${idPrefix}-${field.id}`;
     if (field.type === "select") {
-      return /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { id, value, onChange: (e) => onChange(e.target.value), children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: field.placeholder || `Select ${field.label}` }),
-        (_a2 = field.options) == null ? void 0 : _a2.map((opt) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: opt.value, children: opt.label }, opt.value))
-      ] });
+      return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Select,
+        {
+          id,
+          value,
+          onChange: (e) => onChange(e.target.value),
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: field.placeholder || `Select ${field.label}` }),
+            (_a2 = field.options) == null ? void 0 : _a2.map((opt) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: opt.value, children: opt.label }, opt.value))
+          ]
+        }
+      );
     }
     if (field.type === "country") {
-      return /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { id, value, onChange: (e) => onChange(e.target.value), children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: field.placeholder || "Select Country" }),
-        countryList.map((c) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: c.code, children: c.name }, c.code))
-      ] });
+      return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Select,
+        {
+          id,
+          value,
+          onChange: (e) => onChange(e.target.value),
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: field.placeholder || "Select Country" }),
+            countryList.map((c) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: c.code, children: c.name }, c.code))
+          ]
+        }
+      );
     }
     if (field.type === "textarea") {
       return /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -1768,4 +1790,4 @@ const BookingForm = () => {
 export {
   BookingForm as default
 };
-//# sourceMappingURL=BookingForm-ByKX6xhm.js.map
+//# sourceMappingURL=BookingForm-BMTMci_h.js.map

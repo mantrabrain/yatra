@@ -58,7 +58,12 @@ declare global {
       locale?: string;
       timezone?: string;
       countries?: Array<{ code: string; name: string }>;
-      userScopes?: { destinations?: number[]; activities?: number[]; trips?: number[]; categories?: number[] };
+      userScopes?: {
+        destinations?: number[];
+        activities?: number[];
+        trips?: number[];
+        categories?: number[];
+      };
     };
     yatraBookingData?: {
       currency: string;

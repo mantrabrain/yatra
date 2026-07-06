@@ -661,7 +661,7 @@ const Items: React.FC = () => {
     }
 
     return actions;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [can, queryClient, showToast]);
 
   return (

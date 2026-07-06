@@ -344,8 +344,7 @@ const RecurringRuleForm: React.FC = () => {
         week_of_month: existingRule.week_of_month || "first",
         day_of_week: existingRule.day_of_week ?? 0,
         interval_days: existingRule.interval_days || 7,
-        start_date:
-          existingRule.start_date || todayYmd(),
+        start_date: existingRule.start_date || todayYmd(),
         end_date: existingRule.end_date || "",
         excluded_dates: Array.isArray(existingRule.excluded_dates)
           ? existingRule.excluded_dates
@@ -2562,15 +2561,14 @@ const RecurringRuleForm: React.FC = () => {
                             className="text-xs px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded flex justify-between"
                           >
                             <span>
-                              {toDateValue(date.departure_date).toLocaleDateString(
-                                "en-US",
-                                {
-                                  weekday: "short",
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                },
-                              )}
+                              {toDateValue(
+                                date.departure_date,
+                              ).toLocaleDateString("en-US", {
+                                weekday: "short",
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
                             </span>
                             {date.departure_time && (
                               <span className="text-gray-500">

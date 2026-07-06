@@ -666,7 +666,9 @@ const AbandonedRecoveryPage = ({ tab }) => {
               ] }),
               booking.departure_date && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { className: "text-sm text-gray-500 dark:text-gray-400", children: __("Departure Date") }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white mt-1", children: toDateValue(booking.departure_date).toLocaleDateString() })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white mt-1", children: toDateValue(
+                  booking.departure_date
+                ).toLocaleDateString() })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { className: "text-sm text-gray-500 dark:text-gray-400", children: __("Travelers") }),
@@ -1336,4 +1338,4 @@ const AbandonedRecoveryPage = ({ tab }) => {
 export {
   AbandonedRecoveryPage as default
 };
-//# sourceMappingURL=AbandonedRecovery-DbG0ANh1.js.map
+//# sourceMappingURL=AbandonedRecovery-D-_h1DEg.js.map

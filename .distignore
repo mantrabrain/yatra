@@ -18,7 +18,6 @@ package-lock.json
 yarn.lock
 pnpm-lock.yaml
 npm-debug.log*
-composer.json
 composer.lock
 
 # Tooling & tests

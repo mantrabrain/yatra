@@ -314,7 +314,9 @@ const Profile: React.FC<ProfileProps> = ({
                 className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-yatra-primary text-white hover:bg-yatra-primary-dark transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <CheckCircle className="w-4 h-4" />
-                {isSaving ? __("Saving…", "yatra") : __("Save Changes", "yatra")}
+                {isSaving
+                  ? __("Saving…", "yatra")
+                  : __("Save Changes", "yatra")}
               </button>
               <div
                 role="button"

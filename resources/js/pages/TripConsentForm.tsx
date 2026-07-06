@@ -215,7 +215,7 @@ const SignaturePadPreview: React.FC<SignaturePadPreviewProps> = ({
       canvas.width = rect.width;
       canvas.height = rect.height;
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

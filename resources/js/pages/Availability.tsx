@@ -181,7 +181,7 @@ const Availability: React.FC = () => {
     const params = new URLSearchParams(window.location.search);
     const tripId = params.get("trip_id");
     return tripId ? parseInt(tripId) : null;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlKey]);
 
   // Trip selection - initialize from localStorage or URL if available
@@ -882,8 +882,9 @@ const Availability: React.FC = () => {
         const travelerPrices = pts
           .map(
             (pt) =>
-              Number(pt.sale_price ?? pt.discounted_price ?? pt.original_price) ||
-              0,
+              Number(
+                pt.sale_price ?? pt.discounted_price ?? pt.original_price,
+              ) || 0,
           )
           .filter((n) => n > 0);
         if (travelerPrices.length > 0) {
@@ -899,35 +900,35 @@ const Availability: React.FC = () => {
           );
         }
         return (
-        <div className="flex flex-col gap-1">
-          {date.discounted_price &&
-          parseFloat(date.discounted_price) <
-            parseFloat(date.original_price) ? (
-            <>
-              <span className="text-sm line-through text-gray-400">
+          <div className="flex flex-col gap-1">
+            {date.discounted_price &&
+            parseFloat(date.discounted_price) <
+              parseFloat(date.original_price) ? (
+              <>
+                <span className="text-sm line-through text-gray-400">
+                  {getCurrencySymbol(selectedTrip?.currency || "USD")}
+                  {parseFloat(date.original_price).toLocaleString()}
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {getCurrencySymbol(selectedTrip?.currency || "USD")}
+                    {parseFloat(date.discounted_price).toLocaleString()}
+                  </span>
+                  {date.discount_percentage &&
+                    parseFloat(date.discount_percentage) > 0 && (
+                      <Badge variant="error" className="text-xs">
+                        {date.discount_percentage}% {__("OFF", "yatra")}
+                      </Badge>
+                    )}
+                </div>
+              </>
+            ) : (
+              <span className="text-sm font-semibold">
                 {getCurrencySymbol(selectedTrip?.currency || "USD")}
                 {parseFloat(date.original_price).toLocaleString()}
               </span>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                  {getCurrencySymbol(selectedTrip?.currency || "USD")}
-                  {parseFloat(date.discounted_price).toLocaleString()}
-                </span>
-                {date.discount_percentage &&
-                  parseFloat(date.discount_percentage) > 0 && (
-                    <Badge variant="error" className="text-xs">
-                      {date.discount_percentage}% {__("OFF", "yatra")}
-                    </Badge>
-                  )}
-              </div>
-            </>
-          ) : (
-            <span className="text-sm font-semibold">
-              {getCurrencySymbol(selectedTrip?.currency || "USD")}
-              {parseFloat(date.original_price).toLocaleString()}
-            </span>
-          )}
-        </div>
+            )}
+          </div>
         );
       },
     });

@@ -435,10 +435,7 @@ const Itinerary = () => {
             ),
             deleted,
             failed
-          ) : sprintf(
-            __("%d item(s) deleted successfully.", "yatra"),
-            deleted
-          ),
+          ) : sprintf(__("%d item(s) deleted successfully.", "yatra"), deleted),
           "success"
         );
       } else {
@@ -1911,4 +1908,4 @@ const Itinerary = () => {
 export {
   Itinerary as default
 };
-//# sourceMappingURL=Itinerary-KETvoyJ5.js.map
+//# sourceMappingURL=Itinerary-BgsX-8sZ.js.map
