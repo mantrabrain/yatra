@@ -95,6 +95,22 @@ class CustomerController extends BaseController
             ],
         ]);
 
+        // "Add to calendar" (.ics) for the current customer's booking.
+        register_rest_route($namespace, '/' . $base . '/my-bookings/(?P<id>\d+)/calendar', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'downloadMyBookingCalendar'],
+                'permission_callback' => [$this, 'checkCustomerPermission'],
+                'args' => [
+                    'id' => [
+                        'required' => true,
+                        'type' => 'integer',
+                        'sanitize_callback' => 'absint',
+                    ],
+                ],
+            ],
+        ]);
+
         // Current customer's payments
         register_rest_route($namespace, '/' . $base . '/my-payments', [
             [
@@ -403,6 +419,43 @@ class CustomerController extends BaseController
             'success' => true,
             'data' => $booking,
         ]);
+    }
+
+    /**
+     * Stream an "add to calendar" (.ics) file for the current customer's
+     * booking. Ownership is enforced by the same getBookingDetailsForUser()
+     * gate as getMyBooking() — a booking the caller doesn't own yields 404.
+     */
+    public function downloadMyBookingCalendar(WP_REST_Request $request)
+    {
+        $userId = get_current_user_id();
+        $bookingId = (int) $request->get_param('id');
+
+        // Ownership check (returns null for a booking the user does not own).
+        if (!$this->customerService->getBookingDetailsForUser($userId, $bookingId)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Booking not found.', 'yatra'),
+            ], 404);
+        }
+
+        // Re-fetch the row (with trip) for the calendar fields.
+        $booking = (new \Yatra\Repositories\BookingRepository())->findWithTrip($bookingId);
+        $ics = is_object($booking) ? \Yatra\Services\IcsService::forBooking($booking) : '';
+
+        if ($ics === '') {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('This booking has no scheduled date to add to a calendar.', 'yatra'),
+            ], 404);
+        }
+
+        nocache_headers();
+        header('Content-Type: text/calendar; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . \Yatra\Services\IcsService::filename($booking) . '"');
+        header('Content-Length: ' . strlen($ics));
+        echo $ics; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- raw .ics file download.
+        exit;
     }
 
     /**
