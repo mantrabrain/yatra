@@ -1218,9 +1218,17 @@ class DiscountService extends BaseService
             return ['valid' => false, 'message' => __('This coupon has expired.', 'yatra')];
         }
         
-        // Check usage limit
-        if ($discount->usage_limit > 0 && $discount->usage_count >= $discount->usage_limit) {
-            return ['valid' => false, 'message' => __('This coupon has reached its usage limit.', 'yatra')];
+        // Check usage limit — count live usage, not the stored `usage_count`
+        // column. That column was never incremented at checkout, so limited /
+        // single-use coupons were effectively unlimited. countUsage() counts the
+        // bookings that actually redeemed the code (excluding cancelled/failed),
+        // which is the same source the admin list already displays. Enforcement
+        // is forward-only: coupons still under their limit are unaffected.
+        if ((int) $discount->usage_limit > 0) {
+            $usageCount = $this->repository->countUsage((string) ($discount->code ?? ''));
+            if ($usageCount >= (int) $discount->usage_limit) {
+                return ['valid' => false, 'message' => __('This coupon has reached its usage limit.', 'yatra')];
+            }
         }
         
         // Check if applicable to this trip

@@ -77,6 +77,12 @@ class SettingsService
         'booking_reminder_days' => 3,
         'allow_waitlist' => true,
         'waitlist_auto_confirm' => false,
+        // Enforce the departure capacity guard at checkout: reject a public
+        // booking that would oversell the last seat(s). Default on (the safe,
+        // correct behaviour). Operators who deliberately allow overselling can
+        // turn it off; admins can always overbook via manual booking, and OTA
+        // ingest is never blocked.
+        'prevent_overbooking' => true,
         // Pro: when enabled, the single-trip date_specific mode renders a
         // <select> of available departure dates instead of the flatpickr
         // calendar (desktop sidebar and mobile sticky bar). Renders no-op

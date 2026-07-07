@@ -140,8 +140,10 @@ class PaymentController extends BaseController
     public function getPayments(WP_REST_Request $request): WP_REST_Response
     {
         $filters = [
-            'page' => (int) ($request->get_param('page') ?: 1),
-            'per_page' => (int) ($request->get_param('per_page') ?: 20),
+            'page' => max(1, (int) ($request->get_param('page') ?: 1)),
+            // Clamp to a sane range: guards the total_pages division below and
+            // stops an unbounded ?per_page=999999 query.
+            'per_page' => min(100, max(1, (int) ($request->get_param('per_page') ?: 20))),
             'booking_id' => (int) $request->get_param('booking_id'),
             'status' => $request->get_param('status') ?: '',
             'gateway' => $request->get_param('gateway') ?: '',
@@ -182,7 +184,29 @@ class PaymentController extends BaseController
     public function createPayment(WP_REST_Request $request)
     {
         $data = $request->get_json_params();
-        
+        if (!is_array($data)) {
+            $data = [];
+        }
+
+        // A valid booking is required.
+        if ((int) ($data['booking_id'] ?? 0) <= 0) {
+            return new WP_Error('yatra_invalid_booking', __('A valid booking is required.', 'yatra'), ['status' => 400]);
+        }
+
+        // Refund-cap gate: this route is gated on the *edit* cap, but a negative
+        // amount or an explicit `payment_type=refund` records a refund — which
+        // PUT/DELETE already restrict to the dedicated refund capability. Require
+        // the same here so an edit-only user can't record a refund via POST.
+        $amount = isset($data['amount']) ? (float) $data['amount'] : 0.0;
+        $paymentType = isset($data['payment_type']) ? sanitize_key((string) $data['payment_type']) : '';
+        if (($paymentType === 'refund' || $amount < 0) && !current_user_can('yatra_refund_bookings')) {
+            return new WP_Error(
+                'yatra_forbidden',
+                __('You are not allowed to record a refund.', 'yatra'),
+                ['status' => 403]
+            );
+        }
+
         try {
             $payment = $this->paymentService->createPayment($data);
             return new WP_REST_Response($payment, 201);

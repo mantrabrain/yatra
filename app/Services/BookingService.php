@@ -191,6 +191,11 @@ class BookingService
         // Checkout defers the rich confirmation to BookingSessionController (avoids duplicate customer emails).
         // Not persisted; stripped by BookingValidator::sanitize().
         $skipInitialCustomerConfirmation = !empty($data['skip_initial_customer_confirmation']);
+
+        // Captured before sanitize() strips unknown keys. Trusted callers (admin
+        // manual booking) set this so they may exceed departure capacity; public
+        // checkout never sets it, so the `prevent_overbooking` guard applies.
+        $allowOverbookingRequested = !empty($data['allow_overbooking']);
         
         try {
             Logger::info("Booking creation started", [
@@ -384,27 +389,29 @@ class BookingService
             );
             $data['amount_due'] = max(0.0, round($bs_due_now, 2));
 
-            // Create booking
-            $bookingId = $this->bookingRepository->create($data);
-
-            if (!$bookingId) {
-                Logger::error("Failed to create booking in database", ['data' => $data]);
-                return ['success' => false, 'message' => __('Failed to create booking.', 'yatra')];
-            }
-
-            // Waitlist bookings do not consume departure capacity until promoted.
+            // ── Reserve departure capacity BEFORE inserting the booking ──
+            // A1 fix: the seat is claimed with an atomic conditional UPDATE
+            // (DepartureRepository::incrementBookedCount) *before* the booking
+            // row exists, so two concurrent last-seat checkouts can no longer
+            // both succeed. Waitlist bookings never consume capacity. If the
+            // departure can't be resolved we fall back to the legacy path
+            // (proceed without a reservation) so no existing flow regresses.
             $isWaitlist = isset($data['status']) && $data['status'] === 'waitlist';
+            $travelersCount = (int) ($data['travelers_count'] ?? 0);
+            $reservedDepartureId = null;
+            $reservedSeats = 0;
 
-            // Link booking to departure if start_date is provided
+            // `prevent_overbooking` (default on) enforces the capacity guard for
+            // public checkout. Trusted callers (admin manual booking, OTA ingest)
+            // set `allow_overbooking`; when overbooking is allowed the increment
+            // is forced so booked_count stays accurate even past capacity.
+            $allowOverbook = $allowOverbookingRequested
+                || !SettingsService::isEnabled('prevent_overbooking');
+
             if (!$isWaitlist && !empty($data['start_date']) && !empty($data['end_date'])) {
                 try {
                     $trip = $this->tripRepository->find((int) $data['trip_id']);
-                    // Get max capacity from trip's max_travelers, or use default
-                    $maxCapacity = null;
-                    if ($trip && !empty($trip->max_travelers)) {
-                        $maxCapacity = (int) $trip->max_travelers;
-                    }
-                    $travelersCount = (int) ($data['travelers_count'] ?? 0);
+                    $maxCapacity = ($trip && !empty($trip->max_travelers)) ? (int) $trip->max_travelers : null;
 
                     $departureTime = null;
                     if (!empty($data['departure_time']) && is_string($data['departure_time'])) {
@@ -414,7 +421,7 @@ class BookingService
                         }
                     }
 
-                    // Find or create departure
+                    // Find or create departure (creates with booked_count = 0).
                     $departure = $this->departureService->findOrCreateForBooking(
                         (int) $data['trip_id'],
                         $data['start_date'],
@@ -424,18 +431,58 @@ class BookingService
                         $departureTime
                     );
 
-                    // Link booking to departure
-                    $this->departureService->linkBookingToDeparture($bookingId, $departure->id);
+                    $seats = max(1, $travelersCount);
+                    $reserved = $this->departureService->incrementBookedCount($departure->id, $seats, $allowOverbook);
+                    if (!$reserved && !$allowOverbook) {
+                        // The last seat(s) went while this checkout was in flight.
+                        // Nothing has been persisted yet, so refuse cleanly.
+                        return [
+                            'success' => false,
+                            'message' => __('This departure is sold out.', 'yatra'),
+                            'code' => 'sold_out',
+                        ];
+                    }
+                    $reservedDepartureId = (int) $departure->id;
+                    $reservedSeats = $seats;
+                } catch (\Exception $e) {
+                    // Departure resolution failed — preserve legacy behaviour and
+                    // let the booking proceed without a seat reservation.
+                    Logger::warning("Failed to reserve departure capacity", [
+                        'trip_id' => $data['trip_id'] ?? null,
+                        'error' => $e->getMessage(),
+                    ]);
+                    $reservedDepartureId = null;
+                }
+            }
 
-                    // Increment booked count
-                    $this->departureService->incrementBookedCount($departure->id, $travelersCount);
+            // Create booking (after the seat is safely held).
+            $bookingId = $this->bookingRepository->create($data);
 
+            if (!$bookingId) {
+                // Release the seat(s) reserved for a booking that never landed.
+                if ($reservedDepartureId !== null && $reservedSeats > 0) {
+                    try {
+                        $this->departureService->decrementBookedCount($reservedDepartureId, $reservedSeats);
+                    } catch (\Throwable $e) {
+                        Logger::warning("Failed to release reserved capacity after booking insert failed", [
+                            'departure_id' => $reservedDepartureId,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
+                Logger::error("Failed to create booking in database", ['data' => $data]);
+                return ['success' => false, 'message' => __('Failed to create booking.', 'yatra')];
+            }
+
+            // Link the booking to the departure we already reserved.
+            if ($reservedDepartureId !== null) {
+                try {
+                    $this->departureService->linkBookingToDeparture($bookingId, $reservedDepartureId);
                     Logger::info("Booking linked to departure", [
                         'booking_id' => $bookingId,
-                        'departure_id' => $departure->id
+                        'departure_id' => $reservedDepartureId,
                     ]);
                 } catch (\Exception $e) {
-                    // Log error but don't fail the booking
                     Logger::warning("Failed to link booking to departure", [
                         'booking_id' => $bookingId,
                         'error' => $e->getMessage()

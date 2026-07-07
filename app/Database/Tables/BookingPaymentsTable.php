@@ -66,6 +66,10 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     KEY `idx_booking_created` (`booking_id`, `created_at`),
     KEY `idx_customer_id` (`customer_id`),
     KEY `idx_transaction_id` (`transaction_id`),
+    -- Backstops the payment idempotency guard against duplicate rows. NULLs are
+    -- distinct in MySQL unique indexes, so offline/pay-later payments (no gateway
+    -- transaction) don't collide. Existing installs get this via Upgrade_3_0_9.
+    UNIQUE KEY `uniq_gateway_transaction` (`gateway`, `transaction_id`),
     KEY `idx_status` (`status`),
     KEY `idx_created` (`created_at`)
 ) {$charsetCollate} COMMENT='Booking payment history';

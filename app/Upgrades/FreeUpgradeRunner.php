@@ -7,6 +7,7 @@ namespace Yatra\Upgrades;
 use Yatra\Core\Database;
 use Yatra\Services\InstallerService;
 use Yatra\Upgrades\Versions\Upgrade_3_0_5;
+use Yatra\Upgrades\Versions\Upgrade_3_0_9;
 
 /**
  * Orchestrates Yatra Free upgrades: {@see Database::createTables()} for schema sync, then version-gated
@@ -181,5 +182,11 @@ final class FreeUpgradeRunner
         // past the chain. The upgrade step's own one-shot option flag
         // gates the work so this is cheap on subsequent pageviews.
         Upgrade_3_0_5::run(YATRA_VERSION, YATRA_VERSION);
+
+        // One-time reconcile of trip_departures.booked_count drift left by the
+        // pre-A1 overbooking bug (insert-before-reserve) and the expiry seat
+        // leak. Version-independent + gated by its own one-shot option flag, so
+        // it's a single boolean check on subsequent pageviews.
+        Upgrade_3_0_9::run(YATRA_VERSION, YATRA_VERSION);
     }
 }

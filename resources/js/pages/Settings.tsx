@@ -823,6 +823,7 @@ interface SettingsData {
   require_guest_email_verification: boolean;
   booking_expiry_hours: number;
   booking_reminder_days: number;
+  prevent_overbooking: boolean;
   allow_waitlist: boolean;
   waitlist_auto_confirm: boolean;
   date_picker_as_dropdown: boolean;
@@ -2696,6 +2697,7 @@ const Settings: React.FC = () => {
       require_guest_email_verification: false,
       booking_expiry_hours: 24,
       booking_reminder_days: 3,
+      prevent_overbooking: true,
       allow_waitlist: true,
       waitlist_auto_confirm: false,
       date_picker_as_dropdown: false,
@@ -5951,6 +5953,31 @@ const Settings: React.FC = () => {
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     {__(
                       "Hold guest bookings until the customer clicks a magic link sent to their email. Stops typo'd addresses and form-spam bots. Only applies when guest checkout is allowed and login isn't required — logged-in customers are already verified.",
+                      "yatra",
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                <input
+                  type="checkbox"
+                  id="prevent_overbooking"
+                  checked={formData.prevent_overbooking}
+                  name="prevent_overbooking"
+                  onChange={handleFieldChange}
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <div className="flex-1">
+                  <Label
+                    htmlFor="prevent_overbooking"
+                    className="font-medium cursor-pointer"
+                  >
+                    {__("Prevent overbooking at checkout", "yatra")}
+                  </Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {__(
+                      "Reject a booking that would exceed a departure's remaining seats. Recommended. Admins can still overbook from the manual booking screen.",
                       "yatra",
                     )}
                   </p>

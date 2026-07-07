@@ -1828,6 +1828,7 @@ const Settings = () => {
       require_guest_email_verification: false,
       booking_expiry_hours: 24,
       booking_reminder_days: 3,
+      prevent_overbooking: true,
       allow_waitlist: true,
       waitlist_auto_confirm: false,
       date_picker_as_dropdown: false,
@@ -4776,6 +4777,33 @@ const Settings = () => {
                 ),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: __(
                   "Hold guest bookings until the customer clicks a magic link sent to their email. Stops typo'd addresses and form-spam bots. Only applies when guest checkout is allowed and login isn't required — logged-in customers are already verified.",
+                  "yatra"
+                ) })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "checkbox",
+                  id: "prevent_overbooking",
+                  checked: formData.prevent_overbooking,
+                  name: "prevent_overbooking",
+                  onChange: handleFieldChange,
+                  className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Label,
+                  {
+                    htmlFor: "prevent_overbooking",
+                    className: "font-medium cursor-pointer",
+                    children: __("Prevent overbooking at checkout", "yatra")
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: __(
+                  "Reject a booking that would exceed a departure's remaining seats. Recommended. Admins can still overbook from the manual booking screen.",
                   "yatra"
                 ) })
               ] })
@@ -8104,4 +8132,4 @@ const Settings = () => {
 export {
   Settings as default
 };
-//# sourceMappingURL=Settings-D5L9IwFN.js.map
+//# sourceMappingURL=Settings-CCRHDg94.js.map

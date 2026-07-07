@@ -320,7 +320,13 @@ class BookingsController extends BaseController
             $data = BookingValidator::sanitize($data);
             
             Logger::apiRequest('/bookings', 'POST', $data);
-            
+
+            // Admin manual bookings may exceed departure capacity (an operator
+            // override); public checkout never sets this, so its overbooking
+            // guard stays enforced. The forced increment keeps booked_count
+            // accurate even when the admin deliberately oversells.
+            $data['allow_overbooking'] = true;
+
             $result = $this->bookingService->createBooking($data);
 
             if (!$result['success']) {

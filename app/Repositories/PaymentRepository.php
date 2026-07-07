@@ -446,7 +446,12 @@ class PaymentRepository extends BaseRepository
         }
 
         if (array_key_exists('transaction_id', $data)) {
-            $prepared['transaction_id'] = sanitize_text_field((string) $data['transaction_id']);
+            // Store NULL (not '') when there is no gateway transaction, so
+            // offline / manual / refund rows don't collide on the
+            // UNIQUE(gateway, transaction_id) index — MySQL treats NULLs as
+            // distinct, but every '' would clash.
+            $txn = sanitize_text_field((string) ($data['transaction_id'] ?? ''));
+            $prepared['transaction_id'] = $txn === '' ? null : $txn;
         }
 
         if (array_key_exists('gateway', $data)) {

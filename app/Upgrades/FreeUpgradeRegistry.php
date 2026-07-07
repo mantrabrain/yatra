@@ -7,6 +7,7 @@ namespace Yatra\Upgrades;
 use Yatra\Upgrades\Contracts\UpgradeStepInterface;
 use Yatra\Upgrades\Versions\Upgrade_3_0_3;
 use Yatra\Upgrades\Versions\Upgrade_3_0_5;
+use Yatra\Upgrades\Versions\Upgrade_3_0_9;
 
 /**
  * Register Free upgrade steps (add a class per release when DB/data migration is required).
@@ -27,6 +28,7 @@ final class FreeUpgradeRegistry
         return [
             Upgrade_3_0_3::class,
             Upgrade_3_0_5::class,
+            Upgrade_3_0_9::class,
         ];
     }
 

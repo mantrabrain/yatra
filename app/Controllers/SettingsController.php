@@ -68,6 +68,9 @@ class SettingsController extends BaseController
         'booking_reminder_days' => 3,
         'allow_waitlist' => true,
         'waitlist_auto_confirm' => false,
+        // Enforce the departure capacity guard at checkout (reject a public
+        // booking that would oversell). Default on; see SettingsService.
+        'prevent_overbooking' => true,
         // Pro: render available departure dates as a <select> instead of a
         // flatpickr calendar on the single-trip sidebar (desktop + mobile).
         'date_picker_as_dropdown' => false,

@@ -245,13 +245,45 @@ class PaymentService
             return ['success' => false, 'message' => __('Only completed payments can be refunded.', 'yatra')];
         }
 
-        $refundAmount = $amount ?? (float) $payment->amount;
+        $paymentAmount = (float) $payment->amount;
+        $refundAmount  = $amount ?? $paymentAmount;
 
-        if ($refundAmount > (float) $payment->amount) {
+        if ($refundAmount <= 0) {
+            return ['success' => false, 'message' => __('Refund amount must be greater than zero.', 'yatra')];
+        }
+        if ($refundAmount > $paymentAmount + 0.001) {
             return ['success' => false, 'message' => __('Refund amount exceeds payment amount.', 'yatra')];
         }
 
-        // Create refund record
+        // Actually move the money at the gateway before recording anything. The
+        // previous version wrote a negative ledger row and returned "success"
+        // WITHOUT ever contacting the gateway — so the operator believed a refund
+        // happened when no money moved. For an online gateway we now call its
+        // processRefund() and only record the ledger row when it succeeds. For
+        // offline / manual methods (Pay Later, or a payment with no gateway
+        // transaction) there is nothing to call, so we record the bookkeeping
+        // refund as before.
+        $registry    = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
+        $gateway     = $registry->get((string) $payment->gateway);
+        $txnId       = (string) ($payment->transaction_id ?? '');
+        $isManual    = !$gateway || $gateway->isOffline() || $txnId === '';
+        $refundTxnId = null;
+
+        if (!$isManual) {
+            $gwResult = $gateway->processRefund($txnId, $refundAmount);
+            if (empty($gwResult['success'])) {
+                return [
+                    'success' => false,
+                    'message' => $gwResult['error']
+                        ?? ($gwResult['message']
+                            ?? __('The payment gateway could not process this refund. Issue it from your gateway dashboard, then record it here.', 'yatra')),
+                ];
+            }
+            $refundTxnId = ((string) ($gwResult['transaction_id'] ?? ($gwResult['refund_id'] ?? ''))) ?: null;
+        }
+
+        // Create refund record (only reached after the gateway actually refunded,
+        // or for a genuine offline/manual method).
         $refundId = $this->paymentRepository->create([
             'booking_id' => $payment->booking_id,
             'gateway' => $payment->gateway,
@@ -259,6 +291,7 @@ class PaymentService
             'currency' => $payment->currency,
             'status' => 'completed',
             'payment_type' => 'refund',
+            'transaction_id' => $refundTxnId,
             'notes' => $reason,
         ]);
 
@@ -266,8 +299,13 @@ class PaymentService
             return ['success' => false, 'message' => __('Failed to process refund.', 'yatra')];
         }
 
-        // Update original payment status
-        $this->paymentRepository->updateStatus($paymentId, 'refunded');
+        // Only mark the original payment 'refunded' when it is refunded IN FULL.
+        // A partial refund must leave it 'completed' so the remainder can still be
+        // refunded later — the old code flipped it unconditionally, which
+        // permanently blocked the rest (the gate above rejects non-'completed').
+        if ($refundAmount >= $paymentAmount - 0.001) {
+            $this->paymentRepository->updateStatus($paymentId, 'refunded');
+        }
 
         // Recalculate booking amount paid
         $totalPaid = $this->paymentRepository->getTotalPaidForBooking((int) $payment->booking_id);

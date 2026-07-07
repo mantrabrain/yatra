@@ -236,16 +236,32 @@ class BookingSessionController extends BaseController
             $booking_token = sanitize_text_field((string) wp_unslash($_GET['booking_token']));
         }
 
-        // H-1: ownership gate (monitor-first). An honest caller either owns the
-        // booking (logged-in user / admin) or carries the booking_token bound to
-        // it; only a stranger targeting someone else's booking_id is rejected.
-        // In monitor mode this just logs and proceeds (zero behaviour change).
+        // H-1: ownership gate. An honest caller either owns the booking
+        // (logged-in user / admin) or carries the booking_token bound to it;
+        // only a stranger targeting someone else's booking_id reaches the block.
+        // Enforced by default now (this is the IDOR fix): the check is proven
+        // safe because requesterOwnsBooking() recognises every legitimate owner.
+        // A dedicated filter (default true) lets an operator fall back to
+        // monitor-only if some bespoke integration ever trips it, without
+        // touching the global security-enforce switch (which also governs the
+        // amount override — deliberately left in monitor until amount_due is
+        // kept accurate). The event is always logged for observability.
         if (!$this->requesterOwnsBooking($booking_id, $booking, $booking_token)) {
-            if (\Yatra\Security\Guard::denied('payment_complete_ownership', [
+            \Yatra\Security\Guard::flag('payment_complete_ownership', [
                 'booking_id' => $booking_id,
                 'user'       => get_current_user_id(),
                 'gateway'    => $gateway_id,
-            ])) {
+            ]);
+
+            /**
+             * Enforce booking ownership on payment completion (block cross-customer
+             * requests). Default true. Return false to revert to monitor-only.
+             *
+             * @param bool $enforce True to block a non-owner, false to log-only.
+             * @param int  $booking_id
+             */
+            $enforceOwnership = (bool) apply_filters('yatra_enforce_payment_ownership', true, $booking_id);
+            if ($enforceOwnership || \Yatra\Security\Guard::enforcing()) {
                 return new WP_REST_Response([
                     'success' => false,
                     'message' => __('You are not allowed to complete this payment.', 'yatra'),
@@ -253,35 +269,46 @@ class BookingSessionController extends BaseController
             }
         }
 
-        // H-1: server-authoritative amount/currency. Honest clients already send
-        // the booking's due amount, so this is invisible to them; it removes the
-        // ability to tamper the charged amount. Override only when enforcing.
+        // H-1: server-authoritative amount/currency (the amount-tamper fix). The
+        // charged amount is derived from the booking, never trusted from the
+        // client: it is the booking's current "due now" (amount_due — a deposit,
+        // the full total, or the remaining balance after a deposit), capped at
+        // the true outstanding balance (total − already paid) as defence in depth
+        // against a stale-high due. Honest clients already send exactly this
+        // value, so the change is invisible to them; only a tampered amount is
+        // corrected. Applied unconditionally (not Guard-gated) because it can only
+        // ever move the charge toward the amount actually owed — capped at the
+        // outstanding balance it never overcharges, and it never lets an
+        // underpayment through. Falls back to the client amount only if the
+        // booking carries no usable server figure (shouldn't happen).
         $amount   = $client_amount;
         $currency = $client_currency;
         if ($booking) {
-            $server_amount = (float) ($booking->amount_due ?? 0);
-            if ($server_amount <= 0) {
-                $server_amount = (float) ($booking->total_amount ?? 0);
-            }
             $server_currency = (string) ($booking->currency ?? $client_currency);
+            $total_amount    = (float) ($booking->total_amount ?? 0);
+            $already_paid    = (float) (new \Yatra\Repositories\PaymentRepository())->getTotalPaidForBooking($booking_id);
+            $outstanding     = max(0.0, round($total_amount - $already_paid, 2));
 
-            if ($server_amount > 0) {
-                $mismatch = abs($server_amount - $client_amount) > 0.001
+            $server_due = (float) ($booking->amount_due ?? 0);
+            if ($server_due <= 0) {
+                $server_due = $total_amount;
+            }
+
+            $authoritative = $outstanding > 0 ? min($server_due, $outstanding) : 0.0;
+
+            if ($authoritative > 0) {
+                if (abs($authoritative - $client_amount) > 0.001
                     || ($client_currency !== '' && $server_currency !== ''
-                        && strcasecmp($client_currency, $server_currency) !== 0);
-
-                if ($mismatch) {
-                    \Yatra\Security\Guard::flag('payment_complete_amount_mismatch', [
+                        && strcasecmp($client_currency, $server_currency) !== 0)
+                ) {
+                    \Yatra\Security\Guard::flag('payment_complete_amount_override', [
                         'booking_id'    => $booking_id,
                         'client_amount' => $client_amount,
-                        'server_amount' => $server_amount,
+                        'server_amount' => $authoritative,
                     ]);
                 }
-
-                if (\Yatra\Security\Guard::enforcing()) {
-                    $amount   = $server_amount;
-                    $currency = $server_currency;
-                }
+                $amount   = $authoritative;
+                $currency = $server_currency;
             }
         }
 
@@ -347,16 +374,30 @@ class BookingSessionController extends BaseController
 
                 // Update booking status if payment is complete
                 if (($result['status'] ?? 'completed') === 'completed') {
-                    // Get total paid amount
-                    $total_paid = $paymentRepository->getTotalPaidForBooking($booking_id);
+                    // A6: persist the booking's financial columns from the ledger.
+                    // This path previously left amount_paid at 0 / amount_due
+                    // stale, so admin balances and the "pay remaining" math were
+                    // wrong — and the server-authoritative charge above depends on
+                    // amount_due being current for the next payment step.
+                    $total_paid   = $paymentRepository->getTotalPaidForBooking($booking_id);
                     $total_amount = (float) $booking->total_amount;
+                    $new_due      = max(0.0, round($total_amount - (float) $total_paid, 2));
 
                     if ($total_paid >= $total_amount) {
                         $prevStatus = (string) ($booking->status ?? 'pending');
-                        $bookingRepository->update($booking_id, ['status' => 'confirmed', 'payment_status' => 'paid']);
+                        $bookingRepository->update($booking_id, [
+                            'amount_paid'    => $total_paid,
+                            'amount_due'     => $new_due,
+                            'status'         => 'confirmed',
+                            'payment_status' => 'paid',
+                        ]);
                         \yatra_trigger_booking_confirmed((int) $booking_id, $prevStatus);
                     } else {
-                        $bookingRepository->update($booking_id, ['payment_status' => 'partial']);
+                        $bookingRepository->update($booking_id, [
+                            'amount_paid'    => $total_paid,
+                            'amount_due'     => $new_due,
+                            'payment_status' => 'partial',
+                        ]);
                     }
                 }
             }

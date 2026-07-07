@@ -718,7 +718,7 @@ class BookingRepository extends BaseRepository
      * @param string $travelDate Target travel date
      * @return array
      */
-    public function getBookingsForReminder(string $travelDate): array
+    public function getBookingsForReminder(string $travelDate, int $limit = 0): array
     {
         $table = $this->getTableName();
 
@@ -726,15 +726,21 @@ class BookingRepository extends BaseRepository
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $tripsTable = $tripRepository->getTableName();
 
-        return $this->wpdb->get_results($this->wpdb->prepare(
-            "SELECT b.*, t.title as trip_title, t.currency
+        $sql = "SELECT b.*, t.title as trip_title, t.currency
              FROM {$table} b
              LEFT JOIN {$tripsTable} t ON b.trip_id = t.id
              WHERE b.status = 'confirmed'
              AND b.travel_date = %s
-             AND b.reminder_sent = 0",
-            $travelDate
-        ));
+             AND b.reminder_sent = 0
+             ORDER BY b.id ASC";
+
+        // Optional batch cap so a backlog doesn't process every row in one cron
+        // request (default 0 = unbounded, preserving the previous behaviour).
+        if ($limit > 0) {
+            return $this->wpdb->get_results($this->wpdb->prepare($sql . ' LIMIT %d', $travelDate, $limit));
+        }
+
+        return $this->wpdb->get_results($this->wpdb->prepare($sql, $travelDate));
     }
 
     /**
@@ -767,18 +773,58 @@ class BookingRepository extends BaseRepository
      * @param string $expiryThreshold Datetime threshold
      * @return array
      */
-    public function getExpiredPendingBookings(string $expiryThreshold): array
+    public function getExpiredPendingBookings(string $expiryThreshold, int $limit = 0): array
     {
         $table = $this->getTableName();
 
-        return $this->wpdb->get_results($this->wpdb->prepare(
-            "SELECT id, reference, contact_email, contact_first_name, contact_last_name, trip_id
+        $sql = "SELECT id, reference, contact_email, contact_first_name, contact_last_name, trip_id
              FROM {$table}
              WHERE status = 'pending'
              AND payment_status = 'pending'
-             AND created_at < %s",
-            $expiryThreshold
+             AND created_at < %s
+             ORDER BY id ASC";
+
+        // Optional batch cap so a backlog doesn't process every row in one cron
+        // request (default 0 = unbounded, preserving the previous behaviour).
+        if ($limit > 0) {
+            return $this->wpdb->get_results($this->wpdb->prepare($sql . ' LIMIT %d', $expiryThreshold, $limit));
+        }
+
+        return $this->wpdb->get_results($this->wpdb->prepare($sql, $expiryThreshold));
+    }
+
+    /**
+     * Whether a customer has a real (non-cancelled) booking for a trip — used to
+     * flag reviews as verified purchases. Matches on the owning user id OR the
+     * contact email; either identifier is enough.
+     */
+    public function hasBookingForTrip(int $tripId, int $userId = 0, string $email = ''): bool
+    {
+        $email = trim($email);
+        if ($tripId <= 0 || ($userId <= 0 && $email === '')) {
+            return false;
+        }
+
+        $table = $this->getTableName();
+        $conditions = [];
+        $args = [$tripId];
+        if ($userId > 0) {
+            $conditions[] = 'user_id = %d';
+            $args[] = $userId;
+        }
+        if ($email !== '') {
+            $conditions[] = 'contact_email = %s';
+            $args[] = $email;
+        }
+        $who = implode(' OR ', $conditions); // static column fragments only, no user input
+
+        $count = $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COUNT(*) FROM {$table}
+             WHERE trip_id = %d AND ({$who}) AND status NOT IN ('cancelled', 'failed')",
+            $args
         ));
+
+        return (int) $count > 0;
     }
 
     /**

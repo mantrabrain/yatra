@@ -41,6 +41,20 @@ class BookingCronService
     }
 
     /**
+     * Get DepartureService instance
+     *
+     * @return DepartureService
+     */
+    private static function getDepartureService(): DepartureService
+    {
+        static $service = null;
+        if ($service === null) {
+            $service = new DepartureService(new \Yatra\Repositories\DepartureRepository());
+        }
+        return $service;
+    }
+
+    /**
      * Register cron hooks
      */
     public static function register(): void
@@ -99,10 +113,15 @@ class BookingCronService
         $bookingRepository = self::getBookingRepository();
 
         // Calculate the target date (X days from now)
-        $target_date = date('Y-m-d', strtotime("+{$reminder_days} days"));
+        // Use site-local time: bookings store travel_date/created_at via
+        // current_time(), so a UTC strtotime() here skewed the window by the
+        // site's offset (e.g. reminders a day off at UTC+5:45).
+        $target_date = date('Y-m-d', current_time('timestamp') + $reminder_days * DAY_IN_SECONDS);
 
         // Get confirmed bookings with travel date matching the target
-        $bookings = $bookingRepository->getBookingsForReminder($target_date);
+        // Process in a bounded batch per run so a backlog can't time out the
+        // request; remaining rows are picked up on the next cron tick.
+        $bookings = $bookingRepository->getBookingsForReminder($target_date, 200);
 
         if (empty($bookings)) {
             return;
@@ -174,21 +193,41 @@ class BookingCronService
         $tripRepository = self::getTripRepository();
 
         // Calculate the expiry threshold
-        $expiry_threshold = date('Y-m-d H:i:s', strtotime("-{$expiry_hours} hours"));
+        // Site-local threshold to match created_at (stored via current_time());
+        // a UTC strtotime() here expired bookings early/late by the site offset.
+        $expiry_threshold = date('Y-m-d H:i:s', current_time('timestamp') - $expiry_hours * HOUR_IN_SECONDS);
 
         // Get pending bookings that are older than the expiry threshold
-        $expired_bookings = $bookingRepository->getExpiredPendingBookings($expiry_threshold);
+        // Bounded batch per run (see reminder cron) — the next tick continues.
+        $expired_bookings = $bookingRepository->getExpiredPendingBookings($expiry_threshold, 200);
 
         if (empty($expired_bookings)) {
             return;
         }
 
+        $departureService = self::getDepartureService();
         foreach ($expired_bookings as $booking) {
             // Update booking status to expired/cancelled
-            $bookingRepository->expireBooking(
+            $expired = $bookingRepository->expireBooking(
                 $booking->id,
                 __('Booking expired due to non-payment', 'yatra')
             );
+
+            // A4: release the departure seat the expired booking was holding.
+            // expireBooking() raw-updates status and — unlike
+            // BookingService::updateStatus — previously left booked_count
+            // elevated forever, permanently shrinking real availability. Mirror
+            // the cancellation path (unlink + decrement).
+            if ($expired) {
+                try {
+                    $departure = $departureService->getDepartureForBooking((int) $booking->id);
+                    if ($departure) {
+                        $departureService->unlinkBookingFromDeparture((int) $booking->id, (int) $departure->id);
+                    }
+                } catch (\Throwable $e) {
+                    // Non-fatal: expiry proceeds even if the seat release hiccups.
+                }
+            }
 
             do_action('yatra_booking_status_changed', (int) $booking->id, 'pending', 'cancelled');
 
