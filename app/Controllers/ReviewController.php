@@ -210,8 +210,8 @@ class ReviewController extends BaseController
      */
     public function checkReviewPermission(): bool
     {
-        $settings = \Yatra\Services\SettingsService::getSettings();
-        $requireLogin = $settings['reviews']['require_login'] ?? true;
+        // (Fixes a latent fatal: SettingsService::getSettings() does not exist.)
+        $requireLogin = (bool) \Yatra\Services\SettingsService::get('reviews_require_login', true);
 
         if ($requireLogin) {
             return is_user_logged_in();
@@ -256,7 +256,7 @@ class ReviewController extends BaseController
                 'title' => $review['title'] ?? '',
                 'content' => $review['content'] ?? '',
                 'status' => $review['status'] ?? '',
-                'verified' => false, // TODO: Add verified field to database
+                'verified' => (bool) ($review['verified'] ?? false),
                 'created_at' => $review['created_at'] ?? null,
             ];
         }, $result['data']);
@@ -383,12 +383,9 @@ class ReviewController extends BaseController
             // payload introspectable in logs.
         }
 
-        // `verified` has no column in wp_yatra_reviews yet. Drop it
-        // explicitly so a future log of the payload doesn't suggest the
-        // value was honoured.
-        if (array_key_exists('verified', $payload)) {
-            unset($payload['verified']);
-        }
+        // `verified` is now a real column (added by Upgrade_3_0_9); the
+        // repository maps it, so an admin-supplied value is honoured and public
+        // submissions auto-set it from the reviewer's booking history.
 
         // Clamp status to the actual enum. Anything else gets coerced to
         // 'pending' so we never write '' (the silent-truncation pit that

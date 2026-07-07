@@ -130,10 +130,17 @@ class ReviewService
             }
         }
 
-        // Set default status
-        $settings = SettingsService::getSettings();
-        $autoApprove = $settings['reviews']['auto_approve'] ?? false;
+        // Set default status. (Fixes a latent fatal: SettingsService::getSettings()
+        // does not exist and the reviews settings are stored flat, not nested.)
+        $autoApprove = SettingsService::isEnabled('auto_approve_reviews');
         $data['status'] = $autoApprove ? 'approved' : 'pending';
+
+        // Verified-purchase flag: true when the reviewer actually booked this
+        // trip (matched by logged-in user id or the review's email). Powers the
+        // "Verified" trust badge and the review schema.
+        $reviewerEmail = (string) ($data['reviewer_email'] ?? ($data['author_email'] ?? ''));
+        $data['verified'] = (new \Yatra\Repositories\BookingRepository())
+            ->hasBookingForTrip((int) $data['trip_id'], (int) $userId, $reviewerEmail) ? 1 : 0;
 
         // Create review
         $reviewId = $this->reviewRepository->create($data);
@@ -404,9 +411,8 @@ class ReviewService
     {
         $userId = $userId ?? get_current_user_id();
 
-        // Check if user is logged in
-        $settings = SettingsService::getSettings();
-        $requireLogin = $settings['reviews']['require_login'] ?? true;
+        // Check if user is logged in. (Fixes a latent fatal — see submitReview.)
+        $requireLogin = (bool) SettingsService::get('reviews_require_login', true);
 
         if ($requireLogin && !$userId) {
             return [

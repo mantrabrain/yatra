@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `author_location` varchar(100) DEFAULT NULL,
     `status` enum('pending','approved','rejected','spam','trash') DEFAULT 'pending',
     `helpful_count` int(11) UNSIGNED DEFAULT 0,
+    `verified` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '1 = reviewer has a booking for this trip',
     `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
     `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `created_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who created this review',

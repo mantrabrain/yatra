@@ -562,6 +562,10 @@ class ReviewRepository extends BaseRepository
             $prepared['helpful_count'] = (int) $data['helpful_count'];
         }
 
+        if (array_key_exists('verified', $data)) {
+            $prepared['verified'] = !empty($data['verified']) ? 1 : 0;
+        }
+
         // Audit columns — kept optional so legacy callers don't need updating.
         if (array_key_exists('created_by', $data)) {
             $prepared['created_by'] = $data['created_by'] ? (int) $data['created_by'] : null;
