@@ -267,8 +267,8 @@ class SettingsService
                 'description' => __('Person to contact in case of emergency', 'yatra'),
                 'enabled' => true,
                 'fields' => [
-                    ['id' => 'name', 'type' => 'text', 'label' => __('Contact Name', 'yatra'), 'placeholder' => __('Full name', 'yatra'), 'required' => true, 'enabled' => true, 'order' => 1, 'width' => 'half'],
-                    ['id' => 'phone', 'type' => 'tel', 'label' => __('Contact Phone', 'yatra'), 'placeholder' => '+1 234 567 8900', 'required' => true, 'enabled' => true, 'order' => 2, 'width' => 'half'],
+                    ['id' => 'name', 'type' => 'text', 'label' => __('Contact Name', 'yatra'), 'placeholder' => __('Full name', 'yatra'), 'required' => false, 'enabled' => true, 'order' => 1, 'width' => 'half'],
+                    ['id' => 'phone', 'type' => 'tel', 'label' => __('Contact Phone', 'yatra'), 'placeholder' => '+1 234 567 8900', 'required' => false, 'enabled' => true, 'order' => 2, 'width' => 'half'],
                     ['id' => 'relationship', 'type' => 'select', 'label' => __('Relationship', 'yatra'), 'placeholder' => __('Select Relationship', 'yatra'), 'required' => false, 'enabled' => true, 'order' => 3, 'width' => 'full', 'options' => [
                         ['value' => 'spouse', 'label' => __('Spouse/Partner', 'yatra')],
                         ['value' => 'parent', 'label' => __('Parent', 'yatra')],
