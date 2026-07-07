@@ -839,8 +839,9 @@ class SEOService
                 return $this->generatePlaceSchema($baseSchema);
             case self::PAGE_TYPE_ACTIVITY:
             case self::PAGE_TYPE_CATEGORY:
-            case self::PAGE_TYPE_TRIP:
                 return $this->generateArticleSchema($baseSchema);
+            case self::PAGE_TYPE_TRIP:
+                return $this->generateTripSchema($baseSchema);
             default:
                 return $baseSchema;
         }
@@ -890,6 +891,102 @@ class SEOService
                 'name' => get_bloginfo('name')
             ]
         ]);
+    }
+
+    /**
+     * Product/Offer/AggregateRating JSON-LD for a single trip. This replaces the
+     * generic Article schema so the trip page is eligible for Google price and
+     * review-star rich results (the microdata elsewhere on the page is not a
+     * reliable substitute for the search engines).
+     */
+    private function generateTripSchema(array $baseSchema): array
+    {
+        $trip = $this->pageObject;
+
+        $schema = array_merge($baseSchema, [
+            '@type' => 'Product',
+            'brand' => [
+                '@type' => 'Brand',
+                'name' => get_bloginfo('name'),
+            ],
+        ]);
+
+        // Offer — the "from" price + currency. Only emitted when a price is known.
+        $price = is_object($trip) ? $this->resolveTripSchemaPrice($trip) : null;
+        if ($price !== null && $price > 0) {
+            $schema['offers'] = [
+                '@type' => 'Offer',
+                'price' => number_format($price, 2, '.', ''),
+                'priceCurrency' => SettingsService::getCurrency(),
+                'availability' => 'https://schema.org/InStock',
+                'url' => $this->seoData['url'],
+            ];
+        }
+
+        // AggregateRating — only when there are approved reviews (Google rejects
+        // an aggregateRating with a zero review count).
+        $tripId = (int) ($trip->id ?? 0);
+        if ($tripId > 0) {
+            $reviewRepo = new \Yatra\Repositories\ReviewRepository();
+            $reviewCount = $reviewRepo->getReviewCount($tripId);
+            if ($reviewCount > 0) {
+                $average = round($reviewRepo->getAverageRating($tripId), 1);
+                if ($average > 0) {
+                    $schema['aggregateRating'] = [
+                        '@type' => 'AggregateRating',
+                        'ratingValue' => (string) $average,
+                        'reviewCount' => (string) $reviewCount,
+                        'bestRating' => '5',
+                        'worstRating' => '1',
+                    ];
+                }
+            }
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Resolve a single representative "from" price for a trip's Offer schema,
+     * covering both regular and traveler-based pricing. Returns null when no
+     * usable price can be determined (Offer is then omitted).
+     */
+    private function resolveTripSchemaPrice(object $trip): ?float
+    {
+        // Regular pricing — prefer the actual selling price.
+        foreach (['discounted_price', 'sale_price', 'original_price'] as $field) {
+            $value = (float) ($trip->$field ?? 0);
+            if ($value > 0) {
+                return $value;
+            }
+        }
+
+        // Traveler-based — the lowest category / effective price.
+        foreach (['effective_price_min', 'min_category_original_price', 'min_price', 'starting_price'] as $field) {
+            $value = (float) ($trip->$field ?? 0);
+            if ($value > 0) {
+                return $value;
+            }
+        }
+
+        // Last resort: the minimum across the per-category price types.
+        if (!empty($trip->price_types) && is_array($trip->price_types)) {
+            $prices = [];
+            foreach ($trip->price_types as $priceType) {
+                if (!is_array($priceType)) {
+                    continue;
+                }
+                $p = (float) ($priceType['price'] ?? ($priceType['sale_price'] ?? ($priceType['regular_price'] ?? 0)));
+                if ($p > 0) {
+                    $prices[] = $p;
+                }
+            }
+            if ($prices !== []) {
+                return min($prices);
+            }
+        }
+
+        return null;
     }
 
     /**
