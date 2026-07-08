@@ -30,6 +30,7 @@ import { AiEmailTemplateModal } from "../components/ai/AiEmailTemplateModal";
 import { isAiEligible, isAiModuleEnabled } from "../lib/ai-availability";
 import { Switch } from "../components/ui/switch";
 import {
+  EMAIL_TEMPLATES_CATALOG,
   getCatalogEntryByTemplateKey,
   getCoreTemplateDefinition,
   isCoreTemplateSlug,
@@ -186,14 +187,32 @@ const EmailTemplateForm: React.FC = () => {
     queryFn: fetchEmailTemplateEvents,
     enabled: !isCoreSettingsEdit && isEmailAutomationModuleEnabled(),
   });
-  // Prefer the live fetch, but only when it actually returned events — an empty
-  // array (transient error / not-yet-loaded edge) must NOT wipe out the working
-  // localize snapshot, or the "Trigger Event" dropdown ends up empty. `??` alone
-  // would keep an empty [] because [] is not nullish.
-  const events =
-    Array.isArray(fetchedEvents) && fetchedEvents.length > 0
-      ? fetchedEvents
-      : (window as any).yatraAdmin?.emailEvents || [];
+  // Resolve the trigger-event list from the first non-empty source. Both the
+  // live fetch AND the window.yatraAdmin.emailEvents localize are gated on the
+  // Pro Email Automation module actively delivering data (route + localize both
+  // only run when the module is enabled and the client flag agrees), so if the
+  // module gate isn't delivering — disabled, or a client/server flag drift —
+  // both are empty and the dropdown ended up unselectable. Fall back to the
+  // module-INDEPENDENT catalog (same source the templates list uses) so an event
+  // can always be chosen. `??` alone won't do — [] is not nullish.
+  const events = useMemo(() => {
+    if (Array.isArray(fetchedEvents) && fetchedEvents.length > 0) {
+      return fetchedEvents;
+    }
+    const localized = (window as any).yatraAdmin?.emailEvents;
+    if (Array.isArray(localized) && localized.length > 0) {
+      return localized;
+    }
+    // Derive a readable name from the event key (e.g. "booking.created" →
+    // "Booking Created") since the catalog keys events, not names.
+    const prettify = (key: string) =>
+      key.replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    return [
+      ...new Set(
+        EMAIL_TEMPLATES_CATALOG.map((e) => e.event_key).filter(Boolean),
+      ),
+    ].map((key) => ({ key, name: prettify(key) }));
+  }, [fetchedEvents]);
 
   useEffect(() => {
     if (!templateData || typeof templateData !== "object") return;
@@ -388,9 +407,43 @@ const EmailTemplateForm: React.FC = () => {
   };
 
   const copyVariable = (variable: string) => {
-    navigator.clipboard.writeText(`{{${variable}}}`);
-    setCopiedVar(variable);
-    setTimeout(() => setCopiedVar(null), 2000);
+    const text = `{{${variable}}}`;
+
+    const markCopied = () => {
+      setCopiedVar(variable);
+      setTimeout(() => setCopiedVar(null), 2000);
+    };
+
+    // Legacy fallback: navigator.clipboard is only defined in a secure context
+    // (HTTPS or localhost). On a plain-HTTP wp-admin it is undefined, so the
+    // previous call threw and nothing was copied. execCommand("copy") works
+    // there via a temporary off-screen textarea.
+    const legacyCopy = (): boolean => {
+      try {
+        const el = document.createElement("textarea");
+        el.value = text;
+        el.setAttribute("readonly", "");
+        el.style.position = "fixed";
+        el.style.top = "-9999px";
+        document.body.appendChild(el);
+        el.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(el);
+        return ok;
+      } catch {
+        return false;
+      }
+    };
+
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).then(markCopied, () => {
+        if (legacyCopy()) {
+          markCopied();
+        }
+      });
+    } else if (legacyCopy()) {
+      markCopied();
+    }
   };
 
   const insertVariable = (variable: string) => {

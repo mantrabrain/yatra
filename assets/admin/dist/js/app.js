@@ -73022,7 +73022,7 @@ const EmailPreview = ({ html }) => {
   );
 };
 const EmailTemplateForm = () => {
-  var _a, _b, _c, _d;
+  var _a, _b, _c;
   const { id, isCreateMode, coreTemplateSlug, coreReadOnlyParam } = reactExports.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     const templateId = params.get("id");
@@ -73110,7 +73110,22 @@ const EmailTemplateForm = () => {
     queryFn: fetchEmailTemplateEvents,
     enabled: !isCoreSettingsEdit && isEmailAutomationModuleEnabled()
   });
-  const events = Array.isArray(fetchedEvents) && fetchedEvents.length > 0 ? fetchedEvents : ((_a = window.yatraAdmin) == null ? void 0 : _a.emailEvents) || [];
+  const events = reactExports.useMemo(() => {
+    var _a2;
+    if (Array.isArray(fetchedEvents) && fetchedEvents.length > 0) {
+      return fetchedEvents;
+    }
+    const localized = (_a2 = window.yatraAdmin) == null ? void 0 : _a2.emailEvents;
+    if (Array.isArray(localized) && localized.length > 0) {
+      return localized;
+    }
+    const prettify = (key2) => key2.replace(/[._]/g, " ").replace(/\b\w/g, (c2) => c2.toUpperCase());
+    return [
+      ...new Set(
+        EMAIL_TEMPLATES_CATALOG.map((e) => e.event_key).filter(Boolean)
+      )
+    ].map((key2) => ({ key: key2, name: prettify(key2) }));
+  }, [fetchedEvents]);
   reactExports.useEffect(() => {
     if (!templateData || typeof templateData !== "object") return;
     const t = templateData;
@@ -73276,9 +73291,37 @@ const EmailTemplateForm = () => {
     saveMutation.mutate(formData);
   };
   const copyVariable = (variable) => {
-    navigator.clipboard.writeText(`{{${variable}}}`);
-    setCopiedVar(variable);
-    setTimeout(() => setCopiedVar(null), 2e3);
+    var _a2;
+    const text = `{{${variable}}}`;
+    const markCopied = () => {
+      setCopiedVar(variable);
+      setTimeout(() => setCopiedVar(null), 2e3);
+    };
+    const legacyCopy = () => {
+      try {
+        const el = document.createElement("textarea");
+        el.value = text;
+        el.setAttribute("readonly", "");
+        el.style.position = "fixed";
+        el.style.top = "-9999px";
+        document.body.appendChild(el);
+        el.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(el);
+        return ok;
+      } catch {
+        return false;
+      }
+    };
+    if ((_a2 = navigator == null ? void 0 : navigator.clipboard) == null ? void 0 : _a2.writeText) {
+      navigator.clipboard.writeText(text).then(markCopied, () => {
+        if (legacyCopy()) {
+          markCopied();
+        }
+      });
+    } else if (legacyCopy()) {
+      markCopied();
+    }
   };
   const insertVariable = (variable) => {
     if (isCoreBodyReadOnly) {
@@ -73493,7 +73536,7 @@ const EmailTemplateForm = () => {
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("System templates cannot change events") })
                 ] }),
-                formData.event_key && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-indigo-800 dark:text-indigo-300", children: ((_b = events.find((e) => e.key === formData.event_key)) == null ? void 0 : _b.description) || "" }) })
+                formData.event_key && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-indigo-800 dark:text-indigo-300", children: ((_a = events.find((e) => e.key === formData.event_key)) == null ? void 0 : _a.description) || "" }) })
               ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs(
                   "button",
@@ -73504,9 +73547,9 @@ const EmailTemplateForm = () => {
                     children: [
                       formData.event_key ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx(Zap, { className: "w-4 h-4 text-blue-500" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-gray-900 dark:text-white", children: ((_c = events.find(
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-gray-900 dark:text-white", children: ((_b = events.find(
                           (e) => e.key === formData.event_key
-                        )) == null ? void 0 : _c.name) || formData.event_key })
+                        )) == null ? void 0 : _b.name) || formData.event_key })
                       ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-4 h-4 text-gray-400" }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("No Event (Sequence Only)") })
@@ -73860,7 +73903,7 @@ const EmailTemplateForm = () => {
                   formData.event_key || "-"
                 ] })
               ] }),
-              formData.event_key && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 italic", children: ((_d = events.find((e) => e.key === formData.event_key)) == null ? void 0 : _d.description) || "" })
+              formData.event_key && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 italic", children: ((_c = events.find((e) => e.key === formData.event_key)) == null ? void 0 : _c.description) || "" })
             ] }),
             isCreateMode ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
