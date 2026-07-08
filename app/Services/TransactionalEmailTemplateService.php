@@ -150,24 +150,21 @@ class TransactionalEmailTemplateService
         }
 
         if ($subjectTpl === '') {
+            // No operator-configured subject → use the built-in default, unless
+            // a caller supplied a context-specific override (e.g. guest checkout
+            // substitutes its booking-oriented subject for the account default).
+            // This is a FALLBACK only: when the operator HAS configured a subject
+            // (the `else` branch) it always wins — otherwise `_subject_override`
+            // would clobber a configured subject with the generic default.
             $subject = self::defaultSubject($type, $variables);
+            if (isset($variables['_subject_override'])
+                && is_string($variables['_subject_override'])
+                && $variables['_subject_override'] !== ''
+            ) {
+                $subject = $variables['_subject_override'];
+            }
         } else {
             $subject = self::parseTemplate($subjectTpl, $variables);
-        }
-
-        // Backward-compatible subject override. A caller may preserve a
-        // context-specific subject line while still reusing another type's
-        // body — e.g. guest checkout keeps its booking-specific "Verify your
-        // email to complete your booking" line even though the body now comes
-        // from the operator's customer verification template. Only applied when
-        // the reserved key is explicitly supplied and non-empty; every existing
-        // caller (which never sets it) is completely unaffected. The value is a
-        // pre-rendered final string, so it is used verbatim (no re-parsing).
-        if (isset($variables['_subject_override'])
-            && is_string($variables['_subject_override'])
-            && $variables['_subject_override'] !== ''
-        ) {
-            $subject = $variables['_subject_override'];
         }
 
         if ($bodyTpl === '') {
