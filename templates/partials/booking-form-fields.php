@@ -881,6 +881,7 @@ if (!is_user_logged_in() && !$is_remaining_payment
                         <?php esc_html_e('Password', 'yatra'); ?> <span class="required">*</span>
                     </label>
                     <input type="password" id="account_password" name="account_password" minlength="8"
+                           autocomplete="new-password"
                            placeholder="<?php esc_attr_e('Minimum 8 characters', 'yatra'); ?>">
                 </div>
                 <div class="yatra-form-group yatra-field-half">
@@ -888,6 +889,7 @@ if (!is_user_logged_in() && !$is_remaining_payment
                         <?php esc_html_e('Confirm Password', 'yatra'); ?> <span class="required">*</span>
                     </label>
                     <input type="password" id="account_password_confirm" name="account_password_confirm" minlength="8"
+                           autocomplete="new-password"
                            placeholder="<?php esc_attr_e('Re-enter password', 'yatra'); ?>">
                 </div>
             </div>

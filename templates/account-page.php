@@ -28,13 +28,24 @@ if (!$current_user->ID) {
     wp_enqueue_script(
         'yatra-login-shortcode',
         YATRA_PLUGIN_URL . 'assets/js/login-shortcode.js',
-        ['jquery'],
+        ['jquery', 'wp-i18n'],
         YATRA_VERSION,
         true
     );
+    // Load JS translations so __() strings in login-shortcode.js are localized
+    // on this standalone account page (mirrors LoginShortcode::enqueueAssets).
+    if (function_exists('wp_set_script_translations')) {
+        wp_set_script_translations(
+            'yatra-login-shortcode',
+            'yatra',
+            YATRA_PLUGIN_PATH . 'i18n/languages'
+        );
+    }
     wp_localize_script('yatra-login-shortcode', 'yatra_ajax', [
         'ajax_url' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('yatra_login_nonce'),
+        'rest_url' => esc_url_raw(rest_url('yatra/v1')),
+        'rest_nonce' => wp_create_nonce('wp_rest'),
         'debug' => defined('WP_DEBUG') && WP_DEBUG,
         'strings' => [
             'login_error' => __('Login failed. Please try again.', 'yatra'),

@@ -67,9 +67,279 @@
         // Initialize components
         initPasswordToggles();
         initAjaxLogin();
+        initPanelSwitching();
+        initAjaxRegister();
+        initAjaxForgotPassword();
         initAccessibility();
         initPerformanceOptimizations();
     });
+
+    /**
+     * Switch between the login / register / forgot-password panels.
+     * The links carry a real href (wp-admin) as a no-JS fallback; here we
+     * intercept and reveal the matching inline panel instead.
+     */
+    function initPanelSwitching() {
+        // Reveal `target` panel, hide the rest, and sync tab state + roving
+        // tabindex. Forgot-password is a sub-view of Login, so the Login tab
+        // stays active while it is shown.
+        function activatePanel($container, target, focusPanelInput) {
+            const $panels = $container.find('.yatra-auth-panel');
+            if (!$panels.length) {
+                return;
+            }
+            $panels.hide().attr('aria-hidden', 'true');
+            const $active = $container.find('.yatra-auth-panel[data-panel="' + target + '"]');
+            $active.show().attr('aria-hidden', 'false');
+
+            const activeTab = target === 'forgot' ? 'login' : target;
+            $container.find('.yatra-login-tab').each(function() {
+                const isActive = $(this).data('target') === activeTab;
+                $(this)
+                    .toggleClass('is-active', isActive)
+                    .attr('aria-selected', isActive ? 'true' : 'false')
+                    .attr('tabindex', isActive ? '0' : '-1');
+            });
+
+            // Keep the shared header + footer copy in sync with the active panel.
+            // Each panel carries its own data-header-*/data-footer-text strings
+            // (server-translated), so this is a single source of truth.
+            const $root = $container.closest('.yatra-login-container');
+            const headerTitle = $active.attr('data-header-title');
+            const headerSubtitle = $active.attr('data-header-subtitle');
+            const footerText = $active.attr('data-footer-text');
+            if (typeof headerTitle === 'string') {
+                $root.find('.yatra-login-header .yatra-login-title').text(headerTitle);
+            }
+            if (typeof headerSubtitle === 'string') {
+                const $subtitle = $root.find('.yatra-login-header .yatra-login-subtitle');
+                $subtitle.text(headerSubtitle);
+                // Hide the element entirely when a panel has no subtitle so it
+                // doesn't leave an empty gap.
+                $subtitle.css('display', headerSubtitle === '' ? 'none' : '');
+            }
+            if (typeof footerText === 'string') {
+                $root.find('.yatra-login-footer .yatra-security-text').text(footerText);
+            }
+
+            // Clear any stale messages when switching panels.
+            $container.find('.yatra-form-error, .yatra-form-success').remove();
+
+            if (focusPanelInput) {
+                $active.find('input:visible').first().trigger('focus');
+            }
+        }
+
+        // Both the top tabs (.yatra-login-tab) and the in-panel text links
+        // (.yatra-auth-switch, e.g. "Forgot your password?", "Back to login")
+        // switch panels via a data-target.
+        $document.on('click', '.yatra-login-tab, .yatra-auth-switch', function(e) {
+            e.preventDefault();
+            const target = $(this).data('target');
+            if (!target) {
+                return;
+            }
+            activatePanel($(this).closest('.yatra-login-form-container'), target, true);
+        });
+
+        // WAI-ARIA tabs keyboard support: Left/Right/Home/End move between tabs
+        // (automatic activation — switching panels is cheap here).
+        $document.on('keydown', '.yatra-login-tab', function(e) {
+            if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].indexOf(e.key) === -1) {
+                return;
+            }
+            e.preventDefault();
+            const $tabs = $(this).closest('.yatra-login-tabs').find('.yatra-login-tab');
+            const count = $tabs.length;
+            if (!count) {
+                return;
+            }
+            let idx = $tabs.index(this);
+            if (e.key === 'ArrowLeft') { idx = (idx - 1 + count) % count; }
+            else if (e.key === 'ArrowRight') { idx = (idx + 1) % count; }
+            else if (e.key === 'Home') { idx = 0; }
+            else if (e.key === 'End') { idx = count - 1; }
+            const $next = $tabs.eq(idx);
+            activatePanel($next.closest('.yatra-login-form-container'), $next.data('target'), false);
+            $next.trigger('focus');
+        });
+    }
+
+    /**
+     * Validate the registration form client-side before submitting.
+     */
+    function validateRegisterForm($form) {
+        const email = $form.find('[name="email"]').val().trim();
+        const password = $form.find('[name="password"]').val();
+        const confirm = $form.find('[name="confirm_password"]').val();
+        const firstName = $form.find('[name="first_name"]').val().trim();
+        const lastName = $form.find('[name="last_name"]').val().trim();
+
+        if (!firstName || !lastName) {
+            return { valid: false, message: __('Please enter your first and last name.', 'yatra') };
+        }
+        if (!email) {
+            return { valid: false, message: __('Please enter your email address.', 'yatra') };
+        }
+        if (!password || password.length < 8) {
+            return { valid: false, message: __('Password must be at least 8 characters long.', 'yatra') };
+        }
+        if (password !== confirm) {
+            return { valid: false, message: __('Passwords do not match.', 'yatra') };
+        }
+        return { valid: true };
+    }
+
+    /**
+     * Initialize AJAX registration against the public /auth/register REST route.
+     * Reuses the same backend the booking checkout uses (email verification
+     * included), so no new server logic is introduced here.
+     */
+    function initAjaxRegister() {
+        $document.on('submit', '.yatra-register-form[data-ajax="true"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const $form = $(this);
+            const $submitBtn = $form.find('button[type="submit"]');
+            if ($submitBtn.prop('disabled')) {
+                return false;
+            }
+
+            const validation = validateRegisterForm($form);
+            if (!validation.valid) {
+                showFormError($form, validation.message);
+                return false;
+            }
+
+            $form.find('.yatra-form-error, .yatra-form-success').remove();
+            setButtonLoading($submitBtn, true);
+
+            const restBase = (yatra_ajax && yatra_ajax.rest_url ? yatra_ajax.rest_url : '/wp-json/yatra/v1').replace(/\/$/, '');
+            const payload = {
+                first_name: $form.find('[name="first_name"]').val().trim(),
+                last_name: $form.find('[name="last_name"]').val().trim(),
+                email: $form.find('[name="email"]').val().trim(),
+                phone: $form.find('[name="phone"]').val().trim(),
+                password: $form.find('[name="password"]').val(),
+                confirm_password: $form.find('[name="confirm_password"]').val()
+            };
+
+            const request = $.ajax({
+                url: restBase + '/auth/register',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                headers: yatra_ajax && yatra_ajax.rest_nonce ? { 'X-WP-Nonce': yatra_ajax.rest_nonce } : {},
+                timeout: 20000,
+                dataType: 'json'
+            });
+
+            request.done(function(response) {
+                if (response && response.success) {
+                    showFormSuccess($form, response.message || __('Registration successful! Please check your email to verify your account.', 'yatra'));
+                    $form[0].reset();
+                } else {
+                    showFormError($form, (response && response.message) || __('Registration failed. Please try again.', 'yatra'));
+                }
+            });
+
+            request.fail(function(xhr, status) {
+                let message = __('Network error. Please check your connection and try again.', 'yatra');
+                if (status === 'timeout') {
+                    message = __('Request timed out. Please try again.', 'yatra');
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+                showFormError($form, message);
+            });
+
+            request.always(function() {
+                setButtonLoading($submitBtn, false);
+            });
+
+            return false;
+        });
+    }
+
+    /**
+     * Initialize AJAX forgot-password. Delegates to WordPress core's secure
+     * password-reset flow server-side (retrieve_password) — we never reimplement
+     * reset-token handling. The entry point stays on the branded page.
+     */
+    function initAjaxForgotPassword() {
+        $document.on('submit', '.yatra-forgot-form[data-ajax="true"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const $form = $(this);
+            const $submitBtn = $form.find('button[type="submit"]');
+            if ($submitBtn.prop('disabled')) {
+                return false;
+            }
+
+            const userLogin = $form.find('[name="user_login"]').val().trim();
+            if (!userLogin) {
+                showFormError($form, __('Please enter your email address or username.', 'yatra'));
+                return false;
+            }
+
+            $form.find('.yatra-form-error, .yatra-form-success').remove();
+            setButtonLoading($submitBtn, true);
+
+            const request = $.ajax({
+                url: yatra_ajax && yatra_ajax.ajax_url ? yatra_ajax.ajax_url : '/wp-admin/admin-ajax.php',
+                method: 'POST',
+                data: {
+                    action: 'yatra_ajax_lost_password',
+                    user_login: userLogin,
+                    yatra_login_nonce: $form.find('[name="yatra_login_nonce"]').val()
+                },
+                timeout: 20000,
+                dataType: 'json'
+            });
+
+            request.done(function(response) {
+                if (response && response.success) {
+                    showFormSuccess($form, (response.data && response.data.message) || __('If an account exists for that email, a password reset link has been sent.', 'yatra'));
+                    $form[0].reset();
+                } else {
+                    showFormError($form, (response && response.data && response.data.message) || __('Unable to process the request. Please try again.', 'yatra'));
+                }
+            });
+
+            request.fail(function(xhr, status) {
+                let message = __('Network error. Please check your connection and try again.', 'yatra');
+                if (status === 'timeout') {
+                    message = __('Request timed out. Please try again.', 'yatra');
+                } else if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+                    message = xhr.responseJSON.data.message;
+                }
+                showFormError($form, message);
+            });
+
+            request.always(function() {
+                setButtonLoading($submitBtn, false);
+            });
+
+            return false;
+        });
+    }
+
+    /**
+     * Toggle a submit button's loading state, mirroring the login button pattern.
+     */
+    function setButtonLoading($submitBtn, loading) {
+        if (loading) {
+            $submitBtn.prop('disabled', true).addClass('yatra-is-loading');
+            $submitBtn.find('.yatra-btn-text').hide();
+            $submitBtn.find('.yatra-btn-loading').show();
+        } else {
+            $submitBtn.prop('disabled', false).removeClass('yatra-is-loading');
+            $submitBtn.find('.yatra-btn-loading').hide();
+            $submitBtn.find('.yatra-btn-text').show();
+        }
+    }
 
     /**
      * Initialize password toggle functionality with performance optimizations
@@ -276,16 +546,16 @@
                         }
                     } else {
                         // Error: Show error message
-                        showFormError($form, response.data.message || 'Login failed. Please try again.');
+                        showFormError($form, response.data.message || __('Login failed. Please try again.', 'yatra'));
                     }
                 });
-                
+
                 // Handle error
                 ajaxRequest.fail(function(xhr, status, error) {
-                    let errorMessage = 'Network error. Please check your connection and try again.';
-                    
+                    let errorMessage = __('Network error. Please check your connection and try again.', 'yatra');
+
                     if (status === 'timeout') {
-                        errorMessage = 'Request timed out. Please try again.';
+                        errorMessage = __('Request timed out. Please try again.', 'yatra');
                     } else if (xhr.responseJSON && xhr.responseJSON.data) {
                         errorMessage = xhr.responseJSON.data.message || errorMessage;
                     }

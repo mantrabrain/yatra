@@ -67,6 +67,8 @@ class LoginShortcode extends BaseShortcode
         wp_localize_script('yatra-login-shortcode', 'yatra_ajax', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('yatra_login_nonce'),
+            'rest_url' => esc_url_raw(rest_url('yatra/v1')),
+            'rest_nonce' => wp_create_nonce('wp_rest'),
             'debug' => defined('WP_DEBUG') && WP_DEBUG,
             'strings' => [
                 'login_error' => __('Login failed. Please try again.', 'yatra'),
@@ -82,10 +84,22 @@ class LoginShortcode extends BaseShortcode
     protected function renderContent(array $atts): string
     {
         $atts = shortcode_atts($this->default_attributes, $atts, $this->tag);
-        
+
         // Sanitize and validate attributes
         $atts = $this->sanitizeAttributes($atts);
-        
+
+        // Translate the built-in default title/subtitle at render time. The
+        // defaults are stored as raw English in the constructor because __()
+        // must not run that early (before init) — doing so triggers WordPress's
+        // just-in-time textdomain notice. A custom title/subtitle set by the
+        // operator on the shortcode passes through unchanged.
+        if ($atts['title'] === 'Customer Login') {
+            $atts['title'] = __('Customer Login', 'yatra');
+        }
+        if ($atts['subtitle'] === 'Login to access your bookings and account') {
+            $atts['subtitle'] = __('Login to access your bookings and account', 'yatra');
+        }
+
         // Check if user is already logged in
         if (is_user_logged_in()) {
             return $this->renderLoggedInMessage($atts);

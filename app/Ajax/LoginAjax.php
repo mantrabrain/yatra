@@ -25,6 +25,66 @@ class LoginAjax
         
         // Register AJAX action for non-logged-in users
         add_action('wp_ajax_nopriv_yatra_ajax_login', [$this, 'handleAjaxLogin']);
+
+        // Password reset request (delegates to WordPress core's reset flow).
+        add_action('wp_ajax_yatra_ajax_lost_password', [$this, 'handleAjaxLostPassword']);
+        add_action('wp_ajax_nopriv_yatra_ajax_lost_password', [$this, 'handleAjaxLostPassword']);
+    }
+
+    /**
+     * Handle AJAX password-reset request.
+     *
+     * This is a thin, on-site entry point that delegates to WordPress core's
+     * retrieve_password(): core generates the reset key and sends its standard
+     * reset email. We deliberately do NOT reimplement reset-token crypto. A
+     * generic success message is always returned to avoid account enumeration.
+     */
+    public function handleAjaxLostPassword(): void
+    {
+        // Rate limiting (shared with login attempts).
+        $this->checkRateLimit();
+
+        // Verify nonce (same nonces the login form issues).
+        $nonce = $_POST['yatra_login_nonce'] ?? $_POST['nonce'] ?? '';
+        if (!wp_verify_nonce($nonce, 'yatra_login_action') && !wp_verify_nonce($nonce, 'yatra_login_nonce')) {
+            wp_send_json_error([
+                'success' => false,
+                'code' => 'security_check_failed',
+                'message' => __('Security check failed. Please refresh the page and try again.', 'yatra'),
+            ]);
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            wp_send_json_error([
+                'success' => false,
+                'code' => 'invalid_method',
+                'message' => __('Invalid request method.', 'yatra'),
+            ]);
+        }
+
+        $user_login = sanitize_text_field(wp_unslash($_POST['user_login'] ?? $_POST['log'] ?? ''));
+
+        if ($user_login === '') {
+            wp_send_json_error([
+                'success' => false,
+                'code' => 'empty_user_login',
+                'message' => __('Please enter your email address or username.', 'yatra'),
+            ]);
+        }
+
+        // Populate $_POST['user_login'] for cross-version compatibility:
+        // retrieve_password() reads it directly on WordPress older than 5.7,
+        // and the explicit argument is used on 5.7+ (extra args are ignored on
+        // older cores, so this is safe either way).
+        $_POST['user_login'] = $user_login;
+        retrieve_password($user_login);
+
+        // Always report success regardless of whether the account exists —
+        // prevents user/email enumeration (mirrors WordPress core behavior).
+        wp_send_json_success([
+            'success' => true,
+            'message' => __('If an account exists for that email, a password reset link has been sent. Please check your inbox.', 'yatra'),
+        ]);
     }
 
     /**

@@ -65,6 +65,41 @@
     $(document).ready(function() {
         const $form = $('#yatra-booking-form');
         const $submitBtn = $('#yatra-submit-booking');
+
+        // --- Guest "Create an account" reveal ---
+        // The optional account-creation block (#yatra-account-fields) ships hidden
+        // with non-required password inputs. Without this handler the guest can
+        // tick "Create an account" but never see a password field, so either no
+        // account is created (empty password) or autofill populates the hidden
+        // field asymmetrically and the server rejects with "Passwords do not
+        // match" — with no visible field to correct. Reveal + require the fields
+        // only when opted in; hide + clear + un-require otherwise so a pure-guest
+        // submit is never blocked and no stale/autofilled password is sent.
+        (function initCreateAccountToggle() {
+            const $accountFields = $('#yatra-account-fields');
+            const $checkbox = $('#create-account');
+            if (!$accountFields.length || !$checkbox.length) {
+                return;
+            }
+            const $pw = $accountFields.find('#account_password');
+            const $pwConfirm = $accountFields.find('#account_password_confirm');
+
+            const applyState = function (checked) {
+                if (checked) {
+                    $accountFields.show();
+                    $pw.add($pwConfirm).attr('required', 'required');
+                } else {
+                    $accountFields.hide();
+                    $pw.add($pwConfirm).removeAttr('required').val('');
+                }
+            };
+
+            // Honor the current state on load (covers browser-restored checkboxes).
+            applyState($checkbox.is(':checked'));
+            $checkbox.on('change', function () {
+                applyState($(this).is(':checked'));
+            });
+        })();
         const isRemainingPayment = Boolean(window.yatraBookingData?.isRemainingPayment) || ($form.data('is-remaining-payment') === 'yes');
         const remainingAmount = isRemainingPayment
             ? parseFloat(window.yatraBookingData?.remainingAmount ?? $form.data('payment-due')) || 0
