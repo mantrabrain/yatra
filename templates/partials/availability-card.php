@@ -28,6 +28,27 @@ $item_id = isset($card['id']) ? (string) $card['id'] : (string) $index;
                 $card_status = 'sold_out';
             }
 
+            // A sold-out departure is only bookable as a WAITLIST entry, and only
+            // when the server would actually accept it — the same gate
+            // BookingSessionController applies (WaitlistService::canJoinWaitlist).
+            // When waitlist is unavailable the booking is rejected at the final
+            // step, so the Book Now button must be blocked here rather than
+            // failing late (the reported bug). Probing with 1 traveler is
+            // sufficient: canJoinWaitlist requires seats_available < N, which for a
+            // sold-out card (0 seats) holds for any N >= 1.
+            $waitlist_available = false;
+            if ($is_sold_out && class_exists('\\Yatra\\Services\\WaitlistService')) {
+                $waitlist_probe = (object) [
+                    'id' => (int) ($card['id'] ?? 0),
+                    'seats_available' => $seats_available,
+                ];
+                $waitlist_available = \Yatra\Services\WaitlistService::canJoinWaitlist(
+                    $trip_data,
+                    $waitlist_probe,
+                    1
+                );
+            }
+
 // Match Y-m-d even if DB returns datetime (e.g. 2026-08-13 00:00:00)
 $yatra_card_date_norm = static function ($v): string {
     $v = trim((string) $v);
@@ -561,8 +582,25 @@ $initial_total_price = $display_sale_price;
                     // Is this a day trip?
                     $is_card_day_trip = !empty($card['is_day_trip']) || !empty($card['date_display']);
                     ?>
-                    <button type="button" 
-                       class="yatra-card-book-btn" 
+                    <?php if ($is_sold_out && !$waitlist_available): ?>
+                    <?php // Sold out and no waitlist available: block booking here.
+                          // The server would reject this at the final step
+                          // (BookingSessionController → code 'sold_out'), so we
+                          // disable the button instead of letting the customer go
+                          // all the way through and fail. ?>
+                    <button type="button"
+                       class="yatra-card-book-btn yatra-card-book-btn--sold-out"
+                       disabled
+                       aria-disabled="true"
+                       data-item="<?php echo esc_attr($item_id); ?>">
+                        <span class="yatra-card-book-btn-text">
+                            <span class="yatra-card-book-btn-title"><?php esc_html_e('Sold Out', 'yatra'); ?></span>
+                            <span class="yatra-card-book-btn-subtitle"><?php esc_html_e('No seats available', 'yatra'); ?></span>
+                        </span>
+                    </button>
+                    <?php else: ?>
+                    <button type="button"
+                       class="yatra-card-book-btn<?php echo ($is_sold_out && $waitlist_available) ? ' yatra-card-book-btn--waitlist' : ''; ?>"
                        data-trip-id="<?php echo esc_attr($trip_id); ?>"
                        data-availability-id="<?php echo esc_attr($item_id); ?>"
                        data-date="<?php echo esc_attr($card['data_date'] ?? ''); ?>"
@@ -574,10 +612,16 @@ $initial_total_price = $display_sale_price;
                        data-item="<?php echo esc_attr($item_id); ?>">
                         <?php echo yatra_svg_icon('shopping-cart', 'yatra-icon-sm'); ?>
                         <span class="yatra-card-book-btn-text">
+                            <?php if ($is_sold_out && $waitlist_available): ?>
+                            <span class="yatra-card-book-btn-title"><?php esc_html_e('Join Waitlist', 'yatra'); ?></span>
+                            <span class="yatra-card-book-btn-subtitle"><?php esc_html_e('Sold out — join the waitlist', 'yatra'); ?></span>
+                            <?php else: ?>
                             <span class="yatra-card-book-btn-title"><?php esc_html_e('Book Now', 'yatra'); ?></span>
                             <span class="yatra-card-book-btn-subtitle"><?php esc_html_e('Continue to booking', 'yatra'); ?></span>
+                            <?php endif; ?>
                         </span>
                     </button>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

@@ -9735,6 +9735,24 @@ button[type="button"].yatra-card-book-btn {
     flex-shrink: 0;
 }
 
+/* Sold out with no waitlist: disabled, cannot proceed to checkout (the booking
+   would be rejected server-side, so we block it here instead of failing late). */
+button[type="button"].yatra-card-book-btn--sold-out,
+button[type="button"].yatra-card-book-btn:disabled {
+    background: #e5e7eb;
+    cursor: not-allowed;
+}
+button[type="button"].yatra-card-book-btn--sold-out .yatra-card-book-btn-title,
+button[type="button"].yatra-card-book-btn--sold-out .yatra-card-book-btn-subtitle {
+    color: #9ca3af;
+}
+
+/* Sold out but waitlist available: amber to signal this is a waitlist join,
+   not a normal booking. */
+button[type="button"].yatra-card-book-btn--waitlist {
+    background: var(--yatra-warning, #f59e0b);
+}
+
 .yatra-card-book-btn-text {
     display: flex;
     flex-direction: column;
