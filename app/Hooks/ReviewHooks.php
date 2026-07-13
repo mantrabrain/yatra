@@ -140,6 +140,16 @@ class ReviewHooks
             wp_send_json_error(['message' => __('Security check failed.', 'yatra')]);
         }
 
+        // reCAPTCHA v3 (no-op unless the enquiry form is protected in settings).
+        $recaptcha = \Yatra\Services\RecaptchaService::verifyForm(
+            'enquiry',
+            (string) ($_POST['recaptcha_token'] ?? ''),
+            $_SERVER['REMOTE_ADDR'] ?? null
+        );
+        if (empty($recaptcha['success'])) {
+            wp_send_json_error(['message' => $recaptcha['message'] ?? __('reCAPTCHA verification failed.', 'yatra')]);
+        }
+
         // Validate required fields
         $name = sanitize_text_field($_POST['name'] ?? '');
         $email = sanitize_email($_POST['email'] ?? '');

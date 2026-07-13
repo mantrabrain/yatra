@@ -193,7 +193,14 @@ class SettingsController extends BaseController
         'recaptcha_enabled' => false,
         'recaptcha_site_key' => '',
         'recaptcha_secret_key' => '',
-        
+        // reCAPTCHA v3: score threshold (0.0-1.0) + per-form protection toggles.
+        // All off by default so enabling reCAPTCHA alone changes nothing until
+        // the operator picks which forms to protect.
+        'recaptcha_score_threshold' => 0.5,
+        'recaptcha_protect_enquiry' => false,
+        'recaptcha_protect_booking' => false,
+        'recaptcha_protect_registration' => false,
+
         // Permalink Settings
         'trip_base' => 'trip',
         'destination_base' => 'destination',

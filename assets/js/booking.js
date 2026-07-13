@@ -1140,6 +1140,23 @@
          * Submit booking to server
          */
         function submitBookingToServer(bookingData, originalBtnHtml) {
+            // reCAPTCHA v3: attach a token when the booking form is protected,
+            // then run the real submit. Wraps every call path (direct submit and
+            // the gateway `proceedWithSubmission` hook). No-op unless the operator
+            // opted booking into reCAPTCHA (off by default), so payment flows are
+            // unchanged otherwise.
+            const yatraRc = window.yatraRecaptcha;
+            if (yatraRc && yatraRc.protects && yatraRc.protects('booking') && !bookingData.recaptcha_token) {
+                yatraRc.execute('booking').then(function (recaptchaToken) {
+                    if (recaptchaToken) { bookingData.recaptcha_token = recaptchaToken; }
+                    submitBookingToServerInner(bookingData, originalBtnHtml);
+                });
+                return;
+            }
+            submitBookingToServerInner(bookingData, originalBtnHtml);
+        }
+
+        function submitBookingToServerInner(bookingData, originalBtnHtml) {
             const { base: restBase, isPlain } = getRestBase();
             const siteBase = (window.yatraBookingData?.siteUrl || window.location.origin || '').replace(/\/$/, '');
             let createUrl;

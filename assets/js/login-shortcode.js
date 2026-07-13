@@ -225,37 +225,49 @@
                 confirm_password: $form.find('[name="confirm_password"]').val()
             };
 
-            const request = $.ajax({
-                url: restBase + '/auth/register',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(payload),
-                headers: yatra_ajax && yatra_ajax.rest_nonce ? { 'X-WP-Nonce': yatra_ajax.rest_nonce } : {},
-                timeout: 20000,
-                dataType: 'json'
-            });
+            // reCAPTCHA v3: attach a fresh token when registration is protected.
+            const yatraRc = window.yatraRecaptcha;
+            const regTokenPromise = (yatraRc && yatraRc.protects && yatraRc.protects('registration'))
+                ? yatraRc.execute('registration')
+                : Promise.resolve('');
 
-            request.done(function(response) {
-                if (response && response.success) {
-                    showFormSuccess($form, response.message || __('Registration successful! Please check your email to verify your account.', 'yatra'));
-                    $form[0].reset();
-                } else {
-                    showFormError($form, (response && response.message) || __('Registration failed. Please try again.', 'yatra'));
+            regTokenPromise.then(function (recaptchaToken) {
+                if (recaptchaToken) {
+                    payload.recaptcha_token = recaptchaToken;
                 }
-            });
 
-            request.fail(function(xhr, status) {
-                let message = __('Network error. Please check your connection and try again.', 'yatra');
-                if (status === 'timeout') {
-                    message = __('Request timed out. Please try again.', 'yatra');
-                } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                    message = xhr.responseJSON.message;
-                }
-                showFormError($form, message);
-            });
+                const request = $.ajax({
+                    url: restBase + '/auth/register',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    headers: yatra_ajax && yatra_ajax.rest_nonce ? { 'X-WP-Nonce': yatra_ajax.rest_nonce } : {},
+                    timeout: 20000,
+                    dataType: 'json'
+                });
 
-            request.always(function() {
-                setButtonLoading($submitBtn, false);
+                request.done(function(response) {
+                    if (response && response.success) {
+                        showFormSuccess($form, response.message || __('Registration successful! Please check your email to verify your account.', 'yatra'));
+                        $form[0].reset();
+                    } else {
+                        showFormError($form, (response && response.message) || __('Registration failed. Please try again.', 'yatra'));
+                    }
+                });
+
+                request.fail(function(xhr, status) {
+                    let message = __('Network error. Please check your connection and try again.', 'yatra');
+                    if (status === 'timeout') {
+                        message = __('Request timed out. Please try again.', 'yatra');
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    }
+                    showFormError($form, message);
+                });
+
+                request.always(function() {
+                    setButtonLoading($submitBtn, false);
+                });
             });
 
             return false;

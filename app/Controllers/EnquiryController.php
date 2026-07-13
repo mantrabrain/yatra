@@ -205,6 +205,19 @@ class EnquiryController extends BaseController
             $data = $request->get_params();
         }
 
+        // reCAPTCHA v3 (no-op unless the enquiry form is protected in settings).
+        $recaptcha = \Yatra\Services\RecaptchaService::verifyForm(
+            'enquiry',
+            (string) ($data['recaptcha_token'] ?? ''),
+            $_SERVER['REMOTE_ADDR'] ?? null
+        );
+        if (empty($recaptcha['success'])) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => $recaptcha['message'] ?? __('reCAPTCHA verification failed.', 'yatra'),
+            ], 400);
+        }
+
         $result = $this->enquiryService->createEnquiry($data);
 
         if (!$result['success']) {

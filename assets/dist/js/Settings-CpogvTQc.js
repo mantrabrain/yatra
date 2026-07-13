@@ -2050,6 +2050,10 @@ const Settings = () => {
       recaptcha_enabled: false,
       recaptcha_site_key: "",
       recaptcha_secret_key: "",
+      recaptcha_score_threshold: 0.5,
+      recaptcha_protect_enquiry: false,
+      recaptcha_protect_booking: false,
+      recaptcha_protect_registration: false,
       trip_base: "trip",
       destination_base: "destination",
       activity_base: "activity",
@@ -6979,7 +6983,85 @@ const Settings = () => {
                     }
                   )
                 }
-              )
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: __(
+                "Uses reCAPTCHA v3 (invisible, score-based). Create v3 keys at google.com/recaptcha and paste them above.",
+                "yatra"
+              ) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                FormField,
+                {
+                  id: "recaptcha_score_threshold",
+                  label: __("Score Threshold", "yatra"),
+                  description: __(
+                    "Minimum v3 score (0.0–1.0) to accept a submission. Lower is more lenient, higher is stricter. Default 0.5.",
+                    "yatra"
+                  ),
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      id: "recaptcha_score_threshold",
+                      type: "number",
+                      min: "0",
+                      max: "1",
+                      step: "0.1",
+                      value: String(formData.recaptcha_score_threshold ?? 0.5),
+                      name: "recaptcha_score_threshold",
+                      onChange: (e) => setFormData(
+                        (prev) => prev ? {
+                          ...prev,
+                          recaptcha_score_threshold: parseFloat(
+                            e.target.value
+                          )
+                        } : prev
+                      )
+                    }
+                  )
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "pt-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { className: "font-medium", children: __("Protect these forms", "yatra") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5 mb-2", children: __(
+                  "Choose which forms reCAPTCHA should verify. Booking protection is off by default to avoid blocking a legitimate payment on a low score.",
+                  "yatra"
+                ) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2", children: [
+                  {
+                    key: "recaptcha_protect_enquiry",
+                    label: __("Enquiry form", "yatra")
+                  },
+                  {
+                    key: "recaptcha_protect_booking",
+                    label: __("Booking / checkout form", "yatra")
+                  },
+                  {
+                    key: "recaptcha_protect_registration",
+                    label: __("Customer registration", "yatra")
+                  }
+                ].map((f) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "label",
+                  {
+                    className: "flex items-center gap-2 cursor-pointer",
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "input",
+                        {
+                          type: "checkbox",
+                          id: f.key,
+                          name: f.key,
+                          checked: Boolean(
+                            formData[f.key]
+                          ),
+                          onChange: handleFieldChange,
+                          className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: f.label })
+                    ]
+                  },
+                  f.key
+                )) })
+              ] })
             ] })
           ] })
         ] });
@@ -8109,4 +8191,4 @@ const Settings = () => {
 export {
   Settings as default
 };
-//# sourceMappingURL=Settings-B77KuwZ-.js.map
+//# sourceMappingURL=Settings-CpogvTQc.js.map

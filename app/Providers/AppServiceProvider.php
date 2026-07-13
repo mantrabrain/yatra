@@ -64,6 +64,9 @@ class AppServiceProvider extends ServiceProvider
         // Initialize review and enquiry hooks
         \Yatra\Hooks\ReviewHooks::init();
 
+        // Load the reCAPTCHA v3 script on the frontend when enabled (self-guards).
+        add_action('wp_enqueue_scripts', ['\\Yatra\\Services\\RecaptchaService', 'enqueueScript']);
+
         // Garbage-collect deleted-trip IDs out of user wishlist meta.
         \Yatra\Hooks\SavedTripHooks::init();
 

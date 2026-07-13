@@ -294,6 +294,19 @@ class AuthController
             ], 403);
         }
 
+        // reCAPTCHA v3 (no-op unless the registration form is protected in settings).
+        $recaptcha = \Yatra\Services\RecaptchaService::verifyForm(
+            'registration',
+            (string) ($request->get_param('recaptcha_token') ?? ''),
+            $_SERVER['REMOTE_ADDR'] ?? null
+        );
+        if (empty($recaptcha['success'])) {
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => $recaptcha['message'] ?? __('reCAPTCHA verification failed.', 'yatra'),
+            ], 400);
+        }
+
         $first_name = sanitize_text_field($request->get_param('first_name') ?? '');
         $last_name = sanitize_text_field($request->get_param('last_name') ?? '');
         $email = sanitize_email($request->get_param('email') ?? '');

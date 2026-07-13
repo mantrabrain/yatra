@@ -2847,14 +2847,26 @@
           ? `${baseUrlRaw}/enquiries`
           : `${baseUrlRaw}/yatra/v1/enquiries`;
 
-      fetch(enquiriesUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'omit', // public endpoint
-        body: JSON.stringify(payload),
-      })
+      // reCAPTCHA v3: attach a fresh token when the enquiry form is protected.
+      const yatraRc = window.yatraRecaptcha;
+      const enquiryTokenPromise = (yatraRc && yatraRc.protects && yatraRc.protects('enquiry'))
+          ? yatraRc.execute('enquiry')
+          : Promise.resolve('');
+
+      enquiryTokenPromise
+        .then(recaptchaToken => {
+          if (recaptchaToken) {
+            payload.recaptcha_token = recaptchaToken;
+          }
+          return fetch(enquiriesUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'omit', // public endpoint
+            body: JSON.stringify(payload),
+          });
+        })
         .then(response => response.json())
         .then(result => {
           if (result.success) {

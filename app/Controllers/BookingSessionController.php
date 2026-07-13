@@ -1206,6 +1206,21 @@ class BookingSessionController extends BaseController
 
         $data = $request->get_json_params();
 
+        // reCAPTCHA v3 — no-op unless the booking form is explicitly protected in
+        // settings (off by default so payment flows are never gated unless the
+        // operator opts in).
+        $recaptcha = \Yatra\Services\RecaptchaService::verifyForm(
+            'booking',
+            (string) (($data['recaptcha_token'] ?? '') ?: ''),
+            $_SERVER['REMOTE_ADDR'] ?? null
+        );
+        if (empty($recaptcha['success'])) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => $recaptcha['message'] ?? __('reCAPTCHA verification failed.', 'yatra'),
+            ], 400);
+        }
+
         // ========================================
         // CSRF — booking-scoped action nonce
         // ========================================

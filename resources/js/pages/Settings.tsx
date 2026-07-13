@@ -994,6 +994,10 @@ interface SettingsData {
   recaptcha_enabled: boolean;
   recaptcha_site_key: string;
   recaptcha_secret_key: string;
+  recaptcha_score_threshold: number;
+  recaptcha_protect_enquiry: boolean;
+  recaptcha_protect_booking: boolean;
+  recaptcha_protect_registration: boolean;
 
   // Mailchimp Integration (Pro)
   mailchimp_api_key?: string;
@@ -2913,6 +2917,10 @@ const Settings: React.FC = () => {
       recaptcha_enabled: false,
       recaptcha_site_key: "",
       recaptcha_secret_key: "",
+      recaptcha_score_threshold: 0.5,
+      recaptcha_protect_enquiry: false,
+      recaptcha_protect_booking: false,
+      recaptcha_protect_registration: false,
       trip_base: "trip",
       destination_base: "destination",
       activity_base: "activity",
@@ -8392,6 +8400,91 @@ const Settings: React.FC = () => {
                       placeholder={__("Enter secret key", "yatra")}
                     />
                   </FormField>
+
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {__(
+                      "Uses reCAPTCHA v3 (invisible, score-based). Create v3 keys at google.com/recaptcha and paste them above.",
+                      "yatra",
+                    )}
+                  </p>
+
+                  <FormField
+                    id="recaptcha_score_threshold"
+                    label={__("Score Threshold", "yatra")}
+                    description={__(
+                      "Minimum v3 score (0.0–1.0) to accept a submission. Lower is more lenient, higher is stricter. Default 0.5.",
+                      "yatra",
+                    )}
+                  >
+                    <Input
+                      id="recaptcha_score_threshold"
+                      type="number"
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      value={String(formData.recaptcha_score_threshold ?? 0.5)}
+                      name="recaptcha_score_threshold"
+                      onChange={(e) =>
+                        setFormData((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                recaptcha_score_threshold: parseFloat(
+                                  e.target.value,
+                                ),
+                              }
+                            : prev,
+                        )
+                      }
+                    />
+                  </FormField>
+
+                  <div className="pt-2">
+                    <Label className="font-medium">
+                      {__("Protect these forms", "yatra")}
+                    </Label>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 mb-2">
+                      {__(
+                        "Choose which forms reCAPTCHA should verify. Booking protection is off by default to avoid blocking a legitimate payment on a low score.",
+                        "yatra",
+                      )}
+                    </p>
+                    <div className="space-y-2">
+                      {[
+                        {
+                          key: "recaptcha_protect_enquiry",
+                          label: __("Enquiry form", "yatra"),
+                        },
+                        {
+                          key: "recaptcha_protect_booking",
+                          label: __("Booking / checkout form", "yatra"),
+                        },
+                        {
+                          key: "recaptcha_protect_registration",
+                          label: __("Customer registration", "yatra"),
+                        },
+                      ].map((f) => (
+                        <label
+                          key={f.key}
+                          className="flex items-center gap-2 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            id={f.key}
+                            name={f.key}
+                            checked={Boolean(
+                              (formData as unknown as Record<string, unknown>)[
+                                f.key
+                              ],
+                            )}
+                            onChange={handleFieldChange}
+                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <span className="text-sm">{f.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
                 </>
               )}
             </div>
