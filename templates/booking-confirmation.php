@@ -973,6 +973,46 @@ do_action('yatra_booking_confirmation_header', $booking);
     margin: 0 0 12px;
 }
 
+/* Star rating. This confirmation page only enqueues yatra-common + fontawesome,
+   not booking.css/trip.css where these live, so without them the inline SVG
+   stars render with no size or colour (invisible). Mirrors booking.css. */
+.yatra-trip-rating {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.yatra-rating-stars {
+    display: inline-flex;
+    gap: 4px;
+}
+
+.yatra-star {
+    width: 20px;
+    height: 20px;
+    color: #e2e8f0;
+}
+
+.yatra-star svg {
+    width: 100%;
+    height: 100%;
+}
+
+.yatra-star-filled {
+    color: #f59e0b;
+}
+
+.yatra-rating-meta strong {
+    color: #0f172a;
+    margin-right: 6px;
+}
+
+.yatra-rating-meta span {
+    color: #64748b;
+    font-size: 14px;
+}
+
 .yatra-trip-meta {
     display: flex;
     gap: 20px;
