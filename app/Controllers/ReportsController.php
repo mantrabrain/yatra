@@ -79,10 +79,14 @@ class ReportsController extends BaseController
 
         $bookingsList = $this->request('GET', '/yatra/v1/bookings', $params);
         $paymentsList = $this->request('GET', '/yatra/v1/payments', $params);
+        // The reporting window [$dateFrom, $dateTo] is historical (default: last
+        // 30 days), matching the bookings/payments/revenue stats. Departures must
+        // therefore INCLUDE past departures — otherwise "in the last 30 days" AND
+        // "not past" is an empty set, and every occupancy figure renders as 0%.
         $departuresList = $this->request('GET', '/yatra/v1/departures', [
             'date_from'   => $dateFrom,
             'date_to'     => $dateTo,
-            'include_past' => 'false',
+            'include_past' => 'true',
         ]);
 
         $bookings = isset($bookingsList['data']) && is_array($bookingsList['data'])
