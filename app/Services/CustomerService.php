@@ -694,6 +694,7 @@ class CustomerService
 
             // Get payments for this booking (invoices per payment)
             $payments = $this->paymentRepository->findByBookingId($bookingId);
+            $hasPaidInvoice = false;
             foreach ($payments as $payment) {
                 $paymentId = (int) ($payment->id ?? 0);
                 if ($paymentId <= 0) {
@@ -724,6 +725,34 @@ class CustomerService
                     'url' => $invoiceUrl,
                     'booking_id' => $bookingId,
                     'payment_id' => $paymentId,
+                ];
+                $hasPaidInvoice = true;
+            }
+
+            // Pro-forma invoice for offline / unpaid bookings (e.g. Bank Transfer):
+            // no completed payment yet, but there is a balance due. Carries the
+            // gateway's payment instructions so the customer knows how to pay.
+            $amountDue = is_object($booking)
+                ? (float) ($booking->amount_due ?? $booking->booking_amount_due ?? 0)
+                : (float) ($booking['amount_due'] ?? $booking['booking_amount_due'] ?? 0);
+            if (!$hasPaidInvoice && $amountDue > 0) {
+                $proformaToken = \Yatra\Controllers\PaymentGatewayController::issueInvoiceToken(0, $bookingId);
+                $proformaUrl = add_query_arg(
+                    ['invoice_token' => $proformaToken, '_wpnonce' => wp_create_nonce('wp_rest')],
+                    rest_url('yatra/v1/booking/' . $bookingId . '/invoice')
+                );
+                $documents[] = [
+                    'id' => 'invoice-booking-' . $bookingId,
+                    'name' => sprintf(
+                        /* translators: %s: booking reference or ID. */
+                        __('Invoice #%s.pdf', 'yatra'),
+                        $reference ?: $bookingId
+                    ),
+                    'trip_title' => $tripTitle,
+                    'category' => 'invoice',
+                    'updated_at' => $createdAt ?: date('Y-m-d H:i:s'),
+                    'url' => $proformaUrl,
+                    'booking_id' => $bookingId,
                 ];
             }
 

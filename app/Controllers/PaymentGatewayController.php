@@ -145,6 +145,17 @@ class PaymentGatewayController extends BaseController
                 'permission_callback' => '__return_true', // Auth checked inside callback
             ],
         ]);
+
+        // Download a pro-forma invoice for a booking that has no payment yet
+        // (offline gateways, e.g. Bank Transfer). Includes payment instructions
+        // so the customer knows how to pay. Auth checked inside the callback.
+        register_rest_route($namespace, '/booking/(?P<booking_id>[\d]+)/invoice', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'download_booking_invoice'],
+                'permission_callback' => '__return_true',
+            ],
+        ]);
     }
 
     /**
@@ -989,6 +1000,115 @@ class PaymentGatewayController extends BaseController
     }
 
     /**
+     * Download a PRO-FORMA invoice for a booking that has no payment yet
+     * (offline gateways such as Bank Transfer). Shows the amount due and any
+     * gateway-supplied payment instructions (via yatra_invoice_payment_instructions)
+     * so the customer knows how to pay. Renders the same pdf/invoice.php template.
+     */
+    public function download_booking_invoice(WP_REST_Request $request)
+    {
+        $bookingId    = (int) $request->get_param('booking_id');
+        $isPreview    = $request->get_param('preview') === '1';
+        $bookingToken = sanitize_text_field((string) ($request->get_param('booking_token') ?? ''));
+        $invoiceToken = sanitize_text_field((string) ($request->get_param('invoice_token') ?? ''));
+
+        if ($bookingId <= 0) {
+            return new WP_Error('invalid_booking', __('Invalid booking ID.', 'yatra'), ['status' => 400]);
+        }
+
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        $booking = $bookingRepository->find($bookingId);
+        if (!$booking) {
+            return new WP_Error('booking_not_found', __('Booking not found.', 'yatra'), ['status' => 404]);
+        }
+
+        // Authorisation mirrors download_invoice: admin -> owner -> signed
+        // booking-scoped invoice_token (paymentId 0) -> guest booking_token.
+        $currentUserId = (int) get_current_user_id();
+        $bookingUserId = (int) ($booking->user_id ?? 0);
+        $authorised = false;
+        if (current_user_can('manage_options')) {
+            $authorised = true;
+        } elseif ($currentUserId && $bookingUserId && $currentUserId === $bookingUserId) {
+            $authorised = true;
+        } elseif ($invoiceToken !== '' && self::verifyInvoiceToken($invoiceToken, 0, $bookingId)) {
+            $authorised = true;
+        } elseif ($bookingToken !== '' && (bool) SettingsService::get('allow_guest_checkout', true)) {
+            $session = get_transient($bookingToken);
+            if (is_array($session) && (int) ($session['booking_id'] ?? 0) === $bookingId) {
+                $authorised = true;
+            }
+        }
+        if (!$authorised) {
+            return $currentUserId
+                ? new WP_Error('forbidden', __('You do not have permission to access this invoice.', 'yatra'), ['status' => 403])
+                : new WP_Error('unauthorized', __('You must be logged in to download invoices.', 'yatra'), ['status' => 401]);
+        }
+
+        $pdfService = new PdfService();
+        if (!$pdfService->isAvailable()) {
+            return new WP_Error('pdf_engine_missing', __('Invoice PDF generator is not installed. Please run composer install to install dompdf/dompdf.', 'yatra'), ['status' => 500]);
+        }
+
+        $trip = !empty($booking->trip_id) ? $this->tripRepository->find((int) $booking->trip_id) : null;
+
+        $currency = SettingsService::getCurrency();
+        $currencySymbol = FormatHelper::getCurrencySymbol($currency);
+        $bookingRef = (string) ($booking->reference ?? $booking->booking_number ?? (string) $bookingId);
+        $filename = 'Invoice #' . $bookingRef . '.pdf';
+        $travelDate = !empty($booking->travel_date) ? date_i18n(get_option('date_format'), strtotime((string) $booking->travel_date)) : '';
+
+        $total = (float) ($booking->total_amount ?? 0);
+        $paid  = (float) ($booking->amount_paid ?? 0);
+        $due   = (float) ($booking->amount_due ?? max(0.0, $total - $paid));
+
+        // Gateway-supplied payment instructions (Bank Transfer fills this in Pro).
+        $paymentInstructions = apply_filters('yatra_invoice_payment_instructions', [], $booking);
+
+        $templateData = [
+            'company_name'    => SettingsService::get('company_name', get_bloginfo('name')),
+            'company_address' => SettingsService::get('company_address', ''),
+            'company_email'   => SettingsService::get('company_email', get_option('admin_email')),
+            'company_phone'   => SettingsService::get('company_phone', ''),
+            'customer_name'   => trim(($booking->contact_first_name ?? '') . ' ' . ($booking->contact_last_name ?? '')) ?: __('Customer', 'yatra'),
+            'customer_email'  => $booking->contact_email ?? '',
+            'payment_ref'     => $bookingRef,
+            'payment_date'    => !empty($booking->created_at) ? date_i18n(get_option('date_format'), strtotime((string) $booking->created_at)) : '',
+            'payment_status'  => __('Payment Pending', 'yatra'),
+            'status_class'    => 'pending',
+            'trip_title'      => $trip->title ?? $booking->trip_title ?? __('Trip Booking', 'yatra'),
+            'payment_method'  => ucwords(str_replace('_', ' ', (string) ($booking->payment_gateway ?? 'offline'))),
+            'booking_ref'     => $bookingRef,
+            'travel_date'     => $travelDate,
+            'currency_symbol' => $currencySymbol,
+            'amount'          => number_format($due, 2),
+            'booking_total'   => number_format($total, 2),
+            'amount_paid'     => number_format($paid, 2),
+            'amount_due'      => number_format($due, 2),
+            'tax_breakdown'   => [],
+            'tax_amount'      => number_format(0, 2),
+            'subtotal'        => number_format($total, 2),
+            'payment_instructions' => is_array($paymentInstructions) ? $paymentInstructions : [],
+        ];
+
+        $pdfBinary = $pdfService->renderTemplateToPdfSafely('pdf/invoice.php', $templateData, [
+            'paper' => 'A4',
+            'orientation' => 'portrait',
+            'default_font' => 'DejaVu Sans',
+        ]);
+
+        if ($isPreview) {
+            return new WP_REST_Response([
+                'success' => true,
+                'pdf_data' => base64_encode($pdfBinary),
+                'filename' => $filename,
+            ]);
+        }
+        $pdfService->outputPdfDownload($pdfBinary, $filename);
+        exit;
+    }
+
+    /**
      * Download travel voucher PDF for a booking
      */
     public function download_voucher(WP_REST_Request $request)
@@ -1223,7 +1343,9 @@ class PaymentGatewayController extends BaseController
      */
     public static function issueInvoiceToken(int $paymentId, int $bookingId): string
     {
-        if ($paymentId <= 0 || $bookingId <= 0) {
+        // $paymentId === 0 denotes a booking-scoped (pro-forma) invoice token —
+        // used for offline/unpaid bookings that have no payment row yet.
+        if ($paymentId < 0 || $bookingId <= 0) {
             return '';
         }
         $iat = time();
@@ -1248,7 +1370,8 @@ class PaymentGatewayController extends BaseController
      */
     public static function verifyInvoiceToken(string $token, int $paymentId, int $bookingId): bool
     {
-        if ($token === '' || $paymentId <= 0 || $bookingId <= 0) {
+        // $paymentId === 0 = booking-scoped (pro-forma) token; see issueInvoiceToken().
+        if ($token === '' || $paymentId < 0 || $bookingId <= 0) {
             return false;
         }
 

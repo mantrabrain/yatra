@@ -811,8 +811,33 @@ do_action('yatra_booking_confirmation_header', $booking);
                         rest_url('yatra/v1/payment/' . (int) $latestPayment->id . '/invoice')
                     );
                 ?>
-                <a href="<?php echo esc_url($invoiceUrl); ?>" 
-                   target="_blank" 
+                <a href="<?php echo esc_url($invoiceUrl); ?>"
+                   target="_blank"
+                   rel="noopener"
+                   class="yatra-btn yatra-btn-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <?php esc_html_e('Download Invoice', 'yatra'); ?>
+                </a>
+                <?php
+                // No completed payment yet (e.g. Bank Transfer / offline): offer a
+                // pro-forma invoice that carries the payment instructions so the
+                // customer knows how to pay. Uses a booking-scoped invoice token.
+                elseif ((float) ($booking->amount_due ?? $booking->total_amount ?? 0) > 0) :
+                    $proformaToken = \Yatra\Controllers\PaymentGatewayController::issueInvoiceToken(0, (int) $booking->id);
+                    $proformaUrl = add_query_arg(
+                        [
+                            'download' => '1',
+                            'invoice_token' => $proformaToken,
+                        ],
+                        rest_url('yatra/v1/booking/' . (int) $booking->id . '/invoice')
+                    );
+                ?>
+                <a href="<?php echo esc_url($proformaUrl); ?>"
+                   target="_blank"
                    rel="noopener"
                    class="yatra-btn yatra-btn-primary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

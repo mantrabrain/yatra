@@ -27,6 +27,11 @@ $bookingTotal = (string) ($booking_total ?? '0.00');
 $amountPaid = (string) ($amount_paid ?? '0.00');
 $amountDue = (string) ($amount_due ?? '0.00');
 
+// Structured payment instructions (e.g. bank-transfer details) provided by a
+// gateway via the yatra_invoice_payment_instructions filter. Shape:
+// ['title' => string, 'rows' => [['label'=>.., 'value'=>..], ...], 'note' => string]
+$paymentInstructions = (isset($payment_instructions) && is_array($payment_instructions)) ? $payment_instructions : [];
+
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -175,6 +180,28 @@ $amountDue = (string) ($amount_due ?? '0.00');
             <td class="value grand"><?php echo $currencySymbol . htmlspecialchars($amount, ENT_QUOTES, 'UTF-8'); ?></td>
         </tr>
     </table>
+
+    <?php if (!empty($paymentInstructions['rows']) && is_array($paymentInstructions['rows'])): ?>
+    <table class="panel" style="margin-top: 6mm;">
+        <tr>
+            <td>
+                <h3><?php echo htmlspecialchars((string) ($paymentInstructions['title'] ?? __('Payment Instructions', 'yatra')), ENT_QUOTES, 'UTF-8'); ?></h3>
+                <table class="details">
+                    <?php foreach ($paymentInstructions['rows'] as $piRow): ?>
+                        <?php if (!is_array($piRow)) { continue; } ?>
+                    <tr>
+                        <td class="k" style="width: 40mm;"><?php echo htmlspecialchars((string) ($piRow['label'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>:</td>
+                        <td class="v-wrap"><?php echo htmlspecialchars((string) ($piRow['value'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </table>
+                <?php if (!empty($paymentInstructions['note'])): ?>
+                <p class="muted" style="margin-top: 4mm;"><?php echo htmlspecialchars((string) $paymentInstructions['note'], ENT_QUOTES, 'UTF-8'); ?></p>
+                <?php endif; ?>
+            </td>
+        </tr>
+    </table>
+    <?php endif; ?>
 </div>
 </body>
 </html>
