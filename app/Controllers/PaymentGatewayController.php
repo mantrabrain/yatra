@@ -933,7 +933,14 @@ class PaymentGatewayController extends BaseController
             'company_phone' => $companyPhone,
             'customer_name' => trim(($payment->contact_first_name ?? '') . ' ' . ($payment->contact_last_name ?? '')) ?: ($payment->customer_name ?? __('Customer', 'yatra')),
             'customer_email' => $payment->contact_email ?? $payment->customer_email ?? '',
-            'payment_ref' => $payment->reference ?? '',
+            // The booking_payments table has no `reference` column — the payment
+            // reference is a derived value. Mirror PaymentService::formatPayment
+            // (`PAY-%06d`, the same string the React account page shows) so the
+            // invoice's "Invoice #" is populated and consistent, instead of blank.
+            // A real stored reference (if a future join ever provides one) still wins.
+            'payment_ref' => (isset($payment->reference) && (string) $payment->reference !== '')
+                ? (string) $payment->reference
+                : sprintf('PAY-%06d', (int) ($payment->id ?? 0)),
             'payment_date' => $paymentDate,
             'payment_status' => ucfirst($payment->status ?? 'paid'),
             'status_class' => in_array(strtolower((string) ($payment->status ?? '')), ['paid', 'completed', 'success'], true) ? 'paid' : 'pending',
