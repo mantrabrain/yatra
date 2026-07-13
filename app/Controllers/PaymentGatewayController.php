@@ -776,15 +776,25 @@ class PaymentGatewayController extends BaseController
 
         $previousBookingStatus = (string) ($booking->status ?? 'pending');
 
+        // Only auto-confirm when the operator allows it (or the booking is now
+        // fully paid). A deposit / partial payment leaves the booking pending
+        // when "Auto-Confirm Bookings" is off, for the operator to confirm.
+        $should_confirm = \yatra_should_confirm_booking_on_payment($new_amount_due <= 0, $bookingId);
+
         // Update booking
-        $this->bookingRepository->update($bookingId, [
+        $booking_update = [
             'amount_paid' => $new_amount_paid,
             'amount_due' => $new_amount_due,
             'payment_status' => $payment_status,
-            'status' => 'confirmed',
-        ]);
+        ];
+        if ($should_confirm) {
+            $booking_update['status'] = 'confirmed';
+        }
+        $this->bookingRepository->update($bookingId, $booking_update);
 
-        \yatra_trigger_booking_confirmed($bookingId, $previousBookingStatus);
+        if ($should_confirm) {
+            \yatra_trigger_booking_confirmed($bookingId, $previousBookingStatus);
+        }
 
         // Clear remaining payment session if this was a remaining payment
         if (function_exists('yatra_has_remaining_session') && yatra_has_remaining_session()) {

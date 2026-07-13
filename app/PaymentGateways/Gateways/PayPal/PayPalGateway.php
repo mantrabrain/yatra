@@ -875,19 +875,30 @@ class PayPalGateway extends AbstractPaymentGateway
         $newAmountDue = max(0.0, $totalAmount - $newAmountPaid);
         $paymentStatus = $newAmountDue <= 0.01 ? 'paid' : 'partial';
 
+        // Only auto-confirm when the operator allows it (or fully paid). A
+        // deposit / partial payment must not confirm when "Auto-Confirm
+        // Bookings" is off — the operator confirms it manually.
+        $shouldConfirm = \yatra_should_confirm_booking_on_payment($newAmountDue <= 0.01, $bookingId);
+
         // Update booking payment status
         $bookings_table = BookingsTable::getTableName();
+        $bookingUpdate = [
+            'payment_status' => $paymentStatus,
+            'amount_paid' => $newAmountPaid,
+            'amount_due' => $newAmountDue,
+        ];
+        $bookingUpdateFormat = ['%s', '%f', '%f'];
+        if ($shouldConfirm) {
+            $bookingUpdate['status'] = 'confirmed';
+            $bookingUpdate['confirmed_at'] = current_time('mysql');
+            $bookingUpdateFormat[] = '%s';
+            $bookingUpdateFormat[] = '%s';
+        }
         $wpdb->update(
             $bookings_table,
-            [
-                'payment_status' => $paymentStatus,
-                'amount_paid' => $newAmountPaid,
-                'amount_due' => $newAmountDue,
-                'status' => 'confirmed',
-                'confirmed_at' => current_time('mysql'),
-            ],
+            $bookingUpdate,
             ['id' => $bookingId],
-            ['%s', '%f', '%f', '%s', '%s'],
+            $bookingUpdateFormat,
             ['%d']
         );
 
@@ -913,7 +924,9 @@ class PayPalGateway extends AbstractPaymentGateway
             'payment_status' => $paymentStatus,
         ]);
 
-        \yatra_trigger_booking_confirmed($bookingId, $previousBookingStatus);
+        if ($shouldConfirm) {
+            \yatra_trigger_booking_confirmed($bookingId, $previousBookingStatus);
+        }
 
         // Fire action for other plugins/services
         do_action('yatra_payment_completed', [

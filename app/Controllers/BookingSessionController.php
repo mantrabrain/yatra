@@ -2991,14 +2991,22 @@ class BookingSessionController extends BaseController
             $paymentStatus = $newAmountDue > 0.0 ? 'partial' : 'paid';
             $previousStatus = (string) ($booking->status ?? 'pending');
 
-            $this->bookingRepository->update($bookingId, [
+            // Only auto-confirm when the operator allows it (or fully paid). A
+            // deposit / partial payment must not confirm when "Auto-Confirm
+            // Bookings" is off.
+            $shouldConfirm = \yatra_should_confirm_booking_on_payment($newAmountDue <= 0.0, $bookingId);
+
+            $bookingUpdate = [
                 'amount_paid' => $newAmountPaid,
                 'amount_due' => $newAmountDue,
                 'payment_status' => $paymentStatus,
-                'status' => 'confirmed',
-            ]);
+            ];
+            if ($shouldConfirm) {
+                $bookingUpdate['status'] = 'confirmed';
+            }
+            $this->bookingRepository->update($bookingId, $bookingUpdate);
 
-            if (function_exists('yatra_trigger_booking_confirmed')) {
+            if ($shouldConfirm && function_exists('yatra_trigger_booking_confirmed')) {
                 \yatra_trigger_booking_confirmed($bookingId, $previousStatus);
             }
 

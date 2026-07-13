@@ -1240,6 +1240,36 @@ function yatra_trigger_booking_confirmed(int $bookingId, string $previousStatus)
 }
 
 /**
+ * Decide whether a successful payment should auto-confirm the booking.
+ *
+ * A booking auto-confirms on payment only when the operator has enabled
+ * "Auto-Confirm Bookings", OR the booking is now fully paid. A deposit /
+ * partial payment must NOT confirm the booking while auto-confirm is off — the
+ * operator confirms it manually. Previously the synchronous-gateway, Stripe and
+ * PayPal completion paths force-confirmed on any payment, so deposit bookings
+ * were confirmed immediately regardless of the setting.
+ *
+ * @param bool $fullyPaid Whether the booking's balance is now zero.
+ * @param int  $bookingId Booking ID (passed to the filter for context).
+ * @return bool True to set the booking to `confirmed`.
+ */
+function yatra_should_confirm_booking_on_payment(bool $fullyPaid, int $bookingId = 0): bool
+{
+    $autoConfirm = (bool) \Yatra\Services\SettingsService::isEnabled('auto_confirm_bookings');
+    $shouldConfirm = $autoConfirm || $fullyPaid;
+
+    /**
+     * Filter whether a completed payment auto-confirms the booking.
+     *
+     * @param bool $shouldConfirm Default: auto-confirm setting is on OR fully paid.
+     * @param bool $fullyPaid     Whether the balance is now zero.
+     * @param int  $bookingId     Booking ID.
+     * @param bool $autoConfirm   The `auto_confirm_bookings` setting value.
+     */
+    return (bool) apply_filters('yatra_confirm_booking_on_payment', $shouldConfirm, $fullyPaid, $bookingId, $autoConfirm);
+}
+
+/**
  * ============================================
  * REMAINING PAYMENT SESSION MANAGEMENT
  * ============================================
