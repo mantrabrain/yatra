@@ -33,7 +33,13 @@ class BookingConfirmationPageHandler extends BasePageHandler
         // Configure $wp_query + virtual WP_Post so FSE block themes don't fall back to 404.html.
         $this->setupPageEnvironment('singular', [
             'title' => __('Booking Confirmation', 'yatra'),
-            'object_id' => (int) ($booking->id ?? 0),
+            // Keep the virtual post ID at 0 (like the account/login/booking
+            // handlers). Using the booking row id made get_queried_object_id()
+            // collide with a real wp_posts row of the same id, so SEO plugins /
+            // WordPress emitted THAT page's title, description and OG tags on the
+            // confirmation page. The booking is read from the `yatra_booking`
+            // global, so no queried-object id is needed here.
+            'object_id' => 0,
             'post_type' => 'page',
             'post_name' => $confirmation_id,
         ]);
