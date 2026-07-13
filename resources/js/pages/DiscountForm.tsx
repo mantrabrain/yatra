@@ -21,6 +21,11 @@ import { useToast } from "../components/ui/toast";
 import { apiClient } from "../lib/api-client";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import { getCurrencySymbol } from "../data/currencies";
+import {
+  normalizeCurrencyPosition,
+  readYatraCurrencyPositionFromWindow,
+} from "../lib/currency-display";
 import { Select } from "../components/ui/select";
 import { PageHeader } from "../components/common/PageHeader";
 import {
@@ -84,6 +89,26 @@ const DiscountForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can, permissions, isPro } = usePermissions();
   const { showToast } = useToast();
+
+  // Currency symbol + placement for the amount fields, taken from the operator's
+  // settings (localized into window.yatraAdmin). Previously these inputs
+  // hardcoded "$" on the left, ignoring both the configured symbol and its
+  // position (left / left_space / right / right_space).
+  const currencySymbol = getCurrencySymbol(
+    ((window as unknown as { yatraAdmin?: { currency?: string } })?.yatraAdmin
+      ?.currency as string) || "USD",
+  );
+  const currencyOnRight = (() => {
+    const pos = normalizeCurrencyPosition(readYatraCurrencyPositionFromWindow());
+    return pos === "right" || pos === "right_space";
+  })();
+  const currencyPad = currencyOnRight
+    ? currencySymbol.length > 1
+      ? "pr-10"
+      : "pr-7"
+    : currencySymbol.length > 1
+      ? "pl-10"
+      : "pl-7";
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   // Get initial discount_mode from URL at initialization time
   const getInitialState = (): DiscountFormData => {
@@ -1349,9 +1374,8 @@ const DiscountForm: React.FC = () => {
                             />
                           ) : (
                             <div className="relative">
-                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                                $
-                              </span>
+                              <span className={`absolute ${currencyOnRight ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2 text-gray-500 text-sm`}>
+                                {currencySymbol}                              </span>
                               <Input
                                 id="amount"
                                 name="amount"
@@ -1363,7 +1387,7 @@ const DiscountForm: React.FC = () => {
                                   handleFieldChange("amount", e.target.value)
                                 }
                                 placeholder={__("e.g., 50", "yatra")}
-                                className={`pl-7 ${errors.amount ? "border-red-500" : ""}`}
+                                className={`${currencyPad} ${errors.amount ? "border-red-500" : ""}`}
                                 required
                               />
                             </div>
@@ -1401,9 +1425,8 @@ const DiscountForm: React.FC = () => {
                         className="mb-2"
                       />
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                          $
-                        </span>
+                        <span className={`absolute ${currencyOnRight ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2 text-gray-500 text-sm`}>
+                          {currencySymbol}                        </span>
                         <Input
                           id="max_discount_amount"
                           type="number"
@@ -1417,7 +1440,7 @@ const DiscountForm: React.FC = () => {
                             )
                           }
                           placeholder={__("e.g., 500 (optional)", "yatra")}
-                          className={`pl-7 ${errors.max_discount_amount ? "border-red-500" : ""}`}
+                          className={`${currencyPad} ${errors.max_discount_amount ? "border-red-500" : ""}`}
                         />
                       </div>
                       {errors.max_discount_amount && (
@@ -1555,9 +1578,8 @@ const DiscountForm: React.FC = () => {
                       className="mb-2"
                     />
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                        $
-                      </span>
+                      <span className={`absolute ${currencyOnRight ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2 text-gray-500 text-sm`}>
+                        {currencySymbol}                      </span>
                       <Input
                         id="min_amount"
                         type="number"
@@ -1568,7 +1590,7 @@ const DiscountForm: React.FC = () => {
                           handleFieldChange("min_amount", e.target.value)
                         }
                         placeholder={__("e.g., 100", "yatra")}
-                        className={`pl-7 ${errors.min_amount ? "border-red-500" : ""}`}
+                        className={`${currencyPad} ${errors.min_amount ? "border-red-500" : ""}`}
                       />
                     </div>
                     {errors.min_amount && (
@@ -1932,9 +1954,8 @@ const DiscountForm: React.FC = () => {
                                             <div className="relative">
                                               {range.discount_type ===
                                                 "fixed" && (
-                                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                                                  $
-                                                </span>
+                                                <span className={`absolute ${currencyOnRight ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2 text-gray-500 text-sm`}>
+                                                  {currencySymbol}                                                </span>
                                               )}
                                               <Input
                                                 type="number"
@@ -1961,7 +1982,7 @@ const DiscountForm: React.FC = () => {
                                                     ? __("e.g., 10", "yatra")
                                                     : __("e.g., 50", "yatra")
                                                 }
-                                                className={`${range.discount_type === "fixed" ? "pl-7" : ""} ${errors[`group_discount_ranges_${idx}_amount`] ? "border-red-500" : ""}`}
+                                                className={`${range.discount_type === "fixed" ? currencyPad : ""} ${errors[`group_discount_ranges_${idx}_amount`] ? "border-red-500" : ""}`}
                                               />
                                               {range.discount_type ===
                                                 "percentage" && (
@@ -2498,9 +2519,8 @@ const DiscountForm: React.FC = () => {
                                                       <div className="relative">
                                                         {range.discount_type ===
                                                           "fixed" && (
-                                                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                                                            $
-                                                          </span>
+                                                          <span className={`absolute ${currencyOnRight ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2 text-gray-500 text-sm`}>
+                                                            {currencySymbol}                                                          </span>
                                                         )}
                                                         <Input
                                                           type="number"
@@ -2539,7 +2559,7 @@ const DiscountForm: React.FC = () => {
                                                                   "yatra",
                                                                 )
                                                           }
-                                                          className={`${range.discount_type === "fixed" ? "pl-7" : ""} ${errors[`category_discounts_${catIdx}_ranges_${rIdx}_amount`] ? "border-red-500" : ""}`}
+                                                          className={`${range.discount_type === "fixed" ? currencyPad : ""} ${errors[`category_discounts_${catIdx}_ranges_${rIdx}_amount`] ? "border-red-500" : ""}`}
                                                         />
                                                         {range.discount_type ===
                                                           "percentage" && (

@@ -1,11 +1,20 @@
 import { t as useQueryClient, r as reactExports, u as useQuery, v as useMutation, j as jsxRuntimeExports, z as ArrowLeft, aF as Info, U as Users, aw as Plus, aN as Trash2, D as Loader2, aV as Save } from "./react-vendor-zODANjVp.js";
-import { u as useToast, _ as __, t as toDateValue, a as apiClient } from "./index-C2r48y7c.js";
+import { u as useToast, h as getCurrencySymbol, n as normalizeCurrencyPosition, r as readYatraCurrencyPositionFromWindow, _ as __, t as toDateValue, a as apiClient } from "./index-C2r48y7c.js";
 import { u as usePermissions, C as Card, d as CardContent, f as CardHeader, P as PageHeader, B as Button, s as ConditionalRender, g as CardTitle, H as HelpText, I as Input, S as Select, D as DatePicker, v as PremiumUpgradeDialog } from "../../admin/dist/js/app.js";
 import { A as ApplicableTripSelector } from "./ApplicableTripSelector-FOUEp-g8.js";
 const DiscountForm = () => {
+  var _a;
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
+  const currencySymbol = getCurrencySymbol(
+    ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.currency) || "USD"
+  );
+  const currencyOnRight = (() => {
+    const pos = normalizeCurrencyPosition(readYatraCurrencyPositionFromWindow());
+    return pos === "right" || pos === "right_space";
+  })();
+  const currencyPad = currencyOnRight ? currencySymbol.length > 1 ? "pr-10" : "pr-7" : currencySymbol.length > 1 ? "pl-10" : "pl-7";
   const [showPremiumModal, setShowPremiumModal] = reactExports.useState(false);
   const getInitialState = () => {
     const params = new URLSearchParams(window.location.search);
@@ -88,13 +97,13 @@ const DiscountForm = () => {
     enabled: (isEditMode || isDuplicateMode) && can("yatra_manage_discounts")
   });
   reactExports.useEffect(() => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
+    var _a2, _b, _c, _d, _e, _f, _g, _h, _i;
     if (discountData && (isEditMode || isDuplicateMode)) {
       setFormData({
         code: isDuplicateMode ? `${discountData.code}_COPY` : discountData.code || "",
         description: discountData.description || "",
         type: discountData.type || "percentage",
-        amount: ((_a = discountData.amount) == null ? void 0 : _a.toString()) || "",
+        amount: ((_a2 = discountData.amount) == null ? void 0 : _a2.toString()) || "",
         max_discount_amount: ((_b = discountData.max_discount_amount) == null ? void 0 : _b.toString()) || "",
         usage_limit: ((_c = discountData.usage_limit) == null ? void 0 : _c.toString()) || "0",
         usage_limit_per_customer: ((_d = discountData.usage_limit_per_customer) == null ? void 0 : _d.toString()) || "0",
@@ -192,7 +201,7 @@ const DiscountForm = () => {
   const travelerCategoriesQuery = useQuery({
     queryKey: ["traveler-categories"],
     queryFn: async () => {
-      var _a;
+      var _a2;
       try {
         const response = await apiClient.get("/traveler-categories", {
           params: {
@@ -200,7 +209,7 @@ const DiscountForm = () => {
             status: "publish"
           }
         });
-        const categories = ((_a = response == null ? void 0 : response.data) == null ? void 0 : _a.data) || (response == null ? void 0 : response.data) || response || [];
+        const categories = ((_a2 = response == null ? void 0 : response.data) == null ? void 0 : _a2.data) || (response == null ? void 0 : response.data) || response || [];
         return Array.isArray(categories) ? categories : [];
       } catch (error) {
         console.error("Failed to load traveler categories:", error);
@@ -605,8 +614,8 @@ const DiscountForm = () => {
       );
       if (!isEditMode) {
         setTimeout(() => {
-          var _a;
-          window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=discounts`;
+          var _a2;
+          window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=discounts`;
         }, 1e3);
       }
       setIsSubmitting(false);
@@ -631,8 +640,8 @@ const DiscountForm = () => {
     }
   };
   const handleBack = () => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=discounts`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=discounts`;
   };
   if (isLoadingDiscount) {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
@@ -1022,7 +1031,10 @@ const DiscountForm = () => {
                         required: true
                       }
                     ) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm", children: "$" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: `absolute ${currencyOnRight ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2 text-gray-500 text-sm`, children: [
+                        currencySymbol,
+                        "                              "
+                      ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx(
                         Input,
                         {
@@ -1034,7 +1046,7 @@ const DiscountForm = () => {
                           value: formData.amount,
                           onChange: (e) => handleFieldChange("amount", e.target.value),
                           placeholder: __("e.g., 50", "yatra"),
-                          className: `pl-7 ${errors.amount ? "border-red-500" : ""}`,
+                          className: `${currencyPad} ${errors.amount ? "border-red-500" : ""}`,
                           required: true
                         }
                       )
@@ -1067,7 +1079,10 @@ const DiscountForm = () => {
                   }
                 ),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm", children: "$" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: `absolute ${currencyOnRight ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2 text-gray-500 text-sm`, children: [
+                    currencySymbol,
+                    "                        "
+                  ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
                     Input,
                     {
@@ -1081,7 +1096,7 @@ const DiscountForm = () => {
                         e.target.value
                       ),
                       placeholder: __("e.g., 500 (optional)", "yatra"),
-                      className: `pl-7 ${errors.max_discount_amount ? "border-red-500" : ""}`
+                      className: `${currencyPad} ${errors.max_discount_amount ? "border-red-500" : ""}`
                     }
                   )
                 ] }),
@@ -1217,7 +1232,10 @@ const DiscountForm = () => {
                   }
                 ),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm", children: "$" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: `absolute ${currencyOnRight ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2 text-gray-500 text-sm`, children: [
+                    currencySymbol,
+                    "                      "
+                  ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
                     Input,
                     {
@@ -1228,7 +1246,7 @@ const DiscountForm = () => {
                       value: formData.min_amount,
                       onChange: (e) => handleFieldChange("min_amount", e.target.value),
                       placeholder: __("e.g., 100", "yatra"),
-                      className: `pl-7 ${errors.min_amount ? "border-red-500" : ""}`
+                      className: `${currencyPad} ${errors.min_amount ? "border-red-500" : ""}`
                     }
                   )
                 ] }),
@@ -1505,7 +1523,10 @@ const DiscountForm = () => {
                                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
                               ] }),
                               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                                range.discount_type === "fixed" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm", children: "$" }),
+                                range.discount_type === "fixed" && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: `absolute ${currencyOnRight ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2 text-gray-500 text-sm`, children: [
+                                  currencySymbol,
+                                  "                                                "
+                                ] }),
                                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                                   Input,
                                   {
@@ -1518,7 +1539,7 @@ const DiscountForm = () => {
                                       discount_amount: e.target.value
                                     }),
                                     placeholder: range.discount_type === "percentage" ? __("e.g., 10", "yatra") : __("e.g., 50", "yatra"),
-                                    className: `${range.discount_type === "fixed" ? "pl-7" : ""} ${errors[`group_discount_ranges_${idx}_amount`] ? "border-red-500" : ""}`
+                                    className: `${range.discount_type === "fixed" ? currencyPad : ""} ${errors[`group_discount_ranges_${idx}_amount`] ? "border-red-500" : ""}`
                                   }
                                 ),
                                 range.discount_type === "percentage" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm", children: "%" })
@@ -1563,7 +1584,7 @@ const DiscountForm = () => {
                           "yatra"
                         ) }) }),
                         travelerCategoryOptions.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "divide-y divide-gray-100 dark:divide-gray-700 max-h-[300px] overflow-y-auto", children: travelerCategoryOptions.map((cat) => {
-                          var _a;
+                          var _a2;
                           return /* @__PURE__ */ jsxRuntimeExports.jsx(
                             "div",
                             {
@@ -1591,7 +1612,7 @@ const DiscountForm = () => {
                                     " •",
                                     " "
                                   ] }),
-                                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "capitalize", children: ((_a = cat.pricing_mode) == null ? void 0 : _a.replace(
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "capitalize", children: ((_a2 = cat.pricing_mode) == null ? void 0 : _a2.replace(
                                     "_",
                                     " "
                                   )) || "Per person" })
@@ -1893,7 +1914,10 @@ const DiscountForm = () => {
                                         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
                                       ] }),
                                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                                        range.discount_type === "fixed" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm", children: "$" }),
+                                        range.discount_type === "fixed" && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: `absolute ${currencyOnRight ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2 text-gray-500 text-sm`, children: [
+                                          currencySymbol,
+                                          "                                                          "
+                                        ] }),
                                         /* @__PURE__ */ jsxRuntimeExports.jsx(
                                           Input,
                                           {
@@ -1916,7 +1940,7 @@ const DiscountForm = () => {
                                               "e.g., 50",
                                               "yatra"
                                             ),
-                                            className: `${range.discount_type === "fixed" ? "pl-7" : ""} ${errors[`category_discounts_${catIdx}_ranges_${rIdx}_amount`] ? "border-red-500" : ""}`
+                                            className: `${range.discount_type === "fixed" ? currencyPad : ""} ${errors[`category_discounts_${catIdx}_ranges_${rIdx}_amount`] ? "border-red-500" : ""}`
                                           }
                                         ),
                                         range.discount_type === "percentage" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm", children: "%" })
@@ -2036,4 +2060,4 @@ const DiscountForm = () => {
 export {
   DiscountForm as default
 };
-//# sourceMappingURL=DiscountForm-B6a2ZyAE.js.map
+//# sourceMappingURL=DiscountForm-Cj7v896E.js.map
