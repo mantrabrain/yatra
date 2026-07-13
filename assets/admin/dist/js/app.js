@@ -1,4 +1,4 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-Dt7DMLNy.js","../../../dist/js/react-vendor-zODANjVp.js","../css/react-vendor.css","../../../dist/js/index-C2r48y7c.js","../css/index.css","../../../dist/js/BuildItineraryModal-HUNcFNfg.js","../../../dist/js/ProFeature-DYw8nXQz.js","../../../dist/js/Settings-D5L9IwFN.js","../../../dist/js/Team-B_KgxrXn.js","../../../dist/js/Reports-BDV_PeQi.js","../../../dist/js/DiscountForm-B6a2ZyAE.js","../../../dist/js/ApplicableTripSelector-FOUEp-g8.js","../../../dist/js/Itinerary-BgsX-8sZ.js","../../../dist/js/RecurringRuleForm-BxJKMH38.js","./Whatsapp.js","../../../dist/js/module-skeleton-7zwRYol6.js","../../../dist/js/ChannelManager-GHZSYZTZ.js","../../../dist/js/Webhooks-BqesOuT5.js","../../../dist/js/TripConsentForm-_25PIzZW.js","../../../dist/js/BookingForm-BMTMci_h.js","../../../dist/js/ViewBooking-3J9LLImi.js","../../../dist/js/AvailabilityForm-CmfN3023.js","../../../dist/js/DynamicPricing-DM4TReVs.js","../../../dist/js/RuleTypeSelectionModal-BMCv4u1z.js","../../../dist/js/toggle-B0m9K-Pk.js","../../../dist/js/DynamicPricingRuleForm-UpRJRCgy.js","../../../dist/js/AiAssistant-CORYJUQp.js","../../../dist/js/AbandonedRecovery-D-_h1DEg.js","../../../dist/js/WhiteLabel-BQUlVdLk.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-Dt7DMLNy.js","../../../dist/js/react-vendor-zODANjVp.js","../css/react-vendor.css","../../../dist/js/index-C2r48y7c.js","../css/index.css","../../../dist/js/BuildItineraryModal-HUNcFNfg.js","../../../dist/js/ProFeature-DYw8nXQz.js","../../../dist/js/Settings-B77KuwZ-.js","../../../dist/js/Team-B_KgxrXn.js","../../../dist/js/Reports-BDV_PeQi.js","../../../dist/js/DiscountForm-B6a2ZyAE.js","../../../dist/js/ApplicableTripSelector-FOUEp-g8.js","../../../dist/js/Itinerary-BgsX-8sZ.js","../../../dist/js/RecurringRuleForm-BxJKMH38.js","./Whatsapp.js","../../../dist/js/module-skeleton-7zwRYol6.js","../../../dist/js/ChannelManager-GHZSYZTZ.js","../../../dist/js/Webhooks-BqesOuT5.js","../../../dist/js/TripConsentForm-_25PIzZW.js","../../../dist/js/BookingForm-BMTMci_h.js","../../../dist/js/ViewBooking-3J9LLImi.js","../../../dist/js/AvailabilityForm-CmfN3023.js","../../../dist/js/DynamicPricing-DM4TReVs.js","../../../dist/js/RuleTypeSelectionModal-BMCv4u1z.js","../../../dist/js/toggle-B0m9K-Pk.js","../../../dist/js/DynamicPricingRuleForm-UpRJRCgy.js","../../../dist/js/AiAssistant-CORYJUQp.js","../../../dist/js/AbandonedRecovery-D-_h1DEg.js","../../../dist/js/WhiteLabel-BQUlVdLk.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
@@ -1452,6 +1452,11 @@ const yatraIconsManifest = {
     svg: '<svg class="lucide lucide-earth-lock" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M7 3.34V5a3 3 0 0 0 3 3" /> <path d="M11 21.95V18a2 2 0 0 0-2-2 2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H2.05" /> <path d="M21.54 15H17a2 2 0 0 0-2 2v4.54" /> <path d="M12 2a10 10 0 1 0 9.54 13" /> <path d="M20 6V4a2 2 0 1 0-4 0v2" /> <rect width="8" height="5" x="14" y="6" rx="1" /> </svg>'
   },
   eye,
+  "eye-off": {
+    label: "Hide",
+    category: "general",
+    svg: '<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+  },
   fan,
   feather,
   "ferris-wheel": {
@@ -77172,7 +77177,7 @@ const License = () => {
   ] });
 };
 const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-Dt7DMLNy.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-D5L9IwFN.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-B77KuwZ-.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
 const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-B_KgxrXn.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
 const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-BDV_PeQi.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
 const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-B6a2ZyAE.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));

@@ -3593,30 +3593,40 @@ const Settings: React.FC = () => {
     };
   }, [formData?.seo_trip_meta_image]);
 
-  // Initialize gateway order when gateway definitions are loaded
+  // Initialize gateway order ONCE, and only after BOTH the gateway definitions
+  // AND the settings have loaded. These are two independent queries. The old
+  // guard (`gatewayOrder.length === 0`) initialized as soon as the definitions
+  // arrived — if that happened before `settings` resolved, `savedOrder` was
+  // still undefined, so it fell back to the DEFAULT order; the length guard then
+  // permanently shadowed the saved order once it arrived. That was the "payment
+  // option order is not saved" bug: the order persisted fine in the DB but the
+  // UI reverted to default on reload. Waiting for `settings` to resolve, tracked
+  // by a run-once ref, fixes it without clobbering in-progress drag reordering.
+  const gatewayOrderInitialized = React.useRef(false);
   React.useEffect(() => {
-    if (
-      gatewayDefinitions &&
-      Object.keys(gatewayDefinitions).length > 0 &&
-      gatewayOrder.length === 0
-    ) {
-      // Use saved order if available, otherwise use default order from definitions
-      const savedOrder = settings?.gateway_order as string[] | undefined;
-      if (savedOrder) {
-        // Merge saved order with any new gateways
-        const allGateways = Object.keys(gatewayDefinitions);
-        const validSavedOrder = savedOrder.filter((id) =>
-          allGateways.includes(id),
-        );
-        const newGateways = allGateways.filter(
-          (id) => !validSavedOrder.includes(id),
-        );
-        setGatewayOrder([...validSavedOrder, ...newGateways]);
-      } else {
-        setGatewayOrder(Object.keys(gatewayDefinitions));
-      }
+    if (gatewayOrderInitialized.current) return;
+    if (!gatewayDefinitions || Object.keys(gatewayDefinitions).length === 0) {
+      return;
     }
-  }, [gatewayDefinitions, settings?.gateway_order, gatewayOrder.length]);
+    // Wait for the settings query to resolve so the saved order is available.
+    if (settings === undefined) return;
+
+    const allGateways = Object.keys(gatewayDefinitions);
+    const savedOrder = settings?.gateway_order as string[] | undefined;
+    if (Array.isArray(savedOrder) && savedOrder.length > 0) {
+      // Keep the saved order, appending any gateways added since it was saved.
+      const validSavedOrder = savedOrder.filter((id) =>
+        allGateways.includes(id),
+      );
+      const newGateways = allGateways.filter(
+        (id) => !validSavedOrder.includes(id),
+      );
+      setGatewayOrder([...validSavedOrder, ...newGateways]);
+    } else {
+      setGatewayOrder(allGateways);
+    }
+    gatewayOrderInitialized.current = true;
+  }, [gatewayDefinitions, settings]);
 
   // Single stable onChange handler that reads field name from input's name or id attribute
   const handleFieldChange = React.useCallback(

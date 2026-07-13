@@ -2632,23 +2632,28 @@ const Settings = () => {
       controller.abort();
     };
   }, [formData == null ? void 0 : formData.seo_trip_meta_image]);
+  const gatewayOrderInitialized = React.useRef(false);
   React.useEffect(() => {
-    if (gatewayDefinitions && Object.keys(gatewayDefinitions).length > 0 && gatewayOrder.length === 0) {
-      const savedOrder = settings == null ? void 0 : settings.gateway_order;
-      if (savedOrder) {
-        const allGateways = Object.keys(gatewayDefinitions);
-        const validSavedOrder = savedOrder.filter(
-          (id) => allGateways.includes(id)
-        );
-        const newGateways = allGateways.filter(
-          (id) => !validSavedOrder.includes(id)
-        );
-        setGatewayOrder([...validSavedOrder, ...newGateways]);
-      } else {
-        setGatewayOrder(Object.keys(gatewayDefinitions));
-      }
+    if (gatewayOrderInitialized.current) return;
+    if (!gatewayDefinitions || Object.keys(gatewayDefinitions).length === 0) {
+      return;
     }
-  }, [gatewayDefinitions, settings == null ? void 0 : settings.gateway_order, gatewayOrder.length]);
+    if (settings === void 0) return;
+    const allGateways = Object.keys(gatewayDefinitions);
+    const savedOrder = settings == null ? void 0 : settings.gateway_order;
+    if (Array.isArray(savedOrder) && savedOrder.length > 0) {
+      const validSavedOrder = savedOrder.filter(
+        (id) => allGateways.includes(id)
+      );
+      const newGateways = allGateways.filter(
+        (id) => !validSavedOrder.includes(id)
+      );
+      setGatewayOrder([...validSavedOrder, ...newGateways]);
+    } else {
+      setGatewayOrder(allGateways);
+    }
+    gatewayOrderInitialized.current = true;
+  }, [gatewayDefinitions, settings]);
   const handleFieldChange = React.useCallback(
     (e) => {
       const field = e.target.name || e.target.id;
@@ -8104,4 +8109,4 @@ const Settings = () => {
 export {
   Settings as default
 };
-//# sourceMappingURL=Settings-D5L9IwFN.js.map
+//# sourceMappingURL=Settings-B77KuwZ-.js.map
