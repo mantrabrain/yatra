@@ -224,7 +224,13 @@ class RecurringAvailabilityRepository extends BaseRepository
     public function findActiveRulesForDate(int $tripId, string $date): array
     {
         $table = esc_sql($this->table);
-        
+
+        // Date-only compare: start_date/end_date are DATE columns, so a datetime
+        // input would break the `end_date >= %s` boundary (DATE treated as midnight).
+        if (preg_match('/^(\d{4}-\d{2}-\d{2})/', $date, $m)) {
+            $date = $m[1];
+        }
+
         $query = $this->wpdb->prepare(
             "SELECT * FROM `{$table}` 
              WHERE trip_id = %d 

@@ -33,6 +33,15 @@ class CapacityService
      */
     public function getCapacityForDate(int $tripId, string $date): int
     {
+        // Normalize to Y-m-d. The availability-date and recurring-rule columns are
+        // DATE type, so a datetime input (e.g. "2026-07-18 12:30:00") breaks the
+        // rule's `end_date >= %s` boundary match (the DATE end_date is treated as
+        // midnight) and silently falls through to the trip default. Strip any time
+        // component so matching is date-only.
+        if (preg_match('/^(\d{4}-\d{2}-\d{2})/', $date, $m)) {
+            $date = $m[1];
+        }
+
         // 1. Check Availability Date first (specific date overrides)
         $availability = $this->availabilityRepository->findByTripIdAndDate($tripId, $date);
         if ($availability && isset($availability->seats_total) && $availability->seats_total > 0) {

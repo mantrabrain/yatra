@@ -73,7 +73,13 @@ class AvailabilityRepository extends BaseRepository
     public function findByTripIdAndDate(int $tripId, string $departureDate): ?object
     {
         $table = esc_sql($this->table);
-        
+
+        // departure_date is a DATE column — strip any time component so a datetime
+        // input still matches (avoids date-vs-datetime string-compare misses).
+        if (preg_match('/^(\d{4}-\d{2}-\d{2})/', $departureDate, $m)) {
+            $departureDate = $m[1];
+        }
+
         $result = $this->wpdb->get_row($this->wpdb->prepare(
             "SELECT * FROM `{$table}` 
              WHERE trip_id = %d 
