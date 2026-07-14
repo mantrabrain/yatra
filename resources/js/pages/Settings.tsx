@@ -250,6 +250,7 @@ const GoogleCalendarIntegrationSection: React.FC<{
   );
   const [connecting, setConnecting] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [savingCalendar, setSavingCalendar] = useState(false);
   const { showToast } = useToast();
 
   const redirectUri =
@@ -348,6 +349,27 @@ const GoogleCalendarIntegrationSection: React.FC<{
       );
     } finally {
       setSyncing(false);
+    }
+  };
+
+  // Persist the target calendar to the Google Calendar module endpoint (the same
+  // store the sync path reads), so the value survives a page reload. A blank
+  // Calendar ID is allowed and resolves to the primary calendar at sync time.
+  const handleSaveCalendar = async () => {
+    setSavingCalendar(true);
+    try {
+      await apiClient.post("/google-calendar/settings", {
+        calendar_id: calendarId.trim(),
+        calendar_name: calendarName.trim(),
+      });
+      showToast(__("Calendar settings saved.", "yatra"), "success");
+    } catch (error) {
+      showToast(
+        __("Failed to save calendar settings. Please try again.", "yatra"),
+        "error",
+      );
+    } finally {
+      setSavingCalendar(false);
     }
   };
 
@@ -582,6 +604,19 @@ const GoogleCalendarIntegrationSection: React.FC<{
                     <Calendar className="w-4 h-4" />
                     {__("Open dashboard", "yatra")}
                   </a>
+                  <Button
+                    size="sm"
+                    onClick={handleSaveCalendar}
+                    disabled={savingCalendar}
+                    className="flex items-center gap-2"
+                  >
+                    {savingCalendar ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <CheckCircle className="w-4 h-4" />
+                    )}
+                    {__("Save Calendar", "yatra")}
+                  </Button>
                   <Button
                     variant="outline"
                     size="sm"

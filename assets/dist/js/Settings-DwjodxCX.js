@@ -131,6 +131,7 @@ const GoogleCalendarIntegrationSection = ({ formData, setFormData }) => {
   );
   const [connecting, setConnecting] = reactExports.useState(false);
   const [syncing, setSyncing] = reactExports.useState(false);
+  const [savingCalendar, setSavingCalendar] = reactExports.useState(false);
   const { showToast } = useToast();
   const redirectUri = yatraAdmin.googleCalendarRedirectUri || gcSettings.redirect_uri || `${siteUrl}/wp-json/yatra/v1/google-calendar/callback`;
   const lastSync = formData.google_calendar_last_sync || gcSettings.last_sync || null;
@@ -210,6 +211,23 @@ const GoogleCalendarIntegrationSection = ({ formData, setFormData }) => {
       );
     } finally {
       setSyncing(false);
+    }
+  };
+  const handleSaveCalendar = async () => {
+    setSavingCalendar(true);
+    try {
+      await apiClient.post("/google-calendar/settings", {
+        calendar_id: calendarId.trim(),
+        calendar_name: calendarName.trim()
+      });
+      showToast(__("Calendar settings saved.", "yatra"), "success");
+    } catch (error) {
+      showToast(
+        __("Failed to save calendar settings. Please try again.", "yatra"),
+        "error"
+      );
+    } finally {
+      setSavingCalendar(false);
     }
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
@@ -459,6 +477,19 @@ const GoogleCalendarIntegrationSection = ({ formData, setFormData }) => {
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { className: "w-4 h-4" }),
                   __("Open dashboard", "yatra")
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              Button,
+              {
+                size: "sm",
+                onClick: handleSaveCalendar,
+                disabled: savingCalendar,
+                className: "flex items-center gap-2",
+                children: [
+                  savingCalendar ? /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4 animate-spin" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4" }),
+                  __("Save Calendar", "yatra")
                 ]
               }
             ),
@@ -8191,4 +8222,4 @@ const Settings = () => {
 export {
   Settings as default
 };
-//# sourceMappingURL=Settings-3nMtGNY2.js.map
+//# sourceMappingURL=Settings-DwjodxCX.js.map
