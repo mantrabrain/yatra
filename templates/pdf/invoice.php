@@ -63,6 +63,7 @@ $paymentInstructions = (isset($payment_instructions) && is_array($payment_instru
 
         .badge { display: inline-block; padding: 2px 10px; font-size: 10px; border-radius: 12px; border: 1px solid #e5e7eb; margin-left: 6px; vertical-align: middle; line-height: 1.4; }
         .badge-paid { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+        .badge-partial { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
         .badge-pending { background: #fef3c7; color: #92400e; border-color: #fde68a; }
 
         .items { width: 100%; border-collapse: collapse; margin-top: 4mm; }

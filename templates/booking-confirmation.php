@@ -1028,6 +1028,26 @@ do_action('yatra_booking_confirmation_header', $booking);
     color: #f59e0b;
 }
 
+/* Half star: base star stays grey; overlay the left half in amber via an
+   SVG mask (size-independent, so it tracks the star's dimensions). */
+.yatra-star-half {
+    position: relative;
+    color: #e2e8f0;
+}
+
+.yatra-star-half::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 50%;
+    overflow: hidden;
+    background: #f59e0b;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpolygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26'/%3E%3C/svg%3E") no-repeat left center / 200% 100%;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpolygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26'/%3E%3C/svg%3E") no-repeat left center / 200% 100%;
+}
+
 .yatra-rating-meta strong {
     color: #0f172a;
     margin-right: 6px;

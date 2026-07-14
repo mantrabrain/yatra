@@ -1074,8 +1074,12 @@ class PaymentGatewayController extends BaseController
             'customer_email'  => $booking->contact_email ?? '',
             'payment_ref'     => $bookingRef,
             'payment_date'    => !empty($booking->created_at) ? date_i18n(get_option('date_format'), strtotime((string) $booking->created_at)) : '',
-            'payment_status'  => __('Payment Pending', 'yatra'),
-            'status_class'    => 'pending',
+            // Reflect the booking's real payment state rather than a fixed
+            // "Payment Pending" — a deposit-paid booking is Partially Paid.
+            'payment_status'  => $due <= 0.0
+                ? __('Paid', 'yatra')
+                : ($paid > 0.0 ? __('Partially Paid', 'yatra') : __('Payment Pending', 'yatra')),
+            'status_class'    => $due <= 0.0 ? 'paid' : ($paid > 0.0 ? 'partial' : 'pending'),
             'trip_title'      => $trip->title ?? $booking->trip_title ?? __('Trip Booking', 'yatra'),
             'payment_method'  => ucwords(str_replace('_', ' ', (string) ($booking->payment_gateway ?? 'offline'))),
             'booking_ref'     => $bookingRef,
