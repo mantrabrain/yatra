@@ -62,6 +62,7 @@ const Profile: React.FC<ProfileProps> = ({
   const { showToast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
+  const [isResendingEmail, setIsResendingEmail] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -76,8 +77,9 @@ const Profile: React.FC<ProfileProps> = ({
       const firstName = parts.shift() || "";
       const lastName = parts.join(" ");
 
-      // Email is intentionally NOT sent — it is the account login and is
-      // locked (the backend also strips it defensively).
+      // Email is NOT sent to the profile endpoint — it is the account login and
+      // the backend strips it defensively. Changing it follows WordPress core's
+      // pending-change pattern (handled separately below).
       const payload: Record<string, string> = {
         first_name: firstName,
         phone: formData.phone,
@@ -95,7 +97,36 @@ const Profile: React.FC<ProfileProps> = ({
       // Refetch the parent's profile query so the saved values are reflected.
       await queryClient.invalidateQueries({ queryKey: ["account-profile"] });
 
-      showToast(__("Profile updated successfully.", "yatra"), "success");
+      // If the email was edited, request the change separately. Like WordPress
+      // core, this does NOT change the email now — it emails a confirmation link
+      // to the new address and the change only applies once it is clicked.
+      const currentEmail = (profile?.email || "").trim().toLowerCase();
+      const nextEmail = formData.email.trim();
+      if (nextEmail && nextEmail.toLowerCase() !== currentEmail) {
+        try {
+          const resp: any = await apiClient.post(
+            API_ENDPOINTS.CUSTOMER_CHANGE_EMAIL,
+            { email: nextEmail },
+          );
+          await queryClient.invalidateQueries({ queryKey: ["account-profile"] });
+          showToast(
+            resp?.message ||
+              __(
+                "A confirmation link has been sent to your new email address. The change takes effect once you confirm it.",
+                "yatra",
+              ),
+            "success",
+          );
+        } catch (emailError: any) {
+          showToast(
+            emailError?.message ||
+              __("Could not request the email change.", "yatra"),
+            "error",
+          );
+        }
+      } else {
+        showToast(__("Profile updated successfully.", "yatra"), "success");
+      }
       setIsEditing(false);
     } catch (error: any) {
       showToast(
@@ -138,6 +169,28 @@ const Profile: React.FC<ProfileProps> = ({
       );
     } finally {
       setIsSavingPassword(false);
+    }
+  };
+
+  const handleResendEmailChange = async () => {
+    setIsResendingEmail(true);
+    try {
+      const resp: any = await apiClient.post(
+        API_ENDPOINTS.CUSTOMER_RESEND_EMAIL_CHANGE,
+      );
+      showToast(
+        resp?.message ||
+          __("Confirmation link re-sent to your new email address.", "yatra"),
+        "success",
+      );
+    } catch (error: any) {
+      showToast(
+        error?.message ||
+          __("Could not re-send the confirmation email.", "yatra"),
+        "error",
+      );
+    } finally {
+      setIsResendingEmail(false);
     }
   };
 
@@ -215,11 +268,53 @@ const Profile: React.FC<ProfileProps> = ({
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {__("Email Address", "yatra")}
               </label>
-              {/* Email is the account login and is never editable here —
-                  always shown as static text, even in edit mode. */}
-              <p className="text-sm font-medium text-gray-900 dark:text-white py-2">
-                {formData.email || __("Not set", "yatra")}
-              </p>
+              {isEditing ? (
+                <>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
+                    placeholder={__("you@example.com", "yatra")}
+                  />
+                  {/* Mirrors WordPress core: the email is not changed here — a
+                      confirmation link is sent to the new address first. */}
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    {__(
+                      "For security, we'll email a confirmation link to the new address. Your email changes only after you click that link.",
+                      "yatra",
+                    )}
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm font-medium text-gray-900 dark:text-white py-2">
+                  {formData.email || __("Not set", "yatra")}
+                </p>
+              )}
+              {profile?.pending_email ? (
+                <div className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                  <p>
+                    {__("Pending confirmation for:", "yatra")}{" "}
+                    <span className="font-medium">
+                      {profile.pending_email}
+                    </span>{" "}
+                    {__(
+                      "— check that inbox for the confirmation link.",
+                      "yatra",
+                    )}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleResendEmailChange}
+                    disabled={isResendingEmail}
+                    className="mt-1 font-medium text-yatra-primary underline hover:no-underline disabled:opacity-60"
+                  >
+                    {isResendingEmail
+                      ? __("Sending…", "yatra")
+                      : __("Resend confirmation email", "yatra")}
+                  </button>
+                </div>
+              ) : null}
             </div>
 
             <div className="yatra-profile-field">

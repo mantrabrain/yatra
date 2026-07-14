@@ -71,6 +71,28 @@ class CustomerController extends BaseController
             ],
         ]);
 
+        // Request an account email change (WordPress pending-change pattern:
+        // a confirmation link is emailed to the new address; nothing changes yet).
+        // The confirmation link itself is a normal front-end URL handled by
+        // AccountPageHandler — NOT a REST route — because a browser GET to REST
+        // carries no nonce and would be treated as anonymous.
+        register_rest_route($namespace, '/' . $base . '/me/email', [
+            [
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'updateMyEmail'],
+                'permission_callback' => [$this, 'checkCustomerPermission'],
+            ],
+        ]);
+
+        // Re-send the confirmation email for an already-pending email change.
+        register_rest_route($namespace, '/' . $base . '/me/email/resend', [
+            [
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'resendMyEmailConfirmation'],
+                'permission_callback' => [$this, 'checkCustomerPermission'],
+            ],
+        ]);
+
         // Current customer's bookings
         register_rest_route($namespace, '/' . $base . '/my-bookings', [
             [
@@ -367,6 +389,47 @@ class CustomerController extends BaseController
         Logger::info('Customer changed account password', ['user_id' => $userId]);
 
         return $this->success_response(['updated' => true]);
+    }
+
+    /**
+     * POST /customers/me/email - Request a change to the account login email.
+     *
+     * Follows WordPress core's pending-change pattern: the email is NOT changed
+     * here. A confirmation link is emailed to the NEW address; the change only
+     * applies once the customer clicks it (confirmed by AccountPageHandler).
+     */
+    public function updateMyEmail(WP_REST_Request $request)
+    {
+        $userId = get_current_user_id();
+        if ($userId <= 0) {
+            return $this->error_response(__('Authentication required.', 'yatra'), 401);
+        }
+
+        $data = $request->get_json_params();
+        $newEmail = '';
+        if (is_array($data)) {
+            $newEmail = (string) ($data['email'] ?? $data['new_email'] ?? '');
+        }
+
+        $result = $this->customerService->requestEmailChange($userId, $newEmail);
+
+        return new WP_REST_Response($result, empty($result['success']) ? 400 : 200);
+    }
+
+    /**
+     * POST /customers/me/email/resend - Re-send the confirmation link for a
+     * pending email change (reuses the existing token; nothing else changes).
+     */
+    public function resendMyEmailConfirmation(WP_REST_Request $request)
+    {
+        $userId = get_current_user_id();
+        if ($userId <= 0) {
+            return $this->error_response(__('Authentication required.', 'yatra'), 401);
+        }
+
+        $result = $this->customerService->resendEmailChangeConfirmation($userId);
+
+        return new WP_REST_Response($result, empty($result['success']) ? 400 : 200);
     }
 
     /**

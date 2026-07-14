@@ -165,17 +165,188 @@ class CustomerService
             return null;
         }
 
-        $customer = $this->getCustomerByUserId($userId);
-        if ($customer !== null) {
-            return $customer;
+        $profile = $this->getCustomerByUserId($userId);
+        if ($profile === null) {
+            $user = get_userdata($userId);
+            if (!$user instanceof \WP_User) {
+                return null;
+            }
+            $profile = $this->buildProfileArrayFromWpUser($user);
         }
 
+        // Surface any pending (unconfirmed) email change so the account UI can
+        // show "awaiting confirmation" — WordPress stores it in the _new_email meta.
+        $pending = get_user_meta($userId, '_new_email', true);
+        $profile['pending_email'] = (is_array($pending) && !empty($pending['newemail']))
+            ? (string) $pending['newemail']
+            : '';
+
+        return $profile;
+    }
+
+    /**
+     * Request a change to the account's login email, following WordPress core's
+     * pending-change pattern ({@see send_confirmation_on_profile_email()}): the
+     * email is NOT changed directly. Validate, store the pending change in the
+     * `_new_email` user meta (the same shape core uses), and email a confirmation
+     * link to the NEW address; the change only applies when that link is clicked.
+     *
+     * @return array{success:bool, message:string, pending_email?:string}
+     */
+    public function requestEmailChange(int $userId, string $newEmail): array
+    {
         $user = get_userdata($userId);
         if (!$user instanceof \WP_User) {
-            return null;
+            return ['success' => false, 'message' => __('Account not found.', 'yatra')];
         }
 
-        return $this->buildProfileArrayFromWpUser($user);
+        $newEmail = trim($newEmail);
+        if ($newEmail === '' || !is_email($newEmail)) {
+            return ['success' => false, 'message' => __('Please enter a valid email address.', 'yatra')];
+        }
+        if (strtolower($newEmail) === strtolower((string) $user->user_email)) {
+            return ['success' => false, 'message' => __('That is already your email address.', 'yatra')];
+        }
+        if (email_exists($newEmail)) {
+            delete_user_meta($userId, '_new_email');
+            return ['success' => false, 'message' => __('That email address is already in use.', 'yatra')];
+        }
+
+        // Identical meta shape + hash to WordPress core (wp-includes/user.php),
+        // so the pending change is fully compatible with core's own flow.
+        $hash = md5($newEmail . time() . wp_rand());
+        update_user_meta($userId, '_new_email', ['hash' => $hash, 'newemail' => $newEmail]);
+
+        $this->sendEmailChangeConfirmation($user, $newEmail, $hash);
+
+        return [
+            'success' => true,
+            'message' => sprintf(
+                /* translators: %s: the new email address. */
+                __('A confirmation link has been sent to %s. Your email address will change once you confirm it there.', 'yatra'),
+                $newEmail
+            ),
+            'pending_email' => $newEmail,
+        ];
+    }
+
+    /**
+     * Re-send the confirmation email for an already-pending email change. Reuses
+     * the stored hash + address, so the original link stays valid (this does not
+     * rotate the token or change any state). Returns an error if nothing is pending.
+     *
+     * @return array{success:bool, message:string, pending_email?:string}
+     */
+    public function resendEmailChangeConfirmation(int $userId): array
+    {
+        $user = get_userdata($userId);
+        if (!$user instanceof \WP_User) {
+            return ['success' => false, 'message' => __('Account not found.', 'yatra')];
+        }
+
+        $pending = get_user_meta($userId, '_new_email', true);
+        if (!is_array($pending) || empty($pending['hash']) || empty($pending['newemail'])) {
+            return ['success' => false, 'message' => __('There is no pending email change to confirm.', 'yatra')];
+        }
+
+        $newEmail = (string) $pending['newemail'];
+        $this->sendEmailChangeConfirmation($user, $newEmail, (string) $pending['hash']);
+
+        return [
+            'success' => true,
+            'message' => sprintf(
+                /* translators: %s: the pending new email address. */
+                __('We\'ve re-sent the confirmation link to %s.', 'yatra'),
+                $newEmail
+            ),
+            'pending_email' => $newEmail,
+        ];
+    }
+
+    /**
+     * Send the email-change confirmation to the NEW address. Mirrors WordPress
+     * core's message and reuses its `new_user_email_content` filter, but points
+     * the confirmation link at the frontend account endpoint (not wp-admin).
+     */
+    private function sendEmailChangeConfirmation(\WP_User $user, string $newEmail, string $hash): void
+    {
+        $sitename   = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
+        // Point at the front-end account page (a normal request with cookie auth),
+        // NOT a REST endpoint — a browser GET to REST carries no nonce and would be
+        // read as anonymous. AccountPageHandler consumes the token there.
+        $accountUrl = home_url('/' . trailingslashit(SettingsService::getAccountBase()));
+        $confirmUrl = add_query_arg('yatra_email_token', rawurlencode($hash), $accountUrl);
+
+        /* translators: Do not translate the ###...### placeholders; they are replaced below. */
+        $email_text = __(
+            'Howdy ###USERNAME###,
+
+You recently requested to change the email address on your account to this one.
+
+If this is correct, please click the link below to confirm the change:
+###CONFIRM_URL###
+
+If you did not request this, you can safely ignore and delete this email.
+
+This email has been sent to ###EMAIL###
+
+Regards,
+All at ###SITENAME###
+###SITEURL###',
+            'yatra'
+        );
+
+        // Reuse core's filter so operators who already customise the change-email
+        // text keep their template. ###ADMIN_URL### is also swapped for BC.
+        $content = apply_filters('new_user_email_content', $email_text, ['hash' => $hash, 'newemail' => $newEmail]);
+        $content = str_replace(['###CONFIRM_URL###', '###ADMIN_URL###'], esc_url_raw($confirmUrl), $content);
+        $content = str_replace('###USERNAME###', $user->user_login, $content);
+        $content = str_replace('###EMAIL###', $newEmail, $content);
+        $content = str_replace('###SITENAME###', $sitename, $content);
+        $content = str_replace('###SITEURL###', home_url(), $content);
+
+        /* translators: %s: Site title. */
+        wp_mail($newEmail, sprintf(__('[%s] Email Change Request', 'yatra'), $sitename), $content);
+    }
+
+    /**
+     * Confirm a pending email change (WordPress core pattern): verify the hash
+     * against the `_new_email` meta, apply via wp_update_user, then clear the meta.
+     *
+     * @return array{success:bool, message:string}
+     */
+    public function confirmEmailChange(int $userId, string $hash): array
+    {
+        $pending = get_user_meta($userId, '_new_email', true);
+        if (!is_array($pending) || empty($pending['hash']) || empty($pending['newemail'])) {
+            return ['success' => false, 'message' => __('No pending email change was found.', 'yatra')];
+        }
+        if (!hash_equals((string) $pending['hash'], (string) $hash)) {
+            return ['success' => false, 'message' => __('This confirmation link is invalid or has expired.', 'yatra')];
+        }
+
+        $newEmail = trim((string) $pending['newemail']);
+        $existing = $newEmail !== '' ? email_exists($newEmail) : false;
+        if ($existing && (int) $existing !== $userId) {
+            delete_user_meta($userId, '_new_email');
+            return ['success' => false, 'message' => __('That email address is now in use. Please try again.', 'yatra')];
+        }
+
+        $result = wp_update_user(['ID' => $userId, 'user_email' => $newEmail]);
+        if (is_wp_error($result)) {
+            return ['success' => false, 'message' => wp_strip_all_tags($result->get_error_message())];
+        }
+
+        // Keep the linked Yatra customer record in step with the WP user email,
+        // otherwise the account page would keep showing the old address (it reads
+        // the customer table's own email column).
+        $customer = $this->customerRepository->findByUserId($userId);
+        if ($customer && strtolower((string) $customer->email) !== strtolower($newEmail)) {
+            $this->customerRepository->updateCustomer((int) $customer->id, ['email' => $newEmail]);
+        }
+
+        delete_user_meta($userId, '_new_email');
+        return ['success' => true, 'message' => __('Your email address has been updated.', 'yatra')];
     }
 
     /**

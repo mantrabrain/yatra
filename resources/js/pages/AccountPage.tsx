@@ -35,6 +35,7 @@ import Payments from "./account/Payments";
 import Documents from "./account/Documents";
 import Profile from "./account/Profile";
 import SavedTrips from "./account/SavedTrips";
+import { useToast } from "../components/ui/toast";
 
 const navigation: Array<{
   id: Section;
@@ -51,6 +52,7 @@ const navigation: Array<{
 
 const AccountPage: React.FC = () => {
   const accountShell = useMemo(() => getYatraAccountPageGlobals(), []);
+  const { showToast } = useToast();
 
   const accountNavigation = React.useMemo(() => {
     const wl =
@@ -156,6 +158,40 @@ const AccountPage: React.FC = () => {
     const newSection = getSectionFromUrl();
     setSection(newSection);
   }, [urlKey]);
+
+  // Surface the result of an email-change confirmation. The confirmation link
+  // (from WordPress-style verification email) redirects here with
+  // ?email_change=success|error; show feedback, open the Profile tab, then
+  // strip the param so a refresh doesn't repeat the toast.
+  React.useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    const params = new URLSearchParams(window.location.search);
+    const outcome = params.get("email_change");
+    if (outcome !== "success" && outcome !== "error") {
+      return;
+    }
+    if (outcome === "success") {
+      showToast(__("Your email address has been updated.", "yatra"), "success");
+      setSection("profile");
+    } else {
+      showToast(
+        __(
+          "This email confirmation link is invalid or has expired.",
+          "yatra",
+        ),
+        "error",
+      );
+    }
+    params.delete("email_change");
+    const query = params.toString();
+    const cleanUrl = `${window.location.pathname}${query ? `?${query}` : ""}`;
+    window.history.replaceState({}, "", cleanUrl);
+    (window as any).__lastAccountSearch = window.location.search;
+    // Run once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Update URL and localStorage when section changes
   const handleSectionChange = (newSection: Section) => {

@@ -1,5 +1,5 @@
 import { j as jsxRuntimeExports, p as Calendar, k as FileText, b as Plane, at as ArrowRight, q as MapPin, I as User, y as ChevronRight, S as Sparkles, h as Package, i as CreditCard, by as LifeBuoy, be as Bell, az as AlertCircle, aD as CheckCircle2, ar as Clock, V as ExternalLink, U as Users, d as Mail, aW as Phone, b4 as Download, r as reactExports, a5 as React, u as useQuery, av as CheckCircle, as as DollarSign, aQ as Eye, t as useQueryClient, aJ as PenSquare, b6 as XCircle, bz as ShieldCheck, bf as Heart, s as LayoutDashboard, bA as LogOut, bv as QueryClient, bw as client, bx as QueryClientProvider } from "./react-vendor-zODANjVp.js";
-import { f as formatYatraMoney, _ as __, p as parseDate, e as formatDate$1, k as applyCurrencyPosition, s as sprintf, t as toDateValue, a as apiClient, A as API_ENDPOINTS, u as useToast, l as getCountryOptions, i as getCountryName$1, T as ToastProvider, E as ErrorBoundary } from "./index-C2r48y7c.js";
+import { f as formatYatraMoney, _ as __, p as parseDate, e as formatDate$1, k as applyCurrencyPosition, s as sprintf, t as toDateValue, a as apiClient, A as API_ENDPOINTS, u as useToast, l as getCountryOptions, i as getCountryName$1, T as ToastProvider, E as ErrorBoundary } from "./index-CzC53-AA.js";
 function toBrowserLocaleTag(locale) {
   const raw = String(locale || "").trim();
   if (!raw) return void 0;
@@ -2448,6 +2448,7 @@ const Profile = ({
   const { showToast } = useToast();
   const [isSaving, setIsSaving] = reactExports.useState(false);
   const [isSavingPassword, setIsSavingPassword] = reactExports.useState(false);
+  const [isResendingEmail, setIsResendingEmail] = reactExports.useState(false);
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -2469,7 +2470,31 @@ const Profile = ({
       }
       await apiClient.put(API_ENDPOINTS.CUSTOMER_ME, payload);
       await queryClient2.invalidateQueries({ queryKey: ["account-profile"] });
-      showToast(__("Profile updated successfully.", "yatra"), "success");
+      const currentEmail = ((profile == null ? void 0 : profile.email) || "").trim().toLowerCase();
+      const nextEmail = formData.email.trim();
+      if (nextEmail && nextEmail.toLowerCase() !== currentEmail) {
+        try {
+          const resp = await apiClient.post(
+            API_ENDPOINTS.CUSTOMER_CHANGE_EMAIL,
+            { email: nextEmail }
+          );
+          await queryClient2.invalidateQueries({ queryKey: ["account-profile"] });
+          showToast(
+            (resp == null ? void 0 : resp.message) || __(
+              "A confirmation link has been sent to your new email address. The change takes effect once you confirm it.",
+              "yatra"
+            ),
+            "success"
+          );
+        } catch (emailError) {
+          showToast(
+            (emailError == null ? void 0 : emailError.message) || __("Could not request the email change.", "yatra"),
+            "error"
+          );
+        }
+      } else {
+        showToast(__("Profile updated successfully.", "yatra"), "success");
+      }
       setIsEditing(false);
     } catch (error) {
       showToast(
@@ -2506,6 +2531,25 @@ const Profile = ({
       );
     } finally {
       setIsSavingPassword(false);
+    }
+  };
+  const handleResendEmailChange = async () => {
+    setIsResendingEmail(true);
+    try {
+      const resp = await apiClient.post(
+        API_ENDPOINTS.CUSTOMER_RESEND_EMAIL_CHANGE
+      );
+      showToast(
+        (resp == null ? void 0 : resp.message) || __("Confirmation link re-sent to your new email address.", "yatra"),
+        "success"
+      );
+    } catch (error) {
+      showToast(
+        (error == null ? void 0 : error.message) || __("Could not re-send the confirmation email.", "yatra"),
+        "error"
+      );
+    } finally {
+      setIsResendingEmail(false);
     }
   };
   const handleCancel = () => {
@@ -2569,7 +2613,44 @@ const Profile = ({
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-field", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Email Address", "yatra") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.email || __("Not set", "yatra") })
+          isEditing ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "input",
+              {
+                type: "email",
+                value: formData.email,
+                onChange: (e) => handleInputChange("email", e.target.value),
+                className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent",
+                placeholder: __("you@example.com", "yatra")
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-xs text-gray-500 dark:text-gray-400", children: __(
+              "For security, we'll email a confirmation link to the new address. Your email changes only after you click that link.",
+              "yatra"
+            ) })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.email || __("Not set", "yatra") }),
+          (profile == null ? void 0 : profile.pending_email) ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 text-xs text-amber-600 dark:text-amber-400", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+              __("Pending confirmation for:", "yatra"),
+              " ",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: profile.pending_email }),
+              " ",
+              __(
+                "— check that inbox for the confirmation link.",
+                "yatra"
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                type: "button",
+                onClick: handleResendEmailChange,
+                disabled: isResendingEmail,
+                className: "mt-1 font-medium text-yatra-primary underline hover:no-underline disabled:opacity-60",
+                children: isResendingEmail ? __("Sending…", "yatra") : __("Resend confirmation email", "yatra")
+              }
+            )
+          ] }) : null
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-field", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Phone Number", "yatra") }),
@@ -2992,6 +3073,7 @@ const navigation = [
 const AccountPage = () => {
   var _a;
   const accountShell = reactExports.useMemo(() => getYatraAccountPageGlobals(), []);
+  const { showToast } = useToast();
   const accountNavigation = React.useMemo(() => {
     var _a2;
     const wl = typeof window !== "undefined" && !!((_a2 = window.yatraAccountPage) == null ? void 0 : _a2.wishlistEnabled);
@@ -3058,6 +3140,33 @@ const AccountPage = () => {
     const newSection = getSectionFromUrl();
     setSection(newSection);
   }, [urlKey]);
+  React.useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    const params = new URLSearchParams(window.location.search);
+    const outcome = params.get("email_change");
+    if (outcome !== "success" && outcome !== "error") {
+      return;
+    }
+    if (outcome === "success") {
+      showToast(__("Your email address has been updated.", "yatra"), "success");
+      setSection("profile");
+    } else {
+      showToast(
+        __(
+          "This email confirmation link is invalid or has expired.",
+          "yatra"
+        ),
+        "error"
+      );
+    }
+    params.delete("email_change");
+    const query = params.toString();
+    const cleanUrl = `${window.location.pathname}${query ? `?${query}` : ""}`;
+    window.history.replaceState({}, "", cleanUrl);
+    window.__lastAccountSearch = window.location.search;
+  }, []);
   const handleSectionChange = (newSection) => {
     setSection(newSection);
     if (typeof window !== "undefined") {

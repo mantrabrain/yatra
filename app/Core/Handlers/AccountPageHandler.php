@@ -25,6 +25,18 @@ class AccountPageHandler extends BasePageHandler
         $page = (string) ($route_data['page'] ?? 'dashboard');
         $base = (string) ($route_data['base'] ?? SettingsService::getAccountBase());
 
+        // Email-change confirmation (WordPress core pattern). The emailed link
+        // lands here as a normal front-end request, so the WordPress auth cookie
+        // identifies the customer — unlike a REST GET, which carries no nonce and
+        // would be treated as anonymous. Handled before anything else so the
+        // token is consumed and we redirect away cleanly.
+        $emailToken = isset($_GET['yatra_email_token'])
+            ? sanitize_text_field(wp_unslash((string) $_GET['yatra_email_token']))
+            : '';
+        if ($emailToken !== '') {
+            $this->confirmEmailChange($emailToken, $base); // always redirects + exits
+        }
+
         if (!$this->isValidAccountPage($page)) {
             return false;
         }
@@ -55,6 +67,35 @@ class AccountPageHandler extends BasePageHandler
         $GLOBALS['yatra_loading_react_account_page'] = true;
 
         return $this->selectTemplate('account-page', null, 'account');
+    }
+
+    /**
+     * Confirm a pending account email change from the emailed link, then redirect
+     * back to the Profile tab with a success/error flag. Mirrors WordPress core's
+     * confirmation step (logged-out visitors are bounced through login and returned
+     * here to finish). Always redirects and exits.
+     */
+    private function confirmEmailChange(string $token, string $base): void
+    {
+        $accountUrl = home_url('/' . trailingslashit($base));
+
+        if (!is_user_logged_in()) {
+            $returnUrl = add_query_arg('yatra_email_token', rawurlencode($token), $accountUrl);
+            wp_safe_redirect(wp_login_url($returnUrl));
+            exit;
+        }
+
+        $result = (new \Yatra\Services\CustomerService())
+            ->confirmEmailChange(get_current_user_id(), $token);
+
+        wp_safe_redirect(add_query_arg(
+            [
+                'tab' => 'profile',
+                'email_change' => empty($result['success']) ? 'error' : 'success',
+            ],
+            $accountUrl
+        ));
+        exit;
     }
 
     /**

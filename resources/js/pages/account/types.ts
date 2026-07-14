@@ -79,6 +79,8 @@ export interface CustomerProfile {
   first_name?: string;
   last_name?: string;
   email: string;
+  /** A pending (unconfirmed) email change awaiting the customer's confirmation. */
+  pending_email?: string;
   phone?: string;
   address?: string;
   city?: string;
