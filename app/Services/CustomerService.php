@@ -277,16 +277,21 @@ class CustomerService
         $accountUrl = home_url('/' . trailingslashit(SettingsService::getAccountBase()));
         $confirmUrl = add_query_arg('yatra_email_token', rawurlencode($hash), $accountUrl);
 
+        // Verbatim copy of WordPress core's default text (send_confirmation_on_profile_email),
+        // including the ###ADMIN_URL### placeholder, so operators who customise the
+        // shared `new_user_email_content` filter with core's placeholders get an
+        // identical result here.
         /* translators: Do not translate the ###...### placeholders; they are replaced below. */
         $email_text = __(
             'Howdy ###USERNAME###,
 
-You recently requested to change the email address on your account to this one.
+You recently requested to have the email address on your account changed.
 
-If this is correct, please click the link below to confirm the change:
-###CONFIRM_URL###
+If this is correct, please click on the following link to change it:
+###ADMIN_URL###
 
-If you did not request this, you can safely ignore and delete this email.
+You can safely ignore and delete this email if you do not want to
+take this action.
 
 This email has been sent to ###EMAIL###
 
@@ -297,9 +302,9 @@ All at ###SITENAME###
         );
 
         // Reuse core's filter so operators who already customise the change-email
-        // text keep their template. ###ADMIN_URL### is also swapped for BC.
+        // text keep their template. ###CONFIRM_URL### is also honoured as an alias.
         $content = apply_filters('new_user_email_content', $email_text, ['hash' => $hash, 'newemail' => $newEmail]);
-        $content = str_replace(['###CONFIRM_URL###', '###ADMIN_URL###'], esc_url_raw($confirmUrl), $content);
+        $content = str_replace(['###ADMIN_URL###', '###CONFIRM_URL###'], esc_url_raw($confirmUrl), $content);
         $content = str_replace('###USERNAME###', $user->user_login, $content);
         $content = str_replace('###EMAIL###', $newEmail, $content);
         $content = str_replace('###SITENAME###', $sitename, $content);

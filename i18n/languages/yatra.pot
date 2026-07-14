@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-14T03:51:24+00:00\n"
+"POT-Creation-Date: 2026-07-14T03:56:27+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -198,14 +198,14 @@ msgstr ""
 
 # Source: resources/js/pages/account/SavedTrips.tsx:253
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3039
+#: assets/dist/js/account-page.js:3037
 #, js-format
 msgid "(%d review)"
 msgstr ""
 
 # Source: resources/js/pages/account/SavedTrips.tsx:254
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3039
+#: assets/dist/js/account-page.js:3037
 #, js-format
 msgid "(%d reviews)"
 msgstr ""
@@ -1979,7 +1979,7 @@ msgstr ""
 #: app/Services/SettingsService.php:256
 #: assets/admin/dist/js/app.js:44103
 #: assets/dist/js/account-page.js:1042
-#: assets/dist/js/account-page.js:2697
+#: assets/dist/js/account-page.js:2695
 msgid "Address"
 msgstr ""
 
@@ -4603,7 +4603,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:62841
 #: assets/admin/dist/js/app.js:63857
 #: assets/dist/js/account-page.js:1738
-#: assets/dist/js/account-page.js:3067
+#: assets/dist/js/account-page.js:3065
 #: assets/dist/js/ChannelManager-DBTZ4iK_.js:2253
 #: assets/dist/js/Reports-BNaZrbMf.js:481
 #: assets/dist/js/Reports-BNaZrbMf.js:576
@@ -4795,7 +4795,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/SavedTrips.tsx:77
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2930
+#: assets/dist/js/account-page.js:2928
 msgid "Browse Trips"
 msgstr ""
 
@@ -5083,8 +5083,8 @@ msgstr ""
 #: assets/admin/dist/js/app.js:76294
 #: assets/admin/dist/js/Whatsapp.js:1001
 #: assets/admin/dist/js/Whatsapp.js:1168
-#: assets/dist/js/account-page.js:2733
-#: assets/dist/js/account-page.js:2854
+#: assets/dist/js/account-page.js:2731
+#: assets/dist/js/account-page.js:2852
 #: assets/dist/js/AvailabilityForm-jQMsxNDg.js:1379
 #: assets/dist/js/BookingForm-m1_-mHdV.js:1781
 #: assets/dist/js/BuildItineraryModal-7n2jsdb4.js:133
@@ -5438,8 +5438,8 @@ msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:436, resources/js/pages/account/Profile.tsx:450
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2744
-#: assets/dist/js/account-page.js:2757
+#: assets/dist/js/account-page.js:2742
+#: assets/dist/js/account-page.js:2755
 msgid "Change Password"
 msgstr ""
 
@@ -5739,7 +5739,7 @@ msgstr ""
 #: app/Providers/FrontendAssetsProvider.php:1003
 #: assets/admin/dist/js/app.js:43304
 #: assets/dist/js/account-page.js:1043
-#: assets/dist/js/account-page.js:2684
+#: assets/dist/js/account-page.js:2682
 #: assets/dist/js/Settings-3nMtGNY2.js:3120
 #: assets/dist/js/Settings-3nMtGNY2.js:3127
 msgid "City"
@@ -6307,7 +6307,7 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:626
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3470
+#: assets/dist/js/account-page.js:3468
 msgid "Concierge Desk"
 msgstr ""
 
@@ -6468,13 +6468,13 @@ msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:497
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2805
+#: assets/dist/js/account-page.js:2803
 msgid "Confirm New Password"
 msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:510
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2819
+#: assets/dist/js/account-page.js:2817
 msgid "Confirm your new password"
 msgstr ""
 
@@ -7047,7 +7047,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:43346
 #: assets/admin/dist/js/app.js:44116
 #: assets/dist/js/account-page.js:1041
-#: assets/dist/js/account-page.js:2669
+#: assets/dist/js/account-page.js:2667
 #: assets/dist/js/BookingForm-m1_-mHdV.js:1006
 #: assets/dist/js/Settings-3nMtGNY2.js:3153
 #: assets/dist/js/Settings-3nMtGNY2.js:3161
@@ -7751,7 +7751,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:459
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2765
+#: assets/dist/js/account-page.js:2763
 msgid "Current Password"
 msgstr ""
 
@@ -8115,7 +8115,7 @@ msgstr ""
 #: app/Providers/AdminServiceProvider.php:653
 #: assets/admin/dist/js/app.js:4415
 #: assets/admin/dist/js/app.js:27020
-#: assets/dist/js/account-page.js:3066
+#: assets/dist/js/account-page.js:3064
 msgid "Dashboard"
 msgstr ""
 
@@ -9892,7 +9892,7 @@ msgstr ""
 # Source: resources/js/pages/AccountPage.tsx:48
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/hero.php:269
-#: assets/dist/js/account-page.js:3069
+#: assets/dist/js/account-page.js:3067
 msgid "Documents"
 msgstr ""
 
@@ -11462,7 +11462,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:491
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2799
+#: assets/dist/js/account-page.js:2797
 msgid "Enter new password"
 msgstr ""
 
@@ -11581,19 +11581,19 @@ msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:393
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2705
+#: assets/dist/js/account-page.js:2703
 msgid "Enter your address"
 msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:374
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2692
+#: assets/dist/js/account-page.js:2690
 msgid "Enter your city"
 msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:472
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2779
+#: assets/dist/js/account-page.js:2777
 msgid "Enter your current password"
 msgstr ""
 
@@ -11617,7 +11617,7 @@ msgstr ""
 # Source: resources/js/pages/TripConsentForm.tsx:609, resources/js/pages/account/Profile.tsx:330
 #: assets/admin/dist/js/app.js
 #: templates/shortcodes/login.php:190
-#: assets/dist/js/account-page.js:2664
+#: assets/dist/js/account-page.js:2662
 msgid "Enter your phone number"
 msgstr ""
 
@@ -11736,7 +11736,7 @@ msgstr ""
 
 # Source: resources/js/account-page.tsx:54
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3546
+#: assets/dist/js/account-page.js:3544
 msgid "Error loading account page"
 msgstr ""
 
@@ -12928,7 +12928,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/SavedTrips.tsx:23
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2894
+#: assets/dist/js/account-page.js:2892
 msgid "Failed to remove trip from wishlist."
 msgstr ""
 
@@ -13502,7 +13502,7 @@ msgstr ""
 #: templates/partials/single-trip/content-itinerary.php:121
 #: assets/admin/dist/js/app.js:30054
 #: assets/admin/dist/js/app.js:52252
-#: assets/dist/js/account-page.js:2994
+#: assets/dist/js/account-page.js:2992
 #: assets/dist/js/Itinerary-tEr-LQr2.js:1612
 msgid "Flexible"
 msgstr ""
@@ -13731,7 +13731,7 @@ msgstr ""
 #: templates/single-activity.php:130
 #: templates/single-destination.php:130
 #: assets/admin/dist/js/app.js:58324
-#: assets/dist/js/account-page.js:2876
+#: assets/dist/js/account-page.js:2874
 msgid "From"
 msgstr ""
 
@@ -14404,7 +14404,7 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:555, resources/js/pages/Bookings.tsx:583
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3408
+#: assets/dist/js/account-page.js:3406
 msgid "Guest"
 msgstr ""
 
@@ -14538,7 +14538,7 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:554
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3406
+#: assets/dist/js/account-page.js:3404
 msgid "Hello,"
 msgstr ""
 
@@ -16650,7 +16650,7 @@ msgstr ""
 #: app/Providers/FrontendAssetsProvider.php:978
 #: app/Shortcodes/LoginShortcode.php:169
 #: assets/admin/dist/js/app.js:5326
-#: assets/dist/js/account-page.js:3439
+#: assets/dist/js/account-page.js:3437
 msgid "Logout"
 msgstr ""
 
@@ -16864,7 +16864,7 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:558
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3410
+#: assets/dist/js/account-page.js:3408
 msgid "Manage bookings, payments, and documents – everything for your adventures in one place."
 msgstr ""
 
@@ -18174,7 +18174,7 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:623
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3469
+#: assets/dist/js/account-page.js:3467
 msgid "Need help right away?"
 msgstr ""
 
@@ -18225,7 +18225,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:478
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2785
+#: assets/dist/js/account-page.js:2783
 msgid "New Password"
 msgstr ""
 
@@ -18933,8 +18933,8 @@ msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:604, resources/js/pages/account/SavedTrips.tsx:64
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2882
-#: assets/dist/js/account-page.js:2918
+#: assets/dist/js/account-page.js:2880
+#: assets/dist/js/account-page.js:2916
 msgid "No saved trips yet"
 msgstr ""
 
@@ -19194,10 +19194,10 @@ msgstr ""
 #: assets/admin/dist/js/app.js:35436
 #: assets/dist/js/account-page.js:2612
 #: assets/dist/js/account-page.js:2631
-#: assets/dist/js/account-page.js:2666
-#: assets/dist/js/account-page.js:2681
-#: assets/dist/js/account-page.js:2694
-#: assets/dist/js/account-page.js:2707
+#: assets/dist/js/account-page.js:2664
+#: assets/dist/js/account-page.js:2679
+#: assets/dist/js/account-page.js:2692
+#: assets/dist/js/account-page.js:2705
 msgid "Not set"
 msgstr ""
 
@@ -19322,7 +19322,7 @@ msgstr ""
 # Source: resources/js/pages/Availability.tsx:920, resources/js/pages/account/SavedTrips.tsx:137
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:61254
-#: assets/dist/js/account-page.js:2957
+#: assets/dist/js/account-page.js:2955
 msgid "OFF"
 msgstr ""
 
@@ -19975,7 +19975,7 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:464
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3333
+#: assets/dist/js/account-page.js:3331
 msgid "Outstanding Balance"
 msgstr ""
 
@@ -20189,7 +20189,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:516
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2822
+#: assets/dist/js/account-page.js:2820
 msgid "Passwords do not match"
 msgstr ""
 
@@ -20579,7 +20579,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:4510
 #: assets/admin/dist/js/app.js:26518
 #: assets/admin/dist/js/app.js:56916
-#: assets/dist/js/account-page.js:3068
+#: assets/dist/js/account-page.js:3066
 msgid "Payments"
 msgstr ""
 
@@ -20656,10 +20656,12 @@ msgstr ""
 msgid "Pending booking promotions"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:297
+# Source: resources/js/pages/account/Profile.tsx:299
+#. translators: %s: the pending new email address.
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2634
-msgid "Pending confirmation for:"
+#: assets/dist/js/account-page.js:2635
+#, js-format
+msgid "Pending confirmation for %s — check that inbox for the confirmation link."
 msgstr ""
 
 # Source: resources/js/components/ai/TodaysBriefCard.tsx:149
@@ -20710,7 +20712,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:58331
 #: assets/admin/dist/js/app.js:59414
-#: assets/dist/js/account-page.js:3046
+#: assets/dist/js/account-page.js:3044
 msgid "Per person"
 msgstr ""
 
@@ -20945,7 +20947,7 @@ msgstr ""
 #: templates/partials/single-trip/enquiry-modal.php:41
 #: assets/admin/dist/js/app.js:43172
 #: assets/admin/dist/js/app.js:44089
-#: assets/dist/js/account-page.js:2656
+#: assets/dist/js/account-page.js:2654
 msgid "Phone Number"
 msgstr ""
 
@@ -21197,7 +21199,7 @@ msgstr ""
 
 # Source: resources/js/account-page.tsx:56
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3548
+#: assets/dist/js/account-page.js:3546
 msgid "Please refresh the page or contact support if the problem continues."
 msgstr ""
 
@@ -21856,7 +21858,7 @@ msgstr ""
 # Source: resources/js/pages/AccountPage.tsx:50, resources/js/pages/account/Profile.tsx:221
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/account-page.js:2573
-#: assets/dist/js/account-page.js:3071
+#: assets/dist/js/account-page.js:3069
 msgid "Profile"
 msgstr ""
 
@@ -22850,7 +22852,7 @@ msgstr ""
 # Source: resources/js/pages/account/SavedTrips.tsx:142
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:315
-#: assets/dist/js/account-page.js:2963
+#: assets/dist/js/account-page.js:2961
 #: assets/js/listing-wishlist.js:45
 #: assets/js/trip.js:4912
 msgid "Remove from favorites"
@@ -23169,7 +23171,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:314
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2650
+#: assets/dist/js/account-page.js:2648
 msgid "Resend confirmation email"
 msgstr ""
 
@@ -24034,7 +24036,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailSequenceForm.tsx:407, resources/js/pages/account/Profile.tsx:414
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2720
+#: assets/dist/js/account-page.js:2718
 msgid "Save Changes"
 msgstr ""
 
@@ -24178,9 +24180,9 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:49, resources/js/pages/account/Profile.tsx:573, resources/js/pages/account/SavedTrips.tsx:32
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2864
-#: assets/dist/js/account-page.js:2899
-#: assets/dist/js/account-page.js:3070
+#: assets/dist/js/account-page.js:2862
+#: assets/dist/js/account-page.js:2897
+#: assets/dist/js/account-page.js:3068
 msgid "Saved Trips"
 msgstr ""
 
@@ -24239,7 +24241,7 @@ msgstr ""
 #: assets/admin/dist/js/Whatsapp.js:554
 #: assets/admin/dist/js/Whatsapp.js:1278
 #: assets/admin/dist/js/Whatsapp.js:1871
-#: assets/dist/js/account-page.js:2720
+#: assets/dist/js/account-page.js:2718
 #: assets/dist/js/AiAssistant-BSlTjAQR.js:636
 #: assets/dist/js/AiAssistant-BSlTjAQR.js:808
 #: assets/dist/js/AiAssistant-BSlTjAQR.js:1118
@@ -25427,7 +25429,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:350
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2677
+#: assets/dist/js/account-page.js:2675
 msgid "Select your country"
 msgstr ""
 
@@ -25833,7 +25835,7 @@ msgstr ""
 
 # Source: resources/js/pages/Team.tsx:2992, resources/js/pages/account/Profile.tsx:313
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2650
+#: assets/dist/js/account-page.js:2648
 #: assets/dist/js/Team-K1mPL_la.js:2356
 msgid "Sending…"
 msgstr ""
@@ -27027,7 +27029,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/SavedTrips.tsx:67
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2919
+#: assets/dist/js/account-page.js:2917
 msgid "Start exploring and save your favorite trips to your wishlist!"
 msgstr ""
 
@@ -27075,7 +27077,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/SavedTrips.tsx:271
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3044
+#: assets/dist/js/account-page.js:3042
 msgid "Starting from"
 msgstr ""
 
@@ -28311,7 +28313,7 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:180
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3157
+#: assets/dist/js/account-page.js:3155
 msgid "This email confirmation link is invalid or has expired."
 msgstr ""
 
@@ -28895,7 +28897,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:27089
 #: assets/admin/dist/js/app.js:44221
 #: assets/dist/js/account-page.js:1772
-#: assets/dist/js/account-page.js:3322
+#: assets/dist/js/account-page.js:3320
 #: assets/dist/js/Reports-BNaZrbMf.js:567
 #: assets/dist/js/Reports-BNaZrbMf.js:691
 #: assets/dist/js/Reports-BNaZrbMf.js:1932
@@ -28962,7 +28964,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:44228
 #: assets/dist/js/account-page.js:1800
-#: assets/dist/js/account-page.js:3338
+#: assets/dist/js/account-page.js:3336
 msgid "Total Spent"
 msgstr ""
 
@@ -30322,7 +30324,7 @@ msgstr ""
 # Source: resources/js/pages/AccountPage.tsx:459, resources/js/pages/account/Dashboard.tsx:245
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/account-page.js:384
-#: assets/dist/js/account-page.js:3328
+#: assets/dist/js/account-page.js:3326
 msgid "Upcoming Trips"
 msgstr ""
 
@@ -30426,7 +30428,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:537
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2834
+#: assets/dist/js/account-page.js:2832
 msgid "Update Password"
 msgstr ""
 
@@ -30574,7 +30576,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:439
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2746
+#: assets/dist/js/account-page.js:2744
 msgid "Update your password to keep your account secure."
 msgstr ""
 
@@ -30637,7 +30639,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/Profile.tsx:536
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2834
+#: assets/dist/js/account-page.js:2832
 msgid "Updating…"
 msgstr ""
 
@@ -31217,7 +31219,7 @@ msgstr ""
 #: templates/single-destination.php:274
 #: templates/trip-listing-card.php:462
 #: assets/dist/js/account-page.js:1884
-#: assets/dist/js/account-page.js:3053
+#: assets/dist/js/account-page.js:3051
 msgid "View Details"
 msgstr ""
 
@@ -32282,8 +32284,8 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:176
 #: assets/admin/dist/js/app.js
-#: app/Services/CustomerService.php:349
-#: assets/dist/js/account-page.js:3153
+#: app/Services/CustomerService.php:354
+#: assets/dist/js/account-page.js:3151
 msgid "Your email address has been updated."
 msgstr ""
 
@@ -32355,7 +32357,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/SavedTrips.tsx:35
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2900
+#: assets/dist/js/account-page.js:2898
 msgid "Your wishlist of favorite trips"
 msgstr ""
 
@@ -33962,12 +33964,6 @@ msgstr ""
 msgid "— Select —"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:301
-#: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2638
-msgid "— check that inbox for the confirmation link."
-msgstr ""
-
 # Source: resources/js/pages/Settings.tsx:7625
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/Settings-3nMtGNY2.js:6301
@@ -35052,9 +35048,9 @@ msgid "Your current password is incorrect."
 msgstr ""
 
 #: app/Controllers/CustomerController.php:585
-#: app/Services/CustomerService.php:440
-#: app/Services/CustomerService.php:481
-#: app/Services/CustomerService.php:511
+#: app/Services/CustomerService.php:445
+#: app/Services/CustomerService.php:486
+#: app/Services/CustomerService.php:516
 msgid "Customer not found."
 msgstr ""
 
@@ -37201,7 +37197,7 @@ msgid "Please fill in all required fields."
 msgstr ""
 
 #: app/Hooks/ReviewHooks.php:167
-#: app/Services/CustomerService.php:401
+#: app/Services/CustomerService.php:406
 #: app/Services/EnquiryService.php:122
 msgid "Please provide a valid email address."
 msgstr ""
@@ -37872,7 +37868,7 @@ msgid "Booking updated successfully."
 msgstr ""
 
 #: app/Services/BookingService.php:651
-#: app/Services/CustomerService.php:475
+#: app/Services/CustomerService.php:480
 #: app/Services/EnquiryService.php:345
 #: app/Services/PaymentService.php:149
 #: app/Services/ReviewService.php:288
@@ -37881,7 +37877,7 @@ msgid "Invalid status."
 msgstr ""
 
 #: app/Services/BookingService.php:664
-#: app/Services/CustomerService.php:487
+#: app/Services/CustomerService.php:492
 #: app/Services/PaymentService.php:161
 #: app/Services/ReviewService.php:300
 msgid "Failed to update status."
@@ -37960,16 +37956,17 @@ msgid "We've re-sent the confirmation link to %s."
 msgstr ""
 
 #. translators: Do not translate the ###...### placeholders; they are replaced below.
-#: app/Services/CustomerService.php:281
+#: app/Services/CustomerService.php:285
 msgid ""
 "Howdy ###USERNAME###,\n"
 "\n"
-"You recently requested to change the email address on your account to this one.\n"
+"You recently requested to have the email address on your account changed.\n"
 "\n"
-"If this is correct, please click the link below to confirm the change:\n"
-"###CONFIRM_URL###\n"
+"If this is correct, please click on the following link to change it:\n"
+"###ADMIN_URL###\n"
 "\n"
-"If you did not request this, you can safely ignore and delete this email.\n"
+"You can safely ignore and delete this email if you do not want to\n"
+"take this action.\n"
 "\n"
 "This email has been sent to ###EMAIL###\n"
 "\n"
@@ -37979,97 +37976,97 @@ msgid ""
 msgstr ""
 
 #. translators: %s: Site title.
-#: app/Services/CustomerService.php:309
+#: app/Services/CustomerService.php:314
 #, php-format
 msgid "[%s] Email Change Request"
 msgstr ""
 
-#: app/Services/CustomerService.php:322
+#: app/Services/CustomerService.php:327
 msgid "No pending email change was found."
 msgstr ""
 
-#: app/Services/CustomerService.php:325
+#: app/Services/CustomerService.php:330
 msgid "This confirmation link is invalid or has expired."
 msgstr ""
 
-#: app/Services/CustomerService.php:332
+#: app/Services/CustomerService.php:337
 msgid "That email address is now in use. Please try again."
 msgstr ""
 
-#: app/Services/CustomerService.php:396
+#: app/Services/CustomerService.php:401
 msgid "Email is required."
 msgstr ""
 
-#: app/Services/CustomerService.php:409
+#: app/Services/CustomerService.php:414
 msgid "A customer with this email already exists."
 msgstr ""
 
-#: app/Services/CustomerService.php:418
+#: app/Services/CustomerService.php:423
 msgid "Failed to create customer."
 msgstr ""
 
-#: app/Services/CustomerService.php:424
+#: app/Services/CustomerService.php:429
 msgid "Customer created successfully."
 msgstr ""
 
-#: app/Services/CustomerService.php:447
+#: app/Services/CustomerService.php:452
 msgid "Email is already in use by another customer."
 msgstr ""
 
-#: app/Services/CustomerService.php:454
+#: app/Services/CustomerService.php:459
 msgid "Failed to update customer."
 msgstr ""
 
-#: app/Services/CustomerService.php:459
+#: app/Services/CustomerService.php:464
 msgid "Customer updated successfully."
 msgstr ""
 
 #. translators: %s: new customer status.
-#: app/Services/CustomerService.php:494
+#: app/Services/CustomerService.php:499
 #, php-format
 msgid "Customer status updated to %s."
 msgstr ""
 
-#: app/Services/CustomerService.php:519
+#: app/Services/CustomerService.php:524
 msgid "Cannot delete customer with existing bookings. Consider deactivating instead."
 msgstr ""
 
-#: app/Services/CustomerService.php:526
+#: app/Services/CustomerService.php:531
 msgid "Failed to delete customer."
 msgstr ""
 
-#: app/Services/CustomerService.php:531
+#: app/Services/CustomerService.php:536
 msgid "Customer deleted successfully."
 msgstr ""
 
 #. translators: %s: booking reference or ID.
-#: app/Services/CustomerService.php:890
-#: app/Services/CustomerService.php:919
+#: app/Services/CustomerService.php:895
+#: app/Services/CustomerService.php:924
 #, php-format
 msgid "Invoice #%s.pdf"
 msgstr ""
 
 #. translators: %s: booking reference or ID.
-#: app/Services/CustomerService.php:941
+#: app/Services/CustomerService.php:946
 #, php-format
 msgid "Travel Voucher #%s.pdf"
 msgstr ""
 
 #. translators: %s: booking reference or ID.
-#: app/Services/CustomerService.php:959
+#: app/Services/CustomerService.php:964
 #, php-format
 msgid "Travel Itinerary #%s.pdf"
 msgstr ""
 
-#: app/Services/CustomerService.php:1043
+#: app/Services/CustomerService.php:1048
 msgid "Cannot merge customer with itself."
 msgstr ""
 
-#: app/Services/CustomerService.php:1050
+#: app/Services/CustomerService.php:1055
 msgid "One or both customers not found."
 msgstr ""
 
-#: app/Services/CustomerService.php:1067
+#: app/Services/CustomerService.php:1072
 msgid "Customers merged successfully."
 msgstr ""
 

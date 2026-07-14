@@ -2630,16 +2630,14 @@ const Profile = ({
             ) })
           ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.email || __("Not set", "yatra") }),
           (profile == null ? void 0 : profile.pending_email) ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 text-xs text-amber-600 dark:text-amber-400", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-              __("Pending confirmation for:", "yatra"),
-              " ",
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: profile.pending_email }),
-              " ",
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: sprintf(
+              /* translators: %s: the pending new email address. */
               __(
-                "— check that inbox for the confirmation link.",
+                "Pending confirmation for %s — check that inbox for the confirmation link.",
                 "yatra"
-              )
-            ] }),
+              ),
+              profile.pending_email
+            ) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "button",
               {

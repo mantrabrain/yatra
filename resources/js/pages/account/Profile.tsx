@@ -8,7 +8,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { __ } from "../../lib/i18n";
+import { __, sprintf } from "../../lib/i18n";
 import { currency } from "./utils";
 import { getCountryName, getCountryOptions } from "../../lib/countries";
 import { apiClient } from "../../lib/api-client";
@@ -294,13 +294,13 @@ const Profile: React.FC<ProfileProps> = ({
               {profile?.pending_email ? (
                 <div className="mt-2 text-xs text-amber-600 dark:text-amber-400">
                   <p>
-                    {__("Pending confirmation for:", "yatra")}{" "}
-                    <span className="font-medium">
-                      {profile.pending_email}
-                    </span>{" "}
-                    {__(
-                      "— check that inbox for the confirmation link.",
-                      "yatra",
+                    {sprintf(
+                      /* translators: %s: the pending new email address. */
+                      __(
+                        "Pending confirmation for %s — check that inbox for the confirmation link.",
+                        "yatra",
+                      ),
+                      profile.pending_email,
                     )}
                   </p>
                   <button
