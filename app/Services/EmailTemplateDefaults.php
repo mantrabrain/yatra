@@ -161,6 +161,14 @@ final class EmailTemplateDefaults
                 'subject' => '✉️ [{{site_name}}] Verify your email to complete your booking',
                 'body' => self::htmlCustomerEmailVerification(),
             ],
+            'account_email_change_request' => [
+                'subject' => '✉️ [{{site_name}}] Confirm your new email address',
+                'body' => self::htmlAccountEmailChangeRequest(),
+            ],
+            'account_email_changed' => [
+                'subject' => '🔔 [{{site_name}}] Your email address was changed',
+                'body' => self::htmlAccountEmailChanged(),
+            ],
             'booking_expired_customer' => [
                 'subject' => '⏱️ [{{site_name}}] Booking expired · {{booking_reference}}',
                 'body' => self::htmlBookingExpiredCustomer(),
