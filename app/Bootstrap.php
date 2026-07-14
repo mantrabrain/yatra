@@ -371,8 +371,11 @@ class Bootstrap
             load_textdomain('yatra', WP_LANG_DIR . '/loco/plugins/yatra-' . $locale . '.mo');
         }
         
-        // Load from plugin directory (fallback)
-        load_plugin_textdomain('yatra', false, 'i18n/languages');
+        // Load from the plugin's own i18n/languages folder (fallback). The 3rd
+        // arg is relative to WP_PLUGIN_DIR, so it MUST include the plugin folder
+        // name — a bare 'i18n/languages' resolves to wp-content/plugins/i18n/
+        // languages (which doesn't exist), so bundled translations never load.
+        load_plugin_textdomain('yatra', false, dirname(YATRA_PLUGIN_BASENAME) . '/i18n/languages');
     }
 
     /**
