@@ -267,6 +267,11 @@ const GoogleCalendarIntegrationSection: React.FC<{
       google_calendar_client_id: clientId,
       google_calendar_client_secret: clientSecret,
       google_calendar_enabled: true, // Enable by default when settings are provided
+      // Persist the target calendar through the MAIN page Save too (the option
+      // name matches what the sync path reads), so the user's natural action —
+      // clicking the page's Save button — keeps the chosen calendar.
+      google_calendar_calendar_id: calendarId,
+      google_calendar_calendar_name: calendarName,
     };
 
     // Update formData with all settings
@@ -283,7 +288,7 @@ const GoogleCalendarIntegrationSection: React.FC<{
   useEffect(() => {
     syncSettingsToFormData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clientId, clientSecret]);
+  }, [clientId, clientSecret, calendarId, calendarName]);
 
   const handleConnect = async () => {
     setConnecting(true);

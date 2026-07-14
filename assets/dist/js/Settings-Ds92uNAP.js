@@ -139,8 +139,13 @@ const GoogleCalendarIntegrationSection = ({ formData, setFormData }) => {
     const allSettings = {
       google_calendar_client_id: clientId,
       google_calendar_client_secret: clientSecret,
-      google_calendar_enabled: true
+      google_calendar_enabled: true,
       // Enable by default when settings are provided
+      // Persist the target calendar through the MAIN page Save too (the option
+      // name matches what the sync path reads), so the user's natural action —
+      // clicking the page's Save button — keeps the chosen calendar.
+      google_calendar_calendar_id: calendarId,
+      google_calendar_calendar_name: calendarName
     };
     setFormData((prev) => {
       if (!prev) return prev;
@@ -152,7 +157,7 @@ const GoogleCalendarIntegrationSection = ({ formData, setFormData }) => {
   };
   reactExports.useEffect(() => {
     syncSettingsToFormData();
-  }, [clientId, clientSecret]);
+  }, [clientId, clientSecret, calendarId, calendarName]);
   const handleConnect = async () => {
     var _a;
     setConnecting(true);
@@ -8222,4 +8227,4 @@ const Settings = () => {
 export {
   Settings as default
 };
-//# sourceMappingURL=Settings-DwjodxCX.js.map
+//# sourceMappingURL=Settings-Ds92uNAP.js.map
