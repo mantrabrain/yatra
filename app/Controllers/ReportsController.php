@@ -442,6 +442,7 @@ class ReportsController extends BaseController
         $upcomingDepartures = 0;
         $totalCapacity = 0;
         $bookedCapacity = 0;
+        $departuresWithBookings = 0;
         $upcomingTrips = [];
 
         $todayTs = strtotime('today');
@@ -463,10 +464,17 @@ class ReportsController extends BaseController
             $booked = (int) ($d['booked_count'] ?? $d['travelers_count'] ?? 0);
             $totalCapacity += $capacity;
             $bookedCapacity += $booked;
+            if ($booked > 0) {
+                $departuresWithBookings++;
+            }
         }
 
         $occupancyRate = $totalCapacity > 0 ? round(($bookedCapacity / $totalCapacity) * 100.0, 1) : 0.0;
-        $averageGroupSize = $upcomingDepartures > 0 ? round($bookedCapacity / $upcomingDepartures, 1) : 0.0;
+        // Average size of an actual booked group: total booked travellers over the
+        // departures that have bookings. Divides over the SAME set the numerator
+        // sums (all in-window departures with bookings) — not the upcoming-only
+        // count, which mismatched the window-wide numerator and inflated the value.
+        $averageGroupSize = $departuresWithBookings > 0 ? round($bookedCapacity / $departuresWithBookings, 1) : 0.0;
 
         $operationalStats = [
             'upcomingDepartures' => $upcomingDepartures,
