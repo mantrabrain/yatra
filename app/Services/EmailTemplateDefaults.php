@@ -44,6 +44,12 @@ final class EmailTemplateDefaults
             // and the admin template editor pre-fills them.
             'email_tpl_guest_verification_subject' => '✉️ [{{site_name}}] Verify your email to complete your booking',
             'email_tpl_guest_verification_body' => self::htmlCustomerEmailVerification(),
+            // Account email change: confirmation link to the NEW address, and a
+            // security notice to the OLD address once the change is confirmed.
+            'email_tpl_account_email_change_subject' => '✉️ [{{site_name}}] Confirm your new email address',
+            'email_tpl_account_email_change_body' => self::htmlAccountEmailChangeRequest(),
+            'email_tpl_account_email_changed_subject' => '🔔 [{{site_name}}] Your email address was changed',
+            'email_tpl_account_email_changed_body' => self::htmlAccountEmailChanged(),
             'email_tpl_booking_completed_subject' => '🌟 [{{site_name}}] Thanks for traveling · {{booking_reference}}',
             'email_tpl_booking_completed_body' => self::htmlTripCompleted(),
             'email_tpl_booking_expired_customer_subject' => '⏱️ [{{site_name}}] Booking expired · {{booking_reference}}',
@@ -505,6 +511,88 @@ final class EmailTemplateDefaults
     }
 
     /**
+     * Fallback HTML for the account email-change confirmation (empty saved template).
+     *
+     * @param array<string, string> $v
+     */
+    public static function fallbackTransactionalAccountEmailChangeRequest(array $v): string
+    {
+        $firstRaw = (string) ($v['customer_first_name'] ?? '');
+        if ($firstRaw === '') {
+            $firstRaw = (string) ($v['customer_name'] ?? '');
+        }
+        $first = esc_html($firstRaw !== '' ? $firstRaw : __('there', 'yatra'));
+        $site = esc_html($v['site_name'] ?? get_bloginfo('name'));
+        $link = esc_url((string) ($v['verification_link'] ?? home_url('/')));
+        $newEmail = esc_html((string) ($v['new_email'] ?? ''));
+        $intro = isset($v['intro_paragraph']) ? esc_html((string) $v['intro_paragraph']) : '';
+        $footer = isset($v['footer_note']) ? esc_html((string) $v['footer_note']) : '';
+
+        $newBlock = $newEmail !== ''
+            ? '<div style="margin:0 0 20px;padding:12px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;color:#475569;">'
+                . esc_html__('New email address:', 'yatra') . ' <strong>' . $newEmail . '</strong></div>'
+            : '';
+
+        $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">'
+            . sprintf(/* translators: %s: customer name */ esc_html__('Hello %s,', 'yatra'), $first)
+            . '</p>'
+            . ($intro !== '' ? '<p style="margin:0 0 20px;color:#475569;">' . $intro . '</p>' : '')
+            . $newBlock
+            . EmailTemplateLayout::button($link, __('Confirm email change', 'yatra'))
+            . ($footer !== '' ? '<p style="margin:24px 0 0;font-size:14px;color:#64748b;">' . $footer . '</p>' : '')
+            . '<p style="margin:20px 0 0;font-size:13px;color:#64748b;">'
+            . esc_html__('If the button does not work, copy this link into your browser:', 'yatra')
+            . '</p>'
+            . '<p style="margin:8px 0 0;font-size:13px;word-break:break-all;"><a href="' . $link . '" style="color:#0d9488;">' . $link . '</a></p>';
+
+        return EmailTemplateLayout::customer(
+            '✉️',
+            __('Confirm your new email', 'yatra'),
+            $inner,
+            $site,
+            __('Account security', 'yatra')
+        );
+    }
+
+    /**
+     * Fallback HTML for the "email changed" security notice (empty saved template).
+     *
+     * @param array<string, string> $v
+     */
+    public static function fallbackTransactionalAccountEmailChanged(array $v): string
+    {
+        $firstRaw = (string) ($v['customer_first_name'] ?? '');
+        if ($firstRaw === '') {
+            $firstRaw = (string) ($v['customer_name'] ?? '');
+        }
+        $first = esc_html($firstRaw !== '' ? $firstRaw : __('there', 'yatra'));
+        $site = esc_html($v['site_name'] ?? get_bloginfo('name'));
+        $newEmail = esc_html((string) ($v['new_email'] ?? ''));
+        $intro = isset($v['intro_paragraph']) ? esc_html((string) $v['intro_paragraph']) : '';
+        $footer = isset($v['footer_note']) ? esc_html((string) $v['footer_note']) : '';
+
+        $newBlock = $newEmail !== ''
+            ? '<div style="margin:0 0 20px;padding:12px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;color:#475569;">'
+                . esc_html__('New email address:', 'yatra') . ' <strong>' . $newEmail . '</strong></div>'
+            : '';
+
+        $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">'
+            . sprintf(/* translators: %s: customer name */ esc_html__('Hello %s,', 'yatra'), $first)
+            . '</p>'
+            . ($intro !== '' ? '<p style="margin:0 0 20px;color:#475569;">' . $intro . '</p>' : '')
+            . $newBlock
+            . ($footer !== '' ? '<p style="margin:24px 0 0;font-size:14px;color:#64748b;">' . $footer . '</p>' : '');
+
+        return EmailTemplateLayout::customer(
+            '🔔',
+            __('Your email address was changed', 'yatra'),
+            $inner,
+            $site,
+            __('Account security', 'yatra')
+        );
+    }
+
+    /**
      * Fallback HTML for admin new-booking notice (empty saved template).
      *
      * @param array<string, string> $v
@@ -918,6 +1006,53 @@ final class EmailTemplateDefaults
             $inner,
             '{{site_name}}',
             __('Account verification', 'yatra')
+        );
+    }
+
+    private static function htmlAccountEmailChangeRequest(): string
+    {
+        $cta = '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0;"><tr>'
+            . '<td style="border-radius:10px;background:#0d9488;">'
+            . '<a href="{{verification_link}}" style="display:inline-block;padding:14px 28px;font-family:\'Segoe UI\',Roboto,Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;">'
+            . esc_html__('Confirm email change', 'yatra')
+            . '</a></td></tr></table>';
+
+        $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">Hello {{customer_first_name}},</p>'
+            . '<p style="margin:0 0 20px;color:#475569;">{{intro_paragraph}}</p>'
+            . '<div style="margin:0 0 20px;padding:12px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;color:#475569;">'
+            . esc_html__('New email address:', 'yatra') . ' <strong>{{new_email}}</strong>'
+            . '</div>'
+            . $cta
+            . '<p style="margin:24px 0 0;font-size:14px;color:#64748b;">{{footer_note}}</p>'
+            . '<p style="margin:20px 0 0;font-size:13px;color:#64748b;">'
+            . esc_html__('If the button does not work, copy this link into your browser:', 'yatra')
+            . '</p>'
+            . '<p style="margin:8px 0 0;font-size:13px;word-break:break-all;"><a href="{{verification_link}}" style="color:#0d9488;">{{verification_link}}</a></p>';
+
+        return EmailTemplateLayout::customer(
+            '✉️',
+            __('Confirm your new email', 'yatra'),
+            $inner,
+            '{{site_name}}',
+            __('Account security', 'yatra')
+        );
+    }
+
+    private static function htmlAccountEmailChanged(): string
+    {
+        $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">Hello {{customer_first_name}},</p>'
+            . '<p style="margin:0 0 20px;color:#475569;">{{intro_paragraph}}</p>'
+            . '<div style="margin:0 0 20px;padding:12px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;color:#475569;">'
+            . esc_html__('New email address:', 'yatra') . ' <strong>{{new_email}}</strong>'
+            . '</div>'
+            . '<p style="margin:24px 0 0;font-size:14px;color:#64748b;">{{footer_note}}</p>';
+
+        return EmailTemplateLayout::customer(
+            '🔔',
+            __('Your email address was changed', 'yatra'),
+            $inner,
+            '{{site_name}}',
+            __('Account security', 'yatra')
         );
     }
 

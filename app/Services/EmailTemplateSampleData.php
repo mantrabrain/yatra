@@ -53,6 +53,19 @@ final class EmailTemplateSampleData
             );
         }
 
+        if ($templateKey === 'account_email_change_request') {
+            $vars['new_email'] = 'alex.new@example.com';
+            $vars['verification_link'] = home_url('/?yatra_email_token=preview-change-token');
+            $vars['intro_paragraph'] = __('You recently requested to change the email address on your account. To confirm this new address, click the button below.', 'yatra');
+            $vars['footer_note'] = __('If you did not request this change, you can safely ignore this email — your address will not change.', 'yatra');
+        }
+
+        if ($templateKey === 'account_email_changed') {
+            $vars['new_email'] = 'alex.new@example.com';
+            $vars['intro_paragraph'] = __('The email address on your account was just changed. If this was you, no further action is needed.', 'yatra');
+            $vars['footer_note'] = __('If you did not make this change, please contact us immediately.', 'yatra');
+        }
+
         /** @var array<string, string> $filtered */
         $filtered = apply_filters('yatra_email_template_preview_variables', $vars, $templateKey, $tripId);
 
@@ -73,6 +86,7 @@ final class EmailTemplateSampleData
             'customer_first_name' => 'Alex',
             'customer_last_name' => __('Traveler', 'yatra'),
             'customer_email' => 'alex@example.com',
+            'new_email' => 'alex.new@example.com',
             'customer_phone' => '+1 555 0100',
             'booking_reference' => 'YTR-PREVIEW-001',
             'booking_id' => '42',

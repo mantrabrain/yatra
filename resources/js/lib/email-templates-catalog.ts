@@ -47,6 +47,8 @@ export const CORE_FREE_TEMPLATE_KEYS = [
   "trip_consent_request",
   "customer_email_verification",
   "guest_email_verification",
+  "account_email_change_request",
+  "account_email_changed",
   "booking_completed",
   "booking_expired_customer",
   "admin_booking_expired",
@@ -201,6 +203,42 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsBody: "email_tpl_guest_verification_body",
     mergeTags:
       "{{site_name}}, {{site_url}}, {{customer_first_name}}, {{customer_name}}, {{verification_link}}, {{intro_paragraph}}, {{expiry_notice_html}}, {{footer_note}}",
+  },
+  {
+    template_key: "account_email_change_request",
+    event_key: "account.email_change_request",
+    name: __("Account email change request", "yatra"),
+    description: __(
+      "Sent to the NEW address when a customer changes their account email. Contains the confirmation link; the change only applies once they click it.",
+      "yatra",
+    ),
+    category: "account",
+    recipient_type: "customer",
+    to_email: "{new_email}",
+    isCoreFree: true,
+    settingsFlag: "email_template_account_email_change",
+    settingsSubject: "email_tpl_account_email_change_subject",
+    settingsBody: "email_tpl_account_email_change_body",
+    mergeTags:
+      "{{site_name}}, {{site_url}}, {{customer_first_name}}, {{customer_name}}, {{new_email}}, {{verification_link}}, {{intro_paragraph}}, {{footer_note}}",
+  },
+  {
+    template_key: "account_email_changed",
+    event_key: "account.email_changed",
+    name: __("Account email changed", "yatra"),
+    description: __(
+      "Security notice sent to the OLD address once a customer's account email change is confirmed.",
+      "yatra",
+    ),
+    category: "account",
+    recipient_type: "customer",
+    to_email: "{customer_email}",
+    isCoreFree: true,
+    settingsFlag: "email_template_account_email_changed",
+    settingsSubject: "email_tpl_account_email_changed_subject",
+    settingsBody: "email_tpl_account_email_changed_body",
+    mergeTags:
+      "{{site_name}}, {{site_url}}, {{customer_first_name}}, {{customer_name}}, {{new_email}}, {{intro_paragraph}}, {{footer_note}}",
   },
   {
     template_key: "admin_new_booking",

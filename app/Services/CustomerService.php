@@ -289,48 +289,50 @@ class CustomerService
      */
     private function sendEmailChangeConfirmation(\WP_User $user, string $newEmail, string $hash): void
     {
-        $sitename   = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
         // Point at the front-end account page (a normal request with cookie auth),
         // NOT a REST endpoint — a browser GET to REST carries no nonce and would be
         // read as anonymous. AccountPageHandler consumes the token there.
         $accountUrl = home_url('/' . trailingslashit(SettingsService::getAccountBase()));
         $confirmUrl = add_query_arg('yatra_email_token', rawurlencode($hash), $accountUrl);
+        $firstName  = trim((string) $user->first_name) ?: (trim((string) $user->display_name) ?: (string) $user->user_login);
 
-        // Verbatim copy of WordPress core's default text (send_confirmation_on_profile_email),
-        // including the ###ADMIN_URL### placeholder, so operators who customise the
-        // shared `new_user_email_content` filter with core's placeholders get an
-        // identical result here.
-        /* translators: Do not translate the ###...### placeholders; they are replaced below. */
-        $email_text = __(
-            'Howdy ###USERNAME###,
-
-You recently requested to have the email address on your account changed.
-
-If this is correct, please click on the following link to change it:
-###ADMIN_URL###
-
-You can safely ignore and delete this email if you do not want to
-take this action.
-
-This email has been sent to ###EMAIL###
-
-Regards,
-All at ###SITENAME###
-###SITEURL###',
-            'yatra'
+        // Send through the Yatra transactional-email template system (branded HTML,
+        // merge tags, operator-editable in Settings → Email Templates) rather than a
+        // raw wp_mail. {{verification_link}} is reused for the confirmation link.
+        TransactionalEmailTemplateService::sendIfEnabled(
+            TransactionalEmailTemplateService::TYPE_ACCOUNT_EMAIL_CHANGE_REQUEST,
+            $newEmail,
+            [
+                'customer_first_name' => $firstName,
+                'customer_name'       => $firstName,
+                'customer_email'      => (string) $user->user_email,
+                'new_email'           => $newEmail,
+                'verification_link'   => $confirmUrl,
+                'intro_paragraph'     => __('You recently requested to change the email address on your account. To confirm this new address, click the button below.', 'yatra'),
+                'footer_note'         => __('If you did not request this change, you can safely ignore this email — your address will not change.', 'yatra'),
+            ]
         );
+    }
 
-        // Reuse core's filter so operators who already customise the change-email
-        // text keep their template. ###CONFIRM_URL### is also honoured as an alias.
-        $content = apply_filters('new_user_email_content', $email_text, ['hash' => $hash, 'newemail' => $newEmail]);
-        $content = str_replace(['###ADMIN_URL###', '###CONFIRM_URL###'], esc_url_raw($confirmUrl), $content);
-        $content = str_replace('###USERNAME###', $user->user_login, $content);
-        $content = str_replace('###EMAIL###', $newEmail, $content);
-        $content = str_replace('###SITENAME###', $sitename, $content);
-        $content = str_replace('###SITEURL###', home_url(), $content);
-
-        /* translators: %s: Site title. */
-        wp_mail($newEmail, sprintf(__('[%s] Email Change Request', 'yatra'), $sitename), $content);
+    /**
+     * Notify the OLD address that the account email was changed (WordPress core
+     * sends an equivalent security notice). Uses the editable "Email changed"
+     * transactional template.
+     */
+    private function sendEmailChangedNotice(string $oldEmail, string $firstName, string $newEmail): void
+    {
+        TransactionalEmailTemplateService::sendIfEnabled(
+            TransactionalEmailTemplateService::TYPE_ACCOUNT_EMAIL_CHANGED,
+            $oldEmail,
+            [
+                'customer_first_name' => $firstName,
+                'customer_name'       => $firstName,
+                'customer_email'      => $oldEmail,
+                'new_email'           => $newEmail,
+                'intro_paragraph'     => __('The email address on your account was just changed. If this was you, no further action is needed.', 'yatra'),
+                'footer_note'         => __('If you did not make this change, please contact us immediately — your account may have been accessed by someone else.', 'yatra'),
+            ]
+        );
     }
 
     /**
@@ -356,6 +358,14 @@ All at ###SITENAME###
             return ['success' => false, 'message' => __('That email address is now in use. Please try again.', 'yatra')];
         }
 
+        // Capture the OLD address + name before the update, so we can send the
+        // "email changed" security notice to it afterwards.
+        $preUser  = get_userdata($userId);
+        $oldEmail = $preUser instanceof \WP_User ? (string) $preUser->user_email : '';
+        $firstName = $preUser instanceof \WP_User
+            ? (trim((string) $preUser->first_name) ?: (trim((string) $preUser->display_name) ?: (string) $preUser->user_login))
+            : '';
+
         $result = wp_update_user(['ID' => $userId, 'user_email' => $newEmail]);
         if (is_wp_error($result)) {
             return ['success' => false, 'message' => wp_strip_all_tags($result->get_error_message())];
@@ -370,6 +380,12 @@ All at ###SITENAME###
         }
 
         delete_user_meta($userId, '_new_email');
+
+        // Security notice to the old address (best-effort; never block the change).
+        if ($oldEmail !== '' && strtolower($oldEmail) !== strtolower($newEmail)) {
+            $this->sendEmailChangedNotice($oldEmail, $firstName, $newEmail);
+        }
+
         return ['success' => true, 'message' => __('Your email address has been updated.', 'yatra')];
     }
 

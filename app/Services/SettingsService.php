@@ -140,6 +140,8 @@ class SettingsService
         'email_template_trip_consent' => true,
         'email_template_customer_verification' => true,
         'email_template_guest_verification' => true,
+        'email_template_account_email_change' => true,
+        'email_template_account_email_changed' => true,
         'email_template_booking_completed' => true,
         'email_template_booking_expired_customer' => true,
         'email_template_admin_booking_expired' => true,

@@ -41,6 +41,12 @@ class TransactionalEmailTemplateService
      */
     public const TYPE_GUEST_EMAIL_VERIFICATION = 'guest_email_verification';
 
+    /** Confirmation link sent to the NEW address when a customer changes their account email. */
+    public const TYPE_ACCOUNT_EMAIL_CHANGE_REQUEST = 'account_email_change_request';
+
+    /** Security notice sent to the OLD address once an account email change is confirmed. */
+    public const TYPE_ACCOUNT_EMAIL_CHANGED = 'account_email_changed';
+
     public const TYPE_BOOKING_COMPLETED = 'booking_completed';
 
     public const TYPE_BOOKING_EXPIRED_CUSTOMER = 'booking_expired_customer';
@@ -84,6 +90,8 @@ class TransactionalEmailTemplateService
             'trip_consent_request' => self::TYPE_TRIP_CONSENT_REQUEST,
             'customer_email_verification' => self::TYPE_CUSTOMER_EMAIL_VERIFICATION,
             'guest_email_verification' => self::TYPE_GUEST_EMAIL_VERIFICATION,
+            'account_email_change_request' => self::TYPE_ACCOUNT_EMAIL_CHANGE_REQUEST,
+            'account_email_changed' => self::TYPE_ACCOUNT_EMAIL_CHANGED,
             'booking_completed' => self::TYPE_BOOKING_COMPLETED,
             'booking_expired_customer' => self::TYPE_BOOKING_EXPIRED_CUSTOMER,
             'admin_booking_expired' => self::TYPE_ADMIN_BOOKING_EXPIRED,
@@ -234,6 +242,16 @@ class TransactionalEmailTemplateService
                 'flag' => 'email_template_guest_verification',
                 'subject' => 'email_tpl_guest_verification_subject',
                 'body' => 'email_tpl_guest_verification_body',
+            ],
+            self::TYPE_ACCOUNT_EMAIL_CHANGE_REQUEST => [
+                'flag' => 'email_template_account_email_change',
+                'subject' => 'email_tpl_account_email_change_subject',
+                'body' => 'email_tpl_account_email_change_body',
+            ],
+            self::TYPE_ACCOUNT_EMAIL_CHANGED => [
+                'flag' => 'email_template_account_email_changed',
+                'subject' => 'email_tpl_account_email_changed_subject',
+                'body' => 'email_tpl_account_email_changed_body',
             ],
             self::TYPE_BOOKING_COMPLETED => [
                 'flag' => 'email_template_booking_completed',
@@ -612,6 +630,14 @@ class TransactionalEmailTemplateService
                 /* translators: %s: site name. */
                 return sprintf(__('✉️ [%s] Verify your email to complete your booking', 'yatra'), $site);
 
+            case self::TYPE_ACCOUNT_EMAIL_CHANGE_REQUEST:
+                /* translators: %s: site name. */
+                return sprintf(__('✉️ [%s] Confirm your new email address', 'yatra'), $site);
+
+            case self::TYPE_ACCOUNT_EMAIL_CHANGED:
+                /* translators: %s: site name. */
+                return sprintf(__('🔔 [%s] Your email address was changed', 'yatra'), $site);
+
             case self::TYPE_BOOKING_COMPLETED:
                 /* translators: 1: site name, 2: booking reference. */
                 return sprintf(__('🌟 [%1$s] Trip complete · %2$s', 'yatra'), $site, $ref);
@@ -734,6 +760,12 @@ class TransactionalEmailTemplateService
                 // injected at call-time via the intro_paragraph /
                 // footer_note merge tags by the booking handler.
                 return EmailTemplateDefaults::fallbackTransactionalCustomerEmailVerification($v);
+
+            case self::TYPE_ACCOUNT_EMAIL_CHANGE_REQUEST:
+                return EmailTemplateDefaults::fallbackTransactionalAccountEmailChangeRequest($v);
+
+            case self::TYPE_ACCOUNT_EMAIL_CHANGED:
+                return EmailTemplateDefaults::fallbackTransactionalAccountEmailChanged($v);
 
             case self::TYPE_BOOKING_COMPLETED:
                 return EmailTemplateDefaults::fallbackTransactionalBookingCompleted($v);
