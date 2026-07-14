@@ -93,6 +93,15 @@ class CustomerController extends BaseController
             ],
         ]);
 
+        // Cancel (dismiss) a pending email change — deletes the stored token.
+        register_rest_route($namespace, '/' . $base . '/me/email', [
+            [
+                'methods' => \WP_REST_Server::DELETABLE,
+                'callback' => [$this, 'cancelMyEmailChange'],
+                'permission_callback' => [$this, 'checkCustomerPermission'],
+            ],
+        ]);
+
         // Current customer's bookings
         register_rest_route($namespace, '/' . $base . '/my-bookings', [
             [
@@ -428,6 +437,22 @@ class CustomerController extends BaseController
         }
 
         $result = $this->customerService->resendEmailChangeConfirmation($userId);
+
+        return new WP_REST_Response($result, empty($result['success']) ? 400 : 200);
+    }
+
+    /**
+     * DELETE /customers/me/email - Cancel (dismiss) a pending email change,
+     * discarding the stored token so the emailed link stops working.
+     */
+    public function cancelMyEmailChange(WP_REST_Request $request)
+    {
+        $userId = get_current_user_id();
+        if ($userId <= 0) {
+            return $this->error_response(__('Authentication required.', 'yatra'), 401);
+        }
+
+        $result = $this->customerService->cancelEmailChange($userId);
 
         return new WP_REST_Response($result, empty($result['success']) ? 400 : 200);
     }

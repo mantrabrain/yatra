@@ -264,6 +264,25 @@ class CustomerService
     }
 
     /**
+     * Cancel a pending email change, discarding the stored token so the emailed
+     * link no longer works. Mirrors WordPress core's "dismiss" action
+     * (profile.php?dismiss=<id>_new_email), which simply deletes the `_new_email`
+     * user meta. Safe to call when nothing is pending.
+     *
+     * @return array{success:bool, message:string}
+     */
+    public function cancelEmailChange(int $userId): array
+    {
+        if (!get_userdata($userId) instanceof \WP_User) {
+            return ['success' => false, 'message' => __('Account not found.', 'yatra')];
+        }
+
+        delete_user_meta($userId, '_new_email');
+
+        return ['success' => true, 'message' => __('The pending email change has been cancelled.', 'yatra')];
+    }
+
+    /**
      * Send the email-change confirmation to the NEW address. Mirrors WordPress
      * core's message and reuses its `new_user_email_content` filter, but points
      * the confirmation link at the frontend account endpoint (not wp-admin).

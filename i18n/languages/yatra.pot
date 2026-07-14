@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-14T03:56:27+00:00\n"
+"POT-Creation-Date: 2026-07-14T03:59:46+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -198,14 +198,14 @@ msgstr ""
 
 # Source: resources/js/pages/account/SavedTrips.tsx:253
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3037
+#: assets/dist/js/account-page.js:3070
 #, js-format
 msgid "(%d review)"
 msgstr ""
 
 # Source: resources/js/pages/account/SavedTrips.tsx:254
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3037
+#: assets/dist/js/account-page.js:3070
 #, js-format
 msgid "(%d reviews)"
 msgstr ""
@@ -640,9 +640,9 @@ msgstr ""
 msgid "A catchy title that describes your trip. Recommended: 50-60 characters for best SEO results."
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:114
+# Source: resources/js/pages/account/Profile.tsx:115
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2483
+#: assets/dist/js/account-page.js:2484
 msgid "A confirmation link has been sent to your new email address. The change takes effect once you confirm it."
 msgstr ""
 
@@ -1973,13 +1973,13 @@ msgstr ""
 msgid "Additional payload fields"
 msgstr ""
 
-# Source: resources/js/pages/ViewCustomer.tsx:492, resources/js/pages/account/BookingDetails.tsx:76, resources/js/pages/account/Profile.tsx:385
+# Source: resources/js/pages/ViewCustomer.tsx:492, resources/js/pages/account/BookingDetails.tsx:76, resources/js/pages/account/Profile.tsx:421
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:1002
 #: app/Services/SettingsService.php:256
 #: assets/admin/dist/js/app.js:44103
 #: assets/dist/js/account-page.js:1042
-#: assets/dist/js/account-page.js:2695
+#: assets/dist/js/account-page.js:2728
 msgid "Address"
 msgstr ""
 
@@ -4603,7 +4603,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:62841
 #: assets/admin/dist/js/app.js:63857
 #: assets/dist/js/account-page.js:1738
-#: assets/dist/js/account-page.js:3065
+#: assets/dist/js/account-page.js:3098
 #: assets/dist/js/ChannelManager-DBTZ4iK_.js:2253
 #: assets/dist/js/Reports-BNaZrbMf.js:481
 #: assets/dist/js/Reports-BNaZrbMf.js:576
@@ -4795,7 +4795,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/SavedTrips.tsx:77
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2928
+#: assets/dist/js/account-page.js:2961
 msgid "Browse Trips"
 msgstr ""
 
@@ -5027,7 +5027,7 @@ msgstr ""
 msgid "Campaign Name"
 msgstr ""
 
-# Source: resources/js/components/Tools.tsx:3184, resources/js/components/ai/AiEmailTemplateModal.tsx:102, resources/js/components/ai/AiEmailTemplateModal.tsx:274, resources/js/components/ai/AutoFillTripModal.tsx:321, resources/js/components/ai/AutoFillTripModal.tsx:649, resources/js/components/ai/BuildItineraryModal.tsx:169, resources/js/components/ai/BuildItineraryModal.tsx:712, resources/js/components/ai/BuildItineraryModal.tsx:723, resources/js/components/ai/CreateTripWithAiWizard.tsx:419, resources/js/components/ai/CreateTripWithAiWizard.tsx:955, resources/js/components/availability/RecurringRules.tsx:640, resources/js/components/availability/RecurringRules.tsx:659, resources/js/components/email/EmailTemplatesList.tsx:942, resources/js/components/itinerary/DayConflictDialog.tsx:75, resources/js/components/modals/RuleTypeSelectionModal.tsx:101, resources/js/components/shared/BulkActionToolbar.tsx:339, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1163, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1332, resources/js/components/ui/confirmation-dialog.tsx:94, resources/js/pages/AbandonedRecoveryEmailForm.tsx:337, resources/js/pages/Activities.tsx:554, resources/js/pages/Activities.tsx:598, resources/js/pages/ActivityForm.tsx:682, resources/js/pages/AdditionalServices.tsx:372, resources/js/pages/AttributeForm.tsx:1180, resources/js/pages/Attributes.tsx:581, resources/js/pages/Attributes.tsx:624, resources/js/pages/Availability.tsx:1026, resources/js/pages/Availability.tsx:1091, resources/js/pages/AvailabilityForm.tsx:1693, resources/js/pages/BookingForm.tsx:2034, resources/js/pages/Bookings.tsx:1011, resources/js/pages/Categories.tsx:981, resources/js/pages/CategoryForm.tsx:826, resources/js/pages/ChannelManager.tsx:634, resources/js/pages/ChannelManager.tsx:1844, resources/js/pages/ChannelManager.tsx:2224, resources/js/pages/CustomerForm.tsx:941, resources/js/pages/Customers.tsx:896, resources/js/pages/DepartureForm.tsx:314, resources/js/pages/DepartureRecurringRuleForm.tsx:418, resources/js/pages/DestinationForm.tsx:688, resources/js/pages/Destinations.tsx:419, resources/js/pages/DifficultyLevelForm.tsx:524, resources/js/pages/DifficultyLevels.tsx:593, resources/js/pages/DiscountForm.tsx:2699, resources/js/pages/Discounts.tsx:981, resources/js/pages/Discounts.tsx:1092, resources/js/pages/DynamicPricingRuleForm.tsx:1486, resources/js/pages/DynamicPricingRuleForm.tsx:1498, resources/js/pages/Enquiries.tsx:831, resources/js/pages/Enquiries.tsx:880, resources/js/pages/Enquiries.tsx:926, resources/js/pages/ItemForm.tsx:491, resources/js/pages/ItemTypeForm.tsx:577, resources/js/pages/ItemTypes.tsx:709, resources/js/pages/ItemTypes.tsx:809, resources/js/pages/Items.tsx:686, resources/js/pages/Items.tsx:778, resources/js/pages/ItineraryForm.tsx:1159, resources/js/pages/PaymentForm.tsx:562, resources/js/pages/Payments.tsx:759, resources/js/pages/RecurringRuleForm.tsx:2618, resources/js/pages/RecurringRulesPage.tsx:444, resources/js/pages/RecurringRulesPage.tsx:463, resources/js/pages/ReviewForm.tsx:558, resources/js/pages/Reviews.tsx:471, resources/js/pages/Settings.tsx:1894, resources/js/pages/Settings.tsx:2425, resources/js/pages/Team.tsx:955, resources/js/pages/Team.tsx:1038, resources/js/pages/Team.tsx:1104, resources/js/pages/Team.tsx:1318, resources/js/pages/Team.tsx:1586, resources/js/pages/Team.tsx:2131, resources/js/pages/Team.tsx:2402, resources/js/pages/Team.tsx:2885, resources/js/pages/Team.tsx:2935, resources/js/pages/Team.tsx:2983, resources/js/pages/Team.tsx:3484, resources/js/pages/Team.tsx:3505, resources/js/pages/TravelerCategories.tsx:644, resources/js/pages/TravelerCategoryForm.tsx:899, resources/js/pages/Travelers.tsx:625, resources/js/pages/TripConsent.tsx:364, resources/js/pages/TripForm.tsx:9423, resources/js/pages/TripForm.tsx:9530, resources/js/pages/TripForm.tsx:9558, resources/js/pages/Trips.tsx:1733, resources/js/pages/Trips.tsx:1863, resources/js/pages/ViewEnquiry.tsx:521, resources/js/pages/Webhooks.tsx:663, resources/js/pages/Webhooks.tsx:1468, resources/js/pages/Webhooks.tsx:1918, resources/js/pages/Webhooks.tsx:2571, resources/js/pages/Whatsapp.tsx:1294, resources/js/pages/Whatsapp.tsx:1513, resources/js/pages/account/Profile.tsx:423, resources/js/pages/account/Profile.tsx:553
+# Source: resources/js/components/Tools.tsx:3184, resources/js/components/ai/AiEmailTemplateModal.tsx:102, resources/js/components/ai/AiEmailTemplateModal.tsx:274, resources/js/components/ai/AutoFillTripModal.tsx:321, resources/js/components/ai/AutoFillTripModal.tsx:649, resources/js/components/ai/BuildItineraryModal.tsx:169, resources/js/components/ai/BuildItineraryModal.tsx:712, resources/js/components/ai/BuildItineraryModal.tsx:723, resources/js/components/ai/CreateTripWithAiWizard.tsx:419, resources/js/components/ai/CreateTripWithAiWizard.tsx:955, resources/js/components/availability/RecurringRules.tsx:640, resources/js/components/availability/RecurringRules.tsx:659, resources/js/components/email/EmailTemplatesList.tsx:942, resources/js/components/itinerary/DayConflictDialog.tsx:75, resources/js/components/modals/RuleTypeSelectionModal.tsx:101, resources/js/components/shared/BulkActionToolbar.tsx:339, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1163, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1332, resources/js/components/ui/confirmation-dialog.tsx:94, resources/js/pages/AbandonedRecoveryEmailForm.tsx:337, resources/js/pages/Activities.tsx:554, resources/js/pages/Activities.tsx:598, resources/js/pages/ActivityForm.tsx:682, resources/js/pages/AdditionalServices.tsx:372, resources/js/pages/AttributeForm.tsx:1180, resources/js/pages/Attributes.tsx:581, resources/js/pages/Attributes.tsx:624, resources/js/pages/Availability.tsx:1026, resources/js/pages/Availability.tsx:1091, resources/js/pages/AvailabilityForm.tsx:1693, resources/js/pages/BookingForm.tsx:2034, resources/js/pages/Bookings.tsx:1011, resources/js/pages/Categories.tsx:981, resources/js/pages/CategoryForm.tsx:826, resources/js/pages/ChannelManager.tsx:634, resources/js/pages/ChannelManager.tsx:1844, resources/js/pages/ChannelManager.tsx:2224, resources/js/pages/CustomerForm.tsx:941, resources/js/pages/Customers.tsx:896, resources/js/pages/DepartureForm.tsx:314, resources/js/pages/DepartureRecurringRuleForm.tsx:418, resources/js/pages/DestinationForm.tsx:688, resources/js/pages/Destinations.tsx:419, resources/js/pages/DifficultyLevelForm.tsx:524, resources/js/pages/DifficultyLevels.tsx:593, resources/js/pages/DiscountForm.tsx:2699, resources/js/pages/Discounts.tsx:981, resources/js/pages/Discounts.tsx:1092, resources/js/pages/DynamicPricingRuleForm.tsx:1486, resources/js/pages/DynamicPricingRuleForm.tsx:1498, resources/js/pages/Enquiries.tsx:831, resources/js/pages/Enquiries.tsx:880, resources/js/pages/Enquiries.tsx:926, resources/js/pages/ItemForm.tsx:491, resources/js/pages/ItemTypeForm.tsx:577, resources/js/pages/ItemTypes.tsx:709, resources/js/pages/ItemTypes.tsx:809, resources/js/pages/Items.tsx:686, resources/js/pages/Items.tsx:778, resources/js/pages/ItineraryForm.tsx:1159, resources/js/pages/PaymentForm.tsx:562, resources/js/pages/Payments.tsx:759, resources/js/pages/RecurringRuleForm.tsx:2618, resources/js/pages/RecurringRulesPage.tsx:444, resources/js/pages/RecurringRulesPage.tsx:463, resources/js/pages/ReviewForm.tsx:558, resources/js/pages/Reviews.tsx:471, resources/js/pages/Settings.tsx:1894, resources/js/pages/Settings.tsx:2425, resources/js/pages/Team.tsx:955, resources/js/pages/Team.tsx:1038, resources/js/pages/Team.tsx:1104, resources/js/pages/Team.tsx:1318, resources/js/pages/Team.tsx:1586, resources/js/pages/Team.tsx:2131, resources/js/pages/Team.tsx:2402, resources/js/pages/Team.tsx:2885, resources/js/pages/Team.tsx:2935, resources/js/pages/Team.tsx:2983, resources/js/pages/Team.tsx:3484, resources/js/pages/Team.tsx:3505, resources/js/pages/TravelerCategories.tsx:644, resources/js/pages/TravelerCategoryForm.tsx:899, resources/js/pages/Travelers.tsx:625, resources/js/pages/TripConsent.tsx:364, resources/js/pages/TripForm.tsx:9423, resources/js/pages/TripForm.tsx:9530, resources/js/pages/TripForm.tsx:9558, resources/js/pages/Trips.tsx:1733, resources/js/pages/Trips.tsx:1863, resources/js/pages/ViewEnquiry.tsx:521, resources/js/pages/Webhooks.tsx:663, resources/js/pages/Webhooks.tsx:1468, resources/js/pages/Webhooks.tsx:1918, resources/js/pages/Webhooks.tsx:2571, resources/js/pages/Whatsapp.tsx:1294, resources/js/pages/Whatsapp.tsx:1513, resources/js/pages/account/Profile.tsx:459, resources/js/pages/account/Profile.tsx:589
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:308
 #: templates/partials/booking-content.php:180
@@ -5083,8 +5083,8 @@ msgstr ""
 #: assets/admin/dist/js/app.js:76294
 #: assets/admin/dist/js/Whatsapp.js:1001
 #: assets/admin/dist/js/Whatsapp.js:1168
-#: assets/dist/js/account-page.js:2731
-#: assets/dist/js/account-page.js:2852
+#: assets/dist/js/account-page.js:2764
+#: assets/dist/js/account-page.js:2885
 #: assets/dist/js/AvailabilityForm-jQMsxNDg.js:1379
 #: assets/dist/js/BookingForm-m1_-mHdV.js:1781
 #: assets/dist/js/BuildItineraryModal-7n2jsdb4.js:133
@@ -5117,6 +5117,12 @@ msgstr ""
 #: assets/js/stripe.js:151
 #: assets/js/trip.js:4951
 msgid "Cancel"
+msgstr ""
+
+# Source: resources/js/pages/account/Profile.tsx:349
+#: assets/admin/dist/js/app.js
+#: assets/dist/js/account-page.js:2680
+msgid "Cancel change"
 msgstr ""
 
 # Source: resources/js/pages/ActivityForm.tsx:446, resources/js/pages/CategoryForm.tsx:518, resources/js/pages/DestinationForm.tsx:451, resources/js/pages/DifficultyLevelForm.tsx:360, resources/js/pages/ItemForm.tsx:383, resources/js/pages/ItemTypeForm.tsx:417, resources/js/pages/TravelerCategoryForm.tsx:517
@@ -5178,6 +5184,12 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/Reports-BNaZrbMf.js:2048
 msgid "Cancelled Bookings"
+msgstr ""
+
+# Source: resources/js/pages/account/Profile.tsx:348
+#: assets/admin/dist/js/app.js
+#: assets/dist/js/account-page.js:2680
+msgid "Cancelling…"
 msgstr ""
 
 # Source: resources/js/pages/Departures.tsx:626
@@ -5436,10 +5448,10 @@ msgstr ""
 msgid "Change Image"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:436, resources/js/pages/account/Profile.tsx:450
+# Source: resources/js/pages/account/Profile.tsx:472, resources/js/pages/account/Profile.tsx:486
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2742
-#: assets/dist/js/account-page.js:2755
+#: assets/dist/js/account-page.js:2775
+#: assets/dist/js/account-page.js:2788
 msgid "Change Password"
 msgstr ""
 
@@ -5734,12 +5746,12 @@ msgstr ""
 msgid "Circuit: {state}."
 msgstr ""
 
-# Source: resources/js/pages/CustomerForm.tsx:538, resources/js/pages/Settings.tsx:4179, resources/js/pages/Settings.tsx:4185, resources/js/pages/account/BookingDetails.tsx:77, resources/js/pages/account/Profile.tsx:366
+# Source: resources/js/pages/CustomerForm.tsx:538, resources/js/pages/Settings.tsx:4179, resources/js/pages/Settings.tsx:4185, resources/js/pages/account/BookingDetails.tsx:77, resources/js/pages/account/Profile.tsx:402
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:1003
 #: assets/admin/dist/js/app.js:43304
 #: assets/dist/js/account-page.js:1043
-#: assets/dist/js/account-page.js:2682
+#: assets/dist/js/account-page.js:2715
 #: assets/dist/js/Settings-3nMtGNY2.js:3120
 #: assets/dist/js/Settings-3nMtGNY2.js:3127
 msgid "City"
@@ -6307,7 +6319,7 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:626
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3468
+#: assets/dist/js/account-page.js:3501
 msgid "Concierge Desk"
 msgstr ""
 
@@ -6466,21 +6478,21 @@ msgstr ""
 msgid "Confirm Bulk Action"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:497
+# Source: resources/js/pages/account/Profile.tsx:533
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2803
+#: assets/dist/js/account-page.js:2836
 msgid "Confirm New Password"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:510
+# Source: resources/js/pages/account/Profile.tsx:546
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2817
+#: assets/dist/js/account-page.js:2850
 msgid "Confirm your new password"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:183
+# Source: resources/js/pages/account/Profile.tsx:184
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2543
+#: assets/dist/js/account-page.js:2544
 msgid "Confirmation link re-sent to your new email address."
 msgstr ""
 
@@ -6949,6 +6961,12 @@ msgstr ""
 msgid "Cost per person"
 msgstr ""
 
+# Source: resources/js/pages/account/Profile.tsx:213
+#: assets/admin/dist/js/app.js
+#: assets/dist/js/account-page.js:2569
+msgid "Could not cancel the pending email change."
+msgstr ""
+
 # Source: resources/js/pages/Discounts.tsx:585
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:55639
@@ -6979,15 +6997,15 @@ msgstr ""
 msgid "Could not open receipt."
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:189
+# Source: resources/js/pages/account/Profile.tsx:190
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2548
+#: assets/dist/js/account-page.js:2549
 msgid "Could not re-send the confirmation email."
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:123
+# Source: resources/js/pages/account/Profile.tsx:124
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2491
+#: assets/dist/js/account-page.js:2492
 msgid "Could not request the email change."
 msgstr ""
 
@@ -7040,14 +7058,14 @@ msgstr ""
 msgid "Countries"
 msgstr ""
 
-# Source: resources/js/pages/BookingForm.tsx:1031, resources/js/pages/CustomerForm.tsx:578, resources/js/pages/Customers.tsx:451, resources/js/pages/Settings.tsx:4206, resources/js/pages/Settings.tsx:4213, resources/js/pages/ViewCustomer.tsx:508, resources/js/pages/account/BookingDetails.tsx:75, resources/js/pages/account/Profile.tsx:342
+# Source: resources/js/pages/BookingForm.tsx:1031, resources/js/pages/CustomerForm.tsx:578, resources/js/pages/Customers.tsx:451, resources/js/pages/Settings.tsx:4206, resources/js/pages/Settings.tsx:4213, resources/js/pages/ViewCustomer.tsx:508, resources/js/pages/account/BookingDetails.tsx:75, resources/js/pages/account/Profile.tsx:378
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:1001
 #: app/Services/SettingsService.php:254
 #: assets/admin/dist/js/app.js:43346
 #: assets/admin/dist/js/app.js:44116
 #: assets/dist/js/account-page.js:1041
-#: assets/dist/js/account-page.js:2667
+#: assets/dist/js/account-page.js:2700
 #: assets/dist/js/BookingForm-m1_-mHdV.js:1006
 #: assets/dist/js/Settings-3nMtGNY2.js:3153
 #: assets/dist/js/Settings-3nMtGNY2.js:3161
@@ -7749,9 +7767,9 @@ msgstr ""
 msgid "Current"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:459
+# Source: resources/js/pages/account/Profile.tsx:495
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2763
+#: assets/dist/js/account-page.js:2796
 msgid "Current Password"
 msgstr ""
 
@@ -8115,7 +8133,7 @@ msgstr ""
 #: app/Providers/AdminServiceProvider.php:653
 #: assets/admin/dist/js/app.js:4415
 #: assets/admin/dist/js/app.js:27020
-#: assets/dist/js/account-page.js:3064
+#: assets/dist/js/account-page.js:3097
 msgid "Dashboard"
 msgstr ""
 
@@ -9892,7 +9910,7 @@ msgstr ""
 # Source: resources/js/pages/AccountPage.tsx:48
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/hero.php:269
-#: assets/dist/js/account-page.js:3067
+#: assets/dist/js/account-page.js:3100
 msgid "Documents"
 msgstr ""
 
@@ -10530,10 +10548,10 @@ msgstr ""
 msgid "Edit Pricing Rule"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1481, resources/js/pages/account/Profile.tsx:237
+# Source: resources/js/components/Layout.tsx:1481, resources/js/pages/account/Profile.tsx:261
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:5264
-#: assets/dist/js/account-page.js:2590
+#: assets/dist/js/account-page.js:2611
 msgid "Edit Profile"
 msgstr ""
 
@@ -10655,7 +10673,7 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-# Source: resources/js/pages/CustomerForm.tsx:381, resources/js/pages/TripConsentForm.tsx:598, resources/js/pages/ViewCustomer.tsx:464, resources/js/pages/ViewReview.tsx:388, resources/js/pages/account/Profile.tsx:269
+# Source: resources/js/pages/CustomerForm.tsx:381, resources/js/pages/TripConsentForm.tsx:598, resources/js/pages/ViewCustomer.tsx:464, resources/js/pages/ViewReview.tsx:388, resources/js/pages/account/Profile.tsx:293
 #: assets/admin/dist/js/app.js
 #: app/Services/SettingsService.php:252
 #: templates/partials/booking-auth.php:157
@@ -10663,7 +10681,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:43144
 #: assets/admin/dist/js/app.js:44082
 #: assets/admin/dist/js/app.js:45633
-#: assets/dist/js/account-page.js:2615
+#: assets/dist/js/account-page.js:2636
 msgid "Email Address"
 msgstr ""
 
@@ -11460,9 +11478,9 @@ msgstr ""
 msgid "Enter nationality"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:491
+# Source: resources/js/pages/account/Profile.tsx:527
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2797
+#: assets/dist/js/account-page.js:2830
 msgid "Enter new password"
 msgstr ""
 
@@ -11579,21 +11597,21 @@ msgstr ""
 msgid "Enter value"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:393
+# Source: resources/js/pages/account/Profile.tsx:429
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2703
+#: assets/dist/js/account-page.js:2736
 msgid "Enter your address"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:374
+# Source: resources/js/pages/account/Profile.tsx:410
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2690
+#: assets/dist/js/account-page.js:2723
 msgid "Enter your city"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:472
+# Source: resources/js/pages/account/Profile.tsx:508
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2777
+#: assets/dist/js/account-page.js:2810
 msgid "Enter your current password"
 msgstr ""
 
@@ -11607,17 +11625,17 @@ msgstr ""
 msgid "Enter your full legal name"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:258
+# Source: resources/js/pages/account/Profile.tsx:282
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/enquiry-modal.php:32
-#: assets/dist/js/account-page.js:2610
+#: assets/dist/js/account-page.js:2631
 msgid "Enter your full name"
 msgstr ""
 
-# Source: resources/js/pages/TripConsentForm.tsx:609, resources/js/pages/account/Profile.tsx:330
+# Source: resources/js/pages/TripConsentForm.tsx:609, resources/js/pages/account/Profile.tsx:366
 #: assets/admin/dist/js/app.js
 #: templates/shortcodes/login.php:190
-#: assets/dist/js/account-page.js:2662
+#: assets/dist/js/account-page.js:2695
 msgid "Enter your phone number"
 msgstr ""
 
@@ -11736,7 +11754,7 @@ msgstr ""
 
 # Source: resources/js/account-page.tsx:54
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3544
+#: assets/dist/js/account-page.js:3577
 msgid "Error loading account page"
 msgstr ""
 
@@ -12291,9 +12309,9 @@ msgstr ""
 msgid "Failed to apply bulk action. Please try again."
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:167
+# Source: resources/js/pages/account/Profile.tsx:168
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2529
+#: assets/dist/js/account-page.js:2530
 msgid "Failed to change password."
 msgstr ""
 
@@ -12928,7 +12946,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/SavedTrips.tsx:23
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2892
+#: assets/dist/js/account-page.js:2925
 msgid "Failed to remove trip from wishlist."
 msgstr ""
 
@@ -13116,9 +13134,9 @@ msgstr ""
 msgid "Failed to update pricing rule status"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:133
+# Source: resources/js/pages/account/Profile.tsx:134
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2501
+#: assets/dist/js/account-page.js:2502
 msgid "Failed to update profile."
 msgstr ""
 
@@ -13502,7 +13520,7 @@ msgstr ""
 #: templates/partials/single-trip/content-itinerary.php:121
 #: assets/admin/dist/js/app.js:30054
 #: assets/admin/dist/js/app.js:52252
-#: assets/dist/js/account-page.js:2992
+#: assets/dist/js/account-page.js:3025
 #: assets/dist/js/Itinerary-tEr-LQr2.js:1612
 msgid "Flexible"
 msgstr ""
@@ -13594,9 +13612,9 @@ msgstr ""
 msgid "For percentage discounts, you can set a maximum dollar amount to cap the discount"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:283
+# Source: resources/js/pages/account/Profile.tsx:307
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2627
+#: assets/dist/js/account-page.js:2648
 msgid "For security, we'll email a confirmation link to the new address. Your email changes only after you click that link."
 msgstr ""
 
@@ -13719,7 +13737,7 @@ msgstr ""
 msgid "Friday"
 msgstr ""
 
-# Source: resources/js/pages/TravelerCategories.tsx:241, resources/js/pages/TripForm.tsx:7472, resources/js/pages/TripForm.tsx:7583, resources/js/pages/account/Profile.tsx:594
+# Source: resources/js/pages/TravelerCategories.tsx:241, resources/js/pages/TripForm.tsx:7472, resources/js/pages/TripForm.tsx:7583, resources/js/pages/account/Profile.tsx:630
 #: assets/admin/dist/js/app.js
 #: templates/listing-activity.php:246
 #: templates/partials/single-trip/content-sidebar.php:79
@@ -13731,7 +13749,7 @@ msgstr ""
 #: templates/single-activity.php:130
 #: templates/single-destination.php:130
 #: assets/admin/dist/js/app.js:58324
-#: assets/dist/js/account-page.js:2874
+#: assets/dist/js/account-page.js:2907
 msgid "From"
 msgstr ""
 
@@ -13837,13 +13855,13 @@ msgstr ""
 msgid "Full Board (All Meals)"
 msgstr ""
 
-# Source: resources/js/pages/TripConsentForm.tsx:588, resources/js/pages/ViewCustomer.tsx:447, resources/js/pages/account/BookingDetails.tsx:67, resources/js/pages/account/Profile.tsx:249
+# Source: resources/js/pages/TripConsentForm.tsx:588, resources/js/pages/ViewCustomer.tsx:447, resources/js/pages/account/BookingDetails.tsx:67, resources/js/pages/account/Profile.tsx:273
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:993
 #: templates/partials/single-trip/enquiry-modal.php:31
 #: assets/admin/dist/js/app.js:44067
 #: assets/dist/js/account-page.js:1033
-#: assets/dist/js/account-page.js:2599
+#: assets/dist/js/account-page.js:2620
 msgid "Full Name"
 msgstr ""
 
@@ -14404,7 +14422,7 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:555, resources/js/pages/Bookings.tsx:583
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3406
+#: assets/dist/js/account-page.js:3439
 msgid "Guest"
 msgstr ""
 
@@ -14538,7 +14556,7 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:554
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3404
+#: assets/dist/js/account-page.js:3437
 msgid "Hello,"
 msgstr ""
 
@@ -16650,7 +16668,7 @@ msgstr ""
 #: app/Providers/FrontendAssetsProvider.php:978
 #: app/Shortcodes/LoginShortcode.php:169
 #: assets/admin/dist/js/app.js:5326
-#: assets/dist/js/account-page.js:3437
+#: assets/dist/js/account-page.js:3470
 msgid "Logout"
 msgstr ""
 
@@ -16864,7 +16882,7 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:558
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3408
+#: assets/dist/js/account-page.js:3441
 msgid "Manage bookings, payments, and documents – everything for your adventures in one place."
 msgstr ""
 
@@ -18174,7 +18192,7 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:623
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3467
+#: assets/dist/js/account-page.js:3500
 msgid "Need help right away?"
 msgstr ""
 
@@ -18223,9 +18241,9 @@ msgstr ""
 msgid "New Customers"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:478
+# Source: resources/js/pages/account/Profile.tsx:514
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2783
+#: assets/dist/js/account-page.js:2816
 msgid "New Password"
 msgstr ""
 
@@ -18931,10 +18949,10 @@ msgstr ""
 msgid "No sample captured yet"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:604, resources/js/pages/account/SavedTrips.tsx:64
+# Source: resources/js/pages/account/Profile.tsx:640, resources/js/pages/account/SavedTrips.tsx:64
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2880
-#: assets/dist/js/account-page.js:2916
+#: assets/dist/js/account-page.js:2913
+#: assets/dist/js/account-page.js:2949
 msgid "No saved trips yet"
 msgstr ""
 
@@ -19181,7 +19199,7 @@ msgstr ""
 msgid "Not provided"
 msgstr ""
 
-# Source: resources/js/pages/AbandonedRecovery.tsx:1510, resources/js/pages/Activities.tsx:856, resources/js/pages/Activities.tsx:881, resources/js/pages/Activities.tsx:904, resources/js/pages/Categories.tsx:678, resources/js/pages/Categories.tsx:701, resources/js/pages/Categories.tsx:724, resources/js/pages/Destinations.tsx:679, resources/js/pages/Destinations.tsx:704, resources/js/pages/Destinations.tsx:729, resources/js/pages/account/Profile.tsx:262, resources/js/pages/account/Profile.tsx:291, resources/js/pages/account/Profile.tsx:334, resources/js/pages/account/Profile.tsx:359, resources/js/pages/account/Profile.tsx:378, resources/js/pages/account/Profile.tsx:397
+# Source: resources/js/pages/AbandonedRecovery.tsx:1510, resources/js/pages/Activities.tsx:856, resources/js/pages/Activities.tsx:881, resources/js/pages/Activities.tsx:904, resources/js/pages/Categories.tsx:678, resources/js/pages/Categories.tsx:701, resources/js/pages/Categories.tsx:724, resources/js/pages/Destinations.tsx:679, resources/js/pages/Destinations.tsx:704, resources/js/pages/Destinations.tsx:729, resources/js/pages/account/Profile.tsx:286, resources/js/pages/account/Profile.tsx:315, resources/js/pages/account/Profile.tsx:370, resources/js/pages/account/Profile.tsx:395, resources/js/pages/account/Profile.tsx:414, resources/js/pages/account/Profile.tsx:433
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:31921
 #: assets/admin/dist/js/app.js:31940
@@ -19192,12 +19210,12 @@ msgstr ""
 #: assets/admin/dist/js/app.js:35404
 #: assets/admin/dist/js/app.js:35420
 #: assets/admin/dist/js/app.js:35436
-#: assets/dist/js/account-page.js:2612
-#: assets/dist/js/account-page.js:2631
-#: assets/dist/js/account-page.js:2664
-#: assets/dist/js/account-page.js:2679
-#: assets/dist/js/account-page.js:2692
-#: assets/dist/js/account-page.js:2705
+#: assets/dist/js/account-page.js:2633
+#: assets/dist/js/account-page.js:2652
+#: assets/dist/js/account-page.js:2697
+#: assets/dist/js/account-page.js:2712
+#: assets/dist/js/account-page.js:2725
+#: assets/dist/js/account-page.js:2738
 msgid "Not set"
 msgstr ""
 
@@ -19322,7 +19340,7 @@ msgstr ""
 # Source: resources/js/pages/Availability.tsx:920, resources/js/pages/account/SavedTrips.tsx:137
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:61254
-#: assets/dist/js/account-page.js:2955
+#: assets/dist/js/account-page.js:2988
 msgid "OFF"
 msgstr ""
 
@@ -19975,7 +19993,7 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:464
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3331
+#: assets/dist/js/account-page.js:3364
 msgid "Outstanding Balance"
 msgstr ""
 
@@ -20181,23 +20199,23 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:154
+# Source: resources/js/pages/account/Profile.tsx:155
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2519
+#: assets/dist/js/account-page.js:2520
 msgid "Password changed successfully."
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:516
+# Source: resources/js/pages/account/Profile.tsx:552
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2820
+#: assets/dist/js/account-page.js:2853
 msgid "Passwords do not match"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:143
+# Source: resources/js/pages/account/Profile.tsx:144
 #: assets/admin/dist/js/app.js
 #: app/Controllers/AuthController.php:349
 #: app/Controllers/BookingSessionController.php:1909
-#: assets/dist/js/account-page.js:2510
+#: assets/dist/js/account-page.js:2511
 #: assets/js/booking.js:1877
 #: assets/js/login-shortcode.js:188
 msgid "Passwords do not match."
@@ -20579,7 +20597,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:4510
 #: assets/admin/dist/js/app.js:26518
 #: assets/admin/dist/js/app.js:56916
-#: assets/dist/js/account-page.js:3066
+#: assets/dist/js/account-page.js:3099
 msgid "Payments"
 msgstr ""
 
@@ -20656,10 +20674,10 @@ msgstr ""
 msgid "Pending booking promotions"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:299
+# Source: resources/js/pages/account/Profile.tsx:323
 #. translators: %s: the pending new email address.
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2635
+#: assets/dist/js/account-page.js:2656
 #, js-format
 msgid "Pending confirmation for %s — check that inbox for the confirmation link."
 msgstr ""
@@ -20712,7 +20730,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:58331
 #: assets/admin/dist/js/app.js:59414
-#: assets/dist/js/account-page.js:3044
+#: assets/dist/js/account-page.js:3077
 msgid "Per person"
 msgstr ""
 
@@ -20940,14 +20958,14 @@ msgstr ""
 msgid "Phone (E.164)"
 msgstr ""
 
-# Source: resources/js/pages/CustomerForm.tsx:410, resources/js/pages/TripConsentForm.tsx:608, resources/js/pages/ViewCustomer.tsx:474, resources/js/pages/account/Profile.tsx:322
+# Source: resources/js/pages/CustomerForm.tsx:410, resources/js/pages/TripConsentForm.tsx:608, resources/js/pages/ViewCustomer.tsx:474, resources/js/pages/account/Profile.tsx:358
 #: assets/admin/dist/js/app.js
 #: app/Services/SettingsService.php:253
 #: templates/partials/booking-auth.php:170
 #: templates/partials/single-trip/enquiry-modal.php:41
 #: assets/admin/dist/js/app.js:43172
 #: assets/admin/dist/js/app.js:44089
-#: assets/dist/js/account-page.js:2654
+#: assets/dist/js/account-page.js:2687
 msgid "Phone Number"
 msgstr ""
 
@@ -21199,7 +21217,7 @@ msgstr ""
 
 # Source: resources/js/account-page.tsx:56
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3546
+#: assets/dist/js/account-page.js:3579
 msgid "Please refresh the page or contact support if the problem continues."
 msgstr ""
 
@@ -21855,16 +21873,16 @@ msgstr ""
 msgid "Professional Itinerary Builder"
 msgstr ""
 
-# Source: resources/js/pages/AccountPage.tsx:50, resources/js/pages/account/Profile.tsx:221
+# Source: resources/js/pages/AccountPage.tsx:50, resources/js/pages/account/Profile.tsx:245
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2573
-#: assets/dist/js/account-page.js:3069
+#: assets/dist/js/account-page.js:2594
+#: assets/dist/js/account-page.js:3102
 msgid "Profile"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:128
+# Source: resources/js/pages/account/Profile.tsx:129
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2496
+#: assets/dist/js/account-page.js:2497
 msgid "Profile updated successfully."
 msgstr ""
 
@@ -22852,7 +22870,7 @@ msgstr ""
 # Source: resources/js/pages/account/SavedTrips.tsx:142
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:315
-#: assets/dist/js/account-page.js:2961
+#: assets/dist/js/account-page.js:2994
 #: assets/js/listing-wishlist.js:45
 #: assets/js/trip.js:4912
 msgid "Remove from favorites"
@@ -23169,9 +23187,9 @@ msgstr ""
 msgid "Requires an API secret from the same GA4 data stream."
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:314
+# Source: resources/js/pages/account/Profile.tsx:339
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2648
+#: assets/dist/js/account-page.js:2670
 msgid "Resend confirmation email"
 msgstr ""
 
@@ -24034,9 +24052,9 @@ msgstr ""
 msgid "Save Availability"
 msgstr ""
 
-# Source: resources/js/pages/EmailSequenceForm.tsx:407, resources/js/pages/account/Profile.tsx:414
+# Source: resources/js/pages/EmailSequenceForm.tsx:407, resources/js/pages/account/Profile.tsx:450
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2718
+#: assets/dist/js/account-page.js:2751
 msgid "Save Changes"
 msgstr ""
 
@@ -24178,11 +24196,11 @@ msgstr ""
 msgid "Saved Data:"
 msgstr ""
 
-# Source: resources/js/pages/AccountPage.tsx:49, resources/js/pages/account/Profile.tsx:573, resources/js/pages/account/SavedTrips.tsx:32
+# Source: resources/js/pages/AccountPage.tsx:49, resources/js/pages/account/Profile.tsx:609, resources/js/pages/account/SavedTrips.tsx:32
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2862
-#: assets/dist/js/account-page.js:2897
-#: assets/dist/js/account-page.js:3068
+#: assets/dist/js/account-page.js:2895
+#: assets/dist/js/account-page.js:2930
+#: assets/dist/js/account-page.js:3101
 msgid "Saved Trips"
 msgstr ""
 
@@ -24235,13 +24253,13 @@ msgstr ""
 msgid "Savings"
 msgstr ""
 
-# Source: resources/js/components/ai/BuildItineraryModal.tsx:759, resources/js/pages/AiAssistant.tsx:891, resources/js/pages/AiAssistant.tsx:1099, resources/js/pages/AiAssistant.tsx:1489, resources/js/pages/EmailAutomation.tsx:970, resources/js/pages/Team.tsx:1599, resources/js/pages/Team.tsx:2225, resources/js/pages/Team.tsx:3669, resources/js/pages/Webhooks.tsx:1929, resources/js/pages/Whatsapp.tsx:695, resources/js/pages/Whatsapp.tsx:1653, resources/js/pages/Whatsapp.tsx:2412, resources/js/pages/WhiteLabel.tsx:1556, resources/js/pages/account/Profile.tsx:413
+# Source: resources/js/components/ai/BuildItineraryModal.tsx:759, resources/js/pages/AiAssistant.tsx:891, resources/js/pages/AiAssistant.tsx:1099, resources/js/pages/AiAssistant.tsx:1489, resources/js/pages/EmailAutomation.tsx:970, resources/js/pages/Team.tsx:1599, resources/js/pages/Team.tsx:2225, resources/js/pages/Team.tsx:3669, resources/js/pages/Webhooks.tsx:1929, resources/js/pages/Whatsapp.tsx:695, resources/js/pages/Whatsapp.tsx:1653, resources/js/pages/Whatsapp.tsx:2412, resources/js/pages/WhiteLabel.tsx:1556, resources/js/pages/account/Profile.tsx:449
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:72738
 #: assets/admin/dist/js/Whatsapp.js:554
 #: assets/admin/dist/js/Whatsapp.js:1278
 #: assets/admin/dist/js/Whatsapp.js:1871
-#: assets/dist/js/account-page.js:2718
+#: assets/dist/js/account-page.js:2751
 #: assets/dist/js/AiAssistant-BSlTjAQR.js:636
 #: assets/dist/js/AiAssistant-BSlTjAQR.js:808
 #: assets/dist/js/AiAssistant-BSlTjAQR.js:1118
@@ -25427,9 +25445,9 @@ msgstr ""
 msgid "Select your Business Account"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:350
+# Source: resources/js/pages/account/Profile.tsx:386
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2675
+#: assets/dist/js/account-page.js:2708
 msgid "Select your country"
 msgstr ""
 
@@ -25833,9 +25851,9 @@ msgstr ""
 msgid "Sending..."
 msgstr ""
 
-# Source: resources/js/pages/Team.tsx:2992, resources/js/pages/account/Profile.tsx:313
+# Source: resources/js/pages/Team.tsx:2992, resources/js/pages/account/Profile.tsx:338
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2648
+#: assets/dist/js/account-page.js:2670
 #: assets/dist/js/Team-K1mPL_la.js:2356
 msgid "Sending…"
 msgstr ""
@@ -27029,7 +27047,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/SavedTrips.tsx:67
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2917
+#: assets/dist/js/account-page.js:2950
 msgid "Start exploring and save your favorite trips to your wishlist!"
 msgstr ""
 
@@ -27077,7 +27095,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/SavedTrips.tsx:271
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3042
+#: assets/dist/js/account-page.js:3075
 msgid "Starting from"
 msgstr ""
 
@@ -28202,6 +28220,13 @@ msgstr ""
 msgid "The page hit an unexpected error and needs to reload. Your data is safe."
 msgstr ""
 
+# Source: resources/js/pages/account/Profile.tsx:207
+#: assets/admin/dist/js/app.js
+#: app/Services/CustomerService.php:282
+#: assets/dist/js/account-page.js:2564
+msgid "The pending email change has been cancelled."
+msgstr ""
+
 # Source: resources/js/pages/AdditionalServicesForm.tsx:550
 #: assets/admin/dist/js/app.js
 msgid "The price will be calculated as a percentage of the trip base price."
@@ -28313,7 +28338,7 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:180
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:3155
+#: assets/dist/js/account-page.js:3188
 msgid "This email confirmation link is invalid or has expired."
 msgstr ""
 
@@ -28897,7 +28922,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:27089
 #: assets/admin/dist/js/app.js:44221
 #: assets/dist/js/account-page.js:1772
-#: assets/dist/js/account-page.js:3320
+#: assets/dist/js/account-page.js:3353
 #: assets/dist/js/Reports-BNaZrbMf.js:567
 #: assets/dist/js/Reports-BNaZrbMf.js:691
 #: assets/dist/js/Reports-BNaZrbMf.js:1932
@@ -28964,7 +28989,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:44228
 #: assets/dist/js/account-page.js:1800
-#: assets/dist/js/account-page.js:3336
+#: assets/dist/js/account-page.js:3369
 msgid "Total Spent"
 msgstr ""
 
@@ -30324,7 +30349,7 @@ msgstr ""
 # Source: resources/js/pages/AccountPage.tsx:459, resources/js/pages/account/Dashboard.tsx:245
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/account-page.js:384
-#: assets/dist/js/account-page.js:3326
+#: assets/dist/js/account-page.js:3359
 msgid "Upcoming Trips"
 msgstr ""
 
@@ -30426,9 +30451,9 @@ msgstr ""
 msgid "Update Itinerary Activity"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:537
+# Source: resources/js/pages/account/Profile.tsx:573
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2832
+#: assets/dist/js/account-page.js:2865
 msgid "Update Password"
 msgstr ""
 
@@ -30568,15 +30593,15 @@ msgstr ""
 msgid "Update your consent form settings and fields."
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:224
+# Source: resources/js/pages/account/Profile.tsx:248
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2575
+#: assets/dist/js/account-page.js:2596
 msgid "Update your contact details, address, and communication preferences."
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:439
+# Source: resources/js/pages/account/Profile.tsx:475
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2744
+#: assets/dist/js/account-page.js:2777
 msgid "Update your password to keep your account secure."
 msgstr ""
 
@@ -30637,9 +30662,9 @@ msgstr ""
 msgid "Updates & reminders"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:536
+# Source: resources/js/pages/account/Profile.tsx:572
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2832
+#: assets/dist/js/account-page.js:2865
 msgid "Updating…"
 msgstr ""
 
@@ -31219,7 +31244,7 @@ msgstr ""
 #: templates/single-destination.php:274
 #: templates/trip-listing-card.php:462
 #: assets/dist/js/account-page.js:1884
-#: assets/dist/js/account-page.js:3051
+#: assets/dist/js/account-page.js:3084
 msgid "View Details"
 msgstr ""
 
@@ -32284,8 +32309,8 @@ msgstr ""
 
 # Source: resources/js/pages/AccountPage.tsx:176
 #: assets/admin/dist/js/app.js
-#: app/Services/CustomerService.php:354
-#: assets/dist/js/account-page.js:3151
+#: app/Services/CustomerService.php:373
+#: assets/dist/js/account-page.js:3184
 msgid "Your email address has been updated."
 msgstr ""
 
@@ -32357,7 +32382,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/SavedTrips.tsx:35
 #: assets/admin/dist/js/app.js
-#: assets/dist/js/account-page.js:2898
+#: assets/dist/js/account-page.js:2931
 msgid "Your wishlist of favorite trips"
 msgstr ""
 
@@ -33911,10 +33936,10 @@ msgstr ""
 msgid "years old"
 msgstr ""
 
-# Source: resources/js/pages/account/Profile.tsx:278
+# Source: resources/js/pages/account/Profile.tsx:302
 #: assets/admin/dist/js/app.js
 #: templates/shortcodes/login.php:184
-#: assets/dist/js/account-page.js:2624
+#: assets/dist/js/account-page.js:2645
 msgid "you@example.com"
 msgstr ""
 
@@ -34497,7 +34522,7 @@ msgstr ""
 #: app/Controllers/BookingsController.php:651
 #: app/Controllers/BookingsController.php:712
 #: app/Controllers/BookingSessionController.php:2611
-#: app/Controllers/CustomerController.php:461
+#: app/Controllers/CustomerController.php:486
 #: app/Controllers/PaymentGatewayController.php:201
 #: app/Controllers/PaymentGatewayController.php:274
 #: app/Controllers/PaymentGatewayController.php:438
@@ -35020,41 +35045,42 @@ msgstr ""
 msgid "Category not found"
 msgstr ""
 
-#: app/Controllers/CustomerController.php:267
+#: app/Controllers/CustomerController.php:276
 msgid "Customer profile not found."
 msgstr ""
 
-#: app/Controllers/CustomerController.php:303
+#: app/Controllers/CustomerController.php:312
 msgid "Customer profile not found"
 msgstr ""
 
-#: app/Controllers/CustomerController.php:321
+#: app/Controllers/CustomerController.php:330
 msgid "Failed to save profile."
 msgstr ""
 
-#: app/Controllers/CustomerController.php:366
-#: app/Controllers/CustomerController.php:405
-#: app/Controllers/CustomerController.php:427
+#: app/Controllers/CustomerController.php:375
+#: app/Controllers/CustomerController.php:414
+#: app/Controllers/CustomerController.php:436
+#: app/Controllers/CustomerController.php:452
 #: app/Controllers/PaymentGatewayController.php:715
 msgid "Authentication required."
 msgstr ""
 
-#: app/Controllers/CustomerController.php:374
+#: app/Controllers/CustomerController.php:383
 msgid "Current and new password are required."
 msgstr ""
 
-#: app/Controllers/CustomerController.php:379
+#: app/Controllers/CustomerController.php:388
 msgid "Your current password is incorrect."
 msgstr ""
 
-#: app/Controllers/CustomerController.php:585
-#: app/Services/CustomerService.php:445
-#: app/Services/CustomerService.php:486
-#: app/Services/CustomerService.php:516
+#: app/Controllers/CustomerController.php:610
+#: app/Services/CustomerService.php:464
+#: app/Services/CustomerService.php:505
+#: app/Services/CustomerService.php:535
 msgid "Customer not found."
 msgstr ""
 
-#: app/Controllers/CustomerController.php:673
+#: app/Controllers/CustomerController.php:698
 msgid "Both source and target customer IDs are required."
 msgstr ""
 
@@ -37197,7 +37223,7 @@ msgid "Please fill in all required fields."
 msgstr ""
 
 #: app/Hooks/ReviewHooks.php:167
-#: app/Services/CustomerService.php:406
+#: app/Services/CustomerService.php:425
 #: app/Services/EnquiryService.php:122
 msgid "Please provide a valid email address."
 msgstr ""
@@ -37868,7 +37894,7 @@ msgid "Booking updated successfully."
 msgstr ""
 
 #: app/Services/BookingService.php:651
-#: app/Services/CustomerService.php:480
+#: app/Services/CustomerService.php:499
 #: app/Services/EnquiryService.php:345
 #: app/Services/PaymentService.php:149
 #: app/Services/ReviewService.php:288
@@ -37877,7 +37903,7 @@ msgid "Invalid status."
 msgstr ""
 
 #: app/Services/BookingService.php:664
-#: app/Services/CustomerService.php:492
+#: app/Services/CustomerService.php:511
 #: app/Services/PaymentService.php:161
 #: app/Services/ReviewService.php:300
 msgid "Failed to update status."
@@ -37928,6 +37954,7 @@ msgstr ""
 
 #: app/Services/CustomerService.php:200
 #: app/Services/CustomerService.php:244
+#: app/Services/CustomerService.php:277
 msgid "Account not found."
 msgstr ""
 
@@ -37956,7 +37983,7 @@ msgid "We've re-sent the confirmation link to %s."
 msgstr ""
 
 #. translators: Do not translate the ###...### placeholders; they are replaced below.
-#: app/Services/CustomerService.php:285
+#: app/Services/CustomerService.php:304
 msgid ""
 "Howdy ###USERNAME###,\n"
 "\n"
@@ -37976,97 +38003,97 @@ msgid ""
 msgstr ""
 
 #. translators: %s: Site title.
-#: app/Services/CustomerService.php:314
+#: app/Services/CustomerService.php:333
 #, php-format
 msgid "[%s] Email Change Request"
 msgstr ""
 
-#: app/Services/CustomerService.php:327
+#: app/Services/CustomerService.php:346
 msgid "No pending email change was found."
 msgstr ""
 
-#: app/Services/CustomerService.php:330
+#: app/Services/CustomerService.php:349
 msgid "This confirmation link is invalid or has expired."
 msgstr ""
 
-#: app/Services/CustomerService.php:337
+#: app/Services/CustomerService.php:356
 msgid "That email address is now in use. Please try again."
 msgstr ""
 
-#: app/Services/CustomerService.php:401
+#: app/Services/CustomerService.php:420
 msgid "Email is required."
 msgstr ""
 
-#: app/Services/CustomerService.php:414
+#: app/Services/CustomerService.php:433
 msgid "A customer with this email already exists."
 msgstr ""
 
-#: app/Services/CustomerService.php:423
+#: app/Services/CustomerService.php:442
 msgid "Failed to create customer."
 msgstr ""
 
-#: app/Services/CustomerService.php:429
+#: app/Services/CustomerService.php:448
 msgid "Customer created successfully."
 msgstr ""
 
-#: app/Services/CustomerService.php:452
+#: app/Services/CustomerService.php:471
 msgid "Email is already in use by another customer."
 msgstr ""
 
-#: app/Services/CustomerService.php:459
+#: app/Services/CustomerService.php:478
 msgid "Failed to update customer."
 msgstr ""
 
-#: app/Services/CustomerService.php:464
+#: app/Services/CustomerService.php:483
 msgid "Customer updated successfully."
 msgstr ""
 
 #. translators: %s: new customer status.
-#: app/Services/CustomerService.php:499
+#: app/Services/CustomerService.php:518
 #, php-format
 msgid "Customer status updated to %s."
 msgstr ""
 
-#: app/Services/CustomerService.php:524
+#: app/Services/CustomerService.php:543
 msgid "Cannot delete customer with existing bookings. Consider deactivating instead."
 msgstr ""
 
-#: app/Services/CustomerService.php:531
+#: app/Services/CustomerService.php:550
 msgid "Failed to delete customer."
 msgstr ""
 
-#: app/Services/CustomerService.php:536
+#: app/Services/CustomerService.php:555
 msgid "Customer deleted successfully."
 msgstr ""
 
 #. translators: %s: booking reference or ID.
-#: app/Services/CustomerService.php:895
-#: app/Services/CustomerService.php:924
+#: app/Services/CustomerService.php:914
+#: app/Services/CustomerService.php:943
 #, php-format
 msgid "Invoice #%s.pdf"
 msgstr ""
 
 #. translators: %s: booking reference or ID.
-#: app/Services/CustomerService.php:946
+#: app/Services/CustomerService.php:965
 #, php-format
 msgid "Travel Voucher #%s.pdf"
 msgstr ""
 
 #. translators: %s: booking reference or ID.
-#: app/Services/CustomerService.php:964
+#: app/Services/CustomerService.php:983
 #, php-format
 msgid "Travel Itinerary #%s.pdf"
 msgstr ""
 
-#: app/Services/CustomerService.php:1048
+#: app/Services/CustomerService.php:1067
 msgid "Cannot merge customer with itself."
 msgstr ""
 
-#: app/Services/CustomerService.php:1055
+#: app/Services/CustomerService.php:1074
 msgid "One or both customers not found."
 msgstr ""
 
-#: app/Services/CustomerService.php:1072
+#: app/Services/CustomerService.php:1091
 msgid "Customers merged successfully."
 msgstr ""
 

@@ -2449,6 +2449,7 @@ const Profile = ({
   const [isSaving, setIsSaving] = reactExports.useState(false);
   const [isSavingPassword, setIsSavingPassword] = reactExports.useState(false);
   const [isResendingEmail, setIsResendingEmail] = reactExports.useState(false);
+  const [isCancellingEmail, setIsCancellingEmail] = reactExports.useState(false);
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -2552,6 +2553,26 @@ const Profile = ({
       setIsResendingEmail(false);
     }
   };
+  const handleCancelEmailChange = async () => {
+    setIsCancellingEmail(true);
+    try {
+      const resp = await apiClient.delete(
+        API_ENDPOINTS.CUSTOMER_CHANGE_EMAIL
+      );
+      await queryClient2.invalidateQueries({ queryKey: ["account-profile"] });
+      showToast(
+        (resp == null ? void 0 : resp.message) || __("The pending email change has been cancelled.", "yatra"),
+        "success"
+      );
+    } catch (error) {
+      showToast(
+        (error == null ? void 0 : error.message) || __("Could not cancel the pending email change.", "yatra"),
+        "error"
+      );
+    } finally {
+      setIsCancellingEmail(false);
+    }
+  };
   const handleCancel = () => {
     setIsEditing(false);
     if (profile) {
@@ -2638,16 +2659,28 @@ const Profile = ({
               ),
               profile.pending_email
             ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "button",
-              {
-                type: "button",
-                onClick: handleResendEmailChange,
-                disabled: isResendingEmail,
-                className: "mt-1 font-medium text-yatra-primary underline hover:no-underline disabled:opacity-60",
-                children: isResendingEmail ? __("Sending…", "yatra") : __("Resend confirmation email", "yatra")
-              }
-            )
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-1 flex flex-wrap items-center gap-x-3 gap-y-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: handleResendEmailChange,
+                  disabled: isResendingEmail || isCancellingEmail,
+                  className: "font-medium text-yatra-primary underline hover:no-underline disabled:opacity-60",
+                  children: isResendingEmail ? __("Sending…", "yatra") : __("Resend confirmation email", "yatra")
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: handleCancelEmailChange,
+                  disabled: isResendingEmail || isCancellingEmail,
+                  className: "font-medium text-gray-500 dark:text-gray-400 underline hover:no-underline disabled:opacity-60",
+                  children: isCancellingEmail ? __("Cancelling…", "yatra") : __("Cancel change", "yatra")
+                }
+              )
+            ] })
           ] }) : null
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-field", children: [

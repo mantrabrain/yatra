@@ -63,6 +63,7 @@ const Profile: React.FC<ProfileProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
   const [isResendingEmail, setIsResendingEmail] = useState(false);
+  const [isCancellingEmail, setIsCancellingEmail] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -194,6 +195,29 @@ const Profile: React.FC<ProfileProps> = ({
     }
   };
 
+  const handleCancelEmailChange = async () => {
+    setIsCancellingEmail(true);
+    try {
+      const resp: any = await apiClient.delete(
+        API_ENDPOINTS.CUSTOMER_CHANGE_EMAIL,
+      );
+      await queryClient.invalidateQueries({ queryKey: ["account-profile"] });
+      showToast(
+        resp?.message ||
+          __("The pending email change has been cancelled.", "yatra"),
+        "success",
+      );
+    } catch (error: any) {
+      showToast(
+        error?.message ||
+          __("Could not cancel the pending email change.", "yatra"),
+        "error",
+      );
+    } finally {
+      setIsCancellingEmail(false);
+    }
+  };
+
   const handleCancel = () => {
     setIsEditing(false);
     if (profile) {
@@ -303,16 +327,28 @@ const Profile: React.FC<ProfileProps> = ({
                       profile.pending_email,
                     )}
                   </p>
-                  <button
-                    type="button"
-                    onClick={handleResendEmailChange}
-                    disabled={isResendingEmail}
-                    className="mt-1 font-medium text-yatra-primary underline hover:no-underline disabled:opacity-60"
-                  >
-                    {isResendingEmail
-                      ? __("Sending…", "yatra")
-                      : __("Resend confirmation email", "yatra")}
-                  </button>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <button
+                      type="button"
+                      onClick={handleResendEmailChange}
+                      disabled={isResendingEmail || isCancellingEmail}
+                      className="font-medium text-yatra-primary underline hover:no-underline disabled:opacity-60"
+                    >
+                      {isResendingEmail
+                        ? __("Sending…", "yatra")
+                        : __("Resend confirmation email", "yatra")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancelEmailChange}
+                      disabled={isResendingEmail || isCancellingEmail}
+                      className="font-medium text-gray-500 dark:text-gray-400 underline hover:no-underline disabled:opacity-60"
+                    >
+                      {isCancellingEmail
+                        ? __("Cancelling…", "yatra")
+                        : __("Cancel change", "yatra")}
+                    </button>
+                  </div>
                 </div>
               ) : null}
             </div>
