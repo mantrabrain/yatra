@@ -2,6 +2,23 @@
 
 All notable changes to this project are documented here. The WordPress.org–canonical history lives in **`readme.txt`** under **Changelog**; this file mirrors recent releases for GitHub and tooling.
 
+## [3.0.10] — 2026-07-15
+
+- **Tour review structured data (SEO) — fixed Google Search Console errors** ("Invalid object type for field &lt;parent_node&gt;", "Missing field author", "Missing field itemReviewed"): the review Microdata was invalid (AggregateRating under a `TouristTrip`; the whole reviews section as one `Review` with no author/itemReviewed). Replaced with valid **JSON-LD** emitted centrally for every tour page — a `Product` with the tour name, `aggregateRating`, and a `review[]` array (each with `author`/`reviewRating`/`reviewBody`/`datePublished`/title). Removed the broken Microdata; review-less tours keep the prior schema. Output is `\u`-escaped so review text can't break out of the `<script>` block.
+- **Account email address is editable** (My Account → Profile): WordPress-style confirmation-link flow (change applies only after the customer clicks the link mailed to the new address), with Resend / Cancel, a pending-change notice, and an "email changed" security notice to the old address. All four emails are editable transactional templates.
+- **Sold-out departures can no longer be booked** — disabled up front (reusing the server waitlist/capacity rule) instead of failing only at the final step; server guard retained.
+- **Deposits no longer auto-confirm when Auto-Confirm is off** — a deposit/partial leaves the booking pending across all completion paths; deposit-paid bookings are shielded from the pending-expiry cron. Overridable via `yatra_confirm_booking_on_payment`.
+- **reCAPTCHA v3 now works** — server-verified per protected form (enquiry/review/booking/registration), fail-closed, secret never sent to the client, action validated.
+- **Invoice fixes** — the "Invoice #" is no longer empty; the pro-forma invoice shows the real payment state (Paid / Partially Paid / Payment Pending).
+- **Pro-forma invoice for offline bookings** — Bank Transfer / Pay Later bookings can download an invoice; includes payment instructions when a balance is due (Pro fills bank details).
+- **Discounts respect the currency** — Discount Amount + Minimum Booking Amount fields show the configured symbol and position.
+- **Confirmation & checkout pages no longer leak another page's SEO** (virtual pages no longer inherit an unrelated page's meta).
+- **Capacity & occupancy** — a departure honours a recurring rule on datetime input; dashboard occupancy no longer stuck at 0%; Reports Average Group Size computed over the correct set.
+- **Booking-confirmation stars restored** (missing CSS), including half-stars.
+- **Google Calendar** — the target Calendar ID/Name in Settings is saved and survives reload.
+- **Translations** — bundled translations now load from the plugin's own `i18n/languages` folder; new strings translatable; regenerated `yatra.pot`.
+- No DB changes, no migration. Safe to update from 3.0.9. Pair with **Yatra Pro 3.0.8**.
+
 ## [3.0.9] — 2026-07-02
 
 - **Price filter — highest trips are reachable again:** the trip-listing price filter now bounds its Min/Max on every price a customer can actually book. The maximum previously looked only at the base trip price, so a per-category (traveler-based) tier or an availability-date / recurring-rule / departure **override** priced above it fell off the top of the slider and became unfindable. The slider can now also land exactly on the true maximum (the range step no longer stops short — e.g. it no longer caps €10,000 at €9,909). Bounds come only from published, non-deleted trips, so a draft/trashed override can't inflate them.
