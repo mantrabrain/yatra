@@ -279,6 +279,8 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 
 == Changelog ==
 
+The two most recent releases are listed below. For the complete version history, see [changelog.txt](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
+
 = 3.0.10 — 15 July 2026 =
 * **Tour review structured data (SEO) — fixed the Google Search Console errors:** GSC reported *"Invalid object type for field &lt;parent_node&gt;"*, *"Missing field author"* and *"Missing field itemReviewed"* on tour pages. The cause was the review Microdata — the AggregateRating was nested in a `TouristTrip` (a type Google doesn't support for review snippets), and the whole reviews section was marked as one `Review` with no author/itemReviewed. Microdata can't express this correctly here (the rating is in the hero, the reviews are a separate section, so they can't share one valid parent node), so review structured data is now emitted as **JSON-LD** — Google's recommended format — centrally for every tour page: a `Product` with the tour name, `aggregateRating`, and a `review[]` array where each review carries `author` (Person), `reviewRating`, `reviewBody`, `datePublished` and the review title. The broken Microdata was removed. Tours without reviews keep their previous schema (no incomplete-Product markup). The JSON-LD is `\u`-escaped so review text can never break out of the `<script>` block.
 * **Account email address is now editable:** customers can change their account email from **My Account → Profile**. It follows WordPress's own confirmation-link flow — the address is not changed until the customer clicks a link emailed to the **new** address — with **Resend** and **Cancel** actions, a pending-change notice, and a security notice sent to the **old** address once confirmed. All four emails are editable transactional templates.
@@ -310,152 +312,7 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 * **Email notifications:** manually changing a booking's **payment status** to Paid/Partial (e.g. confirming an offline bank transfer) now sends the customer a Payment Confirmation and the admin a Payment Received email, and no longer logs an "Undefined array key data" warning. A guest booking that requires **email verification** now sends its booking-confirmation email once the customer verifies (it was previously dropped).
 * Safe to update from 3.0.8 — no database changes and no migrations. Pair with **Yatra Pro 3.0.7**.
 
-= 3.0.8 =
-* **Additional Services — percentage pricing fixed:** a service priced as a *percentage* now correctly charges that percent of the trip price instead of a flat amount. The displayed line-item, the live popup total and the amount actually charged are all server-calculated from the same value, so they always agree. **Fixed-price services are unchanged to the cent.** Price is now validated server-side (no negative values; percentages capped at 100%).
-* **Translations:** the "Pay Now" / "Complete Booking" booking-button labels, the country dropdown (translated at the country definition), the bank-transfer details on the confirmation page, and all payment-gateway labels are now translatable. Pro strings were corrected to the proper text domain. Regenerated the translation template (`yatra.pot`).
-* **Booking confirmation email:** stopped appending a stray currency code after the total (`{{currency}}` is the ISO code, not the formatted amount).
-* **Lead-traveler fields:** the traveler form can now carry fields that apply to the lead traveler only — required, saved, shown in admin/booking details and emails for Traveler 1 only.
-* **Settings gating:** when Customer Registration / sign-in are disabled, the account-creation and Sign In options no longer appear during booking; deposit and registration toggles are honored consistently.
-* **Deposit + offline gateways on guest / waitlist checkout:** when a customer chose an offline gateway (Bank Transfer or Pay Later) with a deposit/partial payment and the booking went through guest email-verification or the waitlist, the gateway was silently switched to "Pay Later" and the deposit replaced with the full amount. The chosen gateway and the deposit/partial amount are now preserved through verification and waitlist promotion; online gateways are unaffected.
-* **Reports:** Google Analytics and Facebook Pixel reports now enable as soon as their module is enabled and configured.
-* **Guest email verification** now uses the configured, editable email template.
-* **SEO:** the `{name}` placeholder in destination/activity/category meta title & description is now expanded correctly.
-* **Cleanup:** diagnostic `console.log` output on the frontend is now gated behind a debug flag (off in production), including form-input logging in Abandoned Booking Recovery.
-* **XML Sitemap:** Yatra now publishes one sitemap of all trips, destinations, activities and categories at `/yatra-sitemap.xml` — trips/classifications live in custom tables, so they were previously invisible to every sitemap generator. It is advertised in `robots.txt` and integrated with WordPress core, Yoast, Rank Math and All in One SEO sitemaps automatically. A toggle and the sitemap URL are available under **Settings → SEO**.
-* Safe to update from 3.0.7 — no database changes and no migrations. Pair with **Yatra Pro 3.0.6**.
-
-= 3.0.7 =
-* **Booking Form — Text Block field:** new display-only field type to place instructions, notes or a divider **between** booking-form fields in any section (contact, emergency, traveler). It is not an input — never validated, stored, or shown in emails — and supports safe basic HTML; the admin only sets content + width. Hardening: locked core fields (name/email/phone/country) can no longer be retyped, so their inputs can never be dropped from checkout. The builder is gated behind the Pro Dynamic Form Field module.
-* **PayPal — bookings now actually confirm (Simple + Advanced):** Simple/IPN now records the payment and confirms the booking; Advanced captures the approved order on return **and** via a signature-verified webhook (configurable Webhook URL + Webhook ID in the admin). Deposits and partial payments settle correctly. Change is contained to PayPal — no shared recorder or other gateway is touched.
-* **Square / Authorize.Net:** fixed "not configured properly" on checkout (the frontend gateway config is now built from each gateway's public data, so no gateway secret ever reaches the browser) and bookings now confirm after a synchronous charge, with deposit / partial / remaining-balance amounts settling correctly.
-* **Decimals — single source of truth:** the **Number of decimals** setting now controls **every** price consistently — PHP-rendered (single trip page, destination/category/activity showcases, listings, booking confirmation, pricing summaries) and JS-rendered totals alike. Previously PHP prices ignored the setting and always showed two decimals. Backward compatible; existing Setup-Wizard choices are preserved.
-* **Search & Listing:** new Settings tab to show/hide search-bar fields (keyword, destination, activities, duration, budget). The `[yatra_search]` shortcode honors those toggles and adds per-placement attributes — e.g. `[yatra_search budget="no"]` — while the trip listing page wires the settings to the shortcode automatically.
-* **Itinerary:** fixed bulk delete for single-day trips and partial activity selection (only the ticked activities are removed); translated the action toasts.
-* **Availability:** Alert Threshold, Block Reason and Block status now save and reflect on the edit form (clamped/capped to avoid strict-mode write failures).
-* **Dynamic Form Field module:** robust contact/emergency/traveler handling at checkout (email-field resolution, traveler synthesis, server-side required-field validation), admin booking-edit round-trip, and dynamic `{{contact_*}}` / `{{emergency_*}}` email merge tags.
-* **Admin UI hardening:** added an app-level ErrorBoundary, opted the React roots out of browser auto-translation, and auto-reload once on stale chunk loads — preventing white-screen DOM reconciliation crashes.
-* **Internationalization:** translatable booking-form labels/placeholders and new strings throughout; regenerated the translation template (`yatra.pot`).
-* **Other:** Google Calendar fixes; account page renders travelers + custom contact fields; email total/balance placeholder fixes; per-module "Learn more" links; wpyatra.com domain updates.
-* Safe to update from 3.0.6 — no database changes and no migrations. Pair with **Yatra Pro 3.0.5**.
-
-= 3.0.6 =
-* **Pricing plans renamed:** Personal → **Starter**, Agency → **Scale** (Growth unchanged). Display-only rename across the admin — the Modules page tier badges, the premium-upgrade dialog, and the REST gate messages now read Starter / Growth / Scale. The internal capability slugs are **unchanged**, so existing Pro licenses keep the exact same feature access; only the visible plan name changed.
-* **Scale 1-site / 15-site:** the Scale (formerly Agency) tier is now offered as a 1-site or 15-site license. Feature set is identical between the two — only the activation count differs.
-* **UX:** White Label module re-categorised under "Branding" (was "Agency"); removed the leading icon before the plan name in the upgrade dialog badge.
-* Safe to update from 3.0.5.x. No database changes, no migration, no gating-logic change — existing Growth/Agency (now Scale) licenses are unaffected. Pair with **Yatra Pro 3.0.4**.
-
-= 3.0.5.1 =
-* **Hotfix — admin 403 on REST routes:** site administrators on a free-only install were hitting `rest_forbidden` on Settings (and any other surface whose REST controller gates on a granular `yatra_*` cap). Root cause: the `user_has_cap` filter installer (`AdminServiceProvider::bootstrapMenuCapability()`) was only called from `registerAdminMenu()` — hooked on `admin_menu`, which doesn't fire during REST requests. The admin SPA loads everything via REST, so the admin fallback that grants `yatra_*` caps to users with `manage_options` never ran for those calls. Fix: the installer is now also invoked from `AppServiceProvider::register()` (always-loaded core path), so the filters install for every entry point — admin pageviews, REST, AJAX, frontend, CLI. An idempotency guard prevents double-registration. Filter logic, priorities, and the team-module-disabled strip branch are unchanged — this is a registration-timing fix, not a semantics change. Pair with **Yatra Pro 3.0.4** (Team & Access).
-* Safe to update from 3.0.5. No database changes, no settings reset.
-
-= 3.0.5 =
-* **Capability registry foundation:** the free plugin now ships a `user_has_cap` filter at priority 7 (`AdminServiceProvider::bootstrapMenuCapability()`) that reads the `yatra_team_role_enforcement_active` filter signal to decide whether non-admin `yatra_*` caps resolve normally or get stripped. When the Pro Team & Access module is enabled (or its "keep access on disable" setting is on), the signal returns true and caps resolve. When Pro is deactivated or the module is off without that opt-in, non-admin yatra_* caps are stripped so existing role assignments become inert — re-activating restores everything. WP administrators always pass via the admin fallback regardless.
-* **Cap-string consistency sweep:** every React page that gated UI on `manage_yatra` now references the canonical registered cap (`yatra_manage_settings`, `yatra_manage_emails`, `yatra_access_admin`). New caps registered: `yatra_view_reviews`, `yatra_edit_reviews`, `yatra_delete_reviews`, `yatra_manage_reviews`. Inline cap checks inside `TripController::restore_revision` and `SingleTripController` draft-preview gain `manage_options` fallback so site owners never fail.
-* **`isWpAdmin` always injected:** `AdminAssetsProvider` now always injects `isWpAdmin` and `manage_options` into `window.yatraAdmin.capabilities` (was previously only set by the Pro Team module). Fixes the regression where Reviews + Email Templates didn't load data for admins on free-only or Team-disabled installs. React `usePermissions.can()` gets a triple admin-fallback (isWpAdmin → roles.administrator → capabilities.manage_options) so admins always pass regardless of injection edge cases.
-* **Customer + Availability controllers:** `CustomerController::checkAdminPermission`, `AvailabilitySpecificDatesController::checkPermission`, and `AvailabilityRecurringRulesController::checkPermission` now accept the registered Team caps (`yatra_edit_customers`, `yatra_edit_trips`) in addition to the legacy `manage_options` and pre-existing legacy caps (kept as OR-arms for back-compat with any hand-grant filter).
-* **Transactional email types are now extensible:** `TransactionalEmailTemplateService::typeToSettingsKeys()` exposes the `yatra_transactional_email_type_to_keys` filter so Pro modules can register their own type → settings-keys mapping. Default subject/body lookups expose `yatra_transactional_email_default_subject` and `yatra_transactional_email_default_body` so modules can supply baseline copy. Powers the new Team module's customizable invitation email surface.
-* **Try Yatra Pro pill:** subtle amber pill appears next to the page title on every admin page when the Pro plugin is NOT active. Links to `https://try.wpyatra.com/try-yatra-pro/` (no credit card required). Hidden as soon as Pro is active.
-* **UX polish:** `SharedTable` action-menu dropdown shadow reduced from `shadow-2xl` to `shadow-md` (matches the rest of the admin design); modal-body data loaders replaced with Skeleton blocks (Team page, MemberEditDrawer, RoleEditDrawer, AddMemberModal candidate picker); Departure save/cancel redirect now returns to the Departures page instead of the Trips page; Email page tabs (Delivery, Templates, Sequences, Logs) persist in the URL so direct links and reload work.
-* **Reviews + Email registry:** `Layout.tsx` sidebar entry for Reviews now gates on `yatra_view_reviews` (was `yatra_view_trips`); `useEmailSettingsManager` gates on `yatra_manage_emails` (was the unregistered `manage_yatra`).
-* **Version:** Yatra free **3.0.5**. Pair with **Yatra Pro 3.0.3** for the Team & Access module.
-* Safe to update from 3.0.4.
-* **NEW — Discount Stacking setting:** Settings → Pricing tab with four modes (Both apply / Best for the customer / Discount only / Dynamic Pricing only). Only renders when both Advanced Discount and Dynamic Pricing modules are enabled. Default `both` preserves legacy behaviour — zero change for existing sites unless an operator opts in.
-* **NEW — `yatra_pricing_after_discount_stack` filter** in `CalculationService` lets premium modules rewrite the discount/DP combination per operator policy. `pre_dp_base_amount` ships in the snapshot so listeners detect DP-active without re-running rules. `calculateBaseAmount()` and `calculateGroupDiscount()` made public; new `computeBaseAmountWithoutDynamicPricing()` helper for the discount-only re-walk.
-* **NEW — Channel Manager UI:** searchable TripPicker on the New Mapping form (replaces the numeric Trip ID input); Mappings list shows trip name with link instead of `#42`; All-channels filter + Add Mapping button stay on one row.
-* **NEW — Module-page skeletons:** Webhooks, Channel Manager, AI Assistant, WhatsApp, WhiteLabel, Team now render shape-aware skeletons (not bare spinners) on initial load. New `ModulePageSkeleton` + variants component.
-* **Booking confirmation:** Features tag row removed; featured-image always renders with a bundled placeholder fallback (no more lopsided text-only cards on trips without an image set).
-* **Booking sidebar consistency:** per-category price (Adult × N) now always matches Trip Subtotal across JSON response, server-rendered HTML, and the React renderer — reconciled against CalculationService's authoritative `category_prices_post_dp` map.
-* **Stripe / AuthorizeNet / Square checkout fix:** all three premium-gateway flows now forward `X-Yatra-Booking-Nonce` on `/booking/create`, fixing the `invalid_nonce` 403 that blocked card payments.
-* **Booking confirmation fatal fix:** `BookingRepository::getResolvedBookingsTable()` → `getTableName()` (post-3.0.5 dangling refactor that crashed the confirmation page).
-* **Booking-Form sub-tab gate:** truthy check on `yatraAdmin.dynamicFormFieldEnabled` so the sub-tab actually renders (wp_localize_script string-coercion bug — `true` arrives as `"1"`, strict-equality silently failed).
-* **Repo housekeeping:** `BookingForm.tsx.backup` removed (71 KB orphan file).
-
-= 3.0.4 =
-* **Unicode / Cyrillic slugs (end-to-end):** `SlugHelper::generate()` now rawurldecodes percent-encoded UTF-8 and uses `mb_strtolower` with a Unicode-aware regex (`\pL\pN`), so Cyrillic / CJK trip, destination, activity, and category slugs round-trip cleanly through validators and pretty-permalink routing. `ActivityValidator`, `DestinationValidator`, and `TripValidator` now route raw user input through `SlugHelper` instead of `sanitize_title` (which stripped non-ASCII characters down to a single dash). `PrettyRouteMatcher` decodes captured slugs the same way before lookup, so a URL like `/trip/токио/` resolves correctly.
-* **Pricing — single source of truth:** `create_booking` now uses `CalculationService::calculateFromSession` as its primary path, so the sidebar pricing summary, the AJAX summary refresh, and the actual amount sent to the payment gateway are all driven by the same code. The calculation result exposes `unit_price_before_dp`, `dp_total_adjustment`, `category_prices_post_dp`, and a `dynamic_pricing` breakdown so templates can render a clean "Trip Pricing → Services → Itinerary → Dynamic Pricing → Discount" stack with no double-counting and no sidebar/payment drift.
-* **Pricing summary — UI cleanup:** services render as compact rows above Trip Subtotal (matching the traveler-row style instead of a separate card), Dynamic Pricing renders as one consolidated line (no "1 rule applied" caption), and service descriptions surface via a CSS `data-tooltip` hover (no native `title` attribute, no info-icon clutter). The duplicate-traveler bug (1 selected showing as 2) is fixed in `formDataToObject`'s handling of `name[]` array notation.
-* **Coupon UI persistence:** `remove_coupon` now writes back via `yatra_set_booking_session()` so the transient stays in sync, and the applied-coupon row's visible state is server-rendered on first paint — the Remove button is now visible after a page refresh.
-* **Session management:** `yatra_set_booking_session()` writes to both `$_SESSION` and a transient keyed by a `booking_token` in the URL, and `yatra_get_booking_session()` falls back to the transient when REST endpoints arrive without `PHPSESSID`. Service toggles, summary refresh, coupon apply / remove, and create-booking all resolve the same cart regardless of how the request authenticated.
-* **Mobile sticky bar:** the sticky-bottom booking widget's flatpickr / traveler-sync JavaScript is extracted into `assets/js/single-trip-sidebar.js` so it can no longer be mangled by WordPress's `convert_chars` content filter (which previously rewrote `&&` operators inside inline scripts as `&#038;&#038;` and broke the bar on some themes).
-* **FSE / block-theme support:** new `Yatra\Core\Template\FseTemplates` + `Yatra\Core\Routing\PageContext` provide a proper handoff between page handlers and the renderer so single-trip, booking, account, and confirmation pages render correctly inside the FSE template canvas.
-* **Custom trip tab:** new `templates/partials/single-trip/content-custom.php` lets an admin-defined "Custom" frontend tab render through the same `yatra_render_tab_icon()` pipeline as the built-in tabs.
-* **Pro toggle scaffolding:** Settings → Booking now has **"Show available dates as a dropdown"** with a PRO badge. The setting key (`date_picker_as_dropdown`) and free-side filter contract (`yatra_use_date_dropdown`, `yatra_single_trip_date_dropdown_options`) live in the free plugin; the actual behavior (gate, option-builder, flexible-trip date synthesis) is contributed by the corresponding Yatra Pro module.
-* **i18n / Loco Translate:** `Bootstrap::loadTextDomain()` now installs a `load_script_translation_file` filter that falls back to `WP_LANG_DIR/loco/plugins/` for `.json` script-translation files. This mirrors the existing `.mo` fallback so React surfaces (account page, admin app, blocks) pick up Loco-managed translations from Loco's standard private workspace.
-* **CI / DevOps:** the PHP-lint pipeline's silent-failure bug (subshell counter in `find | while`) is fixed; `xargs -0 -P 4 php -l` now aggregates failures correctly. Added `concurrency`, least-privilege `permissions: contents: read`, and `timeout-minutes` to every job; `composer validate --strict` moved before `composer install`; debug noise and the inline AI-report preamble removed from `$GITHUB_STEP_SUMMARY`.
-* Safe to update from 3.0.3.
-
-= 3.0.3 =
-* **Shortcodes:** **`[yatra_trip_category]`** — lists trip categories in the same card layout as destinations, with optional filters, pagination (`trip_category_page`), and AJAX-friendly behavior (see `TripCategoryShortcode` + `TripCategoryShortcodeAjax`).
-* **Shortcodes / blocks (`[yatra_trip]`, Trip block):** **Featured Priority** filter (`featured_priority` = `featured` / `new` / `limited`; mirrors the trip form's *Categorization → Featured Priority*) and **Difficulty / fitness-level** filter (`difficulty="3,5"`) are now first-class attributes. Legacy `featured="1"` is retained as a back-compat alias for `featured_priority="featured"` (`featured_priority` wins if both are set). Centralised in `TripListingFilterBuilder` so the same rules apply to both shortcode and block inputs.
-* **Trip block:** retired the legacy *Show only featured trips* toggle in favor of the unified **Featured Priority** dropdown; existing block instances saved with `featured: true` are auto-migrated to `featured_priority: "featured"` when reopened in the editor. Inserter title and labels read **Trip** (registered block name `yatra/tour` is preserved for back-compat with saved posts).
-* **Cards (Destination / Activity / Trip Category — shortcodes + blocks):** the whole card is now a click target instead of just the title text. Implemented via the WAI-ARIA "stretched link" pattern (CSS pseudo-element on the existing title `<a>`) so a single canonical link is exposed to screen readers and crawlers; keyboard focus shows a card-wide outline.
-* **Enquiry emails:** `{{trip_name}}` (and other trip merge tags) now resolve correctly when an enquiry is submitted from a single-trip page. The modal posts `trip_id` / `trip_slug` reliably; backend normalizes `tripId` casing and derives `trip_id` from slug or `HTTP_REFERER` when missing; `EnquiryService` now eager-loads joined trip data before firing `yatra_enquiry_created` so admin templates and Pro automation receive a complete object. Merge-tag regex now tolerates surrounding whitespace (`{{ trip_name }}`).
-* **Payments admin (Add / Edit Payment):** the *Booking ID* text field is replaced with a searchable **booking picker** that queries `GET /yatra/v1/bookings?search=…` and matches against booking code (reference), customer name, and email — debounced server-side search with rich rows (code, customer, trip, email). The *Payment Date* field now uses the shared admin `DatePicker` for visual parity with every other date field in the admin and prevents future-dated payments by default.
-* **Upgrades:** version-gated Free upgrade runner; legacy payment tokens table dropped when applicable (see `Upgrade_3_0_3`).
-* **Discounts:** REST and repository hardening (writable column whitelist; safer updates).
-* **Single trip:** group discount discoverability in the sidebar; **Similar trips** links respect plain permalinks via `yatra_get_trip_permalink()`; enquiry modal **Send Enquiry** uses `yatra-booking-button` so primary color matches **Check Availability** and global `--yatra-primary` tokens.
-* **Admin / i18n:** Trip Builder meal plan strings use shared labels; attribute icon picker preserves Font Awesome `provider` after save; front-end Important Info shows translated meal plan labels (`yatra_meal_plan_label()`).
-* Safe to update from 3.0.2.x.
-
-= 3.0.2.9 =
-* **Mobile booking bar:** Improved sticky booking UI on small screens (date + travelers layout, full-width travelers dropdown opening upward, and reliable click targets).
-* **Admin caching:** Fixed service cache invalidation so updates (including SEO fields) reflect immediately when cache is enabled.
-* Safe to update from 3.0.2.8.
-
-= 3.0.2.8 =
-* **Booking UI:** Added Advanced settings to select **Terms & Conditions** and **Privacy Policy** pages; booking form now links to these pages (Privacy falls back to WordPress Settings → Privacy when unset).
-* **Fix (Usage Tracking):** Moved `StatsUsage` into `app/Services` and updated references to avoid case-sensitive autoload issues on Linux hosts.
-* **Fix (Gallery Modal):** Hardened gallery modal image URL resolution against LiteSpeed Cache lazy-load placeholders.
-* Safe to update from 3.0.2.7.
-
-= 3.0.2.7 =
-* **Fix (Gallery Modal):** Improved compatibility with LiteSpeed Cache lazy-load placeholders (base64 `src`) so the modal always opens the real image URLs.
-* **Compat (LiteSpeed Cache):** Excluded Yatra hero/gallery selectors from LiteSpeed lazy-load and excluded Yatra trip assets from optimisation where needed.
-* Safe to update from 3.0.2.6.
-
-= 3.0.2.6 =
-* **Fix:** Composer autoload path was declared as `includes/Admin/` (uppercase) but the directory on disk is `includes/admin/` (lowercase); caused fatal `include` warnings on Linux/cPanel servers (case-sensitive filesystems).
-* **License:** Removed stub `LicenseController` from the free plugin — all `/yatra/v1/license/*` routes are now registered exclusively by Yatra Pro's own controller, eliminating any route conflicts.
-* **Admin UI (Additional Services):** Added missing **Add New Service** button via the `PageHeader` component on the Additional Services screen.
-* Safe to update from 3.0.2.5.
-
-= 3.0.2.5 =
-* Admin: add Review + Upgrade notices (React UI + WordPress notices) with smart dismiss scheduling.
-* Setup wizard: save step settings when navigating between steps.
-
-= 3.0.2.4 =
-* **REST:** implemented **`TripService::permanentDelete()`** so **`DELETE /yatra/v1/trips/{id}/permanent-delete`** no longer fatals (fixes permanent delete from trash and bulk actions).
-* **Admin (React):** bulk trip actions rely on **`BulkActionToolbar`** confirmation only (removed duplicate **`window.confirm`**); improved bulk dialog copy for **`mark_*`** actions.
-* Safe to update from 3.0.2.3.
-
-= 3.0.2.3 =
-* **Admin (React):** moved fullscreen shell CSS into the document **head** to reduce wp-admin chrome flicker; added HTML/CSS **boot splash** and **`modulepreload`** for the admin bundle; primary **sidebar navigation** uses client-side URL updates so the PHP loading state does not repeat on every screen change.
-* **REST:** registered **License** routes in the API registry so **`GET /yatra/v1/license`** works on the free plugin (License screen and scripts that probe it).
-* **Admin UI:** hardened **Departures** and **Availability** trip dropdowns against **TanStack Query** cache shapes and `/trips` list payloads (fixes `map` / `find` errors when navigating without a full reload).
-* Safe to update from 3.0.2.2.
-
-= 3.0.2.2 =
-* Maintenance / patch release. Safe to update from 3.0.2.1.
-
-= 3.0.2.1 =
-* **Readme (WordPress.org):** linked **Pro** gateways, modules, traveler features, and related mentions to **[wpyatra.com/pricing](https://wpyatra.com/pricing/)** throughout the long description, FAQ, and quick links.
-* Patch release; safe to update from 3.0.2.
-
-= 3.0.2 =
-* **Readme (WordPress.org):** reorganized the long description — the **Yatra Pro** section now appears **before** **Blocks and shortcodes** for a clearer Free → Pro → integration flow.
-* Documentation-only release for the plugin directory listing; no code changes required for existing 3.0.x sites.
-
-= 3.0.1 =
-* Maintenance release: updated WordPress.org **banner** and directory **assets** (including screenshots) for the 3.x listing.
-* **Readme:** shortened the plugin short description to meet WordPress.org's **150-character** limit so imports are no longer truncated.
-* Minor fixes and polish; see [wpyatra.com](https://wpyatra.com/) for release notes.
-
-= 3.0.0 =
-* Major 3.0 release: redesigned admin experience, streamlined booking and traveler account flows, expanded gateway and module architecture for Pro, and ongoing hardening for production travel sites.
-* See the plugin's release notes and [wpyatra.com](https://wpyatra.com/yatra-3-0/) for highlights. **Always back up** before upgrading from 2.x; follow migration guidance in documentation.
-
-= Earlier versions =
-* For 2.x changelog entries, see the plugin's GitHub releases or historical notes on the vendor site.
+**Older versions:** the full history is in [changelog.txt](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
 
 == Upgrade Notice ==
 
