@@ -795,7 +795,11 @@ class SEOService
     {
         $schema = $this->generateSchemaMarkup();
         if (!empty($schema)) {
-            echo '<script type="application/ld+json">' . json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . '</script>' . "\n";
+            // JSON_HEX_TAG|JSON_HEX_AMP escape < > & as \u00xx so no string value
+            // (e.g. user-submitted review text/author) can break out of this
+            // <script> block — a </script> in a review would otherwise be XSS.
+            // Google parses the \u-escaped JSON identically.
+            echo '<script type="application/ld+json">' . json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) . '</script>' . "\n";
         }
     }
 
@@ -910,23 +914,7 @@ class SEOService
     {
         $trip = $this->pageObject;
 
-        $schema = [
-            '@context' => 'https://schema.org',
-            '@type' => 'Product',
-            'name' => $this->seoData['title'],
-            'description' => $this->seoData['description'],
-            'url' => $this->seoData['url'],
-            'brand' => [
-                '@type' => 'Brand',
-                'name' => get_bloginfo('name'),
-            ],
-        ];
-        if (!empty($this->seoData['image'])) {
-            $schema['image'] = $this->seoData['image'];
-        }
-
         $tripId = (\is_object($trip) && isset($trip->id)) ? (int) $trip->id : 0;
-
         $avg = (\is_object($trip) && \method_exists($trip, 'getAverageRating'))
             ? (float) $trip->getAverageRating()
             : 0.0;
@@ -934,67 +922,92 @@ class SEOService
             ? (int) $trip->getReviewCount()
             : 0;
 
-        // Only advertise ratings/reviews when there genuinely are some.
-        if ($tripId > 0 && $count > 0 && $avg > 0) {
-            $schema['aggregateRating'] = [
-                '@type' => 'AggregateRating',
-                'ratingValue' => (string) round($avg, 1),
-                'reviewCount' => (string) $count,
-                'bestRating' => '5',
-                'worstRating' => '1',
+        // No approved reviews → keep the generic Article (unchanged behaviour).
+        // A Product is emitted ONLY when there's a real rating to nest, which is
+        // exactly what fixes the review markup — and it avoids emitting a bare
+        // Product (offers/review/rating all absent) that Google would flag as
+        // incomplete on the many tours that have no reviews yet.
+        if (!($tripId > 0 && $count > 0 && $avg > 0)) {
+            return $this->generateArticleSchema($baseSchema);
+        }
+
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Product',
+            'name' => $this->seoData['title'],
+            'url' => $this->seoData['url'],
+            'brand' => [
+                '@type' => 'Brand',
+                'name' => get_bloginfo('name'),
+            ],
+        ];
+        if (!empty($this->seoData['description'])) {
+            $schema['description'] = $this->seoData['description'];
+        }
+        if (!empty($this->seoData['image'])) {
+            $schema['image'] = $this->seoData['image'];
+        }
+
+        $schema['aggregateRating'] = [
+            '@type' => 'AggregateRating',
+            'ratingValue' => (string) round($avg, 1),
+            'reviewCount' => (string) $count,
+            'bestRating' => '5',
+            'worstRating' => '1',
+        ];
+
+        $rows = [];
+        try {
+            $rows = (new \Yatra\Repositories\ReviewRepository())->findApprovedByTripId($tripId, 10);
+        } catch (\Throwable $e) {
+            $rows = [];
+        }
+
+        $reviews = [];
+        foreach ($rows as $row) {
+            $rating = (int) ($row->rating ?? 0);
+            if ($rating < 1 || $rating > 5) {
+                continue;
+            }
+            // Strip tags on every user-derived value — even though the emitter
+            // now \u-escapes < > &, keep the data itself clean/plain-text.
+            $authorName = trim(\wp_strip_all_tags((string) ($row->author_name ?? $row->user_display_name ?? '')));
+            if ($authorName === '') {
+                $authorName = __('Anonymous', 'yatra');
+            }
+
+            $review = [
+                '@type' => 'Review',
+                'author' => ['@type' => 'Person', 'name' => $authorName],
+                'reviewRating' => [
+                    '@type' => 'Rating',
+                    'ratingValue' => (string) $rating,
+                    'bestRating' => '5',
+                    'worstRating' => '1',
+                ],
             ];
 
-            $rows = [];
-            try {
-                $rows = (new \Yatra\Repositories\ReviewRepository())->findApprovedByTripId($tripId, 10);
-            } catch (\Throwable $e) {
-                $rows = [];
+            $title = $this->sanitizeText(trim((string) ($row->title ?? '')));
+            if ($title !== '') {
+                $review['name'] = $title;
+            }
+            $body = $this->sanitizeText(trim(\wp_strip_all_tags((string) ($row->content ?? ''))));
+            if ($body !== '') {
+                $review['reviewBody'] = $body;
+            }
+            $created = (string) ($row->created_at ?? '');
+            if ($created !== '') {
+                $ts = strtotime($created);
+                if ($ts) {
+                    $review['datePublished'] = date('Y-m-d', $ts);
+                }
             }
 
-            $reviews = [];
-            foreach ($rows as $row) {
-                $rating = (int) ($row->rating ?? 0);
-                if ($rating < 1 || $rating > 5) {
-                    continue;
-                }
-                $authorName = trim((string) ($row->author_name ?? $row->user_display_name ?? ''));
-                if ($authorName === '') {
-                    $authorName = __('Anonymous', 'yatra');
-                }
+            $reviews[] = $review;
+        }
 
-                $review = [
-                    '@type' => 'Review',
-                    'author' => ['@type' => 'Person', 'name' => $authorName],
-                    'reviewRating' => [
-                        '@type' => 'Rating',
-                        'ratingValue' => (string) $rating,
-                        'bestRating' => '5',
-                        'worstRating' => '1',
-                    ],
-                ];
-
-                $title = trim((string) ($row->title ?? ''));
-                if ($title !== '') {
-                    $review['name'] = $this->sanitizeText($title);
-                }
-                $body = trim(\wp_strip_all_tags((string) ($row->content ?? '')));
-                if ($body !== '') {
-                    $review['reviewBody'] = $this->sanitizeText($body);
-                }
-                $created = (string) ($row->created_at ?? '');
-                if ($created !== '') {
-                    $ts = strtotime($created);
-                    if ($ts) {
-                        $review['datePublished'] = date('Y-m-d', $ts);
-                    }
-                }
-
-                $reviews[] = $review;
-            }
-
-            if (!empty($reviews)) {
-                $schema['review'] = $reviews;
-            }
+        if (!empty($reviews)) {
+            $schema['review'] = $reviews;
         }
 
         return $schema;
