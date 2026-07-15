@@ -837,9 +837,14 @@ class SEOService
                 return $this->generateCollectionPageSchema($baseSchema);
             case self::PAGE_TYPE_DESTINATION:
                 return $this->generatePlaceSchema($baseSchema);
+            case self::PAGE_TYPE_TRIP:
+                // A tour with ratings/reviews must be a Google-supported review
+                // type (Product) with the rating + reviews nested inside it —
+                // NOT a TouristTrip/Article, which Google rejects for review
+                // snippets ("invalid object type for parent_node").
+                return $this->generateTripProductSchema($baseSchema);
             case self::PAGE_TYPE_ACTIVITY:
             case self::PAGE_TYPE_CATEGORY:
-            case self::PAGE_TYPE_TRIP:
                 return $this->generateArticleSchema($baseSchema);
             default:
                 return $baseSchema;
@@ -890,6 +895,109 @@ class SEOService
                 'name' => get_bloginfo('name')
             ]
         ]);
+    }
+
+    /**
+     * Generate Product schema for a single trip, with rating + reviews nested
+     * INSIDE the product (the structure Google requires for review snippets).
+     *
+     * `aggregateRating` and `review` are added only when approved reviews exist —
+     * an empty aggregateRating is itself a structured-data error. Each review
+     * carries the required author / reviewRating / reviewBody / datePublished so
+     * Google no longer reports "Missing field author" or "Missing field itemReviewed".
+     */
+    private function generateTripProductSchema(array $baseSchema): array
+    {
+        $trip = $this->pageObject;
+
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Product',
+            'name' => $this->seoData['title'],
+            'description' => $this->seoData['description'],
+            'url' => $this->seoData['url'],
+            'brand' => [
+                '@type' => 'Brand',
+                'name' => get_bloginfo('name'),
+            ],
+        ];
+        if (!empty($this->seoData['image'])) {
+            $schema['image'] = $this->seoData['image'];
+        }
+
+        $tripId = (\is_object($trip) && isset($trip->id)) ? (int) $trip->id : 0;
+
+        $avg = (\is_object($trip) && \method_exists($trip, 'getAverageRating'))
+            ? (float) $trip->getAverageRating()
+            : 0.0;
+        $count = (\is_object($trip) && \method_exists($trip, 'getReviewCount'))
+            ? (int) $trip->getReviewCount()
+            : 0;
+
+        // Only advertise ratings/reviews when there genuinely are some.
+        if ($tripId > 0 && $count > 0 && $avg > 0) {
+            $schema['aggregateRating'] = [
+                '@type' => 'AggregateRating',
+                'ratingValue' => (string) round($avg, 1),
+                'reviewCount' => (string) $count,
+                'bestRating' => '5',
+                'worstRating' => '1',
+            ];
+
+            $rows = [];
+            try {
+                $rows = (new \Yatra\Repositories\ReviewRepository())->findApprovedByTripId($tripId, 10);
+            } catch (\Throwable $e) {
+                $rows = [];
+            }
+
+            $reviews = [];
+            foreach ($rows as $row) {
+                $rating = (int) ($row->rating ?? 0);
+                if ($rating < 1 || $rating > 5) {
+                    continue;
+                }
+                $authorName = trim((string) ($row->author_name ?? $row->user_display_name ?? ''));
+                if ($authorName === '') {
+                    $authorName = __('Anonymous', 'yatra');
+                }
+
+                $review = [
+                    '@type' => 'Review',
+                    'author' => ['@type' => 'Person', 'name' => $authorName],
+                    'reviewRating' => [
+                        '@type' => 'Rating',
+                        'ratingValue' => (string) $rating,
+                        'bestRating' => '5',
+                        'worstRating' => '1',
+                    ],
+                ];
+
+                $title = trim((string) ($row->title ?? ''));
+                if ($title !== '') {
+                    $review['name'] = $this->sanitizeText($title);
+                }
+                $body = trim(\wp_strip_all_tags((string) ($row->content ?? '')));
+                if ($body !== '') {
+                    $review['reviewBody'] = $this->sanitizeText($body);
+                }
+                $created = (string) ($row->created_at ?? '');
+                if ($created !== '') {
+                    $ts = strtotime($created);
+                    if ($ts) {
+                        $review['datePublished'] = date('Y-m-d', $ts);
+                    }
+                }
+
+                $reviews[] = $review;
+            }
+
+            if (!empty($reviews)) {
+                $schema['review'] = $reviews;
+            }
+        }
+
+        return $schema;
     }
 
     /**

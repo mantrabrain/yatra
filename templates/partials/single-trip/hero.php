@@ -31,7 +31,8 @@ $yatra_hero_dp_flags = function_exists('yatra_get_dynamic_pricing_display_flags'
         </nav>
         <h1 class="yatra-trip-hero-title-new" itemprop="name"><?php echo esc_html($trip->getTitle()); ?></h1>
         <div class="yatra-hero-meta">
-            <div class="yatra-hero-rating" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+            <?php // Rating is expressed via JSON-LD (Product.aggregateRating) in SEOService — no microdata here, which Google rejected on a TouristTrip parent. ?>
+            <div class="yatra-hero-rating">
                 <?php if ($trip->getAverageRating() > 0 || $trip->getReviewCount() > 0): ?>
                     <?php
                     $hero_avg = (float) $trip->getAverageRating();
@@ -56,13 +57,11 @@ $yatra_hero_dp_flags = function_exists('yatra_get_dynamic_pricing_display_flags'
                             )); ?>">★</span>
                         <?php endfor; ?>
                     </div>
-                    <span class="yatra-rating-number" itemprop="ratingValue"><?php echo esc_html(number_format($trip->getAverageRating(), 1)); ?></span>
+                    <span class="yatra-rating-number"><?php echo esc_html(number_format($trip->getAverageRating(), 1)); ?></span>
                     <span class="yatra-rating-text">
-                        <span itemprop="reviewCount"><?php echo esc_html($trip->getReviewCount()); ?></span> 
+                        <span><?php echo esc_html($trip->getReviewCount()); ?></span>
                         <?php echo esc_html(_n('Review', 'Reviews', $trip->getReviewCount(), 'yatra')); ?>
                     </span>
-                    <meta itemprop="bestRating" content="5">
-                    <meta itemprop="worstRating" content="1">
                 <?php else: ?>
                     <div class="yatra-rating-stars yatra-no-rating">
                         <?php for ($i = 1; $i <= 5; $i++): ?>
@@ -74,7 +73,6 @@ $yatra_hero_dp_flags = function_exists('yatra_get_dynamic_pricing_display_flags'
                         <?php endfor; ?>
                     </div>
                     <span class="yatra-rating-text yatra-no-reviews"><?php echo esc_html__('No reviews yet', 'yatra'); ?></span>
-                    <meta itemprop="reviewCount" content="0">
                 <?php endif; ?>
             </div>
             <?php if (!empty($trip->getStartingLocation())): ?>

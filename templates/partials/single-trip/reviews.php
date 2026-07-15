@@ -7,14 +7,16 @@ if (!defined('ABSPATH')) {
 // Expected variables: $trip
 ?>
 <!-- Reviews: full width within unified trip container (same max-width + padding as .yatra-trip-container) -->
-<section class="yatra-reviews-section" id="reviews" itemscope itemtype="https://schema.org/Review">
+<?php // Structured data for reviews is emitted as JSON-LD (Product.review[]) in
+      // SEOService. The old itemtype="Review" here made the whole list a single
+      // Review with no author/itemReviewed, which Google flagged. ?>
+<section class="yatra-reviews-section" id="reviews">
     <div class="yatra-reviews-section-container">
         <div class="yatra-reviews-header">
             <h2 class="yatra-reviews-section-title">
                 <?php echo yatra_svg_icon('star', 'yatra-reviews-section-icon'); ?>
                 <?php echo esc_html__('Reviews', 'yatra'); ?>
             </h2>
-            <meta itemprop="about" content="<?php echo esc_attr($trip->getTitle()); ?>">
         </div>
 
         <?php
