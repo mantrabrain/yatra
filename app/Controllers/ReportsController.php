@@ -79,13 +79,22 @@ class ReportsController extends BaseController
 
         $bookingsList = $this->request('GET', '/yatra/v1/bookings', $params);
         $paymentsList = $this->request('GET', '/yatra/v1/payments', $params);
-        // The reporting window [$dateFrom, $dateTo] is historical (default: last
-        // 30 days), matching the bookings/payments/revenue stats. Departures must
-        // therefore INCLUDE past departures — otherwise "in the last 30 days" AND
-        // "not past" is an empty set, and every occupancy figure renders as 0%.
+        // Departures are deliberately NOT capped at $dateTo.
+        //
+        // The reporting window [$dateFrom, $dateTo] is historical (default: the
+        // last 30 days) because bookings/payments/revenue are historical. Applying
+        // that same upper bound to departures is wrong: an operator's seats live in
+        // UPCOMING departures, so "ends today" excludes exactly the departures the
+        // occupancy figures are about — a site selling future tours then reports 0%
+        // occupancy while each departure page correctly shows e.g. 1/9 = 11.1%.
+        //
+        // So we take departures from the period start onwards, including past ones
+        // (a past departure in the window still counts) and upcoming ones. Every
+        // departure-derived figure — the Occupancy Rate card, per-trip occupancy,
+        // the occupancy trend, seat utilisation and the departures table — reads
+        // this one set, so they always agree with each other.
         $departuresList = $this->request('GET', '/yatra/v1/departures', [
             'date_from'   => $dateFrom,
-            'date_to'     => $dateTo,
             'include_past' => 'true',
         ]);
 
