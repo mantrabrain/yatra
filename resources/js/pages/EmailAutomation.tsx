@@ -93,6 +93,11 @@ const EmailSequencesList: React.FC = () => {
     enabled: isEmailAutomationModuleEnabled(),
   });
 
+  // Shared dialog rather than the browser's native confirm().
+  const [sequenceToDelete, setSequenceToDelete] = useState<number | null>(
+    null,
+  );
+
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       return await deleteEmailSequence(id);
@@ -309,17 +314,7 @@ const EmailSequencesList: React.FC = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => {
-                        if (
-                          confirm(
-                            __(
-                              "Are you sure you want to delete this sequence?",
-                            ),
-                          )
-                        ) {
-                          deleteMutation.mutate(sequence.id);
-                        }
-                      }}
+                      onClick={() => setSequenceToDelete(sequence.id)}
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </Button>
@@ -330,6 +325,26 @@ const EmailSequencesList: React.FC = () => {
           ))}
         </div>
       )}
+
+      <ConfirmationDialog
+        isOpen={sequenceToDelete !== null}
+        onClose={() => setSequenceToDelete(null)}
+        onConfirm={() => {
+          if (sequenceToDelete !== null) {
+            deleteMutation.mutate(sequenceToDelete);
+          }
+          setSequenceToDelete(null);
+        }}
+        title={__("Delete Sequence", "yatra")}
+        message={__(
+          "Are you sure you want to delete this sequence? This action cannot be undone.",
+          "yatra",
+        )}
+        confirmText={__("Delete", "yatra")}
+        cancelText={__("Cancel", "yatra")}
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 };

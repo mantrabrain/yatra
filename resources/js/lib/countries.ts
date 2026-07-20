@@ -72,6 +72,28 @@ export function getCountryOptions(): CountryOption[] {
 }
 
 /**
+ * Country options shaped for SearchableSelect, each carrying its national flag.
+ *
+ * The flag base URL is localized by AdminAssetsProvider (`flagBase`), pointing at
+ * the SVG set the plugin already ships and the phone widget already uses — one
+ * source of flag assets for the whole product. Without that global the options
+ * are returned flagless rather than with broken images.
+ */
+export function getCountrySelectOptions(): Array<{
+  value: string;
+  label: string;
+  icon?: string;
+}> {
+  const base = (window as any).yatraAdmin?.flagBase || "";
+
+  return getCountryOptions().map((c) => ({
+    value: c.code,
+    label: c.name,
+    icon: base ? base + c.code.toLowerCase() + ".svg" : undefined,
+  }));
+}
+
+/**
  * Look up a single country's display name by ISO-3166 code.
  * Returns the code itself when unknown — same fallback the PHP
  * helper uses, so the two never disagree on rendering.

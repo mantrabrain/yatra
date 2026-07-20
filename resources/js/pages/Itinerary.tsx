@@ -1111,11 +1111,20 @@ const Itinerary: React.FC = () => {
       ...selectedDayKeysFromEntries,
     ]);
 
-    if (!bulkAction || (ids.length === 0 && combinedDayKeys.size === 0)) {
+    // Report the input that is actually missing. The Apply button is disabled
+    // whenever nothing is selected, so this can only be reached with a non-empty
+    // selection — the combined message blamed the selection and left operators
+    // re-selecting rows that were already ticked.
+    if (ids.length === 0 && combinedDayKeys.size === 0) {
       showToast(
-        __("Please select entries or days and a bulk action first.", "yatra"),
+        __("Please select at least one entry or day.", "yatra"),
         "error",
       );
+      return;
+    }
+
+    if (!bulkAction) {
+      showToast(__("Please choose a bulk action to apply.", "yatra"), "error");
       return;
     }
 

@@ -152,9 +152,14 @@ class DepartureRepository extends BaseRepository
             $params[] = $offset;
         }
         
-        // Debug output
-        $prepared_query = $this->wpdb->prepare($query, ...$params);
-        $results = $this->wpdb->get_results($prepared_query, ARRAY_A);
+        // Every dynamic value in this query goes through $params, so with no
+        // filters applied the SQL carries no placeholders at all — and calling
+        // prepare() on a placeholder-free query is what WordPress warns about
+        // ("The query argument of wpdb::prepare() must have a placeholder").
+        // Only prepare when there is something to bind.
+        $results = empty($params)
+            ? $this->wpdb->get_results($query, ARRAY_A)
+            : $this->wpdb->get_results($this->wpdb->prepare($query, ...$params), ARRAY_A);
         
         if ($this->wpdb->last_error) {
             }
@@ -575,25 +580,26 @@ class DepartureRepository extends BaseRepository
     }
 
     /**
-     * Delete a departure
-     * Only allowed if source is recurring_generated and booked_count is 0
+     * Delete a departure.
+     *
+     * The booking-level policy lives in DepartureService::delete(), which is the
+     * only caller — this performs the row removal itself.
      */
     public function delete(int $id): bool
     {
         $departure = $this->findModel($id);
-        
+
         if (!$departure) {
             return false;
         }
-        
-        // Only allow deletion of recurring_generated departures with no bookings
-        if ($departure->source === 'recurring_generated' && $departure->booked_count === 0) {
-            $table = esc_sql($this->table);
-            return (bool) $this->wpdb->delete($table, ['id' => $id], ['%d']);
-        }
-        
-        // Manual departures or departures with bookings cannot be deleted
-        return false;
+
+        // This previously required source === 'recurring_generated', a value the
+        // plugin never writes (departures are `booking_created` or `manual`, see
+        // Departure::$source), so the guard could never pass and every departure
+        // was undeletable.
+        $table = esc_sql($this->table);
+
+        return (bool) $this->wpdb->delete($table, ['id' => $id], ['%d']);
     }
 
     /**

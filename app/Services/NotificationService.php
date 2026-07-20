@@ -109,6 +109,37 @@ class NotificationService
     }
 
     /**
+     * Which payment email to send: the part-payment template or the full one.
+     *
+     * Defaults to the long-standing single template. The part-payment template
+     * is used only when ALL of these hold, so an existing site sees no change
+     * until its operator opts in:
+     *
+     *   1. a balance is genuinely still outstanding on the booking,
+     *   2. deposits / partial payments are switched on at all, and
+     *   3. the operator has enabled the separate part-payment template.
+     */
+    private static function paymentTemplateTypeFor(object $booking): string
+    {
+        $full = TransactionalEmailTemplateService::TYPE_PAYMENT_CONFIRMATION;
+
+        // Nothing left to pay → this is the full-payment confirmation.
+        if ((float) ($booking->amount_due ?? 0) <= 0) {
+            return $full;
+        }
+
+        if (!yatra_partial_payments_enabled()) {
+            return $full;
+        }
+
+        if (!SettingsService::isEnabled('email_template_partial_payment')) {
+            return $full;
+        }
+
+        return TransactionalEmailTemplateService::TYPE_PARTIAL_PAYMENT_RECEIVED;
+    }
+
+    /**
      * Notify customer of payment received
      */
     private static function notifyCustomerPaymentReceived(array $paymentData): void
@@ -126,7 +157,7 @@ class NotificationService
         $vars['transaction_id'] = (string) ($paymentData['transaction_id'] ?? '');
 
         TransactionalEmailTemplateService::sendIfEnabled(
-            TransactionalEmailTemplateService::TYPE_PAYMENT_CONFIRMATION,
+            self::paymentTemplateTypeFor($booking),
             $booking->contact_email,
             $vars
         );

@@ -521,7 +521,7 @@ const Tools: React.FC = () => {
   // Handle actual export after data type selection - uses background job
   const handleExport = async () => {
     if (selectedExportData.length === 0) {
-      alert("Please select at least one data type to export.");
+      showToast(__("Please select at least one data type to export.", "yatra"), "error");
       return;
     }
 
@@ -538,7 +538,7 @@ const Tools: React.FC = () => {
       pollJobStatus(jobId, "export");
     } catch (error) {
       console.error("Export error:", error);
-      alert("Export failed. Please try again.");
+      showToast(__("Export failed. Please try again.", "yatra"), "error");
       setIsExporting(false);
     }
   };
@@ -579,8 +579,15 @@ const Tools: React.FC = () => {
             }
 
             if (jobData.status === "failed") {
-              alert(
-                `${type === "export" ? "Export" : "Import"} failed: ${jobData.error || "Unknown error"}`,
+              showToast(
+                (type === "export"
+                  ? __("Export failed: %s", "yatra")
+                  : __("Import failed: %s", "yatra")
+                ).replace(
+                  "%s",
+                  jobData.error || __("Unknown error", "yatra"),
+                ),
+                "error",
               );
             }
           }
@@ -621,7 +628,7 @@ const Tools: React.FC = () => {
       setExportJob(null);
     } catch (error) {
       console.error("Download error:", error);
-      alert("Download failed. Please try again.");
+      showToast(__("Download failed. Please try again.", "yatra"), "error");
     }
   };
 
@@ -647,7 +654,7 @@ const Tools: React.FC = () => {
       setExportJob(null);
     } catch (error) {
       console.error("Delete error:", error);
-      alert("Failed to delete export file.");
+      showToast(__("Failed to delete export file.", "yatra"), "error");
     }
   };
 
@@ -661,7 +668,7 @@ const Tools: React.FC = () => {
   // Handle file processing (for both input and drop) - uses background job
   const processFile = async (file: File) => {
     if (selectedImportData.length === 0) {
-      alert("Please select at least one data type to import.");
+      showToast(__("Please select at least one data type to import.", "yatra"), "error");
       return;
     }
 
@@ -680,7 +687,7 @@ const Tools: React.FC = () => {
       setSelectedImportData([]);
     } catch (error) {
       console.error("Import error:", error);
-      alert("Import failed. Please check the file format and try again.");
+      showToast(__("Import failed. Please check the file format and try again.", "yatra"), "error");
       setIsImporting(false);
     }
   };
@@ -716,7 +723,7 @@ const Tools: React.FC = () => {
     );
 
     if (!jsonFile) {
-      alert("Please drop a valid JSON file.");
+      showToast(__("Please drop a valid JSON file.", "yatra"), "error");
       return;
     }
 

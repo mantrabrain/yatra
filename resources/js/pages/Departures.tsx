@@ -44,6 +44,7 @@ import { Table as SharedTable } from "../components/shared/Table";
 import { Pagination } from "../components/shared/Pagination";
 import { apiClient } from "../lib/api-client";
 import { useToast } from "../components/ui/toast";
+import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
 import { getErrorContext } from "../lib/errors";
 // Format date helper
 const formatDate = (dateString: string): string => {
@@ -195,6 +196,17 @@ const Departures: React.FC = () => {
     useState<Departure | null>(null);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [bulkAction, setBulkAction] = useState("");
+
+  // Row-level confirmations run through the shared ConfirmationDialog, matching
+  // the bulk actions in BulkActionToolbar. These used to call the browser's
+  // native confirm(), which ignores the admin theme (including dark mode) and
+  // cannot be styled or translated consistently with the rest of the UI.
+  const [rowConfirm, setRowConfirm] = useState<{
+    action: "delete" | "trash" | "restore";
+    departure: Departure;
+    tripId: number;
+  } | null>(null);
+  const [rowActionPending, setRowActionPending] = useState(false);
   const queryClient = useQueryClient();
   const { showToast } = useToast();
 
@@ -451,9 +463,18 @@ const Departures: React.FC = () => {
   const handleBulkApply = async () => {
     const ids = selectedIds;
 
-    if (!bulkAction || ids.length === 0) {
+    // Report the input that is actually missing. The Apply button is disabled
+    // whenever nothing is selected, so this handler can only ever be reached
+    // with a non-empty selection — the combined message used to blame the
+    // selection and left operators re-selecting rows that were already ticked.
+    if (ids.length === 0) {
+      showToast(__("Please select at least one departure.", "yatra"), "error");
+      return;
+    }
+
+    if (!bulkAction) {
       showToast(
-        __("Please select departures and a bulk action first.", "yatra"),
+        __("Please choose a bulk action to apply.", "yatra"),
         "error",
       );
       return;
@@ -490,36 +511,59 @@ const Departures: React.FC = () => {
         showToast(__("Selected departures restored.", "yatra"), "success");
       } else if (bulkAction === "delete") {
         // Delete permanently (only from trash)
+        // Mirrors the server policy in DepartureService::delete(): a departure is
+        // deletable once it has no bookings left, however it was created.
+        // `booked_count` is deliberately NOT filtered on here — that counter can
+        // drift upwards and the server checks the real booking rows, so filtering
+        // on it client-side silently dropped departures the server would happily
+        // delete.
         const eligibleIds = departures
-          .filter(
-            (d) =>
-              ids.includes(d.id) &&
-              d.status === "trash" &&
-              d.source === "booking_created" &&
-              d.booked_count === 0,
-          )
+          .filter((d) => ids.includes(d.id) && d.status === "trash")
           .map((d) => d.id);
 
         if (eligibleIds.length === 0) {
           showToast(
             __(
-              "No selected departures can be deleted (must be in trash, booking-created with zero bookings).",
-              "No selected departures can be deleted (must be in trash, booking-created with zero bookings).",
+              "No selected departures can be deleted. Only departures in the trash can be removed.",
+              "yatra",
             ),
             "error",
           );
           return;
         }
 
-        await Promise.all(
+        // Report per-departure outcomes: the server can still refuse an
+        // individual departure (for example one that regained a booking), and
+        // Promise.all would have hidden the successes behind that one rejection.
+        const results = await Promise.allSettled(
           eligibleIds.map((id) =>
             apiClient.delete(`/trips/${selectedTripId}/departures/${id}`),
           ),
         );
-        showToast(
-          __("Selected departures deleted permanently.", "yatra"),
-          "success",
-        );
+        const deleted = results.filter((r) => r.status === "fulfilled").length;
+        const failed = results.length - deleted;
+
+        if (deleted === 0) {
+          showToast(
+            __("No departures could be deleted.", "yatra"),
+            "error",
+          );
+        } else if (failed > 0) {
+          showToast(
+            __(
+              "Deleted {deleted} departure(s); {failed} could not be deleted.",
+              "yatra",
+            )
+              .replace("{deleted}", deleted.toString())
+              .replace("{failed}", failed.toString()),
+            "warning",
+          );
+        } else {
+          showToast(
+            __("Selected departures deleted permanently.", "yatra"),
+            "success",
+          );
+        }
       }
 
       setSelectedIds([]);
@@ -628,12 +672,7 @@ const Departures: React.FC = () => {
       );
       return;
     }
-    if (
-      !confirm(__("Are you sure you want to delete this departure?", "yatra"))
-    ) {
-      return;
-    }
-    deleteMutation.mutate({ id: departure.id, tripId: tid });
+    setRowConfirm({ action: "delete", departure, tripId: tid });
   };
 
   const isAllSelected =
@@ -878,26 +917,7 @@ const Departures: React.FC = () => {
       );
       return;
     }
-    if (
-      !window.confirm(
-        __("Are you sure you want to move this departure to trash?", "yatra"),
-      )
-    ) {
-      return;
-    }
-    try {
-      await apiClient.patch(`/trips/${tid}/departures/${departure.id}`, {
-        status: "trash",
-      });
-      showToast(__("Departure moved to trash.", "yatra"), "success");
-      queryClient.invalidateQueries({ queryKey: ["departures"] });
-      queryClient.invalidateQueries({ queryKey: ["departures-stats"] });
-    } catch (error: any) {
-      showToast(
-        error?.message || __("Failed to move departure to trash", "yatra"),
-        "error",
-      );
-    }
+    setRowConfirm({ action: "trash", departure, tripId: tid });
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -910,25 +930,47 @@ const Departures: React.FC = () => {
       );
       return;
     }
-    if (
-      !window.confirm(
-        __("Are you sure you want to restore this departure?", "yatra"),
-      )
-    ) {
+    setRowConfirm({ action: "restore", departure, tripId: tid });
+  };
+
+  // Performs whichever row action was confirmed. Kept in one place so the three
+  // entry points stay thin and the dialog has a single completion path.
+  const performRowAction = async () => {
+    if (!rowConfirm) {
       return;
     }
+
+    const { action, departure, tripId } = rowConfirm;
+
+    if (action === "delete") {
+      setRowConfirm(null);
+      deleteMutation.mutate({ id: departure.id, tripId });
+      return;
+    }
+
+    const status = action === "trash" ? "trash" : "upcoming";
+    const successMessage =
+      action === "trash"
+        ? __("Departure moved to trash.", "yatra")
+        : __("Departure restored.", "yatra");
+    const failureMessage =
+      action === "trash"
+        ? __("Failed to move departure to trash", "yatra")
+        : __("Failed to restore departure", "yatra");
+
+    setRowActionPending(true);
     try {
-      await apiClient.patch(`/trips/${tid}/departures/${departure.id}`, {
-        status: "upcoming",
+      await apiClient.patch(`/trips/${tripId}/departures/${departure.id}`, {
+        status,
       });
-      showToast(__("Departure restored.", "yatra"), "success");
+      showToast(successMessage, "success");
       queryClient.invalidateQueries({ queryKey: ["departures"] });
       queryClient.invalidateQueries({ queryKey: ["departures-stats"] });
+      setRowConfirm(null);
     } catch (error: any) {
-      showToast(
-        error?.message || __("Failed to restore departure", "yatra"),
-        "error",
-      );
+      showToast(error?.message || failureMessage, "error");
+    } finally {
+      setRowActionPending(false);
     }
   };
 
@@ -1307,6 +1349,42 @@ const Departures: React.FC = () => {
           </div>
         </div>
       )}
+
+      <ConfirmationDialog
+        isOpen={rowConfirm !== null}
+        onClose={() => setRowConfirm(null)}
+        onConfirm={performRowAction}
+        title={
+          rowConfirm?.action === "delete"
+            ? __("Delete Departure", "yatra")
+            : rowConfirm?.action === "trash"
+              ? __("Move to Trash", "yatra")
+              : __("Restore Departure", "yatra")
+        }
+        message={
+          rowConfirm?.action === "delete"
+            ? __(
+                "Are you sure you want to permanently delete this departure? This action cannot be undone.",
+                "yatra",
+              )
+            : rowConfirm?.action === "trash"
+              ? __(
+                  "Are you sure you want to move this departure to trash?",
+                  "yatra",
+                )
+              : __("Are you sure you want to restore this departure?", "yatra")
+        }
+        confirmText={
+          rowConfirm?.action === "delete"
+            ? __("Delete", "yatra")
+            : rowConfirm?.action === "trash"
+              ? __("Move to Trash", "yatra")
+              : __("Restore", "yatra")
+        }
+        cancelText={__("Cancel", "yatra")}
+        variant={rowConfirm?.action === "delete" ? "danger" : "warning"}
+        isLoading={rowActionPending || deleteMutation.isPending}
+      />
     </>
   );
 };

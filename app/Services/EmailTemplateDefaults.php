@@ -17,11 +17,13 @@ final class EmailTemplateDefaults
      */
     public static function settingsOptionDefaults(): array
     {
-        return [
+        $defaults = [
             'email_tpl_booking_subject' => '✈️ [{{site_name}}] Booking update · {{booking_reference}}',
             'email_tpl_booking_body' => self::htmlBookingCustomer(),
             'email_tpl_payment_subject' => '✅ [{{site_name}}] Payment received · {{booking_reference}}',
             'email_tpl_payment_body' => self::htmlPaymentCustomer(),
+            'email_tpl_partial_payment_subject' => '💳 [{{site_name}}] Part payment received · {{booking_reference}}',
+            'email_tpl_partial_payment_body' => self::htmlPartialPaymentCustomer(),
             'email_tpl_cancellation_subject' => '📋 [{{site_name}}] Booking cancelled · {{booking_reference}}',
             'email_tpl_cancellation_body' => self::htmlCancellationCustomer(),
             'email_tpl_reminder_subject' => '🗓️ [{{site_name}}] Your trip is coming up · {{booking_reference}}',
@@ -79,6 +81,24 @@ final class EmailTemplateDefaults
             'email_tpl_abandoned_booking_recovery_final_subject' => '⚠️ [{{site_name}}] Final reminder: complete your booking',
             'email_tpl_abandoned_booking_recovery_final_body' => self::htmlAbandonedBookingRecoveryFinal(),
         ];
+
+        // Every template also gets an opt-in Bcc / Cc option, derived from its
+        // own subject key so the two lists can never drift apart (and so a
+        // template type added later picks them up for free). Empty by default:
+        // no address configured means no copy is sent and nothing changes for
+        // existing sites. Registered here because this array doubles as the
+        // whitelist of settings the REST API will persist.
+        foreach (array_keys($defaults) as $key) {
+            if (substr($key, -8) !== '_subject') {
+                continue;
+            }
+
+            $base = substr($key, 0, -8);
+            $defaults[$base . '_bcc'] = '';
+            $defaults[$base . '_cc'] = '';
+        }
+
+        return $defaults;
     }
 
     /**
@@ -120,6 +140,10 @@ final class EmailTemplateDefaults
             'payment_received' => [
                 'subject' => '✅ Payment received · {{booking_reference}}',
                 'body' => self::htmlPaymentCustomer(),
+            ],
+            'partial_payment_received' => [
+                'subject' => '💳 Part payment received · {{booking_reference}}',
+                'body' => self::htmlPartialPaymentCustomer(),
             ],
             'payment_reminder' => [
                 'subject' => '💳 Payment reminder · {{booking_reference}}',
@@ -311,6 +335,57 @@ final class EmailTemplateDefaults
             $inner,
             $site,
             __('Payment confirmation', 'yatra')
+        );
+    }
+
+    /**
+     * Part-payment received — a balance is still outstanding.
+     *
+     * Wording differs from the full-payment email on purpose: it confirms what
+     * was received AND states what is still owed, which is the whole reason this
+     * template is separate.
+     *
+     * @param array<string, string> $v
+     */
+    public static function fallbackTransactionalPartialPayment(array $v): string
+    {
+        // Null-coalescing rather than `?:` so this renders cleanly even when a
+        // caller passes a sparse variable set — this fallback runs on sites that
+        // upgraded before the template's body option was seeded.
+        $name = esc_html(
+            ($v['customer_first_name'] ?? '') ?: ($v['customer_name'] ?? '') ?: __('Customer', 'yatra')
+        );
+        $site = esc_html($v['site_name'] ?? get_bloginfo('name'));
+        $rows = array_values(array_filter([
+            ['label' => __('Booking reference', 'yatra'), 'value' => esc_html($v['booking_reference'] ?? '')],
+            ['label' => __('Amount received', 'yatra'), 'value' => esc_html($v['payment_amount_formatted'] ?? '')],
+            ['label' => __('Paid so far', 'yatra'), 'value' => esc_html($v['amount_paid_formatted'] ?? '')],
+            ['label' => __('Balance remaining', 'yatra'), 'value' => esc_html($v['amount_due_formatted'] ?? '')],
+            ['label' => __('Booking total', 'yatra'), 'value' => esc_html($v['total_amount_formatted'] ?? '')],
+            ['label' => __('Method', 'yatra'), 'value' => esc_html($v['payment_method'] ?? '')],
+            ['label' => __('Transaction ID', 'yatra'), 'value' => esc_html($v['transaction_id'] ?? '')],
+        ], static function (array $row): bool {
+            return $row['value'] !== '';
+        }));
+
+        $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">'
+            . sprintf(
+                /* translators: %s: customer name */
+                esc_html__('Dear %s,', 'yatra'),
+                $name
+            )
+            . '</p>'
+            . '<p style="margin:0 0 8px;color:#475569;">'
+            . esc_html__('Thank you — we’ve received your part payment. Your booking is not yet paid in full, so the remaining balance is shown below.', 'yatra')
+            . '</p>'
+            . EmailTemplateLayout::detailCard($rows);
+
+        return EmailTemplateLayout::customer(
+            '💳',
+            __('Part payment received', 'yatra'),
+            $inner,
+            $site,
+            __('Payment update', 'yatra')
         );
     }
 
@@ -881,6 +956,33 @@ final class EmailTemplateDefaults
             $inner,
             '{{site_name}}',
             'Payment received'
+        );
+    }
+
+    /**
+     * Editor pre-fill for the part-payment template ({{merge tags}} intact).
+     */
+    private static function htmlPartialPaymentCustomer(): string
+    {
+        $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">Dear {{customer_name}},</p>'
+            . '<p style="margin:0 0 20px;color:#475569;">'
+            . esc_html__('Thank you — we’ve received your part payment. The remaining balance for your booking is shown below.', 'yatra')
+            . '</p>'
+            . EmailTemplateLayout::detailCard([
+                ['label' => 'Booking reference', 'value' => '{{booking_reference}}'],
+                ['label' => 'Amount received', 'value' => '{{payment_amount_formatted}}'],
+                ['label' => 'Paid so far', 'value' => '{{amount_paid_formatted}}'],
+                ['label' => 'Balance remaining', 'value' => '{{amount_due_formatted}}'],
+                ['label' => 'Booking total', 'value' => '{{total_amount_formatted}}'],
+                ['label' => 'Method', 'value' => '{{payment_method}}'],
+            ]);
+
+        return EmailTemplateLayout::customer(
+            '💳',
+            'Part payment received',
+            $inner,
+            '{{site_name}}',
+            'Payment update'
         );
     }
 

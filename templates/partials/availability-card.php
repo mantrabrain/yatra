@@ -354,6 +354,12 @@ $initial_total_price = $display_sale_price;
                                 && (($pt->group_overflow ?? 'block') !== 'per_block')) {
                                 $pt_max_qty = (int) min($pt_max_qty, (int) $pt->max_pax);
                             }
+                            // A sold-out departure has no seats left to offer, so the
+                            // first category must not still open at 1 traveler. Clamping
+                            // here also disables both +/- buttons below (0 <= 0 >= 0).
+                            if ($pt_default > $pt_max_qty) {
+                                $pt_default = $pt_max_qty;
+                            }
 
                             // Determine price with fallback chain
                             $pt_price = 0;
@@ -506,6 +512,15 @@ $initial_total_price = $display_sale_price;
                         ?>
                         <?php else: ?>
                         <!-- Regular pricing: Show simple number of travelers -->
+                        <?php
+                        // A sold-out departure offers no seats, so the counter must start
+                        // at 0 (not 1) and both controls stay disabled. Only the ceiling
+                        // was capacity-aware before, which left sold-out cards showing a
+                        // selectable traveler.
+                        $simple_max_qty = (int) min($seats_available, $max_travelers);
+                        $simple_qty = $simple_max_qty > 0 ? 1 : 0;
+                        $simple_min_qty = $simple_qty;
+                        ?>
                         <div class="yatra-booking-travelers-simple yatra-availability-travelers-simple" data-item="<?php echo esc_attr($item_id); ?>">
                             <div class="yatra-booking-field-icon">
                                 <?php echo yatra_svg_icon('users', 'yatra-icon-sm'); ?>
@@ -516,16 +531,16 @@ $initial_total_price = $display_sale_price;
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
                                     </svg>
                                 </button>
-                                <input type="number" 
-                                       id="num-travelers-<?php echo esc_attr($item_id); ?>" 
-                                       class="yatra-quantity-input-simple yatra-availability-num-travelers" 
+                                <input type="number"
+                                       id="num-travelers-<?php echo esc_attr($item_id); ?>"
+                                       class="yatra-quantity-input-simple yatra-availability-num-travelers"
                                        data-item="<?php echo esc_attr($item_id); ?>"
-                                       value="1" 
-                                       min="1" 
-                                       max="<?php echo esc_attr(min($seats_available, $max_travelers)); ?>" 
+                                       value="<?php echo esc_attr($simple_qty); ?>"
+                                       min="<?php echo esc_attr($simple_min_qty); ?>"
+                                       max="<?php echo esc_attr($simple_max_qty); ?>"
                                        readonly
                                        data-price="<?php echo esc_attr($display_sale_price); ?>">
-                                <button type="button" class="yatra-quantity-btn yatra-quantity-plus" data-target="num-travelers-<?php echo esc_attr($item_id); ?>" aria-label="<?php esc_attr_e('Increase travelers', 'yatra'); ?>">
+                                <button type="button" class="yatra-quantity-btn yatra-quantity-plus" data-target="num-travelers-<?php echo esc_attr($item_id); ?>" aria-label="<?php esc_attr_e('Increase travelers', 'yatra'); ?>"<?php echo $simple_qty >= $simple_max_qty ? ' disabled' : ''; ?>>
                                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                     </svg>

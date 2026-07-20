@@ -23,6 +23,7 @@ import {
 import { Badge } from "../components/ui/badge";
 import { apiClient } from "../lib/api-client";
 import { useToast } from "../components/ui/toast";
+import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
 
 // Format date helper
 const formatDate = (dateString: string): string => {
@@ -55,6 +56,13 @@ interface Departure {
 const PastDepartures: React.FC = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
+
+  // Row confirmations use the shared ConfirmationDialog, matching the rest of
+  // the admin, instead of the browser's native (unstyleable) confirm().
+  const [confirmDelete, setConfirmDelete] = useState<{
+    id: number;
+    bookedCount: number;
+  } | null>(null);
 
   // Get trip_id from URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -114,20 +122,21 @@ const PastDepartures: React.FC = () => {
   });
 
   const handleDelete = (id: number, source: string, bookedCount: number) => {
-    if (source !== "recurring_generated" || bookedCount > 0) {
-      showToast(
-        __("Only empty recurring-generated departures can be deleted", "yatra"),
-        "error",
-      );
+    // The old guard required source === "recurring_generated", a value this
+    // plugin never writes (departures are "booking_created" or "manual"), so it
+    // was always true and delete was permanently blocked behind a misleading
+    // message. The server is the authority — it refuses only when real bookings
+    // are still attached — so surface a confirmation and let it decide.
+    setConfirmDelete({ id, bookedCount });
+  };
+
+  const performDelete = () => {
+    if (!confirmDelete) {
       return;
     }
 
-    if (
-      !confirm(__("Are you sure you want to delete this departure?", "yatra"))
-    ) {
-      return;
-    }
-    deleteMutation.mutate(id);
+    deleteMutation.mutate(confirmDelete.id);
+    setConfirmDelete(null);
   };
 
   const handleBack = () => {
@@ -258,6 +267,28 @@ const PastDepartures: React.FC = () => {
           </Card>
         </>
       )}
+
+      <ConfirmationDialog
+        isOpen={confirmDelete !== null}
+        onClose={() => setConfirmDelete(null)}
+        onConfirm={performDelete}
+        title={__("Delete Departure", "yatra")}
+        message={
+          confirmDelete && confirmDelete.bookedCount > 0
+            ? __(
+                "This departure still shows bookings against it. Deleting is only possible once no bookings remain. Continue?",
+                "yatra",
+              )
+            : __(
+                "Are you sure you want to permanently delete this departure? This action cannot be undone.",
+                "yatra",
+              )
+        }
+        confirmText={__("Delete", "yatra")}
+        cancelText={__("Cancel", "yatra")}
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 };

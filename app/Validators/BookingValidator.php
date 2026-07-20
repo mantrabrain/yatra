@@ -37,6 +37,18 @@ class BookingValidator
     ];
 
     /**
+     * Accepted payment statuses — mirrors the `payment_status` ENUM on the
+     * bookings table.
+     */
+    private const VALID_PAYMENT_STATUSES = [
+        'pending',
+        'partial',
+        'paid',
+        'refunded',
+        'failed',
+    ];
+
+    /**
      * Normalize a locale-formatted numeric string to a PHP-parseable form.
      *
      * Russian / European locales format money as "1 200,50" (space thousands +
@@ -223,6 +235,16 @@ class BookingValidator
         if (isset($data['status'])) {
             if (!in_array($data['status'], self::VALID_BOOKING_STATUSES, true)) {
                 $errors['status'][] = __('Invalid booking status', 'yatra');
+            }
+        }
+
+        // Reject rather than fall through to sanitize(), which coerces an
+        // unknown value to 'pending'. On an update that silently reset a
+        // fully-paid booking to unpaid while amount_paid kept the money that had
+        // actually been received — and still reported success.
+        if (isset($data['payment_status'])) {
+            if (!in_array($data['payment_status'], self::VALID_PAYMENT_STATUSES, true)) {
+                $errors['payment_status'][] = __('Invalid payment status', 'yatra');
             }
         }
 

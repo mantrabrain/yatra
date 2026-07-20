@@ -924,7 +924,9 @@ class PaymentGatewayController extends BaseController
                 $tax_breakdown[] = [
                     'name' => $tax['name'] ?? 'Tax',
                     'rate' => $tax['rate'] ?? 0,
-                    'amount' => $tax['amount'] ?? 0
+                    // Pre-formatted like every other invoice figure, so the tax
+                    // rows honour the configured separators and symbol position.
+                    'amount' => yatra_format_price((float) ($tax['amount'] ?? 0), $currency, false)
                 ];
             }
             // Adjust subtotal for tax-exclusive pricing
@@ -937,7 +939,7 @@ class PaymentGatewayController extends BaseController
             $tax_breakdown[] = [
                 'name' => __('Tax', 'yatra'),
                 'rate' => (float) ($payment->tax_rate ?? 0),
-                'amount' => $tax_amount
+                'amount' => yatra_format_price((float) $tax_amount, $currency, false)
             ];
             // Adjust subtotal for tax-exclusive pricing
             if (!empty($payment->tax_inclusive) && $payment->tax_inclusive) {
@@ -954,6 +956,7 @@ class PaymentGatewayController extends BaseController
             'company_phone' => $companyPhone,
             'customer_name' => trim(($payment->contact_first_name ?? '') . ' ' . ($payment->contact_last_name ?? '')) ?: ($payment->customer_name ?? __('Customer', 'yatra')),
             'customer_email' => $payment->contact_email ?? $payment->customer_email ?? '',
+            'customer_address_lines' => FormatHelper::customerAddressLines($payment),
             // The booking_payments table has no `reference` column — the payment
             // reference is a derived value. Mirror PaymentService::formatPayment
             // (`PAY-%06d`, the same string the React account page shows) so the
@@ -970,13 +973,13 @@ class PaymentGatewayController extends BaseController
             'booking_ref' => $payment->booking_reference ?? $payment->booking_number ?? '',
             'travel_date' => $travelDate,
             'currency_symbol' => $currencySymbol,
-            'amount' => number_format((float) ($payment->amount ?? 0), 2),
-            'booking_total' => number_format((float) ($payment->booking_total_amount ?? $payment->amount ?? 0), 2),
-            'amount_paid' => number_format((float) ($payment->booking_amount_paid ?? $payment->amount ?? 0), 2),
-            'amount_due' => number_format((float) ($payment->booking_amount_due ?? 0), 2),
+            'amount' => yatra_format_price((float) ($payment->amount ?? 0), $currency, false),
+            'booking_total' => yatra_format_price((float) ($payment->booking_total_amount ?? $payment->amount ?? 0), $currency, false),
+            'amount_paid' => yatra_format_price((float) ($payment->booking_amount_paid ?? $payment->amount ?? 0), $currency, false),
+            'amount_due' => yatra_format_price((float) ($payment->booking_amount_due ?? 0), $currency, false),
             'tax_breakdown' => $tax_breakdown,
-            'tax_amount' => number_format($tax_amount, 2),
-            'subtotal' => number_format($subtotal, 2),
+            'tax_amount' => yatra_format_price((float) $tax_amount, $currency, false),
+            'subtotal' => yatra_format_price((float) $subtotal, $currency, false),
         ];
 
         $pdfBinary = $pdfService->renderTemplateToPdfSafely('pdf/invoice.php', $templateData, [
@@ -1072,6 +1075,7 @@ class PaymentGatewayController extends BaseController
             'company_phone'   => SettingsService::get('company_phone', ''),
             'customer_name'   => trim(($booking->contact_first_name ?? '') . ' ' . ($booking->contact_last_name ?? '')) ?: __('Customer', 'yatra'),
             'customer_email'  => $booking->contact_email ?? '',
+            'customer_address_lines' => FormatHelper::customerAddressLines($booking),
             'payment_ref'     => $bookingRef,
             'payment_date'    => !empty($booking->created_at) ? date_i18n(get_option('date_format'), strtotime((string) $booking->created_at)) : '',
             // Reflect the booking's real payment state rather than a fixed
@@ -1085,13 +1089,13 @@ class PaymentGatewayController extends BaseController
             'booking_ref'     => $bookingRef,
             'travel_date'     => $travelDate,
             'currency_symbol' => $currencySymbol,
-            'amount'          => number_format($due, 2),
-            'booking_total'   => number_format($total, 2),
-            'amount_paid'     => number_format($paid, 2),
-            'amount_due'      => number_format($due, 2),
+            'amount'          => yatra_format_price((float) $due, $currency, false),
+            'booking_total'   => yatra_format_price((float) $total, $currency, false),
+            'amount_paid'     => yatra_format_price((float) $paid, $currency, false),
+            'amount_due'      => yatra_format_price((float) $due, $currency, false),
             'tax_breakdown'   => [],
-            'tax_amount'      => number_format(0, 2),
-            'subtotal'        => number_format($total, 2),
+            'tax_amount'      => yatra_format_price(0.0, $currency, false),
+            'subtotal'        => yatra_format_price((float) $total, $currency, false),
             'payment_instructions' => is_array($paymentInstructions) ? $paymentInstructions : [],
         ];
 
@@ -1204,6 +1208,7 @@ class PaymentGatewayController extends BaseController
             'company_phone' => $companyPhone,
             'customer_name' => trim(($payment->contact_first_name ?? '') . ' ' . ($payment->contact_last_name ?? '')) ?: ($payment->customer_name ?? __('Customer', 'yatra')),
             'customer_email' => $payment->contact_email ?? $payment->customer_email ?? '',
+            'customer_address_lines' => FormatHelper::customerAddressLines($payment),
             'booking_ref' => $bookingRef,
             'booking_date' => $bookingDate,
             'booking_status' => ucfirst($payment->status ?? 'confirmed'),
@@ -1225,9 +1230,9 @@ class PaymentGatewayController extends BaseController
             'travel_date' => $travelDate,
             'return_date' => $returnDate,
             'currency_symbol' => $currencySymbol,
-            'total_amount' => number_format((float) ($payment->booking_total_amount ?? $payment->amount ?? 0), 2),
-            'amount_paid' => number_format((float) ($payment->booking_amount_paid ?? $payment->amount ?? 0), 2),
-            'amount_due' => number_format((float) ($payment->booking_amount_due ?? 0), 2),
+            'total_amount' => yatra_format_price((float) ($payment->booking_total_amount ?? $payment->amount ?? 0), $currency, false),
+            'amount_paid' => yatra_format_price((float) ($payment->booking_amount_paid ?? $payment->amount ?? 0), $currency, false),
+            'amount_due' => yatra_format_price((float) ($payment->booking_amount_due ?? 0), $currency, false),
             'traveler_count' => (int) ($payment->traveler_count ?? 1),
         ];
 

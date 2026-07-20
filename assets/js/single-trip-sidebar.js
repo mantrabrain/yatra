@@ -1,3 +1,16 @@
+// Parse a numeric min/max attribute while preserving a legitimate 0.
+// `parseInt(el.getAttribute('max')) || 99` treated max="0" — what a sold-out
+// departure renders — as "unset" and fell back to the placeholder ceiling, so
+// the guest selector stayed usable and ignored the departure's real capacity.
+// Only an absent or non-numeric value may fall back. Installed once and shared
+// by every frontend script, so load order does not matter.
+if (typeof window.yatraNumOr !== 'function') {
+    window.yatraNumOr = function (raw, fallback) {
+        var parsed = parseInt(raw, 10);
+        return isNaN(parsed) ? fallback : parsed;
+    };
+}
+
 function yatraScrollToBooking() {
     const bookingForm = document.querySelector('.yatra-booking-form');
     if (bookingForm) {
@@ -63,7 +76,7 @@ function initializeMobileBookingForm() {
             const input = document.getElementById(targetId);
             if (input) {
                 const current = parseInt(input.value) || 1;
-                const min = parseInt(input.getAttribute('min')) || 1;
+                const min = window.yatraNumOr(input.getAttribute('min'), 1);
                 if (current > min) {
                     input.value = current - 1;
                     updateMobileTotal();
@@ -78,7 +91,7 @@ function initializeMobileBookingForm() {
             const input = document.getElementById(targetId);
             if (input) {
                 const current = parseInt(input.value) || 1;
-                const max = parseInt(input.getAttribute('max')) || 20;
+                const max = window.yatraNumOr(input.getAttribute('max'), 20);
                 if (current < max) {
                     input.value = current + 1;
                     updateMobileTotal();

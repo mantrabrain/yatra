@@ -44,6 +44,10 @@ class RecurringRule
     public string $exception_type = 'exclude';
     public string $capacity_type = 'fixed';
     public ?int $capacity_value = null;
+    // The rule editor persists the seat cap here; `capacity_value` is only written
+    // by the legacy `/trips/{id}/recurring-rules` path. Both are read (seats_total
+    // first) so rules created by either path resolve to the same capacity.
+    public ?int $seats_total = null;
     public float $pricing_adjustment = 0.00;
     public string $pricing_adjustment_type = 'amount';
     public ?int $cutoff_hours = null;
@@ -81,6 +85,9 @@ class RecurringRule
         $rule->start_date = !empty($data['start_date']) ? sanitize_text_field($data['start_date']) : null;
         $rule->end_date = !empty($data['end_date']) ? sanitize_text_field($data['end_date']) : null;
         $rule->capacity_value = (int) ($data['capacity_value'] ?? 0);
+        $rule->seats_total = isset($data['seats_total']) && $data['seats_total'] !== null && $data['seats_total'] !== ''
+            ? (int) $data['seats_total']
+            : null;
         $rule->price_override = !empty($data['price_override']) ? (float) $data['price_override'] : null;
         $rule->created_at = $data['created_at'] ?? '';
         $rule->updated_at = $data['updated_at'] ?? '';

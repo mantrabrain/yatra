@@ -145,8 +145,15 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
                 break;
                 
             case 'country':
+                // Flag base is handed to the field (same contract as the phone
+                // widget) so country-select.js can build flag URLs without
+                // knowing the plugin URL. The select still renders and submits
+                // normally — the widget is a progressive enhancement over it.
+                $country_flag_base = \defined('YATRA_PLUGIN_URL') ? YATRA_PLUGIN_URL . 'assets/img/flags/' : '';
                 ?>
-                <select id="<?php echo $field_id; ?>" name="<?php echo $field_name; ?>" <?php echo $required_attr; ?>>
+                <select id="<?php echo $field_id; ?>" name="<?php echo $field_name; ?>" <?php echo $required_attr; ?>
+                        data-yatra-country-select
+                        data-flag-base="<?php echo esc_url($country_flag_base); ?>">
                     <option value=""><?php echo esc_html(yatra_translate_form_string($field['placeholder'] ?? '') ?: __('Select Country', 'yatra')); ?></option>
                     <?php foreach ($countries as $code => $name) : ?>
                         <option value="<?php echo esc_attr($code); ?>" <?php echo selected($prefill_value, (string) $code, false); ?>>

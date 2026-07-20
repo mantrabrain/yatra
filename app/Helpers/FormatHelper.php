@@ -305,6 +305,82 @@ class FormatHelper
     }
 
     /**
+     * Build a customer's postal address as display lines, for invoices and any
+     * other document that has to show where the customer actually is.
+     *
+     * Two sources, in order of authority:
+     *   1. The booking's own contact data — what the customer entered at the time
+     *      of purchase, which is what an invoice should reflect.
+     *   2. The linked customer record, which carries the structured city / state /
+     *      postal code / country that the booking form does not always collect.
+     *
+     * @param object|array|null $booking Booking (or payment joined to one) carrying
+     *                                   contact_data / contact_country / customer_id.
+     * @return string[] Non-empty address lines, ready to render one per line.
+     */
+    public static function customerAddressLines($booking): array
+    {
+        $get = static function ($source, string $key) {
+            if (is_array($source)) {
+                return $source[$key] ?? null;
+            }
+            if (is_object($source)) {
+                return $source->$key ?? null;
+            }
+            return null;
+        };
+
+        $parts = ['address' => '', 'city' => '', 'state' => '', 'postal_code' => '', 'country' => ''];
+
+        // 1. What the customer typed when booking.
+        $contactData = $get($booking, 'contact_data');
+        if (is_string($contactData) && $contactData !== '') {
+            $contactData = json_decode($contactData, true);
+        }
+        if (is_array($contactData)) {
+            foreach (array_keys($parts) as $key) {
+                if (!empty($contactData[$key]) && is_scalar($contactData[$key])) {
+                    $parts[$key] = trim((string) $contactData[$key]);
+                }
+            }
+            // The booking form stores the postcode under either name.
+            if ($parts['postal_code'] === '' && !empty($contactData['zip'])) {
+                $parts['postal_code'] = trim((string) $contactData['zip']);
+            }
+        }
+
+        if ($parts['country'] === '') {
+            $parts['country'] = trim((string) ($get($booking, 'contact_country') ?? ''));
+        }
+
+        // 2. Fill the gaps from the customer record.
+        $customerId = (int) ($get($booking, 'customer_id') ?? 0);
+        if ($customerId > 0 && in_array('', $parts, true)) {
+            $customer = (new \Yatra\Repositories\CustomerRepository())->find($customerId);
+
+            if ($customer) {
+                foreach (array_keys($parts) as $key) {
+                    if ($parts[$key] === '' && !empty($customer->$key)) {
+                        $parts[$key] = trim((string) $customer->$key);
+                    }
+                }
+            }
+        }
+
+        // "City, State 12345" reads as one line; street and country get their own.
+        $locality = trim(implode(', ', array_filter([$parts['city'], $parts['state']])));
+        if ($parts['postal_code'] !== '') {
+            $locality = trim($locality . ' ' . $parts['postal_code']);
+        }
+
+        $country = $parts['country'] !== '' ? self::getCountryName($parts['country']) : '';
+
+        return array_values(array_filter([$parts['address'], $locality, $country], static function ($line) {
+            return $line !== '';
+        }));
+    }
+
+    /**
      * Canonical country list — single source of truth used by every
      * country / nationality dropdown in both Free and Pro plugins.
      *

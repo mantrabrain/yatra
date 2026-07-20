@@ -91,6 +91,15 @@ $yatra_normalize_list = static function ($value): array {
     return $out;
 };
 
+
+// Optional logo + header colour supplied by the White Label module.
+// Unbranded sites keep this document's original header colour and show no logo.
+$pdfBranding = function_exists('yatra_get_pdf_branding')
+    ? yatra_get_pdf_branding('#1e40af')
+    : ['logo_url' => '', 'header_color' => '#1e40af'];
+$brandLogoUrl = (string) ($pdfBranding['logo_url'] ?? '');
+$brandHeaderColor = (string) ($pdfBranding['header_color'] ?? '#1e40af');
+
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -147,7 +156,8 @@ $yatra_normalize_list = static function ($value): array {
 
         .header { width: 100%; border-collapse: collapse; }
         .header td { vertical-align: top; }
-        .brand { background: #1e40af; color: #fff; padding: 6mm 6mm; }
+        .brand { background: <?php echo htmlspecialchars($brandHeaderColor, ENT_QUOTES, 'UTF-8'); ?>; color: #fff; padding: 6mm 6mm; }
+        .brand-logo { max-height: 18mm; max-width: 60mm; margin-bottom: 3mm; }
         .brand h1 { font-size: 18px; font-weight: 700; margin: 0; }
         .brand p { font-size: 11px; margin-top: 4px; }
 
@@ -286,7 +296,10 @@ $yatra_normalize_list = static function ($value): array {
             <tr>
                 <td style="width: 60%;">
                     <div class="brand">
-                        <h1><?php echo htmlspecialchars($companyName ?: __('Travel Company', 'yatra'), ENT_QUOTES, 'UTF-8'); ?></h1>
+                        <?php if ($brandLogoUrl !== ''): ?>
+                <img class="brand-logo" src="<?php echo htmlspecialchars($brandLogoUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="">
+            <?php endif; ?>
+            <h1><?php echo htmlspecialchars($companyName ?: __('Travel Company', 'yatra'), ENT_QUOTES, 'UTF-8'); ?></h1>
                         <p><?php esc_html_e('Travel Itinerary Document', 'yatra'); ?></p>
                     </div>
                 </td>

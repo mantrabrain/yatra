@@ -66,6 +66,8 @@ const RecurringRulesPage: React.FC = () => {
     : null;
 
   // Filters and search
+  const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
@@ -199,16 +201,9 @@ const RecurringRulesPage: React.FC = () => {
 
     switch (bulkAction) {
       case "delete":
-        if (
-          confirm(
-            __(
-              "Are you sure you want to delete {count} rule(s)?",
-              "yatra",
-            ).replace("{count}", selectedIds.length.toString()),
-          )
-        ) {
-          bulkDeleteMutation.mutate(selectedIds);
-        }
+        // Confirmed through the shared dialog, matching the single-rule delete
+        // already used on this page.
+        setBulkDeleteConfirm(true);
         break;
     }
 
@@ -644,6 +639,24 @@ const RecurringRulesPage: React.FC = () => {
           </Card>
         </>
       )}
+
+      <ConfirmationDialog
+        isOpen={bulkDeleteConfirm}
+        onClose={() => setBulkDeleteConfirm(false)}
+        onConfirm={() => {
+          bulkDeleteMutation.mutate(selectedIds);
+          setBulkDeleteConfirm(false);
+        }}
+        title={__("Delete Rules", "yatra")}
+        message={__(
+          "Are you sure you want to delete {count} rule(s)? This action cannot be undone.",
+          "yatra",
+        ).replace("{count}", selectedIds.length.toString())}
+        confirmText={__("Delete", "yatra")}
+        cancelText={__("Cancel", "yatra")}
+        variant="danger"
+        isLoading={bulkDeleteMutation.isPending}
+      />
     </div>
   );
 };

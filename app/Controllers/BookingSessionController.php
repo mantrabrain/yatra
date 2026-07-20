@@ -2917,8 +2917,10 @@ class BookingSessionController extends BaseController
                 }
                 
                 // For offline gateways or successful direct payments without redirect
+                $this->recordOfflinePendingPayment($params, $result, $gatewayId);
+
                 return [
-                    'success' => true, 
+                    'success' => true,
                     'redirect_url' => $this->getConfirmationUrl($params['reference'] ?? '')
                 ];
             }
@@ -2945,6 +2947,73 @@ class BookingSessionController extends BaseController
      * Record payment from gateway result
      * Matches Stripe's completePayment behavior
      */
+    /**
+     * Record the awaited payment for an offline gateway (bank transfer, cash on
+     * arrival, pay later) as a PENDING ledger row.
+     *
+     * These gateways take no money at checkout, and previously wrote no payment
+     * row at all — so when the transfer finally landed there was nothing in the
+     * Payments screen for the operator to mark as received. The booking's own
+     * fields were the only record, and marking those by hand left the invoice
+     * reporting "Payment Pending" with nothing paid.
+     *
+     * The row is deliberately `pending`: no money has arrived yet, and
+     * getTotalPaidForBooking() counts only `completed`, so booking financials and
+     * every report are untouched until the operator confirms it.
+     */
+    private function recordOfflinePendingPayment(array $params, array $result, string $gatewayId): void
+    {
+        try {
+            $bookingId = (int) ($params['booking_id'] ?? 0);
+            $amount = (float) ($params['amount'] ?? 0);
+
+            if ($bookingId <= 0 || $amount <= 0) {
+                return;
+            }
+
+            // Only for gateways that settle out of band. Anything reporting a
+            // completed/succeeded status already records its own row.
+            $status = strtolower((string) ($result['status'] ?? ''));
+            if (!in_array($status, ['', 'pending', 'pending_verification'], true)) {
+                return;
+            }
+
+            $booking = $this->bookingRepository->find($bookingId);
+            if (!$booking || ($booking->payment_status ?? '') === 'paid') {
+                return;
+            }
+
+            $paymentRepository = new \Yatra\Repositories\PaymentRepository();
+
+            // Idempotency: a retried checkout must not stack up duplicate rows.
+            foreach ($paymentRepository->findByBookingId($bookingId) as $existing) {
+                if ((string) ($existing->gateway ?? '') === $gatewayId
+                    && in_array((string) ($existing->status ?? ''), ['pending', 'completed'], true)
+                ) {
+                    return;
+                }
+            }
+
+            $paymentRepository->create([
+                'booking_id' => $bookingId,
+                'amount' => $amount,
+                'currency' => $params['currency'] ?? \Yatra\Services\SettingsService::getCurrency(),
+                'gateway' => $gatewayId,
+                'status' => 'pending',
+                'customer_id' => !empty($booking->customer_id) ? (int) $booking->customer_id : null,
+                'notes' => __('Awaiting payment — mark as completed once received.', 'yatra'),
+                'created_at' => current_time('mysql'),
+            ]);
+        } catch (\Throwable $e) {
+            // Never break a successful checkout over a bookkeeping row.
+            \Yatra\Utils\Logger::warning('Could not record pending offline payment', [
+                'booking_id' => $params['booking_id'] ?? 0,
+                'gateway' => $gatewayId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
     private function recordGatewayPayment(array $params, array $result, string $gatewayId): void
     {
         global $wpdb;

@@ -118,6 +118,7 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
   });
 
   // Confirmation dialogs
+  const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean;
     rule: RecurringRule | null;
@@ -287,23 +288,25 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
 
   // Handle bulk actions
   const handleBulkApply = () => {
-    if (!bulkAction || selectedIds.length === 0) {
-      showToast(__("Please select rules and an action", "yatra"), "warning");
+    // Report the input that is actually missing. The Apply button is disabled
+    // whenever nothing is selected, so this can only be reached with a non-empty
+    // selection — the combined message blamed the selection and left operators
+    // re-selecting rows that were already ticked.
+    if (selectedIds.length === 0) {
+      showToast(__("Please select at least one rule.", "yatra"), "warning");
+      return;
+    }
+
+    if (!bulkAction) {
+      showToast(__("Please choose an action to apply.", "yatra"), "warning");
       return;
     }
 
     switch (bulkAction) {
       case "delete":
-        if (
-          confirm(
-            __(
-              "Are you sure you want to delete {count} rule(s)?",
-              "yatra",
-            ).replace("{count}", selectedIds.length.toString()),
-          )
-        ) {
-          bulkDeleteMutation.mutate(selectedIds.map((id) => id.toString()));
-        }
+        // Confirmed through the shared dialog, matching the single-rule delete
+        // and duplicate actions in this same component.
+        setBulkDeleteConfirm(true);
         break;
     }
 
@@ -939,6 +942,24 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
           </div>
         </CardContent>
       </Card>
+
+      <ConfirmationDialog
+        isOpen={bulkDeleteConfirm}
+        onClose={() => setBulkDeleteConfirm(false)}
+        onConfirm={() => {
+          bulkDeleteMutation.mutate(selectedIds.map((id) => id.toString()));
+          setBulkDeleteConfirm(false);
+        }}
+        title={__("Delete Rules", "yatra")}
+        message={__(
+          "Are you sure you want to delete {count} rule(s)? This action cannot be undone.",
+          "yatra",
+        ).replace("{count}", selectedIds.length.toString())}
+        confirmText={__("Delete", "yatra")}
+        cancelText={__("Cancel", "yatra")}
+        variant="danger"
+        isLoading={bulkDeleteMutation.isPending}
+      />
     </div>
   );
 };

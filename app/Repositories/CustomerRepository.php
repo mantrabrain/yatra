@@ -601,9 +601,15 @@ class CustomerRepository extends BaseRepository
         
         $whereClause = implode(' AND ', $where);
         
-        // Count total
+        // Count total. With no status/search filters the WHERE clause is all
+        // literals, so there is nothing to bind — and prepare() on a
+        // placeholder-free query is exactly what WordPress warns about. The data
+        // query below always binds its LIMIT/OFFSET, so only this one needs the
+        // guard.
         $countQuery = "SELECT COUNT(*) FROM {$table} WHERE {$whereClause}";
-        $total = (int) $wpdb->get_var($wpdb->prepare($countQuery, $params));
+        $total = (int) (empty($params)
+            ? $wpdb->get_var($countQuery)
+            : $wpdb->get_var($wpdb->prepare($countQuery, $params)));
         
         // Get data
         $orderBy = sanitize_sql_orderby($args['orderby'] ?? 'created_at') ?: 'created_at';

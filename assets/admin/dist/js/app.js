@@ -1,9 +1,9 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-xkmIMgME.js","../../../dist/js/react-vendor-zODANjVp.js","../css/react-vendor.css","../../../dist/js/index-CzC53-AA.js","../css/index.css","../../../dist/js/BuildItineraryModal-7n2jsdb4.js","../../../dist/js/ProFeature-hD-dwLty.js","../../../dist/js/Settings-Ds92uNAP.js","../../../dist/js/Team-K1mPL_la.js","../../../dist/js/Reports-BNaZrbMf.js","../../../dist/js/DiscountForm-Ccnc_cg6.js","../../../dist/js/ApplicableTripSelector-DKKnDV4T.js","../../../dist/js/Itinerary-tEr-LQr2.js","../../../dist/js/RecurringRuleForm-DFNF1N0b.js","./Whatsapp.js","../../../dist/js/module-skeleton-7zwRYol6.js","../../../dist/js/ChannelManager-DBTZ4iK_.js","../../../dist/js/Webhooks-CTOaug1s.js","../../../dist/js/TripConsentForm-DedTBtCw.js","../../../dist/js/BookingForm-m1_-mHdV.js","../../../dist/js/ViewBooking-BlRipCYv.js","../../../dist/js/AvailabilityForm-jQMsxNDg.js","../../../dist/js/DynamicPricing-BoPmvjYO.js","../../../dist/js/RuleTypeSelectionModal-Bhlb1Jly.js","../../../dist/js/toggle-B0m9K-Pk.js","../../../dist/js/DynamicPricingRuleForm-Bya2YN6O.js","../../../dist/js/AiAssistant-BSlTjAQR.js","../../../dist/js/AbandonedRecovery-BTJPicIq.js","../../../dist/js/WhiteLabel-B9hnTpRK.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-DC2KEIV2.js","../../../dist/js/react-vendor-xzSqHjRF.js","../css/react-vendor.css","../../../dist/js/index-Cfwr4v__.js","../css/index.css","../../../dist/js/BuildItineraryModal-D7Fb3uzt.js","../../../dist/js/ProFeature-DLowS7DM.js","../../../dist/js/Settings-BolgDnsp.js","../../../dist/js/Team-B2tJV0MB.js","../../../dist/js/Reports-FO-orrZZ.js","../../../dist/js/DiscountForm-Cf3-BEPg.js","../../../dist/js/ApplicableTripSelector-ByXYCU1M.js","../../../dist/js/Itinerary-D2s5vBse.js","../../../dist/js/RecurringRuleForm-DqbHRd9P.js","./Whatsapp.js","../../../dist/js/module-skeleton-Cb1q-Zbx.js","../../../dist/js/ChannelManager-Ci_izIZp.js","../../../dist/js/Webhooks-BXiv98Nu.js","../../../dist/js/TripConsentForm-CUEd4uhQ.js","../../../dist/js/BookingForm-CmQBN4N9.js","../../../dist/js/ViewBooking-zKw1OoXU.js","../../../dist/js/AvailabilityForm-C50ev4a-.js","../../../dist/js/DynamicPricing-D8ZvLcDs.js","../../../dist/js/RuleTypeSelectionModal-DX3yB1Ol.js","../../../dist/js/toggle-DUbJsrWf.js","../../../dist/js/DynamicPricingRuleForm-ChhxklVe.js","../../../dist/js/AiAssistant-Cw-ji0-f.js","../../../dist/js/AbandonedRecovery-9p2u7HOq.js","../../../dist/js/WhiteLabel-DqrT0VH3.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
-import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as Calendar$1, q as MapPin, s as LayoutDashboard, u as useQuery, t as useQueryClient, v as useMutation, Z as Zap, w as Webhook, x as ChevronDown, y as ChevronRight, z as ArrowLeft, G as Gift, D as Loader2, E as Sun, H as Moon, I as User, J as RefreshCw, O as Inbox, Q as AlertTriangle, V as ExternalLink, X as isObjectLike_1, _ as _baseGetTag, Y as isArray_1, $ as _MapCache, a0 as getDefaultExportFromCjs, a1 as _Symbol, a2 as isObject$5, a3 as isFunction, a4 as reactIsExports, a5 as React, a6 as _Stack, a7 as _baseIsEqual, a8 as isObject_1, a9 as keys_1, aa as isLength_1, ab as _isIndex, ac as isArguments_1, ad as _Set, ae as _setToArray, af as _SetCache, ag as _cacheHas, ah as _arrayPush, ai as isArrayLike_1, aj as _baseUnary, ak as _getNative, al as eq_1, am as _root, an as isEqual, ao as Animate, ap as _overArg, aq as _arraySome, ar as Clock, as as DollarSign, at as ArrowRight, au as Shield, av as CheckCircle, aw as Plus, ax as X, ay as reactDomExports, az as AlertCircle, aA as Check, aB as Wand2, aC as ChevronLeft, aD as CheckCircle2, aE as HelpCircle, aF as Info, aG as Copy, aH as MoreVertical, aI as Columns, aJ as PenSquare, aK as ArrowUp, aL as ArrowDown, aM as Archive, aN as Trash2, aO as Search, aP as ArrowUpDown, aQ as Eye, aR as Upload, aS as Image, aT as ReactQuill, aU as Pen, aV as Save, aW as Phone, aX as PauseCircle, aY as ShieldX, aZ as ShieldOff, a_ as Globe, a$ as Award, b0 as Database, b1 as Folder, b2 as Mountain, b3 as UserCheck, b4 as Download, b5 as Server, b6 as XCircle, b7 as Video, b8 as Lock, b9 as GripVertical, ba as ChevronUp, bb as Play, bc as ClipboardCopy, bd as Ban, be as Bell, bf as Heart, bg as Scissors, bh as Send, bi as Filter, bj as ArrowUpRight, bk as ClipboardCheck, bl as PenTool, bm as Camera, bn as BarChart$1, bo as Megaphone, bp as GitBranch, bq as Pause, br as Settings2, bs as Code, bt as Bug, bu as EyeOff, bv as QueryClient, bw as client, bx as QueryClientProvider } from "../../../dist/js/react-vendor-zODANjVp.js";
-import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, e as formatDate$1, g as todayYmd, h as getCurrencySymbol, i as getCountryName, j as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-CzC53-AA.js";
+import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as Calendar$1, q as MapPin, s as LayoutDashboard, u as useQuery, t as useQueryClient, v as useMutation, Z as Zap, w as Webhook, x as ChevronDown, y as ChevronRight, z as ArrowLeft, G as Gift, D as Loader2, E as Sun, H as Moon, I as User, J as RefreshCw, O as Inbox, Q as AlertTriangle, V as ExternalLink, X as isObjectLike_1, _ as _baseGetTag, Y as isArray_1, $ as _MapCache, a0 as getDefaultExportFromCjs, a1 as _Symbol, a2 as isObject$5, a3 as isFunction, a4 as reactIsExports, a5 as React, a6 as _Stack, a7 as _baseIsEqual, a8 as isObject_1, a9 as keys_1, aa as isLength_1, ab as _isIndex, ac as isArguments_1, ad as _Set, ae as _setToArray, af as _SetCache, ag as _cacheHas, ah as _arrayPush, ai as isArrayLike_1, aj as _baseUnary, ak as _getNative, al as eq_1, am as _root, an as isEqual, ao as Animate, ap as _overArg, aq as _arraySome, ar as Clock, as as DollarSign, at as ArrowRight, au as Shield, av as CheckCircle, aw as Plus, ax as X, ay as reactDomExports, az as AlertCircle, aA as Check, aB as Wand2, aC as ChevronLeft, aD as CheckCircle2, aE as HelpCircle, aF as Info, aG as Copy, aH as MoreVertical, aI as Columns, aJ as PenSquare, aK as ArrowUp, aL as ArrowDown, aM as Archive, aN as Trash2, aO as Search, aP as ArrowUpDown, aQ as Eye, aR as Upload, aS as Image, aT as ReactQuill, aU as Pen, aV as Save, aW as CircleDollarSign, aX as Undo2, aY as Phone, aZ as PauseCircle, a_ as ShieldX, a$ as ShieldOff, b0 as Globe, b1 as Award, b2 as Database, b3 as Folder, b4 as Mountain, b5 as UserCheck, b6 as Download, b7 as Server, b8 as XCircle, b9 as Video, ba as Lock, bb as GripVertical, bc as ChevronUp, bd as Play, be as ClipboardCopy, bf as Ban, bg as Bell, bh as Heart, bi as Scissors, bj as Send, bk as Filter, bl as ArrowUpRight, bm as ClipboardCheck, bn as PenTool, bo as Camera, bp as BarChart$1, bq as Megaphone, br as GitBranch, bs as Pause, bt as Settings2, bu as Code, bv as Bug, bw as EyeOff, bx as QueryClient, by as client, bz as QueryClientProvider } from "../../../dist/js/react-vendor-xzSqHjRF.js";
+import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as todayYmd, S as SearchableSelect, h as getCurrencySymbol, i as getCountryName, j as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-Cfwr4v__.js";
 const scriptRel = "modulepreload";
 const assetsURL = function(dep, importerUrl) {
   return new URL(dep, importerUrl).href;
@@ -27269,20 +27269,6 @@ const Dashboard = () => {
     ] })
   ] });
 };
-const Input = reactExports.forwardRef(
-  ({ className = "", type, ...props }, ref) => {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(
-      "input",
-      {
-        type,
-        className: `flex h-12 w-full rounded-md border-2 border-gray-300 bg-white px-4 py-3 text-base font-normal text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 transition-colors ${className}`,
-        ref,
-        ...props
-      }
-    );
-  }
-);
-Input.displayName = "Input";
 const sizeClasses = {
   sm: "max-w-md",
   md: "max-w-xl",
@@ -37586,6 +37572,28 @@ const DifficultyLevelForm = () => {
     ] }) }) })
   ] });
 };
+const PAYMENT_STATUS_ACTIONS = [
+  {
+    value: "paid",
+    label: () => __("Payment: Mark as Paid"),
+    icon: /* @__PURE__ */ jsxRuntimeExports.jsx(CreditCard, { className: "w-4 h-4" })
+  },
+  {
+    value: "partial",
+    label: () => __("Payment: Mark as Partially Paid"),
+    icon: /* @__PURE__ */ jsxRuntimeExports.jsx(CircleDollarSign, { className: "w-4 h-4" })
+  },
+  {
+    value: "pending",
+    label: () => __("Payment: Mark as Pending"),
+    icon: /* @__PURE__ */ jsxRuntimeExports.jsx(CircleDollarSign, { className: "w-4 h-4" })
+  },
+  {
+    value: "refunded",
+    label: () => __("Payment: Mark as Refunded"),
+    icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Undo2, { className: "w-4 h-4" })
+  }
+];
 const Bookings = () => {
   var _a, _b, _c;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
@@ -37879,6 +37887,22 @@ const Bookings = () => {
   const isAllSelected = bookings.length > 0 && selectedIds.length === bookings.length;
   const updateStatusForIds = async (ids, newStatus) => {
     await apiService.bulkUpdateStatus("bookings", ids, newStatus);
+  };
+  const updatePaymentStatus = async (booking, status) => {
+    setIsBulkPending(true);
+    try {
+      await apiService.updateBooking(booking.id, { payment_status: status });
+      queryClient2.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient2.invalidateQueries({ queryKey: ["bookings-stats"] });
+      showToast(__2("Payment status updated"), "success");
+    } catch (error2) {
+      showToast(
+        (error2 == null ? void 0 : error2.message) || __2("Failed to update payment status"),
+        "error"
+      );
+    } finally {
+      setIsBulkPending(false);
+    }
   };
   const handleBulkApply = async () => {
     if (!bulkAction || selectedIds.length === 0) {
@@ -38194,6 +38218,15 @@ const Bookings = () => {
       },
       condition: (booking) => can("yatra_edit_bookings") && booking.booking_status !== "completed"
     },
+    ...PAYMENT_STATUS_ACTIONS.map((action) => ({
+      key: `payment_${action.value}`,
+      label: action.label(),
+      icon: action.icon,
+      onClick: (booking) => updatePaymentStatus(booking, action.value),
+      // Hidden when the booking is already in that payment state, matching how
+      // the booking-status actions above behave.
+      condition: (booking) => can("yatra_edit_bookings") && booking.payment_status !== action.value
+    })),
     {
       key: "delete",
       label: __2("Delete"),
@@ -43156,11 +43189,14 @@ const CustomerForm = () => {
                   onChange: (e) => handleFieldChange("email", e.target.value),
                   placeholder: __("customer@example.com", "yatra"),
                   className: errors.email ? "border-red-500" : "",
-                  required: true,
-                  disabled: isEditMode
+                  required: true
                 }
               ),
-              errors.email && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-red-500", children: errors.email })
+              errors.email && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-red-500", children: errors.email }),
+              isEditMode && !errors.email && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-xs text-gray-500 dark:text-gray-400", children: __(
+                "If this customer can sign in, a confirmation link is sent to the new address and their email changes only once it is confirmed there. Customers without an account are updated straight away.",
+                "yatra"
+              ) })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -45978,7 +46014,7 @@ const Tools = () => {
   };
   const handleExport = async () => {
     if (selectedExportData.length === 0) {
-      alert("Please select at least one data type to export.");
+      showToast(__("Please select at least one data type to export.", "yatra"), "error");
       return;
     }
     setIsExporting(true);
@@ -45991,7 +46027,7 @@ const Tools = () => {
       pollJobStatus(jobId, "export");
     } catch (error) {
       console.error("Export error:", error);
-      alert("Export failed. Please try again.");
+      showToast(__("Export failed. Please try again.", "yatra"), "error");
       setIsExporting(false);
     }
   };
@@ -46023,8 +46059,12 @@ const Tools = () => {
               setIsImporting(false);
             }
             if (jobData.status === "failed") {
-              alert(
-                `${type === "export" ? "Export" : "Import"} failed: ${jobData.error || "Unknown error"}`
+              showToast(
+                (type === "export" ? __("Export failed: %s", "yatra") : __("Import failed: %s", "yatra")).replace(
+                  "%s",
+                  jobData.error || __("Unknown error", "yatra")
+                ),
+                "error"
               );
             }
           }
@@ -46054,7 +46094,7 @@ const Tools = () => {
       setExportJob(null);
     } catch (error) {
       console.error("Download error:", error);
-      alert("Download failed. Please try again.");
+      showToast(__("Download failed. Please try again.", "yatra"), "error");
     }
   };
   const handleDeleteClick = () => {
@@ -46072,7 +46112,7 @@ const Tools = () => {
       setExportJob(null);
     } catch (error) {
       console.error("Delete error:", error);
-      alert("Failed to delete export file.");
+      showToast(__("Failed to delete export file.", "yatra"), "error");
     }
   };
   reactExports.useEffect(() => {
@@ -46082,7 +46122,7 @@ const Tools = () => {
   }, [activeTab, selectedLogType]);
   const processFile = async (file) => {
     if (selectedImportData.length === 0) {
-      alert("Please select at least one data type to import.");
+      showToast(__("Please select at least one data type to import.", "yatra"), "error");
       return;
     }
     setIsImporting(true);
@@ -46096,7 +46136,7 @@ const Tools = () => {
       setSelectedImportData([]);
     } catch (error) {
       console.error("Import error:", error);
-      alert("Import failed. Please check the file format and try again.");
+      showToast(__("Import failed. Please check the file format and try again.", "yatra"), "error");
       setIsImporting(false);
     }
   };
@@ -46124,7 +46164,7 @@ const Tools = () => {
       (file) => file.type === "application/json" || file.name.endsWith(".json")
     );
     if (!jsonFile) {
-      alert("Please drop a valid JSON file.");
+      showToast(__("Please drop a valid JSON file.", "yatra"), "error");
       return;
     }
     setPendingImportFile(jsonFile);
@@ -48517,11 +48557,12 @@ const ItemTypes = () => {
     ];
   }, [statusFilter]);
   const handleBulkApply = async () => {
-    if (!bulkAction || selectedIds.length === 0) {
-      showToast(
-        __("Please select item types and a bulk action first.", "yatra"),
-        "error"
-      );
+    if (selectedIds.length === 0) {
+      showToast(__("Please select at least one item type.", "yatra"), "error");
+      return;
+    }
+    if (!bulkAction) {
+      showToast(__("Please choose a bulk action to apply.", "yatra"), "error");
       return;
     }
     try {
@@ -49718,11 +49759,12 @@ const Items = () => {
     ];
   }, [statusFilter]);
   const handleBulkApply = async () => {
-    if (!bulkAction || selectedIds.length === 0) {
-      showToast(
-        __("Please select items and a bulk action first.", "yatra"),
-        "error"
-      );
+    if (selectedIds.length === 0) {
+      showToast(__("Please select at least one item.", "yatra"), "error");
+      return;
+    }
+    if (!bulkAction) {
+      showToast(__("Please choose a bulk action to apply.", "yatra"), "error");
       return;
     }
     try {
@@ -50192,192 +50234,6 @@ const Items = () => {
       ) })
     ] }) })
   ] });
-};
-const SearchableSelect = ({
-  value,
-  onChange,
-  options: options2,
-  placeholder = __("Select an option...", "yatra"),
-  searchPlaceholder = __("Search...", "yatra"),
-  className = "",
-  error = false,
-  disabled = false,
-  showValueId = true
-}) => {
-  const [isOpen, setIsOpen] = reactExports.useState(false);
-  const [searchTerm, setSearchTerm] = reactExports.useState("");
-  const containerRef = reactExports.useRef(null);
-  const searchInputRef = reactExports.useRef(null);
-  const [menuRect, setMenuRect] = reactExports.useState(null);
-  const filteredOptions = options2.filter(
-    (option) => option.label.toLowerCase().includes(searchTerm.toLowerCase()) || option.value.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  const selectedOption = options2.find((opt) => opt.value === value);
-  reactExports.useEffect(() => {
-    const handleClickOutside = (event) => {
-      const target2 = event.target;
-      if (containerRef.current && containerRef.current.contains(target2)) {
-        return;
-      }
-      const portalRoot = document.getElementById(
-        "yatra-searchable-select-portal"
-      );
-      if (portalRoot && portalRoot.contains(target2)) {
-        return;
-      }
-      setIsOpen(false);
-      setSearchTerm("");
-    };
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      setTimeout(() => {
-        var _a;
-        (_a = searchInputRef.current) == null ? void 0 : _a.focus();
-      }, 100);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
-  reactExports.useLayoutEffect(() => {
-    if (!isOpen) {
-      setMenuRect(null);
-      return;
-    }
-    const measure = () => {
-      const el = containerRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      setMenuRect({
-        top: rect.bottom + 4,
-        left: rect.left,
-        width: rect.width
-      });
-    };
-    measure();
-    window.addEventListener("scroll", measure, true);
-    window.addEventListener("resize", measure);
-    return () => {
-      window.removeEventListener("scroll", measure, true);
-      window.removeEventListener("resize", measure);
-    };
-  }, [isOpen]);
-  const handleSelect = (optionValue) => {
-    onChange(optionValue);
-    setIsOpen(false);
-    setSearchTerm("");
-  };
-  const handleClear = (e) => {
-    e.stopPropagation();
-    onChange("");
-    setSearchTerm("");
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-    "div",
-    {
-      ref: containerRef,
-      className: `relative ${className}`,
-      style: { zIndex: isOpen ? 9999 : "auto" },
-      children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "div",
-          {
-            className: `flex h-11 w-full rounded-md border-2 ${error ? "border-red-500" : "border-gray-300 dark:border-gray-600"} bg-white dark:bg-gray-800 px-4 py-2.5 text-base ring-offset-white focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-900 dark:focus-within:ring-blue-400 transition-colors`,
-            children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "div",
-              {
-                onClick: () => !disabled && setIsOpen(!isOpen),
-                className: `flex-1 flex items-center justify-between text-left ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`,
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "span",
-                    {
-                      className: selectedOption ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-gray-400",
-                      children: selectedOption ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between w-full", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: selectedOption.label }),
-                        showValueId && selectedOption.value && selectedOption.value !== "" && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-gray-500 dark:text-gray-400 ml-2 font-medium", children: [
-                          "ID: ",
-                          selectedOption.value
-                        ] })
-                      ] }) : placeholder
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                    value && !disabled && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      "button",
-                      {
-                        type: "button",
-                        onClick: handleClear,
-                        className: "p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded",
-                        "aria-label": __("Clear selection", "yatra"),
-                        children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4 text-gray-400" })
-                      }
-                    ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      ChevronDown,
-                      {
-                        className: `w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`
-                      }
-                    )
-                  ] })
-                ]
-              }
-            )
-          }
-        ),
-        isOpen && menuRect && reactDomExports.createPortal(
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "div",
-            {
-              id: "yatra-searchable-select-portal",
-              style: {
-                position: "fixed",
-                top: menuRect.top,
-                left: menuRect.left,
-                width: menuRect.width,
-                zIndex: 999999
-              },
-              className: "bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-visible",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 border-b border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Input,
-                    {
-                      ref: searchInputRef,
-                      type: "text",
-                      placeholder: searchPlaceholder,
-                      value: searchTerm,
-                      onChange: (e) => setSearchTerm(e.target.value),
-                      className: "pl-8 h-8",
-                      onClick: (e) => e.stopPropagation()
-                    }
-                  )
-                ] }) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-48 overflow-y-auto overflow-x-visible", children: filteredOptions.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center", children: __("No options found", "yatra") }) : filteredOptions.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "button",
-                  {
-                    type: "button",
-                    onClick: () => handleSelect(option.value),
-                    className: `w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${value === option.value ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400" : "text-gray-900 dark:text-white"}`,
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: option.label }),
-                      showValueId && option.value && option.value !== "" && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-gray-500 dark:text-gray-400 ml-2 font-medium", children: [
-                        "ID: ",
-                        option.value
-                      ] })
-                    ] })
-                  },
-                  option.value
-                )) })
-              ]
-            }
-          ),
-          document.body
-        )
-      ]
-    }
-  );
 };
 const ItemForm = () => {
   const queryClient2 = useQueryClient();
@@ -60024,6 +59880,7 @@ const RecurringRules = ({
     price: true,
     status: true
   });
+  const [bulkDeleteConfirm, setBulkDeleteConfirm] = reactExports.useState(false);
   const [deleteConfirm, setDeleteConfirm] = reactExports.useState({
     isOpen: false,
     rule: null
@@ -60154,20 +60011,17 @@ const RecurringRules = ({
     }
   });
   const handleBulkApply = () => {
-    if (!bulkAction || selectedIds.length === 0) {
-      showToast(__("Please select rules and an action", "yatra"), "warning");
+    if (selectedIds.length === 0) {
+      showToast(__("Please select at least one rule.", "yatra"), "warning");
+      return;
+    }
+    if (!bulkAction) {
+      showToast(__("Please choose an action to apply.", "yatra"), "warning");
       return;
     }
     switch (bulkAction) {
       case "delete":
-        if (confirm(
-          __(
-            "Are you sure you want to delete {count} rule(s)?",
-            "yatra"
-          ).replace("{count}", selectedIds.length.toString())
-        )) {
-          bulkDeleteMutation.mutate(selectedIds.map((id) => id.toString()));
-        }
+        setBulkDeleteConfirm(true);
         break;
     }
     setBulkAction("");
@@ -60677,7 +60531,27 @@ const RecurringRules = ({
           ] })
         ] })
       ] })
-    ] }) }) })
+    ] }) }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: bulkDeleteConfirm,
+        onClose: () => setBulkDeleteConfirm(false),
+        onConfirm: () => {
+          bulkDeleteMutation.mutate(selectedIds.map((id) => id.toString()));
+          setBulkDeleteConfirm(false);
+        },
+        title: __("Delete Rules", "yatra"),
+        message: __(
+          "Are you sure you want to delete {count} rule(s)? This action cannot be undone.",
+          "yatra"
+        ).replace("{count}", selectedIds.length.toString()),
+        confirmText: __("Delete", "yatra"),
+        cancelText: __("Cancel", "yatra"),
+        variant: "danger",
+        isLoading: bulkDeleteMutation.isPending
+      }
+    )
   ] });
 };
 function mapApiRowToTrip(trip) {
@@ -62347,6 +62221,8 @@ const Departures = () => {
   const [travelerModalDeparture, setTravelerModalDeparture] = reactExports.useState(null);
   const [selectedIds, setSelectedIds] = reactExports.useState([]);
   const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [rowConfirm, setRowConfirm] = reactExports.useState(null);
+  const [rowActionPending, setRowActionPending] = reactExports.useState(false);
   const queryClient2 = useQueryClient();
   const { showToast } = useToast();
   reactExports.useEffect(() => {
@@ -62537,9 +62413,13 @@ const Departures = () => {
   }, [statusFilter]);
   const handleBulkApply = async () => {
     const ids = selectedIds;
-    if (!bulkAction || ids.length === 0) {
+    if (ids.length === 0) {
+      showToast(__("Please select at least one departure.", "yatra"), "error");
+      return;
+    }
+    if (!bulkAction) {
       showToast(
-        __("Please select departures and a bulk action first.", "yatra"),
+        __("Please choose a bulk action to apply.", "yatra"),
         "error"
       );
       return;
@@ -62571,28 +62451,43 @@ const Departures = () => {
         );
         showToast(__("Selected departures restored.", "yatra"), "success");
       } else if (bulkAction === "delete") {
-        const eligibleIds = departures.filter(
-          (d) => ids.includes(d.id) && d.status === "trash" && d.source === "booking_created" && d.booked_count === 0
-        ).map((d) => d.id);
+        const eligibleIds = departures.filter((d) => ids.includes(d.id) && d.status === "trash").map((d) => d.id);
         if (eligibleIds.length === 0) {
           showToast(
             __(
-              "No selected departures can be deleted (must be in trash, booking-created with zero bookings).",
-              "No selected departures can be deleted (must be in trash, booking-created with zero bookings)."
+              "No selected departures can be deleted. Only departures in the trash can be removed.",
+              "yatra"
             ),
             "error"
           );
           return;
         }
-        await Promise.all(
+        const results = await Promise.allSettled(
           eligibleIds.map(
             (id) => apiClient.delete(`/trips/${selectedTripId}/departures/${id}`)
           )
         );
-        showToast(
-          __("Selected departures deleted permanently.", "yatra"),
-          "success"
-        );
+        const deleted = results.filter((r2) => r2.status === "fulfilled").length;
+        const failed = results.length - deleted;
+        if (deleted === 0) {
+          showToast(
+            __("No departures could be deleted.", "yatra"),
+            "error"
+          );
+        } else if (failed > 0) {
+          showToast(
+            __(
+              "Deleted {deleted} departure(s); {failed} could not be deleted.",
+              "yatra"
+            ).replace("{deleted}", deleted.toString()).replace("{failed}", failed.toString()),
+            "warning"
+          );
+        } else {
+          showToast(
+            __("Selected departures deleted permanently.", "yatra"),
+            "success"
+          );
+        }
       }
       setSelectedIds([]);
       setBulkAction("");
@@ -62690,10 +62585,7 @@ const Departures = () => {
       );
       return;
     }
-    if (!confirm(__("Are you sure you want to delete this departure?", "yatra"))) {
-      return;
-    }
-    deleteMutation.mutate({ id: departure.id, tripId: tid });
+    setRowConfirm({ action: "delete", departure, tripId: tid });
   };
   const isAllSelected = departures.length > 0 && selectedIds.length === departures.length;
   const handleSelectAll = (checked) => {
@@ -62887,24 +62779,7 @@ const Departures = () => {
       );
       return;
     }
-    if (!window.confirm(
-      __("Are you sure you want to move this departure to trash?", "yatra")
-    )) {
-      return;
-    }
-    try {
-      await apiClient.patch(`/trips/${tid}/departures/${departure.id}`, {
-        status: "trash"
-      });
-      showToast(__("Departure moved to trash.", "yatra"), "success");
-      queryClient2.invalidateQueries({ queryKey: ["departures"] });
-      queryClient2.invalidateQueries({ queryKey: ["departures-stats"] });
-    } catch (error2) {
-      showToast(
-        (error2 == null ? void 0 : error2.message) || __("Failed to move departure to trash", "yatra"),
-        "error"
-      );
-    }
+    setRowConfirm({ action: "trash", departure, tripId: tid });
   };
   const handleRestore = async (departure) => {
     const tid = tripIdForDeparture(departure);
@@ -62915,23 +62790,34 @@ const Departures = () => {
       );
       return;
     }
-    if (!window.confirm(
-      __("Are you sure you want to restore this departure?", "yatra")
-    )) {
+    setRowConfirm({ action: "restore", departure, tripId: tid });
+  };
+  const performRowAction = async () => {
+    if (!rowConfirm) {
       return;
     }
+    const { action, departure, tripId } = rowConfirm;
+    if (action === "delete") {
+      setRowConfirm(null);
+      deleteMutation.mutate({ id: departure.id, tripId });
+      return;
+    }
+    const status = action === "trash" ? "trash" : "upcoming";
+    const successMessage = action === "trash" ? __("Departure moved to trash.", "yatra") : __("Departure restored.", "yatra");
+    const failureMessage = action === "trash" ? __("Failed to move departure to trash", "yatra") : __("Failed to restore departure", "yatra");
+    setRowActionPending(true);
     try {
-      await apiClient.patch(`/trips/${tid}/departures/${departure.id}`, {
-        status: "upcoming"
+      await apiClient.patch(`/trips/${tripId}/departures/${departure.id}`, {
+        status
       });
-      showToast(__("Departure restored.", "yatra"), "success");
+      showToast(successMessage, "success");
       queryClient2.invalidateQueries({ queryKey: ["departures"] });
       queryClient2.invalidateQueries({ queryKey: ["departures-stats"] });
+      setRowConfirm(null);
     } catch (error2) {
-      showToast(
-        (error2 == null ? void 0 : error2.message) || __("Failed to restore departure", "yatra"),
-        "error"
-      );
+      showToast((error2 == null ? void 0 : error2.message) || failureMessage, "error");
+    } finally {
+      setRowActionPending(false);
     }
   };
   const tableActions = React.useMemo(() => {
@@ -63243,7 +63129,27 @@ const Departures = () => {
           ) })
         ] }, traveler.id)) })
       ] }) })
-    ] }) })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: rowConfirm !== null,
+        onClose: () => setRowConfirm(null),
+        onConfirm: performRowAction,
+        title: (rowConfirm == null ? void 0 : rowConfirm.action) === "delete" ? __("Delete Departure", "yatra") : (rowConfirm == null ? void 0 : rowConfirm.action) === "trash" ? __("Move to Trash", "yatra") : __("Restore Departure", "yatra"),
+        message: (rowConfirm == null ? void 0 : rowConfirm.action) === "delete" ? __(
+          "Are you sure you want to permanently delete this departure? This action cannot be undone.",
+          "yatra"
+        ) : (rowConfirm == null ? void 0 : rowConfirm.action) === "trash" ? __(
+          "Are you sure you want to move this departure to trash?",
+          "yatra"
+        ) : __("Are you sure you want to restore this departure?", "yatra"),
+        confirmText: (rowConfirm == null ? void 0 : rowConfirm.action) === "delete" ? __("Delete", "yatra") : (rowConfirm == null ? void 0 : rowConfirm.action) === "trash" ? __("Move to Trash", "yatra") : __("Restore", "yatra"),
+        cancelText: __("Cancel", "yatra"),
+        variant: (rowConfirm == null ? void 0 : rowConfirm.action) === "delete" ? "danger" : "warning",
+        isLoading: rowActionPending || deleteMutation.isPending
+      }
+    )
   ] });
 };
 const DepartureForm = () => {
@@ -70683,6 +70589,27 @@ const EmailDeliverySection = ({
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         Field,
         {
+          id: "email_always_bcc",
+          label: __("Always BCC", "yatra"),
+          description: __(
+            "Blind-copy this address on every email Yatra sends, for archiving or monitoring. Hidden from recipients. Separate several addresses with commas. Leave empty to send no copies.",
+            "yatra"
+          ),
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "email_always_bcc",
+              value: values.email_always_bcc ?? "",
+              name: "email_always_bcc",
+              onChange: onFieldChange,
+              placeholder: __("archive@example.com", "yatra")
+            }
+          )
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Field,
+        {
           id: "from_email",
           label: __("From Email", "yatra"),
           description: __(
@@ -70858,6 +70785,7 @@ const BOOKING_RICH_MERGE_TAGS = "{{payment_gateway}}, {{payment_gateway_label}},
 const CORE_FREE_TEMPLATE_KEYS = [
   "booking_confirmation",
   "payment_received",
+  "partial_payment_received",
   "booking_cancelled",
   "trip_reminder",
   "trip_consent_request",
@@ -70917,6 +70845,25 @@ const EMAIL_TEMPLATES_CATALOG = [
     settingsSubject: "email_tpl_payment_subject",
     settingsBody: "email_tpl_payment_body",
     mergeTags: "{{site_name}}, {{customer_name}}, {{customer_first_name}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{payment_amount_formatted}}, {{payment_method}}, {{transaction_id}}, {{total_amount_formatted}}, {{currency}}, " + BOOKING_RICH_MERGE_TAGS
+  },
+  {
+    template_key: "partial_payment_received",
+    event_key: "payment.partial_received",
+    name: __("Partial Payment Received", "yatra"),
+    description: __(
+      "Sent when a payment is recorded but a balance is still outstanding. Only used when deposits or partial payments are enabled and this template is switched on — otherwise the standard Payment Received email is sent for every payment.",
+      "yatra"
+    ),
+    category: "payment",
+    recipient_type: "customer",
+    to_email: "{customer_email}",
+    isCoreFree: true,
+    // Shown only when the site actually takes deposits / partial payments.
+    requiresPartialPayments: true,
+    settingsFlag: "email_template_partial_payment",
+    settingsSubject: "email_tpl_partial_payment_subject",
+    settingsBody: "email_tpl_partial_payment_body",
+    mergeTags: "{{site_name}}, {{customer_name}}, {{customer_first_name}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{payment_amount_formatted}}, {{amount_paid_formatted}}, {{amount_due_formatted}}, {{total_amount_formatted}}, {{payment_method}}, {{transaction_id}}, {{currency}}, " + BOOKING_RICH_MERGE_TAGS
   },
   {
     template_key: "booking_cancelled",
@@ -71413,7 +71360,12 @@ function getCoreTemplateDefinition(slug) {
 function buildLocalTemplateRows(values, options2) {
   const pro = (options2 == null ? void 0 : options2.isProPluginActive) ?? false;
   const moduleOk = (slug) => (options2 == null ? void 0 : options2.isModuleActive) ? options2.isModuleActive(slug) : false;
-  return EMAIL_TEMPLATES_CATALOG.map((entry) => {
+  const partialPaymentsOn = Boolean(
+    values.partial_payment || values.enable_deposit || values.deposit_required
+  );
+  return EMAIL_TEMPLATES_CATALOG.filter(
+    (entry) => !entry.requiresPartialPayments || partialPaymentsOn
+  ).map((entry) => {
     const moduleGateOk = !entry.requiresModule || pro && moduleOk(entry.requiresModule);
     const proCatalogLocked = !entry.isCoreFree;
     const moduleContentLocked = Boolean(entry.requiresModule) && !moduleGateOk;
@@ -71821,8 +71773,12 @@ const EmailTemplatesList = ({
     window.location.href = "admin.php?page=yatra&subpage=email-automation&tab=template&action=create";
   };
   const handleBulkAction = () => {
-    if (!bulkAction || selectedIds.length === 0) {
-      showToast(__("Please select templates and an action"), "error");
+    if (selectedIds.length === 0) {
+      showToast(__("Please select at least one template.", "yatra"), "error");
+      return;
+    }
+    if (!bulkAction) {
+      showToast(__("Please choose an action to apply.", "yatra"), "error");
       return;
     }
     if (bulkAction === "delete") {
@@ -72239,6 +72195,9 @@ const EmailSequencesList = () => {
     queryFn: () => fetchEmailSequences(),
     enabled: isEmailAutomationModuleEnabled()
   });
+  const [sequenceToDelete, setSequenceToDelete] = reactExports.useState(
+    null
+  );
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
       return await deleteEmailSequence(id);
@@ -72404,20 +72363,34 @@ const EmailSequencesList = () => {
           {
             variant: "ghost",
             size: "sm",
-            onClick: () => {
-              if (confirm(
-                __(
-                  "Are you sure you want to delete this sequence?"
-                )
-              )) {
-                deleteMutation.mutate(sequence.id);
-              }
-            },
+            onClick: () => setSequenceToDelete(sequence.id),
             children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4 text-red-500" })
           }
         )
       ] })
-    ] }) }) }, sequence.id)) })
+    ] }) }) }, sequence.id)) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: sequenceToDelete !== null,
+        onClose: () => setSequenceToDelete(null),
+        onConfirm: () => {
+          if (sequenceToDelete !== null) {
+            deleteMutation.mutate(sequenceToDelete);
+          }
+          setSequenceToDelete(null);
+        },
+        title: __("Delete Sequence", "yatra"),
+        message: __(
+          "Are you sure you want to delete this sequence? This action cannot be undone.",
+          "yatra"
+        ),
+        confirmText: __("Delete", "yatra"),
+        cancelText: __("Cancel", "yatra"),
+        variant: "danger",
+        isLoading: deleteMutation.isPending
+      }
+    )
   ] });
 };
 const EmailLogsList = () => {
@@ -73091,6 +73064,7 @@ const EmailTemplateForm = () => {
     };
   }, []);
   const isCoreSettingsEdit = isCoreTemplateSlug(coreTemplateSlug);
+  const coreAddressKey = (subjectKey, suffix) => subjectKey ? subjectKey.replace(/_subject$/, "") + "_" + suffix : null;
   const coreDef = isCoreSettingsEdit ? getCoreTemplateDefinition(coreTemplateSlug) : void 0;
   const catalogEntryForCore = reactExports.useMemo(
     () => coreTemplateSlug ? getCatalogEntryByTemplateKey(coreTemplateSlug) : void 0,
@@ -73121,6 +73095,8 @@ const EmailTemplateForm = () => {
     from_email: "",
     to_email: "",
     reply_to: "",
+    bcc: "",
+    cc: "",
     subject: "",
     body: "",
     event_key: "",
@@ -73191,6 +73167,8 @@ const EmailTemplateForm = () => {
       from_email: String(t.from_email ?? ""),
       to_email: String(t.to_email ?? ""),
       reply_to: String(t.reply_to ?? ""),
+      bcc: String(t.bcc ?? ""),
+      cc: String(t.cc ?? ""),
       subject: String(t.subject ?? ""),
       body: String(t.body ?? ""),
       event_key: String(t.event_key ?? ""),
@@ -73211,6 +73189,8 @@ const EmailTemplateForm = () => {
       from_email: "",
       to_email: coreDef.to_email || "",
       reply_to: "",
+      bcc: String(s2[coreAddressKey(subj, "bcc") ?? ""] ?? ""),
+      cc: String(s2[coreAddressKey(subj, "cc") ?? ""] ?? ""),
       subject: String(s2[subj] ?? ""),
       body: String(s2[bodyKey] ?? ""),
       event_key: coreDef.event_key,
@@ -73270,6 +73250,10 @@ const EmailTemplateForm = () => {
       base[coreDef.settingsSubject] = formData.subject;
       base[coreDef.settingsBody] = formData.body;
       base[coreDef.settingsFlag] = formData.is_active;
+      const bccKey = coreAddressKey(coreDef.settingsSubject, "bcc");
+      const ccKey = coreAddressKey(coreDef.settingsSubject, "cc");
+      if (bccKey) base[bccKey] = formData.bcc;
+      if (ccKey) base[ccKey] = formData.cc;
       await saveSettings(base);
       return base;
     },
@@ -73780,6 +73764,40 @@ const EmailTemplateForm = () => {
               "From / reply addresses are configured under Email → Delivery. Recipient uses the customer on the booking.",
               "yatra"
             ) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", children: __("BCC", "yatra") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: formData.bcc,
+                    onChange: (e) => setFormData({ ...formData, bcc: e.target.value }),
+                    placeholder: __("e.g., archive@yoursite.com", "yatra"),
+                    disabled: isCoreViewMode
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: __(
+                  "Blind copy, hidden from the recipient. Separate several addresses with commas. Leave empty to send no copy.",
+                  "yatra"
+                ) })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", children: __("CC", "yatra") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: formData.cc,
+                    onChange: (e) => setFormData({ ...formData, cc: e.target.value }),
+                    placeholder: __("e.g., office@yoursite.com", "yatra"),
+                    disabled: isCoreViewMode
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: __(
+                  "Visible copy — the recipient can see this address. Separate several addresses with commas.",
+                  "yatra"
+                ) })
+              ] })
+            ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", children: __("Subject Line") }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -77226,27 +77244,27 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-xkmIMgME.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-Ds92uNAP.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
-const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-K1mPL_la.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
-const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-BNaZrbMf.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
-const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-Ccnc_cg6.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
-const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-tEr-LQr2.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
-const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-DFNF1N0b.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-DC2KEIV2.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-BolgDnsp.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-B2tJV0MB.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
+const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-FO-orrZZ.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
+const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-Cf3-BEPg.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
+const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-D2s5vBse.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
+const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-DqbHRd9P.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
 const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.js"), true ? __vite__mapDeps([14,1,2,3,4,15]) : void 0, import.meta.url));
-const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-DBTZ4iK_.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
-const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-CTOaug1s.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
-const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-DedTBtCw.js"), true ? __vite__mapDeps([18,1,2,11,3,4]) : void 0, import.meta.url));
-const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-m1_-mHdV.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
-const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-BlRipCYv.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-jQMsxNDg.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
-const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-BoPmvjYO.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
+const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-Ci_izIZp.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
+const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-BXiv98Nu.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
+const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-CUEd4uhQ.js"), true ? __vite__mapDeps([18,1,2,3,4,11]) : void 0, import.meta.url));
+const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-CmQBN4N9.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
+const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-zKw1OoXU.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-C50ev4a-.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
+const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-D8ZvLcDs.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
-  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-Bya2YN6O.js"), true ? __vite__mapDeps([25,1,2,23,3,4]) : void 0, import.meta.url)
+  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-ChhxklVe.js"), true ? __vite__mapDeps([25,1,2,3,4,23]) : void 0, import.meta.url)
 );
-const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-BSlTjAQR.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
-const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-BTJPicIq.js"), true ? __vite__mapDeps([27,1,2,24,3,4]) : void 0, import.meta.url));
-const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-B9hnTpRK.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
+const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-Cw-ji0-f.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
+const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-9p2u7HOq.js"), true ? __vite__mapDeps([27,1,2,3,4,24]) : void 0, import.meta.url));
+const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-DqrT0VH3.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
 const PageLoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-1/3" }),
@@ -77532,73 +77550,71 @@ if (rootElement) {
   }
 }
 export {
-  BookingsOverviewChart as $,
+  isModuleActive as $,
   Alert as A,
   Button as B,
   Card as C,
   DatePicker as D,
-  saveSettings as E,
-  buildYatraListingPublicUrl as F,
-  postInsertBookingShortcode as G,
+  postInsertBookingShortcode as E,
+  postFlushRewriteRules as F,
+  fetchBookingPageShortcodeStatus as G,
   HelpText as H,
-  Input as I,
-  postFlushRewriteRules as J,
-  fetchBookingPageShortcodeStatus as K,
+  IconPicker as I,
+  fetchPaymentGatewayDefinitions as J,
+  fetchWordPressPages as K,
   LocationPicker as L,
   Modal as M,
-  fetchPaymentGatewayDefinitions as N,
-  fetchWordPressPages as O,
+  Skeleton as N,
+  Table as O,
   PageHeader as P,
-  Skeleton as Q,
+  Tooltip$1 as Q,
   RichTextEditor as R,
   Select as S,
   TimePicker as T,
-  Table as U,
-  Tooltip$1 as V,
-  Pagination as W,
-  Switch as X,
-  setUserCaps as Y,
-  canCap as Z,
-  BookingStatusChart as _,
+  Pagination as U,
+  Switch as V,
+  setUserCaps as W,
+  canCap as X,
+  BookingStatusChart as Y,
+  BookingsOverviewChart as Z,
+  isProPluginActive as _,
   isAiModuleEnabled as a,
-  isProPluginActive as a0,
-  isModuleActive as a1,
-  BulkActionToolbar as a2,
-  IconSelector as a3,
-  useNavigate as a4,
-  Table$1 as a5,
-  TableHeader as a6,
-  TableRow as a7,
-  TableHead as a8,
-  TableBody as a9,
-  MenuIcon as aA,
-  ICON_MAP as aB,
-  TableCell as aa,
-  clsx as ab,
-  Dot as ac,
-  findAllByType as ad,
-  ErrorBar as ae,
-  Layer as af,
-  filterProps as ag,
-  Curve as ah,
-  interpolateNumber$2 as ai,
-  isNil$1 as aj,
-  hasClipDot as ak,
-  LabelList as al,
-  getValueByDataKey as am,
-  uniqueId as an,
-  Global as ao,
-  getCateCoordinateOfLine as ap,
-  generateCategoricalChart as aq,
-  XAxis as ar,
-  YAxis as as,
-  formatAxisMap as at,
-  SearchFilterToolbar as au,
-  ResponsiveContainer as av,
-  CartesianGrid as aw,
-  Tooltip as ax,
-  DEFAULT_MENU_ITEMS as ay,
-  useWordPressMedia as az,
+  BulkActionToolbar as a0,
+  IconSelector as a1,
+  useNavigate as a2,
+  Table$1 as a3,
+  TableHeader as a4,
+  TableRow as a5,
+  TableHead as a6,
+  TableBody as a7,
+  TableCell as a8,
+  clsx as a9,
+  Dot as aa,
+  findAllByType as ab,
+  ErrorBar as ac,
+  Layer as ad,
+  filterProps as ae,
+  Curve as af,
+  interpolateNumber$2 as ag,
+  isNil$1 as ah,
+  hasClipDot as ai,
+  LabelList as aj,
+  getValueByDataKey as ak,
+  uniqueId as al,
+  Global as am,
+  getCateCoordinateOfLine as an,
+  generateCategoricalChart as ao,
+  XAxis as ap,
+  YAxis as aq,
+  formatAxisMap as ar,
+  SearchFilterToolbar as as,
+  ResponsiveContainer as at,
+  CartesianGrid as au,
+  Tooltip as av,
+  DEFAULT_MENU_ITEMS as aw,
+  useWordPressMedia as ax,
+  MenuIcon as ay,
+  ICON_MAP as az,
   isAiReady as b,
   aiApi as c,
   CardContent as d,
@@ -77611,18 +77627,18 @@ export {
   ConfirmationDialog as k,
   buildYatraSinglePublicUrls as l,
   isWordPressPlainPermalink as m,
-  IconPicker as n,
-  prepareWordPressMediaFrameOpen as o,
+  prepareWordPressMediaFrameOpen as n,
+  fetchSettings as o,
   parseItineraryText as p,
-  fetchSettings as q,
-  unwrapApiPayload as r,
-  ConditionalRender as s,
-  CardFooter as t,
+  unwrapApiPayload as q,
+  ConditionalRender as r,
+  CardFooter as s,
+  PremiumUpgradeDialog as t,
   usePermissions as u,
-  PremiumUpgradeDialog as v,
-  Label as w,
-  SearchableSelect as x,
-  buildYatraAccountViewUrl as y,
-  navigateMenu as z
+  Label as v,
+  buildYatraAccountViewUrl as w,
+  navigateMenu as x,
+  saveSettings as y,
+  buildYatraListingPublicUrl as z
 };
 //# sourceMappingURL=app.js.map

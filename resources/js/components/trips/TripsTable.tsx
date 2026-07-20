@@ -4,7 +4,7 @@
  * Supports extensibility for Pro features
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { __ } from "../../lib/i18n";
 import { formatYatraMoney } from "../../lib/currency-display";
 import { ConditionalRender } from "../ui/conditional-render";
@@ -19,6 +19,7 @@ import {
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Edit, Trash2, Eye } from "lucide-react";
+import { ConfirmationDialog } from "../ui/confirmation-dialog";
 
 interface Trip {
   id: number;
@@ -52,6 +53,10 @@ export const TripsTable: React.FC<TripsTableProps> = ({
   onView,
   showProFeatures = false,
 }) => {
+  // Uses the shared ConfirmationDialog like the rest of the admin, instead of
+  // the browser's native confirm() which ignores the admin theme.
+  const [tripToDelete, setTripToDelete] = useState<any | null>(null);
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
   };
@@ -181,18 +186,7 @@ export const TripsTable: React.FC<TripsTableProps> = ({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          if (
-                            confirm(
-                              __(
-                                "Are you sure you want to delete this trip?",
-                                "yatra",
-                              ),
-                            )
-                          ) {
-                            onDelete(trip);
-                          }
-                        }}
+                        onClick={() => setTripToDelete(trip)}
                         aria-label={__("Delete trip", "yatra")}
                       >
                         <Trash2 className="w-4 h-4 text-red-500" />
@@ -205,6 +199,25 @@ export const TripsTable: React.FC<TripsTableProps> = ({
           ))}
         </TableBody>
       </Table>
+
+      <ConfirmationDialog
+        isOpen={tripToDelete !== null}
+        onClose={() => setTripToDelete(null)}
+        onConfirm={() => {
+          if (tripToDelete && onDelete) {
+            onDelete(tripToDelete);
+          }
+          setTripToDelete(null);
+        }}
+        title={__("Delete Trip", "yatra")}
+        message={__(
+          "Are you sure you want to delete this trip? This action cannot be undone.",
+          "yatra",
+        )}
+        confirmText={__("Delete", "yatra")}
+        cancelText={__("Cancel", "yatra")}
+        variant="danger"
+      />
     </div>
   );
 };

@@ -409,7 +409,15 @@ class AdminAssetsProvider
             $appJs = YATRA_PLUGIN_PATH . 'assets/admin/dist/js/app.js';
 
             if (file_exists($appJs)) {
-                $jsVersion = YATRA_VERSION . '.' . filemtime($appJs) . '.view-icon-fix.' . time() . '.' . microtime(true);
+                // Version on the plugin version + the bundle's own mtime. That
+                // already changes on every update or rebuild, which is exactly
+                // when the cache must be busted.
+                //
+                // This previously appended time() . microtime(true), making the
+                // URL unique on every single request — so the ~3 MB admin bundle
+                // was re-downloaded on every admin page view and could never be
+                // cached by the browser.
+                $jsVersion = YATRA_VERSION . '.' . filemtime($appJs);
 
                 $localized_data = $this->buildAdminLocalizedData();
 

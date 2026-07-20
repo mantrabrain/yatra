@@ -29,6 +29,15 @@ $travelerCount = (int) ($traveler_count ?? 1);
 $departureLocation = (string) ($departure_location ?? '');
 $destination = (string) ($destination ?? '');
 
+
+// Optional logo + header colour supplied by the White Label module.
+// Unbranded sites keep this document's original header colour and show no logo.
+$pdfBranding = function_exists('yatra_get_pdf_branding')
+    ? yatra_get_pdf_branding('#059669')
+    : ['logo_url' => '', 'header_color' => '#059669'];
+$brandLogoUrl = (string) ($pdfBranding['logo_url'] ?? '');
+$brandHeaderColor = (string) ($pdfBranding['header_color'] ?? '#059669');
+
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,7 +52,8 @@ $destination = (string) ($destination ?? '');
 
         .header { width: 100%; border-collapse: collapse; }
         .header td { vertical-align: top; }
-        .brand { background: #059669; color: #fff; padding: 6mm 6mm; }
+        .brand { background: <?php echo htmlspecialchars($brandHeaderColor, ENT_QUOTES, 'UTF-8'); ?>; color: #fff; padding: 6mm 6mm; }
+        .brand-logo { max-height: 18mm; max-width: 60mm; margin-bottom: 3mm; }
         .brand h1 { font-size: 20px; font-weight: 700; margin: 0; }
         .brand p { font-size: 12px; margin-top: 4px; font-weight: 400; }
 
@@ -87,6 +97,9 @@ $destination = (string) ($destination ?? '');
 <table class="header">
     <tr>
         <td class="brand">
+            <?php if ($brandLogoUrl !== ''): ?>
+                <img class="brand-logo" src="<?php echo htmlspecialchars($brandLogoUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="">
+            <?php endif; ?>
             <h1><?php echo htmlspecialchars($companyName, ENT_QUOTES, 'UTF-8'); ?></h1>
             <p><?php esc_html_e('Travel Voucher', 'yatra'); ?></p>
         </td>
@@ -180,15 +193,15 @@ $destination = (string) ($destination ?? '');
     <table class="totals">
         <tr>
             <td class="label"><?php esc_html_e('Total Amount', 'yatra'); ?></td>
-            <td class="value"><?php echo $currencySymbol . htmlspecialchars($totalAmount, ENT_QUOTES, 'UTF-8'); ?></td>
+            <td class="value"><?php echo htmlspecialchars($totalAmount, ENT_QUOTES, 'UTF-8'); ?></td>
         </tr>
         <tr>
             <td class="label"><?php esc_html_e('Amount Paid', 'yatra'); ?></td>
-            <td class="value"><?php echo $currencySymbol . htmlspecialchars($amountPaid, ENT_QUOTES, 'UTF-8'); ?></td>
+            <td class="value"><?php echo htmlspecialchars($amountPaid, ENT_QUOTES, 'UTF-8'); ?></td>
         </tr>
         <tr>
             <td class="label"><?php esc_html_e('Balance Due', 'yatra'); ?></td>
-            <td class="value"><?php echo $currencySymbol . htmlspecialchars($amountDue, ENT_QUOTES, 'UTF-8'); ?></td>
+            <td class="value"><?php echo htmlspecialchars($amountDue, ENT_QUOTES, 'UTF-8'); ?></td>
         </tr>
     </table>
 </div>

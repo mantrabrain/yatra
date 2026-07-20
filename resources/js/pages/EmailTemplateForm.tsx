@@ -77,6 +77,16 @@ const EmailTemplateForm: React.FC = () => {
     }, []);
 
   const isCoreSettingsEdit = isCoreTemplateSlug(coreTemplateSlug);
+  // Per-template BCC/CC settings keys are derived from the template's subject
+  // key (email_tpl_booking_subject -> _bcc / _cc), exactly as the PHP side does,
+  // so the catalog needs no extra entries and a new template type is covered
+  // automatically.
+  const coreAddressKey = (
+    subjectKey: string | undefined,
+    suffix: "bcc" | "cc",
+  ): string | null =>
+    subjectKey ? subjectKey.replace(/_subject$/, "") + "_" + suffix : null;
+
   const coreDef = isCoreSettingsEdit
     ? getCoreTemplateDefinition(coreTemplateSlug)
     : undefined;
@@ -122,6 +132,8 @@ const EmailTemplateForm: React.FC = () => {
     from_email: "",
     to_email: "",
     reply_to: "",
+    bcc: "",
+    cc: "",
     subject: "",
     body: "",
     event_key: "",
@@ -224,6 +236,8 @@ const EmailTemplateForm: React.FC = () => {
       from_email: String(t.from_email ?? ""),
       to_email: String(t.to_email ?? ""),
       reply_to: String(t.reply_to ?? ""),
+      bcc: String(t.bcc ?? ""),
+      cc: String(t.cc ?? ""),
       subject: String(t.subject ?? ""),
       body: String(t.body ?? ""),
       event_key: String(t.event_key ?? ""),
@@ -245,6 +259,8 @@ const EmailTemplateForm: React.FC = () => {
       from_email: "",
       to_email: coreDef.to_email || "",
       reply_to: "",
+      bcc: String(s[coreAddressKey(subj, "bcc") ?? ""] ?? ""),
+      cc: String(s[coreAddressKey(subj, "cc") ?? ""] ?? ""),
       subject: String(s[subj] ?? ""),
       body: String(s[bodyKey] ?? ""),
       event_key: coreDef.event_key,
@@ -321,6 +337,11 @@ const EmailTemplateForm: React.FC = () => {
       base[coreDef.settingsSubject] = formData.subject;
       base[coreDef.settingsBody] = formData.body;
       base[coreDef.settingsFlag] = formData.is_active;
+
+      const bccKey = coreAddressKey(coreDef.settingsSubject, "bcc");
+      const ccKey = coreAddressKey(coreDef.settingsSubject, "cc");
+      if (bccKey) base[bccKey] = formData.bcc;
+      if (ccKey) base[ccKey] = formData.cc;
       await saveSettings(base);
       return base;
     },
@@ -1003,6 +1024,49 @@ const EmailTemplateForm: React.FC = () => {
                   )}
                 </p>
               )}
+
+              {/* Copy addresses — available for every template, core or Pro.
+                  Both are opt-in: left empty, no copy is sent. */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {__("BCC", "yatra")}
+                  </label>
+                  <Input
+                    value={formData.bcc}
+                    onChange={(e) =>
+                      setFormData({ ...formData, bcc: e.target.value })
+                    }
+                    placeholder={__("e.g., archive@yoursite.com", "yatra")}
+                    disabled={isCoreViewMode}
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {__(
+                      "Blind copy, hidden from the recipient. Separate several addresses with commas. Leave empty to send no copy.",
+                      "yatra",
+                    )}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {__("CC", "yatra")}
+                  </label>
+                  <Input
+                    value={formData.cc}
+                    onChange={(e) =>
+                      setFormData({ ...formData, cc: e.target.value })
+                    }
+                    placeholder={__("e.g., office@yoursite.com", "yatra")}
+                    disabled={isCoreViewMode}
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {__(
+                      "Visible copy — the recipient can see this address. Separate several addresses with commas.",
+                      "yatra",
+                    )}
+                  </p>
+                </div>
+              </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

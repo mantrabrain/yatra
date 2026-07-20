@@ -33,6 +33,8 @@ export type EmailCatalogEntry = {
   /** If set, subject/body cannot be edited until Pro + this module slug is active (row still listed). */
   requiresModule?: string;
   settingsFlag?: keyof EmailSettingsValues;
+  /** Only relevant when deposits / partial payments are enabled. */
+  requiresPartialPayments?: boolean;
   settingsSubject?: keyof EmailSettingsValues;
   settingsBody?: keyof EmailSettingsValues;
   /** Shown in core editor sidebar for merge tags */
@@ -42,6 +44,7 @@ export type EmailCatalogEntry = {
 export const CORE_FREE_TEMPLATE_KEYS = [
   "booking_confirmation",
   "payment_received",
+  "partial_payment_received",
   "booking_cancelled",
   "trip_reminder",
   "trip_consent_request",
@@ -112,6 +115,27 @@ export const EMAIL_TEMPLATES_CATALOG: EmailCatalogEntry[] = [
     settingsBody: "email_tpl_payment_body",
     mergeTags:
       "{{site_name}}, {{customer_name}}, {{customer_first_name}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{payment_amount_formatted}}, {{payment_method}}, {{transaction_id}}, {{total_amount_formatted}}, {{currency}}, " +
+      BOOKING_RICH_MERGE_TAGS,
+  },
+  {
+    template_key: "partial_payment_received",
+    event_key: "payment.partial_received",
+    name: __("Partial Payment Received", "yatra"),
+    description: __(
+      "Sent when a payment is recorded but a balance is still outstanding. Only used when deposits or partial payments are enabled and this template is switched on — otherwise the standard Payment Received email is sent for every payment.",
+      "yatra",
+    ),
+    category: "payment",
+    recipient_type: "customer",
+    to_email: "{customer_email}",
+    isCoreFree: true,
+    // Shown only when the site actually takes deposits / partial payments.
+    requiresPartialPayments: true,
+    settingsFlag: "email_template_partial_payment",
+    settingsSubject: "email_tpl_partial_payment_subject",
+    settingsBody: "email_tpl_partial_payment_body",
+    mergeTags:
+      "{{site_name}}, {{customer_name}}, {{customer_first_name}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{payment_amount_formatted}}, {{amount_paid_formatted}}, {{amount_due_formatted}}, {{total_amount_formatted}}, {{payment_method}}, {{transaction_id}}, {{currency}}, " +
       BOOKING_RICH_MERGE_TAGS,
   },
   {
@@ -689,7 +713,15 @@ export function buildLocalTemplateRows(
   const moduleOk = (slug: string) =>
     options?.isModuleActive ? options.isModuleActive(slug) : false;
 
-  return EMAIL_TEMPLATES_CATALOG.map((entry) => {
+  // Sites that never take a deposit or part payment have no use for the
+  // part-payment template, so it is hidden rather than shown inert.
+  const partialPaymentsOn = Boolean(
+    values.partial_payment || values.enable_deposit || values.deposit_required,
+  );
+
+  return EMAIL_TEMPLATES_CATALOG.filter(
+    (entry) => !entry.requiresPartialPayments || partialPaymentsOn,
+  ).map((entry) => {
     const moduleGateOk =
       !entry.requiresModule || (pro && moduleOk(entry.requiresModule));
 

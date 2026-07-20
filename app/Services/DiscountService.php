@@ -869,10 +869,14 @@ class DiscountService extends BaseService
     private function formatDiscountAmount($discount): string {
         $amount = $discount->group_discount_amount ?? 0;
         if ($discount->group_discount_type === 'percentage') {
-            return "{$amount}% off";
-        } else {
-            return "$" . number_format((float) $amount, 2) . " off";
+            /* translators: %s: discount percentage. */
+            return sprintf(__('%s%% off', 'yatra'), $amount);
         }
+
+        // Was a hardcoded "$" with default separators, so every non-dollar site
+        // showed the wrong currency (and the label could not be translated).
+        /* translators: %s: discount amount, already formatted with the site currency. */
+        return sprintf(__('%s off', 'yatra'), yatra_format_price((float) $amount, null, false));
     }
 
     /**

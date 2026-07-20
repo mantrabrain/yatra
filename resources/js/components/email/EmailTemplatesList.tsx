@@ -471,8 +471,17 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
   };
 
   const handleBulkAction = () => {
-    if (!bulkAction || selectedIds.length === 0) {
-      showToast(__("Please select templates and an action"), "error");
+    // Report the input that is actually missing. The Apply button is disabled
+    // whenever nothing is selected, so this can only be reached with a non-empty
+    // selection — the combined message blamed the selection and left operators
+    // re-selecting rows that were already ticked.
+    if (selectedIds.length === 0) {
+      showToast(__("Please select at least one template.", "yatra"), "error");
+      return;
+    }
+
+    if (!bulkAction) {
+      showToast(__("Please choose an action to apply.", "yatra"), "error");
       return;
     }
     if (bulkAction === "delete") {

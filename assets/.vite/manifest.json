@@ -1,37 +1,37 @@
 {
-  "_ApplicableTripSelector-DKKnDV4T.js": {
-    "file": "dist/js/ApplicableTripSelector-DKKnDV4T.js",
+  "_ApplicableTripSelector-ByXYCU1M.js": {
+    "file": "dist/js/ApplicableTripSelector-ByXYCU1M.js",
     "name": "ApplicableTripSelector",
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx"
     ]
   },
-  "_BuildItineraryModal-7n2jsdb4.js": {
-    "file": "dist/js/BuildItineraryModal-7n2jsdb4.js",
+  "_BuildItineraryModal-D7Fb3uzt.js": {
+    "file": "dist/js/BuildItineraryModal-D7Fb3uzt.js",
     "name": "BuildItineraryModal",
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx"
     ]
   },
-  "_ProFeature-hD-dwLty.js": {
-    "file": "dist/js/ProFeature-hD-dwLty.js",
+  "_ProFeature-DLowS7DM.js": {
+    "file": "dist/js/ProFeature-DLowS7DM.js",
     "name": "ProFeature",
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx"
     ]
   },
-  "_RuleTypeSelectionModal-Bhlb1Jly.js": {
-    "file": "dist/js/RuleTypeSelectionModal-Bhlb1Jly.js",
+  "_RuleTypeSelectionModal-DX3yB1Ol.js": {
+    "file": "dist/js/RuleTypeSelectionModal-DX3yB1Ol.js",
     "name": "RuleTypeSelectionModal",
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx"
     ]
   },
@@ -39,21 +39,21 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{00k}~.js"
   },
-  "_index-CzC53-AA.js": {
-    "file": "dist/js/index-CzC53-AA.js",
+  "_index-Cfwr4v__.js": {
+    "file": "dist/js/index-Cfwr4v__.js",
     "name": "index",
     "imports": [
-      "_react-vendor-zODANjVp.js"
+      "_react-vendor-xzSqHjRF.js"
     ],
     "css": [
       "admin/dist/css/index.css"
     ]
   },
-  "_module-skeleton-7zwRYol6.js": {
-    "file": "dist/js/module-skeleton-7zwRYol6.js",
+  "_module-skeleton-Cb1q-Zbx.js": {
+    "file": "dist/js/module-skeleton-Cb1q-Zbx.js",
     "name": "module-skeleton",
     "imports": [
-      "_react-vendor-zODANjVp.js",
+      "_react-vendor-xzSqHjRF.js",
       "resources/js/main.tsx"
     ]
   },
@@ -61,18 +61,18 @@
     "file": "admin/dist/css/react-vendor.css",
     "src": "_react-vendor-!~{001}~.js"
   },
-  "_react-vendor-zODANjVp.js": {
-    "file": "dist/js/react-vendor-zODANjVp.js",
+  "_react-vendor-xzSqHjRF.js": {
+    "file": "dist/js/react-vendor-xzSqHjRF.js",
     "name": "react-vendor",
     "css": [
       "admin/dist/css/react-vendor.css"
     ]
   },
-  "_toggle-B0m9K-Pk.js": {
-    "file": "dist/js/toggle-B0m9K-Pk.js",
+  "_toggle-DUbJsrWf.js": {
+    "file": "dist/js/toggle-DUbJsrWf.js",
     "name": "toggle",
     "imports": [
-      "_react-vendor-zODANjVp.js"
+      "_react-vendor-xzSqHjRF.js"
     ]
   },
   "resources/js/account-page.tsx": {
@@ -81,8 +81,8 @@
     "src": "resources/js/account-page.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js"
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -91,8 +91,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js"
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js"
     ],
     "dynamicImports": [
       "resources/js/pages/TripForm.tsx",
@@ -117,203 +117,203 @@
     ]
   },
   "resources/js/pages/AbandonedRecovery.tsx": {
-    "file": "dist/js/AbandonedRecovery-BTJPicIq.js",
+    "file": "dist/js/AbandonedRecovery-9p2u7HOq.js",
     "name": "AbandonedRecovery",
     "src": "resources/js/pages/AbandonedRecovery.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
+      "_react-vendor-xzSqHjRF.js",
       "resources/js/main.tsx",
-      "_toggle-B0m9K-Pk.js",
-      "_index-CzC53-AA.js"
+      "_index-Cfwr4v__.js",
+      "_toggle-DUbJsrWf.js"
     ]
   },
   "resources/js/pages/AiAssistant.tsx": {
-    "file": "dist/js/AiAssistant-BSlTjAQR.js",
+    "file": "dist/js/AiAssistant-Cw-ji0-f.js",
     "name": "AiAssistant",
     "src": "resources/js/pages/AiAssistant.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx",
-      "_module-skeleton-7zwRYol6.js"
+      "_module-skeleton-Cb1q-Zbx.js"
     ]
   },
   "resources/js/pages/AvailabilityForm.tsx": {
-    "file": "dist/js/AvailabilityForm-jQMsxNDg.js",
+    "file": "dist/js/AvailabilityForm-C50ev4a-.js",
     "name": "AvailabilityForm",
     "src": "resources/js/pages/AvailabilityForm.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
+      "_react-vendor-xzSqHjRF.js",
       "resources/js/main.tsx",
-      "_index-CzC53-AA.js"
+      "_index-Cfwr4v__.js"
     ]
   },
   "resources/js/pages/BookingForm.tsx": {
-    "file": "dist/js/BookingForm-m1_-mHdV.js",
+    "file": "dist/js/BookingForm-CmQBN4N9.js",
     "name": "BookingForm",
     "src": "resources/js/pages/BookingForm.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx"
     ]
   },
   "resources/js/pages/ChannelManager.tsx": {
-    "file": "dist/js/ChannelManager-DBTZ4iK_.js",
+    "file": "dist/js/ChannelManager-Ci_izIZp.js",
     "name": "ChannelManager",
     "src": "resources/js/pages/ChannelManager.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx",
-      "_module-skeleton-7zwRYol6.js"
+      "_module-skeleton-Cb1q-Zbx.js"
     ]
   },
   "resources/js/pages/DiscountForm.tsx": {
-    "file": "dist/js/DiscountForm-Ccnc_cg6.js",
+    "file": "dist/js/DiscountForm-Cf3-BEPg.js",
     "name": "DiscountForm",
     "src": "resources/js/pages/DiscountForm.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx",
-      "_ApplicableTripSelector-DKKnDV4T.js"
+      "_ApplicableTripSelector-ByXYCU1M.js"
     ]
   },
   "resources/js/pages/DynamicPricing.tsx": {
-    "file": "dist/js/DynamicPricing-BoPmvjYO.js",
+    "file": "dist/js/DynamicPricing-D8ZvLcDs.js",
     "name": "DynamicPricing",
     "src": "resources/js/pages/DynamicPricing.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
+      "_react-vendor-xzSqHjRF.js",
       "resources/js/main.tsx",
-      "_RuleTypeSelectionModal-Bhlb1Jly.js",
-      "_toggle-B0m9K-Pk.js",
-      "_index-CzC53-AA.js"
+      "_RuleTypeSelectionModal-DX3yB1Ol.js",
+      "_toggle-DUbJsrWf.js",
+      "_index-Cfwr4v__.js"
     ]
   },
   "resources/js/pages/DynamicPricingRuleForm.tsx": {
-    "file": "dist/js/DynamicPricingRuleForm-Bya2YN6O.js",
+    "file": "dist/js/DynamicPricingRuleForm-ChhxklVe.js",
     "name": "DynamicPricingRuleForm",
     "src": "resources/js/pages/DynamicPricingRuleForm.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
+      "_react-vendor-xzSqHjRF.js",
       "resources/js/main.tsx",
-      "_RuleTypeSelectionModal-Bhlb1Jly.js",
-      "_index-CzC53-AA.js"
+      "_index-Cfwr4v__.js",
+      "_RuleTypeSelectionModal-DX3yB1Ol.js"
     ]
   },
   "resources/js/pages/Itinerary.tsx": {
-    "file": "dist/js/Itinerary-tEr-LQr2.js",
+    "file": "dist/js/Itinerary-D2s5vBse.js",
     "name": "Itinerary",
     "src": "resources/js/pages/Itinerary.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx",
-      "_BuildItineraryModal-7n2jsdb4.js"
+      "_BuildItineraryModal-D7Fb3uzt.js"
     ]
   },
   "resources/js/pages/RecurringRuleForm.tsx": {
-    "file": "dist/js/RecurringRuleForm-DFNF1N0b.js",
+    "file": "dist/js/RecurringRuleForm-DqbHRd9P.js",
     "name": "RecurringRuleForm",
     "src": "resources/js/pages/RecurringRuleForm.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx"
     ]
   },
   "resources/js/pages/Reports.tsx": {
-    "file": "dist/js/Reports-BNaZrbMf.js",
+    "file": "dist/js/Reports-FO-orrZZ.js",
     "name": "Reports",
     "src": "resources/js/pages/Reports.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx"
     ]
   },
   "resources/js/pages/Settings.tsx": {
-    "file": "dist/js/Settings-Ds92uNAP.js",
+    "file": "dist/js/Settings-BolgDnsp.js",
     "name": "Settings",
     "src": "resources/js/pages/Settings.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx",
-      "_ProFeature-hD-dwLty.js"
+      "_ProFeature-DLowS7DM.js"
     ]
   },
   "resources/js/pages/Team.tsx": {
-    "file": "dist/js/Team-K1mPL_la.js",
+    "file": "dist/js/Team-B2tJV0MB.js",
     "name": "Team",
     "src": "resources/js/pages/Team.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx"
     ]
   },
   "resources/js/pages/TripConsentForm.tsx": {
-    "file": "dist/js/TripConsentForm-DedTBtCw.js",
+    "file": "dist/js/TripConsentForm-CUEd4uhQ.js",
     "name": "TripConsentForm",
     "src": "resources/js/pages/TripConsentForm.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
+      "_react-vendor-xzSqHjRF.js",
       "resources/js/main.tsx",
-      "_ApplicableTripSelector-DKKnDV4T.js",
-      "_index-CzC53-AA.js"
+      "_index-Cfwr4v__.js",
+      "_ApplicableTripSelector-ByXYCU1M.js"
     ]
   },
   "resources/js/pages/TripForm.tsx": {
-    "file": "dist/js/TripForm-xkmIMgME.js",
+    "file": "dist/js/TripForm-DC2KEIV2.js",
     "name": "TripForm",
     "src": "resources/js/pages/TripForm.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
+      "_react-vendor-xzSqHjRF.js",
       "resources/js/main.tsx",
-      "_index-CzC53-AA.js",
-      "_BuildItineraryModal-7n2jsdb4.js",
-      "_ProFeature-hD-dwLty.js"
+      "_index-Cfwr4v__.js",
+      "_BuildItineraryModal-D7Fb3uzt.js",
+      "_ProFeature-DLowS7DM.js"
     ]
   },
   "resources/js/pages/ViewBooking.tsx": {
-    "file": "dist/js/ViewBooking-BlRipCYv.js",
+    "file": "dist/js/ViewBooking-zKw1OoXU.js",
     "name": "ViewBooking",
     "src": "resources/js/pages/ViewBooking.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx"
     ]
   },
   "resources/js/pages/Webhooks.tsx": {
-    "file": "dist/js/Webhooks-CTOaug1s.js",
+    "file": "dist/js/Webhooks-BXiv98Nu.js",
     "name": "Webhooks",
     "src": "resources/js/pages/Webhooks.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx",
-      "_module-skeleton-7zwRYol6.js"
+      "_module-skeleton-Cb1q-Zbx.js"
     ]
   },
   "resources/js/pages/Whatsapp.tsx": {
@@ -322,22 +322,22 @@
     "src": "resources/js/pages/Whatsapp.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx",
-      "_module-skeleton-7zwRYol6.js"
+      "_module-skeleton-Cb1q-Zbx.js"
     ]
   },
   "resources/js/pages/WhiteLabel.tsx": {
-    "file": "dist/js/WhiteLabel-B9hnTpRK.js",
+    "file": "dist/js/WhiteLabel-DqrT0VH3.js",
     "name": "WhiteLabel",
     "src": "resources/js/pages/WhiteLabel.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-zODANjVp.js",
-      "_index-CzC53-AA.js",
+      "_react-vendor-xzSqHjRF.js",
+      "_index-Cfwr4v__.js",
       "resources/js/main.tsx",
-      "_module-skeleton-7zwRYol6.js"
+      "_module-skeleton-Cb1q-Zbx.js"
     ]
   }
 }

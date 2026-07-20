@@ -154,7 +154,18 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           >
             {selectedOption ? (
               <div className="flex items-center justify-between w-full">
-                <span>{selectedOption.label}</span>
+                <span className="flex items-center gap-2 min-w-0">
+                  {selectedOption.icon && (
+                    <img
+                      src={selectedOption.icon}
+                      alt=""
+                      width={22}
+                      height={16}
+                      className="flex-shrink-0 rounded-[2px] object-cover ring-1 ring-black/10"
+                    />
+                  )}
+                  <span className="truncate">{selectedOption.label}</span>
+                </span>
                 {showValueId &&
                   selectedOption.value &&
                   selectedOption.value !== "" && (
@@ -234,7 +245,19 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span>{option.label}</span>
+                      <span className="flex items-center gap-2 min-w-0">
+                        {option.icon && (
+                          <img
+                            src={option.icon}
+                            alt=""
+                            loading="lazy"
+                            width={22}
+                            height={16}
+                            className="flex-shrink-0 rounded-[2px] object-cover ring-1 ring-black/10"
+                          />
+                        )}
+                        <span className="truncate">{option.label}</span>
+                      </span>
                       {showValueId && option.value && option.value !== "" && (
                         <span className="text-xs text-gray-500 dark:text-gray-400 ml-2 font-medium">
                           ID: {option.value}

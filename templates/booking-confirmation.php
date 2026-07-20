@@ -213,8 +213,13 @@ do_action('yatra_booking_confirmation_header', $booking);
                         <div class="yatra-trip-rating">
                             <div class="yatra-rating-stars">
                                 <?php
-                                $filled_stars = floor($booking->trip_average_rating);
-                                $has_half = ($booking->trip_average_rating - $filled_stars) >= 0.5;
+                                // floor() returns a float, so the strict `$i === $filled_stars + 1`
+                                // below compared int against float and never matched — the half
+                                // star was silently dropped and a 4.5 rating rendered as 4 solid
+                                // stars beside the text "4.5". Cast so the comparison holds.
+                                $average_rating = (float) $booking->trip_average_rating;
+                                $filled_stars = (int) floor($average_rating);
+                                $has_half = ($average_rating - $filled_stars) >= 0.5;
                                 for ($i = 1; $i <= 5; $i++) :
                                     $class = $i <= $filled_stars ? 'yatra-star-filled' : ($has_half && $i === $filled_stars + 1 ? 'yatra-star-half' : '');
                                 ?>
@@ -1218,6 +1223,42 @@ do_action('yatra_booking_confirmation_header', $booking);
     color: #22c55e;
 }
 
+/* Bank-transfer details (markup injected by Yatra Pro's Bank Transfer gateway
+   into this page). The card reuses this page's .yatra-confirmation-card /
+   .yatra-card-title classes, but its rows had no styling at all, so the values
+   sat immediately after their label while every other row on the page is
+   flex/space-between — the bank values were the only ones not flush right.
+   Styling lives here because this template owns the confirmation page's CSS
+   and Pro enqueues no stylesheet on this page. */
+.yatra-bank-info-grid {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.yatra-bank-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.yatra-bank-info-item:last-child {
+    border-bottom: none;
+}
+
+.yatra-bank-label {
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.yatra-bank-value {
+    text-align: right;
+    word-break: break-word;
+}
+
 .yatra-payment-method {
     margin-top: 16px;
     padding: 12px;
@@ -1617,7 +1658,8 @@ do_action('yatra_booking_confirmation_header', $booking);
     body.yatra-printing-confirmation .yatra-payment-rows {
         margin: 0 !important;
     }
-    body.yatra-printing-confirmation .yatra-payment-row {
+    body.yatra-printing-confirmation .yatra-payment-row,
+    body.yatra-printing-confirmation .yatra-bank-info-item {
         display: flex !important;
         justify-content: space-between !important;
         align-items: baseline !important;

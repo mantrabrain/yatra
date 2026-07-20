@@ -231,20 +231,29 @@ class RecurringAvailabilityRepository extends BaseRepository
             $date = $m[1];
         }
 
+        // Callers (notably CapacityService) take the FIRST row as the winning
+        // rule, so the ordering must be total — not just `priority DESC`.
+        // `priority` is not exposed in the rule editor, so every rule carries the
+        // same default and overlapping rules tied, leaving the winner to MySQL's
+        // arbitrary row order. A trip with an older wide rule (e.g. 25 seats) plus
+        // a newer, narrower one (e.g. 1 seat for a private group) could therefore
+        // resolve to the wrong capacity and silently fall back to the trip default.
+        // Break ties by most-recently-created, matching the ordering this same
+        // repository already uses for rule listings.
         $query = $this->wpdb->prepare(
-            "SELECT * FROM `{$table}` 
-             WHERE trip_id = %d 
+            "SELECT * FROM `{$table}`
+             WHERE trip_id = %d
                AND status = 'active'
                AND start_date <= %s
                AND (end_date IS NULL OR end_date >= %s)
-             ORDER BY priority DESC",
+             ORDER BY priority DESC, created_at DESC, id DESC",
             $tripId,
             $date,
             $date
         );
-        
+
         $results = $this->wpdb->get_results($query);
-        
+
         return array_map([$this, 'hydrateRule'], $results ?: []);
     }
 

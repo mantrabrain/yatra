@@ -145,9 +145,9 @@ class ItineraryPdfBuilder
             'travel_date'     => $travelDate,
             'return_date'     => $returnDate,
             'currency_symbol' => FormatHelper::getCurrencySymbol($currency),
-            'total_amount'    => number_format((float) ($source['total_amount'] ?? 0), 2),
-            'amount_paid'     => number_format((float) ($source['amount_paid'] ?? 0), 2),
-            'amount_due'      => number_format((float) ($source['amount_due'] ?? 0), 2),
+            'total_amount'    => yatra_format_price((float) ($source['total_amount'] ?? 0), $currency, false),
+            'amount_paid'     => yatra_format_price((float) ($source['amount_paid'] ?? 0), $currency, false),
+            'amount_due'      => yatra_format_price((float) ($source['amount_due'] ?? 0), $currency, false),
             'traveler_count'  => (int) ($source['travelers_count'] ?? $source['traveler_count'] ?? $source['travelers'] ?? 1),
             'itinerary_days'  => $itineraryDays,
             // Real trip-specific Important Information fields, same

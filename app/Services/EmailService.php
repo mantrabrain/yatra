@@ -29,6 +29,12 @@ class EmailService
      */
     public static function send($to, string $subject, string $message, array $headers = [], array $attachments = []): bool
     {
+        // Archive copy of every Yatra email, if the operator configured one.
+        // Applied here rather than at each call site so it covers all senders —
+        // core transactional mail, Pro automation templates and sequences — and
+        // cannot be forgotten by a sender added later.
+        $headers = self::withAlwaysBcc($headers);
+
         // Check if SMTP is enabled
         $smtp_enabled = SettingsService::isEnabled('smtp_enabled');
         
@@ -40,6 +46,75 @@ class EmailService
         return self::sendViaWpMail($to, $subject, $message, $headers, $attachments);
     }
     
+    /**
+     * Merge the configured always-BCC address into a header list.
+     *
+     * Opt-in: with the setting empty nothing is added and the headers are handed
+     * back untouched, so an operator who never configures it sees no change at
+     * all. When a template already carries its own Bcc header the two are merged
+     * and de-duplicated, so an address listed in both places is only copied once.
+     *
+     * @param string[] $headers
+     * @return string[]
+     */
+    private static function withAlwaysBcc(array $headers): array
+    {
+        // Cc/Bcc configured on the template being sent. Read here rather than at
+        // the call site because Yatra Pro can take the send over and mail it
+        // through its own service — both routes end up here.
+        foreach (TransactionalEmailTemplateService::headersForCurrentDispatch() as $templateHeader) {
+            $headers[] = $templateHeader;
+        }
+
+        $configured = TransactionalEmailTemplateService::sanitizeAddressList(
+            (string) SettingsService::get('email_always_bcc', '')
+        );
+
+        /**
+         * Filter the always-BCC recipients for a single send. Return an empty
+         * array to skip archiving this particular email.
+         *
+         * @param string[] $configured
+         * @param string[] $headers
+         */
+        $configured = (array) apply_filters('yatra_email_always_bcc', $configured, $headers);
+
+        if ($configured === []) {
+            return $headers;
+        }
+
+        // Fold any Bcc headers already present into the same list so the address
+        // cannot be added twice, then re-emit a single combined header.
+        $existing = [];
+        $kept = [];
+
+        foreach ($headers as $header) {
+            if (is_string($header) && stripos(trim($header), 'bcc:') === 0) {
+                $existing = array_merge(
+                    $existing,
+                    TransactionalEmailTemplateService::sanitizeAddressList(trim(substr(trim($header), 4)))
+                );
+                continue;
+            }
+
+            $kept[] = $header;
+        }
+
+        $all = [];
+
+        foreach (array_merge($existing, $configured) as $address) {
+            $all[strtolower($address)] = $address;
+        }
+
+        if ($all === []) {
+            return $headers;
+        }
+
+        $kept[] = 'Bcc: ' . implode(', ', array_values($all));
+
+        return $kept;
+    }
+
     /**
      * Send email via WordPress wp_mail with custom from address
      */

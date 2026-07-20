@@ -1,5 +1,5 @@
-import { j as jsxRuntimeExports, p as Calendar, k as FileText, b as Plane, at as ArrowRight, q as MapPin, I as User, y as ChevronRight, S as Sparkles, h as Package, i as CreditCard, by as LifeBuoy, be as Bell, az as AlertCircle, aD as CheckCircle2, ar as Clock, V as ExternalLink, U as Users, d as Mail, aW as Phone, b4 as Download, r as reactExports, a5 as React, u as useQuery, av as CheckCircle, as as DollarSign, aQ as Eye, t as useQueryClient, aJ as PenSquare, b6 as XCircle, bz as ShieldCheck, bf as Heart, s as LayoutDashboard, bA as LogOut, bv as QueryClient, bw as client, bx as QueryClientProvider } from "./react-vendor-zODANjVp.js";
-import { f as formatYatraMoney, _ as __, p as parseDate, e as formatDate$1, k as applyCurrencyPosition, s as sprintf, t as toDateValue, a as apiClient, A as API_ENDPOINTS, u as useToast, l as getCountryOptions, i as getCountryName$1, T as ToastProvider, E as ErrorBoundary } from "./index-CzC53-AA.js";
+import { j as jsxRuntimeExports, p as Calendar, k as FileText, b as Plane, at as ArrowRight, q as MapPin, I as User, y as ChevronRight, S as Sparkles, h as Package, i as CreditCard, bA as LifeBuoy, bg as Bell, az as AlertCircle, aD as CheckCircle2, ar as Clock, V as ExternalLink, U as Users, d as Mail, aY as Phone, b6 as Download, r as reactExports, a5 as React, u as useQuery, av as CheckCircle, as as DollarSign, aQ as Eye, t as useQueryClient, aJ as PenSquare, b8 as XCircle, bB as ShieldCheck, bh as Heart, s as LayoutDashboard, bC as LogOut, bx as QueryClient, by as client, bz as QueryClientProvider } from "./react-vendor-xzSqHjRF.js";
+import { f as formatYatraMoney, _ as __, p as parseDate, e as formatDate$1, k as applyCurrencyPosition, s as sprintf, t as toDateValue, a as apiClient, A as API_ENDPOINTS, u as useToast, S as SearchableSelect, l as getCountrySelectOptions, i as getCountryName$1, T as ToastProvider, E as ErrorBoundary } from "./index-Cfwr4v__.js";
 function toBrowserLocaleTag(locale) {
   const raw = String(locale || "").trim();
   if (!raw) return void 0;
@@ -2698,16 +2698,14 @@ const Profile = ({
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-field", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Country", "yatra") }),
-          isEditing ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "select",
+          isEditing ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+            SearchableSelect,
             {
               value: formData.country,
-              onChange: (e) => handleInputChange("country", e.target.value),
-              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Select your country", "yatra") }),
-                getCountryOptions().map((c) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: c.code, children: c.name }, c.code))
-              ]
+              onChange: (v) => handleInputChange("country", v),
+              options: getCountrySelectOptions(),
+              placeholder: __("Select your country", "yatra"),
+              searchPlaceholder: __("Search country", "yatra")
             }
           ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: getCountryName$1(formData.country) || __("Not set", "yatra") })
         ] }),

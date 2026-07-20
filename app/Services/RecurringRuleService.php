@@ -171,7 +171,14 @@ class RecurringRuleService
      */
     private function buildDateInfo(string $date, RecurringRule $rule): array
     {
-        $cap = (int) ($rule->capacity_value ?? 0);
+        // Mirror CapacityService's precedence: the rule editor writes the seat cap
+        // to `seats_total` and leaves `capacity_value` NULL, so reading
+        // capacity_value alone reported 0 seats for every rule created in the UI
+        // (a date that shows no capacity yet is not marked full).
+        $cap = (int) ($rule->seats_total ?? 0);
+        if ($cap <= 0) {
+            $cap = (int) ($rule->capacity_value ?? 0);
+        }
 
         return [
             'date' => $date,

@@ -2,11 +2,18 @@ import type { ChangeEventHandler } from "react";
 
 /** Core email fields stored via Settings API (`/settings`). */
 export type EmailSettingsValues = {
+  email_always_bcc?: string;
+  // Payment-mode flags, read to decide whether part-payment specific
+  // templates are relevant to this site.
+  partial_payment?: boolean;
+  enable_deposit?: boolean;
+  deposit_required?: boolean;
   admin_email: string;
   from_email: string;
   from_name: string;
   email_template_booking: boolean;
   email_template_confirmation: boolean;
+  email_template_partial_payment?: boolean;
   email_template_cancellation: boolean;
   email_template_reminder: boolean;
   email_template_admin_new_booking: boolean;
@@ -40,7 +47,9 @@ export type EmailSettingsValues = {
   email_tpl_booking_subject: string;
   email_tpl_booking_body: string;
   email_tpl_payment_subject: string;
+  email_tpl_partial_payment_subject?: string;
   email_tpl_payment_body: string;
+  email_tpl_partial_payment_body?: string;
   email_tpl_cancellation_subject: string;
   email_tpl_cancellation_body: string;
   email_tpl_reminder_subject: string;

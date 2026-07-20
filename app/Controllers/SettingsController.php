@@ -109,8 +109,14 @@ class SettingsController extends BaseController
         'admin_email' => $wpAdminEmail,
         'from_email' => $wpAdminEmail,
         'from_name' => $wpSiteName,
+        // Blind copy of every outgoing Yatra email, for archiving/monitoring.
+        // Empty means no copy is sent; accepts several comma-separated addresses.
+        'email_always_bcc' => '',
         'email_template_booking' => true,
         'email_template_confirmation' => true,
+        // Separate part-payment email. Off by default so existing sites keep
+        // sending the single payment template for every payment.
+        'email_template_partial_payment' => false,
         'email_template_cancellation' => true,
         'email_template_reminder' => true,
         'email_template_admin_new_booking' => true,

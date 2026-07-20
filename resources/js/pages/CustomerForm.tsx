@@ -391,11 +391,18 @@ const CustomerForm: React.FC = () => {
                       placeholder={__("customer@example.com", "yatra")}
                       className={errors.email ? "border-red-500" : ""}
                       required
-                      disabled={isEditMode} // Can't change email
                     />
                     {errors.email && (
                       <p className="mt-1 text-sm text-red-500">
                         {errors.email}
+                      </p>
+                    )}
+                    {isEditMode && !errors.email && (
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        {__(
+                          "If this customer can sign in, a confirmation link is sent to the new address and their email changes only once it is confirmed there. Customers without an account are updated straight away.",
+                          "yatra",
+                        )}
                       </p>
                     )}
                   </div>

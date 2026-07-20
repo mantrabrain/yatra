@@ -1884,6 +1884,9 @@ video {
 .rounded-2xl {
   border-radius: 1rem;
 }
+.rounded-\[2px\] {
+  border-radius: 2px;
+}
 .rounded-full {
   border-radius: 9999px;
 }
@@ -3546,6 +3549,9 @@ video {
 .ring-amber-300 {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(252 211 77 / var(--tw-ring-opacity, 1));
+}
+.ring-black\/10 {
+  --tw-ring-color: rgb(0 0 0 / 0.1);
 }
 .ring-blue-100 {
   --tw-ring-opacity: 1;

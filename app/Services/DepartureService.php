@@ -185,24 +185,36 @@ class DepartureService
     }
 
     /**
-     * Delete a departure
-     * Only allowed if source is recurring_generated and booked_count is 0
+     * Delete a departure.
+     *
+     * Allowed once the departure no longer has any booking attached, whether it
+     * was created automatically or by hand — an operator who adds a departure by
+     * mistake must be able to remove it again.
      */
     public function delete(int $id): bool
     {
         $departure = $this->repository->findModel($id);
-        
+
         if (!$departure) {
             throw new \InvalidArgumentException('Departure not found');
         }
-        
-        // Only allow deletion of recurring_generated departures with no bookings
-        if ($departure->source === 'recurring_generated' && $departure->booked_count === 0) {
-            return $this->repository->delete($id);
+
+        // Bookings themselves are the source of truth here, not `booked_count`:
+        // that counter can drift upwards (a cancelled or expired booking does not
+        // always decrement it), which would otherwise leave a departure
+        // permanently undeletable long after its last booking went away.
+        //
+        // This is the ONLY thing standing between a departure and deletion. The
+        // previous guard also required source === 'recurring_generated', a value
+        // this plugin never writes (departures are `booking_created` or `manual`,
+        // see Departure::$source), so no departure was ever deletable at all.
+        if (!empty($this->bookingRepository->findByDepartureId($id))) {
+            throw new \InvalidArgumentException(
+                __('Cannot delete departure: it still has bookings attached.', 'yatra')
+            );
         }
-        
-        // Manual departures or departures with bookings cannot be deleted
-        throw new \InvalidArgumentException('Cannot delete departure: Manual departures or departures with bookings cannot be deleted');
+
+        return $this->repository->delete($id);
     }
 
     /**

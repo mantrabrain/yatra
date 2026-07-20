@@ -68,8 +68,11 @@ if (!defined('ABSPATH')) {
                     </div>
                     <div class="yatra-overall-stars">
                         <?php
-                        $full_stars = floor($avg_rating);
-                        $has_half = ($avg_rating - $full_stars) >= 0.3;
+                        // 0.5, matching the booking confirmation page. This used to
+                        // round at 0.3, so a 4.3 trip showed 4.5 stars here but 4.0
+                        // on the confirmation page for the very same rating.
+                        $full_stars = (int) floor($avg_rating);
+                        $has_half = ($avg_rating - $full_stars) >= 0.5;
                         for ($i = 1; $i <= 5; $i++):
                             if ($i <= $full_stars):
                                 ?>

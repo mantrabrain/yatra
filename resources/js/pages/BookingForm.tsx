@@ -24,7 +24,8 @@ import {
   formatDateForInput,
   todayYmd,
 } from "../lib/dateFormat";
-import { getCountryOptions } from "../lib/countries";
+import { getCountrySelectOptions } from "../lib/countries";
+import { SearchableSelect } from "../components/ui/searchable-select";
 import { apiService } from "../lib/api-client";
 import { usePermissions } from "../hooks/usePermissions";
 import { getCurrencySymbol } from "../data/currencies";
@@ -100,7 +101,7 @@ interface BookingFormData {
 // One source of truth; operators that want a curated subset apply
 // the `yatra_countries_list` PHP filter once and every dropdown
 // (admin + public booking + Pro modules) picks it up.
-const countryList = getCountryOptions();
+const countrySelectOptions = getCountrySelectOptions();
 
 // Core contact fields rendered explicitly (name/email/phone/country); everything
 // else in the contact form is treated as an "extra/custom" field.
@@ -556,19 +557,16 @@ const BookingForm: React.FC = () => {
       );
     }
     if (field.type === "country") {
+      // Searchable list with national flags, matching the public booking form
+      // and the phone country-code control.
       return (
-        <Select
-          id={id}
+        <SearchableSelect
           value={value}
-          onChange={(e) => onChange(e.target.value)}
-        >
-          <option value="">{field.placeholder || "Select Country"}</option>
-          {countryList.map((c) => (
-            <option key={c.code} value={c.code}>
-              {c.name}
-            </option>
-          ))}
-        </Select>
+          onChange={onChange}
+          options={countrySelectOptions}
+          placeholder={field.placeholder || __("Select Country", "yatra")}
+          searchPlaceholder={__("Search country", "yatra")}
+        />
       );
     }
     if (field.type === "textarea") {
@@ -1030,21 +1028,13 @@ const BookingForm: React.FC = () => {
                     >
                       {__("Country", "yatra")}
                     </label>
-                    <select
-                      id="customer_country"
+                    <SearchableSelect
                       value={formData.customer_country}
-                      onChange={(e) =>
-                        handleFieldChange("customer_country", e.target.value)
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="">{__("Select country", "yatra")}</option>
-                      {countryList.map((country) => (
-                        <option key={country.code} value={country.code}>
-                          {country.name}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(v) => handleFieldChange("customer_country", v)}
+                      options={countrySelectOptions}
+                      placeholder={__("Select country", "yatra")}
+                      searchPlaceholder={__("Search country", "yatra")}
+                    />
                   </div>
 
                   {/* Extra / custom contact fields (nationality, address, and
@@ -1504,28 +1494,18 @@ const BookingForm: React.FC = () => {
                                 ))}
                               </Select>
                             ) : field.type === "country" ? (
-                              <Select
-                                id={`emergency-${field.id}`}
+                              <SearchableSelect
                                 value={emergencyContactData[field.id] || ""}
-                                onChange={(e) =>
-                                  handleEmergencyContactChange(
-                                    field.id,
-                                    e.target.value,
-                                  )
+                                onChange={(v) =>
+                                  handleEmergencyContactChange(field.id, v)
                                 }
-                              >
-                                <option value="">
-                                  {field.placeholder || "Select Country"}
-                                </option>
-                                {countryList.map((country) => (
-                                  <option
-                                    key={country.code}
-                                    value={country.code}
-                                  >
-                                    {country.name}
-                                  </option>
-                                ))}
-                              </Select>
+                                options={countrySelectOptions}
+                                placeholder={
+                                  field.placeholder ||
+                                  __("Select Country", "yatra")
+                                }
+                                searchPlaceholder={__("Search country", "yatra")}
+                              />
                             ) : field.type === "textarea" ? (
                               <textarea
                                 id={`emergency-${field.id}`}
@@ -1768,30 +1748,25 @@ const BookingForm: React.FC = () => {
                                           ))}
                                         </Select>
                                       ) : field.type === "country" ? (
-                                        <Select
-                                          id={`traveler-${travelerIndex}-${field.id}`}
+                                        <SearchableSelect
                                           value={traveler[field.id] || ""}
-                                          onChange={(e) =>
+                                          onChange={(v) =>
                                             handleTravelerChange(
                                               travelerIndex,
                                               field.id,
-                                              e.target.value,
+                                              v,
                                             )
                                           }
-                                        >
-                                          <option value="">
-                                            {field.placeholder ||
-                                              "Select Country"}
-                                          </option>
-                                          {countryList.map((country) => (
-                                            <option
-                                              key={country.code}
-                                              value={country.code}
-                                            >
-                                              {country.name}
-                                            </option>
-                                          ))}
-                                        </Select>
+                                          options={countrySelectOptions}
+                                          placeholder={
+                                            field.placeholder ||
+                                            __("Select Country", "yatra")
+                                          }
+                                          searchPlaceholder={__(
+                                            "Search country",
+                                            "yatra",
+                                          )}
+                                        />
                                       ) : field.type === "textarea" ? (
                                         <textarea
                                           id={`traveler-${travelerIndex}-${field.id}`}

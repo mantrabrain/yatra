@@ -36,6 +36,19 @@
     }
 })();
 
+// Parse a numeric min/max attribute while preserving a legitimate 0.
+// `parseInt(el.getAttribute('max')) || 20` treated max="0" — what a sold-out
+// departure renders — as "unset" and fell back to the placeholder ceiling, so
+// the guest selector stayed usable and ignored the departure's real capacity.
+// Only an absent or non-numeric value may fall back. Installed once and shared
+// by every frontend script, so load order does not matter.
+if (typeof window.yatraNumOr !== 'function') {
+    window.yatraNumOr = function (raw, fallback) {
+        var parsed = parseInt(raw, 10);
+        return isNaN(parsed) ? fallback : parsed;
+    };
+}
+
 (function($) {
     'use strict';
 
@@ -718,8 +731,8 @@
             const $btn = $(this);
             const $input = $('#number-of-travelers');
             let currentValue = parseInt($input.val()) || 1;
-            const min = parseInt($input.attr('min')) || 1;
-            const max = parseInt($input.attr('max')) || 20;
+            const min = window.yatraNumOr($input.attr('min'), 1);
+            const max = window.yatraNumOr($input.attr('max'), 20);
 
             if ($btn.hasClass('yatra-qty-plus')) {
                 if (currentValue < max) {
@@ -751,8 +764,8 @@
             const $row = $btn.closest('.yatra-quantity-row');
             const $input = $row.find('.yatra-qty-input');
             let currentValue = parseInt($input.val()) || 0;
-            const min = parseInt($input.attr('min')) || 0;
-            const max = parseInt($input.attr('max')) || 20;
+            const min = window.yatraNumOr($input.attr('min'), 0);
+            const max = window.yatraNumOr($input.attr('max'), 20);
 
             if ($btn.hasClass('yatra-qty-plus')) {
                 if (currentValue < max) {

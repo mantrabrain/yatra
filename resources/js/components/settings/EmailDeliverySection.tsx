@@ -58,6 +58,7 @@ export type EmailDeliverySectionProps = {
     | "admin_email"
     | "from_email"
     | "from_name"
+    | "email_always_bcc"
     | "smtp_enabled"
     | "smtp_host"
     | "smtp_port"
@@ -94,6 +95,23 @@ export const EmailDeliverySection: React.FC<EmailDeliverySectionProps> = ({
             name="admin_email"
             onChange={onFieldChange}
             placeholder={__("admin@example.com", "yatra")}
+          />
+        </Field>
+
+        <Field
+          id="email_always_bcc"
+          label={__("Always BCC", "yatra")}
+          description={__(
+            "Blind-copy this address on every email Yatra sends, for archiving or monitoring. Hidden from recipients. Separate several addresses with commas. Leave empty to send no copies.",
+            "yatra",
+          )}
+        >
+          <Input
+            id="email_always_bcc"
+            value={values.email_always_bcc ?? ""}
+            name="email_always_bcc"
+            onChange={onFieldChange}
+            placeholder={__("archive@example.com", "yatra")}
           />
         </Field>
 

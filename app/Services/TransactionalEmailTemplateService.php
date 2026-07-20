@@ -14,6 +14,15 @@ class TransactionalEmailTemplateService
 
     public const TYPE_PAYMENT_CONFIRMATION = 'payment_confirmation';
 
+    /**
+     * Partial payment received (deposit / instalment), where a balance remains.
+     *
+     * Opt-in: until an operator enables it, every payment keeps using
+     * TYPE_PAYMENT_CONFIRMATION exactly as before, so existing sites see no
+     * change. Only relevant when partial payments or deposits are switched on.
+     */
+    public const TYPE_PARTIAL_PAYMENT_RECEIVED = 'partial_payment_received';
+
     public const TYPE_BOOKING_CANCELLATION = 'booking_cancellation';
 
     public const TYPE_BOOKING_REMINDER = 'booking_reminder';
@@ -82,6 +91,7 @@ class TransactionalEmailTemplateService
         $map = [
             'booking_confirmation' => self::TYPE_BOOKING_CONFIRMATION,
             'payment_received' => self::TYPE_PAYMENT_CONFIRMATION,
+            'partial_payment_received' => self::TYPE_PARTIAL_PAYMENT_RECEIVED,
             'booking_cancelled' => self::TYPE_BOOKING_CANCELLATION,
             'trip_reminder' => self::TYPE_BOOKING_REMINDER,
             'admin_new_booking' => self::TYPE_ADMIN_NEW_BOOKING,
@@ -202,6 +212,11 @@ class TransactionalEmailTemplateService
                 'flag' => 'email_template_confirmation',
                 'subject' => 'email_tpl_payment_subject',
                 'body' => 'email_tpl_payment_body',
+            ],
+            self::TYPE_PARTIAL_PAYMENT_RECEIVED => [
+                'flag' => 'email_template_partial_payment',
+                'subject' => 'email_tpl_partial_payment_subject',
+                'body' => 'email_tpl_partial_payment_body',
             ],
             self::TYPE_BOOKING_CANCELLATION => [
                 'flag' => 'email_template_cancellation',
@@ -339,7 +354,117 @@ class TransactionalEmailTemplateService
          *
          * @param array<string, array{flag:string,subject:string,body:string}> $defaults
          */
+        // Per-template BCC / CC keys are DERIVED from each type's subject key
+        // (email_tpl_booking_subject -> email_tpl_booking_bcc / _cc) rather than
+        // written out 26 times. A hand-maintained parallel list is exactly how
+        // `admin_payment_received` ended up missing from the Pro override map, so
+        // a new template type now gets its BCC/CC keys automatically — including
+        // types added by modules through the filter below.
+        foreach ($defaults as $type => $keys) {
+            if (empty($keys['subject']) || !is_string($keys['subject'])) {
+                continue;
+            }
+
+            $base = preg_replace('/_subject$/', '', $keys['subject']);
+
+            if (!isset($defaults[$type]['bcc'])) {
+                $defaults[$type]['bcc'] = $base . '_bcc';
+            }
+            if (!isset($defaults[$type]['cc'])) {
+                $defaults[$type]['cc'] = $base . '_cc';
+            }
+        }
+
         return (array) apply_filters('yatra_transactional_email_type_to_keys', $defaults);
+    }
+
+    /**
+     * Build Cc/Bcc headers for a transactional type from its own settings.
+     *
+     * Both are opt-in: an empty setting adds no header, so nothing changes for
+     * an operator who never fills them in. Multiple comma-separated addresses are
+     * supported, and anything that is not a valid address is dropped rather than
+     * handed to the mailer.
+     *
+     * @return string[]
+     */
+    /**
+     * The transactional type currently being dispatched, if any.
+     *
+     * Pro can take over a send through `yatra_send_transactional_email` and mails
+     * it through its own service, which means header building here would be
+     * skipped entirely. Both paths funnel through EmailService::send, so the type
+     * is recorded for the duration of the dispatch and the Cc/Bcc for that
+     * template is applied there — one injection point that works whether core or
+     * Pro actually sends.
+     *
+     * @var string
+     */
+    private static $dispatchingType = '';
+
+    /**
+     * Cc/Bcc headers for the send currently in flight, for EmailService.
+     *
+     * @return string[]
+     */
+    public static function headersForCurrentDispatch(): array
+    {
+        if (self::$dispatchingType === '') {
+            return [];
+        }
+
+        return self::recipientHeadersForType(self::$dispatchingType);
+    }
+
+    private static function recipientHeadersForType(string $type): array
+    {
+        $map = self::typeToSettingsKeys();
+
+        if (!isset($map[$type])) {
+            return [];
+        }
+
+        $headers = [];
+
+        foreach (['Cc' => $map[$type]['cc'] ?? '', 'Bcc' => $map[$type]['bcc'] ?? ''] as $label => $settingKey) {
+            if ($settingKey === '') {
+                continue;
+            }
+
+            $addresses = self::sanitizeAddressList((string) SettingsService::get($settingKey, ''));
+
+            if ($addresses !== []) {
+                $headers[] = $label . ': ' . implode(', ', $addresses);
+            }
+        }
+
+        return $headers;
+    }
+
+    /**
+     * Split a comma/semicolon separated address list into valid addresses.
+     *
+     * @return string[]
+     */
+    public static function sanitizeAddressList(string $raw): array
+    {
+        $raw = trim($raw);
+
+        if ($raw === '') {
+            return [];
+        }
+
+        $addresses = [];
+
+        foreach (preg_split('/[,;]+/', $raw) as $candidate) {
+            $candidate = sanitize_email(trim((string) $candidate));
+
+            if ($candidate !== '' && is_email($candidate)) {
+                $addresses[strtolower($candidate)] = $candidate;
+            }
+        }
+
+        return array_values($addresses);
     }
 
     /**
@@ -376,23 +501,33 @@ class TransactionalEmailTemplateService
          * Allow Yatra Pro (or extensions) to send instead of core templates.
          * Return null to use core; true/false if handled.
          */
-        $handled = apply_filters('yatra_send_transactional_email', null, $type, $to, $variables);
-        if ($handled !== null) {
-            return (bool) $handled;
+        // Mark the type for the whole dispatch — including a Pro takeover — so
+        // EmailService can apply this template's own Cc/Bcc whichever service
+        // ends up doing the sending.
+        $previousType = self::$dispatchingType;
+        self::$dispatchingType = $type;
+
+        try {
+            $handled = apply_filters('yatra_send_transactional_email', null, $type, $to, $variables);
+            if ($handled !== null) {
+                return (bool) $handled;
+            }
+
+            if (!SettingsService::isEnabled($flag)) {
+                return false;
+            }
+
+            $rendered = self::render($type, $variables);
+
+            return EmailService::send(
+                $to,
+                $rendered['subject'],
+                $rendered['body'],
+                ['Content-Type: text/html; charset=UTF-8']
+            );
+        } finally {
+            self::$dispatchingType = $previousType;
         }
-
-        if (!SettingsService::isEnabled($flag)) {
-            return false;
-        }
-
-        $rendered = self::render($type, $variables);
-
-        return EmailService::send(
-            $to,
-            $rendered['subject'],
-            $rendered['body'],
-            ['Content-Type: text/html; charset=UTF-8']
-        );
     }
 
     /**
@@ -594,6 +729,10 @@ class TransactionalEmailTemplateService
                 /* translators: 1: site name, 2: booking reference. */
                 return sprintf(__('✅ [%1$s] Payment received · %2$s', 'yatra'), $site, $ref);
 
+            case self::TYPE_PARTIAL_PAYMENT_RECEIVED:
+                /* translators: 1: site name, 2: booking reference. */
+                return sprintf(__('💳 [%1$s] Part payment received · %2$s', 'yatra'), $site, $ref);
+
             case self::TYPE_BOOKING_CANCELLATION:
                 /* translators: 1: site name, 2: booking reference. */
                 return sprintf(__('📋 [%1$s] Booking cancelled · %2$s', 'yatra'), $site, $ref);
@@ -729,6 +868,9 @@ class TransactionalEmailTemplateService
 
             case self::TYPE_PAYMENT_CONFIRMATION:
                 return EmailTemplateDefaults::fallbackTransactionalPayment($v);
+
+            case self::TYPE_PARTIAL_PAYMENT_RECEIVED:
+                return EmailTemplateDefaults::fallbackTransactionalPartialPayment($v);
 
             case self::TYPE_BOOKING_CANCELLATION:
                 return EmailTemplateDefaults::fallbackTransactionalCancellation($v);

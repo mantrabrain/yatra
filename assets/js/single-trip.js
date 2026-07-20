@@ -13,6 +13,19 @@
 // Translation helpers — idempotent shim matching booking.js / trip.js so
 // `__()` resolves through wp.i18n when wp-i18n is enqueued, otherwise it
 // falls back to the source string.
+// Parse a numeric min/max attribute while preserving a legitimate 0.
+// `parseInt(el.getAttribute('max')) || 99` treated max="0" — what a sold-out
+// departure renders — as "unset" and fell back to the placeholder ceiling, so
+// the guest selector stayed usable and ignored the departure's real capacity.
+// Only an absent or non-numeric value may fall back. Installed once and shared
+// by every frontend script, so load order does not matter.
+if (typeof window.yatraNumOr !== 'function') {
+    window.yatraNumOr = function (raw, fallback) {
+        var parsed = parseInt(raw, 10);
+        return isNaN(parsed) ? fallback : parsed;
+    };
+}
+
 (function () {
     var i18n = (window.wp && window.wp.i18n) ? window.wp.i18n : null;
     if (i18n && typeof i18n.__ === 'function') {
@@ -560,8 +573,8 @@ document.addEventListener('DOMContentLoaded', function () {
         
         if (!input) return;
         
-        const min = parseInt(input.getAttribute('min')) || 0;
-        const max = parseInt(input.getAttribute('max')) || 99;
+        const min = window.yatraNumOr(input.getAttribute('min'), 0);
+        const max = window.yatraNumOr(input.getAttribute('max'), 99);
         let value = parseInt(input.value) || 0;
         
         // Update value based on button type
@@ -619,7 +632,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const regularInputs = document.querySelectorAll('#num_travelers, #enquiry_adults');
             regularInputs.forEach(input => {
                 if (input !== sourceInput) {
-                    const max = parseInt(input.getAttribute('max')) || 99;
+                    const max = window.yatraNumOr(input.getAttribute('max'), 99);
                     input.value = Math.min(sourceValue, max);
                 }
             });
@@ -628,7 +641,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const availabilityInputs = document.querySelectorAll('input[id^="num-travelers-"]');
             availabilityInputs.forEach(input => {
                 if (input !== sourceInput) {
-                    const max = parseInt(input.getAttribute('max')) || 99;
+                    const max = window.yatraNumOr(input.getAttribute('max'), 99);
                     input.value = Math.min(sourceValue, max);
                 }
             });
@@ -655,13 +668,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 categoryInputs.forEach(input => {
                     if (input !== sourceInput) {
-                        const max = parseInt(input.getAttribute('max')) || 99;
+                        const max = window.yatraNumOr(input.getAttribute('max'), 99);
                         input.value = Math.min(sourceValue, max);
                         
                         // Update button states for this input
                         const row = input.closest('.yatra-quantity-row');
                         if (row) {
-                            const min = parseInt(input.getAttribute('min')) || 0;
+                            const min = window.yatraNumOr(input.getAttribute('min'), 0);
                             const minusBtn = row.querySelector('.yatra-quantity-minus');
                             const plusBtn = row.querySelector('.yatra-quantity-plus');
                             if (minusBtn) minusBtn.disabled = input.value <= min;

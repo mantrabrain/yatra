@@ -7,6 +7,7 @@ namespace Yatra\Services;
 use Yatra\Repositories\CustomerRepository;
 use Yatra\Repositories\BookingRepository;
 use Yatra\Repositories\PaymentRepository;
+use Yatra\Utils\Logger;
 
 /**
  * Customer Service
@@ -480,18 +481,99 @@ class CustomerService
             return ['success' => false, 'message' => __('Customer not found.', 'yatra')];
         }
 
+        $previousEmail = (string) $customer->email;
+        $linkedUserId  = (int) ($customer->user_id ?? 0);
+
         // Check email uniqueness if changing
+        $emailChanged = false;
+        $newEmail     = '';
         if (!empty($data['email']) && $data['email'] !== $customer->email) {
-            $existingCustomer = $this->customerRepository->findByEmail($data['email']);
+            $newEmail = sanitize_email((string) $data['email']);
+
+            if (!is_email($newEmail)) {
+                return ['success' => false, 'message' => __('Please enter a valid email address.', 'yatra')];
+            }
+
+            $existingCustomer = $this->customerRepository->findByEmail($newEmail);
             if ($existingCustomer && (int) $existingCustomer->id !== $id) {
                 return ['success' => false, 'message' => __('Email is already in use by another customer.', 'yatra')];
             }
+
+            $data['email'] = $newEmail;
+            $emailChanged  = true;
+        }
+
+        // Decide up-front whether this customer signs in, so a rejection happens
+        // BEFORE anything is written.
+        //
+        // An account is only recognised when this customer row unambiguously
+        // represents it — that is, the account currently carries this very same
+        // address. Several customer rows can legitimately share one user_id (an
+        // operator booking on behalf of guests while logged in links every row to
+        // their own account), and acting on the account from one of those rows
+        // would touch the WRONG person's login — including an administrator's.
+        $accountUserId = 0;
+        if ($emailChanged && $linkedUserId > 0) {
+            $linkedUser = get_userdata($linkedUserId);
+
+            if ($linkedUser && strtolower((string) $linkedUser->user_email) === strtolower($previousEmail)) {
+                $ownerId = email_exists($data['email']);
+                if ($ownerId && (int) $ownerId !== $linkedUserId) {
+                    return [
+                        'success' => false,
+                        'message' => __('That email address already belongs to another user account.', 'yatra'),
+                    ];
+                }
+
+                $accountUserId = $linkedUserId;
+            }
+        }
+
+        // A customer who can sign in keeps ownership of their own login address:
+        // the new address must confirm the change before it takes effect, exactly
+        // as it does when the customer edits it themselves. Nothing is written
+        // here — the stored email stays put until that link is clicked.
+        //
+        // A customer WITHOUT an account has no login and no inbox to confirm
+        // from, so their record is corrected immediately.
+        $pendingEmail = '';
+        if ($accountUserId > 0) {
+            unset($data['email']);
         }
 
         $updated = $this->customerRepository->updateCustomer($id, $data);
 
         if (!$updated) {
             return ['success' => false, 'message' => __('Failed to update customer.', 'yatra')];
+        }
+
+        if ($accountUserId > 0) {
+            $requested = $this->requestEmailChange($accountUserId, $newEmail);
+
+            if (empty($requested['success'])) {
+                Logger::warning('Admin-requested customer email change could not be sent', [
+                    'customer_id' => $id,
+                    'user_id'     => $accountUserId,
+                    'reason'      => $requested['message'] ?? '',
+                ]);
+
+                return [
+                    'success' => false,
+                    'message' => $requested['message'] ?? __('The email change could not be requested.', 'yatra'),
+                ];
+            }
+
+            $pendingEmail = (string) ($requested['pending_email'] ?? $newEmail);
+
+            return [
+                'success'       => true,
+                'message'       => sprintf(
+                    /* translators: %s: the new email address awaiting confirmation. */
+                    __('Customer updated. A confirmation link was sent to %s — their email address changes once it is confirmed there.', 'yatra'),
+                    $pendingEmail
+                ),
+                'pending_email' => $pendingEmail,
+            ];
         }
 
         return [

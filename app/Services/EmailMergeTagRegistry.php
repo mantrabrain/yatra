@@ -45,6 +45,8 @@ final class EmailMergeTagRegistry
     public const EVENT_BOOKING_COMPLETED = 'booking.completed';
     public const EVENT_BOOKING_EXPIRED = 'booking.expired';
     public const EVENT_PAYMENT_RECEIVED = 'payment.received';
+    /** A payment landed but a balance is still outstanding (deposit / instalment). */
+    public const EVENT_PAYMENT_PARTIAL_RECEIVED = 'payment.partial_received';
     public const EVENT_PAYMENT_REMINDER = 'payment.reminder';
     public const EVENT_REMINDER_TRIP = 'reminder.trip';
     public const EVENT_ENQUIRY_CREATED = 'enquiry.created';
@@ -69,6 +71,7 @@ final class EmailMergeTagRegistry
         self::EVENT_BOOKING_COMPLETED,
         self::EVENT_BOOKING_EXPIRED,
         self::EVENT_PAYMENT_RECEIVED,
+        self::EVENT_PAYMENT_PARTIAL_RECEIVED,
         self::EVENT_PAYMENT_REMINDER,
         self::EVENT_REMINDER_TRIP,
         self::EVENT_REVIEW_REQUEST,
@@ -492,7 +495,7 @@ final class EmailMergeTagRegistry
                 'description' => 'Amount of the specific payment with currency.',
                 'category' => self::CATEGORY_PAYMENT,
                 'sample' => '$500.00',
-                'events' => [self::EVENT_PAYMENT_RECEIVED, self::EVENT_PAYMENT_REMINDER],
+                'events' => [self::EVENT_PAYMENT_RECEIVED, self::EVENT_PAYMENT_PARTIAL_RECEIVED, self::EVENT_PAYMENT_REMINDER],
             ],
             'payment_method' => [
                 'key' => 'payment_method',
@@ -500,7 +503,7 @@ final class EmailMergeTagRegistry
                 'description' => 'Instrument label (e.g. Card, Bank Transfer).',
                 'category' => self::CATEGORY_PAYMENT,
                 'sample' => 'Credit Card',
-                'events' => [self::EVENT_PAYMENT_RECEIVED, self::EVENT_PAYMENT_REMINDER],
+                'events' => [self::EVENT_PAYMENT_RECEIVED, self::EVENT_PAYMENT_PARTIAL_RECEIVED, self::EVENT_PAYMENT_REMINDER],
             ],
             'transaction_id' => [
                 'key' => 'transaction_id',

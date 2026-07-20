@@ -28,6 +28,13 @@ use Yatra\Services\BookingTaxService;
  */
 class BookingService
 {
+    /**
+     * Accepted payment statuses — mirrors the `payment_status` ENUM on the
+     * bookings table. Anything outside this list is rejected before it reaches
+     * the database, where an unknown value would be silently coerced.
+     */
+    public const PAYMENT_STATUSES = ['pending', 'partial', 'paid', 'refunded', 'failed'];
+
     private BookingRepository $bookingRepository;
     private PaymentRepository $paymentRepository;
     private TravellerRepository $travellerRepository;
@@ -522,6 +529,25 @@ class BookingService
             return ['success' => false, 'message' => __('Booking not found.', 'yatra')];
         }
 
+        // Reject an unknown payment status instead of handing it to MySQL. The
+        // column is an ENUM, so an unrecognised value was silently coerced —
+        // resetting a fully-paid booking to "pending" while amount_paid kept the
+        // money that had actually been received, and still returning success.
+        if (array_key_exists('payment_status', $data)) {
+            $paymentStatus = (string) $data['payment_status'];
+
+            if (!in_array($paymentStatus, self::PAYMENT_STATUSES, true)) {
+                return [
+                    'success' => false,
+                    'message' => sprintf(
+                        /* translators: %s: the list of accepted payment statuses. */
+                        __('Invalid payment status. Accepted values are: %s.', 'yatra'),
+                        implode(', ', self::PAYMENT_STATUSES)
+                    ),
+                ];
+            }
+        }
+
         // Check if date is being changed
         $oldStartDate = $booking->start_date ?? $booking->travel_date ?? null;
         $newStartDate = $data['start_date'] ?? $data['travel_date'] ?? null;
@@ -595,6 +621,43 @@ class BookingService
     }
 
     /**
+     * Record an operator-confirmed payment against a booking.
+     *
+     * Used when a booking is marked paid by hand — typically an offline payment
+     * such as a bank transfer or cash, where no gateway callback ever arrives.
+     * Without this the booking claimed the money while the ledger showed
+     * nothing, and the Payments screen stayed empty.
+     *
+     * Written as `completed` because the operator is asserting the funds were
+     * received; `payment_type` reflects whether this settles a balance or is the
+     * only payment on the booking.
+     */
+    private function recordManualPayment(object $booking, int $bookingId, float $amount, float $existingLedger): void
+    {
+        $gateway = (string) ($booking->payment_gateway ?? $booking->payment_method ?? '');
+
+        if (trim($gateway) === '') {
+            // `gateway` is NOT NULL on the payments table.
+            $gateway = 'manual';
+        }
+
+        $this->paymentRepository->create([
+            'booking_id'   => $bookingId,
+            'customer_id'  => !empty($booking->customer_id) ? (int) $booking->customer_id : null,
+            'gateway'      => $gateway,
+            'amount'       => $amount,
+            'currency'     => (string) ($booking->currency ?? SettingsService::getCurrency()),
+            'status'       => 'completed',
+            'payment_type' => $existingLedger > 0 ? 'final' : 'initial',
+            'notes'        => __('Recorded manually when the booking was marked as paid.', 'yatra'),
+            'processed_at' => current_time('mysql'),
+            'created_at'   => current_time('mysql'),
+        ]);
+
+        do_action('yatra_manual_payment_recorded', $bookingId, $amount, $gateway);
+    }
+
+    /**
      * React to a manual payment-status change (admin edits, e.g. bank transfer
      * marked Paid). Sends the customer + admin payment emails when money is
      * (fully or partially) received, and fires `yatra_payment_status_changed`
@@ -609,6 +672,55 @@ class BookingService
         }
 
         do_action('yatra_payment_status_changed', $bookingId, $oldStatus, $newStatus, $booking);
+
+        // Marking a booking paid has to settle its money fields too. An operator
+        // confirming an offline payment (bank transfer, cash) has no payment row
+        // to mark as completed — this status change is the only signal we get.
+        // Without reconciling here the booking read "paid" while amount_paid
+        // stayed 0 and amount_due kept the outstanding figure, so the invoice
+        // still reported "Payment Pending" with nothing paid and the full amount
+        // due.
+        //
+        // Only ever settles UP: a recorded amount_paid at or above the total is
+        // left alone, so this can never erase or reduce a real payment. The other
+        // statuses are deliberately untouched — "partial" carries no amount to
+        // apply, and zeroing on "pending"/"refunded" would destroy payment data.
+        if ($newStatus === 'paid') {
+            $total = (float) ($booking->total_amount ?? 0);
+            $recorded = (float) ($booking->amount_paid ?? 0);
+
+            if ($total > 0) {
+                // The payments ledger is the source of truth: PaymentService
+                // recalculates amount_paid from it whenever a payment is added,
+                // so a booking marked paid without a matching ledger row would
+                // silently revert to "partial" the next time any payment was
+                // recorded. Write the outstanding balance as a real payment so
+                // the two agree and the Payments screen shows what was received.
+                $ledger = (float) $this->paymentRepository->getTotalPaidForBooking($bookingId);
+
+                // Measure the gap against whichever figure is higher so an
+                // existing (pre-ledger) amount_paid is never double-counted.
+                $alreadyCovered = max($ledger, $recorded);
+                $outstanding = round($total - $alreadyCovered, 2);
+
+                if ($outstanding > 0) {
+                    $this->recordManualPayment($booking, $bookingId, $outstanding, $ledger);
+                    $ledger = (float) $this->paymentRepository->getTotalPaidForBooking($bookingId);
+                }
+
+                // Never reduce a recorded overpayment: settle up, never down.
+                $newAmountPaid = max($ledger, $recorded);
+
+                if ($newAmountPaid > $recorded || $recorded < $total) {
+                    // Canonical writer — also derives amount_due and keeps
+                    // payment_status consistent with the amounts.
+                    $this->bookingRepository->updateAmountPaid($bookingId, $newAmountPaid);
+
+                    $booking->amount_paid = $newAmountPaid;
+                    $booking->amount_due = max(0.0, $total - $newAmountPaid);
+                }
+            }
+        }
 
         if (in_array($newStatus, ['paid', 'partial'], true)) {
             $paidAmount = (float) ($booking->amount_paid ?? 0);

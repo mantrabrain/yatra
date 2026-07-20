@@ -14,6 +14,9 @@ import {
   Edit,
   Trash2,
   AlertTriangle,
+  CreditCard,
+  CircleDollarSign,
+  Undo2,
 } from "lucide-react";
 import {
   Pagination,
@@ -55,6 +58,45 @@ interface Booking {
   payment_gateway?: string;
   created_at: string;
 }
+
+
+/**
+ * Payment statuses an administrator can set straight from the booking list.
+ *
+ * Labels are prefixed with "Payment:" because the same menu already carries
+ * booking-status actions ("Mark as Pending", "Mark as Cancelled") — without the
+ * prefix two entries would read identically and set different fields.
+ *
+ * `failed` is deliberately omitted: it describes a gateway outcome rather than
+ * something an operator records by hand, and it is still settable from the
+ * booking edit screen.
+ */
+const PAYMENT_STATUS_ACTIONS: Array<{
+  value: string;
+  label: () => string;
+  icon: React.ReactNode;
+}> = [
+  {
+    value: "paid",
+    label: () => __("Payment: Mark as Paid"),
+    icon: <CreditCard className="w-4 h-4" />,
+  },
+  {
+    value: "partial",
+    label: () => __("Payment: Mark as Partially Paid"),
+    icon: <CircleDollarSign className="w-4 h-4" />,
+  },
+  {
+    value: "pending",
+    label: () => __("Payment: Mark as Pending"),
+    icon: <CircleDollarSign className="w-4 h-4" />,
+  },
+  {
+    value: "refunded",
+    label: () => __("Payment: Mark as Refunded"),
+    icon: <Undo2 className="w-4 h-4" />,
+  },
+];
 
 const Bookings: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -429,6 +471,30 @@ const Bookings: React.FC = () => {
     await apiService.bulkUpdateStatus("bookings", ids, newStatus);
   };
 
+  /**
+   * Set a booking's payment status from the actions menu.
+   *
+   * Marking a booking paid also settles its money fields server-side
+   * (BookingService::handlePaymentStatusChange), so the invoice reports the
+   * correct Amount Paid / Amount Due rather than staying at "Payment Pending".
+   */
+  const updatePaymentStatus = async (booking: Booking, status: string) => {
+    setIsBulkPending(true);
+    try {
+      await apiService.updateBooking(booking.id, { payment_status: status });
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["bookings-stats"] });
+      showToast(__("Payment status updated"), "success");
+    } catch (error: any) {
+      showToast(
+        error?.message || __("Failed to update payment status"),
+        "error",
+      );
+    } finally {
+      setIsBulkPending(false);
+    }
+  };
+
   const handleBulkApply = async () => {
     if (!bulkAction || selectedIds.length === 0) {
       return;
@@ -780,6 +846,16 @@ const Bookings: React.FC = () => {
       condition: (booking: Booking) =>
         can("yatra_edit_bookings") && booking.booking_status !== "completed",
     },
+    ...PAYMENT_STATUS_ACTIONS.map((action) => ({
+      key: `payment_${action.value}`,
+      label: action.label(),
+      icon: action.icon,
+      onClick: (booking: Booking) => updatePaymentStatus(booking, action.value),
+      // Hidden when the booking is already in that payment state, matching how
+      // the booking-status actions above behave.
+      condition: (booking: Booking) =>
+        can("yatra_edit_bookings") && booking.payment_status !== action.value,
+    })),
     {
       key: "delete",
       label: __("Delete"),

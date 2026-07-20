@@ -10,7 +10,8 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { __, sprintf } from "../../lib/i18n";
 import { currency } from "./utils";
-import { getCountryName, getCountryOptions } from "../../lib/countries";
+import { getCountryName, getCountrySelectOptions } from "../../lib/countries";
+import { SearchableSelect } from "../../components/ui/searchable-select";
 import { apiClient } from "../../lib/api-client";
 import { API_ENDPOINTS } from "../../lib/api-endpoints";
 import { useToast } from "../../components/ui/toast";
@@ -378,18 +379,13 @@ const Profile: React.FC<ProfileProps> = ({
                 {__("Country", "yatra")}
               </label>
               {isEditing ? (
-                <select
+                <SearchableSelect
                   value={formData.country}
-                  onChange={(e) => handleInputChange("country", e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
-                >
-                  <option value="">{__("Select your country", "yatra")}</option>
-                  {getCountryOptions().map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(v) => handleInputChange("country", v)}
+                  options={getCountrySelectOptions()}
+                  placeholder={__("Select your country", "yatra")}
+                  searchPlaceholder={__("Search country", "yatra")}
+                />
               ) : (
                 <p className="text-sm font-medium text-gray-900 dark:text-white py-2">
                   {getCountryName(formData.country) || __("Not set", "yatra")}

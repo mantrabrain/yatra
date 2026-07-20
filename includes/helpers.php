@@ -1020,6 +1020,59 @@ function yatra_get_white_label_settings(): array
 }
 
 /**
+ * Branding for generated PDFs (invoice, voucher, itinerary).
+ *
+ * Free ships an unbranded default — the header keeps whatever colour the
+ * document already used and no logo is shown — so nothing changes for a site
+ * without Yatra Pro. The White Label module hooks these filters to supply the
+ * operator's own logo and colour, exactly as it already does for
+ * `yatra_brand_icon_url` and friends.
+ *
+ * Kept as filters rather than reading White Label options directly so free never
+ * depends on Pro, and so a site can brand its PDFs from a theme or snippet
+ * without the module at all.
+ *
+ * @param string $defaultHeaderColor The document's existing header colour, so
+ *                                   each PDF keeps its own look when unbranded.
+ * @return array{logo_url: string, header_color: string}
+ */
+function yatra_get_pdf_branding(string $defaultHeaderColor): array
+{
+    $logo = (string) apply_filters('yatra_pdf_branding_logo_url', '');
+    $color = (string) apply_filters('yatra_pdf_branding_header_color', $defaultHeaderColor);
+
+    // Only accept a well-formed hex colour; anything else falls back to the
+    // document default rather than emitting broken CSS into the PDF.
+    if (!preg_match('/^#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?$/', $color)) {
+        $color = $defaultHeaderColor;
+    }
+
+    $logo = esc_url_raw(trim($logo));
+
+    return [
+        'logo_url'     => $logo,
+        'header_color' => $color,
+    ];
+}
+
+/**
+ * Are partial payments possible on this site at all?
+ *
+ * True when deposits or partial payments are switched on globally. Used to
+ * decide whether part-payment specific features (such as the separate
+ * "part payment received" email template) are relevant — there is no point
+ * showing them to an operator who only ever takes payment in full.
+ */
+function yatra_partial_payments_enabled(): bool
+{
+    $enabled = \Yatra\Services\SettingsService::isEnabled('partial_payment')
+        || \Yatra\Services\SettingsService::isEnabled('enable_deposit')
+        || \Yatra\Services\SettingsService::isEnabled('deposit_required');
+
+    return (bool) apply_filters('yatra_partial_payments_enabled', $enabled);
+}
+
+/**
  * Branded plugin name shown in admin menu, plugin list, and PDFs.
  */
 function yatra_get_brand_name(): string

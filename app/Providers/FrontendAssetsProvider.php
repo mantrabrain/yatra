@@ -398,6 +398,7 @@ class FrontendAssetsProvider
         // International phone-number widget (country flag + dial code) used by
         // the booking form's tel fields.
         $this->enqueuePhoneInputAssets();
+        $this->enqueueCountrySelectAssets();
 
         // Mobile sticky-sidebar + flatpickr init for the single-trip page. Lives in a
         // dedicated file rather than as inline <script> in the partial because
@@ -536,6 +537,57 @@ class FrontendAssetsProvider
                 'bookingNonce' => wp_create_nonce('yatra_booking_action'),
             ]
         ));
+    }
+
+    /**
+     * Enqueue the country selector widget (assets/js/country-select.js +
+     * assets/css/country-select.css).
+     *
+     * Upgrades every `type => country` field (Country, Nationality, on both the
+     * contact and traveler sections) into a searchable dropdown showing the
+     * national flag, matching the phone country-code control. Purely additive:
+     * the underlying <select> still renders and submits, so a site that never
+     * loads this script behaves exactly as before.
+     *
+     * Idempotent, so it is safe to call from every path that renders the form.
+     *
+     * @return void
+     */
+    private function enqueueCountrySelectAssets(): void
+    {
+        if (wp_script_is('yatra-country-select', 'enqueued')) {
+            return;
+        }
+
+        $css = YATRA_PLUGIN_PATH . 'assets/css/country-select.css';
+        if (file_exists($css)) {
+            wp_enqueue_style(
+                'yatra-country-select',
+                YATRA_PLUGIN_URL . 'assets/css/country-select.css',
+                [],
+                YATRA_VERSION . '.' . filemtime($css)
+            );
+        }
+
+        $js = YATRA_PLUGIN_PATH . 'assets/js/country-select.js';
+        if (!file_exists($js)) {
+            return;
+        }
+
+        wp_enqueue_script(
+            'yatra-country-select',
+            YATRA_PLUGIN_URL . 'assets/js/country-select.js',
+            [],
+            YATRA_VERSION . '.' . filemtime($js),
+            true
+        );
+
+        wp_localize_script('yatra-country-select', 'yatraCountrySelectData', [
+            'i18n' => [
+                'search'    => __('Search country', 'yatra'),
+                'noResults' => __('No matches', 'yatra'),
+            ],
+        ]);
     }
 
     /**
@@ -688,6 +740,7 @@ class FrontendAssetsProvider
 
         // International phone-number widget (country flag + dial code).
         $this->enqueuePhoneInputAssets();
+        $this->enqueueCountrySelectAssets();
 
         // Load each available gateway's own client scripts on the checkout page
         // (e.g. Square Web Payments SDK + square.js, Authorize.Net Accept.js +

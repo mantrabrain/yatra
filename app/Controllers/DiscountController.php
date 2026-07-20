@@ -374,8 +374,8 @@ class DiscountController extends BaseController
             return sprintf(__('%s%% off', 'yatra'), $this->formatDiscountNumberForDisplay($amount));
         }
 
-        /* translators: %s: discount amount */
-        return sprintf(__('%s off', 'yatra'), '$' . number_format($amount, 2));
+        /* translators: %s: discount amount, already formatted with the site currency */
+        return sprintf(__('%s off', 'yatra'), yatra_format_price((float) $amount, null, false));
     }
 
     private function formatDiscountNumberForDisplay(float $amount): string

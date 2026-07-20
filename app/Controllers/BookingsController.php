@@ -810,6 +810,7 @@ class BookingsController extends BaseController
             'company_phone' => $companyPhone,
             'customer_name' => $customerName,
             'customer_email' => (string) ($booking['contact_email'] ?? $booking['customer_email'] ?? ''),
+            'customer_address_lines' => FormatHelper::customerAddressLines($booking),
             'booking_ref' => $bookingRef,
             'booking_date' => $bookingDate,
             'booking_status' => ucfirst($statusRaw ?: 'pending'),
@@ -827,9 +828,9 @@ class BookingsController extends BaseController
             'travel_date' => $travelDate,
             'return_date' => $returnDate,
             'currency_symbol' => $currencySymbol,
-            'total_amount' => number_format((float) ($booking['total_amount'] ?? 0), 2),
-            'amount_paid' => number_format((float) ($booking['amount_paid'] ?? 0), 2),
-            'amount_due' => number_format((float) ($booking['amount_due'] ?? 0), 2),
+            'total_amount' => yatra_format_price((float) ($booking['total_amount'] ?? 0), $currency, false),
+            'amount_paid' => yatra_format_price((float) ($booking['amount_paid'] ?? 0), $currency, false),
+            'amount_due' => yatra_format_price((float) ($booking['amount_due'] ?? 0), $currency, false),
             'traveler_count' => (int) ($booking['travelers_count'] ?? $booking['travelers'] ?? 1),
         ];
 

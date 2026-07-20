@@ -113,6 +113,10 @@ class SettingsService
         'admin_email' => '',
         'enable_admin_notifications' => true,
         'enable_customer_notifications' => true,
+        // Blind copy of every outgoing Yatra email, for archiving or monitoring.
+        // Empty (the default) means no copy is sent, so existing sites are
+        // unaffected. Accepts several comma-separated addresses.
+        'email_always_bcc' => '',
 
         // Email template enable flags.
         //
@@ -132,6 +136,11 @@ class SettingsService
         // on those installs (sendIfEnabled gates on the flag).
         'email_template_booking' => true,
         'email_template_confirmation' => true,
+        // Separate "part payment received" email. Off by default: existing sites
+        // keep sending the single payment-received template for every payment,
+        // exactly as before. Only meaningful when deposits / partial payments
+        // are enabled.
+        'email_template_partial_payment' => false,
         'email_template_cancellation' => true,
         'email_template_reminder' => true,
         'email_template_admin_new_booking' => true,

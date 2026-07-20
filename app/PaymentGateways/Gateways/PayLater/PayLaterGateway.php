@@ -123,13 +123,13 @@ class PayLaterGateway extends AbstractPaymentGateway
                 ? sprintf(
                     /* translators: 1: formatted deposit amount, 2: number of days before the trip. */
                     __('A deposit of %1$s is required to confirm your booking. Full payment is due %2$d days before your trip.', 'yatra'),
-                    number_format($depositAmount, 2),
+                    yatra_format_price((float) $depositAmount, null, false),
                     $deadlineDays
                 )
                 : sprintf(
                     /* translators: 1: formatted total amount, 2: number of days before the trip. */
                     __('Your booking is reserved! Full payment of %1$s is due %2$d days before your trip.', 'yatra'),
-                    number_format($amount, 2),
+                    yatra_format_price((float) $amount, null, false),
                     $deadlineDays
                 ),
         ];
