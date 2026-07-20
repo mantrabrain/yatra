@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel, travel-agency
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 3.0.10
+Stable tag: 3.0.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -280,6 +280,27 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 == Changelog ==
 
 The two most recent releases are listed below. For the complete version history, see [changelog.txt](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
+
+= 3.0.11 — 20 July 2026 =
+* **Departures now honour your recurring availability rule:** a tour with a 9-seat vehicle but a rule allowing only **1 booking per date** showed 9 under Departures. Overlapping rules were resolved in an arbitrary order (every rule carries the same priority), so the wrong one could win and the display fell back to the tour's passenger capacity. Rule matching is now deterministic — the most recently created rule wins a tie — and rules created in the editor are read correctly everywhere.
+* **Departures can be deleted again:** deletion always failed with *"Manual departures or departures with bookings cannot be deleted"*, even for an empty, auto-created departure. The check required an internal value the plugin never actually stores, so **no** departure was ever deletable. A departure can now be removed once no bookings remain — checked against the real booking records rather than a counter that can drift — and departures with bookings are still protected.
+* **Dashboard occupancy is no longer 0%:** the dashboard counted only departures inside the selected date range, which excluded the upcoming departures the figure is about, while individual trip pages calculated it correctly.
+* **Guest selector on sold-out dates:** the traveller selector stayed usable on a fully booked departure and allowed more guests than the tour's capacity. A sold-out date now starts at 0 with the controls disabled, and the maximum always reflects the seats actually left.
+* **Bulk actions no longer report the wrong thing:** choosing departures and pressing Apply without picking an action said *"Please select departures and a bulk action first"*, pointing at the selection rather than the missing action. Each message now names the input that is actually missing (also fixed on Rules, Items, Item Types, Itinerary and Email Templates).
+* **Star ratings on the booking confirmation:** half stars never appeared, so a 4.5 rating rendered as 4 solid stars next to the text "4.5". Trip pages and the confirmation page now round identically.
+* **Administrators can change a customer's email address:** editable from the customer screen. If the customer can sign in, a confirmation link is sent to the new address and the change applies once confirmed (matching WordPress); customers without an account are updated immediately.
+* **Invoices show full addresses:** the customer's postal address is included, and a multi-line company address keeps its line breaks instead of collapsing onto one line.
+* **Invoices respect your number and currency settings:** amounts previously always printed as `$1,234.56`, ignoring the configured decimal separator, thousands separator, decimal places and symbol position. Vouchers and itineraries were corrected too.
+* **Invoices reflect the payment status:** after an offline payment the invoice stayed *Payment Pending* with nothing paid and the full amount due. Marking a booking paid now settles the amounts and records the payment, so the invoice reads Paid with a zero balance.
+* **Customised admin emails are used again:** when a payment arrived the customer received their customised template but the administrator still got the built-in default. Every core email type can now be overridden.
+* **Bank transfer details on invoices are translatable:** they reuse the same translations as the booking confirmation page, so translating once covers both.
+* **Bank details on the booking confirmation are aligned** with every other row.
+* **Payment status can be changed from the bookings list:** an Actions entry for Paid, Partially Paid, Pending and Refunded — useful for bank transfers and other payments received by hand. Marking a booking paid also records it in Payments, so a later payment cannot overwrite it.
+* **Always-BCC and per-template CC/BCC:** archive or monitor outgoing mail with a site-wide blind copy, plus optional CC/BCC on any individual template. Nothing is copied until you enter an address.
+* **Country flags in every country selector**, including a search box, on checkout and in the admin.
+* **Invoice, voucher and itinerary branding:** the White Label module can now supply a company logo and header colour for generated documents.
+* **Separate "Partial Payment Received" email:** an optional template with its own wording and remaining-balance details, used only when deposits or partial payments are enabled and the template is switched on.
+* Fixed several smaller issues: hidden PHP notices on the departures and customers screens, hardcoded `$` in discount labels and deposit messages, a To address with several recipients being silently mangled, team invitations bypassing SMTP settings, and an admin bundle that could never be cached by the browser.
 
 = 3.0.10 — 15 July 2026 =
 * **Tour review structured data (SEO) — fixed the Google Search Console errors:** GSC reported *"Invalid object type for field &lt;parent_node&gt;"*, *"Missing field author"* and *"Missing field itemReviewed"* on tour pages. The cause was the review Microdata — the AggregateRating was nested in a `TouristTrip` (a type Google doesn't support for review snippets), and the whole reviews section was marked as one `Review` with no author/itemReviewed. Microdata can't express this correctly here (the rating is in the hero, the reviews are a separate section, so they can't share one valid parent node), so review structured data is now emitted as **JSON-LD** — Google's recommended format — centrally for every tour page: a `Product` with the tour name, `aggregateRating`, and a `review[]` array where each review carries `author` (Person), `reviewRating`, `reviewBody`, `datePublished` and the review title. The broken Microdata was removed. Tours without reviews keep their previous schema (no incomplete-Product markup). The JSON-LD is `\u`-escaped so review text can never break out of the `<script>` block.
