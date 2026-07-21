@@ -806,6 +806,7 @@ class BookingsController extends BaseController
         $templateData = [
             'company_name' => $companyName,
             'company_address' => $companyAddress,
+            'company_address_lines' => \Yatra\Helpers\FormatHelper::companyAddressLines(),
             'company_email' => $companyEmail,
             'company_phone' => $companyPhone,
             'customer_name' => $customerName,

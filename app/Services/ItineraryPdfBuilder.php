@@ -122,6 +122,7 @@ class ItineraryPdfBuilder
         $templateData = [
             'company_name'    => SettingsService::get('company_name', get_bloginfo('name')),
             'company_address' => SettingsService::get('company_address', ''),
+            'company_address_lines' => \Yatra\Helpers\FormatHelper::companyAddressLines(),
             'company_email'   => SettingsService::get('company_email', get_option('admin_email')),
             'company_phone'   => SettingsService::get('company_phone', ''),
             'customer_name'   => $customerName,

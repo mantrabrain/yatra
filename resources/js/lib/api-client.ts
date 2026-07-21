@@ -515,6 +515,8 @@ export const apiService = {
     apiClient.get(API_ENDPOINTS.BOOKINGS, { params }),
   getBooking: (id: string | number) =>
     apiClient.get(API_ENDPOINTS.BOOKING_GET(id)),
+  getTripAvailableDates: (id: string | number) =>
+    apiClient.get(API_ENDPOINTS.TRIP_AVAILABLE_DATES(id)),
   createBooking: (data: any) => apiClient.post(API_ENDPOINTS.BOOKINGS, data),
   updateBooking: (id: string | number, data: any) =>
     apiClient.put(API_ENDPOINTS.BOOKING_GET(id), data),

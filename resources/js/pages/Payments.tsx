@@ -48,6 +48,8 @@ interface Payment {
   amount: number;
   currency?: string;
   payment_method: string;
+  /** Resolved display label; falls back to payment_method when absent */
+  payment_method_label?: string;
   payment_status:
     | "pending"
     | "completed"
@@ -570,7 +572,7 @@ const Payments: React.FC = () => {
       visible: visibleColumns.method,
       render: (payment: Payment) => (
         <span className="text-gray-600 dark:text-gray-400">
-          {payment.payment_method}
+          {payment.payment_method_label || payment.payment_method}
         </span>
       ),
     },

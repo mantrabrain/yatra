@@ -381,6 +381,56 @@ class FormatHelper
     }
 
     /**
+     * The operator's own business address, one entry per line.
+     *
+     * Settings hold the address in separate fields (street, city, state, postcode,
+     * country) but documents only ever printed `company_address` — so everything
+     * after the street silently vanished and the address looked truncated at its
+     * final line. Composed the same way as {@see customerAddressLines()} so both
+     * sides of a document read identically.
+     *
+     * @return list<string>
+     */
+    public static function companyAddressLines(): array
+    {
+        $get = static function (string $key): string {
+            return trim((string) \Yatra\Services\SettingsService::get($key, ''));
+        };
+
+        $street = $get('company_address');
+        $city = $get('company_city');
+        $state = $get('company_state');
+        $zip = $get('company_zip');
+        $countryRaw = $get('company_country');
+
+        // "City, State 12345" reads as one line; street and country get their own.
+        $locality = trim(implode(', ', array_filter([$city, $state])));
+        if ($zip !== '') {
+            $locality = trim($locality . ' ' . $zip);
+        }
+
+        $country = $countryRaw !== '' ? self::getCountryName($countryRaw) : '';
+
+        // The street field may itself carry line breaks (an operator pasting a full
+        // address), so keep those as separate lines rather than one run-on entry.
+        $lines = [];
+        foreach (preg_split('/\R/', $street) ?: [] as $streetLine) {
+            $streetLine = trim($streetLine);
+            if ($streetLine !== '') {
+                $lines[] = $streetLine;
+            }
+        }
+
+        foreach ([$locality, $country] as $line) {
+            if ($line !== '') {
+                $lines[] = $line;
+            }
+        }
+
+        return array_values($lines);
+    }
+
+    /**
      * Canonical country list — single source of truth used by every
      * country / nationality dropdown in both Free and Pro plugins.
      *

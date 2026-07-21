@@ -55,6 +55,7 @@ interface ViewPaymentRow {
   trip_title: string;
   amount: number;
   payment_method: string;
+  payment_method_label?: string;
   payment_status: string;
   transaction_id: string;
   payment_date: string;
@@ -380,7 +381,7 @@ const ViewPayment: React.FC = () => {
                     <div className="mt-1 flex items-center gap-2">
                       <CreditCard className="w-4 h-4 text-gray-400" />
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {payment.payment_method}
+                        {payment.payment_method_label || payment.payment_method}
                       </p>
                     </div>
                   </div>

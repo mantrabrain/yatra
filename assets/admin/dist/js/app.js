@@ -1,9 +1,9 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-DC2KEIV2.js","../../../dist/js/react-vendor-xzSqHjRF.js","../css/react-vendor.css","../../../dist/js/index-Cfwr4v__.js","../css/index.css","../../../dist/js/BuildItineraryModal-D7Fb3uzt.js","../../../dist/js/ProFeature-DLowS7DM.js","../../../dist/js/Settings-GWKCAgwb.js","../../../dist/js/Team-B2tJV0MB.js","../../../dist/js/Reports-FO-orrZZ.js","../../../dist/js/DiscountForm-Cf3-BEPg.js","../../../dist/js/ApplicableTripSelector-ByXYCU1M.js","../../../dist/js/Itinerary-D2s5vBse.js","../../../dist/js/RecurringRuleForm-DqbHRd9P.js","./Whatsapp.js","../../../dist/js/module-skeleton-Cb1q-Zbx.js","../../../dist/js/ChannelManager-Ci_izIZp.js","../../../dist/js/Webhooks-BXiv98Nu.js","../../../dist/js/TripConsentForm-CUEd4uhQ.js","../../../dist/js/BookingForm-CmQBN4N9.js","../../../dist/js/ViewBooking-zKw1OoXU.js","../../../dist/js/AvailabilityForm-C50ev4a-.js","../../../dist/js/DynamicPricing-D8ZvLcDs.js","../../../dist/js/RuleTypeSelectionModal-DX3yB1Ol.js","../../../dist/js/toggle-DUbJsrWf.js","../../../dist/js/DynamicPricingRuleForm-ChhxklVe.js","../../../dist/js/AiAssistant-Cw-ji0-f.js","../../../dist/js/AbandonedRecovery-9p2u7HOq.js","../../../dist/js/WhiteLabel-DqrT0VH3.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-CNo9Rmha.js","../../../dist/js/react-vendor-xzSqHjRF.js","../css/react-vendor.css","../../../dist/js/index-d5SvbCd2.js","../css/index.css","../../../dist/js/BuildItineraryModal-uwHaNgQi.js","../../../dist/js/ProFeature-xUch0Nzh.js","../../../dist/js/Settings-D6fIQOg0.js","../../../dist/js/Team-BfLCCRw_.js","../../../dist/js/Reports-IbJtBH1g.js","../../../dist/js/DiscountForm-h3YgOklC.js","../../../dist/js/ApplicableTripSelector-5VkyoFjX.js","../../../dist/js/Itinerary-yt934gWp.js","../../../dist/js/RecurringRuleForm-fvC6oxv3.js","./Whatsapp.js","../../../dist/js/module-skeleton-Cb1q-Zbx.js","../../../dist/js/ChannelManager-ot3cFDSl.js","../../../dist/js/Webhooks-Dgo5wDFi.js","../../../dist/js/TripConsentForm-BXPYoZJl.js","../../../dist/js/BookingForm-CErVpQqK.js","../../../dist/js/ViewBooking-B_1Vf_7k.js","../../../dist/js/AvailabilityForm-C1xVLre3.js","../../../dist/js/DynamicPricing-CMoXGDlV.js","../../../dist/js/RuleTypeSelectionModal-iEzskFri.js","../../../dist/js/toggle-DUbJsrWf.js","../../../dist/js/DynamicPricingRuleForm-DTYPKfzW.js","../../../dist/js/AiAssistant-CxWksDSA.js","../../../dist/js/AbandonedRecovery-DJcU_lO7.js","../../../dist/js/WhiteLabel-ji7Esrgv.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
 import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as Calendar$1, q as MapPin, s as LayoutDashboard, u as useQuery, t as useQueryClient, v as useMutation, Z as Zap, w as Webhook, x as ChevronDown, y as ChevronRight, z as ArrowLeft, G as Gift, D as Loader2, E as Sun, H as Moon, I as User, J as RefreshCw, O as Inbox, Q as AlertTriangle, V as ExternalLink, X as isObjectLike_1, _ as _baseGetTag, Y as isArray_1, $ as _MapCache, a0 as getDefaultExportFromCjs, a1 as _Symbol, a2 as isObject$5, a3 as isFunction, a4 as reactIsExports, a5 as React, a6 as _Stack, a7 as _baseIsEqual, a8 as isObject_1, a9 as keys_1, aa as isLength_1, ab as _isIndex, ac as isArguments_1, ad as _Set, ae as _setToArray, af as _SetCache, ag as _cacheHas, ah as _arrayPush, ai as isArrayLike_1, aj as _baseUnary, ak as _getNative, al as eq_1, am as _root, an as isEqual, ao as Animate, ap as _overArg, aq as _arraySome, ar as Clock, as as DollarSign, at as ArrowRight, au as Shield, av as CheckCircle, aw as Plus, ax as X, ay as reactDomExports, az as AlertCircle, aA as Check, aB as Wand2, aC as ChevronLeft, aD as CheckCircle2, aE as HelpCircle, aF as Info, aG as Copy, aH as MoreVertical, aI as Columns, aJ as PenSquare, aK as ArrowUp, aL as ArrowDown, aM as Archive, aN as Trash2, aO as Search, aP as ArrowUpDown, aQ as Eye, aR as Upload, aS as Image, aT as ReactQuill, aU as Pen, aV as Save, aW as CircleDollarSign, aX as Undo2, aY as Phone, aZ as PauseCircle, a_ as ShieldX, a$ as ShieldOff, b0 as Globe, b1 as Award, b2 as Database, b3 as Folder, b4 as Mountain, b5 as UserCheck, b6 as Download, b7 as Server, b8 as XCircle, b9 as Video, ba as Lock, bb as GripVertical, bc as ChevronUp, bd as Play, be as ClipboardCopy, bf as Ban, bg as Bell, bh as Heart, bi as Scissors, bj as Send, bk as Filter, bl as ArrowUpRight, bm as ClipboardCheck, bn as PenTool, bo as Camera, bp as BarChart$1, bq as Megaphone, br as GitBranch, bs as Pause, bt as Settings2, bu as Code, bv as Bug, bw as EyeOff, bx as QueryClient, by as client, bz as QueryClientProvider } from "../../../dist/js/react-vendor-xzSqHjRF.js";
-import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as todayYmd, S as SearchableSelect, h as getCurrencySymbol, i as getCountryName, j as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-Cfwr4v__.js";
+import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as todayYmd, S as SearchableSelect, h as getCurrencySymbol, i as getCountryName, j as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-d5SvbCd2.js";
 const scriptRel = "modulepreload";
 const assetsURL = function(dep, importerUrl) {
   return new URL(dep, importerUrl).href;
@@ -26149,6 +26149,7 @@ const UpcomingDepartures = ({
 }) => {
   const formatDate2 = (dateString) => {
     const date2 = toDateValue(dateString);
+    if (isNaN(date2.getTime())) return "-";
     return date2.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -26158,6 +26159,7 @@ const UpcomingDepartures = ({
   const getDaysUntil = (dateString) => {
     const today = /* @__PURE__ */ new Date();
     const departure = toDateValue(dateString);
+    if (isNaN(departure.getTime())) return null;
     const diffTime = departure.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1e3 * 60 * 60 * 24));
     return diffDays;
@@ -26202,7 +26204,7 @@ const UpcomingDepartures = ({
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: departure.destination })
                 ] })
               ] }),
-              daysUntil >= 0 && daysUntil <= 7 && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: daysUntil <= 3 ? "error" : "warning", children: daysUntil === 0 ? __("Today", "yatra") : daysUntil === 1 ? __("Tomorrow", "yatra") : `${daysUntil} ${__("days", "yatra")}` })
+              daysUntil !== null && daysUntil >= 0 && daysUntil <= 7 && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: daysUntil <= 3 ? "error" : "warning", children: daysUntil === 0 ? __("Today", "yatra") : daysUntil === 1 ? __("Tomorrow", "yatra") : `${daysUntil} ${__("days", "yatra")}` })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
@@ -26253,7 +26255,9 @@ const PendingPayments = ({
     zeroAsUnknown: false
   });
   const formatDate2 = (dateString) => {
-    return toDateValue(dateString).toLocaleDateString();
+    const date2 = toDateValue(dateString);
+    if (isNaN(date2.getTime())) return "-";
+    return date2.toLocaleDateString();
   };
   const totalPending = (payments == null ? void 0 : payments.reduce((sum, p) => sum + p.amount, 0)) || 0;
   if (loading) {
@@ -26286,7 +26290,7 @@ const PendingPayments = ({
                 /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-3 h-3" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: payment.customer_name })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400", children: [
+              formatDate2(payment.due_date) !== "-" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-3 h-3" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
                   __("Due", "yatra"),
@@ -26297,7 +26301,7 @@ const PendingPayments = ({
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-right", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-gray-900 dark:text-white", children: formatCurrency2(payment.amount) }),
-              payment.payment_method && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: payment.payment_method })
+              payment.payment_method && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: payment.payment_method_label || payment.payment_method })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 mt-2", children: [
@@ -26337,7 +26341,9 @@ const RecentBookings = ({
 }) => {
   var _a;
   const formatDate2 = (dateString) => {
-    return toDateValue(dateString).toLocaleDateString("en-US", {
+    const date2 = toDateValue(dateString);
+    if (isNaN(date2.getTime())) return "-";
+    return date2.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric"
@@ -56591,7 +56597,7 @@ const Payments = () => {
       label: __("Method", "yatra"),
       sortable: true,
       visible: visibleColumns.method,
-      render: (payment) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: payment.payment_method })
+      render: (payment) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: payment.payment_method_label || payment.payment_method })
     },
     {
       key: "status",
@@ -57940,7 +57946,7 @@ const ViewPayment = () => {
                 /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide", children: __("Payment Method", "yatra") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-1 flex items-center gap-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(CreditCard, { className: "w-4 h-4 text-gray-400" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white", children: payment.payment_method })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white", children: payment.payment_method_label || payment.payment_method })
                 ] })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -73131,6 +73137,7 @@ const EmailTemplateForm = () => {
     queryFn: () => fetchEmailTemplate(id),
     enabled: Boolean(id) && !isCoreSettingsEdit
   });
+  const isSystemTemplate = Boolean(templateData == null ? void 0 : templateData.is_system);
   const { data: variablesData } = useQuery({
     queryKey: ["email-variables", formData.event_key || ""],
     queryFn: () => fetchEmailTemplateVariables(formData.event_key || ""),
@@ -73976,6 +73983,19 @@ const EmailTemplateForm = () => {
                   formData.event_key || "-"
                 ] })
               ] }),
+              !isSystemTemplate && !isCoreSettingsEdit && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "select",
+                {
+                  "aria-label": __("Trigger Event"),
+                  value: formData.event_key || "",
+                  onChange: (e) => setFormData({ ...formData, event_key: e.target.value }),
+                  className: "w-full mt-1 px-2 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white",
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("No event (use in a sequence)") }),
+                    events.map((ev) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: ev.key, children: ev.name || ev.key }, ev.key))
+                  ]
+                }
+              ),
               formData.event_key && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 italic", children: ((_c = events.find((e) => e.key === formData.event_key)) == null ? void 0 : _c.description) || "" })
             ] }),
             isCreateMode ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
@@ -77244,27 +77264,27 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-DC2KEIV2.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-GWKCAgwb.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
-const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-B2tJV0MB.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
-const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-FO-orrZZ.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
-const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-Cf3-BEPg.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
-const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-D2s5vBse.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
-const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-DqbHRd9P.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-CNo9Rmha.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-D6fIQOg0.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-BfLCCRw_.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
+const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-IbJtBH1g.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
+const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-h3YgOklC.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
+const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-yt934gWp.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
+const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-fvC6oxv3.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
 const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.js"), true ? __vite__mapDeps([14,1,2,3,4,15]) : void 0, import.meta.url));
-const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-Ci_izIZp.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
-const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-BXiv98Nu.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
-const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-CUEd4uhQ.js"), true ? __vite__mapDeps([18,1,2,3,4,11]) : void 0, import.meta.url));
-const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-CmQBN4N9.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
-const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-zKw1OoXU.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-C50ev4a-.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
-const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-D8ZvLcDs.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
+const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-ot3cFDSl.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
+const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-Dgo5wDFi.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
+const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-BXPYoZJl.js"), true ? __vite__mapDeps([18,1,2,3,4,11]) : void 0, import.meta.url));
+const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-CErVpQqK.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
+const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-B_1Vf_7k.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-C1xVLre3.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
+const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-CMoXGDlV.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
-  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-ChhxklVe.js"), true ? __vite__mapDeps([25,1,2,3,4,23]) : void 0, import.meta.url)
+  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-DTYPKfzW.js"), true ? __vite__mapDeps([25,1,2,3,4,23]) : void 0, import.meta.url)
 );
-const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-Cw-ji0-f.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
-const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-9p2u7HOq.js"), true ? __vite__mapDeps([27,1,2,3,4,24]) : void 0, import.meta.url));
-const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-DqrT0VH3.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
+const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-CxWksDSA.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
+const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-DJcU_lO7.js"), true ? __vite__mapDeps([27,1,2,3,4,24]) : void 0, import.meta.url));
+const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-ji7Esrgv.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
 const PageLoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-1/3" }),

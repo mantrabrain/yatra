@@ -2,6 +2,17 @@
 
 $companyName = (string) ($company_name ?? '');
 $companyAddress = (string) ($company_address ?? '');
+// Settings keep the business address in separate fields (street, city, state,
+// postcode, country); documents only ever printed the street, so everything after
+// it was missing and the address looked cut off at its last line. Prefer the
+// composed lines, falling back to the raw street for any caller not passing them.
+$companyAddressLines = (isset($company_address_lines) && is_array($company_address_lines))
+    ? array_values(array_filter(array_map('strval', $company_address_lines), static function ($line) {
+        return trim($line) !== '';
+    }))
+    : array_values(array_filter(preg_split('/\R/', $companyAddress) ?: [], static function ($line) {
+        return trim($line) !== '';
+    }));
 $companyEmail = (string) ($company_email ?? '');
 $companyPhone = (string) ($company_phone ?? '');
 

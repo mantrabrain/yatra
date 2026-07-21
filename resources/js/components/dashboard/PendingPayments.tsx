@@ -19,9 +19,10 @@ interface PendingPayment {
   customer_name: string;
   trip_title: string;
   amount: number;
-  due_date: string;
+  due_date?: string | null;
   days_overdue?: number;
   payment_method?: string;
+  payment_method_label?: string;
 }
 
 interface PendingPaymentsProps {
@@ -46,9 +47,12 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
       zeroAsUnknown: false,
     });
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string | null) => {
     // toDateValue: a date-only due_date must not roll back a day in behind-UTC zones.
-    return toDateValue(dateString).toLocaleDateString();
+    // A payment can arrive with no due date, so render a dash rather than throwing.
+    const date = toDateValue(dateString);
+    if (isNaN(date.getTime())) return "-";
+    return date.toLocaleDateString();
   };
 
   const totalPending = payments?.reduce((sum, p) => sum + p.amount, 0) || 0;
@@ -104,12 +108,16 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
                       <User className="w-3 h-3" />
                       <span>{payment.customer_name}</span>
                     </div>
-                    <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                      <Clock className="w-3 h-3" />
-                      <span>
-                        {__("Due", "yatra")}: {formatDate(payment.due_date)}
-                      </span>
-                    </div>
+                    {/* Payments carry no due date today, so this line stays hidden
+                        rather than printing an empty "Due:" for every row. */}
+                    {formatDate(payment.due_date) !== "-" && (
+                      <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                        <Clock className="w-3 h-3" />
+                        <span>
+                          {__("Due", "yatra")}: {formatDate(payment.due_date)}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="text-right">
                     <p className="text-base font-semibold text-gray-900 dark:text-white">
@@ -117,7 +125,7 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
                     </p>
                     {payment.payment_method && (
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {payment.payment_method}
+                        {payment.payment_method_label || payment.payment_method}
                       </p>
                     )}
                   </div>

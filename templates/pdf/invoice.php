@@ -5,6 +5,17 @@ if ($companyName === '' && function_exists('yatra_get_brand_name')) {
     $companyName = yatra_get_brand_name();
 }
 $companyAddress = (string) ($company_address ?? '');
+// Settings keep the business address in separate fields (street, city, state,
+// postcode, country); documents only ever printed the street, so everything after
+// it was missing and the address looked cut off at its last line. Prefer the
+// composed lines, falling back to the raw street for any caller not passing them.
+$companyAddressLines = (isset($company_address_lines) && is_array($company_address_lines))
+    ? array_values(array_filter(array_map('strval', $company_address_lines), static function ($line) {
+        return trim($line) !== '';
+    }))
+    : array_values(array_filter(preg_split('/\R/', $companyAddress) ?: [], static function ($line) {
+        return trim($line) !== '';
+    }));
 $companyEmail = (string) ($company_email ?? '');
 $companyPhone = (string) ($company_phone ?? '');
 
@@ -140,19 +151,9 @@ $brandHeaderColor = (string) ($pdfBranding['header_color'] ?? '#1e40af');
             <td style="width: 30%;">
                 <h3><?php esc_html_e('Company', 'yatra'); ?></h3>
                 <div><?php echo htmlspecialchars($companyName, ENT_QUOTES, 'UTF-8'); ?></div>
-                <?php if ($companyAddress !== ''): ?>
-                    <?php
-                    // The setting is a textarea, so a full business address arrives
-                    // with newlines. HTML collapses those, which ran the whole
-                    // address onto one line — keep the operator's own line breaks.
-                    foreach (preg_split('/\R/', $companyAddress) as $companyAddressLine):
-                        if (trim($companyAddressLine) === '') {
-                            continue;
-                        }
-                        ?>
-                        <div class="muted"><?php echo htmlspecialchars($companyAddressLine, ENT_QUOTES, 'UTF-8'); ?></div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                <?php foreach ($companyAddressLines as $companyAddressLine): ?>
+                    <div class="muted"><?php echo htmlspecialchars($companyAddressLine, ENT_QUOTES, 'UTF-8'); ?></div>
+                <?php endforeach; ?>
                 <?php if ($companyEmail !== ''): ?>
                     <div class="muted"><?php echo htmlspecialchars($companyEmail, ENT_QUOTES, 'UTF-8'); ?></div>
                 <?php endif; ?>

@@ -175,6 +175,9 @@ const EmailTemplateForm: React.FC = () => {
     enabled: Boolean(id) && !isCoreSettingsEdit,
   });
 
+  // System templates own their trigger event; everything else may choose one.
+  const isSystemTemplate = Boolean((templateData as any)?.is_system);
+
   // Event-scoped variables: the sidebar re-fetches whenever the
   // operator switches the trigger event so the "Available
   // Variables" panel reflects only tags that will actually
@@ -1315,6 +1318,31 @@ const EmailTemplateForm: React.FC = () => {
                     {formData.event_key || "-"}
                   </span>
                 </div>
+                {/* The badge above only reports the choice. This panel sits right
+                    under "Select an event to trigger this email automatically",
+                    so give it a control that actually selects one — a plain
+                    <select>, which cannot be clipped by an ancestor and needs no
+                    open/close state, unlike the styled dropdown in the main
+                    column. System and core templates keep their fixed event. */}
+                {!isSystemTemplate && !isCoreSettingsEdit && (
+                  <select
+                    aria-label={__("Trigger Event")}
+                    value={formData.event_key || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, event_key: e.target.value })
+                    }
+                    className="w-full mt-1 px-2 py-1.5 text-xs rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
+                  >
+                    <option value="">
+                      {__("No event (use in a sequence)")}
+                    </option>
+                    {events.map((ev: any) => (
+                      <option key={ev.key} value={ev.key}>
+                        {ev.name || ev.key}
+                      </option>
+                    ))}
+                  </select>
+                )}
                 {formData.event_key && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 italic">
                     {events.find((e: any) => e.key === formData.event_key)

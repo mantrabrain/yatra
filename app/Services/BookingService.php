@@ -580,13 +580,22 @@ class BookingService
             WaitlistService::releaseWaitlistHolding($booking);
         }
 
-        // Handle departure date change if date was changed
-        if ($dateChanged && !empty($data['start_date']) && !empty($data['end_date'])) {
+        // Re-link the departure when the date changed OR the operator picked a
+        // different departure time. A trip running several departures a day needs the
+        // time as well — moving a booking from the 09:00 to the 14:00 slot is not a
+        // date change, and without this it silently stayed on the original slot.
+        $departureTimeForUpdate = null;
+        if (!empty($data['departure_time']) && is_string($data['departure_time'])) {
+            $departureTimeForUpdate = trim($data['departure_time']) !== '' ? trim($data['departure_time']) : null;
+        }
+
+        if (($dateChanged || $departureTimeForUpdate !== null) && !empty($data['start_date']) && !empty($data['end_date'])) {
             try {
                 $this->departureService->handleBookingDateChange(
                     $id,
                     $data['start_date'],
-                    $data['end_date']
+                    $data['end_date'],
+                    $departureTimeForUpdate
                 );
                 } catch (\Exception $e) {
                 // Log error but don't fail the update
@@ -609,6 +618,36 @@ class BookingService
         $newPaymentStatus = isset($data['payment_status']) ? (string) $data['payment_status'] : null;
         if ($newPaymentStatus !== null && $newPaymentStatus !== $oldPaymentStatus) {
             $this->handlePaymentStatusChange($id, $oldPaymentStatus, $newPaymentStatus);
+        }
+
+        // Changing the status here fired no event at all, so confirming a booking
+        // from the edit form saved the status and then went silent: no confirmation
+        // email, no Email Automation sequence (booking.confirmed / .cancelled /
+        // .completed), no seat release on cancel. Only the status action
+        // (updateStatus) ever emitted it, which is why the same change appeared to
+        // work from one screen and not the other.
+        //
+        // Fired last, once the travellers and related rows are saved, so listeners
+        // read the booking's final state — and only on a real transition, so
+        // re-saving the form without touching the status stays silent.
+        if ($newStatus !== null && $newStatus !== $oldStatus) {
+            // Same order as updateStatus(): the notification is sent inline (it is
+            // not a listener on the action below), then the event fans out.
+            $this->sendStatusChangeNotification($id, $oldStatus, $newStatus);
+
+            /**
+             * Fires when a booking's status changes.
+             *
+             * @param int    $id        The booking ID
+             * @param string $oldStatus Previous status
+             * @param string $newStatus New status
+             */
+            do_action('yatra_booking_status_changed', $id, $oldStatus, $newStatus);
+
+            if ($newStatus === 'confirmed' && $oldStatus !== 'confirmed'
+                && function_exists('yatra_trigger_booking_confirmed')) {
+                yatra_trigger_booking_confirmed($id, $oldStatus);
+            }
         }
 
         // Return the fresh booking so the REST controller's `$result['data']`

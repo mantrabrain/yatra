@@ -35,8 +35,9 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
   loading = false,
   onView,
 }) => {
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string | null) => {
     const date = toDateValue(dateString);
+    if (isNaN(date.getTime())) return "-";
     return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -44,9 +45,10 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
     });
   };
 
-  const getDaysUntil = (dateString: string) => {
+  const getDaysUntil = (dateString?: string | null) => {
     const today = new Date();
     const departure = toDateValue(dateString);
+    if (isNaN(departure.getTime())) return null;
     const diffTime = departure.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
@@ -115,7 +117,7 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
                         </div>
                       )}
                     </div>
-                    {daysUntil >= 0 && daysUntil <= 7 && (
+                    {daysUntil !== null && daysUntil >= 0 && daysUntil <= 7 && (
                       <Badge variant={daysUntil <= 3 ? "error" : "warning"}>
                         {daysUntil === 0
                           ? __("Today", "yatra")

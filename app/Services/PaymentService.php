@@ -85,6 +85,20 @@ class PaymentService
             return ['success' => false, 'message' => __('Booking not found.', 'yatra')];
         }
 
+        // A payment recorded by hand carries no currency, and both the payments and
+        // bookings tables declare `currency char(3) DEFAULT 'USD'` — so on a Euro
+        // store a manual payment was saved as USD and listed with a dollar sign
+        // beside correctly-formatted euro rows.
+        //
+        // The store currency is the source of truth here, not the booking's own
+        // column: that column is only written when a caller passes it, so it silently
+        // inherits the same 'USD' default and would just propagate the wrong value.
+        // Multi-currency is not a shipped feature, so every amount is in the store
+        // currency by definition.
+        if (empty($data['currency'])) {
+            $data['currency'] = SettingsService::getCurrency();
+        }
+
         // Create payment
         $paymentId = $this->paymentRepository->create($data);
 
@@ -328,6 +342,12 @@ class PaymentService
             'transaction_id' => $payment->transaction_id,
             'gateway' => $payment->gateway,
             'payment_method' => $gateway,
+            // Display label resolved from the gateway registry. `payment_method`
+            // stays the raw stored value because the list filter posts it back as
+            // `gateway`; this is purely what the UI should print. Without it the
+            // list mixed registry slugs ("paypal") with whatever a manually added
+            // payment happened to store ("PayPal", "Credit Card").
+            'payment_method_label' => self::gatewayLabel($gateway),
             'amount' => (float) $payment->amount,
             'currency' => $payment->currency,
             'status' => $payment->status,
@@ -348,9 +368,47 @@ class PaymentService
             // consumer that reads them.
             'reference' => $reference,
             'method' => $gateway,
+            'method_label' => self::gatewayLabel($gateway),
             'date' => $paymentDate,
             'type' => $payment->payment_type,
         ];
+    }
+
+    /**
+     * Human label for a stored gateway value.
+     *
+     * Resolves through the gateway registry first so the wording matches what the
+     * customer saw at checkout (and what the payment emails print — see
+     * BookingEmailRichMergeTags::gatewayLabel). Values recorded by hand may already
+     * be human ("Credit Card"), so anything unregistered is title-cased rather than
+     * discarded.
+     *
+     * @param string $gateway
+     * @return string
+     */
+    private static function gatewayLabel(string $gateway): string
+    {
+        $gateway = trim($gateway);
+        if ($gateway === '') {
+            return '';
+        }
+
+        if (class_exists(\Yatra\PaymentGateways\PaymentGatewayRegistry::class)) {
+            try {
+                $registered = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance()->get(strtolower($gateway));
+                if ($registered !== null) {
+                    $title = trim((string) $registered->getTitle());
+                    if ($title !== '') {
+                        return $title;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Registry unavailable (e.g. called before gateways register) —
+                // fall through to the humanized form rather than failing the list.
+            }
+        }
+
+        return ucwords(str_replace(['_', '-'], ' ', $gateway));
     }
 }
 

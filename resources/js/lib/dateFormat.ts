@@ -66,8 +66,16 @@ export function getTimezone(): string {
  * calendar day regardless of timezone. Datetime strings (with a time part) and
  * Date objects are parsed/returned as before.
  */
-export function toDateValue(value: string | Date): Date {
-  if (typeof value !== "string") return value;
+export function toDateValue(value: string | Date | null | undefined): Date {
+  // Never hand back a non-Date. This previously returned `value` unchanged for
+  // anything that wasn't a string, so a missing date came back as `undefined`
+  // and the caller's `.toLocaleDateString()` threw — taking the whole admin
+  // dashboard down with it via the error boundary. An Invalid Date keeps every
+  // caller's date maths working (comparisons are simply false) and lets the
+  // display helpers fall back to "-".
+  if (value === null || value === undefined) return new Date(NaN);
+  if (value instanceof Date) return value;
+  if (typeof value !== "string") return new Date(NaN);
   const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
   if (dateOnly) {
     return new Date(

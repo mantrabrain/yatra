@@ -55,6 +55,7 @@ export const API_ENDPOINTS = {
   TRIP_DUPLICATE: (id: string | number) => `/trips/${id}/duplicate`,
   TRIPS_STATS: "/trips/stats",
   TRIP_ATTRIBUTES: (id: string | number) => `/trips/${id}/attributes`,
+  TRIP_AVAILABLE_DATES: (id: string | number) => `/trips/${id}/available-dates`,
 
   // Departures
   DEPARTURES: "/departures",

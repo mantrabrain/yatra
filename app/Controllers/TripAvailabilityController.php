@@ -762,7 +762,43 @@ class TripAvailabilityController extends BaseController
         
         try {
             $dates = $this->departureService->getAvailableDates($tripId, $fromDate, $toDate);
-            
+
+            // Attach the departure times each date actually runs. The list above is
+            // keyed by date and reports `time => null` for rule-generated dates, so a
+            // trip running several departures a day looked like a single slot — and
+            // an operator booking it from the admin had no way to say which departure
+            // the booking was for. Capacity is tracked per departure, so such a
+            // booking reserved no seats at all.
+            //
+            // Added as an extra field rather than by changing the row shape, so every
+            // existing consumer of this endpoint is unaffected.
+            $timesByDate = [];
+            try {
+                $resolver = new \Yatra\Services\AvailabilityResolutionService();
+                foreach ($resolver->getAllAvailabilityDates($tripId, $fromDate, $toDate) as $slot) {
+                    $slotDate = (string) ($slot->departure_date ?? $slot->date ?? '');
+                    $slotTime = trim((string) ($slot->departure_time ?? ''));
+                    if ($slotDate === '' || $slotTime === '') {
+                        continue;
+                    }
+                    $timesByDate[$slotDate][$slotTime] = true;
+                }
+            } catch (\Throwable $e) {
+                $timesByDate = [];
+            }
+
+            foreach ($dates as $key => $row) {
+                $rowDate = is_array($row) ? (string) ($row['date'] ?? '') : (string) ($row->date ?? '');
+                $times = isset($timesByDate[$rowDate]) ? array_keys($timesByDate[$rowDate]) : [];
+                sort($times);
+
+                if (is_array($row)) {
+                    $dates[$key]['departure_times'] = $times;
+                } elseif (is_object($row)) {
+                    $row->departure_times = $times;
+                }
+            }
+
             return new WP_REST_Response([
                 'success' => true,
                 'data' => $dates,

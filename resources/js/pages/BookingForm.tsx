@@ -85,6 +85,7 @@ interface BookingFormData {
   trip_id: string;
   booking_date: string;
   travel_date: string;
+  departure_time: string;
   travelers: string;
   subtotal: string;
   tax_amount: string;
@@ -136,6 +137,7 @@ const BookingForm: React.FC = () => {
     trip_id: "",
     booking_date: todayYmd(),
     travel_date: "",
+    departure_time: "",
     travelers: "1",
     subtotal: "",
     tax_amount: "",
@@ -270,6 +272,35 @@ const BookingForm: React.FC = () => {
     enabled: can("yatra_view_bookings") || can("yatra_view_trips"),
     retry: 1,
   });
+
+  // Departures available on the chosen date. A trip can run several a day, and
+  // capacity is tracked per departure — so the operator has to say which one this
+  // booking is for, otherwise it occupies no slot at all.
+  const { data: availableDatesData } = useQuery({
+    queryKey: ["booking-form-available-dates", formData.trip_id],
+    queryFn: async () => {
+      if (!formData.trip_id) return null;
+      return await apiService.getTripAvailableDates(formData.trip_id);
+    },
+    enabled: !!formData.trip_id,
+    retry: 1,
+  });
+
+  const departureTimesForDate = React.useMemo(() => {
+    const rows =
+      (availableDatesData as any)?.data ?? (availableDatesData as any) ?? [];
+    if (!Array.isArray(rows) || !formData.travel_date) return [];
+    const row = rows.find(
+      (r: any) => (r?.date ?? r?.departure_date) === formData.travel_date,
+    );
+    if (!row) return [];
+    // `departure_times` lists every departure the date runs; `time` is the
+    // single-slot fallback for dates that carry one.
+    const times: string[] = Array.isArray((row as any).departure_times)
+      ? (row as any).departure_times
+      : [(row as any).time ?? (row as any).departure_time ?? ""];
+    return Array.from(new Set(times.filter((t) => !!t)));
+  }, [availableDatesData, formData.travel_date]);
 
   // Fetch booking data if editing
   const { data: bookingData, isLoading: isLoadingBooking } = useQuery({
@@ -420,6 +451,7 @@ const BookingForm: React.FC = () => {
         trip_id: String(bookingData.trip_id || ""),
         booking_date: bookingData.booking_date || todayYmd(),
         travel_date: bookingData.travel_date || "",
+        departure_time: (bookingData as any).departure_time || "",
         travelers: String(
           (bookingData as any).travelers_count ||
             bookingData.travelers_data?.length ||
@@ -628,6 +660,45 @@ const BookingForm: React.FC = () => {
     });
   };
 
+  // Typing in "Number of Travelers" has to resize the traveller list, not just
+  // the number itself: the booking is saved with `travelers_count:
+  // travelersData.length`, so a number typed here used to be dropped on save and
+  // the change looked like it had never been made. Mirrors addTraveler /
+  // removeTraveler so both routes stay in step.
+  const handleTravelersCountChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, travelers: value }));
+    if (errors.travelers) {
+      setErrors((prev) => ({ ...prev, travelers: "" }));
+    }
+
+    // Allow the field to be cleared while typing without collapsing the list.
+    if (value.trim() === "") {
+      return;
+    }
+
+    const parsed = parseInt(value, 10);
+    if (isNaN(parsed) || parsed < 1) {
+      return;
+    }
+
+    setTravelersData((prev) => {
+      if (parsed === prev.length) {
+        return prev;
+      }
+      if (parsed < prev.length) {
+        // Trim from the end so details already entered for earlier travellers stay.
+        return prev.slice(0, parsed);
+      }
+      const grown = [...prev];
+      while (grown.length < parsed) {
+        grown.push(createEmptyTraveler());
+      }
+      return grown;
+    });
+
+    setExpandedTravelers((prev) => prev.filter((i) => i < parsed));
+  };
+
   const addTraveler = () => {
     const newTraveler = createEmptyTraveler();
     setTravelersData((prev) => [...prev, newTraveler]);
@@ -677,6 +748,9 @@ const BookingForm: React.FC = () => {
       newErrors.booking_date = __("Booking date is required", "yatra");
     }
 
+    if (departureTimesForDate.length > 1 && !formData.departure_time) {
+      newErrors.departure_time = __("Departure time is required", "yatra");
+    }
     if (!formData.travel_date) {
       newErrors.travel_date = __("Travel date is required", "yatra");
     }
@@ -716,6 +790,10 @@ const BookingForm: React.FC = () => {
         contact_country: data.customer_country || "",
         trip_id: parseInt(data.trip_id),
         travel_date: data.travel_date,
+        // Which departure the booking occupies. A trip running several
+        // departures a day counts capacity per (date, time), so a booking saved
+        // without this matches no slot and never reduces frontend availability.
+        departure_time: data.departure_time || "",
         travelers_count: travelersData.length,
         total_amount: parseFloat(data.total_amount),
         payment_status: data.payment_status,
@@ -1264,9 +1342,11 @@ const BookingForm: React.FC = () => {
                       </label>
                       <DatePicker
                         value={formData.travel_date}
-                        onChange={(value: string) =>
-                          handleFieldChange("travel_date", value)
-                        }
+                        onChange={(value: string) => {
+                          handleFieldChange("travel_date", value);
+                          // A time from the previous date no longer applies.
+                          handleFieldChange("departure_time", "");
+                        }}
                         placeholder={__("Select travel date", "yatra")}
                         error={!!errors.travel_date}
                       />
@@ -1276,6 +1356,56 @@ const BookingForm: React.FC = () => {
                         </p>
                       )}
                     </div>
+
+                    {/* Departure time — only when the chosen date actually runs
+                        more than one departure. Capacity is tracked per departure,
+                        so without this the booking occupies no slot. */}
+                    {departureTimesForDate.length > 1 && (
+                      <div>
+                        <label
+                          htmlFor="departure_time"
+                          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                        >
+                          {__("Departure Time", "yatra")}{" "}
+                          <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          id="departure_time"
+                          name="departure_time"
+                          value={formData.departure_time}
+                          onChange={(e) =>
+                            handleFieldChange("departure_time", e.target.value)
+                          }
+                          className={`w-full rounded-md border px-3 py-2 text-sm bg-white dark:bg-gray-800 dark:text-white ${
+                            errors.departure_time
+                              ? "border-red-500"
+                              : "border-gray-300 dark:border-gray-600"
+                          }`}
+                          required
+                        >
+                          <option value="">
+                            {__("Select departure time", "yatra")}
+                          </option>
+                          {departureTimesForDate.map((t: string) => (
+                            <option key={t} value={t}>
+                              {t}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.departure_time ? (
+                          <p className="mt-1 text-sm text-red-500">
+                            {errors.departure_time}
+                          </p>
+                        ) : (
+                          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            {__(
+                              "This date has several departures. Pick the one this booking is for so its seats are reserved.",
+                              "yatra",
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1294,7 +1424,7 @@ const BookingForm: React.FC = () => {
                         min="1"
                         value={formData.travelers}
                         onChange={(e) =>
-                          handleFieldChange("travelers", e.target.value)
+                          handleTravelersCountChange(e.target.value)
                         }
                         className={errors.travelers ? "border-red-500" : ""}
                         required

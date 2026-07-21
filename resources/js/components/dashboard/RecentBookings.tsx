@@ -35,9 +35,11 @@ export const RecentBookings: React.FC<RecentBookingsProps> = ({
   loading = false,
   onView,
 }) => {
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string | null) => {
     // toDateValue: a date-only booking_date must not roll back a day in behind-UTC zones.
-    return toDateValue(dateString).toLocaleDateString("en-US", {
+    const date = toDateValue(dateString);
+    if (isNaN(date.getTime())) return "-";
+    return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",

@@ -952,6 +952,7 @@ class PaymentGatewayController extends BaseController
         $templateData = [
             'company_name' => $companyName,
             'company_address' => $companyAddress,
+            'company_address_lines' => \Yatra\Helpers\FormatHelper::companyAddressLines(),
             'company_email' => $companyEmail,
             'company_phone' => $companyPhone,
             'customer_name' => trim(($payment->contact_first_name ?? '') . ' ' . ($payment->contact_last_name ?? '')) ?: ($payment->customer_name ?? __('Customer', 'yatra')),
@@ -1071,6 +1072,7 @@ class PaymentGatewayController extends BaseController
         $templateData = [
             'company_name'    => SettingsService::get('company_name', get_bloginfo('name')),
             'company_address' => SettingsService::get('company_address', ''),
+            'company_address_lines' => \Yatra\Helpers\FormatHelper::companyAddressLines(),
             'company_email'   => SettingsService::get('company_email', get_option('admin_email')),
             'company_phone'   => SettingsService::get('company_phone', ''),
             'customer_name'   => trim(($booking->contact_first_name ?? '') . ' ' . ($booking->contact_last_name ?? '')) ?: __('Customer', 'yatra'),
@@ -1204,6 +1206,7 @@ class PaymentGatewayController extends BaseController
         $templateData = [
             'company_name' => $companyName,
             'company_address' => $companyAddress,
+            'company_address_lines' => \Yatra\Helpers\FormatHelper::companyAddressLines(),
             'company_email' => $companyEmail,
             'company_phone' => $companyPhone,
             'customer_name' => trim(($payment->contact_first_name ?? '') . ' ' . ($payment->contact_last_name ?? '')) ?: ($payment->customer_name ?? __('Customer', 'yatra')),

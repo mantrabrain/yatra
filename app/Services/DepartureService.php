@@ -604,7 +604,12 @@ class DepartureService
      * @param string $newEndDate New end date
      * @return array {success: bool, new_departure_id: int, old_departure_id: int|null}
      */
-    public function handleBookingDateChange(int $bookingId, string $newStartDate, string $newEndDate): array
+    /**
+     * @param string|null $newDepartureTime Departure time (HH:MM/HH:MM:SS) when the trip
+     *                                      runs several departures a day. Optional, so
+     *                                      existing callers keep their behaviour.
+     */
+    public function handleBookingDateChange(int $bookingId, string $newStartDate, string $newEndDate, ?string $newDepartureTime = null): array
     {
         // Get booking to find trip_id
         $booking = $this->bookingRepository->find($bookingId);
@@ -623,8 +628,17 @@ class DepartureService
             $maxCapacity = (int) $trip->max_travelers;
         }
 
-        // Find or create new departure
-        $newDeparture = $this->findOrCreateForBooking($tripId, $newStartDate, $newEndDate, 0, $maxCapacity);
+        // Find or create new departure. The time matters when a trip runs several
+        // departures a day: without it the booking lands on whichever departure
+        // matches the date alone, so it never occupies the slot it was booked for.
+        $newDeparture = $this->findOrCreateForBooking(
+            $tripId,
+            $newStartDate,
+            $newEndDate,
+            0,
+            $maxCapacity,
+            ($newDepartureTime !== null && trim($newDepartureTime) !== '') ? trim($newDepartureTime) : null
+        );
 
         // Link booking to new departure
         $this->bookingDepartureRepository->updateDepartureForBooking($bookingId, $newDeparture->id);
