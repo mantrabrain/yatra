@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel, travel-agency
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 3.0.12
+Stable tag: 3.0.13
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -281,7 +281,7 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 
 The two most recent releases are listed below. For the complete version history, see [changelog.txt](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
 
-= 3.0.12 — 21 July 2026 =
+= 3.0.13 — 21 July 2026 =
 * **Star ratings now match the number shown:** a 4.9 average drew four-and-a-half stars beside the printed "4.9". Ratings round to the nearest half star everywhere — trip pages, the reviews block, listing cards and the booking confirmation all draw the same rating identically.
 * **Dashboard occupancy is no longer stuck at 0%:** the dashboard ignored the capacity figures the departures list actually returns, so every tour showed 0% occupied and available seats could read as a negative number, while the individual trip page calculated it correctly from the same departures.
 * **Departures honour the seats set on a time slot:** a private tour whose vehicle holds 9 passengers but sells a single booking unit per departure still showed 9 available. Capacity defined on a time slot is now used everywhere it applies, and where a date has several departure times each one uses its own seat count instead of the day's total.
