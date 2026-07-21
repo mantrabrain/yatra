@@ -57,7 +57,8 @@ class DepartureService
         if (empty($data['max_capacity'])) {
             $data['max_capacity'] = $this->capacityService->getCapacityForDate(
                 (int) $data['trip_id'],
-                $startDate
+                $startDate,
+                $data['time'] ?? null
             );
             
             // If still no capacity, throw an error
@@ -420,7 +421,7 @@ class DepartureService
     public function findOrCreateForBooking(int $tripId, string $startDate, string $endDate, int $travelersCount = 0, ?int $defaultMaxCapacity = null, ?string $time = null): Departure
     {
         // Get capacity based on priority
-        $maxCapacity = $this->capacityService->getCapacityForDate($tripId, $startDate);
+        $maxCapacity = $this->capacityService->getCapacityForDate($tripId, $startDate, $time);
         
         // If no capacity found from availability or rules, use the provided default
         if ($maxCapacity <= 0 && $defaultMaxCapacity !== null) {

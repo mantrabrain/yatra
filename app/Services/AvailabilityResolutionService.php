@@ -62,14 +62,32 @@ class AvailabilityResolutionService
             throw new \Exception('Trip not found');
         }
 
-        // Priority 0: A non-bookable specific row (blocked/closed/cancelled) must win
-        // over everything so the booking guard rejects it. The standard lookup below
-        // hides those rows by design (status IN available/limited), which would let
+        // Priority 0: A non-bookable specific row (blocked/closed/cancelled/unavailable)
+        // must win over everything so the booking guard rejects it. The standard lookup
+        // below hides those rows by design (status IN available/limited), which would let
         // the resolver fall through to a recurring rule / trip default = "available"
         // and silently allow the booking. We therefore look the row up including any
         // status and short-circuit on the guard's reject statuses.
+        // `sold_out` belongs here for the same reason. The inventory hook marks a
+        // full date sold_out WITHOUT setting is_blocked, and the lookup below skips
+        // it too, so the resolver fell through to a rule / trip default reporting
+        // free seats — the guard then allowed a booking on a sold-out date and the
+        // waitlist never engaged. Surfacing the real status lets the guard's
+        // existing sold_out branch decide (reject, or offer the waitlist).
         $anyStatusRow = $this->availabilityRepository->findByTripIdAndDateTime($tripId, $date, $departureTime, true);
-        if ($anyStatusRow && (\in_array(($anyStatusRow->status ?? ''), ['blocked', 'closed', 'cancelled'], true) || !empty($anyStatusRow->is_blocked))) {
+        if ($anyStatusRow && (\in_array(($anyStatusRow->status ?? ''), ['blocked', 'closed', 'cancelled', 'unavailable'], true) || !empty($anyStatusRow->is_blocked))) {
+            return $this->buildAvailabilityObject($trip, $anyStatusRow, 'availability_date');
+        }
+
+        // A sold-out row only wins while it genuinely has no seats. Gating on the
+        // seat count rather than the status alone means a stale `sold_out` row that
+        // has since freed up (cancellation before the hook recalculated it) keeps
+        // falling through as it does today, so this can never block a bookable date.
+        if (
+            $anyStatusRow
+            && ($anyStatusRow->status ?? '') === 'sold_out'
+            && (int) ($anyStatusRow->seats_available ?? 0) <= 0
+        ) {
             return $this->buildAvailabilityObject($trip, $anyStatusRow, 'availability_date');
         }
 
@@ -95,9 +113,14 @@ class AvailabilityResolutionService
      * @param int $tripId Trip ID
      * @param string $fromDate Start date
      * @param string $toDate End date
+     * @param bool $includeSoldOut Whether sold-out dates stay in the result. Defaults
+     *                             to true so every existing caller — including Pro's
+     *                             ChannelManager inventory sync, which must always see
+     *                             the full picture — is unchanged. Storefront callers
+     *                             pass the `show_sold_out` setting.
      * @return array Array of availability objects
      */
-    public function getAllAvailabilityDates(int $tripId, string $fromDate, string $toDate): array
+    public function getAllAvailabilityDates(int $tripId, string $fromDate, string $toDate, bool $includeSoldOut = true): array
     {
         $trip = $this->tripRepository->find($tripId);
         if (!$trip) {
@@ -145,14 +168,26 @@ class AvailabilityResolutionService
             $dateMap = $this->generateDefaultAvailability($trip, $fromDate, $toDate);
         }
 
-        // Step 4: Drop non-bookable dates (blocked/closed/cancelled). A blocked
-        // specific row was kept in Step 1 so it overrides its recurring rule
+        // Step 4: Drop non-bookable dates (blocked/closed/cancelled/unavailable). A
+        // blocked specific row was kept in Step 1 so it overrides its recurring rule
         // (preventing the rule from resurrecting the date); we remove it here so the
         // resolved list represents only bookable departures. This feeds the
         // single-trip count + calendar and the admin date-picker. (sold_out is kept
-        // so it can render as "sold out" / drive waitlist.)
+        // by default so it can render as "sold out" / drive waitlist.)
+        //
+        // `unavailable` is dropped alongside the rest: the booking guard rejects it
+        // too, so leaving it visible advertised a date that cannot be booked.
+        $nonBookable = ['blocked', 'closed', 'cancelled', 'unavailable'];
         foreach ($dateMap as $key => $obj) {
-            if (\is_object($obj) && (\in_array(($obj->status ?? ''), ['blocked', 'closed', 'cancelled'], true) || !empty($obj->is_blocked))) {
+            if (!\is_object($obj)) {
+                continue;
+            }
+            if (\in_array(($obj->status ?? ''), $nonBookable, true) || !empty($obj->is_blocked)) {
+                unset($dateMap[$key]);
+                continue;
+            }
+            // Owner opted to hide sold-out dates entirely rather than badge them.
+            if (!$includeSoldOut && (($obj->status ?? '') === 'sold_out' || !empty($obj->is_sold_out))) {
                 unset($dateMap[$key]);
             }
         }
@@ -641,6 +676,27 @@ class AvailabilityResolutionService
     }
 
     /**
+     * Normalize a time to HH:MM so "8:00", "08:00" and "08:00:00" compare equal.
+     * Returns an empty string for empty input so two blanks still match.
+     *
+     * @param string|null $time
+     * @return string
+     */
+    private function normalizeTimeKey(?string $time): string
+    {
+        $time = trim((string) $time);
+        if ($time === '') {
+            return '';
+        }
+
+        $parts = explode(':', $time);
+        $hour = isset($parts[0]) ? (int) $parts[0] : 0;
+        $minute = isset($parts[1]) ? (int) $parts[1] : 0;
+
+        return sprintf('%02d:%02d', $hour, $minute);
+    }
+
+    /**
      * Resolve a single day's availability from recurring rules (new rules engine).
      *
      * @return array|null A generated availability row (array shape) or null if no rule applies
@@ -662,7 +718,12 @@ class AvailabilityResolutionService
             }
             $depTime = $row['departure_time'] ?? null;
             if ($departureTime !== null) {
-                if ($depTime === $departureTime) {
+                // Compare on HH:MM. Rule time slots store "08:00" while the
+                // departure tables use a SQL TIME column ("08:00:00"), so a strict
+                // match silently missed and the resolver fell through to the trip
+                // default — reporting whole-trip capacity for a slot that sells far
+                // fewer seats, which let the booking guard over-allow.
+                if ($this->normalizeTimeKey($depTime) === $this->normalizeTimeKey($departureTime)) {
                     return $row;
                 }
                 continue;

@@ -35,9 +35,12 @@ $yatra_hero_dp_flags = function_exists('yatra_get_dynamic_pricing_display_flags'
             <div class="yatra-hero-rating">
                 <?php if ($trip->getAverageRating() > 0 || $trip->getReviewCount() > 0): ?>
                     <?php
+                    // Shared helper, so the hero, the reviews block below it and the
+                    // booking confirmation all draw the same rating identically.
                     $hero_avg = (float) $trip->getAverageRating();
-                    $hero_full = (int) floor($hero_avg);
-                    $hero_half = ($hero_avg - $hero_full) >= 0.3;
+                    $hero_parts = yatra_rating_star_parts($hero_avg);
+                    $hero_full = $hero_parts['full'];
+                    $hero_half = $hero_parts['half'];
                     ?>
                     <div class="yatra-rating-stars">
                         <?php for ($i = 1; $i <= 5; $i++) : ?>

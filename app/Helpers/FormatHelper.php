@@ -751,8 +751,18 @@ class FormatHelper
     public static function formatRatingStars(float $rating, bool $showNumber = false): string
     {
         $rating = max(0, min(5, $rating));
-        $fullStars = (int) floor($rating);
-        $hasHalfStar = ($rating - $fullStars) >= 0.5;
+
+        // Rounds to the nearest half star (see yatra_rating_star_parts), so this
+        // renderer agrees with the confirmation page and reviews block.
+        if (function_exists('yatra_rating_star_parts')) {
+            $parts = yatra_rating_star_parts($rating);
+            $fullStars = $parts['full'];
+            $hasHalfStar = $parts['half'];
+        } else {
+            $halves = (int) round($rating * 2);
+            $fullStars = intdiv($halves, 2);
+            $hasHalfStar = ($halves % 2) === 1;
+        }
         
         $html = '<span class="yatra-rating-stars">';
         

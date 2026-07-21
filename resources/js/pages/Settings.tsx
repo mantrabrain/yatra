@@ -990,6 +990,8 @@ interface SettingsData {
   customer_dashboard_enabled: boolean;
   /** Wishlist / saved trips (Yatra Pro); toggled in Customer settings */
   enable_wishlist?: boolean;
+  /** Keep sold-out departure dates visible on the storefront (default true) */
+  show_sold_out?: boolean;
 
   // Review Settings
   enable_reviews: boolean;
@@ -2967,6 +2969,7 @@ const Settings: React.FC = () => {
       trip_category_base: "trip-category",
       booking_base: "book",
       enable_wishlist: false,
+      show_sold_out: true,
       use_booking_page: false,
       booking_page_id: 0,
       terms_page_id: 0,
@@ -6009,6 +6012,31 @@ const Settings: React.FC = () => {
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     {__(
                       "Hold guest bookings until the customer clicks a magic link sent to their email. Stops typo'd addresses and form-spam bots. Only applies when guest checkout is allowed and login isn't required — logged-in customers are already verified.",
+                      "yatra",
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                <input
+                  type="checkbox"
+                  id="show_sold_out"
+                  checked={formData.show_sold_out !== false}
+                  name="show_sold_out"
+                  onChange={handleFieldChange}
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <div className="flex-1">
+                  <Label
+                    htmlFor="show_sold_out"
+                    className="font-medium cursor-pointer"
+                  >
+                    {__("Show sold-out dates", "yatra")}
+                  </Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {__(
+                      "Keep sold-out dates on the calendar marked \"Sold out\" — needed for the waitlist below. Turn this off to hide them entirely, the way blocked dates are hidden.",
                       "yatra",
                     )}
                   </p>

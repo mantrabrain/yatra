@@ -213,13 +213,13 @@ do_action('yatra_booking_confirmation_header', $booking);
                         <div class="yatra-trip-rating">
                             <div class="yatra-rating-stars">
                                 <?php
-                                // floor() returns a float, so the strict `$i === $filled_stars + 1`
-                                // below compared int against float and never matched — the half
-                                // star was silently dropped and a 4.5 rating rendered as 4 solid
-                                // stars beside the text "4.5". Cast so the comparison holds.
-                                $average_rating = (float) $booking->trip_average_rating;
-                                $filled_stars = (int) floor($average_rating);
-                                $has_half = ($average_rating - $filled_stars) >= 0.5;
+                                // Shared with the reviews block and listing cards so every
+                                // surface draws the same rating. Rounds to the nearest half:
+                                // flooring drew 4.9 as four-and-a-half stars, which looked
+                                // wrong beside the printed "4.9".
+                                $star_parts = yatra_rating_star_parts($booking->trip_average_rating);
+                                $filled_stars = $star_parts['full'];
+                                $has_half = $star_parts['half'];
                                 for ($i = 1; $i <= 5; $i++) :
                                     $class = $i <= $filled_stars ? 'yatra-star-filled' : ($has_half && $i === $filled_stars + 1 ? 'yatra-star-half' : '');
                                 ?>

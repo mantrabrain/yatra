@@ -1520,7 +1520,7 @@ class TripController extends BaseController
             $fromDate = date('Y-m-d');
             $toDate = date('Y-m-d', strtotime('+12 months'));
             
-            $availability_dates = $resolutionService->getAllAvailabilityDates($id, $fromDate, $toDate);
+            $availability_dates = $resolutionService->getAllAvailabilityDates($id, $fromDate, $toDate, \Yatra\Services\SettingsService::isEnabled('show_sold_out'));
 
             // Determine if this is a day trip
             $is_single_day = ($trip->duration_days ?? 1) <= 1;

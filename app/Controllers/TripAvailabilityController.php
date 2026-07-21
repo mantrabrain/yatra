@@ -237,7 +237,7 @@ class TripAvailabilityController extends BaseController
                 'data' => array_map(function ($d) use ($trip, $bookingDepartureRepo, $travellerRepo, $bookingRepo, $capacityService, $departureRepo) {
                     // Sync capacity from availability before returning
                     $date = $d->start_date ?: $d->date;
-                    $correctCapacity = $capacityService->getCapacityForDate($d->trip_id, $date);
+                    $correctCapacity = $capacityService->getCapacityForDate($d->trip_id, $date, $d->time ?? null);
                     if ($correctCapacity > 0 && $d->max_capacity !== $correctCapacity) {
                         $departureRepo->update($d->id, ['max_capacity' => $correctCapacity]);
                         $d->max_capacity = $correctCapacity;
@@ -363,7 +363,7 @@ class TripAvailabilityController extends BaseController
         // Sync capacity from availability before returning
         $capacityService = new \Yatra\Services\CapacityService();
         $date = $departure->start_date ?: $departure->date;
-        $correctCapacity = $capacityService->getCapacityForDate($departure->trip_id, $date);
+        $correctCapacity = $capacityService->getCapacityForDate($departure->trip_id, $date, $departure->time ?? null);
         if ($correctCapacity > 0 && $departure->max_capacity !== $correctCapacity) {
             $repo->update($departure->id, ['max_capacity' => $correctCapacity]);
             $departure->max_capacity = $correctCapacity;
@@ -621,7 +621,7 @@ class TripAvailabilityController extends BaseController
             $processed = array_map(function ($d) use ($tripRepository, $bookingDepartureRepo, $travellerRepo, $bookingRepo, $capacityService, $departureRepo) {
                 // Sync capacity from availability before returning
                 $date = $d->start_date ?: $d->date;
-                $correctCapacity = $capacityService->getCapacityForDate($d->trip_id, $date);
+                $correctCapacity = $capacityService->getCapacityForDate($d->trip_id, $date, $d->time ?? null);
                 if ($correctCapacity > 0 && $d->max_capacity !== $correctCapacity) {
                     $departureRepo->update($d->id, ['max_capacity' => $correctCapacity]);
                     $d->max_capacity = $correctCapacity;

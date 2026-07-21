@@ -42,7 +42,7 @@ class DepartureCapacitySyncScript
                 $date = $departure->start_date ?: $departure->date;
                 
                 // Get correct capacity from availability
-                $correctCapacity = $this->capacityService->getCapacityForDate($departure->trip_id, $date);
+                $correctCapacity = $this->capacityService->getCapacityForDate($departure->trip_id, $date, $departure->time ?? null);
                 
                 // Only update if capacity is different and correct capacity > 0
                 if ($correctCapacity > 0 && $departure->max_capacity !== $correctCapacity) {

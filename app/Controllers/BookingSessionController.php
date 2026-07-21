@@ -1728,7 +1728,7 @@ class BookingSessionController extends BaseController
 
         if ($resolvedAvailabilityForWaitlist !== null) {
             $availStatus = (string) ($resolvedAvailabilityForWaitlist->status ?? 'available');
-            if (in_array($availStatus, ['blocked', 'closed', 'cancelled'], true)) {
+            if (in_array($availStatus, ['blocked', 'closed', 'cancelled', 'unavailable'], true)) {
                 return new WP_REST_Response([
                     'success' => false,
                     'message' => __('This departure is not open for booking.', 'yatra'),

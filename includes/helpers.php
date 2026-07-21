@@ -1073,6 +1073,34 @@ function yatra_partial_payments_enabled(): bool
 }
 
 /**
+ * How many stars to draw for an average rating.
+ *
+ * Rounds to the NEAREST half star rather than flooring. Flooring made a 4.9
+ * average draw four-and-a-half stars, which reads as a mistake sitting next to
+ * the printed "4.9" — a 4.9 is five stars to anyone looking at it.
+ *
+ *   4.9 -> 5      4.7 -> 4.5    4.4 -> 4.5    4.2 -> 4
+ *
+ * Returns the number of solid stars and whether a half star follows them, so
+ * every surface (confirmation page, reviews block, listing cards) draws the
+ * same rating identically.
+ *
+ * @return array{full:int, half:bool}
+ */
+function yatra_rating_star_parts($rating): array
+{
+    $rating = max(0.0, min(5.0, (float) $rating));
+
+    // Work in half-star units so the rounding is a single, obvious step.
+    $halves = (int) round($rating * 2);
+
+    return [
+        'full' => intdiv($halves, 2),
+        'half' => ($halves % 2) === 1,
+    ];
+}
+
+/**
  * Branded plugin name shown in admin menu, plugin list, and PDFs.
  */
 function yatra_get_brand_name(): string

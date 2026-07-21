@@ -410,17 +410,25 @@ const Dashboard: React.FC = () => {
           (d?.trip?.destinations && d.trip.destinations[0]?.name) ||
           d?.destination ||
           undefined;
+        // `/departures` returns max_capacity / available_capacity. Neither was
+        // listed here, so every card fell back to 0 capacity — which made
+        // available go negative (0 - bookings) and pinned occupancy at 0%, even
+        // though the trip page computed it correctly from the same rows. The
+        // API's own names come first; the rest remain as fallbacks for any other
+        // shape that reaches this mapper.
         const totalSpots =
+          d?.max_capacity ??
           d?.total_spots ??
           d?.capacity ??
           d?.total_seats ??
           d?.max_travelers ??
           0;
         const availableSpots =
+          d?.available_capacity ??
           d?.available_spots ??
           d?.available_seats ??
           d?.remaining_slots ??
-          totalSpots - (d?.bookings_count || 0);
+          totalSpots - (d?.booked_count ?? d?.bookings_count ?? 0);
         return {
           id: d.id,
           trip_id: d.trip_id || d?.trip?.id,

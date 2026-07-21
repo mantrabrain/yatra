@@ -401,7 +401,7 @@ class SingleTripController
         $fromDate = date('Y-m-d');
         $toDate = date('Y-m-d', strtotime('+12 months'));
         
-        $availability = $resolutionService->getAllAvailabilityDates($trip_id, $fromDate, $toDate);
+        $availability = $resolutionService->getAllAvailabilityDates($trip_id, $fromDate, $toDate, \Yatra\Services\SettingsService::isEnabled('show_sold_out'));
         
         // Add calculated fields
         foreach ($availability as $avail) {

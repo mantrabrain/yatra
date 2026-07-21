@@ -217,6 +217,11 @@ class SettingsController extends BaseController
         'booking_base' => 'book',
         // Wishlist (Pro) — stored in free options; active only when Pro + setting on
         'enable_wishlist' => false,
+        // Sold-out date visibility on the storefront. Default true keeps the
+        // existing behaviour (sold-out dates stay visible, badged "sold out" and
+        // able to drive the waitlist); owners can switch it off to hide them the
+        // same way blocked dates are hidden.
+        'show_sold_out' => true,
 
         // Search & Listing storefront UX. Defaults preserve current behaviour:
         // every search field shown (true) and mobile filters expanded (false),

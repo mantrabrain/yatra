@@ -240,7 +240,7 @@ class AvailabilityInventoryHooks
             
             // Get capacity from availability
             $capacityService = new CapacityService();
-            $correctCapacity = $capacityService->getCapacityForDate($departure->trip_id, $date);
+            $correctCapacity = $capacityService->getCapacityForDate($departure->trip_id, $date, $departure->time ?? null);
             
             if ($correctCapacity > 0 && $departure->max_capacity !== $correctCapacity) {
                 // Remove hook temporarily to prevent infinite loop
