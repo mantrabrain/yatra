@@ -567,6 +567,7 @@ class BookingService
 
         $oldStatus = (string) ($booking->status ?? '');
         $oldPaymentStatus = (string) ($booking->payment_status ?? '');
+        $oldTripId = (int) ($booking->trip_id ?? 0);
 
         // Update booking
         $updated = $this->bookingRepository->update($id, $data);
@@ -589,12 +590,34 @@ class BookingService
             $departureTimeForUpdate = trim($data['departure_time']) !== '' ? trim($data['departure_time']) : null;
         }
 
-        if (($dateChanged || $departureTimeForUpdate !== null) && !empty($data['start_date']) && !empty($data['end_date'])) {
+        // Changing the tour (trip_id) also has to move the departure: the booking
+        // now belongs to a different trip, so its seat has to be released from the
+        // old trip's departure and taken on the new trip's departure. Previously
+        // only a date/time change triggered the re-link, so switching Tour A -> Tour B
+        // left the booking counted against Tour A's departure (and absent from
+        // Tour B's) — over-selling A and under-selling B.
+        $tripChanged = isset($data['trip_id'])
+            && (int) $data['trip_id'] > 0
+            && (int) $data['trip_id'] !== $oldTripId;
+
+        // handleBookingDateChange() re-reads the booking (already saved with the new
+        // trip_id above) and needs the effective travel dates. When only the tour
+        // changed, the date fields aren't in $data, so fall back to the booking's
+        // current dates rather than skipping the re-link.
+        $effectiveStart = !empty($data['start_date'])
+            ? $data['start_date']
+            : ($booking->start_date ?? $booking->travel_date ?? null);
+        $effectiveEnd = !empty($data['end_date'])
+            ? $data['end_date']
+            : ($booking->end_date ?? $effectiveStart);
+
+        if (($dateChanged || $tripChanged || $departureTimeForUpdate !== null)
+            && !empty($effectiveStart) && !empty($effectiveEnd)) {
             try {
                 $this->departureService->handleBookingDateChange(
                     $id,
-                    $data['start_date'],
-                    $data['end_date'],
+                    $effectiveStart,
+                    $effectiveEnd,
                     $departureTimeForUpdate
                 );
                 } catch (\Exception $e) {

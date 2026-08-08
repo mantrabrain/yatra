@@ -23,6 +23,32 @@ interface DepartureFormData {
   max_capacity: string;
   price_override?: string;
   notes?: string;
+  trip_id: string;
+}
+
+interface TripOption {
+  id: number;
+  title?: string;
+  name?: string;
+}
+
+// Trips endpoint returns either data[] or data.data[] depending on the caller;
+// normalise both to a plain array (mirrors Departures.tsx).
+function normalizeTripsForDropdown(raw: unknown): TripOption[] {
+  if (Array.isArray(raw)) return raw as TripOption[];
+  if (raw && typeof raw === "object") {
+    const r = raw as Record<string, unknown>;
+    if (Array.isArray(r.data)) return r.data as TripOption[];
+    const inner = r.data;
+    if (
+      inner &&
+      typeof inner === "object" &&
+      Array.isArray((inner as Record<string, unknown>).data)
+    ) {
+      return (inner as Record<string, unknown>).data as TripOption[];
+    }
+  }
+  return [];
 }
 
 const DepartureForm: React.FC = () => {
@@ -43,11 +69,25 @@ const DepartureForm: React.FC = () => {
     max_capacity: "",
     price_override: "",
     notes: "",
+    trip_id: tripId ? String(tripId) : "",
   });
 
   const [errors, setErrors] = useState<
     Partial<Record<keyof DepartureFormData, string>>
   >({});
+
+  // Tours for the "Tour" selector so an existing departure can be reassigned
+  // from one tour to another (e.g. to correct a wrong assignment).
+  const { data: tripsData } = useQuery({
+    queryKey: ["trips", "departure-form-tour-select", "v1"],
+    queryFn: async () => {
+      const response = await apiClient.get("/trips", {
+        params: { per_page: 1000 },
+      });
+      return normalizeTripsForDropdown(response);
+    },
+  });
+  const tripsList = normalizeTripsForDropdown(tripsData);
 
   // Fetch existing departure data if editing
   const { data: departureData, isLoading: isLoadingDeparture } = useQuery({
@@ -71,17 +111,24 @@ const DepartureForm: React.FC = () => {
         max_capacity: departureData.max_capacity?.toString() || "",
         price_override: departureData.price_override?.toString() || "",
         notes: departureData.notes || "",
+        trip_id:
+          departureData.trip_id?.toString() || (tripId ? String(tripId) : ""),
       });
     }
-  }, [departureData]);
+  }, [departureData, tripId]);
 
   // Create/Update mutation
   const saveMutation = useMutation({
     mutationFn: async (data: DepartureFormData) => {
       if (!tripId) throw new Error("Trip ID is required");
 
+      // In edit mode the operator may reassign the departure to a different
+      // tour via the selector; fall back to the URL trip otherwise.
+      const targetTripId =
+        isEditMode && data.trip_id ? parseInt(data.trip_id) : tripId;
+
       const payload: any = {
-        trip_id: tripId,
+        trip_id: targetTripId,
         date: data.date,
         max_capacity: parseInt(data.max_capacity),
         source: "manual",
@@ -102,7 +149,14 @@ const DepartureForm: React.FC = () => {
       }
     },
     onSuccess: () => {
+      // The departure may have been reassigned to another tour, so refresh
+      // both the old and new tour's lists and land on the new tour.
+      const destTripId =
+        isEditMode && formData.trip_id ? parseInt(formData.trip_id) : tripId;
       queryClient.invalidateQueries({ queryKey: ["departures", tripId] });
+      if (destTripId !== tripId) {
+        queryClient.invalidateQueries({ queryKey: ["departures", destTripId] });
+      }
       showToast(
         isEditMode
           ? __("Departure updated successfully", "yatra")
@@ -114,7 +168,7 @@ const DepartureForm: React.FC = () => {
       // departures-tab query string, which surprised anyone who reached
       // the form via the Departures sidebar entry — the table they
       // expected to see post-save was nowhere on the trip page.
-      window.location.href = `?page=yatra&subpage=departures${tripId ? `&trip_id=${tripId}` : ""}`;
+      window.location.href = `?page=yatra&subpage=departures${destTripId ? `&trip_id=${destTripId}` : ""}`;
     },
     onError: (error: any) => {
       showToast(
@@ -188,6 +242,42 @@ const DepartureForm: React.FC = () => {
       <form onSubmit={handleSubmit}>
         <Card>
           <CardContent className="pt-6 space-y-6">
+            {/* Tour (edit mode only): allows reassigning an existing departure
+                from one tour to another. In create mode the tour comes from the
+                page the operator started on. */}
+            {isEditMode && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {__("Tour", "yatra")}{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.trip_id}
+                  onChange={(e) =>
+                    setFormData({ ...formData, trip_id: e.target.value })
+                  }
+                  className="w-full rounded-md border px-3 py-2 text-sm bg-white dark:bg-gray-800 dark:text-white border-gray-300 dark:border-gray-600"
+                >
+                  {tripsList.length === 0 && formData.trip_id && (
+                    <option value={formData.trip_id}>
+                      {__("Loading tours…", "yatra")}
+                    </option>
+                  )}
+                  {tripsList.map((t) => (
+                    <option key={t.id} value={String(t.id)}>
+                      {t.title || t.name || `#${t.id}`}
+                    </option>
+                  ))}
+                </select>
+                <HelpText
+                  text={__(
+                    "Move this departure to a different tour. Any bookings on it move with it.",
+                    "yatra",
+                  )}
+                />
+              </div>
+            )}
+
             {/* Date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

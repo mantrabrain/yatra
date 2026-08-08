@@ -260,6 +260,9 @@ class BookingsController extends BaseController
             'search' => $request->get_param('search') ?: '',
             'date_from' => $request->get_param('date_from') ?: '',
             'date_to' => $request->get_param('date_to') ?: '',
+            // Column sorting from the table headers — whitelisted in the repository.
+            'orderby' => $request->get_param('orderby') ?: '',
+            'order' => $request->get_param('order') ?: '',
         ];
 
         // Delegate to service

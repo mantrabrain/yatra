@@ -133,6 +133,11 @@ const ViewEnquiry: React.FC = () => {
           "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
         label: __("Responded", "yatra"),
       },
+      completed: {
+        className:
+          "bg-teal-100 text-teal-700 dark:bg-teal-900/20 dark:text-teal-400",
+        label: __("Completed", "yatra"),
+      },
       converted: {
         className:
           "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
@@ -305,6 +310,7 @@ const ViewEnquiry: React.FC = () => {
             <ConditionalRender capability="yatra_respond_to_enquiries">
               <div className="flex items-center gap-2">
                 {enquiry.status !== "responded" &&
+                  enquiry.status !== "completed" &&
                   enquiry.status !== "closed" && (
                     <Button
                       variant="outline"

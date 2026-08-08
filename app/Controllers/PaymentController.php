@@ -148,6 +148,10 @@ class PaymentController extends BaseController
             'search' => $request->get_param('search') ?: '',
             'date_from' => $request->get_param('date_from') ?: '',
             'date_to' => $request->get_param('date_to') ?: '',
+            // Column sorting from the table headers. Both are validated against a
+            // whitelist in the repository — never interpolated raw into SQL.
+            'orderby' => $request->get_param('orderby') ?: '',
+            'order' => $request->get_param('order') ?: '',
         ];
 
         $result = $this->paymentService->getPayments($filters);

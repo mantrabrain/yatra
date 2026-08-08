@@ -362,6 +362,35 @@ class AvailabilityService
     }
 
     /**
+     * Booked travellers for a date/time, counted from the bookings themselves.
+     *
+     * The `availability_id` join used by getBookingCountsByAvailabilityIds only
+     * counts bookings whose availability_id was set to this exact row — a stored
+     * link that the booking paths don't reliably set, and that rule-generated
+     * dates never have. That made the "Booked" column read 0 for real bookings.
+     *
+     * This counts by the booking's own identity — (trip, date, time) — via the
+     * booking_departures link both checkout and manual booking always create, so
+     * it can't desync. It is the same method the recurring-rule availability path
+     * already uses. Pass the row's own departure_time so a date with several
+     * departures reports each slot separately rather than the day's total.
+     */
+    public function getBookedCountForSlot(int $tripId, string $date, ?string $departureTime = null): int
+    {
+        if ($tripId <= 0 || $date === '') {
+            return 0;
+        }
+
+        // Dates are stored DATE-only; a datetime input would never string-match.
+        if (preg_match('/^(\d{4}-\d{2}-\d{2})/', $date, $m)) {
+            $date = $m[1];
+        }
+
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        return $bookingRepository->countActiveSeatsForSlot($tripId, $date, $departureTime);
+    }
+
+    /**
      * Update availability status based on booking counts
      */
     public function updateAvailabilityStatusBasedOnBookings(int $availabilityId): bool

@@ -25,6 +25,10 @@ import {
   Table as SharedTable,
 } from "../components/shared";
 import { __ } from "../lib/i18n";
+import {
+  buildYatraSinglePublicUrls,
+  isWordPressPlainPermalink,
+} from "../lib/frontend-permalink-urls";
 import { useToast } from "../components/ui/toast";
 import { Button } from "../components/ui/button";
 import { Select } from "../components/ui/select";
@@ -45,6 +49,7 @@ interface Booking {
   customer_email: string;
   trip_title: string;
   trip_id: number;
+  trip_slug?: string;
   booking_date: string;
   travel_date: string;
   travelers?: number;
@@ -213,6 +218,9 @@ const Bookings: React.FC = () => {
         search: queryParams.search,
         status: queryParams.status,
         payment_status: queryParams.payment_status,
+        // Forward sort params so column-header sorting reaches the backend.
+        orderby: queryParams.orderby,
+        order: queryParams.order,
       });
     },
     enabled: canViewBookings,
@@ -659,19 +667,43 @@ const Bookings: React.FC = () => {
       label: __("Trip"),
       sortable: true,
       visible: visibleColumns.trip,
-      render: (booking: Booking) => (
-        <div className="flex flex-col">
-          <a
-            href={`${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${booking.trip_id}`}
-            className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
-          >
-            {booking.trip_title}
-          </a>
-          <span className="ml-1 text-[11px] text-gray-400 dark:text-gray-500">
-            {booking.trip_id ? `(ID: ${booking.trip_id})` : ""}
-          </span>
-        </div>
-      ),
+      render: (booking: Booking) => {
+        // Link to the tour's PUBLIC single page (opens in a new tab), not the
+        // tour editor — a booking overview should never be a one-click path to
+        // editing the underlying tour. Without a slug we can't build the public
+        // URL, so the name is shown as plain text rather than falling back to
+        // the editor.
+        const slug = booking.trip_slug || "";
+        let tourUrl = "";
+        if (slug) {
+          const { plainUrl, prettyUrl } = buildYatraSinglePublicUrls({
+            entity: "trip",
+            slug,
+          });
+          tourUrl = isWordPressPlainPermalink() ? plainUrl : prettyUrl;
+        }
+        return (
+          <div className="flex flex-col">
+            {tourUrl ? (
+              <a
+                href={tourUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+              >
+                {booking.trip_title}
+              </a>
+            ) : (
+              <span className="font-medium text-gray-900 dark:text-white">
+                {booking.trip_title}
+              </span>
+            )}
+            <span className="ml-1 text-[11px] text-gray-400 dark:text-gray-500">
+              {booking.trip_id ? `(ID: ${booking.trip_id})` : ""}
+            </span>
+          </div>
+        );
+      },
     },
     {
       key: "travelers",

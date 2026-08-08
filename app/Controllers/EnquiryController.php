@@ -289,6 +289,10 @@ class EnquiryController extends BaseController
                 $result = $this->enquiryService->bulkUpdateStatus($ids, 'pending');
                 break;
 
+            case 'mark_completed':
+                $result = $this->enquiryService->bulkUpdateStatus($ids, 'completed');
+                break;
+
             case 'mark_spam':
                 $result = $this->enquiryService->bulkUpdateStatus($ids, 'spam');
                 break;

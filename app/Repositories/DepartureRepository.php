@@ -139,6 +139,23 @@ class DepartureRepository extends BaseRepository
                 $where[] = 'date >= CURDATE()';
             }
         }
+
+        // Past-only filter — for the "Past Departures" archive. Deliberately
+        // DATE-based (mirrors the end_date ?: start_date ?: date precedence used
+        // when marking departures past) rather than checking status = 'past':
+        // that stored status is only kept current by the daily cron, so relying
+        // on it made departures that had already taken place disappear entirely
+        // whenever the cron had not run. Date is the source of truth.
+        if (!empty($filters['past_only'])) {
+            // start_date / end_date are nullable DATE columns (never ''), so guard
+            // with IS NULL / IS NOT NULL — comparing a DATE column to '' errors
+            // under MySQL strict mode.
+            $where[] = "(
+                (end_date IS NOT NULL AND end_date < CURDATE())
+                OR (end_date IS NULL AND start_date IS NOT NULL AND start_date < CURDATE())
+                OR (end_date IS NULL AND start_date IS NULL AND date < CURDATE())
+            )";
+        }
         
         $query = "SELECT * FROM `{$table}` WHERE " . implode(' AND ', $where);
         $query .= " ORDER BY date ASC, time ASC";
@@ -234,6 +251,23 @@ class DepartureRepository extends BaseRepository
                 $where[] = 'date >= CURDATE()';
             }
         }
+
+        // Past-only filter — for the "Past Departures" archive. Deliberately
+        // DATE-based (mirrors the end_date ?: start_date ?: date precedence used
+        // when marking departures past) rather than checking status = 'past':
+        // that stored status is only kept current by the daily cron, so relying
+        // on it made departures that had already taken place disappear entirely
+        // whenever the cron had not run. Date is the source of truth.
+        if (!empty($filters['past_only'])) {
+            // start_date / end_date are nullable DATE columns (never ''), so guard
+            // with IS NULL / IS NOT NULL — comparing a DATE column to '' errors
+            // under MySQL strict mode.
+            $where[] = "(
+                (end_date IS NOT NULL AND end_date < CURDATE())
+                OR (end_date IS NULL AND start_date IS NOT NULL AND start_date < CURDATE())
+                OR (end_date IS NULL AND start_date IS NULL AND date < CURDATE())
+            )";
+        }
         
         $query = "SELECT * FROM `{$table}` WHERE " . implode(' AND ', $where);
         $query .= " ORDER BY date ASC, time ASC";
@@ -262,7 +296,10 @@ class DepartureRepository extends BaseRepository
      */
     public function findPastByTripId(int $tripId, array $filters = []): array
     {
-        $filters['status'] = 'past';
+        // Match by date, not the stored status column (see past_only in
+        // findByTripId) — a departure that has taken place must appear here even
+        // if the daily status cron has not yet marked it 'past'.
+        $filters['past_only'] = true;
         $filters['include_past'] = true;
         return $this->findByTripId($tripId, $filters);
     }
@@ -610,51 +647,48 @@ class DepartureRepository extends BaseRepository
         $table = esc_sql($this->table);
         $today = date('Y-m-d');
         
-        // Update past departures - use end_date if available, otherwise start_date or date
+        // The effective date is end_date ?: start_date ?: date. start_date and
+        // end_date are nullable DATE columns (never ''), so guard with IS NULL /
+        // IS NOT NULL — comparing a DATE column to '' errors under MySQL strict
+        // mode, which previously made this whole recalculation fail silently.
+        $pastCond = "(
+            (end_date IS NOT NULL AND end_date < %s) OR
+            (end_date IS NULL AND start_date IS NOT NULL AND start_date < %s) OR
+            (end_date IS NULL AND start_date IS NULL AND date < %s)
+        )";
+        $futureCond = "(
+            (end_date IS NOT NULL AND end_date >= CURDATE()) OR
+            (end_date IS NULL AND start_date IS NOT NULL AND start_date >= CURDATE()) OR
+            (end_date IS NULL AND start_date IS NULL AND date >= CURDATE())
+        )";
+
+        // Update past departures.
         $this->wpdb->query($this->wpdb->prepare(
-            "UPDATE `{$table}` 
+            "UPDATE `{$table}`
              SET status = 'past', updated_at = %s
-             WHERE (
-                 (end_date IS NOT NULL AND end_date != '' AND end_date < %s) OR
-                 (end_date IS NULL OR end_date = '') AND (
-                     (start_date IS NOT NULL AND start_date != '' AND start_date < %s) OR
-                     (start_date IS NULL OR start_date = '') AND date < %s
-                 )
-             )
+             WHERE {$pastCond}
              AND status != 'cancelled'",
             current_time('mysql'),
             $today,
             $today,
             $today
         ));
-        
-        // Update full departures - check future dates only
+
+        // Update full departures - future dates only.
         $this->wpdb->query(
-            "UPDATE `{$table}` 
+            "UPDATE `{$table}`
              SET status = 'full', updated_at = NOW()
-             WHERE booked_count >= max_capacity 
-             AND max_capacity > 0 
-             AND (
-                 (end_date IS NOT NULL AND end_date != '' AND end_date >= CURDATE()) OR
-                 (end_date IS NULL OR end_date = '') AND (
-                     (start_date IS NOT NULL AND start_date != '' AND start_date >= CURDATE()) OR
-                     (start_date IS NULL OR start_date = '') AND date >= CURDATE()
-                 )
-             )
+             WHERE booked_count >= max_capacity
+             AND max_capacity > 0
+             AND {$futureCond}
              AND status NOT IN ('cancelled', 'past')"
         );
-        
-        // Update upcoming departures - check future dates only
+
+        // Update upcoming departures - future dates only.
         $this->wpdb->query(
-            "UPDATE `{$table}` 
+            "UPDATE `{$table}`
              SET status = 'upcoming', updated_at = NOW()
-             WHERE (
-                 (end_date IS NOT NULL AND end_date != '' AND end_date >= CURDATE()) OR
-                 (end_date IS NULL OR end_date = '') AND (
-                     (start_date IS NOT NULL AND start_date != '' AND start_date >= CURDATE()) OR
-                     (start_date IS NULL OR start_date = '') AND date >= CURDATE()
-                 )
-             )
+             WHERE {$futureCond}
              AND booked_count < max_capacity
              AND status NOT IN ('cancelled', 'past', 'full')"
         );

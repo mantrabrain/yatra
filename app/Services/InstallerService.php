@@ -48,13 +48,29 @@ class InstallerService
      */
     private static function setDefaultOptions(): void
     {
+        // Whether this is a brand-new install vs. a reactivation/upgrade.
+        // Captured before version/date are stamped below so it reflects the
+        // pre-activation state.
+        $isFreshInstall = self::isFreshInstallation();
+
+        // Seed a default only when the option is absent. add_option() is a
+        // no-op when the option already exists (existence is keyed on the
+        // option NAME, so values legitimately stored as false/0/'' are still
+        // preserved). This makes activation idempotent: a deactivate ->
+        // reactivate, or a plugin update, can never overwrite an operator's
+        // saved settings, while a fresh install (and any newly-introduced
+        // default on upgrade) is still seeded.
+        $seed = static function (string $name, $value): void {
+            add_option($name, $value);
+        };
+
         // Payment Gateway Settings - Only enable Pay Later by default
         // These match SettingsService defaults exactly
-        update_option('yatra_payment_gateways', ['pay_later']);
-        update_option('yatra_payment_methods', []);
-        update_option('yatra_payment_test_mode', true);
-        update_option('yatra_auto_confirm_pay_later', true);
-        update_option('yatra_partial_payment', false);
+        $seed('yatra_payment_gateways', ['pay_later']);
+        $seed('yatra_payment_methods', []);
+        $seed('yatra_payment_test_mode', true);
+        $seed('yatra_auto_confirm_pay_later', true);
+        $seed('yatra_partial_payment', false);
         // Set gateway configs with proper structure - only enable pay_later by default
         $gateway_configs = [
             'pay_later' => [
@@ -107,101 +123,106 @@ class InstallerService
                 'api_secret' => '',
             ]
         ];
-        update_option('yatra_gateway_configs', $gateway_configs);
-        update_option('yatra_gateway_order', []);
+        $seed('yatra_gateway_configs', $gateway_configs);
+        $seed('yatra_gateway_order', []);
         
         // Currency Settings - Match SettingsService defaults
-        update_option('yatra_currency', 'USD');
-        update_option('yatra_currency_position', 'before');
-        update_option('yatra_thousand_separator', ',');
-        update_option('yatra_decimal_separator', '.');
-        update_option('yatra_decimal_places', 2);
+        $seed('yatra_currency', 'USD');
+        $seed('yatra_currency_position', 'before');
+        $seed('yatra_thousand_separator', ',');
+        $seed('yatra_decimal_separator', '.');
+        $seed('yatra_decimal_places', 2);
         
         // Flexible Payment Settings - Match SettingsService defaults
-        update_option('yatra_enable_deposit', false);
-        update_option('yatra_deposit_type', 'percentage');
-        update_option('yatra_deposit_amount', 20);
-        update_option('yatra_deposit_required', false);
-        update_option('yatra_deposit_percentage', 20);
-        update_option('yatra_partial_payment_percentage', 30);
+        $seed('yatra_enable_deposit', false);
+        $seed('yatra_deposit_type', 'percentage');
+        $seed('yatra_deposit_amount', 20);
+        $seed('yatra_deposit_required', false);
+        $seed('yatra_deposit_percentage', 20);
+        $seed('yatra_partial_payment_percentage', 30);
         
-        update_option('yatra_allow_save_payment_methods', false);
+        $seed('yatra_allow_save_payment_methods', false);
         
         // Trip Settings - Match SettingsService defaults
-        update_option('yatra_trip_base', 'trip');
-        update_option('yatra_trips_per_page', 12);
-        update_option('yatra_enable_wishlist', false);
-        update_option('yatra_enable_comparison', false);
-        update_option('yatra_show_sold_out', true);
+        $seed('yatra_trip_base', 'trip');
+        $seed('yatra_trips_per_page', 12);
+        $seed('yatra_enable_wishlist', false);
+        $seed('yatra_enable_comparison', false);
+        $seed('yatra_show_sold_out', true);
         
         // Customer Settings - Match SettingsService defaults
-        update_option('yatra_enable_customer_accounts', true);
-        update_option('yatra_enable_customer_registration', true);
+        $seed('yatra_enable_customer_accounts', true);
+        $seed('yatra_enable_customer_registration', true);
         
         // Booking Settings - Match SettingsService defaults
-        update_option('yatra_booking_base', 'book');
-        update_option('yatra_use_booking_page', false);
-        update_option('yatra_booking_page_id', 0);
-        update_option('yatra_enable_guest_booking', true);
-        update_option('yatra_booking_confirmation', true);
-        update_option('yatra_auto_confirm_bookings', false);
-        update_option('yatra_require_login', false);
-        update_option('yatra_allow_guest_checkout', true);
+        $seed('yatra_booking_base', 'book');
+        $seed('yatra_use_booking_page', false);
+        $seed('yatra_booking_page_id', 0);
+        $seed('yatra_enable_guest_booking', true);
+        $seed('yatra_booking_confirmation', true);
+        $seed('yatra_auto_confirm_bookings', false);
+        $seed('yatra_require_login', false);
+        $seed('yatra_allow_guest_checkout', true);
         // cancellation_policy / cancellation_days / refund_policy
         // intentionally not seeded — these are removed settings (see
         // SettingsController::$default_settings comment). Existing
         // sites that already have orphan values stored will keep
         // them in wp_options; new sites won't acquire them.
-        update_option('yatra_booking_expiry_hours', 24);
-        update_option('yatra_booking_reminder_days', 3);
-        update_option('yatra_allow_waitlist', true);
+        $seed('yatra_booking_expiry_hours', 24);
+        $seed('yatra_booking_reminder_days', 3);
+        $seed('yatra_allow_waitlist', true);
         
         // Email identity: canonical keys (REST / EmailService) + legacy keys for older code paths
         $wpAdminEmail = (string) get_option('admin_email', '');
         $blogName = (string) get_bloginfo('name');
-        update_option('yatra_from_email', $wpAdminEmail);
-        update_option('yatra_from_name', $blogName);
-        update_option('yatra_admin_email', $wpAdminEmail);
-        update_option('yatra_email_from_name', $blogName);
-        update_option('yatra_email_from_address', $wpAdminEmail);
-        update_option('yatra_enable_admin_notifications', true);
-        update_option('yatra_enable_customer_notifications', true);
+        $seed('yatra_from_email', $wpAdminEmail);
+        $seed('yatra_from_name', $blogName);
+        $seed('yatra_admin_email', $wpAdminEmail);
+        $seed('yatra_email_from_name', $blogName);
+        $seed('yatra_email_from_address', $wpAdminEmail);
+        $seed('yatra_enable_admin_notifications', true);
+        $seed('yatra_enable_customer_notifications', true);
 
         // Default transactional template HTML + subjects (Email → Templates / settings API)
         foreach (EmailTemplateDefaults::settingsOptionDefaults() as $optionKey => $value) {
-            update_option('yatra_' . $optionKey, $value);
+            $seed('yatra_' . $optionKey, $value);
         }
-        update_option('yatra_email_template_booking', true);
-        update_option('yatra_email_template_confirmation', true);
-        update_option('yatra_email_template_cancellation', true);
-        update_option('yatra_email_template_reminder', true);
-        update_option('yatra_email_template_admin_new_booking', true);
-        update_option('yatra_email_template_admin_payment', true);
-        update_option('yatra_email_template_admin_cancellation', true);
-        update_option('yatra_email_template_trip_consent', true);
-        update_option('yatra_email_template_customer_verification', true);
-        update_option('yatra_email_template_guest_verification', true);
-        update_option('yatra_email_template_booking_completed', true);
-        update_option('yatra_email_template_booking_expired_customer', true);
-        update_option('yatra_email_template_admin_booking_expired', true);
-        update_option('yatra_email_template_scheduled_payment_reminder', true);
-        update_option('yatra_email_template_scheduled_payment_succeeded', true);
-        update_option('yatra_email_template_scheduled_payment_failed', true);
-        update_option('yatra_email_template_admin_scheduled_payment_failed', true);
-        update_option('yatra_email_template_enquiry_received', true);
-        update_option('yatra_email_template_enquiry_admin', true);
-        update_option('yatra_email_template_enquiry_response', true);
-        update_option('yatra_email_template_review_request', true);
-        update_option('yatra_email_template_abandoned_booking_recovery_first', true);
-        update_option('yatra_email_template_abandoned_booking_recovery_second', true);
-        update_option('yatra_email_template_abandoned_booking_recovery_final', true);
+        $seed('yatra_email_template_booking', true);
+        $seed('yatra_email_template_confirmation', true);
+        $seed('yatra_email_template_cancellation', true);
+        $seed('yatra_email_template_reminder', true);
+        $seed('yatra_email_template_admin_new_booking', true);
+        $seed('yatra_email_template_admin_payment', true);
+        $seed('yatra_email_template_admin_cancellation', true);
+        $seed('yatra_email_template_trip_consent', true);
+        $seed('yatra_email_template_customer_verification', true);
+        $seed('yatra_email_template_guest_verification', true);
+        $seed('yatra_email_template_booking_completed', true);
+        $seed('yatra_email_template_booking_expired_customer', true);
+        $seed('yatra_email_template_admin_booking_expired', true);
+        $seed('yatra_email_template_scheduled_payment_reminder', true);
+        $seed('yatra_email_template_scheduled_payment_succeeded', true);
+        $seed('yatra_email_template_scheduled_payment_failed', true);
+        $seed('yatra_email_template_admin_scheduled_payment_failed', true);
+        $seed('yatra_email_template_enquiry_received', true);
+        $seed('yatra_email_template_enquiry_admin', true);
+        $seed('yatra_email_template_enquiry_response', true);
+        $seed('yatra_email_template_review_request', true);
+        $seed('yatra_email_template_abandoned_booking_recovery_first', true);
+        $seed('yatra_email_template_abandoned_booking_recovery_second', true);
+        $seed('yatra_email_template_abandoned_booking_recovery_final', true);
 
-        // Clear any existing Stripe/PayPal settings that might exist
-        delete_option('yatra_stripe_settings');
-        delete_option('yatra_paypal_settings');
+        // Clear pre-existing legacy Stripe/PayPal settings, but only on a
+        // brand-new install. On a reactivation these may hold the operator's
+        // configured gateway data, so deleting them would be destructive.
+        if ($isFreshInstall) {
+            delete_option('yatra_stripe_settings');
+            delete_option('yatra_paypal_settings');
+        }
         
-        // Set installation tracking (not in SettingsService but needed for tracking)
-        update_option('yatra_installation_date', current_time('mysql'));
+        // Installation tracking: stamp the date once (seed); keep the
+        // version current so upgrade routines can detect version changes.
+        $seed('yatra_installation_date', current_time('mysql'));
         update_option('yatra_version', defined('YATRA_VERSION') ? YATRA_VERSION : '3.0.3');
         
 

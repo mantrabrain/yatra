@@ -441,6 +441,9 @@ const EnquiryForm: React.FC = () => {
                     <option value="responded">
                       {__("Responded", "yatra")}
                     </option>
+                    <option value="completed">
+                      {__("Completed", "yatra")}
+                    </option>
                     <option value="converted">
                       {__("Converted", "yatra")}
                     </option>

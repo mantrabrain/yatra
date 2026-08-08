@@ -22,9 +22,12 @@ import {
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { Skeleton } from "../components/ui/skeleton";
 import { DatePicker } from "../components/ui/date-picker";
+import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
 
 interface CustomerFormData {
   first_name: string;
+  /** Create-mode only: also create a WordPress login account for this customer */
+  create_account?: boolean;
   last_name: string;
   email: string;
   phone: string;
@@ -58,6 +61,7 @@ const CustomerForm: React.FC = () => {
   const baseAdminUrl = (window as any).yatraAdmin?.adminUrl || "";
   const [formData, setFormData] = useState<CustomerFormData>({
     first_name: "",
+    create_account: false,
     last_name: "",
     email: "",
     phone: "",
@@ -85,6 +89,11 @@ const CustomerForm: React.FC = () => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // When the entered email already has a login account, we ask before linking.
+  const [linkConfirm, setLinkConfirm] = useState<{ open: boolean; message: string }>({
+    open: false,
+    message: "",
+  });
 
   // Get action and id from URL
   const action = useMemo(() => {
@@ -100,6 +109,7 @@ const CustomerForm: React.FC = () => {
   const isEditMode = action === "edit" && customerId !== null;
 
   // Fetch customer data if editing
+
   const { data: customerData, isLoading: isLoadingCustomer } = useQuery<
     { data?: any } | CustomerFormData | null
   >({
@@ -141,10 +151,19 @@ const CustomerForm: React.FC = () => {
           typeof data.loyalty_points === "number"
             ? data.loyalty_points
             : parseInt(data.loyalty_points || "0", 10) || 0,
+        // Carried through so the form can tell whether this customer already has
+        // a login account (controls the "Create a login account" option below).
+        user_id: (data as any).user_id ?? null,
       } as CustomerFormData;
     },
     enabled: isEditMode,
   });
+
+  // True only when editing a customer that already has a WordPress login. Used
+  // to HIDE the "Create a login account" option — an existing account is never
+  // touched from this form; the option is only for adding one where none exists.
+  const customerHasAccount =
+    isEditMode && !!(customerData as any)?.user_id;
 
   // Load customer data into form when editing
   useEffect(() => {
@@ -185,19 +204,39 @@ const CustomerForm: React.FC = () => {
       if (isEditMode && customerId) {
         return await apiService.updateCustomer(customerId, payload);
       } else {
-        // For creation, we need a different approach since CustomerController
-        // doesn't have a create endpoint yet - customers are created during booking
-        // For now, return error for create
-        throw new Error(
-          "Creating customers directly is not supported. Customers are created when bookings are made.",
-        );
+        return await apiService.createCustomer(payload);
       }
     },
-    onSuccess: () => {
+    onSuccess: (result: any) => {
+      // The email already has a login account — don't treat this as saved. Ask
+      // the operator to confirm the link; nothing was written server-side.
+      if (result?.needs_link_confirmation) {
+        setIsSubmitting(false);
+        setLinkConfirm({
+          open: true,
+          message:
+            result.message ||
+            __(
+              "This email already has a login account. Link this customer to it?",
+              "yatra",
+            ),
+        });
+        return;
+      }
       queryClient.invalidateQueries({ queryKey: ["customers"] });
       queryClient.invalidateQueries({ queryKey: ["customer", customerId] });
       setIsSubmitting(false);
-      showToast(__("Customer updated successfully", "yatra"), "success");
+      // The server returns a message tailored to what happened (created, created
+      // with a login account, or linked to an existing account); prefer it.
+      const message =
+        result?.message ||
+        (isEditMode
+          ? __("Customer updated successfully", "yatra")
+          : __("Customer created successfully", "yatra"));
+      showToast(message, "success");
+      if (!isEditMode) {
+        window.location.href = `${baseAdminUrl}?page=yatra&subpage=customers`;
+      }
     },
     onError: (error: any) => {
       const errorMessage =
@@ -404,6 +443,43 @@ const CustomerForm: React.FC = () => {
                           "yatra",
                         )}
                       </p>
+                    )}
+                    {/* Editing a customer that already signs in: no checkbox —
+                        their account is managed elsewhere, never from here. */}
+                    {customerHasAccount && (
+                      <div className="mt-3 flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md text-sm text-gray-600 dark:text-gray-400">
+                        {__("This customer has a login account.", "yatra")}
+                      </div>
+                    )}
+                    {/* Shown on Add, and on Edit when the customer has no login
+                        yet — ticking it creates one on save (never removes one). */}
+                    {!customerHasAccount && (
+                      <div className="mt-3 flex items-start gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                        <input
+                          type="checkbox"
+                          id="create_account"
+                          checked={!!formData.create_account}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              create_account: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <label
+                          htmlFor="create_account"
+                          className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
+                        >
+                          {__("Create a login account for this customer", "yatra")}
+                          <span className="block text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            {__(
+                              "They'll receive an email to set their own password and can then sign in to see their bookings. If this email already has an account, it will be linked instead.",
+                              "yatra",
+                            )}
+                          </span>
+                        </label>
+                      </div>
                     )}
                   </div>
 
@@ -955,6 +1031,25 @@ const CustomerForm: React.FC = () => {
           </div>
         </form>
       </ConditionalRender>
+
+      {/* Shown when the entered email already has a login account. Confirming
+          re-submits with confirm_link_existing so the backend links to it;
+          cancelling leaves everything unsaved (nothing was written). */}
+      <ConfirmationDialog
+        isOpen={linkConfirm.open}
+        onClose={() => setLinkConfirm({ open: false, message: "" })}
+        onConfirm={() => {
+          setLinkConfirm({ open: false, message: "" });
+          setIsSubmitting(true);
+          saveMutation.mutate({
+            ...formData,
+            confirm_link_existing: true,
+          } as any);
+        }}
+        title={__("Link to existing account?", "yatra")}
+        message={linkConfirm.message}
+        confirmText={__("Link account", "yatra")}
+      />
     </div>
   );
 };

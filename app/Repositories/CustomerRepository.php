@@ -242,8 +242,38 @@ class CustomerRepository extends BaseRepository
             null,
             ['%d']
         );
-        
+
         return $result !== false;
+    }
+
+    /**
+     * Link a WordPress user to a customer, ONLY when the customer has none yet.
+     *
+     * Deliberately narrow: the WHERE clause requires the current user_id to be
+     * NULL/0, so this can add a login link but can never reassign or overwrite an
+     * existing one — a customer's login is never silently switched to a different
+     * account. Returns true only when a row was actually linked.
+     */
+    public function linkUserIfUnlinked(int $customerId, int $userId): bool
+    {
+        global $wpdb;
+
+        if ($customerId <= 0 || $userId <= 0) {
+            return false;
+        }
+
+        $table = $this->getTableName();
+
+        $result = $wpdb->query($wpdb->prepare(
+            "UPDATE `{$table}`
+             SET user_id = %d, updated_at = %s
+             WHERE id = %d AND (user_id IS NULL OR user_id = 0)",
+            $userId,
+            current_time('mysql'),
+            $customerId
+        ));
+
+        return $result > 0;
     }
 
     /**

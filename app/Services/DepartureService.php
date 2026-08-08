@@ -157,14 +157,51 @@ class DepartureService
             }
         }
         
+        // Detect a tour (trip) reassignment: the operator is moving this
+        // departure from one trip to another. The DB layer already persists
+        // trip_id, but the move must be validated and kept consistent:
+        //   1. the target trip must exist,
+        //   2. it must not collide with an existing departure on the target
+        //      trip for the same date/time, and
+        //   3. the departure's bookings must move to the new trip too, so a
+        //      booking never ends up pointing at a departure that belongs to a
+        //      different trip (the invariant the booking edit path also keeps).
+        $newTripId = isset($data['trip_id']) ? (int) $data['trip_id'] : 0;
+        $tripReassigned = $newTripId > 0 && $newTripId !== (int) $departure->trip_id;
+
+        if ($tripReassigned) {
+            $targetTrip = $this->tripRepository->find($newTripId);
+            if (!$targetTrip) {
+                throw new \InvalidArgumentException('Target tour not found');
+            }
+
+            $checkDate = $data['start_date'] ?? $data['date'] ?? ($departure->start_date ?: $departure->date);
+            $checkTime = $data['time'] ?? $departure->time;
+            $existing = $this->repository->findByTripIdAndStartDate($newTripId, (string) $checkDate, $checkTime);
+            if ($existing && (int) $existing->id !== $id) {
+                throw new \InvalidArgumentException(
+                    'A departure already exists for the selected tour on this date'
+                );
+            }
+        }
+
         // Mark as manually edited by admin
         if (!isset($data['source'])) {
             $data['source'] = 'manual'; // Admin edits mark as manual
         }
-        
+
         // Update departure
         $result = $this->repository->update($id, $data);
-        
+
+        // Move the departure's bookings onto the new trip so booking.trip_id and
+        // departure.trip_id stay in sync after a manual reassignment.
+        if ($result && $tripReassigned) {
+            $bookingIds = $this->bookingDepartureRepository->getBookingIdsForDeparture($id);
+            foreach ($bookingIds as $bookingId) {
+                $this->bookingRepository->update((int) $bookingId, ['trip_id' => $newTripId]);
+            }
+        }
+
         // Trigger hook to sync capacity from availability
         if ($result) {
             do_action('yatra_departure_saved', $id);

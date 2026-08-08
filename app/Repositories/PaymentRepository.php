@@ -131,6 +131,26 @@ class PaymentRepository extends BaseRepository
         }
         $total = (int) $this->wpdb->get_var($count_query);
 
+        // Resolve the sort column from a strict whitelist. ORDER BY cannot be
+        // parameterised with $wpdb->prepare (that's for values), so the column
+        // MUST come from this map of known-safe expressions and the direction is
+        // constrained to ASC/DESC — user input never reaches the SQL directly.
+        $sortColumns = [
+            'payment'      => 'p.id',
+            'customer'     => 'b.contact_first_name',
+            'amount'       => 'p.amount',
+            'method'       => 'p.gateway',
+            'status'       => 'p.status',
+            'date'         => 'p.created_at',
+            'payment_date' => 'p.created_at',
+            'created_at'   => 'p.created_at',
+            'transaction_id' => 'p.transaction_id',
+        ];
+        $orderColumn = $sortColumns[(string) ($filters['orderby'] ?? '')] ?? 'p.created_at';
+        $orderDir = strtoupper((string) ($filters['order'] ?? '')) === 'ASC' ? 'ASC' : 'DESC';
+        // Stable tie-breaker so equal values keep a deterministic order across pages.
+        $order_sql = $orderColumn . ' ' . $orderDir . ', p.id DESC';
+
         // Get payments with booking and trip info
         $query = "SELECT p.*, 
                          b.reference as booking_reference,
@@ -142,7 +162,7 @@ class PaymentRepository extends BaseRepository
                   LEFT JOIN {$bookings_table} b ON p.booking_id = b.id
                   LEFT JOIN {$trips_table} t ON b.trip_id = t.id
                   WHERE {$where_sql}
-                  ORDER BY p.created_at DESC
+                  ORDER BY {$order_sql}
                   LIMIT %d OFFSET %d";
 
         $query_values = array_merge($where_values, [$per_page, $offset]);

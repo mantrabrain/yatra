@@ -57,6 +57,7 @@ interface Enquiry {
     | "new"
     | "pending"
     | "responded"
+    | "completed"
     | "closed"
     | "converted"
     | "read"
@@ -130,6 +131,7 @@ const Enquiries: React.FC = () => {
     }
 
     return [
+      { value: "mark_completed", label: __("Mark as Completed", "yatra") },
       { value: "mark_spam", label: __("Mark as Spam", "yatra") },
       { value: "mark_trash", label: __("Move to Trash", "yatra") },
       { value: "delete", label: __("Delete Permanently", "yatra") },
@@ -175,6 +177,7 @@ const Enquiries: React.FC = () => {
     new: ((statsData as any)?.by_status?.new?.count as number) || 0,
     pending: ((statsData as any)?.by_status?.pending?.count as number) || 0,
     responded: ((statsData as any)?.by_status?.responded?.count as number) || 0,
+    completed: ((statsData as any)?.by_status?.completed?.count as number) || 0,
     converted: ((statsData as any)?.by_status?.converted?.count as number) || 0,
     closed: ((statsData as any)?.by_status?.closed?.count as number) || 0,
     spam: ((statsData as any)?.by_status?.spam?.count as number) || 0,
@@ -277,7 +280,9 @@ const Enquiries: React.FC = () => {
       // roles.
       condition: (enquiry: Enquiry) =>
         can("yatra_respond_to_enquiries") &&
-        !["closed", "spam", "trash", "archived"].includes(enquiry.status),
+        !["completed", "closed", "spam", "trash", "archived"].includes(
+          enquiry.status,
+        ),
     },
     {
       key: "edit",
@@ -397,6 +402,11 @@ const Enquiries: React.FC = () => {
         className:
           "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
         label: __("Responded", "yatra"),
+      },
+      completed: {
+        className:
+          "bg-teal-100 text-teal-700 dark:bg-teal-900/20 dark:text-teal-400",
+        label: __("Completed", "yatra"),
       },
       converted: {
         className:
@@ -534,6 +544,7 @@ const Enquiries: React.FC = () => {
               <option value="new">{__("New", "yatra")}</option>
               <option value="pending">{__("Pending", "yatra")}</option>
               <option value="responded">{__("Responded", "yatra")}</option>
+              <option value="completed">{__("Completed", "yatra")}</option>
               <option value="converted">{__("Converted", "yatra")}</option>
               <option value="closed">{__("Closed", "yatra")}</option>
               <option value="spam">{__("Spam", "yatra")}</option>
@@ -615,6 +626,11 @@ const Enquiries: React.FC = () => {
             key: "responded",
             label: __("Responded", "yatra"),
             count: statusCounts.responded,
+          },
+          {
+            key: "completed",
+            label: __("Completed", "yatra"),
+            count: statusCounts.completed,
           },
           {
             key: "converted",

@@ -123,8 +123,30 @@ class BookingRepository extends BaseRepository
         }
         $total = (int)$this->wpdb->get_var($count_query);
 
+        // Resolve the sort column from a strict whitelist. ORDER BY cannot be
+        // parameterised, so the column MUST come from this known-safe map and the
+        // direction is constrained to ASC/DESC — user input never touches the SQL.
+        $sortColumns = [
+            'booking_number' => 'b.id',
+            'reference'      => 'b.reference',
+            'customer'       => 'b.contact_first_name',
+            'trip'           => 't.title',
+            'travelers'      => 'b.travelers_count',
+            'booking_date'   => 'b.created_at',
+            'created_at'     => 'b.created_at',
+            'travel_date'    => 'b.travel_date',
+            'amount'         => 'b.total_amount',
+            'total_amount'   => 'b.total_amount',
+            'payment_status' => 'b.payment_status',
+            'booking_status' => 'b.status',
+            'status'         => 'b.status',
+        ];
+        $orderColumn = $sortColumns[(string) ($filters['orderby'] ?? '')] ?? 'b.created_at';
+        $orderDir = strtoupper((string) ($filters['order'] ?? '')) === 'ASC' ? 'ASC' : 'DESC';
+        $order_sql = $orderColumn . ' ' . $orderDir . ', b.id DESC';
+
         // Get bookings with trip info and customer info
-        $query = "SELECT 
+        $query = "SELECT
                     b.*, 
                     t.title as trip_title, 
                     t.slug as trip_slug, 
@@ -136,7 +158,7 @@ class BookingRepository extends BaseRepository
                   LEFT JOIN {$trips_table} t ON b.trip_id = t.id
                   LEFT JOIN {$customers_table} c ON c.id = b.customer_id
                   WHERE {$where_sql}
-                  ORDER BY b.created_at DESC
+                  ORDER BY {$order_sql}
                   LIMIT %d OFFSET %d";
 
         $query_values = array_merge($where_values, [$per_page, $offset]);
@@ -735,6 +757,50 @@ class BookingRepository extends BaseRepository
              AND b.reminder_sent = 0",
             $travelDate
         ));
+    }
+
+    /**
+     * Find IDs of confirmed bookings whose tour has already taken place, so the
+     * daily cron can transition them to 'completed' (which fires the
+     * booking.completed notification / Email Automation sequence).
+     *
+     * "Tour has taken place" = its effective end date is strictly before today.
+     * The effective date prefers end_date (multi-day itineraries), then
+     * start_date, then travel_date (which is NOT NULL). NULLIF guards against
+     * any legacy zero-dates so they fall through to the next non-empty date.
+     *
+     * The $floor lower bound (feature-activation date) ensures we never
+     * retroactively complete — and email the customers of — tours that ended
+     * before this automation existed. Only 'confirmed' bookings are eligible:
+     * pending/on_hold/waitlist never travelled, and cancelled/refunded/completed
+     * are terminal.
+     *
+     * @param string $today Today (WP-local, 'Y-m-d') — exclusive upper bound.
+     * @param string $floor Activation floor ('Y-m-d') — inclusive lower bound.
+     * @param int    $limit Max rows per run (drains any backlog over days).
+     * @return int[]
+     */
+    public function getConfirmedBookingIdsPastTour(string $today, string $floor, int $limit = 500): array
+    {
+        $table = $this->getTableName();
+
+        $effectiveDate = "COALESCE(NULLIF(b.end_date, '0000-00-00'), "
+            . "NULLIF(b.start_date, '0000-00-00'), b.travel_date)";
+
+        $ids = $this->wpdb->get_col($this->wpdb->prepare(
+            "SELECT b.id
+             FROM {$table} b
+             WHERE b.status = 'confirmed'
+             AND {$effectiveDate} < %s
+             AND {$effectiveDate} >= %s
+             ORDER BY b.id ASC
+             LIMIT %d",
+            $today,
+            $floor,
+            $limit
+        ));
+
+        return array_map('intval', (array) $ids);
     }
 
     /**

@@ -533,6 +533,7 @@ export const apiService = {
     apiClient.get(API_ENDPOINTS.CUSTOMER_GET(id)),
   deleteCustomer: (id: string | number) =>
     apiClient.delete(API_ENDPOINTS.CUSTOMER_DELETE(id)),
+  createCustomer: (data: any) => apiClient.post(API_ENDPOINTS.CUSTOMERS, data),
   updateCustomer: (id: string | number, data: any) =>
     apiClient.put(API_ENDPOINTS.CUSTOMER_GET(id), data),
   updateCustomerStatus: (id: string | number, status: string) =>

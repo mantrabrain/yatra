@@ -48,7 +48,7 @@ class BookingCronService
         // Register cron hooks
         add_action('yatra_booking_reminder', [self::class, 'sendBookingReminders']);
         add_action('yatra_booking_expiry', [self::class, 'expirePendingBookings']);
-        
+
         // Schedule events if not already scheduled
         self::scheduleEvents();
     }
@@ -117,6 +117,92 @@ class BookingCronService
         // Log the operation
         if (defined('WP_DEBUG') && WP_DEBUG) {
             }
+    }
+
+    /**
+     * Ensure the daily booking-completion sweep is scheduled.
+     *
+     * Wired from CronHooks (the plugin's live cron bootstrap) rather than the
+     * legacy register()/scheduleEvents() path above, which is not invoked. Only
+     * the completion event is scheduled here — the reminder/expiry events are
+     * intentionally left as-is to avoid changing their (separate) behavior.
+     */
+    public static function registerCompletionCron(): void
+    {
+        if (!wp_next_scheduled('yatra_booking_completion')) {
+            wp_schedule_event(time(), 'daily', 'yatra_booking_completion');
+        }
+    }
+
+    /**
+     * Unschedule the booking-completion sweep (plugin deactivation).
+     */
+    public static function unregisterCompletionCron(): void
+    {
+        $timestamp = wp_next_scheduled('yatra_booking_completion');
+        if ($timestamp) {
+            wp_unschedule_event($timestamp, 'yatra_booking_completion');
+        }
+    }
+
+    /**
+     * Mark confirmed bookings 'completed' once their tour has taken place.
+     *
+     * Nothing previously transitioned a booking to 'completed' automatically —
+     * the status (and therefore the booking.completed email / Email Automation
+     * sequence) only changed when an operator edited each booking by hand. So
+     * the post-tour email was effectively never sent. This daily sweep does
+     * what an operator would: for every confirmed booking whose tour date has
+     * passed, it calls the same updateStatus() path the admin UI uses, which
+     * fires the notification, the yatra_booking_status_changed action (Pro
+     * sequences), and schedules the review reminder.
+     *
+     * Backward-compat: an activation floor (yatra_booking_autocomplete_since) is
+     * stamped on the first run so we never retroactively complete — and email
+     * the customers of — tours that ended before this automation shipped. Only
+     * tours finishing from activation onward are auto-completed. Operators can
+     * disable the sweep entirely via the yatra_auto_complete_bookings filter,
+     * and the email itself still respects its own template on/off setting.
+     */
+    public static function completeFinishedBookings(): void
+    {
+        /**
+         * Allow disabling automatic booking completion entirely.
+         *
+         * @param bool $enabled Default true.
+         */
+        if (!apply_filters('yatra_auto_complete_bookings', true)) {
+            return;
+        }
+
+        $floorOption = 'yatra_booking_autocomplete_since';
+        $today = current_time('Y-m-d');
+
+        $floor = (string) get_option($floorOption, '');
+        if ($floor === '') {
+            // First run on this site: establish the floor at today so historical
+            // bookings are never retroactively completed/emailed. Tours finishing
+            // from now on are picked up on subsequent runs.
+            update_option($floorOption, $today);
+
+            return;
+        }
+
+        $bookingRepository = self::getBookingRepository();
+        $ids = $bookingRepository->getConfirmedBookingIdsPastTour($today, $floor, 500);
+
+        if (empty($ids)) {
+            return;
+        }
+
+        $bookingService = new BookingService();
+
+        foreach ($ids as $id) {
+            // Same entry point the admin "change status" action uses, so all
+            // side effects (notification, status-changed hook, review reminder,
+            // departure booked_count handling) stay identical to a manual mark.
+            $bookingService->updateStatus((int) $id, 'completed');
+        }
     }
 
     /**

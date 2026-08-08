@@ -1,9 +1,9 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-CNo9Rmha.js","../../../dist/js/react-vendor-xzSqHjRF.js","../css/react-vendor.css","../../../dist/js/index-d5SvbCd2.js","../css/index.css","../../../dist/js/BuildItineraryModal-uwHaNgQi.js","../../../dist/js/ProFeature-xUch0Nzh.js","../../../dist/js/Settings-D6fIQOg0.js","../../../dist/js/Team-BfLCCRw_.js","../../../dist/js/Reports-IbJtBH1g.js","../../../dist/js/DiscountForm-h3YgOklC.js","../../../dist/js/ApplicableTripSelector-5VkyoFjX.js","../../../dist/js/Itinerary-yt934gWp.js","../../../dist/js/RecurringRuleForm-fvC6oxv3.js","./Whatsapp.js","../../../dist/js/module-skeleton-Cb1q-Zbx.js","../../../dist/js/ChannelManager-ot3cFDSl.js","../../../dist/js/Webhooks-Dgo5wDFi.js","../../../dist/js/TripConsentForm-BXPYoZJl.js","../../../dist/js/BookingForm-CErVpQqK.js","../../../dist/js/ViewBooking-B_1Vf_7k.js","../../../dist/js/AvailabilityForm-C1xVLre3.js","../../../dist/js/DynamicPricing-CMoXGDlV.js","../../../dist/js/RuleTypeSelectionModal-iEzskFri.js","../../../dist/js/toggle-DUbJsrWf.js","../../../dist/js/DynamicPricingRuleForm-DTYPKfzW.js","../../../dist/js/AiAssistant-CxWksDSA.js","../../../dist/js/AbandonedRecovery-DJcU_lO7.js","../../../dist/js/WhiteLabel-ji7Esrgv.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-DS8rRmWJ.js","../../../dist/js/react-vendor-xzSqHjRF.js","../css/react-vendor.css","../../../dist/js/index-dxjln488.js","../css/index.css","../../../dist/js/BuildItineraryModal-Din2wa2y.js","../../../dist/js/ProFeature-D0xvp27g.js","../../../dist/js/Settings-C-lQODDl.js","../../../dist/js/Team-CYVEBFh_.js","../../../dist/js/Reports-bwvDDxDa.js","../../../dist/js/DiscountForm-BPHrQuZ8.js","../../../dist/js/ApplicableTripSelector-C0c7ClTX.js","../../../dist/js/Itinerary-Di5mqu8p.js","../../../dist/js/RecurringRuleForm-CQAwpLLy.js","./Whatsapp.js","../../../dist/js/module-skeleton-Cb1q-Zbx.js","../../../dist/js/ChannelManager-Dn_wX-8B.js","../../../dist/js/Webhooks-BZCllOzA.js","../../../dist/js/TripConsentForm-DoZ_IwQo.js","../../../dist/js/BookingForm-C6yUdmmA.js","../../../dist/js/ViewBooking-B_Y-GQvO.js","../../../dist/js/AvailabilityForm-KJ4grufJ.js","../../../dist/js/DynamicPricing-PfW4sTnd.js","../../../dist/js/RuleTypeSelectionModal-qmYsGxo5.js","../../../dist/js/toggle-DUbJsrWf.js","../../../dist/js/DynamicPricingRuleForm-Dbl5YS1x.js","../../../dist/js/AiAssistant-Byhtz-Zn.js","../../../dist/js/AbandonedRecovery-CRkcuFBP.js","../../../dist/js/WhiteLabel-DrkhXPLD.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
 import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as Calendar$1, q as MapPin, s as LayoutDashboard, u as useQuery, t as useQueryClient, v as useMutation, Z as Zap, w as Webhook, x as ChevronDown, y as ChevronRight, z as ArrowLeft, G as Gift, D as Loader2, E as Sun, H as Moon, I as User, J as RefreshCw, O as Inbox, Q as AlertTriangle, V as ExternalLink, X as isObjectLike_1, _ as _baseGetTag, Y as isArray_1, $ as _MapCache, a0 as getDefaultExportFromCjs, a1 as _Symbol, a2 as isObject$5, a3 as isFunction, a4 as reactIsExports, a5 as React, a6 as _Stack, a7 as _baseIsEqual, a8 as isObject_1, a9 as keys_1, aa as isLength_1, ab as _isIndex, ac as isArguments_1, ad as _Set, ae as _setToArray, af as _SetCache, ag as _cacheHas, ah as _arrayPush, ai as isArrayLike_1, aj as _baseUnary, ak as _getNative, al as eq_1, am as _root, an as isEqual, ao as Animate, ap as _overArg, aq as _arraySome, ar as Clock, as as DollarSign, at as ArrowRight, au as Shield, av as CheckCircle, aw as Plus, ax as X, ay as reactDomExports, az as AlertCircle, aA as Check, aB as Wand2, aC as ChevronLeft, aD as CheckCircle2, aE as HelpCircle, aF as Info, aG as Copy, aH as MoreVertical, aI as Columns, aJ as PenSquare, aK as ArrowUp, aL as ArrowDown, aM as Archive, aN as Trash2, aO as Search, aP as ArrowUpDown, aQ as Eye, aR as Upload, aS as Image, aT as ReactQuill, aU as Pen, aV as Save, aW as CircleDollarSign, aX as Undo2, aY as Phone, aZ as PauseCircle, a_ as ShieldX, a$ as ShieldOff, b0 as Globe, b1 as Award, b2 as Database, b3 as Folder, b4 as Mountain, b5 as UserCheck, b6 as Download, b7 as Server, b8 as XCircle, b9 as Video, ba as Lock, bb as GripVertical, bc as ChevronUp, bd as Play, be as ClipboardCopy, bf as Ban, bg as Bell, bh as Heart, bi as Scissors, bj as Send, bk as Filter, bl as ArrowUpRight, bm as ClipboardCheck, bn as PenTool, bo as Camera, bp as BarChart$1, bq as Megaphone, br as GitBranch, bs as Pause, bt as Settings2, bu as Code, bv as Bug, bw as EyeOff, bx as QueryClient, by as client, bz as QueryClientProvider } from "../../../dist/js/react-vendor-xzSqHjRF.js";
-import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as todayYmd, S as SearchableSelect, h as getCurrencySymbol, i as getCountryName, j as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-d5SvbCd2.js";
+import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as todayYmd, S as SearchableSelect, h as getCurrencySymbol, i as getCountryName, j as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-dxjln488.js";
 const scriptRel = "modulepreload";
 const assetsURL = function(dep, importerUrl) {
   return new URL(dep, importerUrl).href;
@@ -37694,7 +37694,10 @@ const Bookings = () => {
         per_page: queryParams.per_page,
         search: queryParams.search,
         status: queryParams.status,
-        payment_status: queryParams.payment_status
+        payment_status: queryParams.payment_status,
+        // Forward sort params so column-header sorting reaches the backend.
+        orderby: queryParams.orderby,
+        order: queryParams.order
       });
     },
     enabled: canViewBookings
@@ -38058,16 +38061,26 @@ const Bookings = () => {
       sortable: true,
       visible: visibleColumns.trip,
       render: (booking) => {
-        var _a2;
+        const slug = booking.trip_slug || "";
+        let tourUrl = "";
+        if (slug) {
+          const { plainUrl, prettyUrl } = buildYatraSinglePublicUrls({
+            entity: "trip",
+            slug
+          });
+          tourUrl = isWordPressPlainPermalink() ? plainUrl : prettyUrl;
+        }
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+          tourUrl ? /* @__PURE__ */ jsxRuntimeExports.jsx(
             "a",
             {
-              href: `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${booking.trip_id}`,
+              href: tourUrl,
+              target: "_blank",
+              rel: "noopener noreferrer",
               className: "font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300",
               children: booking.trip_title
             }
-          ),
+          ) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: booking.trip_title }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-1 text-[11px] text-gray-400 dark:text-gray-500", children: booking.trip_id ? `(ID: ${booking.trip_id})` : "" })
         ] });
       }
@@ -42917,6 +42930,7 @@ const CustomerForm = () => {
   const baseAdminUrl = ((_a = window.yatraAdmin) == null ? void 0 : _a.adminUrl) || "";
   const [formData, setFormData] = reactExports.useState({
     first_name: "",
+    create_account: false,
     last_name: "",
     email: "",
     phone: "",
@@ -42944,6 +42958,10 @@ const CustomerForm = () => {
   });
   const [errors, setErrors] = reactExports.useState({});
   const [isSubmitting, setIsSubmitting] = reactExports.useState(false);
+  const [linkConfirm, setLinkConfirm] = reactExports.useState({
+    open: false,
+    message: ""
+  });
   const action = reactExports.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("action") || "create";
@@ -42985,11 +43003,15 @@ const CustomerForm = () => {
         status: data.status || "active",
         notes: data.notes || "",
         loyalty_tier: data.loyalty_tier || "bronze",
-        loyalty_points: typeof data.loyalty_points === "number" ? data.loyalty_points : parseInt(data.loyalty_points || "0", 10) || 0
+        loyalty_points: typeof data.loyalty_points === "number" ? data.loyalty_points : parseInt(data.loyalty_points || "0", 10) || 0,
+        // Carried through so the form can tell whether this customer already has
+        // a login account (controls the "Create a login account" option below).
+        user_id: data.user_id ?? null
       };
     },
     enabled: isEditMode
   });
+  const customerHasAccount = isEditMode && !!(customerData == null ? void 0 : customerData.user_id);
   reactExports.useEffect(() => {
     if (customerData && isEditMode) {
       setFormData(customerData);
@@ -43020,16 +43042,29 @@ const CustomerForm = () => {
       if (isEditMode && customerId) {
         return await apiService.updateCustomer(customerId, payload);
       } else {
-        throw new Error(
-          "Creating customers directly is not supported. Customers are created when bookings are made."
-        );
+        return await apiService.createCustomer(payload);
       }
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
+      if (result == null ? void 0 : result.needs_link_confirmation) {
+        setIsSubmitting(false);
+        setLinkConfirm({
+          open: true,
+          message: result.message || __(
+            "This email already has a login account. Link this customer to it?",
+            "yatra"
+          )
+        });
+        return;
+      }
       queryClient2.invalidateQueries({ queryKey: ["customers"] });
       queryClient2.invalidateQueries({ queryKey: ["customer", customerId] });
       setIsSubmitting(false);
-      showToast(__("Customer updated successfully", "yatra"), "success");
+      const message2 = (result == null ? void 0 : result.message) || (isEditMode ? __("Customer updated successfully", "yatra") : __("Customer created successfully", "yatra"));
+      showToast(message2, "success");
+      if (!isEditMode) {
+        window.location.href = `${baseAdminUrl}?page=yatra&subpage=customers`;
+      }
     },
     onError: (error) => {
       const errorMessage = (error == null ? void 0 : error.message) || __("An error occurred while saving the customer", "yatra");
@@ -43202,7 +43237,37 @@ const CustomerForm = () => {
               isEditMode && !errors.email && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-xs text-gray-500 dark:text-gray-400", children: __(
                 "If this customer can sign in, a confirmation link is sent to the new address and their email changes only once it is confirmed there. Customers without an account are updated straight away.",
                 "yatra"
-              ) })
+              ) }),
+              customerHasAccount && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md text-sm text-gray-600 dark:text-gray-400", children: __("This customer has a login account.", "yatra") }),
+              !customerHasAccount && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3 flex items-start gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "input",
+                  {
+                    type: "checkbox",
+                    id: "create_account",
+                    checked: !!formData.create_account,
+                    onChange: (e) => setFormData({
+                      ...formData,
+                      create_account: e.target.checked
+                    }),
+                    className: "w-4 h-4 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "label",
+                  {
+                    htmlFor: "create_account",
+                    className: "text-sm text-gray-700 dark:text-gray-300 cursor-pointer",
+                    children: [
+                      __("Create a login account for this customer", "yatra"),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "block text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: __(
+                        "They'll receive an email to set their own password and can then sign in to see their bookings. If this email already has an account, it will be linked instead.",
+                        "yatra"
+                      ) })
+                    ]
+                  }
+                )
+              ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -43723,7 +43788,25 @@ const CustomerForm = () => {
           ] })
         ] }) }) })
       ] })
-    ] }) }) })
+    ] }) }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: linkConfirm.open,
+        onClose: () => setLinkConfirm({ open: false, message: "" }),
+        onConfirm: () => {
+          setLinkConfirm({ open: false, message: "" });
+          setIsSubmitting(true);
+          saveMutation.mutate({
+            ...formData,
+            confirm_link_existing: true
+          });
+        },
+        title: __("Link to existing account?", "yatra"),
+        message: linkConfirm.message,
+        confirmText: __("Link account", "yatra")
+      }
+    )
   ] });
 };
 const CustomerSummaryCard = ({ customerId }) => {
@@ -56258,6 +56341,12 @@ const Payments = () => {
       if (queryParams.payment_method) {
         paramsObj.gateway = queryParams.payment_method;
       }
+      if (queryParams.orderby) {
+        paramsObj.orderby = queryParams.orderby;
+      }
+      if (queryParams.order) {
+        paramsObj.order = queryParams.order;
+      }
       return await apiService.getPayments(paramsObj);
     },
     enabled: can("yatra_view_bookings")
@@ -59712,6 +59801,7 @@ const AvailabilityCalendar = ({
                               availability.arrival_time
                             ) : ""
                           ] }),
+                          availability.is_virtual && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mb-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300", children: __("From rule", "yatra") }),
                           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-3 text-xs", children: [
                             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-gray-500 dark:text-gray-400 mb-1", children: __("Capacity", "yatra") }),
@@ -60751,6 +60841,16 @@ const Availability = () => {
     },
     enabled: !!selectedTripId
   });
+  const { data: generatedData } = useQuery({
+    queryKey: ["availability-generated", selectedTripId],
+    queryFn: async () => {
+      if (!selectedTripId) return { dates: [] };
+      return await apiClient.get("/availability/generated", {
+        params: { trip_id: selectedTripId }
+      });
+    },
+    enabled: !!selectedTripId && viewMode === "calendar"
+  });
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
       return await apiClient.delete(`/availability/${id}`);
@@ -60893,6 +60993,27 @@ const Availability = () => {
     }
     return filtered;
   }, [availabilityData, searchTerm, statusFilter, monthFilter, selectedTrip]);
+  const calendarDates = reactExports.useMemo(() => {
+    const rows = [...filteredDates];
+    const seen2 = new Set(
+      ((availabilityData == null ? void 0 : availabilityData.dates) || []).map(
+        (d) => `${d.departure_date}|${d.departure_time || ""}`
+      )
+    );
+    const generated = (generatedData == null ? void 0 : generatedData.dates) || [];
+    for (const g of generated) {
+      const key2 = `${g.departure_date}|${g.departure_time || ""}`;
+      if (seen2.has(key2)) continue;
+      seen2.add(key2);
+      rows.push({
+        ...g,
+        id: String(g.id),
+        seats_remaining: (g.available_seats || 0) > 10 ? "10+" : String(g.available_seats || 0),
+        is_virtual: true
+      });
+    }
+    return rows;
+  }, [filteredDates, generatedData, availabilityData]);
   const availableMonths = reactExports.useMemo(() => {
     if (!(availabilityData == null ? void 0 : availabilityData.dates) || (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day")
       return [];
@@ -61882,10 +62003,13 @@ const Availability = () => {
           ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             AvailabilityCalendar,
             {
-              dates: filteredDates,
+              dates: calendarDates,
               tripType: selectedTrip == null ? void 0 : selectedTrip.trip_type,
               currency: (selectedTrip == null ? void 0 : selectedTrip.currency) || "USD",
               onDateClick: (date2) => {
+                if (date2.is_virtual) {
+                  return;
+                }
                 navigate({
                   subpage: "trips",
                   tab: "availability",
@@ -62168,7 +62292,7 @@ const formatCurrency = (value) => {
     return `${currency} ${value.toFixed(2)}`;
   }
 };
-function normalizeTripsForDropdown(raw) {
+function normalizeTripsForDropdown$1(raw) {
   if (Array.isArray(raw)) {
     return raw;
   }
@@ -62285,11 +62409,11 @@ const Departures = () => {
       const response = await apiClient.get("/trips", {
         params: { per_page: 1e3 }
       });
-      return normalizeTripsForDropdown(response);
+      return normalizeTripsForDropdown$1(response);
     }
   });
   const tripsList = reactExports.useMemo(
-    () => normalizeTripsForDropdown(tripsData),
+    () => normalizeTripsForDropdown$1(tripsData),
     [tripsData]
   );
   const {
@@ -63158,6 +63282,18 @@ const Departures = () => {
     )
   ] });
 };
+function normalizeTripsForDropdown(raw) {
+  if (Array.isArray(raw)) return raw;
+  if (raw && typeof raw === "object") {
+    const r2 = raw;
+    if (Array.isArray(r2.data)) return r2.data;
+    const inner = r2.data;
+    if (inner && typeof inner === "object" && Array.isArray(inner.data)) {
+      return inner.data;
+    }
+  }
+  return [];
+}
 const DepartureForm = () => {
   const queryClient2 = useQueryClient();
   const { showToast } = useToast();
@@ -63170,9 +63306,20 @@ const DepartureForm = () => {
     time: "",
     max_capacity: "",
     price_override: "",
-    notes: ""
+    notes: "",
+    trip_id: tripId ? String(tripId) : ""
   });
   const [errors, setErrors] = reactExports.useState({});
+  const { data: tripsData } = useQuery({
+    queryKey: ["trips", "departure-form-tour-select", "v1"],
+    queryFn: async () => {
+      const response = await apiClient.get("/trips", {
+        params: { per_page: 1e3 }
+      });
+      return normalizeTripsForDropdown(response);
+    }
+  });
+  const tripsList = normalizeTripsForDropdown(tripsData);
   const { data: departureData, isLoading: isLoadingDeparture } = useQuery({
     queryKey: ["departure", departureId],
     queryFn: async () => {
@@ -63185,22 +63332,24 @@ const DepartureForm = () => {
     enabled: isEditMode && !!departureId && !!tripId
   });
   reactExports.useEffect(() => {
-    var _a, _b;
+    var _a, _b, _c;
     if (departureData) {
       setFormData({
         date: departureData.date || departureData.start_date || "",
         time: departureData.time || "",
         max_capacity: ((_a = departureData.max_capacity) == null ? void 0 : _a.toString()) || "",
         price_override: ((_b = departureData.price_override) == null ? void 0 : _b.toString()) || "",
-        notes: departureData.notes || ""
+        notes: departureData.notes || "",
+        trip_id: ((_c = departureData.trip_id) == null ? void 0 : _c.toString()) || (tripId ? String(tripId) : "")
       });
     }
-  }, [departureData]);
+  }, [departureData, tripId]);
   const saveMutation = useMutation({
     mutationFn: async (data) => {
       if (!tripId) throw new Error("Trip ID is required");
+      const targetTripId = isEditMode && data.trip_id ? parseInt(data.trip_id) : tripId;
       const payload = {
-        trip_id: tripId,
+        trip_id: targetTripId,
         date: data.date,
         max_capacity: parseInt(data.max_capacity),
         source: "manual"
@@ -63219,12 +63368,16 @@ const DepartureForm = () => {
       }
     },
     onSuccess: () => {
+      const destTripId = isEditMode && formData.trip_id ? parseInt(formData.trip_id) : tripId;
       queryClient2.invalidateQueries({ queryKey: ["departures", tripId] });
+      if (destTripId !== tripId) {
+        queryClient2.invalidateQueries({ queryKey: ["departures", destTripId] });
+      }
       showToast(
         isEditMode ? __("Departure updated successfully", "yatra") : __("Departure created successfully", "yatra"),
         "success"
       );
-      window.location.href = `?page=yatra&subpage=departures${tripId ? `&trip_id=${tripId}` : ""}`;
+      window.location.href = `?page=yatra&subpage=departures${destTripId ? `&trip_id=${destTripId}` : ""}`;
     },
     onError: (error) => {
       showToast(
@@ -63277,6 +63430,34 @@ const DepartureForm = () => {
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx("form", { onSubmit: handleSubmit, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "pt-6 space-y-6", children: [
+      isEditMode && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: [
+          __("Tour", "yatra"),
+          " ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "select",
+          {
+            value: formData.trip_id,
+            onChange: (e) => setFormData({ ...formData, trip_id: e.target.value }),
+            className: "w-full rounded-md border px-3 py-2 text-sm bg-white dark:bg-gray-800 dark:text-white border-gray-300 dark:border-gray-600",
+            children: [
+              tripsList.length === 0 && formData.trip_id && /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: formData.trip_id, children: __("Loading tours…", "yatra") }),
+              tripsList.map((t) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: String(t.id), children: t.title || t.name || `#${t.id}` }, t.id))
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          HelpText,
+          {
+            text: __(
+              "Move this departure to a different tour. Any bookings on it move with it.",
+              "yatra"
+            )
+          }
+        )
+      ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: [
           __("Departure Date", "yatra"),
@@ -64444,7 +64625,7 @@ function extractError(e) {
   return String(e);
 }
 const Enquiries = () => {
-  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q;
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [sortBy2, setSortBy] = reactExports.useState("created_at");
@@ -64499,6 +64680,7 @@ const Enquiries = () => {
       ];
     }
     return [
+      { value: "mark_completed", label: __("Mark as Completed", "yatra") },
       { value: "mark_spam", label: __("Mark as Spam", "yatra") },
       { value: "mark_trash", label: __("Move to Trash", "yatra") },
       { value: "delete", label: __("Delete Permanently", "yatra") }
@@ -64535,10 +64717,11 @@ const Enquiries = () => {
     new: ((_b = (_a = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _a.new) == null ? void 0 : _b.count) || 0,
     pending: ((_d = (_c = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _c.pending) == null ? void 0 : _d.count) || 0,
     responded: ((_f = (_e = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _e.responded) == null ? void 0 : _f.count) || 0,
-    converted: ((_h = (_g = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _g.converted) == null ? void 0 : _h.count) || 0,
-    closed: ((_j = (_i = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _i.closed) == null ? void 0 : _j.count) || 0,
-    spam: ((_l = (_k = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _k.spam) == null ? void 0 : _l.count) || 0,
-    trash: ((_n = (_m = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _m.trash) == null ? void 0 : _n.count) || 0
+    completed: ((_h = (_g = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _g.completed) == null ? void 0 : _h.count) || 0,
+    converted: ((_j = (_i = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _i.converted) == null ? void 0 : _j.count) || 0,
+    closed: ((_l = (_k = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _k.closed) == null ? void 0 : _l.count) || 0,
+    spam: ((_n = (_m = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _m.spam) == null ? void 0 : _n.count) || 0,
+    trash: ((_p = (_o = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _o.trash) == null ? void 0 : _p.count) || 0
   };
   const handleBulkApply = () => {
     if (!bulkAction || selectedIds.length === 0) {
@@ -64629,7 +64812,9 @@ const Enquiries = () => {
       // so checking the wrong cap would have hidden the action from
       // them while still showing 403-failing buttons to bookings-only
       // roles.
-      condition: (enquiry) => can("yatra_respond_to_enquiries") && !["closed", "spam", "trash", "archived"].includes(enquiry.status)
+      condition: (enquiry) => can("yatra_respond_to_enquiries") && !["completed", "closed", "spam", "trash", "archived"].includes(
+        enquiry.status
+      )
     },
     {
       key: "edit",
@@ -64701,8 +64886,8 @@ const Enquiries = () => {
   });
   const enquiriesResponse = data;
   const enquiries = (enquiriesResponse == null ? void 0 : enquiriesResponse.data) || (enquiriesResponse == null ? void 0 : enquiriesResponse.enquiries) || [];
-  const total = ((_o = enquiriesResponse == null ? void 0 : enquiriesResponse.meta) == null ? void 0 : _o.total) ?? (enquiriesResponse == null ? void 0 : enquiriesResponse.total) ?? enquiries.length ?? 0;
-  const perPage = ((_p = enquiriesResponse == null ? void 0 : enquiriesResponse.meta) == null ? void 0 : _p.per_page) ?? 10;
+  const total = ((_q = enquiriesResponse == null ? void 0 : enquiriesResponse.meta) == null ? void 0 : _q.total) ?? (enquiriesResponse == null ? void 0 : enquiriesResponse.total) ?? enquiries.length ?? 0;
+  const perPage = ((_r = enquiriesResponse == null ? void 0 : enquiriesResponse.meta) == null ? void 0 : _r.per_page) ?? 10;
   const totalPages = Math.max(1, Math.ceil(total / perPage));
   const errorContext = getErrorContext(error);
   const apiErrorMessage = (data == null ? void 0 : data.error) || (data == null ? void 0 : data.message);
@@ -64724,6 +64909,10 @@ const Enquiries = () => {
       responded: {
         className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
         label: __("Responded", "yatra")
+      },
+      completed: {
+        className: "bg-teal-100 text-teal-700 dark:bg-teal-900/20 dark:text-teal-400",
+        label: __("Completed", "yatra")
       },
       converted: {
         className: "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
@@ -64831,6 +65020,7 @@ const Enquiries = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "new", children: __("New", "yatra") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pending", children: __("Pending", "yatra") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "responded", children: __("Responded", "yatra") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "completed", children: __("Completed", "yatra") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "converted", children: __("Converted", "yatra") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "closed", children: __("Closed", "yatra") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "spam", children: __("Spam", "yatra") }),
@@ -64906,6 +65096,11 @@ const Enquiries = () => {
             key: "responded",
             label: __("Responded", "yatra"),
             count: statusCounts.responded
+          },
+          {
+            key: "completed",
+            label: __("Completed", "yatra"),
+            count: statusCounts.completed
           },
           {
             key: "converted",
@@ -65220,7 +65415,7 @@ const Enquiries = () => {
               }
             )
           ] }),
-          respondMutation.isError && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400", children: ((_q = respondMutation.error) == null ? void 0 : _q.message) || __("Failed to send response. Please try again.", "yatra") })
+          respondMutation.isError && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400", children: ((_s = respondMutation.error) == null ? void 0 : _s.message) || __("Failed to send response. Please try again.", "yatra") })
         ] })
       }
     )
@@ -65283,6 +65478,10 @@ const ViewEnquiry = () => {
       responded: {
         className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
         label: __("Responded", "yatra")
+      },
+      completed: {
+        className: "bg-teal-100 text-teal-700 dark:bg-teal-900/20 dark:text-teal-400",
+        label: __("Completed", "yatra")
       },
       converted: {
         className: "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
@@ -65430,7 +65629,7 @@ const ViewEnquiry = () => {
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_respond_to_enquiries", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-            enquiry.status !== "responded" && enquiry.status !== "closed" && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            enquiry.status !== "responded" && enquiry.status !== "completed" && enquiry.status !== "closed" && /* @__PURE__ */ jsxRuntimeExports.jsxs(
               Button,
               {
                 variant: "outline",
@@ -65949,6 +66148,7 @@ const EnquiryForm = () => {
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "new", children: __("New", "yatra") }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pending", children: __("Pending", "yatra") }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "responded", children: __("Responded", "yatra") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "completed", children: __("Completed", "yatra") }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "converted", children: __("Converted", "yatra") }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "closed", children: __("Closed", "yatra") }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "spam", children: __("Spam", "yatra") }),
@@ -77264,27 +77464,27 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-CNo9Rmha.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-D6fIQOg0.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
-const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-BfLCCRw_.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
-const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-IbJtBH1g.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
-const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-h3YgOklC.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
-const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-yt934gWp.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
-const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-fvC6oxv3.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-DS8rRmWJ.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-C-lQODDl.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-CYVEBFh_.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
+const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-bwvDDxDa.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
+const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-BPHrQuZ8.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
+const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-Di5mqu8p.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
+const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-CQAwpLLy.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
 const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.js"), true ? __vite__mapDeps([14,1,2,3,4,15]) : void 0, import.meta.url));
-const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-ot3cFDSl.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
-const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-Dgo5wDFi.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
-const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-BXPYoZJl.js"), true ? __vite__mapDeps([18,1,2,3,4,11]) : void 0, import.meta.url));
-const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-CErVpQqK.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
-const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-B_1Vf_7k.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-C1xVLre3.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
-const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-CMoXGDlV.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
+const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-Dn_wX-8B.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
+const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-BZCllOzA.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
+const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-DoZ_IwQo.js"), true ? __vite__mapDeps([18,1,2,3,4,11]) : void 0, import.meta.url));
+const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-C6yUdmmA.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
+const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-B_Y-GQvO.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-KJ4grufJ.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
+const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-PfW4sTnd.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
-  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-DTYPKfzW.js"), true ? __vite__mapDeps([25,1,2,3,4,23]) : void 0, import.meta.url)
+  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-Dbl5YS1x.js"), true ? __vite__mapDeps([25,1,2,3,4,23]) : void 0, import.meta.url)
 );
-const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-CxWksDSA.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
-const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-DJcU_lO7.js"), true ? __vite__mapDeps([27,1,2,3,4,24]) : void 0, import.meta.url));
-const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-ji7Esrgv.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
+const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-Byhtz-Zn.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
+const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-CRkcuFBP.js"), true ? __vite__mapDeps([27,1,2,3,4,24]) : void 0, import.meta.url));
+const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-DrkhXPLD.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
 const PageLoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-1/3" }),

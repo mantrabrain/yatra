@@ -452,6 +452,29 @@ class CustomerService
             ];
         }
 
+        // Optional: also give the customer a WordPress login account. This is
+        // opt-in (the operator ticks "Create a login account"); left off, the
+        // customer stays a CRM-only record with user_id = NULL exactly as before.
+        // Resolved before the row is inserted so the customer is stored already
+        // linked to its user in a single write.
+        $accountResult = null;
+        if (!empty($data['create_account'])) {
+            $accountResult = $this->createOrLinkLoginAccount($data, !empty($data['confirm_link_existing']));
+            // The email belongs to an existing account — return the confirmation
+            // request WITHOUT writing anything, so no customer is created until the
+            // operator agrees to link (or changes the email).
+            if (!empty($accountResult['needs_link_confirmation'])) {
+                return $accountResult;
+            }
+            if (empty($accountResult['success'])) {
+                return [
+                    'success' => false,
+                    'message' => $accountResult['message'] ?? __('Failed to create the login account.', 'yatra'),
+                ];
+            }
+            $data['user_id'] = (int) $accountResult['user_id'];
+        }
+
         // Create customer
         $customerId = $this->customerRepository->findOrCreate($data);
 
@@ -459,11 +482,115 @@ class CustomerService
             return ['success' => false, 'message' => __('Failed to create customer.', 'yatra')];
         }
 
+        // A newly created account may already have guest bookings under the same
+        // email — link them so they show in My Account (mirrors the user_register
+        // reconciliation used for self-registrations).
+        if ($accountResult !== null && !empty($accountResult['user_id'])) {
+            $this->linkGuestBookingsToUser((int) $accountResult['user_id']);
+        }
+
+        $message = __('Customer created successfully.', 'yatra');
+        if ($accountResult !== null) {
+            $message = !empty($accountResult['linked'])
+                ? __('Customer created and linked to the existing login account.', 'yatra')
+                : __('Customer created and a login account was set up. They will receive an email to choose a password.', 'yatra');
+        }
+
         return [
             'success' => true,
             'customer_id' => $customerId,
-            'message' => __('Customer created successfully.', 'yatra'),
+            'user_id' => $accountResult['user_id'] ?? null,
+            'account_created' => $accountResult !== null && empty($accountResult['linked']),
+            'account_linked' => $accountResult !== null && !empty($accountResult['linked']),
+            'message' => $message,
         ];
+    }
+
+    /**
+     * Create a WordPress login account for a customer being added in the admin,
+     * or link an existing account when one already uses that email.
+     *
+     * Mirrors the account creation used by self-registration and guest checkout
+     * (yatra_customer role + billing meta), so an admin-created login behaves
+     * identically to one the customer made themselves. The password is random and
+     * never shown; WordPress emails the customer a set-your-password link.
+     *
+     * @param array $data Customer data (email required; name/phone optional)
+     * @return array{success:bool, user_id?:int, linked?:bool, message?:string}
+     */
+    private function createOrLinkLoginAccount(array $data, bool $confirmLink = false): array
+    {
+        $email = sanitize_email((string) ($data['email'] ?? ''));
+        if ($email === '' || !is_email($email)) {
+            return ['success' => false, 'message' => __('A valid email is required to create a login account.', 'yatra')];
+        }
+
+        $firstName = sanitize_text_field((string) ($data['first_name'] ?? ''));
+        $lastName  = sanitize_text_field((string) ($data['last_name'] ?? ''));
+        $phone     = sanitize_text_field((string) ($data['phone'] ?? ''));
+
+        // Email already has an account. Linking connects this customer — and any
+        // past bookings made with that email — to a real, possibly unrelated
+        // account, so it must be confirmed first (guards a mistyped address). Once
+        // the operator confirms, link rather than create a duplicate.
+        $existingUser = get_user_by('email', $email);
+        if ($existingUser instanceof \WP_User) {
+            if (!$confirmLink) {
+                return [
+                    'success' => false,
+                    'needs_link_confirmation' => true,
+                    'existing_user_login' => $existingUser->user_login,
+                    'message' => sprintf(
+                        /* translators: 1: email address, 2: existing account username. */
+                        __('A login account already exists for %1$s (username: %2$s). Linking will connect this customer — and any past bookings made with that email — to that account. Confirm to link, or use a different email.', 'yatra'),
+                        $email,
+                        $existingUser->user_login
+                    ),
+                ];
+            }
+            return ['success' => true, 'user_id' => (int) $existingUser->ID, 'linked' => true];
+        }
+
+        // Derive a unique username from the email local-part (same as registration).
+        $baseUsername = sanitize_user(current(explode('@', $email)), true);
+        if ($baseUsername === '') {
+            $baseUsername = 'customer';
+        }
+        $username = $baseUsername;
+        $counter  = 1;
+        while (username_exists($username)) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+
+        $userId = wp_insert_user([
+            'user_login'   => $username,
+            'user_email'   => $email,
+            'user_pass'    => wp_generate_password(24, true),
+            'first_name'   => $firstName,
+            'last_name'    => $lastName,
+            'display_name' => trim($firstName . ' ' . $lastName) !== '' ? trim($firstName . ' ' . $lastName) : $username,
+            'role'         => 'yatra_customer',
+        ]);
+
+        if (is_wp_error($userId)) {
+            return ['success' => false, 'message' => wp_strip_all_tags($userId->get_error_message())];
+        }
+
+        if ($phone !== '') {
+            update_user_meta($userId, 'billing_phone', $phone);
+            update_user_meta($userId, 'phone', $phone);
+        }
+
+        // Admin-created accounts are trusted (the operator vouches for the email),
+        // so they are pre-verified — unlike self-registration, which starts at '0'.
+        update_user_meta($userId, 'yatra_email_verified', '1');
+
+        // WordPress emails the customer a "set your password" link so they choose
+        // their own password; the random one above is never disclosed.
+        wp_new_user_notification($userId, null, 'user');
+
+        return ['success' => true, 'user_id' => (int) $userId, 'linked' => false];
     }
 
     /**
@@ -541,10 +668,48 @@ class CustomerService
             unset($data['email']);
         }
 
+        // Add a login account to a customer that doesn't have one yet, when the
+        // operator ticked "Create a login account" on the edit form. This ONLY
+        // ADDS an account — it never removes one: a customer who already signs in
+        // never reaches here ($linkedUserId > 0), and the form hides the option
+        // for them, so unchecking is always a no-op. Runs before the write so the
+        // new user_id is persisted in the same update; the repository only accepts
+        // user_id when the row has none, a second guard against reassignment.
+        $accountAdded = false;
+        if (!empty($data['create_account']) && $linkedUserId <= 0) {
+            $accountResult = $this->createOrLinkLoginAccount([
+                'email'      => $data['email'] ?? $customer->email,
+                'first_name' => $data['first_name'] ?? $customer->first_name,
+                'last_name'  => $data['last_name'] ?? $customer->last_name,
+                'phone'      => $data['phone'] ?? $customer->phone,
+            ], !empty($data['confirm_link_existing']));
+            // Existing account for this email → ask before linking; return here so
+            // the edit is not written until the operator confirms.
+            if (!empty($accountResult['needs_link_confirmation'])) {
+                return $accountResult;
+            }
+            if (empty($accountResult['success'])) {
+                return [
+                    'success' => false,
+                    'message' => $accountResult['message'] ?? __('Failed to create the login account.', 'yatra'),
+                ];
+            }
+            $accountAdded = true;
+        }
+
         $updated = $this->customerRepository->updateCustomer($id, $data);
 
         if (!$updated) {
             return ['success' => false, 'message' => __('Failed to update customer.', 'yatra')];
+        }
+
+        // Persist the link and reconcile prior guest bookings. Uses the dedicated
+        // linkUserIfUnlinked (updateCustomer does not write user_id), which only
+        // sets it when the row has none — so it adds, never reassigns.
+        if ($accountAdded && !empty($accountResult['user_id'])) {
+            $newUserId = (int) $accountResult['user_id'];
+            $this->customerRepository->linkUserIfUnlinked($id, $newUserId);
+            $this->linkGuestBookingsToUser($newUserId);
         }
 
         if ($accountUserId > 0) {
@@ -578,7 +743,10 @@ class CustomerService
 
         return [
             'success' => true,
-            'message' => __('Customer updated successfully.', 'yatra'),
+            'account_created' => $accountAdded,
+            'message' => $accountAdded
+                ? __('Customer updated and a login account was set up. They will receive an email to choose a password.', 'yatra')
+                : __('Customer updated successfully.', 'yatra'),
         ];
     }
 

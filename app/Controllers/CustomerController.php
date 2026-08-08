@@ -625,7 +625,22 @@ class CustomerController extends BaseController
     {
         $data = $request->get_json_params();
 
+        // Creating a WordPress login account is a higher-privilege action than
+        // adding a CRM record, so it needs the WP user-creation capability. A
+        // staffer who can manage customers but not create users simply gets a
+        // CRM-only record — the request still succeeds.
+        if (!empty($data['create_account']) && !current_user_can('create_users')) {
+            unset($data['create_account']);
+        }
+
         $result = $this->customerService->createCustomer($data);
+
+        // A confirmation request (email already has a login) is not an error — the
+        // client shows a prompt and re-submits with confirm_link_existing. Return
+        // 200 so it isn't treated as a failed request.
+        if (!empty($result['needs_link_confirmation'])) {
+            return new WP_REST_Response($result, 200);
+        }
 
         if (!$result['success']) {
             return new WP_REST_Response($result, 400);
@@ -642,7 +657,21 @@ class CustomerController extends BaseController
         $id = (int) $request->get_param('id');
         $data = $request->get_json_params();
 
+        // Adding a login account from the edit form is the same higher-privilege
+        // action as on create, so it needs the WP user-creation capability. A
+        // staffer who can edit customers but not create users just saves the edit
+        // without an account being made.
+        if (is_array($data) && !empty($data['create_account']) && !current_user_can('create_users')) {
+            unset($data['create_account']);
+        }
+
         $result = $this->customerService->updateCustomer($id, $data);
+
+        // Confirmation request (email already has a login) — not an error; 200 so
+        // the client can prompt and re-submit with confirm_link_existing.
+        if (!empty($result['needs_link_confirmation'])) {
+            return new WP_REST_Response($result, 200);
+        }
 
         if (!$result['success']) {
             return new WP_REST_Response($result, 400);

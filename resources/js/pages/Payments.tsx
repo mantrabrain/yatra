@@ -158,6 +158,15 @@ const Payments: React.FC = () => {
       if (queryParams.payment_method) {
         paramsObj.gateway = queryParams.payment_method;
       }
+      // Forward the sort params — they were in queryParams (so the query
+      // refetched on a header click) but never reached the request, so the
+      // backend always returned the default order.
+      if (queryParams.orderby) {
+        paramsObj.orderby = queryParams.orderby;
+      }
+      if (queryParams.order) {
+        paramsObj.order = queryParams.order;
+      }
 
       return await apiService.getPayments(paramsObj);
     },
