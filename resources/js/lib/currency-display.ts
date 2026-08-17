@@ -95,29 +95,60 @@ export function readYatraCurrencyPositionFromWindow(): string {
   );
 }
 
-function readAdminNumberFormatConfig(): {
+function readYatraNumberFormatConfig(): {
   decimalPlaces: number;
   thousandSeparator: string;
   decimalSeparator: string;
 } {
+  const fallback = {
+    decimalPlaces: 2,
+    thousandSeparator: ",",
+    decimalSeparator: ".",
+  };
   if (typeof window === "undefined") {
-    return { decimalPlaces: 2, thousandSeparator: ",", decimalSeparator: "." };
+    return fallback;
   }
-  const a = ((window as AdminWindow).yatraAdmin || {}) as Record<
-    string,
-    unknown
-  >;
-  const decimals = Number(a.decimalPlaces ?? a.currency_decimals ?? 2) || 2;
+  // Read from the SAME set of globals as the currency position, not just
+  // yatraAdmin. On public pages (customer account, checkout, single trip)
+  // window.yatraAdmin is absent, so reading separators only from it made the
+  // decimal/thousand separators silently fall back to defaults ("." / ",")
+  // while the position — read from these public globals — was correct. That is
+  // the "decimal separator ignored in payment amounts" bug on the storefront.
+  const w = window as AdminWindow;
+  const sources: Array<Record<string, unknown> | undefined> = [
+    w.yatraAdmin as Record<string, unknown> | undefined,
+    w.yatraBookingData as Record<string, unknown> | undefined,
+    w.yatraTripData as Record<string, unknown> | undefined,
+    w.yatraAccountPage as Record<string, unknown> | undefined,
+  ];
+  const pickString = (field: string): string | undefined => {
+    for (const o of sources) {
+      const v = o?.[field];
+      if (typeof v === "string" && v !== "") {
+        return v;
+      }
+    }
+    return undefined;
+  };
+  const pickNumber = (...fields: string[]): number | undefined => {
+    for (const o of sources) {
+      if (!o) {
+        continue;
+      }
+      for (const field of fields) {
+        const v = o[field];
+        if (v !== undefined && v !== null && v !== "" && !Number.isNaN(Number(v))) {
+          return Number(v);
+        }
+      }
+    }
+    return undefined;
+  };
+  const decimals = pickNumber("decimalPlaces", "currency_decimals") ?? 2;
   return {
     decimalPlaces: Math.max(0, Math.min(4, decimals)),
-    thousandSeparator:
-      typeof a.thousandSeparator === "string" && a.thousandSeparator !== ""
-        ? (a.thousandSeparator as string)
-        : ",",
-    decimalSeparator:
-      typeof a.decimalSeparator === "string" && a.decimalSeparator !== ""
-        ? (a.decimalSeparator as string)
-        : ".",
+    thousandSeparator: pickString("thousandSeparator") ?? ",",
+    decimalSeparator: pickString("decimalSeparator") ?? ".",
   };
 }
 
@@ -138,14 +169,18 @@ export function formatYatraMoney(
   }
 
   const { decimalPlaces, thousandSeparator, decimalSeparator } =
-    readAdminNumberFormatConfig();
+    readYatraNumberFormatConfig();
   const currencyData = getCurrency(currencyCode);
   const decimals =
     currencyData?.decimalDigits !== undefined
       ? Math.max(0, Math.min(4, currencyData.decimalDigits))
       : decimalPlaces;
 
-  const formattedCore = new Intl.NumberFormat(undefined, {
+  // Format with a FIXED "en-US" base (grouping ",", decimal ".") so the
+  // replace-with-configured-separators step below is deterministic. Using the
+  // viewer's locale here (undefined) would already yield locale separators and
+  // the naive comma/dot replacement would swap them for e.g. German browsers.
+  const formattedCore = new Intl.NumberFormat("en-US", {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   })

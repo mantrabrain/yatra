@@ -19,6 +19,7 @@ use Yatra\Utils\Cache;
 use Yatra\Utils\QueryCache;
 use Yatra\Database\Tables\TripAvailabilityDatesTable;
 use Yatra\Database\Tables\TripAvailabilityRulesTable;
+use Yatra\Database\Tables\DeparturesTable;
 use Yatra\Constants\ClassificationTypes;
 
 /**
@@ -811,7 +812,27 @@ class TripRepository extends BaseRepository
             $wheres[] = "CAST(t.duration_days AS UNSIGNED) <= %d";
             $params[] = $filters['duration_max'];
         }
-        
+
+        // Availability date filter ("available from this date onward"): keep only
+        // trips that have a departure starting ON OR AFTER the selected date, so
+        // a customer who picks a date sees every trip they could still travel on
+        // from then. A departure matches when its effective start date (the
+        // explicit start_date, else the single `date`) is >= the chosen day and
+        // it has not been cancelled — the date bound alone excludes past dates
+        // when the picker's min=today is respected, so no reliance on a possibly
+        // stale 'past' status. Clause + param are appended together so the WHERE
+        // ordering stays in sync with $params (see the count/main queries).
+        if (!empty($filters['available_date'])) {
+            $departures_table = DeparturesTable::getTableName();
+            $wheres[] = "EXISTS (
+                SELECT 1 FROM {$departures_table} yd
+                WHERE yd.trip_id = t.id
+                AND COALESCE(NULLIF(yd.start_date, '0000-00-00'), yd.date) >= %s
+                AND yd.status <> 'cancelled'
+            )";
+            $params[] = $filters['available_date'];
+        }
+
         // Rating filter
         if (!empty($filters['rating_min']) && $filters['rating_min'] > 0) {
             $having_clauses[] = "AVG(r.rating) >= %f";

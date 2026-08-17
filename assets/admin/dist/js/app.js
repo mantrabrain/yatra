@@ -1,9 +1,9 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-DS8rRmWJ.js","../../../dist/js/react-vendor-xzSqHjRF.js","../css/react-vendor.css","../../../dist/js/index-dxjln488.js","../css/index.css","../../../dist/js/BuildItineraryModal-Din2wa2y.js","../../../dist/js/ProFeature-D0xvp27g.js","../../../dist/js/Settings-C-lQODDl.js","../../../dist/js/Team-CYVEBFh_.js","../../../dist/js/Reports-bwvDDxDa.js","../../../dist/js/DiscountForm-BPHrQuZ8.js","../../../dist/js/ApplicableTripSelector-C0c7ClTX.js","../../../dist/js/Itinerary-Di5mqu8p.js","../../../dist/js/RecurringRuleForm-CQAwpLLy.js","./Whatsapp.js","../../../dist/js/module-skeleton-Cb1q-Zbx.js","../../../dist/js/ChannelManager-Dn_wX-8B.js","../../../dist/js/Webhooks-BZCllOzA.js","../../../dist/js/TripConsentForm-DoZ_IwQo.js","../../../dist/js/BookingForm-C6yUdmmA.js","../../../dist/js/ViewBooking-B_Y-GQvO.js","../../../dist/js/AvailabilityForm-KJ4grufJ.js","../../../dist/js/DynamicPricing-PfW4sTnd.js","../../../dist/js/RuleTypeSelectionModal-qmYsGxo5.js","../../../dist/js/toggle-DUbJsrWf.js","../../../dist/js/DynamicPricingRuleForm-Dbl5YS1x.js","../../../dist/js/AiAssistant-Byhtz-Zn.js","../../../dist/js/AbandonedRecovery-CRkcuFBP.js","../../../dist/js/WhiteLabel-DrkhXPLD.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-DiHD1jqy.js","../../../dist/js/react-vendor-xzSqHjRF.js","../css/react-vendor.css","../../../dist/js/index-CbMRo6lO.js","../css/index.css","../../../dist/js/BuildItineraryModal-ZwjF_pCL.js","../../../dist/js/ProFeature-97ewna1x.js","../../../dist/js/Settings-z7nK9LKk.js","../../../dist/js/Team-Bk-2HOlE.js","../../../dist/js/Reports-S1LiUBAm.js","../../../dist/js/DiscountForm--OXC6TLT.js","../../../dist/js/ApplicableTripSelector-BYZjxt18.js","../../../dist/js/Itinerary-Do2hZtmM.js","../../../dist/js/RecurringRuleForm-CZVn9vM6.js","./Whatsapp.js","../../../dist/js/module-skeleton-Cb1q-Zbx.js","../../../dist/js/ChannelManager-B369twWu.js","../../../dist/js/Webhooks-CnRxl1B7.js","../../../dist/js/TripConsentForm-ClLISE_5.js","../../../dist/js/BookingForm-DkL1nwFO.js","../../../dist/js/ViewBooking-BtL7C3fO.js","../../../dist/js/AvailabilityForm-BOtuwB57.js","../../../dist/js/DynamicPricing-pIYuZsxl.js","../../../dist/js/RuleTypeSelectionModal-Bgbf_xbp.js","../../../dist/js/toggle-DUbJsrWf.js","../../../dist/js/DynamicPricingRuleForm-Dg6kEVSu.js","../../../dist/js/AiAssistant-Dvltmd3o.js","../../../dist/js/AbandonedRecovery-rMedCeJ6.js","../../../dist/js/WhiteLabel-DGBv_X_H.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
 import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as Calendar$1, q as MapPin, s as LayoutDashboard, u as useQuery, t as useQueryClient, v as useMutation, Z as Zap, w as Webhook, x as ChevronDown, y as ChevronRight, z as ArrowLeft, G as Gift, D as Loader2, E as Sun, H as Moon, I as User, J as RefreshCw, O as Inbox, Q as AlertTriangle, V as ExternalLink, X as isObjectLike_1, _ as _baseGetTag, Y as isArray_1, $ as _MapCache, a0 as getDefaultExportFromCjs, a1 as _Symbol, a2 as isObject$5, a3 as isFunction, a4 as reactIsExports, a5 as React, a6 as _Stack, a7 as _baseIsEqual, a8 as isObject_1, a9 as keys_1, aa as isLength_1, ab as _isIndex, ac as isArguments_1, ad as _Set, ae as _setToArray, af as _SetCache, ag as _cacheHas, ah as _arrayPush, ai as isArrayLike_1, aj as _baseUnary, ak as _getNative, al as eq_1, am as _root, an as isEqual, ao as Animate, ap as _overArg, aq as _arraySome, ar as Clock, as as DollarSign, at as ArrowRight, au as Shield, av as CheckCircle, aw as Plus, ax as X, ay as reactDomExports, az as AlertCircle, aA as Check, aB as Wand2, aC as ChevronLeft, aD as CheckCircle2, aE as HelpCircle, aF as Info, aG as Copy, aH as MoreVertical, aI as Columns, aJ as PenSquare, aK as ArrowUp, aL as ArrowDown, aM as Archive, aN as Trash2, aO as Search, aP as ArrowUpDown, aQ as Eye, aR as Upload, aS as Image, aT as ReactQuill, aU as Pen, aV as Save, aW as CircleDollarSign, aX as Undo2, aY as Phone, aZ as PauseCircle, a_ as ShieldX, a$ as ShieldOff, b0 as Globe, b1 as Award, b2 as Database, b3 as Folder, b4 as Mountain, b5 as UserCheck, b6 as Download, b7 as Server, b8 as XCircle, b9 as Video, ba as Lock, bb as GripVertical, bc as ChevronUp, bd as Play, be as ClipboardCopy, bf as Ban, bg as Bell, bh as Heart, bi as Scissors, bj as Send, bk as Filter, bl as ArrowUpRight, bm as ClipboardCheck, bn as PenTool, bo as Camera, bp as BarChart$1, bq as Megaphone, br as GitBranch, bs as Pause, bt as Settings2, bu as Code, bv as Bug, bw as EyeOff, bx as QueryClient, by as client, bz as QueryClientProvider } from "../../../dist/js/react-vendor-xzSqHjRF.js";
-import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as todayYmd, S as SearchableSelect, h as getCurrencySymbol, i as getCountryName, j as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-dxjln488.js";
+import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as todayYmd, S as SearchableSelect, h as getCurrencySymbol, i as getCountryName, j as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-CbMRo6lO.js";
 const scriptRel = "modulepreload";
 const assetsURL = function(dep, importerUrl) {
   return new URL(dep, importerUrl).href;
@@ -62447,7 +62447,12 @@ const Departures = () => {
           search: searchTerm || void 0,
           date_from: dateFrom && dateFrom.trim() !== "" ? dateFrom : void 0,
           date_to: dateTo && dateTo.trim() !== "" ? dateTo : void 0,
-          include_past: dateFrom && dateFrom.trim() !== "" || dateTo && dateTo.trim() !== "" ? "true" : "false",
+          // Include past-dated departures for every tab except the inherently
+          // future ones (upcoming/full). Without this, the Past / All /
+          // Cancelled / Trash tabs excluded completed departures entirely
+          // (date >= today), so they vanished from the list. A date range
+          // always includes past.
+          include_past: statusFilter === "upcoming" || statusFilter === "full" ? dateFrom && dateFrom.trim() !== "" || dateTo && dateTo.trim() !== "" ? "true" : "false" : "true",
           page,
           per_page: 20
         }
@@ -62488,7 +62493,9 @@ const Departures = () => {
           search: searchTerm || void 0,
           date_from: dateFrom && dateFrom.trim() !== "" ? dateFrom : void 0,
           date_to: dateTo && dateTo.trim() !== "" ? dateTo : void 0,
-          include_past: dateFrom && dateFrom.trim() !== "" || dateTo && dateTo.trim() !== "" ? "true" : "false",
+          // Always include past so the per-status tab counts (especially Past)
+          // reflect completed departures, not only upcoming ones.
+          include_past: "true",
           page: 1,
           per_page: 1e3
         }
@@ -62554,15 +62561,22 @@ const Departures = () => {
       );
       return;
     }
-    if (!selectedTripId) {
-      showToast(__("Please select a trip first", "yatra"), "error");
+    const resolveTid = (d) => d.trip_id > 0 ? d.trip_id : selectedTripId != null && selectedTripId > 0 ? selectedTripId : null;
+    const selectedDepartures = departures.filter(
+      (d) => ids.includes(d.id) && resolveTid(d) != null
+    );
+    if (selectedDepartures.length === 0) {
+      showToast(
+        __("Could not resolve the tour for the selected departures.", "yatra"),
+        "error"
+      );
       return;
     }
     try {
       if (bulkAction === "trash") {
         await Promise.all(
-          ids.map(
-            (id) => apiClient.patch(`/trips/${selectedTripId}/departures/${id}`, {
+          selectedDepartures.map(
+            (d) => apiClient.patch(`/trips/${resolveTid(d)}/departures/${d.id}`, {
               status: "trash"
             })
           )
@@ -62573,16 +62587,18 @@ const Departures = () => {
         );
       } else if (bulkAction === "restore") {
         await Promise.all(
-          ids.map(
-            (id) => apiClient.patch(`/trips/${selectedTripId}/departures/${id}`, {
+          selectedDepartures.map(
+            (d) => apiClient.patch(`/trips/${resolveTid(d)}/departures/${d.id}`, {
               status: "upcoming"
             })
           )
         );
         showToast(__("Selected departures restored.", "yatra"), "success");
       } else if (bulkAction === "delete") {
-        const eligibleIds = departures.filter((d) => ids.includes(d.id) && d.status === "trash").map((d) => d.id);
-        if (eligibleIds.length === 0) {
+        const eligible = selectedDepartures.filter(
+          (d) => d.status === "trash"
+        );
+        if (eligible.length === 0) {
           showToast(
             __(
               "No selected departures can be deleted. Only departures in the trash can be removed.",
@@ -62593,8 +62609,8 @@ const Departures = () => {
           return;
         }
         const results = await Promise.allSettled(
-          eligibleIds.map(
-            (id) => apiClient.delete(`/trips/${selectedTripId}/departures/${id}`)
+          eligible.map(
+            (d) => apiClient.delete(`/trips/${resolveTid(d)}/departures/${d.id}`)
           )
         );
         const deleted = results.filter((r2) => r2.status === "fulfilled").length;
@@ -73303,6 +73319,7 @@ const EmailTemplateForm = () => {
     reply_to: "",
     bcc: "",
     cc: "",
+    category: "booking",
     subject: "",
     body: "",
     event_key: "",
@@ -73376,6 +73393,7 @@ const EmailTemplateForm = () => {
       reply_to: String(t.reply_to ?? ""),
       bcc: String(t.bcc ?? ""),
       cc: String(t.cc ?? ""),
+      category: String(t.category ?? "booking"),
       subject: String(t.subject ?? ""),
       body: String(t.body ?? ""),
       event_key: String(t.event_key ?? ""),
@@ -73398,6 +73416,7 @@ const EmailTemplateForm = () => {
       reply_to: "",
       bcc: String(s2[coreAddressKey(subj, "bcc") ?? ""] ?? ""),
       cc: String(s2[coreAddressKey(subj, "cc") ?? ""] ?? ""),
+      category: String(coreDef.category ?? "booking"),
       subject: String(s2[subj] ?? ""),
       body: String(s2[bodyKey] ?? ""),
       event_key: coreDef.event_key,
@@ -73933,6 +73952,30 @@ const EmailTemplateForm = () => {
                   ),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: __("Leave empty to use site default") })
                 ] })
+              ] }),
+              !isCoreSettingsEdit && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", children: __("Category") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "select",
+                  {
+                    "aria-label": __("Category"),
+                    value: formData.category || "booking",
+                    onChange: (e) => setFormData({ ...formData, category: e.target.value }),
+                    disabled: isCoreViewMode || isSystemTemplate,
+                    className: "w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white disabled:opacity-60",
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "booking", children: __("Booking") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "payment", children: __("Payment") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "reminder", children: __("Reminder") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "enquiry", children: __("Enquiry") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "account", children: __("Account") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "marketing", children: __("Marketing") })
+                    ]
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: __(
+                  "How this template is grouped in the list. Recipient (Customer/Admin) follows the To address."
+                ) })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -77464,27 +77507,27 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-DS8rRmWJ.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-C-lQODDl.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
-const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-CYVEBFh_.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
-const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-bwvDDxDa.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
-const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-BPHrQuZ8.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
-const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-Di5mqu8p.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
-const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-CQAwpLLy.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-DiHD1jqy.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-z7nK9LKk.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-Bk-2HOlE.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
+const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-S1LiUBAm.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
+const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm--OXC6TLT.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
+const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-Do2hZtmM.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
+const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-CZVn9vM6.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
 const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.js"), true ? __vite__mapDeps([14,1,2,3,4,15]) : void 0, import.meta.url));
-const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-Dn_wX-8B.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
-const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-BZCllOzA.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
-const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-DoZ_IwQo.js"), true ? __vite__mapDeps([18,1,2,3,4,11]) : void 0, import.meta.url));
-const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-C6yUdmmA.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
-const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-B_Y-GQvO.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-KJ4grufJ.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
-const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-PfW4sTnd.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
+const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-B369twWu.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
+const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-CnRxl1B7.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
+const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-ClLISE_5.js"), true ? __vite__mapDeps([18,1,2,3,4,11]) : void 0, import.meta.url));
+const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-DkL1nwFO.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
+const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-BtL7C3fO.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-BOtuwB57.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
+const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-pIYuZsxl.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
-  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-Dbl5YS1x.js"), true ? __vite__mapDeps([25,1,2,3,4,23]) : void 0, import.meta.url)
+  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-Dg6kEVSu.js"), true ? __vite__mapDeps([25,1,2,3,4,23]) : void 0, import.meta.url)
 );
-const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-Byhtz-Zn.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
-const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-CRkcuFBP.js"), true ? __vite__mapDeps([27,1,2,3,4,24]) : void 0, import.meta.url));
-const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-DrkhXPLD.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
+const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-Dvltmd3o.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
+const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-rMedCeJ6.js"), true ? __vite__mapDeps([27,1,2,3,4,24]) : void 0, import.meta.url));
+const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-DGBv_X_H.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
 const PageLoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-1/3" }),

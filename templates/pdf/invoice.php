@@ -65,7 +65,7 @@ $brandHeaderColor = (string) ($pdfBranding['header_color'] ?? '#1e40af');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo esc_html__('Invoice', 'yatra'); ?> - <?php echo htmlspecialchars($paymentRef, ENT_QUOTES, 'UTF-8'); ?></title>
+    <title><?php echo esc_html__('Invoice', 'yatra'); ?> - <?php echo htmlspecialchars($bookingRef !== '' ? $bookingRef : $paymentRef, ENT_QUOTES, 'UTF-8'); ?></title>
     <style>
         @page { size: A4 portrait; margin: 0mm; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -136,7 +136,11 @@ $brandHeaderColor = (string) ($pdfBranding['header_color'] ?? '#1e40af');
                 <table class="details">
                     <tr>
                         <td class="k"><?php esc_html_e('Invoice #:', 'yatra'); ?></td>
-                        <td class="v-wrap"><?php echo htmlspecialchars($paymentRef, ENT_QUOTES, 'UTF-8'); ?></td>
+                        <?php // Always the booking reference — consistent whether the invoice is
+                        // downloaded from the confirmation page or after a payment. Previously
+                        // this used $paymentRef, which the post-payment path set to the payment
+                        // number (PAY-xxxxxx), so the invoice number changed per download. ?>
+                        <td class="v-wrap"><?php echo htmlspecialchars($bookingRef !== '' ? $bookingRef : $paymentRef, ENT_QUOTES, 'UTF-8'); ?></td>
                     </tr>
                     <tr>
                         <td class="k"><?php esc_html_e('Date:', 'yatra'); ?></td>

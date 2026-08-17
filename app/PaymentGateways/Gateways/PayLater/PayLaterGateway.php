@@ -137,8 +137,16 @@ class PayLaterGateway extends AbstractPaymentGateway
 
     public function verifyPayment(string $transactionId): array
     {
-        // Pay later doesn't need verification at checkout
-        return ['success' => true, 'status' => 'reserved'];
+        // Pay Later takes no money at checkout — the balance is settled offline
+        // later. There is nothing to verify online, so this MUST NOT report
+        // success: callers such as confirm_payment() / handle_callback() treat a
+        // successful verify as a captured payment and would otherwise mark the
+        // booking paid + completed before any money has arrived.
+        return [
+            'success' => false,
+            'status' => 'reserved',
+            'error' => __('Pay Later bookings are settled offline; there is no online payment to verify.', 'yatra'),
+        ];
     }
 
     /**

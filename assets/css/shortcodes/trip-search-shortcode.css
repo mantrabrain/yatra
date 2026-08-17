@@ -805,3 +805,139 @@ body .yatra-trip-search-shortcode .yatra-search-main-btn:focus {
         min-width: 100% !important;
     }
 }
+
+/* ---------------------------------------------------------------------------
+   Date field (optional, opt-in via Settings → Search & Listing → Date).
+   Mirrors the keyword segment so it sits inline with the other search fields.
+   Uses a native <input type="date"> for zero-dependency, mobile-friendly UX.
+--------------------------------------------------------------------------- */
+body .yatra-trip-search-shortcode .yatra-search-date-segment {
+    display: flex !important;
+    flex: 1;
+    align-items: stretch !important;
+    min-width: 150px;
+    max-width: 240px;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-date-inner {
+    display: flex !important;
+    flex-direction: row;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    min-height: var(--yatra-ts-row) !important;
+    padding: 8px 12px !important;
+    margin: 0 !important;
+    border: 1px solid transparent !important;
+    border-radius: calc(var(--yatra-ts-radius) - 6px) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-date-inner:hover {
+    background: #f8fafc !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-date-inner:focus-within {
+    background: #fafafa !important;
+    border-color: rgba(37, 99, 235, 0.28) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+    outline: none !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-date-leading {
+    display: flex !important;
+    flex-shrink: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 20px !important;
+    height: 20px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    color: #64748b !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-date-leading svg {
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+    max-width: none !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    vertical-align: middle !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-date-inner:focus-within .yatra-search-date-leading {
+    color: #2563eb !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-date-stack {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-date-stack .yatra-dropdown-label {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-date-input {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 1.3 !important;
+    color: var(--yatra-ts-text) !important;
+    font-family: inherit !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-date-input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-date-input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.55;
+    margin: 0;
+}
+
+body .yatra-trip-search-shortcode .yatra-search-date-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 0.9;
+}
+
+/* When flatpickr upgrades the native date input it becomes a read-only text
+   field opened by click; show a pointer cursor and keep the caret hidden. */
+body .yatra-trip-search-shortcode .yatra-search-date-input.flatpickr-input {
+    cursor: pointer !important;
+    caret-color: transparent !important;
+}
+
+/* Placeholder ("Any date") shown when no date is selected. Native type="date"
+   ignores placeholder, but flatpickr converts the field to a text input where
+   it renders — matching the muted placeholder styling of the keyword field. */
+body .yatra-trip-search-shortcode .yatra-search-date-input::placeholder {
+    color: #94a3b8 !important;
+    font-weight: 500 !important;
+    opacity: 1 !important;
+}

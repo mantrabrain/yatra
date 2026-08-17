@@ -482,7 +482,10 @@ class PaymentGatewayController extends BaseController
         }
 
         $cancelParam = esc_url_raw($request->get_param('cancel_url'));
-        $paymentData['cancel_url'] = $cancelParam ?: home_url('/book/?payment=cancelled&ref=' . ($paymentData['reference'] ?? $paymentData['booking_id']));
+        // Fall back to the booking-confirmation page (always a resolvable route) rather
+        // than `home_url('/book/?...')`, which 404s under a custom booking base/page.
+        $cancelReference = (string) ($paymentData['reference'] ?? $paymentData['booking_id']);
+        $paymentData['cancel_url'] = $cancelParam ?: add_query_arg('payment', 'cancelled', $this->getConfirmationUrl($cancelReference));
 
         if ($paymentData['amount'] <= 0) {
             return new WP_Error('invalid_amount', __('Invalid payment amount', 'yatra'), ['status' => 400]);
@@ -538,6 +541,20 @@ class PaymentGatewayController extends BaseController
         $gateway = $this->registry->get($gatewayId);
         if (!$gateway) {
             return new WP_Error('invalid_gateway', __('Gateway not found', 'yatra'), ['status' => 404]);
+        }
+
+        // Offline gateways (Bank Transfer, Pay Later) settle out of band and take
+        // no money at checkout. They must NEVER be auto-completed through this
+        // endpoint — doing so marks the booking paid + records a "completed"
+        // payment before any funds have arrived. Confirmation is a manual admin
+        // action once the operator sees the money. Guard here as well as in the
+        // gateways' verifyPayment() so a future offline gateway can't regress.
+        if ($gateway->isOffline()) {
+            return new WP_Error(
+                'offline_gateway_manual',
+                __('This payment method is settled manually and cannot be confirmed automatically.', 'yatra'),
+                ['status' => 400]
+            );
         }
 
         if ($bookingId <= 0 || $transactionId === '') {
@@ -647,8 +664,17 @@ class PaymentGatewayController extends BaseController
             exit;
         }
 
+        // Offline gateways never redirect here, and must never be auto-completed:
+        // they settle out of band and are confirmed manually by the operator.
+        // Bounce a spoofed `?status=success` callback to the confirmation page
+        // (still pending) rather than recording a payment that never happened.
+        if ($gateway->isOffline()) {
+            wp_redirect(yatra_get_booking_confirmation_url($bookingId > 0 ? (string) $bookingId : ''));
+            exit;
+        }
+
         // Get transaction ID from request (varies by gateway)
-        $transactionId = $request->get_param('refId') 
+        $transactionId = $request->get_param('refId')
             ?? $request->get_param('pidx') 
             ?? $request->get_param('transaction_id') 
             ?? '';
@@ -971,7 +997,9 @@ class PaymentGatewayController extends BaseController
             'status_class' => in_array(strtolower((string) ($payment->status ?? '')), ['paid', 'completed', 'success'], true) ? 'paid' : 'pending',
             'trip_title' => $trip->title ?? $payment->trip_title ?? __('Trip Booking', 'yatra'),
             'payment_method' => ucfirst($payment->gateway ?? $payment->payment_method ?? 'Online'),
-            'booking_ref' => $payment->booking_reference ?? $payment->booking_number ?? '',
+            // Booking-only fallback chain (never a payment identifier) so the
+            // invoice number always resolves to the booking reference.
+            'booking_ref' => $payment->booking_reference ?? $payment->booking_number ?? (string) ($payment->booking_id ?? ''),
             'travel_date' => $travelDate,
             'currency_symbol' => $currencySymbol,
             'amount' => yatra_format_price((float) ($payment->amount ?? 0), $currency, false),

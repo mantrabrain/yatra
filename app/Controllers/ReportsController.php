@@ -385,7 +385,7 @@ class ReportsController extends BaseController
             if ($tripTitle === '') {
                 continue;
             }
-            $cap = (int) ($d['max_capacity'] ?? $d['total_spots'] ?? 0);
+            $cap = $this->departureAvailabilityCapacity($d);
             $bkd = (int) ($d['booked_count'] ?? $d['travelers_count'] ?? 0);
             if (!isset($occupancyByTripTitle[$tripTitle])) {
                 $occupancyByTripTitle[$tripTitle] = ['booked' => 0, 'capacity' => 0];
@@ -465,11 +465,11 @@ class ReportsController extends BaseController
                     'trip'     => $d['trip']['title'] ?? ($d['trip_title'] ?? __('Unknown Trip', 'yatra')),
                     'date'     => $dateStr,
                     'booked'   => (int) ($d['booked_count'] ?? $d['travelers_count'] ?? 0),
-                    'capacity' => (int) ($d['max_capacity'] ?? $d['total_spots'] ?? 0),
+                    'capacity' => $this->departureAvailabilityCapacity($d),
                 ];
             }
 
-            $capacity = (int) ($d['max_capacity'] ?? $d['total_spots'] ?? 0);
+            $capacity = $this->departureAvailabilityCapacity($d);
             $booked = (int) ($d['booked_count'] ?? $d['travelers_count'] ?? 0);
             $totalCapacity += $capacity;
             $bookedCapacity += $booked;
@@ -726,7 +726,7 @@ class ReportsController extends BaseController
         foreach ($departures as $d) {
             $dateStr = $d['start_date'] ?? ($d['date'] ?? null);
             $tripTitle = $d['trip']['title'] ?? ($d['trip_title'] ?? __('Unknown Trip', 'yatra'));
-            $capacity = (int) ($d['max_capacity'] ?? $d['total_spots'] ?? 0);
+            $capacity = $this->departureAvailabilityCapacity($d);
             $booked   = (int) ($d['booked_count'] ?? $d['travelers_count'] ?? 0);
             $left     = $capacity > 0 ? max(0, $capacity - $booked) : 0;
             $status   = strtolower((string) ($d['status'] ?? 'upcoming'));
@@ -966,6 +966,50 @@ class ReportsController extends BaseController
                 'top_destinations'   => $topDestinations,
             ],
         ]);
+    }
+
+    /**
+     * Resolve a departure's capacity from the Availability configuration — the
+     * same authoritative source the Departures page and the /departures
+     * endpoint use (Availability date > recurring rule > the trip's
+     * max_travelers). The dashboard previously summed each departure's stored
+     * `max_capacity`, which could be a stale trip-settings value or a legacy
+     * "unlimited" default (e.g. 9999/11111), so its capacity and occupancy
+     * disagreed with the Departures page. Reading the live availability figure
+     * keeps them consistent.
+     *
+     * @param array<string,mixed> $d Departure row (from /departures)
+     */
+    private function departureAvailabilityCapacity(array $d): int
+    {
+        static $capacityService = null;
+        static $memo = [];
+        if ($capacityService === null && class_exists('\\Yatra\\Services\\CapacityService')) {
+            $capacityService = new \Yatra\Services\CapacityService();
+        }
+
+        $tripId = (int) ($d['trip_id'] ?? ($d['trip']['id'] ?? 0));
+        $date   = (string) ($d['start_date'] ?? ($d['date'] ?? ''));
+        $time   = isset($d['time']) ? (string) $d['time'] : '';
+        $stored = (int) ($d['max_capacity'] ?? $d['total_spots'] ?? 0);
+
+        // The same departure is read across several reporting loops, so memoise
+        // the resolution per (trip, date, time, stored) to avoid re-querying.
+        $key = $tripId . '|' . $date . '|' . $time . '|' . $stored;
+        if (isset($memo[$key])) {
+            return $memo[$key];
+        }
+
+        if ($capacityService !== null && $tripId > 0 && $date !== '') {
+            $cap = $capacityService->getCapacityForDate($tripId, $date, $time !== '' ? $time : null);
+            if ($cap > 0) {
+                return $memo[$key] = $cap;
+            }
+        }
+
+        // No availability/trip capacity resolved — fall back to the stored value,
+        // but drop the legacy "unlimited" sentinels that would inflate occupancy.
+        return $memo[$key] = ($stored >= 9999 ? 0 : $stored);
     }
 
     /**

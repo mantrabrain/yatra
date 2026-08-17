@@ -102,10 +102,23 @@ class DepartureRepository extends BaseRepository
         $where = ['1=1']; // Always true for base condition
         $params = [];
         
-        // Status filter
+        // Status filter. 'past' is date-derived (see Departure::calculateStatus),
+        // NOT the stored status column — that column is only kept current by the
+        // daily cron, so filtering status = 'past' hid every departure that had
+        // taken place whenever the cron had not run. Match 'past' by date instead;
+        // all other statuses (upcoming/full/cancelled/trash) use the stored value.
+        $statusIsPast = (!empty($filters['status']) && $filters['status'] === 'past');
         if (!empty($filters['status']) && $filters['status'] !== 'all') {
-            $where[] = 'status = %s';
-            $params[] = $filters['status'];
+            if ($statusIsPast) {
+                $where[] = "(
+                    (end_date IS NOT NULL AND end_date < CURDATE())
+                    OR (end_date IS NULL AND start_date IS NOT NULL AND start_date < CURDATE())
+                    OR (end_date IS NULL AND start_date IS NULL AND date < CURDATE())
+                )";
+            } else {
+                $where[] = 'status = %s';
+                $params[] = $filters['status'];
+            }
         }
         
         // Date range filter - simple approach
@@ -133,9 +146,11 @@ class DepartureRepository extends BaseRepository
             $params[] = $filters['source'];
         }
         
-        // Past/upcoming filter
+        // Past/upcoming filter. Never exclude past dates when the caller is asking
+        // for the 'past' status — that combination is contradictory and returned
+        // nothing (the exact reason completed departures vanished from the Past tab).
         if (isset($filters['include_past'])) {
-            if (!$filters['include_past']) {
+            if (!$filters['include_past'] && !$statusIsPast) {
                 $where[] = 'date >= CURDATE()';
             }
         }
@@ -200,10 +215,23 @@ class DepartureRepository extends BaseRepository
         $where = ['trip_id = %d'];
         $params = [$tripId];
         
-        // Status filter
+        // Status filter. 'past' is date-derived (see Departure::calculateStatus),
+        // NOT the stored status column — that column is only kept current by the
+        // daily cron, so filtering status = 'past' hid every departure that had
+        // taken place whenever the cron had not run. Match 'past' by date instead;
+        // all other statuses (upcoming/full/cancelled/trash) use the stored value.
+        $statusIsPast = (!empty($filters['status']) && $filters['status'] === 'past');
         if (!empty($filters['status']) && $filters['status'] !== 'all') {
-            $where[] = 'status = %s';
-            $params[] = $filters['status'];
+            if ($statusIsPast) {
+                $where[] = "(
+                    (end_date IS NOT NULL AND end_date < CURDATE())
+                    OR (end_date IS NULL AND start_date IS NOT NULL AND start_date < CURDATE())
+                    OR (end_date IS NULL AND start_date IS NULL AND date < CURDATE())
+                )";
+            } else {
+                $where[] = 'status = %s';
+                $params[] = $filters['status'];
+            }
         }
         
         // Date range filter - check both start_date and date columns
@@ -245,9 +273,11 @@ class DepartureRepository extends BaseRepository
             $params[] = $filters['source'];
         }
         
-        // Past/upcoming filter
+        // Past/upcoming filter. Never exclude past dates when the caller is asking
+        // for the 'past' status — that combination is contradictory and returned
+        // nothing (the exact reason completed departures vanished from the Past tab).
         if (isset($filters['include_past'])) {
-            if (!$filters['include_past']) {
+            if (!$filters['include_past'] && !$statusIsPast) {
                 $where[] = 'date >= CURDATE()';
             }
         }

@@ -28,6 +28,10 @@ $active_filters = [
     'activity' => isset($_GET['activity']) ? sanitize_text_field(wp_unslash((string) $_GET['activity'])) : '',
     'duration' => isset($_GET['duration']) ? sanitize_text_field(wp_unslash((string) $_GET['duration'])) : '',
     'budget' => isset($_GET['budget']) ? sanitize_text_field(wp_unslash((string) $_GET['budget'])) : '',
+    // Pre-fill the date picker from the URL, but only if it is a real Y-m-d date.
+    'available_date' => isset($_GET['available_date'])
+        ? \Yatra\Helpers\TripListingFilterBuilder::normalizeAvailableDate((string) wp_unslash($_GET['available_date']))
+        : '',
 ];
 
 $dur_initial_min = $dmin;
@@ -101,6 +105,8 @@ $show_destination = (bool) ($field_visibility['destination'] ?? true);
 $show_activities  = (bool) ($field_visibility['activities']  ?? true);
 $show_duration    = (bool) ($field_visibility['duration']    ?? true);
 $show_budget      = (bool) ($field_visibility['budget']      ?? true);
+$show_date        = (bool) ($field_visibility['date']        ?? false);
+$date_min         = current_time('Y-m-d');
 
 // Tracks whether a field has been rendered yet, so a divider is only emitted
 // BETWEEN visible fields (no leading/trailing/double dividers when some are off).
@@ -177,6 +183,33 @@ $yatra_search_rendered = false;
                             <?php else : ?>
                                 <div class="yatra-dropdown-option selected" data-value="" data-search-text=""><?php esc_html_e('All destinations', 'yatra'); ?></div>
                             <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <?php $yatra_search_rendered = true; endif; ?>
+
+                <?php if ($show_date) : ?>
+                <?php if ($yatra_search_rendered) : ?><div class="yatra-search-divider"></div><?php endif; ?>
+                <div class="yatra-search-date-segment">
+                    <label class="screen-reader-text" for="yatra-trip-search-date"><?php esc_html_e('Travel date', 'yatra'); ?></label>
+                    <div class="yatra-search-date-inner">
+                        <span class="yatra-search-date-leading" aria-hidden="true">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </span>
+                        <div class="yatra-search-date-stack">
+                            <span class="yatra-dropdown-label"><?php esc_html_e('Date', 'yatra'); ?></span>
+                            <input
+                                type="date"
+                                id="yatra-trip-search-date"
+                                name="available_date"
+                                class="yatra-search-date-input"
+                                autocomplete="off"
+                                placeholder="<?php esc_attr_e('Any date', 'yatra'); ?>"
+                                min="<?php echo esc_attr($date_min); ?>"
+                                value="<?php echo esc_attr($active_filters['available_date']); ?>"
+                            >
                         </div>
                     </div>
                 </div>

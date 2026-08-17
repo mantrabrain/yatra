@@ -232,6 +232,10 @@ class SettingsController extends BaseController
         'search_show_activities' => true,
         'search_show_duration' => true,
         'search_show_budget' => true,
+        // Date field is opt-in (default false) so updating the plugin never
+        // changes an existing site's search bar. Operators enable it to let
+        // customers find trips with a departure on a specific date.
+        'search_show_date' => false,
         'collapse_filters_on_mobile' => false,
 
         // Booking Page Settings
@@ -390,13 +394,21 @@ class SettingsController extends BaseController
         try {
             $settings = [];
             
-            // Get all settings from WordPress options table with yatra_ prefix
+            // Get all settings from WordPress options table with yatra_ prefix.
+            // A sentinel default is essential here: get_option() returns boolean
+            // false for a stored-false option just as it does for a missing one,
+            // so checking `=== false` would reset every saved-off boolean back to
+            // its default. That is exactly the "Show sold-out dates" bug — the
+            // storefront honoured the saved value (isEnabled coerces '' -> false)
+            // while the admin checkbox re-appeared enabled because this endpoint
+            // handed React the default (true) instead of the saved false.
+            $unset_sentinel = "\0__yatra_option_unset__\0";
             foreach ($this->default_settings as $key => $default_value) {
                 $option_name = 'yatra_' . $key;
-                $value = get_option($option_name, false);
-                
-                // Only use default if option doesn't exist (wasn't set by InstallerService)
-                if ($value === false) {
+                $value = get_option($option_name, $unset_sentinel);
+
+                // Only use default when the option truly does not exist.
+                if ($value === $unset_sentinel) {
                     $value = $default_value;
                 }
 
@@ -419,7 +431,16 @@ class SettingsController extends BaseController
                 if (is_array($default_value) && !is_array($value)) {
                     $value = [];
                 }
-                
+
+                // Boolean settings must round-trip to the admin as real booleans.
+                // update_option() stores false as '' and the object cache can
+                // return boolean false, so without this a disabled toggle would
+                // reach React as '' / false and the checkbox (checked unless the
+                // value is strictly !== false) would render enabled again.
+                if (is_bool($default_value)) {
+                    $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                }
+
                 $settings[$key] = $value;
             }
             

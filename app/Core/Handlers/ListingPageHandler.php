@@ -73,6 +73,7 @@ class ListingPageHandler extends BasePageHandler
                 'duration_min' => $_GET['duration_min'] ?? '',
                 'duration_max' => $_GET['duration_max'] ?? '',
                 'duration' => $_GET['duration'] ?? '',
+                'available_date' => $_GET['available_date'] ?? '',
                 'rating_min' => $_GET['rating_min'] ?? '',
                 'rating' => $_GET['rating'] ?? [],
                 'difficulty' => $_GET['difficulty'] ?? [],

@@ -242,7 +242,22 @@ class TripAvailabilityController extends BaseController
                         $departureRepo->update($d->id, ['max_capacity' => $correctCapacity]);
                         $d->max_capacity = $correctCapacity;
                     }
-                    
+
+                    // Promote a departure that has taken place to 'past' so a
+                    // completed departure is never shown with (or hidden behind) a
+                    // stale 'upcoming'/'full' status — the daily cron may not have
+                    // run. Cancelled/trashed departures are left as-is. This keeps
+                    // the status badge and the tab counts date-accurate.
+                    if (!in_array($d->status, ['cancelled', 'trash', 'past'], true)) {
+                        $checkDate = (!empty($d->end_date) && $d->end_date !== '0000-00-00')
+                            ? $d->end_date
+                            : ((!empty($d->start_date) && $d->start_date !== '0000-00-00') ? $d->start_date : $d->date);
+                        if (!empty($checkDate) && $checkDate < date('Y-m-d')) {
+                            $departureRepo->update($d->id, ['status' => 'past']);
+                            $d->status = 'past';
+                        }
+                    }
+
                     $departureArray = $d->toArray();
                     
                     // Add trip information
@@ -626,7 +641,22 @@ class TripAvailabilityController extends BaseController
                     $departureRepo->update($d->id, ['max_capacity' => $correctCapacity]);
                     $d->max_capacity = $correctCapacity;
                 }
-                
+
+                // Promote a departure that has taken place to 'past' so a completed
+                // departure is never shown with (or hidden behind) a stale
+                // 'upcoming'/'full' status — the daily cron may not have run.
+                // Cancelled/trashed departures are left as-is. Keeps the status
+                // badge and the dashboard/tab counts date-accurate.
+                if (!in_array($d->status, ['cancelled', 'trash', 'past'], true)) {
+                    $checkDate = (!empty($d->end_date) && $d->end_date !== '0000-00-00')
+                        ? $d->end_date
+                        : ((!empty($d->start_date) && $d->start_date !== '0000-00-00') ? $d->start_date : $d->date);
+                    if (!empty($checkDate) && $checkDate < date('Y-m-d')) {
+                        $departureRepo->update($d->id, ['status' => 'past']);
+                        $d->status = 'past';
+                    }
+                }
+
                 $departureArray = $d->toArray();
                 
                 // Add trip information

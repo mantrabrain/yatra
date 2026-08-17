@@ -206,7 +206,12 @@ if (typeof window.yatraNumOr !== 'function') {
 
       const num = Number(amount) || 0;
 
-      const formatted = new Intl.NumberFormat(undefined, {
+      // Format with a FIXED 'en-US' base (grouping ',', decimal '.') so the
+      // replace-with-configured-separators below is deterministic. With the
+      // viewer's locale (undefined), a European browser already yields
+      // '1.234,56' and the naive comma/dot replacement SWAPS the separators —
+      // making the configured decimal separator appear ignored.
+      const formatted = new Intl.NumberFormat('en-US', {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals,
       }).format(num)

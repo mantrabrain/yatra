@@ -34,6 +34,7 @@ class SearchShortcode extends BaseShortcode
             'activities' => '',
             'duration' => '',
             'budget' => '',
+            'date' => '',
         ]);
 
         // [yatra_search] may appear in posts, widgets, builders, FSE templates, or do_shortcode()
@@ -67,6 +68,33 @@ class SearchShortcode extends BaseShortcode
             $tripSearchCssVer
         );
 
+        // When the date field is enabled, load the same flatpickr library the
+        // checkout/booking page uses, so the search date field gets the styled
+        // calendar instead of the browser's native one. Gated on the global
+        // toggle so the extra CSS/JS only ships where the field is actually
+        // used; the search JS self-guards on `typeof flatpickr`, so a per-
+        // placement [yatra_search date="yes"] override still falls back safely
+        // to the native input when flatpickr is not present. Shared 'yatra-
+        // flatpickr' handle → WordPress de-dupes if another component enqueues
+        // it too.
+        $searchJsDeps = ['jquery'];
+        if (\Yatra\Services\SettingsService::isEnabled('search_show_date')) {
+            wp_enqueue_style(
+                'yatra-flatpickr',
+                'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
+                [],
+                YATRA_VERSION
+            );
+            wp_enqueue_script(
+                'yatra-flatpickr',
+                'https://cdn.jsdelivr.net/npm/flatpickr',
+                [],
+                YATRA_VERSION,
+                true
+            );
+            $searchJsDeps[] = 'yatra-flatpickr';
+        }
+
         $tripSearchJsPath = YATRA_PLUGIN_PATH . 'assets/js/trip-search-shortcode.js';
         $tripSearchJsVer = is_readable($tripSearchJsPath)
             ? (string) filemtime($tripSearchJsPath)
@@ -74,7 +102,7 @@ class SearchShortcode extends BaseShortcode
         wp_enqueue_script(
             'yatra-trip-search-shortcode',
             YATRA_PLUGIN_URL . 'assets/js/trip-search-shortcode.js',
-            ['jquery'],
+            $searchJsDeps,
             $tripSearchJsVer,
             true
         );
@@ -159,6 +187,7 @@ class SearchShortcode extends BaseShortcode
             'activities'  => $resolve($atts['activities'] ?? '', 'search_show_activities'),
             'duration'    => $resolve($atts['duration'] ?? '', 'search_show_duration'),
             'budget'      => $resolve($atts['budget'] ?? '', 'search_show_budget'),
+            'date'        => $resolve($atts['date'] ?? '', 'search_show_date'),
         ];
     }
 }

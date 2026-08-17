@@ -188,6 +188,10 @@ class SettingsService
         'search_show_activities' => true,
         'search_show_duration' => true,
         'search_show_budget' => true,
+        // Opt-in (default false): show a date field that filters trips to those
+        // with a departure on the selected date. Off by default so existing
+        // search bars are unchanged on update.
+        'search_show_date' => false,
         // Collapse the listing filter sidebar sections on mobile. Default false
         // = today's behaviour (all sections expanded on every viewport), so an
         // existing site sees no change on update until the owner opts in.

@@ -190,6 +190,16 @@ class TripListingService extends BaseService
             }
         }
 
+        // Availability date: keep only a valid Y-m-d calendar date. Trips are
+        // then filtered to those with a departure on that date (see
+        // TripRepository::findWithFilters).
+        if (!empty($params['available_date']) && is_string($params['available_date'])) {
+            $date = \Yatra\Helpers\TripListingFilterBuilder::normalizeAvailableDate($params['available_date']);
+            if ($date !== '') {
+                $filters['available_date'] = $date;
+            }
+        }
+
         // Horizontal search "budget" presets (min-max or min+) → price range when explicit prices not set
         if (
             empty($filters['price_min']) && empty($filters['price_max'])

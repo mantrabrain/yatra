@@ -198,7 +198,10 @@ class PayPalGateway extends AbstractPaymentGateway
             $reference
         );
         $returnUrl = $paymentData['return_url'] ?? yatra_get_booking_confirmation_url((string) $reference);
-        $cancelUrl = $paymentData['cancel_url'] ?? home_url('/book/?payment=cancelled&ref=' . $reference);
+        // Cancel returns must land on the booking-confirmation page (a route that always
+        // resolves). The legacy `home_url('/book/?...')` 404s whenever the booking base is
+        // customised or a custom booking page is used — see RouteMatcher::matchBookingRoute().
+        $cancelUrl = $paymentData['cancel_url'] ?? add_query_arg('payment', 'cancelled', yatra_get_booking_confirmation_url((string) $reference));
 
         // PayPal Standard base URL
         $isTestMode = \Yatra\Services\SettingsService::isPaymentTestMode();
@@ -256,7 +259,9 @@ class PayPalGateway extends AbstractPaymentGateway
         $bookingId = $paymentData['booking_id'] ?? 0;
         $referenceForReturn = (string) ($paymentData['reference'] ?? $bookingId);
         $returnUrl = $paymentData['return_url'] ?? yatra_get_booking_confirmation_url($referenceForReturn);
-        $cancelUrl = $paymentData['cancel_url'] ?? home_url('/book/?payment=cancelled');
+        // Cancel returns must land on the booking-confirmation page (always resolvable);
+        // the legacy `home_url('/book/?...')` 404s under a custom booking base/page.
+        $cancelUrl = $paymentData['cancel_url'] ?? add_query_arg('payment', 'cancelled', yatra_get_booking_confirmation_url($referenceForReturn));
         $savePayment = !empty($paymentData['save_payment']);
 
         $orderData = [

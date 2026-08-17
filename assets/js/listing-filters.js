@@ -833,7 +833,7 @@
         // Remove all filter parameters (both single and array formats)
         const filterParams = ['price_min', 'price_max', 'trip_type', 'difficulty', 'categories', 'destinations',
             'activities', 'accommodation', 'services', 'offers', 'booking', 'age', 'rating', 'page', 'paged', 's',
-            'destination', 'activity', 'category', 'duration', 'sort', 'budget'];
+            'destination', 'activity', 'category', 'duration', 'available_date', 'sort', 'budget'];
         
         filterParams.forEach(function(param) {
             url.searchParams.delete(param);

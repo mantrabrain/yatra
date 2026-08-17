@@ -268,6 +268,11 @@ jQuery(document).ready(function() {
             }
         }
 
+        var dateInput = document.querySelector('.yatra-search-date-input');
+        if (dateInput && dateInput.value && /^\d{4}-\d{2}-\d{2}$/.test(dateInput.value)) {
+            filters.available_date = dateInput.value;
+        }
+
         var listing = getListingUrl();
         var url;
         try {
@@ -306,7 +311,33 @@ jQuery(document).ready(function() {
         }
     }
 
+    // Upgrade the native date field to the same flatpickr picker used on the
+    // checkout/booking page, for a consistent, styled calendar. Fully guarded:
+    // with no flatpickr (or on mobile, where the native picker is already good)
+    // the native <input type="date"> is left working untouched. The submitted
+    // value stays ISO (Y-m-d) so the search URL and back-end are unchanged.
+    function initTripSearchDatePicker() {
+        var input = document.querySelector('.yatra-search-date-input');
+        if (!input || input.dataset.yatraFp === '1') return;
+        if (typeof window.flatpickr === 'undefined') return;
+        var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || '');
+        if (isMobile) return; // native mobile date UI is already good; leave it
+        input.dataset.yatraFp = '1';
+        // Switch off the native date UI so flatpickr is the only picker; the
+        // value stays ISO (Y-m-d) via dateFormat, so runTripSearch() and the
+        // back-end see the same format as before.
+        try { input.type = 'text'; } catch (e) {}
+        window.flatpickr(input, {
+            dateFormat: 'Y-m-d',
+            minDate: input.getAttribute('min') || 'today',
+            defaultDate: input.value || null,
+            allowInput: false,
+            disableMobile: true
+        });
+    }
+
     initHorizontalSearchDropdowns();
     initDurationSlider();
     initSearchFunctionality();
+    initTripSearchDatePicker();
 });

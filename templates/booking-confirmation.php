@@ -44,6 +44,13 @@ $booking_amount_due = (float) ($booking->amount_due ?? 0);
 $booking_is_fully_paid = $booking_payment_status === 'paid' || $booking_amount_due <= 0.01;
 $show_balance_paid_banner = $is_balance_paid_request && $booking_is_fully_paid;
 
+// A gateway may redirect back here with `?payment=cancelled` (user aborted the
+// payment at the provider) or `?payment=failed`. Show an informative notice only
+// when the booking is not already fully paid, so a genuinely-paid booking that
+// happens to carry a stale query arg never shows a misleading "cancelled" message.
+$payment_result_flag = isset($_GET['payment']) ? sanitize_key((string) $_GET['payment']) : '';
+$show_payment_cancelled_notice = in_array($payment_result_flag, ['cancelled', 'failed'], true) && !$booking_is_fully_paid;
+
 // Resolve the most recent gateway used on this booking.
 // `$booking->payment_gateway` is the *initial* method chosen at booking time
 // (e.g. Pay Later), which is misleading when the customer later settled the
@@ -173,6 +180,24 @@ do_action('yatra_booking_confirmation_header', $booking);
             </div>
         <?php endif; ?>
 
+        <?php if ($show_payment_cancelled_notice) : ?>
+            <div class="yatra-payment-cancelled-banner" role="status" aria-live="polite" style="margin: 16px 0; padding: 14px 18px; background: #fef3c7; border: 1px solid #fcd34d; border-left: 4px solid #d97706; border-radius: 8px; color: #92400e; display: flex; gap: 12px; align-items: flex-start;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex: 0 0 22px; width: 22px; height: 22px; margin-top: 1px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <div style="flex: 1; line-height: 1.45;">
+                    <strong style="display: block; margin-bottom: 2px;">
+                        <?php esc_html_e('Payment not completed.', 'yatra'); ?>
+                    </strong>
+                    <span>
+                        <?php esc_html_e('Your payment was cancelled and no charge was made. Your booking has been saved — you can complete payment anytime from your account.', 'yatra'); ?>
+                    </span>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <?php
         // Resolve featured image URL (handle attachment ID or direct URL).
         // Falls back to the bundled trip-placeholder.svg so the confirmation
@@ -210,6 +235,26 @@ do_action('yatra_booking_confirmation_header', $booking);
                         <h2 class="yatra-trip-name"><?php echo esc_html($booking->trip_title); ?></h2>
 
                         <?php if (!empty($booking->trip_average_rating) && $booking->trip_review_count >= 0) : ?>
+                        <?php
+                        // The confirmation page isn't a "booking page" (it has its
+                        // own route), so booking.css — which colours the rating
+                        // stars amber — is never enqueued here and the filled stars
+                        // fell back to the grey base colour. The rest of this page
+                        // is inline-styled, so rather than loading the whole
+                        // stylesheet (and risk restyling it) the rating rules are
+                        // scoped inline here, mirroring assets/css/booking.css.
+                        ?>
+                        <style>
+                        .yatra-trip-rating{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+                        .yatra-rating-stars{display:inline-flex;gap:4px}
+                        .yatra-star{width:20px;height:20px;color:#e2e8f0}
+                        .yatra-star svg{width:100%;height:100%}
+                        .yatra-star-filled{color:#f59e0b}
+                        .yatra-star-half{position:relative;color:#e2e8f0}
+                        .yatra-star-half::after{content:"";position:absolute;top:0;left:0;bottom:0;width:50%;overflow:hidden;background:#f59e0b;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpolygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26'/%3E%3C/svg%3E") no-repeat left center / 200% 100%;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpolygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26'/%3E%3C/svg%3E") no-repeat left center / 200% 100%}
+                        .yatra-rating-meta strong{color:#0f172a;margin-right:6px}
+                        .yatra-rating-meta span{color:#64748b;font-size:14px}
+                        </style>
                         <div class="yatra-trip-rating">
                             <div class="yatra-rating-stars">
                                 <?php

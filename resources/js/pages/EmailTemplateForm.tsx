@@ -134,6 +134,7 @@ const EmailTemplateForm: React.FC = () => {
     reply_to: "",
     bcc: "",
     cc: "",
+    category: "booking",
     subject: "",
     body: "",
     event_key: "",
@@ -241,6 +242,7 @@ const EmailTemplateForm: React.FC = () => {
       reply_to: String(t.reply_to ?? ""),
       bcc: String(t.bcc ?? ""),
       cc: String(t.cc ?? ""),
+      category: String(t.category ?? "booking"),
       subject: String(t.subject ?? ""),
       body: String(t.body ?? ""),
       event_key: String(t.event_key ?? ""),
@@ -264,6 +266,7 @@ const EmailTemplateForm: React.FC = () => {
       reply_to: "",
       bcc: String(s[coreAddressKey(subj, "bcc") ?? ""] ?? ""),
       cc: String(s[coreAddressKey(subj, "cc") ?? ""] ?? ""),
+      category: String(coreDef.category ?? "booking"),
       subject: String(s[subj] ?? ""),
       body: String(s[bodyKey] ?? ""),
       event_key: coreDef.event_key,
@@ -977,6 +980,40 @@ const EmailTemplateForm: React.FC = () => {
                       </p>
                     </div>
                   </div>
+
+                  {/* Category — lets the operator classify the template (e.g.
+                      Payment) instead of it always defaulting to Booking. The
+                      recipient (Customer/Admin) is derived server-side from the
+                      To address ({{admin_email}} => admin). Locked for core/
+                      system templates whose category is fixed. */}
+                  {!isCoreSettingsEdit && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        {__("Category")}
+                      </label>
+                      <select
+                        aria-label={__("Category")}
+                        value={formData.category || "booking"}
+                        onChange={(e) =>
+                          setFormData({ ...formData, category: e.target.value })
+                        }
+                        disabled={isCoreViewMode || isSystemTemplate}
+                        className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white disabled:opacity-60"
+                      >
+                        <option value="booking">{__("Booking")}</option>
+                        <option value="payment">{__("Payment")}</option>
+                        <option value="reminder">{__("Reminder")}</option>
+                        <option value="enquiry">{__("Enquiry")}</option>
+                        <option value="account">{__("Account")}</option>
+                        <option value="marketing">{__("Marketing")}</option>
+                      </select>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {__(
+                          "How this template is grouped in the list. Recipient (Customer/Admin) follows the To address.",
+                        )}
+                      </p>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>

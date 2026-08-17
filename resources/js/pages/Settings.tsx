@@ -853,6 +853,7 @@ interface SettingsData {
   search_show_activities: boolean;
   search_show_duration: boolean;
   search_show_budget: boolean;
+  search_show_date: boolean;
   collapse_filters_on_mobile: boolean;
 
   // Booking Settings
@@ -2734,6 +2735,7 @@ const Settings: React.FC = () => {
       search_show_activities: true,
       search_show_duration: true,
       search_show_budget: true,
+      search_show_date: false,
       collapse_filters_on_mobile: false,
       booking_confirmation: true,
       auto_confirm_bookings: false,
@@ -5806,6 +5808,14 @@ const Settings: React.FC = () => {
                     label: __("Budget", "yatra"),
                     description: __(
                       "Dropdown to filter trips by price range.",
+                      "yatra",
+                    ),
+                  },
+                  {
+                    key: "search_show_date" as const,
+                    label: __("Date", "yatra"),
+                    description: __(
+                      "Date picker to find trips with a departure on a specific date.",
                       "yatra",
                     ),
                   },

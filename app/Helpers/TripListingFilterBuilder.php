@@ -155,10 +155,41 @@ final class TripListingFilterBuilder
             $filters['duration_max'] = (int) $durMax;
         }
 
+        $availableDate = self::normalizeAvailableDate((string) ($atts['available_date'] ?? ''));
+        if ($availableDate !== '') {
+            $filters['available_date'] = $availableDate;
+        }
+
         $order = \strtolower((string) ($atts['order'] ?? 'desc'));
         $filters['sort'] = $order === 'asc' ? 'date_asc' : '';
 
         return $filters;
+    }
+
+    /**
+     * Normalise an availability-date input to a strict Y-m-d calendar date.
+     *
+     * Returns '' for anything that is not a real Y-m-d date, so callers can
+     * safely skip the filter (and it never reaches SQL as a malformed value).
+     *
+     * @param string $raw
+     * @return string Valid 'Y-m-d' date, or '' when invalid/empty.
+     */
+    public static function normalizeAvailableDate(string $raw): string
+    {
+        $raw = \trim($raw);
+        if ($raw === '') {
+            return '';
+        }
+
+        $dt = \DateTime::createFromFormat('Y-m-d', $raw);
+        // createFromFormat is lenient (e.g. accepts 2026-13-40 by rolling over),
+        // so round-trip the formatted value to reject anything not exactly Y-m-d.
+        if ($dt instanceof \DateTime && $dt->format('Y-m-d') === $raw) {
+            return $raw;
+        }
+
+        return '';
     }
 
     /**

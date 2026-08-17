@@ -327,11 +327,18 @@ const Departures: React.FC = () => {
           search: searchTerm || undefined,
           date_from: dateFrom && dateFrom.trim() !== "" ? dateFrom : undefined,
           date_to: dateTo && dateTo.trim() !== "" ? dateTo : undefined,
+          // Include past-dated departures for every tab except the inherently
+          // future ones (upcoming/full). Without this, the Past / All /
+          // Cancelled / Trash tabs excluded completed departures entirely
+          // (date >= today), so they vanished from the list. A date range
+          // always includes past.
           include_past:
-            (dateFrom && dateFrom.trim() !== "") ||
-            (dateTo && dateTo.trim() !== "")
-              ? "true"
-              : "false",
+            statusFilter === "upcoming" || statusFilter === "full"
+              ? (dateFrom && dateFrom.trim() !== "") ||
+                (dateTo && dateTo.trim() !== "")
+                ? "true"
+                : "false"
+              : "true",
           page: page,
           per_page: 20,
         },
@@ -393,11 +400,9 @@ const Departures: React.FC = () => {
           search: searchTerm || undefined,
           date_from: dateFrom && dateFrom.trim() !== "" ? dateFrom : undefined,
           date_to: dateTo && dateTo.trim() !== "" ? dateTo : undefined,
-          include_past:
-            (dateFrom && dateFrom.trim() !== "") ||
-            (dateTo && dateTo.trim() !== "")
-              ? "true"
-              : "false",
+          // Always include past so the per-status tab counts (especially Past)
+          // reflect completed departures, not only upcoming ones.
+          include_past: "true",
           page: 1,
           per_page: 1000,
         },
@@ -480,8 +485,28 @@ const Departures: React.FC = () => {
       return;
     }
 
-    if (!selectedTripId) {
-      showToast(__("Please select a trip first", "yatra"), "error");
+    // Resolve each departure's trip id from its OWN row (every /departures row
+    // carries trip_id), falling back to the active trip filter. Bulk actions
+    // used to require a single selected trip and errored with "Please select a
+    // trip first" in the all-trips view — making bulk delete impossible unless a
+    // trip filter was active, even though single-row delete already used the
+    // row's trip id. This makes bulk work everywhere single actions do.
+    const resolveTid = (d: Departure): number | null =>
+      d.trip_id > 0
+        ? d.trip_id
+        : selectedTripId != null && selectedTripId > 0
+          ? selectedTripId
+          : null;
+
+    const selectedDepartures = departures.filter(
+      (d) => ids.includes(d.id) && resolveTid(d) != null,
+    );
+
+    if (selectedDepartures.length === 0) {
+      showToast(
+        __("Could not resolve the tour for the selected departures.", "yatra"),
+        "error",
+      );
       return;
     }
 
@@ -489,8 +514,8 @@ const Departures: React.FC = () => {
       if (bulkAction === "trash") {
         // Move to trash
         await Promise.all(
-          ids.map((id) =>
-            apiClient.patch(`/trips/${selectedTripId}/departures/${id}`, {
+          selectedDepartures.map((d) =>
+            apiClient.patch(`/trips/${resolveTid(d)}/departures/${d.id}`, {
               status: "trash",
             }),
           ),
@@ -502,8 +527,8 @@ const Departures: React.FC = () => {
       } else if (bulkAction === "restore") {
         // Restore from trash
         await Promise.all(
-          ids.map((id) =>
-            apiClient.patch(`/trips/${selectedTripId}/departures/${id}`, {
+          selectedDepartures.map((d) =>
+            apiClient.patch(`/trips/${resolveTid(d)}/departures/${d.id}`, {
               status: "upcoming",
             }),
           ),
@@ -517,11 +542,11 @@ const Departures: React.FC = () => {
         // drift upwards and the server checks the real booking rows, so filtering
         // on it client-side silently dropped departures the server would happily
         // delete.
-        const eligibleIds = departures
-          .filter((d) => ids.includes(d.id) && d.status === "trash")
-          .map((d) => d.id);
+        const eligible = selectedDepartures.filter(
+          (d) => d.status === "trash",
+        );
 
-        if (eligibleIds.length === 0) {
+        if (eligible.length === 0) {
           showToast(
             __(
               "No selected departures can be deleted. Only departures in the trash can be removed.",
@@ -536,8 +561,8 @@ const Departures: React.FC = () => {
         // individual departure (for example one that regained a booking), and
         // Promise.all would have hidden the successes behind that one rejection.
         const results = await Promise.allSettled(
-          eligibleIds.map((id) =>
-            apiClient.delete(`/trips/${selectedTripId}/departures/${id}`),
+          eligible.map((d) =>
+            apiClient.delete(`/trips/${resolveTid(d)}/departures/${d.id}`),
           ),
         );
         const deleted = results.filter((r) => r.status === "fulfilled").length;

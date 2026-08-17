@@ -2864,9 +2864,13 @@ class BookingSessionController extends BaseController
             // (e.g. PayPal Advanced, Mollie, Paystack) do not fall back to wrong paths; gateways
             // may still append their own query args on top of this URL.
             $ref = isset($params['reference']) ? trim((string) $params['reference']) : '';
+            // Cancel returns must land on the booking-confirmation page (always resolvable);
+            // `home_url('/book/?...')` 404s under a custom booking base/page. Use the reference,
+            // falling back to the booking id so the confirmation route always has a token.
+            $cancelRef = $ref !== '' ? $ref : (string) ($params['booking_id'] ?? '');
             $paymentData = array_merge($params, [
                 'description' => $params['trip_title'] ?? '',
-                'cancel_url' => home_url('/book/?payment=cancelled&ref=' . ($params['reference'] ?? '')),
+                'cancel_url' => add_query_arg('payment', 'cancelled', $this->getConfirmationUrl($cancelRef)),
                 'metadata' => [
                     'booking_id' => $params['booking_id'],
                     'reference' => $params['reference'] ?? ''
@@ -3161,7 +3165,7 @@ class BookingSessionController extends BaseController
                     ]],
                     'application_context' => [
                         'return_url' => add_query_arg('payment', 'success', $this->getConfirmationUrl($params['reference'])),
-                        'cancel_url' => home_url('/book/?payment=cancelled&ref=' . $params['reference']),
+                        'cancel_url' => add_query_arg('payment', 'cancelled', $this->getConfirmationUrl($params['reference'])),
                     ],
                 ]),
             ]);
@@ -3282,7 +3286,10 @@ class BookingSessionController extends BaseController
                 ['payment' => 'success', 'gateway' => 'esewa'],
                 $this->getConfirmationUrl($params['reference'])
             ),
-            'fu' => home_url('/book/?payment=failed&ref=' . $params['reference']),
+            'fu' => add_query_arg(
+                ['payment' => 'failed', 'gateway' => 'esewa'],
+                $this->getConfirmationUrl($params['reference'])
+            ),
         ], $base_url);
         
         return ['success' => true, 'payment_url' => $payment_url];
